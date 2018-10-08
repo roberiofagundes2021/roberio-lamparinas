@@ -6,7 +6,7 @@
 				<a href="#" class="sidebar-mobile-main-toggle">
 					<i class="icon-arrow-left8"></i>
 				</a>
-				<span class="font-weight-semibold">Main sidebar</span>
+				<span class="font-weight-semibold">Menu</span>
 				<a href="#" class="sidebar-mobile-expand">
 					<i class="icon-screen-full"></i>
 					<i class="icon-screen-normal"></i>
@@ -20,20 +20,21 @@
 				<div class="card card-sidebar-mobile">
 
 					<!-- Header -->
-					<div class="card-header header-elements-inline">
+					<!--<div class="card-header header-elements-inline">
 						<h6 class="card-title">Navigation</h6>
 						<div class="header-elements">
 							<div class="list-icons">
 								<a class="list-icons-item" data-action="collapse"></a>
 							</div>
 						</div>
-					</div>
+					</div> -->
 					
 					<!-- User menu -->
 					<div class="sidebar-user">
 						<div class="card-body">
 							<div class="media">
-								<div class="mr-3">
+								<a href="index.php"><img src="global_assets/images/lamparinas/logo-lamparinas.jpg" width="220" height="220" alt=""></a>
+								<!--<div class="mr-3">
 									<a href="#"><img src="global_assets/images/placeholders/placeholder.jpg" width="38" height="38" class="rounded-circle" alt=""></a>
 								</div>
 
@@ -46,7 +47,7 @@
 
 								<div class="ml-3 align-self-center">
 									<a href="#" class="text-white"><i class="icon-cog3"></i></a>
-								</div>
+								</div> -->
 							</div>
 						</div>
 					</div>

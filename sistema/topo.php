@@ -1,11 +1,38 @@
 	<!-- Main navbar -->
 	<div class="navbar navbar-expand-md navbar-dark fixed-top">
-		<div class="navbar-brand wmin-200">
-			<a href="index.html" class="d-inline-block">
+		<div class="navbar-nav">  <!-- CV: class="navbar-brand wmin-200" -->
+			<span style="color:#fff; margin-top: 13px; font-size: 15px;">Painel Principal</span>
+			<!--<a href="index.html" class="d-inline-block">
 				<img src="global_assets/images/logo_light.png" alt="">
-			</a>
+			</a>-->
 		</div>
-
+		<ul class="navbar-nav">
+			<li class="nav-item dropdown">
+				<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">
+					<i class="icon-circle-down2"></i>
+					<span class="d-md-none ml-2">Módulos</span>
+					<!--<span class="badge badge-pill badge-mark bg-orange-400 border-orange-400 ml-auto ml-md-0"></span>-->
+				</a>
+				
+				<div class="dropdown-menu dropdown-menu-content wmin-md-350">				
+					<div class="dropdown-content-body dropdown-scrollable">
+						<ul class="media-list">
+							<li class="media">
+								<span style="margin-top: 3px; font-size: 15px;">Painel Principal</span>
+							</li>						
+							<li class="media">
+								<span style="margin-top: 3px; font-size: 15px;">Controle de Estoque</span>
+							</li>
+							<li class="media">
+								<span style="margin-top: 3px; font-size: 15px;">Financeiro</span>
+							</li>
+							<li class="media">
+								<span style="margin-top: 3px; font-size: 15px;">RH</span>
+							</li>
+				</div>
+			</li>
+		</ul>
+		
 		<div class="d-md-none">
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-mobile">
 				<i class="icon-tree5"></i>
@@ -22,17 +49,24 @@
 						<i class="icon-paragraph-justify3"></i>
 					</a>
 				</li>
+			</ul>
 
+			<span class="navbar-text ml-md-auto mr-md-3">
+				<span class="badge bg-success-400">Prefeitura de Guanambi</span>
+			</span>
+
+			<ul class="navbar-nav">
+				
 				<li class="nav-item dropdown">
 					<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">
 						<i class="icon-bell2"></i>
-						<span class="d-md-none ml-2">Activity</span>
+						<span class="d-md-none ml-2">Atividades</span>
 						<span class="badge badge-pill badge-mark bg-orange-400 border-orange-400 ml-auto ml-md-0"></span>
 					</a>
 					
-					<div class="dropdown-menu dropdown-content wmin-md-350">
+					<div class="dropdown-menu dropdown-menu-right wmin-md-350">
 						<div class="dropdown-content-header">
-							<span class="font-weight-semibold">Latest activity</span>
+							<span class="font-weight-semibold">Últimas atividades</span>
 							<a href="#" class="text-default"><i class="icon-search4 font-size-base"></i></a>
 						</div>
 
@@ -107,7 +141,7 @@
 						</div>
 
 						<div class="dropdown-content-footer bg-light">
-							<a href="#" class="text-grey mr-auto">All activity</a>
+							<a href="#" class="text-grey mr-auto">Todas atividades</a>
 							<div>
 								<a href="#" class="text-grey" data-popup="tooltip" title="Clear list"><i class="icon-checkmark3"></i></a>
 								<a href="#" class="text-grey ml-2" data-popup="tooltip" title="Settings"><i class="icon-gear"></i></a>
@@ -115,14 +149,9 @@
 						</div>
 					</div>
 				</li>
-			</ul>
-
-			<span class="navbar-text ml-md-auto mr-md-3">
-				<span class="badge bg-success-400">Active</span>
-			</span>
-
-			<ul class="navbar-nav">
-				<li class="nav-item dropdown">
+				
+				
+				<!--<li class="nav-item dropdown">
 					<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">
 						<i class="icon-bubbles5"></i>
 						<span class="d-md-none ml-2">Messages</span>
@@ -225,7 +254,7 @@
 							<a href="#" class="bg-light text-grey w-100 py-2" data-popup="tooltip" title="Load more"><i class="icon-menu7 d-block top-0"></i></a>
 						</div>
 					</div>
-				</li>
+				</li>-->
 
 				<li class="nav-item dropdown dropdown-user">
 					<a href="#" class="navbar-nav-link dropdown-toggle" data-toggle="dropdown">
@@ -234,12 +263,12 @@
 					</a>
 
 					<div class="dropdown-menu dropdown-menu-right">
-						<a href="#" class="dropdown-item"><i class="icon-user-plus"></i> My profile</a>
-						<a href="#" class="dropdown-item"><i class="icon-coins"></i> My balance</a>
-						<a href="#" class="dropdown-item"><i class="icon-comment-discussion"></i> Messages <span class="badge badge-pill bg-blue ml-auto">58</span></a>
+						<a href="#" class="dropdown-item"><i class="icon-user-plus"></i> Minha conta</a>
+						<!--<a href="#" class="dropdown-item"><i class="icon-coins"></i> My balance</a>-->
+						<!--<a href="#" class="dropdown-item"><i class="icon-comment-discussion"></i> Messages <span class="badge badge-pill bg-blue ml-auto">58</span></a>-->
 						<div class="dropdown-divider"></div>
-						<a href="#" class="dropdown-item"><i class="icon-cog5"></i> Account settings</a>
-						<a href="#" class="dropdown-item"><i class="icon-switch2"></i> Logout</a>
+						<a href="#" class="dropdown-item"><i class="icon-cog5"></i> Configurações da Conta</a>
+						<a href="#" class="dropdown-item"><i class="icon-switch2"></i> Sair</a>
 					</div>
 				</li>
 			</ul>

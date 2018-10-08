@@ -7,6 +7,8 @@
 	<title>Lamparinas | Home</title>
 
 	<?php include_once("head.php"); ?>
+	
+	<?php include_once("acesso.php"); ?>
 
 </head>
 
