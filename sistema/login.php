@@ -23,15 +23,22 @@
 	<!-- /core JS files -->
 
 	<!-- Theme JS files -->
+<!--	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script> -->
+	
+	<!-- Theme JS files -->
 	<script src="layout_1/LTR/default/full/assets/js/app.js"></script>
+<!--	<script src="global_assets/js/demo_pages/login_validation.js"></script> -->
 	<!-- /theme JS files -->
-
+	
+<!--	<script src="global_assets/js/lamparinas/traducao.js"></script> -->
+	
 </head>
 
 <body>
 
 	<!-- Page content -->
-	<div class="page-content">
+	<div class="page-content login-cover">
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -40,7 +47,7 @@
 			<div class="content d-flex justify-content-center align-items-center">
 
 				<!-- Login form -->
-				<form method="post" class="login-form" action="index.php">
+				<form name="formLogin" method="post" class="login-form form-validate" action="index.php">
 					<div class="card mb-0">
 						<div class="card-body">
 							<div class="text-center mb-3">
@@ -51,14 +58,14 @@
 							</div>
 
 							<div class="form-group form-group-feedback form-group-feedback-left">
-								<input name="usuario" type="text" class="form-control" placeholder="Usuário...">
+								<input name="usuario" type="text" class="form-control" placeholder="Usuário..." required>
 								<div class="form-control-feedback">
 									<i class="icon-user text-muted"></i>
 								</div>
 							</div>
 
 							<div class="form-group form-group-feedback form-group-feedback-left">
-								<input name="senha" type="password" class="form-control" placeholder="Senha..." onKeyPress="if (event.keyCode == 13){document.forms[0].submit();document.forms[0].reset();}">
+								<input name="senha" type="password" class="form-control" placeholder="Senha..." onKeyPress="if (event.keyCode == 13){document.forms[0].submit();}" required>
 								<div class="form-control-feedback">
 									<i class="icon-lock2 text-muted"></i>
 								</div>
@@ -68,19 +75,21 @@
 								<button type="submit" class="btn btn-primary btn-block">Entrar <i class="icon-circle-right2 ml-2"></i></button>
 							</div>
 
-							<div class="text-center">
+							<div class="form-group text-center">
 								<a href="esqueceu-sua-senha.php">Esqueceu sua senha?</a>
-							</div>
+							</div>							
 						</div>
+					</div>
+					<div class="form-group text-center text-muted content-divider" style="margin-top: 15px;">
+						<span class="px-2"><a href="http://www.lamparinas.com.br">Ir para o site</a></spam>
 					</div>
 				</form>
 				<!-- /login form -->
 
 			</div>
-			<!-- /content area -->
+			<!-- /content area -->			
 
-
-			<?php include_once("footer.php"); ?>
+			<?php //include_once("footer.php"); ?>
 
 		</div>
 		<!-- /main content -->
