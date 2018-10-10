@@ -1,3 +1,8 @@
+<?php session_start(); 
+
+require_once("global_assets/php/funcoesgerais.php");
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -8,7 +13,7 @@
 
 	<?php include_once("head.php"); ?>
 	
-	<?php include_once("acesso.php"); ?>
+	<?php //include_once("acesso.php"); ?>
 
 </head>
 
