@@ -21,7 +21,11 @@ if(isset($_POST['usuario'])){
 	$senha_escape = addslashes($psSenha);
 
 	$sql = ("SELECT Top 1 UsuarId, UsuarLogin, UsuarNome, UsuarSenha 
-			 FROM Usuario 
+			 FROM Usuario
+			 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+			 JOIN Perfil on PerfiId = EXUXPPerfil
+			 JOIN Empresa on EmpreId = EXUXPEmpresa
+			 JOIN Licenca on LicenEmpresa = EmpreId
 			 WHERE UsuarLogin = '$usuario_escape'");
 	$result = $conn->query("$sql");
 	$count = $result->rowCount();
