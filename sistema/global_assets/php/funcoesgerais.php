@@ -126,7 +126,11 @@
 	function nomeSobrenome($fullName) {
 		$arr = explode(' ', $fullName);
 		/* Junta os dois primeiros nomes em uma nova string */
-		$doisNomes = $arr[0] . ' ' . $arr[1];
+		if(isset($arr[1])){
+			$doisNomes = $arr[0] . ' ' . $arr[1];
+		} else {
+			$doisNomes = $arr[0];
+		}
 		return $doisNomes;
 	}
 	
