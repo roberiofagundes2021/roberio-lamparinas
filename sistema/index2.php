@@ -1,8 +1,13 @@
-<?php 
+<?php session_start(); 
 
-include_once("sessao.php"); 
+if(!array_key_exists('UsuarId', $_SESSION) or !$_SESSION['UsuarLogado']){
+  header('Expires: 0');
+  header('Pragma: no-cache');  
+  header("Location: login.php");
+  return false;	
+}
 
-$_SESSION['PaginaAtual'] = 'Painel de Controle';
+require_once("global_assets/php/funcoesgerais.php");
 
 ?>
 
@@ -13,27 +18,26 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Lamparinas | Home</title>
-	
+
 	<?php include_once("head.php"); ?>
 	
 	<?php //include_once("acesso.php"); ?>
 
 </head>
 
-<!-- A classe "navbar-top" está sendo usada aqui porque no topo.php a nav-bar é "fixed-top" -->
 <body class="navbar-top">
-	
-	<?php include_once("topo.php"); ?>	
+
+	<?php include_once("topo2.php"); ?>
+
+	<?php include_once("subtopo.php"); ?>		
 
 	<!-- Page content -->
-	<div class="page-content">
+	<div class="page-content pt-0">
 
-		<?php include_once("menu-left.php"); ?>
+		<?php include_once("menu-left2.php"); ?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
-
-			<?php include_once("cabecalho.php"); ?>	
 
 			<!-- Content area -->
 			<div class="content">
@@ -1730,13 +1734,13 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 			</div>
 			<!-- /content area -->
 
-			<?php include_once("footer.php"); ?>
-
 		</div>
 		<!-- /main content -->
 
 	</div>
 	<!-- /page content -->
 
+	<?php include_once("footer.php"); ?>
+		
 </body>
 </html>

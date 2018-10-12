@@ -1,38 +1,42 @@
 	<!-- Main navbar -->
-	<div class="navbar navbar-expand-md navbar-dark fixed-top">
-		<div class="navbar-nav">  <!-- CV: class="navbar-brand wmin-200" -->
+	<div class="navbar navbar-expand-md navbar-dark bg-black fixed-top">
+		<div class="navbar-brand">
 			<span style="color:#fff; margin-top: 13px; font-size: 15px;">Painel Principal</span>
 			<!--<a href="index.html" class="d-inline-block">
 				<img src="global_assets/images/logo_light.png" alt="">
 			</a>-->
 		</div>
-		<ul class="navbar-nav">
-			<li class="nav-item dropdown">
-				<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">
-					<i class="icon-circle-down2"></i>
-					<span class="d-md-none ml-2">Módulos</span>
-					<!--<span class="badge badge-pill badge-mark bg-orange-400 border-orange-400 ml-auto ml-md-0"></span>-->
-				</a>
-				
-				<div class="dropdown-menu dropdown-menu-content wmin-md-350">				
-					<div class="dropdown-content-body dropdown-scrollable">
-						<ul class="media-list">
-							<li class="media">
-								<span style="margin-top: 3px; font-size: 15px;">Painel Principal</span>
-							</li>						
-							<li class="media">
-								<span style="margin-top: 3px; font-size: 15px;">Controle de Estoque</span>
-							</li>
-							<li class="media">
-								<span style="margin-top: 3px; font-size: 15px;">Financeiro</span>
-							</li>
-							<li class="media">
-								<span style="margin-top: 3px; font-size: 15px;">RH</span>
-							</li>
-				</div>
-			</li>
-		</ul>
-		
+		<div class="navbar-nav">
+			<ul class="navbar-nav">
+				<li class="nav-item dropdown">
+					<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">
+						<i class="icon-circle-down2"></i>
+						<span class="d-md-none ml-2">Módulos</span>
+						<!--<span class="badge badge-pill badge-mark bg-orange-400 border-orange-400 ml-auto ml-md-0"></span>-->
+					</a>
+					
+					<div class="dropdown-menu dropdown-menu-content wmin-md-250">				
+						<div class="dropdown-content-body dropdown-scrollable">
+							<ul class="media-list">
+								<li class="media">
+									<span style="margin-top: 3px; font-size: 15px;">Painel Principal</span>
+								</li>						
+								<li class="media">
+									<span style="margin-top: 3px; font-size: 15px;">Controle de Estoque</span>
+								</li>
+								<li class="media">
+									<span style="margin-top: 3px; font-size: 15px;">Financeiro</span>
+								</li>
+								<li class="media">
+									<span style="margin-top: 3px; font-size: 15px;">RH</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</li>
+			</ul>	
+		</div>	
+
 		<div class="d-md-none">
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-mobile">
 				<i class="icon-tree5"></i>
@@ -51,22 +55,72 @@
 				</li>
 			</ul>
 
-			<span class="navbar-text ml-md-auto mr-md-3">
-				<span class="badge bg-success-400">Prefeitura de Guanambi</span>
+			<span class="navbar-text ml-md-3">
+				<span class="badge badge-mark border-orange-300 mr-2"></span>
+				<?php echo saudacoes().", ".nomeSobrenome($_SESSION['UsuarNome'],1)."!"; ?>
 			</span>
+			
+			
+			<ul class="navbar-nav ml-md-auto">
+			<!--	<li class="nav-item dropdown">
+					<a href="#" class="navbar-nav-link dropdown-toggle" data-toggle="dropdown">
+						<i class="icon-make-group mr-2"></i>
+						Connect
+					</a>
 
-			<ul class="navbar-nav">
+					<div class="dropdown-menu dropdown-menu-right dropdown-content wmin-md-350">
+						<div class="dropdown-content-body p-2">
+							<div class="row no-gutters">
+								<div class="col-12 col-sm-4">
+									<a href="#" class="d-block text-default text-center ripple-dark rounded p-3">
+										<i class="icon-github4 icon-2x"></i>
+										<div class="font-size-sm font-weight-semibold text-uppercase mt-2">Github</div>
+									</a>
+
+									<a href="#" class="d-block text-default text-center ripple-dark rounded p-3">
+										<i class="icon-dropbox text-blue-400 icon-2x"></i>
+										<div class="font-size-sm font-weight-semibold text-uppercase mt-2">Dropbox</div>
+									</a>
+								</div>
+								
+								<div class="col-12 col-sm-4">
+									<a href="#" class="d-block text-default text-center ripple-dark rounded p-3">
+										<i class="icon-dribbble3 text-pink-400 icon-2x"></i>
+										<div class="font-size-sm font-weight-semibold text-uppercase mt-2">Dribbble</div>
+									</a>
+
+									<a href="#" class="d-block text-default text-center ripple-dark rounded p-3">
+										<i class="icon-google-drive text-success-400 icon-2x"></i>
+										<div class="font-size-sm font-weight-semibold text-uppercase mt-2">Drive</div>
+									</a>
+								</div>
+
+								<div class="col-12 col-sm-4">
+									<a href="#" class="d-block text-default text-center ripple-dark rounded p-3">
+										<i class="icon-twitter text-info-400 icon-2x"></i>
+										<div class="font-size-sm font-weight-semibold text-uppercase mt-2">Twitter</div>
+									</a>
+
+									<a href="#" class="d-block text-default text-center ripple-dark rounded p-3">
+										<i class="icon-youtube text-danger icon-2x"></i>
+										<div class="font-size-sm font-weight-semibold text-uppercase mt-2">Youtube</div>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</li>
+				-->
 				
 				<li class="nav-item dropdown">
-					<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">
-						<i class="icon-bell2"></i>
-						<span class="d-md-none ml-2">Atividades</span>
-						<span class="badge badge-pill badge-mark bg-orange-400 border-orange-400 ml-auto ml-md-0"></span>
+					<a href="#" class="navbar-nav-link dropdown-toggle" data-toggle="dropdown">
+						<i class="icon-pulse2 mr-2"></i>
+						Atividades
 					</a>
 					
-					<div class="dropdown-menu dropdown-menu-right wmin-md-350">
+					<div class="dropdown-menu dropdown-menu-right dropdown-content wmin-md-350">
 						<div class="dropdown-content-header">
-							<span class="font-weight-semibold">Últimas atividades</span>
+							<span class="font-size-sm line-height-sm text-uppercase font-weight-semibold">Últimas atividades</span>
 							<a href="#" class="text-default"><i class="icon-search4 font-size-base"></i></a>
 						</div>
 
@@ -141,135 +195,20 @@
 						</div>
 
 						<div class="dropdown-content-footer bg-light">
-							<a href="#" class="text-grey mr-auto">Todas atividades</a>
+							<a href="#" class="font-size-sm line-height-sm text-uppercase font-weight-semibold text-grey mr-auto">Todas atividades</a>
 							<div>
 								<a href="#" class="text-grey" data-popup="tooltip" title="Clear list"><i class="icon-checkmark3"></i></a>
-								<a href="#" class="text-grey ml-2" data-popup="tooltip" title="Settings"><i class="icon-gear"></i></a>
+								<a href="#" class="text-grey ml-2" data-popup="tooltip" title="Configurador"><i class="icon-gear"></i></a>
 							</div>
 						</div>
 					</div>
 				</li>
-				
-				
-				<!--<li class="nav-item dropdown">
-					<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">
-						<i class="icon-bubbles5"></i>
-						<span class="d-md-none ml-2">Messages</span>
-						<span class="badge badge-pill badge-mark bg-orange-400 border-orange-400 ml-auto ml-md-0"></span>
+
+				<li class="nav-item">
+					<a href="sair.php" class="navbar-nav-link">
+						<i class="icon-switch2"></i>
+						<span class="ml-1">Sair</span>
 					</a>
-					
-					<div class="dropdown-menu dropdown-menu-right dropdown-content wmin-md-350">
-						<div class="dropdown-content-header">
-							<span class="font-weight-semibold">Messages</span>
-							<a href="#" class="text-default"><i class="icon-compose"></i></a>
-						</div>
-
-						<div class="dropdown-content-body dropdown-scrollable">
-							<ul class="media-list">
-								<li class="media">
-									<div class="mr-3 position-relative">
-										<img src="global_assets/images/placeholders/placeholder.jpg" width="36" height="36" class="rounded-circle" alt="">
-									</div>
-
-									<div class="media-body">
-										<div class="media-title">
-											<a href="#">
-												<span class="font-weight-semibold">James Alexander</span>
-												<span class="text-muted float-right font-size-sm">04:58</span>
-											</a>
-										</div>
-
-										<span class="text-muted">who knows, maybe that would be the best thing for me...</span>
-									</div>
-								</li>
-
-								<li class="media">
-									<div class="mr-3 position-relative">
-										<img src="global_assets/images/placeholders/placeholder.jpg" width="36" height="36" class="rounded-circle" alt="">
-									</div>
-
-									<div class="media-body">
-										<div class="media-title">
-											<a href="#">
-												<span class="font-weight-semibold">Margo Baker</span>
-												<span class="text-muted float-right font-size-sm">12:16</span>
-											</a>
-										</div>
-
-										<span class="text-muted">That was something he was unable to do because...</span>
-									</div>
-								</li>
-
-								<li class="media">
-									<div class="mr-3">
-										<img src="global_assets/images/placeholders/placeholder.jpg" width="36" height="36" class="rounded-circle" alt="">
-									</div>
-									<div class="media-body">
-										<div class="media-title">
-											<a href="#">
-												<span class="font-weight-semibold">Jeremy Victorino</span>
-												<span class="text-muted float-right font-size-sm">22:48</span>
-											</a>
-										</div>
-
-										<span class="text-muted">But that would be extremely strained and suspicious...</span>
-									</div>
-								</li>
-
-								<li class="media">
-									<div class="mr-3">
-										<img src="global_assets/images/placeholders/placeholder.jpg" width="36" height="36" class="rounded-circle" alt="">
-									</div>
-									<div class="media-body">
-										<div class="media-title">
-											<a href="#">
-												<span class="font-weight-semibold">Beatrix Diaz</span>
-												<span class="text-muted float-right font-size-sm">Tue</span>
-											</a>
-										</div>
-
-										<span class="text-muted">What a strenuous career it is that I've chosen...</span>
-									</div>
-								</li>
-
-								<li class="media">
-									<div class="mr-3">
-										<img src="global_assets/images/placeholders/placeholder.jpg" width="36" height="36" class="rounded-circle" alt="">
-									</div>
-									<div class="media-body">
-										<div class="media-title">
-											<a href="#">
-												<span class="font-weight-semibold">Richard Vango</span>
-												<span class="text-muted float-right font-size-sm">Mon</span>
-											</a>
-										</div>
-										
-										<span class="text-muted">Other travelling salesmen live a life of luxury...</span>
-									</div>
-								</li>
-							</ul>
-						</div>
-
-						<div class="dropdown-content-footer justify-content-center p-0">
-							<a href="#" class="bg-light text-grey w-100 py-2" data-popup="tooltip" title="Load more"><i class="icon-menu7 d-block top-0"></i></a>
-						</div>
-					</div>
-				</li>-->
-
-				<li class="nav-item dropdown dropdown-user">
-					<a href="#" class="navbar-nav-link dropdown-toggle" data-toggle="dropdown">
-						<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" alt="">
-						<span><?php echo nomeSobrenome($_SESSION['UsuarioNome']); ?></span>
-					</a>
-
-					<div class="dropdown-menu dropdown-menu-right">
-						<a href="#" class="dropdown-item"><i class="icon-user-plus"></i> Minha conta</a>
-						<!--<a href="#" class="dropdown-item"><i class="icon-coins"></i> My balance</a>-->
-						<!--<a href="#" class="dropdown-item"><i class="icon-comment-discussion"></i> Messages <span class="badge badge-pill bg-blue ml-auto">58</span></a>-->
-						<div class="dropdown-divider"></div>
-						<a href="#" class="dropdown-item"><i class="icon-cog5"></i> Configurações da Conta</a>
-						<a href="sair.php" class="dropdown-item"><i class="icon-switch2"></i> Sair</a>
-					</div>
 				</li>
 			</ul>
 		</div>

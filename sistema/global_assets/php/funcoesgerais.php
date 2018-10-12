@@ -123,16 +123,36 @@
 		return ($s);
 	}
 	
-	function nomeSobrenome($fullName) {
+	function nomeSobrenome($fullName, $num = 1) {
+		
 		$arr = explode(' ', $fullName);
+		
 		/* Junta os dois primeiros nomes em uma nova string */
 		if(isset($arr[1])){
 			$doisNomes = $arr[0] . ' ' . $arr[1];
 		} else {
 			$doisNomes = $arr[0];
 		}
-		return $doisNomes;
+		
+		if($num == 1){
+			return $arr[0];
+		} else{
+			return $doisNomes;
+		}
 	}
 	
-
+	function saudacoes(){
+		
+		$hr = date(" H ");
+		
+		if($hr >= 12 && $hr<18) {
+			$resp = "Boa tarde";
+		} else if ($hr >= 0 && $hr <12 ){
+			$resp = "Bom dia";
+		} else {
+			$resp = "Boa noite";
+		}
+		
+		return "$resp";
+	}
 ?>

@@ -21,7 +21,7 @@ if(isset($_POST['usuario'])){
 		$_SESSION['EmpreId'] = $piEmpresa;
 	}
 	
-	$_SESSION['UsuarioLogin'] = $_POST['usuario'];
+	$_SESSION['UsuarLogin'] = $_POST['usuario'];
 
 	$usuario_escape = addslashes($psUsuario);
 	$senha_escape = addslashes($psSenha);
@@ -37,7 +37,7 @@ if(isset($_POST['usuario'])){
 	//$row = $result->fetch();
 	//var_dump($row);die;
 	
-	$_SESSION['UsuarioLogado'] = 0;
+	$_SESSION['UsuarLogado'] = 0;
 	
 	if ($count == 0){	
 		$erro[] = "O usuário não está cadastrado.";
@@ -47,7 +47,7 @@ if(isset($_POST['usuario'])){
 		$erro[] = "<strong>Senha</strong> incorreta.";
 	} else {	
 	
-		$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia
+		$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiNome
 				 FROM Usuario
 				 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
 				 JOIN Perfil on PerfiId = EXUXPPerfil
@@ -61,7 +61,7 @@ if(isset($_POST['usuario'])){
 		$count = count($row);
 
 		if ($count == 0){
-			$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";
+			$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";			
 		} else if ($count > 1 and $piEmpresa == 0) {
 			$erro[] = "Você está vinculado em mais de uma empresa. Informe qual deseja acessar.";
 			
@@ -71,9 +71,9 @@ if(isset($_POST['usuario'])){
 			while ($linhas = $result->fetch()){
 				$_SESSION['Empresa'][$linhas['EmpreId']] = $linhas['EmpreNomeFantasia'];
 			}
-			
 		} else if ($piEmpresa) {
-			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia
+
+			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiNome
 					 FROM Usuario
 					 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
 					 JOIN Perfil on PerfiId = EXUXPPerfil
@@ -85,23 +85,25 @@ if(isset($_POST['usuario'])){
 			$result = $conn->query("$sql");
 			$row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
-			$_SESSION['UsuarioId'] = $row[0]['UsuarId'];
-			$_SESSION['UsuarioLogin'] = $row[0]['UsuarLogin'];
-			$_SESSION['UsuarioNome'] = $row[0]['UsuarNome'];
+			$_SESSION['UsuarId'] = $row[0]['UsuarId'];
+			$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
+			$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
 			$_SESSION['EmpreId'] = $row[0]['EmpreId'];
 			$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
-			$_SESSION['UsuarioLogado'] = 1;
+			$_SESSION['PerfiNome'] = $row[0]['PerfiNome'];
+			$_SESSION['UsuarLogado'] = 1;
 			
 			irpara("index.php");
 			
 		} else {			
 			
-			$_SESSION['UsuarioId'] = $row[0]['UsuarId'];
-			$_SESSION['UsuarioLogin'] = $row[0]['UsuarLogin'];
-			$_SESSION['UsuarioNome'] = $row[0]['UsuarNome'];
+			$_SESSION['UsuarId'] = $row[0]['UsuarId'];
+			$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
+			$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
 			$_SESSION['EmpreId'] = $row[0]['EmpreId'];
 			$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
-			$_SESSION['UsuarioLogado'] = 1;
+			$_SESSION['PerfiNome'] = $row[0]['PerfiNome'];
+			$_SESSION['UsuarLogado'] = 1;
 			
 			irpara("index.php");
 		}
@@ -219,14 +221,14 @@ if(isset($_POST['usuario'])){
                             ?>							
 							
 							<div class="form-group form-group-feedback form-group-feedback-left">
-								<input value="<?php if(isset($_SESSION['UsuarioLogin'])) echo $_SESSION['UsuarioLogin']; ?>" name="usuario" type="text" class="form-control" placeholder="Usuário..." required <?php if(!isset($_SESSION['UsuarioLogin'])) echo "autofocus"; ?>>
+								<input value="<?php if(isset($_SESSION['UsuarLogin'])) echo $_SESSION['UsuarLogin']; ?>" name="usuario" type="text" class="form-control" placeholder="Usuário..." required <?php if(!isset($_SESSION['UsuarLogin'])) echo "autofocus"; ?>>
 								<div class="form-control-feedback">
 									<i class="icon-user text-muted"></i>
 								</div>
 							</div>
 
 							<div class="form-group form-group-feedback form-group-feedback-left">
-								<input name="senha" id="senha" type="password" class="form-control" placeholder="Senha..." onKeyPress="if (event.keyCode == 13){document.forms[0].submit();}" required  <?php if(isset($_SESSION['UsuarioLogin'])) echo "autofocus"; ?>>
+								<input name="senha" id="senha" type="password" class="form-control" placeholder="Senha..." onKeyPress="if (event.keyCode == 13){document.forms[0].submit();}" required  <?php if(isset($_SESSION['UsuarLogin'])) echo "autofocus"; ?>>
 								<div class="form-control-feedback">
 									<i class="icon-lock2 text-muted"></i>
 								</div>
