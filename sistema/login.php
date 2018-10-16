@@ -13,6 +13,7 @@ $erro = array();
 $empresas = array();
 $piEmpresa = 0;
 
+// Se a pessoa preencheu o login
 if(isset($_POST['usuario'])){
 	$psUsuario = $_POST['usuario'];
 	$psSenha = md5($_POST['senha']);
@@ -26,9 +27,10 @@ if(isset($_POST['usuario'])){
 	$usuario_escape = addslashes($psUsuario);
 	$senha_escape = addslashes($psSenha);
 
-	$sql = ("SELECT Top 1 UsuarId, UsuarLogin, UsuarNome, UsuarSenha, EXUXPStatus
+	$sql = ("SELECT Top 1 UsuarId, UsuarLogin, UsuarNome, UsuarSenha, EXUXPStatus, PerfiChave
 			 FROM Usuario
-			 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId			 
+			 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId	
+			 JOIN Perfil on PerfiId = EXUXPPerfil			 
 			 WHERE UsuarLogin = '$usuario_escape'");
 	$result = $conn->query("$sql");
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -39,6 +41,8 @@ if(isset($_POST['usuario'])){
 	
 	$_SESSION['UsuarLogado'] = 0;
 	
+	$sPerfilChave = $row[0]['PerfiChave'];
+	
 	if ($count == 0){	
 		$erro[] = "O usuário não está cadastrado.";
 	} else if ($row[0]['EXUXPStatus'] == 0){
@@ -46,21 +50,31 @@ if(isset($_POST['usuario'])){
 	} else if (strcmp($row[0]['UsuarSenha'], ($psSenha)) != 0){  //"strcmp": cpmpara 2 strings (se for 0 significa que são iguais)
 		$erro[] = "<strong>Senha</strong> incorreta.";
 	} else {	
-	
-		$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
-				 FROM Usuario
-				 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-				 JOIN Perfil on PerfiId = EXUXPPerfil
-				 JOIN Empresa on EmpreId = EXUXPEmpresa
-				 JOIN Licenca on LicenEmpresa = EmpreId
-				 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and 
-					   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
-				 ");
+		
+		if ($sPerfilChave == 'SUPER'){
+			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
+					 FROM Usuario
+					 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+					 JOIN Perfil on PerfiId = EXUXPPerfil
+					 JOIN Empresa on EmpreId = EXUXPEmpresa
+					 JOIN Licenca on LicenEmpresa = EmpreId					 
+					 ");			
+		} else {
+			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
+					 FROM Usuario
+					 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+					 JOIN Perfil on PerfiId = EXUXPPerfil
+					 JOIN Empresa on EmpreId = EXUXPEmpresa
+					 JOIN Licenca on LicenEmpresa = EmpreId
+					 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and 
+						   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
+					 ");
+		}
 		$result = $conn->query("$sql");
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
 		$count = count($row);
-
-		if ($count == 0){
+		
+		if ($count == 0 and $sPerfilChave != 'SUPER'){
 			$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";			
 		} else if ($count > 1 and $piEmpresa == 0) {
 			$erro[] = "Você está vinculado em mais de uma empresa. Informe qual deseja acessar.";

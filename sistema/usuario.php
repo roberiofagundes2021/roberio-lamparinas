@@ -100,7 +100,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 														<div class="dropdown-menu dropdown-menu-right">
 															<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \'edita\')" class="dropdown-item"><i class="icon-pencil7"></i> Editar</a>
-															<a href="#" onclick="atualizaUsuario('.$item['usuarId'].', \'exclui\')" class="dropdown-item"><i class="icon-bin"></i> Excluir</a>
+															<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \'exclui\')" class="dropdown-item"><i class="icon-bin"></i> Excluir</a>
 														</div>
 													</div>
 												</div>
