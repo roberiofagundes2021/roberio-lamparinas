@@ -47,7 +47,7 @@ if(isset($_POST['usuario'])){
 		$erro[] = "<strong>Senha</strong> incorreta.";
 	} else {	
 	
-		$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiNome
+		$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
 				 FROM Usuario
 				 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
 				 JOIN Perfil on PerfiId = EXUXPPerfil
@@ -73,7 +73,7 @@ if(isset($_POST['usuario'])){
 			}
 		} else if ($piEmpresa) {
 
-			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiNome
+			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
 					 FROM Usuario
 					 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
 					 JOIN Perfil on PerfiId = EXUXPPerfil
@@ -90,7 +90,7 @@ if(isset($_POST['usuario'])){
 			$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
 			$_SESSION['EmpreId'] = $row[0]['EmpreId'];
 			$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
-			$_SESSION['PerfiNome'] = $row[0]['PerfiNome'];
+			$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
 			$_SESSION['UsuarLogado'] = 1;
 			
 			irpara("index.php");
@@ -102,7 +102,7 @@ if(isset($_POST['usuario'])){
 			$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
 			$_SESSION['EmpreId'] = $row[0]['EmpreId'];
 			$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
-			$_SESSION['PerfiNome'] = $row[0]['PerfiNome'];
+			$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
 			$_SESSION['UsuarLogado'] = 1;
 			
 			irpara("index.php");

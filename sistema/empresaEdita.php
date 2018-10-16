@@ -91,17 +91,7 @@ if(isset($_POST['inputCnpj'])){
 			<?php include_once("cabecalho.php"); ?>	
 
 			<!-- Content area -->
-			<div class="content">
-				
-				<?php 
-
-				if ($_SESSION['editaRegistro'] == 'Empresa'){
-					/*<button type="button" class="btn btn-light" id="noty_top_center">Launch <i class="icon-play3 ml-2"></i></button>
-					<button type="button" class="btn btn-success legitRipple" id="noty_success"></button>*/
-					echo "Empresa editada com sucesso!!!";
-				}
-
-				?>				
+			<div class="content">		
 				
 				<!-- Info blocks -->
 				<div class="card">

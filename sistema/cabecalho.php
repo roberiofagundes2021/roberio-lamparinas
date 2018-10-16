@@ -49,7 +49,10 @@
 								</a>
 
 								<div class="dropdown-menu dropdown-menu-right">
-									<a href="empresa.php" class="dropdown-item"><i class="icon-office"></i> Empresas</a>
+									<?php if ($_SESSION['PerfiChave'] == "SUPER") {
+											print('<a href="empresa.php" class="dropdown-item"><i class="icon-office"></i> Empresas</a>'); 
+									      }
+									?>
 									<a href="usuario.php" class="dropdown-item"><i class="icon-users"></i> Usuários</a>
 									<a href="perfil.php" class="dropdown-item"><i class="icon-user-check"></i> Perfis</a>
 									<div class="dropdown-divider"></div>

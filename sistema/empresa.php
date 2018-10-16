@@ -37,18 +37,22 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
 	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
+	<script src="global_assets/js/demo_pages/components_popups.js"></script
 	<!-- /theme JS files -->	
 	
 	<script>
 		
-		function atualizaEmpresa(EmpresaId, Tipo){
-			
+		function atualizaEmpresa(EmpresaId, EmpresaStatus, Tipo){
+
 			document.getElementById('inputEmpresaId').value = EmpresaId;
-			
+			document.getElementById('inputEmpresaStatus').value = EmpresaStatus;
+		
 			if (Tipo == 'edita'){	
 				document.formEmpresa.action = "empresaEdita.php";		
 			} else if (Tipo == 'exclui'){
 				document.formEmpresa.action = "empresaExclui.php";
+			} else if (Tipo == 'mudaStatus'){
+				document.formEmpresa.action = "empresaMudaSituacao.php";
 			}
 			
 			document.formEmpresa.submit();
@@ -77,7 +81,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				<?php 
 
-				if ($_SESSION['msg']){
+				if (isset($_SESSION['msg'])){
 					/*<button type="button" class="btn btn-light" id="noty_top_center">Launch <i class="icon-play3 ml-2"></i></button>
 					<button type="button" class="btn btn-success legitRipple" id="noty_success"></button>*/
 					echo $_SESSION['msg'];
@@ -113,7 +117,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>Razão Social</th>
 										<th>CNPJ</th>
 										<th>Situação</th>
-										<th>Licença</th>
+										<!--<th>Licença</th>-->
 										<th class="text-center">Acões</th>
 									</tr>
 								</thead>
@@ -128,10 +132,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<tr>
 											<td>'.$item['EmpreNomeFantasia'].'</td>
 											<td>'.$item['EmpreRazaoSocial'].'</td>
-											<td>'.formatarCnpj($item['EmpreCnpj']).'</td>
-											<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>
-											<td><span class="badge '.$situacaoClasse.'">'.$item['diasAVencer'].'</span></td>
-											<td class="text-center">
+											<td>'.formatarCnpj($item['EmpreCnpj']).'</td>');
+										
+										if ($_SESSION['EmpreId'] != $item['EmpreId']) {
+											print('<td><a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										} else {
+											print('<td><a href="#" data-popup="tooltip" data-trigger="focus" title="Essa empresa está sendo usada por você no momento"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										}
+										
+										//<td><span class="badge '.$situacaoClasse.'">'.$item['diasAVencer'].'</span></td>
+										
+										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="dropdown">
 														<a href="#" class="list-icons-item" data-toggle="dropdown">
@@ -139,8 +150,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														</a>
 
 														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \'edita\')" class="dropdown-item"><i class="icon-pencil7"></i> Editar</a>
-															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \'exclui\')" class="dropdown-item"><i class="icon-bin"></i> Excluir</a>
+															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'edita\')" class="dropdown-item"><i class="icon-pencil7"></i> Editar</a>
+															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'exclui\')" class="dropdown-item"><i class="icon-bin"></i> Excluir</a>
 														</div>
 													</div>
 												</div>
@@ -161,6 +172,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<form name="formEmpresa" method="post" action="empresaEdita.php">
 					<input type="hidden" id="inputEmpresaId" name="inputEmpresaId" >
+					<input type="hidden" id="inputEmpresaStatus" name="inputEmpresaStatus" >
 				</form>
 
 			</div>
