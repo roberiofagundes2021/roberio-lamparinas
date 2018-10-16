@@ -1,0 +1,196 @@
+<?php 
+
+include_once("sessao.php"); 
+
+$_SESSION['PaginaAtual'] = 'Editar Usuário';
+
+include('global_assets/php/conexao.php');
+
+if(isset($_POST['inputUsuarioId'])){
+	
+	$iUsuario = $_POST['inputUsuarioId'];
+        	
+	try{
+		
+		$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, EmpreStatus
+				FROM Usuario
+				WHERE UsuarId = $iUsuario ";
+		$result = $conn->query("$sql");
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+		
+	} catch(PDOException $e) {
+		echo 'Error: ' . $e->getMessage();
+	}
+}
+
+if(isset($_POST['inputCpf'])){
+	
+	try{
+		
+		$sql = "UPDATE Usuario SET UsuarCpf = :sCpf, UsuarNome = :sNome, usuarLogin = :sUsuarLogin, 
+					   EmpreEndereco = :sEndereco, UsuarUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE UsuarId = :iUsuario";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+						':sCpf' => $_POST['inputCpf'],
+						':sNome' => $_POST['inputNome'],
+						':sLogin' => $_POST['inputLogin'],
+						':sEndereco' => $_POST['inputEndereco'],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iEmpresa' => $_POST['inputEmpreId']
+						));
+		
+		$_SESSION['msg'] = "Usuário alterado com sucesso!!!";
+		
+	} catch(PDOException $e) {
+		
+		$_SESSION['msg'] = "Erro ao alterar usuário!!!";
+		
+		echo 'Error: ' . $e->getMessage();
+	}
+	
+	irpara("empresa.php");
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Lamparinas | Usuário</title>
+
+	<?php include_once("head.php"); ?>
+	
+	<!-- Theme JS files -->
+	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+
+	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
+	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<!-- /theme JS files -->	
+
+</head>
+
+<body class="navbar-top">
+
+	<?php include_once("topo.php"); ?>	
+
+	<!-- Page content -->
+	<div class="page-content">
+		
+		<?php include_once("menu-left.php"); ?>
+
+		<!-- Main content -->
+		<div class="content-wrapper">
+
+			<?php include_once("cabecalho.php"); ?>	
+
+			<!-- Content area -->
+			<div class="content">
+				
+				<?php 
+
+				if ($_SESSION['editaRegistro'] == 'Usuário'){
+					/*<button type="button" class="btn btn-light" id="noty_top_center">Launch <i class="icon-play3 ml-2"></i></button>
+					<button type="button" class="btn btn-success legitRipple" id="noty_success"></button>*/
+					echo "Usuário alterado com sucesso!!!";
+				}
+
+				?>				
+				
+				<!-- Info blocks -->
+				<div class="card">
+					
+					<form name="formUsuario" method="post" class="form-validate" action="usuarioEdita.php">
+						<div class="card-header header-elements-inline">
+							<h5 class="text-uppercase font-weight-bold">Editar Usuário "<?php echo $row['UsuarNome']; ?>"</h5>
+						</div>
+						
+						<input type="hidden" id="inputUsuarId" name="inputUsuarId" value="<?php echo $row['UsuarId']; ?>" >
+						
+						<div class="card-body">								
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="row">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputCpf">CPF</label>
+												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo $row['EmpreCnpj']; ?>" maxlength="11" pattern="[0-9]+$" required>
+											</div>
+										</div>
+										<div class="col-lg-9">
+											<div class="form-group">
+												<label for="inputNome">Nome</label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Razão Social" value="<?php echo $row['UsuarNome']; ?>" required>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+								
+							<div class="row">				
+								<div class="col-lg-12">
+									<div class="row">
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputLogin">Login</label>
+												<input type="text" id="inputLogin" name="inputLogin" class="form-control" placeholder="Login" value="<?php echo $row['UsuarLogin']; ?>" required>
+											</div>
+										</div>
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputSenha">Senha</label>
+												<input type="text" id="inputSenha" name="inputSenha" class="form-control" placeholder="Senha" value="<?php echo $row['UsuarSenha']; ?>">
+											</div>
+										</div>										
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputPerfil">Perfil</label>
+												<select name="inputPerfil" class="form-control" required>
+													<option value="0">Informe um perfil</option>
+													<?php
+														foreach ($rowPerfil as $item){
+															print('<option value="'.$item['PerfiId'].'">'.$item['PerfiNome'].'</option>');
+														}	
+													?>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+								
+							<div class="row" style="margin-top: 10px;">
+								<div class="col-lg-12">								
+									<div class="form-group">
+										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<a href="usuario.php" class="btn btn-basic" role="button">Cancelar</a>
+									</div>
+								</div>
+							</div>
+						</form>								
+
+					</div>
+					<!-- /card-body -->
+					
+				</div>
+				<!-- /info blocks -->
+
+			</div>
+			<!-- /content area -->			
+			
+			<?php include_once("footer.php"); ?>
+
+		</div>
+		<!-- /main content -->
+
+	</div>
+	<!-- /page content -->
+
+</body>
+</html>
