@@ -86,37 +86,48 @@ if(isset($_POST['usuario'])){
 				$_SESSION['Empresa'][$linhas['EmpreId']] = $linhas['EmpreNomeFantasia'];
 			}
 		} else if ($piEmpresa) {
-
-			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
-					 FROM Usuario
-					 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-					 JOIN Perfil on PerfiId = EXUXPPerfil
-					 JOIN Empresa on EmpreId = EXUXPEmpresa
-					 JOIN Licenca on LicenEmpresa = EmpreId
-					 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa and 
-						   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
-					 ");			 		 
-			$result = $conn->query("$sql");
-			$row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
-			$_SESSION['UsuarId'] = $row[0]['UsuarId'];
-			$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
-			$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
-			$_SESSION['EmpreId'] = $row[0]['EmpreId'];
-			$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
-			$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
+			if ($sPerfilChave == 'SUPER'){
+				$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
+						 FROM Usuario
+						 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+						 JOIN Perfil on PerfiId = EXUXPPerfil
+						 JOIN Empresa on EmpreId = EXUXPEmpresa
+						 JOIN Licenca on LicenEmpresa = EmpreId
+						 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa
+						 ");			 		
+			} else {
+				$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
+						 FROM Usuario
+						 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+						 JOIN Perfil on PerfiId = EXUXPPerfil
+						 JOIN Empresa on EmpreId = EXUXPEmpresa
+						 JOIN Licenca on LicenEmpresa = EmpreId
+						 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa and 
+							   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
+						 ");
+			} 
+			$result = $conn->query("$sql");
+			$row = $result->fetch();
+			
+			$_SESSION['UsuarId'] = $row['UsuarId'];
+			$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
+			$_SESSION['UsuarNome'] = $row['UsuarNome'];
+			$_SESSION['EmpreId'] = $row['EmpreId'];
+			$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
+			$_SESSION['PerfiChave'] = $row['PerfiChave'];
 			$_SESSION['UsuarLogado'] = 1;
 			
 			irpara("index.php");
 			
 		} else {			
 			
-			$_SESSION['UsuarId'] = $row[0]['UsuarId'];
-			$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
-			$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
-			$_SESSION['EmpreId'] = $row[0]['EmpreId'];
-			$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
-			$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
+			$_SESSION['UsuarId'] = $row['UsuarId'];
+			$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
+			$_SESSION['UsuarNome'] = $row['UsuarNome'];
+			$_SESSION['EmpreId'] = $row['EmpreId'];
+			$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
+			$_SESSION['PerfiChave'] = $row['PerfiChave'];
 			$_SESSION['UsuarLogado'] = 1;
 			
 			irpara("index.php");

@@ -21,6 +21,8 @@ if(isset($_POST['inputEmpresaId'])){
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
 	}
+	
+	$_SESSION['msg'] = "";
 }
 
 if(isset($_POST['inputCnpj'])){

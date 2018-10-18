@@ -7,7 +7,7 @@ try {
 }
 catch (PDOException $e) {
     print("Erro de conexão com o banco.");
-    die(print_r($e));
+    //die(print_r($e));
 }
 
 ?>

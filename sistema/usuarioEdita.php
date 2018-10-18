@@ -12,7 +12,7 @@ if(isset($_POST['inputUsuarioId'])){
         	
 	try{
 		
-		$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, EmpreStatus
+		$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha
 				FROM Usuario
 				WHERE UsuarId = $iUsuario ";
 		$result = $conn->query("$sql");
@@ -27,8 +27,8 @@ if(isset($_POST['inputCpf'])){
 	
 	try{
 		
-		$sql = "UPDATE Usuario SET UsuarCpf = :sCpf, UsuarNome = :sNome, usuarLogin = :sUsuarLogin, 
-					   EmpreEndereco = :sEndereco, UsuarUsuarioAtualizador = :iUsuarioAtualizador
+		$sql = "UPDATE Usuario SET UsuarCpf = :sCpf, UsuarNome = :sNome, usuarLogin = :sLogin, 
+					   UsuarSenha = :sSenha
 				WHERE UsuarId = :iUsuario";
 		$result = $conn->prepare($sql);
 				
@@ -36,9 +36,8 @@ if(isset($_POST['inputCpf'])){
 						':sCpf' => $_POST['inputCpf'],
 						':sNome' => $_POST['inputNome'],
 						':sLogin' => $_POST['inputLogin'],
-						':sEndereco' => $_POST['inputEndereco'],
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_POST['inputEmpreId']
+						':sSenha' => $_POST['inputSenha'],						
+						':iUsuario' => $_POST['inputUsuarioId']
 						));
 		
 		$_SESSION['msg'] = "Usuário alterado com sucesso!!!";
@@ -50,7 +49,7 @@ if(isset($_POST['inputCpf'])){
 		echo 'Error: ' . $e->getMessage();
 	}
 	
-	irpara("empresa.php");
+	irpara("usuario.php");
 }
 
 ?>
@@ -92,17 +91,7 @@ if(isset($_POST['inputCpf'])){
 
 			<!-- Content area -->
 			<div class="content">
-				
-				<?php 
-
-				if ($_SESSION['editaRegistro'] == 'Usuário'){
-					/*<button type="button" class="btn btn-light" id="noty_top_center">Launch <i class="icon-play3 ml-2"></i></button>
-					<button type="button" class="btn btn-success legitRipple" id="noty_success"></button>*/
-					echo "Usuário alterado com sucesso!!!";
-				}
-
-				?>				
-				
+							
 				<!-- Info blocks -->
 				<div class="card">
 					
@@ -111,7 +100,7 @@ if(isset($_POST['inputCpf'])){
 							<h5 class="text-uppercase font-weight-bold">Editar Usuário "<?php echo $row['UsuarNome']; ?>"</h5>
 						</div>
 						
-						<input type="hidden" id="inputUsuarId" name="inputUsuarId" value="<?php echo $row['UsuarId']; ?>" >
+						<input type="hidden" id="inputUsuarioId" name="inputUsuarioId" value="<?php echo $row['UsuarId']; ?>" >
 						
 						<div class="card-body">								
 							<div class="row">
@@ -120,13 +109,13 @@ if(isset($_POST['inputCpf'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputCpf">CPF</label>
-												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo $row['EmpreCnpj']; ?>" maxlength="11" pattern="[0-9]+$" required>
+												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo $row['UsuarCpf']; ?>" maxlength="11" pattern="[0-9]+$" required>
 											</div>
 										</div>
 										<div class="col-lg-9">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Razão Social" value="<?php echo $row['UsuarNome']; ?>" required>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['UsuarNome']; ?>" required>
 											</div>
 										</div>
 									</div>
@@ -145,7 +134,7 @@ if(isset($_POST['inputCpf'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputSenha">Senha</label>
-												<input type="text" id="inputSenha" name="inputSenha" class="form-control" placeholder="Senha" value="<?php echo $row['UsuarSenha']; ?>">
+												<input type="password" id="inputSenha" name="inputSenha" class="form-control" placeholder="Senha" value="<?php echo $row['UsuarSenha']; ?>">
 											</div>
 										</div>										
 										<div class="col-lg-4">

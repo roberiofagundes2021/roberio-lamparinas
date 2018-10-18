@@ -6,10 +6,11 @@ $_SESSION['PaginaAtual'] = 'Usuário';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPStatus
+$sql = ("SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPStatus, PerfiNome
 		 FROM Usuario
-		 LEFT JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
-		 LEFT JOIN Empresa on EXUXPEmpresa = EmpreId
+		 JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+		 JOIN Empresa on EXUXPEmpresa = EmpreId
+		 JOIN Perfil on PerfiId = EXUXPPerfil
 		 Where EmpreId = ".$_SESSION['EmpreId']."
 		 ORDER BY UsuarNome ASC");
 $result = $conn->query("$sql");
@@ -27,6 +28,40 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<title>Lamparinas | Usuário</title>
 
 	<?php include_once("head.php"); ?>
+
+	<!-- Theme JS files -->
+	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+
+	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
+	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	
+	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
+	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
+	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
+	<script src="global_assets/js/demo_pages/components_popups.js"></script
+	<!-- /theme JS files -->
+	
+	<script>
+		
+		function atualizaUsuario(UsuarioId, UsuarioStatus, Tipo){
+
+			document.getElementById('inputUsuarioId').value = UsuarioId;
+			document.getElementById('inputUsuarioStatus').value = UsuarioStatus;
+		
+			if (Tipo == 'edita'){
+				document.formUsuario.action = "usuarioEdita.php";
+			} else if (Tipo == 'exclui'){
+				document.formUsuario.action = "usuarioExclui.php";
+			} else if (Tipo == 'mudaStatus'){
+				document.formUsuario.action = "usuarioMudaSituacao.php";
+			}
+			
+			document.formUsuario.submit();
+		}
+			
+	</script>	
 
 </head>
 
@@ -74,6 +109,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>Nome</th>
 										<th>Login</th>
 										<th>CPF</th>
+										<th>Perfil</th>
 										<th>Situação</th>										
 										<th class="text-center">Acões</th>
 									</tr>
@@ -90,8 +126,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['UsuarNome'].'</td>
 											<td>'.$item['UsuarLogin'].'</td>
 											<td>'.formatarCnpj($item['UsuarCpf']).'</td>
-											<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>											
-											<td class="text-center">
+											<td>'.$item['PerfiNome'].'</td>');
+											
+										if ($_SESSION['UsuarId'] != $item['UsuarId']) {
+											print('<td><a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', '.$item['EXUXPStatus'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										} else {
+											print('<td><a href="#" data-popup="tooltip" data-trigger="focus" title="Seu usuário não pode ser desativado por você."><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										}
+										
+										//<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>											
+											
+										print('	<td class="text-center">
 												<div class="list-icons">
 													<div class="dropdown">
 														<a href="#" class="list-icons-item" data-toggle="dropdown">
@@ -121,6 +166,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<form name="formUsuario" method="post" action="usuarioEdita.php">
 					<input type="hidden" id="inputUsuarioId" name="inputUsuarioId" >
+					<input type="hidden" id="inputUsuarioStatus" name="inputUsuarioStatus" >
 				</form>
 
 			</div>
