@@ -119,13 +119,13 @@ if(isset($_POST['inputCpf'])){
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="row">
-										<div class="col-lg-9">
+										<div class="col-lg-8">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputCpf">E-mail</label>
 												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" required>
