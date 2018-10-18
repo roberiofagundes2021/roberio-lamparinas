@@ -22,17 +22,11 @@ if(isset($_POST['inputCpf'])){
 		$sql = "INSERT INTO Usuario (UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha)
 				VALUES (:sCpf, :sNome, :sLogin, :sSenha)";
 		$result = $conn->prepare($sql);
-				
 		$result->execute(array(
 						':sCpf' => $_POST['inputCpf'],
 						':sNome' => $_POST['inputNome'],
 						':sLogin' => $_POST['inputLogin'],
-						':sSenha' => $_POST['inputSenha'],
-						':iEmpresa' => $_SESSION['EmpreId'],
-						':iUsuario' => $_POST['inputEndereco'],
-						':iPerfil' => $_POST['inputPerfil'],
-						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId']
+						':sSenha' => $_POST['inputSenha']
 						));
 		$LAST_ID = $conn->lastInsertId();
 		
@@ -40,7 +34,6 @@ if(isset($_POST['inputCpf'])){
 		$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPStatus, EXUXPUsuarioAtualizador)
 				VALUES (:iEmpresa, :iUsuario, :iPerfil, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
-		
 		$result->execute(array(
 						':iEmpresa' => $_SESSION['EmpreId'],
 						':iUsuario' => $LAST_ID,
@@ -118,17 +111,30 @@ if(isset($_POST['inputCpf'])){
 												<label for="inputCpf">CPF</label>
 												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" maxlength="11" pattern="[0-9]+$" required>
 											</div>
-										</div>
+										</div>								
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="row">
 										<div class="col-lg-9">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
-										</div>										
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputCpf">E-mail</label>
+												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" required>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
-								
+							
 							<div class="row">				
 								<div class="col-lg-12">
 									<div class="row">
