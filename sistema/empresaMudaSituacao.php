@@ -4,6 +4,8 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
+$_SESSION['msg'] = "";
+
 if(isset($_POST['inputEmpresaId'])){
 	
 	$iEmpresa = $_POST['inputEmpresaId'];

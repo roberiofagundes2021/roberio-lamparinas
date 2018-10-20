@@ -112,10 +112,22 @@ if(isset($_POST['inputCpf'])){
 												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo $row['UsuarCpf']; ?>" maxlength="11" pattern="[0-9]+$" required>
 											</div>
 										</div>
-										<div class="col-lg-9">
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="row">
+										<div class="col-lg-8">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['UsuarNome']; ?>" required>
+											</div>
+										</div>									
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputEmail">E-mail</label>
+												<input type="text" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" value="<?php //echo $row['UsuarEmail']; ?>" required>
 											</div>
 										</div>
 									</div>

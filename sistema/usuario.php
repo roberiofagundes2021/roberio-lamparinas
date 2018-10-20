@@ -82,6 +82,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			<!-- Content area -->
 			<div class="content">
 
+				<?php 
+
+				if (isset($_SESSION['msg'])){
+					
+					echo $_SESSION['msg'];					
+					
+					$_SESSION['msg'] = "";
+				}
+				
+				?>			
+			
 				<!-- Info blocks -->
 				<div class="row">
 					<div class="col-lg-12">

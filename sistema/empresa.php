@@ -89,6 +89,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					/*<button type="button" class="btn btn-light" id="noty_top_center">Launch <i class="icon-play3 ml-2"></i></button>
 					<button type="button" class="btn btn-success legitRipple" id="noty_success"></button>*/
 					echo $_SESSION['msg'];
+					
+					$_SESSION['msg'] = "";
 				}
 				
 				?>
