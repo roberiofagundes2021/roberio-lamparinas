@@ -53,6 +53,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				document.formEmpresa.action = "empresaExclui.php";
 			} else if (Tipo == 'mudaStatus'){
 				document.formEmpresa.action = "empresaMudaSituacao.php";
+			} else if (Tipo == 'usuario') {
+				document.formEmpresa.action = "empresaUsuario.php";
+			} else if (Tipo == 'licenca'){
+				document.formEmpresa.action = "licenca.php";
 			}
 			
 			document.formEmpresa.submit();
@@ -99,7 +103,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a class="list-icons-item" data-action="reload"></a>
+										<a href="empresa.php" class="list-icons-item" data-action="reload"></a>
 										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
@@ -152,6 +156,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														<div class="dropdown-menu dropdown-menu-right">
 															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'edita\')" class="dropdown-item"><i class="icon-pencil7"></i> Editar</a>
 															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'exclui\')" class="dropdown-item"><i class="icon-bin"></i> Excluir</a>
+															<div class="dropdown-divider"></div>
+															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'usuario\')" class="dropdown-item"><i class="icon-user-plus"></i> Adicionar usuários</a>
+															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'licenca\')" class="dropdown-item"><i class="icon-certificate"></i> Gerenciar Licença</a>
 														</div>
 													</div>
 												</div>
