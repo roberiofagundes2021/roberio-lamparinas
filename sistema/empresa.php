@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Empresa';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreStatus
+$sql = ("SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreStatus, '10/10/2020' as Licenca
 		 FROM Empresa
 		 LEFT JOIN Licenca on LicenEmpresa = EmpreId
 		 ORDER BY EmpreNomeFantasia ASC");
@@ -42,11 +42,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	
 	<script>
 		
-		function atualizaEmpresa(EmpresaId, EmpresaStatus, Tipo){
+		function atualizaEmpresa(EmpresaId, EmpresaNome, EmpresaStatus, Tipo){
 
 			document.getElementById('inputEmpresaId').value = EmpresaId;
+			document.getElementById('inputEmpresaNome').value = EmpresaNome;
 			document.getElementById('inputEmpresaStatus').value = EmpresaStatus;
-		
+					
 			if (Tipo == 'edita'){	
 				document.formEmpresa.action = "empresaEdita.php";		
 			} else if (Tipo == 'exclui'){
@@ -123,8 +124,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>Razão Social</th>
 										<th>CNPJ</th>
 										<th>Situação</th>
-										<!--<th>Licença</th>-->
-										<th class="text-center">Acões</th>
+										<th>Licença</th>
+										<th class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -141,26 +142,27 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.formatarCnpj($item['EmpreCnpj']).'</td>');
 										
 										if ($_SESSION['EmpreId'] != $item['EmpreId']) {
-											print('<td><a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+											print('<td><a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										} else {
 											print('<td><a href="#" data-popup="tooltip" data-trigger="focus" title="Essa empresa está sendo usada por você no momento"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										}
 										
-										//<td><span class="badge '.$situacaoClasse.'">'.$item['diasAVencer'].'</span></td>
+										print('<td><span>'.$item['Licenca'].'</span></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
-													<div class="dropdown">
-														<a href="#" class="list-icons-item" data-toggle="dropdown">
-															<i class="icon-menu9"></i>
-														</a>
+													<div class="list-icons list-icons-extended">
+														<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<div class="dropdown">													
+															<a href="#" class="list-icons-item" data-toggle="dropdown">
+																<i class="icon-menu9"></i>
+															</a>
 
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'edita\')" class="dropdown-item"><i class="icon-pencil7"></i> Editar</a>
-															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'exclui\')" class="dropdown-item"><i class="icon-bin"></i> Excluir</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'usuario\')" class="dropdown-item"><i class="icon-user-plus"></i> Adicionar usuários</a>
-															<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', '.$item['EmpreStatus'].', \'licenca\')" class="dropdown-item"><i class="icon-certificate"></i> Gerenciar Licença</a>
+															<div class="dropdown-menu dropdown-menu-right">
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'usuario\');" class="dropdown-item"><i class="icon-user-plus"></i> Adicionar usuários</a>
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'licenca\');" class="dropdown-item"><i class="icon-certificate"></i> Gerenciar Licença</a>
+															</div>
 														</div>
 													</div>
 												</div>
@@ -181,6 +183,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<form name="formEmpresa" method="post" action="empresaEdita.php">
 					<input type="hidden" id="inputEmpresaId" name="inputEmpresaId" >
+					<input type="hidden" id="inputEmpresaNome" name="inputEmpresaNome" >
 					<input type="hidden" id="inputEmpresaStatus" name="inputEmpresaStatus" >
 				</form>
 

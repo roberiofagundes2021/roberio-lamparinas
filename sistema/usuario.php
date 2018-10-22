@@ -6,12 +6,21 @@ $_SESSION['PaginaAtual'] = 'Usuário';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPStatus, PerfiNome
+if (isset($_POST['inputEmpresaId']){	
+	$EmpresaId = $_POST['inputEmpresaId'];		
+} else if ($_SESSION['UC'] == 'Empresa'){
+	$EmpresaId = $_POST['inputEmpresaId'];
+} else {	
+	$EmpresaId = $_SESSION['EmpreId'];	
+	$_SESSION['UC'] = 'Usuario';
+}
+
+$sql = ("SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPStatus, PerfiNome, EmpreNome
 		 FROM Usuario
 		 JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		 JOIN Empresa on EXUXPEmpresa = EmpreId
 		 JOIN Perfil on PerfiId = EXUXPPerfil
-		 Where EmpreId = ".$_SESSION['EmpreId']."
+		 Where EmpreId = ".$EmpresaId."
 		 ORDER BY UsuarNome ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -122,7 +131,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>CPF</th>
 										<th>Perfil</th>
 										<th>Situação</th>										
-										<th class="text-center">Acões</th>
+										<th class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>

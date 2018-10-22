@@ -5,7 +5,7 @@
 	  -------------------------------------------------------------------------*/
 	function mostradata($data) {
 	
-		if ($data <> '0000-00-00'){
+		if ($data <> '0000-00-00' and $data <> ''){
 			$data = explode(" ", $data);
 			$data = explode("-", $data[0]);
 			$dataformatada = array();
