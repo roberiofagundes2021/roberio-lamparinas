@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Empresa';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreStatus, '10/10/2020' as Licenca
+$sql = ("SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreStatus, dbo.fnLicencaVencimento(EmpreId) as Licenca
 		 FROM Empresa
 		 LEFT JOIN Licenca on LicenEmpresa = EmpreId
 		 ORDER BY EmpreNomeFantasia ASC");
@@ -124,7 +124,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>Razão Social</th>
 										<th>CNPJ</th>
 										<th>Situação</th>
-										<th>Licença</th>
+										<th>Fim Licença</th>
 										<th class="text-center">Ações</th>
 									</tr>
 								</thead>

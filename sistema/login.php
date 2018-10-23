@@ -23,6 +23,7 @@ if(isset($_POST['usuario'])){
 	}
 	
 	$_SESSION['UsuarLogin'] = $_POST['usuario'];
+	$_SESSION['UsuarSenha'] = $_POST['senha'];	
 
 	$usuario_escape = addslashes($psUsuario);
 	$senha_escape = addslashes($psSenha);
@@ -33,21 +34,21 @@ if(isset($_POST['usuario'])){
 			 JOIN Perfil on PerfiId = EXUXPPerfil			 
 			 WHERE UsuarLogin = '$usuario_escape'");
 	$result = $conn->query("$sql");
-	$row = $result->fetchAll(PDO::FETCH_ASSOC);
-	$count = count($row);
+	$row = $result->fetch();
+	//$count = count($row);
 	//$count = $result->rowCount();
 	//$row = $result->fetch();
 	//var_dump($row);die;
 	
 	$_SESSION['UsuarLogado'] = 0;
 	
-	$sPerfilChave = $row[0]['PerfiChave'];
+	$sPerfilChave = $row['PerfiChave'];
 	
-	if ($count == 0){	
+	if ($row == 0){	
 		$erro[] = "O usuário não está cadastrado.";
-	} else if ($row[0]['EXUXPStatus'] == 0){
+	} else if ($row['EXUXPStatus'] == 0){
 		$erro[] = "Esse usuário está desativado.";
-	} else if (strcmp($row[0]['UsuarSenha'], ($psSenha)) != 0){  //"strcmp": cpmpara 2 strings (se for 0 significa que são iguais)
+	} else if (strcmp($row['UsuarSenha'], ($psSenha)) != 0){  //"strcmp": cpmpara 2 strings (se for 0 significa que são iguais)
 		$erro[] = "<strong>Senha</strong> incorreta.";
 	} else {	
 		
@@ -100,14 +101,15 @@ if(isset($_POST['usuario'])){
 			
 			irpara("index.php");
 			
-		} else {			
+		} else {		
 			
-			$_SESSION['UsuarId'] = $row['UsuarId'];
-			$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
-			$_SESSION['UsuarNome'] = $row['UsuarNome'];
-			$_SESSION['EmpreId'] = $row['EmpreId'];
-			$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
-			$_SESSION['PerfiChave'] = $row['PerfiChave'];
+			//Pra esse caso aqui só vai vim um registro mesmo, daí precisa do [0] sem fazer o foreach
+			$_SESSION['UsuarId'] = $row[0]['UsuarId'];
+			$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
+			$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
+			$_SESSION['EmpreId'] = $row[0]['EmpreId'];
+			$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
+			$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
 			$_SESSION['UsuarLogado'] = 1;
 			
 			irpara("index.php");
@@ -233,7 +235,7 @@ if(isset($_POST['usuario'])){
 							</div>
 
 							<div class="form-group form-group-feedback form-group-feedback-left">
-								<input name="senha" id="senha" type="password" class="form-control" placeholder="Senha..." onKeyPress="if (event.keyCode == 13){document.forms[0].submit();}" required  <?php if(isset($_SESSION['UsuarLogin'])) echo "autofocus"; ?>>
+								<input value="<?php if(isset($_SESSION['UsuarSenha'])) echo $_SESSION['UsuarSenha']; ?>" name="senha" id="senha" type="password" class="form-control" placeholder="Senha..." onKeyPress="if (event.keyCode == 13){document.forms[0].submit();}" required  <?php if(isset($_SESSION['UsuarLogin'])) echo "autofocus"; ?>>
 								<div class="form-control-feedback">
 									<i class="icon-lock2 text-muted"></i>
 								</div>
