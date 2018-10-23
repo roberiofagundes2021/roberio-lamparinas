@@ -51,30 +51,21 @@ if(isset($_POST['usuario'])){
 		$erro[] = "<strong>Senha</strong> incorreta.";
 	} else {	
 		
-		if ($sPerfilChave == 'SUPER'){
-			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
-					 FROM Usuario
-					 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-					 JOIN Perfil on PerfiId = EXUXPPerfil
-					 JOIN Empresa on EmpreId = EXUXPEmpresa
-					 JOIN Licenca on LicenEmpresa = EmpreId					 
-					 ");			
-		} else {
-			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
-					 FROM Usuario
-					 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-					 JOIN Perfil on PerfiId = EXUXPPerfil
-					 JOIN Empresa on EmpreId = EXUXPEmpresa
-					 JOIN Licenca on LicenEmpresa = EmpreId
-					 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and 
-						   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
-					 ");
-		}
+		$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
+				 FROM Usuario
+				 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+				 JOIN Perfil on PerfiId = EXUXPPerfil
+				 JOIN Empresa on EmpreId = EXUXPEmpresa
+				 JOIN Licenca on LicenEmpresa = EmpreId
+				 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and 
+					   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
+				 ");
+
 		$result = $conn->query("$sql");
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
 		$count = count($row);
 		
-		if ($count == 0 and $sPerfilChave != 'SUPER'){
+		if ($count == 0){
 			$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";			
 		} else if ($count > 1 and $piEmpresa == 0) {
 			$erro[] = "Você está vinculado em mais de uma empresa. Informe qual deseja acessar.";
@@ -86,27 +77,16 @@ if(isset($_POST['usuario'])){
 				$_SESSION['Empresa'][$linhas['EmpreId']] = $linhas['EmpreNomeFantasia'];
 			}
 		} else if ($piEmpresa) {
-			
-			if ($sPerfilChave == 'SUPER'){
-				$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
-						 FROM Usuario
-						 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-						 JOIN Perfil on PerfiId = EXUXPPerfil
-						 JOIN Empresa on EmpreId = EXUXPEmpresa
-						 JOIN Licenca on LicenEmpresa = EmpreId
-						 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa
-						 ");			 		
-			} else {
-				$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
-						 FROM Usuario
-						 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-						 JOIN Perfil on PerfiId = EXUXPPerfil
-						 JOIN Empresa on EmpreId = EXUXPEmpresa
-						 JOIN Licenca on LicenEmpresa = EmpreId
-						 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa and 
-							   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
-						 ");
-			} 
+						
+			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
+					 FROM Usuario
+					 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+					 JOIN Perfil on PerfiId = EXUXPPerfil
+					 JOIN Empresa on EmpreId = EXUXPEmpresa
+					 JOIN Licenca on LicenEmpresa = EmpreId
+					 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa and 
+						   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
+					 ");
 			$result = $conn->query("$sql");
 			$row = $result->fetch();
 			
