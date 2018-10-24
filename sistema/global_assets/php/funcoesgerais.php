@@ -108,19 +108,17 @@
 	}	
 	
 	//-------------------------------- Retira os acentos
-	function tiraacento($s) {
-		$s = ereg_replace("[áàâãª]","a",$s);
-		$s = ereg_replace("[ÁÀÂÃ]","A",$s);
-		$s = ereg_replace("[éèê]","e",$s);
-		$s = ereg_replace("[ÉÈÊ]","E",$s);
-		$s = ereg_replace("[óòôõº]","o",$s);
-		$s = ereg_replace("[ÓÒÔÕ]","O",$s);
-		$s = ereg_replace("[úùû]","u",$s);
-		$s = ereg_replace("[ÚÙÛ]","U",$s);
-		$s = str_replace("ç","c",$s);
-		$s = str_replace("Ç","C",$s);
-		$s = ereg_replace("  ","",$s);
-		return ($s);
+	function tiraacento($string) {
+		$string	= utf8_decode($string);
+		
+		// matriz de entrada
+		$de = array( 'ä','ã','à','á','â','ê','ë','è','é','ï','ì','í','ö','õ','ò','ó','ô','ü','ù','ú','û','À','Á','É','Í','Ó','Ú','ñ','Ñ','ç','Ç',' ','-','(',')',',',';',':','|','!','"','#','$','%','&','/','=','?','~','^','>','<','ª','º' );
+
+		// matriz de saída
+		$para   = array( 'a','a','a','a','a','e','e','e','e','i','i','i','o','o','o','o','o','u','u','u','u','A','A','E','I','O','U','n','n','c','C','','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_' );
+
+		// devolver a string
+		return str_replace($de, $para, $string);								  
 	}
 	
 	function nomeSobrenome($fullName, $num = 1) {
@@ -166,4 +164,16 @@
 
 		return $response;
 	}	
+	
+	function formatarChave($texto){
+		
+		$TextoSemAcentos = tiraacento($texto);
+		
+		$TextoSemEspacoBranco = str_replace(' ', '', $TextoSemAcentos);
+		
+		$TextoFormatado = strtoupper(trim(utf8_decode($TextoSemEspacoBranco)));
+
+		return $TextoFormatado;
+	}	
+	
 ?>
