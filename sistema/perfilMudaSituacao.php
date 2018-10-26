@@ -4,7 +4,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$_SESSION['msg'] = "";
+$_SESSION['msg'] = array();
 
 if(isset($_POST['inputPerfilId'])){
 	
@@ -20,11 +20,15 @@ if(isset($_POST['inputPerfilId'])){
 		$result->bindParam(':id', $iPerfil); 
 		$result->execute();
 		
-		$_SESSION['msg'] = "Situação da Perfil alterada com sucesso!!!";
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Situação do Perfil alterada!!!";
+		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
-		$_SESSION['msg'] = "Erro ao alterar situação da Perfil!!!";
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do Perfil!!!";
+		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();
 	}

@@ -39,29 +39,68 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/demo_pages/components_popups.js"></script
 	<!-- /theme JS files -->	
 	
-	<script src="global_assets/js/demo_pages/components_modals.js"></script>
+	<!--<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>
+	<script src="global_assets/js/demo_pages/components_modals.js"></script>-->
+	
+	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
+	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
 	
 	<script>
 	
-		$('#confirm').modal(options);
-		$('#confirm').modal('show');
-		
-		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaPerfil(PerfilId, PerfilNome, PerfilStatus, Tipo){
-
-			document.getElementById('inputPerfilId').value = PerfilId;
-			document.getElementById('inputPerfilNome').value = PerfilNome;
-			document.getElementById('inputPerfilStatus').value = PerfilStatus;
+		function alerta(titulo, msg, tipo, modal) {
 					
-			if (Tipo == 'edita'){	
-				document.formPerfil.action = "perfilEdita.php";		
-			} else if (Tipo == 'exclui'){
-				document.formPerfil.action = "perfilExclui.php";
-			} else if (Tipo == 'mudaStatus'){
-				document.formPerfil.action = "perfilMudaSituacao.php";
-			}		
+			var opts = {
+				title: "",
+				text: "",
+				type: "",
+				icon: ""
+			};
+
+			opts.title = titulo;
+			opts.text = msg;
+			opts.type = tipo;
+			//opts.desktop = {desktop: true}
 			
-			document.formPerfil.submit();
+			switch (tipo) {
+			case 'success':
+				opts.icon = "icon-checkmark3";
+				break;
+			case 'error':
+				opts.icon = 'icon-blocked';
+				break;
+			}
+			//console.log(opts);
+			//PNotify.desktop.permission();
+			
+			new PNotify(opts);
+		}	
+		
+		function confima() {
+			
+			console.log('Entrou');
+			
+			new PNotify({
+				title: 'Confirmation Needed',
+				text: 'Are you sure?',
+				icon: 'glyphicon glyphicon-question-sign',
+				hide: false,
+				confirm: {
+					confirm: true
+				},
+				buttons: {
+					closer: false,
+					sticker: false
+				},
+				history: {
+					history: false
+				}
+			}).get().on('pnotify.confirm', function() {
+				return true;
+			}).on('pnotify.cancel', function() {
+				return false;
+			});		
+			
+			console.log('Saiu');
 		}
 			
 	</script>
@@ -85,17 +124,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			<!-- Content area -->
 			<div class="content">
 
-				<?php 
-
-				if (isset($_SESSION['msg'])){
-
-					echo $_SESSION['msg'];		
-					print("<script> $('#confirm').modal('show'); </script>");
-					$_SESSION['msg'] = "";
-				}
-				
-				?>
-
 				<!-- Info blocks -->		
 				<div class="row">
 					<div class="col-lg-12">
@@ -115,11 +143,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<div class="card-body">
 								Segue abaixo a relação de perfis disponíveis para os usuários do sistema.
 								<div class="text-right"><a href="perfilNovo.php" class="btn btn-success" role="button">Novo Perfil</a></div>
-							</div>							
-
-							<button type="button" class="btn btn-primary" id="confirm">
-								Launch demo modal
-							</button>
+							</div>
 							
 							<table class="table datatable-responsive">
 								<thead>
@@ -172,6 +196,32 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			</div>
 			<!-- /content area -->
+			
+			<?php
+
+				if (isset($_SESSION['msg'])){
+					
+					print("
+						<script>
+							
+							var titulo = '".$_SESSION['msg']['titulo']."';
+							var msg = '".$_SESSION['msg']['mensagem']."';
+							var tipo = '".$_SESSION['msg']['tipo']."';							
+							
+							if (msg) {
+															
+								$(function(){
+									alerta(titulo, msg, tipo);
+								});
+							}
+					
+						 </script>  					
+					");	
+					
+					$_SESSION['msg'] = array();
+				}
+				
+			?>
 
 			<?php include_once("footer.php"); ?>
 
@@ -182,4 +232,30 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- /page content -->
 
 </body>
+
+<script>
+
+	//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
+	function atualizaPerfil(PerfilId, PerfilNome, PerfilStatus, Tipo){
+	
+		document.getElementById('inputPerfilId').value = PerfilId;
+		document.getElementById('inputPerfilNome').value = PerfilNome;
+		document.getElementById('inputPerfilStatus').value = PerfilStatus;
+				
+		if (Tipo == 'edita'){	
+			document.formPerfil.action = "perfilEdita.php";		
+		} else if (Tipo == 'exclui'){
+			//$(function(){
+				if (confirma()){
+					document.formPerfil.action = "perfilExclui.php";
+				}
+			//});				
+		} else if (Tipo == 'mudaStatus'){
+			document.formPerfil.action = "perfilMudaSituacao.php";
+		}		
+		
+		document.formPerfil.submit();
+	}
+
+</script>
 </html>

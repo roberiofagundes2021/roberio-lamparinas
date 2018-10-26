@@ -20,12 +20,16 @@ if(isset($_POST['inputNome'])){
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']
 						));
-		
-		$_SESSION['msg'] = "Perfil incluído com sucesso!!!";
+
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Perfil incluído!!!";
+		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
 		
-		$_SESSION['msg'] = "Erro ao incluir Perfil!!!";
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao incluir Perfil!!!";
+		$_SESSION['msg']['tipo'] = "error";				
 		
 		echo 'Error: ' . $e->getMessage();
 	}

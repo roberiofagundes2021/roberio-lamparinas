@@ -23,7 +23,8 @@ var Pnotify = function() {
             console.warn('Warning - pnotify.min.js is not loaded.');
             return;
         }
-
+	
+		
         //
         // Notification styles
         //
@@ -110,6 +111,15 @@ var Pnotify = function() {
                 type: 'info'
             });
         });
+		
+		$('#sucesso').on('click', function() {
+			new PNotify({
+				title: 'Perfil',
+				text: 'Incluido com sucesso.',
+				icon: 'icon-checkmark3',
+				type: 'success'
+			});
+		});		
 
 
         //

@@ -22,7 +22,7 @@ if(isset($_POST['inputPerfilId'])){
 		echo 'Error: ' . $e->getMessage();
 	}
 	
-	$_SESSION['msg'] = "";
+	$_SESSION['msg'] = array();
 }
 
 if(isset($_POST['inputNome'])){
@@ -39,11 +39,15 @@ if(isset($_POST['inputNome'])){
 						':iPerfil' => $_POST['inputPerfiId']
 						));
 		
-		$_SESSION['msg'] = "Perfil alterado com sucesso!!!";
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Perfil alterado!!!";
+		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
-		$_SESSION['msg'] = "Erro ao alterar Perfil!!!";
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar Perfil!!!";
+		$_SESSION['msg']['tipo'] = "error";		
 		
 		echo 'Error: ' . $e->getMessage();
 	}

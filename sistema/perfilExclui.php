@@ -16,11 +16,15 @@ if(isset($_POST['inputPerfilId'])){
 		$result->bindParam(':id', $iPerfil); 
 		$result->execute();
 		
-		$_SESSION['msg'] = "Perfil excluído com sucesso!!!";
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Perfil excluído!!!";
+		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
 		
-		$_SESSION['msg'] = "Erro ao excluir Perfil!!!";
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir Perfil!!!";
+		$_SESSION['msg']['tipo'] = "error";			
 		
 		echo 'Error: ' . $e->getMessage();
 	}
