@@ -16,11 +16,15 @@ if(isset($_POST['inputEmpresaId'])){
 		$result->bindParam(':id', $iEmpresa); 
 		$result->execute();
 		
-		$_SESSION['msg'] = "Empresa excluída com sucesso!!!";
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Empresa excluída!!!";
+		$_SESSION['msg']['tipo'] = "success";	
 		
 	} catch(PDOException $e) {
 		
-		$_SESSION['msg'] = "Erro ao excluir empresa!!!";
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir empresa!!!";
+		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
 	}

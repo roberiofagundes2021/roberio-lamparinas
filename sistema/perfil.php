@@ -39,69 +39,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/demo_pages/components_popups.js"></script
 	<!-- /theme JS files -->	
 	
-	<!--<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>
-	<script src="global_assets/js/demo_pages/components_modals.js"></script>-->
-	
-	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
-	
 	<script>
-	
-		function alerta(titulo, msg, tipo, modal) {
-					
-			var opts = {
-				title: "",
-				text: "",
-				type: "",
-				icon: ""
-			};
-
-			opts.title = titulo;
-			opts.text = msg;
-			opts.type = tipo;
-			//opts.desktop = {desktop: true}
 			
-			switch (tipo) {
-			case 'success':
-				opts.icon = "icon-checkmark3";
-				break;
-			case 'error':
-				opts.icon = 'icon-blocked';
-				break;
-			}
-			//console.log(opts);
-			//PNotify.desktop.permission();
-			
-			new PNotify(opts);
-		}	
+		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
+		function atualizaPerfil(PerfilId, PerfilNome, PerfilStatus, Tipo){
 		
-		function confima() {
+			document.getElementById('inputPerfilId').value = PerfilId;
+			document.getElementById('inputPerfilNome').value = PerfilNome;
+			document.getElementById('inputPerfilStatus').value = PerfilStatus;
+					
+			if (Tipo == 'edita'){	
+				document.formPerfil.action = "perfilEdita.php";		
+			} else if (Tipo == 'exclui'){
+				confirmaExclusao(document.formPerfil, "Tem certeza que deseja excluir esse perfil?", "perfilExclui.php");
+			} else if (Tipo == 'mudaStatus'){
+				document.formPerfil.action = "perfilMudaSituacao.php";
+			}		
 			
-			console.log('Entrou');
-			
-			new PNotify({
-				title: 'Confirmation Needed',
-				text: 'Are you sure?',
-				icon: 'glyphicon glyphicon-question-sign',
-				hide: false,
-				confirm: {
-					confirm: true
-				},
-				buttons: {
-					closer: false,
-					sticker: false
-				},
-				history: {
-					history: false
-				}
-			}).get().on('pnotify.confirm', function() {
-				return true;
-			}).on('pnotify.cancel', function() {
-				return false;
-			});		
-			
-			console.log('Saiu');
-		}
+			document.formPerfil.submit();
+		}		
 			
 	</script>
 
@@ -197,32 +153,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			</div>
 			<!-- /content area -->
 			
-			<?php
-
-				if (isset($_SESSION['msg'])){
-					
-					print("
-						<script>
-							
-							var titulo = '".$_SESSION['msg']['titulo']."';
-							var msg = '".$_SESSION['msg']['mensagem']."';
-							var tipo = '".$_SESSION['msg']['tipo']."';							
-							
-							if (msg) {
-															
-								$(function(){
-									alerta(titulo, msg, tipo);
-								});
-							}
-					
-						 </script>  					
-					");	
-					
-					$_SESSION['msg'] = array();
-				}
-				
-			?>
-
 			<?php include_once("footer.php"); ?>
 
 		</div>
@@ -231,31 +161,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	</div>
 	<!-- /page content -->
 
+	<?php include_once("alerta.php"); ?>
+
 </body>
 
-<script>
-
-	//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-	function atualizaPerfil(PerfilId, PerfilNome, PerfilStatus, Tipo){
-	
-		document.getElementById('inputPerfilId').value = PerfilId;
-		document.getElementById('inputPerfilNome').value = PerfilNome;
-		document.getElementById('inputPerfilStatus').value = PerfilStatus;
-				
-		if (Tipo == 'edita'){	
-			document.formPerfil.action = "perfilEdita.php";		
-		} else if (Tipo == 'exclui'){
-			//$(function(){
-				if (confirma()){
-					document.formPerfil.action = "perfilExclui.php";
-				}
-			//});				
-		} else if (Tipo == 'mudaStatus'){
-			document.formPerfil.action = "perfilMudaSituacao.php";
-		}		
-		
-		document.formPerfil.submit();
-	}
-
-</script>
 </html>

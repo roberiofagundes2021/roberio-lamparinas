@@ -23,11 +23,15 @@ if(isset($_POST['inputCnpj'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']
 						));
 		
-		$_SESSION['msg'] = "Empresa incluída com sucesso!!!";
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Empresa incluída!!!";
+		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
-		$_SESSION['msg'] = "Erro ao incluir empresa!!!";
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao incluir empresa!!!";
+		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
 	}

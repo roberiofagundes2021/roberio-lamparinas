@@ -4,6 +4,8 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
+$_SESSION['msg'] = array();
+
 if(isset($_POST['inputUsuarioId'])){
 	
 	$iUsuario = $_POST['inputUsuarioId'];
@@ -20,11 +22,15 @@ if(isset($_POST['inputUsuarioId'])){
 		$result->bindParam(':idEmpresa', $iEmpresa);
 		$result->execute();
 		
-		$_SESSION['msg'] = "Situação do usuário alterada com sucesso!!!";
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Situação do usuário alterada!!!";
+		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
-		$_SESSION['msg'] = "Erro ao alterar situação do usuário!!!";
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do usuário!!!";
+		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();
 	}

@@ -46,7 +46,7 @@ if(isset($_POST['inputNome'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar Perfil!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar perfil!!!";
 		$_SESSION['msg']['tipo'] = "error";		
 		
 		echo 'Error: ' . $e->getMessage();

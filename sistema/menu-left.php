@@ -40,26 +40,26 @@
 							<li class="nav-item">
 								<a href="#" class="nav-link">
 									<i class="icon-user-plus"></i>
-									<span>My profile</span>
+									<span>Meu Perfil</span>
 								</a>
 							</li>
-							<li class="nav-item">
+							<!--<li class="nav-item">
 								<a href="#" class="nav-link">
 									<i class="icon-coins"></i>
-									<span>My balance</span>
+									<span>Minha bandeja</span>
 								</a>
-							</li>
+							</li>-->
 							<li class="nav-item">
 								<a href="#" class="nav-link">
 									<i class="icon-comment-discussion"></i>
-									<span>Messages</span>
-									<span class="badge bg-teal-400 badge-pill align-self-center ml-auto">58</span>
+									<span>Minha bandeja</span>
+									<span class="badge bg-teal-400 badge-pill align-self-center ml-auto">5</span>
 								</a>
 							</li>
 							<li class="nav-item">
 								<a href="#" class="nav-link">
 									<i class="icon-cog5"></i>
-									<span>Account settings</span>
+									<span>Configurar Conta</span>
 								</a>
 							</li>
 							<li class="nav-item">

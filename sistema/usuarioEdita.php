@@ -6,21 +6,32 @@ $_SESSION['PaginaAtual'] = 'Editar Usuário';
 
 include('global_assets/php/conexao.php');
 
+$sql = ("SELECT PerfiId, PerfiNome
+		 FROM Perfil
+		 Where PerfiStatus = 1
+		 ORDER BY PerfiNome ASC");
+$result = $conn->query("$sql");
+$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
+
 if(isset($_POST['inputUsuarioId'])){
 	
 	$iUsuario = $_POST['inputUsuarioId'];
+	$iEmpresa = $_SESSION['EmpreId'];
         	
 	try{
 		
-		$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha
+		$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, EXUXPPerfil
 				FROM Usuario
-				WHERE UsuarId = $iUsuario ";
+				JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+				WHERE UsuarId = $iUsuario and EXUXPEmpresa = $iEmpresa ";
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
 	}
+	
+	$_SESSION['msg'] = array();	
 }
 
 if(isset($_POST['inputCpf'])){
@@ -39,12 +50,27 @@ if(isset($_POST['inputCpf'])){
 						':sSenha' => $_POST['inputSenha'],						
 						':iUsuario' => $_POST['inputUsuarioId']
 						));
+						
+		$sql = "UPDATE EmpresaXUsuarioXPerfil SET EXUXPPerfil = :iPerfil, EXUXPUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE EXUXPUsuario = :iUsuario and EXUXPEmpresa = :iEmpresa";
+		$result = $conn->prepare($sql);
+	
+		$result->execute(array(
+						':iPerfil' => $_POST['inputPerfil'],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iUsuario' => $_POST['inputUsuarioId'],
+						':iEmpresa' => $_SESSION['EmpreId']
+						));						
 		
-		$_SESSION['msg'] = "Usuário alterado com sucesso!!!";
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Usuário alterado!!!";
+		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
 		
-		$_SESSION['msg'] = "Erro ao alterar usuário!!!";
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar usuário!!!";
+		$_SESSION['msg']['tipo'] = "error";			
 		
 		echo 'Error: ' . $e->getMessage();
 	}
@@ -156,7 +182,11 @@ if(isset($_POST['inputCpf'])){
 													<option value="0">Informe um perfil</option>
 													<?php
 														foreach ($rowPerfil as $item){
-															print('<option value="'.$item['PerfiId'].'">'.$item['PerfiNome'].'</option>');
+															if($item['PerfiId'] == $row['EXUXPPerfil']){
+																print('<option value="'.$item['PerfiId'].'" selected="selected">'.$item['PerfiNome'].'</option>');
+															} else {
+																print('<option value="'.$item['PerfiId'].'">'.$item['PerfiNome'].'</option>');
+															}
 														}	
 													?>
 												</select>

@@ -25,6 +25,11 @@
 
 	<script src="layout_1/LTR/material/full/assets/js/app.js"></script>
 	<script src="global_assets/js/demo_pages/dashboard.js"></script>
+	
+	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
+	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
+	
+	<script src="global_assets/js/lamparinas/custom.js"></script>
 	<!-- /theme JS files -->
 
 	<link href="global_assets/css/lamparinas/custom.css" rel="stylesheet" type="text/css">

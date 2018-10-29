@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Usuário';
 
 include('global_assets/php/conexao.php');
 
-if (isset($_POST['inputEmpresaId']){	
+if (isset($_POST['inputEmpresaId'])){	
 	$EmpresaId = $_POST['inputEmpresaId'];		
 } else if ($_SESSION['UC'] == 'Empresa'){
 	$EmpresaId = $_POST['inputEmpresaId'];
@@ -15,7 +15,7 @@ if (isset($_POST['inputEmpresaId']){
 	$_SESSION['UC'] = 'Usuario';
 }
 
-$sql = ("SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPStatus, PerfiNome, EmpreNome
+$sql = ("SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPStatus, PerfiNome, EmpreNomeFantasia
 		 FROM Usuario
 		 JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		 JOIN Empresa on EXUXPEmpresa = EmpreId
@@ -62,7 +62,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			if (Tipo == 'edita'){
 				document.formUsuario.action = "usuarioEdita.php";
 			} else if (Tipo == 'exclui'){
-				document.formUsuario.action = "usuarioExclui.php";
+				confirmaExclusao(document.formUsuario, "Tem certeza que deseja excluir esse usuário?", "usuarioExclui.php");
 			} else if (Tipo == 'mudaStatus'){
 				document.formUsuario.action = "usuarioMudaSituacao.php";
 			}
@@ -89,18 +89,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			<?php include_once("cabecalho.php"); ?>	
 
 			<!-- Content area -->
-			<div class="content">
-
-				<?php 
-
-				if (isset($_SESSION['msg'])){
-					
-					echo $_SESSION['msg'];					
-					
-					$_SESSION['msg'] = "";
-				}
-				
-				?>			
+			<div class="content">		
 			
 				<!-- Info blocks -->
 				<div class="row">
@@ -158,15 +147,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											
 										print('	<td class="text-center">
 												<div class="list-icons">
-													<div class="dropdown">
-														<a href="#" class="list-icons-item" data-toggle="dropdown">
-															<i class="icon-menu9"></i>
-														</a>
-
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \'edita\')" class="dropdown-item"><i class="icon-pencil7"></i> Editar</a>
-															<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \'exclui\')" class="dropdown-item"><i class="icon-bin"></i> Excluir</a>
-														</div>
+													<div class="list-icons list-icons-extended">
+														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', '.$item['EXUXPStatus'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', '.$item['EXUXPStatus'].', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
@@ -199,6 +182,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	</div>
 	<!-- /page content -->
+
+	<?php include_once("alerta.php"); ?>
 
 </body>
 </html>

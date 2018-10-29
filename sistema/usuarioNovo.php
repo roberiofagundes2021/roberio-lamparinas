@@ -42,11 +42,15 @@ if(isset($_POST['inputCpf'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']
 						));		
 		
-		$_SESSION['msg'] = "Usuário incluído com sucesso!!!";
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Usuário incluído!!!";
+		$_SESSION['msg']['tipo'] = "success";				
 		
 	} catch(PDOException $e) {
 		
-		$_SESSION['msg'] = "Erro ao incluir usuário!!!";
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao incluir usuário!!!";
+		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
 	}

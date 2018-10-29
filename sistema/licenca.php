@@ -7,22 +7,21 @@ $_SESSION['PaginaAtual'] = 'Licença';
 include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputEmpresaId'])){
-	$EmpresaId = $_POST['inputEmpresaId'];
-} else {
+	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
+} else if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
 
 $sql = ("SELECT LicenId, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenStatus
 		 FROM Licenca
 		 JOIN Empresa on EmpreId = LicenEmpresa
-		 WHERE EmpreId = ".$EmpresaId."
+		 WHERE EmpreId = ".$_SESSION['EmpresaId']."
 		 ORDER BY LicenDtInicio DESC"); 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -58,7 +57,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			if (Tipo == 'edita'){	
 				document.formLicenca.action = "licencaEdita.php";		
 			} else if (Tipo == 'exclui'){
-				document.formLicenca.action = "licencaExclui.php";
+				confirmaExclusao(document.formLicenca, "Tem certeza que deseja excluir essa licença?", "licencaExclui.php");
 			} else if (Tipo == 'mudaStatus'){
 				document.formLicenca.action = "licencaMudaSituacao.php";
 			}
@@ -86,17 +85,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			<!-- Content area -->
 			<div class="content">
-
-				<?php 
-
-				if (isset($_SESSION['msg'])){
-
-					echo $_SESSION['msg'];
-					
-					$_SESSION['msg'] = "";
-				}
-				
-				?>
 
 				<!-- Info blocks -->		
 				<div class="row">
@@ -188,6 +176,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	</div>
 	<!-- /page content -->
+	
+	<?php include_once("alerta.php"); ?>
 
 </body>
 </html>

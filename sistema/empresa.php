@@ -41,7 +41,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- /theme JS files -->	
 	
 	<script>
-		
+				
 		function atualizaEmpresa(EmpresaId, EmpresaNome, EmpresaStatus, Tipo){
 
 			document.getElementById('inputEmpresaId').value = EmpresaId;
@@ -51,7 +51,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			if (Tipo == 'edita'){	
 				document.formEmpresa.action = "empresaEdita.php";		
 			} else if (Tipo == 'exclui'){
-				document.formEmpresa.action = "empresaExclui.php";
+				confirmaExclusao(document.formEmpresa, "Tem certeza que deseja excluir essa empresa?", "empresaExclui.php");
 			} else if (Tipo == 'mudaStatus'){
 				document.formEmpresa.action = "empresaMudaSituacao.php";
 			} else if (Tipo == 'usuario') {
@@ -83,18 +83,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			<!-- Content area -->
 			<div class="content">
-
-				<?php 
-
-				if (isset($_SESSION['msg'])){
-					/*<button type="button" class="btn btn-light" id="noty_top_center">Launch <i class="icon-play3 ml-2"></i></button>
-					<button type="button" class="btn btn-success legitRipple" id="noty_success"></button>*/
-					echo $_SESSION['msg'];
-					
-					$_SESSION['msg'] = "";
-				}
-				
-				?>
 
 				<!-- Info blocks -->		
 				<div class="row">
@@ -197,6 +185,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	</div>
 	<!-- /page content -->
+	
+	<?php include_once("alerta.php"); ?>
 
 </body>
 </html>

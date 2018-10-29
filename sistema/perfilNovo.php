@@ -80,7 +80,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formPerfil" method="post" class="form-validate" action="PerfilNovo.php">
+					<form name="formPerfil" method="post" class="form-validate" action="perfilNovo.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Perfil</h5>
 						</div>
@@ -90,7 +90,7 @@ if(isset($_POST['inputNome'])){
 								<div class="col-lg-12">
 									<div class="form-group">
 										<label for="inputNome">Perfil</label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Perfil" required>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Perfil" required autofocus>
 									</div>
 								</div>
 							</div>

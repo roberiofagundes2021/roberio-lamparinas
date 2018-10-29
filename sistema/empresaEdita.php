@@ -22,7 +22,7 @@ if(isset($_POST['inputEmpresaId'])){
 		echo 'Error: ' . $e->getMessage();
 	}
 	
-	$_SESSION['msg'] = "";
+	$_SESSION['msg'] = array();
 }
 
 if(isset($_POST['inputCnpj'])){
@@ -43,11 +43,15 @@ if(isset($_POST['inputCnpj'])){
 						':iEmpresa' => $_POST['inputEmpreId']
 						));
 		
-		$_SESSION['msg'] = "Empresa alterada com sucesso!!!";
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Empresa alterada!!!";
+		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
-		$_SESSION['msg'] = "Erro ao alterar empresa!!!";
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar empresa!!!";
+		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
 	}

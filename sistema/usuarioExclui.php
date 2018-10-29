@@ -16,13 +16,17 @@ if(isset($_POST['inputUsuarioId'])){
 		$result->bindParam(':id', $iUsuario);
 		$result->execute();
 		
-		$_SESSION['msg'] = "Usuário excluída com sucesso!!!";
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Usuário excluído!!!";
+		$_SESSION['msg']['tipo'] = "success";	
 		
 	} catch(PDOException $e) {
 		
-		$_SESSION['msg'] = "Erro ao excluir usuário!!!";
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir Usuário!!!";
+		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 }
 
