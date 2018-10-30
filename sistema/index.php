@@ -38,11 +38,11 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 			<!-- Content area -->
 			<div class="content">
 
-				<!-- Main charts -->
+				<!-- Main charts --
 				<div class="row">
 					<div class="col-xl-7">
 
-						<!-- Traffic sources -->
+						<!-- Traffic sources --
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h6 class="card-title">Traffic sources</h6>
@@ -101,13 +101,13 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 
 							<div class="chart position-relative" id="traffic-sources"></div>
 						</div>
-						<!-- /traffic sources -->
+						<!-- /traffic sources --
 
 					</div>
 
 					<div class="col-xl-5">
 
-						<!-- Sales stats -->
+						<!-- Sales stats --
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h6 class="card-title">Sales statistics</h6>
@@ -149,7 +149,7 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 							<div class="chart mb-2" id="app_sales"></div>
 							<div class="chart" id="monthly-sales-stats"></div>
 						</div>
-						<!-- /sales stats -->
+						<!-- /sales stats --
 
 					</div>
 				</div>
@@ -1012,7 +1012,7 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 						<!-- /support tickets -->
 
 
-						<!-- Latest posts -->
+						<!-- Latest posts --
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h6 class="card-title">Latest posts</h6>
