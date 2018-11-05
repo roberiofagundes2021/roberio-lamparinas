@@ -2,36 +2,52 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Nova Licenca';
+$_SESSION['PaginaAtual'] = 'Editar Licenca';
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputDataInicio'])){
-
+if(isset($_POST['inputLicencaId'])){
+	
+	$iLicenca = $_POST['inputLicencaId'];
+        	
 	try{
 		
-		$sql = "INSERT INTO Licenca (LicenEmpresa, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenStatus, LicenUsuarioAtualizador)
-				VALUES (:iEmpresa, :dDtInicio, :dDtFim, :iLimiteUsuarios, :bStatus, :iUsuarioAtualizador)";
+		$sql = "SELECT LicenId
+				FROM Licenca
+				WHERE LicenId = $iLicenca ";
+		$result = $conn->query("$sql");
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+		
+	} catch(PDOException $e) {
+		echo 'Error: ' . $e->getMessage();
+	}
+	
+	$_SESSION['msg'] = array();
+}
+
+if(isset($_POST['inputNome'])){
+	
+	try{
+		
+		$sql = "UPDATE Licenca SET PerfiNome = :sNome, LicenUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE LicenId = :iLicenca";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':iEmpresa' => $_SESSION['EmpreId'],
-						':dDtInicio' => $_POST['inputDataInicio'],
-						':dDtFim' => $_POST['inputDataFim'],
-						':iLimiteUsuarios' => $_POST['inputLimiteUsuarios'],
-						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId']
+						':sNome' => $_POST['inputNome'],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iPerfil' => $_POST['inputPerfiId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Licença incluída!!!";
-		$_SESSION['msg']['tipo'] = "success";	
+		$_SESSION['msg']['mensagem'] = "Licença alterada!!!";
+		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir Licença!!!";
-		$_SESSION['msg']['tipo'] = "error";	
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar licenca!!!";
+		$_SESSION['msg']['tipo'] = "error";		
 		
 		echo 'Error: ' . $e->getMessage();
 	}
@@ -59,8 +75,6 @@ if(isset($_POST['inputDataInicio'])){
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<!-- /theme JS files -->	
-	
-	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 
 </head>
 
@@ -79,46 +93,44 @@ if(isset($_POST['inputDataInicio'])){
 			<?php include_once("cabecalho.php"); ?>	
 
 			<!-- Content area -->
-			<div class="content">
+			<div class="content">		
 				
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formLicenca" method="post" class="form-validate" action="licencaNovo.php">
+					<form name="formPerfil" method="post" class="form-validate" action="perfilEdita.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Licença</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Licença</h5>
 						</div>
+						
+						<input type="hidden" id="inputLicenId" name="inputLicenId" value="<?php echo $row['LicenId']; ?>" >
 						
 						<div class="card-body">								
 							<div class="row">
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputDataInicio">Data Início</label>
-										<div class="input-group">
-											<span class="input-group-prepend">
-												<span class="input-group-text"><i class="icon-calendar22"></i></span>
-											</span>
-											<input type="text" id="inputDataInicio" name="inputDataInicio" class="form-control daterange-single" placeholder="Data Início" required>
-										</div>
+										<input type="text" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['PerfiNome']; ?>" required>
 									</div>
 								</div>
+							</div>
 								
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputDataFim">Data Fim</label>
-										<div class="input-group">
-											<span class="input-group-prepend">
-												<span class="input-group-text"><i class="icon-calendar22"></i></span>
-											</span>																					
-											<input type="text" id="inputDataFim" name="inputDataFim" class="form-control daterange-single" placeholder="Data Fim">
+							<div class="row">				
+								<div class="col-lg-12">
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="inputDataFim">Data Fim</label>
+												<input type="text" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['PerfiNome']; ?>">
+											</div>
 										</div>
-									</div>
-								</div>
 										
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputLimiteUsuarios">Limite de Usuários</label>
-										<input type="text" id="inputLimiteUsuarios" name="inputLimiteUsuarios" class="form-control" placeholder="Limite de Usuários">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="inputLimiteUsuarios">Limite de Usuários</label>
+												<input type="text" id="inputLimiteUsuarios" name="inputLimiteUsuarios" class="form-control" placeholder="Limite de Usuários" value="<?php echo $row['PerfiNome']; ?>">
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>							
@@ -131,7 +143,7 @@ if(isset($_POST['inputDataInicio'])){
 									</div>
 								</div>
 							</div>
-						</form>								
+						</form>
 
 					</div>
 					<!-- /card-body -->
