@@ -1,4 +1,4 @@
-		<!-- Main sidebar -->
+				<!-- Main sidebar -->
 		<div class="sidebar sidebar-light sidebar-main sidebar-expand-md">
 
 			<!-- Sidebar mobile toggler -->
@@ -79,130 +79,38 @@
 					<ul class="nav nav-sidebar" data-nav-type="accordion">
 
 						<!-- Main -->
-						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Main</div> <i class="icon-menu" title="Main"></i></li>
+						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Principal</div> <i class="icon-menu" title="Main"></i></li>
 						<li class="nav-item">
 							<a href="index.html" class="nav-link active">
 								<i class="icon-home4"></i>
 								<span>
-									Dashboard
+									Página Inicial
 								</span>
 							</a>
 						</li>
-						<li class="nav-item nav-item-submenu">
-							<a href="#" class="nav-link"><i class="icon-copy"></i> <span>Layouts</span></a>
+								<!-- /main -->
 
-							<ul class="nav nav-group-sub" data-submenu-title="Layouts">
-								<li class="nav-item"><a href="index.html" class="nav-link active">Default layout</a></li>
-								<li class="nav-item"><a href="../../../../layout_2/LTR/material/full/index.html" class="nav-link">Layout 2</a></li>
-								<li class="nav-item"><a href="../../../../layout_3/LTR/material/full/index.html" class="nav-link">Layout 3</a></li>
-								<li class="nav-item"><a href="../../../../layout_4/LTR/material/full/index.html" class="nav-link">Layout 4</a></li>
-								<li class="nav-item"><a href="../../../../layout_5/LTR/material/full/index.html" class="nav-link">Layout 5</a></li>
-								<li class="nav-item"><a href="../../../../layout_6/LTR/material/full/index.html" class="nav-link disabled">Layout 6 <span class="badge bg-transparent align-self-center ml-auto">Coming soon</span></a></li>
-							</ul>
+						<!-- Forms -->
+						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Controle de Estoque</div> <i class="icon-menu" title="Forms"></i></li>
+						<li class="nav-item">
+							<a href="fornecedor.php" class="nav-link"><i class="icon-pencil3"></i> <span>Fornecedor</span></a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link"><i class="icon-file-css"></i> <span>Produto</span></a>
 						</li>
 						<li class="nav-item nav-item-submenu">
-							<a href="#" class="nav-link"><i class="icon-color-sampler"></i> <span>Themes</span></a>
-
-							<ul class="nav nav-group-sub" data-submenu-title="Themes">
-								<li class="nav-item"><a href="../../../LTR/default/full/index.html" class="nav-link">Default</a></li>
-								<li class="nav-item"><a href="index.html" class="nav-link active">Material</a></li>
-								<li class="nav-item"><a href="../../../dark/full/index.html" class="nav-link disabled">Dark <span class="badge bg-transparent align-self-center ml-auto">Coming soon</span></a></li>
-								<li class="nav-item"><a href="../../../clean/full/index.html" class="nav-link disabled">Clean <span class="badge bg-transparent align-self-center ml-auto">Coming soon</span></a></li>
-							</ul>
-						</li>
-						<li class="nav-item nav-item-submenu">
-							<a href="#" class="nav-link"><i class="icon-stack"></i> <span>Starter kit</span></a>
-
-							<ul class="nav nav-group-sub" data-submenu-title="Starter kit">
-								<li class="nav-item"><a href="../seed/layout_nav_horizontal.html" class="nav-link">Horizontal navigation</a></li>
-								<li class="nav-item"><a href="../seed/sidebar_none.html" class="nav-link">No sidebar</a></li>
-								<li class="nav-item"><a href="../seed/sidebar_main.html" class="nav-link">1 sidebar</a></li>
-								<li class="nav-item nav-item-submenu">
-									<a href="#" class="nav-link">2 sidebars</a>
-									<ul class="nav nav-group-sub">
-										<li class="nav-item"><a href="../seed/sidebar_secondary.html" class="nav-link">Secondary sidebar</a></li>
-										<li class="nav-item"><a href="../seed/sidebar_right.html" class="nav-link">Right sidebar</a></li>
-									</ul>
-								</li>
-								<li class="nav-item nav-item-submenu">
-									<a href="#" class="nav-link">3 sidebars</a>
-									<ul class="nav nav-group-sub">
-										<li class="nav-item"><a href="../seed/sidebar_right_hidden.html" class="nav-link">Right sidebar hidden</a></li>
-										<li class="nav-item"><a href="../seed/sidebar_right_visible.html" class="nav-link">Right sidebar visible</a></li>
-									</ul>
-								</li>
-								<li class="nav-item nav-item-submenu">
-									<a href="#" class="nav-link">Content sidebars</a>
-									<ul class="nav nav-group-sub">
-										<li class="nav-item"><a href="../seed/sidebar_content_left.html" class="nav-link">Left sidebar</a></li>
-										<li class="nav-item"><a href="../seed/sidebar_content_right.html" class="nav-link">Right sidebar</a></li>
-									</ul>
-								</li>
-								<li class="nav-item"><a href="../seed/layout_boxed.html" class="nav-link">Boxed layout</a></li>
-								<li class="nav-item-divider"></li>
-								<li class="nav-item"><a href="../seed/navbar_fixed_main.html" class="nav-link">Fixed main navbar</a></li>
-								<li class="nav-item"><a href="../seed/navbar_fixed_secondary.html" class="nav-link">Fixed secondary navbar</a></li>
-								<li class="nav-item"><a href="../seed/navbar_fixed_both.html" class="nav-link">Both navbars fixed</a></li>
-								<li class="nav-item"><a href="../seed/layout_fixed.html" class="nav-link">Fixed layout</a></li>
+							<a href="#" class="nav-link"><i class="icon-spell-check"></i> <span>Compras</span></a>
+							<ul class="nav nav-group-sub" data-submenu-title="Text editors">
+								<li class="nav-item"><a href="editor_summernote.html" class="nav-link">Orçamento</a></li>
+								<li class="nav-item"><a href="editor_ckeditor.html" class="nav-link">Solicitação</a></li>
+								<li class="nav-item"><a href="editor_trumbowyg.html" class="nav-link">Ordem de Compra</a></li>
 							</ul>
 						</li>
 						<li class="nav-item">
-							<a href="changelog.html" class="nav-link">
-								<i class="icon-list-unordered"></i>
-								<span>Changelog</span>
-								<span class="badge bg-blue-400 align-self-center ml-auto">2.0</span>
-							</a>
-						</li>
-						<li class="nav-item"><a href="../../../RTL/material/full/index.html" class="nav-link"><i class="icon-width"></i> <span>RTL version</span></a></li>
-						<!-- /main -->
-
-						<!-- Forms -->
-						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Forms</div> <i class="icon-menu" title="Forms"></i></li>
-						<li class="nav-item nav-item-submenu">
-							<a href="#" class="nav-link"><i class="icon-pencil3"></i> <span>Form components</span></a>
-							<ul class="nav nav-group-sub" data-submenu-title="Form components">
-								<li class="nav-item"><a href="form_inputs.html" class="nav-link">Basic inputs</a></li>
-								<li class="nav-item"><a href="form_checkboxes_radios.html" class="nav-link">Checkboxes &amp; radios</a></li>
-								<li class="nav-item"><a href="form_select2.html" class="nav-link">Select2 selects</a></li>
-								<li class="nav-item"><a href="form_multiselect.html" class="nav-link">Bootstrap multiselect</a></li>
-								<li class="nav-item"><a href="form_input_groups.html" class="nav-link">Input groups</a></li>
-								<li class="nav-item"><a href="form_controls_extended.html" class="nav-link">Extended controls</a></li>
-								<li class="nav-item"><a href="form_floating_labels.html" class="nav-link">Floating labels</a></li>
-								<li class="nav-item"><a href="form_tag_inputs.html" class="nav-link">Tag inputs</a></li>
-								<li class="nav-item"><a href="form_dual_listboxes.html" class="nav-link">Dual Listboxes</a></li>
-								<li class="nav-item"><a href="form_validation.html" class="nav-link">Validation</a></li>
-								<li class="nav-item"><a href="form_wizard.html" class="nav-link">Form wizard</a></li>
-								<li class="nav-item"><a href="form_actions.html" class="nav-link">Form actions</a></li>
-								<li class="nav-item"><a href="form_inputs_grid.html" class="nav-link">Inputs grid</a></li>
-							</ul>
+							<a href="#" class="nav-link"><i class="icon-select2"></i> <span>Gerenciamento do Estoque</span></a>
 						</li>
 						<li class="nav-item nav-item-submenu">
-							<a href="#" class="nav-link"><i class="icon-file-css"></i> <span>JSON forms</span></a>
-							<ul class="nav nav-group-sub" data-submenu-title="JSON forms">
-								<li class="nav-item"><a href="alpaca_basic.html" class="nav-link">Basic inputs</a></li>
-								<li class="nav-item"><a href="alpaca_advanced.html" class="nav-link">Advanced inputs</a></li>
-								<li class="nav-item"><a href="alpaca_controls.html" class="nav-link">Controls</a></li>
-							</ul>
-						</li>
-						<li class="nav-item nav-item-submenu">
-							<a href="#" class="nav-link"><i class="icon-spell-check"></i> <span>Text editors</span></a>
-							<ul class="nav nav-group-sub" data-submenu-title="Text editors">
-								<li class="nav-item"><a href="editor_summernote.html" class="nav-link">Summernote editor</a></li>
-								<li class="nav-item"><a href="editor_ckeditor.html" class="nav-link">CKEditor</a></li>
-								<li class="nav-item"><a href="editor_trumbowyg.html" class="nav-link">Trumbowyg editor</a></li>
-								<li class="nav-item"><a href="editor_code.html" class="nav-link">Code editor</a></li>
-							</ul>
-						</li>
-						<li class="nav-item nav-item-submenu">
-							<a href="#" class="nav-link"><i class="icon-select2"></i> <span>Pickers</span></a>
-							<ul class="nav nav-group-sub" data-submenu-title="Pickers">
-								<li class="nav-item"><a href="picker_date.html" class="nav-link">Date &amp; time pickers</a></li>
-								<li class="nav-item"><a href="picker_color.html" class="nav-link">Color pickers</a></li>
-								<li class="nav-item"><a href="picker_location.html" class="nav-link">Location pickers</a></li>
-							</ul>
-						</li>
-						<li class="nav-item nav-item-submenu">
-							<a href="#" class="nav-link"><i class="icon-insert-template"></i> <span>Form layouts</span></a>
+							<a href="#" class="nav-link"><i class="icon-insert-template"></i> <span>Relatórios</span></a>
 							<ul class="nav nav-group-sub" data-submenu-title="Form layouts">
 								<li class="nav-item"><a href="form_layout_vertical.html" class="nav-link">Vertical form</a></li>
 								<li class="nav-item"><a href="form_layout_vertical_styled.html" class="nav-link disabled">Custom styles <span class="badge bg-transparent align-self-center ml-auto">Coming soon</span></a></li>
