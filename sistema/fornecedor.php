@@ -106,7 +106,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<tr class="bg-slate">
 										<th>Nome Fantasia</th>
 										<th>Razão Social</th>
-										<th>CNPJ</th>
+										<th>CPF/CNPJ</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
