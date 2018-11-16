@@ -6,9 +6,10 @@ $_SESSION['PaginaAtual'] = 'Fornecedor';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ForneId, ForneNomeFantasia, ForneRazaoSocial, ForneCnpj, ForneStatus
-		 FROM Fornecedor		 
-		 ORDER BY ForneNomeFantasia ASC");
+$sql = ("SELECT ForneId, ForneNome, ForneRazaoSocial, ForneCnpj, ForneStatus
+		 FROM Fornecedor
+	     WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ."
+		 ORDER BY ForneNome ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -120,18 +121,18 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										print('
 										<tr>
-											<td>'.$item['ForneNomeFantasia'].'</td>
+											<td>'.$item['ForneNome'].'</td>
 											<td>'.$item['ForneRazaoSocial'].'</td>
 											<td>'.$item['ForneCnpj'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNomeFantasia'].'\','.$item['ForneStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNomeFantasia'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNomeFantasia'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
