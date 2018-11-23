@@ -2,14 +2,16 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Fornecedor';
+$_SESSION['PaginaAtual'] = 'Produto';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ForneId, ForneNome, ForneRazaoSocial, ForneCnpj, ForneStatus
-		 FROM Fornecedor
-	     WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY ForneNome ASC");
+$sql = ("SELECT ProduId, ProduDescricao, CategNome, SbCatNome, ProduStatus
+		 FROM Produto
+		 JOIN Categoria on CategId = ProduCategoria
+		 JOIN SubCategoria on SbCatId = ProduSubCategoria
+	     WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ."
+		 ORDER BY ProduDescricao ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -22,7 +24,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Fornecedor</title>
+	<title>Lamparinas | Produto</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -43,21 +45,21 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script>
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaFornecedor(ForneId, ForneNome, ForneStatus, Tipo){
+		function atualizaProduto(ProduId, ProduNome, ProduStatus, Tipo){
 		
-			document.getElementById('inputFornecedorId').value = ForneId;
-			document.getElementById('inputFornecedorNome').value = ForneNome;
-			document.getElementById('inputFornecedorStatus').value = ForneStatus;
+			document.getElementById('inputProdutoId').value = ProduId;
+			document.getElementById('inputProdutoNome').value = ProduNome;
+			document.getElementById('inputProdutoStatus').value = ProduStatus;
 					
 			if (Tipo == 'edita'){	
-				document.formFornecedor.action = "fornecedorEdita.php";		
+				document.formProduto.action = "produtoEdita.php";		
 			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir esse fornecedor?", "fornecedorExclui.php");
+				confirmaExclusao(document.formProduto, "Tem certeza que deseja excluir esse produto?", "produtoExclui.php");
 			} else if (Tipo == 'mudaStatus'){
-				document.formFornecedor.action = "fornecedorMudaSituacao.php";
+				document.formProduto.action = "produtoMudaSituacao.php";
 			}		
 			
-			document.formFornecedor.submit();
+			document.formProduto.submit();
 		}		
 			
 	</script>
@@ -87,7 +89,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Fornecedores</h3>
+								<h3 class="card-title">Relação de Produtos</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
@@ -98,16 +100,21 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos fornecedores da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
-								<div class="text-right"><a href="fornecedorNovo.php" class="btn btn-success" role="button">Novo Fornecedor</a></div>
+								<p class="font-size-lg">A relação abaixo faz referência aos produtos da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<div class="text-right">
+									<a href="produtoNovo.php" class="btn btn-success" role="button">Novo Produto</a>
+									<a href="importarProduto.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>
+									<a href="exportarProduto.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>									
+									<a href="imprimirProduto.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação">Imprimir</a></div>
 							</div>
 							
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th>Nome Fantasia</th>
-										<th>Razão Social</th>
-										<th>CPF/CNPJ</th>
+										<th>Descrição</th>
+										<th>Categoria</th>
+										<th>SubCategoria</th>
+										<th>Preço Venda</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -116,23 +123,24 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['ForneStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['ForneStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['ProduStatus'] ? 'Ativo' : 'Inativo';
+										$situacaoClasse = $item['ProduStatus'] ? 'badge-success' : 'badge-secondary';
 										
 										print('
 										<tr>
-											<td>'.$item['ForneNome'].'</td>
-											<td>'.$item['ForneRazaoSocial'].'</td>
-											<td>'.$item['ForneCnpj'].'</td>
+											<td>'.$item['ProduDescricao'].'</td>
+											<td>'.$item['CategNome'].'</td>
+											<td>'.$item['SbCatNome'].'</td>
+											<td>'.$item['ProduValorVenda'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduDescricao'].'\','.$item['ProduStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduDescricao'].'\','.$item['ProduStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduDescricao'].'\','.$item['ProduStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
@@ -151,9 +159,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<!-- /info blocks -->
 				
 				<form name="formPerfil" method="post">
-					<input type="hidden" id="inputFornecedorId" name="inputFornecedorId" >
-					<input type="hidden" id="inputFornecedorNome" name="inputFornecedorNome" >
-					<input type="hidden" id="inputFornecedorStatus" name="inputFornecedorStatus" >
+					<input type="hidden" id="inputProdutoId" name="inputProdutoId" >
+					<input type="hidden" id="inputProdutoNome" name="inputProdutoNome" >
+					<input type="hidden" id="inputProdutoStatus" name="inputProdutoStatus" >
 				</form>
 
 			</div>

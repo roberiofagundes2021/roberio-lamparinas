@@ -96,7 +96,7 @@
 							<a href="fornecedor.php" class="nav-link"><i class="icon-pencil3"></i> <span>Fornecedor</span></a>
 						</li>
 						<li class="nav-item">
-							<a href="#" class="nav-link"><i class="icon-file-css"></i> <span>Produto</span></a>
+							<a href="produto.php" class="nav-link"><i class="icon-file-css"></i> <span>Produto</span></a>
 						</li>
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-spell-check"></i> <span>Compras</span></a>

@@ -97,7 +97,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h5 class="card-title">Relação de Usuários</h5>
+								<h3 class="card-title">Relação de Usuários</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
@@ -108,7 +108,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								Os usuários cadastrados abaixo pertencem a empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b>.
+								<p class="font-size-lg">Os usuários cadastrados abaixo pertencem a empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b>.</p>
 								<div class="text-right"><a href="usuarioNovo.php" class="btn btn-success" role="button">Novo usário</a></div>
 							</div>							
 

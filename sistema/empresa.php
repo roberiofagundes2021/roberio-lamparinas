@@ -90,7 +90,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h5 class="card-title">Relação de Empresas</h5>
+								<h3 class="card-title">Relação de Empresas</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
@@ -101,7 +101,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								As empresas cadastradas abaixo estarão aptas a utilizar o sistema, desde que ativas e com licença vigente.
+								<p class="font-size-lg">As empresas cadastradas abaixo estarão aptas a utilizar o sistema, desde que ativas e com licença vigente.</p>
 								<div class="text-right"><a href="empresaNovo.php" class="btn btn-success" role="button">Nova Empresa</a></div>
 							</div>							
 
