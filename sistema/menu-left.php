@@ -101,9 +101,9 @@
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-spell-check"></i> <span>Compras</span></a>
 							<ul class="nav nav-group-sub" data-submenu-title="Text editors">
-								<li class="nav-item"><a href="editor_summernote.html" class="nav-link">Orçamento</a></li>
+								<li class="nav-item"><a href="orcamento.php" class="nav-link">Orçamento</a></li>
 								<li class="nav-item"><a href="editor_ckeditor.html" class="nav-link">Solicitação</a></li>
-								<li class="nav-item"><a href="editor_trumbowyg.html" class="nav-link">Ordem de Compra</a></li>
+								<li class="nav-item"><a href="ordemcompra.php" class="nav-link">Ordem de Compra</a></li>
 							</ul>
 						</li>
 						<li class="nav-item">

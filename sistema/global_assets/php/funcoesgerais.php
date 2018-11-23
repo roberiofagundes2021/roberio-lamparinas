@@ -82,7 +82,7 @@
 	function gravadata ($data) {
 	if ($data != '') {
 	   $parte = explode("/", $data);
-		return ($parte[2].'/'.$parte[1].'/'.$parte[0]); 
+		return ($parte[2].'-'.$parte[1].'-'.$parte[0]); 
 	   /* return (substr($data,6,4).'/'.substr($data,3,2).'/'.substr($data,0,2));  */
 	}
 	else { 
