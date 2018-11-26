@@ -103,9 +103,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<p class="font-size-lg">A relação abaixo faz referência aos produtos da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
 								<div class="text-right">
 									<a href="produtoNovo.php" class="btn btn-success" role="button">Novo Produto</a>
-									<a href="importarProduto.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>
-									<a href="exportarProduto.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>									
-									<a href="imprimirProduto.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação">Imprimir</a></div>
+									<a href="produtoImportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>
+									<a href="produtoExportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>									
+									<a href="produtoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Imprimir</a></div>
 							</div>
 							
 							<table class="table datatable-responsive">
