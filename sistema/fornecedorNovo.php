@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Novo Orçamento';
+$_SESSION['PaginaAtual'] = 'Novo Fornecedor';
 
 include('global_assets/php/conexao.php');
 
@@ -17,23 +17,50 @@ if(isset($_POST['inputTipo'])){
 									    ForneBanco, ForneAgencia, ForneConta, ForneInformacaoAdicional, ForneIpi, ForneFrete, ForneIcms, 
 									    ForneOutros, ForneStatus, ForneUsuarioAtualizador, ForneEmpresa)
 				VALUES (:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual, :iCategoria, :iSubCategoria, 
-						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dAniversario, :sCep, :sEndereco, :sNumero, :sComplemtento, :sBairo, 
+						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dAniversario, :sCep, :sEndereco, :sNumero, :sComplemtento, :sBairro, 
 						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, :iBanco, :sAgencia, 
-						:sConta, :sInformacaoAdicional, :iIpi, :iFrete, :iIcms, :iOutros,:bStatus, :iUsuarioAtualizador, :iEmpresa)";
+						:sConta, :sInformacaoAdicional, :iIpi, :iFrete, :iIcms, :iOutros, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':sNumero' => date()."/".$_POST['inputLote'],
-						':sTipo' => $_POST['radioTipo'] == "on" ? "P" : "S",
-						':dData' => gravadata($_POST['inputData']),
-						':sLote' => $_POST['inputLote'],
+						':sTipo' => $_POST['radioTipo'] == "on" ? "F" : "J",
+						':sNome' => $_POST['inputNome'],
+						':sRazaoSocial' => $_POST['inputRazaoSocial'],
+						':sCnpj' => $_POST['inputCnpj'],
+						':sInscricaoMunicipal' => $_POST['inputInscricaoMunicipal'],
+						':sInscricaoEstadual' => $_POST['inputInscricaoEstadual'],
 						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'],
-						':sConteudo' => $_POST['txtareaConteudo'],
-						':iFornecedor' => $_POST['inputFornecedor'],
-						':iSolicitante' => $_SESSION['UsuarId'],
+						':sCpf' => $_POST['inputCpf'],
+						':sRg' => $_POST['inputRg'],
+						':sOrgaoEmissor' => $_POST['inputEmissor'],
+						':sUf' => $_POST['cmbUf'],
+						':sSexo' => $_POST['cmbSexo'],
+						':dAniversario' => gravadata($_POST['inputAniversario']),
+						':sCep' => $_POST['inputCep'],
+						':sEndereco' => $_POST['inputEndereco'],
+						':sNumero' => $_POST['inputNumero'],
+						':sComplemento' => $_POST['inputComplemento'],
+						':sBairro' => $_POST['inputBairro'],
+						':sCidade' => $_POST['inputCidade'],
+						':sEstado' => $_POST['cmbEstado'],
+						':sContato' => $_POST['inputNomeContato'],
+						':sTelefone' => $_POST['inputTelefone'],
+						':sCelular' => $_POST['inputCelular'],
+						':sEmail' => $_POST['inputEmail'],
+						':sSite' => $_POST['inputSite'],
+						':sObservacao' => $_POST['txtareaObservacao'],
+						':iBanco' => $_POST['cmbBanco'],
+						':sAgencia' => $_POST['inputAgencia'],
+						':sConta' => $_POST['inputConta'],
+						':sInformacaoAdicional' => $_POST['inputInformacaoAdicional'],
+						':iIpi' => $_POST['inputIpi'],
+						':iFrete' => $_POST['inputFrete'],
+						':iIcms' => $_POST['inputIcms'],
+						':iOutros' => $_POST['inputOutros'],
 						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId']
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iEmpresa' => $_SESSION['EmpreId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -74,8 +101,78 @@ if(isset($_POST['inputTipo'])){
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	<!-- /theme JS files -->	
 
+	<!-- Adicionando Javascript -->
+    <script type="text/javascript" >
+
+        $(document).ready(function() {
+
+            function limpa_formulário_cep() {
+                // Limpa valores do formulário de cep.
+                $("#inputEndereco").val("");
+                $("#inputBairro").val("");
+                $("#inputCidade").val("");
+                $("#cmbEstado").val("");                
+            }
+            
+            //Quando o campo cep perde o foco.
+            $("#inputCep").blur(function() {
+
+                //Nova variável "cep" somente com dígitos.
+                var cep = $(this).val().replace(/\D/g, '');
+
+                //Verifica se campo cep possui valor informado.
+                if (cep != "") {
+
+                    //Expressão regular para validar o CEP.
+                    var validacep = /^[0-9]{8}$/;
+
+                    //Valida o formato do CEP.
+                    if(validacep.test(cep)) {
+
+                        //Preenche os campos com "..." enquanto consulta webservice.
+                        $("#inputEndereco").val("...");
+                        $("#inputBairro").val("...");
+                        $("#inputCidade").val("...");
+                        $("#cmbEstado").val("...");                        
+
+                        //Consulta o webservice viacep.com.br/
+                        $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados) {
+
+                            if (!("erro" in dados)) {
+								alert("Entrou aqui");
+                                //Atualiza os campos com os valores da consulta.
+                                $("#inputEndereco").val(dados.logradouro);
+                                $("#inputBairro").val(dados.bairro);
+                                $("#inputCidade").val(dados.localidade);
+                                $("#cmbEstado").val(dados.uf);
+								$("#cmbEstado").find('option:selected').text();
+                            } //end if.
+                            else {
+                                //CEP pesquisado não foi encontrado.
+                                limpa_formulário_cep();
+                                alert("CEP não encontrado.");
+                            }
+                        });
+                    } //end if.
+                    else {
+                        //cep é inválido.
+                        limpa_formulário_cep();
+                        alert("Formato de CEP inválido.");
+                    }
+                } //end if.
+                else {
+                    //cep sem valor, limpa formulário.
+                    limpa_formulário_cep();
+                }
+            });
+        });
+
+    </script>	
+	
 </head>
 
 <body class="navbar-top">
@@ -121,127 +218,150 @@ if(isset($_POST['inputTipo'])){
 										</div>										
 									</div>									
 								</div>
+							</div>
+							
+							<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
+							<br>
+							<div class="row">
+								<div class="col-lg-9">
+									<div class="form-group">
+										<label for="inputNome">Nome</label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" required>
+									</div>
+								</div>	
 								
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputCpf">CPF</label>
-										<input type="text" id="inputCpf" name="inputCpf" class="form-control">
+										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF">
 									</div>	
 								</div>
 								
-								<div class="col-lg-4" style="display:none;">
+								<div class="col-lg-3" style="display:none;">
 									<div class="form-group">				
 										<label for="inputCnpj">CNPJ</label>
-										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control">
+										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ">
 									</div>	
-								</div>
+								</div>							
 							</div>
 								
 							<div class="row">				
 								<div class="col-lg-12">
 									<div class="row">
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputNome">Nome</label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" required>
-											</div>
-										</div>
-										
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputRg">RG</label>
 												<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG">
 											</div>
 										</div>
-										
-										<div class="col-lg-4">
+
+										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-													<?php 
-														$sql = ("SELECT CategId, CategNome
-																 FROM Categoria															     
-																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
-															     ORDER BY CategNome ASC");
-														$result = $conn->query("$sql");
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($row as $item){															
-															print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-														}
-													
-													?>
+												<label for="inputEmissor">Emissor</label>
+												<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor">
+											</div>
+										</div>
+
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="cmbUf">UF</label>
+												<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
+													<option value="#">Selecione um estado</option>
+													<option value="AC">Acre</option>
+													<option value="AL">Alagoas</option>
+													<option value="AP">Amapá</option>
+													<option value="AM">Amazonas</option>
+													<option value="BA">Bahia</option>
+													<option value="CE">Ceará</option>
+													<option value="DF">Distrito Federal</option>
+													<option value="ES">Espírito Santo</option>
+													<option value="GO">Goiás</option>
+													<option value="MA">Maranhão</option>
+													<option value="MT">Mato Grosso</option>
+													<option value="MS">Mato Grosso do Sul</option>
+													<option value="MG">Minas Gerais</option>
+													<option value="PA">Pará</option>
+													<option value="PB">Paraíba</option>
+													<option value="PR">Paraná</option>
+													<option value="PE">Pernambuco</option>
+													<option value="PI">Piauí</option>
+													<option value="RJ">Rio de Janeiro</option>
+													<option value="RN">Rio Grande do Norte</option>
+													<option value="RS">Rio Grande do Sul</option>
+													<option value="RO">Rondônia</option>
+													<option value="RR">Roraima</option>
+													<option value="SC">Santa Catarina</option>
+													<option value="SP">São Paulo</option>
+													<option value="SE">Sergipe</option>
+													<option value="TO">Tocantins</option>
+													<option value="ES">Estrangeiro</option>
+												</select>
+											</div>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="cmbSexo">Sexo</label>
+												<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
+													<option value="#">Selecione o sexo</option>
+													<option value="F">Feminino</option>
+													<option value="M">Masculino</option>
 												</select>
 											</div>
 										</div>
 
-										<div class="col-lg-4">
+										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<?php 
-														$sql = ("SELECT CategId, CategNome
-																 FROM Categoria															     
-																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
-															     ORDER BY CategNome ASC");
-														$result = $conn->query("$sql");
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($row as $item){
-															print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-														}
-													
-													?>
-												</select>
+												<label for="inputAniversario">Aniversário</label>
+												<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário">
 											</div>
 										</div>										
 									</div>
 								</div>
 							</div>
-								
-							<div class="row">
-								<div class="col-lg-12">
-									<div class="form-group">
-										<label for="txtareaConteudo">Conteúdo personalizado</label>
-										<textarea rows="5" cols="5" class="form-control" id="txtareaConteudo" name="txtareaConteudo" placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"></textarea>
-									</div>
-								</div>
-							</div>		
-							<br>
 							
 							<div class="row">
-								<div class="col-lg-12">									
-									<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
-									<br>
-									<div class="row">
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputNomeForncedor">Fornecedor</label>
-												<input type="text" id="inputNomeFornecedor" name="inputNomeFornecedor" class="form-control">
-												<input type="hidden" id="inputFornecedor" name="inputFornecedor">
-											</div>
-										</div>
-										
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputContato">Contato</label>
-												<input type="text" id="inputContato" name="inputContato" class="form-control" readOnly>
-											</div>
-										</div>									
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label for="cmbCategoria">Categoria</label>
+										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+											<option value="#">Selecione uma categoria</option>
+											<?php 
+												$sql = ("SELECT CategId, CategNome
+														 FROM Categoria															     
+														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
+														 ORDER BY CategNome ASC");
+												$result = $conn->query("$sql");
+												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($row as $item){															
+													print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+												}
+											
+											?>
+										</select>
+									</div>
+								</div>
 
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputEmailFornecedor">E-mail</label>
-												<input type="text" id="inputEmailFornecedor" name="inputEmailFornecedor" class="form-control" readOnly>
-											</div>
-										</div>									
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputTelefoneFornecedor">Telefone</label>
-												<input type="text" id="inputTelefoneFornecedor" name="inputTelefoneFornecedor" class="form-control" readOnly>
-											</div>
-										</div>									
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label for="cmbSubCategoria">SubCategoria</label>
+										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+											<option value="#">Selecione uma subcategoria</option>
+											<?php 
+												$sql = ("SELECT CategId, CategNome
+														 FROM Categoria															     
+														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
+														 ORDER BY CategNome ASC");
+												$result = $conn->query("$sql");
+												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($row as $item){
+													print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+												}
+											
+											?>
+										</select>
 									</div>
 								</div>
 							</div>
@@ -249,63 +369,239 @@ if(isset($_POST['inputTipo'])){
 							
 							<div class="row">
 								<div class="col-lg-12">									
-									<h5 class="mb-0 font-weight-semibold">Dados dos Produtos</h5>
+									<h5 class="mb-0 font-weight-semibold">Endereço</h5>
 									<br>
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-1">
 											<div class="form-group">
-												<label for="inputNomeProduto">Produto</label>
-												<input type="text" id="inputNomeProduto" name="inputNomeProduto" class="form-control">
-												<input type="hidden" id="inputProduto" name="inputProduto">
+												<label for="inputCep">CEP</label>
+												<input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP">
 											</div>
 										</div>
 										
+										<div class="col-lg-5">
+											<div class="form-group">
+												<label for="inputEndereco">Endereço</label>
+												<input type="text" id="inputEndereco" name="inputEndereco" class="form-control" placeholder="Endereço">
+											</div>
+										</div>
+
+										<div class="col-lg-1">
+											<div class="form-group">
+												<label for="inputNumero">Nº</label>
+												<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número">
+											</div>
+										</div>
+
+										<div class="col-lg-5">
+											<div class="form-group">
+												<label for="inputComplemento">Complemento</label>
+												<input type="text" id="inputComplemento" name="inputComplemento" class="form-control" placeholder="complemento">
+											</div>
+										</div>
+									</div>
+									
+									<div class="row">
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputBairro">Bairro</label>
+												<input type="text" id="inputBairro" name="inputBairro" class="form-control" placeholder="Bairro">
+											</div>
+										</div>
+
+										<div class="col-lg-5">
+											<div class="form-group">
+												<label for="inputCidade">Cidade</label>
+												<input type="text" id="inputCidade" name="inputCidade" class="form-control" placeholder="Cidade">
+											</div>
+										</div>
+
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputQuantidade">Quantidade</label>
-												<input type="text" id="inputQuantidade" name="inputQuantidade" class="form-control" readOnly>
+												<label for="cmbEstado">Estado</label>
+												<select id="cmbEstado" name="cmbEstado" class="form-control form-control-select2">
+													<option value="#">Selecione um estado</option>
+													<option value="AC">Acre</option>
+													<option value="AL">Alagoas</option>
+													<option value="AP">Amapá</option>
+													<option value="AM">Amazonas</option>
+													<option value="BA">Bahia</option>
+													<option value="CE">Ceará</option>
+													<option value="DF">Distrito Federal</option>
+													<option value="ES">Espírito Santo</option>
+													<option value="GO">Goiás</option>
+													<option value="MA">Maranhão</option>
+													<option value="MT">Mato Grosso</option>
+													<option value="MS">Mato Grosso do Sul</option>
+													<option value="MG">Minas Gerais</option>
+													<option value="PA">Pará</option>
+													<option value="PB">Paraíba</option>
+													<option value="PR">Paraná</option>
+													<option value="PE">Pernambuco</option>
+													<option value="PI">Piauí</option>
+													<option value="RJ">Rio de Janeiro</option>
+													<option value="RN">Rio Grande do Norte</option>
+													<option value="RS">Rio Grande do Sul</option>
+													<option value="RO">Rondônia</option>
+													<option value="RR">Roraima</option>
+													<option value="SC">Santa Catarina</option>
+													<option value="SP">São Paulo</option>
+													<option value="SE">Sergipe</option>
+													<option value="TO">Tocantins</option>
+													<option value="ES">Estrangeiro</option>
+												</select>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>							
+							</div>
 							<br>
 							
 							<div class="row">
 								<div class="col-lg-12">									
-									<h5 class="mb-0 font-weight-semibold">Dados do Solicitante</h5>
+									<h5 class="mb-0 font-weight-semibold">Contato</h5>
 									<br>
-									<div class="row">
-										<div class="col-lg-6">
+									<div class="row">								
+										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputNomeSolicitante">Solicitante</label>
-												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control">
-												<input type="hidden" id="inputSolicitante" name="inputSolicitante">
+												<label for="inputNomeContato">Nome</label>
+												<input type="text" id="inputNomeContato" name="inputNomeContato" class="form-control" placeholder="Contato">
+											</div>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputTelefone">Telefone</label>
+												<input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999">
+											</div>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputCelular">Celular</label>
+												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
+											</div>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputEmail">E-mail</label>
+												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail">
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputEmailSolicitante">E-mail</label>
-												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" readOnly>
+												<label for="inputSite">Site</label>
+												<input type="url" id="inputSite" name="inputSite" class="form-control" placeholder="URL">
 											</div>
-										</div>									
+										</div>										
+									</div>
+									
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label for="txtObservacao">Observação</label>
+												<textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" placeholder="Observação"></textarea>
+											</div>
+										</div>
+									</div>										
+								</div>
+							</div>
+							<br>
+							
+							<div class="row">
+								<div class="col-lg-12">									
+									<h5 class="mb-0 font-weight-semibold">Dados Bancários</h5>
+									<br>
+									<div class="row">
+										<div class="col-lg-5">
+											<label for="cmbBanco">Banco</label>
+											<select id="cmbBanco" name="cmbBanco" class="form-control form-control-select2">
+												<option value="#">Selecione um banco</option>
+												<?php 
+													$sql = ("SELECT BancoId, BancoCodigo, BancoNome
+															 FROM Banco
+															 WHERE BancoStatus = 1
+															 ORDER BY BancoCodigo ASC");
+													$result = $conn->query("$sql");
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													
+													foreach ($row as $item){
+														print('<option value="'.$item['BancoId'].'">'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
+													}
+												
+												?>
+											</select>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputAgencia">Agência</label>
+												<input type="text" id="inputAgencia" name="inputAgencia" class="form-control" placeholder="Agência + dígito">
+												<input type="hidden" id="inputSolicitante" name="inputSolicitante">
+											</div>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputConta">Conta</label>
+												<input type="text" id="inputConta" name="inputConta" class="form-control" placeholder="Conta + dígito">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputInfoAdicional">Informação Adicional</label>
+												<input type="text" id="inputInfoAdicional" name="inputInfoAdicional" class="form-control">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<br>
+							
+							<div class="row">
+								<div class="col-lg-12">									
+									<h5 class="mb-0 font-weight-semibold">Tributos</h5>
+									<br>
+									<div class="row">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="cmbBanco">IPI (%)</label>
+												<input type="number" id="inputIpi" name="inputIpi" class="form-control" placeholder="IPI (%)">
+											</div>
+										</div>
+										
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputFrete">Frete (%)</label>
+												<input type="number" id="inputFrete" name="inputFrete" class="form-control" placeholder="Frete (%)">
+											</div>
+										</div>
+										
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputIcms">ICMS (%)</label>
+												<input type="text" id="inputIcms" name="inputIcms" class="form-control" placeholder="ICMS (%)">
+											</div>
+										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputTelefoneSolicitante">Telefone</label>
-												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" readOnly>
+												<label for="inputOutros">Outros (%)</label>
+												<input type="text" id="inputOutros" name="inputOutros" class="form-control" placeholder="Outros (%)">
 											</div>
-										</div>									
+										</div>
 									</div>
 								</div>
-							</div>							
+							</div>
 
-							<div class="row" style="margin-top: 10px;">
+							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
-										<a href="orcamento.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="fornecedor.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>
