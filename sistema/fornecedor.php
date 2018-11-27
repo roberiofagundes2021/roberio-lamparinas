@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Fornecedor';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ForneId, ForneNome, ForneRazaoSocial, ForneCnpj, ForneStatus
+$sql = ("SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneCelular, ForneStatus
 		 FROM Fornecedor
 	     WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ."
 		 ORDER BY ForneNome ASC");
@@ -105,9 +105,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th>Nome Fantasia</th>
-										<th>Razão Social</th>
+										<th>Nome</th>
 										<th>CPF/CNPJ</th>
+										<th>Celular</th>										
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -118,12 +118,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										$situacao = $item['ForneStatus'] ? 'Ativo' : 'Inativo';
 										$situacaoClasse = $item['ForneStatus'] ? 'badge-success' : 'badge-secondary';
+										$documento = $item['ForneCnpj'] == NULL ? $item['ForneCnpj'] : $item['ForneCpf'];
 										
 										print('
 										<tr>
 											<td>'.$item['ForneNome'].'</td>
-											<td>'.$item['ForneRazaoSocial'].'</td>
-											<td>'.$item['ForneCnpj'].'</td>
+											<td>'.$documento.'</td>
+											<td>'.$item['ForneCelular'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

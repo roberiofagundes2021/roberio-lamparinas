@@ -17,26 +17,26 @@ if(isset($_POST['inputTipo'])){
 									    ForneBanco, ForneAgencia, ForneConta, ForneInformacaoAdicional, ForneIpi, ForneFrete, ForneIcms, 
 									    ForneOutros, ForneStatus, ForneUsuarioAtualizador, ForneEmpresa)
 				VALUES (:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual, :iCategoria, :iSubCategoria, 
-						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dAniversario, :sCep, :sEndereco, :sNumero, :sComplemtento, :sBairro, 
+						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dAniversario, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
 						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, :iBanco, :sAgencia, 
 						:sConta, :sInformacaoAdicional, :iIpi, :iFrete, :iIcms, :iOutros, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':sTipo' => $_POST['radioTipo'] == "on" ? "F" : "J",
+						':sTipo' => $_POST['inputTipo'] == "on" ? "F" : "J",
 						':sNome' => $_POST['inputNome'],
 						':sRazaoSocial' => $_POST['inputRazaoSocial'],
-						':sCnpj' => $_POST['inputCnpj'],
+						':sCnpj' => limpaCPF_CNPJ($_POST['inputCnpj']),
 						':sInscricaoMunicipal' => $_POST['inputInscricaoMunicipal'],
 						':sInscricaoEstadual' => $_POST['inputInscricaoEstadual'],
 						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'],
-						':sCpf' => $_POST['inputCpf'],
+						':sCpf' => limpaCPF_CNPJ($_POST['inputCpf']),
 						':sRg' => $_POST['inputRg'],
 						':sOrgaoEmissor' => $_POST['inputEmissor'],
 						':sUf' => $_POST['cmbUf'],
 						':sSexo' => $_POST['cmbSexo'],
-						':dAniversario' => gravadata($_POST['inputAniversario']),
+						':dAniversario' => $_POST['inputAniversario'],
 						':sCep' => $_POST['inputCep'],
 						':sEndereco' => $_POST['inputEndereco'],
 						':sNumero' => $_POST['inputNumero'],
@@ -67,13 +67,14 @@ if(isset($_POST['inputTipo'])){
 		$_SESSION['msg']['mensagem'] = "Fornecedor incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
-	} catch(PDOException $e) {
+	} catch(PDOException $e) {		
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir fornecedor!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
+		exit;
 	}
 	
 	irpara("fornecedor.php");
@@ -170,6 +171,20 @@ if(isset($_POST['inputTipo'])){
                 }
             });
         });
+        
+        function selecionaPessoa(tipo) {
+			if (tipo == 'PF'){
+				document.getElementById('CPF').style.display = "block";
+				document.getElementById('CNPJ').style.display = "none";
+				document.getElementById('dadosPF').style.display = "block";
+				document.getElementById('dadosPJ').style.display = "none";
+			} else {
+				document.getElementById('CPF').style.display = "none";
+				document.getElementById('CNPJ').style.display = "block";				
+				document.getElementById('dadosPF').style.display = "none";
+				document.getElementById('dadosPJ').style.display = "block";
+			}
+		}
 
     </script>	
 	
@@ -206,13 +221,13 @@ if(isset($_POST['inputTipo'])){
 									<div class="form-group">							
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" checked data-fouc>
+												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" checked data-fouc onclick="selecionaPessoa('PF')">
 												Pessoa Física
 											</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" data-fouc>
+												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" data-fouc onclick="selecionaPessoa('PJ')">
 												Pessoa Jurídica
 											</label>
 										</div>										
@@ -230,93 +245,120 @@ if(isset($_POST['inputTipo'])){
 									</div>
 								</div>	
 								
-								<div class="col-lg-3">
+								<div class="col-lg-3" id="CPF">
 									<div class="form-group">
 										<label for="inputCpf">CPF</label>
-										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF">
+										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99">
 									</div>	
 								</div>
 								
-								<div class="col-lg-3" style="display:none;">
+								<div class="col-lg-3" id="CNPJ" style="display:none;">
 									<div class="form-group">				
 										<label for="inputCnpj">CNPJ</label>
-										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ">
+										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99">
 									</div>	
 								</div>							
 							</div>
 								
 							<div class="row">				
 								<div class="col-lg-12">
-									<div class="row">
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputRg">RG</label>
-												<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG">
+									<div id="dadosPF">
+										<div class="row">
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputRg">RG</label>
+													<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG">
+												</div>
 											</div>
-										</div>
 
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputEmissor">Emissor</label>
-												<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor">
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputEmissor">Emissor</label>
+													<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor">
+												</div>
 											</div>
-										</div>
 
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="cmbUf">UF</label>
-												<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
-													<option value="#">Selecione um estado</option>
-													<option value="AC">Acre</option>
-													<option value="AL">Alagoas</option>
-													<option value="AP">Amapá</option>
-													<option value="AM">Amazonas</option>
-													<option value="BA">Bahia</option>
-													<option value="CE">Ceará</option>
-													<option value="DF">Distrito Federal</option>
-													<option value="ES">Espírito Santo</option>
-													<option value="GO">Goiás</option>
-													<option value="MA">Maranhão</option>
-													<option value="MT">Mato Grosso</option>
-													<option value="MS">Mato Grosso do Sul</option>
-													<option value="MG">Minas Gerais</option>
-													<option value="PA">Pará</option>
-													<option value="PB">Paraíba</option>
-													<option value="PR">Paraná</option>
-													<option value="PE">Pernambuco</option>
-													<option value="PI">Piauí</option>
-													<option value="RJ">Rio de Janeiro</option>
-													<option value="RN">Rio Grande do Norte</option>
-													<option value="RS">Rio Grande do Sul</option>
-													<option value="RO">Rondônia</option>
-													<option value="RR">Roraima</option>
-													<option value="SC">Santa Catarina</option>
-													<option value="SP">São Paulo</option>
-													<option value="SE">Sergipe</option>
-													<option value="TO">Tocantins</option>
-													<option value="ES">Estrangeiro</option>
-												</select>
+											<div class="col-lg-3">
+												<div class="form-group">
+													<label for="cmbUf">UF</label>
+													<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
+														<option value="#">Selecione um estado</option>
+														<option value="AC">Acre</option>
+														<option value="AL">Alagoas</option>
+														<option value="AP">Amapá</option>
+														<option value="AM">Amazonas</option>
+														<option value="BA">Bahia</option>
+														<option value="CE">Ceará</option>
+														<option value="DF">Distrito Federal</option>
+														<option value="ES">Espírito Santo</option>
+														<option value="GO">Goiás</option>
+														<option value="MA">Maranhão</option>
+														<option value="MT">Mato Grosso</option>
+														<option value="MS">Mato Grosso do Sul</option>
+														<option value="MG">Minas Gerais</option>
+														<option value="PA">Pará</option>
+														<option value="PB">Paraíba</option>
+														<option value="PR">Paraná</option>
+														<option value="PE">Pernambuco</option>
+														<option value="PI">Piauí</option>
+														<option value="RJ">Rio de Janeiro</option>
+														<option value="RN">Rio Grande do Norte</option>
+														<option value="RS">Rio Grande do Sul</option>
+														<option value="RO">Rondônia</option>
+														<option value="RR">Roraima</option>
+														<option value="SC">Santa Catarina</option>
+														<option value="SP">São Paulo</option>
+														<option value="SE">Sergipe</option>
+														<option value="TO">Tocantins</option>
+														<option value="ES">Estrangeiro</option>
+													</select>
+												</div>
 											</div>
-										</div>
-										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="cmbSexo">Sexo</label>
-												<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
-													<option value="#">Selecione o sexo</option>
-													<option value="F">Feminino</option>
-													<option value="M">Masculino</option>
-												</select>
+											
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="cmbSexo">Sexo</label>
+													<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
+														<option value="#">Selecione o sexo</option>
+														<option value="F">Feminino</option>
+														<option value="M">Masculino</option>
+													</select>
+												</div>
 											</div>
-										</div>
 
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputAniversario">Aniversário</label>
-												<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário">
+											<div class="col-lg-3">
+												<div class="form-group">
+													<label for="inputAniversario">Aniversário</label>
+													<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário">
+												</div>
+											</div>										
+										</div>	
+									</div> <!-- Fim dadosPF -->
+									
+									<div id="dadosPJ" style="display:none">
+										<div class="row">
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputRazaoSocial">Razão Social</label>
+													<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social">
+												</div>
 											</div>
-										</div>										
-									</div>
+
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputInscricaoMunicipal">Inscrição Municipal</label>
+													<input type="text" id="inputInscricaoMunicipal" name="inputInscricaoMunicipal" class="form-control" placeholder="Inscrição Municipal">
+												</div>
+											</div>
+
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputInscricaoEstadual">Inscrição Estadual</label>
+													<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Inscrição Estadual">
+												</div>
+											</div>	
+										</div>	
+									</div> <!-- Fim dadosPJ -->
 								</div>
 							</div>
 							
@@ -349,15 +391,15 @@ if(isset($_POST['inputTipo'])){
 										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
 											<option value="#">Selecione uma subcategoria</option>
 											<?php 
-												$sql = ("SELECT CategId, CategNome
-														 FROM Categoria															     
-														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
-														 ORDER BY CategNome ASC");
+												$sql = ("SELECT SbCatId, SbCatNome
+														 FROM SubCategoria															     
+														 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ."
+														 ORDER BY SbCatNome ASC");
 												$result = $conn->query("$sql");
 												$row = $result->fetchAll(PDO::FETCH_ASSOC);
 												
 												foreach ($row as $item){
-													print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+													print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
 												}
 											
 											?>
