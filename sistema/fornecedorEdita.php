@@ -2,24 +2,45 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Novo Fornecedor';
+$_SESSION['PaginaAtual'] = 'Editar Fornecedor';
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputTipo'])){
+if(isset($_POST['inputFornecedorId'])){
+	
+	$iFornecedor = $_POST['inputFornecedorId'];
+	
+	try{
+		
+		$sql = "SELECT *
+				FROM Fornecedor
+				WHERE ForneId = $iFornecedor ";
+		$result = $conn->query("$sql");
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+		
+	} catch(PDOException $e) {
+		echo 'Error: ' . $e->getMessage();
+	}
+	
+	$_SESSION['msg'] = array();
+}
+
+if(isset($_POST['inputTipo'])){	
 		
 	try{
 		
-		$sql = "INSERT INTO Fornecedor (ForneTipo, ForneNome, ForneRazaoSocial, ForneCnpj, ForneInscricaoMunicipal, ForneInscricaoEstadual, 
-										ForneCategoria, ForneSubCategoria, ForneCpf, ForneRg, ForneOrgaoEmissor, ForneUf, ForneSexo, 
-										ForneAniversario, ForneCep, ForneEndereco, ForneNumero, ForneComplemento, ForneBairro, ForneCidade, 
-										ForneEstado, ForneContato, ForneTelefone, ForneCelular, ForneEmail, ForneSite, ForneObservacao,
-									    ForneBanco, ForneAgencia, ForneConta, ForneInformacaoAdicional, ForneIpi, ForneFrete, ForneIcms, 
-									    ForneOutros, ForneStatus, ForneUsuarioAtualizador, ForneEmpresa)
-				VALUES (:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual, :iCategoria, :iSubCategoria, 
-						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dAniversario, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
-						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, :iBanco, :sAgencia, 
-						:sConta, :sInformacaoAdicional, :iIpi, :iFrete, :iIcms, :iOutros, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "UPDATE Fornecedor SET ForneTipo = :sTipo, ForneNome = :sNome, ForneRazaoSocial = :sRazaoSocial, ForneCnpj = :sCnpj, 
+									  ForneInscricaoMunicipal = :sInscricaoMunicipal, ForneInscricaoEstadual = :sInscricaoEstadual, 
+									  ForneCategoria = :iCategoria, ForneSubCategoria = :iSubCategoria, ForneCpf = :sCpf, 
+									  ForneRg = :sRg, ForneOrgaoEmissor = :sOrgaoEmissor, ForneUf = :sUf, ForneSexo = :sSexo, 
+									  ForneAniversario = :dAniversario, ForneCep = :sCep, ForneEndereco = :sEndereco, 
+									  ForneNumero = :sNumero, ForneComplemento = :sComplemento, ForneBairro = :sBairro, 
+									  ForneCidade = :sCidade, ForneEstado = :sEstado, ForneContato = :sContato, ForneTelefone = :sTelefone, 
+									  ForneCelular = :sCelular, ForneEmail = :sEmail, ForneSite = :sSite, ForneObservacao = :sObservacao,
+									  ForneBanco = :iBanco, ForneAgencia = :sAgencia, ForneConta = :sConta, 
+									  ForneInformacaoAdicional = :sInformacaoAdicional, ForneIpi = :iIpi, ForneFrete = :iFrete, 
+									  ForneIcms = :iIcms, ForneOutros = :iOutros, ForneStatus = :bStatus, ForneUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE ForneId = :iFornecedor";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -53,24 +74,24 @@ if(isset($_POST['inputTipo'])){
 						':iBanco' => $_POST['cmbBanco'],
 						':sAgencia' => $_POST['inputAgencia'],
 						':sConta' => $_POST['inputConta'],
-						':sInformacaoAdicional' => $_POST['inputInformacaoAdicional'],
+						':sInformacaoAdicional' => $_POST['inputInfoAdicional'],
 						':iIpi' => $_POST['inputIpi'],
 						':iFrete' => $_POST['inputFrete'],
 						':iIcms' => $_POST['inputIcms'],
 						':iOutros' => $_POST['inputOutros'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iFornecedor'	=> $_POST['inputFornecedorId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Fornecedor incluído!!!";
+		$_SESSION['msg']['mensagem'] = "Fornecedor alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {		
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir fornecedor!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar fornecedor!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
@@ -210,10 +231,12 @@ if(isset($_POST['inputTipo'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formFornecedor" method="post" class="form-validate" action="fornecedorNovo.php">
+					<form name="formFornecedor" method="post" class="form-validate" action="fornecedorEdita.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Fornecedor</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Fornecedor "<?php echo $row['ForneNome']; ?>"</h5>
 						</div>
+						
+						<input type="hidden" id="inputFornecedorId" name="inputFornecedorId" value="<?php echo $row['ForneId']; ?>" >
 						
 						<div class="card-body">								
 							<div class="row">
@@ -221,13 +244,13 @@ if(isset($_POST['inputTipo'])){
 									<div class="form-group">							
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" checked data-fouc onclick="selecionaPessoa('PF')">
+												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" data-fouc onclick="selecionaPessoa('PF')"  <?php if ($row['ForneTipo'] == 'F') echo "checked"; ?> >
 												Pessoa Física
 											</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" data-fouc onclick="selecionaPessoa('PJ')">
+												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" data-fouc onclick="selecionaPessoa('PJ')" <?php if ($row['ForneTipo'] == 'J') echo "checked"; ?>>
 												Pessoa Jurídica
 											</label>
 										</div>										
@@ -241,21 +264,21 @@ if(isset($_POST['inputTipo'])){
 								<div class="col-lg-9">
 									<div class="form-group">
 										<label for="inputNome">Nome</label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" required>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ForneNome']; ?>" required>
 									</div>
 								</div>	
 								
 								<div class="col-lg-3" id="CPF">
 									<div class="form-group">
 										<label for="inputCpf">CPF</label>
-										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99">
+										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php echo formatarCPF_Cnpj($row['ForneCpf']); ?>">
 									</div>	
 								</div>
 								
 								<div class="col-lg-3" id="CNPJ" style="display:none;">
 									<div class="form-group">				
 										<label for="inputCnpj">CNPJ</label>
-										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99">
+										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" value="<?php echo formatarCPF_Cnpj($row['ForneCnpj']); ?>">
 									</div>	
 								</div>							
 							</div>
@@ -267,14 +290,14 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputRg">RG</label>
-													<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG">
+													<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG" value="<?php echo $row['ForneRg']; ?>">
 												</div>
 											</div>
 
 											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputEmissor">Emissor</label>
-													<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor">
+													<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor" value="<?php echo $row['ForneOrgaoEmissor']; ?>">
 												</div>
 											</div>
 
@@ -283,34 +306,34 @@ if(isset($_POST['inputTipo'])){
 													<label for="cmbUf">UF</label>
 													<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
 														<option value="#">Selecione um estado</option>
-														<option value="AC">Acre</option>
-														<option value="AL">Alagoas</option>
-														<option value="AP">Amapá</option>
-														<option value="AM">Amazonas</option>
-														<option value="BA">Bahia</option>
-														<option value="CE">Ceará</option>
-														<option value="DF">Distrito Federal</option>
-														<option value="ES">Espírito Santo</option>
-														<option value="GO">Goiás</option>
-														<option value="MA">Maranhão</option>
-														<option value="MT">Mato Grosso</option>
-														<option value="MS">Mato Grosso do Sul</option>
-														<option value="MG">Minas Gerais</option>
-														<option value="PA">Pará</option>
-														<option value="PB">Paraíba</option>
-														<option value="PR">Paraná</option>
-														<option value="PE">Pernambuco</option>
-														<option value="PI">Piauí</option>
-														<option value="RJ">Rio de Janeiro</option>
-														<option value="RN">Rio Grande do Norte</option>
-														<option value="RS">Rio Grande do Sul</option>
-														<option value="RO">Rondônia</option>
-														<option value="RR">Roraima</option>
-														<option value="SC">Santa Catarina</option>
-														<option value="SP">São Paulo</option>
-														<option value="SE">Sergipe</option>
-														<option value="TO">Tocantins</option>
-														<option value="ES">Estrangeiro</option>
+														<option value="AC" <?php if ($row['ForneUf'] == 'AC') echo "selected"; ?> >Acre</option>
+														<option value="AL" <?php if ($row['ForneUf'] == 'AL') echo "selected"; ?> >Alagoas</option>
+														<option value="AP" <?php if ($row['ForneUf'] == 'AP') echo "selected"; ?> >Amapá</option>
+														<option value="AM" <?php if ($row['ForneUf'] == 'AM') echo "selected"; ?> >Amazonas</option>
+														<option value="BA" <?php if ($row['ForneUf'] == 'BA') echo "selected"; ?> >Bahia</option>
+														<option value="CE" <?php if ($row['ForneUf'] == 'CE') echo "selected"; ?> >Ceará</option>
+														<option value="DF" <?php if ($row['ForneUf'] == 'DF') echo "selected"; ?> >Distrito Federal</option>
+														<option value="ES" <?php if ($row['ForneUf'] == 'ES') echo "selected"; ?> >Espírito Santo</option>
+														<option value="GO" <?php if ($row['ForneUf'] == 'GO') echo "selected"; ?> >Goiás</option>
+														<option value="MA" <?php if ($row['ForneUf'] == 'MA') echo "selected"; ?> >Maranhão</option>
+														<option value="MT" <?php if ($row['ForneUf'] == 'MT') echo "selected"; ?> >Mato Grosso</option>
+														<option value="MS" <?php if ($row['ForneUf'] == 'MS') echo "selected"; ?> >Mato Grosso do Sul</option>
+														<option value="MG" <?php if ($row['ForneUf'] == 'MG') echo "selected"; ?> >Minas Gerais</option>
+														<option value="PA" <?php if ($row['ForneUf'] == 'PA') echo "selected"; ?> >Pará</option>
+														<option value="PB" <?php if ($row['ForneUf'] == 'PB') echo "selected"; ?> >Paraíba</option>
+														<option value="PR" <?php if ($row['ForneUf'] == 'PR') echo "selected"; ?> >Paraná</option>
+														<option value="PE" <?php if ($row['ForneUf'] == 'PE') echo "selected"; ?> >Pernambuco</option>
+														<option value="PI" <?php if ($row['ForneUf'] == 'PI') echo "selected"; ?> >Piauí</option>
+														<option value="RJ" <?php if ($row['ForneUf'] == 'RJ') echo "selected"; ?> >Rio de Janeiro</option>
+														<option value="RN" <?php if ($row['ForneUf'] == 'RN') echo "selected"; ?> >Rio Grande do Norte</option>
+														<option value="RS" <?php if ($row['ForneUf'] == 'RS') echo "selected"; ?> >Rio Grande do Sul</option>
+														<option value="RO" <?php if ($row['ForneUf'] == 'RO') echo "selected"; ?> >Rondônia</option>
+														<option value="RR" <?php if ($row['ForneUf'] == 'RR') echo "selected"; ?> >Roraima</option>
+														<option value="SC" <?php if ($row['ForneUf'] == 'SC') echo "selected"; ?> >Santa Catarina</option>
+														<option value="SP" <?php if ($row['ForneUf'] == 'SP') echo "selected"; ?> >São Paulo</option>
+														<option value="SE" <?php if ($row['ForneUf'] == 'SE') echo "selected"; ?> >Sergipe</option>
+														<option value="TO" <?php if ($row['ForneUf'] == 'TO') echo "selected"; ?> >Tocantins</option>
+														<option value="ES" <?php if ($row['ForneUf'] == 'ES') echo "selected"; ?> >Estrangeiro</option>
 													</select>
 												</div>
 											</div>
@@ -320,8 +343,8 @@ if(isset($_POST['inputTipo'])){
 													<label for="cmbSexo">Sexo</label>
 													<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
 														<option value="#">Selecione o sexo</option>
-														<option value="F">Feminino</option>
-														<option value="M">Masculino</option>
+														<option value="F" <?php if ($row['ForneSexo'] == 'F') echo "selected"; ?> >Feminino</option>
+														<option value="M" <?php if ($row['ForneSexo'] == 'M') echo "selected"; ?> >Masculino</option>
 													</select>
 												</div>
 											</div>
@@ -329,7 +352,7 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputAniversario">Aniversário</label>
-													<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário">
+													<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário" value="<?php echo $row['ForneAniversario']; ?>">
 												</div>
 											</div>										
 										</div>	
@@ -340,21 +363,21 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-4">
 												<div class="form-group">
 													<label for="inputRazaoSocial">Razão Social</label>
-													<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social">
+													<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" value="<?php echo $row['ForneRazaoSocial']; ?>">
 												</div>
 											</div>
 
 											<div class="col-lg-4">
 												<div class="form-group">
 													<label for="inputInscricaoMunicipal">Inscrição Municipal</label>
-													<input type="text" id="inputInscricaoMunicipal" name="inputInscricaoMunicipal" class="form-control" placeholder="Inscrição Municipal">
+													<input type="text" id="inputInscricaoMunicipal" name="inputInscricaoMunicipal" class="form-control" placeholder="Inscrição Municipal" value="<?php echo $row['ForneInscricaoMunicipal']; ?>">
 												</div>
 											</div>
 
 											<div class="col-lg-4">
 												<div class="form-group">
 													<label for="inputInscricaoEstadual">Inscrição Estadual</label>
-													<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Inscrição Estadual">
+													<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Inscrição Estadual" value="<?php echo $row['ForneInscricaoEstadual']; ?>">
 												</div>
 											</div>	
 										</div>	
@@ -374,10 +397,11 @@ if(isset($_POST['inputTipo'])){
 														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
 														 ORDER BY CategNome ASC");
 												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 												
-												foreach ($row as $item){															
-													print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+												foreach ($rowCategoria as $item){			
+													$seleciona = $item['CategId'] == $row['ForneCategoria'] ? "selected" : "";												
+													print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
 												}
 											
 											?>
@@ -396,10 +420,11 @@ if(isset($_POST['inputTipo'])){
 														 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ."
 														 ORDER BY SbCatNome ASC");
 												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 												
-												foreach ($row as $item){
-													print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
+												foreach ($rowSubCategoria as $item){
+													$seleciona = $item['SbCatId'] == $row['ForneSubCategoria'] ? "selected" : "";
+													print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
 												}
 											
 											?>
@@ -417,28 +442,28 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputCep">CEP</label>
-												<input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP">
+												<input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP" value="<?php echo $row['ForneCep']; ?>">
 											</div>
 										</div>
 										
 										<div class="col-lg-5">
 											<div class="form-group">
 												<label for="inputEndereco">Endereço</label>
-												<input type="text" id="inputEndereco" name="inputEndereco" class="form-control" placeholder="Endereço">
+												<input type="text" id="inputEndereco" name="inputEndereco" class="form-control" placeholder="Endereço" value="<?php echo $row['ForneEndereco']; ?>">
 											</div>
 										</div>
 
 										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputNumero">Nº</label>
-												<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número">
+												<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número" value="<?php echo $row['ForneNumero']; ?>">
 											</div>
 										</div>
 
 										<div class="col-lg-5">
 											<div class="form-group">
 												<label for="inputComplemento">Complemento</label>
-												<input type="text" id="inputComplemento" name="inputComplemento" class="form-control" placeholder="complemento">
+												<input type="text" id="inputComplemento" name="inputComplemento" class="form-control" placeholder="complemento" value="<?php echo $row['ForneComplemento']; ?>">
 											</div>
 										</div>
 									</div>
@@ -447,14 +472,14 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputBairro">Bairro</label>
-												<input type="text" id="inputBairro" name="inputBairro" class="form-control" placeholder="Bairro">
+												<input type="text" id="inputBairro" name="inputBairro" class="form-control" placeholder="Bairro" value="<?php echo $row['ForneBairro']; ?>">
 											</div>
 										</div>
 
 										<div class="col-lg-5">
 											<div class="form-group">
 												<label for="inputCidade">Cidade</label>
-												<input type="text" id="inputCidade" name="inputCidade" class="form-control" placeholder="Cidade">
+												<input type="text" id="inputCidade" name="inputCidade" class="form-control" placeholder="Cidade" value="<?php echo $row['ForneCidade']; ?>">
 											</div>
 										</div>
 
@@ -463,34 +488,34 @@ if(isset($_POST['inputTipo'])){
 												<label for="cmbEstado">Estado</label>
 												<select id="cmbEstado" name="cmbEstado" class="form-control form-control-select2">
 													<option value="#">Selecione um estado</option>
-													<option value="AC">Acre</option>
-													<option value="AL">Alagoas</option>
-													<option value="AP">Amapá</option>
-													<option value="AM">Amazonas</option>
-													<option value="BA">Bahia</option>
-													<option value="CE">Ceará</option>
-													<option value="DF">Distrito Federal</option>
-													<option value="ES">Espírito Santo</option>
-													<option value="GO">Goiás</option>
-													<option value="MA">Maranhão</option>
-													<option value="MT">Mato Grosso</option>
-													<option value="MS">Mato Grosso do Sul</option>
-													<option value="MG">Minas Gerais</option>
-													<option value="PA">Pará</option>
-													<option value="PB">Paraíba</option>
-													<option value="PR">Paraná</option>
-													<option value="PE">Pernambuco</option>
-													<option value="PI">Piauí</option>
-													<option value="RJ">Rio de Janeiro</option>
-													<option value="RN">Rio Grande do Norte</option>
-													<option value="RS">Rio Grande do Sul</option>
-													<option value="RO">Rondônia</option>
-													<option value="RR">Roraima</option>
-													<option value="SC">Santa Catarina</option>
-													<option value="SP">São Paulo</option>
-													<option value="SE">Sergipe</option>
-													<option value="TO">Tocantins</option>
-													<option value="ES">Estrangeiro</option>
+													<option value="AC" <?php if ($row['ForneEstado'] == 'AC') echo "selected"; ?> >Acre</option>
+													<option value="AL" <?php if ($row['ForneEstado'] == 'AL') echo "selected"; ?> >Alagoas</option>
+													<option value="AP" <?php if ($row['ForneEstado'] == 'AP') echo "selected"; ?> >Amapá</option>
+													<option value="AM" <?php if ($row['ForneEstado'] == 'AM') echo "selected"; ?> >Amazonas</option>
+													<option value="BA" <?php if ($row['ForneEstado'] == 'BA') echo "selected"; ?> >Bahia</option>
+													<option value="CE" <?php if ($row['ForneEstado'] == 'CE') echo "selected"; ?> >Ceará</option>
+													<option value="DF" <?php if ($row['ForneEstado'] == 'DF') echo "selected"; ?> >Distrito Federal</option>
+													<option value="ES" <?php if ($row['ForneEstado'] == 'ES') echo "selected"; ?> >Espírito Santo</option>
+													<option value="GO" <?php if ($row['ForneEstado'] == 'GO') echo "selected"; ?> >Goiás</option>
+													<option value="MA" <?php if ($row['ForneEstado'] == 'MA') echo "selected"; ?> >Maranhão</option>
+													<option value="MT" <?php if ($row['ForneEstado'] == 'MT') echo "selected"; ?> >Mato Grosso</option>
+													<option value="MS" <?php if ($row['ForneEstado'] == 'MS') echo "selected"; ?> >Mato Grosso do Sul</option>
+													<option value="MG" <?php if ($row['ForneEstado'] == 'MG') echo "selected"; ?> >Minas Gerais</option>
+													<option value="PA" <?php if ($row['ForneEstado'] == 'PA') echo "selected"; ?> >Pará</option>
+													<option value="PB" <?php if ($row['ForneEstado'] == 'PB') echo "selected"; ?> >Paraíba</option>
+													<option value="PR" <?php if ($row['ForneEstado'] == 'PR') echo "selected"; ?> >Paraná</option>
+													<option value="PE" <?php if ($row['ForneEstado'] == 'PE') echo "selected"; ?> >Pernambuco</option>
+													<option value="PI" <?php if ($row['ForneEstado'] == 'PI') echo "selected"; ?> >Piauí</option>
+													<option value="RJ" <?php if ($row['ForneEstado'] == 'RJ') echo "selected"; ?> >Rio de Janeiro</option>
+													<option value="RN" <?php if ($row['ForneEstado'] == 'RN') echo "selected"; ?> >Rio Grande do Norte</option>
+													<option value="RS" <?php if ($row['ForneEstado'] == 'RS') echo "selected"; ?> >Rio Grande do Sul</option>
+													<option value="RO" <?php if ($row['ForneEstado'] == 'RO') echo "selected"; ?> >Rondônia</option>
+													<option value="RR" <?php if ($row['ForneEstado'] == 'RR') echo "selected"; ?> >Roraima</option>
+													<option value="SC" <?php if ($row['ForneEstado'] == 'SC') echo "selected"; ?> >Santa Catarina</option>
+													<option value="SP" <?php if ($row['ForneEstado'] == 'SP') echo "selected"; ?> >São Paulo</option>
+													<option value="SE" <?php if ($row['ForneEstado'] == 'SE') echo "selected"; ?> >Sergipe</option>
+													<option value="TO" <?php if ($row['ForneEstado'] == 'TO') echo "selected"; ?> >Tocantins</option>
+													<option value="ES" <?php if ($row['ForneEstado'] == 'ES') echo "selected"; ?> >Estrangeiro</option>
 												</select>
 											</div>
 										</div>
@@ -507,35 +532,35 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputNomeContato">Nome</label>
-												<input type="text" id="inputNomeContato" name="inputNomeContato" class="form-control" placeholder="Contato">
+												<input type="text" id="inputNomeContato" name="inputNomeContato" class="form-control" placeholder="Contato" value="<?php echo $row['ForneContato']; ?>">
 											</div>
 										</div>
 										
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputTelefone">Telefone</label>
-												<input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999">
+												<input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999" value="<?php echo $row['ForneTelefone']; ?>">
 											</div>
 										</div>
 										
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputCelular">Celular</label>
-												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
+												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999" value="<?php echo $row['ForneCelular']; ?>">
 											</div>
 										</div>
 										
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputEmail">E-mail</label>
-												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail">
+												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" value="<?php echo $row['ForneEmail']; ?>">
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputSite">Site</label>
-												<input type="url" id="inputSite" name="inputSite" class="form-control" placeholder="URL">
+												<input type="url" id="inputSite" name="inputSite" class="form-control" placeholder="URL" value="<?php echo $row['ForneSite']; ?>">
 											</div>
 										</div>										
 									</div>
@@ -544,7 +569,7 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtObservacao">Observação</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" placeholder="Observação"></textarea>
+												<textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" placeholder="Observação"><?php echo $row['ForneObservacao']; ?></textarea>
 											</div>
 										</div>
 									</div>										
@@ -567,10 +592,11 @@ if(isset($_POST['inputTipo'])){
 															 WHERE BancoStatus = 1
 															 ORDER BY BancoCodigo ASC");
 													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$rowBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 													
-													foreach ($row as $item){
-														print('<option value="'.$item['BancoId'].'">'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
+													foreach ($rowBanco as $item){
+														$seleciona = $item['BancoId'] == $row['ForneBanco'] ? "selected" : "";
+														print('<option value="'.$item['BancoId'].'" '. $seleciona .'>'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
 													}
 												
 												?>
@@ -580,21 +606,21 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputAgencia">Agência</label>
-												<input type="text" id="inputAgencia" name="inputAgencia" class="form-control" placeholder="Agência + dígito">												
+												<input type="text" id="inputAgencia" name="inputAgencia" class="form-control" placeholder="Agência + dígito" value="<?php echo $row['ForneAgencia']; ?>">												
 											</div>
 										</div>
 										
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputConta">Conta</label>
-												<input type="text" id="inputConta" name="inputConta" class="form-control" placeholder="Conta + dígito">
+												<input type="text" id="inputConta" name="inputConta" class="form-control" placeholder="Conta + dígito" value="<?php echo $row['ForneConta']; ?>">
 											</div>
 										</div>
 
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputInfoAdicional">Informação Adicional</label>
-												<input type="text" id="inputInfoAdicional" name="inputInfoAdicional" class="form-control">
+												<input type="text" id="inputInfoAdicional" name="inputInfoAdicional" class="form-control" value="<?php echo $row['ForneInformacaoAdicional']; ?>">
 											</div>
 										</div>
 									</div>
@@ -610,28 +636,28 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbBanco">IPI (%)</label>
-												<input type="number" id="inputIpi" name="inputIpi" class="form-control" placeholder="IPI (%)">
+												<input type="number" id="inputIpi" name="inputIpi" class="form-control" placeholder="IPI (%)" value="<?php echo $row['ForneIpi']; ?>">
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputFrete">Frete (%)</label>
-												<input type="number" id="inputFrete" name="inputFrete" class="form-control" placeholder="Frete (%)">
+												<input type="number" id="inputFrete" name="inputFrete" class="form-control" placeholder="Frete (%)" value="<?php echo $row['ForneFrete']; ?>">
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputIcms">ICMS (%)</label>
-												<input type="text" id="inputIcms" name="inputIcms" class="form-control" placeholder="ICMS (%)">
+												<input type="text" id="inputIcms" name="inputIcms" class="form-control" placeholder="ICMS (%)" value="<?php echo $row['ForneIcms']; ?>">
 											</div>
 										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputOutros">Outros (%)</label>
-												<input type="text" id="inputOutros" name="inputOutros" class="form-control" placeholder="Outros (%)">
+												<input type="text" id="inputOutros" name="inputOutros" class="form-control" placeholder="Outros (%)" value="<?php echo $row['ForneOutros']; ?>">
 											</div>
 										</div>
 									</div>
@@ -641,7 +667,7 @@ if(isset($_POST['inputTipo'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
 										<a href="fornecedor.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

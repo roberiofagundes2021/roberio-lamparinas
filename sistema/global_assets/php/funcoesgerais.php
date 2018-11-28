@@ -154,7 +154,7 @@
 		return "$resp";
 	}
 	
-	function formatarCnpj($cnpj_cpf){
+	function formatarCPF_Cnpj($cnpj_cpf){
 		
 		if (strlen(preg_replace("/\D/", '', $cnpj_cpf)) === 11) {
 			$response = preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "\$1.\$2.\$3-\$4", $cnpj_cpf);

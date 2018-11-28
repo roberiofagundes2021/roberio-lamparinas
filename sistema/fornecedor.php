@@ -91,7 +91,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="perfil.php" class="list-icons-item" data-action="reload"></a>
+										<a href="fornecedor.php" class="list-icons-item" data-action="reload"></a>
 										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
@@ -123,7 +123,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('
 										<tr>
 											<td>'.$item['ForneNome'].'</td>
-											<td>'.$documento.'</td>
+											<td>'.formatarCPF_Cnpj($documento).'</td>
 											<td>'.$item['ForneCelular'].'</td>
 											');
 										
@@ -151,7 +151,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<!-- /info blocks -->
 				
-				<form name="formPerfil" method="post">
+				<form name="formFornecedor" method="post">
 					<input type="hidden" id="inputFornecedorId" name="inputFornecedorId" >
 					<input type="hidden" id="inputFornecedorNome" name="inputFornecedorNome" >
 					<input type="hidden" id="inputFornecedorStatus" name="inputFornecedorStatus" >
