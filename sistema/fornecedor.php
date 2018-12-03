@@ -55,7 +55,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir esse fornecedor?", "fornecedorExclui.php");
 			} else if (Tipo == 'mudaStatus'){
 				document.formFornecedor.action = "fornecedorMudaSituacao.php";
-			}		
+			} else if (Tipo == 'imprime'){
+				document.formFornecedor.action = "fornecedorImprime.php";
+				document.formFornecedor.setAttribute("target", "_blank");
+			}
 			
 			document.formFornecedor.submit();
 		}		
@@ -132,8 +135,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'imprime\');" class="list-icons-item"><i class="icon-printer2" data-popup="tooltip" data-placement="bottom" title="Gerar PDF"></i></a>
 													</div>
 												</div>
 											</td>

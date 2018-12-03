@@ -104,13 +104,20 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+	
+	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
+	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
+	
+	<script src="global_assets/js/lamparinas/custom.js"></script>	
 	<!-- /theme JS files -->	
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 
         $(document).ready(function() {
-
+			
+			//$("#cmbEstado").addClass("form-control-select2");
+				            
             function limpa_formulário_cep() {
                 // Limpa valores do formulário de cep.
                 $("#inputEndereco").val("");
@@ -122,6 +129,8 @@ if(isset($_POST['inputTipo'])){
             //Quando o campo cep perde o foco.
             $("#inputCep").blur(function() {
 
+				$("#cmbEstado").removeClass("form-control-select2");
+				
                 //Nova variável "cep" somente com dígitos.
                 var cep = $(this).val().replace(/\D/g, '');
 
@@ -137,39 +146,44 @@ if(isset($_POST['inputTipo'])){
                         //Preenche os campos com "..." enquanto consulta webservice.
                         $("#inputEndereco").val("...");
                         $("#inputBairro").val("...");
-                        $("#inputCidade").val("...");
+                        $("#inputCidade").val("...");                        
                         $("#cmbEstado").val("...");                        
 
                         //Consulta o webservice viacep.com.br/
                         $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados) {
 
                             if (!("erro" in dados)) {
-								alert("Entrou aqui");
+
                                 //Atualiza os campos com os valores da consulta.
                                 $("#inputEndereco").val(dados.logradouro);
                                 $("#inputBairro").val(dados.bairro);
-                                $("#inputCidade").val(dados.localidade);
-                                $("#cmbEstado").val(dados.uf);
-								$("#cmbEstado").find('option:selected').text();
+                                $("#inputCidade").val(dados.localidade);                                
+                                $("#cmbEstado").val(dados.uf);                                
+								//$("#cmbEstado").find('option[value="MA"]').attr('selected','selected');
+								//$('#cmbEstado :selected').text();
+								//$("#cmbEstado").find('option:selected').text();
+								//document.getElementById("cmbEstado").options[5].selected = true;
                             } //end if.
                             else {
                                 //CEP pesquisado não foi encontrado.
                                 limpa_formulário_cep();
-                                alert("CEP não encontrado.");
+                                alerta("Erro","CEP não encontrado.", "erro");
                             }
                         });
                     } //end if.
                     else {
                         //cep é inválido.
                         limpa_formulário_cep();
-                        alert("Formato de CEP inválido.");
+                        alerta("Erro","Formato de CEP inválido.","erro");
                     }
                 } //end if.
                 else {
                     //cep sem valor, limpa formulário.
                     limpa_formulário_cep();
-                }
+                }             
+                
             });
+            
         });
         
         function selecionaPessoa(tipo) {
@@ -461,7 +475,7 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbEstado">Estado</label>
-												<select id="cmbEstado" name="cmbEstado" class="form-control form-control-select2">
+												<select id="cmbEstado" name="cmbEstado" class="form-control"> <!-- retirei isso da class: form-control-select2 para que funcionasse a seleção do texto do estado, além do valor -->
 													<option value="#">Selecione um estado</option>
 													<option value="AC">Acre</option>
 													<option value="AL">Alagoas</option>
@@ -624,14 +638,14 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputIcms">ICMS (%)</label>
-												<input type="text" id="inputIcms" name="inputIcms" class="form-control" placeholder="ICMS (%)">
+												<input type="number" id="inputIcms" name="inputIcms" class="form-control" placeholder="ICMS (%)">
 											</div>
 										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputOutros">Outros (%)</label>
-												<input type="text" id="inputOutros" name="inputOutros" class="form-control" placeholder="Outros (%)">
+												<input type="number" id="inputOutros" name="inputOutros" class="form-control" placeholder="Outros (%)">
 											</div>
 										</div>
 									</div>

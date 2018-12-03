@@ -125,6 +125,11 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+
+	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
+	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
+	
+	<script src="global_assets/js/lamparinas/custom.js"></script>	
 	<!-- /theme JS files -->	
 
 	<!-- Adicionando Javascript -->
@@ -176,14 +181,14 @@ if(isset($_POST['inputTipo'])){
                             else {
                                 //CEP pesquisado não foi encontrado.
                                 limpa_formulário_cep();
-                                alert("CEP não encontrado.");
+                                alerta("Erro","CEP não encontrado.", "erro");
                             }
                         });
                     } //end if.
                     else {
                         //cep é inválido.
                         limpa_formulário_cep();
-                        alert("Formato de CEP inválido.");
+                        alerta("Erro","Formato de CEP inválido.","erro");
                     }
                 } //end if.
                 else {
@@ -400,7 +405,7 @@ if(isset($_POST['inputTipo'])){
 												$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 												
 												foreach ($rowCategoria as $item){			
-													$seleciona = $item['CategId'] == $row['ForneCategoria'] ? "selected" : "";												
+													$seleciona = $item['CategId'] == $row['ForneCategoria'] ? "selected" : "";
 													print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
 												}
 											

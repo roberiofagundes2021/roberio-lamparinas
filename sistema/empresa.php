@@ -12,8 +12,8 @@ $sql = ("SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreSt
 		 ORDER BY EmpreNomeFantasia ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
-
+$count = count($row);
+//	var_dump($count);die;
 ?>
 
 <!DOCTYPE html>
@@ -119,7 +119,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<tbody>
 								<?php
 									foreach ($row as $item){
-										
+
 										$situacao = $item['EmpreStatus'] ? 'Ativo' : 'Inativo';
 										$situacaoClasse = $item['EmpreStatus'] ? 'badge-success' : 'badge-secondary';
 										
@@ -127,7 +127,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<tr>
 											<td>'.$item['EmpreNomeFantasia'].'</td>
 											<td>'.$item['EmpreRazaoSocial'].'</td>
-											<td>'.formatarCnpj($item['EmpreCnpj']).'</td>');
+											<td>'.formatarCPF_Cnpj($item['EmpreCnpj']).'</td>');
 										
 										if ($_SESSION['EmpreId'] != $item['EmpreId']) {
 											print('<td><a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
