@@ -6,12 +6,12 @@ $_SESSION['PaginaAtual'] = 'Produto';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ProduId, ProduDescricao, CategNome, SbCatNome, ProduStatus
+$sql = ("SELECT ProduId, ProduNome, CategNome, SbCatNome, ProduValorVenda, ProduStatus
 		 FROM Produto
-		 JOIN Categoria on CategId = ProduCategoria
-		 JOIN SubCategoria on SbCatId = ProduSubCategoria
+		 LEFT JOIN Categoria on CategId = ProduCategoria
+		 LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 	     WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY ProduDescricao ASC");
+		 ORDER BY ProduNome ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -111,7 +111,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th>Descrição</th>
+										<th>Produto</th>
 										<th>Categoria</th>
 										<th>SubCategoria</th>
 										<th>Preço Venda</th>
@@ -128,19 +128,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										print('
 										<tr>
-											<td>'.$item['ProduDescricao'].'</td>
+											<td>'.$item['ProduNome'].'</td>
 											<td>'.$item['CategNome'].'</td>
 											<td>'.$item['SbCatNome'].'</td>
-											<td>'.$item['ProduValorVenda'].'</td>
+											<td>'.formatamoeda($item['ProduValorVenda']).'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduDescricao'].'\','.$item['ProduStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduDescricao'].'\','.$item['ProduStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduDescricao'].'\','.$item['ProduStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
@@ -158,7 +158,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<!-- /info blocks -->
 				
-				<form name="formPerfil" method="post">
+				<form name="formProduto" method="post">
 					<input type="hidden" id="inputProdutoId" name="inputProdutoId" >
 					<input type="hidden" id="inputProdutoNome" name="inputProdutoNome" >
 					<input type="hidden" id="inputProdutoStatus" name="inputProdutoStatus" >

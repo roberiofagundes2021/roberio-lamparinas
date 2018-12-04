@@ -39,7 +39,7 @@ if(isset($_POST['inputTipo'])){
 									  ForneCelular = :sCelular, ForneEmail = :sEmail, ForneSite = :sSite, ForneObservacao = :sObservacao,
 									  ForneBanco = :iBanco, ForneAgencia = :sAgencia, ForneConta = :sConta, 
 									  ForneInformacaoAdicional = :sInformacaoAdicional, ForneIpi = :iIpi, ForneFrete = :iFrete, 
-									  ForneIcms = :iIcms, ForneOutros = :iOutros, ForneStatus = :bStatus, ForneUsuarioAtualizador = :iUsuarioAtualizador
+									  ForneIcms = :iIcms, ForneOutros = :iOutros, ForneUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE ForneId = :iFornecedor";
 		$result = $conn->prepare($sql);
 				
@@ -79,7 +79,6 @@ if(isset($_POST['inputTipo'])){
 						':iFrete' => $_POST['inputFrete'],
 						':iIcms' => $_POST['inputIcms'],
 						':iOutros' => $_POST['inputOutros'],
-						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iFornecedor'	=> $_POST['inputFornecedorId']
 						));
