@@ -6,6 +6,7 @@ $_SESSION['PaginaAtual'] = 'Editar Fornecedor';
 
 include('global_assets/php/conexao.php');
 
+//Seveio do fornecedor.php
 if(isset($_POST['inputFornecedorId'])){
 	
 	$iFornecedor = $_POST['inputFornecedorId'];
@@ -23,6 +24,10 @@ if(isset($_POST['inputFornecedorId'])){
 	}
 	
 	$_SESSION['msg'] = array();
+
+} else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
+
+	irpara("fornecedor.php");
 }
 
 if(isset($_POST['inputTipo'])){	
@@ -640,28 +645,28 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbBanco">IPI (%)</label>
-												<input type="number" id="inputIpi" name="inputIpi" class="form-control" placeholder="IPI (%)" value="<?php echo $row['ForneIpi']; ?>">
+												<input type="text" id="inputIpi" name="inputIpi" class="form-control" data-mask="99%" placeholder="IPI (%)" value="<?php echo $row['ForneIpi']; ?>">
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputFrete">Frete (%)</label>
-												<input type="number" id="inputFrete" name="inputFrete" class="form-control" placeholder="Frete (%)" value="<?php echo $row['ForneFrete']; ?>">
+												<input type="text" id="inputFrete" name="inputFrete" class="form-control" data-mask="99%" placeholder="Frete (%)" value="<?php echo $row['ForneFrete']; ?>">
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputIcms">ICMS (%)</label>
-												<input type="text" id="inputIcms" name="inputIcms" class="form-control" placeholder="ICMS (%)" value="<?php echo $row['ForneIcms']; ?>">
+												<input type="text" id="inputIcms" name="inputIcms" class="form-control" data-mask="99%" placeholder="ICMS (%)" value="<?php echo $row['ForneIcms']; ?>">
 											</div>
 										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputOutros">Outros (%)</label>
-												<input type="text" id="inputOutros" name="inputOutros" class="form-control" placeholder="Outros (%)" value="<?php echo $row['ForneOutros']; ?>">
+												<input type="text" id="inputOutros" name="inputOutros" class="form-control" data-mask="99%" placeholder="Outros (%)" value="<?php echo $row['ForneOutros']; ?>">
 											</div>
 										</div>
 									</div>

@@ -624,28 +624,28 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbBanco">IPI (%)</label>
-												<input type="number" id="inputIpi" name="inputIpi" class="form-control" placeholder="IPI (%)">
+												<input type="text" id="inputIpi" name="inputIpi" class="form-control" data-mask="99%" placeholder="IPI (%)">
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputFrete">Frete (%)</label>
-												<input type="number" id="inputFrete" name="inputFrete" class="form-control" placeholder="Frete (%)">
+												<input type="text" id="inputFrete" name="inputFrete" class="form-control" data-mask="99%" placeholder="Frete (%)">
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputIcms">ICMS (%)</label>
-												<input type="number" id="inputIcms" name="inputIcms" class="form-control" placeholder="ICMS (%)">
+												<input type="text" id="inputIcms" name="inputIcms" class="form-control" data-mask="99%" placeholder="ICMS (%)">
 											</div>
 										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputOutros">Outros (%)</label>
-												<input type="number" id="inputOutros" name="inputOutros" class="form-control" placeholder="Outros (%)">
+												<input type="text" id="inputOutros" name="inputOutros" class="form-control" data-mask="99%" placeholder="Outros (%)">
 											</div>
 										</div>
 									</div>

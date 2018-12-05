@@ -18,11 +18,22 @@ if(isset($_POST['inputProdutoId'])){
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);		
 		
+		$valorCusto = number_format($row['ProduValorCusto'], 2, ',', '.');
+		$valorVenda	= $row['ProduValorVenda'];
+		$despesasAcessorias = $row['ProduDespesasAcessorias'];
+		$outrasDespesas = $row['ProduOutrasDespesas'];
+		$custoFinal = $row['ProduCustoFinal'];
+		$numSerie = $row['ProduNumSerie'];
+		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
 	}
 	
 	$_SESSION['msg'] = array();
+
+} else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
+
+	irpara("produto.php");
 }
 
 if(isset($_POST['inputCodigo'])){	
@@ -109,7 +120,7 @@ if(isset($_POST['inputCodigo'])){
 	
 	<script src="global_assets/js/lamparinas/custom.js"></script>	
 	<!-- /theme JS files -->	
-	
+		
 </head>
 
 <body class="navbar-top">
@@ -229,7 +240,7 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputValorCusto">Valor de Custo</label>
-										<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="<?php echo $row['ProduValorCusto']; ?>">
+										<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="<?php echo $valorCusto; ?>">
 									</div>
 								</div>
 								
@@ -261,7 +272,7 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputDespesasAcessorias">Despesas Acessórias</label>
-										<input type="text" id="inputDespesasAcessorias" name="inputDespesaAcessoria" class="form-control" placeholder="Despesa Acessoria" value="<?php echo $row['ProduDespesaAcessoria']; ?>">
+										<input type="text" id="inputDespesasAcessorias" name="inputDespesasAcessorias" class="form-control" placeholder="Despesas Acessorias" value="<?php echo $despesasAcessorias; ?>">
 									</div>
 								</div>
 								
@@ -293,14 +304,14 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputOutrasDespesas">Outras Despesas</label>
-										<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" value="<?php echo $row['ProduOutrasDespesas']; ?>">
+										<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" value="<?php echo $outrasDespesas; ?>">
 									</div>
 								</div>
 
 								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputNumSerie">Número de Série</label>
-										<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série" value="<?php echo $row['ProduNumSerie']; ?>">
+										<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série" value="<?php echo $numSerie; ?>">
 									</div>
 								</div>								
 							</div>
@@ -309,14 +320,14 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputCustoFinal">Custo Final</label>
-										<input type="text" id="inputCustoFinal" name="inputCustoFinal" class="form-control" placeholder="Custo Final" value="<?php echo $row['ProduCustoFinal']; ?>">
+										<input type="text" id="inputCustoFinal" name="inputCustoFinal" class="form-control" placeholder="Custo Final" value="<?php echo $custoFinal; ?>">
 									</div>
 								</div>
 
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputValorVenda">Valor de Venda</label>
-										<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" value="<?php echo $row['ProduValorVenda']; ?>">
+										<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" value="<?php echo $valorVenda; ?>">
 									</div>
 								</div>
 								
