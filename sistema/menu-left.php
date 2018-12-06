@@ -93,6 +93,9 @@
 						<!-- Forms -->
 						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Controle de Estoque</div> <i class="icon-menu" title="Forms"></i></li>
 						<li class="nav-item">
+							<a href="categoria.php" class="nav-link"><i class="icon-pencil3"></i> <span>Categoria</span></a>
+						</li>
+						<li class="nav-item">
 							<a href="fornecedor.php" class="nav-link"><i class="icon-pencil3"></i> <span>Fornecedor</span></a>
 						</li>
 						<li class="nav-item">

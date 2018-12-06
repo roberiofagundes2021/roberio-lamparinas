@@ -2,60 +2,39 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Editar Perfil';
+$_SESSION['PaginaAtual'] = 'Nova Categoria';
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputPerfilId'])){
-	
-	$iPerfil = $_POST['inputPerfilId'];
-        	
-	try{
-		
-		$sql = "SELECT PerfiId, PerfiNome
-				FROM Perfil
-				WHERE PerfiId = $iPerfil ";
-		$result = $conn->query("$sql");
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-		
-	} catch(PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
-	}
-	
-	$_SESSION['msg'] = array();
-} else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
-
-	irpara("perfil.php");
-}
-
 if(isset($_POST['inputNome'])){
-	
+
 	try{
 		
-		$sql = "UPDATE Perfil SET PerfiNome = :sNome, PerfiUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE PerfiId = :iPerfil";
+		$sql = "INSERT INTO Categoria (CategNome, CategStatus, CategUsuarioAtualizador, CategEmpresa)
+				VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
+						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iPerfil' => $_POST['inputPerfiId']
+						':iEmpresa' => $_SESSION['EmpreId'],
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Perfil alterado!!!";
+		$_SESSION['msg']['mensagem'] = "Categoria incluída!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar perfil!!!";
-		$_SESSION['msg']['tipo'] = "error";		
+		$_SESSION['msg']['mensagem'] = "Erro ao incluir categoria!!!";
+		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
 	}
 	
-	irpara("perfil.php");
+	irpara("categoria.php");
 }
 
 ?>
@@ -66,7 +45,7 @@ if(isset($_POST['inputNome'])){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Perfil</title>
+	<title>Lamparinas | Categoria</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -74,9 +53,15 @@ if(isset($_POST['inputNome'])){
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
+	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+	
+	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
+	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
+	
+	<script src="global_assets/js/lamparinas/custom.js"></script>
 	<!-- /theme JS files -->	
-
+	
 </head>
 
 <body class="navbar-top">
@@ -94,33 +79,31 @@ if(isset($_POST['inputNome'])){
 			<?php include_once("cabecalho.php"); ?>	
 
 			<!-- Content area -->
-			<div class="content">		
+			<div class="content">
 				
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formPerfil" method="post" class="form-validate" action="perfilEdita.php">
+					<form name="formEmpresa" method="post" class="form-validate" action="categoriaNovo.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Perfil "<?php echo $row['PerfiNome']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Categoria</h5>
 						</div>
-						
-						<input type="hidden" id="inputPerfiId" name="inputPerfiId" value="<?php echo $row['PerfiId']; ?>" >
 						
 						<div class="card-body">								
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="inputNome">Perfil</label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Perfil" value="<?php echo $row['PerfiNome']; ?>" required>
+										<label for="inputNome">Nome da Categoria</label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Categoria" required autofocus>
 									</div>
 								</div>
 							</div>
-								
+															
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
-										<a href="perfil.php" class="btn btn-basic" role="button">Cancelar</a>
+										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<a href="categoria.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

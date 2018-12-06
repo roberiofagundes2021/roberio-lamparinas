@@ -2,19 +2,19 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Editar Perfil';
+$_SESSION['PaginaAtual'] = 'Editar Categoria';
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputPerfilId'])){
+if(isset($_POST['inputCategoriaId'])){
 	
-	$iPerfil = $_POST['inputPerfilId'];
+	$iCategoria = $_POST['inputCategoriaId'];
         	
 	try{
 		
-		$sql = "SELECT PerfiId, PerfiNome
-				FROM Perfil
-				WHERE PerfiId = $iPerfil ";
+		$sql = "SELECT CategId, CategNome
+				FROM Categoria
+				WHERE CategId = $iCategoria ";
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
@@ -25,37 +25,37 @@ if(isset($_POST['inputPerfilId'])){
 	$_SESSION['msg'] = array();
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
-	irpara("perfil.php");
+	irpara("categoria.php");
 }
 
 if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE Perfil SET PerfiNome = :sNome, PerfiUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE PerfiId = :iPerfil";
+		$sql = "UPDATE Categoria SET CategNome = :sNome, CategUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE CategId = :iCategoria";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iPerfil' => $_POST['inputPerfiId']
+						':iCategoria' => $_POST['inputCategoriaId']
 						));
-		
+
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Perfil alterado!!!";
+		$_SESSION['msg']['mensagem'] = "Categoria alterada!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar perfil!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar categoria!!!";
 		$_SESSION['msg']['tipo'] = "error";		
 		
 		echo 'Error: ' . $e->getMessage();
 	}
 	
-	irpara("perfil.php");
+	irpara("categoria.php");
 }
 
 ?>
@@ -66,7 +66,7 @@ if(isset($_POST['inputNome'])){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Perfil</title>
+	<title>Lamparinas | Categoria</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -99,19 +99,19 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formPerfil" method="post" class="form-validate" action="perfilEdita.php">
+					<form name="formCategoria" method="post" class="form-validate" action="categoriaEdita.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Perfil "<?php echo $row['PerfiNome']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Categoria "<?php echo $row['CategNome']; ?>"</h5>
 						</div>
 						
-						<input type="hidden" id="inputPerfiId" name="inputPerfiId" value="<?php echo $row['PerfiId']; ?>" >
+						<input type="hidden" id="inputCategoriaId" name="inputCategoriaId" value="<?php echo $row['CategId']; ?>" >
 						
 						<div class="card-body">								
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="inputNome">Perfil</label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Perfil" value="<?php echo $row['PerfiNome']; ?>" required>
+										<label for="inputNome">Nome da Categoria</label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Categoria" value="<?php echo $row['CategNome']; ?>" required autofocus>
 									</div>
 								</div>
 							</div>
@@ -120,7 +120,7 @@ if(isset($_POST['inputNome'])){
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
-										<a href="perfil.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="categoria.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>
