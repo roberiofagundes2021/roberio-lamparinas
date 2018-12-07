@@ -6152,10 +6152,6 @@ a.plupload_disabled {
     .brighttheme .ui-pnotify-action-bar input::-moz-placeholder {
       color: #fff;
       opacity: 1; }
-    .ui-pnotify[class*=bg-] .brighttheme .ui-pnotify-action-bar textarea:-ms-input-placeholder, .ui-pnotify[class*=bg-]
-    .brighttheme .ui-pnotify-action-bar input:-ms-input-placeholder {
-      color: #fff;
-      opacity: 1; }
     .ui-pnotify[class*=bg-] .brighttheme .ui-pnotify-action-bar textarea::-ms-input-placeholder, .ui-pnotify[class*=bg-]
     .brighttheme .ui-pnotify-action-bar input::-ms-input-placeholder {
       color: #fff;
@@ -12592,9 +12588,6 @@ textarea#HandsontableCopyPaste {
       color: #999;
       opacity: 1; }
     .dataTables_filter input::-moz-placeholder {
-      color: #999;
-      opacity: 1; }
-    .dataTables_filter input:-ms-input-placeholder {
       color: #999;
       opacity: 1; }
     .dataTables_filter input::-ms-input-placeholder {

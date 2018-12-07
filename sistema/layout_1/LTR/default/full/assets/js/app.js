@@ -53,10 +53,10 @@ var App = function () {
                 totalHeight += $this.find('.' + navSubmenuClass).filter(':visible').outerHeight();
                 if($this.children('.' + navSubmenuClass).length) {
                     if(($this.children('.' + navSubmenuClass).offset().top + $this.find('.' + navSubmenuClass).filter(':visible').outerHeight()) > document.body.clientHeight) {
-                        $this.addClass(navSubmenuReversedClass)
+                        $this.addClass(navSubmenuReversedClass);
                     }
                     else {
-                        $this.removeClass(navSubmenuReversedClass)
+                        $this.removeClass(navSubmenuReversedClass);
                     }
                 }
             });

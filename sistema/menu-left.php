@@ -1,5 +1,5 @@
 				<!-- Main sidebar -->
-		<div class="sidebar sidebar-light sidebar-main sidebar-expand-md">
+		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-md">
 
 			<!-- Sidebar mobile toggler -->
 			<div class="sidebar-mobile-toggler text-center">
@@ -81,7 +81,7 @@
 						<!-- Main -->
 						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Principal</div> <i class="icon-menu" title="Main"></i></li>
 						<li class="nav-item">
-							<a href="index.html" class="nav-link active">
+							<a href="index.php" class="nav-link active">
 								<i class="icon-home4"></i>
 								<span>
 									Página Inicial
@@ -92,9 +92,19 @@
 
 						<!-- Forms -->
 						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Controle de Estoque</div> <i class="icon-menu" title="Forms"></i></li>
-						<li class="nav-item">
-							<a href="categoria.php" class="nav-link"><i class="icon-pencil3"></i> <span>Categoria</span></a>
+						
+						<li class="nav-item nav-item-submenu">
+							<a href="#" class="nav-link"> <span>Apoio</span></a>
+							<ul class="nav nav-group-sub" data-submenu-title="Text editors">
+								<li class="nav-item"><a href="categoria.php" class="nav-link">Categoria</a></li>
+								<li class="nav-item"><a href="subcategoria.php" class="nav-link">SubCategoria</a></li>								
+								<li class="nav-item"><a href="marca.php" class="nav-link">Marca</a></li>
+								<li class="nav-item"><a href="modelo.php" class="nav-link">Modelo</a></li>
+								<li class="nav-item"><a href="fabricante.php" class="nav-link">Fabricante</a></li>
+								<li class="nav-item"><a href="unidademedida.php" class="nav-link">Unidade de Medida</a></li>
+							</ul>
 						</li>
+						
 						<li class="nav-item">
 							<a href="fornecedor.php" class="nav-link"><i class="icon-pencil3"></i> <span>Fornecedor</span></a>
 						</li>

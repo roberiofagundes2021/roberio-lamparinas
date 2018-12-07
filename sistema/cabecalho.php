@@ -56,7 +56,7 @@
 									<a href="usuario.php" class="dropdown-item"><i class="icon-users"></i> Usuários</a>
 									<a href="perfil.php" class="dropdown-item"><i class="icon-user-check"></i> Perfis</a>
 									<div class="dropdown-divider"></div>
-									<a href="#" class="dropdown-item"><i class="icon-gear"></i> Demais ajustes</a>
+									<a href="banco.php" class="dropdown-item"><i class="icon-piggy-bank"></i> Bancos</a>
 								</div>
 							</div>
 						</div>

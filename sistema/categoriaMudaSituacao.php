@@ -8,7 +8,7 @@ $_SESSION['msg'] = array();
 
 if(isset($_POST['inputCategoriaId'])){
 	
-	$iPerfil = $_POST['inputCategoriaId'];
+	$iCategoria = $_POST['inputCategoriaId'];
 	$bStatus = $_POST['inputCategoriaStatus'] ? 0 : 1;
         	
 	try{
@@ -17,7 +17,7 @@ if(isset($_POST['inputCategoriaId'])){
 				WHERE CategId = :id";
 		$result = $conn->prepare("$sql");
 		$result->bindParam(':bStatus', $bStatus); 
-		$result->bindParam(':id', $iPerfil); 
+		$result->bindParam(':id', $iCategoria); 
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

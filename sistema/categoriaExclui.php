@@ -6,14 +6,14 @@ include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputCategoriaId'])){
 	
-	$iPerfil = $_POST['inputCategoriaId'];
+	$iCategoria = $_POST['inputCategoriaId'];
         	
 	try{
 		
 		$sql = "DELETE FROM Categoria
 				WHERE CategId = :id";
 		$result = $conn->prepare("$sql");
-		$result->bindParam(':id', $iPerfil); 
+		$result->bindParam(':id', $iCategoria); 
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -23,7 +23,7 @@ if(isset($_POST['inputCategoriaId'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir Categoria!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir categoria!!!";
 		$_SESSION['msg']['tipo'] = "error";			
 		
 		echo 'Error: ' . $e->getMessage();

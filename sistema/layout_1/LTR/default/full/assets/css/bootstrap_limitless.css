@@ -770,8 +770,6 @@ select[size] {
     color: #fff; }
   .form-control[class*=bg-]:not(.bg-white):not(.bg-light):not(.bg-transparent)::-moz-placeholder {
     color: #fff; }
-  .form-control[class*=bg-]:not(.bg-white):not(.bg-light):not(.bg-transparent):-ms-input-placeholder {
-    color: #fff; }
   .form-control[class*=bg-]:not(.bg-white):not(.bg-light):not(.bg-transparent)::-ms-input-placeholder {
     color: #fff; }
   .form-control[class*=bg-]:not(.bg-white):not(.bg-light):not(.bg-transparent)::placeholder {
