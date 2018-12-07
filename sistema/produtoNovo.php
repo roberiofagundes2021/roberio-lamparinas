@@ -165,7 +165,7 @@ if(isset($_POST['inputCodigo'])){
 									<div class="form-group">
 										<label for="cmbCategoria">Categoria</label>
 										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-											<option value="#">Selecione uma categoria</option>
+											<option value="#">Selecione</option>
 											<?php 
 												$sql = ("SELECT CategId, CategNome
 														 FROM Categoria															     
@@ -187,7 +187,7 @@ if(isset($_POST['inputCodigo'])){
 									<div class="form-group">
 										<label for="cmbSubCategoria">SubCategoria</label>
 										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-											<option value="#">Selecione uma subcategoria</option>
+											<option value="#">Selecione</option>
 											<?php 
 												$sql = ("SELECT SbCatId, SbCatNome
 														 FROM SubCategoria															     
@@ -218,7 +218,7 @@ if(isset($_POST['inputCodigo'])){
 									<div class="form-group">
 										<label for="cmbMarca">Marca</label>
 										<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
-											<option value="#">Selecione uma Marca</option>
+											<option value="#">Selecione</option>
 											<?php 
 												$sql = ("SELECT MarcaId, MarcaNome
 														 FROM Marca															     
@@ -249,7 +249,7 @@ if(isset($_POST['inputCodigo'])){
 									<div class="form-group">
 										<label for="cmbModelo">Modelo</label>
 										<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
-											<option value="#">Selecione uma Marca</option>
+											<option value="#">Selecione</option>
 											<?php 
 												$sql = ("SELECT ModelId, ModelNome
 														 FROM Modelo
@@ -303,7 +303,7 @@ if(isset($_POST['inputCodigo'])){
 									<div class="form-group">
 										<label for="cmbFabricante">Fabricante</label>
 										<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
-											<option value="#">Selecione um Fabricante</option>
+											<option value="#">Selecione</option>
 											<?php 
 												$sql = ("SELECT FabriId, FabriNome
 														 FROM Fabricante
@@ -331,9 +331,9 @@ if(isset($_POST['inputCodigo'])){
 										<div class="col-lg-3">
 											<label for="cmbUnidadeMedida">Unidade de Medida</label>
 											<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control form-control-select2">
-												<option value="#">Selecione uma Unidade de Medida</option>
+												<option value="#">Selecione</option>
 												<?php 
-													$sql = ("SELECT UnMedId, UnMedNome
+													$sql = ("SELECT UnMedId, UnMedNome, UnMedSigla
 															 FROM UnidadeMedida
 															 WHERE UnMedStatus = 1
 															 ORDER BY UnMedNome ASC");
@@ -341,7 +341,7 @@ if(isset($_POST['inputCodigo'])){
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($row as $item){
-														print('<option value="'.$item['UnMedId'].'">'.$item['UnMedNome'].'</option>');
+														print('<option value="'.$item['UnMedId'].'">'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
 													}
 												
 												?>
@@ -351,7 +351,7 @@ if(isset($_POST['inputCodigo'])){
 										<div class="col-lg-3">
 											<label for="cmbTipoFiscal">Tipo</label>
 											<select id="cmbTipoFiscal" name="cmbTipoFiscal" class="form-control form-control-select2">
-												<option value="#">Selecione um Tipo</option>
+												<option value="#">Selecione</option>
 												<?php 
 													$sql = ("SELECT TpFisId, TpFisNome
 															 FROM TipoFiscal
