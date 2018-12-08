@@ -60,7 +60,35 @@ if(isset($_POST['inputNome'])){
 	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
 	
 	<script src="global_assets/js/lamparinas/custom.js"></script>
-	<!-- /theme JS files -->	
+	<!-- /theme JS files -->
+	
+	<script type="text/javascript" >
+
+        $(document).ready(function() {
+			
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputNome = $('#inputNome').val();
+				
+				$.ajax({
+					type: "POST",
+					url: "categoriaValida.php",
+					data: ('nome='+inputNome),
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Esse registro já existe!','error');
+							return false;
+						}
+						
+						$( "#formCategoria" ).submit();
+					}
+				})
+			})
+		})
+	</script>
 	
 </head>
 
@@ -84,7 +112,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formEmpresa" method="post" class="form-validate" action="categoriaNovo.php">
+					<form name="formCategoria" id="formCategoria" method="post" class="form-validate" action="">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Categoria</h5>
 						</div>
@@ -102,19 +130,16 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
 										<a href="categoria.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
-							</div>
-						</form>								
-
-					</div>
-					<!-- /card-body -->
-					
+							</div>	
+						</div>
+						<!-- /card-body -->
+					</form>						
 				</div>
 				<!-- /info blocks -->
-
 			</div>
 			<!-- /content area -->			
 			

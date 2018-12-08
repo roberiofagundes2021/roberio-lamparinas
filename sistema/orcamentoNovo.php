@@ -6,6 +6,14 @@ $_SESSION['PaginaAtual'] = 'Novo Orçamento';
 
 include('global_assets/php/conexao.php');
 
+
+$sql = ("SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
+		 FROM Usuario
+		 Where and UsuarId = ".$_SESSION['UsuarId']."
+		 ORDER BY UsuarNome ASC");
+$result = $conn->query("$sql");
+$rowUsuario = $result->fetchAll(PDO::FETCH_ASSOC);		 
+
 if(isset($_POST['inputData'])){
 		
 	try{
@@ -159,15 +167,15 @@ if(isset($_POST['inputData'])){
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
 													<?php 
-														$sql = ("SELECT CategId, CategNome
-																 FROM Categoria															     
-																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
-															     ORDER BY CategNome ASC");
+														$sql = ("SELECT SbCatId, SbCatNome
+																 FROM SubCategoria
+																 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
+															     ORDER BY SbCatNome ASC");
 														$result = $conn->query("$sql");
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($row as $item){
-															print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+															print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
 														}
 													
 													?>
@@ -258,22 +266,22 @@ if(isset($_POST['inputData'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputNomeSolicitante">Solicitante</label>
-												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control">
-												<input type="hidden" id="inputSolicitante" name="inputSolicitante">
+												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly>
+												<input type="hidden" id="inputSolicitante" name="inputSolicitante" value="<?php echo $rowUsuario['UsuarId']; ?>">
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputEmailSolicitante">E-mail</label>
-												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" readOnly>
+												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarEmail']; ?>" readOnly>
 											</div>
 										</div>									
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputTelefoneSolicitante">Telefone</label>
-												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" readOnly>
+												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarTelefone']; ?>" readOnly>
 											</div>
 										</div>									
 									</div>

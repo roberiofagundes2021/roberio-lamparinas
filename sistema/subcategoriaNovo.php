@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Nova Unidade de Medida';
+$_SESSION['PaginaAtual'] = 'Nova Sub Categoria';
 
 include('global_assets/php/conexao.php');
 
@@ -10,32 +10,32 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO UnidadeMedida (UnMedNome, UnMedSigla, UnMedStatus, UnMedUsuarioAtualizador, UnMedEmpresa)
-				VALUES (:sNome, :sSigla, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO SubCategoria (SbCatNome, SbCatCategoria, SbCatStatus, SbCatUsuarioAtualizador, SbCatEmpresa)
+				VALUES (:sNome, :sCategoria, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
-						':sSigla' => $_POST['inputSigla'],
+						':sCategoria' => $_POST['cmbCategoria'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId'],
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Unidade de Medida incluída!!!";
+		$_SESSION['msg']['mensagem'] = "Sub Categoria incluída!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir unidade de medida!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao incluir sub categoria!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
 	}
 	
-	irpara("unidademedida.php");
+	irpara("subcategoria.php");
 }
 
 ?>
@@ -46,7 +46,7 @@ if(isset($_POST['inputNome'])){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Unidade de Medida</title>
+	<title>Lamparinas | Sub Categoria</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -56,6 +56,9 @@ if(isset($_POST['inputNome'])){
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+	
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
 	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
@@ -85,32 +88,46 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formUnidadeMedida" method="post" class="form-validate" action="unidademedidaNovo.php">
+					<form name="formSubCategoria" method="post" class="form-validate" action="subcategoriaNovo.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Unidade de Medida</h5>
+							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Sub Categoria</h5>
 						</div>
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-8">
+								<div class="col-lg-6">
 									<div class="form-group">
-										<label for="inputNome">Nome</label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Unidade de Medida" required autofocus>
+										<label for="inputNome">Sub Categoria</label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Sub Categoria" required autofocus>
 									</div>
 								</div>
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputSigla">Sigla</label>
-										<input type="text" id="inputSigla" name="inputSigla" class="form-control" placeholder="Sigla">
-									</div>
-								</div>								
+
+								<div class="col-lg-6">
+									<label for="cmbCategoria">Categoria</label>
+									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+										<?php 
+											$sql = ("SELECT CategId, CategNome
+													 FROM Categoria
+													 WHERE CategStatus = 1 and CategEmpresa = ".$_SESSION['EmpreId']."
+													 ORDER BY CategNome ASC");
+											$result = $conn->query("$sql");
+											$row = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											foreach ($row as $item){
+												print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+											}
+										
+										?>
+									</select>
+								</div>						
 							</div>
 															
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
-										<a href="unidademedida.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="subcategoria.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

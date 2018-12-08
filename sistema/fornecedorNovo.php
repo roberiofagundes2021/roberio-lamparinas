@@ -660,10 +660,12 @@ if(isset($_POST['inputTipo'])){
 									</div>
 								</div>
 							</div>
-						</form>								
+													
 
 					</div>
 					<!-- /card-body -->
+					
+					</form>
 					
 				</div>
 				<!-- /info blocks -->

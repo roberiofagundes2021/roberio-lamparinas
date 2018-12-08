@@ -573,7 +573,7 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 						<!-- /quick stats boxes -->
 
 
-						<!-- Support tickets -->
+						<!-- Support tickets --
 						<div class="card">
 							<div class="card-header header-elements-sm-inline">
 								<h6 class="card-title">Support tickets</h6>
@@ -1161,7 +1161,7 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 						<!-- /progress counters -->
 
 
-						<!-- Daily sales -->
+						<!-- Daily sales --
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h6 class="card-title">Daily sales stats</h6>
@@ -1625,7 +1625,7 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 						<!-- /my messages -->
 
 
-						<!-- Daily financials -->
+						<!-- Daily financials --
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h6 class="card-title">Daily financials</h6>

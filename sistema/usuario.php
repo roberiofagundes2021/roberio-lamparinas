@@ -134,7 +134,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<tr>
 											<td>'.$item['UsuarNome'].'</td>
 											<td>'.$item['UsuarLogin'].'</td>
-											<td>'.formatarCnpj($item['UsuarCpf']).'</td>
+											<td>'.formatarCPF_Cnpj($item['UsuarCpf']).'</td>
 											<td>'.$item['PerfiNome'].'</td>');
 											
 										if ($_SESSION['UsuarId'] != $item['UsuarId']) {

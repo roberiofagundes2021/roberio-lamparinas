@@ -94,6 +94,9 @@ if(isset($_POST['inputCpf'])){
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>		
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
@@ -132,53 +135,22 @@ if(isset($_POST['inputCpf'])){
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="row">
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputCpf">CPF</label>
 												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo $row['UsuarCpf']; ?>" maxlength="11" pattern="[0-9]+$" required>
 											</div>
 										</div>
-									</div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-lg-12">
-									<div class="row">
-										<div class="col-lg-8">
+										<div class="col-lg-7">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['UsuarNome']; ?>" required>
 											</div>
-										</div>									
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputEmail">E-mail</label>
-												<input type="text" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" value="<?php //echo $row['UsuarEmail']; ?>" required>
-											</div>
 										</div>
-									</div>
-								</div>
-							</div>
-								
-							<div class="row">				
-								<div class="col-lg-12">
-									<div class="row">
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputLogin">Login</label>
-												<input type="text" id="inputLogin" name="inputLogin" class="form-control" placeholder="Login" value="<?php echo $row['UsuarLogin']; ?>" required>
-											</div>
-										</div>
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputSenha">Senha</label>
-												<input type="password" id="inputSenha" name="inputSenha" class="form-control" placeholder="Senha" value="<?php echo $row['UsuarSenha']; ?>">
-											</div>
-										</div>										
-										<div class="col-lg-4">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputPerfil">Perfil</label>
-												<select name="inputPerfil" class="form-control" required>
+												<select name="inputPerfil" class="form-control form-control-select2" required>
 													<option value="0">Informe um perfil</option>
 													<?php
 														foreach ($rowPerfil as $item){
@@ -191,7 +163,63 @@ if(isset($_POST['inputCpf'])){
 													?>
 												</select>
 											</div>
+										</div>										
+									</div>
+								</div>
+							</div>
+							
+							<h5 class="mb-0 font-weight-semibold">Login</h5>
+							<br>						
+							<div class="row">				
+								<div class="col-lg-12">
+									<div class="row">
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputLogin">Login</label>
+												<input type="text" id="inputLogin" name="inputLogin" class="form-control" placeholder="Login" value="<?php echo $row['UsuarLogin']; ?>" required>
+											</div>
 										</div>
+										
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputSenha">Senha</label>
+												<input type="password" id="inputSenha" name="inputSenha" class="form-control" placeholder="Senha" value="<?php echo $row['UsuarSenha']; ?>">
+											</div>
+										</div>	
+										
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputConfirmaSenha">Confirma Senha</label>
+												<input type="password" id="inputConfirmaSenha" name="inputConfirmaSenha" class="form-control" placeholder="Confirma Senha" value="<?php echo $row['UsuarSenha']; ?>">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+								
+							<h5 class="mb-0 font-weight-semibold">Contato</h5>
+							<br>
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="row">
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputEmail">E-mail</label>
+												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" required>
+											</div>
+										</div>
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputTelefone">Telefone</label>
+												<input type="email" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone">
+											</div>
+										</div>
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputCelular">Celular</label>
+												<input type="email" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular">
+											</div>
+										</div>											
 									</div>
 								</div>
 							</div>

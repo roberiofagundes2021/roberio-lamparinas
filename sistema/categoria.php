@@ -12,7 +12,8 @@ $sql = ("SELECT CategId, CategNome, CategStatus
 		 ORDER BY CategNome ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
+$count = count($row);
+//var_dump($count);die;
 
 ?>
 
@@ -149,7 +150,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<!-- /info blocks -->
 				
-				<form name="formCategoria" method="post">
+				<form name="formCategoria" method="post" action="cEdita.php">
 					<input type="hidden" id="inputCategoriaId" name="inputCategoriaId" >
 					<input type="hidden" id="inputCategoriaNome" name="inputCategoriaNome" >
 					<input type="hidden" id="inputCategoriaStatus" name="inputCategoriaStatus" >

@@ -84,7 +84,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formEmpresa" method="post" class="form-validate" action="modeloNovo.php">
+					<form name="formModelo" method="post" class="form-validate" action="modeloNovo.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Modelo</h5>
 						</div>

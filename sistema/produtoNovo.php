@@ -335,7 +335,7 @@ if(isset($_POST['inputCodigo'])){
 												<?php 
 													$sql = ("SELECT UnMedId, UnMedNome, UnMedSigla
 															 FROM UnidadeMedida
-															 WHERE UnMedStatus = 1
+															 WHERE UnMedStatus = 1 and UnMedEmpresa = ".$_SESSION['EmpreId']."
 															 ORDER BY UnMedNome ASC");
 													$result = $conn->query("$sql");
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -417,7 +417,6 @@ if(isset($_POST['inputCodigo'])){
 												?>
 											</select>
 										</div>
-
 									</div>
 								</div> <!-- /col -->
 							</div>	<!-- /row -->
