@@ -70,12 +70,47 @@ if(isset($_POST['inputNome'])){
 
 	<?php include_once("head.php"); ?>
 	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script type="text/javascript" >
 
-	<!-- /theme JS files -->	
+        $(document).ready(function() {
+			
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+
+				e.preventDefault();
+				
+				var inputNomeNovo  = $('#inputNome').val();
+				var inputNomeVelho = $('#inputModeloNome').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNomeNovo = inputNomeNovo.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNomeNovo == ''){
+					alerta('Atenção','Informe o modelo!','error');
+					return false;
+				}
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "modeloValida.php",
+					data: ('nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho),
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Esse registro já existe!','error');
+							return false;								
+						}
+						
+						$( "#formModelo" ).submit();
+					}
+				})
+
+			})
+		})
+	
+	</script>
 
 </head>
 
@@ -99,12 +134,13 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formModelo" method="post" class="form-validate" action="modeloEdita.php">
+					<form name="formModelo" id="formModelo" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Modelo "<?php echo $row['ModelNome']; ?>"</h5>
 						</div>
 						
 						<input type="hidden" id="inputModeloId" name="inputModeloId" value="<?php echo $row['ModelId']; ?>" >
+						<input type="hidden" id="inputModeloNome" name="inputModeloNome" value="<?php echo $row['ModelNome']; ?>" >
 						
 						<div class="card-body">								
 							<div class="row">
@@ -119,7 +155,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
 										<a href="modelo.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

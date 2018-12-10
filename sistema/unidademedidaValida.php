@@ -5,13 +5,13 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['nomeVelho'])){
-	$sql = ("SELECT CategId
-			 FROM Categoria
-			 WHERE CategEmpresa = ".$_SESSION['EmpreId']." and CategNome = '". $_POST['nomeNovo']."' and CategNome <> '". $_POST['nomeVelho']."'");
+	$sql = ("SELECT UnMedId
+			 FROM UnidadeMedida
+			 WHERE UnMedEmpresa = ".$_SESSION['EmpreId']." and UnMedNome = '". $_POST['nomeNovo']."' and UnMedNome <> '". $_POST['nomeVelho']."'");
 } else{
-	$sql = ("SELECT CategId
-			 FROM Categoria
-			 WHERE CategEmpresa = ".$_SESSION['EmpreId']." and CategNome = '". $_POST['nome']."'");
+	$sql = ("SELECT UnMedId
+			 FROM UnidadeMedida
+			 WHERE UnMedEmpresa = ".$_SESSION['EmpreId']." and UnMedNome = '". $_POST['nome']."'");
 }
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

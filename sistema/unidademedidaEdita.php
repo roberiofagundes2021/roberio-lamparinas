@@ -71,12 +71,55 @@ if(isset($_POST['inputNome'])){
 
 	<?php include_once("head.php"); ?>
 	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script type="text/javascript" >
 
-	<!-- /theme JS files -->	
+        $(document).ready(function() {
+			
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+
+				e.preventDefault();
+				
+				var inputNomeNovo  = $('#inputNome').val();
+				var inputNomeVelho = $('#inputUnidadeMedidaNome').val();
+				var inputSigla = $('#inputSigla').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNomeNovo = inputNomeNovo.trim();
+				inputSigla = inputSigla.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNomeNovo == ''){
+					alerta('Atenção','Informe a unidade de medida!','error');
+					return false;
+				}
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputSigla == ''){
+					alerta('Atenção','Informe a sigla!','error');
+					return false;
+				}				
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "unidademedidaValida.php",
+					data: ('nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho),
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Esse registro já existe!','error');
+							return false;								
+						}
+						
+						$( "#formUnidadeMedida" ).submit();
+					}
+				})
+
+			})
+		})
+	
+	</script>
 
 </head>
 
@@ -100,12 +143,13 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formUnidadeMedida" method="post" class="form-validate" action="unidademedidaEdita.php">
+					<form name="formUnidadeMedida" id="formUnidadeMedida" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Unidade de Medida "<?php echo $row['UnMedNome']; ?>"</h5>
 						</div>
 						
 						<input type="hidden" id="inputUnidadeMedidaId" name="inputUnidadeMedidaId" value="<?php echo $row['UnMedId']; ?>" >
+						<input type="hidden" id="inputUnidadeMedidaNome" name="inputUnidadeMedidaNome" value="<?php echo $row['UnMedNome']; ?>" >
 						
 						<div class="card-body">								
 							<div class="row">
@@ -126,7 +170,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
 										<a href="unidademedida.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

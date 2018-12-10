@@ -50,18 +50,52 @@ if(isset($_POST['inputNome'])){
 
 	<?php include_once("head.php"); ?>
 	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	
-	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
-	
-	<script src="global_assets/js/lamparinas/custom.js"></script>
-	<!-- /theme JS files -->	
+	<script type="text/javascript" >
+
+        $(document).ready(function() {
+			
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputNome = $('#inputNome').val();
+				var inputSigla = $('#inputSigla').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNome.trim();
+				inputSigla = inputSigla.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == ''){
+					alerta('Atenção','Informe a unidade de medida!','error');
+					return false;
+				}
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputSigla == ''){
+					alerta('Atenção','Informe a sigla!','error');
+					return false;
+				}
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "unidademedidaValida.php",
+					data: ('nome='+inputNome),
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Esse registro já existe!','error');
+							return false;
+						}
+						
+						$( "#formUnidadeMedida" ).submit();
+					}
+				})
+			})
+		})
+	</script>
 	
 </head>
 
@@ -85,7 +119,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formUnidadeMedida" method="post" class="form-validate" action="unidademedidaNovo.php">
+					<form name="formUnidadeMedida" id="formUnidadeMedida" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Unidade de Medida</h5>
 						</div>
@@ -101,7 +135,7 @@ if(isset($_POST['inputNome'])){
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputSigla">Sigla</label>
-										<input type="text" id="inputSigla" name="inputSigla" class="form-control" placeholder="Sigla">
+										<input type="text" id="inputSigla" name="inputSigla" class="form-control" placeholder="Sigla" required>
 									</div>
 								</div>								
 							</div>
@@ -109,7 +143,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
 										<a href="unidademedida.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

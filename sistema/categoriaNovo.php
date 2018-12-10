@@ -49,29 +49,27 @@ if(isset($_POST['inputNome'])){
 
 	<?php include_once("head.php"); ?>
 	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	
-	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
-	
-	<script src="global_assets/js/lamparinas/custom.js"></script>
-	<!-- /theme JS files -->
-	
 	<script type="text/javascript" >
 
         $(document).ready(function() {
 			
+			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
 				
 				var inputNome = $('#inputNome').val();
 				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNome.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == ''){
+					alerta('Atenção','Informe a categoria!','error');
+					return false;
+				}
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
 					url: "categoriaValida.php",
@@ -112,7 +110,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formCategoria" id="formCategoria" method="post" class="form-validate" action="">
+					<form name="formCategoria" id="formCategoria" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Categoria</h5>
 						</div>
