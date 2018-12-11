@@ -39,7 +39,7 @@ if(isset($_POST['inputNome'])){
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iPerfil' => $_POST['inputPerfiId']
+						':iPerfil' => $_POST['inputPerfilId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -70,12 +70,48 @@ if(isset($_POST['inputNome'])){
 
 	<?php include_once("head.php"); ?>
 	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script type="text/javascript" >
 
-	<!-- /theme JS files -->	
+        $(document).ready(function() {
+			
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+
+				e.preventDefault();
+				
+				var inputNomeNovo  = $('#inputNome').val();
+				var inputNomeVelho = $('#inputPerfilNome').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNomeNovo = inputNomeNovo.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNomeNovo == ''){
+					alerta('Atenção','Informe o perfil!','error');
+					return false;
+				}
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "perfilValida.php",
+					data: ('nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho),
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Esse registro já existe!','error');
+							return false;								
+						}
+						
+						$( "#formPerfil" ).submit();
+					}
+				})
+
+			})
+		})
+	
+	</script>
+
 
 </head>
 
@@ -99,12 +135,13 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formPerfil" method="post" class="form-validate" action="perfilEdita.php">
+					<form name="formPerfil" id="formPerfil" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Perfil "<?php echo $row['PerfiNome']; ?>"</h5>
 						</div>
 						
-						<input type="hidden" id="inputPerfiId" name="inputPerfiId" value="<?php echo $row['PerfiId']; ?>" >
+						<input type="hidden" id="inputPerfilId" name="inputPerfilId" value="<?php echo $row['PerfiId']; ?>" >
+						<input type="hidden" id="inputPerfilNome" name="inputPerfilNome" value="<?php echo $row['PerfiNome']; ?>" >
 						
 						<div class="card-body">								
 							<div class="row">
@@ -119,7 +156,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
 										<a href="perfil.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

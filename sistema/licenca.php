@@ -36,7 +36,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
@@ -135,15 +134,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																				
 										print('<td class="text-center">
 												<div class="list-icons">
-													<div class="dropdown">
-														<a href="#" class="list-icons-item" data-toggle="dropdown">
-															<i class="icon-menu9"></i>
-														</a>
-
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'edita\')" class="dropdown-item"><i class="icon-pencil7"></i> Editar</a>
-															<a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'exclui\')" class="dropdown-item"><i class="icon-bin"></i> Excluir</a>
-														</div>
+													<div class="list-icons list-icons-extended">
+														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>														
 													</div>
 												</div>
 											</td>

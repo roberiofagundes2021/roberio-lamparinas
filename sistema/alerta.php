@@ -1,6 +1,7 @@
 <?php
-
-	if (isset($_SESSION['msg'])){
+	
+	//verifica se existe a variável de sessão e se ela não não está vazia (lembrando que ela é um array)
+	if (isset($_SESSION['msg']) and !empty($_SESSION['msg'])){
 		
 		print("
 			<script>
