@@ -10,15 +10,30 @@ if(isset($_POST['inputCnpj'])){
 
 	try{
 		
-		$sql = "INSERT INTO Empresa (EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreEndereco, EmpreStatus, EmpreUsuarioAtualizador)
-				VALUES (:sCnpj, :sRazaoSocial, :sNomeFantasia, :sEndereco, :bStatus, :iUsuarioAtualizador)";
+		$sql = "INSERT INTO Empresa (EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreCep, EmpreEndereco, EmpreNumero, EmpreComplemento, 
+									 EmpreBairro, EmpreCidade, EmpreEstado, EmpreContato, EmpreTelefone, EmpreCelular, EmpreEmail, 
+									 EmpreSite, EmpreObservacao, EmpreStatus, EmpreUsuarioAtualizador)
+				VALUES (:sCnpj, :sRazaoSocial, :sNomeFantasia,  :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, :sCidade, 
+						:sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':sCnpj' => $_POST['inputCnpj'],
+						':sCnpj' => limpaCPF_CNPJ($_POST['inputCnpj']),
 						':sRazaoSocial' => $_POST['inputRazaoSocial'],
 						':sNomeFantasia' => $_POST['inputNomeFantasia'],
+						':sCep' => limpaCEP($_POST['inputCep']),
 						':sEndereco' => $_POST['inputEndereco'],
+						':sNumero' => $_POST['inputNumero'],
+						':sComplemento' => $_POST['inputComplemento'],
+						':sBairro' => $_POST['inputBairro'],
+						':sCidade' => $_POST['inputCidade'],
+						':sEstado' => $_POST['cmbEstado'],
+						':sContato' => $_POST['inputNomeContato'],
+						':sTelefone' => $_POST['inputTelefone'],
+						':sCelular' => $_POST['inputCelular'],
+						':sEmail' => $_POST['inputEmail'],
+						':sSite' => $_POST['inputSite'],
+						':sObservacao' => $_POST['txtareaObservacao'],						
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']
 						));
@@ -52,8 +67,6 @@ if(isset($_POST['inputCnpj'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
@@ -61,7 +74,6 @@ if(isset($_POST['inputCnpj'])){
 	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
 	
-	<script src="global_assets/js/lamparinas/custom.js"></script>
 	<!-- /theme JS files -->	
 	
 	<!-- Adicionando Javascript -->
@@ -168,7 +180,7 @@ if(isset($_POST['inputCnpj'])){
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputCnpj">CNPJ</label>
-										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ"  data-mask="99.999.999/9999-99" required>
+										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" required>
 									</div>
 								</div>
 							</div>
@@ -201,7 +213,7 @@ if(isset($_POST['inputCnpj'])){
 										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputCep">CEP</label>
-												<input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP">
+												<input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP" data-mask="99999-999">
 											</div>
 										</div>
 										
@@ -318,7 +330,7 @@ if(isset($_POST['inputCnpj'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputSite">Site</label>
-												<input type="url" id="inputSite" name="inputSite" class="form-control" placeholder="URL">
+												<input type="text" id="inputSite" name="inputSite" class="form-control" placeholder="URL">
 											</div>
 										</div>										
 									</div>
@@ -326,7 +338,7 @@ if(isset($_POST['inputCnpj'])){
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group">
-												<label for="txtObservacao">Observação</label>
+												<label for="txtareaObservacao">Observação</label>
 												<textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" placeholder="Observação"></textarea>
 											</div>
 										</div>

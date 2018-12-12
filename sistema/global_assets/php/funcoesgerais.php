@@ -185,4 +185,10 @@
 		return $valor;
 	}	
 	
+	function limpaCEP($valor){
+		$valor = trim($valor);		
+		$valor = str_replace("-", "", $valor);		
+		return $valor;
+	}		
+	
 ?>
