@@ -75,12 +75,14 @@ if(isset($_POST['inputNome'])){
 				//Verifica se o campo só possui espaços em branco
 				if (inputNome == ''){
 					alerta('Atenção','Informe a sub categoria!','error');
+					$('#inputNome').focus();
 					return false;
 				}
 
 				//Verifica se o campo só possui espaços em branco
 				if (cmbCategoria == '#'){
 					alerta('Atenção','Informe a categoria!','error');
+					$('#cmbCategoria').focus();
 					return false;
 				}
 				

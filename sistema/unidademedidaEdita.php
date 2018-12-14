@@ -91,12 +91,14 @@ if(isset($_POST['inputNome'])){
 				//Verifica se o campo só possui espaços em branco
 				if (inputNomeNovo == ''){
 					alerta('Atenção','Informe a unidade de medida!','error');
+					$('#inputNome').focus();
 					return false;
 				}
 				
 				//Verifica se o campo só possui espaços em branco
 				if (inputSigla == ''){
 					alerta('Atenção','Informe a sigla!','error');
+					$('#inputSigla').focus();
 					return false;
 				}				
 				

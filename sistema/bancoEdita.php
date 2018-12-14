@@ -93,12 +93,14 @@ if(isset($_POST['inputNome'])){
 				//Verifica se o campo só possui espaços em branco
 				if (inputCodigo == ''){
 					alerta('Atenção','Informe o código do banco!','error');
+					$('#inputCodigo').focus();
 					return false;
 				}
 				
 				//Verifica se o campo só possui espaços em branco
 				if (inputNomeNovo == ''){
 					alerta('Atenção','Informe o nome do banco!','error');
+					$('#inputNome').focus();
 					return false;
 				}
 				

@@ -88,6 +88,7 @@ if(isset($_POST['inputNome'])){
 				//Verifica se o campo só possui espaços em branco
 				if (inputNomeNovo == ''){
 					alerta('Atenção','Informe a categoria!','error');
+					$('#inputNome').focus();
 					return false;
 				}
 				

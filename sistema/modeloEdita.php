@@ -88,6 +88,7 @@ if(isset($_POST['inputNome'])){
 				//Verifica se o campo só possui espaços em branco
 				if (inputNomeNovo == ''){
 					alerta('Atenção','Informe o modelo!','error');
+					$('#inputNome').focus();
 					return false;
 				}
 				

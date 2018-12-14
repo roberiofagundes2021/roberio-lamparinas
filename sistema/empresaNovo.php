@@ -144,7 +144,59 @@ if(isset($_POST['inputCnpj'])){
                     //cep sem valor, limpa formulário.
                     limpa_formulário_cep();
                 }
-            });
+            }); //end blur
+       
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				//pega só os números do campo CNPJ
+				var inputCnpj = $('#inputCnpj').val().replace(/[^\d]+/g,'');
+				var inputRazaoSocial = $('#inputRazaoSocial').val();
+				var inputNomeFantasia = $('#inputNomeFantasia').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputRazaoSocial = inputRazaoSocial.trim();
+				inputNomeFantasia = inputNomeFantasia.trim();
+								
+				//Verifica se o campo só possui espaços em branco
+				if (inputCnpj == ''){
+					alerta('Atenção','Informe o CNPJ da empresa!','error');
+					$('#inputCnpj').focus();
+					return false;
+				}
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputRazaoSocial == ''){
+					alerta('Atenção','Informe a Razão Social da empresa!','error');
+					$('#inputRazaoSocial').focus();
+					return false;
+				}				
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNomeFantasia == ''){
+					alerta('Atenção','Informe o nome fantasia da empresa!','error');
+					$('#inputNomeFantasia').focus();
+					return false;
+				}
+								
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "empresaValida.php",
+					data: ('cnpj='+inputCnpj),
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Esse registro já existe!','error');
+							return false;
+						}
+						
+						$( "#formEmpresa" ).submit();
+					}
+				})
+			})       
         });	
      </script>	
 
@@ -170,7 +222,7 @@ if(isset($_POST['inputCnpj'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formEmpresa" method="post" class="form-validate" action="empresaNovo.php">
+					<form name="formEmpresa" id="formEmpresa" method="post" class="form-validate" action="empresaNovo.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Empresa</h5>
 						</div>
@@ -349,7 +401,7 @@ if(isset($_POST['inputCnpj'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
 										<a href="empresa.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

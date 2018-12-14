@@ -118,22 +118,16 @@ if(isset($_POST['inputTipo'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 
 	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
 	
-	<script src="global_assets/js/lamparinas/custom.js"></script>	
 	<!-- /theme JS files -->	
 
 	<!-- Adicionando Javascript -->
