@@ -12,7 +12,7 @@ if(isset($_POST['inputLicencaId'])){
         	
 	try{
 		
-		$sql = "SELECT LicenId
+		$sql = "SELECT LicenId, LicenDtInicio, isnull(LicenDtFim,0) , LicenLimiteUsuarios
 				FROM Licenca
 				WHERE LicenId = $iLicenca ";
 		$result = $conn->query("$sql");
@@ -23,20 +23,24 @@ if(isset($_POST['inputLicencaId'])){
 	}
 	
 	$_SESSION['msg'] = array();
+} else {
+	irpara("licenca.php");
 }
 
-if(isset($_POST['inputNome'])){
+if(isset($_POST['inputDataInicio'])){
 	
 	try{
 		
-		$sql = "UPDATE Licenca SET PerfiNome = :sNome, LicenUsuarioAtualizador = :iUsuarioAtualizador
+		$sql = "UPDATE Licenca SET LicenDtInicio = :dDtInicio, LicenDtFim = :dDtFim, LicenLimiteUsuarios = :iLimiteUsuarios, LicenUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE LicenId = :iLicenca";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':sNome' => $_POST['inputNome'],
+						':dDtInicio' => $_POST['inputDataInicio'],
+						':dDtFim' => $_POST['inputDataFim'],
+						':iLimiteUsuarios' => $_POST['inputLimiteUsuarios'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iPerfil' => $_POST['inputPerfiId']
+						':iLicenca' => $_POST['inputLicencaId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -46,10 +50,10 @@ if(isset($_POST['inputNome'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar licenca!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar licença!!!";
 		$_SESSION['msg']['tipo'] = "error";		
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();exit;
 	}
 	
 	irpara("licenca.php");
@@ -74,6 +78,8 @@ if(isset($_POST['inputNome'])){
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	
+	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 	<!-- /theme JS files -->	
 
 </head>
@@ -98,47 +104,51 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formPerfil" method="post" class="form-validate" action="perfilEdita.php">
+					<form name="formLicenca" id="formLicenca" method="post" class="form-validate" action="licencaEdita.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Licença</h5>
 						</div>
 						
-						<input type="hidden" id="inputLicenId" name="inputLicenId" value="<?php echo $row['LicenId']; ?>" >
+						<input type="hidden" id="inputLicencaId" name="inputLicencaId" value="<?php echo $row['LicenId']; ?>" >
 						
-						<div class="card-body">								
+						<div class="card-body">			
 							<div class="row">
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputDataInicio">Data Início</label>
-										<input type="text" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['PerfiNome']; ?>" required>
+										<div class="input-group">
+											<span class="input-group-prepend">
+												<span class="input-group-text"><i class="icon-calendar22"></i></span>
+											</span>
+											<input type="text" id="inputDataInicio" name="inputDataInicio" class="form-control daterange-single" placeholder="Data Início" value="<?php echo mostradata($row['LicenDtInicio']); ?>" required>
+										</div>
 									</div>
 								</div>
-							</div>
 								
-							<div class="row">				
-								<div class="col-lg-12">
-									<div class="row">
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputDataFim">Data Fim</label>
-												<input type="text" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['PerfiNome']; ?>">
-											</div>
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="inputDataFim">Data Fim</label>
+										<div class="input-group">
+											<span class="input-group-prepend">
+												<span class="input-group-text"><i class="icon-calendar22"></i></span>
+											</span>																					
+											<input type="text" id="inputDataFim" name="inputDataFim" class="form-control daterange-single" placeholder="Data Fim" value="<?php ($row['LicenDtFim'] == 0) ? '' : mostradata($row['LicenDtFim']); ?>">
 										</div>
+									</div>
+								</div>
 										
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputLimiteUsuarios">Limite de Usuários</label>
-												<input type="text" id="inputLimiteUsuarios" name="inputLimiteUsuarios" class="form-control" placeholder="Limite de Usuários" value="<?php echo $row['PerfiNome']; ?>">
-											</div>
-										</div>
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="inputLimiteUsuarios">Limite de Usuários</label>
+										<input type="text" id="inputLimiteUsuarios" name="inputLimiteUsuarios" class="form-control" placeholder="Limite de Usuários" value="<?php echo $row['LicenLimiteUsuarios']; ?>">
 									</div>
 								</div>
 							</div>							
-
+						
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
 										<a href="licenca.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

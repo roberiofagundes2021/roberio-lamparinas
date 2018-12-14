@@ -4,9 +4,6 @@ include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Empresa';
 
-unset($_SESSION['EmpresaId']);
-unset($_SESSION['EmpresaNome']);
-
 include('global_assets/php/conexao.php');
 
 $sql = ("SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreStatus, dbo.fnLicencaVencimento(EmpreId) as Licenca
@@ -41,6 +38,11 @@ $count = count($row);
 	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
 	<script src="global_assets/js/demo_pages/components_popups.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 	<!-- /theme JS files -->	
 	
 	<script>
@@ -70,7 +72,7 @@ $count = count($row);
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -79,6 +81,118 @@ $count = count($row);
 		
 		<?php include_once("menu-left.php"); ?>
 
+		<!-- Secondary sidebar -->
+		<div class="sidebar sidebar-light sidebar-secondary sidebar-expand-md">
+
+			<!-- Sidebar mobile toggler -->
+			<div class="sidebar-mobile-toggler text-center">
+				<a href="#" class="sidebar-mobile-secondary-toggle">
+					<i class="icon-arrow-left8"></i>
+				</a>
+				<span class="font-weight-semibold">Secondary sidebar</span>
+				<a href="#" class="sidebar-mobile-expand">
+					<i class="icon-screen-full"></i>
+					<i class="icon-screen-normal"></i>
+				</a>
+			</div>
+			<!-- /sidebar mobile toggler -->
+
+
+			<!-- Sidebar content -->
+			<div class="sidebar-content">
+
+				<!-- Sidebar Empresa -->
+				<div class="card"  style="padding-top:10px;">
+					<div class="card-header bg-transparent header-elements-inline">
+						<span class="text-uppercase font-size-sm font-weight-semibold">Empresa</span>
+					</div>
+
+					<div class="card-body">
+						<form action="#">
+							<div class="form-group-feedback form-group-feedback-right">
+								<select id="cmbEmpresa" name="cmbEmpresa" class="form-control form-control-select2">
+									<?php 
+										$sql = ("SELECT EmpreId, EmpreNomeFantasia
+												 FROM Empresa
+												 WHERE EmpreStatus = 1
+												 ORDER BY EmpreNomeFantasia ASC");
+										$result = $conn->query("$sql");
+										$row = $result->fetchAll(PDO::FETCH_ASSOC);
+										
+										foreach ($row as $item){
+											print('<option value="'.$item['EmpreId'].'">'.$item['EmpreNomeFantasia'].'</option>');
+										}
+									
+									?>
+								</select>
+							</div>
+						</form>
+					</div>
+				</div>
+				<!-- /sidebar Empresa -->
+
+
+				<!-- Sub navigation -->
+				<div class="card mb-2">
+					<div class="card-header bg-transparent header-elements-inline">
+						<span class="text-uppercase font-size-sm font-weight-semibold">Navigation</span>
+						<div class="header-elements">
+							<div class="list-icons">
+		                		<a class="list-icons-item" data-action="collapse"></a>
+	                		</div>
+                		</div>
+					</div>
+
+					<div class="card-body p-0">
+						<ul class="nav nav-sidebar" data-nav-type="accordion">
+							<li class="nav-item-header">Empreory title</li>
+							<li class="nav-item">
+								<a href="#" class="nav-link"><i class="icon-googleplus5"></i> Gerenciar Licença</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" class="nav-link"><i class="icon-portfolio"></i> Adicionar Usuários</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" class="nav-link">
+									<i class="icon-user-plus"></i>
+									Gerenciar Menu
+									<span class="badge bg-primary badge-pill ml-auto">2</span>
+								</a>
+							</li>
+							<li class="nav-item-divider"></li>
+							<li class="nav-item nav-item-submenu">
+								<a href="#" class="nav-link"><i class="icon-cog3"></i> Menu levels</a>
+								<ul class="nav nav-group-sub">
+									<li class="nav-item"><a href="#" class="nav-link">Second level</a></li>
+									<li class="nav-item nav-item-submenu">
+										<a href="#" class="nav-link">Second level with child</a>
+										<ul class="nav nav-group-sub">
+											<li class="nav-item"><a href="#" class="nav-link">Third level</a></li>
+											<li class="nav-item nav-item-submenu">
+												<a href="#" class="nav-link">Third level with child</a>
+												<ul class="nav nav-group-sub">
+													<li class="nav-item"><a href="#" class="nav-link">Fourth level</a></li>
+													<li class="nav-item"><a href="#" class="nav-link">Fourth level</a></li>
+												</ul>
+											</li>
+											<li class="nav-item"><a href="#" class="nav-link">Third level</a></li>
+										</ul>
+									</li>
+									<li class="nav-item"><a href="#" class="nav-link">Second level</a></li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!-- /sub navigation -->
+
+			</div>
+			<!-- /sidebar content -->
+
+		</div>
+		<!-- /secondary sidebar -->		
+		
+		
 		<!-- Main content -->
 		<div class="content-wrapper">
 
@@ -151,9 +265,8 @@ $count = count($row);
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'usuario\');" class="dropdown-item"><i class="icon-user-plus"></i> Usuários</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'licenca\');" class="dropdown-item"><i class="icon-certificate"></i> Licença</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'menu\');" class="dropdown-item"><i class="icon-menu2"></i> Menu</a>
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'usuario\');" class="dropdown-item"><i class="icon-user-plus"></i> Adicionar usuários</a>
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'licenca\');" class="dropdown-item"><i class="icon-certificate"></i> Gerenciar Licença</a>
 															</div>
 														</div>
 													</div>
@@ -182,11 +295,11 @@ $count = count($row);
 			</div>
 			<!-- /content area -->
 
-			<?php include_once("footer.php"); ?>
+			<?php //include_once("footer.php"); ?>
 
 		</div>
 		<!-- /main content -->
-
+		
 	</div>
 	<!-- /page content -->
 	

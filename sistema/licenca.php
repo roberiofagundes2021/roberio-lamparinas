@@ -8,11 +8,12 @@ include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputEmpresaId'])){
 	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
+	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
 } else if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
 
-$sql = ("SELECT LicenId, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenStatus
+$sql = ("SELECT LicenId, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenStatus, EmpreNomeFantasia
 		 FROM Licenca
 		 JOIN Empresa on EmpreId = LicenEmpresa
 		 WHERE EmpreId = ".$_SESSION['EmpresaId']."
@@ -43,7 +44,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
 	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script
+	<script src="global_assets/js/demo_pages/components_popups.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>		
 	<!-- /theme JS files -->	
 	
 	<script>
@@ -68,7 +74,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -77,6 +83,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		
 		<?php include_once("menu-left.php"); ?>
 
+		<?php include_once("menuLeftSecundario.php"); ?>
+		
 		<!-- Main content -->
 		<div class="content-wrapper">
 
@@ -103,7 +111,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								As licenças abaixo são da empresa <?php echo $_POST['inputEmpresaNome']; ?>.
+								As licenças abaixo são da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b>.
 								<div class="text-right"><a href="licencaNovo.php" class="btn btn-success" role="button">Nova Licença</a></div>
 							</div>							
 
