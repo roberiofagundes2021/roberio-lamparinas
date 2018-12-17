@@ -64,7 +64,7 @@ if(isset($_POST['inputDataInicio'])){
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -72,6 +72,8 @@ if(isset($_POST['inputDataInicio'])){
 	<div class="page-content">
 		
 		<?php include_once("menu-left.php"); ?>
+		
+		<?php include_once("menuLeftSecundario.php"); ?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">

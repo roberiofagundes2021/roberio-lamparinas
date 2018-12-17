@@ -61,7 +61,9 @@ $count = count($row);
 				document.formEmpresa.action = "empresaUsuario.php";
 			} else if (Tipo == 'licenca'){
 				document.formEmpresa.action = "licenca.php";
-			}
+			} else if (Tipo == 'menu'){
+				document.formEmpresa.action = "menu.php";
+			}			
 			
 			document.formEmpresa.submit();
 		}
@@ -173,7 +175,7 @@ $count = count($row);
 				
 				<!-- /info blocks -->
 				
-				<form name="formEmpresa" method="post" action="empresaEdita.php">
+				<form name="formEmpresa" method="post">
 					<input type="hidden" id="inputEmpresaId" name="inputEmpresaId" >
 					<input type="hidden" id="inputEmpresaNome" name="inputEmpresaNome" >
 					<input type="hidden" id="inputEmpresaStatus" name="inputEmpresaStatus" >

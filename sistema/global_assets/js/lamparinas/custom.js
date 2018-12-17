@@ -71,4 +71,4 @@ function confirmaExclusao(form, texto, acao) {
 	}).get().on('pnotify.cancel', function(){
 		 return false;
 	});			
-}		
+}

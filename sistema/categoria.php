@@ -99,30 +99,7 @@ $count = count($row);
 							<div class="card-body">
 								<p class="font-size-lg">A relação abaixo faz referência às categorias da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
 								<div class="text-right"><a href="categoriaNovo.php" class="btn btn-success" role="button">Nova Categoria</a></div>
-							</div>
-							
-<table class="table datatable-responsive">
-	<thead>
-		<tr>
-			<th>Name</th>
-			<th data-hide="phone">Phone</th>
-			<th data-hide="phone,tablet">Email</th>
-			<th data-hide="phone,tablet">Phone</th>
-			<th data-hide="phone,tablet">Phone</th>
-			<th data-hide="phone,tablet">Phone</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>Bob Builder</td>
-			<td>555-12345</td>
-			<td>bob@home.com</td>
-			<td>bob@home.com</td>
-			<td>bob@home.com</td>
-			<td>bob@home.com</td>
-		</tr>
-	</tbody>
-</table>							
+							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->
 							<table class="table datatable-responsive">

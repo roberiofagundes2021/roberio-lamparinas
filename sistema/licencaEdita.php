@@ -12,7 +12,7 @@ if(isset($_POST['inputLicencaId'])){
         	
 	try{
 		
-		$sql = "SELECT LicenId, LicenDtInicio, isnull(LicenDtFim,0) , LicenLimiteUsuarios
+		$sql = "SELECT LicenId, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios
 				FROM Licenca
 				WHERE LicenId = $iLicenca ";
 		$result = $conn->query("$sql");
@@ -80,11 +80,27 @@ if(isset($_POST['inputDataInicio'])){
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
+<!--	<script src="global_assets/js/plugins/pickers/daterangepicker.js"></script>	
+	
+	<script src="global_assets/js/plugins/pickers/pickadate/picker.js"></script>
+	<script src="global_assets/js/plugins/pickers/pickadate/picker.date.js"></script>
+	<script src="global_assets/js/plugins/pickers/pickadate/picker.time.js"></script>	
 	<!-- /theme JS files -->	
+	
+	<script language="javascript">
+		
+		$('#inputDataFim').daterangepicker({
+		   locale: {
+				format: 'DD/MM/YYYY'
+		   }
+		 });
+
+		
+	</script>
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -92,6 +108,8 @@ if(isset($_POST['inputDataInicio'])){
 	<div class="page-content">
 		
 		<?php include_once("menu-left.php"); ?>
+		
+		<?php include_once("menuLeftSecundario.php"); ?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -120,7 +138,7 @@ if(isset($_POST['inputDataInicio'])){
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="text" id="inputDataInicio" name="inputDataInicio" class="form-control daterange-single" placeholder="Data Início" value="<?php echo mostradata($row['LicenDtInicio']); ?>" required>
+											<input type="text" id="inputDataInicio" name="inputDataInicio" class="form-control pickadate" placeholder="Data Início" value="<?php echo mostradata($row['LicenDtInicio']); ?>" required>
 										</div>
 									</div>
 								</div>
@@ -132,7 +150,7 @@ if(isset($_POST['inputDataInicio'])){
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>																					
-											<input type="text" id="inputDataFim" name="inputDataFim" class="form-control daterange-single" placeholder="Data Fim" value="<?php ($row['LicenDtFim'] == 0) ? '' : mostradata($row['LicenDtFim']); ?>">
+											<input type="text" id="inputDataFim" name="inputDataFim" class="form-control daterange" placeholder="Data Fim" value="<?php echo mostradata($row['LicenDtFim']); ?>">
 										</div>
 									</div>
 								</div>

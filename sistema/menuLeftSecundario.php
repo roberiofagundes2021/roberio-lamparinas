@@ -21,7 +21,7 @@
 				})				
 				
 			}
-			
+							
 		</script>
 		
 		<!-- Secondary sidebar -->
@@ -119,12 +119,11 @@
 								</a>
 							</li>
 							<li class="nav-item">
-								<a href="#" class="nav-link">
+								<a href="menu.php" class="nav-link">
 									<i class="icon-menu2"></i>
-									Gerenciar Menu									
+									Menu									
 								</a>
 							</li>
-							<li class="nav-item-divider"></li>
 							<!--<li class="nav-item">
 							
 								<?php
@@ -139,12 +138,10 @@
 									}
 								?>
 							</li>-->
+							<li class="nav-item-divider"></li>
 							<li class="nav-item">
-								<a href="#" class="nav-link"><i class="icon-pencil7"></i> Editar Empresa</a>
-							</li>
-							<li class="nav-item">
-								<a href="#" class="nav-link"><i class="icon-bin"></i> Excluir Empresa</a>
-							</li>							
+								<a href="empresa.php" class="nav-link"><i class="icon-office"></i> Listar Empresas</a>
+							</li>	
 						</ul>
 					</div>
 				</div>
@@ -154,4 +151,4 @@
 			<!-- /sidebar content -->
 
 		</div>
-		<!-- /secondary sidebar -->		
+		<!-- /secondary sidebar -->
