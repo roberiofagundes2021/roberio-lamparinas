@@ -10,25 +10,31 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO Menu (MenuNome, MenuUrl, MenuPai, MenuLevel, MenuIco, MenuHome, MenuOrdem, MenuStatus, MenuUsuarioAtualizador, MenuEmpresa)
-				VALUES (:sNome, :sUrl, :iPai, :iLevel, :sIco, :bHome, :iOrdem, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO Menu (MenuNome, MenuUrl, MenuIco, MenuHome, MenuModulo, MenuPai, MenuLevel, MenuOrdem, MenuStatus, MenuUsuarioAtualizador, MenuEmpresa)
+				VALUES (:sNome, :sUrl, :sIco, :bHome, :iModulo, :iPai, :iLevel, :iOrdem, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
-				
+		
+		$aPai = explode('#',  $_POST['cmbPai']);
+		//var_dump($aPai);die;
+		$pai = intval ($aPai[0]);
+		$level = intval ($aPai[1]);
+		
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
 						':sUrl' => $_POST['inputUrl'],
-						':iPai' => $_POST['inputPai'],
-						':iLevel' => $_POST['inputLevel'],
-						':sIco' => $_POST['inputIco'],
-						':bHome' => $_POST['inputHome'],
-						':iOrdem' => $_POST['inputOrdem'],
+						':sIco' => $_POST['cmbIco'],
+						':bHome' =>$_POST['inputHome'] == "on" ? 1 : 0,
+						':iModulo' => $_POST['cmbModulo'],
+						':iPai' => $pai,
+						':iLevel' => $level,
+						':iOrdem' => $_POST['cmbOrdem'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iEmpresa' => $_SESSION['EmpresaId'],
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Menu incluída!!!";
+		$_SESSION['msg']['mensagem'] = "Menu incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";	
 		
 	} catch(PDOException $e) {
@@ -37,7 +43,7 @@ if(isset($_POST['inputNome'])){
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir menu!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 	
 	irpara("menu.php");
@@ -56,9 +62,7 @@ if(isset($_POST['inputNome'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/extensions/jquery_ui/interactions.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
@@ -97,53 +101,116 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-6">
+								<div class="col-lg-5">
 									<div class="form-group">
 										<label for="inputNome">Nome</label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 									</div>
 								</div>
 								
-								<div class="col-lg-6">
+								<div class="col-lg-5">
 									<div class="form-group">
 										<label for="inputUrl">URL</label>
 										<input type="text" id="inputUrl" name="inputUrl" class="form-control" placeholder="URL" required>
 									</div>
 								</div>
+								
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="cmbIco">Ícone</label>
+										<select id="cmbIco" name="cmbIco" class="form-control select-icons">
+											<option value="wordpress2" data-icon="icon-wordpress2">icon-wordpress2</option>
+											<option value="icon-home2" data-icon="icon-home2">icon-home2</option>
+										</select>
+									</div>
+								</div>
 							</div>
 							
-							<div class="row">			
-								<div class="col-lg-6">
-									<label for="cmbPai">Menu Pai</label>
-									<select id="cmbPai" name="cmbPai" class="form-control form-control-select2">
+							<div class="row">
+								<div class="col-lg-4">
+									<label for="cmbModulo">Módulo</label>
+									<select id="cmbModulo" name="cmbModulo" class="form-control form-control-select2">
 										<option value="#">Selecione</option>
 										<?php 
-											$sql = ("SELECT MenuId, MenuNome, MenuLevel, MenuOrdem
-													 FROM Menu
-													 WHERE MenuStatus = 1 and MenuEmpresa = ".$_SESSION['EmpreId']."
-													 ORDER BY MenuNome ASC");
+											$sql = ("SELECT ModulId, ModulNome
+													 FROM Modulo
+													 WHERE ModulStatus = 1
+													 ORDER BY ModulNome ASC");
 											$result = $conn->query("$sql");
 											$row = $result->fetchAll(PDO::FETCH_ASSOC);
 											
-											print('<option value=0>Principal</option>');
-											
 											foreach ($row as $item){
-												print('<option value="'.$item['MenuId'].'">'.$item['MenuNome'].'</option>');
+												print('<option value="'.$item['ModulId'].'">'.$item['ModulNome'].'</option>');
 											}
 										
 										?>
 									</select>
-								</div>	
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="e1_element">Ícone</label>
-										<select id="e1_element" name="e1_element" class="form-control select-icons" data-fouc>
-											<optgroup label="Services">
-												<option value="wordpress2" data-icon="icon-wordpress2">icon-wordpress2</option>
-												<option value="icon-home2" data-icon="icon-home2">icon-home2</option>
-											</optgroup>
-										</select>
-									</div>
+								</div>
+							
+								<div class="col-lg-4">
+									<label for="cmbPai">Menu Pai</label>
+									<select id="cmbPai" name="cmbPai" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+										<?php 
+											$sql = ("SELECT MenuId, MenuNome, MenuLevel
+													 FROM Menu
+													 WHERE MenuStatus = 1 and MenuEmpresa = ".$_SESSION['EmpresaId']."
+													 ORDER BY MenuNome ASC");
+											$result = $conn->query("$sql");
+											$row = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											print('<option value="0#0">Principal</option>');
+											
+											foreach ($row as $item){
+												print('<option value="'.$item['MenuId'].'#'.$item['MenuLevel'].'">'.$item['MenuNome'].'</option>');
+											}
+										
+										?>
+									</select>
+								</div>
+								
+								<div class="col-lg-4">
+									<label for="cmbOrdem">Menu Ordem (Depois de)</label>
+									<select id="cmbOrdem" name="cmbOrdem" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+										<?php 
+											$sql = ("SELECT MenuId, MenuNome, MenuLevel, MenuOrdem
+													 FROM Menu
+													 WHERE MenuStatus = 1 and MenuEmpresa = ".$_SESSION['EmpresaId']."
+													 ORDER BY MenuNome ASC");
+											$result = $conn->query("$sql");
+											$row = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											print('<option value="0"> 0 - Principal</option>');
+											
+											$ordem = 1;
+											foreach ($row as $item){
+												print('<option value="'.$item['MenuId'].'">'.$ordem . ' - ' .$item['MenuNome'].'</option>');
+												$ordem++;
+											}
+										
+										?>
+									</select>
+								</div>
+							</div>
+							
+							<div class="row" style="margin-top:30px;">
+								<div class="col-lg-4">
+									<label for="inputHome">Página Inicial</label>
+									<div class="form-group">							
+										<div class="form-check form-check-inline">
+											<label class="form-check-label">
+												<input type="radio" id="inputHome" name="inputHome" class="form-input-styled" data-fouc>
+												Sim
+											</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<label class="form-check-label">
+												<input type="radio" id="inputHome" name="inputHome" class="form-input-styled" checked data-fouc>
+												Não
+											</label>
+										</div>										
+									</div>									
 								</div>
 							</div>							
 
@@ -155,10 +222,10 @@ if(isset($_POST['inputNome'])){
 									</div>
 								</div>
 							</div>
-						</form>								
 
-					</div>
-					<!-- /card-body -->
+						</div>
+						<!-- /card-body -->
+					</form>								
 					
 				</div>
 				<!-- /info blocks -->

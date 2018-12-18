@@ -13,10 +13,9 @@ if (isset($_POST['inputEmpresaId'])){
 	irpara("empresa.php");
 }
 
-$sql = ("SELECT MenuId, MenuNome, MenuPai, MenuLevel, MenuHome, MenuStatus, ModulNome
+$sql = ("SELECT MenuId, MenuNome, ModulNome, MenuPai, MenuLevel, MenuHome, MenuIco, MenuStatus
 		 FROM Menu
-		 JOIN ModuloXMenu on MdXMeMenu = MenuId
-		 JOIN Modulo on ModulId = MdXMeModulo
+		 JOIN Modulo on ModulId = MenuModulo
 	     WHERE MenuEmpresa = ". $_SESSION['EmpresaId'] ."
 		 ORDER BY MenuNome ASC");
 $result = $conn->query("$sql");
@@ -120,7 +119,10 @@ $count = count($row);
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th data-filter>Menu</th>
+										<th>Menu</th>
+										<th>Módulo</th>
+										<th>Ícone</th>
+										<th>Home</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -129,12 +131,17 @@ $count = count($row);
 								<?php
 									foreach ($row as $item){
 										
+										$home = $item['MenuHome'] ? 'Sim' : 'Não';
+										
 										$situacao = $item['MenuStatus'] ? 'Ativo' : 'Inativo';
 										$situacaoClasse = $item['MenuStatus'] ? 'badge-success' : 'badge-secondary';
 										
 										print('
 										<tr>
 											<td>'.$item['MenuNome'].'</td>
+											<td>'.$item['ModulNome'].'</td>
+											<td><i class="'.$item['MenuIco'].'"></i></td>
+											<td>'.$home.'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaMenu('.$item['MenuId'].', \''.$item['MenuNome'].'\','.$item['MenuStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
