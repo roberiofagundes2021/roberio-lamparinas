@@ -106,13 +106,13 @@
 						</li>
 						
 						<li class="nav-item">
-							<a href="fornecedor.php" class="nav-link"><i class="icon-pencil3"></i> <span>Fornecedor</span></a>
+							<a href="fornecedor.php" class="nav-link"><i class="icon-users2"></i> <span>Fornecedor</span></a>
 						</li>
 						<li class="nav-item">
-							<a href="produto.php" class="nav-link"><i class="icon-file-css"></i> <span>Produto</span></a>
+							<a href="produto.php" class="nav-link"><i class="icon-gift"></i> <span>Produto</span></a>
 						</li>
 						<li class="nav-item nav-item-submenu">
-							<a href="#" class="nav-link"><i class="icon-spell-check"></i> <span>Compras</span></a>
+							<a href="#" class="nav-link"><i class="icon-bag"></i> <span>Compras</span></a>
 							<ul class="nav nav-group-sub" data-submenu-title="Text editors">
 								<li class="nav-item"><a href="orcamento.php" class="nav-link">Orçamento</a></li>
 								<li class="nav-item"><a href="editor_ckeditor.html" class="nav-link">Solicitação</a></li>
@@ -120,10 +120,13 @@
 							</ul>
 						</li>
 						<li class="nav-item">
-							<a href="#" class="nav-link"><i class="icon-select2"></i> <span>Gerenciamento do Estoque</span></a>
+							<a href="movimentacao.php" class="nav-link"><i class="icon-stack2"></i> <span>Gerenciamento do Estoque</span></a>
 						</li>
+						<li class="nav-item">
+							<a href="inventario.php" class="nav-link"><i class="icon-paste2"></i> <span>Inventário</span></a>
+						</li>						
 						<li class="nav-item nav-item-submenu">
-							<a href="#" class="nav-link"><i class="icon-insert-template"></i> <span>Relatórios</span></a>
+							<a href="#" class="nav-link"><i class="icon-stack-text"></i> <span>Relatórios</span></a>
 							<ul class="nav nav-group-sub" data-submenu-title="Form layouts">
 								<li class="nav-item"><a href="form_layout_vertical.html" class="nav-link">Vertical form</a></li>
 								<li class="nav-item"><a href="form_layout_vertical_styled.html" class="nav-link disabled">Custom styles <span class="badge bg-transparent align-self-center ml-auto">Coming soon</span></a></li>

@@ -14,35 +14,34 @@ if(isset($_POST['inputCodigo'])){
 									 ProduDespesasAcessorias, ProduOutrasDespesas, ProduCustoFinal, ProduValorVenda, 
 									 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, ProduFabricante, ProduUnidadeMedida, 
 									 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
-									 ProduUsuarioAtualizador, ProduEmpresa)
+									 ProduUsuarioAtualizador, ProduEmpresa) 
 				VALUES (:sCodigo, :sCodigoBarras, :sNome, :iCategoria, :iSubCategoria, :fValorCusto, :fDespesasAcessorias,
 						:fOutrasDespesas, :fCustoFinal, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, :sNumSerie, 
 						:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
-						:iUsuarioAtualizador, :iEmpresa)";		
+						:iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
-		
-		print($sql);
+
 		$result->execute(array(
 						':sCodigo' => $_POST['inputCodigo'],
-						':sCodigBarras' => $_POST['inputCodigoBarras'],
+						':sCodigoBarras' => $_POST['inputCodigoBarras'],
 						':sNome' => $_POST['inputNome'],
 						':iCategoria' => $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'],
-						':fValorCusto' => gravavalor($_POST['inputValorCusto']),
-						':fDespesasAcessorias' => gravavalor($_POST['inputDespesasAcessorias']),
-						':fOutrasDespesas' => gravavalor($_POST['inputOutrasDespesas']),
-						':fCustoFinal' => gravavalor($_POST['inputCustoFinal']),
-						':fValorVenda' => gravavalor($_POST['inputValorVenda']),
-						':iEstoqueMinimo' => $_POST['inputEstoqueMinimo'],
-						':iMarca' => $_POST['cmbMarca'],
-						':iModelo' => $_POST['cmbModelo'],
-						':sNumSerie' => $_POST['inputNumSerie'],
-						':iFabricante' => $_POST['cmbFabricante'],
-						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'],
-						':iTipoFiscal' => $_POST['cmbTipoFiscal'],
-						':iNcmFiscal' => $_POST['cmbNcmFiscal'],
-						':iOrigemFiscal' => $_POST['cmbOrigemFiscal'],
-						':iCest' => $_POST['inputCest'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),
+						':fDespesasAcessorias' => $_POST['inputDespesasAcessorias'] == null ? null : gravaValor($_POST['inputDespesasAcessorias']),
+						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
+						':fCustoFinal' => $_POST['inputCustoFinal'] == null ? null : gravaValor($_POST['inputCustoFinal']),
+						':fValorVenda' => $_POST['inputValorVenda'] == null ? null : gravaValor($_POST['inputValorVenda']),
+						':iEstoqueMinimo' => $_POST['inputEstoqueMinimo'] == '' ? null : $_POST['inputEstoqueMinimo'],
+						':iMarca' => $_POST['cmbMarca'] == '#' ? null : $_POST['cmbMarca'],
+						':iModelo' => $_POST['cmbModelo'] == '#' ? null : $_POST['cmbModelo'],
+						':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
+						':iFabricante' => $_POST['cmbFabricante'] == '#' ? null : $_POST['cmbFabricante'],
+						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
+						':iTipoFiscal' => $_POST['cmbTipoFiscal'] == '#' ? null : $_POST['cmbTipoFiscal'],
+						':iNcmFiscal' => $_POST['cmbNcmFiscal'] == '#' ? null : $_POST['cmbNcmFiscal'],
+						':iOrigemFiscal' => $_POST['cmbOrigemFiscal'] == '#' ? null : $_POST['cmbOrigemFiscal'],
+						':iCest' => $_POST['inputCest'] == '' ? null : $_POST['inputCest'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
@@ -62,7 +61,6 @@ if(isset($_POST['inputCodigo'])){
 		
 	}
 	
-	exit;
 	irpara("produto.php");
 }
 
@@ -79,20 +77,52 @@ if(isset($_POST['inputCodigo'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	
-	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
-	
-	<script src="global_assets/js/lamparinas/custom.js"></script>	
 	<!-- /theme JS files -->	
+	
+	<!-- Adicionando Javascript -->
+    <script type="text/javascript" >
+
+        $(document).ready(function() {	
+	
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function(e){
+				
+				Filtrando();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option>Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						Reset();
+					}					
+				});
+			});			
+		});
+		
+		function Filtrando(){
+			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+		}
+		
+		function Reset(){
+			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+		}
+	</script>
 	
 </head>
 
@@ -189,7 +219,7 @@ if(isset($_POST['inputCodigo'])){
 										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
 											<option value="#">Selecione</option>
 											<?php 
-												$sql = ("SELECT SbCatId, SbCatNome
+												/*$sql = ("SELECT SbCatId, SbCatNome
 														 FROM SubCategoria															     
 														 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
 														 ORDER BY SbCatNome ASC");
@@ -199,7 +229,7 @@ if(isset($_POST['inputCodigo'])){
 												foreach ($row as $item){
 													print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
 												}
-											
+											  */
 											?>
 										</select>
 									</div>
@@ -210,7 +240,7 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputValorCusto">Valor de Custo</label>
-										<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo">
+										<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>
 								
@@ -241,7 +271,7 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputDespesasAcessorias">Despesas Acessórias</label>
-										<input type="text" id="inputDespesasAcessorias" name="inputDespesaAcessoria" class="form-control" placeholder="Despesa Acessoria">
+										<input type="text" id="inputDespesasAcessorias" name="inputDespesaAcessoria" class="form-control" placeholder="Despesa Acessoria" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>
 								
@@ -272,7 +302,7 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputOutrasDespesas">Outras Despesas</label>
-										<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas">
+										<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>
 
@@ -288,14 +318,14 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputCustoFinal">Custo Final</label>
-										<input type="text" id="inputCustoFinal" name="inputCustoFinal" class="form-control" placeholder="Custo Final">
+										<input type="text" id="inputCustoFinal" name="inputCustoFinal" class="form-control" placeholder="Custo Final" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>
 
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputValorVenda">Valor de Venda</label>
-										<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda">
+										<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>
 								
@@ -371,7 +401,7 @@ if(isset($_POST['inputCodigo'])){
 										<div class="col-lg-4">
 											<label for="cmbOrigemFiscal">Origem</label>
 											<select id="cmbOrigemFiscal" name="cmbOrigemFiscal" class="form-control form-control-select2">
-												<option value="#">Selecione uma Origem</option>
+												<option value="#">Selecione</option>
 												<?php 
 													$sql = ("SELECT OrFisId, OrFisNome
 															 FROM OrigemFiscal

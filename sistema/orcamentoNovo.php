@@ -6,32 +6,40 @@ $_SESSION['PaginaAtual'] = 'Novo Orçamento';
 
 include('global_assets/php/conexao.php');
 
-
 $sql = ("SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
 		 FROM Usuario
-		 Where and UsuarId = ".$_SESSION['UsuarId']."
+		 Where UsuarId = ".$_SESSION['UsuarId']."
 		 ORDER BY UsuarNome ASC");
 $result = $conn->query("$sql");
-$rowUsuario = $result->fetchAll(PDO::FETCH_ASSOC);		 
+$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
 
 if(isset($_POST['inputData'])){
 		
 	try{
+			
+		for ($i=0; $i < $_POST['inputNumItens']; $i++) {
 		
-		$sql = "INSERT INTO Orçamento (OrcamNumero, OrcamTipo, OrcamData, OrcamLote, OrcamCategoria, OrcamSubCategoria, OrcamConteudo, OrcamFornecedor,
+			$campo = 'campo'.$i;
+			//echo $campo;
+			echo "Teste: ".$_POST[$campo];  ///???????
+		}
+		
+		die;
+		
+		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamLote, OrcamCategoria, OrcamSubCategoria, OrcamConteudo, OrcamFornecedor,
 									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador)
 				VALUES (:sNumero, :sTipo, :dData, :sLote, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :iSolicitante, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNumero' => date()."/".$_POST['inputLote'],
-						':sTipo' => $_POST['radioTipo'] == "on" ? "P" : "S",
-						':dData' => gravadata($_POST['inputData']),
+						':sTipo' => $_POST['radioTipo'] == "on" ? "P" : "S",  //refazer isso
+						':dData' => gravaData($_POST['inputData']),
 						':sLote' => $_POST['inputLote'],
 						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
-						':iFornecedor' => $_POST['inputFornecedor'],
+						':iFornecedor' => $_POST['cmbFornecedor'], //explode nisso
 						':iSolicitante' => $_SESSION['UsuarId'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']
@@ -66,7 +74,7 @@ if(isset($_POST['inputData'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+	<script src="global_assets/js/plugins/tables/datatables/datatables.	min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
@@ -75,7 +83,155 @@ if(isset($_POST['inputData'])){
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	<!-- /theme JS files -->	
+	<!-- /theme JS files -->
+	
+	<!-- Adicionando Javascript -->
+    <script type="text/javascript" >
+
+        $(document).ready(function() {	
+	
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function(e){
+				
+				Filtrando();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option value="#">Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});
+				
+				$.getJSON('filtraProduto.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option>Selecione o Produto</option>';
+					
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
+						});						
+						
+						$('#cmbProduto').html(option).show();
+					} else {
+						ResetProduto();
+					}					
+				});				
+				
+			});	
+			
+			
+			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
+			$('#cmbSubCategoria').on('change', function(e){
+				
+				FiltraProduto();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
+				
+				$.getJSON('filtraProduto.php?idCategoria='+cmbCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){
+					
+					var option = '<option>Selecione o Produto</option>';
+
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
+						});						
+						
+						$('#cmbProduto').html(option).show();
+					} else {
+						ResetProduto();
+					}					
+				});				
+				
+			});	
+			
+			
+			//Ao informar o fornecedor, trazer os demais dados dele (contato, e-mail, telefone)
+			$('#cmbFornecedor').on('change', function(e){				
+				
+				var Fornecedor = $('#cmbFornecedor').val();
+				var Forne = Fornecedor.split('#');
+				
+				$('#inputContato').val(Forne[1]);
+				$('#inputEmailFornecedor').val(Forne[2]);
+				if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
+					$('#inputTelefoneFornecedor').val(Forne[3]);
+				} else {
+					$('#inputTelefoneFornecedor').val(Forne[4]);
+				}
+			});
+			
+			$('#btnAdicionar').click(function(){
+				
+				var inputNumItens = $('#inputNumItens').val();
+				var cmbProduto = $('#cmbProduto').val();
+				var inputQuantidade = $('#inputQuantidade').val();	
+				
+				var resNumItens = parseInt(inputNumItens) + 1;		
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "orcamentoAddProduto.php",
+					data: {numItens: resNumItens, idProduto: cmbProduto, quantidade: inputQuantidade},
+					success: function(resposta){
+						
+						//alert(resposta);
+						//return false;
+											
+						var newRow = $("<tr>");
+						
+						newRow.append(resposta);	    
+						$("#tabelaProdutos").append(newRow);
+												
+						//Adiciona mais um item nessa contagem
+						$('#inputNumItens').val(resNumItens);
+						$('#cmbProduto').val("#").change();						
+						$('#inputQuantidade').val('');
+						
+						$('#inputProdutos').append('<input type="text" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+cmbProduto+'#'+inputQuantidade+'">');
+						
+						return false;
+						
+					}
+				})	
+			}); //click
+			
+		}); //document.ready
+		
+		//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
+        function Filtrando(){
+			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+			FiltraProduto();
+		}		
+		
+		//Mostra o "Filtrando..." na combo Produto
+        function FiltraProduto(){
+			$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+		}		
+		
+		function ResetSubCategoria(){
+			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+		}
+		
+		function ResetProduto(){
+			$('#cmbProduto').empty().append('<option>Sem produto</option>');
+		}		
+					
+	</script>
 
 </head>
 
@@ -145,10 +301,11 @@ if(isset($_POST['inputData'])){
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
 													<?php 
 														$sql = ("SELECT CategId, CategNome
 																 FROM Categoria															     
-																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
+																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
 															     ORDER BY CategNome ASC");
 														$result = $conn->query("$sql");
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -166,8 +323,9 @@ if(isset($_POST['inputData'])){
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
 													<?php 
-														$sql = ("SELECT SbCatId, SbCatNome
+													/*	$sql = ("SELECT SbCatId, SbCatNome
 																 FROM SubCategoria
 																 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
 															     ORDER BY SbCatNome ASC");
@@ -177,7 +335,7 @@ if(isset($_POST['inputData'])){
 														foreach ($row as $item){
 															print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
 														}
-													
+													*/
 													?>
 												</select>
 											</div>
@@ -201,11 +359,25 @@ if(isset($_POST['inputData'])){
 									<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
 									<br>
 									<div class="row">
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="inputNomeForncedor">Fornecedor</label>
-												<input type="text" id="inputNomeFornecedor" name="inputNomeFornecedor" class="form-control">
-												<input type="hidden" id="inputFornecedor" name="inputFornecedor">
+												<label for="cmbFornecedor">Fornecedor</label>
+												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+														$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+																 FROM Fornecedor														     
+																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
+															     ORDER BY ForneNome ASC");
+														$result = $conn->query("$sql");
+														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($rowFornecedor as $item){															
+															print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'">'.$item['ForneNome'].'</option>');
+														}
+													
+													?>
+												</select>
 											</div>
 										</div>
 										
@@ -223,7 +395,7 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>									
 
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputTelefoneFornecedor">Telefone</label>
 												<input type="text" id="inputTelefoneFornecedor" name="inputTelefoneFornecedor" class="form-control" readOnly>
@@ -241,21 +413,76 @@ if(isset($_POST['inputData'])){
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNomeProduto">Produto</label>
-												<input type="text" id="inputNomeProduto" name="inputNomeProduto" class="form-control">
-												<input type="hidden" id="inputProduto" name="inputProduto">
+												<label for="cmbProduto">Produto</label>
+												<select id="cmbProduto" name="cmbProduto" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+													/*	$sql = ("SELECT ProduId, ProduNome
+																 FROM Produto				     
+																 WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1
+															     ORDER BY ProduNome ASC");
+														$result = $conn->query("$sql");
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($row as $item){															
+															print('<option value="'.$item['ProduId'].'">'.$item['ProduNome'].'</option>');
+														}
+													*/
+													?>
+												</select>
+											</div>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputQuantidade">Quantidade</label>
+												<input type="text" id="inputQuantidade" name="inputQuantidade" class="form-control">												
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputQuantidade">Quantidade</label>
-												<input type="text" id="inputQuantidade" name="inputQuantidade" class="form-control" readOnly>
+											<div class="form-group">												
+												<button type="button" id="btnAdicionar" class="btn btn-lg btn-success" style="margin-top:20px;">Adicionar</button>
+												<!--<button id="adicionar" type="button">Teste</button>-->
 											</div>
-										</div>
+										</div>										
 									</div>
 								</div>
+							</div>						
+							
+							<div id="inputProdutos">
+								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
+							</div>
+							
+							<div class="row">
+								<div class="col-lg-12">	
+										<table class="table" id="tabelaProdutos">
+											<thead>
+												<tr class="bg-slate">
+													<th width="5%">Item</th>
+													<th width="40%">Produto</th>
+													<th width="14%">Unidade Medida</th>
+													<th width="8%">Quantidade</th>
+													<th width="14%">Valor Unitário</th>
+													<th width="14%">Valor Total</th>
+													<th width="5%" class="text-center">Ações</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr style="display:none;">
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+												</tr>
+											</tbody>
+										</table>
+								</div>
 							</div>							
+							<br>
 							<br>
 							
 							<div class="row">
@@ -267,7 +494,6 @@ if(isset($_POST['inputData'])){
 											<div class="form-group">
 												<label for="inputNomeSolicitante">Solicitante</label>
 												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly>
-												<input type="hidden" id="inputSolicitante" name="inputSolicitante" value="<?php echo $rowUsuario['UsuarId']; ?>">
 											</div>
 										</div>
 										
@@ -296,10 +522,9 @@ if(isset($_POST['inputData'])){
 									</div>
 								</div>
 							</div>
-						</form>								
-
-					</div>
-					<!-- /card-body -->
+						</div>
+						<!-- /card-body -->
+					</form>
 					
 				</div>
 				<!-- /info blocks -->

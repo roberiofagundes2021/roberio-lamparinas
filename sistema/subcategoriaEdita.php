@@ -115,8 +115,6 @@ if(isset($_POST['inputNome'])){
 					data: ('nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho),
 					success: function(resposta){
 						
-						alert(resposta); // aqui deveria vir zero
-						
 						if(resposta == 1){
 							alerta('Atenção','Esse registro já existe!','error');
 							return false;

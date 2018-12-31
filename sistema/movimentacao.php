@@ -2,13 +2,13 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Produto';
+$_SESSION['PaginaAtual'] = 'Movimentação';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ProduId, ProduNome, CategNome, SbCatNome, ProduValorVenda, ProduStatus
-		 FROM Produto
-		 LEFT JOIN Categoria on CategId = ProduCategoria
+$sql = ("SELECT MovimData, MovimTipo, MovimNumNotaFiscal, ForneNome, ProduValorVenda, ProduStatus
+		 FROM Movimentacao
+		 LEFT JOIN Fornecedor on ForneId = MovimFornecedor
 		 LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 	     WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ."
 		 ORDER BY ProduNome ASC");
@@ -24,7 +24,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Produto</title>
+	<title>Lamparinas | Movimentação</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -45,21 +45,21 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script>
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaProduto(ProduId, ProduNome, ProduStatus, Tipo){
+		function atualizaMovimentacao(ProduId, ProduNome, ProduStatus, Tipo){
 		
-			document.getElementById('inputProdutoId').value = ProduId;
-			document.getElementById('inputProdutoNome').value = ProduNome;
-			document.getElementById('inputProdutoStatus').value = ProduStatus;
+			document.getElementById('inputMovimentacaoId').value = ProduId;
+			document.getElementById('inputMovimentacaoNome').value = ProduNome;
+			document.getElementById('inputMovimentacaoStatus').value = ProduStatus;
 					
 			if (Tipo == 'edita'){	
-				document.formProduto.action = "produtoEdita.php";		
+				document.formMovimentacao.action = "movimentacaoEdita.php";		
 			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formProduto, "Tem certeza que deseja excluir esse produto?", "produtoExclui.php");
+				confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir esse movimentacao?", "movimentacaoExclui.php");
 			} else if (Tipo == 'mudaStatus'){
-				document.formProduto.action = "produtoMudaSituacao.php";
+				document.formMovimentacao.action = "movimentacaoMudaSituacao.php";
 			}		
 			
-			document.formProduto.submit();
+			document.formMovimentacao.submit();
 		}		
 			
 	</script>
@@ -89,7 +89,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Produtos</h3>
+								<h3 class="card-title">Relação das Movimentacões do Estoque</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
@@ -100,18 +100,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos produtos da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência às movimentações do estoque da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
 								<div class="text-right">
-									<a href="produtoNovo.php" class="btn btn-success" role="button">Novo Produto</a>
-									<a href="produtoImportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>
-									<a href="produtoExportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>									
-									<a href="produtoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Imprimir</a></div>
+									<a href="movimentacaoNovo.php" class="btn btn-success" role="button">Nova Movimentação</a>
+									<a href="movimentacaoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Requisiçẽos</a></div>
 							</div>
 							
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th>Produto</th>
+										<th>Movimentacao</th>
 										<th>Categoria</th>
 										<th>SubCategoria</th>
 										<th>Preço Venda</th>
@@ -134,13 +132,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.formataMoeda($item['ProduValorVenda']).'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaMovimentacao('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaMovimentacao('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaMovimentacao('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
@@ -158,10 +156,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<!-- /info blocks -->
 				
-				<form name="formProduto" method="post">
-					<input type="hidden" id="inputProdutoId" name="inputProdutoId" >
-					<input type="hidden" id="inputProdutoNome" name="inputProdutoNome" >
-					<input type="hidden" id="inputProdutoStatus" name="inputProdutoStatus" >
+				<form name="formMovimentacao" method="post">
+					<input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId" >
+					<input type="hidden" id="inputMovimentacaoNome" name="inputMovimentacaoNome" >
+					<input type="hidden" id="inputMovimentacaoStatus" name="inputMovimentacaoStatus" >
 				</form>
 
 			</div>

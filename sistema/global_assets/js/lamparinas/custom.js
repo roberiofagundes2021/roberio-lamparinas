@@ -72,3 +72,14 @@ function confirmaExclusao(form, texto, acao) {
 		 return false;
 	});			
 }
+
+function moeda(z){
+	v = z.value;
+	v = v.replace(/\D/g,"") //permite digitar apenas números
+	v = v.replace(/[0-9]{12}/,"inválido") //limita pra máximo 999.999.999,99
+	v=v.replace(/(\d)(\d{8})$/,"$1.$2");//coloca o ponto dos milhões
+	v=v.replace(/(\d)(\d{5})$/,"$1.$2");//coloca o ponto dos milhares
+	//v = v.replace(/(\d{1})(\d{1,2})$/,"$1.$2") //coloca ponto antes dos últimos 2 digitos
+	v = v.replace(/(\d{1})(\d{1,2})$/,"$1,$2") //coloca virgula antes dos últimos 2 digitos
+	z.value = v;
+}

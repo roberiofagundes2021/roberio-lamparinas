@@ -20,7 +20,7 @@ if(isset($_POST['inputUsuarioId'])){
         	
 	try{
 		
-		$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, EXUXPPerfil
+		$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, EXUXPPerfil
 				FROM Usuario
 				JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 				WHERE UsuarId = $iUsuario and EXUXPEmpresa = $iEmpresa ";
@@ -39,7 +39,7 @@ if(isset($_POST['inputCpf'])){
 	try{
 		
 		$sql = "UPDATE Usuario SET UsuarCpf = :sCpf, UsuarNome = :sNome, usuarLogin = :sLogin, 
-					   UsuarSenha = :sSenha
+					   UsuarSenha = :sSenha, UsuarEmail = :sEmail, UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
 				WHERE UsuarId = :iUsuario";
 		$result = $conn->prepare($sql);
 				
@@ -47,7 +47,10 @@ if(isset($_POST['inputCpf'])){
 						':sCpf' => $_POST['inputCpf'],
 						':sNome' => $_POST['inputNome'],
 						':sLogin' => $_POST['inputLogin'],
-						':sSenha' => $_POST['inputSenha'],						
+						':sSenha' => $_POST['inputSenha'],
+						':sEmail' => $_POST['inputEmail'],
+						':sTelefone' => $_POST['inputTelefone'],
+						':sCelular' => $_POST['inputCelular'],
 						':iUsuario' => $_POST['inputUsuarioId']
 						));
 						
@@ -91,15 +94,12 @@ if(isset($_POST['inputCpf'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>		
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>		
 	<!-- /theme JS files -->	
 
 </head>
@@ -205,19 +205,19 @@ if(isset($_POST['inputCpf'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputEmail">E-mail</label>
-												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" required>
+												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" value="<?php echo $row['UsuarEmail']; ?>" required>
 											</div>
 										</div>
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputTelefone">Telefone</label>
-												<input type="email" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone">
+												<input type="text" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999" value="<?php echo $row['UsuarTelefone']; ?>">
 											</div>
 										</div>
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputCelular">Celular</label>
-												<input type="email" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular">
+												<input type="text" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999" value="<?php echo $row['UsuarCelular']; ?>">
 											</div>
 										</div>											
 									</div>

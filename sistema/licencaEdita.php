@@ -138,7 +138,7 @@ if(isset($_POST['inputDataInicio'])){
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="text" id="inputDataInicio" name="inputDataInicio" class="form-control pickadate" placeholder="Data Início" value="<?php echo mostradata($row['LicenDtInicio']); ?>" required>
+											<input type="text" id="inputDataInicio" name="inputDataInicio" class="form-control pickadate" placeholder="Data Início" value="<?php echo mostraData($row['LicenDtInicio']); ?>" required>
 										</div>
 									</div>
 								</div>
@@ -150,7 +150,7 @@ if(isset($_POST['inputDataInicio'])){
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>																					
-											<input type="text" id="inputDataFim" name="inputDataFim" class="form-control daterange" placeholder="Data Fim" value="<?php echo mostradata($row['LicenDtFim']); ?>">
+											<input type="text" id="inputDataFim" name="inputDataFim" class="form-control daterange" placeholder="Data Fim" value="<?php echo mostraData($row['LicenDtFim']); ?>">
 										</div>
 									</div>
 								</div>

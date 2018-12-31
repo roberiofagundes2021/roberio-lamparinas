@@ -3,7 +3,7 @@
 	/*--------------------------------------------------------------------------
 	  |	    Passando data do text box "AAAA-MM-DD" para "DD/MM/AAAA"		   |
 	  -------------------------------------------------------------------------*/
-	function mostradata($data) {
+	function mostraData($data) {
 	
 		if ($data <> '0000-00-00' and $data <> ''){
 			$data = explode(" ", $data);
@@ -79,7 +79,7 @@
 	 }
 	
 	// Passando data do text box "DD/MM/AAAA" para "AAAA-MM-DD"
-	function gravadata ($data) {
+	function gravaData ($data) {
 	if ($data != '') {
 	   $parte = explode("/", $data);
 		return ($parte[2].'-'.$parte[1].'-'.$parte[0]); 
@@ -89,7 +89,7 @@
 		return ''; }
 	}
 	
-	function gravavalor($campo){
+	function gravaValor($campo){
 		//Varre o conteudo da variavel $total e troca todos os pontos por em branco. Ex.: 5.423,36 ficaria 5423,36
 		$frase = str_replace(".","",$campo);
 		//Varre o conteudo da variavel $frase e troca todas as virgulas por ponto. Ex.: 5423,36 ficaria 5423.36
@@ -98,7 +98,16 @@
 		return $campo;		
 	}
 	
-	function formatamoeda($campo){
+	function mostraValor($campo){
+		//Varre o conteudo da variavel $total e troca todos os pontos por em branco. Ex.: 5.423,36 ficaria 5423,36
+		$frase = number_format($campo, 2, '.', '');
+		//Varre o conteudo da variavel $frase e troca todas as virgulas por ponto. Ex.: 5423,36 ficaria 5423.36
+		$campo = number_format($frase, 2, ',', '.');
+		
+		return $campo;		
+	}	
+	
+	function formataMoeda($campo){
 		//Varre o conteudo da variavel $total e troca todos os pontos por em branco. Ex.: 5.423,36 ficaria 5423,36
 		$frase = number_format($campo, 2, '.', '');
 		//Varre o conteudo da variavel $frase e troca todas as virgulas por ponto. Ex.: 5423,36 ficaria 5423.36
@@ -108,7 +117,7 @@
 	}	
 	
 	//-------------------------------- Retira os acentos
-	function tiraacento($string) {
+	function tiraAcento($string) {
 		$string	= utf8_decode($string);
 		
 		// matriz de entrada

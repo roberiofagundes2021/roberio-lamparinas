@@ -2,22 +2,17 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Licença';
+$_SESSION['PaginaAtual'] = 'Inventário';
 
 include('global_assets/php/conexao.php');
 
-if (isset($_POST['inputEmpresaId'])){
-	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
-	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
-} else if (!isset($_SESSION['EmpresaId'])) {
-	irpara("empresa.php");
-}
-
-$sql = ("SELECT LicenId, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenStatus, EmpreNomeFantasia
-		 FROM Licenca
-		 JOIN Empresa on EmpreId = LicenEmpresa
-		 WHERE EmpreId = ".$_SESSION['EmpresaId']."
-		 ORDER BY LicenDtInicio DESC"); 
+$sql = ("SELECT InvenId, InvenData, InvenNumero, SituaNome, SituaChave, LcEstNome
+		 FROM Inventario
+		 JOIN Situacao on SituaId = InvenSituacao
+		 LEFT JOIN InventarioXLocalEstoque on InXLEInventario = InvenId
+		 JOIN LocalEstoque on LcEstId = InXLELocal
+		 WHERE InvenEmpresa = ".$_SESSION['EmpreId']."
+		 ORDER BY InvenData DESC"); 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -30,7 +25,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Licenças</title>
+	<title>Lamparinas | Inventários</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -46,35 +41,33 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
 	<script src="global_assets/js/demo_pages/components_popups.js"></script>
 	
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>		
 	<!-- /theme JS files -->	
 	
 	<script>
 		
-		function atualizaLicenca(LicenId, LicenStatus, Tipo){
+		function atualizaInventario(InvenId, InvenStatus, Tipo){
 
-			document.getElementById('inputLicencaId').value = LicenId;
-			document.getElementById('inputLicencaStatus').value = LicenStatus;
+			document.getElementById('inputInventarioId').value = InvenId;
+			document.getElementById('inputInventarioStatus').value = InvenStatus;
 				
 			if (Tipo == 'edita'){	
-				document.formLicenca.action = "licencaEdita.php";		
+				document.formInventario.action = "inventarioEdita.php";		
 			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formLicenca, "Tem certeza que deseja excluir essa licença?", "licencaExclui.php");
+				confirmaExclusao(document.formInventario, "Tem certeza que deseja excluir esse inventário?", "inventarioExclui.php");
 			} else if (Tipo == 'mudaStatus'){
-				document.formLicenca.action = "licencaMudaSituacao.php";
+				document.formInventario.action = "inventarioMudaSituacao.php";
 			}
 			
-			document.formLicenca.submit();
+			document.formInventario.submit();
 		}
 			
 	</script>
 
 </head>
 
-<body class="navbar-top sidebar-xs">
+<body class="navbar-top">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -82,8 +75,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<div class="page-content">
 		
 		<?php include_once("menu-left.php"); ?>
-
-		<?php include_once("menuLeftSecundario.php"); ?>
 		
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -99,10 +90,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h5 class="card-title">Relação das Licenças</h5>
+								<h5 class="card-title">Relação dos Inventários</h5>
 								<div class="header-elements">
 									<div class="list-icons">
-										<a href="empresa.php" class="icon-backward2"> Voltar</a>
 										<!--<a class="list-icons-item" data-action="collapse"></a>-->
 										<!--<a href="empresa.php" class="list-icons-item" data-action="reload"></a>-->
 										<!--<a class="list-icons-item" data-action="remove"></a>-->
@@ -111,16 +101,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								As licenças abaixo são da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b>.
-								<div class="text-right"><a href="licencaNovo.php" class="btn btn-success" role="button">Nova Licença</a></div>
+								A relação abaixo faz referência aos inventários da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b>.
+								<div class="text-right"><a href="inventarioNovo.php" class="btn btn-success" role="button">Novo Inventário</a></div>
 							</div>							
 
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th>Data Início</th>
-										<th>Data Fim</th>
-										<th>Limite Usuários</th>
+										<th>Data</th>
+										<th>Nº Inventário</th>
+										<th>Locais do Estoque</th>
+										<th>Responsável</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -129,22 +120,24 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['LicenStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['LicenStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = $item['SituaChave'] == 'FINALIZADO' ? 'badge-success' : 'bg-grey';
 										
 										print('
 										<tr>
-											<td>'.mostraData($item['LicenDtInicio']).'</td>
-											<td>'.mostraData($item['LicenDtFim']).'</td>
-											<td>'.$item['LicenLimiteUsuarios'].'</td>');
+											<td>'.mostraData($item['InvenData']).'</td>
+											<td>'.$item['InvenNumero'].'</td>
+											<td>'.$item['LcEstNome'].'</td>
+											<td>Presidente</td>'
+										);
 										
-										print('<td><a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['SituaNome'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 																				
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>														
+														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['SituaNome'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['SituaNome'].', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>														
 													</div>
 												</div>
 											</td>
@@ -162,9 +155,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<!-- /info blocks -->
 				
-				<form name="formLicenca" method="post" action="licencaEdita.php">
-					<input type="hidden" id="inputLicencaId" name="inputLicencaId" >
-					<input type="hidden" id="inputLicencaStatus" name="inputLicencaStatus" >
+				<form name="formInventario" method="post" action="inventarioEdita.php">
+					<input type="hidden" id="inputInventarioId" name="inputInventarioId" >
+					<input type="hidden" id="inputInventarioStatus" name="inputInventarioStatus" >
 				</form>
 
 			</div>

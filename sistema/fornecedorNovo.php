@@ -7,36 +7,38 @@ $_SESSION['PaginaAtual'] = 'Novo Fornecedor';
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputTipo'])){
-		
+			
 	try{
-		
+			
 		$sql = "INSERT INTO Fornecedor (ForneTipo, ForneNome, ForneRazaoSocial, ForneCnpj, ForneInscricaoMunicipal, ForneInscricaoEstadual, 
-										ForneCategoria, ForneSubCategoria, ForneCpf, ForneRg, ForneOrgaoEmissor, ForneUf, ForneSexo, 
+										ForneCategoria, ForneCpf, ForneRg, ForneOrgaoEmissor, ForneUf, ForneSexo, 
 										ForneAniversario, ForneCep, ForneEndereco, ForneNumero, ForneComplemento, ForneBairro, ForneCidade, 
 										ForneEstado, ForneContato, ForneTelefone, ForneCelular, ForneEmail, ForneSite, ForneObservacao,
 									    ForneBanco, ForneAgencia, ForneConta, ForneInformacaoAdicional, ForneIpi, ForneFrete, ForneIcms, 
 									    ForneOutros, ForneStatus, ForneUsuarioAtualizador, ForneEmpresa)
-				VALUES (:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual, :iCategoria, :iSubCategoria, 
+				VALUES (:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual, :iCategoria,  
 						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dAniversario, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
 						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, :iBanco, :sAgencia, 
 						:sConta, :sInformacaoAdicional, :iIpi, :iFrete, :iIcms, :iOutros, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
-				
+
+		$conn->beginTransaction();
+		
 		$result->execute(array(
-						':sTipo' => $_POST['inputTipo'] == "on" ? "F" : "J",
+						':sTipo' => $_POST['inputTipo'],
 						':sNome' => $_POST['inputNome'],
-						':sRazaoSocial' => $_POST['inputRazaoSocial'],
-						':sCnpj' => limpaCPF_CNPJ($_POST['inputCnpj']),
-						':sInscricaoMunicipal' => $_POST['inputInscricaoMunicipal'],
-						':sInscricaoEstadual' => $_POST['inputInscricaoEstadual'],
-						':iCategoria' => $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'],
-						':sCpf' => limpaCPF_CNPJ($_POST['inputCpf']),
-						':sRg' => $_POST['inputRg'],
-						':sOrgaoEmissor' => $_POST['inputEmissor'],
-						':sUf' => $_POST['cmbUf'],
-						':sSexo' => $_POST['cmbSexo'],
-						':dAniversario' => $_POST['inputAniversario'],
+						':sRazaoSocial' => $_POST['inputTipo'] == 'J' ? $_POST['inputRazaoSocial'] : null,
+						':sCnpj' => $_POST['inputTipo'] == 'J' ? limpaCPF_CNPJ($_POST['inputCnpj']) : null,
+						':sInscricaoMunicipal' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null,
+						':sInscricaoEstadual' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoEstadual'] : null,
+						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+						//':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						':sCpf' => $_POST['inputTipo'] == 'F' ? limpaCPF_CNPJ($_POST['inputCpf']) : null,
+						':sRg' => $_POST['inputTipo'] == 'F' ? $_POST['inputRg'] : null,
+						':sOrgaoEmissor' => $_POST['inputTipo'] == 'F' ? $_POST['inputEmissor'] : null,
+						':sUf' => $_POST['inputTipo'] == 'J' || $_POST['cmbUf'] == '#' ? null : $_POST['cmbUf'],
+						':sSexo' => $_POST['inputTipo'] == 'J' || $_POST['cmbSexo'] == '#' ? null : $_POST['cmbSexo'],
+						':dAniversario' => $_POST['inputTipo'] == 'F' ? $_POST['inputAniversario'] : null,
 						':sCep' => $_POST['inputCep'],
 						':sEndereco' => $_POST['inputEndereco'],
 						':sNumero' => $_POST['inputNumero'],
@@ -45,29 +47,59 @@ if(isset($_POST['inputTipo'])){
 						':sCidade' => $_POST['inputCidade'],
 						':sEstado' => $_POST['cmbEstado'],
 						':sContato' => $_POST['inputNomeContato'],
-						':sTelefone' => $_POST['inputTelefone'],
-						':sCelular' => $_POST['inputCelular'],
+						':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
+						':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
 						':sEmail' => $_POST['inputEmail'],
 						':sSite' => $_POST['inputSite'],
 						':sObservacao' => $_POST['txtareaObservacao'],
-						':iBanco' => $_POST['cmbBanco'],
+						':iBanco' => $_POST['cmbBanco'] == '#' ? null : $_POST['cmbBanco'],
 						':sAgencia' => $_POST['inputAgencia'],
 						':sConta' => $_POST['inputConta'],
 						':sInformacaoAdicional' => $_POST['inputInformacaoAdicional'],
-						':iIpi' => $_POST['inputIpi'],
-						':iFrete' => $_POST['inputFrete'],
-						':iIcms' => $_POST['inputIcms'],
-						':iOutros' => $_POST['inputOutros'],
+						':iIpi' => $_POST['inputIpi'] == null ? 0.00 : gravaValor($_POST['inputIpi']),
+						':iFrete' => $_POST['inputFrete'] == null ? 0.00 : gravaValor($_POST['inputFrete']),
+						':iIcms' => $_POST['inputIcms'] == null ? 0.00 : gravaValor($_POST['inputIcms']),
+						':iOutros' => $_POST['inputOutros'] == null ? 0.00 : gravaValor($_POST['inputOutros']),
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
+
+		$insertId = $conn->lastInsertId(); 
+
+		if ($_POST['cmbSubCategoria']){
+			
+			try{
+				$sql = "INSERT INTO FornecedorXSubCategoria 
+							(FrXSCFornecedor, FrXSCSubCategoria, FrXSCEmpresa)
+						VALUES 
+							(:iFornecedor, :iSubCategoria, :iEmpresa)";
+				$result = $conn->prepare($sql);
+
+				foreach ($_POST['cmbSubCategoria'] as $key => $value){
+
+					$result->execute(array(
+									':iFornecedor' => $insertId,
+									':iSubCategoria' => $value,
+									':iEmpresa' => $_SESSION['EmpreId']
+									));
+				}
+				
+				$conn->commit();
+				
+			} catch(PDOException $e) {
+				$conn->rollback();
+				echo 'Error: ' . $e->getMessage();exit;
+			}
+		}
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Fornecedor incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {		
+		
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir fornecedor!!!";
@@ -93,22 +125,13 @@ if(isset($_POST['inputTipo'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	
-	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
-	
-	<script src="global_assets/js/lamparinas/custom.js"></script>	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>		
 	<!-- /theme JS files -->	
 
 	<!-- Adicionando Javascript -->
@@ -184,7 +207,101 @@ if(isset($_POST['inputTipo'])){
                 
             });
             
-        });
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function(e){
+				
+				Filtrando();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option>Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						Reset();
+					}					
+				});
+			});
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputTipo = $('input[name="inputTipo"]:checked').val();				
+				var inputNome = $('#inputNome').val();
+				var inputCpf  = $('#inputCpf').val();
+				var inputCnpj = $('#inputCnpj').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNome.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == ''){
+					alerta('Atenção','Informe o nome do fornecedor!','error');
+					$('#inputNome').focus();
+					return false;
+				}
+				
+				// Se Pessoa Física
+				if (inputTipo  == "F"){
+					//Verifica se o campo só possui espaços em branco
+					if (inputCpf == ''){
+						alerta('Atenção','Informe o CPF!','error');
+						$('#inputCPF').focus();
+						return false;
+					}
+				} else {
+					//Verifica se o campo só possui espaços em branco
+					if (inputCnpj == '' || inputCnpj == '__.___.___/____-__'){
+						alerta('Atenção','Informe o CNPJ!','error');
+						$('#inputCNPJ').focus();
+						return false;
+					}
+				}
+				
+				if (cmbSubCategoria[0] == 'Filtrando'){
+					alerta('Atenção','Por algum problema na sua conexão o campo SubCategoria parece não conseguindo ser filtrado! Favor cancelar a edição e tentar novamente.','error');
+					return false;
+				}
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "fornecedorValida.php",
+					data: {tipo: inputTipo, nome: inputNome, cpf: inputCpf, cnpj: inputCnpj},
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Esse registro já existe!','error');
+							return false;
+						}
+						
+						$( "#formFornecedor" ).submit();
+					}
+				}); //ajax
+				
+			}); // enviar
+
+            
+        }); // document.ready
+
+        function Filtrando(){
+			$('#cmbSubCategoria').empty().append('<option value="Filtrando">Filtrando...</option>');
+		}
+        
+        function Reset(){
+			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+		}
         
         function selecionaPessoa(tipo) {
 			if (tipo == 'PF'){
@@ -224,7 +341,7 @@ if(isset($_POST['inputTipo'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formFornecedor" method="post" class="form-validate" action="fornecedorNovo.php">
+					<form name="formFornecedor" id="formFornecedor" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Fornecedor</h5>
 						</div>
@@ -235,13 +352,13 @@ if(isset($_POST['inputTipo'])){
 									<div class="form-group">							
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" checked data-fouc onclick="selecionaPessoa('PF')">
+												<input type="radio" id="inputTipo" name="inputTipo" value="F" class="form-input-styled" data-fouc onclick="selecionaPessoa('PF')">
 												Pessoa Física
 											</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" data-fouc onclick="selecionaPessoa('PJ')">
+												<input type="radio" id="inputTipo" name="inputTipo" value="J" class="form-input-styled" data-fouc onclick="selecionaPessoa('PJ')" checked>
 												Pessoa Jurídica
 											</label>
 										</div>										
@@ -255,18 +372,18 @@ if(isset($_POST['inputTipo'])){
 								<div class="col-lg-9">
 									<div class="form-group">
 										<label for="inputNome">Nome</label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" required>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" required autofocus>
 									</div>
 								</div>	
 								
-								<div class="col-lg-3" id="CPF">
+								<div class="col-lg-3" id="CPF" style="display:none;">
 									<div class="form-group">
 										<label for="inputCpf">CPF</label>
 										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99">
 									</div>	
 								</div>
 								
-								<div class="col-lg-3" id="CNPJ" style="display:none;">
+								<div class="col-lg-3" id="CNPJ">
 									<div class="form-group">				
 										<label for="inputCnpj">CNPJ</label>
 										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99">
@@ -276,7 +393,7 @@ if(isset($_POST['inputTipo'])){
 								
 							<div class="row">				
 								<div class="col-lg-12">
-									<div id="dadosPF">
+									<div id="dadosPF" style="display:none">
 										<div class="row">
 											<div class="col-lg-2">
 												<div class="form-group">
@@ -349,7 +466,7 @@ if(isset($_POST['inputTipo'])){
 										</div>	
 									</div> <!-- Fim dadosPF -->
 									
-									<div id="dadosPJ" style="display:none">
+									<div id="dadosPJ">
 										<div class="row">
 											<div class="col-lg-4">
 												<div class="form-group">
@@ -385,7 +502,7 @@ if(isset($_POST['inputTipo'])){
 											<?php 
 												$sql = ("SELECT CategId, CategNome
 														 FROM Categoria															     
-														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
+														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
 														 ORDER BY CategNome ASC");
 												$result = $conn->query("$sql");
 												$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -400,23 +517,10 @@ if(isset($_POST['inputTipo'])){
 								</div>
 
 								<div class="col-lg-6">
-									<div class="form-group">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSubCategoria">SubCategoria</label>
-										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
 											<option value="#">Selecione uma subcategoria</option>
-											<?php 
-												$sql = ("SELECT SbCatId, SbCatNome
-														 FROM SubCategoria															     
-														 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-														 ORDER BY SbCatNome ASC");
-												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($row as $item){
-													print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
-												}
-											
-											?>
 										</select>
 									</div>
 								</div>
@@ -431,7 +535,7 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputCep">CEP</label>
-												<input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP">
+												<input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP" maxLength="8">
 											</div>
 										</div>
 										
@@ -624,28 +728,28 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbBanco">IPI (%)</label>
-												<input type="text" id="inputIpi" name="inputIpi" class="form-control" data-mask="99%" placeholder="IPI (%)">
+												<input type="text" id="inputIpi" name="inputIpi" class="form-control" placeholder="IPI (%)" onKeyUp="moeda(this)" maxLength="6">
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputFrete">Frete (%)</label>
-												<input type="text" id="inputFrete" name="inputFrete" class="form-control" data-mask="99%" placeholder="Frete (%)">
+												<input type="text" id="inputFrete" name="inputFrete" class="form-control" placeholder="Frete (%)" onKeyUp="moeda(this)" maxLength="6">
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputIcms">ICMS (%)</label>
-												<input type="text" id="inputIcms" name="inputIcms" class="form-control" data-mask="99%" placeholder="ICMS (%)">
+												<input type="text" id="inputIcms" name="inputIcms" class="form-control" placeholder="ICMS (%)" onKeyUp="moeda(this)" maxLength="6">
 											</div>
 										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputOutros">Outros (%)</label>
-												<input type="text" id="inputOutros" name="inputOutros" class="form-control" data-mask="99%" placeholder="Outros (%)">
+												<input type="text" id="inputOutros" name="inputOutros" class="form-control" placeholder="Outros (%)" onKeyUp="moeda(this)" maxLength="6">
 											</div>
 										</div>
 									</div>
@@ -655,7 +759,7 @@ if(isset($_POST['inputTipo'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
 										<a href="fornecedor.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

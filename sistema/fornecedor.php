@@ -6,8 +6,9 @@ $_SESSION['PaginaAtual'] = 'Fornecedor';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneCelular, ForneStatus
+$sql = ("SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
 		 FROM Fornecedor
+		 LEFT JOIN Categoria on CategId = ForneCategoria
 	     WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ."
 		 ORDER BY ForneNome ASC");
 $result = $conn->query("$sql");
@@ -108,11 +109,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th>Nome</th>
-										<th>CPF/CNPJ</th>
-										<th>Celular</th>										
-										<th>Situação</th>
-										<th class="text-center">Ações</th>
+										<th width="30%">Nome</th>
+										<th width="15%">CPF/CNPJ</th>
+										<th width="15%">Telefone</th>										
+										<th width="20%">Categoria</th>
+										<th width="8%">Situação</th>
+										<th class="text-center" width="7%">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -121,13 +123,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										$situacao = $item['ForneStatus'] ? 'Ativo' : 'Inativo';
 										$situacaoClasse = $item['ForneStatus'] ? 'badge-success' : 'badge-secondary';
-										$documento = $item['ForneCnpj'] == NULL ? $item['ForneCnpj'] : $item['ForneCpf'];
+										$documento = $item['ForneCnpj'] == NULL ? $item['ForneCpf'] : $item['ForneCnpj'];
+										$telefone = $item['ForneCelular'] == NULL ? $item['ForneTelefone'] : $item['ForneCelular'];
 										
 										print('
 										<tr>
 											<td>'.$item['ForneNome'].'</td>
 											<td>'.formatarCPF_Cnpj($documento).'</td>
-											<td>'.$item['ForneCelular'].'</td>
+											<td>'.$telefone.'</td>
+											<td>'.$item['CategNome'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

@@ -18,11 +18,11 @@ if(isset($_POST['inputProdutoId'])){
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);		
 		
-		$valorCusto = number_format($row['ProduValorCusto'], 2, ',', '.');
-		$valorVenda	= $row['ProduValorVenda'];
-		$despesasAcessorias = $row['ProduDespesasAcessorias'];
-		$outrasDespesas = $row['ProduOutrasDespesas'];
-		$custoFinal = $row['ProduCustoFinal'];
+		$valorCusto = mostraValor($row['ProduValorCusto']);
+		$valorVenda	= mostraValor($row['ProduValorVenda']);
+		$despesasAcessorias = mostraValor($row['ProduDespesasAcessorias']);
+		$outrasDespesas = mostraValor($row['ProduOutrasDespesas']);
+		$custoFinal = mostraValor($row['ProduCustoFinal']);
 		$numSerie = $row['ProduNumSerie'];
 		
 	} catch(PDOException $e) {
@@ -53,28 +53,29 @@ if(isset($_POST['inputCodigo'])){
 				
 		$result->execute(array(
 						':sCodigo' => $_POST['inputCodigo'],
-						':sCodigBarras' => $_POST['inputCodigoBarras'],
+						':sCodigoBarras' => $_POST['inputCodigoBarras'],
 						':sNome' => $_POST['inputNome'],
 						':iCategoria' => $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'],
-						':fValorCusto' => gravavalor($_POST['inputValorCusto']),
-						':fDespesasAcessorias' => gravavalor($_POST['inputDespesasAcessorias']),
-						':fOutrasDespesas' => gravavalor($_POST['inputOutrasDespesas']),
-						':fCustoFinal' => gravavalor($_POST['inputCustoFinal']),
-						':fValorVenda' => gravavalor($_POST['inputValorVenda']),
-						':iEstoqueMinimo' => $_POST['inputEstoqueMinimo'],
-						':iMarca' => $_POST['cmbMarca'],
-						':iModelo' => $_POST['cmbModelo'],
-						':sNumSerie' => $_POST['inputNumSerie'],
-						':iFabricante' => $_POST['cmbFabricante'],
-						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'],
-						':iTipoFiscal' => $_POST['cmbTipoFiscal'],
-						':iNcmFiscal' => $_POST['cmbNcmFiscal'],
-						':iOrigemFiscal' => $_POST['cmbOrigemFiscal'],
-						':iCest' => $_POST['inputCest'],						
+						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),
+						':fDespesasAcessorias' => $_POST['inputDespesasAcessorias'] == null ? null : gravaValor($_POST['inputDespesasAcessorias']),
+						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
+						':fCustoFinal' => $_POST['inputCustoFinal'] == null ? null : gravaValor($_POST['inputCustoFinal']),
+						':fValorVenda' => $_POST['inputValorVenda'] == null ? null : gravaValor($_POST['inputValorVenda']),
+						':iEstoqueMinimo' => $_POST['inputEstoqueMinimo'] == '' ? null : $_POST['inputEstoqueMinimo'],
+						':iMarca' => $_POST['cmbMarca'] == '#' ? null : $_POST['cmbMarca'],
+						':iModelo' => $_POST['cmbModelo'] == '#' ? null : $_POST['cmbModelo'],
+						':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
+						':iFabricante' => $_POST['cmbFabricante'] == '#' ? null : $_POST['cmbFabricante'],
+						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
+						':iTipoFiscal' => $_POST['cmbTipoFiscal'] == '#' ? null : $_POST['cmbTipoFiscal'],
+						':iNcmFiscal' => $_POST['cmbNcmFiscal'] == '#' ? null : $_POST['cmbNcmFiscal'],
+						':iOrigemFiscal' => $_POST['cmbOrigemFiscal'] == '#' ? null : $_POST['cmbOrigemFiscal'],
+						':iCest' => $_POST['inputCest'] == '' ? null : $_POST['inputCest'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iProduto' => $_POST['inputProdutoId']
 						));
+		
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Produto alterado!!!";
@@ -86,7 +87,9 @@ if(isset($_POST['inputCodigo'])){
 		$_SESSION['msg']['mensagem'] = "Erro ao alterar produto!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		//$result->debugDumpParams();
+		
+		echo 'Error: ' . $e->getMessage();		
 		exit;
 	}
 	
@@ -106,20 +109,85 @@ if(isset($_POST['inputCodigo'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-
-	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
-	
-	<script src="global_assets/js/lamparinas/custom.js"></script>	
 	<!-- /theme JS files -->	
+
+	<!-- Adicionando Javascript -->
+    <script type="text/javascript" >
+		
+		//Ao carregar a página tive que executar o que o onChange() executa para que a combo da SubCategoria já venha filtrada, além de selecionada, é claro.
+		window.onload = function(){
+
+			var cmbSubCategoria = $('#cmbSubCategoria').val();
+			
+			Filtrando();
+			
+			var cmbCategoria = $('#cmbCategoria').val();
+
+			$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+				
+				var option = '<option>Selecione a SubCategoria</option>';
+				
+				if (dados.length){						
+					
+					$.each(dados, function(i, obj){
+
+						if(obj.SbCatId == cmbSubCategoria){							
+							option += '<option value="'+obj.SbCatId+'" selected>'+obj.SbCatNome+'</option>';
+						} else {							
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						}
+					});
+					
+					$('#cmbSubCategoria').html(option).show();
+				} else {
+					Reset();
+				}					
+			});
+		}	
+
+
+        $(document).ready(function() {	
+	
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function(e){
+				
+				Filtrando();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option>Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						Reset();
+					}					
+				});
+			});			
+		});
+		
+		function Filtrando(){
+			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+		}
+		
+		function Reset(){
+			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+		}
+
+	</script>
 		
 </head>
 
@@ -200,9 +268,9 @@ if(isset($_POST['inputCodigo'])){
 														 WHERE CategStatus = 1 and CategEmpresa = ". $_SESSION['EmpreId'] ."
 														 ORDER BY CategNome ASC");
 												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 												
-												foreach ($row as $item){
+												foreach ($rowCategoria as $item){
 													$seleciona = $item['CategId'] == $row['ProduCategoria'] ? "selected" : "";
 													print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
 												}
@@ -223,9 +291,9 @@ if(isset($_POST['inputCodigo'])){
 														 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
 														 ORDER BY SbCatNome ASC");
 												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 												
-												foreach ($row as $item){
+												foreach ($rowSubCategoria as $item){
 													$seleciona = $item['SbCatId'] == $row['ProduSubCategoria'] ? "selected" : "";
 													print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
 												}
@@ -240,7 +308,7 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputValorCusto">Valor de Custo</label>
-										<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="<?php echo $valorCusto; ?>">
+										<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="<?php echo $valorCusto; ?>" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>
 								
@@ -255,9 +323,9 @@ if(isset($_POST['inputCodigo'])){
 														 WHERE MarcaStatus = 1 and MarcaEmpresa = ". $_SESSION['EmpreId'] ."
 														 ORDER BY MarcaNome ASC");
 												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												$rowMarca = $result->fetchAll(PDO::FETCH_ASSOC);
 												
-												foreach ($row as $item){
+												foreach ($rowMarca as $item){
 													$seleciona = $item['MarcaId'] == $row['ProduMarca'] ? "selected" : "";
 													print('<option value="'.$item['MarcaId'].'" '. $seleciona .'>'.$item['MarcaNome'].'</option>');
 												}
@@ -272,7 +340,7 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputDespesasAcessorias">Despesas Acessórias</label>
-										<input type="text" id="inputDespesasAcessorias" name="inputDespesasAcessorias" class="form-control" placeholder="Despesas Acessorias" value="<?php echo $despesasAcessorias; ?>">
+										<input type="text" id="inputDespesasAcessorias" name="inputDespesasAcessorias" class="form-control" placeholder="Despesas Acessorias" value="<?php echo $despesasAcessorias; ?>" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>
 								
@@ -287,9 +355,9 @@ if(isset($_POST['inputCodigo'])){
 														 WHERE ModelStatus = 1 and ModelEmpresa = ". $_SESSION['EmpreId'] ."
 														 ORDER BY ModelNome ASC");
 												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												$rowModelo = $result->fetchAll(PDO::FETCH_ASSOC);
 												
-												foreach ($row as $item){
+												foreach ($rowModelo as $item){
 													$seleciona = $item['ModelId'] == $row['ProduModelo'] ? "selected" : "";
 													print('<option value="'.$item['ModelId'].'" '. $seleciona .'>'.$item['ModelNome'].'</option>');
 												}
@@ -304,7 +372,7 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputOutrasDespesas">Outras Despesas</label>
-										<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" value="<?php echo $outrasDespesas; ?>">
+										<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" value="<?php echo $outrasDespesas; ?>" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>
 
@@ -320,14 +388,14 @@ if(isset($_POST['inputCodigo'])){
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputCustoFinal">Custo Final</label>
-										<input type="text" id="inputCustoFinal" name="inputCustoFinal" class="form-control" placeholder="Custo Final" value="<?php echo $custoFinal; ?>">
+										<input type="text" id="inputCustoFinal" name="inputCustoFinal" class="form-control" placeholder="Custo Final" value="<?php echo $custoFinal; ?>" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>
 
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputValorVenda">Valor de Venda</label>
-										<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" value="<?php echo $valorVenda; ?>">
+										<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" value="<?php echo $valorVenda; ?>" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>
 								
@@ -342,9 +410,9 @@ if(isset($_POST['inputCodigo'])){
 														 WHERE FabriStatus = 1 and FabriEmpresa = ". $_SESSION['EmpreId'] ."
 														 ORDER BY FabriNome ASC");
 												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												$rowFabricante = $result->fetchAll(PDO::FETCH_ASSOC);
 												
-												foreach ($row as $item){
+												foreach ($rowFabricante as $item){
 													$seleciona = $item['FabriId'] == $row['ProduFabricante'] ? "selected" : "";
 													print('<option value="'.$item['FabriId'].'" '. $seleciona .'>'.$item['FabriNome'].'</option>');
 												}
@@ -371,10 +439,11 @@ if(isset($_POST['inputCodigo'])){
 															 WHERE UnMedStatus = 1
 															 ORDER BY UnMedNome ASC");
 													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$rowUnidadeMedida = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($row as $item){
-														print('<option value="'.$item['UnMedId'].'">'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
+													foreach ($rowUnidadeMedida as $item){
+														$seleciona = $item['UnMedId'] == $row['ProduUnidadeMedida'] ? "selected" : "";
+														print('<option value="'.$item['UnMedId'].'" '. $seleciona .'>'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
 													}
 												
 												?>
@@ -391,10 +460,11 @@ if(isset($_POST['inputCodigo'])){
 															 WHERE TpFisStatus = 1
 															 ORDER BY TpFisNome ASC");
 													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$rowTipoFiscal = $result->fetchAll(PDO::FETCH_ASSOC);
 													
-													foreach ($row as $item){
-														print('<option value="'.$item['TpFisId'].'">'.$item['TpFisNome'].'</option>');
+													foreach ($rowTipoFiscal as $item){
+														$seleciona = $item['TpFisId'] == $row['ProduTipoFiscal'] ? "selected" : "";
+														print('<option value="'.$item['TpFisId'].'" '. $seleciona .'>'.$item['TpFisNome'].'</option>');
 													}
 												
 												?>
@@ -411,10 +481,10 @@ if(isset($_POST['inputCodigo'])){
 															 WHERE OrFisStatus = 1
 															 ORDER BY OrFisNome ASC");
 													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$rowOrigemFiscal = $result->fetchAll(PDO::FETCH_ASSOC);
 													
-													foreach ($row as $item){
-														$seleciona = $item['OrFisNome'] == 'Nacional' ? "selected" : "";
+													foreach ($rowOrigemFiscal as $item){
+														$seleciona = $item['OrFisId'] == $row['ProduOrigemFiscal'] ? "selected" : "";
 														print('<option value="'.$item['OrFisId'].'" '.$seleciona.'>'.$item['OrFisNome'].'</option>');
 													}
 												
@@ -441,9 +511,10 @@ if(isset($_POST['inputCodigo'])){
 															 WHERE BancoStatus = 1
 															 ORDER BY BancoCodigo ASC");
 													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$rowNcmFiscal = $result->fetchAll(PDO::FETCH_ASSOC);
 													
-													foreach ($row as $item){
+													foreach ($rowNcmFiscal as $item){
+														$seleciona = $item['BancoId'] == $row['ProduBanco'] ? "selected" : "";
 														print('<option value="'.$item['BancoId'].'">'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
 													}
 												
