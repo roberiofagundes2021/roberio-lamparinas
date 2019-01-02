@@ -2,23 +2,37 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Editar Inventario';
+$_SESSION['PaginaAtual'] = 'Editar Inventário';
 
 include('global_assets/php/conexao.php');
 
-//Se veio do fornecedor.php
+//Se veio do inventario.php
 if(isset($_POST['inputInventarioId'])){
 	
 	$iInventario = $_POST['inputInventarioId'];
 	
 	try{
 		
-		$sql = "SELECT InvenId, InvenData, InvenNumero, InvenDataLimite, InvenSolicitante, InvenObservacao
+		$sql = "SELECT InvenId, InvenData, InvenNumero, InvenDataLimite, UsuarNome, UsuarTelefone, UsuarEmail, InvenObservacao
 				FROM Inventario
-				WHERE ForneId = $iInventario ";
+				JOIN Usuario on UsuarId = InvenSolicitante
+				WHERE InvenId = $iInventario ";
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);
-						
+		
+		
+		//Locais para esse inventário
+		$sql = ("SELECT LcEstId, LcEstNome
+				 FROM LocalEstoque
+				 JOIN InventarioXLocalEstoque on InXLELocal = LcEstId
+				 WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ." and InXLEInventario = ". $iInventario ." and LcEstStatus = 1
+				 ORDER BY LcEstNome ASC");
+		$result = $conn->query("$sql");
+		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($rowBD as $item){
+			$aLocaisEstoque[] = $item['LcEstId'];
+		}		
+					
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
 	}
@@ -30,13 +44,13 @@ if(isset($_POST['inputInventarioId'])){
 	irpara("inventario.php");
 }
 
-if(isset($_POST['inputTipo'])){	
+if(isset($_POST['inputData'])){	
 		
 	try{
 		
 		$sql = "UPDATE Inventario SET InvenData = :dData, InvenNumero = :sNumero, InvenDataLimite = :dDataLimite,
 									  InvenSolicitante = :iSolicitante, InvenObservacao = :sObservacao, 
-									  InvenSituacao = :iSituacao, InvenUsuarioAtualizador = :iUsuarioAtualizador
+									  InvenUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE InvenId = :iInventario";
 		$result = $conn->prepare($sql);
 		
@@ -48,9 +62,7 @@ if(isset($_POST['inputTipo'])){
 						':dDataLimite' => gravaData($_POST['inputDataLimite']),
 						':iSolicitante' => $_SESSION['UsuarId'],
 						':sObservacao' => $_POST['txtObservacao'],
-						':iSituacao' => $iSituacao,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],						
 						':iInventario'	=> $_POST['inputInventarioId']
 						));
 
@@ -193,7 +205,7 @@ if(isset($_POST['inputTipo'])){
 					
 					<form name="formInventario" id="formInventario" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Inventário "<?php echo $row['InvenNome']; ?></h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Inventário Nº <?php echo $row['InvenNumero']; ?></h5>
 						</div>
 						
 						<input type="hidden" id="inputInventarioId" name="inputInventarioId" value="<?php echo $row['InvenId']; ?>" >
@@ -231,16 +243,19 @@ if(isset($_POST['inputTipo'])){
 										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" data-fouc>
 											<?php 
 												$sql = ("SELECT LcEstId, LcEstNome
-														 FROM LocalEstoque															     
+														 FROM LocalEstoque														 
 														 WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ." and LcEstStatus = 1
 														 ORDER BY LcEstNome ASC");
 												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
+												$count = count($rowLocal);
 												
-												foreach ($row as $item){															
-													print('<option value="'.$item['LcEstId'].'">'.$item['LcEstNome'].'</option>');
+												if($count){
+													foreach ($rowLocal as $item){
+														$seleciona = in_array($item['LcEstId'], $aLocaisEstoque) ? "selected" : "";
+														print('<option value="'.$item['LcEstId'].'" '. $seleciona .'>'.$item['LcEstNome'].'</option>');
+													}
 												}
-											
 											?>
 										</select>
 									</div>
@@ -256,21 +271,21 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputNomeSolicitante">Solicitante</label>
-												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly>
+												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $row['UsuarNome']; ?>" readOnly>
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputEmailSolicitante">E-mail</label>
-												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarEmail']; ?>" readOnly>
+												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $row['UsuarEmail']; ?>" readOnly>
 											</div>
 										</div>									
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputTelefoneSolicitante">Telefone</label>
-												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarTelefone']; ?>" readOnly>
+												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $row['UsuarTelefone']; ?>" readOnly>
 											</div>
 										</div>									
 									</div>
@@ -279,7 +294,7 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtObservacao">Observação</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtObservacao" name="txtObservacao" placeholder="Observação">value="<?php echo $row['InvenObservacao']; ?>"</textarea>
+												<textarea rows="5" cols="5" class="form-control" id="txtObservacao" name="txtObservacao" placeholder="Observação"><?php echo $row['InvenObservacao']; ?></textarea>
 											</div>
 										</div>
 									</div>

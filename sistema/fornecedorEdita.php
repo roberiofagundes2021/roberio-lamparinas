@@ -617,7 +617,7 @@ if(isset($_POST['inputTipo'])){
 												if (isset($row['ForneCategoria'])){
 													$sql = ("SELECT SbCatId, SbCatNome
 															 FROM SubCategoria														 
-															 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['ForneCategoria']."
+															 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['ForneCategoria']." and SbCatStatus = 1
 															 ORDER BY SbCatNome ASC");
 													$result = $conn->query("$sql");
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

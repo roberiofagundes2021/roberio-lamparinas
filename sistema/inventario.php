@@ -47,18 +47,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	
 	<script>
 		
-		function atualizaInventario(InvenId, InvenStatus, Tipo){
+		function atualizaInventario(InvenId, Tipo){
 
 			document.getElementById('inputInventarioId').value = InvenId;
-			document.getElementById('inputInventarioStatus').value = InvenStatus;
 				
 			if (Tipo == 'edita'){	
 				document.formInventario.action = "inventarioEdita.php";		
 			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formInventario, "Tem certeza que deseja excluir esse inventário?", "inventarioExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formInventario.action = "inventarioMudaSituacao.php";
-			}
+			} 
 			
 			document.formInventario.submit();
 		}
@@ -108,12 +105,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th>Data</th>
-										<th>Nº Inventário</th>
-										<th>Locais do Estoque</th>
-										<th>Responsável</th>
-										<th>Situação</th>
-										<th class="text-center">Ações</th>
+										<th width="10%">Data</th>
+										<th width="15%">Nº Inventário</th>
+										<th width="35%">Locais do Estoque</th>
+										<th width="20%">Responsável</th>
+										<th width="10%">Situação</th>
+										<th width="10%" class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -131,13 +128,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>Presidente</td>'
 										);
 										
-										print('<td><a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['SituaNome'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>');
 																				
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['SituaNome'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['SituaNome'].', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>														
+														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
