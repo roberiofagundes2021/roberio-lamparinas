@@ -11,6 +11,7 @@ $sql = ("SELECT InvenId, InvenData, InvenNumero, SituaNome, SituaChave, LcEstNom
 		 JOIN Situacao on SituaId = InvenSituacao
 		 LEFT JOIN InventarioXLocalEstoque on InXLEInventario = InvenId
 		 JOIN LocalEstoque on LcEstId = InXLELocal
+		 LEFT JOIN InventarioXEquipe on InXEqInventario = InvenId
 		 WHERE InvenEmpresa = ".$_SESSION['EmpreId']."
 		 ORDER BY InvenData DESC"); 
 $result = $conn->query($sql);

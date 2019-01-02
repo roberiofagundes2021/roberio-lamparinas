@@ -62,6 +62,30 @@ if(isset($_POST['inputData'])){
 									));
 				}
 				
+			} catch(PDOException $e) {
+				$conn->rollback();
+				echo 'Error: ' . $e->getMessage();exit;
+			}
+		}
+
+		if ($_POST['cmbEquipe']){
+			
+			try{
+				$sql = "INSERT INTO InventarioXEquipe 
+							(InXEqInventario, InXEqUsuario, InXEqPresidente)
+						VALUES 
+							(:iInventario, :iUsuario, :bPresidente)";
+				$result = $conn->prepare($sql);
+
+				foreach ($_POST['cmbEquipe'] as $key => $value){
+
+					$result->execute(array(
+									':iInventario' => $insertId,
+									':iUsuario' => $value,
+									':bPresidente' => $value == $_POST['cmbPresidente'] ? 1 : 0
+									));
+				}
+				
 				$conn->commit();
 				
 			} catch(PDOException $e) {
@@ -150,6 +174,44 @@ if(isset($_POST['inputData'])){
 			}); // enviar
 
             
+			//Ao mudar a Equipe, filtra o possível presidente via ajax (retorno via JSON)
+			$('#cmbEquipe').on('change', function(e){
+						
+				var cmbEquipe = $('#cmbEquipe').val();
+				
+				//Esse IF é para quando se exclui todos que estavam selecionados entrar no ELSE e limpar a combo do Presidente
+				if (cmbEquipe != ''){
+					
+					$.getJSON('filtraPresidente.php?aEquipe='+cmbEquipe, function (dados){
+
+						var option = '';
+
+						if (dados.length){
+							
+							$.each(dados, function(i, obj){
+								option += '<option value="'+obj.UsuarId+'">'+obj.UsuarLogin+'</option>';
+							});						
+							
+							$('#cmbPresidente').html(option).show();
+						} else {
+							ResetPresidente();
+						}					
+					});
+				} else {
+					ResetPresidente();						
+				}				
+			});	
+						
+			
+			//Mostra o "Filtrando..." na combo Presidente da Comissão
+			function FiltraPresidente(){
+				$('#cmbPresidente').empty().append('<option>Filtrando...</option>');
+			}			
+			
+			function ResetPresidente(){
+				$('#cmbPresidente').empty().append('<option value="#">Nenhum</option>');
+			}			
+			
         }); // document.ready
        
 
@@ -218,9 +280,9 @@ if(isset($_POST['inputData'])){
 														 WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ." and LcEstStatus = 1
 														 ORDER BY LcEstNome ASC");
 												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
 												
-												foreach ($row as $item){															
+												foreach ($rowLocal as $item){															
 													print('<option value="'.$item['LcEstId'].'">'.$item['LcEstNome'].'</option>');
 												}
 											
@@ -230,6 +292,43 @@ if(isset($_POST['inputData'])){
 								</div>
 							</div>
 							<br>
+
+							<h5 class="mb-0 font-weight-semibold">Comissão de Inventário</h5>
+							<br>							
+							<div class="row">
+								<div class="col-lg-9">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
+										<label for="cmbEquipe">Equipe Responsável</label>
+										<select id="cmbEquipe" name="cmbEquipe[]" class="form-control select" multiple="multiple" data-fouc>
+											<?php 
+												$sql = ("SELECT UsuarId, UsuarLogin
+														 FROM Usuario
+														 JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+														 WHERE EXUXPEmpresa = ". $_SESSION['EmpreId'] ." and EXUXPStatus = 1
+														 ORDER BY UsuarLogin ASC");
+												$result = $conn->query("$sql");
+												$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($rowEquipe as $item){															
+													print('<option value="'.$item['UsuarId'].'">'.$item['UsuarLogin'].'</option>');
+												}
+											
+											?>
+										</select>
+									</div>
+								</div>
+								
+								<div class="col-lg-3">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
+										<label for="cmbPresidente">Presidente da Comissão</label>
+										<select id="cmbPresidente" name="cmbPresidente" class="form-control form-control-select2">
+											<option value="#">Nenhum</option>
+										</select>
+									</div>
+								</div>								
+							</div>
+							<br>
+							
 							
 							<div class="row">
 								<div class="col-lg-12">									

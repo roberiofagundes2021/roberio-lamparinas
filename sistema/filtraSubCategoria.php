@@ -6,7 +6,7 @@ include('global_assets/php/conexao.php');
 
 $sql = ("SELECT SbCatId, SbCatNome
 		 FROM SubCategoria
-		 WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and SbCatCategoria = '". $_GET['idCategoria']."'");
+		 WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and SbCatCategoria = '". $_GET['idCategoria']."' and SbCatStatus = 1");
 
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
