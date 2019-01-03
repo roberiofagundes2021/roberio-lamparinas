@@ -17,22 +17,29 @@ if(isset($_POST['inputData'])){
 		
 	try{
 			
-		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamLote, OrcamCategoria, OrcamConteudo, OrcamFornecedor,
+		for ($i=0; $i < $_POST['inputNumItens']; $i++) {
+		
+			$campo = 'campo'.$i;
+			//echo $campo;
+			echo "Teste: ".$_POST[$campo];  ///???????
+		}
+		
+		die;
+		
+		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamLote, OrcamCategoria, OrcamSubCategoria, OrcamConteudo, OrcamFornecedor,
 									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador)
-				VALUES (:sNumero, :sTipo, :dData, :sLote, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, :bStatus, :iUsuarioAtualizador)";
+				VALUES (:sNumero, :sTipo, :dData, :sLote, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :iSolicitante, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
-		
-		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
-		$iFornecedor = $aFornecedor[0];
-		
+				
 		$result->execute(array(
 						':sNumero' => date()."/".$_POST['inputLote'],
 						':sTipo' => $_POST['radioTipo'] == "on" ? "P" : "S",  //refazer isso
 						':dData' => gravaData($_POST['inputData']),
 						':sLote' => $_POST['inputLote'],
 						':iCategoria' => $_POST['cmbCategoria'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
-						':iFornecedor' => $iFornecedor,
+						':iFornecedor' => $_POST['cmbFornecedor'], //explode nisso
 						':iSolicitante' => $_SESSION['UsuarId'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']
@@ -82,6 +89,75 @@ if(isset($_POST['inputData'])){
     <script type="text/javascript" >
 
         $(document).ready(function() {	
+	
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function(e){
+				
+				Filtrando();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option value="#">Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});
+				
+				$.getJSON('filtraProduto.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option>Selecione o Produto</option>';
+					
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
+						});						
+						
+						$('#cmbProduto').html(option).show();
+					} else {
+						ResetProduto();
+					}					
+				});				
+				
+			});	
+			
+			
+			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
+			$('#cmbSubCategoria').on('change', function(e){
+				
+				FiltraProduto();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
+				
+				$.getJSON('filtraProduto.php?idCategoria='+cmbCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){
+					
+					var option = '<option>Selecione o Produto</option>';
+
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
+						});						
+						
+						$('#cmbProduto').html(option).show();
+					} else {
+						ResetProduto();
+					}					
+				});				
+				
+			});	
+			
 			
 			//Ao informar o fornecedor, trazer os demais dados dele (contato, e-mail, telefone)
 			$('#cmbFornecedor').on('change', function(e){				
@@ -97,9 +173,64 @@ if(isset($_POST['inputData'])){
 					$('#inputTelefoneFornecedor').val(Forne[4]);
 				}
 			});
+			
+			$('#btnAdicionar').click(function(){
+				
+				var inputNumItens = $('#inputNumItens').val();
+				var cmbProduto = $('#cmbProduto').val();
+				var inputQuantidade = $('#inputQuantidade').val();	
+				
+				var resNumItens = parseInt(inputNumItens) + 1;		
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "orcamentoAddProduto.php",
+					data: {numItens: resNumItens, idProduto: cmbProduto, quantidade: inputQuantidade},
+					success: function(resposta){
 						
+						//alert(resposta);
+						//return false;
+											
+						var newRow = $("<tr>");
+						
+						newRow.append(resposta);	    
+						$("#tabelaProdutos").append(newRow);
+												
+						//Adiciona mais um item nessa contagem
+						$('#inputNumItens').val(resNumItens);
+						$('#cmbProduto').val("#").change();						
+						$('#inputQuantidade').val('');
+						
+						$('#inputProdutos').append('<input type="text" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+cmbProduto+'#'+inputQuantidade+'">');
+						
+						return false;
+						
+					}
+				})	
+			}); //click
+			
 		}); //document.ready
-							
+		
+		//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
+        function Filtrando(){
+			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+			FiltraProduto();
+		}		
+		
+		//Mostra o "Filtrando..." na combo Produto
+        function FiltraProduto(){
+			$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+		}		
+		
+		function ResetSubCategoria(){
+			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+		}
+		
+		function ResetProduto(){
+			$('#cmbProduto').empty().append('<option>Sem produto</option>');
+		}		
+					
 	</script>
 
 </head>
@@ -124,34 +255,34 @@ if(isset($_POST['inputData'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formOrcamento" id="formOrcamento" method="post" class="form-validate" action="orcamentoNovo.php">
+					<form name="formOrcamento" method="post" class="form-validate" action="orcamentoNovo.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Orçamento</h5>
 						</div>
 						
 						<div class="card-body">								
+							<div class="row">
+								<div class="col-lg-4">
+									<div class="form-group">							
+										<div class="form-check form-check-inline">
+											<label class="form-check-label">
+												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" checked data-fouc>
+												Produto
+											</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<label class="form-check-label">
+												<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" data-fouc>
+												Serviço
+											</label>
+										</div>										
+									</div>
+								</div>
+							</div>
 								
 							<div class="row">				
 								<div class="col-lg-12">
 									<div class="row">
-										
-										<div class="col-lg-3">
-											<div class="form-group">							
-												<div class="form-check form-check-inline">
-													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" checked data-fouc>
-														Produto
-													</label>
-												</div>
-												<div class="form-check form-check-inline">
-													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" data-fouc>
-														Serviço
-													</label>
-												</div>										
-											</div>
-										</div>										
-										
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputData">Data</label>
@@ -166,7 +297,7 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 										
-										<div class="col-lg-5">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
@@ -188,6 +319,27 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbSubCategoria">SubCategoria</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+													/*	$sql = ("SELECT SbCatId, SbCatNome
+																 FROM SubCategoria
+																 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
+															     ORDER BY SbCatNome ASC");
+														$result = $conn->query("$sql");
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($row as $item){
+															print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
+														}
+													*/
+													?>
+												</select>
+											</div>
+										</div>										
 									</div>
 								</div>
 							</div>
@@ -253,7 +405,86 @@ if(isset($_POST['inputData'])){
 								</div>
 							</div>
 							<br>
+							
+							<div class="row">
+								<div class="col-lg-12">									
+									<h5 class="mb-0 font-weight-semibold">Dados dos Produtos</h5>
+									<br>
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbProduto">Produto</label>
+												<select id="cmbProduto" name="cmbProduto" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+													/*	$sql = ("SELECT ProduId, ProduNome
+																 FROM Produto				     
+																 WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1
+															     ORDER BY ProduNome ASC");
+														$result = $conn->query("$sql");
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
+														foreach ($row as $item){															
+															print('<option value="'.$item['ProduId'].'">'.$item['ProduNome'].'</option>');
+														}
+													*/
+													?>
+												</select>
+											</div>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputQuantidade">Quantidade</label>
+												<input type="text" id="inputQuantidade" name="inputQuantidade" class="form-control">												
+											</div>
+										</div>
+										
+										<div class="col-lg-3">
+											<div class="form-group">												
+												<button type="button" id="btnAdicionar" class="btn btn-lg btn-success" style="margin-top:20px;">Adicionar</button>
+												<!--<button id="adicionar" type="button">Teste</button>-->
+											</div>
+										</div>										
+									</div>
+								</div>
+							</div>						
+							
+							<div id="inputProdutos">
+								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
+							</div>
+							
+							<div class="row">
+								<div class="col-lg-12">	
+										<table class="table" id="tabelaProdutos">
+											<thead>
+												<tr class="bg-slate">
+													<th width="5%">Item</th>
+													<th width="40%">Produto</th>
+													<th width="14%">Unidade Medida</th>
+													<th width="8%">Quantidade</th>
+													<th width="14%">Valor Unitário</th>
+													<th width="14%">Valor Total</th>
+													<th width="5%" class="text-center">Ações</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr style="display:none;">
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+												</tr>
+											</tbody>
+										</table>
+								</div>
+							</div>							
+							<br>
+							<br>
+							
 							<div class="row">
 								<div class="col-lg-12">									
 									<h5 class="mb-0 font-weight-semibold">Dados do Solicitante</h5>

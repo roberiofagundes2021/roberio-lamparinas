@@ -329,7 +329,6 @@ if(isset($_POST['inputData'])){
 							</div>
 							<br>
 							
-							
 							<div class="row">
 								<div class="col-lg-12">									
 									<h5 class="mb-0 font-weight-semibold">Dados do Solicitante</h5>

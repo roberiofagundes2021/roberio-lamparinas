@@ -197,6 +197,28 @@ if(isset($_POST['inputCpf'])){
 									</div>
 								</div>
 							</div>
+
+							<h5 class="mb-0 font-weight-semibold">Unidade</h5>
+							<br>
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="row">
+										<div class="col-lg-4">
+											<div class="form-group">
+												<!--<label for="inputSetor">Setor</label>-->
+												<select name="cmbSetor" class="form-control form-control-select2" required>
+													<option value="0">Informe uma unidade</option>
+													<?php
+														foreach ($rowPerfil as $item){
+															print('<option value="'.$item['PerfiId'].'">'.$item['PerfiNome'].'</option>');
+														}	
+													?>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 							
 							<h5 class="mb-0 font-weight-semibold">Setor</h5>
 							<br>
