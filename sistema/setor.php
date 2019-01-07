@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Licença';
+$_SESSION['PaginaAtual'] = 'Setor';
 
 include('global_assets/php/conexao.php');
 
@@ -10,12 +10,11 @@ if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
 
-$sql = ("SELECT LicenId, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenStatus, EmpreNomeFantasia
-		 FROM Licenca
-		 JOIN Empresa on EmpreId = LicenEmpresa
-		 WHERE EmpreId = ".$_SESSION['EmpresaId']."
-		 ORDER BY LicenDtInicio DESC"); 
-$result = $conn->query($sql);
+$sql = ("SELECT SetorId, SetorNome, SetorStatus
+		 FROM Setor
+	     WHERE SetorEmpresa = ". $_SESSION['EmpresaId'] ."
+		 ORDER BY SetorNome ASC");
+$result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -27,7 +26,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Licenças</title>
+	<title>Lamparinas | Setor</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -46,26 +45,31 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>		
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<!-- /theme JS files -->	
 	
-	<script>
+	<script language ="javascript">
+			
+		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
+		function atualizaSetor(SetorId, SetorNome, SetorStatus, Tipo){
 		
-		function atualizaLicenca(LicenId, LicenStatus, Tipo){
-
-			document.getElementById('inputLicencaId').value = LicenId;
-			document.getElementById('inputLicencaStatus').value = LicenStatus;
-				
+			document.getElementById('inputSetorId').value = SetorId;
+			document.getElementById('inputSetorNome').value = SetorNome;
+			document.getElementById('inputSetorStatus').value = SetorStatus;
+					
 			if (Tipo == 'edita'){	
-				document.formLicenca.action = "licencaEdita.php";		
+				document.formSetor.action = "setorEdita.php";		
 			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formLicenca, "Tem certeza que deseja excluir essa licença?", "licencaExclui.php");
+				confirmaExclusao(document.formSetor, "Tem certeza que deseja excluir esse setor?", "setorExclui.php");
 			} else if (Tipo == 'mudaStatus'){
-				document.formLicenca.action = "licencaMudaSituacao.php";
+				document.formSetor.action = "setorMudaSituacao.php";
+			} else if (Tipo == 'imprime'){
+				document.formSetor.action = "setorImprime.php";
+				document.formSetor.setAttribute("target", "_blank");
 			}
 			
-			document.formLicenca.submit();
-		}
+			document.formSetor.submit();
+		}		
 			
 	</script>
 
@@ -79,9 +83,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<div class="page-content">
 		
 		<?php include_once("menu-left.php"); ?>
-
-		<?php include_once("menuLeftSecundario.php"); ?>
 		
+		<?php include_once("menuLeftSecundario.php"); ?>		
+
 		<!-- Main content -->
 		<div class="content-wrapper">
 
@@ -96,52 +100,48 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h5 class="card-title">Relação das Licenças</h5>
+								<h3 class="card-title">Relação de Setores</h3>
 								<div class="header-elements">
 									<div class="list-icons">
-										<a href="empresa.php" class="icon-backward2"> Voltar</a>
-										<!--<a class="list-icons-item" data-action="collapse"></a>-->
-										<!--<a href="empresa.php" class="list-icons-item" data-action="reload"></a>-->
+										<a class="list-icons-item" data-action="collapse"></a>
+										<a href="setor.php" class="list-icons-item" data-action="reload"></a>
 										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
 							</div>
 
 							<div class="card-body">
-								As licenças abaixo são da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b>.
-								<div class="text-right"><a href="licencaNovo.php" class="btn btn-success" role="button">Nova Licença</a></div>
-							</div>							
-
+								<p class="font-size-lg">A relação abaixo faz referência aos setores da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>
+								<div class="text-right"><a href="setorNovo.php" class="btn btn-success" role="button">Novo Setor</a></div>
+							</div>
+							
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th>Data Início</th>
-										<th>Data Fim</th>
-										<th>Limite Usuários</th>
-										<th>Situação</th>
-										<th class="text-center">Ações</th>
+										<th width="70%">Setor</th>
+										<th width="15%">Situação</th>
+										<th width="15%" class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['LicenStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['LicenStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SetorStatus'] ? 'Ativo' : 'Inativo';
+										$situacaoClasse = $item['SetorStatus'] ? 'badge-success' : 'badge-secondary';
 										
 										print('
 										<tr>
-											<td>'.mostraData($item['LicenDtInicio']).'</td>
-											<td>'.mostraData($item['LicenDtFim']).'</td>
-											<td>'.$item['LicenLimiteUsuarios'].'</td>');
+											<td>'.$item['SetorNome'].'</td>
+											');
 										
-										print('<td><a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
-																				
+										print('<td><a href="#" onclick="atualizaSetor('.$item['SetorId'].', \''.$item['SetorNome'].'\','.$item['SetorStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>														
+														<a href="#" onclick="atualizaSetor('.$item['SetorId'].', \''.$item['SetorNome'].'\','.$item['SetorStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaSetor('.$item['SetorId'].', \''.$item['SetorNome'].'\','.$item['SetorStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>							
 													</div>
 												</div>
 											</td>
@@ -159,14 +159,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<!-- /info blocks -->
 				
-				<form name="formLicenca" method="post" action="licencaEdita.php">
-					<input type="hidden" id="inputLicencaId" name="inputLicencaId" >
-					<input type="hidden" id="inputLicencaStatus" name="inputLicencaStatus" >
+				<form name="formSetor" method="post">
+					<input type="hidden" id="inputSetorId" name="inputSetorId" >
+					<input type="hidden" id="inputSetorNome" name="inputSetorNome" >
+					<input type="hidden" id="inputSetorStatus" name="inputSetorStatus" >
 				</form>
 
 			</div>
 			<!-- /content area -->
-
+			
 			<?php include_once("footer.php"); ?>
 
 		</div>
@@ -174,8 +175,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	</div>
 	<!-- /page content -->
-	
+
 	<?php include_once("alerta.php"); ?>
 
 </body>
+
 </html>

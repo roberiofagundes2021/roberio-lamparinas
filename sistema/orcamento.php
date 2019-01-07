@@ -6,9 +6,10 @@ $_SESSION['PaginaAtual'] = 'Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT OrcamId, OrcamData, ForneNome, ForneTelefone, ForneCelular, OrcamStatus
+$sql = ("SELECT OrcamId, OrcamNumero, OrcamData, ForneNome, CategNome, OrcamStatus
 		 FROM Orcamento
 		 JOIN Fornecedor on ForneId = OrcamFornecedor
+		 JOIN Categoria on CategId = OrcamCategoria
 	     WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ."
 		 ORDER BY OrcamData DESC");
 $result = $conn->query("$sql");
@@ -44,11 +45,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script>
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaOrcamento(ForneId, ForneNome, ForneStatus, Tipo){
+		function atualizaOrcamento(OrcamId, OrcamNumero, OrcamStatus, Tipo){
 		
-			document.getElementById('inputOrcamentoId').value = ForneId;
-			document.getElementById('inputOrcamentoNome').value = ForneNome;
-			document.getElementById('inputOrcamentoStatus').value = ForneStatus;
+			document.getElementById('inputOrcamentoId').value = OrcamId;
+			document.getElementById('inputOrcamentoNumero').value = OrcamNumero;
+			document.getElementById('inputOrcamentoStatus').value = OrcamStatus;
 					
 			if (Tipo == 'edita'){	
 				document.formOrcamento.action = "orcamentoEdita.php";		
@@ -106,12 +107,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th>Data</th>
-										<th>Nº Orçamento</th>
-										<th>Fornecedor</th>
-										<th>Telefone</th>
-										<th>Situação</th>
-										<th class="text-center">Ações</th>
+										<th width="10%">Data</th>
+										<th width="14%">Nº Orçamento</th>
+										<th width="28%">Fornecedor</th>
+										<th width="28%">Categoria</th>
+										<th width="10%">Situação</th>
+										<th width="10%" class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -121,23 +122,23 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacao = $item['OrcamStatus'] ? 'Ativo' : 'Inativo';
 										$situacaoClasse = $item['OrcamStatus'] ? 'badge-success' : 'badge-secondary';
 										
-										$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
+										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
 										
 										print('
 										<tr>
-											<td>'.$item['OrcamData'].'</td>
+											<td>'.mostraData($item['OrcamData']).'</td>
 											<td>'.$item['OrcamNumero'].'</td>
 											<td>'.$item['ForneNome'].'</td>
-											<td>'.$telefone.'</td>
+											<td>'.$item['CategNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaOrcamento('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\','.$item['OrcamStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaOrcamento('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaOrcamento('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\','.$item['OrcamStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\','.$item['OrcamStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
@@ -157,7 +158,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<form name="formOrcamento" method="post">
 					<input type="hidden" id="inputOrcamentoId" name="inputOrcamentoId" >
-					<input type="hidden" id="inputOrcamentoNome" name="inputOrcamentoNome" >
+					<input type="hidden" id="inputOrcamentoNumero" name="inputOrcamentoNumero" >
 					<input type="hidden" id="inputOrcamentoStatus" name="inputOrcamentoStatus" >
 				</form>
 

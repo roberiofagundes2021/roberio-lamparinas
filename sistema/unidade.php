@@ -6,9 +6,13 @@ $_SESSION['PaginaAtual'] = 'Unidade';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT UnidaId, UnidaNome, UnidaStatus
+if (!isset($_SESSION['EmpresaId'])) {
+	irpara("empresa.php");
+}
+
+$sql = ("SELECT UnidaId, UnidaNome, UnidaBairro, UnidaCidade, UnidaEstado, UnidaStatus
 		 FROM Unidade
-	     WHERE UnidaEmpresa = ". $_SESSION['EmpreId'] ."
+	     WHERE UnidaEmpresa = ". $_SESSION['EmpresaId'] ."
 		 ORDER BY UnidaNome ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -34,9 +38,19 @@ $count = count($row);
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	
+	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
+	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
+	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
+	<script src="global_assets/js/demo_pages/components_popups.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>		
+	
 	<!-- /theme JS files -->	
 	
-	<script>
+	<script language ="javascript">
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaUnidade(UnidaId, UnidaNome, UnidaStatus, Tipo){
@@ -63,7 +77,7 @@ $count = count($row);
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -71,6 +85,8 @@ $count = count($row);
 	<div class="page-content">
 		
 		<?php include_once("menu-left.php"); ?>
+		
+		<?php include_once("menuLeftSecundario.php"); ?>		
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -97,7 +113,7 @@ $count = count($row);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência às unidades da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência às unidades da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>
 								<div class="text-right"><a href="unidadeNovo.php" class="btn btn-success" role="button">Nova Unidade</a></div>
 							</div>					
 							
@@ -105,9 +121,12 @@ $count = count($row);
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th data-filter>Unidade</th>
-										<th>Situação</th>
-										<th class="text-center">Ações</th>
+										<th width="30%">Unidade</th>
+										<th width="20%">Bairro</th>
+										<th width="20%">Cidade</th>
+										<th width="10%">Estado</th>
+										<th width="10%">Situação</th>
+										<th width="10%" class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -120,6 +139,9 @@ $count = count($row);
 										print('
 										<tr>
 											<td>'.$item['UnidaNome'].'</td>
+											<td>'.$item['UnidaBairro'].'</td>
+											<td>'.$item['UnidaCidade'].'</td>
+											<td>'.$item['UnidaEstado'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaUnidade('.$item['UnidaId'].', \''.$item['UnidaNome'].'\','.$item['UnidaStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

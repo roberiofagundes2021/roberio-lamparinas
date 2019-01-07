@@ -12,8 +12,8 @@
 					url: "menuLeftSecundarioAjax.php",
 					data: ('id='+id+'&nome='+nome),
 					success: function(resposta){
-						
-						if(resposta == 1){
+												
+						if(resposta){
 							location.reload();
 							return false;
 						}
@@ -58,7 +58,7 @@
 												 FROM Empresa
 												 ORDER BY EmpreNomeFantasia ASC");
 										$result = $conn->query("$sql");
-										$rowEmpresa = $result->fetchAll(PDO::FETCH_ASSOC);
+										$rowEmpresa = $result->fetchAll(PDO::FETCH_ASSOC);										
 										
 										foreach ($rowEmpresa as $item){
 											$seleciona = $item['EmpreId'] == $_SESSION['EmpresaId'] ? "selected" : "";
@@ -73,7 +73,6 @@
 				</div>
 				<!-- /sidebar Empresa -->
 
-
 				<!-- Sub navigation -->
 				<div class="card mb-2">
 
@@ -82,6 +81,12 @@
 							<li class="nav-item-header">GERENCIAR EMPRESA</li>
 							<li class="nav-item">
 								<a href="licenca.php" class="nav-link"><i class="icon-certificate"></i> Licença</a>
+							</li>
+							<li class="nav-item">
+								<a href="unidade.php" class="nav-link"><i class="icon-home7"></i> Unidade</a>
+							</li>
+							<li class="nav-item">
+								<a href="setor.php" class="nav-link"><i class="icon-cabinet"></i> Setor</a>
 							</li>
 							<li class="nav-item">
 								<a href="#" class="nav-link">

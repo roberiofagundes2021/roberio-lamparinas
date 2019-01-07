@@ -6,38 +6,38 @@ $_SESSION['PaginaAtual'] = 'Novo Usuário';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT PerfiId, PerfiNome
-		 FROM Perfil
-		 Where PerfiStatus = 1
-		 ORDER BY PerfiNome ASC");
-$result = $conn->query("$sql");
-$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
-//echo $count = count($rowPerfil);
-
-
 if(isset($_POST['inputCpf'])){
 
 	try{
 		
-		$sql = "INSERT INTO Usuario (UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha)
-				VALUES (:sCpf, :sNome, :sLogin, :sSenha)";
+		$sql = "INSERT INTO Usuario (UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular)
+				VALUES (:sCpf, :sNome, :sLogin, :sSenha, :sEmail, :sTelefone, :sCelular)";
 		$result = $conn->prepare($sql);
+		
+		$conn->beginTransaction();
+		
 		$result->execute(array(
 						':sCpf' => $_POST['inputCpf'],
 						':sNome' => $_POST['inputNome'],
 						':sLogin' => $_POST['inputLogin'],
-						':sSenha' => $_POST['inputSenha']
+						':sSenha' => $_POST['inputSenha'],
+						':sEmail' => $_POST['inputEmail'],
+						':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
+						':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular']						
 						));
 		$LAST_ID = $conn->lastInsertId();
 		
 						
-		$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPStatus, EXUXPUsuarioAtualizador)
-				VALUES (:iEmpresa, :iUsuario, :iPerfil, :bStatus, :iUsuarioAtualizador)";
+		$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPUnidade, 
+													EXUXPSetor, EXUXPStatus, EXUXPUsuarioAtualizador)
+				VALUES (:iEmpresa, :iUsuario, :iPerfil, :iUnidade, :iSetor, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 		$result->execute(array(
 						':iEmpresa' => $_SESSION['EmpreId'],
 						':iUsuario' => $LAST_ID,
 						':iPerfil' => $_POST['inputPerfil'],
+						':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
+						':iSetor' => $_POST['cmbSetor'] == '#' ? null : $_POST['cmbSetor'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']
 						));		
@@ -71,15 +71,12 @@ if(isset($_POST['inputCpf'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 	<!-- /theme JS files -->	
 
 </head>
@@ -104,7 +101,7 @@ if(isset($_POST['inputCpf'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formUsuario" method="post" class="form-validate" action="usuarioNovo.php">
+					<form name="formUsuario" id="formUsuario" method="post" class="form-validate" action="usuarioNovo.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Usuário</h5>
 						</div>
@@ -116,7 +113,7 @@ if(isset($_POST['inputCpf'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputCpf">CPF</label>
-												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" maxlength="11" pattern="[0-9]+$" required>
+												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required>
 											</div>
 										</div>
 										<div class="col-lg-7">
@@ -131,6 +128,13 @@ if(isset($_POST['inputCpf'])){
 												<select name="inputPerfil" class="form-control form-control-select2" required>
 													<option value="0">Informe um perfil</option>
 													<?php
+														$sql = ("SELECT PerfiId, PerfiNome
+																 FROM Perfil
+																 Where PerfiStatus = 1
+																 ORDER BY PerfiNome ASC");
+														$result = $conn->query("$sql");
+														$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
+													
 														foreach ($rowPerfil as $item){
 															print('<option value="'.$item['PerfiId'].'">'.$item['PerfiNome'].'</option>');
 														}	
@@ -185,64 +189,72 @@ if(isset($_POST['inputCpf'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputTelefone">Telefone</label>
-												<input type="email" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone">
+												<input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999">
 											</div>
 										</div>
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputCelular">Celular</label>
-												<input type="email" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular">
+												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
 											</div>
 										</div>											
 									</div>
 								</div>
 							</div>
 
-							<h5 class="mb-0 font-weight-semibold">Unidade</h5>
+							<h5 class="mb-0 font-weight-semibold">Lotação</h5>
 							<br>
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="row">
-										<div class="col-lg-4">
+										<div class="col-lg-6">
 											<div class="form-group">
-												<!--<label for="inputSetor">Setor</label>-->
-												<select name="cmbSetor" class="form-control form-control-select2" required>
+												<label for="cmbUnidade">Unidade</label>
+												<select name="cmbUnidade" class="form-control form-control-select2" required>
 													<option value="0">Informe uma unidade</option>
-													<?php
-														foreach ($rowPerfil as $item){
-															print('<option value="'.$item['PerfiId'].'">'.$item['PerfiNome'].'</option>');
-														}	
+													<?php 
+														$sql = ("SELECT UnidaId, UnidaNome
+																 FROM Unidade															     
+																 WHERE UnidaEmpresa = ". $_SESSION['EmpreId'] ." and UnidaStatus = 1
+																 ORDER BY UnidaNome ASC");
+														$result = $conn->query("$sql");
+														$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($rowUnidade as $item){															
+															print('<option value="'.$item['UnidaId'].'">'.$item['UnidaNome'].'</option>');
+														}
+													
 													?>
 												</select>
 											</div>
 										</div>
-									</div>
-								</div>
-							</div>
-							
-							<h5 class="mb-0 font-weight-semibold">Setor</h5>
-							<br>
-							<div class="row">
-								<div class="col-lg-12">
-									<div class="row">
-										<div class="col-lg-4">
+										
+										<div class="col-lg-6">
 											<div class="form-group">
-												<!--<label for="inputSetor">Setor</label>-->
+												<label for="cmbSetor">Setor</label>
 												<select name="cmbSetor" class="form-control form-control-select2" required>
 													<option value="0">Informe um setor</option>
-													<?php
-														foreach ($rowPerfil as $item){
-															print('<option value="'.$item['PerfiId'].'">'.$item['PerfiNome'].'</option>');
-														}	
+													<?php 
+														$sql = ("SELECT SetorId, SetorNome
+																 FROM Setor															     
+																 WHERE SetorEmpresa = ". $_SESSION['EmpreId'] ." and SetorStatus = 1
+																 ORDER BY SetorNome ASC");
+														$result = $conn->query("$sql");
+														$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($rowSetor as $item){															
+															print('<option value="'.$item['SetorId'].'">'.$item['SetorNome'].'</option>');
+														}
+													
 													?>
 												</select>
 											</div>
 										</div>
+										
 									</div>
 								</div>
 							</div>
 							
-
 							<div class="row" style="margin-top: 20px;">
 								<div class="col-lg-12">								
 									<div class="form-group">

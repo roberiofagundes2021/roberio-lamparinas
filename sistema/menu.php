@@ -6,10 +6,7 @@ $_SESSION['PaginaAtual'] = 'Menu';
 
 include('global_assets/php/conexao.php');
 
-if (isset($_POST['inputEmpresaId'])){
-	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
-	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
-} else if (!isset($_SESSION['EmpresaId'])) {
+if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
 

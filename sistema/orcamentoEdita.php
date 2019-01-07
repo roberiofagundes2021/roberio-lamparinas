@@ -2,72 +2,81 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Novo Orçamento';
+$_SESSION['PaginaAtual'] = 'Editar Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
-		 FROM Usuario
-		 Where UsuarId = ".$_SESSION['UsuarId']."
-		 ORDER BY UsuarNome ASC");
-$result = $conn->query("$sql");
-$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
+//Se veio do orcamento.php
+if(isset($_POST['inputOrcamentoId'])){
+	
+	$iOrcamento = $_POST['inputOrcamentoId'];
+	
+	try{
+		
+		$sql = "SELECT OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor, ForneContato, ForneEmail, 
+					   ForneTelefone, ForneCelular, OrcamSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
+				FROM Orcamento
+				JOIN Usuario on UsuarId = OrcamSolicitante
+				JOIN Fornecedor on ForneId = OrcamFornecedor
+				WHERE OrcamId = $iOrcamento ";
+		$result = $conn->query("$sql");
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+								
+	} catch(PDOException $e) {
+		echo 'Error: ' . $e->getMessage();
+	}
+	
+	$_SESSION['msg'] = array();
 
-if(isset($_POST['inputData'])){
+} else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
+
+	irpara("orcamento.php");
+}
+
+
+if(isset($_POST['inputTipo'])){	
 		
 	try{
 		
-		$sql = ("SELECT COUNT(isnull(OrcamNumero,0)) as Numero
-				 FROM Orcamento
-				 Where OrcamEmpresa = ".$_SESSION['EmpreId']."");
-		$result = $conn->query("$sql");
-		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);		
-			
-		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor,
-									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamEmpresa)
-				VALUES (:sNumero, :sTipo, :dData, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
-						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "UPDATE Orcamento SET OrcamTipo = :sTipo, OrcamCategoria = :iCategoria, OrcamConteudo = :sConteudo,
+									 OrcamFornecedor = :iFornecedor, OrcamUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE OrcamId = :iOrcamento";
 		$result = $conn->prepare($sql);
 		
-		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
-		$iFornecedor = $aFornecedor[0];
-		
-		$sNumero = (int)$rowNumero['Numero'] + 1;
+		$conn->beginTransaction();				
 		
 		$result->execute(array(
-						':sNumero' => str_pad($sNumero,6,"0",STR_PAD_LEFT),
 						':sTipo' => $_POST['radioTipo'] == "on" ? "P" : "S",  //refazer isso
-						':dData' => gravaData($_POST['inputData']),
 						':iCategoria' => $_POST['cmbCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iFornecedor' => $iFornecedor,
-						':iSolicitante' => $_SESSION['UsuarId'],
-						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUsuarioAtualizador' => $_SESSION['UsuarId']
 						));
-/*		$insertId = $conn->lastInsertId();
+
+		$sql = "DELETE FROM OrcamentoXProduto
+				WHERE OrXPrOrcamento = :iOrcamento and OrXPrEmpresa = :iEmpresa";
+		$result = $conn->prepare($sql);	
 		
-		$sql = "UPDATE Orcamento SET OrcamNumero = :sNumero
-				WHERE OrcamId = :iOrcamento";
-		$result = $conn->prepare($sql);
-				
 		$result->execute(array(
-						':sNumero' => str_pad($insertId,6,"0",STR_PAD_LEFT);
-						':iOrcamento' => $insertId,
-						));
-*/		
+							':iOrcamento' => $_POST['inputOrcamentoId'],
+							':iEmpresa' => $_SESSION['EmpreId']));
+							
+		$conn->commit();						
+		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Orçamento incluído!!!";
+		$_SESSION['msg']['mensagem'] = "Orçamento alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
-	} catch(PDOException $e) {
+	} catch(PDOException $e) {		
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir orçamento!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar orçamento!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();die;
+		$conn->rollback();
+		
+		echo 'Error: ' . $e->getMessage();
+		exit;
 	}
 	
 	irpara("orcamento.php");
@@ -143,9 +152,9 @@ if(isset($_POST['inputData'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formOrcamento" id="formOrcamento" method="post" class="form-validate" action="orcamentoNovo.php">
+					<form name="formOrcamento" id="formOrcamento" method="post" class="form-validate" action="orcamentoEdita.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Orçamento</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Orçamento Nº "<?php echo $_POST['inputOrcamentoNumero']; ?>"</h5>
 						</div>
 						
 						<div class="card-body">								
@@ -158,13 +167,13 @@ if(isset($_POST['inputData'])){
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" checked data-fouc>
+														<input type="radio" id="inputTipo" value="P" name="inputTipo" class="form-input-styled" data-fouc>
 														Produto
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" data-fouc>
+														<input type="radio" id="inputTipo" value="S" name="inputTipo" class="form-input-styled" data-fouc>
 														Serviço
 													</label>
 												</div>										
@@ -174,7 +183,7 @@ if(isset($_POST['inputData'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputData">Data</label>
-												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" readOnly>
+												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo mostraData($row['OrcamData']); ?>" readOnly>
 											</div>
 										</div>
 																				
@@ -189,10 +198,11 @@ if(isset($_POST['inputData'])){
 																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
 															     ORDER BY CategNome ASC");
 														$result = $conn->query("$sql");
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 														
-														foreach ($row as $item){															
-															print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+														foreach ($rowCategoria as $item){
+															$seleciona = $item['CategId'] == $row['OrcamCategoria'] ? "selected" : "";
+															print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
 														}
 													
 													?>
@@ -208,7 +218,7 @@ if(isset($_POST['inputData'])){
 								<div class="col-lg-12">
 									<div class="form-group">
 										<label for="txtareaConteudo">Conteúdo personalizado</label>
-										<textarea rows="5" cols="5" class="form-control" id="txtareaConteudo" name="txtareaConteudo" placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="txtareaConteudo" name="txtareaConteudo" placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"><?php echo $row['OrcamConteudo']; ?></textarea>
 									</div>
 								</div>
 							</div>		
@@ -232,8 +242,9 @@ if(isset($_POST['inputData'])){
 														$result = $conn->query("$sql");
 														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 														
-														foreach ($rowFornecedor as $item){															
-															print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'">'.$item['ForneNome'].'</option>');
+														foreach ($rowFornecedor as $item){
+															$seleciona = $item['ForneId'] == $row['OrcamFornecedor'] ? "selected" : "";
+															print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'" '. $seleciona .'>'.$item['ForneNome'].'</option>');
 														}
 													
 													?>
@@ -244,21 +255,21 @@ if(isset($_POST['inputData'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputContato">Contato</label>
-												<input type="text" id="inputContato" name="inputContato" class="form-control" readOnly>
+												<input type="text" id="inputContato" name="inputContato" class="form-control" <?php echo $row['ForneContato']; ?> readOnly>
 											</div>
 										</div>									
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputEmailFornecedor">E-mail</label>
-												<input type="text" id="inputEmailFornecedor" name="inputEmailFornecedor" class="form-control" readOnly>
+												<input type="text" id="inputEmailFornecedor" name="inputEmailFornecedor" class="form-control" <?php echo $row['ForneEmail']; ?> readOnly>
 											</div>
 										</div>									
 
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputTelefoneFornecedor">Telefone</label>
-												<input type="text" id="inputTelefoneFornecedor" name="inputTelefoneFornecedor" class="form-control" readOnly>
+												<input type="text" id="inputTelefoneFornecedor" name="inputTelefoneFornecedor" class="form-control" <?php echo $row['ForneTelefone']; ?> readOnly>
 											</div>
 										</div>									
 									</div>
@@ -274,21 +285,21 @@ if(isset($_POST['inputData'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputNomeSolicitante">Solicitante</label>
-												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly>
+												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $row['UsuarNome']; ?>" readOnly>
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputEmailSolicitante">E-mail</label>
-												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarEmail']; ?>" readOnly>
+												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $row['UsuarEmail']; ?>" readOnly>
 											</div>
 										</div>									
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputTelefoneSolicitante">Telefone</label>
-												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarTelefone']; ?>" readOnly>
+												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $row['UsuarTelefone']; ?>" readOnly>
 											</div>
 										</div>									
 									</div>
