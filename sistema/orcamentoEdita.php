@@ -13,7 +13,7 @@ if(isset($_POST['inputOrcamentoId'])){
 	
 	try{
 		
-		$sql = "SELECT OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor, ForneContato, ForneEmail, 
+		$sql = "SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor, ForneContato, ForneEmail, 
 					   ForneTelefone, ForneCelular, OrcamSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
 				FROM Orcamento
 				JOIN Usuario on UsuarId = OrcamSolicitante
@@ -21,7 +21,7 @@ if(isset($_POST['inputOrcamentoId'])){
 				WHERE OrcamId = $iOrcamento ";
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);
-								
+		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
 	}
@@ -33,9 +33,8 @@ if(isset($_POST['inputOrcamentoId'])){
 	irpara("orcamento.php");
 }
 
-
 if(isset($_POST['inputTipo'])){	
-		
+
 	try{
 		
 		$sql = "UPDATE Orcamento SET OrcamTipo = :sTipo, OrcamCategoria = :iCategoria, OrcamConteudo = :sConteudo,
@@ -43,14 +42,18 @@ if(isset($_POST['inputTipo'])){
 				WHERE OrcamId = :iOrcamento";
 		$result = $conn->prepare($sql);
 		
-		$conn->beginTransaction();				
+		$conn->beginTransaction();		
+
+		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
+		$iFornecedor = $aFornecedor[0];
 		
 		$result->execute(array(
-						':sTipo' => $_POST['radioTipo'] == "on" ? "P" : "S",  //refazer isso
+						':sTipo' => $_POST['inputTipo'],
 						':iCategoria' => $_POST['cmbCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iFornecedor' => $iFornecedor,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId']
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iOrcamento' => $_POST['inputOrcamentoId']
 						));
 
 		$sql = "DELETE FROM OrcamentoXProduto
@@ -66,7 +69,7 @@ if(isset($_POST['inputTipo'])){
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Orçamento alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
-		
+				
 	} catch(PDOException $e) {		
 		
 		$_SESSION['msg']['titulo'] = "Erro";
@@ -95,15 +98,11 @@ if(isset($_POST['inputTipo'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.	min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<!-- /theme JS files -->
 	
 	<!-- Adicionando Javascript -->
@@ -157,6 +156,9 @@ if(isset($_POST['inputTipo'])){
 							<h5 class="text-uppercase font-weight-bold">Editar Orçamento Nº "<?php echo $_POST['inputOrcamentoNumero']; ?>"</h5>
 						</div>
 						
+						<input type="hidden" id="inputOrcamentoId" name="inputOrcamentoId" value="<?php echo $row['OrcamId']; ?>" >
+						<input type="hidden" id="inputOrcamentoNumero" name="inputOrcamentoNumero" value="<?php echo $row['OrcamNumero']; ?>" >						
+						
 						<div class="card-body">								
 								
 							<div class="row">				
@@ -167,13 +169,13 @@ if(isset($_POST['inputTipo'])){
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="P" name="inputTipo" class="form-input-styled" data-fouc>
+														<input type="radio" id="inputTipo" value="P" name="inputTipo" class="form-input-styled" data-fouc <?php if ($row['OrcamTipo'] == 'P') echo "checked"; ?>>
 														Produto
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="S" name="inputTipo" class="form-input-styled" data-fouc>
+														<input type="radio" id="inputTipo" value="S" name="inputTipo" class="form-input-styled" data-fouc <?php if ($row['OrcamTipo'] == 'S') echo "checked"; ?>>
 														Serviço
 													</label>
 												</div>										
@@ -255,21 +257,21 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputContato">Contato</label>
-												<input type="text" id="inputContato" name="inputContato" class="form-control" <?php echo $row['ForneContato']; ?> readOnly>
+												<input type="text" id="inputContato" name="inputContato" class="form-control" value="<?php echo $row['ForneContato']; ?>" readOnly>
 											</div>
 										</div>									
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputEmailFornecedor">E-mail</label>
-												<input type="text" id="inputEmailFornecedor" name="inputEmailFornecedor" class="form-control" <?php echo $row['ForneEmail']; ?> readOnly>
+												<input type="text" id="inputEmailFornecedor" name="inputEmailFornecedor" class="form-control" value="<?php echo $row['ForneEmail']; ?>" readOnly>
 											</div>
 										</div>									
 
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputTelefoneFornecedor">Telefone</label>
-												<input type="text" id="inputTelefoneFornecedor" name="inputTelefoneFornecedor" class="form-control" <?php echo $row['ForneTelefone']; ?> readOnly>
+												<input type="text" id="inputTelefoneFornecedor" name="inputTelefoneFornecedor" class="form-control" value="<?php echo $row['ForneTelefone']; ?>" readOnly>
 											</div>
 										</div>									
 									</div>
@@ -309,7 +311,7 @@ if(isset($_POST['inputTipo'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
 										<a href="orcamento.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

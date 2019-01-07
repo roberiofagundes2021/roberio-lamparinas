@@ -36,7 +36,7 @@ if(isset($_POST['inputData'])){
 		
 		$result->execute(array(
 						':sNumero' => str_pad($sNumero,6,"0",STR_PAD_LEFT),
-						':sTipo' => $_POST['radioTipo'] == "on" ? "P" : "S",  //refazer isso
+						':sTipo' => $_POST['inputTipo'],
 						':dData' => gravaData($_POST['inputData']),
 						':iCategoria' => $_POST['cmbCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
@@ -158,13 +158,13 @@ if(isset($_POST['inputData'])){
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" checked data-fouc>
+														<input type="radio" id="inputTipo" name="inputTipo" value="P" class="form-input-styled" checked data-fouc>
 														Produto
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" class="form-input-styled" data-fouc>
+														<input type="radio" id="inputTipo" name="inputTipo" value="S" class="form-input-styled" data-fouc>
 														Serviço
 													</label>
 												</div>										

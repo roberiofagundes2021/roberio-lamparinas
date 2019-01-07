@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT OrcamId, OrcamNumero, OrcamData, ForneNome, CategNome, OrcamStatus
+$sql = ("SELECT OrcamId, OrcamNumero, OrcamData, OrcamCategoria, ForneNome, CategNome, OrcamStatus
 		 FROM Orcamento
 		 JOIN Fornecedor on ForneId = OrcamFornecedor
 		 JOIN Categoria on CategId = OrcamCategoria
@@ -45,10 +45,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script>
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaOrcamento(OrcamId, OrcamNumero, OrcamStatus, Tipo){
+		function atualizaOrcamento(OrcamId, OrcamNumero, OrcamCategoria, OrcamStatus, Tipo){
 		
 			document.getElementById('inputOrcamentoId').value = OrcamId;
 			document.getElementById('inputOrcamentoNumero').value = OrcamNumero;
+			document.getElementById('inputOrcamentoCategoria').value = OrcamCategoria;
 			document.getElementById('inputOrcamentoStatus').value = OrcamStatus;
 					
 			if (Tipo == 'edita'){	
@@ -57,7 +58,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				confirmaExclusao(document.formOrcamento, "Tem certeza que deseja excluir esse orcamento?", "orcamentoExclui.php");
 			} else if (Tipo == 'mudaStatus'){
 				document.formOrcamento.action = "orcamentoMudaSituacao.php";
-			}		
+			} else if (Tipo == 'produto'){
+				document.formOrcamento.action = "orcamentoProduto.php";
+			}
 			
 			document.formOrcamento.submit();
 		}		
@@ -137,8 +140,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\','.$item['OrcamStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\','.$item['OrcamStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\','.$item['OrcamStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\','.$item['OrcamStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\','.$item['OrcamStatus'].', \'produto\');" class="list-icons-item"><i class="icon-basket" title="Listar Produtos"></i></a>
 													</div>
 												</div>
 											</td>
@@ -159,6 +163,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<form name="formOrcamento" method="post">
 					<input type="hidden" id="inputOrcamentoId" name="inputOrcamentoId" >
 					<input type="hidden" id="inputOrcamentoNumero" name="inputOrcamentoNumero" >
+					<input type="hidden" id="inputOrcamentoCategoria" name="inputOrcamentoCategoria" >
 					<input type="hidden" id="inputOrcamentoStatus" name="inputOrcamentoStatus" >
 				</form>
 

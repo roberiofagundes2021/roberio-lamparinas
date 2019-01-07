@@ -100,11 +100,26 @@ var HotBasic = function() {
         var hot_headers_init = new Handsontable(hot_headers, {
             data: car_data,
             rowHeaders: true,
-            colHeaders: ['Brand', 'Model', 'Year', 'Color', 'Price'],
+            colHeaders: ['Produto', 'SubCategoria', 'UN', 'Quantidade', 'Valor Unitário'],
             stretchH: 'all'
         });
 
 
+        // Orcamento Produto
+        // ------------------------------
+
+        // Define element
+        var cabecalho = document.getElementById('cabecalho');
+
+        // Initialize with options
+        var cabecalho_init = new Handsontable(cabecalho, {
+            data: car_data,
+            rowHeaders: true,
+            colHeaders: ['Brand', 'Model', 'Year', 'Color', 'Price'],
+            stretchH: 'all'
+        });		
+		
+		
         // Comments
         // ------------------------------
 
