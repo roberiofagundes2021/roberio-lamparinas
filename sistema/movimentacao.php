@@ -6,12 +6,13 @@ $_SESSION['PaginaAtual'] = 'Movimentação';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT MovimData, MovimTipo, MovimNumNotaFiscal, ForneNome, ProduValorVenda, ProduStatus
+$sql = ("SELECT MovimData, MovimTipo, MovimNotaFiscal, ForneNome, MovimSituacao, LcEstNome, SetorNome
 		 FROM Movimentacao
 		 LEFT JOIN Fornecedor on ForneId = MovimFornecedor
-		 LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-	     WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY ProduNome ASC");
+		 LEFT JOIN LocalEstoque on LcEstId = MovimOrigem and LcEstId = MovimDestinoLocal
+		 LEFT JOIN Setor on SetorId = MovimDestinoSetor
+	     WHERE MovimEmpresa = ". $_SESSION['EmpreId'] ."
+		 ORDER BY MovimData DESC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -45,10 +46,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script>
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaMovimentacao(ProduId, ProduNome, ProduStatus, Tipo){
+		function atualizaMovimentacao(ProduId, ProduNotaFiscal, ProduStatus, Tipo){
 		
 			document.getElementById('inputMovimentacaoId').value = ProduId;
-			document.getElementById('inputMovimentacaoNome').value = ProduNome;
+			document.getElementById('inputMovimentacaoNotaFiscal').value = ProduNotaFiscal;
 			document.getElementById('inputMovimentacaoStatus').value = ProduStatus;
 					
 			if (Tipo == 'edita'){	
@@ -109,10 +110,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th>Movimentacao</th>
-										<th>Categoria</th>
-										<th>SubCategoria</th>
-										<th>Preço Venda</th>
+										<th>Data</th>
+										<th>Tipo</th>
+										<th>Nota Fiscal</th>
+										<th>Fornecedor</th>
+										<th>Estoque Destino</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -121,24 +123,27 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
+										$tipo = $item['MovimTipo'] == 'E' ? 'Entrada' : $item['MovimTipo'] == 'S' ? 'Saída' : 'Transferência';
+										$local = $item['MovimTipo'] == 'S' ? $item['SetorNome'] : $item['LcEstNome'];
 										$situacao = $item['ProduStatus'] ? 'Ativo' : 'Inativo';
 										$situacaoClasse = $item['ProduStatus'] ? 'badge-success' : 'badge-secondary';
 										
 										print('
 										<tr>
-											<td>'.$item['ProduNome'].'</td>
-											<td>'.$item['CategNome'].'</td>
-											<td>'.$item['SbCatNome'].'</td>
-											<td>'.formataMoeda($item['ProduValorVenda']).'</td>
+											<td>'.mostraData($item['MovimData']).'</td>
+											<td>'.$tipo.'</td>
+											<td>'.$item['MovimNotaFiscal'].'</td>
+											<td>'.$item['ForneNome'].'</td>
+											<td>'.$local.'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaMovimentacao('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\','.$item['MovimSituacao'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaMovimentacao('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaMovimentacao('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\','.$item['MovimSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\','.$item['MovimSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
@@ -158,7 +163,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<form name="formMovimentacao" method="post">
 					<input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId" >
-					<input type="hidden" id="inputMovimentacaoNome" name="inputMovimentacaoNome" >
+					<input type="hidden" id="inputMovimentacaoNotaFiscal" name="inputMovimentacaoNotaFiscal" >
 					<input type="hidden" id="inputMovimentacaoStatus" name="inputMovimentacaoStatus" >
 				</form>
 
