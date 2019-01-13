@@ -67,7 +67,7 @@ if(isset($_POST['inputNome'])){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Sub Unidade</title>
+	<title>Lamparinas | Local do Estoque</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -161,7 +161,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-6">
 									<div class="form-group">
-										<label for="inputNome">Sub Unidade</label>
+										<label for="inputNome">Local do Estoque</label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local do Estoque" value="<?php echo $row['LcEstNome']; ?>" required autofocus>
 									</div>
 								</div>
