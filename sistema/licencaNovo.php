@@ -15,7 +15,7 @@ if(isset($_POST['inputDataInicio'])){
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iEmpresa' => $_SESSION['EmpresaId'],
 						':dDtInicio' => $_POST['inputDataInicio'],
 						':dDtFim' => $_POST['inputDataFim'],
 						':iLimiteUsuarios' => $_POST['inputLimiteUsuarios'],

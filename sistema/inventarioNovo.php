@@ -247,30 +247,51 @@ if(isset($_POST['inputData'])){
 						<div class="card-body">
 
 							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputData">Data de Emissão</label>
 										<input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data de Emissão" value="<?php echo date('d/m/Y'); ?>" readOnly>
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputNumero">Número</label>
 										<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número" autofocus required>
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputDataLimite">Data Limite</label>
 										<input type="text" id="inputDataLimite" name="inputDataLimite" class="form-control" placeholder="Data Limite">
 									</div>
 								</div>	
+								
+								<div class="col-lg-6">
+									<label for="cmbUnidade">Unidade</label>
+									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+										<?php 
+											$sql = ("SELECT UnidaId, UnidaNome
+													 FROM Unidade
+													 WHERE UnidaStatus = 1 and UnidaEmpresa = ".$_SESSION['EmpreId']."
+													 ORDER BY UnidaNome ASC");
+											$result = $conn->query("$sql");
+											$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											foreach ($rowUnidade as $item){
+												print('<option value="'.$item['UnidaId'].'">'.$item['UnidaNome'].'</option>');
+											}
+										
+										?>
+									</select>
+								</div>									
 							</div>	
 							
-							<div class="row">
-								<div class="col-lg-12">
+							<div class="row">		
+								
+								<div class="col-lg-8">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbLocalEstoque">Locais do Estoque</label>
 										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" data-fouc>
@@ -289,6 +310,26 @@ if(isset($_POST['inputData'])){
 											?>
 										</select>
 									</div>
+								</div>
+								
+								<div class="col-lg-4">
+									<label for="cmbCategoria">Categoria</label>
+									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+										<?php 
+											$sql = ("SELECT CategId, CategNome
+													 FROM Categoria
+													 WHERE CategStatus = 1 and CategEmpresa = ".$_SESSION['EmpreId']."
+													 ORDER BY CategNome ASC");
+											$result = $conn->query("$sql");
+											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											foreach ($rowCategoria as $item){
+												print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+											}
+										
+										?>
+									</select>
 								</div>
 							</div>
 							<br>

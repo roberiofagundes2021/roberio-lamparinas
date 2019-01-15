@@ -4,6 +4,8 @@ include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Novo Usuário';
 
+echo $_SESSION['EmpresaId'];
+
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputCpf'])){
@@ -79,6 +81,45 @@ if(isset($_POST['inputCpf'])){
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 	<!-- /theme JS files -->	
 
+	<!-- Adicionando Javascript -->
+    <script type="text/javascript" >
+
+        $(document).ready(function() {	
+	
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbUnidade').on('change', function(e){
+
+				Filtrando();
+				
+				var cmbUnidade = $('#cmbUnidade').val();
+
+				$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function (dados){
+					
+					var option = '<option>Selecione o Setor</option>';
+					alert(dados.length);
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SetorId+'">' + obj.SetorNome + '</option>';
+						});						
+						
+						$('#cmbSetor').html(option).show();
+					} else {
+						Reset();
+					}					
+				});
+			});			
+		});
+		
+		function Filtrando(){
+			$('#cmbSetor').empty().append('<option>Filtrando...</option>');
+		}
+		
+		function Reset(){
+			$('#cmbSetor').empty().append('<option>Sem setor</option>');
+		}
+	</script>	
+	
 </head>
 
 <body class="navbar-top">
@@ -210,7 +251,7 @@ if(isset($_POST['inputCpf'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbUnidade">Unidade</label>
-												<select name="cmbUnidade" class="form-control form-control-select2" required>
+												<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
 													<option value="0">Informe uma unidade</option>
 													<?php 
 														$sql = ("SELECT UnidaId, UnidaNome
@@ -232,10 +273,10 @@ if(isset($_POST['inputCpf'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSetor">Setor</label>
-												<select name="cmbSetor" class="form-control form-control-select2" required>
+												<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
 													<option value="0">Informe um setor</option>
 													<?php 
-														$sql = ("SELECT SetorId, SetorNome
+													/*	$sql = ("SELECT SetorId, SetorNome
 																 FROM Setor															     
 																 WHERE SetorEmpresa = ". $_SESSION['EmpreId'] ." and SetorStatus = 1
 																 ORDER BY SetorNome ASC");
@@ -245,7 +286,7 @@ if(isset($_POST['inputCpf'])){
 														foreach ($rowSetor as $item){															
 															print('<option value="'.$item['SetorId'].'">'.$item['SetorNome'].'</option>');
 														}
-													
+													*/
 													?>
 												</select>
 											</div>

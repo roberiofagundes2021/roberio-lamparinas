@@ -9,13 +9,14 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputNome'])){
 
 	try{
-		
-		$sql = "INSERT INTO Setor (SetorNome, SetorStatus, SetorUsuarioAtualizador, SetorEmpresa)
-				VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		//echo $_POST['cmbUnidade'];die;
+		$sql = "INSERT INTO Setor (SetorNome, SetorUnidade, SetorStatus, SetorUsuarioAtualizador, SetorEmpresa)
+				VALUES (:sNome, :iUnidade, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
+						':iUnidade' => $_POST['cmbUnidade'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpresaId'],
@@ -49,6 +50,13 @@ if(isset($_POST['inputNome'])){
 
 	<?php include_once("head.php"); ?>
 	
+	<!-- Theme JS files -->
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<!-- /theme JS files -->	
+
 	<script type="text/javascript" >
 
         $(document).ready(function() {
@@ -59,6 +67,8 @@ if(isset($_POST['inputNome'])){
 				e.preventDefault();
 				
 				var inputNome = $('#inputNome').val();
+				var cmbUnidade = $('#cmbUnidade').val();
+				alert(cmbUnidade);
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
@@ -74,7 +84,7 @@ if(isset($_POST['inputNome'])){
 				$.ajax({
 					type: "POST",
 					url: "setorValida.php",
-					data: ('nome='+inputNome),
+					data: ('nome=' + inputNome + '&unidade=' + cmbUnidade),
 					success: function(resposta){
 						
 						if(resposta == 1){
@@ -120,12 +130,33 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-12">
+								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputNome">Nome do Setor</label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Setor" required autofocus>
 									</div>
 								</div>
+								
+								<div class="col-lg-6">
+									<label for="cmbUnidade">Unidade</label>
+									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+										<?php 
+											$sql = ("SELECT UnidaId, UnidaNome
+													 FROM Unidade
+													 WHERE UnidaStatus = 1 and UnidaEmpresa = ".$_SESSION['EmpresaId']."
+													 ORDER BY UnidaNome ASC");
+											$result = $conn->query("$sql");
+											$row = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											foreach ($row as $item){
+												print('<option value="'.$item['UnidaId'].'">'.$item['UnidaNome'].'</option>');
+											}
+										
+										?>
+									</select>
+								</div>
+								
 							</div>
 															
 							<div class="row" style="margin-top: 10px;">

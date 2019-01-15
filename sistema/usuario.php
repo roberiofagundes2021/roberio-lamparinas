@@ -8,7 +8,7 @@ include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputEmpresaId'])){	
 	$EmpresaId = $_POST['inputEmpresaId'];		
-} else if ($_SESSION['UC'] == 'Empresa'){
+} else if (isset($_SESSION['UC']) and $_SESSION['UC'] == 'Empresa'){
 	$EmpresaId = $_POST['inputEmpresaId'];
 } else {	
 	$EmpresaId = $_SESSION['EmpreId'];	

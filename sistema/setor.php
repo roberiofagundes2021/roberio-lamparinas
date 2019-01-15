@@ -10,10 +10,11 @@ if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
 
-$sql = ("SELECT SetorId, SetorNome, SetorStatus
+$sql = ("SELECT SetorId, SetorNome, UnidaNome, SetorStatus
 		 FROM Setor
+		 JOIN Unidade ON UnidaId = SetorUnidade
 	     WHERE SetorEmpresa = ". $_SESSION['EmpresaId'] ."
-		 ORDER BY SetorNome ASC");
+		 ORDER BY UnidaNome, SetorNome ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -118,9 +119,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th width="70%">Setor</th>
-										<th width="15%">Situação</th>
-										<th width="15%" class="text-center">Ações</th>
+										<th width="40%">Setor</th>
+										<th width="40%">Unidade</th>
+										<th width="10%">Situação</th>
+										<th width="10%" class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -133,6 +135,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('
 										<tr>
 											<td>'.$item['SetorNome'].'</td>
+											<td>'.$item['UnidaNome'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaSetor('.$item['SetorId'].', \''.$item['SetorNome'].'\','.$item['SetorStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

@@ -12,7 +12,7 @@ if(isset($_POST['inputSetorId'])){
         	
 	try{
 		
-		$sql = "SELECT SetorId, SetorNome
+		$sql = "SELECT SetorId, SetorNome, SetorUnidade
 				FROM Setor
 				WHERE SetorId = $iSetor ";
 		$result = $conn->query("$sql");
@@ -32,12 +32,13 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE Setor SET SetorNome = :sNome, SetorUsuarioAtualizador = :iUsuarioAtualizador
+		$sql = "UPDATE Setor SET SetorNome = :sNome, SetorUnidade = :iUnidade, SetorUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE SetorId = :iSetor";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
+						':iUnidade' => $_POST['cmbUnidade'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iSetor' => $_POST['inputSetorId']
 						));
@@ -70,6 +71,13 @@ if(isset($_POST['inputNome'])){
 
 	<?php include_once("head.php"); ?>
 	
+	<!-- Theme JS files -->
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<!-- /theme JS files -->	
+	
 	<script type="text/javascript" >
 
         $(document).ready(function() {
@@ -81,6 +89,7 @@ if(isset($_POST['inputNome'])){
 				
 				var inputNomeNovo  = $('#inputNome').val();
 				var inputNomeVelho = $('#inputSetorNome').val();
+				var cmbUnidade     = $('#cmbUnidade').val();
 				
 				//remove os espaços desnecessários antes e depois
 				inputNomeNovo = inputNomeNovo.trim();
@@ -92,11 +101,18 @@ if(isset($_POST['inputNome'])){
 					return false;
 				}
 				
+				//Verifica se o campo só possui espaços em branco
+				if (cmbUnidade == '#'){
+					alerta('Atenção','Informe a unidade!','error');
+					$('#cmbUnidade').focus();
+					return false;
+				}				
+				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
 					url: "setorValida.php",
-					data: ('nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho),
+					data: ('nomeNovo=' + inputNomeNovo + '&nomeVelho=' + inputNomeVelho + '&unidade=' + cmbUnidade),
 					success: function(resposta){
 						
 						if(resposta == 1){
@@ -147,12 +163,32 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-12">
+								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputNome">Nome do Setor</label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Setor" value="<?php echo $row['SetorNome']; ?>" required autofocus>
 									</div>
 								</div>
+								<div class="col-lg-6">
+									<label for="cmbUnidade">Unidade</label>
+									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+										<?php 
+											$sql = ("SELECT UnidaId, UnidaNome
+													 FROM Unidade
+													 WHERE UnidaStatus = 1 and UnidaEmpresa = ".$_SESSION['EmpresaId']."
+													 ORDER BY UnidaNome ASC");
+											$result = $conn->query("$sql");
+											$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											foreach ($rowUnidade as $item){
+												$seleciona = $item['UnidaId'] == $row['SetorUnidade'] ? "selected" : "";
+												print('<option value="'.$item['UnidaId'].'" '. $seleciona .'>'.$item['UnidaNome'].'</option>');
+											}
+										
+										?>
+									</select>
+								</div>								
 							</div>
 								
 							<div class="row" style="margin-top: 10px;">
