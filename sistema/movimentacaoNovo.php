@@ -9,30 +9,33 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputData'])){
 		
 	try{
-			
-		for ($i=0; $i < $_POST['inputNumItens']; $i++) {
+		
+		echo $_POST['inputNumItens'];
+		
+		for ($i=1; $i <= $_POST['inputNumItens']; $i++) {
 		
 			$campo = 'campo'.$i;
-			//echo $campo;
-			echo "Teste: ".$_POST[$campo];  ///???????
+			echo " - Teste: ".$_POST[$campo];
 		}
 		
 		die;
 		
-		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamLote, OrcamCategoria, OrcamSubCategoria, OrcamConteudo, OrcamFornecedor,
-									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador)
-				VALUES (:sNumero, :sTipo, :dData, :sLote, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :iSolicitante, :bStatus, :iUsuarioAtualizador)";
+		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimData, MovimFinalidade, MovimOrigem, MovimDestinoLocal, MovimDestinoSetor, MovimObservacao,
+									      MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
+										  MovimChaveAcesso, MovimSituacao, MovimEmpresa, OrcamUsuarioAtualizador)
+				VALUES (:sTipo, :dData, :iFinalidade, :iOrigem, :iDestinoLocal, :iDestinoSetor, :sObservacao, :iFornecedor, :iOrdemCompra,
+						:sNotaFiscal, :dDataEmissao, sNumSerie, :fValorTotal, :sChaveAcesso, :iSituacao, :iEmpresa, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':sNumero' => date()."/".$_POST['inputLote'],
-						':sTipo' => $_POST['radioTipo'] == "on" ? "P" : "S",  //refazer isso
+						':sTipo' => $_POST['radioTipo'],
 						':dData' => gravaData($_POST['inputData']),
-						':sLote' => $_POST['inputLote'],
-						':iCategoria' => $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'],
-						':sConteudo' => $_POST['txtareaConteudo'],
-						':iFornecedor' => $_POST['cmbFornecedor'], //explode nisso
+						':iFinalidade' => $_POST['cmbFinalidade'],
+						':iOrigem' => $_POST['cmbOrigem'],
+						':iDestinoLocal' => $_POST['cmbDestinoLocal'],
+						':iDestinoSetor' => $_POST['cmbDestinoSetor'],
+						':sObservacao' => $_POST['txtareaObservacao'],
+						':iFornecedor' => $_POST['cmbFornecedor'],
 						':iSolicitante' => $_SESSION['UsuarId'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']
@@ -109,7 +112,7 @@ if(isset($_POST['inputData'])){
 				
 				$.getJSON('filtraProduto.php?idCategoria='+cmbCategoria, function (dados){
 					
-					var option = '<option>Selecione o Produto</option>';
+					var option = '<option value="#" "selected">Selecione o Produto</option>';
 					
 					if (dados.length){
 						
@@ -124,8 +127,7 @@ if(isset($_POST['inputData'])){
 				});				
 				
 			});	
-			
-			
+					
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			$('#cmbSubCategoria').on('change', function(e){
 				
@@ -136,7 +138,7 @@ if(isset($_POST['inputData'])){
 				
 				$.getJSON('filtraProduto.php?idCategoria='+cmbCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){
 					
-					var option = '<option>Selecione o Produto</option>';
+					var option = '<option value="#" "selected">Selecione o Produto</option>';
 
 					if (dados.length){
 						
@@ -151,28 +153,14 @@ if(isset($_POST['inputData'])){
 				});				
 				
 			});	
-			
-			
-			//Ao informar o fornecedor, trazer os demais dados dele (contato, e-mail, telefone)
-			$('#cmbFornecedor').on('change', function(e){				
-				
-				var Fornecedor = $('#cmbFornecedor').val();
-				var Forne = Fornecedor.split('#');
-				
-				$('#inputContato').val(Forne[1]);
-				$('#inputEmailFornecedor').val(Forne[2]);
-				if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
-					$('#inputTelefoneFornecedor').val(Forne[3]);
-				} else {
-					$('#inputTelefoneFornecedor').val(Forne[4]);
-				}
-			});
-			
+						
 			$('#btnAdicionar').click(function(){
 				
 				var inputNumItens = $('#inputNumItens').val();
 				var cmbProduto = $('#cmbProduto').val();
 				var inputQuantidade = $('#inputQuantidade').val();	
+				var inputLote = $('#inputLote').val();
+				var inputValidade = $('#inputValidade').val();
 				
 				var resNumItens = parseInt(inputNumItens) + 1;		
 				
@@ -195,8 +183,10 @@ if(isset($_POST['inputData'])){
 						$('#inputNumItens').val(resNumItens);
 						$('#cmbProduto').val("#").change();						
 						$('#inputQuantidade').val('');
+						$('#inputLote').val('');
+						$('#inputValidade').val('');
 						
-						$('#inputProdutos').append('<input type="text" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+cmbProduto+'#'+inputQuantidade+'">');
+						$('#inputProdutos').append('<input type="text" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+cmbProduto+'#'+inputQuantidade+'#'+inputLote+'#'+inputValidade+'">');
 						
 						return false;
 						
@@ -623,7 +613,7 @@ if(isset($_POST['inputData'])){
 							</div>						
 							
 							<div id="inputProdutos">
-								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
+								<input type="text" id="inputNumItens" name="inputNumItens" value="0">
 							</div>
 							
 							<div class="row">

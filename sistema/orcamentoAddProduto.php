@@ -4,7 +4,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ProduId, ProduNome, ProduValorVenda, UnMedSigla
+$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, UnMedSigla
 		 FROM Produto
 		 LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 		 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduId = ". $_POST['idProduto']);
@@ -15,13 +15,13 @@ $count = count($row);
 	//Verifica se já existe esse registro (se existir, retorna true )
 	if($count){
 		
-		$valorTotal = $_POST['quantidade'] * $row['ProduValorVenda'];
+		$valorTotal = $_POST['quantidade'] * $row['ProduValorCusto'];
 
 		$output = 	'<td>'.$_POST['numItens'].'</td>
 					 <td>'.$row['ProduNome'].'</td>
 					 <td>'.$row['UnMedSigla'].'</td>
 					 <td>'.$_POST['quantidade'].'</td>
-					 <td>'.formataMoeda($row['ProduValorVenda']).'</td>
+					 <td>'.formataMoeda($row['ProduValorCusto']).'</td>
 					 <td>'.formataMoeda($valorTotal).'</td>
 					 <td>Excluir</td>';
 		echo $output;

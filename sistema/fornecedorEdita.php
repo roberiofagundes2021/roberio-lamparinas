@@ -32,7 +32,7 @@ if(isset($_POST['inputFornecedorId'])){
 		}
 						
 	} catch(PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 	
 	$_SESSION['msg'] = array();
@@ -110,7 +110,7 @@ if(isset($_POST['inputTipo'])){
 							':iFornecedor' => $_POST['inputFornecedorId'],
 							':iEmpresa' => $_SESSION['EmpreId']));
 						
-		if ($_POST['cmbSubCategoria']){
+		if (isset($_POST['cmbSubCategoria'])){
 			
 			try{
 				$sql = "INSERT INTO FornecedorXSubCategoria 
@@ -127,15 +127,14 @@ if(isset($_POST['inputTipo'])){
 									':iEmpresa' => $_SESSION['EmpreId']
 									));
 				}
-				
-				$conn->commit();
-				
+							
 			} catch(PDOException $e) {
 				$conn->rollback();
 				echo 'Error: ' . $e->getMessage();exit;
 			}
 		}
-						
+				
+		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Fornecedor alterado!!!";
@@ -150,7 +149,7 @@ if(isset($_POST['inputTipo'])){
 		echo 'Error: ' . $e->getMessage();
 		exit;
 	}
-	
+
 	irpara("fornecedor.php");
 }
 
@@ -558,21 +557,21 @@ if(isset($_POST['inputTipo'])){
 									
 									<div id="dadosPJ">
 										<div class="row">
-											<div class="col-lg-4">
+											<div class="col-lg-6">
 												<div class="form-group">
 													<label for="inputRazaoSocial">Razão Social</label>
 													<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" value="<?php echo $row['ForneRazaoSocial']; ?>">
 												</div>
 											</div>
 
-											<div class="col-lg-4">
+											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputInscricaoMunicipal">Inscrição Municipal</label>
 													<input type="text" id="inputInscricaoMunicipal" name="inputInscricaoMunicipal" class="form-control" placeholder="Inscrição Municipal" value="<?php echo $row['ForneInscricaoMunicipal']; ?>">
 												</div>
 											</div>
 
-											<div class="col-lg-4">
+											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputInscricaoEstadual">Inscrição Estadual</label>
 													<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Inscrição Estadual" value="<?php echo $row['ForneInscricaoEstadual']; ?>">
@@ -689,7 +688,7 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbEstado">Estado</label>
-												<select id="cmbEstado" name="cmbEstado" class="form-control form-control-select2">
+												<select id="cmbEstado" name="cmbEstado" class="form-control">
 													<option value="#">Selecione um estado</option>
 													<option value="AC" <?php if ($row['ForneEstado'] == 'AC') echo "selected"; ?> >Acre</option>
 													<option value="AL" <?php if ($row['ForneEstado'] == 'AL') echo "selected"; ?> >Alagoas</option>

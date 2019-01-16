@@ -67,7 +67,7 @@ if(isset($_POST['inputTipo'])){
 
 		$insertId = $conn->lastInsertId(); 
 
-		if ($_POST['cmbSubCategoria']){
+		if (isset($_POST['cmbSubCategoria'])){
 			
 			try{
 				$sql = "INSERT INTO FornecedorXSubCategoria 
@@ -85,13 +85,13 @@ if(isset($_POST['inputTipo'])){
 									));
 				}
 				
-				$conn->commit();
-				
 			} catch(PDOException $e) {
 				$conn->rollback();
 				echo 'Error: ' . $e->getMessage();exit;
 			}
 		}
+		
+		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Fornecedor incluído!!!";
@@ -468,21 +468,21 @@ if(isset($_POST['inputTipo'])){
 									
 									<div id="dadosPJ">
 										<div class="row">
-											<div class="col-lg-4">
+											<div class="col-lg-6">
 												<div class="form-group">
 													<label for="inputRazaoSocial">Razão Social</label>
 													<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social">
 												</div>
 											</div>
 
-											<div class="col-lg-4">
+											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputInscricaoMunicipal">Inscrição Municipal</label>
 													<input type="text" id="inputInscricaoMunicipal" name="inputInscricaoMunicipal" class="form-control" placeholder="Inscrição Municipal">
 												</div>
 											</div>
 
-											<div class="col-lg-4">
+											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputInscricaoEstadual">Inscrição Estadual</label>
 													<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Inscrição Estadual">
