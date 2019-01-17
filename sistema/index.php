@@ -157,7 +157,7 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 
 
 				<!-- Dashboard content -->
-				<div class="row">
+				<div class="row" style="display:none">
 					<div class="col-xl-8">
 
 						<!-- Marketing campaigns -->

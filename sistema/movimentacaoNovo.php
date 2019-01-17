@@ -10,51 +10,96 @@ if(isset($_POST['inputData'])){
 		
 	try{
 		
-		echo $_POST['inputNumItens'];
-		
-		for ($i=1; $i <= $_POST['inputNumItens']; $i++) {
-		
-			$campo = 'campo'.$i;
-			echo " - Teste: ".$_POST[$campo];
-		}
-		
-		die;
-		
-		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimData, MovimFinalidade, MovimOrigem, MovimDestinoLocal, MovimDestinoSetor, MovimObservacao,
+		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimClassificacao, MovimData, MovimFinalidade, MovimOrigem, MovimDestinoLocal, MovimDestinoSetor, MovimObservacao,
 									      MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
-										  MovimChaveAcesso, MovimSituacao, MovimEmpresa, OrcamUsuarioAtualizador)
+										  MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimEmpresa)
 				VALUES (:sTipo, :dData, :iFinalidade, :iOrigem, :iDestinoLocal, :iDestinoSetor, :sObservacao, :iFornecedor, :iOrdemCompra,
-						:sNotaFiscal, :dDataEmissao, sNumSerie, :fValorTotal, :sChaveAcesso, :iSituacao, :iEmpresa, :iUsuarioAtualizador)";
+						:sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, :sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
+
+/*		echo $sql;
+		echo "<br>";
+		var_dump($_POST['inputTipo'], gravaData($_POST['inputData']), $_POST['cmbFinalidade'], $_POST['cmbOrigem'], $_POST['cmbDestinoLocal'],
+		 $_POST['cmbDestinoSetor'], $_POST['txtareaObservacao'], $_POST['cmbFornecedor'], $_POST['cmbOrdemCompra'], $_POST['inputNotaFiscal'],
+		 gravaData($_POST['inputDataEmissao']), $_POST['inputNumSerie'], gravaValor($_POST['inputValorTotal']), $_POST['inputChaveAcesso'],
+		 $_POST['cmbSituacao'], $_SESSION['UsuarId'], $_SESSION['EmpreId']);
+		die;*/
+		$conn->beginTransaction();				
 				
 		$result->execute(array(
-						':sTipo' => $_POST['radioTipo'],
+						':sTipo' => $_POST['inputTipo'],
+						':iClassificacao' => $_POST['cmbClassificacao'] == '#' ? null : $_POST['cmbClassificacao'],
 						':dData' => gravaData($_POST['inputData']),
 						':iFinalidade' => $_POST['cmbFinalidade'],
-						':iOrigem' => $_POST['cmbOrigem'],
-						':iDestinoLocal' => $_POST['cmbDestinoLocal'],
-						':iDestinoSetor' => $_POST['cmbDestinoSetor'],
+						':iOrigem' => $_POST['cmbOrigem'] == '#' ? null : $_POST['cmbOrigem'],
+						':iDestinoLocal' => $_POST['cmbDestinoLocal'] == '#' ? null : $_POST['cmbDestinoLocal'],
+						':iDestinoSetor' => $_POST['cmbDestinoSetor'] == '#' ? null : $_POST['cmbDestinoSetor'],
 						':sObservacao' => $_POST['txtareaObservacao'],
-						':iFornecedor' => $_POST['cmbFornecedor'],
-						':iSolicitante' => $_SESSION['UsuarId'],
-						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId']
+						':iFornecedor' => $_POST['cmbFornecedor'] == '#' ? null : $_POST['cmbFornecedor'],
+						':iOrdemCompra' => $_POST['cmbOrdemCompra'],
+						':sNotaFiscal' => $_POST['inputNotaFiscal'],
+						':dDataEmissao' => gravaData($_POST['inputDataEmissao']),
+						':sNumSerie' => $_POST['inputNumSerie'],
+						':fValorTotal' => gravaValor($_POST['inputValorTotal']),
+						':sChaveAcesso' => $_POST['inputChaveAcesso'],
+						':iSituacao' => $_POST['cmbSituacao'],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iEmpresa' => $_SESSION['EmpreId']
 						));
+						
+		$insertId = $conn->lastInsertId();
+					
+		try{
+			$sql = "INSERT INTO MovimentacaoXProduto
+						(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrUsuarioAtualizador, MvXPrEmpresa)
+					VALUES 
+						(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iUsuarioAtualizador, :iEmpresa)";
+			$result = $conn->prepare($sql);
+
+			echo "Nº de itens: ". $_POST['inputNumItens'];
+			
+			for ($i=1; $i <= $_POST['inputNumItens']; $i++) {
+		
+				$campo = 'campo'.$i;
+				$registro = explode('#', $_POST[$campo]);	
+				var_dump($registro);
+				
+				$result->execute(array(
+								':iMovimentacao' => $insertId,
+								':iProduto' => $registro[0],
+								':iQuantidade' => $registro[1],
+								':fValorUnitario' => gravaValor($registro[2]),
+								':sLote' => $registro[3],
+								':dValidade' => gravaData($registro[4]),
+								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+								':iEmpresa' => $_SESSION['EmpreId']
+								));				
+			}
+			
+		} catch(PDOException $e) {
+			echo "Entrou1";
+			$conn->rollback();
+			echo 'Error: ' . $e->getMessage();exit;
+		}
+		
+		$conn->commit();		
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Orçamento incluído!!!";
+		$_SESSION['msg']['mensagem'] = "Movimentação realizada!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
+
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir orçamento!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao realizar movimentação!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage(); exit;
 	}
 	
-	irpara("orcamento.php");
+	irpara("movimentacao.php");
 }
 
 ?>
@@ -80,12 +125,14 @@ if(isset($_POST['inputData'])){
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<script src="global_assets/js/lamparinas/jquery.maskMoney.js"></script>  <!-- http://www.fabiobmed.com.br/criando-mascaras-para-moedas-com-jquery/ -->
 	<!-- /theme JS files -->
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 
         $(document).ready(function() {	
+		
 	
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
@@ -117,7 +164,7 @@ if(isset($_POST['inputData'])){
 					if (dados.length){
 						
 						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
+							option += '<option value="'+obj.ProduId+'#'+obj.ProduValorCusto+'">'+obj.ProduNome+'</option>';
 						});						
 						
 						$('#cmbProduto').html(option).show();
@@ -143,7 +190,7 @@ if(isset($_POST['inputData'])){
 					if (dados.length){
 						
 						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
+							option += '<option value="'+obj.ProduId+'#'+obj.ProduValorCusto+'">'+obj.ProduNome+'</option>';
 						});						
 						
 						$('#cmbProduto').html(option).show();
@@ -153,12 +200,28 @@ if(isset($_POST['inputData'])){
 				});				
 				
 			});	
+
+			//Ao mudar o Produto, trazer o Valor Unitário do cadastro (retorno via JSON)
+			$('#cmbProduto').on('change', function(e){
+							
+				var cmbProduto = $('#cmbProduto').val();
+				var inputValorUnitario = $('#inputValorUnitario').val();
+				
+				var Produto = cmbProduto.split("#");
+				//alert(Produto[1].maskMoney());
+				$('#inputValorUnitario').val(Produto[1]).maskMoney({symbol:'R$ ', showSymbol:false, thousands:'.', decimal:',', symbolStay: true});  //Por que não funciona Meus Deus???
+			});	
 						
+			
 			$('#btnAdicionar').click(function(){
 				
 				var inputNumItens = $('#inputNumItens').val();
 				var cmbProduto = $('#cmbProduto').val();
-				var inputQuantidade = $('#inputQuantidade').val();	
+				
+				var Produto = cmbProduto.split("#");
+				
+				var inputQuantidade = $('#inputQuantidade').val();
+				var inputValorUnitario = $('#inputValorUnitario').val();
 				var inputLote = $('#inputLote').val();
 				var inputValidade = $('#inputValidade').val();
 				
@@ -168,12 +231,9 @@ if(isset($_POST['inputData'])){
 				$.ajax({
 					type: "POST",
 					url: "orcamentoAddProduto.php",
-					data: {numItens: resNumItens, idProduto: cmbProduto, quantidade: inputQuantidade},
+					data: {numItens: resNumItens, idProduto: Produto[0], quantidade: inputQuantidade},
 					success: function(resposta){
-						
-						//alert(resposta);
-						//return false;
-											
+																	
 						var newRow = $("<tr>");
 						
 						newRow.append(resposta);	    
@@ -183,10 +243,11 @@ if(isset($_POST['inputData'])){
 						$('#inputNumItens').val(resNumItens);
 						$('#cmbProduto').val("#").change();						
 						$('#inputQuantidade').val('');
+						$('#inputValorUnitario').val('');
 						$('#inputLote').val('');
 						$('#inputValidade').val('');
 						
-						$('#inputProdutos').append('<input type="text" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+cmbProduto+'#'+inputQuantidade+'#'+inputLote+'#'+inputValidade+'">');
+						$('#inputProdutos').append('<input type="hidden" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+Produto[0]+'#'+inputQuantidade+'#'+inputValorUnitario+'#'+inputLote+'#'+inputValidade+'">');
 						
 						return false;
 						
@@ -220,16 +281,19 @@ if(isset($_POST['inputData'])){
 				document.getElementById('EstoqueOrigem').style.display = "none";
 				document.getElementById('DestinoLocal').style.display = "block";
 				document.getElementById('DestinoSetor').style.display = "none";
+				document.getElementById('classificacao').style.display = "block";
 				document.getElementById('motivo').style.display = "none";
 			} else if (tipo == 'S') {
 				document.getElementById('EstoqueOrigem').style.display = "block";
 				document.getElementById('DestinoLocal').style.display = "none";
 				document.getElementById('DestinoSetor').style.display = "block";
+				document.getElementById('classificacao').style.display = "block";
 				document.getElementById('motivo').style.display = "none";
 			} else {
 				document.getElementById('EstoqueOrigem').style.display = "block";
 				document.getElementById('DestinoLocal').style.display = "block";
 				document.getElementById('DestinoSetor').style.display = "none";
+				document.getElementById('classificacao').style.display = "none";
 				document.getElementById('motivo').style.display = "block";
 			}
 		}		
@@ -287,6 +351,28 @@ if(isset($_POST['inputData'])){
 										</div>										
 									</div>
 								</div>
+
+								<div class="col-lg-4" id="classificacao">
+									<div class="form-group">
+										<label for="cmbClassificacao">Classificação/Bens</label>
+										<select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
+											<option value="#">Selecione</option>
+											<?php 
+												$sql = ("SELECT ClassId, ClassNome
+														 FROM Classificacao
+														 WHERE ClassStatus = 1
+														 ORDER BY ClassNome ASC");
+												$result = $conn->query("$sql");
+												$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($rowClassificacao as $item){
+													print('<option value="'.$item['ClassId'].'">'.$item['ClassNome'].'</option>');
+												}
+											
+											?>
+										</select>
+									</div>
+								</div>
 								
 								<div class="col-lg-4" id="motivo" style="display:none;">
 									<div class="form-group">
@@ -299,9 +385,9 @@ if(isset($_POST['inputData'])){
 														 WHERE MotivStatus = 1 and MotivEmpresa = ". $_SESSION['EmpreId'] ."
 														 ORDER BY MotivNome ASC");
 												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												$rowMotivo = $result->fetchAll(PDO::FETCH_ASSOC);
 												
-												foreach ($row as $item){															
+												foreach ($rowMotivo as $item){
 													print('<option value="'.$item['MotivId'].'">'.$item['MotivNome'].'</option>');
 												}
 											
@@ -416,7 +502,7 @@ if(isset($_POST['inputData'])){
 								<div class="col-lg-12">
 									<div class="form-group">
 										<label for="txtareaObservacao">Observação</label>
-										<textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservação" placeholder="Observação"></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" placeholder="Observação"></textarea>
 									</div>
 								</div>
 							</div>
@@ -433,7 +519,7 @@ if(isset($_POST['inputData'])){
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php 
-														$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+														$sql = ("SELECT ForneId, ForneNome
 																 FROM Fornecedor														     
 																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
 															     ORDER BY ForneNome ASC");
@@ -441,7 +527,7 @@ if(isset($_POST['inputData'])){
 														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowFornecedor as $item){															
-															print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'">'.$item['ForneNome'].'</option>');
+															print('<option value="'.$item['ForneId'].'">'.$item['ForneNome'].'</option>');
 														}
 													
 													?>
@@ -451,15 +537,15 @@ if(isset($_POST['inputData'])){
 										
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputNumeroContrato">Nº Ordem Compra / Carta Contrato</label>
-												<input type="text" id="inputNumeroContrato" name="inputNumeroContrato" class="form-control">
+												<label for="cmbOrdemCompra">Nº Ordem Compra / Carta Contrato</label>
+												<input type="text" id="cmbOrdemCompra" name="cmbOrdemCompra" class="form-control">
 											</div>
 										</div>	
 										
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputNumeroNF">Nº Nota Fiscal</label>
-												<input type="text" id="inputNumeroNF" name="inputNumeroNF" class="form-control">
+												<label for="inputNotaFiscal">Nº Nota Fiscal</label>
+												<input type="text" id="inputNotaFiscal" name="inputNotaFiscal" class="form-control">
 											</div>
 										</div>										
 									</div> <!-- row -->
@@ -475,8 +561,8 @@ if(isset($_POST['inputData'])){
 										
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputNumeroSerie">Nº Série</label>
-												<input type="text" id="inputNumeroSerie" name="inputNumeroSerie" class="form-control">
+												<label for="inputNumSerie">Nº Série</label>
+												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" maxLength="30">
 											</div>
 										</div>
 										
@@ -613,7 +699,7 @@ if(isset($_POST['inputData'])){
 							</div>						
 							
 							<div id="inputProdutos">
-								<input type="text" id="inputNumItens" name="inputNumItens" value="0">
+								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
 							</div>
 							
 							<div class="row">

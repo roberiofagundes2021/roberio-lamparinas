@@ -138,7 +138,7 @@
 						</li>
 						<!-- /forms -->
 
-						<!-- Components -->
+						<!-- Components --
 						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Components</div> <i class="icon-menu" title="Components"></i></li>
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-grid"></i> <span>Basic components</span></a>
@@ -243,7 +243,7 @@
 						</li>
 						<!-- /components -->
 
-						<!-- Layout -->
+						<!-- Layout --
 						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Layout</div> <i class="icon-menu" title="Layout options"></i></li>
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-stack2"></i> <span>Page layouts</span></a>
@@ -408,7 +408,7 @@
 						</li>
 						<!-- /layout -->
 
-						<!-- Data visualization -->
+						<!-- Data visualization --
 						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Data visualization</div> <i class="icon-menu" title="Data visualization"></i></li>
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-graph"></i> <span>Echarts library</span></a>
@@ -512,7 +512,7 @@
 						</li>
 						<!-- /data visualization -->
 
-						<!-- Extensions -->
+						<!-- Extensions --
 						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Extensions</div> <i class="icon-menu" title="Extensions"></i></li>
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-puzzle4"></i> <span>Extensions</span></a>
@@ -560,7 +560,7 @@
 						</li>
 						<!-- /extensions -->
 
-						<!-- Tables -->
+						<!-- Tables --
 						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Tables</div> <i class="icon-menu" title="Tables"></i></li>
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-table2"></i> <span>Basic tables</span></a>
@@ -629,7 +629,7 @@
 						</li>
 						<!-- /tables -->
 
-						<!-- Page kits -->
+						<!-- Page kits --
 						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Page kits</div> <i class="icon-menu" title="Page kits"></i></li>
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-grid6"></i> <span>General pages</span></a>
