@@ -55,14 +55,11 @@ if(isset($_POST['inputData'])){
 					VALUES 
 						(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
-
-			echo "Nº de itens: ". $_POST['inputNumItens'];
-			
+		
 			for ($i=1; $i <= $_POST['inputNumItens']; $i++) {
 		
 				$campo = 'campo'.$i;
 				$registro = explode('#', $_POST[$campo]);	
-				var_dump($registro);
 				
 				$result->execute(array(
 								':iMovimentacao' => $insertId,
@@ -222,10 +219,14 @@ if(isset($_POST['inputData'])){
 				
 				var inputQuantidade = $('#inputQuantidade').val();
 				var inputValorUnitario = $('#inputValorUnitario').val();
+				var inputTotal = $('#inputTotal').val();
 				var inputLote = $('#inputLote').val();
 				var inputValidade = $('#inputValidade').val();
 				
-				var resNumItens = parseInt(inputNumItens) + 1;		
+				var resNumItens = parseInt(inputNumItens) + 1;	
+				var total = parseInt(inputQuantidade) * parseInt(inputValorUnitario);
+				
+				total = total + parseFloat(inputTotal);
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -244,10 +245,12 @@ if(isset($_POST['inputData'])){
 						$('#cmbProduto').val("#").change();						
 						$('#inputQuantidade').val('');
 						$('#inputValorUnitario').val('');
+						$('#inputTotal').val(total);
+						$('#total').text(total);
 						$('#inputLote').val('');
 						$('#inputValidade').val('');
 						
-						$('#inputProdutos').append('<input type="hidden" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+Produto[0]+'#'+inputQuantidade+'#'+inputValorUnitario+'#'+inputLote+'#'+inputValidade+'">');
+						$('#inputProdutos').append('<input type="hidden" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+Produto[0]+'#'+inputQuantidade+'#'+inputValorUnitario+'#'+inputLote+'#'+inputValidade+'">');												
 						
 						return false;
 						
@@ -700,6 +703,7 @@ if(isset($_POST['inputData'])){
 							
 							<div id="inputProdutos">
 								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
+								<input type="hidden" id="inputTotal" name="inputTotal" value="0">
 							</div>
 							
 							<div class="row">
@@ -727,6 +731,13 @@ if(isset($_POST['inputData'])){
 													<td>&nbsp;</td>
 												</tr>
 											</tbody>
+									        <tfoot>
+												<tr>
+													<th colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total:</th>
+													<th><div id="total" style="text-align:center; font-size: 16px; font-weight:bold;"></div></th>
+													<th></th>
+												</tr>
+											</tfoot>
 										</table>
 								</div>
 							</div>							
