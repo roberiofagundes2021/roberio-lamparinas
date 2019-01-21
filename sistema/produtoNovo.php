@@ -83,6 +83,8 @@ if(isset($_POST['inputCodigo'])){
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+	<!--<script src="global_assets/js/main/jquery.form.js"></script>-->
+	<script src="http://malsup.github.com/jquery.form.js"></script>
 	<!-- /theme JS files -->	
 	
 	<!-- Adicionando Javascript -->
@@ -112,16 +114,159 @@ if(isset($_POST['inputCodigo'])){
 						Reset();
 					}					
 				});
+			});
+
+			//Ao mudar o Custo, atualiza o CustoFinal
+			$('#inputValorCusto').on('blur', function(e){
+								
+				var inputValorCusto = $('#inputValorCusto').val().replace('.', '').replace(',', '.');
+				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replace('.', '').replace(',', '.');
+				
+				if (inputValorCusto == null || inputValorCusto.trim() == '') {
+					inputValorCusto = 0.00;
+				}
+				
+				if (inputOutrasDespesas == null || inputOutrasDespesas.trim() == '') {
+					inputOutrasDespesas = 0.00;
+				}
+				
+				var inputCustoFinal = parseFloat(inputValorCusto) + parseFloat(inputOutrasDespesas);
+				
+				$('#inputCustoFinal').val(inputCustoFinal);
+			});
+			
+			//Ao mudar o Custo, atualiza o CustoFinal
+			$('#inputOutrasDespesas').on('blur', function(e){
+								
+				var inputValorCusto = $('#inputValorCusto').val().replace('.', '').replace(',', '.');
+				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replace('.', '').replace(',', '.');
+				
+				if (inputValorCusto == null || inputValorCusto.trim() == '') {
+					inputValorCusto = 0.00;
+				}
+				
+				if (inputOutrasDespesas == null || inputOutrasDespesas.trim() == '') {
+					inputOutrasDespesas = 0.00;
+				}
+				
+				var inputCustoFinal = parseFloat(inputValorCusto) + parseFloat(inputOutrasDespesas);
+				
+				$('#inputCustoFinal').val(inputCustoFinal);
 			});			
+			
+			//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
+			$('#inputMargemLucro').on('blur', function(e){
+								
+				var inputCustoFinal = $('#inputCustoFinal').val().replace('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replace(',', '.');				
+				
+				if (inputCustoFinal == null || inputCustoFinal.trim() == '') {
+					inputCustoFinal = 0.00;
+				}
+				
+				if (inputMargemLucro == null || inputMargemLucro.trim() == '') {
+					inputMargemLucro = 0.00;
+				}
+								
+				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
+				
+				$('#inputValorVenda').val(inputValorVenda);				
+
+			});	
+			
+			//Ao mudar o Valor de Venda, atualiza a Margem de Lucro
+			$('#inputValorVenda').on('blur', function(e){
+								
+				var inputCustoFinal = $('#inputCustoFinal').val().replace('.', '').replace(',', '.');
+				var inputValorVenda = $('#inputValorVenda').val().replace('.', '').replace(',', '.');
+				
+				if (inputCustoFinal == null || inputCustoFinal.trim() == '') {
+					inputCustoFinal = 0.00;
+				}
+				
+				if (inputValorVenda == null || inputValorVenda.trim() == '') {
+					inputValorVenda = 0.00;
+				}
+				
+				//alert(parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal));
+				var lucro = parseFloat(inputValorVenda) - parseFloat(inputCustoFinal);		
+				var inputMargemLucro = lucro / parseFloat(inputCustoFinal) * 100;
+				
+				$('#inputMargemLucro').val(inputMargemLucro.toFixed(2));				
+
+			});	
+			
+			
+			//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
+			$('#addFoto').on('click', function(e){
+								
+				$('#imagem').trigger("click");
+			});	
+			
+			// #imagem é o id do input, ao alterar o conteudo do input execurará a função baixo
+			$('#imagem').on('change',function(){
+				
+				//$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
+				
+				var inputImagem = $('#imagem').val();
+				//alert('Passou1');
+				//$("#formFoto").submit();
+				//$("#formFoto").ajaxForm(function(resposta) { 
+				//	console.log(resposta); 
+				//}); 
+				//alert('Passou2');
+				
+				
+				// Get form
+				var form = $('#formFoto')[0];
+				var data = new FormData(form);
+				
+				jQuery.ajax({
+					url: 'upload.php',
+					data: data,
+					contentType: false,
+					processData: false,
+					cache: false,
+					type: 'POST',
+					success: function(data){
+						alert(data);
+					}
+				});
+
+/*				
+				$.ajax({
+					type: "POST",
+					enctype: 'multipart/form-data',
+					url: "upload.php",
+					contentType: false,
+					processData: false,
+					data: {imagem: inputImagem},
+					success: function(resposta){
+						alert(resposta);
+					
+							return false;
+
+						
+						//$( "#formInventario" ).submit();
+					}
+				}); //ajax
+				
+				//$('#formFoto').submit(); */
+				// Efetua o Upload sem dar refresh na pagina
+				$('#formFoto').ajaxForm({
+					target:'#visualizar' // o callback será no elemento com o id #visualizar
+				}).submit();
+			});			
+			
+			function Filtrando(){
+				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+			}
+			
+			function Reset(){
+				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+			}
 		});
 		
-		function Filtrando(){
-			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-		}
-		
-		function Reset(){
-			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
-		}
 	</script>
 	
 </head>
@@ -153,201 +298,239 @@ if(isset($_POST['inputCodigo'])){
 						
 						<div class="card-body">								
 							
-							<div class="row">
-								<div class="col-lg-3">
-									<div class="form-group">
-										<label for="inputCodigo">Código do Produto</label>
-										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código Interno" required>
+							<div class="media">
+								<div class="media-body">
+									<div class="row">
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputCodigo">Código do Produto</label>
+												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código Interno" required>
+											</div>
+										</div>	
+										
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputCodigoBarras">Código de Barras</label>
+												<input type="text" id="inputCodigoBarras" name="inputCodigoBarras" class="form-control" placeholder="Código de Barras">
+											</div>	
+										</div>
+										
+										<div class="col-lg-4">
+											<div class="form-group">				
+												<label for="inputEstoqueMinimo">Estoque Mínimo</label>
+												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo">
+											</div>	
+										</div>						
 									</div>
-								</div>	
-								
-								<div class="col-lg-3">
-									<div class="form-group">
-										<label for="inputCodigoBarras">Código de Barras</label>
-										<input type="text" id="inputCodigoBarras" name="inputCodigoBarras" class="form-control" placeholder="Código de Barras">
-									</div>	
-								</div>
-								
-								<div class="col-lg-3">
-									<div class="form-group">				
-										<label for="inputEstoqueMinimo">Estoque Mínimo</label>
-										<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo">
-									</div>	
-								</div>
-								
-								<div class="col-lg-3">
-									<div class="form-group">				
-										<img src="image.jpg" />
-									</div>
-								</div>								
-								
-								<div class="col-lg-12">
-									<div class="form-group">
-										<label for="inputNome">Nome</label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
-									</div>
-								</div>
-
-							</div>
-							
-							<div class="row">
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="cmbCategoria">Categoria</label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
-											<?php 
-												$sql = ("SELECT CategId, CategNome
-														 FROM Categoria															     
-														 WHERE CategStatus = 1 and CategEmpresa = ". $_SESSION['EmpreId'] ."
-														 ORDER BY CategNome ASC");
-												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($row as $item){															
-													print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-												}
-											
-											?>
-										</select>
-									</div>
-								</div>
-
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="cmbSubCategoria">SubCategoria</label>
-										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
-											<?php 
-												/*$sql = ("SELECT SbCatId, SbCatNome
-														 FROM SubCategoria															     
-														 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-														 ORDER BY SbCatNome ASC");
-												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($row as $item){
-													print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
-												}
-											  */
-											?>
-										</select>
-									</div>
-								</div>
-							</div>							
 									
-							<div class="row">
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="inputValorCusto">Valor de Custo</label>
-										<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" onKeyUp="moeda(this)" maxLength="12">
+									<div class="row">	
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label for="inputNome">Nome</label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
+											</div>
+										</div>
 									</div>
+									
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label for="txtDetalhamento">Detalhamento</label>
+												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do produto"></textarea>
+											</div>
+										</div>
+									</div>									
 								</div>
-								
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="cmbMarca">Marca</label>
-										<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
-											<?php 
-												$sql = ("SELECT MarcaId, MarcaNome
-														 FROM Marca															     
-														 WHERE MarcaStatus = 1 and MarcaEmpresa = ". $_SESSION['EmpreId'] ."
-														 ORDER BY MarcaNome ASC");
-												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($row as $item){
-													print('<option value="'.$item['MarcaId'].'">'.$item['MarcaNome'].'</option>');
-												}
-											
-											?>
-										</select>
+								<div style="text-align:center;">
+									<div id="visualizar">
+										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:250px; border:2px solid #ccc;">
 									</div>
-								</div>								
-							</div>
-
-							<div class="row">
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="inputDespesasAcessorias">Despesas Acessórias</label>
-										<input type="text" id="inputDespesasAcessorias" name="inputDespesaAcessoria" class="form-control" placeholder="Despesa Acessoria" onKeyUp="moeda(this)" maxLength="12">
-									</div>
+									<br>
+									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%">Adicionar Foto</button>
+									<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">										
+										<input type="file" id="imagem" name="imagem" style="display:none;" />
+									</form>									
 								</div>
-								
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="cmbModelo">Modelo</label>
-										<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
-											<?php 
-												$sql = ("SELECT ModelId, ModelNome
-														 FROM Modelo
-														 WHERE ModelStatus = 1 and ModelEmpresa = ". $_SESSION['EmpreId'] ."
-														 ORDER BY ModelNome ASC");
-												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($row as $item){
-													print('<option value="'.$item['ModelId'].'">'.$item['ModelNome'].'</option>');
-												}
-											
-											?>
-										</select>
-									</div>
-								</div>								
-							</div>
-
-							<div class="row">
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="inputOutrasDespesas">Outras Despesas</label>
-										<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" onKeyUp="moeda(this)" maxLength="12">
-									</div>
-								</div>
-
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="inputNumSerie">Número de Série</label>
-										<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série">
-									</div>
-								</div>								
 							</div>
 							
 							<div class="row">
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputCustoFinal">Custo Final</label>
-										<input type="text" id="inputCustoFinal" name="inputCustoFinal" class="form-control" placeholder="Custo Final" onKeyUp="moeda(this)" maxLength="12">
-									</div>
-								</div>
+								<div class="col-lg-3">
+									<h5 class="mb-0 font-weight-semibold">Classificação</h5>
+									<br>
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbCategoria">Categoria</label>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+														$sql = ("SELECT CategId, CategNome
+																 FROM Categoria															     
+																 WHERE CategStatus = 1 and CategEmpresa = ". $_SESSION['EmpreId'] ."
+																 ORDER BY CategNome ASC");
+														$result = $conn->query("$sql");
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($row as $item){															
+															print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>
 
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputValorVenda">Valor de Venda</label>
-										<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" onKeyUp="moeda(this)" maxLength="12">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbSubCategoria">SubCategoria</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+														/*$sql = ("SELECT SbCatId, SbCatNome
+																 FROM SubCategoria															     
+																 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
+																 ORDER BY SbCatNome ASC");
+														$result = $conn->query("$sql");
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($row as $item){
+															print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
+														}
+													  */
+													?>
+												</select>
+											</div>
+										</div>
 									</div>
 								</div>
-								
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="cmbFabricante">Fabricante</label>
-										<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
-											<?php 
-												$sql = ("SELECT FabriId, FabriNome
-														 FROM Fabricante
-														 WHERE FabriStatus = 1 and FabriEmpresa = ". $_SESSION['EmpreId'] ."
-														 ORDER BY FabriNome ASC");
-												$result = $conn->query("$sql");
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($row as $item){
-													print('<option value="'.$item['FabriId'].'">'.$item['FabriNome'].'</option>');
-												}
-											
-											?>
-										</select>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-6">
+									<h5 class="mb-0 font-weight-semibold">Custo</h5>
+									<br>
+								</div>
+								<div class="col-lg-6">
+									<h5 class="mb-0 font-weight-semibold">Venda</h5>
+									<br>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="row">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputValorCusto">Valor de Custo</label>
+												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" onKeyUp="moeda(this)" maxLength="12">
+											</div>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputOutrasDespesas">Outras Despesas</label>
+												<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" onKeyUp="moeda(this)" maxLength="12">
+											</div>
+										</div>			
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputCustoFinal">Custo Final</label>
+												<input type="text" id="inputCustoFinal" name="inputCustoFinal" class="form-control" placeholder="Custo Final" readOnly>
+											</div>
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputMargemLucro">Margem de Lucro (%)</label>
+												<input type="text" id="inputMargemLucro" name="inputMargemLucro" class="form-control" placeholder="Margem Lucro" onKeyUp="moeda(this)" maxLength="6">
+											</div>
+										</div>										
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputValorVenda">Valor de Venda</label>
+												<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" onKeyUp="moeda(this)" maxLength="12">
+											</div>
+										</div>
+									</div>
+								</div>						
+							</div>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<h5 class="mb-0 font-weight-semibold">Dados do Fabricante</h5>
+									<br>
+									<div class="row">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="cmbMarca">Marca</label>
+												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+														$sql = ("SELECT MarcaId, MarcaNome
+																 FROM Marca															     
+																 WHERE MarcaStatus = 1 and MarcaEmpresa = ". $_SESSION['EmpreId'] ."
+																 ORDER BY MarcaNome ASC");
+														$result = $conn->query("$sql");
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($row as $item){
+															print('<option value="'.$item['MarcaId'].'">'.$item['MarcaNome'].'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>
+										
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="cmbModelo">Modelo</label>
+												<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+														$sql = ("SELECT ModelId, ModelNome
+																 FROM Modelo
+																 WHERE ModelStatus = 1 and ModelEmpresa = ". $_SESSION['EmpreId'] ."
+																 ORDER BY ModelNome ASC");
+														$result = $conn->query("$sql");
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($row as $item){
+															print('<option value="'.$item['ModelId'].'">'.$item['ModelNome'].'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>	
+										
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="cmbFabricante">Fabricante</label>
+												<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+														$sql = ("SELECT FabriId, FabriNome
+																 FROM Fabricante
+																 WHERE FabriStatus = 1 and FabriEmpresa = ". $_SESSION['EmpreId'] ."
+																 ORDER BY FabriNome ASC");
+														$result = $conn->query("$sql");
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($row as $item){
+															print('<option value="'.$item['FabriId'].'">'.$item['FabriNome'].'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>
+
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputNumSerie">Número de Série</label>
+												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série">
+											</div>
+										</div>	
 									</div>
 								</div>
 							</div>
