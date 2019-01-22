@@ -6,12 +6,12 @@ $_SESSION['PaginaAtual'] = 'Usuário';
 
 include('global_assets/php/conexao.php');
 
-if (isset($_POST['inputEmpresaId'])){	
-	$EmpresaId = $_POST['inputEmpresaId'];		
-} else if (isset($_SESSION['UC']) and $_SESSION['UC'] == 'Empresa'){
-	$EmpresaId = $_POST['inputEmpresaId'];
+if (isset($_SESSION['EmpresaId'])){	
+	$EmpresaId =   $_SESSION['EmpresaId'];
+	$EmpresaNome = $_SESSION['EmpresaNome'];
 } else {	
-	$EmpresaId = $_SESSION['EmpreId'];	
+	$EmpresaId = $_SESSION['EmpreId'];
+	$EmpresaNome = $_SESSION['EmpreNomeFantasia'];
 	$_SESSION['UC'] = 'Usuario';
 }
 
@@ -41,15 +41,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>		
 	<!-- /theme JS files -->
 	
 	<script>
@@ -74,14 +73,28 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 </head>
 
-<body class="navbar-top">
+	<?php
+		
+		if (isset($_SESSION['EmpresaId'])){	
+			print('<body class="navbar-top sidebar-xs">');
+		} else {
+			print('<body class="navbar-top">');
+		}
 
-	<?php include_once("topo.php"); ?>	
+		include_once("topo.php");
+	?>	
 
 	<!-- Page content -->
 	<div class="page-content">
 		
-		<?php include_once("menu-left.php"); ?>
+		<?php 
+		
+			include_once("menu-left.php"); 
+		
+			if (isset($_SESSION['EmpresaId'])){
+				include_once("menuLeftSecundario.php");
+			}
+		?>		
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -108,8 +121,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">Os usuários cadastrados abaixo pertencem a empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b>.</p>
-								<div class="text-right"><a href="usuarioNovo.php" class="btn btn-success" role="button">Novo usário</a></div>
+								<p class="font-size-lg">Os usuários cadastrados abaixo pertencem a empresa <b><?php echo $EmpresaNome; ?></b>.</p>
+								<div class="text-right"><a href="usuarioNovo.php" class="btn btn-success" role="button">Novo usuário</a></div>
 							</div>							
 
 							<table class="table datatable-responsive">

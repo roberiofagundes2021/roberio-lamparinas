@@ -206,7 +206,7 @@ if(isset($_POST['inputCodigo'])){
 			// #imagem é o id do input, ao alterar o conteudo do input execurará a função baixo
 			$('#imagem').on('change',function(){
 				
-				//$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
+				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
 				
 				var inputImagem = $('#imagem').val();
 				//alert('Passou1');
@@ -352,9 +352,9 @@ if(isset($_POST['inputCodigo'])){
 									</form>									
 								</div>
 							</div>
-							
+														
 							<div class="row">
-								<div class="col-lg-3">
+								<div class="col-lg-12">
 									<h5 class="mb-0 font-weight-semibold">Classificação</h5>
 									<br>
 									<div class="row">

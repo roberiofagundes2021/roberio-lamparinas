@@ -4,9 +4,6 @@ include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Empresa';
 
-unset($_SESSION['EmpresaId']);
-unset($_SESSION['EmpresaNome']);
-
 include('global_assets/php/conexao.php');
 
 $sql = ("SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreStatus, dbo.fnLicencaVencimento(EmpreId) as Licenca
@@ -70,7 +67,7 @@ $count = count($row);
 			} else if (Tipo == 'setor'){
 				document.formEmpresa.action = "setor.php";
 			} else if (Tipo == 'usuario') {
-				document.formEmpresa.action = "empresaUsuario.php";
+				document.formEmpresa.action = "usuario.php";
 			}  else if (Tipo == 'menu'){
 				document.formEmpresa.action = "menu.php";
 			}			

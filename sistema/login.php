@@ -23,7 +23,7 @@ if(isset($_POST['usuario'])){
 	}
 	
 	$_SESSION['UsuarLogin'] = $_POST['usuario'];
-	$_SESSION['UsuarSenha'] = $_POST['senha'];	
+	$_SESSION['UsuarSenha'] = $_POST['senha'];
 
 	$usuario_escape = addslashes($psUsuario);
 	$senha_escape = addslashes($psSenha);
@@ -52,69 +52,110 @@ if(isset($_POST['usuario'])){
 		$erro[] = "<strong>Senha</strong> incorreta.";
 	} else {	
 		
-		$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
-				 FROM Usuario
-				 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-				 JOIN Perfil on PerfiId = EXUXPPerfil
-				 JOIN Empresa on EmpreId = EXUXPEmpresa
-				 JOIN Licenca on LicenEmpresa = EmpreId
-				 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and 
-					   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
-				 ");
-
-		$result = $conn->query("$sql");
-		$row = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
-		$count = count($row);
-		
-		if ($count == 0){
-			$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";			
-		} else if ($count > 1 and $piEmpresa == 0) {
-			$erro[] = "Você está vinculado em mais de uma empresa. Informe qual deseja acessar.";
+	/*	//Se Super Usuário e cadastro ativo, pode acessar qualquer empresa
+		if ($row['PerfiChave'] == 'SUPER' and $row['EXUXPStatus'] == 1){
 			
-			$_SESSION['EmpreId'] = 99999999;  // Se preferirem deixar pre-selecionado já uma empresa basta trocar o 9999999 por $row[0]['EmpreId']
-			
-			$result = $conn->query("$sql");
-			while ($linhas = $result->fetch()){
-				$_SESSION['Empresa'][$linhas['EmpreId']] = $linhas['EmpreNomeFantasia'];
+			//Se não foi selecionado nenhuma empresa ainda
+			if ($piEmpresa == 0){
+				$erro[] = "Você está vinculado em mais de uma empresa. Informe qual deseja acessar.";
+				
+				$_SESSION['EmpreId'] = 99999999;  // Se preferirem deixar pre-selecionado já uma empresa basta trocar o 9999999 por $row[0]['EmpreId']
+				
+				$sql = ("SELECT EmpreId, EmpreNomeFantasia
+						 FROM Empresa
+					     WHERE EmpreStatus = 1");				
+				$result = $conn->query("$sql");
+				while ($linhas = $result->fetch()){
+					$_SESSION['Empresa'][$linhas['EmpreId']] = $linhas['EmpreNomeFantasia'];
+				}				
+			} else {
+				$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
+						 FROM Usuario
+						 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+						 JOIN Perfil on PerfiId = EXUXPPerfil
+						 JOIN Empresa on EmpreId = EXUXPEmpresa
+						 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa
+						 ");
+				$result = $conn->query("$sql");
+				$row = $result->fetch();
+				
+				$_SESSION['UsuarId'] = $row['UsuarId'];
+				$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
+				$_SESSION['UsuarNome'] = $row['UsuarNome'];
+				$_SESSION['PerfiChave'] = $row['PerfiChave'];
+				
+				$_SESSION['EmpreId'] = $row['EmpreId'];
+				$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
+				$_SESSION['UsuarLogado'] = 1;
+				
+				irpara("index.php");
+	
 			}
-		} else if ($piEmpresa) {
-						
+		} else { */
+		
 			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
 					 FROM Usuario
 					 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
 					 JOIN Perfil on PerfiId = EXUXPPerfil
 					 JOIN Empresa on EmpreId = EXUXPEmpresa
 					 JOIN Licenca on LicenEmpresa = EmpreId
-					 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa and 
+					 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and 
 						   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
 					 ");
-			$result = $conn->query("$sql");
-			$row = $result->fetch();
-			
-			$_SESSION['UsuarId'] = $row['UsuarId'];
-			$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
-			$_SESSION['UsuarNome'] = $row['UsuarNome'];
-			$_SESSION['EmpreId'] = $row['EmpreId'];
-			$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
-			$_SESSION['PerfiChave'] = $row['PerfiChave'];
-			$_SESSION['UsuarLogado'] = 1;
-			
-			irpara("index.php");
-			
-		} else {		
-			
-			//Pra esse caso aqui só vai vim um registro mesmo, daí precisa do [0] sem fazer o foreach
-			$_SESSION['UsuarId'] = $row[0]['UsuarId'];
-			$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
-			$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
-			$_SESSION['EmpreId'] = $row[0]['EmpreId'];
-			$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
-			$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
-			$_SESSION['UsuarLogado'] = 1;
-			
-			irpara("index.php");
-		}
 
+			$result = $conn->query("$sql");
+			$row = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
+			$count = count($row);
+			
+			if ($count == 0){
+				$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";			
+			} else if ($count > 1 and $piEmpresa == 0) {
+				$erro[] = "Você está vinculado em mais de uma empresa. Informe qual deseja acessar.";
+				
+				$_SESSION['EmpreId'] = 99999999;  // Se preferirem deixar pre-selecionado já uma empresa basta trocar o 9999999 por $row[0]['EmpreId']
+				
+				$result = $conn->query("$sql");
+				while ($linhas = $result->fetch()){
+					$_SESSION['Empresa'][$linhas['EmpreId']] = $linhas['EmpreNomeFantasia'];
+				}
+			} else if ($piEmpresa) {
+							
+				$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
+						 FROM Usuario
+						 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+						 JOIN Perfil on PerfiId = EXUXPPerfil
+						 JOIN Empresa on EmpreId = EXUXPEmpresa
+						 JOIN Licenca on LicenEmpresa = EmpreId
+						 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa and 
+							   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
+						 ");
+				$result = $conn->query("$sql");
+				$row = $result->fetch();
+				
+				$_SESSION['UsuarId'] = $row['UsuarId'];
+				$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
+				$_SESSION['UsuarNome'] = $row['UsuarNome'];
+				$_SESSION['EmpreId'] = $row['EmpreId'];
+				$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
+				$_SESSION['PerfiChave'] = $row['PerfiChave'];
+				$_SESSION['UsuarLogado'] = 1;
+				
+				irpara("index.php");
+				
+			} else {		
+				
+				//Pra esse caso aqui só vai vim um registro mesmo, daí precisa do [0] sem fazer o foreach
+				$_SESSION['UsuarId'] = $row[0]['UsuarId'];
+				$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
+				$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
+				$_SESSION['EmpreId'] = $row[0]['EmpreId'];
+				$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
+				$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
+				$_SESSION['UsuarLogado'] = 1;
+				
+				irpara("index.php");
+			}
+	//	}
 	} 
 }
 

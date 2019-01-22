@@ -2,11 +2,15 @@
 
 include_once("sessao.php"); 
 
+include('global_assets/php/conexao.php');
+
 $_SESSION['PaginaAtual'] = 'Novo Usuário';
 
-echo $_SESSION['EmpresaId'];
-
-include('global_assets/php/conexao.php');
+if (isset($_SESSION['EmpresaId'])){
+	$EmpresaId = $_SESSION['EmpresaId'];
+} else {	
+	$EmpresaId = $_SESSION['EmpreId'];
+}
 
 if(isset($_POST['inputCpf'])){
 
@@ -35,7 +39,7 @@ if(isset($_POST['inputCpf'])){
 				VALUES (:iEmpresa, :iUsuario, :iPerfil, :iUnidade, :iSetor, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 		$result->execute(array(
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iEmpresa' => $EmpresaId,
 						':iUsuario' => $LAST_ID,
 						':iPerfil' => $_POST['inputPerfil'],
 						':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
@@ -96,7 +100,7 @@ if(isset($_POST['inputCpf'])){
 				$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function (dados){
 					
 					var option = '<option>Selecione o Setor</option>';
-					alert(dados.length);
+
 					if (dados.length){						
 						
 						$.each(dados, function(i, obj){
@@ -122,14 +126,28 @@ if(isset($_POST['inputCpf'])){
 	
 </head>
 
-<body class="navbar-top">
+	<?php
+		
+		if (isset($_SESSION['EmpresaId'])){	
+			print('<body class="navbar-top sidebar-xs">');
+		} else {
+			print('<body class="navbar-top">');
+		}
 
-	<?php include_once("topo.php"); ?>	
+		include_once("topo.php");
+	?>	
 
 	<!-- Page content -->
 	<div class="page-content">
 		
-		<?php include_once("menu-left.php"); ?>
+		<?php 
+		
+			include_once("menu-left.php"); 
+		
+			if (isset($_SESSION['EmpresaId'])){
+				include_once("menuLeftSecundario.php");
+			}
+		?>	
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -256,7 +274,7 @@ if(isset($_POST['inputCpf'])){
 													<?php 
 														$sql = ("SELECT UnidaId, UnidaNome
 																 FROM Unidade															     
-																 WHERE UnidaEmpresa = ". $_SESSION['EmpreId'] ." and UnidaStatus = 1
+																 WHERE UnidaEmpresa = ". $EmpresaId ." and UnidaStatus = 1
 																 ORDER BY UnidaNome ASC");
 														$result = $conn->query("$sql");
 														$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -275,19 +293,6 @@ if(isset($_POST['inputCpf'])){
 												<label for="cmbSetor">Setor</label>
 												<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
 													<option value="0">Informe um setor</option>
-													<?php 
-													/*	$sql = ("SELECT SetorId, SetorNome
-																 FROM Setor															     
-																 WHERE SetorEmpresa = ". $_SESSION['EmpreId'] ." and SetorStatus = 1
-																 ORDER BY SetorNome ASC");
-														$result = $conn->query("$sql");
-														$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowSetor as $item){															
-															print('<option value="'.$item['SetorId'].'">'.$item['SetorNome'].'</option>');
-														}
-													*/
-													?>
 												</select>
 											</div>
 										</div>

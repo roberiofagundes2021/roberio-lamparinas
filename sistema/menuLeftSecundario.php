@@ -89,7 +89,7 @@
 								<a href="setor.php" class="nav-link"><i class="icon-cabinet"></i> Setor</a>
 							</li>
 							<li class="nav-item">
-								<a href="#" class="nav-link">
+								<a href="usuario.php" class="nav-link">
 								
 									<?php 
 										$sql = ("SELECT EXUXPUsuario

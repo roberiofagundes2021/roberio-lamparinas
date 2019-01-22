@@ -7,11 +7,11 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['nomeVelho'])){
 	$sql = ("SELECT UnidaId
 			 FROM Unidade
-			 WHERE UnidaEmpresa = ".$_SESSION['EmpreId']." and UnidaNome = '". $_POST['nomeNovo']."' and UnidaNome <> '". $_POST['nomeVelho']."'");
+			 WHERE UnidaEmpresa = ".$_SESSION['EmpresaId']." and UnidaNome = '". $_POST['nomeNovo']."' and UnidaNome <> '". $_POST['nomeVelho']."'");
 } else{
 	$sql = ("SELECT UnidaId
 			 FROM Unidade
-			 WHERE UnidaEmpresa = ".$_SESSION['EmpreId']." and UnidaNome = '". $_POST['nome']."'");
+			 WHERE UnidaEmpresa = ".$_SESSION['EmpresaId']." and UnidaNome = '". $_POST['nome']."'");
 }
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

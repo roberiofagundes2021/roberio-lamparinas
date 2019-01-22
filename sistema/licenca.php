@@ -38,11 +38,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script>
-	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
