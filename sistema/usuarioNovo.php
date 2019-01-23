@@ -91,6 +91,94 @@ if(isset($_POST['inputCpf'])){
         $(document).ready(function() {	
 	
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#buscar').on('click', function(e){
+			
+				var inputCpf = $('#inputCpf').val();
+
+				$.getJSON('usuarioValida.php?cpf='+inputCpf, function (dados){
+					
+					//Se tem usuário e ele não está vinculado a essa empresa ainda
+					if (typeof dados === 'object'){
+						
+						document.getElementById('demaisCampos').style.display = "block";
+						
+						$.each(dados, function(i, obj){
+							$('#inputNome').val(obj.UsuarNome);
+							$('#cmbPerfil').val(obj.EXUXPPerfil);
+							$('#inputLogin').val(obj.UsuarLogin);
+							$('#inputSenha').val(obj.UsuarSenha);
+							$('#inputConfirmaSenha').val(obj.UsuarSenha);
+							$('#inputEmail').val(obj.UsuarEmail);
+							$('#inputTelefone').val(obj.UsuarTelefone);
+							$('#inputCelular').val(obj.UsuarCelular);
+							$('#cmbUnidade').val(obj.EXUXPUnidade);
+							$('#cmbSetor').val(obj.EXUXPSetor);
+						});
+						
+						$('#btnIncluir').prop("disabled", false);
+		
+					} else {
+						if (dados){
+							document.getElementById('demaisCampos').style.display = "none";
+							alerta('Atenção','O usuário com CPF ' + inputCpf + ' já está vinculado a essa empresa!','error');
+							$('#btnIncluir').prop("disabled", true);
+							$('#inputCpf').val();
+							$('#inputCpf').focus();
+							return false;
+						} else {
+							document.getElementById('demaisCampos').style.display = "block";
+							$('#inputNome').val();
+							$('#cmbPerfil').val();
+							$('#inputLogin').val();
+							$('#inputSenha').val();
+							$('#inputConfirmaSenha').val();
+							$('#inputEmail').val();
+							$('#inputTelefone').val();
+							$('#inputCelular').val();
+							$('#cmbUnidade').val();
+							$('#cmbSetor').val();
+							$('#inputNome').focus();
+							$('#btnIncluir').prop("disabled", false);
+						}
+					}					
+				});				
+
+/*				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "usuarioValida.php",
+					data: ('cpf='+inputCpf),
+					success: function(resposta){
+						
+						alert(resposta);
+						
+						
+						if(resposta == "existeNessaEmpresa"){
+							document.getElementById('demaisCampos').style.display = "none";
+							alerta('Atenção','Esse usuário já está vinculado a essa empresa!','error');
+							return false;
+						} else if (resposta == 0){
+							document.getElementById('demaisCampos').style.display = "block";
+							$('#inputNome').focus();
+						} else {
+							document.getElementById('demaisCampos').style.display = "block";
+							$('#inputNome').val(resposta.UsuarNome);
+							$('#cmbPerfil').val(resposta.EXUXPPerfil);
+							$('#inputLogin').val(resposta.UsuarLogin);
+							$('#inputSenha').val(resposta.UsuarSenha);
+							$('#inputConfirmaSenha').val(resposta.UsuarSenha);
+							$('#inputEmail').val(resposta.UsuarEmail);
+							$('#inputTelefone').val(resposta.UsuarTelefone);
+							$('#inputCelular').val(resposta.UsuarCelular);
+							$('#cmbUnidade').val(resposta.EXUXPUnidade);
+							$('#cmbSetor').val(resposta.EXUXPSetor);
+						}						
+					}
+				})  */
+			});
+
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbUnidade').on('change', function(e){
 
 				Filtrando();
@@ -112,7 +200,12 @@ if(isset($_POST['inputCpf'])){
 						Reset();
 					}					
 				});
-			});			
+			});	
+
+			$('#inputCpf').on('change', function(e){
+				$('#buscar').trigger('click');
+			});
+			
 		});
 		
 		function Filtrando(){
@@ -165,138 +258,146 @@ if(isset($_POST['inputCpf'])){
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Usuário</h5>
 						</div>
 						
-						<div class="card-body">								
+						<div class="card-body">	
 							<div class="row">
-								<div class="col-lg-12">
-									<div class="row">
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputCpf">CPF</label>
-												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required>
-											</div>
-										</div>
-										<div class="col-lg-7">
-											<div class="form-group">
-												<label for="inputNome">Nome</label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputPerfil">Perfil</label>
-												<select name="inputPerfil" class="form-control form-control-select2" required>
-													<option value="0">Informe um perfil</option>
-													<?php
-														$sql = ("SELECT PerfiId, PerfiNome
-																 FROM Perfil
-																 Where PerfiStatus = 1
-																 ORDER BY PerfiNome ASC");
-														$result = $conn->query("$sql");
-														$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-														foreach ($rowPerfil as $item){
-															print('<option value="'.$item['PerfiId'].'">'.$item['PerfiNome'].'</option>');
-														}	
-													?>
-												</select>
-											</div>
-										</div>										
-									</div>
-								</div>
-							</div>
-							
-							<h5 class="mb-0 font-weight-semibold">Login</h5>
-							<br>
-							<div class="row">				
-								<div class="col-lg-12">
-									<div class="row">
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputLogin">Login</label>
-												<input type="text" id="inputLogin" name="inputLogin" class="form-control" placeholder="Login" required>
-											</div>
-										</div>
-										
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputSenha">Senha</label>
-												<input type="password" id="inputSenha" name="inputSenha" class="form-control" placeholder="Senha">
-											</div>
-										</div>
-										
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputConfirmaSenha">Confirma Senha</label>
-												<input type="password" id="inputConfirmaSenha" name="inputConfirmaSenha" class="form-control" placeholder="Confirma Senha">
-											</div>
+								<div class="col-lg-2" style="max-width:150px;">
+									<label for="inputCpf">CPF</label>
+									<div class="form-group form-group-feedback form-group-feedback-right">										
+										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required autofocus>
+										<div class="form-control-feedback" id="buscar" style="cursor: pointer;">
+											<i class="icon-search4"></i>
 										</div>
 									</div>
 								</div>
 							</div>
 							
-							<h5 class="mb-0 font-weight-semibold">Contato</h5>
-							<br>
-							<div class="row">
-								<div class="col-lg-12">
-									<div class="row">
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputEmail">E-mail</label>
-												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" required>
+							<div id="demaisCampos" style="display:none;">
+								<div class="row">
+									<div class="col-lg-12">
+										<div class="row">
+											<div class="col-lg-8">
+												<div class="form-group">
+													<label for="inputNome">Nome</label>
+													<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
+												</div>
 											</div>
-										</div>
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputTelefone">Telefone</label>
-												<input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999">
-											</div>
-										</div>
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputCelular">Celular</label>
-												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
-											</div>
-										</div>											
-									</div>
-								</div>
-							</div>
-
-							<h5 class="mb-0 font-weight-semibold">Lotação</h5>
-							<br>
-							<div class="row">
-								<div class="col-lg-12">
-									<div class="row">
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="cmbUnidade">Unidade</label>
-												<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
-													<option value="0">Informe uma unidade</option>
-													<?php 
-														$sql = ("SELECT UnidaId, UnidaNome
-																 FROM Unidade															     
-																 WHERE UnidaEmpresa = ". $EmpresaId ." and UnidaStatus = 1
-																 ORDER BY UnidaNome ASC");
-														$result = $conn->query("$sql");
-														$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputPerfil">Perfil</label>
+													<select name="inputPerfil" class="form-control form-control-select2" required>
+														<option value="0">Informe um perfil</option>
+														<?php
+															$sql = ("SELECT PerfiId, PerfiNome
+																	 FROM Perfil
+																	 Where PerfiStatus = 1
+																	 ORDER BY PerfiNome ASC");
+															$result = $conn->query("$sql");
+															$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 														
-														foreach ($rowUnidade as $item){															
-															print('<option value="'.$item['UnidaId'].'">'.$item['UnidaNome'].'</option>');
-														}
-													
-													?>
-												</select>
+															foreach ($rowPerfil as $item){
+																print('<option value="'.$item['PerfiId'].'">'.$item['PerfiNome'].'</option>');
+															}	
+														?>
+													</select>
+												</div>
+											</div>										
+										</div>
+									</div>
+								</div>
+								
+								<h5 class="mb-0 font-weight-semibold">Login</h5>
+								<br>
+								<div class="row">				
+									<div class="col-lg-12">
+										<div class="row">
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputLogin">Login</label>
+													<input type="text" id="inputLogin" name="inputLogin" class="form-control" placeholder="Login" required>
+												</div>
+											</div>
+											
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputSenha">Senha</label>
+													<input type="password" id="inputSenha" name="inputSenha" class="form-control" placeholder="Senha">
+												</div>
+											</div>
+											
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputConfirmaSenha">Confirma Senha</label>
+													<input type="password" id="inputConfirmaSenha" name="inputConfirmaSenha" class="form-control" placeholder="Confirma Senha">
+												</div>
 											</div>
 										</div>
-										
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="cmbSetor">Setor</label>
-												<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
-													<option value="0">Informe um setor</option>
-												</select>
+									</div>
+								</div>
+								
+								<h5 class="mb-0 font-weight-semibold">Contato</h5>
+								<br>
+								<div class="row">
+									<div class="col-lg-12">
+										<div class="row">
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputEmail">E-mail</label>
+													<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" required>
+												</div>
 											</div>
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputTelefone">Telefone</label>
+													<input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999">
+												</div>
+											</div>
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputCelular">Celular</label>
+													<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
+												</div>
+											</div>											
 										</div>
-										
+									</div>
+								</div>
+
+								<h5 class="mb-0 font-weight-semibold">Lotação</h5>
+								<br>
+								<div class="row">
+									<div class="col-lg-12">
+										<div class="row">
+											<div class="col-lg-6">
+												<div class="form-group">
+													<label for="cmbUnidade">Unidade</label>
+													<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
+														<option value="0">Informe uma unidade</option>
+														<?php 
+															$sql = ("SELECT UnidaId, UnidaNome
+																	 FROM Unidade															     
+																	 WHERE UnidaEmpresa = ". $EmpresaId ." and UnidaStatus = 1
+																	 ORDER BY UnidaNome ASC");
+															$result = $conn->query("$sql");
+															$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+															
+															foreach ($rowUnidade as $item){															
+																print('<option value="'.$item['UnidaId'].'">'.$item['UnidaNome'].'</option>');
+															}
+														
+														?>
+													</select>
+												</div>
+											</div>
+											
+											<div class="col-lg-6">
+												<div class="form-group">
+													<label for="cmbSetor">Setor</label>
+													<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
+														<option value="0">Informe um setor</option>
+													</select>
+												</div>
+											</div>
+											
+										</div>
 									</div>
 								</div>
 							</div>
@@ -304,7 +405,7 @@ if(isset($_POST['inputCpf'])){
 							<div class="row" style="margin-top: 20px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<button class="btn btn-lg btn-success" type="submit" disabled id="btnIncluir">Incluir</button>
 										<a href="usuario.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

@@ -3,7 +3,7 @@
 session_start(); 
 
 
-$arquivos = array('usuario.php', 'usuarioNovo.php', 'usuarioEdita.php', 'usuarioExclui.php', 'usuarioMudaSituacao.php', 
+$arquivos = array('usuario.php', 'usuarioNovo.php', 'usuarioEdita.php', 'usuarioExclui.php', 'usuarioMudaSituacao.php', 'usuarioValida.php', 
 				  'licenca.php', 'licencaNovo.php', 'licencaEdita.php', 'licencaExclui.php', 'licencaMudaSituacao.php', 
 				  'unidade.php', 'unidadeNovo.php', 'unidadeEdita.php', 'unidadeExclui.php', 'unidadeMudaSituacao.php', 'unidadeValida.php',
 				  'setor.php'  , 'setorNovo.php'  , 'setorEdita.php'  , 'setorExclui.php'  , 'setorMudaSituacao.php',
