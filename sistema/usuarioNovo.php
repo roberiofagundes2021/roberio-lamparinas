@@ -95,10 +95,14 @@ if(isset($_POST['inputCpf'])){
 			
 				var inputCpf = $('#inputCpf').val();
 
+				alert(inputCpf);
+				
 				$.getJSON('usuarioValida.php?cpf='+inputCpf, function (dados){
 					
 					//Se tem usuário e ele não está vinculado a essa empresa ainda
 					if (typeof dados === 'object'){
+						
+						alert('Entrou1');
 						
 						document.getElementById('demaisCampos').style.display = "block";
 						
@@ -118,6 +122,7 @@ if(isset($_POST['inputCpf'])){
 						$('#btnIncluir').prop("disabled", false);
 		
 					} else {
+						//se o usuário está cadastrado e já está vinculado a essa empresa
 						if (dados){
 							document.getElementById('demaisCampos').style.display = "none";
 							alerta('Atenção','O usuário com CPF ' + inputCpf + ' já está vinculado a essa empresa!','error');
@@ -125,18 +130,18 @@ if(isset($_POST['inputCpf'])){
 							$('#inputCpf').val();
 							$('#inputCpf').focus();
 							return false;
-						} else {
+						} else { // se o usuário não está cadastrado
 							document.getElementById('demaisCampos').style.display = "block";
-							$('#inputNome').val();
-							$('#cmbPerfil').val();
-							$('#inputLogin').val();
-							$('#inputSenha').val();
-							$('#inputConfirmaSenha').val();
-							$('#inputEmail').val();
-							$('#inputTelefone').val();
-							$('#inputCelular').val();
-							$('#cmbUnidade').val();
-							$('#cmbSetor').val();
+							$('#inputNome').val("");
+							$('#cmbPerfil').val("");
+							$('#inputLogin').val("");
+							$('#inputSenha').val("");
+							$('#inputConfirmaSenha').val("");
+							$('#inputEmail').val("");
+							$('#inputTelefone').val("");
+							$('#inputCelular').val("");
+							$('#cmbUnidade').val("");
+							$('#cmbSetor').val("");
 							$('#inputNome').focus();
 							$('#btnIncluir').prop("disabled", false);
 						}
