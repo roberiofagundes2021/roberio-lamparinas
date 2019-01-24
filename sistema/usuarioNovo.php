@@ -93,17 +93,18 @@ if(isset($_POST['inputCpf'])){
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#buscar').on('click', function(e){
 			
-				var inputCpf = $('#inputCpf').val();
+				var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g,'');
 
-				alert(inputCpf);
+				if (inputCpf.length < 11){
+					alerta('Atenção','O CPF precisa ser informado corretamente!','error');
+					return false;
+				}
 				
 				$.getJSON('usuarioValida.php?cpf='+inputCpf, function (dados){
 					
 					//Se tem usuário e ele não está vinculado a essa empresa ainda
 					if (typeof dados === 'object'){
-						
-						alert('Entrou1');
-						
+												
 						document.getElementById('demaisCampos').style.display = "block";
 						
 						$.each(dados, function(i, obj){
@@ -146,41 +147,7 @@ if(isset($_POST['inputCpf'])){
 							$('#btnIncluir').prop("disabled", false);
 						}
 					}					
-				});				
-
-/*				
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "usuarioValida.php",
-					data: ('cpf='+inputCpf),
-					success: function(resposta){
-						
-						alert(resposta);
-						
-						
-						if(resposta == "existeNessaEmpresa"){
-							document.getElementById('demaisCampos').style.display = "none";
-							alerta('Atenção','Esse usuário já está vinculado a essa empresa!','error');
-							return false;
-						} else if (resposta == 0){
-							document.getElementById('demaisCampos').style.display = "block";
-							$('#inputNome').focus();
-						} else {
-							document.getElementById('demaisCampos').style.display = "block";
-							$('#inputNome').val(resposta.UsuarNome);
-							$('#cmbPerfil').val(resposta.EXUXPPerfil);
-							$('#inputLogin').val(resposta.UsuarLogin);
-							$('#inputSenha').val(resposta.UsuarSenha);
-							$('#inputConfirmaSenha').val(resposta.UsuarSenha);
-							$('#inputEmail').val(resposta.UsuarEmail);
-							$('#inputTelefone').val(resposta.UsuarTelefone);
-							$('#inputCelular').val(resposta.UsuarCelular);
-							$('#cmbUnidade').val(resposta.EXUXPUnidade);
-							$('#cmbSetor').val(resposta.EXUXPSetor);
-						}						
-					}
-				})  */
+				});
 			});
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
@@ -210,6 +177,12 @@ if(isset($_POST['inputCpf'])){
 			$('#inputCpf').on('change', function(e){
 				$('#buscar').trigger('click');
 			});
+			
+			$('#inputCpf').keypress(function(e) {
+				if (e.which == 13) {
+					 $('#buscar').trigger('click'); 
+				}
+			});			
 			
 		});
 		

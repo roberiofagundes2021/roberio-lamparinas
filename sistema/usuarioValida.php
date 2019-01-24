@@ -19,7 +19,7 @@ if(isset($_POST['nomeVelho'])){
 					EXUXPEmpresa, EXUXPPerfil, EXUXPUnidade, EXUXPSetor
 			 FROM Usuario
 			 JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
-			 WHERE UsuarCpf = '". limpaCPF_CNPJ($_GET['cpf'])."'");
+			 WHERE UsuarCpf = '". $_GET['cpf']."'");
 			 
 	$result = $conn->query("$sql");
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);

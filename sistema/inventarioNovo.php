@@ -173,6 +173,29 @@ if(isset($_POST['inputData'])){
 				
 			}); // enviar
 
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbUnidade').on('change', function(e){
+
+				FiltraLocalEstoque();
+				
+				var cmbUnidade = $('#cmbUnidade').val();
+
+				$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados){
+					
+					var option = '';
+
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.LcEstId+'">' + obj.LcEstNome + '</option>';
+						});						
+						
+						$('#cmbLocalEstoque').html(option).show();
+					} else {
+						ResetLocalEstoque();
+					}					
+				});
+			});
             
 			//Ao mudar a Equipe, filtra o possível presidente via ajax (retorno via JSON)
 			$('#cmbEquipe').on('change', function(e){
@@ -202,6 +225,14 @@ if(isset($_POST['inputData'])){
 				}				
 			});	
 						
+				
+			function FiltraLocalEstoque(){
+				$('#cmbLocalEstoque').empty().append('<option>Filtrando...</option>');
+			}
+			
+			function ResetLocalEstoque(){
+				$('#cmbLocalEstoque').empty().append('<option>Sem Local do Estoque</option>');
+			}			
 			
 			//Mostra o "Filtrando..." na combo Presidente da Comissão
 			function FiltraPresidente(){
@@ -210,7 +241,7 @@ if(isset($_POST['inputData'])){
 			
 			function ResetPresidente(){
 				$('#cmbPresidente').empty().append('<option value="#">Nenhum</option>');
-			}			
+			}		
 			
         }); // document.ready
        
