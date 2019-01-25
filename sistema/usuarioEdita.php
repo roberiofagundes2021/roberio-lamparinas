@@ -2,21 +2,26 @@
 
 include_once("sessao.php"); 
 
+include('global_assets/php/conexao.php');
+
 $_SESSION['PaginaAtual'] = 'Editar Usuário';
 
-include('global_assets/php/conexao.php');
+if (isset($_SESSION['EmpresaId'])){
+	$EmpresaId = $_SESSION['EmpresaId'];
+} else {	
+	$EmpresaId = $_SESSION['EmpreId'];
+}
 
 if(isset($_POST['inputUsuarioId'])){
 	
 	$iUsuario = $_POST['inputUsuarioId'];
-	$iEmpresa = $_SESSION['EmpreId'];
         	
 	try{
 		
-		$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, EXUXPPerfil
+		$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, EXUXPPerfil, EXUXPUnidade, EXUXPSetor
 				FROM Usuario
 				JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
-				WHERE UsuarId = $iUsuario and EXUXPEmpresa = $iEmpresa ";
+				WHERE UsuarId = $iUsuario and EXUXPEmpresa = $EmpresaId ";
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
@@ -96,18 +101,172 @@ if(isset($_POST['inputCpf'])){
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>		
-	<!-- /theme JS files -->	
+	<!-- /theme JS files -->
+
+	<!-- Adicionando Javascript -->
+    <script type="text/javascript" >
+
+        $(document).ready(function() {	
+	
+				Filtrando();
+				
+				var cmbUnidade = $('#cmbUnidade').val();
+				alert(cmbUnidade);
+				
+				if (cmbUnidade == '#'){
+					Reset();
+				} else {
+
+					$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function (dados){
+						
+						var option = '<option value="#">Selecione o Setor</option>';
+alert(dados.length);
+						if (dados.length){						
+							
+							$.each(dados, function(i, obj){
+								option += '<option value="'+obj.SetorId+'">' + obj.SetorNome + '</option>';
+							});						
+							
+							$('#cmbSetor').html(option).show();
+						} else {
+							Reset();
+						}					
+					});
+				}	
+	
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbUnidade').on('change', function(e){
+
+				Filtrando();
+				
+				var cmbUnidade = $('#cmbUnidade').val();
+				
+				if (cmbUnidade == '#'){
+					Reset();
+				} else {
+
+					$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function (dados){
+						
+						var option = '<option value="#">Selecione o Setor</option>';
+
+						if (dados.length){						
+							
+							$.each(dados, function(i, obj){
+								option += '<option value="'+obj.SetorId+'">' + obj.SetorNome + '</option>';
+							});						
+							
+							$('#cmbSetor').html(option).show();
+						} else {
+							Reset();
+						}					
+					});
+				}
+			});	
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+
+				e.preventDefault();
+				
+				var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g,'');
+				var inputNome = $('#inputNome').val();
+				var cmbPerfil = $('#cmbPerfil').val();
+				var inputLogin = $('#inputLogin').val();
+				var inputSenha = $('#inputSenha').val();
+				var inputConfirmaSenha = $('#inputConfirmaSenha').val();
+				var cmbUnidade = $('#cmbUnidade').val();
+				var cmbSetor = $('#cmbSetor').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNome.trim();
+				inputLogin = inputLogin.trim();				
+
+				if (inputCpf.length < 11){
+					alerta('Atenção','O CPF precisa ser informado corretamente!','error');
+					return false;
+				}
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == ''){
+					alerta('Atenção','Informe o nome do usuário!','error');
+					$('#inputNome').focus();
+					return false;
+				}
+
+				if (cmbPerfil == '#'){
+					alerta('Atenção','Informe o perfil!','error');
+					$('#cmPerfil').focus();
+					return false;
+				}
+				
+				if (inputLogin == ''){
+					alerta('Atenção','Informe o login!','error');
+					$('#inputLogin').focus();
+					return false;
+				}
+				
+				if (inputSenha == ''){
+					alerta('Atenção','Informe senha!','error');
+					$('#inputSenha').focus();
+					return false;
+				}
+				
+				if (inputSenha != inputConfirmaSenha){
+					alerta('Atenção','A confirmação de senha não confere!','error');
+					$('#inputConfirmaSenha').focus();
+					return false;
+				}	
+
+				if (cmbUnidade == '#'){
+					alerta('Atenção','Informe a unidade!','error');
+					$('#cmUnidade').focus();
+					return false;
+				}
+
+				if (cmbSetor == '#'){
+					alerta('Atenção','Informe o setor!','error');
+					$('#cmSetor').focus();
+					return false;
+				}				
+				
+				$( "#formUsuario" ).submit();
+			})
+			
+			function Filtrando(){
+				$('#cmbSetor').empty().append('<option>Filtrando...</option>');
+			}
+			
+			function Reset(){
+				$('#cmbSetor').empty().append('<option value="#">Sem setor</option>');
+			}			
+		});
+		
+	</script>
 
 </head>
 
-<body class="navbar-top">
+	<?php
+		
+		if (isset($_SESSION['EmpresaId'])){	
+			print('<body class="navbar-top sidebar-xs">');
+		} else {
+			print('<body class="navbar-top">');
+		}
 
-	<?php include_once("topo.php"); ?>	
+		include_once("topo.php");
+	?>
 
 	<!-- Page content -->
 	<div class="page-content">
 		
-		<?php include_once("menu-left.php"); ?>
+		<?php 
+		
+			include_once("menu-left.php"); 
+		
+			if (isset($_SESSION['EmpresaId'])){
+				include_once("menuLeftSecundario.php");
+			}
+		?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -120,7 +279,7 @@ if(isset($_POST['inputCpf'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formUsuario" id="formUsuario" method="post" class="form-validate" action="usuarioEdita.php">
+					<form name="formUsuario" id="formUsuario" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Usuário "<?php echo $row['UsuarNome']; ?>"</h5>
 						</div>
@@ -134,7 +293,7 @@ if(isset($_POST['inputCpf'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputCpf">CPF</label>
-												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo $row['UsuarCpf']; ?>" maxlength="11" pattern="[0-9]+$" required>
+												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo formatarCPF_Cnpj($row['UsuarCpf']); ?>" required readOnly>
 											</div>
 										</div>
 										<div class="col-lg-7">
@@ -235,18 +394,22 @@ if(isset($_POST['inputCpf'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbUnidade">Unidade</label>
-												<select name="cmbUnidade" class="form-control form-control-select2" required>
-													<option value="0">Informe uma unidade</option>
+												<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
+													<option value="#">Informe uma unidade</option>
 													<?php 
 														$sql = ("SELECT UnidaId, UnidaNome
 																 FROM Unidade															     
-																 WHERE UnidaEmpresa = ". $_SESSION['EmpreId'] ." and UnidaStatus = 1
+																 WHERE UnidaEmpresa = ". $EmpresaId ." and UnidaStatus = 1
 																 ORDER BY UnidaNome ASC");
 														$result = $conn->query("$sql");
 														$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
 														
-														foreach ($rowUnidade as $item){															
-															print('<option value="'.$item['UnidaId'].'">'.$item['UnidaNome'].'</option>');
+														foreach ($rowUnidade as $item){
+															if($item['UnidaId'] == $row['EXUXPUnidade']){
+																print('<option value="'.$item['UnidaId'].'" selected="selected">'.$item['UnidaNome'].'</option>');
+															} else {
+																print('<option value="'.$item['UnidaId'].'">'.$item['UnidaNome'].'</option>');
+															}
 														}
 													
 													?>
@@ -257,18 +420,22 @@ if(isset($_POST['inputCpf'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSetor">Setor</label>
-												<select name="cmbSetor" class="form-control form-control-select2" required>
-													<option value="0">Informe um setor</option>
+												<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
+													<option value="#">Informe um setor</option>
 													<?php 
 														$sql = ("SELECT SetorId, SetorNome
 																 FROM Setor															     
-																 WHERE SetorEmpresa = ". $_SESSION['EmpreId'] ." and SetorStatus = 1
+																 WHERE SetorEmpresa = ". $EmpresaId ." and SetorStatus = 1
 																 ORDER BY SetorNome ASC");
 														$result = $conn->query("$sql");
 														$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
 														
-														foreach ($rowSetor as $item){															
-															print('<option value="'.$item['SetorId'].'">'.$item['SetorNome'].'</option>');
+														foreach ($rowSetor as $item){	
+															if($item['SetorId'] == $row['EXUXPSetor']){
+																print('<option value="'.$item['SetorId'].'" selected="selected">'.$item['SetorNome'].'</option>');
+															} else {
+																print('<option value="'.$item['SetorId'].'">'.$item['SetorNome'].'</option>');
+															}
 														}
 													
 													?>
@@ -283,7 +450,7 @@ if(isset($_POST['inputCpf'])){
 							<div class="row" style="margin-top: 20px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
 										<a href="usuario.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

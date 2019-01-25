@@ -180,21 +180,26 @@ if(isset($_POST['inputData'])){
 				
 				var cmbUnidade = $('#cmbUnidade').val();
 
-				$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados){
-					
-					var option = '';
+				if (cmbUnidade == '#'){
+					ResetLocalEstoque();
+				} else {
+				
+					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados){
+						
+						var option = '';
 
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.LcEstId+'">' + obj.LcEstNome + '</option>';
-						});						
-						
-						$('#cmbLocalEstoque').html(option).show();
-					} else {
-						ResetLocalEstoque();
-					}					
-				});
+						if (dados.length){						
+							
+							$.each(dados, function(i, obj){
+								option += '<option value="'+obj.LcEstId+'">' + obj.LcEstNome + '</option>';
+							});						
+							
+							$('#cmbLocalEstoque').html(option).show();
+						} else {
+							ResetLocalEstoque();
+						}					
+					});
+				}
 			});
             
 			//Ao mudar a Equipe, filtra o possível presidente via ajax (retorno via JSON)

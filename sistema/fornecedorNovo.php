@@ -292,30 +292,29 @@ if(isset($_POST['inputTipo'])){
 				
 			}); // enviar
 
-            
-        }); // document.ready
-
-        function Filtrando(){
-			$('#cmbSubCategoria').empty().append('<option value="Filtrando">Filtrando...</option>');
-		}
-        
-        function Reset(){
-			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
-		}
-        
-        function selecionaPessoa(tipo) {
-			if (tipo == 'PF'){
-				document.getElementById('CPF').style.display = "block";
-				document.getElementById('CNPJ').style.display = "none";
-				document.getElementById('dadosPF').style.display = "block";
-				document.getElementById('dadosPJ').style.display = "none";
-			} else {
-				document.getElementById('CPF').style.display = "none";
-				document.getElementById('CNPJ').style.display = "block";				
-				document.getElementById('dadosPF').style.display = "none";
-				document.getElementById('dadosPJ').style.display = "block";
+			function Filtrando(){
+				$('#cmbSubCategoria').empty().append('<option value="Filtrando">Filtrando...</option>');
 			}
-		}
+			
+			function Reset(){
+				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+			}
+			
+			function selecionaPessoa(tipo) {
+				if (tipo == 'PF'){
+					document.getElementById('CPF').style.display = "block";
+					document.getElementById('CNPJ').style.display = "none";
+					document.getElementById('dadosPF').style.display = "block";
+					document.getElementById('dadosPJ').style.display = "none";
+				} else {
+					document.getElementById('CPF').style.display = "none";
+					document.getElementById('CNPJ').style.display = "block";				
+					document.getElementById('dadosPF').style.display = "none";
+					document.getElementById('dadosPJ').style.display = "block";
+				}
+			}			
+			
+        }); // document.ready
 
     </script>	
 	

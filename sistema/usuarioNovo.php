@@ -16,49 +16,87 @@ if(isset($_POST['inputCpf'])){
 
 	try{
 		
-		$sql = "INSERT INTO Usuario (UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular)
-				VALUES (:sCpf, :sNome, :sLogin, :sSenha, :sEmail, :sTelefone, :sCelular)";
-		$result = $conn->prepare($sql);
-		
 		$conn->beginTransaction();
 		
-		$result->execute(array(
-						':sCpf' => $_POST['inputCpf'],
-						':sNome' => $_POST['inputNome'],
-						':sLogin' => $_POST['inputLogin'],
-						':sSenha' => $_POST['inputSenha'],
-						':sEmail' => $_POST['inputEmail'],
-						':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
-						':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular']						
-						));
-		$LAST_ID = $conn->lastInsertId();
+		//Se for um novo usuário que ainda não estava cadastrado em nenhuma empresa
+		if ($_POST['inputId'] == 0){
 		
-						
-		$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPUnidade, 
-													EXUXPSetor, EXUXPStatus, EXUXPUsuarioAtualizador)
-				VALUES (:iEmpresa, :iUsuario, :iPerfil, :iUnidade, :iSetor, :bStatus, :iUsuarioAtualizador)";
-		$result = $conn->prepare($sql);
-		$result->execute(array(
-						':iEmpresa' => $EmpresaId,
-						':iUsuario' => $LAST_ID,
-						':iPerfil' => $_POST['inputPerfil'],
-						':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
-						':iSetor' => $_POST['cmbSetor'] == '#' ? null : $_POST['cmbSetor'],
-						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId']
-						));		
+			$sql = "INSERT INTO Usuario (UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular)
+					VALUES (:sCpf, :sNome, :sLogin, :sSenha, :sEmail, :sTelefone, :sCelular)";
+			$result = $conn->prepare($sql);			
+			
+			$result->execute(array(
+							':sCpf' => $_POST['inputCpf'],
+							':sNome' => $_POST['inputNome'],
+							':sLogin' => $_POST['inputLogin'],
+							':sSenha' => $_POST['inputSenha'],
+							':sEmail' => $_POST['inputEmail'],
+							':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
+							':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular']						
+							));
+			$LAST_ID = $conn->lastInsertId();
+			
+							
+			$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPUnidade, 
+														EXUXPSetor, EXUXPStatus, EXUXPUsuarioAtualizador)
+					VALUES (:iEmpresa, :iUsuario, :iPerfil, :iUnidade, :iSetor, :bStatus, :iUsuarioAtualizador)";
+			$result = $conn->prepare($sql);
+			$result->execute(array(
+							':iEmpresa' => $EmpresaId,
+							':iUsuario' => $LAST_ID,
+							':iPerfil' => $_POST['inputPerfil'],
+							':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
+							':iSetor' => $_POST['cmbSetor'] == '#' ? null : $_POST['cmbSetor'],
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId']
+							));
+		} else {
+			
+			$sql = "UPDATE Usuario SET UsuarNome = :sNome, usuarLogin = :sLogin, 
+						   UsuarSenha = :sSenha, UsuarEmail = :sEmail, UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
+					WHERE UsuarId = :iUsuario";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(							
+							':sNome' => $_POST['inputNome'],
+							':sLogin' => $_POST['inputLogin'],
+							':sSenha' => $_POST['inputSenha'],
+							':sEmail' => $_POST['inputEmail'],
+							':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
+							':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
+							':iUsuario' =>  $_POST['inputId']
+							));
+			
+			$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPUnidade, 
+														EXUXPSetor, EXUXPStatus, EXUXPUsuarioAtualizador)
+					VALUES (:iEmpresa, :iUsuario, :iPerfil, :iUnidade, :iSetor, :bStatus, :iUsuarioAtualizador)";
+			$result = $conn->prepare($sql);
+			$result->execute(array(
+							':iEmpresa' => $EmpresaId,
+							':iUsuario' => $_POST['inputId'],
+							':iPerfil' => $_POST['cmbPerfil'] == '#' ? null : $_POST['cmbPerfil'],
+							':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
+							':iSetor' => $_POST['cmbSetor'] == '#' ? null : $_POST['cmbSetor'],
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId']
+							));
+		}
 		
+		$conn->commit();
+							
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Usuário incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";				
 		
 	} catch(PDOException $e) {
 		
+		$conn->rollback();
+		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir usuário!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 	
 	irpara("usuario.php");
@@ -94,6 +132,7 @@ if(isset($_POST['inputCpf'])){
 			$('#buscar').on('click', function(e){
 			
 				var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g,'');
+				var inputId = $('#inputId').val();
 
 				if (inputCpf.length < 11){
 					alerta('Atenção','O CPF precisa ser informado corretamente!','error');
@@ -102,32 +141,30 @@ if(isset($_POST['inputCpf'])){
 				
 				$.getJSON('usuarioValida.php?cpf='+inputCpf, function (dados){
 					
-					//Se tem usuário e ele não está vinculado a essa empresa ainda
+					//Se o usuário está cadastrado e ele não está vinculado a essa empresa ainda
 					if (typeof dados === 'object'){
 												
 						document.getElementById('demaisCampos').style.display = "block";
 						
 						$.each(dados, function(i, obj){
+							$('#inputId').val(obj.UsuarId);
 							$('#inputNome').val(obj.UsuarNome);
-							$('#cmbPerfil').val(obj.EXUXPPerfil);
 							$('#inputLogin').val(obj.UsuarLogin);
 							$('#inputSenha').val(obj.UsuarSenha);
 							$('#inputConfirmaSenha').val(obj.UsuarSenha);
 							$('#inputEmail').val(obj.UsuarEmail);
 							$('#inputTelefone').val(obj.UsuarTelefone);
 							$('#inputCelular').val(obj.UsuarCelular);
-							$('#cmbUnidade').val(obj.EXUXPUnidade);
-							$('#cmbSetor').val(obj.EXUXPSetor);
-						});
+						});						
 						
-						$('#btnIncluir').prop("disabled", false);
+						$('#enviar').prop("disabled", false);
 		
 					} else {
 						//se o usuário está cadastrado e já está vinculado a essa empresa
 						if (dados){
 							document.getElementById('demaisCampos').style.display = "none";
 							alerta('Atenção','O usuário com CPF ' + inputCpf + ' já está vinculado a essa empresa!','error');
-							$('#btnIncluir').prop("disabled", true);
+							$('#enviar').prop("disabled", true);
 							$('#inputCpf').val();
 							$('#inputCpf').focus();
 							return false;
@@ -144,7 +181,8 @@ if(isset($_POST['inputCpf'])){
 							$('#cmbUnidade').val("");
 							$('#cmbSetor').val("");
 							$('#inputNome').focus();
-							$('#btnIncluir').prop("disabled", false);
+							$('#enviar').prop("disabled", false);
+							$('#inputId').val(0);
 						}
 					}					
 				});
@@ -156,22 +194,27 @@ if(isset($_POST['inputCpf'])){
 				Filtrando();
 				
 				var cmbUnidade = $('#cmbUnidade').val();
+				
+				if (cmbUnidade == '#'){
+					Reset();
+				} else {
 
-				$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function (dados){
-					
-					var option = '<option>Selecione o Setor</option>';
+					$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function (dados){
+						
+						var option = '<option value="#">Selecione o Setor</option>';
 
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SetorId+'">' + obj.SetorNome + '</option>';
-						});						
-						
-						$('#cmbSetor').html(option).show();
-					} else {
-						Reset();
-					}					
-				});
+						if (dados.length){						
+							
+							$.each(dados, function(i, obj){
+								option += '<option value="'+obj.SetorId+'">' + obj.SetorNome + '</option>';
+							});						
+							
+							$('#cmbSetor').html(option).show();
+						} else {
+							Reset();
+						}					
+					});
+				}
 			});	
 
 			$('#inputCpf').on('change', function(e){
@@ -183,16 +226,85 @@ if(isset($_POST['inputCpf'])){
 					 $('#buscar').trigger('click'); 
 				}
 			});			
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+
+				e.preventDefault();
+				
+				var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g,'');
+				var inputNome = $('#inputNome').val();
+				var cmbPerfil = $('#cmbPerfil').val();
+				var inputLogin = $('#inputLogin').val();
+				var inputSenha = $('#inputSenha').val();
+				var inputConfirmaSenha = $('#inputConfirmaSenha').val();
+				var cmbUnidade = $('#cmbUnidade').val();
+				var cmbSetor = $('#cmbSetor').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNome.trim();
+				inputLogin = inputLogin.trim();				
+
+				if (inputCpf.length < 11){
+					alerta('Atenção','O CPF precisa ser informado corretamente!','error');
+					return false;
+				}
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == ''){
+					alerta('Atenção','Informe o nome do usuário!','error');
+					$('#inputNome').focus();
+					return false;
+				}
+
+				if (cmbPerfil == '#'){
+					alerta('Atenção','Informe o perfil!','error');
+					$('#cmPerfil').focus();
+					return false;
+				}
+				
+				if (inputLogin == ''){
+					alerta('Atenção','Informe o login!','error');
+					$('#inputLogin').focus();
+					return false;
+				}
+				
+				if (inputSenha == ''){
+					alerta('Atenção','Informe senha!','error');
+					$('#inputSenha').focus();
+					return false;
+				}
+				
+				if (inputSenha != inputConfirmaSenha){
+					alerta('Atenção','A confirmação de senha não confere!','error');
+					$('#inputConfirmaSenha').focus();
+					return false;
+				}	
+
+				if (cmbUnidade == '#'){
+					alerta('Atenção','Informe a unidade!','error');
+					$('#cmUnidade').focus();
+					return false;
+				}
+
+				if (cmbSetor == '#'){
+					alerta('Atenção','Informe o setor!','error');
+					$('#cmSetor').focus();
+					return false;
+				}				
+				
+				$( "#formUsuario" ).submit();
+			})
 			
+			function Filtrando(){
+				$('#cmbSetor').empty().append('<option>Filtrando...</option>');
+			}
+			
+			function Reset(){
+				$('#cmbSetor').empty().append('<option value="#">Sem setor</option>');
+			}			
 		});
 		
-		function Filtrando(){
-			$('#cmbSetor').empty().append('<option>Filtrando...</option>');
-		}
-		
-		function Reset(){
-			$('#cmbSetor').empty().append('<option>Sem setor</option>');
-		}
 	</script>	
 	
 </head>
@@ -231,7 +343,7 @@ if(isset($_POST['inputCpf'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formUsuario" id="formUsuario" method="post" class="form-validate" action="usuarioNovo.php">
+					<form name="formUsuario" id="formUsuario" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Usuário</h5>
 						</div>
@@ -245,6 +357,7 @@ if(isset($_POST['inputCpf'])){
 										<div class="form-control-feedback" id="buscar" style="cursor: pointer;">
 											<i class="icon-search4"></i>
 										</div>
+										<input type="hidden" id="inputId" name="inputId" value="0">
 									</div>
 								</div>
 							</div>
@@ -261,9 +374,9 @@ if(isset($_POST['inputCpf'])){
 											</div>
 											<div class="col-lg-4">
 												<div class="form-group">
-													<label for="inputPerfil">Perfil</label>
-													<select name="inputPerfil" class="form-control form-control-select2" required>
-														<option value="0">Informe um perfil</option>
+													<label for="cmbPerfil">Perfil</label>
+													<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2" required>
+														<option value="#">Informe um perfil</option>
 														<?php
 															$sql = ("SELECT PerfiId, PerfiNome
 																	 FROM Perfil
@@ -348,7 +461,7 @@ if(isset($_POST['inputCpf'])){
 												<div class="form-group">
 													<label for="cmbUnidade">Unidade</label>
 													<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
-														<option value="0">Informe uma unidade</option>
+														<option value="#">Informe uma unidade</option>
 														<?php 
 															$sql = ("SELECT UnidaId, UnidaNome
 																	 FROM Unidade															     
@@ -370,7 +483,7 @@ if(isset($_POST['inputCpf'])){
 												<div class="form-group">
 													<label for="cmbSetor">Setor</label>
 													<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
-														<option value="0">Informe um setor</option>
+														<option value="#">Sem setor</option>
 													</select>
 												</div>
 											</div>
@@ -383,7 +496,7 @@ if(isset($_POST['inputCpf'])){
 							<div class="row" style="margin-top: 20px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit" disabled id="btnIncluir">Incluir</button>
+										<button class="btn btn-lg btn-success" disabled id="enviar">Incluir</button>
 										<a href="usuario.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

@@ -258,48 +258,48 @@ if(isset($_POST['inputData'])){
 				})	
 			}); //click
 			
-		}); //document.ready
-		
-		//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
-        function Filtrando(){
-			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-			FiltraProduto();
-		}		
-		
-		//Mostra o "Filtrando..." na combo Produto
-        function FiltraProduto(){
-			$('#cmbProduto').empty().append('<option>Filtrando...</option>');
-		}		
-		
-		function ResetSubCategoria(){
-			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
-		}
-		
-		function ResetProduto(){
-			$('#cmbProduto').empty().append('<option>Sem produto</option>');
-		}
-		
-        function selecionaTipo(tipo) {
-			if (tipo == 'E'){
-				document.getElementById('EstoqueOrigem').style.display = "none";
-				document.getElementById('DestinoLocal').style.display = "block";
-				document.getElementById('DestinoSetor').style.display = "none";
-				document.getElementById('classificacao').style.display = "block";
-				document.getElementById('motivo').style.display = "none";
-			} else if (tipo == 'S') {
-				document.getElementById('EstoqueOrigem').style.display = "block";
-				document.getElementById('DestinoLocal').style.display = "none";
-				document.getElementById('DestinoSetor').style.display = "block";
-				document.getElementById('classificacao').style.display = "block";
-				document.getElementById('motivo').style.display = "none";
-			} else {
-				document.getElementById('EstoqueOrigem').style.display = "block";
-				document.getElementById('DestinoLocal').style.display = "block";
-				document.getElementById('DestinoSetor').style.display = "none";
-				document.getElementById('classificacao').style.display = "none";
-				document.getElementById('motivo').style.display = "block";
+			//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
+			function Filtrando(){
+				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+				FiltraProduto();
+			}		
+			
+			//Mostra o "Filtrando..." na combo Produto
+			function FiltraProduto(){
+				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+			}		
+			
+			function ResetSubCategoria(){
+				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
 			}
-		}		
+			
+			function ResetProduto(){
+				$('#cmbProduto').empty().append('<option>Sem produto</option>');
+			}
+			
+			function selecionaTipo(tipo) {
+				if (tipo == 'E'){
+					document.getElementById('EstoqueOrigem').style.display = "none";
+					document.getElementById('DestinoLocal').style.display = "block";
+					document.getElementById('DestinoSetor').style.display = "none";
+					document.getElementById('classificacao').style.display = "block";
+					document.getElementById('motivo').style.display = "none";
+				} else if (tipo == 'S') {
+					document.getElementById('EstoqueOrigem').style.display = "block";
+					document.getElementById('DestinoLocal').style.display = "none";
+					document.getElementById('DestinoSetor').style.display = "block";
+					document.getElementById('classificacao').style.display = "block";
+					document.getElementById('motivo').style.display = "none";
+				} else {
+					document.getElementById('EstoqueOrigem').style.display = "block";
+					document.getElementById('DestinoLocal').style.display = "block";
+					document.getElementById('DestinoSetor').style.display = "none";
+					document.getElementById('classificacao').style.display = "none";
+					document.getElementById('motivo').style.display = "block";
+				}
+			}				
+			
+		}); //document.ready	
 					
 	</script>
 
