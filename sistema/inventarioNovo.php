@@ -23,19 +23,31 @@ if(isset($_POST['inputData'])){
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
 		$iSituacao = $row['SituaId'];
+
+		$sql = "Select Max(InvenNumero) as MaiorNumero
+				From Inventario
+				Where InvenEmpresa = ".$_SESSION['EmpreId'];
+		$result = $conn->query("$sql");
+		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
-		$sql = "INSERT INTO Inventario (InvenData, InvenNumero, InvenDataLimite, InvenSolicitante, InvenObservacao, 
-										InvenSituacao, InvenUsuarioAtualizador, InvenEmpresa)
-				VALUES (:dData, :sNumero, :dDataLimite, :iSolicitante, :sObservacao, 
-						:iSituacao, :iUsuarioAtualizador, :iEmpresa)";
+		$iUltimoNumero = $row['MaiorNumero'];
+		$iproximoNumero = $iUltimoNumero + 1;
+		
+		$sql = "INSERT INTO Inventario (InvenData, InvenNumero, InvenDataLimite, InvenClassificacao, InvenUnidade, InvenCategoria, InvenSolicitante, 
+										InvenObservacao, InvenSituacao, InvenUsuarioAtualizador, InvenEmpresa)
+				VALUES (:dData, :iNumero, :dDataLimite, :iClassificacao, :iUnidade, :iCategoria, :iSolicitante, 
+						:sObservacao, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$conn->beginTransaction();
 		
 		$result->execute(array(
 						':dData' => gravaData($_POST['inputData']),
-						':sNumero' => $_POST['inputNumero'],
+						':iNumero' => $iproximoNumero,
 						':dDataLimite' => gravaData($_POST['inputDataLimite']),
+						':iClassificacao' => $_POST['cmbClassificacao'] == '#' ? null : $_POST['cmbClassificacao'],
+						':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
+						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSolicitante' => $_SESSION['UsuarId'],
 						':sObservacao' => $_POST['txtObservacao'],
 						':iSituacao' => $iSituacao,
@@ -47,52 +59,40 @@ if(isset($_POST['inputData'])){
 
 		if ($_POST['cmbLocalEstoque']){
 			
-			try{
-				$sql = "INSERT INTO InventarioXLocalEstoque 
-							(InXLEInventario, InXLELocal)
-						VALUES 
-							(:iInventario, :iLocal)";
-				$result = $conn->prepare($sql);
+			$sql = "INSERT INTO InventarioXLocalEstoque 
+						(InXLEInventario, InXLELocal)
+					VALUES 
+						(:iInventario, :iLocal)";
+			$result = $conn->prepare($sql);
 
-				foreach ($_POST['cmbLocalEstoque'] as $key => $value){
+			foreach ($_POST['cmbLocalEstoque'] as $key => $value){
 
-					$result->execute(array(
-									':iInventario' => $insertId,
-									':iLocal' => $value									
-									));
-				}
-				
-			} catch(PDOException $e) {
-				$conn->rollback();
-				echo 'Error: ' . $e->getMessage();exit;
+				$result->execute(array(
+								':iInventario' => $insertId,
+								':iLocal' => $value									
+								));
 			}
 		}
 
 		if ($_POST['cmbEquipe']){
 			
-			try{
-				$sql = "INSERT INTO InventarioXEquipe 
-							(InXEqInventario, InXEqUsuario, InXEqPresidente)
-						VALUES 
-							(:iInventario, :iUsuario, :bPresidente)";
-				$result = $conn->prepare($sql);
+			$sql = "INSERT INTO InventarioXEquipe 
+						(InXEqInventario, InXEqUsuario, InXEqPresidente)
+					VALUES 
+						(:iInventario, :iUsuario, :bPresidente)";
+			$result = $conn->prepare($sql);
 
-				foreach ($_POST['cmbEquipe'] as $key => $value){
+			foreach ($_POST['cmbEquipe'] as $key => $value){
 
-					$result->execute(array(
-									':iInventario' => $insertId,
-									':iUsuario' => $value,
-									':bPresidente' => $value == $_POST['cmbPresidente'] ? 1 : 0
-									));
-				}
-				
-				$conn->commit();
-				
-			} catch(PDOException $e) {
-				$conn->rollback();
-				echo 'Error: ' . $e->getMessage();exit;
+				$result->execute(array(
+								':iInventario' => $insertId,
+								':iUsuario' => $value,
+								':bPresidente' => $value == $_POST['cmbPresidente'] ? 1 : 0
+								));
 			}
 		}
+		
+		$conn->commit();		
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Inventário incluído!!!";
@@ -143,33 +143,30 @@ if(isset($_POST['inputData'])){
 				
 				e.preventDefault();
 						
-				var inputNumero = $('#inputNumero').val();
-				
-				//remove os espaços desnecessários antes e depois
-				inputNumero = inputNumero.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNumero == ''){
-					alerta('Atenção','Informe o número do inventario!','error');
-					$('#inputNumero').focus();
-					return false;
-				}			
+				var cmbUnidade = $('#cmbUnidade').val();
+				var cmbLocalEstoque = $('#cmbLocalEstoque').val();
+				var cmbEquipe = $('#cmbEquipe').val();
 								
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "inventarioValida.php",
-					data: {numero: inputNumero},
-					success: function(resposta){
+				//Verifica se o campo só possui espaços em branco
+				if (cmbUnidade == '#'){
+					alerta('Atenção','Informe a Unidade!','error');
+					$('#cmbUnidade').focus();
+					return false;
+				}
+				
+				if (cmbLocalEstoque == ''){
+					alerta('Atenção','Informe o Local(is) de Estoque!','error');
+					$('#cmbLocalEstoque').focus();
+					return false;
+				}
 
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;
-						}
-						
-						$( "#formInventario" ).submit();
-					}
-				}); //ajax
+				if (cmbEquipe == ''){
+					alerta('Atenção','Informe a equipe responsável!','error');
+					$('#cmbEquipe').focus();
+					return false;
+				}	
+				
+				$( "#formInventario" ).submit();
 				
 			}); // enviar
 
@@ -229,27 +226,25 @@ if(isset($_POST['inputData'])){
 					ResetPresidente();						
 				}				
 			});	
-						
-				
-			function FiltraLocalEstoque(){
-				$('#cmbLocalEstoque').empty().append('<option>Filtrando...</option>');
-			}
-			
-			function ResetLocalEstoque(){
-				$('#cmbLocalEstoque').empty().append('<option>Sem Local do Estoque</option>');
-			}			
-			
-			//Mostra o "Filtrando..." na combo Presidente da Comissão
-			function FiltraPresidente(){
-				$('#cmbPresidente').empty().append('<option>Filtrando...</option>');
-			}			
-			
-			function ResetPresidente(){
-				$('#cmbPresidente').empty().append('<option value="#">Nenhum</option>');
-			}		
 			
         }); // document.ready
-       
+
+		function FiltraLocalEstoque(){
+			$('#cmbLocalEstoque').empty().append('<option>Filtrando...</option>');
+		}
+		
+		function ResetLocalEstoque(){
+			$('#cmbLocalEstoque').empty().append('<option>Sem Local do Estoque</option>');
+		}			
+		
+		//Mostra o "Filtrando..." na combo Presidente da Comissão
+		function FiltraPresidente(){
+			$('#cmbPresidente').empty().append('<option>Filtrando...</option>');
+		}			
+		
+		function ResetPresidente(){
+			$('#cmbPresidente').empty().append('<option value="#">Nenhum</option>');
+		}			
 
     </script>	
 	
@@ -292,17 +287,32 @@ if(isset($_POST['inputData'])){
 
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputNumero">Número</label>
-										<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número" autofocus required>
-									</div>
-								</div>
-
-								<div class="col-lg-2">
-									<div class="form-group">
 										<label for="inputDataLimite">Data Limite</label>
 										<input type="text" id="inputDataLimite" name="inputDataLimite" class="form-control" placeholder="Data Limite">
 									</div>
 								</div>	
+								
+								<div class="col-lg-2" id="classificacao">
+									<div class="form-group">
+										<label for="cmbClassificacao">Classificação/Bens</label>
+										<select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
+											<option value="#">Selecione</option>
+											<?php 
+												$sql = ("SELECT ClassId, ClassNome
+														 FROM Classificacao
+														 WHERE ClassStatus = 1
+														 ORDER BY ClassNome ASC");
+												$result = $conn->query("$sql");
+												$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($rowClassificacao as $item){
+													print('<option value="'.$item['ClassId'].'">'.$item['ClassNome'].'</option>');
+												}
+											
+											?>
+										</select>
+									</div>
+								</div>								
 								
 								<div class="col-lg-6">
 									<label for="cmbUnidade">Unidade</label>

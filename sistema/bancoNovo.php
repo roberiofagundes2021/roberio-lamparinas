@@ -129,13 +129,13 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-3">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputCodigo">Código da Banco</label>
 										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" data-mask="999" required autofocus>
 									</div>
 								</div>								
-								<div class="col-lg-9">
+								<div class="col-lg-10">
 									<div class="form-group">
 										<label for="inputNome">Nome do Banco</label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>

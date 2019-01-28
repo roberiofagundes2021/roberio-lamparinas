@@ -104,7 +104,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table class="table datatable-responsive">
 								<thead>
 									<tr class="bg-slate">
-										<th>Perfil</th>
+										<th width="75%">Perfil</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>

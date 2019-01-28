@@ -51,7 +51,43 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>		
 	<!-- /theme JS files -->
 	
-	<script>
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+			
+			/* Início: Tabela Personalizada */
+			$('#tblUsuario').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: true,
+				responsive: true,
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */
+		});	
 		
 		function atualizaUsuario(UsuarioId, UsuarioStatus, Tipo){
 
@@ -125,7 +161,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="text-right"><a href="usuarioNovo.php" class="btn btn-success" role="button">Novo usuário</a></div>
 							</div>							
 
-							<table class="table datatable-responsive">
+							<table class="table" id="tblUsuario">
 								<thead>
 									<tr class="bg-slate">
 										<th>Nome</th>

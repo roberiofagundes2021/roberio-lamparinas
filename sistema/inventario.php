@@ -6,14 +6,13 @@ $_SESSION['PaginaAtual'] = 'Inventário';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT InvenId, InvenData, InvenNumero, SituaNome, SituaChave, LcEstNome
+$sql = ("SELECT InvenId, InvenData, InvenNumero, SituaNome, SituaChave, UnidaNome, CategNome
 		 FROM Inventario
 		 JOIN Situacao on SituaId = InvenSituacao
-		 LEFT JOIN InventarioXLocalEstoque on InXLEInventario = InvenId
-		 JOIN LocalEstoque on LcEstId = InXLELocal
-		 LEFT JOIN InventarioXEquipe on InXEqInventario = InvenId
+		 LEFT JOIN Unidade on UnidaId = InvenUnidade
+		 LEFT JOIN Categoria on CategId = InvenCategoria
 		 WHERE InvenEmpresa = ".$_SESSION['EmpreId']."
-		 ORDER BY InvenData DESC"); 
+		 ORDER BY InvenNumero DESC"); 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -34,19 +33,55 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>	
+
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script>
-	
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>		
+		
 	<!-- /theme JS files -->	
 	
-	<script>
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+			
+			/* Início: Tabela Personalizada */
+			$('#tblInventario').DataTable( {
+				"order": [[ 1, "desc" ]],
+			    autoWidth: true,
+				responsive: true,
+			    /*  columnDefs: [{ 
+					orderable: true,
+					width: 150,
+					targets: [ 3 ]
+				}], */
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */
+		});
 		
 		function atualizaInventario(InvenId, Tipo){
 
@@ -103,13 +138,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="text-right"><a href="inventarioNovo.php" class="btn btn-success" role="button">Novo Inventário</a></div>
 							</div>							
 
-							<table class="table datatable-responsive">
+							<table class="table" id="tblInventario">
 								<thead>
 									<tr class="bg-slate">
 										<th width="10%">Data</th>
-										<th width="15%">Nº Inventário</th>
-										<th width="35%">Locais do Estoque</th>
-										<th width="20%">Responsável</th>
+										<th width="13%">Nº Inventário</th>
+										<th width="29%">Unidade</th>
+										<th width="28%">Categoria</th>
 										<th width="10%">Situação</th>
 										<th width="10%" class="text-center">Ações</th>
 									</tr>
@@ -124,9 +159,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('
 										<tr>
 											<td>'.mostraData($item['InvenData']).'</td>
-											<td>'.$item['InvenNumero'].'</td>
-											<td>'.$item['LcEstNome'].'</td>
-											<td>Presidente</td>'
+											<td>'.formatarNumero($item['InvenNumero']).'</td>
+											<td>'.$item['UnidaNome'].'</td>
+											<td>'.$item['CategNome'].'</td>'
 										);
 										
 										print('<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>');

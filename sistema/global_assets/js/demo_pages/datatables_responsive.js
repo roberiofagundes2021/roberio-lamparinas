@@ -26,12 +26,12 @@ var DatatableResponsive = function() {
 
         // Setting datatable defaults
         $.extend( $.fn.dataTable.defaults, {
-            autoWidth: false,
+            autoWidth: true,
             responsive: true,
             columnDefs: [{ 
                 orderable: false,
-                width: 100,
-                targets: [ 5 ]
+                width: 150,
+                targets: [ 2 ]
             }],
             dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
             language: {

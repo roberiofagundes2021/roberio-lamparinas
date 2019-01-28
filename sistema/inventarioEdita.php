@@ -13,7 +13,8 @@ if(isset($_POST['inputInventarioId'])){
 	
 	try{
 		
-		$sql = "SELECT InvenId, InvenData, InvenNumero, InvenDataLimite, UsuarNome, UsuarTelefone, UsuarEmail, InvenObservacao
+		$sql = "SELECT InvenId, InvenData, InvenNumero, InvenDataLimite, InvenClassificacao, InvenUnidade, InvenCategoria, 
+					   UsuarNome, UsuarTelefone, UsuarEmail, InvenObservacao
 				FROM Inventario
 				JOIN Usuario on UsuarId = InvenSolicitante
 				WHERE InvenId = $iInventario ";
@@ -48,8 +49,8 @@ if(isset($_POST['inputData'])){
 		
 	try{
 		
-		$sql = "UPDATE Inventario SET InvenData = :dData, InvenNumero = :sNumero, InvenDataLimite = :dDataLimite,
-									  InvenSolicitante = :iSolicitante, InvenObservacao = :sObservacao, 
+		$sql = "UPDATE Inventario SET InvenData = :dData, InvenNumero = :sNumero, InvenDataLimite = :dDataLimite, InvenClassificacao = :iClassificacao,
+									  InvenUnidade = :iUnidade, InvenCategoria = :iCategoria, InvenSolicitante = :iSolicitante, InvenObservacao = :sObservacao, 
 									  InvenUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE InvenId = :iInventario";
 		$result = $conn->prepare($sql);
@@ -60,6 +61,9 @@ if(isset($_POST['inputData'])){
 						':dData' => gravaData($_POST['inputData']),
 						':sNumero' => $_POST['inputNumero'],
 						':dDataLimite' => gravaData($_POST['inputDataLimite']),
+						':iClassificacao' => $_POST['cmbClassificacao'] == '#' ? null : $_POST['cmbClassificacao'],
+						':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
+						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSolicitante' => $_SESSION['UsuarId'],
 						':sObservacao' => $_POST['txtObservacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],						
@@ -205,7 +209,7 @@ if(isset($_POST['inputData'])){
 					
 					<form name="formInventario" id="formInventario" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Inventário Nº <?php echo $row['InvenNumero']; ?></h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Inventário Nº <?php echo formatarNumero($row['InvenNumero']); ?></h5>
 						</div>
 						
 						<input type="hidden" id="inputInventarioId" name="inputInventarioId" value="<?php echo $row['InvenId']; ?>" >
@@ -214,30 +218,76 @@ if(isset($_POST['inputData'])){
 						<div class="card-body">
 
 							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputData">Data de Emissão</label>
 										<input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data de Emissão" value="<?php echo mostraData($row['InvenData']); ?>" readOnly>
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputNumero">Número</label>
-										<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número" value="<?php echo $row['InvenNumero']; ?>" required>
+										<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número" value="<?php echo formatarNumero($row['InvenNumero']); ?>" readOnly>
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputDataLimite">Data Limite</label>
 										<input type="text" id="inputDataLimite" name="inputDataLimite" class="form-control" placeholder="Data Limite" value="<?php echo mostraData($row['InvenDataLimite']); ?>">
 									</div>
 								</div>	
+								
+								<div class="col-lg-2" id="classificacao">
+									<div class="form-group">
+										<label for="cmbClassificacao">Classificação/Bens</label>
+										<select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
+											<option value="#">Selecione</option>
+											<?php 
+												$sql = ("SELECT ClassId, ClassNome
+														 FROM Classificacao
+														 WHERE ClassStatus = 1
+														 ORDER BY ClassNome ASC");
+												$result = $conn->query("$sql");
+												$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($rowClassificacao as $item){
+													$seleciona = $item['ClassId'] == $row['InvenClassificacao'] ? "selected" : "";
+													print('<option value="'.$item['ClassId'].'" '. $seleciona .'>'.$item['ClassNome'].'</option>');
+												}
+											
+											?>
+										</select>
+									</div>
+								</div>								
+								
+								<div class="col-lg-4">
+									<label for="cmbUnidade">Unidade</label>
+									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+										<?php 
+											$sql = ("SELECT UnidaId, UnidaNome
+													 FROM Unidade
+													 WHERE UnidaStatus = 1 and UnidaEmpresa = ".$_SESSION['EmpreId']."
+													 ORDER BY UnidaNome ASC");
+											$result = $conn->query("$sql");
+											$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											foreach ($rowUnidade as $item){
+												$seleciona = $item['UnidaId'] == $row['InvenUnidade'] ? "selected" : "";
+												print('<option value="'.$item['UnidaId'].'" '. $seleciona .'>'.$item['UnidaNome'].'</option>');
+											}
+										
+										?>
+									</select>
+								</div>									
+								
 							</div>	
 							
+							
 							<div class="row">
-								<div class="col-lg-12">
+								<div class="col-lg-8">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbLocalEstoque">Locais do Estoque</label>
 										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" data-fouc>
@@ -260,6 +310,26 @@ if(isset($_POST['inputData'])){
 										</select>
 									</div>
 								</div>
+								<div class="col-lg-4">
+									<label for="cmbCategoria">Categoria</label>
+									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+										<?php 
+											$sql = ("SELECT CategId, CategNome
+													 FROM Categoria
+													 WHERE CategStatus = 1 and CategEmpresa = ".$_SESSION['EmpreId']."
+													 ORDER BY CategNome ASC");
+											$result = $conn->query("$sql");
+											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											foreach ($rowCategoria as $item){
+												$seleciona = $item['CategId'] == $row['InvenCategoria'] ? "selected" : "";
+												print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
+											}
+										
+										?>
+									</select>
+								</div>								
 							</div>
 							<br>
 							
