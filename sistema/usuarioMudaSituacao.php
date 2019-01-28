@@ -6,10 +6,15 @@ include('global_assets/php/conexao.php');
 
 $_SESSION['msg'] = array();
 
+if (isset($_SESSION['EmpresaId'])){
+	$EmpresaId = $_SESSION['EmpresaId'];
+} else {	
+	$EmpresaId = $_SESSION['EmpreId'];
+}
+
 if(isset($_POST['inputUsuarioId'])){
 	
 	$iUsuario = $_POST['inputUsuarioId'];
-	$iEmpresa = $_SESSION['EmpreId'];
 	$bStatus = $_POST['inputUsuarioStatus'] ? 0 : 1;
         	
 	try{
@@ -19,7 +24,7 @@ if(isset($_POST['inputUsuarioId'])){
 		$result = $conn->prepare("$sql");
 		$result->bindParam(':bStatus', $bStatus);
 		$result->bindParam(':idUsuario', $iUsuario);
-		$result->bindParam(':idEmpresa', $iEmpresa);
+		$result->bindParam(':idEmpresa', $EmpresaId);
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

@@ -61,6 +61,46 @@ if(isset($_POST['inputDataInicio'])){
 	<!-- /theme JS files -->	
 	
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
+	
+	<!-- Adicionando Javascript -->
+    <script type="text/javascript" >
+
+        $(document).ready(function() {	
+		
+			//Garantindo que ninguém mude a empresa na tela de inclusão
+			$('#cmbEmpresa').prop("disabled", true);	
+			
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+
+				e.preventDefault();
+				
+				var inputDataInicio = $('#inputDataInicio').val();
+				var inputDataFim = $('#inputDataFim').val();
+				
+				if (inputDataFim < inputDataInicio){
+					alerta('Atenção','A Data Fim deve ser maior que a Data Início!','error');
+					$('#inputDataFim').focus();
+					return false;				
+				}
+				
+				//Aqui falta verificar se a licença com data maior e ativa é menor que a data início (TEM QUE SER)
+				
+				$('#cmbEmpresa').prop("disabled", false);
+				
+				$( "#formLicenca" ).submit();				
+				
+			});		
+			
+			$('#cancelar').on('click', function(e){
+				
+				$('#cmbEmpresa').prop("disabled", false);			
+				$(window.document.location).attr('href', "licenca.php");
+			});
+	
+		
+		});	
+	</script>
 
 </head>
 
@@ -86,7 +126,7 @@ if(isset($_POST['inputDataInicio'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formLicenca" method="post" class="form-validate" action="licencaNovo.php">
+					<form name="formLicenca" id="formLicenca" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Licença</h5>
 						</div>
@@ -128,8 +168,8 @@ if(isset($_POST['inputDataInicio'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
-										<a href="licenca.php" class="btn btn-basic" role="button">Cancelar</a>
+										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
+										<a href="licenca.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 									</div>
 								</div>
 							</div>

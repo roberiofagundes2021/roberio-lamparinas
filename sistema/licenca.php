@@ -94,7 +94,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<h5 class="card-title">Relação das Licenças</h5>
 								<div class="header-elements">
 									<div class="list-icons">
-										<a href="empresa.php" class="icon-backward2"> Voltar</a>
+										<!--<a href="empresa.php" class="icon-backward2"> Voltar</a>-->
 										<!--<a class="list-icons-item" data-action="collapse"></a>-->
 										<!--<a href="empresa.php" class="list-icons-item" data-action="reload"></a>-->
 										<!--<a class="list-icons-item" data-action="remove"></a>-->

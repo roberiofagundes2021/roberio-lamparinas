@@ -36,13 +36,14 @@ if(isset($_POST['inputCpf'])){
 	
 	try{
 		
-		$sql = "UPDATE Usuario SET UsuarCpf = :sCpf, UsuarNome = :sNome, usuarLogin = :sLogin, 
-					   UsuarSenha = :sSenha, UsuarEmail = :sEmail, UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
+		$conn->beginTransaction();
+		
+		$sql = "UPDATE Usuario SET UsuarNome = :sNome, usuarLogin = :sLogin, UsuarSenha = :sSenha, 
+								   UsuarEmail = :sEmail, UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
 				WHERE UsuarId = :iUsuario";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':sCpf' => $_POST['inputCpf'],
 						':sNome' => $_POST['inputNome'],
 						':sLogin' => $_POST['inputLogin'],
 						':sSenha' => $_POST['inputSenha'],
@@ -58,13 +59,15 @@ if(isset($_POST['inputCpf'])){
 		$result = $conn->prepare($sql);
 	
 		$result->execute(array(
-						':iPerfil' => $_POST['inputPerfil'],
+						':iPerfil' => $_POST['cmbPerfil'] == '#' ? null : $_POST['cmbPerfil'],
 						':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
 						':iSetor' => $_POST['cmbSetor'] == '#' ? null : $_POST['cmbSetor'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUsuario' => $_POST['inputUsuarioId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iEmpresa' => $EmpresaId
 						));						
+		
+		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Usuário alterado!!!";
@@ -72,11 +75,13 @@ if(isset($_POST['inputCpf'])){
 		
 	} catch(PDOException $e) {
 		
+		$conn->rollback();
+		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao alterar usuário!!!";
 		$_SESSION['msg']['tipo'] = "error";			
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage(); die;
 	}
 	
 	irpara("usuario.php");
@@ -107,32 +112,38 @@ if(isset($_POST['inputCpf'])){
     <script type="text/javascript" >
 
         $(document).ready(function() {	
-	
-				Filtrando();
-				
-				var cmbUnidade = $('#cmbUnidade').val();
-				alert(cmbUnidade);
-				
-				if (cmbUnidade == '#'){
-					Reset();
-				} else {
+			
+			//Garantindo que ninguém mude a empresa na tela de edição
+			$('#cmbEmpresa').prop("disabled", true);
+			
+			//Já realiza o filtro dos possíveis setores e seleciona o que está informado no banco		
+			var cmbUnidade = $('#cmbUnidade').val();
+			var cmbSetor = $('#cmbSetor').val();
+			
+			if (cmbUnidade == '#'){
+				Reset();
+			} else {
 
-					$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function (dados){
+				$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function (dados){
+					
+					var option = '<option value="#">Selecione o Setor</option>';
+
+					if (dados.length){						
 						
-						var option = '<option value="#">Selecione o Setor</option>';
-alert(dados.length);
-						if (dados.length){						
-							
-							$.each(dados, function(i, obj){
+						$.each(dados, function(i, obj){
+							if (obj.SetorId == cmbSetor) {
+								option += '<option value="'+obj.SetorId+'" selected="selected">' + obj.SetorNome + '</option>';
+							} else {
 								option += '<option value="'+obj.SetorId+'">' + obj.SetorNome + '</option>';
-							});						
-							
-							$('#cmbSetor').html(option).show();
-						} else {
-							Reset();
-						}					
-					});
-				}	
+							}
+						});						
+						
+						$('#cmbSetor').html(option).show();
+					} else {
+						Reset();
+					}					
+				});
+			}	
 	
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbUnidade').on('change', function(e){
@@ -140,7 +151,7 @@ alert(dados.length);
 				Filtrando();
 				
 				var cmbUnidade = $('#cmbUnidade').val();
-				
+
 				if (cmbUnidade == '#'){
 					Reset();
 				} else {
@@ -168,7 +179,6 @@ alert(dados.length);
 
 				e.preventDefault();
 				
-				var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g,'');
 				var inputNome = $('#inputNome').val();
 				var cmbPerfil = $('#cmbPerfil').val();
 				var inputLogin = $('#inputLogin').val();
@@ -180,11 +190,6 @@ alert(dados.length);
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
 				inputLogin = inputLogin.trim();				
-
-				if (inputCpf.length < 11){
-					alerta('Atenção','O CPF precisa ser informado corretamente!','error');
-					return false;
-				}
 				
 				//Verifica se o campo só possui espaços em branco
 				if (inputNome == ''){
@@ -223,14 +228,23 @@ alert(dados.length);
 					return false;
 				}
 
-				if (cmbSetor == '#'){
+				if (cmbSetor == '#' || cmbSetor == 'Filtrando...'){
 					alerta('Atenção','Informe o setor!','error');
 					$('#cmSetor').focus();
 					return false;
 				}				
 				
+				$('#cmbEmpresa').prop("disabled", false);
+				
 				$( "#formUsuario" ).submit();
 			})
+
+			$('#cancelar').on('click', function(e){
+				
+				$('#cmbEmpresa').prop("disabled", false);
+				
+				$(window.document.location).attr('href', "usuario.php");
+			});
 			
 			function Filtrando(){
 				$('#cmbSetor').empty().append('<option>Filtrando...</option>');
@@ -304,9 +318,9 @@ alert(dados.length);
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputPerfil">Perfil</label>
-												<select name="inputPerfil" class="form-control form-control-select2" required>
-													<option value="0">Informe um perfil</option>
+												<label for="cmbPerfil">Perfil</label>
+												<select name="cmbPerfil" class="form-control form-control-select2" required>
+													<option value="#">Informe um perfil</option>
 													<?php
 														$sql = ("SELECT PerfiId, PerfiNome
 																 FROM Perfil
@@ -451,7 +465,7 @@ alert(dados.length);
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
-										<a href="usuario.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="usuario.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 									</div>
 								</div>
 							</div>

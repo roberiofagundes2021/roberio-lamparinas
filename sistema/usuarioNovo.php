@@ -127,6 +127,9 @@ if(isset($_POST['inputCpf'])){
     <script type="text/javascript" >
 
         $(document).ready(function() {	
+			
+			//Garantindo que ninguém mude a empresa na tela de inclusão
+			$('#cmbEmpresa').prop("disabled", true);
 	
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#buscar').on('click', function(e){
@@ -287,14 +290,23 @@ if(isset($_POST['inputCpf'])){
 					return false;
 				}
 
-				if (cmbSetor == '#'){
+				if (cmbSetor == '#' || cmbSetor == 'Filtrando...'){
 					alerta('Atenção','Informe o setor!','error');
 					$('#cmSetor').focus();
 					return false;
 				}				
 				
+				$('#cmbEmpresa').prop("disabled", false);
+				
 				$( "#formUsuario" ).submit();
 			})
+			
+			$('#cancelar').on('click', function(e){
+				
+				$('#cmbEmpresa').prop("disabled", false);
+				
+				$(window.document.location).attr('href', "usuario.php");
+			});
 			
 			function Filtrando(){
 				$('#cmbSetor').empty().append('<option>Filtrando...</option>');
@@ -497,7 +509,7 @@ if(isset($_POST['inputCpf'])){
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" disabled id="enviar">Incluir</button>
-										<a href="usuario.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="usuario.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 									</div>
 								</div>
 							</div>

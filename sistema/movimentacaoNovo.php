@@ -277,6 +277,10 @@ if(isset($_POST['inputData'])){
 				$('#cmbProduto').empty().append('<option>Sem produto</option>');
 			}
 			
+				
+			
+		}); //document.ready	
+		
 			function selecionaTipo(tipo) {
 				if (tipo == 'E'){
 					document.getElementById('EstoqueOrigem').style.display = "none";
@@ -297,9 +301,7 @@ if(isset($_POST['inputData'])){
 					document.getElementById('classificacao').style.display = "none";
 					document.getElementById('motivo').style.display = "block";
 				}
-			}				
-			
-		}); //document.ready	
+			}		
 					
 	</script>
 
