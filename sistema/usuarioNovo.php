@@ -26,7 +26,7 @@ if(isset($_POST['inputCpf'])){
 			$result = $conn->prepare($sql);			
 			
 			$result->execute(array(
-							':sCpf' => $_POST['inputCpf'],
+							':sCpf' => limpaCPF_CNPJ($_POST['inputCpf']),
 							':sNome' => $_POST['inputNome'],
 							':sLogin' => $_POST['inputLogin'],
 							':sSenha' => $_POST['inputSenha'],
@@ -44,7 +44,7 @@ if(isset($_POST['inputCpf'])){
 			$result->execute(array(
 							':iEmpresa' => $EmpresaId,
 							':iUsuario' => $LAST_ID,
-							':iPerfil' => $_POST['inputPerfil'],
+							':iPerfil' => $_POST['cmbPerfil'],
 							':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
 							':iSetor' => $_POST['cmbSetor'] == '#' ? null : $_POST['cmbSetor'],
 							':bStatus' => 1,
@@ -132,7 +132,7 @@ if(isset($_POST['inputCpf'])){
 			$('#cmbEmpresa').prop("disabled", true);
 	
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
-			$('#buscar').on('click', function(e){
+			$('#buscar').on('click', function(e){				
 			
 				var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g,'');
 				var inputId = $('#inputId').val();
@@ -141,7 +141,7 @@ if(isset($_POST['inputCpf'])){
 					alerta('Atenção','O CPF precisa ser informado corretamente!','error');
 					return false;
 				}
-				
+								
 				$.getJSON('usuarioValida.php?cpf='+inputCpf, function (dados){
 					
 					//Se o usuário está cadastrado e ele não está vinculado a essa empresa ainda
@@ -174,15 +174,15 @@ if(isset($_POST['inputCpf'])){
 						} else { // se o usuário não está cadastrado
 							document.getElementById('demaisCampos').style.display = "block";
 							$('#inputNome').val("");
-							$('#cmbPerfil').val("");
+							$('#cmbPerfil').val("#");
 							$('#inputLogin').val("");
 							$('#inputSenha').val("");
 							$('#inputConfirmaSenha').val("");
 							$('#inputEmail').val("");
 							$('#inputTelefone').val("");
 							$('#inputCelular').val("");
-							$('#cmbUnidade').val("");
-							$('#cmbSetor').val("");
+							$('#cmbUnidade').val("#");
+							$('#cmbSetor').val("#");
 							$('#inputNome').focus();
 							$('#enviar').prop("disabled", false);
 							$('#inputId').val(0);
@@ -258,7 +258,7 @@ if(isset($_POST['inputCpf'])){
 					alerta('Atenção','Informe o nome do usuário!','error');
 					$('#inputNome').focus();
 					return false;
-				}
+				}				
 
 				if (cmbPerfil == '#'){
 					alerta('Atenção','Informe o perfil!','error');
@@ -273,7 +273,7 @@ if(isset($_POST['inputCpf'])){
 				}
 				
 				if (inputSenha == ''){
-					alerta('Atenção','Informe senha!','error');
+					alerta('Atenção','Informe a senha!','error');
 					$('#inputSenha').focus();
 					return false;
 				}

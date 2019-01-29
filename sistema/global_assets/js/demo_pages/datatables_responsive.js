@@ -31,7 +31,7 @@ var DatatableResponsive = function() {
             columnDefs: [{ 
                 orderable: false,
                 width: 150,
-                targets: [ 2 ]
+                targets: [ 5 ]
             }],
             dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
             language: {

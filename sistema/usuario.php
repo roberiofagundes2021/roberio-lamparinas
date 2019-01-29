@@ -58,8 +58,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			/* Início: Tabela Personalizada */
 			$('#tblUsuario').DataTable( {
 				"order": [[ 0, "asc" ]],
-			    autoWidth: true,
+			    autoWidth: false,
 				responsive: true,
+				columnDefs: [{ 
+					orderable: false,
+					width: 100,
+					targets: [ 5 ]
+				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
 					search: '<span>Filtro:</span> _INPUT_',

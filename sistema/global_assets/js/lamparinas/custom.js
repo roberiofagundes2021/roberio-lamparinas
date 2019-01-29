@@ -83,3 +83,35 @@ function moeda(z){
 	v = v.replace(/(\d{1})(\d{1,2})$/,"$1,$2") //coloca virgula antes dos últimos 2 digitos
 	z.value = v;
 }
+
+function validarCPF(input_cpf){
+ //get input
+ if(input_cpf){
+   var input=input_cpf.toString();
+
+   var numeros=[];
+   var pesos_A=[10,9,8,7,6,5,4,3,2];
+   var pesos_B=[11,10,9,8,7,6,5,4,3,2];
+   var sum=0;
+   var x1=0;
+   var x2=0;
+
+   for(var i=0;i=2){
+     x1=11-mod;
+   }
+
+   //calcula digito 2
+   sum=0;
+   for(var i=0;i=2){
+     x2=11-mod;
+   }
+
+   if(x1==input[9] && x2==input[10]){
+     return true;
+   }else{
+     return false;
+   }
+   }else{
+     return false;
+   }
+};
