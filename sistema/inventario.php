@@ -93,8 +93,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				confirmaExclusao(document.formInventario, "Tem certeza que deseja excluir esse inventário?", "inventarioExclui.php");
 			} else if (Tipo == 'imprimir-lista'){
 				document.formInventario.action = "inventarioLista.php";
+				document.formInventario.setAttribute("target", "_blank");
 			} else if (Tipo == 'imprimir-inventario'){
 				document.formInventario.action = "inventarioImprimir.php";
+				document.formInventario.setAttribute("target", "_blank");
 			} 
 			
 			document.formInventario.submit();

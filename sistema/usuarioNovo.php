@@ -126,6 +126,27 @@ if(isset($_POST['inputCpf'])){
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 
+		function validaCPF(strCPF) {
+			var Soma;
+			var Resto;
+			Soma = 0;
+		  if (strCPF == "00000000000") return false;
+			 
+		  for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+		  Resto = (Soma * 10) % 11;
+		   
+			if ((Resto == 10) || (Resto == 11))  Resto = 0;
+			if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
+		   
+		  Soma = 0;
+			for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+			Resto = (Soma * 10) % 11;
+		   
+			if ((Resto == 10) || (Resto == 11))  Resto = 0;
+			if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
+			return true;
+		}
+
         $(document).ready(function() {	
 			
 			//Garantindo que ninguém mude a empresa na tela de inclusão
@@ -139,8 +160,15 @@ if(isset($_POST['inputCpf'])){
 
 				if (inputCpf.length < 11){
 					alerta('Atenção','O CPF precisa ser informado corretamente!','error');
+					$('#inputCpf').focus();
 					return false;
 				}
+				
+				if (!validaCPF(inputCpf)){
+					alerta('Atenção','CPF inválido!','error');
+					$('#inputCpf').focus();
+					return false;					
+				}	
 								
 				$.getJSON('usuarioValida.php?cpf='+inputCpf, function (dados){
 					
