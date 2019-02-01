@@ -55,7 +55,7 @@ if(isset($_POST['inputTipo'])){
 						':iBanco' => $_POST['cmbBanco'] == '#' ? null : $_POST['cmbBanco'],
 						':sAgencia' => $_POST['inputAgencia'],
 						':sConta' => $_POST['inputConta'],
-						':sInformacaoAdicional' => $_POST['inputInformacaoAdicional'],
+						':sInformacaoAdicional' => $_POST['inputInfoAdicional'],
 						':iIpi' => $_POST['inputIpi'] == null ? 0.00 : gravaValor($_POST['inputIpi']),
 						':iFrete' => $_POST['inputFrete'] == null ? 0.00 : gravaValor($_POST['inputFrete']),
 						':iIcms' => $_POST['inputIcms'] == null ? 0.00 : gravaValor($_POST['inputIcms']),
@@ -92,7 +92,7 @@ if(isset($_POST['inputTipo'])){
 		}
 		
 		$conn->commit();
-		
+
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Fornecedor incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
@@ -136,7 +136,7 @@ if(isset($_POST['inputTipo'])){
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
-
+	
         $(document).ready(function() {
 			
 			//$("#cmbEstado").addClass("form-control-select2");
@@ -238,7 +238,7 @@ if(isset($_POST['inputTipo'])){
 				
 				var inputTipo = $('input[name="inputTipo"]:checked').val();				
 				var inputNome = $('#inputNome').val();
-				var inputCpf  = $('#inputCpf').val();
+				var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
 				var inputCnpj = $('#inputCnpj').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				
@@ -260,6 +260,12 @@ if(isset($_POST['inputTipo'])){
 						$('#inputCPF').focus();
 						return false;
 					}
+					
+					if (!validaCPF(inputCpf)){
+						alerta('Atenção','CPF inválido!','error');
+						$('#inputCpf').focus();
+						return false;					
+					}					
 				} else {
 					//Verifica se o campo só possui espaços em branco
 					if (inputCnpj == '' || inputCnpj == '__.___.___/____-__'){
@@ -298,23 +304,44 @@ if(isset($_POST['inputTipo'])){
 			
 			function Reset(){
 				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
-			}
-			
-			function selecionaPessoa(tipo) {
-				if (tipo == 'PF'){
-					document.getElementById('CPF').style.display = "block";
-					document.getElementById('CNPJ').style.display = "none";
-					document.getElementById('dadosPF').style.display = "block";
-					document.getElementById('dadosPJ').style.display = "none";
-				} else {
-					document.getElementById('CPF').style.display = "none";
-					document.getElementById('CNPJ').style.display = "block";				
-					document.getElementById('dadosPF').style.display = "none";
-					document.getElementById('dadosPJ').style.display = "block";
-				}
-			}			
+			}	
 			
         }); // document.ready
+		
+		function selecionaPessoa(tipo) {
+			if (tipo == 'PF'){
+				document.getElementById('CPF').style.display = "block";
+				document.getElementById('CNPJ').style.display = "none";
+				document.getElementById('dadosPF').style.display = "block";
+				document.getElementById('dadosPJ').style.display = "none";
+			} else {
+				document.getElementById('CPF').style.display = "none";
+				document.getElementById('CNPJ').style.display = "block";				
+				document.getElementById('dadosPF').style.display = "none";
+				document.getElementById('dadosPJ').style.display = "block";
+			}
+		}	
+
+		function validaCPF(strCPF) {
+			var Soma;
+			var Resto;
+			Soma = 0;
+		  if (strCPF == "00000000000") return false;
+			 
+		  for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+		  Resto = (Soma * 10) % 11;
+		   
+			if ((Resto == 10) || (Resto == 11))  Resto = 0;
+			if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
+		   
+		  Soma = 0;
+			for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+			Resto = (Soma * 10) % 11;
+		   
+			if ((Resto == 10) || (Resto == 11))  Resto = 0;
+			if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
+			return true;
+		}			
 
     </script>	
 	
