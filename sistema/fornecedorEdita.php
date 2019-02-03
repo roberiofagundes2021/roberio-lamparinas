@@ -59,7 +59,7 @@ if(isset($_POST['inputTipo'])){
 									  ForneIcms = :iIcms, ForneOutros = :iOutros, ForneUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE ForneId = :iFornecedor";
 		$result = $conn->prepare($sql);
-		
+				
 		$conn->beginTransaction();				
 		
 		$result->execute(array(
@@ -323,7 +323,7 @@ if(isset($_POST['inputTipo'])){
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputNomeNovo  = $('#inputNome').val();
 				var inputNomeVelho = $('#inputFornecedorNome').val();				
-				var inputCpf  = $('#inputCpf').val();
+				var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
 				var inputCnpj = $('#inputCnpj').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				
@@ -345,6 +345,12 @@ if(isset($_POST['inputTipo'])){
 						$('#inputCPF').focus();
 						return false;
 					}
+					
+					if (!validaCPF(inputCpf)){
+						alerta('Atenção','CPF inválido!','error');
+						$('#inputCpf').focus();
+						return false;					
+					}						
 				} else {
 					//Verifica se o campo só possui espaços em branco
 					if (inputCnpj == '' || inputCnpj == '__.___.___/____-__'){
@@ -402,6 +408,27 @@ if(isset($_POST['inputTipo'])){
 				document.getElementById('dadosPJ').style.display = "block";
 			}
 		}
+		
+		function validaCPF(strCPF) {
+			var Soma;
+			var Resto;
+			Soma = 0;
+		  if (strCPF == "00000000000") return false;
+			 
+		  for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+		  Resto = (Soma * 10) % 11;
+		   
+			if ((Resto == 10) || (Resto == 11))  Resto = 0;
+			if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
+		   
+		  Soma = 0;
+			for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+			Resto = (Soma * 10) % 11;
+		   
+			if ((Resto == 10) || (Resto == 11))  Resto = 0;
+			if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
+			return true;
+		}		
 
     </script>	
 	

@@ -10,6 +10,15 @@ if(isset($_POST['inputCodigo'])){
 		
 	try{
 		
+		$sql = ("SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
+				 FROM Produto
+				 Where ProduEmpresa = ".$_SESSION['EmpreId']."");
+		$result = $conn->query("$sql");
+		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
+		
+		$sCodigo = (int)$rowCodigo['Codigo'] + 1;
+		$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
+		
 		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduCategoria, ProduSubCategoria, ProduValorCusto, 
 									 ProduDespesasAcessorias, ProduOutrasDespesas, ProduCustoFinal, ProduValorVenda, 
 									 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, ProduFabricante, ProduUnidadeMedida, 
@@ -132,6 +141,8 @@ if(isset($_POST['inputCodigo'])){
 				
 				var inputCustoFinal = parseFloat(inputValorCusto) + parseFloat(inputOutrasDespesas);
 				
+				inputCustoFinal = float2moeda(inputCustoFinal).toString();
+				
 				$('#inputCustoFinal').val(inputCustoFinal);
 			});
 			
@@ -151,6 +162,8 @@ if(isset($_POST['inputCodigo'])){
 				
 				var inputCustoFinal = parseFloat(inputValorCusto) + parseFloat(inputOutrasDespesas);
 				
+				inputCustoFinal = float2moeda(inputCustoFinal).toString();
+				
 				$('#inputCustoFinal').val(inputCustoFinal);
 			});			
 			
@@ -169,6 +182,8 @@ if(isset($_POST['inputCodigo'])){
 				}
 								
 				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
+				
+				inputValorVenda = float2moeda(inputValorVenda).toString();
 				
 				$('#inputValorVenda').val(inputValorVenda);				
 
@@ -192,7 +207,9 @@ if(isset($_POST['inputCodigo'])){
 				var lucro = parseFloat(inputValorVenda) - parseFloat(inputCustoFinal);		
 				var inputMargemLucro = lucro / parseFloat(inputCustoFinal) * 100;
 				
-				$('#inputMargemLucro').val(inputMargemLucro.toFixed(2));				
+				inputMargemLucro = float2moeda(inputMargemLucro).toString();
+				
+				$('#inputMargemLucro').val(inputMargemLucro);				
 
 			});	
 			
@@ -267,6 +284,30 @@ if(isset($_POST['inputCodigo'])){
 			}
 		});
 		
+		function float2moeda(num) {
+
+		   x = 0;
+
+		   if(num<0) {
+			  num = Math.abs(num);
+			  x = 1;
+		   }
+		   if(isNaN(num)) num = "0";
+			  cents = Math.floor((num*100+0.5)%100);
+
+		   num = Math.floor((num*100+0.5)/100).toString();
+
+		   if(cents < 10) cents = "0" + cents;
+			  for (var i = 0; i < Math.floor((num.length-(1+i))/3); i++)
+				 num = num.substring(0,num.length-(4*i+3))+'.'
+					   +num.substring(num.length-(4*i+3));
+		   ret = num + ',' + cents;
+		   if (x == 1) ret = ' - ' + ret;
+		   
+		   return ret;
+
+		}		
+		
 	</script>
 	
 </head>
@@ -304,14 +345,14 @@ if(isset($_POST['inputCodigo'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputCodigo">Código do Produto</label>
-												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código Interno" required>
+												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Gerado automaticamente" readOnly>
 											</div>
 										</div>	
 										
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputCodigoBarras">Código de Barras</label>
-												<input type="text" id="inputCodigoBarras" name="inputCodigoBarras" class="form-control" placeholder="Código de Barras">
+												<input type="text" id="inputCodigoBarras" name="inputCodigoBarras" class="form-control" placeholder="Código de Barras" autofocus>
 											</div>	
 										</div>
 										

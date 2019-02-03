@@ -10,12 +10,20 @@ if(isset($_POST['inputData'])){
 		
 	try{
 		
-		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimClassificacao, MovimData, MovimFinalidade, MovimOrigem, MovimDestinoLocal, MovimDestinoSetor, MovimObservacao,
-									      MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
+		if($_POST['cmbMotivo'] != '#'){
+			$aMotivo = explode("#",$_POST['cmbMotivo']);
+			$iMotivo = $aMotivo[0];
+		} else{
+			$iMotivo = null;
+		}
+		
+		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimClassificacao, MovimMotivo, MovimData, MovimFinalidade, MovimOrigem, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
+										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
 										  MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimEmpresa)
-				VALUES (:sTipo, :dData, :iFinalidade, :iOrigem, :iDestinoLocal, :iDestinoSetor, :sObservacao, :iFornecedor, :iOrdemCompra,
-						:sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, :sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
-		$result = $conn->prepare($sql);
+				VALUES (:sTipo, :iClassificacao, :iMotivo, :dData, :iFinalidade, :iOrigem, :iDestinoLocal, :iDestinoSetor, :iDestinoManual, 
+						:sObservacao, :iFornecedor, :iOrdemCompra, :sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, 
+						:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
+		$result = $conn->prepare($sql);	
 
 /*		echo $sql;
 		echo "<br>";
@@ -29,11 +37,13 @@ if(isset($_POST['inputData'])){
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
 						':iClassificacao' => $_POST['cmbClassificacao'] == '#' ? null : $_POST['cmbClassificacao'],
+						':iMotivo' => $iMotivo,
 						':dData' => gravaData($_POST['inputData']),
 						':iFinalidade' => $_POST['cmbFinalidade'],
 						':iOrigem' => $_POST['cmbOrigem'] == '#' ? null : $_POST['cmbOrigem'],
 						':iDestinoLocal' => $_POST['cmbDestinoLocal'] == '#' ? null : $_POST['cmbDestinoLocal'],
 						':iDestinoSetor' => $_POST['cmbDestinoSetor'] == '#' ? null : $_POST['cmbDestinoSetor'],
+						':iDestinoManual' => $_POST['inputDestinoManual'],
 						':sObservacao' => $_POST['txtareaObservacao'],
 						':iFornecedor' => $_POST['cmbFornecedor'] == '#' ? null : $_POST['cmbFornecedor'],
 						':iOrdemCompra' => $_POST['cmbOrdemCompra'],
@@ -74,7 +84,6 @@ if(isset($_POST['inputData'])){
 			}
 			
 		} catch(PDOException $e) {
-			echo "Entrou1";
 			$conn->rollback();
 			echo 'Error: ' . $e->getMessage();exit;
 		}
@@ -130,7 +139,6 @@ if(isset($_POST['inputData'])){
 
         $(document).ready(function() {	
 		
-	
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
 				
@@ -205,8 +213,9 @@ if(isset($_POST['inputData'])){
 				var inputValorUnitario = $('#inputValorUnitario').val();
 				
 				var Produto = cmbProduto.split("#");
-				//alert(Produto[1].maskMoney());
-				$('#inputValorUnitario').val(Produto[1]).maskMoney({symbol:'R$ ', showSymbol:false, thousands:'.', decimal:',', symbolStay: true});  //Por que não funciona Meus Deus???
+				var valor = Produto[1].replace(".",",");
+				
+				$('#inputValorUnitario').val(valor);
 			});	
 						
 			
@@ -227,11 +236,12 @@ if(isset($_POST['inputData'])){
 				var total = parseInt(inputQuantidade) * parseInt(inputValorUnitario);
 				
 				total = total + parseFloat(inputTotal);
+				var totalFormatado = "R$ " + float2moeda(total).toString();
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
-					url: "orcamentoAddProduto.php",
+					url: "movimentacaoAddProduto.php",
 					data: {numItens: resNumItens, idProduto: Produto[0], quantidade: inputQuantidade},
 					success: function(resposta){
 																	
@@ -246,7 +256,7 @@ if(isset($_POST['inputData'])){
 						$('#inputQuantidade').val('');
 						$('#inputValorUnitario').val('');
 						$('#inputTotal').val(total);
-						$('#total').text(total);
+						$('#total').text(totalFormatado);
 						$('#inputLote').val('');
 						$('#inputValidade').val('');
 						
@@ -275,9 +285,7 @@ if(isset($_POST['inputData'])){
 			
 			function ResetProduto(){
 				$('#cmbProduto').empty().append('<option>Sem produto</option>');
-			}
-			
-				
+			}				
 			
 		}); //document.ready	
 		
@@ -288,21 +296,62 @@ if(isset($_POST['inputData'])){
 				document.getElementById('DestinoSetor').style.display = "none";
 				document.getElementById('classificacao').style.display = "block";
 				document.getElementById('motivo').style.display = "none";
+				document.getElementById('dadosNF').style.display = "block";
 			} else if (tipo == 'S') {
 				document.getElementById('EstoqueOrigem').style.display = "block";
 				document.getElementById('DestinoLocal').style.display = "none";
 				document.getElementById('DestinoSetor').style.display = "block";
 				document.getElementById('classificacao').style.display = "block";
 				document.getElementById('motivo').style.display = "none";
+				document.getElementById('dadosNF').style.display = "none";
 			} else {
 				document.getElementById('EstoqueOrigem').style.display = "block";
 				document.getElementById('DestinoLocal').style.display = "block";
 				document.getElementById('DestinoSetor').style.display = "none";
 				document.getElementById('classificacao').style.display = "none";
 				document.getElementById('motivo').style.display = "block";
+				document.getElementById('dadosNF').style.display = "none";
 			}
+		}	
+
+		function selecionaMotivo(motivo) {
+			var Motivo = motivo.split("#");
+			var chave = Motivo[1];
+			
+			if (chave == 'DOACAO' || chave == 'DESCARTE' || chave == 'DEVOLUCAO' || chave == 'CONSIGNACAO'){
+				document.getElementById('DestinoManual').style.display = "block";
+				document.getElementById('DestinoLocal').style.display = "none";
+			} else {
+				document.getElementById('DestinoManual').style.display = "none";
+				document.getElementById('DestinoLocal').style.display = "block";
+				document.getElementById('DestinoManual').value = '';
+			}
+		}	
+		
+		function float2moeda(num) {
+
+		   x = 0;
+
+		   if(num<0) {
+			  num = Math.abs(num);
+			  x = 1;
+		   }
+		   if(isNaN(num)) num = "0";
+			  cents = Math.floor((num*100+0.5)%100);
+
+		   num = Math.floor((num*100+0.5)/100).toString();
+
+		   if(cents < 10) cents = "0" + cents;
+			  for (var i = 0; i < Math.floor((num.length-(1+i))/3); i++)
+				 num = num.substring(0,num.length-(4*i+3))+'.'
+					   +num.substring(num.length-(4*i+3));
+		   ret = num + ',' + cents;
+		   if (x == 1) ret = ' - ' + ret;
+		   
+		   return ret;
+
 		}		
-					
+								
 	</script>
 
 </head>
@@ -382,10 +431,10 @@ if(isset($_POST['inputData'])){
 								<div class="col-lg-4" id="motivo" style="display:none;">
 									<div class="form-group">
 										<label for="cmbMotivo">Motivo</label>
-										<select id="cmbMotivo" name="cmbMotivo" class="form-control form-control-select2">
+										<select id="cmbMotivo" name="cmbMotivo" class="form-control form-control-select2" onChange="selecionaMotivo(this.value)">
 											<option value="#">Selecione</option>
 											<?php 
-												$sql = ("SELECT MotivId, MotivNome
+												$sql = ("SELECT MotivId, MotivNome, MotivChave
 														 FROM Motivo
 														 WHERE MotivStatus = 1 and MotivEmpresa = ". $_SESSION['EmpreId'] ."
 														 ORDER BY MotivNome ASC");
@@ -393,7 +442,7 @@ if(isset($_POST['inputData'])){
 												$rowMotivo = $result->fetchAll(PDO::FETCH_ASSOC);
 												
 												foreach ($rowMotivo as $item){
-													print('<option value="'.$item['MotivId'].'">'.$item['MotivNome'].'</option>');
+													print('<option value="'.$item['MotivId'].'#'.$item['MotivChave'].'">'.$item['MotivNome'].'</option>');
 												}
 											
 											?>
@@ -497,8 +546,14 @@ if(isset($_POST['inputData'])){
 													?>
 												</select>
 											</div>
-										</div>										
+										</div>	
 										
+										<div class="col-lg-4" id="DestinoManual" style="display:none">
+											<div class="form-group">
+												<label for="inputDestinoManual">Destino</label>
+												<input type="text" id="inputDestinoManual" name="inputDestinoManual" class="form-control">
+											</div>											
+										</div>
 									</div>
 								</div>
 							</div>
@@ -513,7 +568,7 @@ if(isset($_POST['inputData'])){
 							</div>
 							<br>
 							
-							<div class="row">
+							<div class="row" id="dadosNF">
 								<div class="col-lg-12">									
 									<h5 class="mb-0 font-weight-semibold">Dados da Nota Fiscal</h5>
 									<br>
@@ -736,8 +791,7 @@ if(isset($_POST['inputData'])){
 									        <tfoot>
 												<tr>
 													<th colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total:</th>
-													<th><div id="total" style="text-align:center; font-size: 16px; font-weight:bold;"></div></th>
-													<th></th>
+													<th colspan="2"><div id="total" style="text-align:left; font-size: 15px; font-weight:bold;"></div></th>
 												</tr>
 											</tfoot>
 										</table>

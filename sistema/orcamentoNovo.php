@@ -22,6 +22,9 @@ if(isset($_POST['inputData'])){
 				 Where OrcamEmpresa = ".$_SESSION['EmpreId']."");
 		$result = $conn->query("$sql");
 		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);		
+		
+		$sNumero = (int)$rowNumero['Numero'] + 1;
+		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 			
 		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor,
 									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamEmpresa)
@@ -32,10 +35,8 @@ if(isset($_POST['inputData'])){
 		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
 		$iFornecedor = $aFornecedor[0];
 		
-		$sNumero = (int)$rowNumero['Numero'] + 1;
-		
 		$result->execute(array(
-						':sNumero' => str_pad($sNumero,6,"0",STR_PAD_LEFT),
+						':sNumero' => $sNumero,
 						':sTipo' => $_POST['inputTipo'],
 						':dData' => gravaData($_POST['inputData']),
 						':iCategoria' => $_POST['cmbCategoria'],

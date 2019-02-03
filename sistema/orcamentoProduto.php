@@ -16,7 +16,7 @@ if(isset($_POST['inputOrcamentoId'])){
 		$sql = "SELECT *
 				FROM Produto
 				JOIN Categoria on CategId = ProduCategoria
-				WHERE ProduEmpresa = ". $_SESSION['EmpreId'];
+				WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$_POST['inputOrcamentoCategoria'];
 		$result = $conn->query("$sql");
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 		
@@ -158,7 +158,7 @@ if(isset($_POST['inputOrcamentoId'])){
 							<!-- Custom header text -->
 							<div class="card">
 								<div class="card-header header-elements-inline">
-									<h5 class="card-title">Custom header text</h5>
+									<h5 class="card-title">Relação de Produtos</h5>
 									<div class="header-elements">
 										<div class="list-icons">
 											<a class="list-icons-item" data-action="collapse"></a>
