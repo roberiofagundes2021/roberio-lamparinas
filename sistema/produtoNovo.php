@@ -31,7 +31,7 @@ if(isset($_POST['inputCodigo'])){
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
-						':sCodigo' => $_POST['inputCodigo'],
+						':sCodigo' => $sCodigo,
 						':sCodigoBarras' => $_POST['inputCodigoBarras'],
 						':sNome' => $_POST['inputNome'],
 						':iCategoria' => $_POST['cmbCategoria'],
@@ -340,16 +340,11 @@ if(isset($_POST['inputCodigo'])){
 						<div class="card-body">								
 							
 							<div class="media">
+								
 								<div class="media-body">
+									
 									<div class="row">
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputCodigo">Código do Produto</label>
-												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Gerado automaticamente" readOnly>
-											</div>
-										</div>	
-										
-										<div class="col-lg-4">
+										<div class="col-lg-8">
 											<div class="form-group">
 												<label for="inputCodigoBarras">Código de Barras</label>
 												<input type="text" id="inputCodigoBarras" name="inputCodigoBarras" class="form-control" placeholder="Código de Barras" autofocus>
@@ -380,8 +375,10 @@ if(isset($_POST['inputCodigo'])){
 												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do produto"></textarea>
 											</div>
 										</div>
-									</div>									
-								</div>
+									</div>
+																		
+								</div> <!-- media-body -->
+								
 								<div style="text-align:center;">
 									<div id="visualizar">
 										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:250px; border:2px solid #ccc;">
@@ -392,7 +389,8 @@ if(isset($_POST['inputCodigo'])){
 										<input type="file" id="imagem" name="imagem" style="display:none;" />
 									</form>									
 								</div>
-							</div>
+								
+							</div> <!-- media -->
 														
 							<div class="row">
 								<div class="col-lg-12">
