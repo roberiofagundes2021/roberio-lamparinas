@@ -20,9 +20,9 @@ if(isset($_POST['inputProdutoId'])){
 		
 		$valorCusto = mostraValor($row['ProduValorCusto']);
 		$valorVenda	= mostraValor($row['ProduValorVenda']);
-		$despesasAcessorias = mostraValor($row['ProduDespesasAcessorias']);
 		$outrasDespesas = mostraValor($row['ProduOutrasDespesas']);
 		$custoFinal = mostraValor($row['ProduCustoFinal']);
+		$margemLucro = mostraValor($row['ProduMargemLucro']);
 		$numSerie = $row['ProduNumSerie'];
 		
 	} catch(PDOException $e) {
