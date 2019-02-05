@@ -20,12 +20,12 @@ if(isset($_POST['inputCodigo'])){
 		$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
 		
 		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduCategoria, ProduSubCategoria, ProduValorCusto, 
-									 ProduDespesasAcessorias, ProduOutrasDespesas, ProduCustoFinal, ProduValorVenda, 
+									 ProduDespesasAcessorias, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
 									 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, ProduFabricante, ProduUnidadeMedida, 
 									 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
 									 ProduUsuarioAtualizador, ProduEmpresa) 
 				VALUES (:sCodigo, :sCodigoBarras, :sNome, :iCategoria, :iSubCategoria, :fValorCusto, :fDespesasAcessorias,
-						:fOutrasDespesas, :fCustoFinal, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, :sNumSerie, 
+						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, :sNumSerie, 
 						:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
 						:iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
@@ -40,6 +40,7 @@ if(isset($_POST['inputCodigo'])){
 						':fDespesasAcessorias' => $_POST['inputDespesasAcessorias'] == null ? null : gravaValor($_POST['inputDespesasAcessorias']),
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
 						':fCustoFinal' => $_POST['inputCustoFinal'] == null ? null : gravaValor($_POST['inputCustoFinal']),
+						':fMargemLucro' => $_POST['inputMargemLucro'] == null ? null : gravaValor($_POST['inputMargemLucro']),
 						':fValorVenda' => $_POST['inputValorVenda'] == null ? null : gravaValor($_POST['inputValorVenda']),
 						':iEstoqueMinimo' => $_POST['inputEstoqueMinimo'] == '' ? null : $_POST['inputEstoqueMinimo'],
 						':iMarca' => $_POST['cmbMarca'] == '#' ? null : $_POST['cmbMarca'],

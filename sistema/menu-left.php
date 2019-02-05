@@ -121,9 +121,14 @@
 								<li class="nav-item"><a href="ordemcompra.php" class="nav-link">Ordem de Compra</a></li>
 							</ul>
 						</li>
-						<li class="nav-item">
-							<a href="movimentacao.php" class="nav-link"><i class="icon-stack2"></i> <span>Gerenciamento do Estoque</span></a>
-						</li>
+						<li class="nav-item nav-item-submenu">
+							<a href="#" class="nav-link"><i class="icon-stack2"></i> <span>Gerenciamento do Estoque</span></a>
+							<ul class="nav nav-group-sub" data-submenu-title="Text editors">
+								<li class="nav-item"><a href="movimentacao.php" class="nav-link">Movimentação</a></li>
+								<li class="nav-item"><a href="fluxo.php" class="nav-link">Fluxo Operacional</a></li>
+							</ul>
+						</li>						
+						
 						<li class="nav-item">
 							<a href="inventario.php" class="nav-link"><i class="icon-paste2"></i> <span>Inventário</span></a>
 						</li>						

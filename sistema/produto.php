@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Produto';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ProduId, ProduNome, CategNome, SbCatNome, ProduValorVenda, ProduStatus
+$sql = ("SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, ProduValorVenda, ProduStatus
 		 FROM Produto
 		 LEFT JOIN Categoria on CategId = ProduCategoria
 		 LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
@@ -31,6 +31,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
@@ -38,7 +39,78 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	
 	<!-- /theme JS files -->	
 	
-	<script>
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+			
+			/* Início: Tabela Personalizada */
+			$('#tblProduto').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [{ 
+					orderable: true,   //Codigo
+					width: "10%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Produto
+					width: "25%",
+					targets: [1]
+				},				
+				{ 
+					orderable: true,   //Categoria
+					width: "20%",
+					targets: [2]
+				},
+				{ 
+					orderable: true,   //SubCategoria
+					width: "20%",
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //Preço Venda
+					width: "15%",
+					targets: [4]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "5%",
+					targets: [5]
+				},
+				{ 
+					orderable: false,  //Ações
+					width: "5%",
+					targets: [6]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */		
+		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaProduto(ProduId, ProduNome, ProduStatus, Tipo){
@@ -104,9 +176,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<a href="produtoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Imprimir</a></div>
 							</div>
 							
-							<table class="table datatable-responsive">
+							<table class="table" id="tblProduto">
 								<thead>
 									<tr class="bg-slate">
+										<th>Código</th>
 										<th>Produto</th>
 										<th>Categoria</th>
 										<th>SubCategoria</th>
@@ -124,6 +197,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										print('
 										<tr>
+											<td>'.$item['ProduCodigo'].'</td>
 											<td>'.$item['ProduNome'].'</td>
 											<td>'.$item['CategNome'].'</td>
 											<td>'.$item['SbCatNome'].'</td>

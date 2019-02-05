@@ -144,6 +144,7 @@ if(isset($_POST['inputData'])){
 				
 				Filtrando();
 				
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var cmbCategoria = $('#cmbCategoria').val();
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
@@ -169,7 +170,11 @@ if(isset($_POST['inputData'])){
 					if (dados.length){
 						
 						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.ProduId+'#'+obj.ProduValorCusto+'">'+obj.ProduNome+'</option>';
+							if (inputTipo == 'E'){
+								option += '<option value="'+obj.ProduId+'#'+obj.ProduValorCusto+'">'+obj.ProduNome+'</option>';
+							} else {
+								option += '<option value="'+obj.ProduId+'#'+obj.ProduCustoFinal+'">'+obj.ProduNome+'</option>';
+							}
 						});						
 						
 						$('#cmbProduto').html(option).show();
@@ -185,6 +190,7 @@ if(isset($_POST['inputData'])){
 				
 				FiltraProduto();
 				
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var cmbCategoria = $('#cmbCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				
@@ -195,7 +201,12 @@ if(isset($_POST['inputData'])){
 					if (dados.length){
 						
 						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.ProduId+'#'+obj.ProduValorCusto+'">'+obj.ProduNome+'</option>';
+							if (inputTipo == 'E'){
+								option += '<option value="'+obj.ProduId+'#'+obj.ProduValorCusto+'">'+obj.ProduNome+'</option>';
+							} else {
+								option += '<option value="'+obj.ProduId+'#'+obj.ProduCustoFinal+'">'+obj.ProduNome+'</option>';
+							}
+
 						});						
 						
 						$('#cmbProduto').html(option).show();
@@ -208,19 +219,29 @@ if(isset($_POST['inputData'])){
 
 			//Ao mudar o Produto, trazer o Valor Unitário do cadastro (retorno via JSON)
 			$('#cmbProduto').on('change', function(e){
-							
+				
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var cmbProduto = $('#cmbProduto').val();
 				var inputValorUnitario = $('#inputValorUnitario').val();
 				
-				var Produto = cmbProduto.split("#");
+				var Produto = cmbProduto.split("#");				
 				var valor = Produto[1].replace(".",",");
 				
 				$('#inputValorUnitario').val(valor);
 			});	
-						
+			
+			$("input[type=radio][name=inputTipo]").click(function(){
+				var inputNumItens = $('#inputNumItens').val();
+				
+				if(inputNumItens > 0){
+					alerta('Atenção','O tipo não pode ser alterado quando se tem produto(s) na lista! Exclua-o(s) primeiro ou cancele e recomece o cadastro da movimentação.','error');
+					return false;
+				}
+			});
 			
 			$('#btnAdicionar').click(function(){
 				
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputNumItens = $('#inputNumItens').val();
 				var cmbProduto = $('#cmbProduto').val();
 				
@@ -242,7 +263,7 @@ if(isset($_POST['inputData'])){
 				$.ajax({
 					type: "POST",
 					url: "movimentacaoAddProduto.php",
-					data: {numItens: resNumItens, idProduto: Produto[0], quantidade: inputQuantidade},
+					data: {tipo: inputTipo, numItens: resNumItens, idProduto: Produto[0], quantidade: inputQuantidade},
 					success: function(resposta){
 																	
 						var newRow = $("<tr>");
@@ -700,19 +721,6 @@ if(isset($_POST['inputData'])){
 												<label for="cmbProduto">Produto</label>
 												<select id="cmbProduto" name="cmbProduto" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
-													<?php 
-													/*	$sql = ("SELECT ProduId, ProduNome
-																 FROM Produto				     
-																 WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1
-																 ORDER BY ProduNome ASC");
-														$result = $conn->query("$sql");
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($row as $item){															
-															print('<option value="'.$item['ProduId'].'">'.$item['ProduNome'].'</option>');
-														}
-													*/
-													?>
 												</select>
 											</div>
 										</div>										

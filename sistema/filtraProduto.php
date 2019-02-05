@@ -8,11 +8,11 @@ include('global_assets/php/conexao.php');
 if(isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] == null) $_GET['idSubCategoria'] = "#";
 
 if (isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] != "#"){
-	$sql = ("SELECT ProduId, ProduNome, ProduValorCusto
+	$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
 			 FROM Produto
 			 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduSubCategoria = '". $_GET['idSubCategoria']."'");
 } else {
-	$sql = ("SELECT ProduId, ProduNome, ProduValorCusto
+	$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
 			 FROM Produto
 			 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = '". $_GET['idCategoria']."'");
 }
