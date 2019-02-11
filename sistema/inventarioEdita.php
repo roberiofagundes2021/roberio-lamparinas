@@ -21,19 +21,38 @@ if(isset($_POST['inputInventarioId'])){
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
-		
-		//Locais para esse inventário
+		//Locais do inventário
 		$sql = ("SELECT LcEstId, LcEstNome
 				 FROM LocalEstoque
 				 JOIN InventarioXLocalEstoque on InXLELocal = LcEstId
 				 WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ." and InXLEInventario = ". $iInventario ." and LcEstStatus = 1
 				 ORDER BY LcEstNome ASC");
 		$result = $conn->query("$sql");
-		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($rowBD as $item){
+		$rowBDLocal = $result->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($rowBDLocal as $item){
 			$aLocaisEstoque[] = $item['LcEstId'];
-		}		
-					
+		}
+		
+		//Equipe do inventário
+		$sql = ("SELECT UsuarId, UsuarLogin
+				 FROM Usuario
+				 JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+				 JOIN InventarioXEquipe on InXEqUsuario = UsuarId
+				 WHERE EXUXPEmpresa = ". $_SESSION['EmpreId'] ." and InXEqInventario =  ". $iInventario ." and EXUXPStatus = 1
+				 ORDER BY UsuarLogin ASC");
+		$result = $conn->query("$sql");
+		$rowBDEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
+		
+		$aEquipes = '';
+		
+		foreach ($rowBDEquipe as $item){
+			
+			$aEquipe[] = $item['UsuarId'];
+			
+			$aEquipes .= $item['UsuarId'] . ",";
+		}
+		$aEquipes = substr($aEquipes,0, -1); // retira a última vírgula
+		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
 	}
@@ -49,8 +68,8 @@ if(isset($_POST['inputData'])){
 		
 	try{
 		
-		$sql = "UPDATE Inventario SET InvenData = :dData, InvenNumero = :sNumero, InvenDataLimite = :dDataLimite, InvenClassificacao = :iClassificacao,
-									  InvenUnidade = :iUnidade, InvenCategoria = :iCategoria, InvenSolicitante = :iSolicitante, InvenObservacao = :sObservacao, 
+		$sql = "UPDATE Inventario SET InvenDataLimite = :dDataLimite, InvenClassificacao = :iClassificacao, InvenUnidade = :iUnidade, 
+									  InvenCategoria = :iCategoria, InvenObservacao = :sObservacao, 
 									  InvenUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE InvenId = :iInventario";
 		$result = $conn->prepare($sql);
@@ -58,13 +77,10 @@ if(isset($_POST['inputData'])){
 		$conn->beginTransaction();				
 		
 		$result->execute(array(
-						':dData' => gravaData($_POST['inputData']),
-						':sNumero' => $_POST['inputNumero'],
 						':dDataLimite' => gravaData($_POST['inputDataLimite']),
 						':iClassificacao' => $_POST['cmbClassificacao'] == '#' ? null : $_POST['cmbClassificacao'],
 						':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iSolicitante' => $_SESSION['UsuarId'],
 						':sObservacao' => $_POST['txtObservacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],						
 						':iInventario'	=> $_POST['inputInventarioId']
@@ -78,35 +94,56 @@ if(isset($_POST['inputData'])){
 						
 		if ($_POST['cmbLocalEstoque']){
 			
-			try{
-				$sql = "INSERT INTO InventarioXLocalEstoque 
-							(InXLEInventario, InXLELocal)
-						VALUES 
-							(:iInventario, :iLocal)";
-				$result = $conn->prepare($sql);
+			$sql = "INSERT INTO InventarioXLocalEstoque 
+						(InXLEInventario, InXLELocal)
+					VALUES 
+						(:iInventario, :iLocal)";
+			$result = $conn->prepare($sql);
 
-				foreach ($_POST['cmbLocalEstoque'] as $key => $value){
+			foreach ($_POST['cmbLocalEstoque'] as $key => $value){
 
-					$result->execute(array(
-									':iInventario' => $_POST['inputInventarioId'],
-									':iLocal' => $value
-									));
-				}
-				
-				$conn->commit();
-				
-			} catch(PDOException $e) {
-				$conn->rollback();
-				echo 'Error: ' . $e->getMessage();exit;
+				$result->execute(array(
+								':iInventario' => $_POST['inputInventarioId'],
+								':iLocal' => $value
+								));
 			}
+								
 		}
+
+		$sql = "DELETE FROM InventarioXEquipe
+				WHERE InXEqInventario = :iInventario";
+		$result = $conn->prepare($sql);	
+		
+		$result->execute(array(':iInventario' => $_POST['inputInventarioId']));
 						
+		if ($_POST['cmbEquipe']){
+			
+			$sql = "INSERT INTO InventarioXEquipe
+						(InXEqInventario, InXEqUsuario, InXEqPresidente)
+					VALUES 
+						(:iInventario, :iUsuario, :bPresidente)";
+			$result = $conn->prepare($sql);
+
+			foreach ($_POST['cmbEquipe'] as $key => $value){
+
+				$result->execute(array(
+								':iInventario' => $_POST['inputInventarioId'],
+								':iUsuario' => $value,
+								':bPresidente' => $value == $_POST['cmbPresidente'] ? 1 : 0
+								));
+			}
+								
+		}
+				
+		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Inventário alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {		
+		
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao alterar inventário!!!";
@@ -148,41 +185,110 @@ if(isset($_POST['inputData'])){
 			$("#enviar").on('click', function(e){
 				
 				e.preventDefault();
-
-				var inputNumeroNovo  = $('#inputNumero').val();
-				var inputNumeroVelho = $('#inputInventarioNumero').val();
 				
-				//remove os espaços desnecessários antes e depois
-				inputNumeroNovo = inputNumeroNovo.trim();
-				
+				var cmbUnidade = $('#cmbUnidade').val();
+				var cmbLocalEstoque = $('#cmbLocalEstoque').val();
+				var cmbEquipe = $('#cmbEquipe').val();
+								
 				//Verifica se o campo só possui espaços em branco
-				if (inputNumeroNovo == ''){
-					alerta('Atenção','Informe o número do inventario!','error');
-					$('#inputNumeroNovo').focus();
+				if (cmbUnidade == '#'){
+					alerta('Atenção','Informe a Unidade!','error');
+					$('#cmbUnidade').focus();
 					return false;
-				}			
-								
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "inventarioValida.php",
-					data: {numeroVelho: inputNumeroVelho, numeroNovo: inputNumeroNovo},
-					success: function(resposta){
+				}
+				
+				if (cmbLocalEstoque == ''){
+					alerta('Atenção','Informe o Local(is) de Estoque!','error');
+					$('#cmbLocalEstoque').focus();
+					return false;
+				}
 
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;
-						}
+				if (cmbEquipe == ''){
+					alerta('Atenção','Informe a equipe responsável!','error');
+					$('#cmbEquipe').focus();
+					return false;
+				}
 						
-						$( "#formInventario" ).submit();
-					}
-				}); //ajax
-								
+				$( "#formInventario" ).submit();
+
 			}); // enviar
+			
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbUnidade').on('change', function(e){
+
+				FiltraLocalEstoque();
+				
+				var cmbUnidade = $('#cmbUnidade').val();
+
+				if (cmbUnidade == '#'){
+					ResetLocalEstoque();
+				} else {
+				
+					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados){
+						
+						var option = '';
+
+						if (dados.length){						
+							
+							$.each(dados, function(i, obj){
+								option += '<option value="'+obj.LcEstId+'">' + obj.LcEstNome + '</option>';
+							});						
+							
+							$('#cmbLocalEstoque').html(option).show();
+						} else {
+							ResetLocalEstoque();
+						}					
+					});
+				}
+			});
+            
+			//Ao mudar a Equipe, filtra o possível presidente via ajax (retorno via JSON)
+			$('#cmbEquipe').on('change', function(e){
+						
+				var cmbEquipe = $('#cmbEquipe').val();
+				
+				//Esse IF é para quando se exclui todos que estavam selecionados entrar no ELSE e limpar a combo do Presidente
+				if (cmbEquipe != ''){
+					
+					$.getJSON('filtraPresidente.php?aEquipe='+cmbEquipe, function (dados){
+
+						var option = '';
+
+						if (dados.length){
+							
+							$.each(dados, function(i, obj){
+								option += '<option value="'+obj.UsuarId+'">'+obj.UsuarLogin+'</option>';
+							});						
+							
+							$('#cmbPresidente').html(option).show();
+						} else {
+							ResetPresidente();
+						}					
+					});
+				} else {
+					ResetPresidente();						
+				}				
+			});			
             
         }); //document.ready
         
-
+		function FiltraLocalEstoque(){
+			$('#cmbLocalEstoque').empty().append('<option>Filtrando...</option>');
+		}
+		
+		function ResetLocalEstoque(){
+			$('#cmbLocalEstoque').empty().append('<option>Sem Local do Estoque</option>');
+		}			
+		
+		//Mostra o "Filtrando..." na combo Presidente da Comissão
+		function FiltraPresidente(){
+			$('#cmbPresidente').empty().append('<option>Filtrando...</option>');
+		}			
+		
+		function ResetPresidente(){
+			$('#cmbPresidente').empty().append('<option value="#">Nenhum</option>');
+		}
+		
     </script>	
 	
 </head>
@@ -332,6 +438,55 @@ if(isset($_POST['inputData'])){
 								</div>								
 							</div>
 							<br>
+							
+							<h5 class="mb-0 font-weight-semibold">Comissão de Inventário</h5>
+							<br>							
+							<div class="row">
+								<div class="col-lg-9">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
+										<label for="cmbEquipe">Equipe Responsável</label>
+										<select id="cmbEquipe" name="cmbEquipe[]" class="form-control select" multiple="multiple" data-fouc>
+											<?php 
+												$sql = ("SELECT UsuarId, UsuarLogin
+														 FROM Usuario
+														 JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+														 WHERE EXUXPEmpresa = ". $_SESSION['EmpreId'] ." and EXUXPStatus = 1
+														 ORDER BY UsuarLogin ASC");
+												$result = $conn->query("$sql");
+												$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($rowEquipe as $item){
+													$seleciona = in_array($item['UsuarId'], $aEquipe) ? "selected" : "";	
+													print('<option value="'.$item['UsuarId'].'" '. $seleciona .'>'.$item['UsuarLogin'].'</option>');
+												}
+											
+											?>
+										</select>
+									</div>
+								</div>
+								
+								<div class="col-lg-3">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
+										<label for="cmbPresidente">Presidente da Comissão</label>
+										<select id="cmbPresidente" name="cmbPresidente" class="form-control form-control-select2">
+											<?php
+												$sql = "SELECT UsuarId, UsuarLogin
+														 FROM Usuario
+														 JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+														 WHERE EXUXPEmpresa = ". $_SESSION['EmpreId'] ." and EXUXPUsuario in (".$aEquipes.") and EXUXPStatus = 1";
+												$result = $conn->query("$sql");
+												$rowPresidente = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($rowPresidente as $item){
+													$seleciona = in_array($item['UsuarId'], $aEquipe) ? "selected" : "";	
+													print('<option value="'.$item['UsuarId'].'" '. $seleciona .'>'.$item['UsuarLogin'].'</option>');
+												}
+											?>
+										</select>
+									</div>
+								</div>								
+							</div>
+							<br>							
 							
 							<div class="row">
 								<div class="col-lg-12">									

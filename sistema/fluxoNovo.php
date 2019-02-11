@@ -202,7 +202,18 @@ if(isset($_POST['inputData'])){
 										</select>
 									</div>
 								</div>
-							</div>							
+							</div>
+							
+							<div class="row">
+								<div class="col-lg-4">
+									<div class="form-group form-group-feedback form-group-feedback-right">
+										<input type="text" class="form-control form-control-lg" placeholder="Nº do Orçamento">
+										<div class="form-control-feedback form-control-feedback-lg">
+											<i class="icon-make-group"></i>
+										</div>
+									</div>
+								</div>
+							</div>
 
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								

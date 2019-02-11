@@ -10,11 +10,15 @@ require_once 'global_assets/php/vendor/autoload.php';
 
 $iInventario = $_POST['inputInventarioId'];
 
-$sql = ("SELECT *
-		 FROM Inventario
-		 WHERE InvenId = ".$iInventario);
+$sql = ("SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal 
+		 FROM Produto
+		 JOIN Categoria on CategId = ProduCategoria
+		 JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+		 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduStatus = 1 and
+		 ProduCategoria in (select InvenCategoria from Inventario where InvenId = ".$iInventario.")
+		 ");
 $result = $conn->query("$sql");
-$row = $result->fetch(PDO::FETCH_ASSOC);
+$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 try {
     $mpdf = new Mpdf([
@@ -40,13 +44,17 @@ try {
 	 </div>	 
 	";
 
-	$html = '
-		<br><br>
-		<div style="width: 30%; text-align: center; margin-top: 100px; border-top: 1px solid #ccc; float:left;">Responsável</div>
-		<div style="width: 30%; text-align: center; margin-top: 100px; border-top: 1px solid #ccc; float:left;">Membro 1</div>
-		<div style="width: 30%; text-align: center; margin-top: 100px; border-top: 1px solid #ccc; float:left;">Membro 2</div>
-	';
-    
+	foreach ($row as $item){
+		$html = '
+			<br>
+			<div style="font-weight: bold;">Local: '.$item[''].'</div>
+			<br>
+			<div style="width: 30%; text-align: center; margin-top: 100px; border-top: 1px solid #ccc; float:left;">Responsável</div>
+			<div style="width: 30%; text-align: center; margin-top: 100px; border-top: 1px solid #ccc; float:left;">Membro 1</div>
+			<div style="width: 30%; text-align: center; margin-top: 100px; border-top: 1px solid #ccc; float:left;">Membro 2</div>
+		';
+	}
+	
     $rodape = "<hr/>
     <div style='width:100%'>
 		<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
