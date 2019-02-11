@@ -20,15 +20,15 @@ if(isset($_POST['inputData'])){
 		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimClassificacao, MovimMotivo, MovimData, MovimFinalidade, MovimOrigem, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
 										  MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimEmpresa)
-				VALUES (:sTipo, :iClassificacao, :iMotivo, :dData, :iFinalidade, :iOrigem, :iDestinoLocal, :iDestinoSetor, :iDestinoManual, 
+				VALUES (:sTipo, :iClassificacao, :iMotivo, :dData, :iFinalidade, :iOrigem, :iDestinoLocal, :iDestinoSetor, :sDestinoManual, 
 						:sObservacao, :iFornecedor, :iOrdemCompra, :sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, 
 						:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);	
 
-/*		echo $sql;
+		/*echo $sql;
 		echo "<br>";
-		var_dump($_POST['inputTipo'], gravaData($_POST['inputData']), $_POST['cmbFinalidade'], $_POST['cmbOrigem'], $_POST['cmbDestinoLocal'],
-		 $_POST['cmbDestinoSetor'], $_POST['txtareaObservacao'], $_POST['cmbFornecedor'], $_POST['cmbOrdemCompra'], $_POST['inputNotaFiscal'],
+		var_dump($_POST['inputTipo'], $_POST['cmbClassificacao'], $iMotivo, gravaData($_POST['inputData']), $_POST['cmbFinalidade'], $_POST['cmbOrigem'], $_POST['cmbDestinoLocal'],
+		 $_POST['cmbDestinoSetor'], $_POST['inputDestinoManual'], $_POST['txtareaObservacao'], $_POST['cmbFornecedor'], $_POST['cmbOrdemCompra'], $_POST['inputNotaFiscal'],
 		 gravaData($_POST['inputDataEmissao']), $_POST['inputNumSerie'], gravaValor($_POST['inputValorTotal']), $_POST['inputChaveAcesso'],
 		 $_POST['cmbSituacao'], $_SESSION['UsuarId'], $_SESSION['EmpreId']);
 		die;*/
@@ -39,20 +39,20 @@ if(isset($_POST['inputData'])){
 						':iClassificacao' => $_POST['cmbClassificacao'] == '#' ? null : $_POST['cmbClassificacao'],
 						':iMotivo' => $iMotivo,
 						':dData' => gravaData($_POST['inputData']),
-						':iFinalidade' => $_POST['cmbFinalidade'],
+						':iFinalidade' => $_POST['cmbFinalidade'] == '#' ? null : $_POST['cmbFinalidade'],
 						':iOrigem' => $_POST['cmbOrigem'] == '#' ? null : $_POST['cmbOrigem'],
 						':iDestinoLocal' => $_POST['cmbDestinoLocal'] == '#' ? null : $_POST['cmbDestinoLocal'],
 						':iDestinoSetor' => $_POST['cmbDestinoSetor'] == '#' ? null : $_POST['cmbDestinoSetor'],
-						':iDestinoManual' => $_POST['inputDestinoManual'],
+						':sDestinoManual' => $_POST['inputDestinoManual'] == '' ? null : $_POST['inputDestinoManual'],
 						':sObservacao' => $_POST['txtareaObservacao'],
 						':iFornecedor' => $_POST['cmbFornecedor'] == '#' ? null : $_POST['cmbFornecedor'],
-						':iOrdemCompra' => $_POST['cmbOrdemCompra'],
-						':sNotaFiscal' => $_POST['inputNotaFiscal'],
-						':dDataEmissao' => gravaData($_POST['inputDataEmissao']),
-						':sNumSerie' => $_POST['inputNumSerie'],
-						':fValorTotal' => gravaValor($_POST['inputValorTotal']),
-						':sChaveAcesso' => $_POST['inputChaveAcesso'],
-						':iSituacao' => $_POST['cmbSituacao'],
+						':iOrdemCompra' => $_POST['cmbOrdemCompra'] == '#' ? null : $_POST['cmbOrdemCompra'],
+						':sNotaFiscal' => $_POST['inputNotaFiscal'] == '' ? null : $_POST['inputNotaFiscal'],
+						':dDataEmissao' => $_POST['inputDataEmissao'] == '' ? null : gravaData($_POST['inputDataEmissao']),
+						':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
+						':fValorTotal' => $_POST['inputValorTotal'] == '' ? null : gravaValor($_POST['inputValorTotal']),
+						':sChaveAcesso' => $_POST['inputChaveAcesso'] == '' ? null : $_POST['inputChaveAcesso'],
+						':iSituacao' => $_POST['cmbSituacao'] == '#' ? null : $_POST['cmbSituacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
@@ -616,11 +616,13 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 										
-										<div class="col-lg-3">
+										<div class="col-lg-3">											
 											<div class="form-group">
 												<label for="cmbOrdemCompra">Nº Ordem Compra / Carta Contrato</label>
-												<input type="text" id="cmbOrdemCompra" name="cmbOrdemCompra" class="form-control">
-											</div>
+												<select id="cmbOrdemCompra" name="cmbOrdemCompra" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+												</select>
+											</div>											
 										</div>	
 										
 										<div class="col-lg-3">
@@ -840,7 +842,7 @@ if(isset($_POST['inputData'])){
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
-										<a href="orcamento.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="movimentacao.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

@@ -83,10 +83,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			/* Fim: Tabela Personalizada */
 		});
 		
-		function atualizaInventario(InvenId, Tipo){
+		function atualizaInventario(InvenId, InvenNumero, Tipo){
 
 			document.getElementById('inputInventarioId').value = InvenId;
-				
+			document.getElementById('inputInventarioNumero').value = InvenNumero;
+							
 			if (Tipo == 'edita'){	
 				document.formInventario.action = "inventarioEdita.php";		
 			} else if (Tipo == 'exclui'){
@@ -175,16 +176,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].',  \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>
 														<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaInventario('.$item['InvenId'].', \'imprimir-lista\')"  class="dropdown-item" title="Imprimir Lista"><i class="icon-printer"></i> Imprimir Lista</a>
-																<a href="#" onclick="atualizaInventario('.$item['InvenId'].', \'imprimir-inventario\')"  class="dropdown-item" title="Imprimir Inventário"><i class="icon-printer2"></i> Imprimir Inventário</a>
+																<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].', \'imprimir-lista\')"  class="dropdown-item" title="Imprimir Lista"><i class="icon-printer"></i> Imprimir Lista</a>
+																<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].', \'imprimir-inventario\')"  class="dropdown-item" title="Imprimir Inventário"><i class="icon-printer2"></i> Imprimir Inventário</a>
 															</div>
 														</div>
 													</div>
@@ -206,6 +207,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<form name="formInventario" method="post" action="inventarioEdita.php">
 					<input type="hidden" id="inputInventarioId" name="inputInventarioId" >
+					<input type="hidden" id="inputInventarioNumero" name="inputInventarioNumero" >
 					<input type="hidden" id="inputInventarioStatus" name="inputInventarioStatus" >
 				</form>
 

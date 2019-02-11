@@ -117,7 +117,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$tipo = $item['MovimTipo'] == 'E' ? 'Entrada' : $item['MovimTipo'] == 'S' ? 'Saída' : 'Transferência';
+										$tipo = $item['MovimTipo'] == 'E' ? 'Entrada' : ($item['MovimTipo'] == 'S' ? 'Saída' : 'Transferência');
 										$local = $item['MovimTipo'] == 'S' ? $item['SetorNome'] : $item['LcEstNome'];
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = $item['SituaChave'] == 'PENDENTE' ? 'badge-success' : 'badge-secondary';
