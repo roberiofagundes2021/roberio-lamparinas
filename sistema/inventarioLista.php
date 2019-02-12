@@ -44,20 +44,22 @@ try {
 	 </div>
 	";		
 	
-	foreach ($row as $item){		
+	$html = '';
+	
+	foreach ($row as $item){	
 		
-		$html = '
+		$html .= '
 		<br>
 		<div style="font-weight: bold; position:relative; margin-top: 50px;">Local: '.$item['LcEstNome'].'</div>
 		<br>
 		<table style="width:100%;">
 			<tr>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 5px; padding-bottom: 5px;">Código</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 5px; padding-bottom: 5px;">Produto</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 5px; padding-bottom: 5px;">Unidade</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 5px; padding-bottom: 5px;">Categoria</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 5px; padding-bottom: 5px;">1ª Contagem</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 5px; padding-bottom: 5px;">2ª Contagem</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Código</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:30%">Produto</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:30%">Categoria</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">1ª Contagem</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">2ª Contagem</th>
 			</tr>
 		';	
 		
@@ -78,16 +80,16 @@ try {
 		$result = $conn->query("$sql");
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);		
 		
-		foreach ($rowProdutos as $item){
+		foreach ($rowProdutos as $itemProduto){
 			
 			$html .= "
 				<tr>
-					<td style='padding-top: 5px;'>".formatarNumero($item['ProduCodigo'])."</td>
-					<td style='padding-top: 5px;'>".$item['ProduNome']."</td>
-					<td style='padding-top: 5px;'>".$item['UnMedSigla']."</td>
-					<td style='padding-top: 5px;'>".$item['CategNome']."</td>
-					<td style='padding-top: 5px;'>__________________</td>
-					<td style='padding-top: 5px;'>__________________</td>
+					<td style='padding-top: 8px;'>".formatarNumero($itemProduto['ProduCodigo'])."</td>
+					<td style='padding-top: 8px;'>".$itemProduto['ProduNome']."</td>
+					<td style='padding-top: 8px;'>".$itemProduto['UnMedSigla']."</td>
+					<td style='padding-top: 8px;'>".$itemProduto['CategNome']."</td>
+					<td style='padding-top: 8px;'>__________________</td>
+					<td style='padding-top: 8px;'>__________________</td>
 				</tr>
 			";
 		}
@@ -96,8 +98,8 @@ try {
 	}
 	
 	$html .= '			
-		<br>
-		<div style="width: 100%; margin-top: 100px;">
+		<br><br>
+		<div style="width: 100%; margin-top: 200px;">
 			<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; float: left; text-align: center;">Responsável</div>
 			<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; float: left; text-align: center; margin-left: 100px;">Membro 1</div>
 			<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; float: left; text-align: center; margin-left: 100px;">Membro 2</div>

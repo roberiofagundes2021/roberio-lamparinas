@@ -69,6 +69,69 @@ if(isset($_POST['inputData'])){
     <script type="text/javascript" >
 
         $(document).ready(function() {	
+
+			//Ao mudar o Fornecedor, filtra a categoria e o Orçamento via ajax (retorno via JSON)
+			$('#cmbFornecedor').on('change', function(e){
+				
+				Filtrando();
+				
+				var cmbFornecedor = $('#cmbFornecedor').val();
+
+				$.getJSON('filtraCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
+					
+					//var option = '<option value="#">Selecione a Categoria</option>';
+					var option = '';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
+						});						
+						
+						$('#cmbCategoria').html(option).show();
+					} else {
+						ResetCategoria();
+					}					
+				});
+				
+				$.getJSON('filtraOrcamento.php?idFornecedor='+cmbFornecedor, function (dados){
+					
+					var option = '<option value="#" "selected">Selecione o Orçamento</option>';
+					
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){							
+							option += '<option value="'+obj.OrcamId+'">'+obj.OrcamNumero + ' - ' + obj.OrcamData +'</option>';
+						});						
+						
+						$('#cmbOrcamento').html(option).show();
+					} else {
+						ResetOrcamento();
+					}					
+				});				
+				
+			});	
+			
+			//Mostra o "Filtrando..." na combo Categoria e Orcamento ao mesmo tempo
+			function Filtrando(){
+				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
+				FiltraOrcamento();
+			}		
+			
+			//Mostra o "Filtrando..." na combo Orcamento
+			function FiltraOrcamento(){
+				$('#cmbOrcamento').empty().append('<option>Filtrando...</option>');
+			}		
+			
+			function ResetCategoria(){
+				$('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
+			}
+			
+			function ResetOrcamento(){
+				$('#cmbOrcamento').empty().append('<option>Sem orçamento</option>');
+			}				
+			
+
 					
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
@@ -84,22 +147,21 @@ if(isset($_POST['inputData'])){
 					return false;				
 				}
 				
-				//Aqui falta verificar se a licença com data maior e ativa é menor que a data início (TEM QUE SER)
-				
-				$('#cmbEmpresa').prop("disabled", false);
-				
 				$( "#formFluxoOperacional" ).submit();				
 				
-			});		
-			
-			$('#cancelar').on('click', function(e){
-				
-				$('#cmbEmpresa').prop("disabled", false);			
-				$(window.document.location).attr('href', "fluxo.php");
-			});
-	
+			});	
 		
 		});	
+		
+		function dataAtualFormatada(){
+			var data = new Date(),
+				dia  = data.getDate().toString(),
+				diaF = (dia.length == 1) ? '0'+dia : dia,
+				mes  = (data.getMonth()+1).toString(), //+1 pois no getMonth Janeiro começa com zero.
+				mesF = (mes.length == 1) ? '0'+mes : mes,
+				anoF = data.getFullYear();
+			return diaF+"/"+mesF+"/"+anoF;
+		}		
 	</script>
 
 </head>
@@ -206,12 +268,10 @@ if(isset($_POST['inputData'])){
 							
 							<div class="row">
 								<div class="col-lg-4">
-									<div class="form-group form-group-feedback form-group-feedback-right">
-										<input type="text" class="form-control form-control-lg" placeholder="Nº do Orçamento">
-										<div class="form-control-feedback form-control-feedback-lg">
-											<i class="icon-make-group"></i>
-										</div>
-									</div>
+									<label for="cmbOrcamento">Orçamento</label>
+									<select id="cmbOrcamento" name="cmbOrcamento" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+									</select>
 								</div>
 							</div>
 
