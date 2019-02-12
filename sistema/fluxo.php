@@ -6,8 +6,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Operacional';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT FlOpeId, FlOpeData, FlOpeNumProcesso, FlOpeNumContrato, FlOpeFornecedor, 
-				FlOpeOrcamento, FlOpeCategoria, FlOpeStatus, CategNome
+$sql = ("SELECT FlOpeId, ForneNome, FlOpeOrcamento, FlOpeCategoria, FlOpeData, 
+				FlOpeNumContrato, FlOpeNumProcesso, FlOpeStatus, CategNome
 		 FROM FluxoOperacional
 		 JOIN Categoria on CategId = FlOpeCategoria
 		 JOIN Fornecedor on ForneId = FlOpeFornecedor
@@ -39,7 +39,48 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	
 	<!-- /theme JS files -->	
 	
-	<script>
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+			
+			/* Início: Tabela Personalizada */
+			$('#tblFluxo').DataTable( {
+				"order": [[ 0, "desc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [{ 
+					orderable: false,
+					width: 50,
+					targets: [ 6 ]
+				}], 
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */
+		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaFluxoOperacional(FlOpeId, FlOpeNumContrato, FlOpeStatus, Tipo){
@@ -104,7 +145,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="text-right"><a href="fluxoNovo.php" class="btn btn-success" role="button">Novo Fluxo Operacional</a></div>
 							</div>
 							
-							<table class="table datatable-responsive">
+							<table class="table" id="tblFluxo">
 								<thead>
 									<tr class="bg-slate">
 										<th width="10%">Data</th>
@@ -125,7 +166,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										print('
 										<tr>
-											<td>'.$item['FlOpeData'].'</td>
+											<td>'.mostraData($item['FlOpeData']).'</td>
 											<td>'.$item['FlOpeNumContrato'].'</td>
 											<td>'.$item['FlOpeNumProcesso'].'</td>
 											<td>'.$item['ForneNome'].'</td>

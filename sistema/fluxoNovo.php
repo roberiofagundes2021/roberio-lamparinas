@@ -10,17 +10,22 @@ if(isset($_POST['inputData'])){
 
 	try{
 		
-		$sql = "INSERT INTO FluxoOperacional (FlOpeEmpresa, FlOpeDtInicio, FlOpeDtFim, FlOpeLimiteUsuarios, FlOpeStatus, FlOpeUsuarioAtualizador)
-				VALUES (:iEmpresa, :dDtInicio, :dDtFim, :iLimiteUsuarios, :bStatus, :iUsuarioAtualizador)";
+		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeOrcamento, FlOpeData, FlOpeNumContrato, FlOpeNumProcesso, 
+											  FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa)
+				VALUES (:iFornecedor, :iCategoria, :iOrcamento, :dData, :iNumContrato, :iNumProcesso, 
+						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':iEmpresa' => $_SESSION['EmpresaId'],
-						':dDtInicio' => $_POST['inputDataInicio'],
-						':dDtFim' => $_POST['inputDataFim'],
-						':iLimiteUsuarios' => $_POST['inputLimiteUsuarios'],
+						':iFornecedor' => $_POST['cmbFornecedor'],
+						':iCategoria' => $_POST['cmbCategoria'],
+						':iOrcamento' => $_POST['cmbOrcamento'],
+						':dData' => $_POST['inputData'],
+						':iNumContrato' => $_POST['inputNumContrato'],
+						':iNumProcesso' => $_POST['inputNumProcesso'],
 						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId']
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iEmpresa' => $_SESSION['EmpreId'],
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -33,7 +38,7 @@ if(isset($_POST['inputData'])){
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir Fluxo Operacional!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 	
 	irpara("fluxo.php");
@@ -96,12 +101,16 @@ if(isset($_POST['inputData'])){
 				
 				$.getJSON('filtraOrcamento.php?idFornecedor='+cmbFornecedor, function (dados){
 					
-					var option = '<option value="#" "selected">Selecione o Orçamento</option>';
+					if (dados.length > 1){
+						var option = '<option value="#" "selected">Selecione o Orçamento</option>';
+					} else {
+						var option = '';
+					}
 					
 					if (dados.length){
 						
 						$.each(dados, function(i, obj){							
-							option += '<option value="'+obj.OrcamId+'">'+obj.OrcamNumero + ' - ' + obj.OrcamData +'</option>';
+							option += '<option value="'+obj.OrcamId+'">Nº: ' + obj.OrcamNumero + ' - Data: ' + obj.OrcamData +'</option>';
 						});						
 						
 						$('#cmbOrcamento').html(option).show();
@@ -192,10 +201,55 @@ if(isset($_POST['inputData'])){
 						</div>
 						
 						<div class="card-body">								
+														
+							<h5 class="mb-0 font-weight-semibold">Dados do Orçamento</h5>
+							<br>
 							<div class="row">
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputData">Data</label>
+										<label for="cmbFornecedor">Fornecedor</label>
+										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
+											<option value="#">Selecione</option>
+											<?php 
+												$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+														 FROM Fornecedor														     
+														 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
+														 ORDER BY ForneNome ASC");
+												$result = $conn->query("$sql");
+												$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($rowFornecedor as $item){															
+													print('<option value="'.$item['ForneId'].'">'.$item['ForneNome'].'</option>');
+												}
+											
+											?>
+										</select>
+									</div>
+								</div>
+								
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="cmbCategoria">Categoria</label>
+										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+											<option value="#">Selecione</option>
+										</select>
+									</div>
+								</div>
+								
+								<div class="col-lg-4">
+									<label for="cmbOrcamento">Orçamento</label>
+									<select id="cmbOrcamento" name="cmbOrcamento" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+									</select>
+								</div>	
+							</div>
+							
+							<h5 class="mb-0 font-weight-semibold">Dados do Contrato</h5>
+							<br>
+							<div class="row">
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="inputData">Data de Emissão</label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
@@ -218,62 +272,7 @@ if(isset($_POST['inputData'])){
 										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo">
 									</div>
 								</div>
-							</div>
-							
-							<div class="row">
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="cmbFornecedor">Fornecedor</label>
-										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
-											<?php 
-												$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-														 FROM Fornecedor														     
-														 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
-														 ORDER BY ForneNome ASC");
-												$result = $conn->query("$sql");
-												$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($rowFornecedor as $item){															
-													print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'">'.$item['ForneNome'].'</option>');
-												}
-											
-											?>
-										</select>
-									</div>
-								</div>
-								
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="cmbCategoria">Categoria</label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
-											<?php 
-												$sql = ("SELECT CategId, CategNome
-														 FROM Categoria															     
-														 WHERE CategStatus = 1 and CategEmpresa = ". $_SESSION['EmpreId'] ."
-														 ORDER BY CategNome ASC");
-												$result = $conn->query("$sql");
-												$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($rowCategoria as $item){															
-													print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-												}
-											
-											?>
-										</select>
-									</div>
-								</div>
-							</div>
-							
-							<div class="row">
-								<div class="col-lg-4">
-									<label for="cmbOrcamento">Orçamento</label>
-									<select id="cmbOrcamento" name="cmbOrcamento" class="form-control form-control-select2">
-										<option value="#">Selecione</option>
-									</select>
-								</div>
-							</div>
+							</div>							
 
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
