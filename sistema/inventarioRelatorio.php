@@ -11,10 +11,11 @@ require_once 'global_assets/php/vendor/autoload.php';
 $iInventario = $_POST['inputInventarioId'];
 $sNumero = $_POST['inputInventarioNumero'];
 
-$sql = ("SELECT InvenNumero, InvenCategoria, InvenObservacao, InXLELocal, LcEstNome
+$sql = ("SELECT InvenNumero, InvenCategoria, CategNome, InXLELocal, LcEstNome
 		 FROM Inventario
 		 JOIN InventarioXLocalEstoque on InXLEInventario = InvenId
 		 JOIN LocalEstoque on LcEstId = InXLELocal
+		 JOIN Categoria on CategId = InvenCategoria
 		 Where InvenId = ".$iInventario."
 		");
 $result = $conn->query("$sql");
@@ -50,23 +51,24 @@ try {
 		
 		$html .= '
 		<br>
-		<div style="font-weight: bold; position:relative; margin-top: 50px;">Local: '.$item['LcEstNome'].'</div>
+		<div style="font-weight: bold; position:relative; margin-top: 50px;text-transform: uppercase;">Local: '.$item['LcEstNome'].'</div>
+		<div style="font-weight: bold; position:relative; margin-top: 20px;">'.$item['CategNome'].'</div>
 		<br>
 		<table style="width:100%;">
 			<tr>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Código</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:30%">Produto</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:48%">Produto</th>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:30%">Categoria</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">1ª Contagem</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">2ª Contagem</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Valor Unitário</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Valor Total</th>
 			</tr>
 		';	
 		
 		$iCategoria = $item['InvenCategoria'];
 		$iLocal = $item['InXLELocal'];
 		
-		$sql = ("SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, dbo.fnSaldoEstoque(".$_SESSION['EmpreId'].", ProduId, MovimDestinoLocal) as Saldo, LcEstNome
+		$sql = ("SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, dbo.fnSaldoEstoque(".$_SESSION['EmpreId'].", ProduId, MovimDestinoLocal) as Saldo, ProduCustoFinal, ValorTotal = 0.00
 				 FROM Produto
 				 JOIN Categoria on CategId = ProduCategoria
 				 JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -87,9 +89,9 @@ try {
 					<td style='padding-top: 8px;'>".formatarNumero($itemProduto['ProduCodigo'])."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome']."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['UnMedSigla']."</td>
-					<td style='padding-top: 8px;'>".$itemProduto['CategNome']."</td>
-					<td style='padding-top: 8px;'>__________________</td>
-					<td style='padding-top: 8px;'>__________________</td>
+					<td style='padding-top: 8px;'>".$itemProduto['Saldo']."</td>
+					<td style='padding-top: 8px;'>".$itemProduto['ProduCustoFinal']."</td>
+					<td style='padding-top: 8px;'>".$itemProduto['ValorTotal']."</td>
 				</tr>
 			";
 		}
@@ -97,14 +99,18 @@ try {
 		$html .= "</table>";
 	}
 	
-	$html .= '			
+	$html .= '
 		<br><br>
-		<div style="width: 100%; margin-top: 200px;">
-			<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; float: left; text-align: center;">Responsável</div>
-			<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; float: left; text-align: center; margin-left: 100px;">Membro 1</div>
-			<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; float: left; text-align: center; margin-left: 100px;">Membro 2</div>
-		</div>
-	';	
+		<div style="width: 100%; margin-top: 200px; text-align: center; position: absolute; left: 35%">
+			<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; text-align: center;">Responsável</div>
+		</div>';
+	
+	if ($item['InvenObservacao'] != ''){
+		$html .= '
+			<br>
+			<div style="100%">Observação: '.$item['InvenObservacao'].'</div>
+		';	
+	}
 	
     $rodape = "<hr/>
     <div style='width:100%'>

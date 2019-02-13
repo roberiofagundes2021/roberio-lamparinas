@@ -96,7 +96,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				document.formInventario.action = "inventarioLista.php";
 				document.formInventario.setAttribute("target", "_blank");
 			} else if (Tipo == 'imprimir-inventario'){
-				document.formInventario.action = "inventarioImprimir.php";
+				document.formInventario.action = "inventarioRelatorio.php";
 				document.formInventario.setAttribute("target", "_blank");
 			} 
 			
