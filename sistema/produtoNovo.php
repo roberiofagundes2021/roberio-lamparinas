@@ -131,6 +131,7 @@ if(isset($_POST['inputCodigo'])){
 								
 				var inputValorCusto = $('#inputValorCusto').val().replace('.', '').replace(',', '.');
 				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replace('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replace('.', '').replace(',', '.');
 				
 				if (inputValorCusto == null || inputValorCusto.trim() == '') {
 					inputValorCusto = 0.00;
@@ -145,6 +146,10 @@ if(isset($_POST['inputCodigo'])){
 				inputCustoFinal = float2moeda(inputCustoFinal).toString();
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
+				
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+					atualizaValorVenda();
+				}
 			});
 			
 			//Ao mudar o Custo, atualiza o CustoFinal
@@ -152,6 +157,7 @@ if(isset($_POST['inputCodigo'])){
 								
 				var inputValorCusto = $('#inputValorCusto').val().replace('.', '').replace(',', '.');
 				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replace('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replace('.', '').replace(',', '.');
 				
 				if (inputValorCusto == null || inputValorCusto.trim() == '') {
 					inputValorCusto = 0.00;
@@ -166,28 +172,16 @@ if(isset($_POST['inputCodigo'])){
 				inputCustoFinal = float2moeda(inputCustoFinal).toString();
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
+				
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+					atualizaValorVenda();
+				}				
 			});			
 			
 			//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
 			$('#inputMargemLucro').on('blur', function(e){
 								
-				var inputCustoFinal = $('#inputCustoFinal').val().replace('.', '').replace(',', '.');
-				var inputMargemLucro = $('#inputMargemLucro').val().replace(',', '.');				
-				
-				if (inputCustoFinal == null || inputCustoFinal.trim() == '') {
-					inputCustoFinal = 0.00;
-				}
-				
-				if (inputMargemLucro == null || inputMargemLucro.trim() == '') {
-					inputMargemLucro = 0.00;
-				}
-								
-				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
-				
-				inputValorVenda = float2moeda(inputValorVenda).toString();
-				
-				$('#inputValorVenda').val(inputValorVenda);				
-
+				atualizaValorVenda();
 			});	
 			
 			//Ao mudar o Valor de Venda, atualiza a Margem de Lucro
@@ -214,6 +208,24 @@ if(isset($_POST['inputCodigo'])){
 
 			});	
 			
+			function atualizaValorVenda(){
+				var inputCustoFinal = $('#inputCustoFinal').val().replace('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replace(',', '.');				
+				
+				if (inputCustoFinal == null || inputCustoFinal.trim() == '') {
+					inputCustoFinal = 0.00;
+				}
+				
+				if (inputMargemLucro == null || inputMargemLucro.trim() == '') {
+					inputMargemLucro = 0.00;
+				}
+								
+				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
+				
+				inputValorVenda = float2moeda(inputValorVenda).toString();
+				
+				$('#inputValorVenda').val(inputValorVenda);
+			}
 			
 			//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
 			$('#addFoto').on('click', function(e){
