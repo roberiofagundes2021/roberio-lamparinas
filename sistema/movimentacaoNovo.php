@@ -69,18 +69,22 @@ if(isset($_POST['inputData'])){
 			for ($i=1; $i <= $_POST['inputNumItens']; $i++) {
 		
 				$campo = 'campo'.$i;
-				$registro = explode('#', $_POST[$campo]);	
 				
-				$result->execute(array(
-								':iMovimentacao' => $insertId,
-								':iProduto' => $registro[0],
-								':iQuantidade' => $registro[1],
-								':fValorUnitario' => gravaValor($registro[2]),
-								':sLote' => $registro[3],
-								':dValidade' => gravaData($registro[4]),
-								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iEmpresa' => $_SESSION['EmpreId']
-								));				
+				//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
+				if (isset($_POST[$campo])){
+					$registro = explode('#', $_POST[$campo]);	
+					
+					$result->execute(array(
+									':iMovimentacao' => $insertId,
+									':iProduto' => $registro[0],
+									':iQuantidade' => $registro[1],
+									':fValorUnitario' => gravaValor($registro[2]),
+									':sLote' => $registro[3],
+									':dValidade' => gravaData($registro[4]),
+									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+									':iEmpresa' => $_SESSION['EmpreId']
+									));
+				}	
 			}
 			
 		} catch(PDOException $e) {
@@ -237,9 +241,15 @@ if(isset($_POST['inputData'])){
 					alerta('Atenção','O tipo não pode ser alterado quando se tem produto(s) na lista! Exclua-o(s) primeiro ou cancele e recomece o cadastro da movimentação.','error');
 					return false;
 				}
+				
+				$('#cmbCategoria').val("#");
+				$('#inputQuantidade').val("");
+				$('#inputValorUnitario').val("");
+				$('#inputLote').val("");
+				$('#inputValidade').val("");
 			});
 			
-			$('#btnAdicionar').click(function(){
+			$('#btnAdicionar').click(function(){				
 				
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputNumItens = $('#inputNumItens').val();
@@ -252,6 +262,31 @@ if(isset($_POST['inputData'])){
 				var inputTotal = $('#inputTotal').val();
 				var inputLote = $('#inputLote').val();
 				var inputValidade = $('#inputValidade').val();
+				var inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
+
+				//remove os espaços desnecessários antes e depois
+				inputQuantidade = inputQuantidade.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputQuantidade == ''){
+					alerta('Atenção','Informe a quantidade antes de adicionar!','error');
+					$('#inputQuantidade').focus();
+					return false;
+				}				
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputValorUnitario == ''){
+					alerta('Atenção','Nenhum produto foi selecionado!','error');
+					$('#cmbProduto').focus();
+					return false;
+				}
+							
+				//Verifica se o campo já está no array
+				if ( inputIdProdutos.includes(Produto[0]) ){
+					alerta('Atenção','Esse produto já foi adicionado!','error');
+					$('#cmbProduto').focus();
+					return false;
+				}				
 				
 				var resNumItens = parseInt(inputNumItens) + 1;	
 				var total = parseInt(inputQuantidade) * parseInt(inputValorUnitario);
@@ -266,10 +301,10 @@ if(isset($_POST['inputData'])){
 					data: {tipo: inputTipo, numItens: resNumItens, idProduto: Produto[0], quantidade: inputQuantidade},
 					success: function(resposta){
 																	
-						var newRow = $("<tr>");
+						//var newRow = $("<tr>");
 						
-						newRow.append(resposta);	    
-						$("#tabelaProdutos").append(newRow);
+						//newRow.append(resposta);	    
+						$("#tabelaProdutos").append(resposta);
 												
 						//Adiciona mais um item nessa contagem
 						$('#inputNumItens').val(resNumItens);
@@ -283,11 +318,71 @@ if(isset($_POST['inputData'])){
 						
 						$('#inputProdutos').append('<input type="hidden" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+Produto[0]+'#'+inputQuantidade+'#'+inputValorUnitario+'#'+inputLote+'#'+inputValidade+'">');												
 						
+						inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
+
+						$('#inputIdProdutos').val(inputIdProdutos);
+						
 						return false;
 						
 					}
 				})	
 			}); //click
+			
+			$(document).on('click', '.btn_remove', function(){
+						
+				var inputTotal = $('#inputTotal').val();
+				var button_id = $(this).attr("id");				
+				var Produto = button_id.split("#");
+				var inputIdProdutos = $('#inputIdProdutos').val(); //array com o Id dos produtos adicionados
+								
+				//alert("Antes: " + inputIdProdutos);
+				
+				var item = inputIdProdutos.split(",");
+				
+				var i;
+				var arr = [];
+				
+				for (i = 0; i < item.length; i++) {
+					arr.push(item[i]);
+				}				
+				
+				var index = arr.indexOf(Produto[0]);			
+				
+				arr.splice(index, 1);
+
+				$('#inputIdProdutos').val(arr);
+				
+				//var teste = $('#inputIdProdutos').val();
+				//alert(teste);
+				
+				$("#row"+Produto[0]+"").remove(); //remove a linha da tabela
+				$("#campo"+Produto[0]+"").remove(); //remove o campo hidden
+				
+				//Agora falta calcular o valor total novamente
+				inputTotal = parseFloat(inputTotal) - parseFloat(Produto[1]);
+				var totalFormatado = "R$ " + float2moeda(inputTotal).toString();
+				
+				$('#inputTotal').val(inputTotal);
+				$('#total').text(totalFormatado);
+				
+			})
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+
+				var inputTotal = $('#inputTotal').val();
+				
+				//Verifica se tem algum produto na Grid
+				if (inputTotal == '' || inputTotal == 0){
+					alerta('Atenção','Informe algum produto!','error');
+					$('#cmbCategoria').focus();
+					return false;
+				}
+				
+				$("#formMovimentacao").submit();
+			});
 			
 			//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
 			function Filtrando(){
@@ -309,6 +404,21 @@ if(isset($_POST['inputData'])){
 			}				
 			
 		}); //document.ready	
+		
+		Array.prototype.remove = function(start, end) {
+		  this.splice(start, end);
+		  return this;
+		}
+
+		Array.prototype.insert = function(pos, item) {
+		  this.splice(pos, 0, item);
+		  return this;
+		}
+				
+		//var arr = [1, 2, 3, 4, 5];
+
+		//alert(arr.remove(1, 1));
+		
 		
 		function selecionaTipo(tipo) {
 			if (tipo == 'E'){
@@ -770,6 +880,8 @@ if(isset($_POST['inputData'])){
 							
 							<div id="inputProdutos">
 								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
+								<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">
+								<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
 								<input type="hidden" id="inputTotal" name="inputTotal" value="0">
 							</div>
 							
@@ -801,7 +913,7 @@ if(isset($_POST['inputData'])){
 									        <tfoot>
 												<tr>
 													<th colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total:</th>
-													<th colspan="2"><div id="total" style="text-align:left; font-size: 15px; font-weight:bold;"></div></th>
+													<th colspan="2"><div id="total" style="text-align:left; font-size: 15px; font-weight:bold;">R$ 0,00</div></th>
 												</tr>
 											</tfoot>
 										</table>
@@ -841,7 +953,7 @@ if(isset($_POST['inputData'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
 										<a href="movimentacao.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

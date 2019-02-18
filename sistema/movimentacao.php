@@ -41,6 +41,52 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- /theme JS files -->	
 	
 	 <script type="text/javascript">
+		
+		$(document).ready(function() {
+			
+			/* Início: Tabela Personalizada */
+			$('#tblMovimentacao').DataTable( {
+				"order": [[ 0, "desc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+			    {
+					visible: false,
+					targets: [ 0 ]
+				},
+			    { 
+					orderable: false,
+					width: 50,
+					targets: [ 7 ]
+				}], 
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */
+		});		
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaMovimentacao(MovimId, MovimNotaFiscal, Tipo){
@@ -101,9 +147,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<a href="movimentacaoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Requisiçẽos</a></div>
 							</div>
 							
-							<table class="table datatable-responsive">
+							<table class="table" id="tblMovimentacao">
 								<thead>
 									<tr class="bg-slate">
+										<th>Id</th>
 										<th>Data</th>
 										<th>Tipo</th>
 										<th>Nota Fiscal</th>
@@ -124,6 +171,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										print('
 										<tr>
+											<td>'.$item['MovimId'].'</td>
 											<td>'.mostraData($item['MovimData']).'</td>
 											<td>'.$tipo.'</td>
 											<td>'.$item['MovimNotaFiscal'].'</td>
