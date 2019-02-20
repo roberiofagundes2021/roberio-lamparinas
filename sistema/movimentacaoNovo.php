@@ -142,8 +142,84 @@ if(isset($_POST['inputData'])){
     <script type="text/javascript" >
 
         $(document).ready(function() {	
+	
+			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
+			$('#cmbFornecedor').on('change', function(e){
+				
+				var inputNumItens = $('#inputNumItens').val();
+				var inputFornecedor = $('#inputFornecedor').val();
+				var cmbFornecedor = $('#cmbFornecedor').val();
+				
+				if(inputNumItens > 0){
+					alerta('Atenção','O fornecedor não pode ser alterado quando se tem produto(s) na lista! Exclua-o(s) primeiro ou cancele e recomece o cadastro da movimentação.','error');
+					$('#cmbFornecedor').val(inputFornecedor);
+					return false;
+				}
+/*				
+				var element = document.getElementById("cmbFornecedor");
+				element.className = element.classList.remove("form-control-select2");
+				
+				$("#cmbFornecedor").removeClass("form-control-select2"); */
+				
+				$('#inputFornecedor').val(cmbFornecedor);
+				
+				Filtrando();				
+
+				$.getJSON('filtraCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
+					
+					var option = '<option value="#">Selecione a Categoria</option>';
+					
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
+						});						
+						
+						$('#cmbCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});				
+				
+				$.getJSON('filtraSubCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
+					
+					var option = '<option value="#">Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});
+				
+				$.getJSON('filtraProduto.php?idFornecedor='+cmbFornecedor, function (dados){
+					
+					var option = '<option value="#" "selected">Selecione o Produto</option>';
+					
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							if (inputTipo == 'E'){
+								option += '<option value="'+obj.ProduId+'#'+obj.ProduValorCusto+'">'+obj.ProduNome+'</option>';
+							} else {
+								option += '<option value="'+obj.ProduId+'#'+obj.ProduCustoFinal+'">'+obj.ProduNome+'</option>';
+							}
+						});						
+						
+						$('#cmbProduto').html(option).show();
+					} else {
+						ResetProduto();
+					}					
+				});				
+				
+			});
 		
-			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
 				
 				Filtrando();
@@ -414,11 +490,6 @@ if(isset($_POST['inputData'])){
 		  this.splice(pos, 0, item);
 		  return this;
 		}
-				
-		//var arr = [1, 2, 3, 4, 5];
-
-		//alert(arr.remove(1, 1));
-		
 		
 		function selecionaTipo(tipo) {
 			if (tipo == 'E'){
@@ -726,6 +797,8 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 										
+										<input type="hidden" id="inputFornecedor" name="inputFornecedor" value="#">
+										
 										<div class="col-lg-3">											
 											<div class="form-group">
 												<label for="cmbOrdemCompra">Nº Ordem Compra / Carta Contrato</label>
@@ -850,7 +923,7 @@ if(isset($_POST['inputData'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorUnitario">Valor Unitário</label>
-												<input type="text" id="inputValorUnitario" name="inputValorUnitario" class="form-control" onKeyUp="moeda(this)" maxLength="10">
+												<input type="text" id="inputValorUnitario" name="inputValorUnitario" class="form-control" readOnly>
 											</div>
 										</div>
 										
