@@ -1,7 +1,7 @@
 
 /* Função responsavel pelos alertas do sistema */
 function alerta(titulo, msg, tipo, modal) {
-			
+
 	var opts = {
 		title: "",
 		text: "",
@@ -16,6 +16,7 @@ function alerta(titulo, msg, tipo, modal) {
 	opts.addclass = 'stack-modal',
 	opts.stack = {'dir1': 'down', 'dir2': 'right', 'modal': false}
 	
+	
 	switch (tipo) {
 	case 'success':
 		opts.icon = "icon-checkmark3";
@@ -23,7 +24,11 @@ function alerta(titulo, msg, tipo, modal) {
 	case 'error':
 		opts.icon = "icon-blocked";
 		break;
+	case 'info':
+		opts.icon = "icon-info22";
+		break;		
 	}
+	
 	//console.log(opts);
 	//PNotify.desktop.permission();
 	

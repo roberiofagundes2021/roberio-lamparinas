@@ -9,7 +9,7 @@
 				var titulo = '".$_SESSION['msg']['titulo']."';
 				var msg = '".$_SESSION['msg']['mensagem']."';
 				var tipo = '".$_SESSION['msg']['tipo']."';							
-				
+
 				if (msg) {
 												
 					$(function(){

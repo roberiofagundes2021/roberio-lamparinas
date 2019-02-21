@@ -11,7 +11,7 @@ require_once 'global_assets/php/vendor/autoload.php';
 $iInventario = $_POST['inputInventarioId'];
 $sNumero = $_POST['inputInventarioNumero'];
 
-$sql = ("SELECT InvenNumero, InvenCategoria, CategNome, InXLELocal, LcEstNome
+$sql = ("SELECT InvenNumero, InvenCategoria, InvenObservacao, CategNome, InXLELocal, LcEstNome
 		 FROM Inventario
 		 JOIN InventarioXLocalEstoque on InXLEInventario = InvenId
 		 JOIN LocalEstoque on LcEstId = InXLELocal
@@ -57,30 +57,35 @@ try {
 		<table style="width:100%;">
 			<tr>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Código</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:48%">Produto</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:42%">Produto</th>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Valor Unitário</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Valor Total</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Unitário</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Total</th>
 			</tr>
 		';	
 		
 		$iCategoria = $item['InvenCategoria'];
 		$iLocal = $item['InXLELocal'];
 		
-		$sql = ("SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, dbo.fnSaldoEstoque(".$_SESSION['EmpreId'].", ProduId, MovimDestinoLocal) as Saldo, ProduCustoFinal, ValorTotal = 0.00
+		$sql = ("SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, 
+						dbo.fnSaldoEstoque(".$_SESSION['EmpreId'].", ProduId, MovimDestinoLocal) as Saldo, 
+						dbo.fnCalculaValorTotalInventario(dbo.fnSaldoEstoque(".$_SESSION['EmpreId'].", ProduId, MovimDestinoLocal), ProduCustoFinal) as ValorTotal
 				 FROM Produto
 				 JOIN Categoria on CategId = ProduCategoria
 				 JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 				 JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 				 JOIN Movimentacao on MovimId = MvXPrMovimentacao
 				 JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+				 JOIN Situacao on SituaId = MovimSituacao
 				 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduStatus = 1 and
 					   ProduCategoria = ".$iCategoria." and
-					   MovimDestinoLocal = (".$iLocal.")
+					   MovimDestinoLocal = (".$iLocal.") and SituaChave = 'FINALIZADO'
 				 ");
 		$result = $conn->query("$sql");
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);		
+		
+		$totalGeral = 0;
 		
 		foreach ($rowProdutos as $itemProduto){
 			
@@ -90,13 +95,27 @@ try {
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome']."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['UnMedSigla']."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['Saldo']."</td>
-					<td style='padding-top: 8px;'>".$itemProduto['ProduCustoFinal']."</td>
-					<td style='padding-top: 8px;'>".$itemProduto['ValorTotal']."</td>
+					<td style='padding-top: 8px;'>".mostraValor($itemProduto['ProduCustoFinal'])."</td>
+					<td style='padding-top: 8px;'>".formataMoeda($itemProduto['ValorTotal'])."</td>
 				</tr>
 			";
+			
+			$totalGeral += $itemProduto['ValorTotal'];
 		}
 		
+		$html .= "
+				<tr>
+					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
+					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
+					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
+					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
+					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
+					<td style='padding-top: 8px; border-top: 1px solid #333;'>".formataMoeda($totalGeral)."</td>
+				</tr>
+			";		
+		
 		$html .= "</table>";
+		
 	}
 	
 	$html .= '
@@ -110,7 +129,7 @@ try {
 			<br>
 			<div style="100%">Observação: '.$item['InvenObservacao'].'</div>
 		';	
-	}
+	}		
 	
     $rodape = "<hr/>
     <div style='width:100%'>

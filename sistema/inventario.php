@@ -83,7 +83,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			/* Fim: Tabela Personalizada */
 		});
 		
-		function atualizaInventario(InvenId, InvenNumero, Tipo){
+		function atualizaInventario(InvenId, InvenNumero, Situacao, Tipo){
 
 			document.getElementById('inputInventarioId').value = InvenId;
 			document.getElementById('inputInventarioNumero').value = InvenNumero;
@@ -92,12 +92,26 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				document.formInventario.action = "inventarioEdita.php";		
 			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formInventario, "Tem certeza que deseja excluir esse inventário?", "inventarioExclui.php");
+			} else if (Tipo == 'mudaStatus'){
+				
+				if (Situacao == 'PENDENTE'){
+					confirmaExclusao(document.formInventario, "Tem certeza que deseja finalizar esse inventário? O processo é irreversível.", "inventarioMudaSituacao.php");
+				} else {
+					alerta('Notificação','Uma vez finalizado não pode mais alterar a situação do inventário.','info');
+					return false;
+				}
+				
 			} else if (Tipo == 'imprimir-lista'){
 				document.formInventario.action = "inventarioLista.php";
 				document.formInventario.setAttribute("target", "_blank");
 			} else if (Tipo == 'imprimir-inventario'){
-				document.formInventario.action = "inventarioRelatorio.php";
-				document.formInventario.setAttribute("target", "_blank");
+				
+				if (Situacao == 'FINALIZADO'){
+					document.formInventario.action = "inventarioRelatorio.php";
+					document.formInventario.setAttribute("target", "_blank");					
+				} else {
+					confirmaExclusao(document.formInventario, "Esse relatório só pode ser visualizado após finalização do inventário. Deseja finalizá-lo? Lembrando que esse processo é irreversível.", "inventarioMudaSituacao.php");
+				}				
 			} 
 			
 			document.formInventario.submit();
@@ -171,21 +185,21 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['CategNome'].'</td>'
 										);
 										
-										print('<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>');
+										print('<td><a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].', \''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 																				
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].',  \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].', \''.$item['SituaChave'].'\', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].', \''.$item['SituaChave'].'\',  \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>
 														<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].', \'imprimir-lista\')"  class="dropdown-item" title="Imprimir Lista"><i class="icon-printer"></i> Imprimir Lista</a>
-																<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].', \'imprimir-inventario\')"  class="dropdown-item" title="Imprimir Inventário"><i class="icon-printer2"></i> Imprimir Inventário</a>
+																<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].', \''.$item['SituaChave'].'\', \'imprimir-lista\')"  class="dropdown-item" title="Imprimir Lista"><i class="icon-printer"></i> Imprimir Lista</a>
+																<a href="#" onclick="atualizaInventario('.$item['InvenId'].', '.$item['InvenNumero'].', \''.$item['SituaChave'].'\', \'imprimir-inventario\')"  class="dropdown-item" title="Imprimir Inventário"><i class="icon-printer2"></i> Imprimir Inventário</a>
 															</div>
 														</div>
 													</div>
