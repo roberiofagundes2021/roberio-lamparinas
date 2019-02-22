@@ -51,7 +51,8 @@ if(isset($_POST['inputOrcamentoId'])){
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
 	<script src="global_assets/js/plugins/tables/handsontable/handsontable.min.js"></script>
-	<script src="global_assets/js/demo_pages/handsontable_basic.js"></script>
+	<!--<script src="global_assets/js/demo_pages/handsontable_basic.js"></script>-->
+	<script src="global_assets/js/demo_pages/handsontable_advanced.js"></script>
 	
 
 	<!-- /theme JS files -->
@@ -76,23 +77,91 @@ if(isset($_POST['inputOrcamentoId'])){
 				}
 			});
 			
-			var data = [
-			  ["Item", "Produto", "SubCategoria", "Unidade de Medida", "Quantidade", "Valor Unitário", "Valor Total"],
-			  [1, "Papel Chamex A", 11, 12, 13],
-			  [2, 20, 11, 14, 13],
-			  [3, 30, 15, 12, 13]
-			];
+			
+			var inputCategoria = $('#inputCategoria').val();
+			
+			$.getJSON('filtraProdutosOrcamento.php?idCategoria='+inputCategoria, function (dados){
+
+				var produtos = [
+				  ['Item','Produto', 'Unidade', 'Quantidade', 'Valor Unitário', 'Valor Total']
+				;
+
+			
+				if (dados.length){
+					
+					var cont = 1;
+					$.each(dados, function(i, obj){
+						produtos += ', ['+ cont +', "'+ obj.ProduNome +'", "'+ obj.UnidaSigla +'", '', '', '']';
+						cont++;
+					});					
+					
+					produtos += ']';
+					
+				} else {
+					//ResetSubCategoria();
+				}					
+			});				
+			
+/*			var produtos = [
+			  ['Item','Produto', 'SubCategoria', 'Unidade', 'Quantidade', 'Valor Unitário', 'Valor Total'],
+			  [1, 'Telha Intercalada', 'Telha', 'UN', '', '5,00', ''],
+			  [2, 'Cimento', 'Telha', 'UN', '', '15,00', '']
+			]; */
 
 			var container = document.getElementById('example');
 			var hot = new Handsontable(container, {
-			  data: data,
-			  rowHeaders: true,
-			  colHeaders: true,
-			  filters: true,
-			  dropdownMenu: true
+			  data: produtos,
+			  //rowHeaders: true,
+			  //colHeaders: true,
+			  //filters: true,
+			  //dropdownMenu: true,
+			  
+			  //rowHeaders: true,
+			  //colHeaders: ['Item','Produto', 'SubCategoria', 'UN', 'Quantidade', 'Valor Unitário', 'Valor Total'],
+			  stretchH: 'all',
+			  cells: function (row, col, prop, td) {
+                 var cellProperties = {};
+
+                 if (row === 0 || this.instance.getData()[row][col] === 'Read only') {
+                    cellProperties.readOnly = true; // make cell read-only if it is first row or the text reads 'readOnly'
+                 }
+                 if (row === 0 || col === 0) {
+                    cellProperties.renderer = firstRowRenderer; // uses function directly
+                 } 
+                 else {
+                    cellProperties.renderer = "negativeValueRenderer"; // uses lookup map
+                 } 
+
+                 return cellProperties;
+              }
 			});			
 						
 		}); //document.ready
+		
+		// Renderizar linha do cabeçalho da tabela
+        function firstRowRenderer(instance, td, row, col, prop, value, cellProperties) {
+            Handsontable.renderers.TextRenderer.apply(this, arguments);
+
+            // Add styles to the table cell
+            td.style.fontWeight = '500';
+            td.style.color = '#1B5E20';
+            td.style.background = '#E8F5E9';
+        }		
+		
+		// Renderizar valores negativos (cor vermelha)
+        function negativeValueRenderer(instance, td, row, col, prop, value, cellProperties) {
+            Handsontable.renderers.TextRenderer.apply(this, arguments);
+
+            // If row contains negative number, add class "negative"
+            if (parseInt(value, 10) < 0) {
+                td.className = 'text-danger';
+            }
+
+            // If empty cell, add grey background
+            if (!value || value === '') {
+                td.style.background = '#f5f5f5';
+            }
+        }		
 							
 	</script>
 
@@ -128,11 +197,18 @@ if(isset($_POST['inputOrcamentoId'])){
 							<div class="row">				
 								<div class="col-lg-12">
 									<div class="row">
-																														
-										<div class="col-lg-7">
+
+										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbCategoria">Sub Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+												<label for="inputCategoria">Categoria</label>
+												<input type="text" id="inputCategoria" name="inputCategoria" class="form-control" value="<?php echo $_POST['inputOrcamentoNomeCategoria']; ?>" readOnly>
+											</div>
+										</div>
+									
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbSubCategoria">Sub Categoria</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = ("SELECT SbCatId, SbCatNome
@@ -169,7 +245,7 @@ if(isset($_POST['inputOrcamentoId'])){
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">The following example demonstrates rows and columns headers with custom text using <code>colHeaders</code> and <code>rowHeaders</code> options. Setting <code>true</code> or <code>false</code> will enable or disable the default column headers (A, B, C). You can also define an array <code>['One', 'Two', 'Three', ...]</code> or a function to define the headers. If a function is set the index of the column is passed as a parameter.</p>
+									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher a coluna <code>Quantidade</code> e clicar em <b>ALTERAR</b>.</p>
 
 									<div class="hot-container">
 										<div id="example"></div>
