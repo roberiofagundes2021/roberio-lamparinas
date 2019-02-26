@@ -77,64 +77,67 @@ if(isset($_POST['inputOrcamentoId'])){
 				}
 			});
 			
-			
 			var inputCategoria = $('#inputCategoria').val();
 			
 			$.getJSON('filtraProdutosOrcamento.php?idCategoria='+inputCategoria, function (dados){
-
+								
 				var produtos = [
-				  ['Item','Produto', 'Unidade', 'Quantidade', 'Valor Unitário', 'Valor Total']
-				;
+					['Item','Produto', 'Unidade', 'Quantidade', 'Valor Unitário', 'Valor Total']
+				];	
 
-			
+				var cont = 1;
+				var registro = '';
+				
 				if (dados.length){
 					
-					var cont = 1;
 					$.each(dados, function(i, obj){
-						produtos += ', ['+ cont +', "'+ obj.ProduNome +'", "'+ obj.UnidaSigla +'", '', '', '']';
+						registro = [[cont], [obj.ProduNome], [obj.UnMedSigla], "", "", [""]];
+						produtos.push(registro);  //adiciona mais um item no array
 						cont++;
-					});					
+					});	
 					
-					produtos += ']';
+					var container = document.getElementById('example');
+					var hot = new Handsontable(container, {
+					  data: produtos,
+					  //rowHeaders: true,
+					  //colHeaders: true,
+					  //filters: true,
+					  //dropdownMenu: true,
+					  
+					  //rowHeaders: true,
+					  //colHeaders: ['Item','Produto', 'SubCategoria', 'UN', 'Quantidade', 'Valor Unitário', 'Valor Total'],
+					  stretchH: 'all',
+					  cells: function (row, col, prop, td) {
+						 var cellProperties = {};
+
+						 if (row === 0 || col === 0 || col === 1 || col === 2 || col === 5 || this.instance.getData()[row][col] === 'Read only') {
+							cellProperties.readOnly = true; // make cell read-only if it is first row or the text reads 'readOnly'
+						 }
+						 if (row === 0 || col === 0) {
+							cellProperties.renderer = firstRowRenderer; // uses function directly
+						 } 
+						 else {
+							cellProperties.renderer = "negativeValueRenderer"; // uses lookup map
+						 } 
+						 
+						 if (row != 0 && col != 3 && col != 4){
+							cellProperties.renderer = demaisRowRenderer;
+						 }	 
+
+						 return cellProperties;
+					  }
+					});
 					
 				} else {
 					//ResetSubCategoria();
-				}					
-			});				
-			
-/*			var produtos = [
+				}				
+			});		
+						
+			/*var produtos = [
 			  ['Item','Produto', 'SubCategoria', 'Unidade', 'Quantidade', 'Valor Unitário', 'Valor Total'],
 			  [1, 'Telha Intercalada', 'Telha', 'UN', '', '5,00', ''],
 			  [2, 'Cimento', 'Telha', 'UN', '', '15,00', '']
-			]; */
-
-			var container = document.getElementById('example');
-			var hot = new Handsontable(container, {
-			  data: produtos,
-			  //rowHeaders: true,
-			  //colHeaders: true,
-			  //filters: true,
-			  //dropdownMenu: true,
-			  
-			  //rowHeaders: true,
-			  //colHeaders: ['Item','Produto', 'SubCategoria', 'UN', 'Quantidade', 'Valor Unitário', 'Valor Total'],
-			  stretchH: 'all',
-			  cells: function (row, col, prop, td) {
-                 var cellProperties = {};
-
-                 if (row === 0 || this.instance.getData()[row][col] === 'Read only') {
-                    cellProperties.readOnly = true; // make cell read-only if it is first row or the text reads 'readOnly'
-                 }
-                 if (row === 0 || col === 0) {
-                    cellProperties.renderer = firstRowRenderer; // uses function directly
-                 } 
-                 else {
-                    cellProperties.renderer = "negativeValueRenderer"; // uses lookup map
-                 } 
-
-                 return cellProperties;
-              }
-			});			
+			]; */ 	
 						
 		}); //document.ready
 		
@@ -146,7 +149,17 @@ if(isset($_POST['inputOrcamentoId'])){
             td.style.fontWeight = '500';
             td.style.color = '#1B5E20';
             td.style.background = '#E8F5E9';
-        }		
+        }	
+        
+        // Renderizar demais linhas somente Leitura da tabela
+        function demaisRowRenderer(instance, td, row, col, prop, value, cellProperties) {
+            Handsontable.renderers.TextRenderer.apply(this, arguments);
+
+            // Add styles to the table cell
+            td.style.fontWeight = '400';
+            td.style.color = '#000';
+            td.style.background = '#f5f5f5';
+        }
 		
 		// Renderizar valores negativos (cor vermelha)
         function negativeValueRenderer(instance, td, row, col, prop, value, cellProperties) {
@@ -200,8 +213,9 @@ if(isset($_POST['inputOrcamentoId'])){
 
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputCategoria">Categoria</label>
-												<input type="text" id="inputCategoria" name="inputCategoria" class="form-control" value="<?php echo $_POST['inputOrcamentoNomeCategoria']; ?>" readOnly>
+												<label for="inputCategoriaNome">Categoria</label>
+												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" value="<?php echo $_POST['inputOrcamentoNomeCategoria']; ?>" readOnly>
+												<input type="hidden" id="inputCategoria" name="inputCategoria" class="form-control" value="<?php echo $_POST['inputOrcamentoCategoria']; ?>">
 											</div>
 										</div>
 									
@@ -245,7 +259,7 @@ if(isset($_POST['inputOrcamentoId'])){
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher a coluna <code>Quantidade</code> e clicar em <b>ALTERAR</b>.</p>
+									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<div class="hot-container">
 										<div id="example"></div>
