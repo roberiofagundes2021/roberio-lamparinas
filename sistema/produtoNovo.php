@@ -3,6 +3,7 @@
 include_once("sessao.php"); 
 
 $_SESSION['PaginaAtual'] = 'Novo Produto';
+$_SESSION['fotoAtual'] = '';
 
 include('global_assets/php/conexao.php');
 
@@ -95,8 +96,10 @@ if(isset($_POST['inputCodigo'])){
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	<!--<script src="global_assets/js/main/jquery.form.js"></script>-->
 	<script src="http://malsup.github.com/jquery.form.js"></script>
-	<!-- /theme JS files -->	
+	<!-- /theme JS files -->
 	
+	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
+		
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 
@@ -228,60 +231,46 @@ if(isset($_POST['inputCodigo'])){
 			}
 			
 			//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
-			$('#addFoto').on('click', function(e){
-								
+			$('#addFoto').on('click', function(e){							
 				$('#imagem').trigger("click");
-			});	
+			});			
 			
-			// #imagem é o id do input, ao alterar o conteudo do input execurará a função baixo
+			// #imagem é o id do input, ao alterar o conteudo do input execurará a função abaixo
 			$('#imagem').on('change',function(){
-				
+
 				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
-				
-				var inputImagem = $('#imagem').val();
-				//alert('Passou1');
-				//$("#formFoto").submit();
-				//$("#formFoto").ajaxForm(function(resposta) { 
-				//	console.log(resposta); 
-				//}); 
-				//alert('Passou2');
-				
-				
+								
 				// Get form
 				var form = $('#formFoto')[0];
-				var data = new FormData(form);
+				var formData = new FormData(form);
 				
-				jQuery.ajax({
-					url: 'upload.php',
-					data: data,
-					contentType: false,
-					processData: false,
-					cache: false,
-					type: 'POST',
-					success: function(data){
-						alert(data);
-					}
-				});
-
-/*				
+				formData.append('file', $('#imagem')[0].files[0] );
+				
 				$.ajax({
 					type: "POST",
 					enctype: 'multipart/form-data',
 					url: "upload.php",
-					contentType: false,
-					processData: false,
-					data: {imagem: inputImagem},
+					processData: false,  // impedir que o jQuery tranforma a "data" em querystring					
+					contentType: false,  // desabilitar o cabeçalho "Content-Type"
+					cache: false, // desabilitar o "cache"
+					data: formData,//{imagem: inputImagem},
 					success: function(resposta){
-						alert(resposta);
-					
-							return false;
-
+						//console.log(resposta);
 						
-						//$( "#formInventario" ).submit();
+						$('#visualizar').html(resposta);
+						$('#addFoto').text("Alterar Foto...");
+						
+						//Aqui sou obrigado a instanciar novamente a utilização do fancybox
+						$(".fancybox").fancybox({
+							// options
+						});	
+						
+						return false;						
 					}
 				}); //ajax
 				
-				//$('#formFoto').submit(); */
+				//$('#formFoto').submit();
+				
 				// Efetua o Upload sem dar refresh na pagina
 				$('#formFoto').ajaxForm({
 					target:'#visualizar' // o callback será no elemento com o id #visualizar
@@ -295,7 +284,8 @@ if(isset($_POST['inputCodigo'])){
 			function Reset(){
 				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
 			}
-		});
+								
+		});			
 		
 		function float2moeda(num) {
 
@@ -393,12 +383,12 @@ if(isset($_POST['inputCodigo'])){
 								</div> <!-- media-body -->
 								
 								<div style="text-align:center;">
-									<div id="visualizar">
+									<div id="visualizar">										
 										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:250px; border:2px solid #ccc;">
 									</div>
 									<br>
-									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%">Adicionar Foto</button>
-									<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">										
+									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%">Adicionar Foto...</button>
+									<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
 										<input type="file" id="imagem" name="imagem" style="display:none;" />
 									</form>									
 								</div>

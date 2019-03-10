@@ -45,7 +45,7 @@ if(isset($_POST['inputData'])){
 						':iDestinoSetor' => $_POST['cmbDestinoSetor'] == '#' ? null : $_POST['cmbDestinoSetor'],
 						':sDestinoManual' => $_POST['inputDestinoManual'] == '' ? null : $_POST['inputDestinoManual'],
 						':sObservacao' => $_POST['txtareaObservacao'],
-						':iFornecedor' => $_POST['cmbFornecedor'] == '#' ? null : $_POST['cmbFornecedor'],
+						':iFornecedor' => $_POST['cmbFornecedor'] == '-1' ? null : $_POST['cmbFornecedor'],
 						':iOrdemCompra' => $_POST['cmbOrdemCompra'] == '#' ? null : $_POST['cmbOrdemCompra'],
 						':sNotaFiscal' => $_POST['inputNotaFiscal'] == '' ? null : $_POST['inputNotaFiscal'],
 						':dDataEmissao' => $_POST['inputDataEmissao'] == '' ? null : gravaData($_POST['inputDataEmissao']),
@@ -146,6 +146,7 @@ if(isset($_POST['inputData'])){
 			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e){
 				
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputNumItens = $('#inputNumItens').val();
 				var inputFornecedor = $('#inputFornecedor').val();
 				var cmbFornecedor = $('#cmbFornecedor').val();
@@ -163,12 +164,13 @@ if(isset($_POST['inputData'])){
 				
 				$('#inputFornecedor').val(cmbFornecedor);
 				
-				Filtrando();				
+				FiltraCategoria();
+				Filtrando();
 
 				$.getJSON('filtraCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
-					
+
 					var option = '<option value="#">Selecione a Categoria</option>';
-					
+
 					if (dados.length){
 						
 						$.each(dados, function(i, obj){
@@ -177,7 +179,7 @@ if(isset($_POST['inputData'])){
 						
 						$('#cmbCategoria').html(option).show();
 					} else {
-						ResetSubCategoria();
+						ResetCategoria();
 					}					
 				});				
 				
@@ -271,10 +273,11 @@ if(isset($_POST['inputData'])){
 				FiltraProduto();
 				
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
+				var cmbFornecedor = $('#cmbFornecedor').val();				
 				var cmbCategoria = $('#cmbCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				
-				$.getJSON('filtraProduto.php?idCategoria='+cmbCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){
+				$.getJSON('filtraProduto.php?idFornecedor='+cmbFornecedor+'&idCategoria='+cmbCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){
 					
 					var option = '<option value="#" "selected">Selecione o Produto</option>';
 
@@ -311,6 +314,8 @@ if(isset($_POST['inputData'])){
 			});	
 			
 			$("input[type=radio][name=inputTipo]").click(function(){
+				
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputNumItens = $('#inputNumItens').val();
 				
 				if(inputNumItens > 0){
@@ -323,6 +328,32 @@ if(isset($_POST['inputData'])){
 				$('#inputValorUnitario').val("");
 				$('#inputLote').val("");
 				$('#inputValidade').val("");
+				
+				$.getJSON('movimentacaoSituacao.php?tipo='+inputTipo, function (dados){
+					
+					var option = '<option value="#">Selecione</option>';
+					
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							if (inputTipo == 'E'){
+								if (obj.SituaChave == 'BLOQUEADO'){
+									option += '<option value="'+obj.SituaId+'" selected>'+obj.SituaNome+'</option>';
+								} else {
+									option += '<option value="'+obj.SituaId+'">'+obj.SituaNome+'</option>';
+								}
+							} else {
+								if (obj.SituaChave == 'FINALIZADO'){
+									option += '<option value="'+obj.SituaId+'" selected>'+obj.SituaNome+'</option>';
+								} else {
+									option += '<option value="'+obj.SituaId+'">'+obj.SituaNome+'</option>';
+								}
+							}
+						});						
+						
+						$('#cmbSituacao').html(option).show();
+					}					
+				});					
 			});
 			
 			$('#btnAdicionar').click(function(){	
@@ -330,6 +361,7 @@ if(isset($_POST['inputData'])){
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputNumItens = $('#inputNumItens').val();
 				var cmbProduto = $('#cmbProduto').val();
+				var cmbFornecedor = $('#cmbFornecedor').val();
 				
 				var Produto = cmbProduto.split("#");
 				
@@ -342,6 +374,13 @@ if(isset($_POST['inputData'])){
 
 				//remove os espaços desnecessários antes e depois
 				inputQuantidade = inputQuantidade.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputTipo == 'E' && cmbFornecedor == '-1' && inputNumItens == 0){
+					alerta('Atenção','Para entrada de mercadoria deve-se informar o Fornecedor antes de adicionar!','error');
+					$('#inputQuantidade').focus();
+					return false;
+				}					
 				
 				//Verifica se o campo só possui espaços em branco
 				if (inputQuantidade == ''){
@@ -440,7 +479,7 @@ if(isset($_POST['inputData'])){
 				//Agora falta calcular o valor total novamente
 				inputTotal = parseFloat(inputTotal) - parseFloat(Produto[1]);
 				var totalFormatado = "R$ " + float2moeda(inputTotal).toString();
-				
+
 				$('#inputTotal').val(inputTotal);
 				$('#total').text(totalFormatado);
 				
@@ -574,8 +613,9 @@ if(isset($_POST['inputData'])){
 					return false;
 				}				
 				
-				//desabilita a combo Fornecedor na hora de gravar, senão o POST não o encontra
+				//desabilita as combos "Fornecedor" e "Situacao" na hora de gravar, senão o POST não o encontra
 				$('#cmbFornecedor').prop('disabled', false);
+				$('#cmbSituacao').prop('disabled', false);
 				
 				$("#formMovimentacao").submit();
 			});
@@ -585,11 +625,20 @@ if(isset($_POST['inputData'])){
 				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
 				FiltraProduto();
 			}		
+
+			//Mostra o "Filtrando..." na combo Produto
+			function FiltraCategoria(){
+				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
+			}
 			
 			//Mostra o "Filtrando..." na combo Produto
 			function FiltraProduto(){
 				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
 			}		
+			
+			function ResetCategoria(){
+				$('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
+			}			
 			
 			function ResetSubCategoria(){
 				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
@@ -900,7 +949,7 @@ if(isset($_POST['inputData'])){
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor</label>
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+													<option value="-1">Selecione</option>
 													<?php 
 														$sql = ("SELECT ForneId, ForneNome
 																 FROM Fornecedor														     
@@ -1119,21 +1168,25 @@ if(isset($_POST['inputData'])){
 							<div class="row">
 								<div class="col-lg-12">									
 									<div class="row">
-										<div class="col-lg-4">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputSituacao">Situação</label>
-												<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" readOnly>
+												<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>
 													<option value="#">Selecione</option>
 													<?php 
-														$sql = ("SELECT SituaId, SituaNome
+														$sql = ("SELECT SituaId, SituaNome, SituaChave
 																 FROM Situacao
 																 WHERE SituaStatus = 1
 															     ORDER BY SituaNome ASC");
 														$result = $conn->query("$sql");
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
-														foreach ($row as $item){															
-															print('<option value="'.$item['SituaId'].'">'.$item['SituaNome'].'</option>');
+														foreach ($row as $item){
+															if($item['SituaChave'] == 'BLOQUEADO'){
+																print('<option value="'.$item['SituaId'].'" selected>'.$item['SituaNome'].'</option>');
+															} else {
+																print('<option value="'.$item['SituaId'].'">'.$item['SituaNome'].'</option>');
+															}
 														}													
 													?>
 												</select>

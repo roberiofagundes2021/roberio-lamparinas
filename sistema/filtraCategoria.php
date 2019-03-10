@@ -4,10 +4,18 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT CategId, CategNome
-		 FROM Categoria
-		 JOIN Fornecedor on ForneCategoria = CategId
-		 WHERE CategEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_GET['idFornecedor']."' and CategStatus = 1");
+if ($_GET['idFornecedor'] == '-1'){
+	$sql = ("SELECT CategId, CategNome
+			 FROM Categoria
+			 WHERE CategEmpresa = ".$_SESSION['EmpreId']." and CategStatus = 1
+			 ORDER BY CategNome ASC");	
+} else{
+	$sql = ("SELECT CategId, CategNome
+			 FROM Categoria
+			 JOIN Fornecedor on ForneCategoria = CategId
+			 WHERE CategEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_GET['idFornecedor']."' and CategStatus = 1
+			 ORDER BY CategNome ASC");
+}
 
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

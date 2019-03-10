@@ -4,13 +4,21 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if (isset($_GET['idFornecedor'])){
+if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#'){
 
-	$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
-			 FROM Produto
-			 JOIN Categoria on CategId = ProduCategoria
-			 JOIN Fornecedor on ForneCategoria = CategId
-			 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_GET['idFornecedor']."'");
+	if (isset($_GET['idSubCategoria']) && $_GET['idSubCategoria'] != '#'){
+		$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
+				 FROM Produto
+				 JOIN Categoria on CategId = ProduCategoria
+				 JOIN Fornecedor on ForneCategoria = CategId
+				 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_GET['idFornecedor']."' and ProduSubCategoria = '". $_GET['idSubCategoria']."'");
+	} else {
+		$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
+				 FROM Produto
+				 JOIN Categoria on CategId = ProduCategoria
+				 JOIN Fornecedor on ForneCategoria = CategId
+				 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_GET['idFornecedor']."'");		
+	}
 	
 } else {
 

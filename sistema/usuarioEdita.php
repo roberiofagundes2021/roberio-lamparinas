@@ -46,7 +46,7 @@ if(isset($_POST['inputCpf'])){
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
 						':sLogin' => $_POST['inputLogin'],
-						':sSenha' => $_POST['inputSenha'],
+						':sSenha' => md5($_POST['inputSenha']),
 						':sEmail' => $_POST['inputEmail'],
 						':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
 						':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
