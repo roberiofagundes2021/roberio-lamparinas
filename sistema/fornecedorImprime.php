@@ -8,12 +8,19 @@ use Mpdf\Mpdf;
 
 require_once 'global_assets/php/vendor/autoload.php';
 
-$iFornecedor = $_POST['inputFornecedorId'];
+$iCategoria = $_POST['inputFornecedorCategoria'];
 
-$sql = ("SELECT *
-		 FROM Fornecedor
-		 LEFT JOIN Empresa on EmpreId = ForneEmpresa
-		 WHERE ForneId = $iFornecedor ");
+if ($iCategoria == '#'){
+	$sql = ("SELECT *
+			 FROM Fornecedor
+			 LEFT JOIN Empresa on EmpreId = ForneEmpresa");
+} else {
+	$sql = ("SELECT *
+			 FROM Fornecedor
+			 LEFT JOIN Empresa on EmpreId = ForneEmpresa
+			 WHERE ForneCategoria = $iCategoria ");
+}
+
 $result = $conn->query("$sql");
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
