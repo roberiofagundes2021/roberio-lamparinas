@@ -322,12 +322,18 @@ if(isset($_POST['inputData'])){
 					alerta('Atenção','O tipo não pode ser alterado quando se tem produto(s) na lista! Exclua-o(s) primeiro ou cancele e recomece o cadastro da movimentação.','error');
 					return false;
 				}
-				
+								
 				$('#cmbCategoria').val("#");
 				$('#inputQuantidade').val("");
 				$('#inputValorUnitario').val("");
 				$('#inputLote').val("");
 				$('#inputValidade').val("");
+				
+				//Quando mudar o tipo para Saída ou Transferência a combo Fornecedor precisa voltar a estaca zero, já que para esses tipos não tem que informar Fornecedor
+				if (inputTipo != 'E'){
+					$('#cmbFornecedor').val(-1); //Selecione
+					$("select#cmbFornecedor").trigger("change"); //Simula o change do select
+				}				
 				
 				$.getJSON('movimentacaoSituacao.php?tipo='+inputTipo, function (dados){
 					

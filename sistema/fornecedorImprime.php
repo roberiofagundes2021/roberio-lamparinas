@@ -41,16 +41,19 @@ try {
 			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: Hospital Padre Manoel</div>
 		</div>
 		<div style='width:150px; float:right; display: inline; text-align:right;'>
-			<div>{DATE j/m/Y}</div>
-			<div style='margin-top:8px;'>Inventário: ".formatarNumero($sNumero)."</div>
+			<div>{DATE j/m/Y}</div>			
 		</div> 
 	 </div>
 	";		
 	
-
+	if ($iCategoria == '#'){
+		
+	}
+		
+	
 	$html .= '
 	<br>
-	<div style="font-weight: bold; position:relative; margin-top: 50px;text-transform: uppercase;">Local: '.$item['LcEstNome'].'</div>
+	<div style="font-weight: bold; position:relative; margin-top: 50px;text-transform: uppercase;">Categoria: '.$item['CategNome'].'</div>
 	<div style="font-weight: bold; position:relative; margin-top: 20px;">'.$item['CategNome'].'</div>
 	<br>
 	<table style="width:100%;">
