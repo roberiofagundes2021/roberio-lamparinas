@@ -8,6 +8,8 @@ $_SESSION['fotoAtual'] = '';
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputCodigo'])){
+	
+	echo "Imagem: ".$_POST['imagem'];die;
 		
 	try{
 		
@@ -20,15 +22,15 @@ if(isset($_POST['inputCodigo'])){
 		$sCodigo = (int)$rowCodigo['Codigo'] + 1;
 		$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
 		
-		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduCategoria, ProduSubCategoria, ProduValorCusto, 
-									 ProduDespesasAcessorias, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
-									 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, ProduFabricante, ProduUnidadeMedida, 
-									 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
-									 ProduUsuarioAtualizador, ProduEmpresa) 
-				VALUES (:sCodigo, :sCodigoBarras, :sNome, :iCategoria, :iSubCategoria, :fValorCusto, :fDespesasAcessorias,
-						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, :sNumSerie, 
-						:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
-						:iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduCategoria, ProduSubCategoria, ProduDetalhamento, 
+									 ProduFoto, ProduValorCusto, ProduDespesasAcessorias, ProduOutrasDespesas, ProduCustoFinal, 
+									 ProduMargemLucro, ProduValorVenda, ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, 
+									 ProduFabricante, ProduUnidadeMedida, ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, 
+									 ProduCest, ProduStatus, ProduUsuarioAtualizador, ProduEmpresa) 
+				VALUES (:sCodigo, :sCodigoBarras, :sNome, :iCategoria, :iSubCategoria, :sDetalhamento, :sFoto, :fValorCusto, 
+						:fDespesasAcessorias, :fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, 
+						:iModelo, :sNumSerie, :iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, 
+						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -37,6 +39,8 @@ if(isset($_POST['inputCodigo'])){
 						':sNome' => $_POST['inputNome'],
 						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						':sDetalhamento' => $_POST['txtDetalhamento'] == null ? null : $_POST['txtDetalhamento'],
+						':sFoto' => $_POST['imagem'] == null ? null : $_POST['imagem'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),
 						':fDespesasAcessorias' => $_POST['inputDespesasAcessorias'] == null ? null : gravaValor($_POST['inputDespesasAcessorias']),
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
