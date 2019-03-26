@@ -4,7 +4,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ProduId, ProduNome, UnMedSigla
+$sql = ("SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
 		 FROM Produto
 		 JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 		 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ". $_GET['idCategoria']." and ProduStatus = 1");

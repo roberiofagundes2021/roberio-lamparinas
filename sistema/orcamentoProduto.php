@@ -82,7 +82,7 @@ if(isset($_POST['inputOrcamentoId'])){
 			$.getJSON('filtraProdutosOrcamento.php?idCategoria='+inputCategoria, function (dados){
 								
 				var produtos = [
-					['Item','Produto', 'Unidade', 'Quantidade', 'Valor Unitário', 'Valor Total']
+					['Item','Produto', 'Detalhamento', 'Unidade', 'Quantidade', 'Valor Unitário', 'Valor Total']
 				];	
 
 				var cont = 1;
@@ -91,7 +91,7 @@ if(isset($_POST['inputOrcamentoId'])){
 				if (dados.length){
 					
 					$.each(dados, function(i, obj){
-						registro = [[cont], [obj.ProduNome], [obj.UnMedSigla], "", "", [""]];
+						registro = [[cont], [obj.ProduNome], [obj.ProduDetalhamento], [obj.UnMedSigla], "", "", [""]];
 						produtos.push(registro);  //adiciona mais um item no array
 						cont++;
 					});	
@@ -110,7 +110,7 @@ if(isset($_POST['inputOrcamentoId'])){
 					  cells: function (row, col, prop, td) {
 						 var cellProperties = {};
 
-						 if (row === 0 || col === 0 || col === 1 || col === 2 || col === 5 || this.instance.getData()[row][col] === 'Read only') {
+						 if (row === 0 || col === 0 || col === 1 || col === 2 || col === 3 || col === 6 || this.instance.getData()[row][col] === 'Read only') {
 							cellProperties.readOnly = true; // make cell read-only if it is first row or the text reads 'readOnly'
 						 }
 						 if (row === 0 || col === 0) {
@@ -120,9 +120,12 @@ if(isset($_POST['inputOrcamentoId'])){
 							cellProperties.renderer = "negativeValueRenderer"; // uses lookup map
 						 } 
 						 
-						 if (row != 0 && col != 3 && col != 4){
+						 if (row != 0 && col != 4 && col != 5){
 							cellProperties.renderer = demaisRowRenderer;
-						 }	 
+						 }	else if (col === 4 && col === 5){
+							alert('Entrou');
+							td.style.background = '#fff';						 
+						 } 
 
 						 return cellProperties;
 					  }
@@ -172,7 +175,7 @@ if(isset($_POST['inputOrcamentoId'])){
 
             // If empty cell, add grey background
             if (!value || value === '') {
-                td.style.background = '#f5f5f5';
+                td.style.background = '#fff';
             }
         }		
 							
@@ -210,7 +213,26 @@ if(isset($_POST['inputOrcamentoId'])){
 							<div class="row">				
 								<div class="col-lg-12">
 									<div class="row">
-
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="inputFornecedor">Fornecedor</label>
+												<input type="text" id="inputFornecedor" name="inputFornecedor" class="form-control" value="<?php echo $_POST['inputOrcamentoNomeCategoria']; ?>" readOnly>												
+											</div>
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputCelular">Celular</label>
+												<input type="text" id="inputCelular" name="inputCelular" class="form-control" value="<?php echo $_POST['inputOrcamentoNomeCategoria']; ?>" readOnly>												
+											</div>
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputTelefone">Telefone</label>
+												<input type="text" id="inputTelefone" name="inputTelefone" class="form-control" value="<?php echo $_POST['inputOrcamentoNomeCategoria']; ?>" readOnly>												
+											</div>
+										</div>
+									</div>
+									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputCategoriaNome">Categoria</label>

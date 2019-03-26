@@ -7,9 +7,9 @@ $_SESSION['fotoAtual'] = '';
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputCodigo'])){
+if(isset($_POST['inputNome'])){
 	
-	echo "Imagem: ".$_POST['imagem'];die;
+	//echo "Imagem: ".$_POST['imagem'];die;
 		
 	try{
 		
@@ -278,8 +278,8 @@ if(isset($_POST['inputCodigo'])){
 				// Efetua o Upload sem dar refresh na pagina
 				$('#formFoto').ajaxForm({
 					target:'#visualizar' // o callback será no elemento com o id #visualizar
-				}).submit();
-			});			
+				}).submit(); 
+			});	// change
 			
 			function Filtrando(){
 				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
@@ -288,6 +288,41 @@ if(isset($_POST['inputCodigo'])){
 			function Reset(){
 				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
 			}
+			
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+					
+				var inputNome = $('#inputNome').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNome.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == ''){
+					alerta('Atenção','Informe o nome do produto!','error');
+					$('#inputNome').focus();
+					return false;
+				}
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "produtoValida.php",
+					data: {nome: inputNome},
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Esse produto já existe!','error');
+							return false;
+						}
+						
+						$( "#formProduto" ).submit();
+					}
+				}); //ajax
+				
+			}); // enviar			
 								
 		});			
 		
@@ -339,7 +374,7 @@ if(isset($_POST['inputCodigo'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formProduto" method="post" class="form-validate" action="produtoNovo.php">
+					<form name="formProduto" id="formProduto" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Produto</h5>
 						</div>
@@ -361,7 +396,7 @@ if(isset($_POST['inputCodigo'])){
 										<div class="col-lg-4">
 											<div class="form-group">				
 												<label for="inputEstoqueMinimo">Estoque Mínimo</label>
-												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo">
+												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo" maxLength="10">
 											</div>	
 										</div>						
 									</div>
@@ -370,7 +405,7 @@ if(isset($_POST['inputCodigo'])){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome">
 											</div>
 										</div>
 									</div>
@@ -683,7 +718,7 @@ if(isset($_POST['inputCodigo'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
 										<a href="produto.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
