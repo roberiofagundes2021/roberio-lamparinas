@@ -14,11 +14,11 @@ if(isset($_POST['inputOrcamentoId'])){
 	try{
 		
 		$sql = "SELECT *
-				FROM Produto
-				JOIN Categoria on CategId = ProduCategoria
-				WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$_POST['inputOrcamentoCategoria'];
+				FROM Orcamento
+				JOIN Fornecedor on ForneId = OrcamFornecedor
+				WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = ".$iOrcamento;
 		$result = $conn->query("$sql");
-		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
@@ -89,7 +89,7 @@ if(isset($_POST['inputOrcamentoId'])){
 				var registro = '';
 				
 				if (dados.length){
-					
+
 					$.each(dados, function(i, obj){
 						registro = [[cont], [obj.ProduNome], [obj.ProduDetalhamento], [obj.UnMedSigla], "", "", [""]];
 						produtos.push(registro);  //adiciona mais um item no array
@@ -99,10 +99,24 @@ if(isset($_POST['inputOrcamentoId'])){
 					var container = document.getElementById('example');
 					var hot = new Handsontable(container, {
 					  data: produtos,
+					  //columnSorting : true,
+					 /* columns: [
+						{data: 'id', type: 'numeric', width: 20}, 
+						{data: 'produto', type: 'text'}, 
+						{data: 'detalhamento', type: 'text'}, 
+						{data: 'unidade', type: 'text', width: 20}, 
+						{data: 'quantidade', type: 'numeric'}, 
+						{data: 'valorunitario', type: 'numeric', numericFormat: {pattern: '0.00'}}, 
+						{data: 'valortotal', type: 'numeric', numericFormat: {pattern: '0.00'}}
+					   ], */
 					  //rowHeaders: true,
 					  //colHeaders: true,
 					  //filters: true,
 					  //dropdownMenu: true,
+					  colWidths: [17, 100, 100, 30, 40, 40, 40],
+					  manualRowResize: false,  //Pra que serve isso?
+					  manualRowMove: false,   //Pra que serve isso?
+					 // fixedRowsTop: 1,  // mantem o cabeçalho fixo
 					  
 					  //rowHeaders: true,
 					  //colHeaders: ['Item','Produto', 'SubCategoria', 'UN', 'Quantidade', 'Valor Unitário', 'Valor Total'],
@@ -113,6 +127,7 @@ if(isset($_POST['inputOrcamentoId'])){
 						 if (row === 0 || col === 0 || col === 1 || col === 2 || col === 3 || col === 6 || this.instance.getData()[row][col] === 'Read only') {
 							cellProperties.readOnly = true; // make cell read-only if it is first row or the text reads 'readOnly'
 						 }
+						 
 						 if (row === 0 || col === 0) {
 							cellProperties.renderer = firstRowRenderer; // uses function directly
 						 } 
@@ -120,12 +135,14 @@ if(isset($_POST['inputOrcamentoId'])){
 							cellProperties.renderer = "negativeValueRenderer"; // uses lookup map
 						 } 
 						 
+						 /*
 						 if (row != 0 && col != 4 && col != 5){
+							alert('Entrou4');
 							cellProperties.renderer = demaisRowRenderer;
 						 }	else if (col === 4 && col === 5){
-							alert('Entrou');
+							alert('Entrou5');
 							td.style.background = '#fff';						 
-						 } 
+						 } */
 
 						 return cellProperties;
 					  }
@@ -136,6 +153,9 @@ if(isset($_POST['inputOrcamentoId'])){
 				}				
 			});		
 						
+						
+			// Maps function to lookup string
+			Handsontable.renderers.registerRenderer('negativeValueRenderer', negativeValueRenderer);
 			/*var produtos = [
 			  ['Item','Produto', 'SubCategoria', 'Unidade', 'Quantidade', 'Valor Unitário', 'Valor Total'],
 			  [1, 'Telha Intercalada', 'Telha', 'UN', '', '5,00', ''],
@@ -153,7 +173,7 @@ if(isset($_POST['inputOrcamentoId'])){
             td.style.color = '#1B5E20';
             td.style.background = '#E8F5E9';
         }	
-        
+      /*  
         // Renderizar demais linhas somente Leitura da tabela
         function demaisRowRenderer(instance, td, row, col, prop, value, cellProperties) {
             Handsontable.renderers.TextRenderer.apply(this, arguments);
@@ -163,20 +183,35 @@ if(isset($_POST['inputOrcamentoId'])){
             td.style.color = '#000';
             td.style.background = '#f5f5f5';
         }
-		
+	*/	
 		// Renderizar valores negativos (cor vermelha)
         function negativeValueRenderer(instance, td, row, col, prop, value, cellProperties) {
             Handsontable.renderers.TextRenderer.apply(this, arguments);
-
+			var quant = 0;
+			var valor = 0;
+			
             // If row contains negative number, add class "negative"
             if (parseInt(value, 10) < 0) {
                 td.className = 'text-danger';
             }
+			
+       /*     if (col === 4) {
+				quant = value;
+				//quant = parseFloat(value, 10);
+				//valor = 
+            }
+			
+			if (col === 5) {
+				alert(quant);
+			}*/
+			
 
             // If empty cell, add grey background
             if (!value || value === '') {
                 td.style.background = '#fff';
-            }
+            } else {
+				td.style.background = '#f5f5f5';
+			}
         }		
 							
 	</script>
@@ -216,19 +251,19 @@ if(isset($_POST['inputOrcamentoId'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputFornecedor">Fornecedor</label>
-												<input type="text" id="inputFornecedor" name="inputFornecedor" class="form-control" value="<?php echo $_POST['inputOrcamentoNomeCategoria']; ?>" readOnly>												
+												<input type="text" id="inputFornecedor" name="inputFornecedor" class="form-control" value="<?php echo $row['ForneNome']; ?>" readOnly>
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputCelular">Celular</label>
-												<input type="text" id="inputCelular" name="inputCelular" class="form-control" value="<?php echo $_POST['inputOrcamentoNomeCategoria']; ?>" readOnly>												
+												<label for="inputCelular">Telefone</label>
+												<input type="text" id="inputTelefone" name="inputTelefone" class="form-control" value="<?php echo $row['ForneTelefone']; ?>" readOnly>
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputTelefone">Telefone</label>
-												<input type="text" id="inputTelefone" name="inputTelefone" class="form-control" value="<?php echo $_POST['inputOrcamentoNomeCategoria']; ?>" readOnly>												
+												<label for="inputTelefone">Celular</label>
+												<input type="text" id="inputCelular" name="inputCelular" class="form-control" value="<?php echo $row['ForneCelular']; ?>" readOnly>
 											</div>
 										</div>
 									</div>

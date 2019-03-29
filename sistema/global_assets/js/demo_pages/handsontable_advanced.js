@@ -66,7 +66,7 @@ var HotAdvanced = function() {
 
             // If empty cell, add grey background
             if (!value || value === '') {
-                td.style.background = '#f5f5f5';
+                td.style.background = '#fff';
             }
         }
 

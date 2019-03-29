@@ -84,7 +84,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaFluxoOperacional(FlOpeId, FlOpeNumContrato, FlOpeStatus, Tipo){
-		
+
 			document.getElementById('inputFluxoOperacionalId').value = FlOpeId;
 			document.getElementById('inputFluxoOperacionalNumContrato').value = FlOpeNumContrato;
 			document.getElementById('inputFluxoOperacionalStatus').value = FlOpeStatus;
@@ -200,7 +200,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<form name="formFluxoOperacional" method="post">
 					<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" >
-					<input type="hidden" id="inputFluxoOperacionalNumContato" name="inputFluxoOperacionalNumContrato" >
+					<input type="hidden" id="inputFluxoOperacionalNumContrato" name="inputFluxoOperacionalNumContrato" >
 					<input type="hidden" id="inputFluxoOperacionalStatus" name="inputFluxoOperacionalStatus" >
 				</form>
 

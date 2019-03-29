@@ -6,14 +6,39 @@ $_SESSION['PaginaAtual'] = 'Novo Fluxo Operacional';
 
 include('global_assets/php/conexao.php');
 
+//Se veio do fluxo.php
+if(isset($_POST['inputFluxoOperacionalId'])){
+	
+	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
+	
+	try{
+		
+		$sql = "SELECT *
+				FROM FluxoOperacional
+				WHERE FlOpeId = $iFluxoOperacional ";
+		$result = $conn->query("$sql");
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+						
+	} catch(PDOException $e) {
+		echo 'Error: ' . $e->getMessage();die;
+	}
+	
+	$_SESSION['msg'] = array();
+
+} else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
+
+	irpara("fluxo.php");
+}
+
 if(isset($_POST['inputData'])){
 
 	try{
 		
-		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeOrcamento, FlOpeData, FlOpeNumContrato, FlOpeNumProcesso, 
-											  FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa)
-				VALUES (:iFornecedor, :iCategoria, :iOrcamento, :dData, :iNumContrato, :iNumProcesso, 
-						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "UPDATE FluxoOperacional SET FlOpeFornecedor = :iFornecedor, FlOpeCategoria = :iCategoria, FlOpeOrcamento = :iOrcamento, 
+										    FlOpeData = :dData, FlOpeNumContrato = :iNumContrato, FlOpeNumProcesso = :iNumProcesso, 
+											FlOpeUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE FlOpeId = ".$_POST['inputFluxoOperacionalId']."
+				";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -22,20 +47,18 @@ if(isset($_POST['inputData'])){
 						':iOrcamento' => $_POST['cmbOrcamento'] == '#' ? null : $_POST['cmbOrcamento'],
 						':dData' => $_POST['inputData'] == '' ? null : $_POST['inputData'],
 						':iNumContrato' => $_POST['inputNumContrato'],
-						':iNumProcesso' => $_POST['inputNumProcesso'],
-						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iNumProcesso' => $_POST['inputNumProcesso'],						
+						':iUsuarioAtualizador' => $_SESSION['UsuarId']						
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Fluxo Operacional incluído!!!";
+		$_SESSION['msg']['mensagem'] = "Fluxo Operacional alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";	
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir Fluxo Operacional!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar Fluxo Operacional!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();die;
@@ -71,7 +94,7 @@ if(isset($_POST['inputData'])){
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 	
 	<!-- Adicionando Javascript -->
-    <script type="text/javascript" >
+    <script type="text/javascript">
 
         $(document).ready(function() {	
 
@@ -121,7 +144,6 @@ if(isset($_POST['inputData'])){
 				
 			});	
 			
-			
 			//Mostra o "Filtrando..." na combo Categoria e Orcamento ao mesmo tempo
 			function Filtrando(){
 				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
@@ -134,11 +156,11 @@ if(isset($_POST['inputData'])){
 			}		
 			
 			function ResetCategoria(){
-				$('#cmbCategoria').empty().append('<option value="#">Sem Categoria</option>');
+				$('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
 			}
 			
 			function ResetOrcamento(){
-				$('#cmbOrcamento').empty().append('<option value="#">Sem orçamento</option>');
+				$('#cmbOrcamento').empty().append('<option>Sem orçamento</option>');
 			}				
 			
 
@@ -148,12 +170,11 @@ if(isset($_POST['inputData'])){
 
 				e.preventDefault();
 				
-				var inputDataInicio = $('#inputDataInicio').val();
-				var inputDataFim = $('#inputDataFim').val();
+				var inputData = $('#inputData').val();				
 				
-				if (inputDataFim < inputDataInicio){
-					alerta('Atenção','A Data Fim deve ser maior que a Data Início!','error');
-					$('#inputDataFim').focus();
+				if (inputData == ''){
+					alerta('Atenção','Informe a data de emissão do contrato!','error');
+					$('#inputData').focus();
 					return false;				
 				}
 				
@@ -162,7 +183,7 @@ if(isset($_POST['inputData'])){
 			});	
 		
 		});	
-		
+			
 	</script>
 
 </head>
@@ -187,10 +208,12 @@ if(isset($_POST['inputData'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formFluxoOperacional" id="formFluxoOperacional" method="post" class="form-validate">
+					<form name="formFluxoOperacional" id="formFluxoOperacional" method="post" class="form-validate" action="fluxoEdita.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Fluxo Operacional</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Fluxo Operacional</h5>
 						</div>
+						
+						<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" value="<?php echo $row['FlOpeId']; ?>" >
 						
 						<div class="card-body">								
 														
@@ -210,8 +233,9 @@ if(isset($_POST['inputData'])){
 												$result = $conn->query("$sql");
 												$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 												
-												foreach ($rowFornecedor as $item){															
-													print('<option value="'.$item['ForneId'].'">'.$item['ForneNome'].'</option>');
+												foreach ($rowFornecedor as $item){	
+													$seleciona = $item['ForneId'] == $row['FlOpeFornecedor'] ? "selected" : "";
+													print('<option value="'.$item['ForneId'].'" '. $seleciona .'>'.$item['ForneNome'].'</option>');
 												}
 											
 											?>
@@ -224,6 +248,20 @@ if(isset($_POST['inputData'])){
 										<label for="cmbCategoria">Categoria</label>
 										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 											<option value="#">Selecione</option>
+											<?php 
+												$sql = ("SELECT CategId, CategNome
+														 FROM Categoria															     
+														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
+														 ORDER BY CategNome ASC");
+												$result = $conn->query("$sql");
+												$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($rowCategoria as $item){			
+													$seleciona = $item['CategId'] == $row['FlOpeCategoria'] ? "selected" : "";
+													print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
+												}
+											
+											?>											
 										</select>
 									</div>
 								</div>
@@ -232,6 +270,21 @@ if(isset($_POST['inputData'])){
 									<label for="cmbOrcamento">Orçamento</label>
 									<select id="cmbOrcamento" name="cmbOrcamento" class="form-control form-control-select2">
 										<option value="#">Selecione</option>
+										<?php 
+										 
+											$sql = ("SELECT OrcamId, OrcamNumero, OrcamData
+													 FROM Orcamento
+													 WHERE OrcamEmpresa = ".$_SESSION['EmpreId']." and OrcamFornecedor = '". $row['FlOpeFornecedor']."' and OrcamStatus = 1
+													 Order By OrcamId DESC");													 
+											$result = $conn->query("$sql");
+											$rowOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											foreach ($rowOrcamento as $item){			
+												$seleciona = $item['OrcamId'] == $row['FlOpeOrcamento'] ? "selected" : "";
+												print('<option value="'.$item['OrcamId'].'" '. $seleciona .'>Nº: '.$item['OrcamNumero'].' - Data: ' .mostraData($item['OrcamData']).'</option>');
+											}
+										
+										?>										
 									</select>
 								</div>	
 							</div>
@@ -246,7 +299,7 @@ if(isset($_POST['inputData'])){
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="date" id="inputData" name="inputData" class="form-control" placeholder="Data" required>
+											<input type="date" id="inputData" name="inputData" class="form-control" placeholder="Data" value="<?php echo $row['FlOpeData']; ?>">
 										</div>
 									</div>
 								</div>
@@ -254,14 +307,14 @@ if(isset($_POST['inputData'])){
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputNumContrato">Número do Contrato</label>
-										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato">
+										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>">
 									</div>
 								</div>
 										
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputNumProcesso">Número do Processo</label>
-										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo">
+										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>">
 									</div>
 								</div>
 							</div>							
@@ -269,7 +322,7 @@ if(isset($_POST['inputData'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
+										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
 										<a href="fluxo.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 									</div>
 								</div>

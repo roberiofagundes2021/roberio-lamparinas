@@ -8,49 +8,41 @@ $_SESSION['fotoAtual'] = '';
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputNome'])){
+	
+	//echo "Imagem: ".$_POST['imagem'];die;
 		
-	try{		
-		$sql = "SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
-				FROM Produto
-				Where ProduEmpresa = ".$_SESSION['EmpreId']."";
-		//echo $sql;die;
+	try{
+		
+		$sql = ("SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
+				 FROM Produto
+				 Where ProduEmpresa = ".$_SESSION['EmpreId']."");
 		$result = $conn->query("$sql");
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
 		
 		$sCodigo = (int)$rowCodigo['Codigo'] + 1;
 		$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
-	} catch(PDOException $e) {	
-		echo 'Error1: ' . $e->getMessage();die;
-	}
-	
-	if (isset($_SESSION['fotoAtual'])){
-		$sFoto = $_SESSION['fotoAtual'];
-	} else {
-		$sFoto = null;
-	}
-	
-	try{
 		
-		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduDetalhamento, ProduFoto, ProduCategoria, ProduSubCategoria, ProduValorCusto, 
-									 ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
-									 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, ProduFabricante, ProduUnidadeMedida, 
-									 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
-									 ProduUsuarioAtualizador, ProduEmpresa) 
-				VALUES (:sCodigo, :sCodigoBarras, :sNome, :sDetalhamento, :sFoto, :iCategoria, :iSubCategoria, :fValorCusto, 
-						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, :sNumSerie, 
-						:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
-						:iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduCategoria, ProduSubCategoria, ProduDetalhamento, 
+									 ProduFoto, ProduValorCusto, ProduDespesasAcessorias, ProduOutrasDespesas, ProduCustoFinal, 
+									 ProduMargemLucro, ProduValorVenda, ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, 
+									 ProduFabricante, ProduUnidadeMedida, ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, 
+									 ProduCest, ProduStatus, ProduUsuarioAtualizador, ProduEmpresa) 
+				VALUES (:sCodigo, :sCodigoBarras, :sNome, :iCategoria, :iSubCategoria, :sDetalhamento, :sFoto, :fValorCusto, 
+						:fDespesasAcessorias, :fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, 
+						:iModelo, :sNumSerie, :iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, 
+						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 						':sCodigo' => $sCodigo,
 						':sCodigoBarras' => $_POST['inputCodigoBarras'],
 						':sNome' => $_POST['inputNome'],
-						':sDetalhamento' => $_POST['txtDetalhamento'],
-						':sFoto' => $sFoto,
-						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
-						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
+						':sDetalhamento' => $_POST['txtDetalhamento'] == null ? null : $_POST['txtDetalhamento'],
+						':sFoto' => $_POST['imagem'] == null ? null : $_POST['imagem'],
+						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),
+						':fDespesasAcessorias' => $_POST['inputDespesasAcessorias'] == null ? null : gravaValor($_POST['inputDespesasAcessorias']),
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
 						':fCustoFinal' => $_POST['inputCustoFinal'] == null ? null : gravaValor($_POST['inputCustoFinal']),
 						':fMargemLucro' => $_POST['inputMargemLucro'] == null ? null : gravaValor($_POST['inputMargemLucro']),
@@ -80,7 +72,7 @@ if(isset($_POST['inputNome'])){
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir produto!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error2: ' . $e->getMessage();die;
+		echo 'Error: ' . $e->getMessage();
 		
 	}
 	
@@ -286,8 +278,8 @@ if(isset($_POST['inputNome'])){
 				// Efetua o Upload sem dar refresh na pagina
 				$('#formFoto').ajaxForm({
 					target:'#visualizar' // o callback será no elemento com o id #visualizar
-				}).submit();
-			});			
+				}).submit(); 
+			});	// change
 			
 			function Filtrando(){
 				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
@@ -296,12 +288,12 @@ if(isset($_POST['inputNome'])){
 			function Reset(){
 				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
 			}
-
+			
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
-				
+					
 				var inputNome = $('#inputNome').val();
 				
 				//remove os espaços desnecessários antes e depois
@@ -314,10 +306,24 @@ if(isset($_POST['inputNome'])){
 					return false;
 				}
 				
-				$( "#formProduto" ).submit();
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "produtoValida.php",
+					data: {nome: inputNome},
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Esse produto já existe!','error');
+							return false;
+						}
+						
+						$( "#formProduto" ).submit();
+					}
+				}); //ajax
 				
-			}); // enviar
-			
+			}); // enviar			
+								
 		});			
 		
 		function float2moeda(num) {
@@ -368,7 +374,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form id="formProduto" name="formProduto" method="post" class="form-validate">
+					<form name="formProduto" id="formProduto" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Produto</h5>
 						</div>
@@ -390,7 +396,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">				
 												<label for="inputEstoqueMinimo">Estoque Mínimo</label>
-												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo">
+												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo" maxLength="10">
 											</div>	
 										</div>						
 									</div>
@@ -399,7 +405,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome">
 											</div>
 										</div>
 									</div>
@@ -420,7 +426,10 @@ if(isset($_POST['inputNome'])){
 										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:250px; border:2px solid #ccc;">
 									</div>
 									<br>
-									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%">Adicionar Foto...</button>	
+									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%">Adicionar Foto...</button>
+									<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
+										<input type="file" id="imagem" name="imagem" style="display:none;" />
+									</form>									
 								</div>
 								
 							</div> <!-- media -->
@@ -719,10 +728,6 @@ if(isset($_POST['inputNome'])){
 						<!-- /card-body -->
 
 					</form>
-					
-					<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
-						<input type="file" id="imagem" name="imagem" style="display:none;" />
-					</form>	
 					
 				</div>
 				<!-- /info blocks -->
