@@ -41,6 +41,173 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- /theme JS files -->	
 	
 	<script type="text/javascript">
+		
+        $(document).ready(function() {	
+			
+			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
+			$('#cmbFornecedor').on('change', function(e){
+				
+				var cmbTipo = $('#cmbTipo').val();
+				var inputFornecedor = $('#inputFornecedor').val();
+				var cmbFornecedor = $('#cmbFornecedor').val();
+				
+				$('#inputFornecedor').val(cmbFornecedor);
+				
+				FiltraCategoria();
+				Filtrando();
+
+				$.getJSON('filtraCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
+
+					var option = '<option value="#">Selecione a Categoria</option>';
+
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
+						});						
+						
+						$('#cmbCategoria').html(option).show();
+					} else {
+						ResetCategoria();
+					}					
+				});				
+				
+				$.getJSON('filtraSubCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
+					
+					var option = '<option value="#">Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});
+				
+				$.getJSON('filtraProduto.php?idFornecedor='+cmbFornecedor, function (dados){
+					
+					var option = '<option value="#" "selected">Selecione o Produto</option>';
+					
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
+						});						
+						
+						$('#cmbProduto').html(option).show();
+					} else {
+						ResetProduto();
+					}					
+				});				
+				
+			});			
+			
+			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function(e){
+				
+				Filtrando();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option value="#">Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});
+				
+				$.getJSON('filtraProduto.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option value="#" "selected">Selecione o Produto</option>';
+					
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
+						});						
+						
+						$('#cmbProduto').html(option).show();
+					} else {
+						ResetProduto();
+					}					
+				});				
+				
+			});	
+					
+			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
+			$('#cmbSubCategoria').on('change', function(e){
+				
+				FiltraProduto();
+				
+				var cmbTipo = $('#cmbTipo').val();
+				var cmbFornecedor = $('#cmbFornecedor').val();				
+				var cmbCategoria = $('#cmbCategoria').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
+				
+				if (cmbTipo == 'S' || cmbTipo == 'T'){
+					cmbFornecedor = '#';
+				}
+				
+				$.getJSON('filtraProduto.php?idFornecedor='+cmbFornecedor+'&idCategoria='+cmbCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){
+					
+					var option = '<option value="#" "selected">Selecione o Produto</option>';
+					
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
+						});						
+						
+						$('#cmbProduto').html(option).show();
+					} else {
+						ResetProduto();
+					}					
+				});				
+				
+			});	
+
+			//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
+			function Filtrando(){
+				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+				FiltraProduto();
+			}		
+
+			//Mostra o "Filtrando..." na combo Produto
+			function FiltraCategoria(){
+				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
+			}
+			
+			//Mostra o "Filtrando..." na combo Produto
+			function FiltraProduto(){
+				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+			}		
+			
+			function ResetCategoria(){
+				$('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
+			}			
+			
+			function ResetSubCategoria(){
+				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+			}
+			
+			function ResetProduto(){
+				$('#cmbProduto').empty().append('<option>Sem produto</option>');
+			}				
+						
+		});		
 					
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaFornecedor(ForneId, ForneNome, ForneStatus, Tipo){
@@ -120,6 +287,27 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											</select>
 										</div>
 									</div>
+									<div class="col-lg-10">
+										<div class="form-group">
+											<label for="cmbFornecedor">Fornecedor</label>
+											<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
+												<option value="-1">Todos</option>
+												<?php 
+													$sql = ("SELECT ForneId, ForneNome
+															 FROM Fornecedor														     
+															 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
+															 ORDER BY ForneNome ASC");
+													$result = $conn->query("$sql");
+													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+													
+													foreach ($rowFornecedor as $item){															
+														print('<option value="'.$item['ForneId'].'">'.$item['ForneNome'].'</option>');
+													}
+												
+												?>
+											</select>
+										</div>
+									</div>
 								</div>
 								<div class="row">
 									<div class="col-lg-6">
@@ -171,15 +359,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<select id="cmbCodigo" name="cmbCodigo" class="form-control form-control-select2">
 												<option value="#">Todas</option>
 												<?php 
-													$sql = ("SELECT CategId, CategNome
-															 FROM Categoria															     
-															 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
-															 ORDER BY CategNome ASC");
+													$sql = ("SELECT ProduCodigo
+															 FROM Produto															     
+															 WHERE ProduStatus = 1 and ProduEmpresa = ". $_SESSION['EmpreId'] ."
+															 ORDER BY ProduNome ASC");
 													$result = $conn->query("$sql");
 													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 													
 													foreach ($rowCategoria as $item){															
-														print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+														print('<option value="'.$item['ProduCodigo'].'">'.$item['ProduCodigo'].'</option>');
 													}
 												
 												?>
@@ -192,15 +380,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												<select id="cmbProduto" name="cmbProduto" class="form-control form-control-select2">
 													<option value="#">Todas</option>
 													<?php 
-														$sql = ("SELECT SbCatId, SbCatNome
-																 FROM SubCategoria															     
-																 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY SbCatNome ASC");
+														$sql = ("SELECT ProduId, ProduNome
+																 FROM Produto															     
+																 WHERE ProduStatus = 1 and ProduEmpresa = ". $_SESSION['EmpreId'] ."
+																 ORDER BY ProduNome ASC");
 														$result = $conn->query("$sql");
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($row as $item){
-															print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
+															print('<option value="'.$item['ProduId'].'">'.$item['ProduNome'].'</option>');
 														}
 													?>
 												</select>
