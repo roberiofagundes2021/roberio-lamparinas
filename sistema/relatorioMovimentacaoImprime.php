@@ -8,19 +8,26 @@ use Mpdf\Mpdf;
 
 require_once 'global_assets/php/vendor/autoload.php';
 
+$dDataInicio = $_POST['inputDataInicio'];
+$dDataFim = $_POST['inputDataFim'];
 $iTipo = isset($_POST['inputTipo']) ? $_POST['inputTipo'] : 0;
-$sCodigo = isset($_POST['inputCodigo']) ? $_POST['inputCodigo'] : 0;
-$iProduto = isset($_POST['cmProduto']) ? $_POST['cmbProduto'] : 0;
+$iFornecedor = isset($_POST['cmFornecedor']) ? $_POST['cmbFornecedor'] : 0;
 $iCategoria = isset($_POST['cmCategoria']) ? $_POST['cmbCategoria'] : 0;
 $iSubCategoria = isset($_POST['cmSubCategoria']) ? $_POST['cmbSubCategoria'] : 0;
+$sCodigo = isset($_POST['inputCodigo']) ? $_POST['inputCodigo'] : 0;
+$iProduto = isset($_POST['cmProduto']) ? $_POST['cmbProduto'] : 0;
 
-$sql = ("SELECT InvenNumero, InvenCategoria, InvenObservacao, CategNome, InXLELocal, LcEstNome
-		 FROM Inventario
-		 JOIN InventarioXLocalEstoque on InXLEInventario = InvenId
-		 JOIN LocalEstoque on LcEstId = InXLELocal
-		 JOIN Categoria on CategId = InvenCategoria
-		 Where InvenId = ".$iInventario."
-		");
+
+$sql = "SELECT MovimData, MovimTipo, MovimNotaFiscal, MovimFinalidade, MovimClassificacao, ForneNome, 
+		LcEstNome as Origem, MovimDestinoManual, ProduNome, MvXPrQuantidade, MvXPrLote, MvXPrValidade
+		FROM Movimentacao
+		JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
+		JOIN Produto on ProduId = MvXPrProduto
+		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
+		LEFT JOIN LocalEstoque on LcEstId = MovimOrigem
+		Where EmpreId = ".$_SESSION['EmpreId']." and MovimData between '".$dDataInicio."' and '".$dDataFim."'";
+		 
+		 
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -43,7 +50,7 @@ try {
 		</div>
 		<div style='width:150px; float:right; display: inline; text-align:right;'>
 			<div>{DATE j/m/Y}</div>
-			<div style='margin-top:8px;'>Inventário: ".formatarNumero($sNumero)."</div>
+			<div style='margin-top:8px;'>Relatório de Movimentação</div>
 		</div> 
 	 </div>
 	";		
@@ -57,14 +64,19 @@ try {
 		<div style="font-weight: bold; position:relative; margin-top: 50px;text-transform: uppercase;">Local: '.$item['LcEstNome'].'</div>
 		<div style="font-weight: bold; position:relative; margin-top: 20px;">'.$item['CategNome'].'</div>
 		<br>
-		<table style="width:100%;">
+		<table style="width:100%; border-collapse: collapse;">
 			<tr>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Código</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:42%">Produto</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Unitário</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Total</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Data</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Fornecedor</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Estoque Destino</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:20%">Produto</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Quantidade</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Lote</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Validade</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">NF</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Finalidade</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Classificação</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Valor de Custo</th>
 			</tr>
 		';	
 		

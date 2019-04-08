@@ -15,6 +15,14 @@ $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
+$d = date("d"); 
+$m = date("m"); 
+$Y = date("Y"); 
+
+$dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d-30, $Y)); //30 dias atrás
+$dataFim = date ("Y-m-d");
+
+
 ?>
 
 <!DOCTYPE html>
@@ -278,6 +286,28 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="row">
 									<div class="col-lg-2">
 										<div class="form-group">
+											<label for="inputDataInicio">Data Início</label>
+											<div class="input-group">
+												<span class="input-group-prepend">
+													<span class="input-group-text"><i class="icon-calendar22"></i></span>
+												</span>
+												<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" value="<?php echo $dataInicio; ?>">
+											</div>
+										</div>
+									</div>
+									<div class="col-lg-2">
+										<div class="form-group">
+											<label for="inputDataFim">Data Fim</label>
+											<div class="input-group">
+												<span class="input-group-prepend">
+													<span class="input-group-text"><i class="icon-calendar22"></i></span>
+												</span>
+												<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" value="<?php echo $dataFim; ?>">
+											</div>
+										</div>
+									</div>										
+									<div class="col-lg-2">
+										<div class="form-group">
 											<label for="cmbTipo">Tipo</label>
 											<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2">
 												<option value="#">Todos</option>
@@ -286,8 +316,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												<option value="T">Transferência</option>
 											</select>
 										</div>
-									</div>
-									<div class="col-lg-10">
+									</div>								
+									<div class="col-lg-6">
 										<div class="form-group">
 											<label for="cmbFornecedor">Fornecedor</label>
 											<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">

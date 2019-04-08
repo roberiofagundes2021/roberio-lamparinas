@@ -76,18 +76,18 @@ try {
 					$html .= "</table>";
 				}
 				
-				$html .= '<div style="position:relative; margin-top: 20px; text-transform: uppercase; font-weight: bold;">Categoria: '.$item['CategNome'].'</div>';
+				$html .= '<div style="position:relative; margin-top: 40px; text-transform: uppercase; font-weight: bold; background-color: #ccc; padding: 5px;">Categoria: '.$item['CategNome'].'</div>';
 						  
 				$html .= '
 				<br>
-				<table style="width:100%;">
+				<table style="width:100%; border-collapse: collapse;">
 					<tr>
-						<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Num</th>
-						<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:38%">Razão Social/Nome</th>
-						<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">CNPJ/CPF</th>
-						<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Contato</th>
-						<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Telefone</th>
-						<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">E-mail</th>
+						<th style="text-align: left; padding-top: 7px; padding-bottom: 7px; border-bottom: 1px solid #333; width:5%">Num</th>
+						<th style="text-align: left; padding-top: 7px; padding-bottom: 7px; border-bottom: 1px solid #333; width:38%">Razão Social/Nome</th>
+						<th style="text-align: left; padding-top: 7px; padding-bottom: 7px; border-bottom: 1px solid #333; width:15%">CNPJ/CPF</th>
+						<th style="text-align: left; padding-top: 7px; padding-bottom: 7px; border-bottom: 1px solid #333; width:12%">Contato</th>
+						<th style="text-align: left; padding-top: 7px; padding-bottom: 7px; border-bottom: 1px solid #333; width:15%">Telefone</th>
+						<th style="text-align: left; padding-top: 7px; padding-bottom: 7px; border-bottom: 1px solid #333; width:15%">E-mail</th>
 					</tr>
 				';							  
 			}
@@ -115,18 +115,18 @@ try {
 		}
 				  
 	} else {
-		$html .= '<div style="font-weight: bold; position:relative; margin-top: 50px;text-transform: uppercase;">Categoria: '.$sCategoria.'</div>';
+		$html .= '<div style="font-weight: bold; position:relative; margin-top: 50px;text-transform: uppercase; background-color: #ccc; padding:5px;">Categoria: '.$sCategoria.'</div>';
 				  
 		$html .= '
 		<br>
-		<table style="width:100%;">
+		<table style="width:100%; border-collapse: collapse;">
 			<tr>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Num</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:38%">Razão Social/Nome</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">CNPJ/CPF</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Contato</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Telefone</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">E-mail</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Num</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:38%">Razão Social/Nome</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">CNPJ/CPF</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Contato</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Telefone</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">E-mail</th>
 			</tr>
 		';					  
 	
