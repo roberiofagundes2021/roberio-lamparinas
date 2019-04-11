@@ -283,156 +283,159 @@ $dataFim = date ("Y-m-d");
 							<div class="card-body">
 								<p class="font-size-lg">Utilize os filtros abaixo para gerar o relatório.</p>
 								<br>
-								<div class="row">
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="inputDataInicio">Data Início</label>
-											<div class="input-group">
-												<span class="input-group-prepend">
-													<span class="input-group-text"><i class="icon-calendar22"></i></span>
-												</span>
-												<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" value="<?php echo $dataInicio; ?>">
+								
+								<form name="formMovimentacao" method="post" action="relatorioMovimentacaoImprime.php" target="_blank">
+									<div class="row">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputDataInicio">Data Início</label>
+												<div class="input-group">
+													<span class="input-group-prepend">
+														<span class="input-group-text"><i class="icon-calendar22"></i></span>
+													</span>
+													<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" value="<?php echo $dataInicio; ?>">
+												</div>
 											</div>
 										</div>
-									</div>
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="inputDataFim">Data Fim</label>
-											<div class="input-group">
-												<span class="input-group-prepend">
-													<span class="input-group-text"><i class="icon-calendar22"></i></span>
-												</span>
-												<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" value="<?php echo $dataFim; ?>">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputDataFim">Data Fim</label>
+												<div class="input-group">
+													<span class="input-group-prepend">
+														<span class="input-group-text"><i class="icon-calendar22"></i></span>
+													</span>
+													<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" value="<?php echo $dataFim; ?>">
+												</div>
 											</div>
-										</div>
-									</div>										
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="cmbTipo">Tipo</label>
-											<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2">
-												<option value="#">Todos</option>
-												<option value="E">Entrada</option>
-												<option value="S">Saída</option>
-												<option value="T">Transferência</option>
-											</select>
-										</div>
-									</div>								
-									<div class="col-lg-6">
-										<div class="form-group">
-											<label for="cmbFornecedor">Fornecedor</label>
-											<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-												<option value="-1">Todos</option>
-												<?php 
-													$sql = ("SELECT ForneId, ForneNome
-															 FROM Fornecedor														     
-															 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
-															 ORDER BY ForneNome ASC");
-													$result = $conn->query("$sql");
-													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($rowFornecedor as $item){															
-														print('<option value="'.$item['ForneId'].'">'.$item['ForneNome'].'</option>');
-													}
-												
-												?>
-											</select>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-lg-6">
-										<div class="form-group">
-											<label for="cmbCategoria">Categoria</label>
-											<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-												<option value="#">Todas</option>
-												<?php 
-													$sql = ("SELECT CategId, CategNome
-															 FROM Categoria															     
-															 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
-															 ORDER BY CategNome ASC");
-													$result = $conn->query("$sql");
-													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($rowCategoria as $item){															
-														print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-													}
-												
-												?>
-											</select>
-										</div>
-									</div>
-									<div class="col-lg-6">
-										<div class="form-group">
-											<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="#">Todas</option>
+										</div>										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="cmbTipo">Tipo</label>
+												<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2">
+													<option value="#">Todos</option>
+													<option value="E">Entrada</option>
+													<option value="S">Saída</option>
+													<option value="T">Transferência</option>
+												</select>
+											</div>
+										</div>								
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbFornecedor">Fornecedor</label>
+												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
+													<option value="-1">Todos</option>
 													<?php 
-														$sql = ("SELECT SbCatId, SbCatNome
-																 FROM SubCategoria															     
-																 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY SbCatNome ASC");
+														$sql = ("SELECT ForneId, ForneNome
+																 FROM Fornecedor														     
+																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
+																 ORDER BY ForneNome ASC");
 														$result = $conn->query("$sql");
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 														
-														foreach ($row as $item){
-															print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
+														foreach ($rowFornecedor as $item){															
+															print('<option value="'.$item['ForneId'].'">'.$item['ForneNome'].'</option>');
 														}
+													
 													?>
 												</select>
-										</div>
-									</div>									
-								</div>
-								<div class="row">
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="cmbCodigo">Código</label>
-											<select id="cmbCodigo" name="cmbCodigo" class="form-control form-control-select2">
-												<option value="#">Todas</option>
-												<?php 
-													$sql = ("SELECT ProduCodigo
-															 FROM Produto															     
-															 WHERE ProduStatus = 1 and ProduEmpresa = ". $_SESSION['EmpreId'] ."
-															 ORDER BY ProduNome ASC");
-													$result = $conn->query("$sql");
-													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($rowCategoria as $item){															
-														print('<option value="'.$item['ProduCodigo'].'">'.$item['ProduCodigo'].'</option>');
-													}
-												
-												?>
-											</select>
+											</div>
 										</div>
 									</div>
-									<div class="col-lg-10">
-										<div class="form-group">
-											<label for="cmbProduto">Produto</label>
-												<select id="cmbProduto" name="cmbProduto" class="form-control form-control-select2">
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbCategoria">Categoria</label>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 													<option value="#">Todas</option>
 													<?php 
-														$sql = ("SELECT ProduId, ProduNome
+														$sql = ("SELECT CategId, CategNome
+																 FROM Categoria															     
+																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
+																 ORDER BY CategNome ASC");
+														$result = $conn->query("$sql");
+														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($rowCategoria as $item){															
+															print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbSubCategoria">SubCategoria</label>
+													<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+														<option value="#">Todas</option>
+														<?php 
+															$sql = ("SELECT SbCatId, SbCatNome
+																	 FROM SubCategoria															     
+																	 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
+																	 ORDER BY SbCatNome ASC");
+															$result = $conn->query("$sql");
+															$row = $result->fetchAll(PDO::FETCH_ASSOC);
+															
+															foreach ($row as $item){
+																print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
+															}
+														?>
+													</select>
+											</div>
+										</div>									
+									</div>
+									<div class="row">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="cmbCodigo">Código</label>
+												<select id="cmbCodigo" name="cmbCodigo" class="form-control form-control-select2">
+													<option value="#">Todas</option>
+													<?php 
+														$sql = ("SELECT ProduCodigo
 																 FROM Produto															     
 																 WHERE ProduStatus = 1 and ProduEmpresa = ". $_SESSION['EmpreId'] ."
 																 ORDER BY ProduNome ASC");
 														$result = $conn->query("$sql");
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 														
-														foreach ($row as $item){
-															print('<option value="'.$item['ProduId'].'">'.$item['ProduNome'].'</option>');
+														foreach ($rowCategoria as $item){															
+															print('<option value="'.$item['ProduCodigo'].'">'.$item['ProduCodigo'].'</option>');
 														}
+													
 													?>
 												</select>
+											</div>
 										</div>
-									</div>									
-								</div>								
-										
-								<div class="text-right">
-									<div>
-										<a href="fornecedorNovo.php" class="btn btn-success btn-icon" role="button">
-											<i class="icon-printer2"> Imprimir</i>
-										</a>
+										<div class="col-lg-10">
+											<div class="form-group">
+												<label for="cmbProduto">Produto</label>
+													<select id="cmbProduto" name="cmbProduto" class="form-control form-control-select2">
+														<option value="#">Todas</option>
+														<?php 
+															$sql = ("SELECT ProduId, ProduNome
+																	 FROM Produto															     
+																	 WHERE ProduStatus = 1 and ProduEmpresa = ". $_SESSION['EmpreId'] ."
+																	 ORDER BY ProduNome ASC");
+															$result = $conn->query("$sql");
+															$row = $result->fetchAll(PDO::FETCH_ASSOC);
+															
+															foreach ($row as $item){
+																print('<option value="'.$item['ProduId'].'">'.$item['ProduNome'].'</option>');
+															}
+														?>
+													</select>
+											</div>
+										</div>									
+									</div>								
+											
+									<div class="text-right">
+										<div>										
+											<button type="submit" class="btn btn-success btn-icon">
+												<i class="icon-printer2"> Imprimir</i>
+											</button>
+										</div>
 									</div>
-								</div>
+								</form>
 								
 							</div>
 							
@@ -443,13 +446,6 @@ $dataFim = date ("Y-m-d");
 				</div>				
 				
 				<!-- /info blocks -->
-				
-				<form name="formFornecedor" method="post">
-					<input type="hidden" id="inputFornecedorId" name="inputFornecedorId" >
-					<input type="hidden" id="inputFornecedorNome" name="inputFornecedorNome" >
-					<input type="hidden" id="inputFornecedorStatus" name="inputFornecedorStatus" >
-					<input type="hidden" id="inputFornecedorCategoria" name="inputFornecedorCategoria" >
-				</form>
 
 			</div>
 			<!-- /content area -->
