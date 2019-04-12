@@ -25,6 +25,21 @@ if(isset($_POST['inputProdutoId'])){
 		$margemLucro = mostraValor($row['ProduMargemLucro']);
 		$numSerie = $row['ProduNumSerie'];
 		
+		//Primeiro verifica se no banco está nulo
+		if ($row['ProduFoto'] != null){
+			
+			//Depois verifica se o arquivo físico ainda existe no servidor
+			if (file_exists("global_assets/images/produtos/".$row['ProduFoto'])){
+				$sFoto = "global_assets/images/produtos/".$row['ProduFoto'];
+			} else {
+				$sFoto = "global_assets/images/lamparinas/sem_foto.gif";
+			}
+			$sButtonFoto = "Alterar Foto...";
+		} else {
+			$sFoto = "global_assets/images/lamparinas/sem_foto.gif";
+			$sButtonFoto = "Adicionar Foto...";
+		}
+		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
 	}
@@ -36,18 +51,22 @@ if(isset($_POST['inputProdutoId'])){
 	irpara("produto.php");
 }
 
-if(isset($_POST['inputCodigo'])){	
+if(isset($_POST['inputNome'])){
+
+	if (isset($_SESSION['fotoAtual'])){
+		$sFoto = $_SESSION['fotoAtual'];
+	} else {
+		$sFoto = null;
+	}
 		
 	try{
 		
-		$sql = "UPDATE Produto SET ProduCodigo = :sCodigo, ProduCodigoBarras = :sCodigoBarras, ProduNome = :sNome, 
-								   ProduCategoria = :iCategoria, ProduSubCategoria = :iSubCategoria, ProduValorCusto = :fValorCusto, 
-								   ProduDespesasAcessorias = :fDespesasAcessorias, ProduOutrasDespesas = :fOutrasDespesas, 
-								   ProduCustoFinal = :fCustoFinal, ProduMargemLucro = :fMargemLucro, ProduValorVenda = :fValorVenda, ProduEstoqueMinimo = :iEstoqueMinimo, 
-								   ProduMarca = :iMarca, ProduModelo = :iModelo, ProduNumSerie = :sNumSerie, 
-								   ProduFabricante = :iFabricante, ProduUnidadeMedida = :iUnidadeMedida, ProduTipoFiscal = :iTipoFiscal, 
-								   ProduNcmFiscal = :iNcmFiscal, ProduOrigemFiscal = :iOrigemFiscal, ProduCest = :iCest, 
-								   ProduUsuarioAtualizador = :iUsuarioAtualizador
+		$sql = "UPDATE Produto SET ProduCodigo = :sCodigo, ProduCodigoBarras = :sCodigoBarras, ProduNome = :sNome, ProduDetalhamento = :sDetalhamento, 
+								   ProduFoto = :sFoto, ProduCategoria = :iCategoria, ProduSubCategoria = :iSubCategoria, ProduValorCusto = :fValorCusto, 
+								   ProduOutrasDespesas = :fOutrasDespesas, ProduCustoFinal = :fCustoFinal, ProduMargemLucro = :fMargemLucro, 
+								   ProduValorVenda = :fValorVenda, ProduEstoqueMinimo = :iEstoqueMinimo, ProduMarca = :iMarca, ProduModelo = :iModelo, 
+								   ProduNumSerie = :sNumSerie, ProduFabricante = :iFabricante, ProduUnidadeMedida = :iUnidadeMedida, ProduTipoFiscal = :iTipoFiscal, 
+								   ProduNcmFiscal = :iNcmFiscal, ProduOrigemFiscal = :iOrigemFiscal, ProduCest = :iCest, ProduUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE ProduId = :iProduto";
 		$result = $conn->prepare($sql);
 				
@@ -55,10 +74,11 @@ if(isset($_POST['inputCodigo'])){
 						':sCodigo' => $_POST['inputCodigo'],
 						':sCodigoBarras' => $_POST['inputCodigoBarras'],
 						':sNome' => $_POST['inputNome'],
-						':iCategoria' => $_POST['cmbCategoria'],
+						':sDetalhamento' => $_POST['txtDetalhamento'],
+						':sFoto' => $sFoto,
+						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
-						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),
-						':fDespesasAcessorias' => $_POST['inputDespesasAcessorias'] == null ? null : gravaValor($_POST['inputDespesasAcessorias']),
+						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
 						':fCustoFinal' => $_POST['inputCustoFinal'] == null ? null : gravaValor($_POST['inputCustoFinal']),
 						':fMargemLucro' => $_POST['inputMargemLucro'] == null ? null : gravaValor($_POST['inputMargemLucro']),
@@ -117,6 +137,8 @@ if(isset($_POST['inputCodigo'])){
 	
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	<!-- /theme JS files -->	
+	
+	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>	
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -152,8 +174,12 @@ if(isset($_POST['inputCodigo'])){
 			});
 		}	
 
-
         $(document).ready(function() {	
+		
+			//Aqui sou obrigado a instanciar novamente a utilização do fancybox
+			$(".fancybox").fancybox({
+				// options
+			});	
 	
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
@@ -266,6 +292,56 @@ if(isset($_POST['inputCodigo'])){
 				$('#inputMargemLucro').val(inputMargemLucro);				
 
 			});
+
+			//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
+			$('#addFoto').on('click', function(e){	
+				e.preventDefault(); // Isso aqui não deixa o formulário "formProduto" ser submetido ao clicar no INcluir Foto, ou seja, ao executar o método ajax
+			
+				$('#imagem').trigger("click");
+			});			
+			
+			// #imagem é o id do input, ao alterar o conteudo do input execurará a função abaixo
+			$('#imagem').on('change',function(){
+
+				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
+								
+				// Get form
+				var form = $('#formFoto')[0];
+				var formData = new FormData(form);
+				
+				formData.append('file', $('#imagem')[0].files[0] );
+				
+				$.ajax({
+					type: "POST",
+					enctype: 'multipart/form-data',
+					url: "upload.php",
+					processData: false,  // impedir que o jQuery tranforma a "data" em querystring					
+					contentType: false,  // desabilitar o cabeçalho "Content-Type"
+					cache: false, // desabilitar o "cache"
+					data: formData,//{imagem: inputImagem},
+					success: function(resposta){
+						//console.log(resposta);
+						
+						$('#visualizar').html(resposta);
+						$('#addFoto').text("Alterar Foto...");
+						
+						//Aqui sou obrigado a instanciar novamente a utilização do fancybox
+						$(".fancybox").fancybox({
+							// options
+						});	
+						
+						return false;						
+					}
+				}); //ajax
+				
+				//$('#formFoto').submit();
+				
+				// Efetua o Upload sem dar refresh na pagina
+				$('#formFoto').ajaxForm({
+					target:'#visualizar' // o callback será no elemento com o id #visualizar
+				}).submit();
+			});			
+
 			
 			function Filtrando(){
 				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
@@ -359,13 +435,10 @@ if(isset($_POST['inputCodigo'])){
 									
 								<div style="text-align:center;">
 									<div id="visualizar">
-										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:250px; border:2px solid #ccc;">
+										<a href="<?php echo $sFoto; ?>" class="fancybox"><img class="ml-3" src="<?php echo $sFoto; ?>" style="max-height:250px; border:2px solid #ccc;"></a>
 									</div>
 									<br>
-									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%">Adicionar Foto</button>
-									<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">										
-										<input type="file" id="imagem" name="imagem" style="display:none;" />
-									</form>									
+									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%"><?php echo $sButtonFoto; ?></button>									
 								</div>									
 									
 							</div> <!-- media -->
@@ -673,6 +746,10 @@ if(isset($_POST['inputCodigo'])){
 						<!-- /card-body -->
 
 					</form>
+					
+					<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
+						<input type="file" id="imagem" name="imagem" style="display:none;" />
+					</form>					
 					
 				</div>
 				<!-- /info blocks -->

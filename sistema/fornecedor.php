@@ -206,7 +206,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											</div>
 										
 											<a href="#" onclick="atualizaFornecedor(0, '','', 'imprime');" class="form-control btn bg-slate-700 btn-icon" role="button" data-placement="bottom" data-container="body">
-												<i class="icon-printer2"> Imprimir Relação</i>
+												<i class="icon-printer2"> Gerar PDF ou Imprimir</i>
 											</a>
 										</div>
 									</div>

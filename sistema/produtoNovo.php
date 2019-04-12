@@ -3,12 +3,11 @@
 include_once("sessao.php"); 
 
 $_SESSION['PaginaAtual'] = 'Novo Produto';
-$_SESSION['fotoAtual'] = '';
 
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputNome'])){
-		
+	
 	try{		
 		$sql = "SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
 				FROM Produto
@@ -85,6 +84,8 @@ if(isset($_POST['inputNome'])){
 	}
 	
 	irpara("produto.php");
+} else {
+	$_SESSION['fotoAtual'] = '';
 }
 
 ?>
@@ -243,7 +244,9 @@ if(isset($_POST['inputNome'])){
 			}
 			
 			//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
-			$('#addFoto').on('click', function(e){							
+			$('#addFoto').on('click', function(e){	
+				e.preventDefault(); // Isso aqui não deixa o formulário "formProduto" ser submetido ao clicar no INcluir Foto, ou seja, ao executar o método ajax
+			
 				$('#imagem').trigger("click");
 			});			
 			
@@ -375,7 +378,7 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							
-							<div class="media">
+							<div class="media">								
 								
 								<div class="media-body">
 									
