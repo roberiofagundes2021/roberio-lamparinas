@@ -22,12 +22,6 @@ if(isset($_POST['inputNome'])){
 		echo 'Error1: ' . $e->getMessage();die;
 	}
 	
-	if (isset($_SESSION['fotoAtual'])){
-		$sFoto = $_SESSION['fotoAtual'];
-	} else {
-		$sFoto = null;
-	}
-	
 	try{
 		
 		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduDetalhamento, ProduFoto, ProduCategoria, ProduSubCategoria, ProduValorCusto, 
@@ -46,7 +40,7 @@ if(isset($_POST['inputNome'])){
 						':sCodigoBarras' => $_POST['inputCodigoBarras'],
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
-						':sFoto' => $sFoto,
+						':sFoto' => isset($_POST['inputFoto']) ? $_POST['inputFoto'] : null,
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
@@ -84,9 +78,7 @@ if(isset($_POST['inputNome'])){
 	}
 	
 	irpara("produto.php");
-} else {
-	$_SESSION['fotoAtual'] = '';
-}
+} 
 
 ?>
 
@@ -258,8 +250,11 @@ if(isset($_POST['inputNome'])){
 				// Get form
 				var form = $('#formFoto')[0];
 				var formData = new FormData(form);
+				//var inputFoto = $('#inputFoto').val();
+				//alert($('#imagem')[0].files[0]);
 				
 				formData.append('file', $('#imagem')[0].files[0] );
+				//formData.append('foto', inputFoto );
 				
 				$.ajax({
 					type: "POST",
@@ -321,6 +316,26 @@ if(isset($_POST['inputNome'])){
 				
 			}); // enviar
 			
+			//Valida Registro Duplicado
+			$('#cancelar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputFoto = $('#inputFoto').val();
+				
+				//Esse ajax está sendo usado para excluir a imagem que nao será mais usada
+				$.ajax({
+					type: "POST",
+					url: "produtoExcluiImagem.php",
+					data: ('foto='+inputFoto),
+					success: function(resposta){
+						
+					}
+				})				
+				
+				$(window.document.location).attr('href',"produto.php");
+				
+			}); // cancelar		
 		});			
 		
 		function float2moeda(num) {
@@ -713,7 +728,7 @@ if(isset($_POST['inputNome'])){
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
-										<a href="produto.php" class="btn btn-basic" role="button">Cancelar</a>
+										<button class="btn btn-lg btn-basic" id="cancelar">Cancelar</button>
 									</div>
 								</div>
 							</div>

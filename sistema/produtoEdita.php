@@ -52,12 +52,6 @@ if(isset($_POST['inputProdutoId'])){
 }
 
 if(isset($_POST['inputNome'])){
-
-	if (isset($_SESSION['fotoAtual'])){
-		$sFoto = $_SESSION['fotoAtual'];
-	} else {
-		$sFoto = null;
-	}
 		
 	try{
 		
@@ -75,7 +69,7 @@ if(isset($_POST['inputNome'])){
 						':sCodigoBarras' => $_POST['inputCodigoBarras'],
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
-						':sFoto' => $sFoto,
+						':sFoto' => isset($_POST['inputFoto']) ? $_POST['inputFoto'] : null,
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						

@@ -1,10 +1,9 @@
 <?php 
 
 include_once("sessao.php"); 
+include('global_assets/php/conexao.php');
 
 $_SESSION['PaginaAtual'] = 'Produto';
-
-include('global_assets/php/conexao.php');
 
 $sql = ("SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, ProduValorVenda, ProduStatus
 		 FROM Produto
@@ -45,7 +44,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 			/* Início: Tabela Personalizada */
 			$('#tblProduto').DataTable( {
-				"order": [[ 0, "asc" ]],
+				"order": [[ 1, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{ 
@@ -115,17 +114,22 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaProduto(ProduId, ProduNome, ProduStatus, Tipo){
 		
-			document.getElementById('inputProdutoId').value = ProduId;
-			document.getElementById('inputProdutoNome').value = ProduNome;
-			document.getElementById('inputProdutoStatus').value = ProduStatus;
-					
-			if (Tipo == 'edita'){	
-				document.formProduto.action = "produtoEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formProduto, "Tem certeza que deseja excluir esse produto?", "produtoExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formProduto.action = "produtoMudaSituacao.php";
-			}		
+			if (Tipo == 'exportar'){	
+				document.formProduto.action = "produtoExportar.php";
+				document.formProduto.setAttribute("target", "_blank");	
+			} else {			
+				document.getElementById('inputProdutoId').value = ProduId;
+				document.getElementById('inputProdutoNome').value = ProduNome;
+				document.getElementById('inputProdutoStatus').value = ProduStatus;
+						
+				if (Tipo == 'edita'){	
+					document.formProduto.action = "produtoEdita.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formProduto, "Tem certeza que deseja excluir esse produto?", "produtoExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formProduto.action = "produtoMudaSituacao.php";
+				}		
+			}
 			
 			document.formProduto.submit();
 		}		
@@ -151,6 +155,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			<!-- Content area -->
 			<div class="content">
 
+<?php echo "Antes: ".$_SESSION['fotoAtual'];
+if (isset($_SESSION['fotoAtual'])){
+	unset($_SESSION['fotoAtual']);
+}
+echo "Depois: ".$_SESSION['fotoAtual']; ?>
+
 				<!-- Info blocks -->		
 				<div class="row">
 					<div class="col-lg-12">
@@ -172,7 +182,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="text-right">
 									<a href="produtoNovo.php" class="btn btn-success" role="button">Novo Produto</a>
 									<a href="produtoImportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>
-									<a href="produtoExportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>									
+									<a href="#" onclick="atualizaProduto(0, '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>									
 									<!--<a href="produtoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Imprimir</a></div>-->
 								</div>
 							</div>

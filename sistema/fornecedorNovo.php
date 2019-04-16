@@ -314,11 +314,13 @@ if(isset($_POST['inputTipo'])){
 				document.getElementById('CNPJ').style.display = "none";
 				document.getElementById('dadosPF').style.display = "block";
 				document.getElementById('dadosPJ').style.display = "none";
+				document.getElementById('inputNome').placeholder = "Nome Completo";
 			} else {
 				document.getElementById('CPF').style.display = "none";
 				document.getElementById('CNPJ').style.display = "block";				
 				document.getElementById('dadosPF').style.display = "none";
 				document.getElementById('dadosPJ').style.display = "block";
+				document.getElementById('inputNome').placeholder = "Nome Fantasia";
 			}
 		}	
 
@@ -398,7 +400,7 @@ if(isset($_POST['inputTipo'])){
 								<div class="col-lg-9">
 									<div class="form-group">
 										<label for="inputNome">Nome</label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" required autofocus>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Fantasia" required autofocus>
 									</div>
 								</div>	
 								

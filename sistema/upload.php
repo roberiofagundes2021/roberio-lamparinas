@@ -4,7 +4,7 @@
 	//include('global_assets/php/conexao.php');
    
 	//echo json_encode($_FILES['imagem']['name']);die;
-    //print_r($_POST);
+    //print_r($_POST);die;
     //print_r($_FILES); die;
     $pasta = "global_assets/images/produtos/";
      
@@ -39,21 +39,31 @@
                  
                 // se enviar a foto, insere o nome da foto no banco de dados
                 if(move_uploaded_file($tmp, $destino)){
-                    
+                    /*
                     //verifica se já foi adicionado alguma foto, se sim, exclui ela fisicamente, já que nao será mais usada, eliminando lixo.
                     if (isset($_SESSION['fotoAtual']) and $_SESSION['fotoAtual'] != ''){
 						if (file_exists($pasta.$_SESSION['fotoAtual'])){
 							unlink($pasta.$_SESSION['fotoAtual']);
 						}
-					}                    
+					} */   
+				/*	//verifica se já foi adicionado alguma foto, se sim, exclui ela fisicamente, já que nao será mais usada, eliminando lixo.
+                    if (isset($_POST['foto']) and $_POST['foto'] != ''){
+						if (file_exists($pasta.$_POST['foto'])){
+							unlink($pasta.$_POST['foto']);
+						}
+					} */
                     
-                    echo "<a href=\"".$pasta.$nome_atual."\" class=\"fancybox\"><img src='".$pasta.$nome_atual."' class='ml-3' style='max-width: 260px; max-height:250px; border:2px solid #ccc;'></a>"; //imprime a foto na tela
+                    print("<a href=\"".$pasta.$nome_atual."\" class=\"fancybox\">
+							 <img src='".$pasta.$nome_atual."' class='ml-3' style='max-width: 260px; max-height:250px; border:2px solid #ccc;'>
+						   </a>
+						   <input type='hidden' id='inputFoto' name='inputFoto' value='".$nome_atual."' >
+						   "); //imprime a foto na tela
                     
                     $_SESSION['fotoAtual'] = $nome_atual; //guarda o nome da foto pra gravar no banco					
                 }else{
                     echo "Falha ao enviar";
 					
-					$_SESSION['fotoAtual'] = '';
+					unset($_SESSION['fotoAtual']);
                 }
             }else{
                 echo "A imagem deve ser de no máximo 1MB";
