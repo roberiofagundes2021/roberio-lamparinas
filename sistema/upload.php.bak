@@ -45,7 +45,13 @@
 						if (file_exists($pasta.$_SESSION['fotoAtual'])){
 							unlink($pasta.$_SESSION['fotoAtual']);
 						}
-					}                    
+					}    
+				/*	//verifica se já foi adicionado alguma foto, se sim, exclui ela fisicamente, já que nao será mais usada, eliminando lixo.
+                    if (isset($_POST['foto']) and $_POST['foto'] != ''){
+						if (file_exists($pasta.$_POST['foto'])){
+							unlink($pasta.$_POST['foto']);
+						}
+					} */
                     
                     print('<a href="'.$pasta.$nome_atual.'" class="fancybox">
 							 <img src="'.$pasta.$nome_atual.'" class="ml-3" style="max-width: 260px; max-height:250px; border:2px solid #ccc;">

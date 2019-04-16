@@ -5,6 +5,10 @@ include('global_assets/php/conexao.php');
 
 $_SESSION['PaginaAtual'] = 'Produto';
 
+if (isset($_SESSION['fotoAtual'])){
+	unset($_SESSION['fotoAtual']);
+}
+
 $sql = ("SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, ProduValorVenda, ProduStatus
 		 FROM Produto
 		 LEFT JOIN Categoria on CategId = ProduCategoria
@@ -154,12 +158,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			<!-- Content area -->
 			<div class="content">
-
-<?php echo "Antes: ".$_SESSION['fotoAtual'];
-if (isset($_SESSION['fotoAtual'])){
-	unset($_SESSION['fotoAtual']);
-}
-echo "Depois: ".$_SESSION['fotoAtual']; ?>
 
 				<!-- Info blocks -->		
 				<div class="row">
