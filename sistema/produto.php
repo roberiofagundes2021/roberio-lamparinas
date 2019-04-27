@@ -107,8 +107,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			};	
 
 			_componentSelect2();
-			
 			/* Fim: Tabela Personalizada */		
+			
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var arquivo = $('#arquivo').val();
+
+				//Verifica se o campo só possui espaços em branco
+				if (arquivo == ''){
+					alerta('Atenção','Selecione o arquivo de importação!','error');
+					$('#arquivo').focus();
+					return false;
+				}
+				
+				$( "#formUpload" ).submit();
+				
+			}); // enviar			
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -181,9 +198,30 @@ echo "Depois: ".$_SESSION['fotoAtual']; ?>
 								<p class="font-size-lg">A relação abaixo faz referência aos produtos da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
 								<div class="text-right">
 									<a href="produtoNovo.php" class="btn btn-success" role="button">Novo Produto</a>
-									<a href="produtoImportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>
-									<a href="#" onclick="atualizaProduto(0, '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>									
+									<a href="#" style="float:right; margin-left: 5px;" onclick="atualizaProduto(0, '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>
+									<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
+										<a href="#collapse-imprimir-relacao" class="dropdown-toggle btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
+											<i class="icon-drawer-in"></i>																						
+										</a>
+									</div>	
 									<!--<a href="produtoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Imprimir</a></div>-->
+								</div>
+								
+									<!--<a href="produtoImportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>-->
+								<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 15px; border-top:1px solid #ddd; padding-top: 10px;">
+									<div class="row">
+										<div class="col-lg-9">
+											<a href="#"><h2>Modelo de importação</h2></a>
+											<p style="font-weight: bold;">CodigoBarras | Nome do Produto | Detalhamento do Produto</p>
+											<p>Observação: Os demais campos deverão ser preenchidos manualmente</p>
+										</div>
+										<div class="col-lg-3">
+											<form name="formUpload" id="formUpload" method="post" enctype="multipart/form-data" action="produtoImporta.php">
+												<input type="file" class="form-control" id="arquivo" name="arquivo">
+												<button class="btn bg-slate-700 btn-icon" id="enviar"><i class="icon-printer2"> Importar produtos</i></button>												
+											</form>
+										</div>
+									</div>
 								</div>
 							</div>
 							
