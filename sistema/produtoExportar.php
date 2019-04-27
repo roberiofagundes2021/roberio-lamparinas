@@ -60,7 +60,7 @@ $dadosXls .= "     </tr>";
 foreach($row as $item){
 	$dadosXls .= "   <tr>";
 	$dadosXls .= "      <td>".$item['ProduCodigo']."</td>";
-	$dadosXls .= "      <td>".$item['ProduCodigoBarras']."</td>";
+	$dadosXls .= "      <td>&nbsp;".$item['ProduCodigoBarras']."</td>";  //Como os números podem ser grandes, o Excel reduzirá o mesmo. Daí colocando espaço em branco antes ele entenderá que é um texto e não um numero
 	$dadosXls .= "      <td>".utf8_decode($item['ProduNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['CategNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['SbCatNome'])."</td>";
