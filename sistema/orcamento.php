@@ -31,6 +31,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
@@ -42,7 +43,73 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/demo_pages/components_popups.js"></script
 	<!-- /theme JS files -->	
 	
-	<script>
+	<script type="text/javascript" >
+			
+		$(document).ready(function() {
+			
+			/* Início: Tabela Personalizada */
+			$('#tblOrcamento').DataTable( {
+				"order": [[ 0, "desc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [{ 
+					orderable: true,   //Data
+					width: "10%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Nº Orçamento
+					width: "20%",
+					targets: [1]
+				},				
+				{ 
+					orderable: true,   //Fornecedor
+					width: "30%",
+					targets: [2]
+				},
+				{ 
+					orderable: true,   //Categoria
+					width: "30%",
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "5%",
+					targets: [4]
+				},
+				{ 
+					orderable: false,  //Ações
+					width: "5%",
+					targets: [5]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */		
+		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaOrcamento(OrcamId, OrcamNumero, OrcamCategoria, CategNome, OrcamStatus, Tipo){
@@ -108,15 +175,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="text-right"><a href="orcamentoNovo.php" class="btn btn-success" role="button">Novo Orçamento</a></div>
 							</div>
 							
-							<table class="table datatable-responsive">
+							<table class="table" id="tblOrcamento">
 								<thead>
 									<tr class="bg-slate">
-										<th width="10%">Data</th>
-										<th width="14%">Nº Orçamento</th>
-										<th width="28%">Fornecedor</th>
-										<th width="28%">Categoria</th>
-										<th width="10%">Situação</th>
-										<th width="10%" class="text-center">Ações</th>
+										<th>Data</th>
+										<th>Nº Orçamento</th>
+										<th>Fornecedor</th>
+										<th>Categoria</th>
+										<th>Situação</th>
+										<th class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
