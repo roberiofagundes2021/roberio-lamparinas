@@ -318,89 +318,9 @@ if(isset($_POST['inputOrcamentoId'])){
 								<div class="card-body">
 									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
 
-									<!--<div class="hot-container">
+									<div class="hot-container">
 										<div id="example"></div>
-									</div>-->
-									
-									<?php
-									
-
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
-												FROM Produto
-												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ". $_POST['inputOrcamentoCategoria']." and ProduStatus = 1";
-										$result = $conn->query($sql);
-										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-										
-										$cont = 1;
-										
-										print('
-										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-8">
-													<div class="row">
-														<div class="col-lg-1">
-															<label for="inputCodigo">Item</label>
-														</div>
-														<div class="col-lg-11">
-															<label for="inputProduto">Produto</label>
-														</div>
-													</div>
-												</div>												
-											<div class="col-lg-1">
-												<div class="form-group">
-													<label for="inputUnidade">Unidade</label>
-												</div>
-											</div>
-											<div class="col-lg-1">
-												<div class="form-group">
-													<label for="inputQuantidade">Quantidade</label>
-												</div>
-											</div>	
-											<div class="col-lg-1">
-												<div class="form-group">
-													<label for="inputValorUnitario">Valor Unitário</label>
-												</div>
-											</div>	
-											<div class="col-lg-1">
-												<div class="form-group">
-													<label for="inputValorTotal">Valor Total</label>
-												</div>
-											</div>											
-										</div>');										
-										
-										foreach ($rowProdutos as $item){
-											
-											print('
-											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
-													<div class="row">
-														<div class="col-lg-1">
-															<input type="text" id="inputItem" name="inputItem" class="form-control-border-off" value="'.$cont.'" readOnly>
-														</div>
-														<div class="col-lg-11">
-															<input type="text" id="inputProduto" name="inputProduto" class="form-control-border-off" value="'.$item['ProduNome'].' - '.$item['ProduDetalhamento'].'" readOnly>
-														</div>
-													</div>
-												</div>								
-												<div class="col-lg-1">
-													<input type="text" id="inputUnidade" name="inputUnidade" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
-												</div>
-												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade" name="inputQuantidade" class="form-control-border" value="">
-												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitario" name="inputValorUnitario" class="form-control-border" value="" onKeyUp="moeda(this)" maxLength="12">
-												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorTotal" name="inputValorTotal" class="form-control-border-off" value="" readOnly>
-												</div>											
-											</div>');
-											
-											$cont++;
-										}
-										
-									?>
-									
+									</div>
 								</div>
 							</div>
 							<!-- /custom header text -->

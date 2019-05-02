@@ -6,3 +6,32 @@ Copyright (c) 2018 Carlos Victor
 .sidebar-user-material .sidebar-user-material-body{background: url(../../../global_assets/images/backgrounds/boxed_bg_retina.png) center center no-repeat;background-size: cover;}
 /*.sidebar-user-material .sidebar-user-material-body{background: url(../../../global_assets/images/backgrounds/user_bg3.jpg) center center no-repeat;background-size: cover;}*/
 
+.form-control-border {
+	display: block;
+    width: 100%;
+    padding: .5rem;
+    font-size: .8125rem;
+    line-height: 1.5385;
+    color: #333;
+    background-color: transparent;
+    background-clip: padding-box;
+    border: 1px solid #ddd;
+    border-radius: 0;
+    box-shadow: 0 0 0 0 transparent;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.form-control-border-off {
+	display: block;
+    width: 100%;
+    padding: .5rem;
+    font-size: .8125rem;
+    line-height: 1.5385;
+    color: #333;
+    background-color: #FAF0E6;
+    background-clip: padding-box;
+    border: 1px solid #ddd;
+    border-radius: 0;
+    box-shadow: 0 0 0 0 transparent;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
