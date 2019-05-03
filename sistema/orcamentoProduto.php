@@ -50,6 +50,12 @@ if(isset($_POST['inputOrcamentoId'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
+	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>	
+
+	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
+
+
+	
 	<script src="global_assets/js/plugins/tables/handsontable/handsontable.min.js"></script>
 	<!--<script src="global_assets/js/demo_pages/handsontable_basic.js"></script>-->
 	<script src="global_assets/js/demo_pages/handsontable_advanced.js"></script>
@@ -62,20 +68,33 @@ if(isset($_POST['inputOrcamentoId'])){
 
         $(document).ready(function() {	
 			
-			//Ao informar o fornecedor, trazer os demais dados dele (contato, e-mail, telefone)
-			$('#cmbFornecedor').on('change', function(e){				
+	
+			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
+			$('#cmbSubCategoria').on('change', function(e){
+							
+				FiltraProduto();
 				
-				var Fornecedor = $('#cmbFornecedor').val();
-				var Forne = Fornecedor.split('#');
+				var inputFornecedor = $('#inputFornecedor').val();
+				var inputCategoria = $('#inputCategoria').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				
-				$('#inputContato').val(Forne[1]);
-				$('#inputEmailFornecedor').val(Forne[2]);
-				if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
-					$('#inputTelefoneFornecedor').val(Forne[3]);
-				} else {
-					$('#inputTelefoneFornecedor').val(Forne[4]);
-				}
-			});
+				$.getJSON('filtraProduto.php?idFornecedor='+inputFornecedor+'&idCategoria='+inputCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){			
+
+					alert(dados.length);
+					
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
+						});						
+						
+						$('#cmbProduto').html(option).show();
+					} else {
+						ResetProduto();
+					}					
+				});				
+				
+			});				
 			
 			var inputCategoria = $('#inputCategoria').val();
 			
@@ -164,6 +183,15 @@ if(isset($_POST['inputOrcamentoId'])){
 						
 		}); //document.ready
 		
+		//Mostra o "Filtrando..." na combo Produto
+		function FiltraProduto(){
+			$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+		}
+		
+		function ResetProduto(){
+			$('#cmbProduto').empty().append('<option>Sem produto</option>');
+		}
+			
 		// Renderizar linha do cabeçalho da tabela
         function firstRowRenderer(instance, td, row, col, prop, value, cellProperties) {
             Handsontable.renderers.TextRenderer.apply(this, arguments);
@@ -268,7 +296,7 @@ if(isset($_POST['inputOrcamentoId'])){
 										</div>
 									</div>
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputCategoriaNome">Categoria</label>
 												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" value="<?php echo $_POST['inputOrcamentoNomeCategoria']; ?>" readOnly>
@@ -276,7 +304,7 @@ if(isset($_POST['inputOrcamentoId'])){
 											</div>
 										</div>
 									
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbSubCategoria">Sub Categoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
@@ -297,6 +325,27 @@ if(isset($_POST['inputOrcamentoId'])){
 												</select>
 											</div>
 										</div>
+										
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbProduto">Produto</label>
+												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-select-all-filtering" multiple="multiple" data-fouc>
+													<?php 
+														$sql = ("SELECT ProduId, ProduNome
+																 FROM Produto										     
+																 WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$_POST['inputOrcamentoCategoria']."
+															     ORDER BY ProduNome ASC");
+														$result = $conn->query("$sql");
+														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($rowProduto as $item){															
+															print('<option value="'.$item['ProduId'].'" selected>'.$item['ProduNome'].'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>										
 
 									</div>
 								</div>
@@ -339,31 +388,31 @@ if(isset($_POST['inputOrcamentoId'])){
 											<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
-															<label for="inputCodigo">Item</label>
+															<label for="inputCodigo"><strong>Item</strong></label>
 														</div>
 														<div class="col-lg-11">
-															<label for="inputProduto">Produto</label>
+															<label for="inputProduto"><strong>Produto</strong></label>
 														</div>
 													</div>
 												</div>												
 											<div class="col-lg-1">
 												<div class="form-group">
-													<label for="inputUnidade">Unidade</label>
+													<label for="inputUnidade"><strong>Unidade</strong></label>
 												</div>
 											</div>
 											<div class="col-lg-1">
 												<div class="form-group">
-													<label for="inputQuantidade">Quantidade</label>
+													<label for="inputQuantidade"><strong>Quantidade</strong></label>
 												</div>
 											</div>	
 											<div class="col-lg-1">
 												<div class="form-group">
-													<label for="inputValorUnitario">Valor Unitário</label>
+													<label for="inputValorUnitario"><strong>Valor Unitário</strong></label>
 												</div>
 											</div>	
 											<div class="col-lg-1">
 												<div class="form-group">
-													<label for="inputValorTotal">Valor Total</label>
+													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
 											</div>											
 										</div>');										
@@ -375,24 +424,24 @@ if(isset($_POST['inputOrcamentoId'])){
 												<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
-															<input type="text" id="inputItem" name="inputItem" class="form-control-border-off" value="'.$cont.'" readOnly>
+															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
 														</div>
 														<div class="col-lg-11">
-															<input type="text" id="inputProduto" name="inputProduto" class="form-control-border-off" value="'.$item['ProduNome'].' - '.$item['ProduDetalhamento'].'" readOnly>
+															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
 														</div>
 													</div>
 												</div>								
 												<div class="col-lg-1">
-													<input type="text" id="inputUnidade" name="inputUnidade" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
+													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade" name="inputQuantidade" class="form-control-border" value="">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border" value="">
 												</div>	
 												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitario" name="inputValorUnitario" class="form-control-border" value="" onKeyUp="moeda(this)" maxLength="12">
+													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border" value="" onKeyUp="moeda(this)" maxLength="12">
 												</div>	
 												<div class="col-lg-1">
-													<input type="text" id="inputValorTotal" name="inputValorTotal" class="form-control-border-off" value="" readOnly>
+													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="" readOnly>
 												</div>											
 											</div>');
 											
