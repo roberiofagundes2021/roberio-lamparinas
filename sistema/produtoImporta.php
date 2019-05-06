@@ -132,8 +132,61 @@ else {
 						$produtosimportados.= $nomeProduto.', ';
 						$importados++;
 					}
-					else 
-						$erro.= $nomeProduto.", ";
+					else {
+						
+						$sql = "SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
+										FROM Produto
+										Where ProduEmpresa = ".$_SESSION['EmpreId']."";
+						//echo $sql;die;
+						$result = $conn->query("$sql");
+						$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
+						
+						$sCodigo = (int)$rowCodigo['Codigo'] + 1;
+						$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);						
+						
+						$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduDetalhamento, ProduFoto, ProduCategoria, ProduSubCategoria, ProduValorCusto, 
+									 ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
+									 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, ProduFabricante, ProduUnidadeMedida, 
+									 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
+									 ProduUsuarioAtualizador, ProduEmpresa) 
+								VALUES (:sCodigo, :sCodigoBarras, :sNome, :sDetalhamento, :sFoto, :iCategoria, :iSubCategoria, :fValorCusto, 
+										:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, :sNumSerie, 
+										:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
+										:iUsuarioAtualizador, :iEmpresa);";
+						$result = $conn->prepare($sql);
+								
+						$result->execute(array(
+										':sCodigo' => $sCodigo,
+										':sCodigoBarras' => $codigoBarras,
+										':sNome' => $nomeProduto,
+										':sDetalhamento' => $detalhamentoProduto,
+										':sFoto' => null,
+										':iCategoria' => null,
+										':iSubCategoria' => null,
+										':fValorCusto' => null,						
+										':fOutrasDespesas' => null,
+										':fCustoFinal' => null,
+										':fMargemLucro' => null,
+										':fValorVenda' => null,
+										':iEstoqueMinimo' => null,
+										':iMarca' => null,
+										':iModelo' => null,
+										':sNumSerie' => null,
+										':iFabricante' => null,
+										':iUnidadeMedida' => null,
+										':iTipoFiscal' => null,
+										':iNcmFiscal' => null,
+										':iOrigemFiscal' => null,
+										':iCest' => null,
+										':bStatus' => 1,
+										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+										':iEmpresa' => $_SESSION['EmpreId']
+										));
+						 
+						$registrou_arquivo = TRUE;  			    
+						$produtosimportados.= $nomeProduto.', ';
+						$importados++;
+					}
 						
 				} else {
 				   

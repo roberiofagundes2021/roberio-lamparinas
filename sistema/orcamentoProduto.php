@@ -53,36 +53,27 @@ if(isset($_POST['inputOrcamentoId'])){
 	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>	
 
 	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
-
-
-	
-	<script src="global_assets/js/plugins/tables/handsontable/handsontable.min.js"></script>
-	<!--<script src="global_assets/js/demo_pages/handsontable_basic.js"></script>-->
-	<script src="global_assets/js/demo_pages/handsontable_advanced.js"></script>
-	
-
 	<!-- /theme JS files -->
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 
         $(document).ready(function() {	
-			
-	
+
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			$('#cmbSubCategoria').on('change', function(e){
 							
 				FiltraProduto();
 				
-				var inputFornecedor = $('#inputFornecedor').val();
+				var inputFornecedor = $('#inputIdFornecedor').val();
 				var inputCategoria = $('#inputCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				
-				$.getJSON('filtraProduto.php?idFornecedor='+inputFornecedor+'&idCategoria='+inputCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){			
-
-					alert(dados.length);
+				$.getJSON('filtraProduto.php?idFornecedor='+inputFornecedor+'&idCategoria='+inputCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){
 					
 					if (dados.length){
+						
+						var option = '';
 						
 						$.each(dados, function(i, obj){
 							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
@@ -94,92 +85,7 @@ if(isset($_POST['inputOrcamentoId'])){
 					}					
 				});				
 				
-			});				
-			
-			var inputCategoria = $('#inputCategoria').val();
-			
-			$.getJSON('filtraProdutosOrcamento.php?idCategoria='+inputCategoria, function (dados){
-								
-				var produtos = [
-					['Item','Produto', 'Detalhamento', 'Unidade', 'Quantidade', 'Valor Unitário', 'Valor Total']
-				];	
-
-				var cont = 1;
-				var registro = '';
-				
-				if (dados.length){
-
-					$.each(dados, function(i, obj){
-						registro = [[cont], [obj.ProduNome], [obj.ProduDetalhamento], [obj.UnMedSigla], "", "", [""]];
-						produtos.push(registro);  //adiciona mais um item no array
-						cont++;
-					});	
-					
-					var container = document.getElementById('example');
-					var hot = new Handsontable(container, {
-					  data: produtos,
-					  //columnSorting : true,
-					 /* columns: [
-						{data: 'id', type: 'numeric', width: 20}, 
-						{data: 'produto', type: 'text'}, 
-						{data: 'detalhamento', type: 'text'}, 
-						{data: 'unidade', type: 'text', width: 20}, 
-						{data: 'quantidade', type: 'numeric'}, 
-						{data: 'valorunitario', type: 'numeric', numericFormat: {pattern: '0.00'}}, 
-						{data: 'valortotal', type: 'numeric', numericFormat: {pattern: '0.00'}}
-					   ], */
-					  //rowHeaders: true,
-					  //colHeaders: true,
-					  //filters: true,
-					  //dropdownMenu: true,
-					  colWidths: [17, 100, 100, 30, 40, 40, 40],
-					  manualRowResize: false,  //Pra que serve isso?
-					  manualRowMove: false,   //Pra que serve isso?
-					 // fixedRowsTop: 1,  // mantem o cabeçalho fixo
-					  
-					  //rowHeaders: true,
-					  //colHeaders: ['Item','Produto', 'SubCategoria', 'UN', 'Quantidade', 'Valor Unitário', 'Valor Total'],
-					  stretchH: 'all',
-					  cells: function (row, col, prop, td) {
-						 var cellProperties = {};
-
-						 if (row === 0 || col === 0 || col === 1 || col === 2 || col === 3 || col === 6 || this.instance.getData()[row][col] === 'Read only') {
-							cellProperties.readOnly = true; // make cell read-only if it is first row or the text reads 'readOnly'
-						 }
-						 
-						 if (row === 0 || col === 0) {
-							cellProperties.renderer = firstRowRenderer; // uses function directly
-						 } 
-						 else {
-							cellProperties.renderer = "negativeValueRenderer"; // uses lookup map
-						 } 
-						 
-						 /*
-						 if (row != 0 && col != 4 && col != 5){
-							alert('Entrou4');
-							cellProperties.renderer = demaisRowRenderer;
-						 }	else if (col === 4 && col === 5){
-							alert('Entrou5');
-							td.style.background = '#fff';						 
-						 } */
-
-						 return cellProperties;
-					  }
-					});
-					
-				} else {
-					//ResetSubCategoria();
-				}				
-			});		
-						
-						
-			// Maps function to lookup string
-			Handsontable.renderers.registerRenderer('negativeValueRenderer', negativeValueRenderer);
-			/*var produtos = [
-			  ['Item','Produto', 'SubCategoria', 'Unidade', 'Quantidade', 'Valor Unitário', 'Valor Total'],
-			  [1, 'Telha Intercalada', 'Telha', 'UN', '', '5,00', ''],
-			  [2, 'Cimento', 'Telha', 'UN', '', '15,00', '']
-			]; */ 	
+			});			
 						
 		}); //document.ready
 		
@@ -191,56 +97,18 @@ if(isset($_POST['inputOrcamentoId'])){
 		function ResetProduto(){
 			$('#cmbProduto').empty().append('<option>Sem produto</option>');
 		}
+		
+		function calculaValorTotal(id){
+			var Quantidade = $('#inputQuantidade'+id+'').val();
+			var ValorUnitario = $('#inputValorUnitario'+id+'').val();
+			var ValorTotal = 0;
 			
-		// Renderizar linha do cabeçalho da tabela
-        function firstRowRenderer(instance, td, row, col, prop, value, cellProperties) {
-            Handsontable.renderers.TextRenderer.apply(this, arguments);
-
-            // Add styles to the table cell
-            td.style.fontWeight = '500';
-            td.style.color = '#1B5E20';
-            td.style.background = '#E8F5E9';
-        }	
-      /*  
-        // Renderizar demais linhas somente Leitura da tabela
-        function demaisRowRenderer(instance, td, row, col, prop, value, cellProperties) {
-            Handsontable.renderers.TextRenderer.apply(this, arguments);
-
-            // Add styles to the table cell
-            td.style.fontWeight = '400';
-            td.style.color = '#000';
-            td.style.background = '#f5f5f5';
-        }
-	*/	
-		// Renderizar valores negativos (cor vermelha)
-        function negativeValueRenderer(instance, td, row, col, prop, value, cellProperties) {
-            Handsontable.renderers.TextRenderer.apply(this, arguments);
-			var quant = 0;
-			var valor = 0;
+			var ValorTotal = parseInt(Quantidade) * parseInt(ValorUnitario);
 			
-            // If row contains negative number, add class "negative"
-            if (parseInt(value, 10) < 0) {
-                td.className = 'text-danger';
-            }
+			ValorTotal = float2moeda(ValorTotal).toString();
 			
-       /*     if (col === 4) {
-				quant = value;
-				//quant = parseFloat(value, 10);
-				//valor = 
-            }
-			
-			if (col === 5) {
-				alert(quant);
-			}*/
-			
-
-            // If empty cell, add grey background
-            if (!value || value === '') {
-                td.style.background = '#fff';
-            } else {
-				td.style.background = '#f5f5f5';
-			}
-        }		
+			$('#inputValorTotal'+id+'').val(ValorTotal);
+		}
 							
 	</script>
 
@@ -280,6 +148,7 @@ if(isset($_POST['inputOrcamentoId'])){
 											<div class="form-group">
 												<label for="inputFornecedor">Fornecedor</label>
 												<input type="text" id="inputFornecedor" name="inputFornecedor" class="form-control" value="<?php echo $row['ForneNome']; ?>" readOnly>
+												<input type="hidden" id="inputIdFornecedor" name="inputIdFornecedor" class="form-control" value="<?php echo $row['ForneId']; ?>">
 											</div>
 										</div>
 										<div class="col-lg-3">
@@ -329,13 +198,13 @@ if(isset($_POST['inputOrcamentoId'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbProduto">Produto</label>
-												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-select-all-filtering" multiple="multiple" data-fouc>
+												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 													<?php 
-														$sql = ("SELECT ProduId, ProduNome
-																 FROM Produto										     
-																 WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$_POST['inputOrcamentoCategoria']."
-															     ORDER BY ProduNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT ProduId, ProduNome
+																FROM Produto										     
+																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$_POST['inputOrcamentoCategoria']."
+															    ORDER BY ProduNome ASC";
+														$result = $conn->query($sql);
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowProduto as $item){															
@@ -435,10 +304,10 @@ if(isset($_POST['inputOrcamentoId'])){
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border" value="">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border" onChange="calculaValorTotal('.$cont.')">
 												</div>	
 												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border" value="" onKeyUp="moeda(this)" maxLength="12">
+													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12">
 												</div>	
 												<div class="col-lg-1">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="" readOnly>
