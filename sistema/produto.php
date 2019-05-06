@@ -119,6 +119,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				e.preventDefault();
 				
 				var arquivo = $('#arquivo').val();
+				var id = $("input:file").attr('id');
+				var tamanho =  1024 * 1024 * 10; //10MB
 
 				//Verifica se o campo só possui espaços em branco
 				if (arquivo == ''){
@@ -127,10 +129,30 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					return false;
 				}
 				
+				//Verifica se a extensão é  diferente de CSV
+				if (ext(arquivo) != 'csv'){
+					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: CSV!','error');
+					$('#arquivo').focus();
+					return false;
+				}
+				
+				//Verifica o tamanho do arquivo
+				if ($('#'+id)[0].files[0].size > tamanho){
+					alerta('Atenção','O arquivo enviado é muito grande, envie arquivos de até 10MB.','error');
+					$('#arquivo').focus();
+					return false;
+				}								
+				
 				$( "#formUpload" ).submit();
 				
 			}); // enviar			
 		});
+		
+		function ext(path) {
+			var final = path.substr(path.lastIndexOf('/')+1);
+			var separador = final.lastIndexOf('.');
+			return separador <= 0 ? '' : final.substr(separador + 1);
+		}			
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaProduto(ProduId, ProduNome, ProduStatus, Tipo){

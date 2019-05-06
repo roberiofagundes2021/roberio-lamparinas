@@ -76,14 +76,27 @@ if(isset($_POST['inputOrcamentoId'])){
 						var option = '';
 						
 						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
+							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';							
 						});						
 						
 						$('#cmbProduto').html(option).show();
 					} else {
 						ResetProduto();
 					}					
-				});				
+				});	
+
+				$.ajax({
+					type: "POST",
+					url: "orcamentoTabelaProduto.php",
+					data: {idFornecedor: inputFornecedor, idCategoria: inputCategoria, idSubCategoria: cmbSubCategoria},
+					success: function(resposta){
+						
+						$("#tabelaProdutos").html(resposta).show();
+						
+						return false;
+						
+					}	
+				});
 				
 			});			
 						
@@ -284,7 +297,9 @@ if(isset($_POST['inputOrcamentoId'])){
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
 											</div>											
-										</div>');										
+										</div>');
+										
+										print('<div id="tabelaProdutos">');
 										
 										foreach ($rowProdutos as $item){
 											
@@ -316,6 +331,8 @@ if(isset($_POST['inputOrcamentoId'])){
 											
 											$cont++;
 										}
+										
+										print('</div>');
 										
 									?>
 									

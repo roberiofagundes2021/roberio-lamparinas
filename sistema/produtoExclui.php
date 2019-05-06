@@ -24,7 +24,7 @@ if(isset($_POST['inputProdutoId'])){
 		$result->bindParam(':id', $iProduto);
 		$result->execute();
 		
-		if (file_exists($pasta.$sFoto)){
+		if (file_exists($pasta.$sFoto) and $sFoto <> ""){
 			unlink($pasta.$sFoto);
 		}		  
 		

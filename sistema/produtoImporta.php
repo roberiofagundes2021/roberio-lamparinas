@@ -39,7 +39,7 @@ if ($_FILES['arquivo']['error'] != 0) {
 
 // Caso script chegue a esse ponto, não houve erro com o upload e o PHP pode continuar
 // Faz a verificação da extensão do arquivo
-
+/*
 $extensao = strtolower(end(explode(".", $_FILES['arquivo']['name'])));
 
 if ($extensao != 'csv') {
@@ -47,7 +47,7 @@ if ($extensao != 'csv') {
 	alerta("Por favor, envie arquivos com a seguinte extensão: CSV!");
 	irpara("produto.php");
 
-}
+} */
 
 // Faz a verificação do tamanho do arquivo
 else if ($_UP['tamanho'] < $_FILES['arquivo']['size']) {
@@ -78,13 +78,15 @@ else {
 		$qtd            = 0;
 		$importados     = 0;
 		$identificador = date('now').time('now');
-	
-		$erro  = "";
+		
+		$produtosimportados = "";
+		$erro = "";
 		$cont = 0;
 	
 		while ($linha_arquivo = fgets($arquivo)) {
 	
-			$coluna  = explode(",",$linha_arquivo);
+			$coluna  = explode(";",$linha_arquivo);
+			//var_dump($coluna);
 			$codigoBarras = $coluna[0];
 			$nomeProduto = $coluna[1];
 			$detalhamentoProduto = $coluna[2];
@@ -112,9 +114,9 @@ else {
 							WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCodigoBarras = '".$codigoBarras."'";
 					$result = $conn->query($sql);
 					$row = $result->fetch(PDO::FETCH_ASSOC);
-					$count = count($row);
+					//$count = count($row);
 					
-					if ($count){
+					if ($row){
 		
 						$sql = "UPDATE Produto SET ProduNome = :sNome, ProduDetalhamento = :sDetalhamento, ProduUsuarioAtualizador = :iUsuarioAtualizador
 								WHERE ProduCodigoBarras = :sCodigoBarras and ProduEmpresa = :iEmpresa";
