@@ -15,6 +15,10 @@ if(isset($_POST['inputOrcamentoId'])){
 	$iCategoria = $_POST['inputIdCategoria'];
 }
 
+/*echo "Orcamento: ".$iOrcamento;
+echo "<br>";
+echo "Categoria: ".$iCategoria;*/
+
 try{
 	
 	$sql = "SELECT *
@@ -30,6 +34,11 @@ try{
 
 //Se está alterando
 if(isset($_POST['inputIdOrcamento'])){
+/*	
+	echo "<br>";
+	echo "Entrou";
+	echo "<br>";
+	echo  "Total Registros: ".$_POST['totalRegistros'];*/
 	
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 	
@@ -69,6 +78,10 @@ if(isset($_POST['inputIdOrcamento'])){
 							':iEmpresa' => $_SESSION['EmpreId']
 							));		
 		}
+		
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Orçamento alterado!!!";
+		$_SESSION['msg']['tipo'] = "success";		
 	}
 }	
 
@@ -155,10 +168,10 @@ if(isset($_POST['inputIdOrcamento'])){
 		
 		function calculaValorTotal(id){
 			var Quantidade = $('#inputQuantidade'+id+'').val();
-			var ValorUnitario = $('#inputValorUnitario'+id+'').val();
+			var ValorUnitario = $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
 			var ValorTotal = 0;
 			
-			var ValorTotal = parseInt(Quantidade) * parseInt(ValorUnitario);
+			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
 			
 			ValorTotal = float2moeda(ValorTotal).toString();
 			
@@ -317,7 +330,7 @@ if(isset($_POST['inputIdOrcamento'])){
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										} 
 										
-										$cont = 1;
+										$cont = 0;
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
@@ -357,6 +370,8 @@ if(isset($_POST['inputIdOrcamento'])){
 										
 										foreach ($rowProdutos as $item){
 											
+											$cont++;
+											
 											$iQuantidade = isset($item['OrXPrQuantidade']) ? $item['OrXPrQuantidade'] : '';
 											$fValorUnitario = isset($item['OrXPrValorUnitario']) ? mostraValor($item['OrXPrValorUnitario']) : '';
 											
@@ -385,9 +400,8 @@ if(isset($_POST['inputIdOrcamento'])){
 												<div class="col-lg-1">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="" readOnly>
 												</div>											
-											</div>');
+											</div>');											
 											
-											$cont++;
 										}
 										
 										print('</div>');
