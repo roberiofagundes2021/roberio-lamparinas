@@ -8,29 +8,69 @@ include('global_assets/php/conexao.php');
 
 //Se veio do orcamento.php
 if(isset($_POST['inputOrcamentoId'])){
-	
 	$iOrcamento = $_POST['inputOrcamentoId'];
-	
-	try{
-		
-		$sql = "SELECT *
-				FROM Orcamento
-				JOIN Fornecedor on ForneId = OrcamFornecedor
-				WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = ".$iOrcamento;
-		$result = $conn->query("$sql");
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-		
-	} catch(PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
-	}
-	
-	$_SESSION['msg'] = array();
-
-} else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
-
-	irpara("orcamento.php");
+	$iCategoria = $_POST['inputOrcamentoCategoria'];
+} else{
+	$iOrcamento = $_POST['inputIdOrcamento'];
+	$iCategoria = $_POST['inputIdCategoria'];
 }
 
+try{
+	
+	$sql = "SELECT *
+			FROM Orcamento
+			JOIN Fornecedor on ForneId = OrcamFornecedor
+			WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = ".$iOrcamento;
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+	
+} catch(PDOException $e) {
+	echo 'Error: ' . $e->getMessage();
+}
+
+//Se está alterando
+if(isset($_POST['inputIdOrcamento'])){
+	
+	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+	
+		$sql = "SELECT *
+				FROM OrcamentoXProduto
+				WHERE OrXPrEmpresa = ". $_SESSION['EmpreId'] ." and OrXPrOrcamento = ".$iOrcamento." and OrXPrProduto = ".$_POST['inputIdProduto'.$i];
+		$result = $conn->query($sql);
+		$rowOrcamentoXProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+		$count = count($rowOrcamentoXProduto);
+		
+		// se já existe o registro UPDATE, senão INSERT
+		if ($count){
+			$sql = "UPDATE OrcamentoXProduto 
+					SET OrXPrQuantidade = :iQuantidade, OrXPrValorUnitario = :fValorUnitario, OrXPrUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE OrXPrEmpresa = :iEmpresa and OrXPrOrcamento = :iOrcamento and OrXPrProduto = :iProduto";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId'],
+							':iOrcamento' => $iOrcamento,
+							':iProduto' => $_POST['inputIdProduto'.$i]
+							));
+		} else {
+			$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrEmpresa)
+					VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+			$result = $conn->prepare($sql);
+			
+			$result->execute(array(
+							':iOrcamento' => $iOrcamento,
+							':iProduto' => $_POST['inputIdProduto'.$i],
+							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId']
+							));		
+		}
+	}
+}	
 
 ?>
 
@@ -66,7 +106,7 @@ if(isset($_POST['inputOrcamentoId'])){
 				FiltraProduto();
 				
 				var inputFornecedor = $('#inputIdFornecedor').val();
-				var inputCategoria = $('#inputCategoria').val();
+				var inputCategoria = $('#inputIdCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				
 				$.getJSON('filtraProduto.php?idFornecedor='+inputFornecedor+'&idCategoria='+inputCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){
@@ -78,6 +118,8 @@ if(isset($_POST['inputOrcamentoId'])){
 						$.each(dados, function(i, obj){
 							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';							
 						});						
+						
+						$('#cmbProduto').remove();
 						
 						$('#cmbProduto').html(option).show();
 					} else {
@@ -152,6 +194,8 @@ if(isset($_POST['inputOrcamentoId'])){
 							<h5 class="text-uppercase font-weight-bold">Listar Produtos - Orçamento Nº "<?php echo $_POST['inputOrcamentoNumero']; ?>"</h5>
 						</div>					
 						
+						<input type="hidden" id="inputIdOrcamento" name="inputIdOrcamento" class="form-control" value="<?php echo $row['OrcamId']; ?>">
+						
 						<div class="card-body">								
 								
 							<div class="row">				
@@ -182,7 +226,7 @@ if(isset($_POST['inputOrcamentoId'])){
 											<div class="form-group">
 												<label for="inputCategoriaNome">Categoria</label>
 												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" value="<?php echo $_POST['inputOrcamentoNomeCategoria']; ?>" readOnly>
-												<input type="hidden" id="inputCategoria" name="inputCategoria" class="form-control" value="<?php echo $_POST['inputOrcamentoCategoria']; ?>">
+												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $_POST['inputOrcamentoCategoria']; ?>">
 											</div>
 										</div>
 									
@@ -253,15 +297,25 @@ if(isset($_POST['inputOrcamentoId'])){
 										<div id="example"></div>
 									</div>-->
 									
-									<?php
-									
+									<?php									
 
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
+										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OrXPrQuantidade, OrXPrValorUnitario
 												FROM Produto
-												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ". $_POST['inputOrcamentoCategoria']." and ProduStatus = 1";
+												JOIN OrcamentoXProduto on OrXPrProduto = ProduId
+												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OrXPrOrcamento = ".$iOrcamento;
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+										$count = count($rowProdutos);
+										
+										if (!$count){
+											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
+													FROM Produto
+													LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and ProduStatus = 1";
+											$result = $conn->query($sql);
+											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+										} 
 										
 										$cont = 1;
 										
@@ -303,12 +357,16 @@ if(isset($_POST['inputOrcamentoId'])){
 										
 										foreach ($rowProdutos as $item){
 											
+											$iQuantidade = isset($item['OrXPrQuantidade']) ? $item['OrXPrQuantidade'] : '';
+											$fValorUnitario = isset($item['OrXPrValorUnitario']) ? mostraValor($item['OrXPrValorUnitario']) : '';
+											
 											print('
 											<div class="row" style="margin-top: 8px;">
 												<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
+															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'">
 														</div>
 														<div class="col-lg-11">
 															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
@@ -319,10 +377,10 @@ if(isset($_POST['inputOrcamentoId'])){
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border" onChange="calculaValorTotal('.$cont.')">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'">
 												</div>	
 												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12">
+													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
 												</div>	
 												<div class="col-lg-1">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="" readOnly>
@@ -333,6 +391,8 @@ if(isset($_POST['inputOrcamentoId'])){
 										}
 										
 										print('</div>');
+										
+										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="'.$cont.'" >');
 										
 									?>
 									
