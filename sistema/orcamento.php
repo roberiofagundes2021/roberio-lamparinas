@@ -6,10 +6,11 @@ $_SESSION['PaginaAtual'] = 'Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT OrcamId, OrcamNumero, OrcamData, OrcamCategoria, ForneNome, CategNome, OrcamStatus
+$sql = ("SELECT OrcamId, OrcamNumero, OrcamData, OrcamCategoria, ForneNome, CategNome, SbCatNome, OrcamStatus
 		 FROM Orcamento
 		 JOIN Fornecedor on ForneId = OrcamFornecedor
 		 JOIN Categoria on CategId = OrcamCategoria
+		 LEFT JOIN SubCategoria on SbCatId = OrcamSubCategoria
 	     WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ."
 		 ORDER BY OrcamData DESC");
 $result = $conn->query("$sql");
@@ -59,28 +60,33 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Nº Orçamento
-					width: "20%",
+					width: "15%",
 					targets: [1]
 				},				
 				{ 
 					orderable: true,   //Fornecedor
-					width: "30%",
+					width: "25%",
 					targets: [2]
 				},
 				{ 
 					orderable: true,   //Categoria
-					width: "30%",
+					width: "20%",
 					targets: [3]
+				},
+				{ 
+					orderable: true,   //Categoria
+					width: "20%",
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [4]
+					targets: [5]
 				},
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [5]
+					targets: [6]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -182,6 +188,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>Nº Orçamento</th>
 										<th>Fornecedor</th>
 										<th>Categoria</th>
+										<th>SubCategoria</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -201,6 +208,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['OrcamNumero'].'</td>
 											<td>'.$item['ForneNome'].'</td>
 											<td>'.$item['CategNome'].'</td>
+											<td>'.$item['SbCatNome'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrcamStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

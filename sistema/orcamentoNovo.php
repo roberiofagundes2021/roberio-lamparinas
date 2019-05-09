@@ -26,9 +26,9 @@ if(isset($_POST['inputData'])){
 		$sNumero = (int)$rowNumero['Numero'] + 1;
 		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 			
-		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor,
+		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamSubCategoria, OrcamConteudo, OrcamFornecedor,
 									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamEmpresa)
-				VALUES (:sNumero, :sTipo, :dData, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
+				VALUES (:sNumero, :sTipo, :dData, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
 						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
@@ -40,6 +40,7 @@ if(isset($_POST['inputData'])){
 						':sTipo' => $_POST['inputTipo'],
 						':dData' => gravaData($_POST['inputData']),
 						':iCategoria' => $_POST['cmbCategoria'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iFornecedor' => $iFornecedor,
 						':iSolicitante' => $_SESSION['UsuarId'],
@@ -117,9 +118,43 @@ if(isset($_POST['inputData'])){
 					$('#inputTelefoneFornecedor').val(Forne[4]);
 				}
 			});
+			
+			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function(e){
+				
+				Filtrando();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option value="#">Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});
+				
+			});				
 						
 		}); //document.ready
-							
+		
+		//Mostra o "Filtrando..." na combo SubCategoria
+		function Filtrando(){
+			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+		}
+		
+		function ResetSubCategoria(){
+			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+		}		
+		
 	</script>
 
 </head>
@@ -172,14 +207,14 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>										
 										
-										<div class="col-lg-2">
+										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputData">Data</label>
 												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" readOnly>
 											</div>
 										</div>
 																				
-										<div class="col-lg-7">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
@@ -200,6 +235,15 @@ if(isset($_POST['inputData'])){
 												</select>
 											</div>
 										</div>
+										
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbSubCategoria">SubCategoria</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+												</select>
+											</div>
+										</div>										
 
 									</div>
 								</div>
