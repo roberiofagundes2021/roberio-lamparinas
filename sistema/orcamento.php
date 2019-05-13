@@ -125,15 +125,21 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			document.getElementById('inputOrcamentoCategoria').value = OrcamCategoria;
 			document.getElementById('inputOrcamentoNomeCategoria').value = CategNome;
 			document.getElementById('inputOrcamentoStatus').value = OrcamStatus;
-					
-			if (Tipo == 'edita'){	
-				document.formOrcamento.action = "orcamentoEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formOrcamento, "Tem certeza que deseja excluir esse orcamento?", "orcamentoExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formOrcamento.action = "orcamentoMudaSituacao.php";
-			} else if (Tipo == 'produto'){
-				document.formOrcamento.action = "orcamentoProduto.php";
+			
+
+			if (Tipo == 'imprimir'){
+				document.formOrcamento.action = "orcamentoImprime.php";
+				document.formOrcamento.setAttribute("target", "_blank");
+			} else {
+				if (Tipo == 'edita'){	
+					document.formOrcamento.action = "orcamentoEdita.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formOrcamento, "Tem certeza que deseja excluir esse orcamento?", "orcamentoExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formOrcamento.action = "orcamentoMudaSituacao.php";
+				} else if (Tipo == 'produto'){
+					document.formOrcamento.action = "orcamentoProduto.php";
+				}
 			}
 			
 			document.formOrcamento.submit();
@@ -218,7 +224,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 													<div class="list-icons list-icons-extended">
 														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrcamStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
 														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrcamStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
-														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrcamStatus'].', \'produto\');" class="list-icons-item"><i class="icon-basket" title="Listar Produtos"></i></a>
+														<div class="dropdown">													
+															<a href="#" class="list-icons-item" data-toggle="dropdown">
+																<i class="icon-menu9"></i>
+															</a>
+
+															<div class="dropdown-menu dropdown-menu-right">
+																<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrcamStatus'].', \'produto\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrcamStatus'].', \'imprimir\')" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
+															</div>
+														</div>
 													</div>
 												</div>
 											</td>

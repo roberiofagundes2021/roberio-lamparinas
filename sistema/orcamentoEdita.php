@@ -182,7 +182,28 @@ if(isset($_POST['inputTipo'])){
 				});
 				
 			});
-						
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputCategoria = $('#inputOrcamentoCategoria').val();
+				var inputSubCategoria = $('#inputOrcamentoSubCategoria').val();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
+				
+				//Verifica se o a categoria ou subcategoria foi alterada (só que aqui eu teria que verificar primeiro se tem produtos preenchidos
+				if (inputCategoria <> cmbCategoria){
+					alerta('Atenção','Tem certeza que deseja alterar o orçamento? Existem produtos com quantidades ou valores lançados!','error');
+					$('#inputNome').focus();  //trocar isso
+					return false;
+				}
+				
+				$( "#formOrcamento" ).submit();
+				
+			}); // enviar			
 		}); //document.ready
 		
 		//Mostra o "Filtrando..." na combo SubCategoria
@@ -224,7 +245,9 @@ if(isset($_POST['inputTipo'])){
 						</div>
 						
 						<input type="hidden" id="inputOrcamentoId" name="inputOrcamentoId" value="<?php echo $row['OrcamId']; ?>" >
-						<input type="hidden" id="inputOrcamentoNumero" name="inputOrcamentoNumero" value="<?php echo $row['OrcamNumero']; ?>" >						
+						<input type="hidden" id="inputOrcamentoNumero" name="inputOrcamentoNumero" value="<?php echo $row['OrcamNumero']; ?>" >	
+						<input type="hidden" id="inputOrcamentoCategoria" name="inputOrcamentoCategoria" value="<?php echo $row['OrcamCategoria']; ?>" >
+						<input type="hidden" id="inputOrcamentoSubCategoria" name="inputOrcamentoSubCategoria" value="<?php echo $row['OrcamSubCategoria']; ?>" >
 						
 						<div class="card-body">								
 								
@@ -401,7 +424,7 @@ if(isset($_POST['inputTipo'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
 										<a href="orcamento.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
