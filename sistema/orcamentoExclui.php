@@ -9,24 +9,37 @@ if(isset($_POST['inputOrcamentoId'])){
 	$iOrcamento = $_POST['inputOrcamentoId'];
         	
 	try{
+		$conn->beginTransaction();	
+		
+		$sql = "DELETE FROM OrcamentoXProduto
+				WHERE OrXPrOrcamento = :iOrcamento and OrXPrEmpresa = :iEmpresa";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':iOrcamento', $iOrcamento);
+		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+		$result->execute();
+		
 		
 		$sql = "DELETE FROM Orcamento
 				WHERE OrcamId = :id";
-		$result = $conn->prepare("$sql");
+		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iOrcamento); 
 		$result->execute();
 		
+		$conn->commit();
+		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Orcamento excluído!!!";
-		$_SESSION['msg']['tipo'] = "success";		
+		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
-		
+			
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao excluir orcamento!!!";
 		$_SESSION['msg']['tipo'] = "error";			
 		
-		echo 'Error: ' . $e->getMessage();
+		$conn->rollback();
+		
+		//echo 'Error: ' . $e->getMessage();
 	}
 }
 

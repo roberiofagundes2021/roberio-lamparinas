@@ -19,7 +19,7 @@ if(isset($_POST['inputOrcamentoId'])){
 				JOIN Usuario on UsuarId = OrcamSolicitante
 				JOIN Fornecedor on ForneId = OrcamFornecedor
 				WHERE OrcamId = $iOrcamento ";
-		$result = $conn->query("$sql");
+		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
 	} catch(PDOException $e) {
@@ -37,6 +37,8 @@ if(isset($_POST['inputTipo'])){
 
 	try{
 		
+		$iOrcamento = $_POST['inputOrcamentoId'];
+		
 		$sql = "UPDATE Orcamento SET OrcamTipo = :sTipo, OrcamCategoria = :iCategoria, OrcamSubCategoria = :iSubCategoria, OrcamConteudo = :sConteudo,
 									 OrcamFornecedor = :iFornecedor, OrcamUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE OrcamId = :iOrcamento";
@@ -49,23 +51,25 @@ if(isset($_POST['inputTipo'])){
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
-						':iCategoria' => $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'],
+						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iFornecedor' => $iFornecedor,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iOrcamento' => $_POST['inputOrcamentoId']
+						':iOrcamento' => $iOrcamento
 						));
-
-		//Aqui só deve deletar, se a categoria e subcategoria forem alteradas (perguntando antes para o usuário se ele tem certeza dessa alteração)
-		$sql = "DELETE FROM OrcamentoXProduto
-				WHERE OrXPrOrcamento = :iOrcamento and OrXPrEmpresa = :iEmpresa";
-		$result = $conn->prepare($sql);	
 		
-		$result->execute(array(
-							':iOrcamento' => $_POST['inputOrcamentoId'],
-							':iEmpresa' => $_SESSION['EmpreId']));
-							
+		if (isset($_POST['inputOrcamentoProdutoExclui']) and $_POST['inputOrcamentoProdutoExclui']){
+			
+			$sql = "DELETE FROM OrcamentoXProduto
+					WHERE OrXPrOrcamento = :iOrcamento and OrXPrEmpresa = :iEmpresa";
+			$result = $conn->prepare($sql);	
+			
+			$result->execute(array(
+								':iOrcamento' => $iOrcamento,
+								':iEmpresa' => $_SESSION['EmpreId']));
+		}
+		
 		$conn->commit();						
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -109,37 +113,6 @@ if(isset($_POST['inputTipo'])){
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
-	
-		//Ao carregar a página tive que executar o que o onChange() executa para que a combo da SubCategoria já venha filtrada, além de selecionada, é claro.
-		window.onload = function(){
-
-			var cmbSubCategoria = $('#cmbSubCategoria').val();
-			
-			Filtrando();
-			
-			var cmbCategoria = $('#cmbCategoria').val();
-
-			$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
-				
-				var option = '<option>Selecione a SubCategoria</option>';
-				
-				if (dados.length){						
-					
-					$.each(dados, function(i, obj){
-
-						if(obj.SbCatId == cmbSubCategoria){							
-							option += '<option value="'+obj.SbCatId+'" selected>'+obj.SbCatNome+'</option>';
-						} else {							
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						}
-					});
-					
-					$('#cmbSubCategoria').html(option).show();
-				} else {
-					ResetSubCategoria();
-				}					
-			});
-		}		
 
         $(document).ready(function() {	
 			
@@ -151,6 +124,7 @@ if(isset($_POST['inputTipo'])){
 				
 				$('#inputContato').val(Forne[1]);
 				$('#inputEmailFornecedor').val(Forne[2]);
+				
 				if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
 					$('#inputTelefoneFornecedor').val(Forne[3]);
 				} else {
@@ -181,24 +155,50 @@ if(isset($_POST['inputTipo'])){
 					}					
 				});
 				
-			});
+			}); 
 
-			//Valida Registro Duplicado
-			$('#enviar').on('click', function(e){
+			$("#enviar").on('click', function(e){
 				
-				e.preventDefault();
+				e.preventDefault();				
 				
+				//Antes
 				var inputCategoria = $('#inputOrcamentoCategoria').val();
 				var inputSubCategoria = $('#inputOrcamentoSubCategoria').val();
+				if (inputSubCategoria == '' || inputSubCategoria == null){
+					inputSubCategoria = '#';
+				}
 				
+				//Depois
 				var cmbCategoria = $('#cmbCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				
-				//Verifica se o a categoria ou subcategoria foi alterada (só que aqui eu teria que verificar primeiro se tem produtos preenchidos
-				if (inputCategoria <> cmbCategoria){
-					alerta('Atenção','Tem certeza que deseja alterar o orçamento? Existem produtos com quantidades ou valores lançados!','error');
-					$('#inputNome').focus();  //trocar isso
+				if (cmbCategoria == '' || cmbCategoria == '#'){
+					alerta('Atenção','Informe a categoria!','error');
+					$('#cmbCategoria').focus();
 					return false;
+				}
+				
+				//Tem produto cadastrado para esse orçamento na tabela OrcamentoXProduto?
+				var inputProduto = $('#inputOrcamentoProduto').val();
+				
+				//Exclui os produtos desse Orçamento?
+				var inputExclui = $('#inputOrcamentoProdutoExclui').val();
+				
+				//Aqui verifica primeiro se tem produtos preenchidos, porque do contrário deixa mudar
+				if (inputProduto > 0){
+
+					//Verifica se o a categoria ou subcategoria foi alterada
+					if (inputSubCategoria != cmbSubCategoria){
+
+						inputExclui = 1;
+						$('#inputOrcamentoProdutoExclui').val(inputExclui);
+						
+						confirmaExclusao(document.formOrcamento, "Tem certeza que deseja alterar o orçamento? Existem produtos com quantidades ou valores lançados!", "orcamentoEdita.php");
+						
+					} else{
+						inputExclui = 0;
+						$('#inputOrcamentoProdutoExclui').val(inputExclui);
+					}
 				}
 				
 				$( "#formOrcamento" ).submit();
@@ -239,15 +239,28 @@ if(isset($_POST['inputTipo'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formOrcamento" id="formOrcamento" method="post" class="form-validate" action="orcamentoEdita.php">
+					<form name="formOrcamento" id="formOrcamento" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Orçamento Nº "<?php echo $_POST['inputOrcamentoNumero']; ?>"</h5>
-						</div>
+						</div>						
 						
 						<input type="hidden" id="inputOrcamentoId" name="inputOrcamentoId" value="<?php echo $row['OrcamId']; ?>" >
 						<input type="hidden" id="inputOrcamentoNumero" name="inputOrcamentoNumero" value="<?php echo $row['OrcamNumero']; ?>" >	
 						<input type="hidden" id="inputOrcamentoCategoria" name="inputOrcamentoCategoria" value="<?php echo $row['OrcamCategoria']; ?>" >
 						<input type="hidden" id="inputOrcamentoSubCategoria" name="inputOrcamentoSubCategoria" value="<?php echo $row['OrcamSubCategoria']; ?>" >
+						<input type="hidden" id="inputOrcamentoProdutoExclui" name="inputOrcamentoProdutoExclui" value="0" >
+						
+						<?php
+						
+							$sql = "SELECT OrXPrOrcamento
+									FROM OrcamentoXProduto
+									WHERE OrXPrOrcamento = ".$iOrcamento." and OrXPrEmpresa = ".$_SESSION['EmpreId'];
+							$result = $conn->query($sql);
+							$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+							$countProduto = count($rowProduto);
+
+							print('<input type="hidden" id="inputOrcamentoProduto" name="inputOrcamentoProduto" value="'.$countProduto.'" >');
+						?>
 						
 						<div class="card-body">								
 								
@@ -285,11 +298,11 @@ if(isset($_POST['inputTipo'])){
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php 
-														$sql = ("SELECT CategId, CategNome
-																 FROM Categoria															     
-																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
-															     ORDER BY CategNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT CategId, CategNome
+																FROM Categoria															     
+																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
+															    ORDER BY CategNome ASC";
+														$result = $conn->query($sql);
 														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowCategoria as $item){
@@ -308,11 +321,11 @@ if(isset($_POST['inputTipo'])){
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php 
-														$sql = ("SELECT SbCatId, SbCatNome
-																 FROM SubCategoria															     
-																 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY SbCatNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT SbCatId, SbCatNome
+																FROM SubCategoria															     
+																WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
+																ORDER BY SbCatNome ASC";
+														$result = $conn->query($sql);
 														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowSubCategoria as $item){
@@ -424,7 +437,7 @@ if(isset($_POST['inputTipo'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
+										<div class="btn btn-lg btn-success" id="enviar">Alterar</div>
 										<a href="orcamento.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
@@ -446,6 +459,42 @@ if(isset($_POST['inputTipo'])){
 
 	</div>
 	<!-- /page content -->
+	
+	<!-- Adicionando Javascript -->
+    <script type="text/javascript" >
+	
+		//Ao carregar a página tive que executar o que o onChange() executa para que a combo da SubCategoria já venha filtrada, além de selecionada, é claro.
+		window.onload = function(){
+
+			var cmbSubCategoria = $('#cmbSubCategoria').val();
+			
+			Filtrando();
+			
+			var cmbCategoria = $('#cmbCategoria').val();
+
+			$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+				
+				var option = '<option value="#">Selecione a SubCategoria</option>';
+				
+				if (dados.length){						
+					
+					$.each(dados, function(i, obj){
+
+						if(obj.SbCatId == cmbSubCategoria){							
+							option += '<option value="'+obj.SbCatId+'" selected>'+obj.SbCatNome+'</option>';
+						} else {							
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						}
+					});
+					
+					$('#cmbSubCategoria').html(option).show();
+				} else {
+					ResetSubCategoria();
+				}					
+			});
+		}
+		
+	</script>
 
 </body>
 </html>

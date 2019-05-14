@@ -8,7 +8,7 @@ include('global_assets/php/conexao.php');
 
 $sql = ("SELECT OrcamId, OrcamNumero, OrcamData, OrcamCategoria, ForneNome, CategNome, SbCatNome, OrcamStatus
 		 FROM Orcamento
-		 JOIN Fornecedor on ForneId = OrcamFornecedor
+		 LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
 		 JOIN Categoria on CategId = OrcamCategoria
 		 LEFT JOIN SubCategoria on SbCatId = OrcamSubCategoria
 	     WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ."

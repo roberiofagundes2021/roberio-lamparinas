@@ -39,8 +39,8 @@ if(isset($_POST['inputData'])){
 						':sNumero' => $sNumero,
 						':sTipo' => $_POST['inputTipo'],
 						':dData' => gravaData($_POST['inputData']),
-						':iCategoria' => $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'],
+						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iFornecedor' => $iFornecedor,
 						':iSolicitante' => $_SESSION['UsuarId'],
@@ -142,7 +142,22 @@ if(isset($_POST['inputData'])){
 					}					
 				});
 				
-			});				
+			});
+			
+			$("#enviar").on('click', function(e){
+				
+				e.preventDefault();	
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+				
+				if (cmbCategoria == '' || cmbCategoria == '#'){
+					alerta('Atenção','Informe a categoria!','error');
+					$('#cmbCategoria').focus();
+					return false;
+				}
+			
+				$("#formOrcamento").submit();
+			});
 						
 		}); //document.ready
 		
@@ -343,7 +358,7 @@ if(isset($_POST['inputData'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Incluir</button>
+										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
 										<a href="orcamento.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
