@@ -151,16 +151,31 @@ if(isset($_POST['inputIdOrcamento'])){
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			$('#cmbProduto').on('change', function(e){
 				
-				var inputFornecedor = $('#inputIdFornecedor').val();
 				var inputCategoria = $('#inputIdCategoria').val();
 				var inputSubCategoria = $('#inputIdSubCategoria').val();
 				var produtos = $(this).val();
+				
+				var cont = 1;
+
+				$.each( $( ".idProduto"+cont ), function() {			
+					console.log($(this).val());
+				});
+				
+				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
+				$.each( $( ".Quantidade"+cont ), function() {
+					console.log($(this).val());
+				});				
+				
+				$.each( $( ".ValorUnitario"+cont ), function() {
+					console.log($(this).val());
+				});
+				return false;
 				//alert(produtos);
 				
 				$.ajax({
 					type: "POST",
 					url: "orcamentoFiltraProduto.php",
-					data: {idFornecedor: inputFornecedor, idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, idProdutos: produtos},
+					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, idProdutos: produtos},
 					success: function(resposta){
 						//alert(resposta);
 						$("#tabelaProdutos").html(resposta).show();
@@ -393,7 +408,7 @@ if(isset($_POST['inputIdOrcamento'])){
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'">
+															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto'.$cont.'">
 														</div>
 														<div class="col-lg-11">
 															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
@@ -404,10 +419,10 @@ if(isset($_POST['inputIdOrcamento'])){
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade'.$cont.'" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'">
 												</div>	
 												<div class="col-lg-2">
-													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
+													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario'.$cont.'" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
 												</div>	
 												<div class="col-lg-2">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>

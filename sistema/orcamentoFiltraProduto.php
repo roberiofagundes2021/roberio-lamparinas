@@ -29,8 +29,7 @@ if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#'){
 			JOIN Categoria on CategId = ProduCategoria
 			JOIN Fornecedor on ForneCategoria = CategId
 			LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_POST['idFornecedor']."' and ProduSubCategoria = '". $_POST['idSubCategoria']."' and 
-				  ProduId in (".$lista.")
+			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduSubCategoria = '". $_POST['idSubCategoria']."' and ProduId in (".$lista.")
 			";
 } else {
 	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
@@ -38,8 +37,7 @@ if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#'){
 			JOIN Categoria on CategId = ProduCategoria
 			JOIN Fornecedor on ForneCategoria = CategId
 			LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_POST['idFornecedor']."' and ProduCategoria = '". $_POST['idCategoria']."' and 
-				  ProduId in (".$lista.")
+			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = '". $_POST['idCategoria']."' and ProduId in (".$lista.")
 			";
 }
 
