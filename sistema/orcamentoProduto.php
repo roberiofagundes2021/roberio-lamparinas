@@ -154,21 +154,34 @@ if(isset($_POST['inputIdOrcamento'])){
 				var inputCategoria = $('#inputIdCategoria').val();
 				var inputSubCategoria = $('#inputIdSubCategoria').val();
 				var produtos = $(this).val();
+				console.log(produtos);
 				
 				var cont = 1;
+				var produtoId = [];
+				var produtoQuant = [];
+				var produtoValor = [];
 
-				$.each( $( ".idProduto"+cont ), function() {			
-					console.log($(this).val());
+				$.each( $(".idProduto"+cont), function() {			
+					produtoId[cont] = $(this).val();
+					cont++;
+					console.log(cont);
 				});
 				
+				cont = 1;
 				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
-				$.each( $( ".Quantidade"+cont ), function() {
-					console.log($(this).val());
+				$.each( $(".Quantidade"+cont), function() {
+					produtoQuant[cont] = $(this).val();
+					cont++;
 				});				
 				
-				$.each( $( ".ValorUnitario"+cont ), function() {
-					console.log($(this).val());
+				cont = 1;
+				$.each( $(".ValorUnitario"+cont), function() {
+					//console.log($(this).val());
+					produtoValor[cont] = $(this).val();
+					cont++;
 				});
+				
+				console.log(produtoId[2], produtoQuant[2], produtoValor[2]);
 				return false;
 				//alert(produtos);
 				
