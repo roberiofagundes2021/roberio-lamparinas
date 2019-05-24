@@ -1,6 +1,5 @@
 <?php 
-echo "Teste";
-/*
+
 include_once("sessao.php"); 
 
 include('global_assets/php/conexao.php');
@@ -146,4 +145,3 @@ try {
     // Process the exception, log, print etc.
     echo $e->getMessage();
 }
-*/

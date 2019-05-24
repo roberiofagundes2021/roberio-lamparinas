@@ -108,13 +108,20 @@ if(isset($_POST['inputTipo'])){
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-
 	<!-- /theme JS files -->
+	
+	<!-- JS file path -->
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+
+	<!-- Uniform plugin file path -->
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 
         $(document).ready(function() {	
+		
+			$('#summernote').summernote();
 			
 			//Ao informar o fornecedor, trazer os demais dados dele (contato, e-mail, telefone)
 			$('#cmbFornecedor').on('change', function(e){				
@@ -346,7 +353,7 @@ if(isset($_POST['inputTipo'])){
 								<div class="col-lg-12">
 									<div class="form-group">
 										<label for="txtareaConteudo">Conteúdo personalizado</label>
-										<textarea rows="5" cols="5" class="form-control" id="txtareaConteudo" name="txtareaConteudo" placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"><?php echo $row['OrcamConteudo']; ?></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="summernote" name="txtareaConteudo" placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"><?php echo $row['OrcamConteudo']; ?></textarea>
 									</div>
 								</div>
 							</div>		
