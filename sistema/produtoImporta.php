@@ -3,6 +3,8 @@
 include_once("sessao.php"); 
 
 $_SESSION['PaginaAtual'] = 'Importa Produto';
+$_SESSION['RelImportacao'] = '';
+$_SESSION['Importacao'] = '';
 
 include('global_assets/php/conexao.php');
 
@@ -80,6 +82,7 @@ else {
 		$identificador = date('now').time('now');
 		
 		$produtosimportados = "";
+		$erroFormato = "";
 		$erro = "";
 		$cont = 0;
 	
@@ -99,7 +102,7 @@ else {
 				   
 				} else { 
 				
-				   $erro = "O formato do arquivo de importação provavelmente não está correto. Verifique Modelo: <a href=\"images/modelo_importacao_emp.jpg\">Modelo de Importação de Produtos</a>";
+				   $erroFormato = "O formato do arquivo de importação provavelmente não está correto. Verifique Modelo: <a href='global_assets/importacao/modelo.csv'>Modelo de Importação de Produtos</a>";
 				   break; //sai do while	
 				}
 							   
@@ -204,48 +207,58 @@ else {
 	
 		fclose($arquivo);
 		
-		echo "<b>Relatório de Importação</b><br><br>";
+		$relatorio = "<b>Relatório de Importação</b><br><br>";
 		
-		if ($erro != "") {
+		if ($erro != "" or $erroFormato != "") {
 		   
-		   echo "<b>Erro na importação</b> - Produtos que não foram importados:<br><br>";
-		   echo substr($erro, 0, -2);
-		   echo "<br><br>";
+		   if ($erroFormato != "") $erro .= $erroFormato;
+		   
+		   $relatorio .= "<span style='color:#FF0000;'>Erro na importação</span><br><br>";
+		   $relatorio .= $erro; //substr($erro, 0, -1);
+		   $relatorio .= "<br><br>";
 		   
 		   //usado para remover os 2 ultimos caracteres da string, para desaparecer com a ultima vírgula
 		   $size = strlen($produtosimportados);
 		   $produtosimportados = substr($produtosimportados,0, $size-2);
-	
-		   echo "Total de registros no arquivo: ".$qtd."<br>";
-		   echo "Total de registros importados: ".$importados."<br><br>";
+		   
+		   if ($erroFormato == ""){
+			   $relatorio .= "Total de registros no arquivo: ".$qtd."<br>";
+			   $relatorio .= "Total de registros importados: ".$importados."<br><br>";
 
-		   echo "<div style=\"width:600px\"><b>Produtos Importados:</b> ".$produtosimportados."</div><br>";
-		   echo "<br>";
+			   $relatorio .= "<div style=\"width:600px\"><b>Produtos Importados:</b> ".$produtosimportados."</div><br>";
+			   $relatorio .= "<br>";
+		   }
 		   //echo "<a href=\"importacaogerar.php?identificador=$identificador\">Gerar empenhos>></a>";
-			  
-		   alerta("Upload efetuado com algumas ressalvas!");
+			
+		   $_SESSION['RelImportacao'] = $relatorio;
+		   $_SESSION['Importacao'] = 'Erro';
 			
 		} else {
+		   
+		   $relatorio .= "<span style='color:#0080FF;'>Importação realizada com sucesso!</span><br><br>";	
+			
 			//usado para remover os 2 ultimos caracteres da string, para desaparecer com a ultima vírgula
 		   $size = strlen($produtosimportados);
 		   $produtosimportados = substr($produtosimportados,0, $size-2);
 	
-		   echo "Total de registros no arquivo: ".$qtd."<br>";
-		   echo "Total de registros importados: ".$importados."<br><br>";
+		   $relatorio .= "Total de registros no arquivo: ".$qtd."<br>";
+		   $relatorio .= "Total de registros importados: ".$importados."<br><br>";
 
-		   echo "<div style=\"width:600px\"><b>Produtos Importados:</b> ".$produtosimportados."</div><br>";
-		   echo "<br>";
+		   $relatorio .= "<div style=\"width:600px\"><b>Produtos Importados:</b> ".$produtosimportados."</div>";
 		   //echo "<a href=\"importacaogerar.php?identificador=$identificador\">Gerar empenhos>></a>";
-			  
-		   alerta("Upload efetuado com sucesso!");		
+		   
+		   $_SESSION['RelImportacao'] = $relatorio; 
+		   $_SESSION['Importacao'] = 'Sucesso';	
 		}
 	
 	} else {
 
 		// Não foi possível fazer o upload, provavelmente a pasta está incorreta
-		alerta("Não foi possível enviar o arquivo, tente novamente");
-		irpara("produto.php");
+		$_SESSION['RelImportacao'] = "Não foi possível enviar o arquivo, tente novamente";
+		$_SESSION['Importacao'] = 'Erro';
 	}
+	
+	irpara("produto.php");
 }
 
 

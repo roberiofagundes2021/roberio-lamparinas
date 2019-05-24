@@ -233,7 +233,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<div class="col-lg-9">
 											<a href="#"><h2>Modelo de importação</h2></a>
 											<p style="font-weight: bold;">CodigoBarras | Nome do Produto | Detalhamento do Produto</p>
-											<p>Observação: Os demais campos deverão ser preenchidos manualmente</p>
+											<p>Observação: Favor utilizar o ; (ponto-e-vírgula) como delimitador ao gerar o arquivo CSV. O arquivo deve conter 3 colunas apenas, sendo que a primeira linha deve ter o cabeçalho acima.</p>
 										</div>
 										<div class="col-lg-3">
 											<form name="formUpload" id="formUpload" method="post" enctype="multipart/form-data" action="produtoImporta.php">
@@ -243,6 +243,28 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										</div>
 									</div>
 								</div>
+								
+								
+								<?php 
+									
+									if (isset($_SESSION['RelImportacao']) and $_SESSION['RelImportacao'] != '') {
+										
+										if (isset($_SESSION['Importacao']) and $_SESSION['Importacao'] == 'Erro'){
+											$classe = 'alert alert-warning';
+										} else {
+											$classe = 'alert alert-success';
+										}
+										
+										print('<div class="'.$classe.' alert-dismissible fade show" role="alert" style="margin-top: 10px;">'.$_SESSION['RelImportacao'].'
+										          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+												  <span aria-hidden="true">&times;</span>
+												  </button>
+											   </div>');										
+										unset($_SESSION['RelImportacao']);
+										//echo "<script> alerta('Atenção','".$_SESSION['RelImportacao']."','error'); </script>";  //Nao sei porque nao aparece
+									}
+								
+								?>
 							</div>
 							
 							<table class="table" id="tblProduto">
