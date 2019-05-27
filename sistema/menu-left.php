@@ -116,6 +116,7 @@
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-bag"></i> <span>Compras</span></a>
 							<ul class="nav nav-group-sub" data-submenu-title="Text editors">
+								<li class="nav-item"><a href="tr.php" class="nav-link">Termo de Referência</a></li>
 								<li class="nav-item"><a href="orcamento.php" class="nav-link">Orçamento</a></li>
 								<li class="nav-item"><a href="editor_ckeditor.html" class="nav-link">Solicitação</a></li>
 								<li class="nav-item"><a href="ordemcompra.php" class="nav-link">Ordem de Compra</a></li>
