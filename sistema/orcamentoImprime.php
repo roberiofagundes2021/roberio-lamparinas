@@ -25,10 +25,10 @@ try {
     $mpdf = new Mpdf([
         'mode' => 'utf-8', 
         //'format' => [190, 236], 
-        'format' => 'A4-L',
+        'format' => 'A4-P', //A4-L
         'default_font_size' => 9,
 		'default_font' => 'dejavusans',
-        'orientation' => 'L'
+        'orientation' => 'P' //P->Portrait (retrato)    L->Landscape (paisagem)
 	]);
 	
 	$topo = "
@@ -58,7 +58,7 @@ try {
 		$html .= '
 		<br>
 		<div style="font-weight: bold; position:relative; margin-top: 50px; background-color:#ccc; padding: 5px;">
-			Fornecedor: <span style="font-weight:normal;">'.$item['ForneNome'].'</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Telefone: <span style="font-weight:normal;">'.$item['ForneCelular'].'</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">'.$item['ForneEmail'].'</span>
+			Fornecedor: <span style="font-weight:normal;">'.$item['ForneNome'].'</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">'.$item['ForneCelular'].'</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">'.$item['ForneEmail'].'</span>
 		</div>
 		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
 			Categoria: <span style="font-weight:normal;">'.$item['CategNome'].'</span> &nbsp;&nbsp;<span style="color:#ccc;">|</span> &nbsp;&nbsp; SubCategoria: <span style="font-weight:normal;">'.$item['SbCatNome'].'</span> 
@@ -69,8 +69,8 @@ try {
 		<table style="width:100%; border-collapse: collapse;">
 			<tr>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Item</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:55%">'.$tipo.'</th>
-				<th style="text-align: center; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Quantidade</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:53%">'.$tipo.'</th>
+				<th style="text-align: center; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
 				<th style="text-align: center; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Unidade</th>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Valor Unit.</th>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Valor Total</th>
@@ -96,8 +96,8 @@ try {
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
 					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['OrXPrQuantidade']."</td>
 					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['UnMedSigla']."</td>
-					<td style='padding-top: 8px;'>______________</td>
-					<td style='padding-top: 8px;'>______________</td>
+					<td style='padding-top: 8px;'>__________</td>
+					<td style='padding-top: 8px;'>__________</td>
 				</tr>
 			";
 			

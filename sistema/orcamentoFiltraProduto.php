@@ -4,8 +4,8 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if (isset($_POST['idProdutos']) and $_POST['idProdutos'] != ''){
-	$produtos = $_POST['idProdutos'];
+if (isset($_POST['produtos']) and $_POST['produtos'] != ''){
+	$produtos = $_POST['produtos'];
 	$numProdutos = count($produtos);
 	
 	$lista = "";
@@ -50,14 +50,24 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 $output = '';
 
-$cont = 1;
+$cont = 0;
 
 foreach ($row as $item){
+	
+	$cont++;
+	
+	$id = $item['ProduId'];
+	
+	$quantidade = isset($_POST['produtoQuant'][$id]) ? $_POST['produtoQuant'][$id] : '';
+	$valorUnitario = isset($_POST['produtoValor'][$id]) ? $_POST['produtoValor'][$id] : '';
+	$valorTotal = (isset($_POST['produtoQuant'][$id]) && isset($_POST['produtoValor'][$id])) ? mostraValor((float)$quantidade * (float)$valorUnitario) : '';
+	
 	$output .= ' <div class="row" style="margin-top: 8px;">
 					<div class="col-lg-6">
 						<div class="row">
 							<div class="col-lg-1">
 								<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
+								<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
 							</div>
 							<div class="col-lg-11">
 								<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
@@ -68,17 +78,18 @@ foreach ($row as $item){
 						<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 					</div>
 					<div class="col-lg-1">
-						<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border" onChange="calculaValorTotal('.$cont.')">
+						<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" value="'.$quantidade.'">
 					</div>	
 					<div class="col-lg-2">
-						<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12">
+						<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$valorUnitario.'">
 					</div>	
 					<div class="col-lg-2">
-						<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="" readOnly>
+						<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$valorTotal.'" readOnly>
 					</div>
-				</div>';
-	$cont++;
+				</div>';	
 }
+
+$output .= '<input type="hidden" id="totalRegistros" name="totalRegistros" value="'.$cont.'" >';
 
 echo $output;
 

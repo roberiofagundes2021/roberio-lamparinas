@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Editar Orçamento';
+$_SESSION['PaginaAtual'] = 'Orçamento Produto';
 
 include('global_assets/php/conexao.php');
 
@@ -10,10 +10,69 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputOrcamentoId'])){
 	$iOrcamento = $_POST['inputOrcamentoId'];
 	$iCategoria = $_POST['inputOrcamentoCategoria'];
-} else{
+} else if (isset($_POST['inputIdOrcamento'])){
 	$iOrcamento = $_POST['inputIdOrcamento'];
 	$iCategoria = $_POST['inputIdCategoria'];
+} else {
+	irpara("orcamento.php");
 }
+
+//Se está alterando
+if(isset($_POST['inputIdOrcamento'])){
+	
+	$sql = "DELETE FROM OrcamentoXProduto
+			WHERE OrXPrOrcamento = :iOrcamento AND OrXPrEmpresa = :iEmpresa";
+	$result = $conn->prepare($sql);
+	
+	$result->execute(array(
+					':iOrcamento' => $iOrcamento,
+					':iEmpresa' => $_SESSION['EmpreId']
+					));		
+	
+	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+	
+	/*	$sql = "SELECT *
+				FROM OrcamentoXProduto
+				WHERE OrXPrEmpresa = ". $_SESSION['EmpreId'] ." and OrXPrOrcamento = ".$iOrcamento." and OrXPrProduto = ".$_POST['inputIdProduto'.$i];
+		$result = $conn->query($sql);
+		$rowOrcamentoXProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+		$count = count($rowOrcamentoXProduto);
+		
+		// se já existe o registro UPDATE, senão INSERT
+		if ($count){
+			$sql = "UPDATE OrcamentoXProduto 
+					SET OrXPrQuantidade = :iQuantidade, OrXPrValorUnitario = :fValorUnitario, OrXPrUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE OrXPrEmpresa = :iEmpresa and OrXPrOrcamento = :iOrcamento and OrXPrProduto = :iProduto";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId'],
+							':iOrcamento' => $iOrcamento,
+							':iProduto' => $_POST['inputIdProduto'.$i]
+							));
+		} else { */
+			$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrEmpresa)
+					VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+			$result = $conn->prepare($sql);
+			
+			$result->execute(array(
+							':iOrcamento' => $iOrcamento,
+							':iProduto' => $_POST['inputIdProduto'.$i],
+							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId']
+							));		
+		//}
+		
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Orçamento alterado!!!";
+		$_SESSION['msg']['tipo'] = "success";
+	}
+}	
 
 try{
 	
@@ -46,54 +105,6 @@ try{
 } catch(PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
 }
-
-//Se está alterando
-if(isset($_POST['inputIdOrcamento'])){
-	
-	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
-	
-		$sql = "SELECT *
-				FROM OrcamentoXProduto
-				WHERE OrXPrEmpresa = ". $_SESSION['EmpreId'] ." and OrXPrOrcamento = ".$iOrcamento." and OrXPrProduto = ".$_POST['inputIdProduto'.$i];
-		$result = $conn->query($sql);
-		$rowOrcamentoXProduto = $result->fetchAll(PDO::FETCH_ASSOC);
-		$count = count($rowOrcamentoXProduto);
-		
-		// se já existe o registro UPDATE, senão INSERT
-		if ($count){
-			$sql = "UPDATE OrcamentoXProduto 
-					SET OrXPrQuantidade = :iQuantidade, OrXPrValorUnitario = :fValorUnitario, OrXPrUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE OrXPrEmpresa = :iEmpresa and OrXPrOrcamento = :iOrcamento and OrXPrProduto = :iProduto";
-			$result = $conn->prepare($sql);
-					
-			$result->execute(array(
-							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iEmpresa' => $_SESSION['EmpreId'],
-							':iOrcamento' => $iOrcamento,
-							':iProduto' => $_POST['inputIdProduto'.$i]
-							));
-		} else {
-			$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrEmpresa)
-					VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
-			$result = $conn->prepare($sql);
-			
-			$result->execute(array(
-							':iOrcamento' => $iOrcamento,
-							':iProduto' => $_POST['inputIdProduto'.$i],
-							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iEmpresa' => $_SESSION['EmpreId']
-							));		
-		}
-		
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Orçamento alterado!!!";
-		$_SESSION['msg']['tipo'] = "success";		
-	}
-}	
 
 ?>
 
@@ -171,41 +182,40 @@ if(isset($_POST['inputIdOrcamento'])){
 				var inputCategoria = $('#inputIdCategoria').val();
 				var inputSubCategoria = $('#inputIdSubCategoria').val();
 				var produtos = $(this).val();
-				console.log(produtos);
+				//console.log(produtos);
 				
 				var cont = 1;
 				var produtoId = [];
 				var produtoQuant = [];
 				var produtoValor = [];
-
-				$.each( $(".idProduto"+cont), function() {			
+				
+				// Aqui é para cada "class" faça
+				$.each( $(".idProduto"), function() {			
 					produtoId[cont] = $(this).val();
 					cont++;
-					console.log(cont);
 				});
 				
 				cont = 1;
 				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
-				$.each( $(".Quantidade"+cont), function() {
-					produtoQuant[cont] = $(this).val();
+				$.each( $(".Quantidade"), function() {
+					$id = produtoId[cont];
+					
+					produtoQuant[$id] = $(this).val();
 					cont++;
 				});				
 				
 				cont = 1;
-				$.each( $(".ValorUnitario"+cont), function() {
-					//console.log($(this).val());
-					produtoValor[cont] = $(this).val();
+				$.each( $(".ValorUnitario"), function() {
+					$id = produtoId[cont];
+					
+					produtoValor[$id] = $(this).val();
 					cont++;
 				});
-				
-				console.log(produtoId[2], produtoQuant[2], produtoValor[2]);
-				return false;
-				//alert(produtos);
 				
 				$.ajax({
 					type: "POST",
 					url: "orcamentoFiltraProduto.php",
-					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, idProdutos: produtos},
+					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
 					success: function(resposta){
 						//alert(resposta);
 						$("#tabelaProdutos").html(resposta).show();
@@ -331,7 +341,7 @@ if(isset($_POST['inputIdOrcamento'])){
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 														
 														foreach ($rowProduto as $item){	
-															var_dump($aProdutos);
+															
 															if (in_array($item['ProduId'], $aProdutos)) {
 																$seleciona = "selected";
 															} else {
@@ -445,7 +455,7 @@ if(isset($_POST['inputIdOrcamento'])){
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto'.$cont.'">
+															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
 														</div>
 														<div class="col-lg-11">
 															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
@@ -456,10 +466,10 @@ if(isset($_POST['inputIdOrcamento'])){
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade'.$cont.'" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'">
 												</div>	
 												<div class="col-lg-2">
-													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario'.$cont.'" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
+													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
 												</div>	
 												<div class="col-lg-2">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>
@@ -468,9 +478,9 @@ if(isset($_POST['inputIdOrcamento'])){
 											
 										}
 										
-										print('</div>');
-										
 										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="'.$cont.'" >');
+										
+										print('</div>');									
 										
 									?>
 									
@@ -504,6 +514,8 @@ if(isset($_POST['inputIdOrcamento'])){
 
 	</div>
 	<!-- /page content -->
+	
+	<?php include_once("alerta.php"); ?>
 
 </body>
 </html>
