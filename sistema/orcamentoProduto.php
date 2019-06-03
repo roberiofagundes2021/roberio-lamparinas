@@ -26,6 +26,23 @@ try{
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
+	
+	$sql = "SELECT OrXPrProduto
+			FROM OrcamentoXProduto
+			JOIN Produto on ProduId = OrXPrProduto
+			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$iCategoria;
+	
+	if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
+		$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
+	}	
+	$result = $conn->query($sql);
+	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+	$count = count($rowProdutoUtilizado);
+	
+	foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
+		$aProdutos[] = $itemProdutoUtilizado['OrXPrProduto'];
+	}
+	
 } catch(PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
 }
@@ -311,10 +328,17 @@ if(isset($_POST['inputIdOrcamento'])){
 														
 														$sql .= " ORDER BY ProduNome ASC";
 														$result = $conn->query($sql);
-														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 														
-														foreach ($rowProduto as $item){															
-															print('<option value="'.$item['ProduId'].'" selected>'.$item['ProduNome'].'</option>');
+														foreach ($rowProduto as $item){	
+															var_dump($aProdutos);
+															if (in_array($item['ProduId'], $aProdutos)) {
+																$seleciona = "selected";
+															} else {
+																$seleciona = "";
+															}													
+															
+															print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
 														}
 													
 													?>
