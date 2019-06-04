@@ -2,50 +2,50 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'TR Produto';
+$_SESSION['PaginaAtual'] = 'Orçamento Produto';
 
 include('global_assets/php/conexao.php');
 
-//Se veio do tr.php
-if(isset($_POST['inputTRId'])){
-	$iTR = $_POST['inputTRId'];
-	$iCategoria = $_POST['inputTRCategoria'];
-} else if (isset($_POST['inputIdTR'])){
-	$iTR = $_POST['inputIdTR'];
+//Se veio do orcamento.php
+if(isset($_POST['inputOrcamentoId'])){
+	$iOrcamento = $_POST['inputOrcamentoId'];
+	$iCategoria = $_POST['inputOrcamentoCategoria'];
+} else if (isset($_POST['inputIdOrcamento'])){
+	$iOrcamento = $_POST['inputIdOrcamento'];
 	$iCategoria = $_POST['inputIdCategoria'];
 } else {
-	irpara("tr.php");
+	irpara("orcamento.php");
 }
 
 //Se está alterando
-if(isset($_POST['inputIdTR'])){
+if(isset($_POST['inputIdOrcamento'])){
 	
-	$sql = "DELETE FROM TermoReferenciaXProduto
-			WHERE TRXPrTermoReferencia = :iTR AND TRXPrEmpresa = :iEmpresa";
+	$sql = "DELETE FROM OrcamentoXProduto
+			WHERE OrXPrOrcamento = :iOrcamento AND OrXPrEmpresa = :iEmpresa";
 	$result = $conn->prepare($sql);
 	
 	$result->execute(array(
-					':iTR' => $iTR,
+					':iOrcamento' => $iOrcamento,
 					':iEmpresa' => $_SESSION['EmpreId']
 					));		
 	
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 	
-		$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrUsuarioAtualizador, TRXPrEmpresa)
-				VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrEmpresa)
+				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
 		$result->execute(array(
-						':iTR' => $iTR,
+						':iOrcamento' => $iOrcamento,
 						':iProduto' => $_POST['inputIdProduto'.$i],
 						':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
 						':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
-						));
+						));		
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "TR alterado!!!";
+		$_SESSION['msg']['mensagem'] = "Orçamento alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 	}
 }	
@@ -53,28 +53,29 @@ if(isset($_POST['inputIdTR'])){
 try{
 	
 	$sql = "SELECT *
-			FROM TermoReferencia
-			JOIN Categoria on CategId = TrRefCategoria
-			LEFT JOIN SubCategoria on SbCatId = TrRefSubCategoria
-			WHERE TrRefEmpresa = ". $_SESSION['EmpreId'] ." and TrRefId = ".$iTR;
+			FROM Orcamento
+			LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
+			JOIN Categoria on CategId = OrcamCategoria
+			LEFT JOIN SubCategoria on SbCatId = OrcamSubCategoria
+			WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = ".$iOrcamento;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
 	
-	$sql = "SELECT TRXPrProduto
-			FROM TermoReferenciaXProduto
-			JOIN Produto on ProduId = TRXPrProduto
+	$sql = "SELECT OrXPrProduto
+			FROM OrcamentoXProduto
+			JOIN Produto on ProduId = OrXPrProduto
 			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$iCategoria;
 	
-	if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null){
-		$sql .= " and ProduSubCategoria = ".$row['TrRefSubCategoria'];
+	if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
+		$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
 	}	
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
 	
 	foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
-		$aProdutos[] = $itemProdutoUtilizado['TRXPrProduto'];
+		$aProdutos[] = $itemProdutoUtilizado['OrXPrProduto'];
 	}
 	
 } catch(PDOException $e) {
@@ -89,7 +90,7 @@ try{
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Listando produtos do TR</title>
+	<title>Lamparinas | Listando produtos do Orçamento</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -108,6 +109,49 @@ try{
     <script type="text/javascript" >
 
         $(document).ready(function() {	
+
+			/*
+			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
+			$('#cmbSubCategoria').on('change', function(e){
+							
+				FiltraProduto();
+				
+				var inputFornecedor = $('#inputIdFornecedor').val();
+				var inputCategoria = $('#inputIdCategoria').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
+				
+				$.getJSON('filtraProduto.php?idFornecedor='+inputFornecedor+'&idCategoria='+inputCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){
+					
+					if (dados.length){
+						
+						var option = '';
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';							
+						});						
+						
+						$('#cmbProduto').remove();
+						
+						$('#cmbProduto').html(option).show();
+					} else {
+						ResetProduto();
+					}					
+				});	
+
+				$.ajax({
+					type: "POST",
+					url: "orcamentoTabelaProduto.php",
+					data: {idFornecedor: inputFornecedor, idCategoria: inputCategoria, idSubCategoria: cmbSubCategoria},
+					success: function(resposta){
+						
+						$("#tabelaProdutos").html(resposta).show();
+						
+						return false;
+						
+					}	
+				});
+				
+			});	 */
 
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			$('#cmbProduto').on('change', function(e){
@@ -147,7 +191,7 @@ try{
 				
 				$.ajax({
 					type: "POST",
-					url: "trFiltraProduto.php",
+					url: "orcamentoFiltraProduto.php",
 					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
 					success: function(resposta){
 						//alert(resposta);
@@ -206,12 +250,12 @@ try{
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formTRProduto" id="formTRProduto" method="post" class="form-validate">
+					<form name="formOrcamentoProduto" id="formOrcamentoProduto" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Listar Produtos - TR Nº "<?php echo $row['TrRefNumero']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Listar Produtos - Orçamento Nº "<?php echo $row['OrcamNumero']; ?>"</h5>
 						</div>					
 						
-						<input type="hidden" id="inputIdTR" name="inputIdTR" class="form-control" value="<?php echo $row['TrRefId']; ?>">
+						<input type="hidden" id="inputIdOrcamento" name="inputIdOrcamento" class="form-control" value="<?php echo $row['OrcamId']; ?>">
 						
 						<div class="card-body">		
 								
@@ -220,9 +264,30 @@ try{
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
+												<label for="inputFornecedor">Fornecedor</label>
+												<input type="text" id="inputFornecedor" name="inputFornecedor" class="form-control" value="<?php echo $row['ForneNome']; ?>" readOnly>
+												<input type="hidden" id="inputIdFornecedor" name="inputIdFornecedor" class="form-control" value="<?php echo $row['ForneId']; ?>">
+											</div>
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputCelular">Telefone</label>
+												<input type="text" id="inputTelefone" name="inputTelefone" class="form-control" value="<?php echo $row['ForneTelefone']; ?>" readOnly>
+											</div>
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputTelefone">Celular</label>
+												<input type="text" id="inputCelular" name="inputCelular" class="form-control" value="<?php echo $row['ForneCelular']; ?>" readOnly>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
 												<label for="inputCategoriaNome">Categoria</label>
 												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" value="<?php echo $row['CategNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['TrRefCategoria']; ?>">
+												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['OrcamCategoria']; ?>">
 											</div>
 										</div>
 									
@@ -230,7 +295,7 @@ try{
 											<div class="form-group">
 												<label for="inputSubCategoria">Sub Categoria</label>
 												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo $row['SbCatNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['TrRefSubCategoria']; ?>">
+												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['OrcamSubCategoria']; ?>">
 											</div>
 										</div>
 									</div>
@@ -244,8 +309,8 @@ try{
 																FROM Produto										     
 																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria;
 														
-														if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null){
-															$sql .= " and ProduSubCategoria = ".$row['TrRefSubCategoria'];
+														if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
+															$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
 														}
 														
 														$sql .= " ORDER BY ProduNome ASC";
@@ -293,11 +358,11 @@ try{
 									
 									<?php									
 
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, TRXPrQuantidade, TRXPrValorUnitario
+										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OrXPrQuantidade, OrXPrValorUnitario
 												FROM Produto
-												JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
+												JOIN OrcamentoXProduto on OrXPrProduto = ProduId
 												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and TRXPrTermoReferencia = ".$iTR;
+												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OrXPrOrcamento = ".$iOrcamento;
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
@@ -308,8 +373,8 @@ try{
 													LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and ProduStatus = 1 ";
 													
-											if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null){
-												$sql .= " and ProduSubCategoria = ".$row['TrRefSubCategoria'];
+											if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
+												$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
 											}
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -357,9 +422,9 @@ try{
 											
 											$cont++;
 											
-											$iQuantidade = isset($item['TRXPrQuantidade']) ? $item['TRXPrQuantidade'] : '';
-											$fValorUnitario = isset($item['TRXPrValorUnitario']) ? mostraValor($item['TRXPrValorUnitario']) : '';											
-											$fValorTotal = (isset($item['TRXPrQuantidade']) and isset($item['TRXPrValorUnitario'])) ? mostraValor($item['TRXPrQuantidade'] * $item['TRXPrValorUnitario']) : '';
+											$iQuantidade = isset($item['OrXPrQuantidade']) ? $item['OrXPrQuantidade'] : '';
+											$fValorUnitario = isset($item['OrXPrValorUnitario']) ? mostraValor($item['OrXPrValorUnitario']) : '';											
+											$fValorTotal = (isset($item['OrXPrQuantidade']) and isset($item['OrXPrValorUnitario'])) ? mostraValor($item['OrXPrQuantidade'] * $item['OrXPrValorUnitario']) : '';
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
@@ -405,7 +470,7 @@ try{
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
-										<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="orcamento.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

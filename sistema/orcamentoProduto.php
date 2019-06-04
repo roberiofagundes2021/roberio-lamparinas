@@ -31,42 +31,18 @@ if(isset($_POST['inputIdOrcamento'])){
 	
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 	
-	/*	$sql = "SELECT *
-				FROM OrcamentoXProduto
-				WHERE OrXPrEmpresa = ". $_SESSION['EmpreId'] ." and OrXPrOrcamento = ".$iOrcamento." and OrXPrProduto = ".$_POST['inputIdProduto'.$i];
-		$result = $conn->query($sql);
-		$rowOrcamentoXProduto = $result->fetchAll(PDO::FETCH_ASSOC);
-		$count = count($rowOrcamentoXProduto);
+		$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrEmpresa)
+				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+		$result = $conn->prepare($sql);
 		
-		// se já existe o registro UPDATE, senão INSERT
-		if ($count){
-			$sql = "UPDATE OrcamentoXProduto 
-					SET OrXPrQuantidade = :iQuantidade, OrXPrValorUnitario = :fValorUnitario, OrXPrUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE OrXPrEmpresa = :iEmpresa and OrXPrOrcamento = :iOrcamento and OrXPrProduto = :iProduto";
-			$result = $conn->prepare($sql);
-					
-			$result->execute(array(
-							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iEmpresa' => $_SESSION['EmpreId'],
-							':iOrcamento' => $iOrcamento,
-							':iProduto' => $_POST['inputIdProduto'.$i]
-							));
-		} else { */
-			$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrEmpresa)
-					VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
-			$result = $conn->prepare($sql);
-			
-			$result->execute(array(
-							':iOrcamento' => $iOrcamento,
-							':iProduto' => $_POST['inputIdProduto'.$i],
-							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iEmpresa' => $_SESSION['EmpreId']
-							));		
-		//}
+		$result->execute(array(
+						':iOrcamento' => $iOrcamento,
+						':iProduto' => $_POST['inputIdProduto'.$i],
+						':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+						':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iEmpresa' => $_SESSION['EmpreId']
+						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Orçamento alterado!!!";
@@ -96,7 +72,7 @@ try{
 	}	
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
-	$count = count($rowProdutoUtilizado);
+	$countProdutoUtilizado = count($rowProdutoUtilizado);
 	
 	foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 		$aProdutos[] = $itemProdutoUtilizado['OrXPrProduto'];
@@ -135,52 +111,10 @@ try{
         $(document).ready(function() {	
 
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
-			$('#cmbSubCategoria').on('change', function(e){
-							
-				FiltraProduto();
-				
-				var inputFornecedor = $('#inputIdFornecedor').val();
-				var inputCategoria = $('#inputIdCategoria').val();
-				var cmbSubCategoria = $('#cmbSubCategoria').val();
-				
-				$.getJSON('filtraProduto.php?idFornecedor='+inputFornecedor+'&idCategoria='+inputCategoria+'&idSubCategoria='+cmbSubCategoria, function (dados){
-					
-					if (dados.length){
-						
-						var option = '';
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';							
-						});						
-						
-						$('#cmbProduto').remove();
-						
-						$('#cmbProduto').html(option).show();
-					} else {
-						ResetProduto();
-					}					
-				});	
-
-				$.ajax({
-					type: "POST",
-					url: "orcamentoTabelaProduto.php",
-					data: {idFornecedor: inputFornecedor, idCategoria: inputCategoria, idSubCategoria: cmbSubCategoria},
-					success: function(resposta){
-						
-						$("#tabelaProdutos").html(resposta).show();
-						
-						return false;
-						
-					}	
-				});
-				
-			});	
-
-			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			$('#cmbProduto').on('change', function(e){
 				
 				var inputCategoria = $('#inputIdCategoria').val();
-				var inputSubCategoria = $('#inputIdSubCategoria').val();
+				var inputSubCategoria = $('#inputIdSubCategoria').val(); alert(inputSubCategoria);
 				var produtos = $(this).val();
 				//console.log(produtos);
 				
@@ -342,7 +276,7 @@ try{
 														
 														foreach ($rowProduto as $item){	
 															
-															if (in_array($item['ProduId'], $aProdutos)) {
+															if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
 																$seleciona = "selected";
 															} else {
 																$seleciona = "";
