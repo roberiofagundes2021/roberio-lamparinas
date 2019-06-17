@@ -215,11 +215,11 @@ if(isset($_POST['inputTipo'])){
 		
 		//Mostra o "Filtrando..." na combo SubCategoria
 		function Filtrando(){
-			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+			$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
 		}		
 		
 		function ResetSubCategoria(){
-			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+			$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
 		}
 							
 	</script>

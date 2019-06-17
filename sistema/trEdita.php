@@ -13,10 +13,8 @@ if(isset($_POST['inputTRId'])){
 	
 	try{
 		
-		$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefSubCategoria, TrRefConteudo, 
-					   TrRefSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
+		$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefSubCategoria, TrRefConteudo
 				FROM TermoReferencia
-				JOIN Usuario on UsuarId = TrRefSolicitante
 				WHERE TrRefId = $iTR ";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -193,11 +191,11 @@ if(isset($_POST['inputData'])){
 		
 		//Mostra o "Filtrando..." na combo SubCategoria
 		function Filtrando(){
-			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+			$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
 		}		
 		
 		function ResetSubCategoria(){
-			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+			$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
 		}
 							
 	</script>
@@ -318,36 +316,7 @@ if(isset($_POST['inputData'])){
 									</div>
 								</div>
 							</div>		
-							<br>
-						
-							<div class="row">
-								<div class="col-lg-12">									
-									<h5 class="mb-0 font-weight-semibold">Dados do Solicitante</h5>
-									<br>
-									<div class="row">
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputNomeSolicitante">Solicitante</label>
-												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $row['UsuarNome']; ?>" readOnly>
-											</div>
-										</div>
-										
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputEmailSolicitante">E-mail</label>
-												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $row['UsuarEmail']; ?>" readOnly>
-											</div>
-										</div>									
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputTelefoneSolicitante">Telefone</label>
-												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $row['UsuarTelefone']; ?>" readOnly>
-											</div>
-										</div>									
-									</div>
-								</div>
-							</div>							
+							<br>					
 
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								

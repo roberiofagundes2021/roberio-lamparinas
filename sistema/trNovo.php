@@ -6,13 +6,6 @@ $_SESSION['PaginaAtual'] = 'Novo TR';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
-		 FROM Usuario
-		 Where UsuarId = ".$_SESSION['UsuarId']."
-		 ORDER BY UsuarNome ASC");
-$result = $conn->query("$sql");
-$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
-
 if(isset($_POST['inputData'])){
 	
 	try{
@@ -27,8 +20,8 @@ if(isset($_POST['inputData'])){
 		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 			
 		$sql = "INSERT INTO TermoReferencia (TrRefNumero, TrRefData, TrRefCategoria, TrRefSubCategoria, TrRefConteudo,
-											 TrRefSolicitante, TrRefStatus, TrRefUsuarioAtualizador, TrRefEmpresa)
-				VALUES (:sNumero, :dData, :iCategoria, :iSubCategoria, :sConteudo, :iSolicitante, 
+											 TrRefStatus, TrRefUsuarioAtualizador, TrRefEmpresa)
+				VALUES (:sNumero, :dData, :iCategoria, :iSubCategoria, :sConteudo, 
 						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 			
@@ -38,7 +31,6 @@ if(isset($_POST['inputData'])){
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
-						':iSolicitante' => $_SESSION['UsuarId'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
@@ -141,11 +133,11 @@ if(isset($_POST['inputData'])){
 		
 		//Mostra o "Filtrando..." na combo SubCategoria
 		function Filtrando(){
-			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+			$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
 		}
 		
 		function ResetSubCategoria(){
-			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+			$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
 		}		
 		
 	</script>
@@ -236,35 +228,6 @@ if(isset($_POST['inputData'])){
 							</div>		
 							<br>
 							
-							<div class="row">
-								<div class="col-lg-12">									
-									<h5 class="mb-0 font-weight-semibold">Dados do Solicitante</h5>
-									<br>
-									<div class="row">
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputNomeSolicitante">Solicitante</label>
-												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly>
-											</div>
-										</div>
-										
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputEmailSolicitante">E-mail</label>
-												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarEmail']; ?>" readOnly>
-											</div>
-										</div>									
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputTelefoneSolicitante">Telefone</label>
-												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarTelefone']; ?>" readOnly>
-											</div>
-										</div>									
-									</div>
-								</div>
-							</div>							
-
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
