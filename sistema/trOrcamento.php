@@ -8,7 +8,7 @@ $_SESSION['PaginaAtual'] = 'TR / Orçamento';
 
 if (isset($_POST['inputTRId'])){
 	
-	echo "Entrou";
+	//echo "Entrou";
 	$_SESSION['TRId'] = $_POST['inputTRId'];
 	$_SESSION['TRNumero'] = $_POST['inputTRNumero'];
 }
