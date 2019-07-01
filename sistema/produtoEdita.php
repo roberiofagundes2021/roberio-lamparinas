@@ -279,7 +279,12 @@ if(isset($_POST['inputNome'])){
 				
 				//alert(parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal));
 				var lucro = parseFloat(inputValorVenda) - parseFloat(inputCustoFinal);		
-				var inputMargemLucro = lucro / parseFloat(inputCustoFinal) * 100;
+
+				inputMargemLucro = 0;
+				
+				if (inputCustoFinal != 0.00){
+					inputMargemLucro = lucro / parseFloat(inputCustoFinal) * 100;
+				}
 				
 				inputMargemLucro = float2moeda(inputMargemLucro).toString();
 				

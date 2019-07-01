@@ -72,8 +72,8 @@ try {
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:53%">'.$tipo.'</th>
 				<th style="text-align: center; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
 				<th style="text-align: center; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Unidade</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Valor Unit.</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Valor Total</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">V. Unit.</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">V. Total</th>
 			</tr>
 		';	
 		
@@ -90,14 +90,22 @@ try {
 		
 		foreach ($rowProdutos as $itemProduto){
 			
+			if ($itemProduto['OrXPrValorUnitario'] != '' and $itemProduto['OrXPrValorUnitario'] != null){
+				$valorUnitario = mostraValor($itemProduto['OrXPrValorUnitario']);
+				$valorTotal = mostraValor($itemProduto['OrXPrQuantidade'] * $itemProduto['OrXPrValorUnitario']);
+			} else {
+				$valorUnitario = "__________";
+				$valorTotal = "__________";
+			}
+			
 			$html .= "
 				<tr>
 					<td style='padding-top: 8px;'>".$cont."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
 					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['OrXPrQuantidade']."</td>
 					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['UnMedSigla']."</td>
-					<td style='padding-top: 8px;'>__________</td>
-					<td style='padding-top: 8px;'>__________</td>
+					<td style='padding-top: 8px;'>".$valorUnitario."</td>
+					<td style='padding-top: 8px;'>".$valorTotal."</td>
 				</tr>
 			";
 			

@@ -62,7 +62,7 @@ if (isset($_POST['inputOrcamentoId'])){
 						':iOrcamento' => $insertId,
 						':iProduto' => $item['OrXPrProduto'],
 						':iQuantidade' => $item['OrXPrQuantidade'],
-						':fValorUnitario' => $item['OrXPrValorUnitario'],
+						':fValorUnitario' => null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));

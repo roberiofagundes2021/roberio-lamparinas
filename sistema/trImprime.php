@@ -80,14 +80,22 @@ try {
 		
 		foreach ($rowProdutos as $itemProduto){
 			
+			if ($itemProduto['OrXPrValorUnitario'] != '' and $itemProduto['OrXPrValorUnitario'] != null){
+				$valorUnitario = mostraValor($itemProduto['OrXPrValorUnitario']);
+				$valorTotal = mostraValor($itemProduto['OrXPrQuantidade'] * $itemProduto['OrXPrValorUnitario']);
+			} else {
+				$valorUnitario = "__________";
+				$valorTotal = "__________";
+			}			
+			
 			$html .= "
 				<tr>
 					<td style='padding-top: 8px;'>".$cont."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
 					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['TRXPrQuantidade']."</td>
 					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['UnMedSigla']."</td>
-					<td style='padding-top: 8px;'>_________</td>
-					<td style='padding-top: 8px;'>_________</td>
+					<td style='padding-top: 8px;'>".$valorUnitario."</td>
+					<td style='padding-top: 8px;'>".$valorTotal."</td>
 				</tr>
 			";
 			
