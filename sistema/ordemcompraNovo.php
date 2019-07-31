@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Nova OrdemCompra';
+$_SESSION['PaginaAtual'] = 'Nova Ordem de Compra';
 
 include('global_assets/php/conexao.php');
 
@@ -204,40 +204,64 @@ if(isset($_POST['inputData'])){
 					
 					<form name="formOrcamento" id="formOrcamento" method="post" class="form-validate" action="orcamentoNovo.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Orçamento</h5>
+							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Ordem de Compra</h5>
 						</div>
 						
 						<div class="card-body">								
 								
 							<div class="row">				
+								
 								<div class="col-lg-12">
-									<div class="row">
-										
+									
+									<div class="row">										
 										<div class="col-lg-3">
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
 														<input type="radio" id="inputTipo" name="inputTipo" value="P" class="form-input-styled" checked data-fouc>
-														Produto
+														Carta Contrato
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
 														<input type="radio" id="inputTipo" name="inputTipo" value="S" class="form-input-styled" data-fouc>
-														Serviço
+														Ordem de Compra
 													</label>
 												</div>										
 											</div>
 										</div>										
 										
-										<div class="col-lg-1">
+										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputData">Data</label>
+												<label for="inputData">Data da Emissão</label>
 												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" readOnly>
 											</div>
 										</div>
-																				
-										<div class="col-lg-4">
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputNumero">Número</label>
+												<input type="text" id="inputNumero" name="inputNumero" class="form-control">
+											</div>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputLote">Lote</label>
+												<input type="text" id="inputLote" name="inputLote" class="form-control">
+											</div>
+										</div>
+										
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputProcesso">Processo</label>
+												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control">
+											</div>
+										</div>	
+									</div>
+									
+									<div class="row">											
+										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
@@ -259,7 +283,7 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 										
-										<div class="col-lg-4">
+										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
@@ -362,7 +386,46 @@ if(isset($_POST['inputData'])){
 										</div>									
 									</div>
 								</div>
-							</div>							
+							</div>
+							<br>
+								
+							<div class="row">
+								<div class="col-lg-12">									
+									<h5 class="mb-0 font-weight-semibold">Dados da Entrega</h5>
+									<br>
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="inputNomeSolicitante">Solicitante</label>
+												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly>
+											</div>
+										</div>
+										
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputEmailSolicitante">E-mail</label>
+												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarEmail']; ?>" readOnly>
+											</div>
+										</div>									
+
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputTelefoneSolicitante">Telefone</label>
+												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarTelefone']; ?>" readOnly>
+											</div>
+										</div>	
+									</div>
+									
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label for="txtareaObservacao">Observação</label>											
+												<textarea rows="3" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
