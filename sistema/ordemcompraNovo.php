@@ -17,19 +17,21 @@ if(isset($_POST['inputData'])){
 	
 	try{
 		
-		$sql = ("SELECT COUNT(isnull(OrcamNumero,0)) as Numero
-				 FROM Orcamento
-				 Where OrcamEmpresa = ".$_SESSION['EmpreId']."");
+		/*
+		$sql = ("SELECT COUNT(isnull(OrComNumero,0)) as Numero
+				 FROM OrdemCompra
+				 Where OrComEmpresa = ".$_SESSION['EmpreId']."");
 		$result = $conn->query("$sql");
 		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);		
 		
 		$sNumero = (int)$rowNumero['Numero'] + 1;
-		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
+		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT); */
 			
-		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamSubCategoria, OrcamConteudo, OrcamFornecedor,
-									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamEmpresa)
-				VALUES (:sNumero, :sTipo, :dData, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
-						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumProcesso, OrComCategoria, OrComSubCategoria, OrComConteudo, OrComFornecedor,
+									     OrComValorFrete, OrComTotalPedido, OrComSolicitante, OrComLocalEntrega, OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, 
+										 OrComSituacao, OrComUsuarioAtualizador, OrComEmpresa)
+				VALUES (:sTipo, :dData, :sNumero, :sLote, :sNumProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, :fTotalPedido, :iSolicitante,
+						:iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
 		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
@@ -88,15 +90,12 @@ if(isset($_POST['inputData'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.	min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>	
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<!-- /theme JS files -->
 	
 	<!-- JS file path -->
@@ -152,6 +151,35 @@ if(isset($_POST['inputData'])){
 				
 			});
 			
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbUnidade').on('change', function(e){
+
+				FiltraLocalEstoque();
+				
+				var cmbUnidade = $('#cmbUnidade').val();
+
+				if (cmbUnidade == '#'){
+					ResetLocalEstoque();
+				} else {
+				
+					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados){
+						
+						var option = '';
+
+						if (dados.length){						
+							
+							$.each(dados, function(i, obj){
+								option += '<option value="'+obj.LcEstId+'">' + obj.LcEstNome + '</option>';
+							});						
+							
+							$('#cmbLocalEstoque').html(option).show();
+						} else {
+							ResetLocalEstoque();
+						}					
+					});
+				}
+			});			
+			
 			$("#enviar").on('click', function(e){
 				
 				e.preventDefault();	
@@ -173,6 +201,14 @@ if(isset($_POST['inputData'])){
 		function Filtrando(){
 			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
 		}
+		
+		function FiltraLocalEstoque(){
+			$('#cmbLocalEstoque').empty().append('<option>Filtrando...</option>');
+		}		
+		
+		function ResetLocalEstoque(){
+			$('#cmbLocalEstoque').empty().append('<option>Sem Local do Estoque</option>');
+		}		
 		
 		function ResetSubCategoria(){
 			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
@@ -395,23 +431,59 @@ if(isset($_POST['inputData'])){
 									<br>
 									<div class="row">
 										<div class="col-lg-6">
+											<label for="cmbUnidade">Unidade</label>
+											<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
+												<option value="#">Selecione</option>
+												<?php 
+													$sql = ("SELECT UnidaId, UnidaNome
+															 FROM Unidade
+															 WHERE UnidaStatus = 1 and UnidaEmpresa = ".$_SESSION['EmpreId']."
+															 ORDER BY UnidaNome ASC");
+													$result = $conn->query("$sql");
+													$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+													
+													foreach ($rowUnidade as $item){
+														print('<option value="'.$item['UnidaId'].'">'.$item['UnidaNome'].'</option>');
+													}
+												
+												?>
+											</select>
+										</div>										
+									
+										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNomeSolicitante">Solicitante</label>
-												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly>
+												<label for="cmbLocalEstoque">Local / Almoxarifado</label>
+												<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" data-fouc>
+													<?php 
+														$sql = ("SELECT LcEstId, LcEstNome
+																 FROM LocalEstoque															     
+																 WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ." and LcEstStatus = 1
+																 ORDER BY LcEstNome ASC");
+														$result = $conn->query("$sql");
+														$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($rowLocal as $item){															
+															print('<option value="'.$item['LcEstId'].'">'.$item['LcEstNome'].'</option>');
+														}
+													
+													?>
+												</select>
 											</div>
 										</div>
-										
-										<div class="col-lg-3">
+									</div>
+									
+									<div class="row">									
+										<div class="col-lg-10">
 											<div class="form-group">
-												<label for="inputEmailSolicitante">E-mail</label>
-												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarEmail']; ?>" readOnly>
+												<label for="inputEnderecoEntrega">Endereço da Entrega</label>
+												<input type="text" id="inputEnderecoEntrega" name="inputEnderecoEntrega" class="form-control">
 											</div>
 										</div>									
 
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputTelefoneSolicitante">Telefone</label>
-												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarTelefone']; ?>" readOnly>
+												<label for="inputDataEntrega">Data da Entrega</label>
+												<input type="text" id="inputDataEntrega" name="inputDataEntrega" class="form-control">
 											</div>
 										</div>	
 									</div>
