@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Ordem de Compra';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT OrComId, OrComTipo, OrComNumero, OrComDtEmissao, OrComCategoria, ForneNome, CategNome, SbCatNome, OrComSituacao
+$sql = "SELECT OrComId, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, CategNome, OrComNumProcesso, OrComSituacao
 		FROM OrdemCompra
 		LEFT JOIN Fornecedor on ForneId = OrComFornecedor
 		JOIN Categoria on CategId = OrComCategoria
@@ -59,34 +59,44 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Nº Orçamento
-					width: "15%",
+					orderable: true,   //Numero
+					width: "10%",
 					targets: [1]
 				},				
 				{ 
-					orderable: true,   //Fornecedor
-					width: "25%",
+					orderable: true,   //Lote
+					width: "10%",
 					targets: [2]
 				},
 				{ 
-					orderable: true,   //Categoria
-					width: "20%",
+					orderable: true,   //Tipo
+					width: "15%",
 					targets: [3]
 				},
 				{ 
-					orderable: true,   //Categoria
+					orderable: true,   //Fornecedor
 					width: "20%",
 					targets: [4]
 				},
 				{ 
+					orderable: true,   //Processo
+					width: "10%",
+					targets: [5]
+				},
+				{ 
+					orderable: true,   //Categoria
+					width: "15%",
+					targets: [6]
+				},
+				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [5]
+					targets: [7]
 				},
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [6]
+					targets: [8]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -193,10 +203,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<thead>
 									<tr class="bg-slate">
 										<th>Data</th>
-										<th>Nº Ordem Compra</th>
+										<th>Número</th>
+										<th>Lote</th>
+										<th>Tipo</th>
 										<th>Fornecedor</th>
+										<th>Processo</th>
 										<th>Categoria</th>
-										<th>SubCategoria</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -210,13 +222,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
 										
+										$tipo = $item['OrComTipo'] == 'C' ? 'Carta Contrato' : 'Ordem de Compra';
+										
 										print('
 										<tr>
 											<td>'.mostraData($item['OrComDtEmissao']).'</td>
 											<td>'.$item['OrComNumero'].'</td>
+											<td>'.$item['OrComLote'].'</td>
+											<td>'.$tipo.'</td>
 											<td>'.$item['ForneNome'].'</td>
-											<td>'.$item['CategNome'].'</td>
-											<td>'.$item['SbCatNome'].'</td>
+											<td>'.$item['OrComNumProcesso'].'</td>
+											<td>'.$item['CategNome'].'</td>											
 											');
 										
 										print('<td><a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
@@ -233,9 +249,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \'produto\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \'imprimir\')" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Ordem de Compra</a>
-																<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \'duplica\')" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Ordem de Compra</a>
+																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \'imprimir\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>
 															</div>
 														</div>
 													</div>

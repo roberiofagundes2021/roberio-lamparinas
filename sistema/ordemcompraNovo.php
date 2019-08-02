@@ -30,22 +30,39 @@ if(isset($_POST['inputData'])){
 		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumProcesso, OrComCategoria, OrComSubCategoria, OrComConteudo, OrComFornecedor,
 									     OrComValorFrete, OrComTotalPedido, OrComSolicitante, OrComLocalEntrega, OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, 
 										 OrComSituacao, OrComUsuarioAtualizador, OrComEmpresa)
-				VALUES (:sTipo, :dData, :sNumero, :sLote, :sNumProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, :fTotalPedido, :iSolicitante,
+				VALUES (:sTipo, :dData, :sNumero, :sLote, :sProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, :fTotalPedido, :iSolicitante,
 						:iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
 		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
 		$iFornecedor = $aFornecedor[0];
 		
+		/*
+		echo $sql."<br>";
+		
+		var_dump($_POST['inputTipo'], gravaData($_POST['inputData']), $_POST['inputNumero'], $_POST['inputLote'], $_POST['inputProcesso'],
+			  $_POST['cmbCategoria'], $_POST['cmbSubCategoria'], $_POST['txtareaConteudo'], $iFornecedor, null, null,
+			  $_SESSION['UsuarId'], $_POST['cmbLocalEstoque'], $_POST['inputEnderecoEntrega'], gravaData($_POST['inputDataEntrega']),
+			  $_POST['txtareaObservacao'], 1, $_SESSION['UsuarId'], $_SESSION['EmpreId']);
+		*/
+		
 		$result->execute(array(
-						':sNumero' => $sNumero,
 						':sTipo' => $_POST['inputTipo'],
 						':dData' => gravaData($_POST['inputData']),
+						':sNumero' => $_POST['inputNumero'],
+						':sLote' => $_POST['inputLote'],
+						':sProcesso' => $_POST['inputProcesso'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iFornecedor' => $iFornecedor,
+						':fValorFrete' => null,
+						':fTotalPedido' => null,
 						':iSolicitante' => $_SESSION['UsuarId'],
+						':iLocalEntrega' => $_POST['cmbLocalEstoque'] == '#' ? null : $_POST['cmbLocalEstoque'],
+						':sEnderecoEntrega' => $_POST['inputEnderecoEntrega'],
+						':dDataEntrega' => gravaData($_POST['inputDataEntrega']),
+						':sObservacao' => $_POST['txtareaObservacao'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
@@ -192,7 +209,7 @@ if(isset($_POST['inputData'])){
 					return false;
 				}
 			
-				$("#formOrcamento").submit();
+				$("#formOrdemCompra").submit();
 			});
 						
 		}); //document.ready
@@ -238,7 +255,7 @@ if(isset($_POST['inputData'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formOrcamento" id="formOrcamento" method="post" class="form-validate" action="orcamentoNovo.php">
+					<form name="formOrdemCompra" id="formOrdemCompra" method="post" class="form-validate" action="ordemcompraNovo.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Ordem de Compra</h5>
 						</div>
@@ -250,17 +267,17 @@ if(isset($_POST['inputData'])){
 								<div class="col-lg-12">
 									
 									<div class="row">										
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" value="P" class="form-input-styled" checked data-fouc>
+														<input type="radio" id="inputTipo" name="inputTipo" value="C" class="form-input-styled" checked data-fouc>
 														Carta Contrato
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" value="S" class="form-input-styled" data-fouc>
+														<input type="radio" id="inputTipo" name="inputTipo" value="O" class="form-input-styled" data-fouc>
 														Ordem de Compra
 													</label>
 												</div>										
@@ -288,7 +305,7 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 										
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputProcesso">Processo</label>
 												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control">
@@ -453,7 +470,7 @@ if(isset($_POST['inputData'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbLocalEstoque">Local / Almoxarifado</label>
-												<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" data-fouc>
+												<select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2">
 													<?php 
 														$sql = ("SELECT LcEstId, LcEstNome
 																 FROM LocalEstoque															     
@@ -503,7 +520,7 @@ if(isset($_POST['inputData'])){
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
-										<a href="orcamento.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="ordemcompra.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>
