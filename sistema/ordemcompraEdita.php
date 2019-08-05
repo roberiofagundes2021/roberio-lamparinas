@@ -14,7 +14,7 @@ if(isset($_POST['inputOrdemCompraId'])){
 	try{
 		
 		$sql = "SELECT OrComId, OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumProcesso, OrComCategoria, OrComSubCategoria, OrComConteudo, OrComFornecedor, 
-					   ForneContato, ForneEmail, ForneTelefone, ForneCelular, OrComValorFrete, OrComTotalPedido, OrComSolicitante, OrComLocalEntrega, 
+					   ForneContato, ForneEmail, ForneTelefone, ForneCelular, OrComValorFrete, OrComTotalPedido, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
 					   OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, UsuarNome, UsuarEmail, UsuarTelefone
 				FROM OrdemCompra
 				JOIN Usuario on UsuarId = OrComSolicitante
@@ -40,8 +40,10 @@ if(isset($_POST['inputTipo'])){
 		
 		$iOrdemCompra = $_POST['inputOrdemCompraId'];
 		
-		$sql = "UPDATE OrdemCompra SET OrComTipo = :sTipo, OrComCategoria = :iCategoria, OrComSubCategoria = :iSubCategoria, OrComConteudo = :sConteudo,
-									   OrComFornecedor = :iFornecedor, OrComUsuarioAtualizador = :iUsuarioAtualizador
+		$sql = "UPDATE OrdemCompra SET OrComTipo = :sTipo, OrComNumero = :sNumero, OrComLote = :sLote, OrComNumProcesso = :sProcesso, OrComCategoria = :iCategoria, 
+									   OrComSubCategoria = :iSubCategoria, OrComConteudo = :sConteudo,  OrComFornecedor = :iFornecedor, OrComUnidade = :iUnidade,
+									   OrComLocalEntrega = :iLocalEntrega, OrComEnderecoEntrega = :sEnderecoEntrega, OrComDtEntrega = :dDataEntrega, 
+									   OrComObservacao = :sObservacao,  OrComUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE OrComId = :iOrdemCompra";
 		$result = $conn->prepare($sql);
 		
@@ -52,10 +54,18 @@ if(isset($_POST['inputTipo'])){
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
+						':sNumero' => $_POST['inputNumero'],
+						':sLote' => $_POST['inputLote'],
+						':sProcesso' => $_POST['inputProcesso'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iFornecedor' => $iFornecedor,
+						':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
+						':iLocalEntrega' => $_POST['cmbLocalEstoque'] == '#' ? null : $_POST['cmbLocalEstoque'],
+						':sEnderecoEntrega' => $_POST['inputEnderecoEntrega'],
+						':dDataEntrega' => gravaData($_POST['inputDataEntrega']),
+						':sObservacao' => $_POST['txtareaObservacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iOrdemCompra' => $iOrdemCompra
 						));
@@ -164,6 +174,35 @@ if(isset($_POST['inputTipo'])){
 				});
 				
 			}); 
+			
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbUnidade').on('change', function(e){
+
+				FiltraLocalEstoque();
+				
+				var cmbUnidade = $('#cmbUnidade').val();
+
+				if (cmbUnidade == '#'){
+					ResetLocalEstoque();
+				} else {
+				
+					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados){
+						
+						var option = '';
+
+						if (dados.length){						
+							
+							$.each(dados, function(i, obj){
+								option += '<option value="'+obj.LcEstId+'">' + obj.LcEstNome + '</option>';
+							});						
+							
+							$('#cmbLocalEstoque').html(option).show();
+						} else {
+							ResetLocalEstoque();
+						}					
+					});
+				}
+			});	
 
 			$("#enviar").on('click', function(e){
 				
@@ -217,7 +256,15 @@ if(isset($_POST['inputTipo'])){
 		//Mostra o "Filtrando..." na combo SubCategoria
 		function Filtrando(){
 			$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
+		}
+		
+		function FiltraLocalEstoque(){
+			$('#cmbLocalEstoque').empty().append('<option>Filtrando...</option>');
 		}		
+		
+		function ResetLocalEstoque(){
+			$('#cmbLocalEstoque').empty().append('<option>Sem Local do Estoque</option>');
+		}			
 		
 		function ResetSubCategoria(){
 			$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
@@ -280,13 +327,13 @@ if(isset($_POST['inputTipo'])){
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="C" name="inputTipo" class="form-input-styled" data-fouc <?php if ($row['OrComTipo'] == 'P') echo "checked"; ?>>
+														<input type="radio" id="inputTipo" value="C" name="inputTipo" class="form-input-styled" data-fouc <?php if ($row['OrComTipo'] == 'C') echo "checked"; ?>>
 														Carta Contrato
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="O" name="inputTipo" class="form-input-styled" data-fouc <?php if ($row['OrComTipo'] == 'S') echo "checked"; ?>>
+														<input type="radio" id="inputTipo" value="O" name="inputTipo" class="form-input-styled" data-fouc <?php if ($row['OrComTipo'] == 'O') echo "checked"; ?>>
 														Ordem de Compra
 													</label>
 												</div>										
@@ -461,6 +508,83 @@ if(isset($_POST['inputTipo'])){
 												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $row['UsuarTelefone']; ?>" readOnly>
 											</div>
 										</div>									
+									</div>
+								</div>
+							</div>
+							<br>
+							
+							<div class="row">
+								<div class="col-lg-12">									
+									<h5 class="mb-0 font-weight-semibold">Dados da Entrega</h5>
+									<br>
+									<div class="row">
+										<div class="col-lg-6">
+											<label for="cmbUnidade">Unidade</label>
+											<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
+												<option value="#">Selecione</option>
+												<?php 
+													$sql = ("SELECT UnidaId, UnidaNome
+															 FROM Unidade
+															 WHERE UnidaStatus = 1 and UnidaEmpresa = ".$_SESSION['EmpreId']."
+															 ORDER BY UnidaNome ASC");
+													$result = $conn->query("$sql");
+													$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+													
+													foreach ($rowUnidade as $item){
+														$seleciona = $item['UnidaId'] == $row['OrComUnidade'] ? "selected" : "";
+														print('<option value="'.$item['UnidaId'].'" '. $seleciona .'>'.$item['UnidaNome'].'</option>');
+													}
+												
+												?>
+											</select>
+										</div>										
+									
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbLocalEstoque">Local / Almoxarifado</label>
+												<select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2">
+													<?php 
+														$sql = ("SELECT LcEstId, LcEstNome
+																 FROM LocalEstoque															     
+																 WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ." and LcEstUnidade = ". $row['OrComUnidade']." and LcEstStatus = 1
+																 ORDER BY LcEstNome ASC");
+														$result = $conn->query("$sql");
+														$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($rowLocal as $item){
+															$seleciona = $item['LcEstId'] == $row['OrComLocalEntrega'] ? "selected" : "";
+															print('<option value="'.$item['LcEstId'].'">'.$item['LcEstNome'].'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>
+									</div>
+									
+									<div class="row">									
+										<div class="col-lg-10">
+											<div class="form-group">
+												<label for="inputEnderecoEntrega">Endereço da Entrega</label>
+												<input type="text" id="inputEnderecoEntrega" name="inputEnderecoEntrega" class="form-control" value="<?php echo $row['OrComEnderecoEntrega']; ?>">
+											</div>
+										</div>									
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputDataEntrega">Data da Entrega</label>
+												<input type="text" id="inputDataEntrega" name="inputDataEntrega" class="form-control" value="<?php echo mostraData($row['OrComDtEntrega']); ?>">
+											</div>
+										</div>	
+									</div>
+									
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label for="txtareaObservacao">Observação</label>											
+												<textarea rows="3" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao"><?php echo $row['OrComObservacao']; ?></textarea>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>							

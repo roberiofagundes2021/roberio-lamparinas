@@ -2,41 +2,41 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Orçamento Produto';
+$_SESSION['PaginaAtual'] = 'Ordem de Compra Produto';
 
 include('global_assets/php/conexao.php');
 
-//Se veio do orcamento.php
-if(isset($_POST['inputOrcamentoId'])){
-	$iOrcamento = $_POST['inputOrcamentoId'];
-	$iCategoria = $_POST['inputOrcamentoCategoria'];
-} else if (isset($_POST['inputIdOrcamento'])){
-	$iOrcamento = $_POST['inputIdOrcamento'];
+//Se veio do ordemcompra.php
+if(isset($_POST['inputOrdemCompraId'])){
+	$iOrdemCompra = $_POST['inputOrdemCompraId'];
+	$iCategoria = $_POST['inputOrdemCompraCategoria'];
+} else if (isset($_POST['inputIdOrdemCompra'])){
+	$iOrdemCompra = $_POST['inputIdOrdemCompra'];
 	$iCategoria = $_POST['inputIdCategoria'];
 } else {
-	irpara("orcamento.php");
+	irpara("ordemcompra.php");
 }
 
 //Se está alterando
-if(isset($_POST['inputIdOrcamento'])){
+if(isset($_POST['inputIdOrdemCompra'])){
 	
-	$sql = "DELETE FROM OrcamentoXProduto
-			WHERE OrXPrOrcamento = :iOrcamento AND OrXPrEmpresa = :iEmpresa";
+	$sql = "DELETE FROM OrdemCompraXProduto
+			WHERE OCXPrOrdemCompra = :iOrdemCompra AND OCXPrEmpresa = :iEmpresa";
 	$result = $conn->prepare($sql);
 	
 	$result->execute(array(
-					':iOrcamento' => $iOrcamento,
+					':iOrdemCompra' => $iOrdemCompra,
 					':iEmpresa' => $_SESSION['EmpreId']
 					));		
 	
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 	
-		$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrEmpresa)
-				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO OrdemCompraXProduto (OCXPrOrdemCompra, OCXPrProduto, OCXPrQuantidade, OCXPrValorUnitario, OCXPrUsuarioAtualizador, OCXPrEmpresa)
+				VALUES (:iOrdemCompra, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
 		$result->execute(array(
-						':iOrcamento' => $iOrcamento,
+						':iOrdemCompra' => $iOrdemCompra,
 						':iProduto' => $_POST['inputIdProduto'.$i],
 						':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
 						':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
@@ -45,7 +45,7 @@ if(isset($_POST['inputIdOrcamento'])){
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Orçamento alterado!!!";
+		$_SESSION['msg']['mensagem'] = "Ordem de Compra alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 	}
 }	
@@ -53,29 +53,29 @@ if(isset($_POST['inputIdOrcamento'])){
 try{
 	
 	$sql = "SELECT *
-			FROM Orcamento
-			LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
-			JOIN Categoria on CategId = OrcamCategoria
-			LEFT JOIN SubCategoria on SbCatId = OrcamSubCategoria
-			WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = ".$iOrcamento;
+			FROM OrdemCompra
+			LEFT JOIN Fornecedor on ForneId = OrComFornecedor
+			JOIN Categoria on CategId = OrComCategoria
+			LEFT JOIN SubCategoria on SbCatId = OrComSubCategoria
+			WHERE OrComEmpresa = ". $_SESSION['EmpreId'] ." and OrComId = ".$iOrdemCompra;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
 	
-	$sql = "SELECT OrXPrProduto
-			FROM OrcamentoXProduto
-			JOIN Produto on ProduId = OrXPrProduto
+	$sql = "SELECT OCXPrProduto
+			FROM OrdemCompraXProduto
+			JOIN Produto on ProduId = OCXPrProduto
 			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$iCategoria;
 	
-	if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-		$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
+	if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
+		$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
 	}	
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
 	
 	foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
-		$aProdutos[] = $itemProdutoUtilizado['OrXPrProduto'];
+		$aProdutos[] = $itemProdutoUtilizado['OCXPrProduto'];
 	}
 	
 } catch(PDOException $e) {
@@ -90,7 +90,7 @@ try{
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Listando produtos do Orçamento</title>
+	<title>Lamparinas | Listando produtos da Ordem de Compra</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -148,7 +148,7 @@ try{
 				
 				$.ajax({
 					type: "POST",
-					url: "orcamentoFiltraProduto.php",
+					url: "ordemcompraFiltraProduto.php",
 					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
 					success: function(resposta){
 						//alert(resposta);
@@ -207,12 +207,12 @@ try{
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formOrcamentoProduto" id="formOrcamentoProduto" method="post" class="form-validate">
+					<form name="formOrdemCompraProduto" id="formOrdemCompraProduto" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Listar Produtos - Orçamento Nº "<?php echo $row['OrcamNumero']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Listar Produtos - Ordem de Compra Nº "<?php echo $row['OrComNumero']; ?>"</h5>
 						</div>					
 						
-						<input type="hidden" id="inputIdOrcamento" name="inputIdOrcamento" class="form-control" value="<?php echo $row['OrcamId']; ?>">
+						<input type="hidden" id="inputIdOrdemCompra" name="inputIdOrdemCompra" class="form-control" value="<?php echo $row['OrComId']; ?>">
 						
 						<div class="card-body">		
 								
@@ -244,7 +244,7 @@ try{
 											<div class="form-group">
 												<label for="inputCategoriaNome">Categoria</label>
 												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" value="<?php echo $row['CategNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['OrcamCategoria']; ?>">
+												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['OrComCategoria']; ?>">
 											</div>
 										</div>
 									
@@ -252,7 +252,7 @@ try{
 											<div class="form-group">
 												<label for="inputSubCategoria">Sub Categoria</label>
 												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo $row['SbCatNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['OrcamSubCategoria']; ?>">
+												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['OrComSubCategoria']; ?>">
 											</div>
 										</div>
 									</div>
@@ -266,8 +266,8 @@ try{
 																FROM Produto										     
 																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria;
 														
-														if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-															$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
+														if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
+															$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
 														}
 														
 														$sql .= " ORDER BY ProduNome ASC";
@@ -315,11 +315,11 @@ try{
 									
 									<?php									
 
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OrXPrQuantidade, OrXPrValorUnitario
+										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario
 												FROM Produto
-												JOIN OrcamentoXProduto on OrXPrProduto = ProduId
+												JOIN OrdemCompraXProduto on OCXPrProduto = ProduId
 												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OrXPrOrcamento = ".$iOrcamento;
+												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OCXPrOrdemCompra = ".$iOrdemCompra;
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
@@ -330,8 +330,8 @@ try{
 													LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and ProduStatus = 1 ";
 													
-											if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-												$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
+											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
+												$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
 											}
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -379,9 +379,9 @@ try{
 											
 											$cont++;
 											
-											$iQuantidade = isset($item['OrXPrQuantidade']) ? $item['OrXPrQuantidade'] : '';
-											$fValorUnitario = isset($item['OrXPrValorUnitario']) ? mostraValor($item['OrXPrValorUnitario']) : '';											
-											$fValorTotal = (isset($item['OrXPrQuantidade']) and isset($item['OrXPrValorUnitario'])) ? mostraValor($item['OrXPrQuantidade'] * $item['OrXPrValorUnitario']) : '';
+											$iQuantidade = isset($item['OCXPrQuantidade']) ? $item['OCXPrQuantidade'] : '';
+											$fValorUnitario = isset($item['OCXPrValorUnitario']) ? mostraValor($item['OCXPrValorUnitario']) : '';											
+											$fValorTotal = (isset($item['OCXPrQuantidade']) and isset($item['OCXPrValorUnitario'])) ? mostraValor($item['OCXPrQuantidade'] * $item['OCXPrValorUnitario']) : '';
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
@@ -427,7 +427,7 @@ try{
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
-										<a href="orcamento.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="ordemcompra.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

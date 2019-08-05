@@ -400,7 +400,7 @@ if(isset($_POST['inputData'])){
 											<?php 
 												$sql = ("SELECT LcEstId, LcEstNome
 														 FROM LocalEstoque														 
-														 WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ." and LcEstStatus = 1
+														 WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ." and LcEstUnidade = ".$row['InvenUnidade']." and LcEstStatus = 1
 														 ORDER BY LcEstNome ASC");
 												$result = $conn->query("$sql");
 												$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
