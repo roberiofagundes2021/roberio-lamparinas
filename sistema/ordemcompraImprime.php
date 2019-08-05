@@ -8,15 +8,22 @@ use Mpdf\Mpdf;
 
 require_once 'global_assets/php/vendor/autoload.php';
 
-$iOrcamento = $_POST['inputOrcamentoId'];
-$sNumero = $_POST['inputOrcamentoNumero'];
+$iOrdemCompra = $_POST['inputOrdemCompraId'];
+$sNumero = $_POST['inputOrdemCompraNumero'];
+
+if ($_POST['inputOrdemCompraTipo'] == 'O'){
+	$sTipo = "Ordem de Compra";
+} else{
+	$sTipo = "Carta Contrato";
+}
+
 
 $sql = "SELECT *
-		FROM Orcamento
-		LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
-		JOIN Categoria on CategId = OrcamCategoria
-		LEFT JOIN SubCategoria on SbCatId = OrcamSubCategoria
-		WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = ".$iOrcamento;
+		FROM OrdemCompra
+		LEFT JOIN Fornecedor on ForneId = OrComFornecedor
+		JOIN Categoria on CategId = OrComCategoria
+		LEFT JOIN SubCategoria on SbCatId = OrComSubCategoria
+		WHERE OrComEmpresa = ". $_SESSION['EmpreId'] ." and OrComId = ".$iOrdemCompra;
 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -38,9 +45,9 @@ try {
 			<span style='font-weight:bold;line-height:200px;'>".$_SESSION['EmpreNomeFantasia']."</span><br>
 			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: Hospital Padre Manoel</div>
 		</div>
-		<div style='width:150px; float:right; display: inline; text-align:right;'>
+		<div style='width:250px; float:right; display: inline; text-align:right;'>
 			<div>{DATE j/m/Y}</div>
-			<div style='margin-top:8px;'>Orçamento: ".formatarNumero($sNumero)."</div>
+			<div style='margin-top:8px;'>".$sTipo.": ".formatarNumero($sNumero)."</div>
 		</div> 
 	 </div>
 	";		
@@ -48,12 +55,6 @@ try {
 	$html = '';
 	
 	foreach ($row as $item){	
-		
-		if ($item['OrcamTipo'] == 'S'){
-			$tipo = "Serviço";
-		} else{
-			$tipo = "Produto";
-		}
 		
 		$html .= '
 		<br>
@@ -64,12 +65,12 @@ try {
 			Categoria: <span style="font-weight:normal;">'.$item['CategNome'].'</span> &nbsp;&nbsp;<span style="color:#ccc;">|</span> &nbsp;&nbsp; SubCategoria: <span style="font-weight:normal;">'.$item['SbCatNome'].'</span> 
 		</div>
 		<br>
-		<div>'.$item['OrcamConteudo'].'</div>
+		<div>'.$item['OrComConteudo'].'</div>
 		<br>
 		<table style="width:100%; border-collapse: collapse;">
 			<tr>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Item</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:53%">'.$tipo.'</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:53%">Produto</th>
 				<th style="text-align: center; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
 				<th style="text-align: center; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Unidade</th>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">V. Unit.</th>
@@ -77,11 +78,11 @@ try {
 			</tr>
 		';	
 		
-		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OrXPrQuantidade, OrXPrValorUnitario
+		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario
 				FROM Produto
-				JOIN OrcamentoXProduto on OrXPrProduto = ProduId
+				JOIN OrdemCompraXProduto on OCXPrProduto = ProduId
 				LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-				WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OrXPrOrcamento = ".$iOrcamento;
+				WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OCXPrOrdemCompra = ".$iOrdemCompra;
 
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);		
@@ -90,9 +91,9 @@ try {
 		
 		foreach ($rowProdutos as $itemProduto){
 			
-			if ($itemProduto['OrXPrValorUnitario'] != '' and $itemProduto['OrXPrValorUnitario'] != null){
-				$valorUnitario = mostraValor($itemProduto['OrXPrValorUnitario']);
-				$valorTotal = mostraValor($itemProduto['OrXPrQuantidade'] * $itemProduto['OrXPrValorUnitario']);
+			if ($itemProduto['OCXPrValorUnitario'] != '' and $itemProduto['OCXPrValorUnitario'] != null){
+				$valorUnitario = mostraValor($itemProduto['OCXPrValorUnitario']);
+				$valorTotal = mostraValor($itemProduto['OCXPrQuantidade'] * $itemProduto['OCXPrValorUnitario']);
 			} else {
 				$valorUnitario = "__________";
 				$valorTotal = "__________";
@@ -102,7 +103,7 @@ try {
 				<tr>
 					<td style='padding-top: 8px;'>".$cont."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
-					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['OrXPrQuantidade']."</td>
+					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['OCXPrQuantidade']."</td>
 					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['UnMedSigla']."</td>
 					<td style='padding-top: 8px;'>".$valorUnitario."</td>
 					<td style='padding-top: 8px;'>".$valorTotal."</td>

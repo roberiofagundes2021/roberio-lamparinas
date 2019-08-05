@@ -128,13 +128,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaOrdemCompra(OrComId, OrComNumero, OrComCategoria, CategNome, OrComSituacao, Tipo){
+		function atualizaOrdemCompra(OrComId, OrComNumero, OrComCategoria, CategNome, OrComSituacao, OrComTipo, Tipo){
 		
 			document.getElementById('inputOrdemCompraId').value = OrComId;
 			document.getElementById('inputOrdemCompraNumero').value = OrComNumero;
 			document.getElementById('inputOrdemCompraCategoria').value = OrComCategoria;
 			document.getElementById('inputOrdemCompraNomeCategoria').value = CategNome;
 			document.getElementById('inputOrdemCompraStatus').value = OrComSituacao;
+			document.getElementById('inputOrdemCompraTipo').value = OrComTipo;
 			
 
 			if (Tipo == 'imprimir'){
@@ -152,6 +153,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				} else if (Tipo == 'duplica'){
 					document.formOrdemCompra.action = "ordemcompraDuplica.php";
 				}
+				document.formOrdemCompra.setAttribute("target", "_self");
 			}
 			
 			document.formOrdemCompra.submit();
@@ -235,21 +237,21 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['CategNome'].'</td>											
 											');
 										
-										print('<td><a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Ordem de Compra"></i></a>
-														<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Ordem de Compra"></i></a>
+														<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Ordem de Compra"></i></a>
+														<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Ordem de Compra"></i></a>
 														<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \'produto\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \'imprimir\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>
+																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'produto\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'imprimir\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>
 															</div>
 														</div>
 													</div>
@@ -275,6 +277,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					<input type="hidden" id="inputOrdemCompraCategoria" name="inputOrdemCompraCategoria" >
 					<input type="hidden" id="inputOrdemCompraNomeCategoria" name="inputOrdemCompraNomeCategoria" >
 					<input type="hidden" id="inputOrdemCompraStatus" name="inputOrdemCompraStatus" >
+					<input type="hidden" id="inputOrdemCompraTipo" name="inputOrdemCompraTipo" >
 				</form>
 
 			</div>
