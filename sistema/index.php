@@ -4,6 +4,18 @@ include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Painel de Controle';
 
+include('global_assets/php/conexao.php');
+
+$sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
+		FROM Bandeja
+		JOIN Usuario on UsuarId = BandeSolicitante
+		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = OrComSituacao
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and BandeStatus = 1
+		ORDER BY BandeData DESC";
+$result = $conn->query($sql);
+$rowBandeja = $result->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -155,6 +167,449 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 				</div>
 				<!-- /main charts -->
 
+				<!-- Support tickets -->
+				<div class="card">
+					<div class="card-header header-elements-sm-inline">
+						<h6 class="card-title">Fluxo de Trabalho (Workflow)</h6>
+						<div class="header-elements">
+							<a class="text-default daterange-ranges font-weight-semibold cursor-pointer dropdown-toggle">
+								<i class="icon-calendar3 mr-2"></i>
+								<span></span>
+							</a>
+						</div>
+					</div>
+
+					<div class="card-body d-md-flex align-items-md-center justify-content-md-between flex-md-wrap">
+						<div class="d-flex align-items-center mb-3 mb-md-0">
+							<div id="tickets-status"></div>
+							<div class="ml-3">
+								<h5 class="font-weight-semibold mb-0">14,327 <span class="text-success font-size-sm font-weight-normal"><i class="icon-arrow-up12"></i> (+2.9%)</span></h5>
+								<span class="badge badge-mark border-success mr-1"></span> <span class="text-muted">Jun 16, 10:00 am</span>
+							</div>
+						</div>
+
+						<div class="d-flex align-items-center mb-3 mb-md-0">
+							<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon">
+								<i class="icon-alarm-add"></i>
+							</a>
+							<div class="ml-3">
+								<h5 class="font-weight-semibold mb-0">1.132</h5>
+								<span class="text-muted">Total de ações</span>
+							</div>
+						</div>
+
+						<div class="d-flex align-items-center mb-3 mb-md-0">
+							<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon">
+								<i class="icon-spinner11"></i>
+							</a>
+							<div class="ml-3">
+								<h5 class="font-weight-semibold mb-0">06:25:00</h5>
+								<span class="text-muted">Tempo de resposta</span>
+							</div>
+						</div>
+
+						<div>
+							<a href="#" class="btn bg-teal-400"><i class="icon-statistics mr-2"></i> Report</a>
+						</div>
+					</div>
+
+					<div class="table-responsive">
+						<table class="table text-nowrap">
+							<thead>
+								<tr>
+									<th style="width: 50px">Dias</th>
+									<th style="width: 300px;">Usuário Solicitante</th>
+									<th>Descrição</th>
+									<th class="text-center" style="width: 20px;"><i class="icon-arrow-down12"></i></th>
+								</tr>
+							</thead>
+							<tbody>
+								
+								<tr class="table-active table-border-double">
+									<td colspan="3">Ações Pendentes</td>
+									<td class="text-right">
+										<span class="badge bg-blue badge-pill">24</span>
+									</td>
+								</tr>
+
+								<?php  foreach ($rowBandeja as $item){ 
+											print('
+											<tr>
+												<td class="text-center">
+													<h6 class="mb-0">0</h6>
+													<div class="font-size-sm text-muted line-height-1">dia</div>
+												</td>
+												<td>
+													<div class="d-flex align-items-center">
+														<div class="mr-3">
+															<a href="#" class="btn bg-teal-400 rounded-round btn-icon btn-sm">
+																<span class="letter-icon"></span>
+															</a>
+														</div>
+														<div>
+															<a href="#" class="text-default font-weight-semibold letter-icon-title">'.nomeSobrenome($item['UsuarNome'], 2).'</a>
+															<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> '.$item['SituaNome'].'</div>
+														</div>
+													</div>
+												</td>
+												<td>
+													<a href="#" class="text-default">
+														<div class="font-weight-semibold">[#'.$item['BandeTabelaId'].'] '.$item['BandeIdentificacao'].'</div>
+														<span class="text-muted">Ação: '.$item['BandeDescricao'].'</span>
+													</a>
+												</td>
+												<td class="text-center">
+													<div class="list-icons">
+														<div class="list-icons-item dropdown">
+															<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+															<div class="dropdown-menu dropdown-menu-right">
+																<a href="#" class="dropdown-item"><i class="icon-undo"></i> Visualizar</a>
+																<div class="dropdown-divider"></div>
+																<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
+																<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
+															</div>
+														</div>
+													</div>
+												</td>
+											</tr>
+											'); 
+									   }
+								?>
+
+								<tr>
+									<td class="text-center">
+										<h6 class="mb-0">16</h6>
+										<div class="font-size-sm text-muted line-height-1">hours</div>
+									</td>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="mr-3">
+												<a href="#">
+													<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
+												</a>
+											</div>
+											<div>
+												<a href="#" class="text-default font-weight-semibold">Chris Macintyre</a>
+												<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> Pendente</div>
+											</div>
+										</div>
+									</td>
+									<td>
+										<a href="#" class="text-default">
+											<div class="font-weight-semibold">[#1249] Vertically center carousel controls</div>
+											<span class="text-muted">Try any carousel control and reduce the screen width below...</span>
+										</a>
+									</td>
+									<td class="text-center">
+										<div class="list-icons">
+											<div class="list-icons-item dropdown">
+												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+												<div class="dropdown-menu dropdown-menu-right">
+													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+													<div class="dropdown-divider"></div>
+													<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
+													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+
+								<tr>
+									<td class="text-center">
+										<h6 class="mb-0">20</h6>
+										<div class="font-size-sm text-muted line-height-1">hours</div>
+									</td>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="mr-3">
+												<a href="#" class="btn bg-blue rounded-round btn-icon btn-sm">
+													<span class="letter-icon"></span>
+												</a>
+											</div>
+											<div>
+												<a href="#" class="text-default font-weight-semibold letter-icon-title">Robert Hauber</a>
+												<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> Pendente</div>
+											</div>
+										</div>
+									</td>
+									<td>
+										<a href="#" class="text-default">
+											<div class="font-weight-semibold">[#1254] Inaccurate small pagination height</div>
+											<span class="text-muted">The height of pagination elements is not consistent with...</span>
+										</a>
+									</td>
+									<td class="text-center">
+										<div class="list-icons">
+											<div class="list-icons-item dropdown">
+												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+												<div class="dropdown-menu dropdown-menu-right">
+													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+													<div class="dropdown-divider"></div>
+													<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
+													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+
+								<tr>
+									<td class="text-center">
+										<h6 class="mb-0">40</h6>
+										<div class="font-size-sm text-muted line-height-1">hours</div>
+									</td>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="mr-3">
+												<a href="#" class="btn bg-warning-400 rounded-round btn-icon btn-sm">
+													<span class="letter-icon"></span>
+												</a>
+											</div>
+											<div>
+												<a href="#" class="text-default font-weight-semibold letter-icon-title">Robert Hauber</a>
+												<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> Pendente</div>
+											</div>
+										</div>
+									</td>
+									<td>
+										<a href="#" class="text-default">
+											<div class="font-weight-semibold">[#1184] Round grid column gutter operations</div>
+											<span class="text-muted">Left rounds up, right rounds down. should keep everything...</span>
+										</a>
+									</td>
+									<td class="text-center">
+										<div class="list-icons">
+											<div class="list-icons-item dropdown">
+												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+												<div class="dropdown-menu dropdown-menu-right">
+													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+													<div class="dropdown-divider"></div>
+													<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
+													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+
+								<tr class="table-active table-border-double">
+									<td colspan="3">Ações Resolvidas</td>
+									<td class="text-right">
+										<span class="badge bg-success badge-pill">42</span>
+									</td>
+								</tr>
+
+								<tr>
+									<td class="text-center">
+										<i class="icon-checkmark3 text-success"></i>
+									</td>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="mr-3">
+												<a href="#" class="btn bg-success-400 rounded-round btn-icon btn-sm">
+													<span class="letter-icon"></span>
+												</a>
+											</div>
+											<div>
+												<a href="#" class="text-default font-weight-semibold letter-icon-title">Alan Macedo</a>
+												<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Liberado</div>
+											</div>
+										</div>
+									</td>
+									<td>
+										<a href="#" class="text-default">
+											<div>[#1046] Avoid some unnecessary HTML string</div>
+											<span class="text-muted">Rather than building a string of HTML and then parsing it...</span>
+										</a>
+									</td>
+									<td class="text-center">
+										<div class="list-icons">
+											<div class="list-icons-item dropdown">
+												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+												<div class="dropdown-menu dropdown-menu-right">
+													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+													<div class="dropdown-divider"></div>
+													<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
+													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+
+								<tr>
+									<td class="text-center">
+										<i class="icon-checkmark3 text-success"></i>
+									</td>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="mr-3">
+												<a href="#" class="btn bg-pink-400 rounded-round btn-icon btn-sm">
+													<span class="letter-icon"></span>
+												</a>
+											</div>
+											<div>
+												<a href="#" class="text-default font-weight-semibold letter-icon-title">Brett Castellano</a>
+												<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Liberado</div>
+											</div>
+										</div>
+									</td>
+									<td>
+										<a href="#" class="text-default">
+											<div>[#1038] Update json configuration</div>
+											<span class="text-muted">The <code>files</code> property is necessary to override the files property...</span>
+										</a>
+									</td>
+									<td class="text-center">
+										<div class="list-icons">
+											<div class="list-icons-item dropdown">
+												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+												<div class="dropdown-menu dropdown-menu-right">
+													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+													<div class="dropdown-divider"></div>
+													<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
+													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+
+								<tr>
+									<td class="text-center">
+										<i class="icon-checkmark3 text-success"></i>
+									</td>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="mr-3">
+												<a href="#">
+													<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
+												</a>
+											</div>
+											<div>
+												<a href="#" class="text-default font-weight-semibold">Roxanne Forbes</a>
+												<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Liberado</div>
+											</div>
+										</div>
+									</td>
+									<td>
+										<a href="#" class="text-default">
+											<div>[#1034] Tooltip multiple event</div>
+											<span class="text-muted">Fix behavior when using tooltips and popovers that are...</span>
+										</a>
+									</td>
+									<td class="text-center">
+										<div class="list-icons">
+											<div class="list-icons-item dropdown">
+												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+												<div class="dropdown-menu dropdown-menu-right">
+													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+													<div class="dropdown-divider"></div>
+													<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
+													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+
+								<tr class="table-active table-border-double">
+									<td colspan="3">Ações Fechadas</td>
+									<td class="text-right">
+										<span class="badge bg-danger badge-pill">37</span>
+									</td>
+								</tr>
+
+								<tr>
+									<td class="text-center">
+										<i class="icon-cross2 text-danger-400"></i>
+									</td>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="mr-3">
+												<a href="#">
+													<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
+												</a>
+											</div>
+											<div>
+												<a href="#" class="text-default font-weight-semibold">Mitchell Sitkin</a>
+												<div class="text-muted font-size-sm"><span class="badge badge-mark border-danger mr-1"></span> Não Liberado</div>
+											</div>
+										</div>
+									</td>
+									<td>
+										<a href="#" class="text-default">
+											<div>[#1040] Account for static form controls in form group</div>
+											<span class="text-muted">Resizes control label's font-size and account for the standard...</span>
+										</a>
+									</td>
+									<td class="text-center">
+										<div class="list-icons">
+											<div class="list-icons-item dropdown">
+												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+												<div class="dropdown-menu dropdown-menu-right">
+													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+													<div class="dropdown-divider"></div>
+													<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
+													<a href="#" class="dropdown-item"><i class="icon-spinner11 text-grey"></i> Reopen issue</a>
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+
+								<tr>
+									<td class="text-center">
+										<i class="icon-cross2 text-danger"></i>
+									</td>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="mr-3">
+												<a href="#" class="btn bg-brown-400 rounded-round btn-icon btn-sm">
+													<span class="letter-icon"></span>
+												</a>
+											</div>
+											<div>
+												<a href="#" class="text-default font-weight-semibold letter-icon-title">Katleen Jensen</a>
+												<div class="text-muted font-size-sm"><span class="badge badge-mark border-danger mr-1"></span> Não Liberado</div>
+											</div>
+										</div>
+									</td>
+									<td>
+										<a href="#" class="text-default">
+											<div>[#1038] Proper sizing of form control feedback</div>
+											<span class="text-muted">Feedback icon sizing inside a larger/smaller form-group...</span>
+										</a>
+									</td>
+									<td class="text-center">
+										<div class="list-icons">
+											<div class="list-icons-item dropdown">
+												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+												<div class="dropdown-menu dropdown-menu-right">
+													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+													<div class="dropdown-divider"></div>
+													<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
+													<a href="#" class="dropdown-item"><i class="icon-spinner11 text-grey"></i> Reopen issue</a>
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- /support tickets -->
+				
 
 				<!-- Dashboard content -->
 				<div class="row" style="display:none">
@@ -571,445 +1026,6 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 							</div>
 						</div>
 						<!-- /quick stats boxes -->
-
-
-						<!-- Support tickets --
-						<div class="card">
-							<div class="card-header header-elements-sm-inline">
-								<h6 class="card-title">Support tickets</h6>
-								<div class="header-elements">
-									<a class="text-default daterange-ranges font-weight-semibold cursor-pointer dropdown-toggle">
-										<i class="icon-calendar3 mr-2"></i>
-										<span></span>
-									</a>
-			                	</div>
-							</div>
-
-							<div class="card-body d-md-flex align-items-md-center justify-content-md-between flex-md-wrap">
-								<div class="d-flex align-items-center mb-3 mb-md-0">
-									<div id="tickets-status"></div>
-									<div class="ml-3">
-										<h5 class="font-weight-semibold mb-0">14,327 <span class="text-success font-size-sm font-weight-normal"><i class="icon-arrow-up12"></i> (+2.9%)</span></h5>
-										<span class="badge badge-mark border-success mr-1"></span> <span class="text-muted">Jun 16, 10:00 am</span>
-									</div>
-								</div>
-
-								<div class="d-flex align-items-center mb-3 mb-md-0">
-									<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon">
-										<i class="icon-alarm-add"></i>
-									</a>
-									<div class="ml-3">
-										<h5 class="font-weight-semibold mb-0">1,132</h5>
-										<span class="text-muted">total tickets</span>
-									</div>
-								</div>
-
-								<div class="d-flex align-items-center mb-3 mb-md-0">
-									<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon">
-										<i class="icon-spinner11"></i>
-									</a>
-									<div class="ml-3">
-										<h5 class="font-weight-semibold mb-0">06:25:00</h5>
-										<span class="text-muted">response time</span>
-									</div>
-								</div>
-
-								<div>
-									<a href="#" class="btn bg-teal-400"><i class="icon-statistics mr-2"></i> Report</a>
-								</div>
-							</div>
-
-							<div class="table-responsive">
-								<table class="table text-nowrap">
-									<thead>
-										<tr>
-											<th style="width: 50px">Due</th>
-											<th style="width: 300px;">User</th>
-											<th>Description</th>
-											<th class="text-center" style="width: 20px;"><i class="icon-arrow-down12"></i></th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr class="table-active table-border-double">
-											<td colspan="3">Active tickets</td>
-											<td class="text-right">
-												<span class="badge bg-blue badge-pill">24</span>
-											</td>
-										</tr>
-
-										<tr>
-											<td class="text-center">
-												<h6 class="mb-0">12</h6>
-												<div class="font-size-sm text-muted line-height-1">hours</div>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-teal-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Annabelle Doney</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> Active</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div class="font-weight-semibold">[#1183] Workaround for OS X selects printing bug</div>
-													<span class="text-muted">Chrome fixed the bug several versions ago, thus rendering this...</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
-															<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-
-										<tr>
-											<td class="text-center">
-												<h6 class="mb-0">16</h6>
-												<div class="font-size-sm text-muted line-height-1">hours</div>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#">
-															<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold">Chris Macintyre</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> Active</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div class="font-weight-semibold">[#1249] Vertically center carousel controls</div>
-													<span class="text-muted">Try any carousel control and reduce the screen width below...</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
-															<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-
-										<tr>
-											<td class="text-center">
-												<h6 class="mb-0">20</h6>
-												<div class="font-size-sm text-muted line-height-1">hours</div>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-blue rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Robert Hauber</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> Active</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div class="font-weight-semibold">[#1254] Inaccurate small pagination height</div>
-													<span class="text-muted">The height of pagination elements is not consistent with...</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
-															<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-
-										<tr>
-											<td class="text-center">
-												<h6 class="mb-0">40</h6>
-												<div class="font-size-sm text-muted line-height-1">hours</div>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-warning-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Robert Hauber</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> Active</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div class="font-weight-semibold">[#1184] Round grid column gutter operations</div>
-													<span class="text-muted">Left rounds up, right rounds down. should keep everything...</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
-															<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-
-										<tr class="table-active table-border-double">
-											<td colspan="3">Resolved tickets</td>
-											<td class="text-right">
-												<span class="badge bg-success badge-pill">42</span>
-											</td>
-										</tr>
-
-										<tr>
-											<td class="text-center">
-												<i class="icon-checkmark3 text-success"></i>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-success-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Alan Macedo</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Resolved</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div>[#1046] Avoid some unnecessary HTML string</div>
-													<span class="text-muted">Rather than building a string of HTML and then parsing it...</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-															<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-
-										<tr>
-											<td class="text-center">
-												<i class="icon-checkmark3 text-success"></i>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-pink-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Brett Castellano</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Resolved</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div>[#1038] Update json configuration</div>
-													<span class="text-muted">The <code>files</code> property is necessary to override the files property...</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-															<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-
-										<tr>
-											<td class="text-center">
-												<i class="icon-checkmark3 text-success"></i>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#">
-															<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold">Roxanne Forbes</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Resolved</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div>[#1034] Tooltip multiple event</div>
-													<span class="text-muted">Fix behavior when using tooltips and popovers that are...</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-															<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-
-										<tr class="table-active table-border-double">
-											<td colspan="3">Closed tickets</td>
-											<td class="text-right">
-												<span class="badge bg-danger badge-pill">37</span>
-											</td>
-										</tr>
-
-										<tr>
-											<td class="text-center">
-												<i class="icon-cross2 text-danger-400"></i>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#">
-															<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold">Mitchell Sitkin</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-danger mr-1"></span> Closed</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div>[#1040] Account for static form controls in form group</div>
-													<span class="text-muted">Resizes control label's font-size and account for the standard...</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-															<a href="#" class="dropdown-item"><i class="icon-spinner11 text-grey"></i> Reopen issue</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-
-										<tr>
-											<td class="text-center">
-												<i class="icon-cross2 text-danger"></i>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-brown-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Katleen Jensen</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-danger mr-1"></span> Closed</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div>[#1038] Proper sizing of form control feedback</div>
-													<span class="text-muted">Feedback icon sizing inside a larger/smaller form-group...</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-															<a href="#" class="dropdown-item"><i class="icon-spinner11 text-grey"></i> Reopen issue</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<!-- /support tickets -->
 
 
 						<!-- Latest posts --

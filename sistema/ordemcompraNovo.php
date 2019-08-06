@@ -17,6 +17,12 @@ if(isset($_POST['inputData'])){
 	
 	try{
 		
+		$sql = "SELECT SituaId
+				FROM Situacao
+				Where SituaChave = 'PENDENTE' ";
+		$result = $conn->query("$sql");
+		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+		
 		/*
 		$sql = ("SELECT COUNT(isnull(OrComNumero,0)) as Numero
 				 FROM OrdemCompra
@@ -63,7 +69,7 @@ if(isset($_POST['inputData'])){
 						':sEnderecoEntrega' => $_POST['inputEnderecoEntrega'],
 						':dDataEntrega' => gravaData($_POST['inputDataEntrega']),
 						':sObservacao' => $_POST['txtareaObservacao'],
-						':bStatus' => 1,
+						':bStatus' => $rowSituacao['SituaId'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
