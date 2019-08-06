@@ -499,7 +499,7 @@ if(isset($_POST['inputData'])){
 
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputDataEntrega">Data da Entrega</label>
+												<label for="inputDataEntrega">Previsão de Entrega</label>
 												<input type="text" id="inputDataEntrega" name="inputDataEntrega" class="form-control">
 											</div>
 										</div>	
