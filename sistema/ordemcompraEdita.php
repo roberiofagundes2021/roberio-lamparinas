@@ -13,7 +13,7 @@ if(isset($_POST['inputOrdemCompraId'])){
 	
 	try{
 		
-		$sql = "SELECT OrComId, OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumProcesso, OrComCategoria, OrComSubCategoria, OrComConteudo, OrComFornecedor, 
+		$sql = "SELECT OrComId, OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, OrComConteudo, OrComFornecedor, 
 					   ForneContato, ForneEmail, ForneTelefone, ForneCelular, OrComValorFrete, OrComTotalPedido, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
 					   OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, UsuarNome, UsuarEmail, UsuarTelefone
 				FROM OrdemCompra
@@ -130,6 +130,15 @@ if(isset($_POST['inputTipo'])){
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 
+		window.onload = function(){
+			
+			//Ao carregar a página é verificado se é PF ou PJ para aparecer os campos relacionados e esconder o que não estiver
+			var tipo = $('input[name="inputTipo"]:checked').val();
+			
+			selecionaTipo(tipo);
+	
+		}	
+	
         $(document).ready(function() {	
 		
 			$('#summernote').summernote();
@@ -269,7 +278,18 @@ if(isset($_POST['inputTipo'])){
 		function ResetSubCategoria(){
 			$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
 		}
-							
+
+		function selecionaTipo(tipo) {
+			
+			if (tipo == 'C'){
+				document.getElementById('Ata').style.display = "block";
+				document.getElementById('Lote').style.display = "none";
+			} else {
+				document.getElementById('Ata').style.display = "none";
+				document.getElementById('Lote').style.display = "block";
+			}
+		}
+		
 	</script>
 
 </head>
@@ -327,13 +347,13 @@ if(isset($_POST['inputTipo'])){
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="C" name="inputTipo" class="form-input-styled" data-fouc <?php if ($row['OrComTipo'] == 'C') echo "checked"; ?>>
+														<input type="radio" id="inputTipo" value="C" name="inputTipo" class="form-input-styled" data-fouc onclick="selecionaTipo('C')" <?php if ($row['OrComTipo'] == 'C') echo "checked"; ?>>
 														Carta Contrato
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="O" name="inputTipo" class="form-input-styled" data-fouc <?php if ($row['OrComTipo'] == 'O') echo "checked"; ?>>
+														<input type="radio" id="inputTipo" value="O" name="inputTipo" class="form-input-styled" data-fouc onclick="selecionaTipo('O')" <?php if ($row['OrComTipo'] == 'O') echo "checked"; ?>>
 														Ordem de Compra
 													</label>
 												</div>										
@@ -347,19 +367,26 @@ if(isset($_POST['inputTipo'])){
 											</div>
 										</div>
 										
-									<div class="col-lg-2">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputNumero">Número</label>
 												<input type="text" id="inputNumero" name="inputNumero" class="form-control" value="<?php echo $row['OrComNumero']; ?>">
 											</div>
 										</div>
 										
-										<div class="col-lg-2">
+										<div class="col-lg-2" id="Ata">
+											<div class="form-group">
+												<label for="inputNumAta">Nº Ata Registro</label>
+												<input type="text" id="inputNumAta" name="inputNumAta" class="form-control" value="<?php echo $row['OrComNumAta']; ?>">
+											</div>
+										</div>
+										
+										<div class="col-lg-2" id="Lote">
 											<div class="form-group">
 												<label for="inputLote">Lote</label>
 												<input type="text" id="inputLote" name="inputLote" class="form-control" value="<?php echo $row['OrComLote']; ?>">
 											</div>
-										</div>
+										</div>										
 										
 										<div class="col-lg-2">
 											<div class="form-group">

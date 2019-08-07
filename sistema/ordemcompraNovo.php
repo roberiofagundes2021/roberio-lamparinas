@@ -23,40 +23,30 @@ if(isset($_POST['inputData'])){
 		$result = $conn->query("$sql");
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 		
-		/*
-		$sql = ("SELECT COUNT(isnull(OrComNumero,0)) as Numero
-				 FROM OrdemCompra
-				 Where OrComEmpresa = ".$_SESSION['EmpreId']."");
+		$sql = "SELECT PerfiId
+				FROM Perfil
+				Where PerfiChave = 'COMPRAS' ";
 		$result = $conn->query("$sql");
-		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);		
-		
-		$sNumero = (int)$rowNumero['Numero'] + 1;
-		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT); */
+		$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);		
 			
-		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumProcesso, OrComCategoria, OrComSubCategoria, OrComConteudo, OrComFornecedor,
-									     OrComValorFrete, OrComTotalPedido, OrComSolicitante, OrComLocalEntrega, OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, 
+		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, OrComConteudo, OrComFornecedor,
+									     OrComValorFrete, OrComTotalPedido, OrComSolicitante, OrComUnidade, OrComLocalEntrega, OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, 
 										 OrComSituacao, OrComUsuarioAtualizador, OrComEmpresa)
-				VALUES (:sTipo, :dData, :sNumero, :sLote, :sProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, :fTotalPedido, :iSolicitante,
+				VALUES (:sTipo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, :fTotalPedido, :iSolicitante, :iUnidade,
 						:iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
 		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
 		$iFornecedor = $aFornecedor[0];
 		
-		/*
-		echo $sql."<br>";
-		
-		var_dump($_POST['inputTipo'], gravaData($_POST['inputData']), $_POST['inputNumero'], $_POST['inputLote'], $_POST['inputProcesso'],
-			  $_POST['cmbCategoria'], $_POST['cmbSubCategoria'], $_POST['txtareaConteudo'], $iFornecedor, null, null,
-			  $_SESSION['UsuarId'], $_POST['cmbLocalEstoque'], $_POST['inputEnderecoEntrega'], gravaData($_POST['inputDataEntrega']),
-			  $_POST['txtareaObservacao'], 1, $_SESSION['UsuarId'], $_SESSION['EmpreId']);
-		*/
+		$conn->beginTransaction();		
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
 						':dData' => gravaData($_POST['inputData']),
 						':sNumero' => $_POST['inputNumero'],
 						':sLote' => $_POST['inputLote'],
+						':sNumAta' => $_POST['inputNumAta'],
 						':sProcesso' => $_POST['inputProcesso'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
@@ -65,6 +55,7 @@ if(isset($_POST['inputData'])){
 						':fValorFrete' => null,
 						':fTotalPedido' => null,
 						':iSolicitante' => $_SESSION['UsuarId'],
+						':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
 						':iLocalEntrega' => $_POST['cmbLocalEstoque'] == '#' ? null : $_POST['cmbLocalEstoque'],
 						':sEnderecoEntrega' => $_POST['inputEnderecoEntrega'],
 						':dDataEntrega' => gravaData($_POST['inputDataEntrega']),
@@ -73,22 +64,49 @@ if(isset($_POST['inputData'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
-/*		$insertId = $conn->lastInsertId();
+
+		$insertId = $conn->lastInsertId();	
 		
-		$sql = "UPDATE Orcamento SET OrcamNumero = :sNumero
-				WHERE OrcamId = :iOrcamento";
-		$result = $conn->prepare($sql);
-				
-		$result->execute(array(
-						':sNumero' => str_pad($insertId,6,"0",STR_PAD_LEFT);
-						':iOrcamento' => $insertId,
-						));
-*/		
+		if ($_POST['inputTipo'] == 'C'){
+			$sIdentificacao = 'Carta Contrato nº '.$_POST['inputNumero'];
+		} else {
+			$sIdentificacao = 'Ordem de Compra nº '.$_POST['inputNumero']." / Lote ".$_POST['inputLote'];
+		}
+		
+		try{
+		
+			$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, BandeSolicitante, BandeTabela, BandeTabelaId,
+										 BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
+					VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sIdentificacao' => $sIdentificacao,
+							':dData' => gravaData($_POST['inputData']),
+							':sDescricao' => 'Liberar Compra',
+							':sURL' => '',
+							':iPerfilDestino' => $rowPerfil['PerfiId'],
+							':iSolicitante' => $_SESSION['UsuarId'],
+							':sTabela' => 'OrdemCompra',
+							':iTabelaId' => $insertId,
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId']						
+							));
+		} catch(PDOException $e) {
+			$conn->rollback();
+			echo 'Error: ' . $e->getMessage();exit;
+		}
+		
+		$conn->commit();
+		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Ordem de compra incluída!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
+		
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir ordem de compra!!!";
@@ -235,6 +253,17 @@ if(isset($_POST['inputData'])){
 		
 		function ResetSubCategoria(){
 			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+		}
+		
+		function selecionaTipo(tipo) {
+			
+			if (tipo == 'C'){
+				document.getElementById('Ata').style.display = "block";
+				document.getElementById('Lote').style.display = "none";
+			} else {
+				document.getElementById('Ata').style.display = "none";
+				document.getElementById('Lote').style.display = "block";
+			}
 		}		
 		
 	</script>
@@ -277,13 +306,13 @@ if(isset($_POST['inputData'])){
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" value="C" class="form-input-styled" checked data-fouc>
+														<input type="radio" id="inputTipo" name="inputTipo" value="C" class="form-input-styled" checked data-fouc onclick="selecionaTipo('C')">
 														Carta Contrato
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" value="O" class="form-input-styled" data-fouc>
+														<input type="radio" id="inputTipo" name="inputTipo" value="O" class="form-input-styled" data-fouc onclick="selecionaTipo('O')">
 														Ordem de Compra
 													</label>
 												</div>										
@@ -304,7 +333,14 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 										
-										<div class="col-lg-2">
+										<div class="col-lg-2" id="Ata">
+											<div class="form-group">
+												<label for="inputNumAta">Nº Ata Registro</label>
+												<input type="text" id="inputNumAta" name="inputNumAta" class="form-control">
+											</div>
+										</div>										
+										
+										<div class="col-lg-2" id="Lote" style="display:none">
 											<div class="form-group">
 												<label for="inputLote">Lote</label>
 												<input type="text" id="inputLote" name="inputLote" class="form-control">
@@ -477,19 +513,7 @@ if(isset($_POST['inputData'])){
 											<div class="form-group">
 												<label for="cmbLocalEstoque">Local / Almoxarifado</label>
 												<select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2">
-													<?php 
-														$sql = ("SELECT LcEstId, LcEstNome
-																 FROM LocalEstoque															     
-																 WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ." and LcEstStatus = 1
-																 ORDER BY LcEstNome ASC");
-														$result = $conn->query("$sql");
-														$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowLocal as $item){															
-															print('<option value="'.$item['LcEstId'].'">'.$item['LcEstNome'].'</option>');
-														}
-													
-													?>
+													<option value="#">Selecione</option>
 												</select>
 											</div>
 										</div>

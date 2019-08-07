@@ -6,15 +6,66 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 
 include('global_assets/php/conexao.php');
 
+/* PENDENTES */
 $sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and BandeStatus = 1
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandeStatus = 1
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
-$rowBandeja = $result->fetchAll(PDO::FETCH_ASSOC);
+$rowPendente = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT COUNT(BandeId) as TotalPendente
+		FROM Bandeja
+		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = OrComSituacao
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandeStatus = 1";
+$result = $conn->query($sql);
+$rowTotalPendente = $result->fetch(PDO::FETCH_ASSOC);
+$totalPendente = $rowTotalPendente['TotalPendente'];
+
+/* LIBERADAS */
+$sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
+		FROM Bandeja
+		JOIN Usuario on UsuarId = BandeSolicitante
+		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = OrComSituacao
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandeStatus = 1
+		ORDER BY BandeData DESC";
+$result = $conn->query($sql);
+$rowLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT COUNT(BandeId) as TotalLiberado
+		FROM Bandeja
+		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = OrComSituacao
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandeStatus = 1";
+$result = $conn->query($sql);
+$rowTotalLiberado = $result->fetch(PDO::FETCH_ASSOC);
+$totalLiberado = $rowTotalLiberado['TotalLiberado'];
+
+/* NÃO LIBERADAS */
+$sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
+		FROM Bandeja
+		JOIN Usuario on UsuarId = BandeSolicitante
+		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = OrComSituacao
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandeStatus = 1
+		ORDER BY BandeData DESC";
+$result = $conn->query($sql);
+$rowNaoLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT COUNT(BandeId) as TotalNaoLiberado
+		FROM Bandeja
+		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = OrComSituacao
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandeStatus = 1";
+$result = $conn->query($sql);
+$rowTotalNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);
+$totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
+
 
 ?>
 
@@ -228,382 +279,165 @@ $rowBandeja = $result->fetchAll(PDO::FETCH_ASSOC);
 								<tr class="table-active table-border-double">
 									<td colspan="3">Ações Pendentes</td>
 									<td class="text-right">
-										<span class="badge bg-blue badge-pill">24</span>
+										<span class="badge bg-blue badge-pill"><?php echo $totalPendente; ?></span>
 									</td>
 								</tr>
 
-								<?php  foreach ($rowBandeja as $item){ 
-											print('
-											<tr>
-												<td class="text-center">
-													<h6 class="mb-0">0</h6>
-													<div class="font-size-sm text-muted line-height-1">dia</div>
-												</td>
-												<td>
-													<div class="d-flex align-items-center">
-														<div class="mr-3">
-															<a href="#" class="btn bg-teal-400 rounded-round btn-icon btn-sm">
-																<span class="letter-icon"></span>
-															</a>
-														</div>
-														<div>
-															<a href="#" class="text-default font-weight-semibold letter-icon-title">'.nomeSobrenome($item['UsuarNome'], 2).'</a>
-															<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> '.$item['SituaNome'].'</div>
+								<?php  
+								
+									foreach ($rowPendente as $item){ 
+										print('
+										<tr>
+											<td class="text-center">
+												<h6 class="mb-0">0</h6>
+												<div class="font-size-sm text-muted line-height-1">dia</div>
+											</td>
+											<td>
+												<div class="d-flex align-items-center">
+													<div class="mr-3">
+														<a href="#" class="btn bg-teal-400 rounded-round btn-icon btn-sm">
+															<span class="letter-icon"></span>
+														</a>
+													</div>
+													<div>
+														<a href="#" class="text-default font-weight-semibold letter-icon-title">'.nomeSobrenome($item['UsuarNome'], 2).'</a>
+														<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> '.$item['SituaNome'].'</div>
+													</div>
+												</div>
+											</td>
+											<td>
+												<a href="#" class="text-default">
+													<div class="font-weight-semibold">[#'.$item['BandeTabelaId'].'] '.$item['BandeIdentificacao'].'</div>
+													<span class="text-muted">Ação: '.$item['BandeDescricao'].'</span>
+												</a>
+											</td>
+											<td class="text-center">
+												<div class="list-icons">
+													<div class="list-icons-item dropdown">
+														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+														<div class="dropdown-menu dropdown-menu-right">
+															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Visualizar</a>
+															<div class="dropdown-divider"></div>
+															<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
+															<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
 														</div>
 													</div>
-												</td>
-												<td>
-													<a href="#" class="text-default">
-														<div class="font-weight-semibold">[#'.$item['BandeTabelaId'].'] '.$item['BandeIdentificacao'].'</div>
-														<span class="text-muted">Ação: '.$item['BandeDescricao'].'</span>
-													</a>
-												</td>
-												<td class="text-center">
-													<div class="list-icons">
-														<div class="list-icons-item dropdown">
-															<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" class="dropdown-item"><i class="icon-undo"></i> Visualizar</a>
-																<div class="dropdown-divider"></div>
-																<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
-																<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
-															</div>
-														</div>
-													</div>
-												</td>
-											</tr>
-											'); 
-									   }
+												</div>
+											</td>
+										</tr>
+										'); 
+								   }
 								?>
 
-								<tr>
-									<td class="text-center">
-										<h6 class="mb-0">16</h6>
-										<div class="font-size-sm text-muted line-height-1">hours</div>
-									</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="mr-3">
-												<a href="#">
-													<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
-												</a>
-											</div>
-											<div>
-												<a href="#" class="text-default font-weight-semibold">Chris Macintyre</a>
-												<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> Pendente</div>
-											</div>
-										</div>
-									</td>
-									<td>
-										<a href="#" class="text-default">
-											<div class="font-weight-semibold">[#1249] Vertically center carousel controls</div>
-											<span class="text-muted">Try any carousel control and reduce the screen width below...</span>
-										</a>
-									</td>
-									<td class="text-center">
-										<div class="list-icons">
-											<div class="list-icons-item dropdown">
-												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-												<div class="dropdown-menu dropdown-menu-right">
-													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-													<div class="dropdown-divider"></div>
-													<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
-													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-												</div>
-											</div>
-										</div>
-									</td>
-								</tr>
-
-								<tr>
-									<td class="text-center">
-										<h6 class="mb-0">20</h6>
-										<div class="font-size-sm text-muted line-height-1">hours</div>
-									</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="mr-3">
-												<a href="#" class="btn bg-blue rounded-round btn-icon btn-sm">
-													<span class="letter-icon"></span>
-												</a>
-											</div>
-											<div>
-												<a href="#" class="text-default font-weight-semibold letter-icon-title">Robert Hauber</a>
-												<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> Pendente</div>
-											</div>
-										</div>
-									</td>
-									<td>
-										<a href="#" class="text-default">
-											<div class="font-weight-semibold">[#1254] Inaccurate small pagination height</div>
-											<span class="text-muted">The height of pagination elements is not consistent with...</span>
-										</a>
-									</td>
-									<td class="text-center">
-										<div class="list-icons">
-											<div class="list-icons-item dropdown">
-												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-												<div class="dropdown-menu dropdown-menu-right">
-													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-													<div class="dropdown-divider"></div>
-													<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
-													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-												</div>
-											</div>
-										</div>
-									</td>
-								</tr>
-
-								<tr>
-									<td class="text-center">
-										<h6 class="mb-0">40</h6>
-										<div class="font-size-sm text-muted line-height-1">hours</div>
-									</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="mr-3">
-												<a href="#" class="btn bg-warning-400 rounded-round btn-icon btn-sm">
-													<span class="letter-icon"></span>
-												</a>
-											</div>
-											<div>
-												<a href="#" class="text-default font-weight-semibold letter-icon-title">Robert Hauber</a>
-												<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> Pendente</div>
-											</div>
-										</div>
-									</td>
-									<td>
-										<a href="#" class="text-default">
-											<div class="font-weight-semibold">[#1184] Round grid column gutter operations</div>
-											<span class="text-muted">Left rounds up, right rounds down. should keep everything...</span>
-										</a>
-									</td>
-									<td class="text-center">
-										<div class="list-icons">
-											<div class="list-icons-item dropdown">
-												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-												<div class="dropdown-menu dropdown-menu-right">
-													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-													<div class="dropdown-divider"></div>
-													<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
-													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-												</div>
-											</div>
-										</div>
-									</td>
-								</tr>
 
 								<tr class="table-active table-border-double">
-									<td colspan="3">Ações Resolvidas</td>
+									<td colspan="3">Ações Liberadas</td>
 									<td class="text-right">
-										<span class="badge bg-success badge-pill">42</span>
+										<span class="badge bg-success badge-pill"><?php echo $totalLiberado; ?></span>
 									</td>
 								</tr>
-
-								<tr>
-									<td class="text-center">
-										<i class="icon-checkmark3 text-success"></i>
-									</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="mr-3">
-												<a href="#" class="btn bg-success-400 rounded-round btn-icon btn-sm">
-													<span class="letter-icon"></span>
-												</a>
-											</div>
-											<div>
-												<a href="#" class="text-default font-weight-semibold letter-icon-title">Alan Macedo</a>
-												<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Liberado</div>
-											</div>
-										</div>
-									</td>
-									<td>
-										<a href="#" class="text-default">
-											<div>[#1046] Avoid some unnecessary HTML string</div>
-											<span class="text-muted">Rather than building a string of HTML and then parsing it...</span>
-										</a>
-									</td>
-									<td class="text-center">
-										<div class="list-icons">
-											<div class="list-icons-item dropdown">
-												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-												<div class="dropdown-menu dropdown-menu-right">
-													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-													<div class="dropdown-divider"></div>
-													<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
+								
+								<?php 
+									
+									foreach ($rowLiberado as $item){ 
+								
+										print('
+										<tr>
+											<td class="text-center">
+												<i class="icon-checkmark3 text-success"></i>
+											</td>
+											<td>
+												<div class="d-flex align-items-center">
+													<div class="mr-3">
+														<a href="#" class="btn bg-success-400 rounded-round btn-icon btn-sm">
+															<span class="letter-icon"></span>
+														</a>
+													</div>
+													<div>
+														<a href="#" class="text-default font-weight-semibold letter-icon-title">Alan Macedo</a>
+														<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Liberado</div>
+													</div>
 												</div>
-											</div>
-										</div>
-									</td>
-								</tr>
-
-								<tr>
-									<td class="text-center">
-										<i class="icon-checkmark3 text-success"></i>
-									</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="mr-3">
-												<a href="#" class="btn bg-pink-400 rounded-round btn-icon btn-sm">
-													<span class="letter-icon"></span>
+											</td>
+											<td>
+												<a href="#" class="text-default">
+													<div>[#1046] Avoid some unnecessary HTML string</div>
+													<span class="text-muted">Rather than building a string of HTML and then parsing it...</span>
 												</a>
-											</div>
-											<div>
-												<a href="#" class="text-default font-weight-semibold letter-icon-title">Brett Castellano</a>
-												<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Liberado</div>
-											</div>
-										</div>
-									</td>
-									<td>
-										<a href="#" class="text-default">
-											<div>[#1038] Update json configuration</div>
-											<span class="text-muted">The <code>files</code> property is necessary to override the files property...</span>
-										</a>
-									</td>
-									<td class="text-center">
-										<div class="list-icons">
-											<div class="list-icons-item dropdown">
-												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-												<div class="dropdown-menu dropdown-menu-right">
-													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-													<div class="dropdown-divider"></div>
-													<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
+											</td>
+											<td class="text-center">
+												<div class="list-icons">
+													<div class="list-icons-item dropdown">
+														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+														<div class="dropdown-menu dropdown-menu-right">
+															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+															<div class="dropdown-divider"></div>
+															<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
+															<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
+														</div>
+													</div>
 												</div>
-											</div>
-										</div>
-									</td>
-								</tr>
-
-								<tr>
-									<td class="text-center">
-										<i class="icon-checkmark3 text-success"></i>
-									</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="mr-3">
-												<a href="#">
-													<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
-												</a>
-											</div>
-											<div>
-												<a href="#" class="text-default font-weight-semibold">Roxanne Forbes</a>
-												<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Liberado</div>
-											</div>
-										</div>
-									</td>
-									<td>
-										<a href="#" class="text-default">
-											<div>[#1034] Tooltip multiple event</div>
-											<span class="text-muted">Fix behavior when using tooltips and popovers that are...</span>
-										</a>
-									</td>
-									<td class="text-center">
-										<div class="list-icons">
-											<div class="list-icons-item dropdown">
-												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-												<div class="dropdown-menu dropdown-menu-right">
-													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-													<div class="dropdown-divider"></div>
-													<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-													<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-												</div>
-											</div>
-										</div>
-									</td>
-								</tr>
+											</td>
+										</tr>
+										');
+									}
+								?>
 
 								<tr class="table-active table-border-double">
-									<td colspan="3">Ações Fechadas</td>
+									<td colspan="3">Ações Não Liberadas</td>
 									<td class="text-right">
-										<span class="badge bg-danger badge-pill">37</span>
+										<span class="badge bg-danger badge-pill"><?php echo $totalNaoLiberado; ?></span>
 									</td>
 								</tr>
 
-								<tr>
-									<td class="text-center">
-										<i class="icon-cross2 text-danger-400"></i>
-									</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="mr-3">
-												<a href="#">
-													<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
-												</a>
-											</div>
-											<div>
-												<a href="#" class="text-default font-weight-semibold">Mitchell Sitkin</a>
-												<div class="text-muted font-size-sm"><span class="badge badge-mark border-danger mr-1"></span> Não Liberado</div>
-											</div>
-										</div>
-									</td>
-									<td>
-										<a href="#" class="text-default">
-											<div>[#1040] Account for static form controls in form group</div>
-											<span class="text-muted">Resizes control label's font-size and account for the standard...</span>
-										</a>
-									</td>
-									<td class="text-center">
-										<div class="list-icons">
-											<div class="list-icons-item dropdown">
-												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-												<div class="dropdown-menu dropdown-menu-right">
-													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-													<div class="dropdown-divider"></div>
-													<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-													<a href="#" class="dropdown-item"><i class="icon-spinner11 text-grey"></i> Reopen issue</a>
+								<?php 
+									
+									foreach ($rowNaoLiberado as $item){ 
+								
+										print('								
+										<tr>
+											<td class="text-center">
+												<i class="icon-cross2 text-danger-400"></i>
+											</td>
+											<td>
+												<div class="d-flex align-items-center">
+													<div class="mr-3">
+														<a href="#">
+															<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
+														</a>
+													</div>
+													<div>
+														<a href="#" class="text-default font-weight-semibold">Mitchell Sitkin</a>
+														<div class="text-muted font-size-sm"><span class="badge badge-mark border-danger mr-1"></span> Não Liberado</div>
+													</div>
 												</div>
-											</div>
-										</div>
-									</td>
-								</tr>
-
-								<tr>
-									<td class="text-center">
-										<i class="icon-cross2 text-danger"></i>
-									</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="mr-3">
-												<a href="#" class="btn bg-brown-400 rounded-round btn-icon btn-sm">
-													<span class="letter-icon"></span>
+											</td>
+											<td>
+												<a href="#" class="text-default">
+													<div>[#1040] Account for static form controls in form group</div>
+													<span class="text-muted">Resizes control labels font-size and account for the standard...</span>
 												</a>
-											</div>
-											<div>
-												<a href="#" class="text-default font-weight-semibold letter-icon-title">Katleen Jensen</a>
-												<div class="text-muted font-size-sm"><span class="badge badge-mark border-danger mr-1"></span> Não Liberado</div>
-											</div>
-										</div>
-									</td>
-									<td>
-										<a href="#" class="text-default">
-											<div>[#1038] Proper sizing of form control feedback</div>
-											<span class="text-muted">Feedback icon sizing inside a larger/smaller form-group...</span>
-										</a>
-									</td>
-									<td class="text-center">
-										<div class="list-icons">
-											<div class="list-icons-item dropdown">
-												<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-												<div class="dropdown-menu dropdown-menu-right">
-													<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-													<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-													<div class="dropdown-divider"></div>
-													<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-													<a href="#" class="dropdown-item"><i class="icon-spinner11 text-grey"></i> Reopen issue</a>
+											</td>
+											<td class="text-center">
+												<div class="list-icons">
+													<div class="list-icons-item dropdown">
+														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+														<div class="dropdown-menu dropdown-menu-right">
+															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+															<div class="dropdown-divider"></div>
+															<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
+															<a href="#" class="dropdown-item"><i class="icon-spinner11 text-grey"></i> Reopen issue</a>
+														</div>
+													</div>
 												</div>
-											</div>
-										</div>
-									</td>
-								</tr>
+											</td>
+										</tr>
+										');
+									}
+								?>
+								
 							</tbody>
 						</table>
 					</div>

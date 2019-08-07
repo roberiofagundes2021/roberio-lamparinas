@@ -252,8 +252,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Ordem de Compra"></i></a>
-														<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Ordem de Compra"></i></a>
+														<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Ordem de Compra"></i></a>
+														<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Ordem de Compra"></i></a>
 														<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
