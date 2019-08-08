@@ -47,8 +47,8 @@ var Dashboard = function () {
                 maxDate: '12/31/2019',
                 dateLimit: { days: 60 },
                 ranges: {
-                    'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Hoje': [moment(), moment()],
+                    'Ontem': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
@@ -2702,7 +2702,7 @@ var Dashboard = function () {
     };
 
     // Tickets status donut chart
-    var _TicketStatusDonutChart = function(element, size) {
+    var _TicketStatusDonutChart = function(element, size, pendente, liberado, naoliberado) {
         if (typeof d3 == 'undefined') {
             console.warn('Warning - d3.min.js is not loaded.');
             return;
@@ -2718,19 +2718,19 @@ var Dashboard = function () {
             // Add data set
             var data = [
                 {
-                    "status": "Pending tickets",
+                    "status": "Pendentes",
                     "icon": "<i class='status-mark border-blue-300 mr-2'></i>",
-                    "value": 295,
+                    "value": pendente,
                     "color": "#29B6F6"
                 }, {
-                    "status": "Resolved tickets",
+                    "status": "Liberados",
                     "icon": "<i class='status-mark border-success-300 mr-2'></i>",
-                    "value": 189,
+                    "value": liberado,
                     "color": "#66BB6A"
                 }, {
-                    "status": "Closed tickets",
+                    "status": "Não Liberados",
                     "icon": "<i class='status-mark border-danger-300 mr-2'></i>",
-                    "value": 277,
+                    "value": naoliberado,
                     "color": "#EF5350"
                 }
             ];
@@ -3786,7 +3786,7 @@ var Dashboard = function () {
             // Donut charts
             _MarketingCampaignsDonutChart('#campaigns-donut', 42);
             _CampaignStatusDonutChart('#campaign-status-pie', 42);
-            _TicketStatusDonutChart('#tickets-status', 42);
+            _TicketStatusDonutChart('#tickets-status', 52, 50, 40, 10);
 
             // Bar charts
             _BarChart('#hours-available-bars', 24, 40, true, 'elastic', 1200, 50, '#EC407A', 'hours');

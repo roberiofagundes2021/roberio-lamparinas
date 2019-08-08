@@ -2428,7 +2428,7 @@ var Dashboard = function () {
             // Add data set
             var data = [
                 {
-                    "status": "Pending tickets",
+                    "status": "Pendente",
                     "icon": "<i class='status-mark border-blue-300 mr-2'></i>",
                     "value": 295,
                     "color": "#29B6F6"

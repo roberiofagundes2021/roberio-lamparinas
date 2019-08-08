@@ -6,6 +6,10 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 
 include('global_assets/php/conexao.php');
 
+$_SESSION['Pendente'] = 50;
+$_SESSION['Liberado'] = 50;
+$_SESSION['NaoLiberado'] = 50;
+
 if (isset($_POST['cmbPerfil'])){
 	$idPerfilLogado = $_POST['cmbPerfil'];
 } else {
@@ -110,7 +114,7 @@ $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 			$('#cmbPerfil').on('change', function(e){
 				
 				$("#formWorkflow").submit();
-			});	
+			});
 		});
 				
 	</script>
@@ -268,8 +272,8 @@ $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 							<div class="d-flex align-items-center mb-3 mb-md-0">
 								<div id="tickets-status"></div>
 								<div class="ml-3">
-									<h5 class="font-weight-semibold mb-0">14,327 <span class="text-success font-size-sm font-weight-normal"><i class="icon-arrow-up12"></i> (+2.9%)</span></h5>
-									<span class="badge badge-mark border-success mr-1"></span> <span class="text-muted">Jun 16, 10:00 am</span>
+									<h5 class="font-weight-semibold mb-0">50% <span class="text-blue font-size-sm font-weight-normal"><i class="icon-arrow-up12"></i> (Pendente)</span></h5>
+									<span class="badge badge-mark border-blue mr-1"></span> <span class="text-muted">Gráfico de ações</span>
 								</div>
 							</div>
 
@@ -278,16 +282,16 @@ $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 									<i class="icon-alarm-add"></i>
 								</a>
 								<div class="ml-3">
-									<h5 class="font-weight-semibold mb-0">1.132</h5>
+									<h5 class="font-weight-semibold mb-0">30</h5>
 									<span class="text-muted">Total de ações</span>
 								</div>
 							</div>
 
 							<div class="d-flex align-items-center mb-3 mb-md-0">
-								<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon">
+								<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon" style="display:none;">
 									<i class="icon-spinner11"></i>
 								</a>
-								<div class="ml-3">
+								<div class="ml-3" style="display:none;">
 									<a class="text-default daterange-ranges font-weight-semibold cursor-pointer dropdown-toggle">
 									<i class="icon-calendar3 mr-2"></i>
 									<span></span>
