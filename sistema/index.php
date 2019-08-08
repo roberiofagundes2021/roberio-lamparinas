@@ -6,13 +6,27 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['cmbPerfil'])){
+	$idPerfilLogado = $_POST['cmbPerfil'];
+} else {
+	$sql = "SELECT PerfiId
+			FROM Perfil		
+			WHERE PerfiChave = '". $_SESSION['PerfiChave'] ."' and PerfiStatus = 1";
+	$result = $conn->query($sql);
+	$rowPerfilLogado = $result->fetch(PDO::FETCH_ASSOC);
+	$idPerfilLogado = $rowPerfilLogado['PerfiId'];
+}
+
 /* PENDENTES */
-$sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
+$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, 
+			   BandeTabelaId, SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
+		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+		JOIN Perfil on PerfiId = EXUXPPerfil
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
-		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandeStatus = 1
+		LEFT JOIN Situacao on SituaId = OrComSituacao		
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado."
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowPendente = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -21,7 +35,7 @@ $sql = "SELECT COUNT(BandeId) as TotalPendente
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandeStatus = 1";
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado;
 $result = $conn->query($sql);
 $rowTotalPendente = $result->fetch(PDO::FETCH_ASSOC);
 $totalPendente = $rowTotalPendente['TotalPendente'];
@@ -30,6 +44,7 @@ $totalPendente = $rowTotalPendente['TotalPendente'];
 $sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
+		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
 	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandeStatus = 1
@@ -50,6 +65,7 @@ $totalLiberado = $rowTotalLiberado['TotalLiberado'];
 $sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
+		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
 	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandeStatus = 1
@@ -66,7 +82,6 @@ $result = $conn->query($sql);
 $rowTotalNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 
-
 ?>
 
 <!DOCTYPE html>
@@ -80,6 +95,25 @@ $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 	<?php include_once("head.php"); ?>
 	
 	<?php //include_once("acesso.php"); ?>
+	
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>	
+	
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	
+    <script type="text/javascript" >
+
+        $(document).ready(function() {		
+			
+			//Ao mudar a combo Perfil, filtra a tabela de Workflow pelo Perfil
+			$('#cmbPerfil').on('change', function(e){
+				
+				$("#formWorkflow").submit();
+			});	
+		});
+				
+	</script>
 
 </head>
 
@@ -220,227 +254,262 @@ $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 
 				<!-- Support tickets -->
 				<div class="card">
-					<div class="card-header header-elements-sm-inline">
-						<h6 class="card-title">Fluxo de Trabalho (Workflow)</h6>
-						<div class="header-elements">
-							<a class="text-default daterange-ranges font-weight-semibold cursor-pointer dropdown-toggle">
-								<i class="icon-calendar3 mr-2"></i>
-								<span></span>
-							</a>
-						</div>
-					</div>
-
-					<div class="card-body d-md-flex align-items-md-center justify-content-md-between flex-md-wrap">
-						<div class="d-flex align-items-center mb-3 mb-md-0">
-							<div id="tickets-status"></div>
-							<div class="ml-3">
-								<h5 class="font-weight-semibold mb-0">14,327 <span class="text-success font-size-sm font-weight-normal"><i class="icon-arrow-up12"></i> (+2.9%)</span></h5>
-								<span class="badge badge-mark border-success mr-1"></span> <span class="text-muted">Jun 16, 10:00 am</span>
+					
+					<form id="formWorkflow" method="post">
+						
+						<div class="card-header header-elements-sm-inline">
+							<h6 class="card-title">Fluxo de Trabalho (Workflow)</h6>
+							<div class="header-elements">
+								
 							</div>
 						</div>
 
-						<div class="d-flex align-items-center mb-3 mb-md-0">
-							<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon">
-								<i class="icon-alarm-add"></i>
-							</a>
-							<div class="ml-3">
-								<h5 class="font-weight-semibold mb-0">1.132</h5>
-								<span class="text-muted">Total de ações</span>
+						<div class="card-body d-md-flex align-items-md-center justify-content-md-between flex-md-wrap">
+							<div class="d-flex align-items-center mb-3 mb-md-0">
+								<div id="tickets-status"></div>
+								<div class="ml-3">
+									<h5 class="font-weight-semibold mb-0">14,327 <span class="text-success font-size-sm font-weight-normal"><i class="icon-arrow-up12"></i> (+2.9%)</span></h5>
+									<span class="badge badge-mark border-success mr-1"></span> <span class="text-muted">Jun 16, 10:00 am</span>
+								</div>
 							</div>
-						</div>
 
-						<div class="d-flex align-items-center mb-3 mb-md-0">
-							<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon">
-								<i class="icon-spinner11"></i>
-							</a>
-							<div class="ml-3">
-								<h5 class="font-weight-semibold mb-0">06:25:00</h5>
-								<span class="text-muted">Tempo de resposta</span>
+							<div class="d-flex align-items-center mb-3 mb-md-0">
+								<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon">
+									<i class="icon-alarm-add"></i>
+								</a>
+								<div class="ml-3">
+									<h5 class="font-weight-semibold mb-0">1.132</h5>
+									<span class="text-muted">Total de ações</span>
+								</div>
 							</div>
-						</div>
 
-						<div>
-							<a href="#" class="btn bg-teal-400"><i class="icon-statistics mr-2"></i> Report</a>
-						</div>
-					</div>
-
-					<div class="table-responsive">
-						<table class="table text-nowrap">
-							<thead>
-								<tr>
-									<th style="width: 50px">Dias</th>
-									<th style="width: 300px;">Usuário Solicitante</th>
-									<th>Descrição</th>
-									<th class="text-center" style="width: 20px;"><i class="icon-arrow-down12"></i></th>
-								</tr>
-							</thead>
-							<tbody>
-								
-								<tr class="table-active table-border-double">
-									<td colspan="3">Ações Pendentes</td>
-									<td class="text-right">
-										<span class="badge bg-blue badge-pill"><?php echo $totalPendente; ?></span>
-									</td>
-								</tr>
-
-								<?php  
-								
-									foreach ($rowPendente as $item){ 
-										print('
-										<tr>
-											<td class="text-center">
-												<h6 class="mb-0">0</h6>
-												<div class="font-size-sm text-muted line-height-1">dia</div>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-teal-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">'.nomeSobrenome($item['UsuarNome'], 2).'</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> '.$item['SituaNome'].'</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div class="font-weight-semibold">[#'.$item['BandeTabelaId'].'] '.$item['BandeIdentificacao'].'</div>
-													<span class="text-muted">Ação: '.$item['BandeDescricao'].'</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Visualizar</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
-															<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-										'); 
-								   }
-								?>
-
-
-								<tr class="table-active table-border-double">
-									<td colspan="3">Ações Liberadas</td>
-									<td class="text-right">
-										<span class="badge bg-success badge-pill"><?php echo $totalLiberado; ?></span>
-									</td>
-								</tr>
-								
-								<?php 
+							<div class="d-flex align-items-center mb-3 mb-md-0">
+								<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon">
+									<i class="icon-spinner11"></i>
+								</a>
+								<div class="ml-3">
+									<a class="text-default daterange-ranges font-weight-semibold cursor-pointer dropdown-toggle">
+									<i class="icon-calendar3 mr-2"></i>
+									<span></span>
+									</a>
 									
-									foreach ($rowLiberado as $item){ 
-								
-										print('
-										<tr>
-											<td class="text-center">
-												<i class="icon-checkmark3 text-success"></i>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-success-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Alan Macedo</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Liberado</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div>[#1046] Avoid some unnecessary HTML string</div>
-													<span class="text-muted">Rather than building a string of HTML and then parsing it...</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-															<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-										');
-									}
-								?>
+								</div>
+							</div>
 
-								<tr class="table-active table-border-double">
-									<td colspan="3">Ações Não Liberadas</td>
-									<td class="text-right">
-										<span class="badge bg-danger badge-pill"><?php echo $totalNaoLiberado; ?></span>
-									</td>
-								</tr>
-
-								<?php 
+							<div>
+								<b>Filtrar pelo perfil</b>
+								<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2">
+									<?php 
+										$sql = "SELECT PerfiId, PerfiNome
+												FROM Perfil
+												WHERE PerfiStatus = 1
+												ORDER BY PerfiNome ASC";
+										$result = $conn->query($sql);
+										$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
+										
+										foreach ($rowPerfil as $item){
+											
+											if (isset($_POST['cmbPerfil'])){
+												$seleciona = $item['PerfiId'] == $_POST['cmbPerfil'] ? "selected" : "";
+											} else{
+												$seleciona = '';
+											}
+											
+											print('<option value="'.$item['PerfiId'].'" '.$seleciona.'>'.$item['PerfiNome'].'</option>');
+										}
 									
-									foreach ($rowNaoLiberado as $item){ 
-								
-										print('								
-										<tr>
-											<td class="text-center">
-												<i class="icon-cross2 text-danger-400"></i>
-											</td>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#">
-															<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold">Mitchell Sitkin</a>
-														<div class="text-muted font-size-sm"><span class="badge badge-mark border-danger mr-1"></span> Não Liberado</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<a href="#" class="text-default">
-													<div>[#1040] Account for static form controls in form group</div>
-													<span class="text-muted">Resizes control labels font-size and account for the standard...</span>
-												</a>
-											</td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-															<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-															<a href="#" class="dropdown-item"><i class="icon-spinner11 text-grey"></i> Reopen issue</a>
+									?>
+								</select>
+								<!--<a href="#" class="btn bg-teal-400"><i class="icon-statistics mr-2"></i> Report</a>-->
+							</div>
+						</div>
+
+						<div class="table-responsive">
+							
+							<table class="table text-nowrap">
+								<thead>
+									<tr>
+										<th style="width: 50px">Dias</th>
+										<th style="width: 300px;">Usuário Solicitante</th>
+										<th>Descrição</th>
+										<th class="text-center" style="width: 20px;"><i class="icon-arrow-down12"></i></th>
+									</tr>
+								</thead>
+								<tbody>
+									
+									<tr class="table-active table-border-double">
+										<td colspan="3">Ações Pendentes</td>
+										<td class="text-right">
+											<span class="badge bg-blue badge-pill"><?php echo $totalPendente; ?></span>
+										</td>
+									</tr>
+
+									<?php  
+																
+										foreach ($rowPendente as $item){ 
+											
+											if ($item['Intervalo'] > 1){
+												$dias = 'dias';
+											} else{
+												$dias = 'dia';
+											}										
+
+											print('
+											<tr>
+												<td class="text-center">
+													<h6 class="mb-0">'.$item['Intervalo'].'</h6>
+													<div class="font-size-sm text-muted line-height-1">'.$dias.'</div>
+												</td>
+												<td>
+													<div class="d-flex align-items-center">
+														<div class="mr-3">
+															<a href="#" class="btn bg-teal-400 rounded-round btn-icon btn-sm">
+																<span class="letter-icon"></span>
+															</a>
+														</div>
+														<div>
+															<a href="#" class="text-default font-weight-semibold letter-icon-title">'.nomeSobrenome($item['UsuarNome'], 2).'</a>
+															<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> '.$item['SituaNome'].'</div>
 														</div>
 													</div>
-												</div>
-											</td>
-										</tr>
-										');
-									}
-								?>
-								
-							</tbody>
-						</table>
-					</div>
+												</td>
+												<td>
+													<a href="#" class="text-default">
+														<div class="font-weight-semibold">[#'.$item['BandeTabelaId'].'] '.$item['BandeIdentificacao'].'</div>
+														<span class="text-muted">Ação: '.$item['BandeDescricao'].'</span>
+													</a>
+												</td>
+												<td class="text-center">
+													<div class="list-icons">
+														<div class="list-icons-item dropdown">
+															<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+															<div class="dropdown-menu dropdown-menu-right">
+																<a href="#" class="dropdown-item"><i class="icon-undo"></i> Visualizar</a>
+																<div class="dropdown-divider"></div>
+																<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
+																<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
+															</div>
+														</div>
+													</div>
+												</td>
+											</tr>
+											'); 
+									   }
+									?>
+
+
+									<tr class="table-active table-border-double">
+										<td colspan="3">Ações Liberadas</td>
+										<td class="text-right">
+											<span class="badge bg-success badge-pill"><?php echo $totalLiberado; ?></span>
+										</td>
+									</tr>
+									
+									<?php 
+										
+										foreach ($rowLiberado as $item){ 
+									
+											print('
+											<tr>
+												<td class="text-center">
+													<i class="icon-checkmark3 text-success"></i>
+												</td>
+												<td>
+													<div class="d-flex align-items-center">
+														<div class="mr-3">
+															<a href="#" class="btn bg-success-400 rounded-round btn-icon btn-sm">
+																<span class="letter-icon"></span>
+															</a>
+														</div>
+														<div>
+															<a href="#" class="text-default font-weight-semibold letter-icon-title">Alan Macedo</a>
+															<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Liberado</div>
+														</div>
+													</div>
+												</td>
+												<td>
+													<a href="#" class="text-default">
+														<div>[#1046] Avoid some unnecessary HTML string</div>
+														<span class="text-muted">Rather than building a string of HTML and then parsing it...</span>
+													</a>
+												</td>
+												<td class="text-center">
+													<div class="list-icons">
+														<div class="list-icons-item dropdown">
+															<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+															<div class="dropdown-menu dropdown-menu-right">
+																<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+																<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+																<div class="dropdown-divider"></div>
+																<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
+																<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
+															</div>
+														</div>
+													</div>
+												</td>
+											</tr>
+											');
+										}
+									?>
+
+									<tr class="table-active table-border-double">
+										<td colspan="3">Ações Não Liberadas</td>
+										<td class="text-right">
+											<span class="badge bg-danger badge-pill"><?php echo $totalNaoLiberado; ?></span>
+										</td>
+									</tr>
+
+									<?php 
+										
+										foreach ($rowNaoLiberado as $item){ 
+									
+											print('								
+											<tr>
+												<td class="text-center">
+													<i class="icon-cross2 text-danger-400"></i>
+												</td>
+												<td>
+													<div class="d-flex align-items-center">
+														<div class="mr-3">
+															<a href="#">
+																<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="32" height="32" alt="">
+															</a>
+														</div>
+														<div>
+															<a href="#" class="text-default font-weight-semibold">Mitchell Sitkin</a>
+															<div class="text-muted font-size-sm"><span class="badge badge-mark border-danger mr-1"></span> Não Liberado</div>
+														</div>
+													</div>
+												</td>
+												<td>
+													<a href="#" class="text-default">
+														<div>[#1040] Account for static form controls in form group</div>
+														<span class="text-muted">Resizes control labels font-size and account for the standard...</span>
+													</a>
+												</td>
+												<td class="text-center">
+													<div class="list-icons">
+														<div class="list-icons-item dropdown">
+															<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+															<div class="dropdown-menu dropdown-menu-right">
+																<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
+																<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
+																<div class="dropdown-divider"></div>
+																<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
+																<a href="#" class="dropdown-item"><i class="icon-spinner11 text-grey"></i> Reopen issue</a>
+															</div>
+														</div>
+													</div>
+												</td>
+											</tr>
+											');
+										}
+									?>
+									
+								</tbody>
+							</table>
+						</div>
+					</form>
 				</div>
 				<!-- /support tickets -->
 				

@@ -580,7 +580,7 @@ if(isset($_POST['inputTipo'])){
 														
 														foreach ($rowLocal as $item){
 															$seleciona = $item['LcEstId'] == $row['OrComLocalEntrega'] ? "selected" : "";
-															print('<option value="'.$item['LcEstId'].'">'.$item['LcEstNome'].'</option>');
+															print('<option value="'.$item['LcEstId'].'" '.$seleciona.'>'.$item['LcEstNome'].'</option>');
 														}
 													
 													?>
