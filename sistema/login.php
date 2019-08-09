@@ -98,7 +98,6 @@ if(isset($_POST['usuario'])){
 					 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
 					 JOIN Perfil on PerfiId = EXUXPPerfil
 					 JOIN Empresa on EmpreId = EXUXPEmpresa
-					 JOIN Licenca on LicenEmpresa = EmpreId
 					 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and 
 						   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
 					 ");
@@ -125,22 +124,25 @@ if(isset($_POST['usuario'])){
 						 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
 						 JOIN Perfil on PerfiId = EXUXPPerfil
 						 JOIN Empresa on EmpreId = EXUXPEmpresa
-						 JOIN Licenca on LicenEmpresa = EmpreId
 						 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa and 
 							   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
 						 ");
 				$result = $conn->query("$sql");
 				$row = $result->fetch();
 				
-				$_SESSION['UsuarId'] = $row['UsuarId'];
-				$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
-				$_SESSION['UsuarNome'] = $row['UsuarNome'];
-				$_SESSION['EmpreId'] = $row['EmpreId'];
-				$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
-				$_SESSION['PerfiChave'] = $row['PerfiChave'];
-				$_SESSION['UsuarLogado'] = 1;
-				
-				irpara("index.php");
+				if ($row > 0){
+					$_SESSION['UsuarId'] = $row['UsuarId'];
+					$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
+					$_SESSION['UsuarNome'] = $row['UsuarNome'];
+					$_SESSION['EmpreId'] = $row['EmpreId'];
+					$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
+					$_SESSION['PerfiChave'] = $row['PerfiChave'];
+					$_SESSION['UsuarLogado'] = 1;
+					
+					irpara("index.php");
+				} else {
+					$erro[] = "Login inválido. Verifique se o usuário informado faz parte dessa empresa.";
+				}
 				
 			} else {		
 				

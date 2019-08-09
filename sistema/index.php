@@ -20,10 +20,11 @@ if (isset($_POST['cmbPerfil'])){
 	$rowPerfilLogado = $result->fetch(PDO::FETCH_ASSOC);
 	$idPerfilLogado = $rowPerfilLogado['PerfiId'];
 }
+//echo $idPerfilLogado;die;
 
 /* PENDENTES */
 $sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, 
-			   BandeTabelaId, SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo
+			   BandeTabelaId, SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, OrComNumero, OrComSituacao, OrComTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
@@ -86,6 +87,8 @@ $result = $conn->query($sql);
 $rowTotalNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 
+
+$totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 ?>
 
 <!DOCTYPE html>
@@ -115,8 +118,38 @@ $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 				
 				$("#formWorkflow").submit();
 			});
+			
 		});
-				
+		
+		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
+		function atualizaOrdemCompra(OrComId, OrComNumero, OrComSituacao, OrComTipo, Tipo){
+		
+			document.getElementById('inputOrdemCompraId').value = OrComId;
+			document.getElementById('inputOrdemCompraNumero').value = OrComNumero;
+			document.getElementById('inputOrdemCompraStatus').value = OrComSituacao;
+			document.getElementById('inputOrdemCompraTipo').value = OrComTipo;
+			
+			if (Tipo == 'imprimir'){
+				document.formOrdemCompra.action = "ordemcompraImprime.php";
+				document.formOrdemCompra.setAttribute("target", "_blank");
+			} else {
+				if (Tipo == 'edita'){	
+					document.formOrdemCompra.action = "ordemcompraEdita.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formOrdemCompra, "Tem certeza que deseja excluir essa ordem de compra?", "ordemcompraExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formOrdemCompra.action = "ordemcompraMudaSituacao.php";
+				} else if (Tipo == 'produto'){
+					document.formOrdemCompra.action = "ordemcompraProduto.php";
+				} else if (Tipo == 'duplica'){
+					document.formOrdemCompra.action = "ordemcompraDuplica.php";
+				}
+				document.formOrdemCompra.setAttribute("target", "_self");
+			}
+			
+			document.formOrdemCompra.submit();
+		}		
+		
 	</script>
 
 </head>
@@ -282,7 +315,7 @@ $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 									<i class="icon-alarm-add"></i>
 								</a>
 								<div class="ml-3">
-									<h5 class="font-weight-semibold mb-0">30</h5>
+									<h5 class="font-weight-semibold mb-0"><?php echo $totalAcoes; ?></h5>
 									<span class="text-muted">Total de ações</span>
 								</div>
 							</div>
@@ -300,32 +333,37 @@ $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 								</div>
 							</div>
 
-							<div>
-								<b>Filtrar pelo perfil</b>
-								<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2">
-									<?php 
-										$sql = "SELECT PerfiId, PerfiNome
-												FROM Perfil
-												WHERE PerfiStatus = 1
-												ORDER BY PerfiNome ASC";
-										$result = $conn->query($sql);
-										$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
-										
-										foreach ($rowPerfil as $item){
-											
-											if (isset($_POST['cmbPerfil'])){
-												$seleciona = $item['PerfiId'] == $_POST['cmbPerfil'] ? "selected" : "";
-											} else{
-												$seleciona = '';
-											}
-											
-											print('<option value="'.$item['PerfiId'].'" '.$seleciona.'>'.$item['PerfiNome'].'</option>');
-										}
-									
-									?>
-								</select>
-								<!--<a href="#" class="btn bg-teal-400"><i class="icon-statistics mr-2"></i> Report</a>-->
-							</div>
+							<?php 
+								if ($_SESSION['PerfiChave'] == "SUPER" or $_SESSION['PerfiChave'] == "ADMINISTRADOR") {
+									print('							
+										<div>
+											<b>Filtrar pelo perfil</b>
+											<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2">');
+												
+												$sql = "SELECT PerfiId, PerfiNome
+														FROM Perfil
+														WHERE PerfiStatus = 1
+														ORDER BY PerfiNome ASC";
+												$result = $conn->query($sql);
+												$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($rowPerfil as $item){
+													
+													if (isset($_POST['cmbPerfil'])){
+														$seleciona = $item['PerfiId'] == $_POST['cmbPerfil'] ? "selected" : "";
+													} else{
+														$seleciona = '';
+													}
+													
+													print('<option value="'.$item['PerfiId'].'" '.$seleciona.'>'.$item['PerfiNome'].'</option>');
+												}
+												
+											print('	
+											</select>
+											<!--<a href="#" class="btn bg-teal-400"><i class="icon-statistics mr-2"></i> Report</a>-->
+										</div>');
+								}
+							?>
 						</div>
 
 						<div class="table-responsive">
@@ -361,7 +399,7 @@ $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 											print('
 											<tr>
 												<td class="text-center">
-													<h6 class="mb-0">'.$item['Intervalo'].'</h6>
+													<h6 class="mb-0" data-popup="tooltip" data-placement="bottom" data-container="body" title="'.mostradata($item['BandeData']).'">'.$item['Intervalo'].'</h6>
 													<div class="font-size-sm text-muted line-height-1">'.$dias.'</div>
 												</td>
 												<td>
@@ -388,7 +426,7 @@ $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 														<div class="list-icons-item dropdown">
 															<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" class="dropdown-item"><i class="icon-undo"></i> Visualizar</a>
+																<a href="#" onclick="atualizaOrdemCompra('.$item['BandeTabelaId'].', \''.$item['OrComNumero'].'\', '.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'imprimir\');" class="dropdown-item"><i class="icon-printer2"></i> Visualizar</a>
 																<div class="dropdown-divider"></div>
 																<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
 																<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
@@ -516,6 +554,13 @@ $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 					</form>
 				</div>
 				<!-- /support tickets -->
+				
+				<form name="formOrdemCompra" method="post">
+					<input type="hidden" id="inputOrdemCompraId" name="inputOrdemCompraId" >
+					<input type="hidden" id="inputOrdemCompraNumero" name="inputOrdemCompraNumero" >
+					<input type="hidden" id="inputOrdemCompraStatus" name="inputOrdemCompraStatus" >
+					<input type="hidden" id="inputOrdemCompraTipo" name="inputOrdemCompraTipo" >
+				</form>				
 				
 
 				<!-- Dashboard content -->
