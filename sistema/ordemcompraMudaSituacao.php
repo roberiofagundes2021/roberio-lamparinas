@@ -8,16 +8,23 @@ $_SESSION['msg'] = array();
 
 if(isset($_POST['inputOrdemCompraId'])){
 	
-	$iProduto = $_POST['inputOrdemCompraId'];
-	$bStatus = $_POST['inputOrdemCompraStatus'] ? 0 : 1;
+	$sql = "SELECT SituaId
+			FROM Situacao	
+			WHERE SituaChave = '". $_POST['inputOrdemCompraStatus'] ."' and SituaStatus = 1";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+	$bStatus = $row['SituaId'] > 0 ? $row['SituaId'] : null;	
+	
+	$iOrdemCompra = $_POST['inputOrdemCompraId'];
         	
 	try{
 		
-		$sql = "UPDATE OrdemCompra SET OrComSituacao = :bStatus
+		$sql = "UPDATE OrdemCompra SET OrComSituacao = :bStatus, OrComUsuarioAtualizador = :iUsuario
 				WHERE OrComId = :id";
-		$result = $conn->prepare("$sql");
+		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $bStatus);
-		$result->bindParam(':id', $iProduto);
+		$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
+		$result->bindParam(':id', $iOrdemCompra);
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

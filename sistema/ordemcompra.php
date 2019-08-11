@@ -229,7 +229,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										if ($item['SituaChave'] == 'PENDENTE'){
 											$situacaoClasse = 'badge badge-flat border-danger text-danger-600';
 										} else{
-											$situacaoClasse = 'badge badge-flat badge-success text-success-600';
+											$situacaoClasse = 'badge badge-flat border-success text-success-600';
 										} 
 										
 										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];

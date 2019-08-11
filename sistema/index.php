@@ -28,7 +28,6 @@ $sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, 
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
-		JOIN Perfil on PerfiId = EXUXPPerfil
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao		
 	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado."
@@ -46,13 +45,13 @@ $rowTotalPendente = $result->fetch(PDO::FETCH_ASSOC);
 $totalPendente = $rowTotalPendente['TotalPendente'];
 
 /* LIBERADAS */
-$sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
+$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandeStatus = 1
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado."
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -61,19 +60,19 @@ $sql = "SELECT COUNT(BandeId) as TotalLiberado
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandeStatus = 1";
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado;
 $result = $conn->query($sql);
 $rowTotalLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalLiberado = $rowTotalLiberado['TotalLiberado'];
 
 /* NÃO LIBERADAS */
-$sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
+$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandeStatus = 1
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado."
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowNaoLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -82,7 +81,7 @@ $sql = "SELECT COUNT(BandeId) as TotalNaoLiberado
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandeStatus = 1";
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado;
 $result = $conn->query($sql);
 $rowTotalNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
@@ -119,30 +118,31 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 				$("#formWorkflow").submit();
 			});
 			
+			//Ao mudar a combo Perfil, filtra a tabela de Workflow pelo Perfil
+			$('#cmbSituacao').on('change', function(e){
+				
+				$("#formWorkflow").submit();
+			});			
+			
 		});
 		
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaOrdemCompra(OrComId, OrComNumero, OrComSituacao, OrComTipo, Tipo){
 		
 			document.getElementById('inputOrdemCompraId').value = OrComId;
-			document.getElementById('inputOrdemCompraNumero').value = OrComNumero;
-			document.getElementById('inputOrdemCompraStatus').value = OrComSituacao;
+			document.getElementById('inputOrdemCompraNumero').value = OrComNumero;			
 			document.getElementById('inputOrdemCompraTipo').value = OrComTipo;
 			
 			if (Tipo == 'imprimir'){
 				document.formOrdemCompra.action = "ordemcompraImprime.php";
 				document.formOrdemCompra.setAttribute("target", "_blank");
 			} else {
-				if (Tipo == 'edita'){	
-					document.formOrdemCompra.action = "ordemcompraEdita.php";		
-				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formOrdemCompra, "Tem certeza que deseja excluir essa ordem de compra?", "ordemcompraExclui.php");
-				} else if (Tipo == 'mudaStatus'){
+				if (Tipo == 'liberar'){	
+					document.getElementById('inputOrdemCompraStatus').value = 'LIBERADO';
+					document.formOrdemCompra.action = "ordemcompraMudaSituacao.php";		
+				} else if (Tipo == 'naoliberar'){
+					document.getElementById('inputOrdemCompraStatus').value = 'NAOLIBERADO';
 					document.formOrdemCompra.action = "ordemcompraMudaSituacao.php";
-				} else if (Tipo == 'produto'){
-					document.formOrdemCompra.action = "ordemcompraProduto.php";
-				} else if (Tipo == 'duplica'){
-					document.formOrdemCompra.action = "ordemcompraDuplica.php";
 				}
 				document.formOrdemCompra.setAttribute("target", "_self");
 			}
@@ -332,6 +332,39 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 									
 								</div>
 							</div>
+							
+							<?php 
+								
+								print('							
+									<div>
+										<b>Filtrar ações por:</b>
+										<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2">');
+											
+											$sql = "SELECT SituaId, SituaNome, SituaChave
+													FROM Situacao
+													WHERE SituaStatus = 1 and SituaChave in ('PENDENTE', 'LIBERADO', 'NAOLIBERADO')
+													ORDER BY SituaNome ASC";
+											$result = $conn->query($sql);
+											$rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											print('<option value="TODOS">Todos</option>');
+											
+											foreach ($rowSituacao as $item){
+												
+												if (isset($_POST['cmbSituacao'])){
+													$seleciona = $item['SituaChave'] == $_POST['cmbSituacao'] ? "selected" : "";
+												} else{
+													$seleciona = '';
+												}
+												
+												print('<option value="'.$item['SituaChave'].'" '.$seleciona.'>'.$item['SituaNome'].'</option>');
+											}
+											
+										print('	
+										</select>										
+									</div>');
+								
+							?>							
 
 							<?php 
 								if ($_SESSION['PerfiChave'] == "SUPER" or $_SESSION['PerfiChave'] == "ADMINISTRADOR") {
@@ -378,6 +411,21 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 									</tr>
 								</thead>
 								<tbody>
+									
+									<?php 
+									
+										if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'TODOS'){
+											
+										} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'PENDENTE')){
+										
+										} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'LIBERADO')){
+										
+										} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'NAOLIBERADO')){
+										
+										} else {
+											
+										}
+									?>
 									
 									<tr class="table-active table-border-double">
 										<td colspan="3">Ações Pendentes</td>
@@ -428,8 +476,8 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaOrdemCompra('.$item['BandeTabelaId'].', \''.$item['OrComNumero'].'\', '.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'imprimir\');" class="dropdown-item"><i class="icon-printer2"></i> Visualizar</a>
 																<div class="dropdown-divider"></div>
-																<a href="#" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
-																<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
+																<a href="#" onclick="atualizaOrdemCompra('.$item['BandeTabelaId'].', \''.$item['OrComNumero'].'\', '.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'liberar\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
+																<a href="#" onclick="atualizaOrdemCompra('.$item['BandeTabelaId'].', \''.$item['OrComNumero'].'\', '.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'naoliberar\');" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
 															</div>
 														</div>
 													</div>
@@ -464,15 +512,15 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 															</a>
 														</div>
 														<div>
-															<a href="#" class="text-default font-weight-semibold letter-icon-title">Alan Macedo</a>
-															<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> Liberado</div>
+															<a href="#" class="text-default font-weight-semibold letter-icon-title">'.nomeSobrenome($item['UsuarNome'], 2).'</a>
+															<div class="text-muted font-size-sm"><span class="badge badge-mark border-success mr-1"></span> '.$item['SituaNome'].'</div>
 														</div>
 													</div>
 												</td>
 												<td>
 													<a href="#" class="text-default">
-														<div>[#1046] Avoid some unnecessary HTML string</div>
-														<span class="text-muted">Rather than building a string of HTML and then parsing it...</span>
+														<div>[#'.$item['BandeTabelaId'].'] '.$item['BandeIdentificacao'].'</div>
+														<span class="text-muted">Ação: '.$item['BandeDescricao'].'</span>
 													</a>
 												</td>
 												<td class="text-center">
@@ -518,15 +566,15 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 															</a>
 														</div>
 														<div>
-															<a href="#" class="text-default font-weight-semibold">Mitchell Sitkin</a>
-															<div class="text-muted font-size-sm"><span class="badge badge-mark border-danger mr-1"></span> Não Liberado</div>
+															<a href="#" class="text-default font-weight-semibold">'.nomeSobrenome($item['UsuarNome'], 2).'</a>
+															<div class="text-muted font-size-sm"><span class="badge badge-mark border-danger mr-1"></span> '.$item['SituaNome'].'</div>
 														</div>
 													</div>
 												</td>
 												<td>
 													<a href="#" class="text-default">
-														<div>[#1040] Account for static form controls in form group</div>
-														<span class="text-muted">Resizes control labels font-size and account for the standard...</span>
+														<div>[#'.$item['BandeTabelaId'].'] '.$item['BandeIdentificacao'].'</div>
+														<span class="text-muted">Ação: '.$item['BandeDescricao'].'</span>
 													</a>
 												</td>
 												<td class="text-center">
