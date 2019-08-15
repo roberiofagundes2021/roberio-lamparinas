@@ -142,6 +142,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				if (OrComSituacaoChave == 'PENDENTE'){			
 					alerta('Atenção','Enquanto o status estiver PENDENTE de liberação a impressão não poderá ser realizada!','error');
 					return false;
+				} else if (OrComSituacaoChave == 'NAOLIBERADO'){			
+					alerta('Atenção','A ordem de compra/contrato não foi liberada, portanto, a impressão não poderá ser realizada!','error');
+					return false;
 				} else {
 					document.formOrdemCompra.action = "ordemcompraImprime.php";
 					document.formOrdemCompra.setAttribute("target", "_blank");
@@ -227,6 +230,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacao = $item['SituaNome'];
 										
 										if ($item['SituaChave'] == 'PENDENTE'){
+											$situacaoClasse = 'badge badge-flat border-primary text-danger-600';
+										} else if ($item['SituaChave'] == 'NAOLIBERADO'){
 											$situacaoClasse = 'badge badge-flat border-danger text-danger-600';
 										} else{
 											$situacaoClasse = 'badge badge-flat border-success text-success-600';
