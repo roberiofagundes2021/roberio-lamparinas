@@ -10,6 +10,8 @@ if(isset($_POST['inputData'])){
 
 	try{
 		
+		$conn->beginTransaction();
+		
 		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeOrcamento, FlOpeData, FlOpeNumContrato, FlOpeNumProcesso, 
 											  FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa)
 				VALUES (:iFornecedor, :iCategoria, :iOrcamento, :dData, :iNumContrato, :iNumProcesso, 
@@ -25,14 +27,42 @@ if(isset($_POST['inputData'])){
 						':iNumProcesso' => $_POST['inputNumProcesso'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iEmpresa' => $_SESSION['EmpreId']
 						));
+
+		$insertId = $conn->lastInsertId();	
+		
+		$sql = "SELECT *
+				FROM OrcamentoXProduto
+				Where OrXPrOrcamento = ".$_POST['cmbOrcamento'];
+		$result = $conn->query("$sql");
+		$rowOrcamentoProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+		
+		foreach ($rowOrcamentoProdutos as $item){
+		
+			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario, FOXPrUsuarioAtualizador, FOXPrEmpresa)
+					VALUES (:iFluxoOperacional, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':iFluxoOperacional' => $insertId,
+							':iProduto' => $item['OrXPrProduto'],
+							':iQuantidade' => $item['OrXPrQuantidade'],
+							':fValorUnitario' => $item['OrXPrValorUnitario'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId']
+							));		
+		}
+						
+		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Fluxo Operacional incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";	
 		
 	} catch(PDOException $e) {
+		
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir Fluxo Operacional!!!";
