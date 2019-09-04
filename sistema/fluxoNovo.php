@@ -12,19 +12,21 @@ if(isset($_POST['inputData'])){
 		
 		$conn->beginTransaction();
 		
-		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeOrcamento, FlOpeData, FlOpeNumContrato, FlOpeNumProcesso, 
-											  FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa)
-				VALUES (:iFornecedor, :iCategoria, :iOrcamento, :dData, :iNumContrato, :iNumProcesso, 
-						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeOrcamento, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, 
+											  FlOpeValor, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa)
+				VALUES (:iFornecedor, :iCategoria, :iOrcamento, :dDataInicio, :dDataFim, :iNumContrato, :iNumProcesso, 
+						:fValor, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':iFornecedor' => $_POST['cmbFornecedor'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iOrcamento' => $_POST['cmbOrcamento'] == '#' ? null : $_POST['cmbOrcamento'],
-						':dData' => $_POST['inputData'] == '' ? null : $_POST['inputData'],
+						':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
+						':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 						':iNumContrato' => $_POST['inputNumContrato'],
 						':iNumProcesso' => $_POST['inputNumProcesso'],
+						':fValor' => gravaValor($_POST['inputValor']),
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
@@ -269,31 +271,50 @@ if(isset($_POST['inputData'])){
 							<h5 class="mb-0 font-weight-semibold">Dados do Contrato</h5>
 							<br>
 							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputData">Data de Emissão</label>
+										<label for="inputData">Data Início</label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="date" id="inputData" name="inputData" class="form-control" placeholder="Data" required>
+											<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" required>
 										</div>
 									</div>
 								</div>
 								
-								<div class="col-lg-4">
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputData">Data Fim</label>
+										<div class="input-group">
+											<span class="input-group-prepend">
+												<span class="input-group-text"><i class="icon-calendar22"></i></span>
+											</span>
+											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" required>
+										</div>
+									</div>
+								</div>								
+								
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputNumContrato">Número do Contrato</label>
 										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato">
 									</div>
 								</div>
 										
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputNumProcesso">Número do Processo</label>
 										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo">
 									</div>
 								</div>
+								
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputValor">Valor Total</label>
+										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total">
+									</div>
+								</div>								
 							</div>							
 
 							<div class="row" style="margin-top: 10px;">

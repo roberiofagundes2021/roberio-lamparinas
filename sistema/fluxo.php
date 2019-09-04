@@ -6,13 +6,13 @@ $_SESSION['PaginaAtual'] = 'Fluxo Operacional';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT FlOpeId, ForneNome, FlOpeOrcamento, FlOpeCategoria, FlOpeData, 
-				FlOpeNumContrato, FlOpeNumProcesso, FlOpeStatus, CategNome
+$sql = ("SELECT FlOpeId, ForneNome, FlOpeOrcamento, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, 
+				FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome
 		 FROM FluxoOperacional
 		 JOIN Categoria on CategId = FlOpeCategoria
 		 JOIN Fornecedor on ForneId = FlOpeFornecedor
 	     WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY FlOpeData DESC, FlOpeCategoria ASC");
+		 ORDER BY FlOpeDataInicio DESC, FlOpeCategoria ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -51,7 +51,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [{ 
 					orderable: false,
 					width: 50,
-					targets: [ 6 ]
+					targets: [ 7 ]
 				}], 
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -150,11 +150,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table class="table" id="tblFluxo">
 								<thead>
 									<tr class="bg-slate">
-										<th width="10%">Data</th>
-										<th width="15%">Nº Contrato</th>
-										<th width="15%">Nº Processo</th>										
-										<th width="20%">Fornecedor</th>
-										<th width="20%">Categoria</th>
+										<th width="10%">Data Início</th>
+										<th width="10%">Data Fim</th>
+										<th width="12%">Nº Contrato</th>
+										<th width="12%">Nº Processo</th>										
+										<th width="18%">Fornecedor</th>
+										<th width="18%">Categoria</th>
 										<th width="10%">Situação</th>
 										<th width="10%" class="text-center">Ações</th>
 									</tr>
@@ -168,7 +169,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										print('
 										<tr>
-											<td>'.mostraData($item['FlOpeData']).'</td>
+											<td>'.mostraData($item['FlOpeDataInicio']).'</td>
+											<td>'.mostraData($item['FlOpeDataFim']).'</td>
 											<td>'.$item['FlOpeNumContrato'].'</td>
 											<td>'.$item['FlOpeNumProcesso'].'</td>
 											<td>'.$item['ForneNome'].'</td>

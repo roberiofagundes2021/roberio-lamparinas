@@ -30,13 +30,13 @@ if(isset($_POST['inputFluxoOperacionalId'])){
 	irpara("fluxo.php");
 }
 
-if(isset($_POST['inputData'])){
+if(isset($_POST['inputDataInicio'])){
 
 	try{
 		
 		$sql = "UPDATE FluxoOperacional SET FlOpeFornecedor = :iFornecedor, FlOpeCategoria = :iCategoria, FlOpeOrcamento = :iOrcamento, 
-										    FlOpeData = :dData, FlOpeNumContrato = :iNumContrato, FlOpeNumProcesso = :iNumProcesso, 
-											FlOpeUsuarioAtualizador = :iUsuarioAtualizador
+										    FlOpeDataInicio = :dDataInicio, FlOpeDataFim = :dDataFim, FlOpeNumContrato = :iNumContrato, 
+										    FlOpeNumProcesso = :iNumProcesso, FlOpeValor = :fValor, FlOpeUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE FlOpeId = ".$_POST['inputFluxoOperacionalId']."
 				";
 		$result = $conn->prepare($sql);
@@ -45,9 +45,11 @@ if(isset($_POST['inputData'])){
 						':iFornecedor' => $_POST['cmbFornecedor'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iOrcamento' => $_POST['cmbOrcamento'] == '#' ? null : $_POST['cmbOrcamento'],
-						':dData' => $_POST['inputData'] == '' ? null : $_POST['inputData'],
+						':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
+						':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 						':iNumContrato' => $_POST['inputNumContrato'],
-						':iNumProcesso' => $_POST['inputNumProcesso'],						
+						':iNumProcesso' => $_POST['inputNumProcesso'],
+						':fValor' => gravaValor($_POST['inputValor']),	
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']						
 						));
 		
@@ -170,11 +172,11 @@ if(isset($_POST['inputData'])){
 
 				e.preventDefault();
 				
-				var inputData = $('#inputData').val();				
+				var inputDataInicio = $('#inputDataInicio').val();				
 				
-				if (inputData == ''){
-					alerta('Atenção','Informe a data de emissão do contrato!','error');
-					$('#inputData').focus();
+				if (inputDataInicio == ''){
+					alerta('Atenção','Informe a data de início do contrato!','error');
+					$('#inputDataInicio').focus();
 					return false;				
 				}
 				
@@ -292,29 +294,48 @@ if(isset($_POST['inputData'])){
 							<h5 class="mb-0 font-weight-semibold">Dados do Contrato</h5>
 							<br>
 							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputData">Data de Emissão</label>
+										<label for="inputData">Data Início</label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="date" id="inputData" name="inputData" class="form-control" placeholder="Data" value="<?php echo $row['FlOpeData']; ?>">
+											<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['FlOpeDataInicio']; ?>">
 										</div>
 									</div>
 								</div>
 								
-								<div class="col-lg-4">
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputData">Data Fim</label>
+										<div class="input-group">
+											<span class="input-group-prepend">
+												<span class="input-group-text"><i class="icon-calendar22"></i></span>
+											</span>
+											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['FlOpeDataFim']; ?>">
+										</div>
+									</div>
+								</div>								
+								
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputNumContrato">Número do Contrato</label>
 										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>">
 									</div>
 								</div>
 										
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputNumProcesso">Número do Processo</label>
 										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>">
+									</div>
+								</div>
+								
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputValor">Valor Total</label>
+										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" value="<?php echo mostraValor($row['FlOpeValor']); ?>" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>
 							</div>							
