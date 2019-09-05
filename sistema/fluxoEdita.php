@@ -172,11 +172,39 @@ if(isset($_POST['inputDataInicio'])){
 
 				e.preventDefault();
 				
-				var inputDataInicio = $('#inputDataInicio').val();				
+				var cmbFornecedor = $('#cmbFornecedor').val();
+				var cmbCategoria = $('#cmbCategoria').val();
+				var cmbOrcamento = $('#cmbOrcamento').val();
+				var inputDataInicio = $('#inputDataInicio').val();
+				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');				
+
+				if (cmbFornecedor == '#'){
+					alerta('Atenção','Informe o fornecedor!','error');
+					$('#cmbFornecedor').focus();
+					return false;				
+				}
+				
+				if (cmbCategoria == '#'){
+					alerta('Atenção','Informe a categoria!','error');
+					$('#cmbCategoria').focus();
+					return false;				
+				}
+
+				if (cmbOrcamento == '#'){
+					alerta('Atenção','Informe o orçamento!','error');
+					$('#cmbOrcamento').focus();
+					return false;				
+				}				
 				
 				if (inputDataInicio == ''){
 					alerta('Atenção','Informe a data de início do contrato!','error');
 					$('#inputDataInicio').focus();
+					return false;				
+				}
+
+				if (inputValor == '' || inputValor <= 0){
+					alerta('Atenção','Informe o valor total do contrato!','error');
+					$('#inputValor').focus();
 					return false;				
 				}
 				
