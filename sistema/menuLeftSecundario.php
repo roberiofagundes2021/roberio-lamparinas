@@ -143,6 +143,9 @@
 									}
 								?>
 							</li>-->
+							<li class="nav-item">
+								<a href="parametro.php" class="nav-link"><i class="icon-cabinet"></i> Parâmetro</a>
+							</li>
 							<li class="nav-item-divider"></li>
 							<li class="nav-item">
 								<a href="empresa.php" class="nav-link"><i class="icon-office"></i> Listar Empresas</a>

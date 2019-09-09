@@ -36,7 +36,7 @@ if(isset($_POST['inputCnpj'])){
 						':sObservacao' => $_POST['txtareaObservacao'],						
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']
-						));
+						));	
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Empresa incluída!!!";
