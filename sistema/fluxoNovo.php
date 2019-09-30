@@ -331,8 +331,8 @@ if(isset($_POST['inputData'])){
 								
 								<div class="col-lg-3">
 									<div class="form-group">
-										<label for="inputNumContrato">Número do Contrato</label>
-										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato">
+										<label for="inputNumContrato">Nº Ata Registro</label>
+										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº Ata Registro">
 									</div>
 								</div>
 										

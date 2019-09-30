@@ -165,6 +165,40 @@ if(isset($_POST['inputData'])){
 				} else {
 					$('#inputTelefoneFornecedor').val(Forne[4]);
 				}
+				
+				$.getJSON('filtraCategoria.php?idFornecedor='+Forne[0], function (dados){
+					
+					//var option = '<option value="#">Selecione a Categoria</option>';
+					var option = '';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
+						});						
+						
+						$('#cmbCategoria').html(option).show();
+					} else {
+						ResetCategoria();
+					}					
+				});
+				
+				$.getJSON('filtraSubCategoria.php?idFornecedor='+Forne[0], function (dados){
+					
+					var option = '<option value="#">Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});				
+				
 			});
 			
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
@@ -249,6 +283,10 @@ if(isset($_POST['inputData'])){
 		
 		function ResetLocalEstoque(){
 			$('#cmbLocalEstoque').empty().append('<option>Sem Local do Estoque</option>');
+		}		
+		
+		function ResetCategoria(){
+			$('#cmbCategoria').empty().append('<option value="#">Sem Categoria</option>');
 		}		
 		
 		function ResetSubCategoria(){
@@ -355,6 +393,58 @@ if(isset($_POST['inputData'])){
 										</div>	
 									</div>
 									
+									<div class="row">
+										<div class="col-lg-12">									
+											<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
+											<br>
+											<div class="row">
+												<div class="col-lg-4">
+													<div class="form-group">
+														<label for="cmbFornecedor">Fornecedor</label>
+														<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
+															<option value="#">Selecione</option>
+															<?php 
+																$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+																		 FROM Fornecedor														     
+																		 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
+																		 ORDER BY ForneNome ASC");
+																$result = $conn->query("$sql");
+																$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+																
+																foreach ($rowFornecedor as $item){															
+																	print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'">'.$item['ForneNome'].'</option>');
+																}
+															
+															?>
+														</select>
+													</div>
+												</div>
+												
+												<div class="col-lg-3">
+													<div class="form-group">
+														<label for="inputContato">Contato</label>
+														<input type="text" id="inputContato" name="inputContato" class="form-control" readOnly>
+													</div>
+												</div>									
+
+												<div class="col-lg-3">
+													<div class="form-group">
+														<label for="inputEmailFornecedor">E-mail</label>
+														<input type="text" id="inputEmailFornecedor" name="inputEmailFornecedor" class="form-control" readOnly>
+													</div>
+												</div>									
+
+												<div class="col-lg-2">
+													<div class="form-group">
+														<label for="inputTelefoneFornecedor">Telefone</label>
+														<input type="text" id="inputTelefoneFornecedor" name="inputTelefoneFornecedor" class="form-control" readOnly>
+													</div>
+												</div>									
+											</div>
+										</div>
+									</div>
+									<br>									
+									
 									<div class="row">											
 										<div class="col-lg-6">
 											<div class="form-group">
@@ -401,59 +491,7 @@ if(isset($_POST['inputData'])){
 								</div>
 							</div>		
 							<br>
-							
-							<div class="row">
-								<div class="col-lg-12">									
-									<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
-									<br>
-									<div class="row">
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="cmbFornecedor">Fornecedor</label>
-												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
-													<?php 
-														$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-																 FROM Fornecedor														     
-																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
-															     ORDER BY ForneNome ASC");
-														$result = $conn->query("$sql");
-														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowFornecedor as $item){															
-															print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'">'.$item['ForneNome'].'</option>');
-														}
-													
-													?>
-												</select>
-											</div>
-										</div>
-										
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputContato">Contato</label>
-												<input type="text" id="inputContato" name="inputContato" class="form-control" readOnly>
-											</div>
-										</div>									
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputEmailFornecedor">E-mail</label>
-												<input type="text" id="inputEmailFornecedor" name="inputEmailFornecedor" class="form-control" readOnly>
-											</div>
-										</div>									
-
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputTelefoneFornecedor">Telefone</label>
-												<input type="text" id="inputTelefoneFornecedor" name="inputTelefoneFornecedor" class="form-control" readOnly>
-											</div>
-										</div>									
-									</div>
-								</div>
-							</div>
-							<br>
-														
+																					
 							<div class="row">
 								<div class="col-lg-12">									
 									<h5 class="mb-0 font-weight-semibold">Dados do Solicitante</h5>

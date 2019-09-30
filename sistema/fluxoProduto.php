@@ -153,6 +153,24 @@ try{
 					}	
 				});
 			});
+			
+			//Valida Registro
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputValor = $('#inputValor').val();
+				var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+				
+				//Verifica se o valor ultrapassou o total
+				if (parseFloat(inputTotalGeral) > parseFloat(inputValor)){
+					alerta('Atenção','A soma dos totais ultrapassou o valor do contrato!','error');
+					return false;
+				}
+				
+				$( "#formFluxoOperacionalProduto" ).submit();
+				
+			}); // enviar			
 						
 		}); //document.ready
 		
@@ -163,18 +181,26 @@ try{
 		
 		function ResetProduto(){
 			$('#cmbProduto').empty().append('<option>Sem produto</option>');
-		}
+		}	
 		
 		function calculaValorTotal(id){
+			
+			var ValorTotalAnterior = $('#inputValorTotal'+id+'').val().replace('.', '').replace(',', '.');
+			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');			
+			
 			var Quantidade = $('#inputQuantidade'+id+'').val();
 			var ValorUnitario = $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
 			var ValorTotal = 0;
 			
 			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
 			
+			var TotalGeral = float2moeda(parseFloat(TotalGeralAnterior) - parseFloat(ValorTotalAnterior) + ValorTotal).toString();
+			
 			ValorTotal = float2moeda(ValorTotal).toString();
 			
 			$('#inputValorTotal'+id+'').val(ValorTotal);
+			
+			$('#inputTotalGeral').val(TotalGeral);
 		}
 							
 	</script>
@@ -222,13 +248,13 @@ try{
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputCelular">Telefone</label>
+												<label for="inputTelefone">Telefone</label>
 												<input type="text" id="inputTelefone" name="inputTelefone" class="form-control" value="<?php echo $row['ForneTelefone']; ?>" readOnly>
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputTelefone">Celular</label>
+												<label for="inputCelular">Celular</label>
 												<input type="text" id="inputCelular" name="inputCelular" class="form-control" value="<?php echo $row['ForneCelular']; ?>" readOnly>
 											</div>
 										</div>
@@ -241,18 +267,24 @@ try{
 												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['FlOpeCategoria']; ?>">
 											</div>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputCelular">Contrato</label>
+												<label for="inputContrato">Contrato</label>
 												<input type="text" id="inputContrato" name="inputContrato" class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly>
 											</div>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputTelefone">Processo</label>
+												<label for="inputProcesso">Processo</label>
 												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
 											</div>
-										</div>										
+										</div>	
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputValor">Valor Total</label>
+												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo $row['FlOpeValor']; ?>" readOnly>
+											</div>
+										</div>											
 									</div>
 									
 									<div class="row" style="display:none;">	
@@ -365,6 +397,8 @@ try{
 										
 										print('<div id="tabelaProdutos">');
 										
+										$fTotalGeral = 0;
+										
 										foreach ($rowProdutos as $item){
 											
 											$cont++;
@@ -372,6 +406,8 @@ try{
 											$iQuantidade = isset($item['FOXPrQuantidade']) ? $item['FOXPrQuantidade'] : '';
 											$fValorUnitario = isset($item['FOXPrValorUnitario']) ? mostraValor($item['FOXPrValorUnitario']) : '';											
 											$fValorTotal = (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? mostraValor($item['FOXPrQuantidade'] * $item['FOXPrValorUnitario']) : '';
+											
+											$fTotalGeral += (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? $item['FOXPrQuantidade'] * $item['FOXPrValorUnitario'] : 0;
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
@@ -402,6 +438,33 @@ try{
 											
 										}
 										
+										print('
+										<div class="row" style="margin-top: 8px;">
+												<div class="col-lg-6">
+													<div class="row">
+														<div class="col-lg-1">
+															
+														</div>
+														<div class="col-lg-11">
+															
+														</div>
+													</div>
+												</div>								
+												<div class="col-lg-1">
+													
+												</div>
+												<div class="col-lg-1">
+													
+												</div>	
+												<div class="col-lg-2" style="padding-top: 5px; text-align: right;">
+													<h3><b>Total:</b></h3>
+												</div>	
+												<div class="col-lg-2">
+													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
+												</div>											
+											</div>'										
+										);
+										
 										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="'.$cont.'" >');
 										
 										print('</div>');									
@@ -416,7 +479,7 @@ try{
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
 										<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

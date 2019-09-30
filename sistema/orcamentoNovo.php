@@ -150,6 +150,22 @@ if(isset($_POST['inputData'])){
 					}					
 				});
 				
+				$.getJSON('filtraFornecedor.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option value="#">Selecione o Fornecedor</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ForneId+'">'+obj.ForneNome+'</option>';
+						});						
+						
+						$('#cmbFornecedor').html(option).show();
+					} else {
+						ResetFornecedor();
+					}					
+				});				
+				
 			});
 			
 			$("#enviar").on('click', function(e){
@@ -176,7 +192,11 @@ if(isset($_POST['inputData'])){
 		
 		function ResetSubCategoria(){
 			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
-		}		
+		}	
+		
+		function ResetFornecedor(){
+			$('#cmbFornecedor').empty().append('<option>Sem Fornecedor</option>');
+		}	
 		
 	</script>
 
