@@ -284,6 +284,13 @@ if(isset($_POST['inputData'])){
 										</select>
 									</div>
 								</div>
+							
+								<div class="col-lg-4">
+									<label for="cmbOrcamento">Orçamento</label>
+									<select id="cmbOrcamento" name="cmbOrcamento" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+									</select>
+								</div>	
 								
 								<div class="col-lg-4">
 									<div class="form-group">
@@ -293,13 +300,7 @@ if(isset($_POST['inputData'])){
 										</select>
 									</div>
 								</div>
-								
-								<div class="col-lg-4">
-									<label for="cmbOrcamento">Orçamento</label>
-									<select id="cmbOrcamento" name="cmbOrcamento" class="form-control form-control-select2">
-										<option value="#">Selecione</option>
-									</select>
-								</div>	
+							
 							</div>
 							
 							<h5 class="mb-0 font-weight-semibold">Dados do Contrato</h5>

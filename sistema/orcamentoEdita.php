@@ -162,6 +162,22 @@ if(isset($_POST['inputTipo'])){
 					}					
 				});
 				
+				$.getJSON('filtraFornecedor.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option value="#">Selecione o Fornecedor</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ForneId+'#'+obj.ForneContato+'#'+obj.ForneEmail+'#'+obj.ForneTelefone+'#'+obj.ForneCelular+'">'+obj.ForneNome+'</option>';
+						});						
+						
+						$('#cmbFornecedor').html(option).show();
+					} else {
+						ResetFornecedor();
+					}					
+				});				
+				
 			}); 
 
 			$("#enviar").on('click', function(e){
@@ -220,6 +236,10 @@ if(isset($_POST['inputTipo'])){
 		
 		function ResetSubCategoria(){
 			$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
+		}
+		
+		function ResetFornecedor(){
+			$('#cmbFornecedor').empty().append('<option>Sem Fornecedor</option>');
 		}
 							
 	</script>

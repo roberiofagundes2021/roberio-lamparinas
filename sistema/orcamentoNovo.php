@@ -88,22 +88,15 @@ if(isset($_POST['inputData'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.	min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<!-- /theme JS files -->
 	
 	<!-- JS file path -->
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-
-	<!-- Uniform plugin file path -->
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -157,7 +150,7 @@ if(isset($_POST['inputData'])){
 					if (dados.length){						
 						
 						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.ForneId+'">'+obj.ForneNome+'</option>';
+							option += '<option value="'+obj.ForneId+'#'+obj.ForneContato+'#'+obj.ForneEmail+'#'+obj.ForneTelefone+'#'+obj.ForneCelular+'">'+obj.ForneNome+'</option>';
 						});						
 						
 						$('#cmbFornecedor').html(option).show();
@@ -280,9 +273,9 @@ if(isset($_POST['inputData'])){
 										</div>
 										
 										<div class="col-lg-4">
-											<div class="form-group">
+											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
 													<option value="#">Selecione</option>
 												</select>
 											</div>
