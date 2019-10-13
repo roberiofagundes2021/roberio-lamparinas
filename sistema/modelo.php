@@ -37,7 +37,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
 	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script
+	<script src="global_assets/js/demo_pages/components_popups.js"></script>
 	<!-- /theme JS files -->	
 	
 	<script>
