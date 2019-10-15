@@ -4,7 +4,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$_SESSION['PaginaAtual'] = 'TR / Orçamento';
+$_SESSION['PaginaAtual'] = 'Termo de Referência / Orçamento';
 
 if (isset($_POST['inputTRId'])){
 	

@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Orçamento';
+$_SESSION['PaginaAtual'] = 'Termo de Referência';
 
 include('global_assets/php/conexao.php');
 

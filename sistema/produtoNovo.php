@@ -121,7 +121,7 @@ if(isset($_POST['inputNome'])){
 					
 					var option = '<option>Selecione a SubCategoria</option>';
 					
-					if (dados.length){						
+					if (dados.length){
 						
 						$.each(dados, function(i, obj){
 							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
