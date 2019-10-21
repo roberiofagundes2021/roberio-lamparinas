@@ -142,7 +142,7 @@ try{
 				
 				$.ajax({
 					type: "POST",
-					url: "orcamentoFiltraProduto.php",
+					url: "fluxoFiltraProduto.php",
 					data: {idCategoria: inputCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
 					success: function(resposta){
 						//alert(resposta);
@@ -287,7 +287,7 @@ try{
 										</div>											
 									</div>
 									
-									<div class="row" style="display:none;">	
+									<div class="row">	
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="cmbProduto">Produto</label>
@@ -341,10 +341,11 @@ try{
 									
 									<?php									
 
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
+										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 												FROM Produto
 												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+												LEFT JOIN Marca on MarcaId = ProduMarca
 												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -363,13 +364,16 @@ try{
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-6">
+											<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
 														</div>
-														<div class="col-lg-11">
+														<div class="col-lg-8">
 															<label for="inputProduto"><strong>Produto</strong></label>
+														</div>
+														<div class="col-lg-3">
+															<label for="inputMarca"><strong>Marca</strong></label>
 														</div>
 													</div>
 												</div>												
@@ -383,12 +387,12 @@ try{
 													<label for="inputQuantidade"><strong>Quantidade</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-2">
+											<div class="col-lg-1">
 												<div class="form-group">
 													<label for="inputValorUnitario"><strong>Valor Unitário</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-2">
+											<div class="col-lg-1">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -411,14 +415,17 @@ try{
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-6">
+												<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
 															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
 														</div>
-														<div class="col-lg-11">
+														<div class="col-lg-8">
 															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+														</div>
+														<div class="col-lg-3">
+															<input type="text" id="inputMarca'.$cont.'" name="inputMarca'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['MarcaNome'].'" value="'.$item['MarcaNome'].'" readOnly>
 														</div>
 													</div>
 												</div>								
@@ -428,10 +435,10 @@ try{
 												<div class="col-lg-1">
 													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border-off Quantidade" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'" readOnly>
 												</div>	
-												<div class="col-lg-2">
+												<div class="col-lg-1">
 													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
 												</div>	
-												<div class="col-lg-2">
+												<div class="col-lg-1">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>
 												</div>											
 											</div>');											
@@ -440,12 +447,15 @@ try{
 										
 										print('
 										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-6">
+												<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															
 														</div>
-														<div class="col-lg-11">
+														<div class="col-lg-8">
+															
+														</div>
+														<div class="col-lg-3">
 															
 														</div>
 													</div>
@@ -456,10 +466,10 @@ try{
 												<div class="col-lg-1">
 													
 												</div>	
-												<div class="col-lg-2" style="padding-top: 5px; text-align: right;">
+												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
 													<h3><b>Total:</b></h3>
 												</div>	
-												<div class="col-lg-2">
+												<div class="col-lg-1">
 													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
 												</div>											
 											</div>'										

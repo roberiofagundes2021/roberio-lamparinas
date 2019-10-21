@@ -110,26 +110,9 @@ if(isset($_POST['inputData'])){
 			//Ao mudar o Fornecedor, filtra a categoria e o Orçamento via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e){
 				
-				Filtrando();
+				FiltraOrcamento();
 				
 				var cmbFornecedor = $('#cmbFornecedor').val();
-
-				$.getJSON('filtraCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
-					
-					//var option = '<option value="#">Selecione a Categoria</option>';
-					var option = '';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
-						});						
-						
-						$('#cmbCategoria').html(option).show();
-					} else {
-						ResetCategoria();
-					}					
-				});
 				
 				$.getJSON('filtraOrcamento.php?idFornecedor='+cmbFornecedor, function (dados){
 					
@@ -153,22 +136,76 @@ if(isset($_POST['inputData'])){
 				
 			});	
 			
-			
-			//Mostra o "Filtrando..." na combo Categoria e Orcamento ao mesmo tempo
-			function Filtrando(){
-				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
-				FiltraOrcamento();
-			}		
+			//Ao mudar o Fornecedor, filtra a categoria e o Orçamento via ajax (retorno via JSON)
+			$('#cmbOrcamento').on('change', function(e){
+				
+				FiltraCategoria();
+				FiltraSubCategoria();
+				
+				var cmbOrcamento = $('#cmbOrcamento').val();
+
+				$.getJSON('filtraCategoria.php?idOrcamento='+cmbOrcamento, function (dados){
+					
+					//var option = '<option value="#">Selecione a Categoria</option>';
+					var option = '';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
+						});						
+						
+						$('#cmbCategoria').html(option).show();
+					} else {
+						ResetCategoria();
+					}					
+				});
+				
+				$.getJSON('filtraSubCategoria.php?idOrcamento='+cmbOrcamento, function (dados){
+					
+					if (dados.length > 1){
+						var option = '<option value="#" "selected">Selecione a SubCategoria</option>';
+					} else {
+						var option = '';
+					}
+					
+					if (dados.length){
+						
+						$.each(dados, function(i, obj){							
+							option += '<option value="'+obj.SbCatId+'">' + obj.SbCatNome + '</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});				
+				
+			});	
 			
 			//Mostra o "Filtrando..." na combo Orcamento
 			function FiltraOrcamento(){
 				$('#cmbOrcamento').empty().append('<option>Filtrando...</option>');
-			}		
+			}
+			
+			//Mostra o "Filtrando..." na combo Categoria
+			function FiltraCategoria(){
+				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
+			}
+			
+			//Mostra o "Filtrando..." na combo SubCategoria
+			function FiltraSubCategoria(){
+				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+			}
 			
 			function ResetCategoria(){
 				$('#cmbCategoria').empty().append('<option value="#">Sem Categoria</option>');
 			}
-			
+
+			function ResetSubCategoria(){
+				$('#cmbSubCategoria').empty().append('<option value="#">Sem SubCategoria</option>');
+			}
+						
 			function ResetOrcamento(){
 				$('#cmbOrcamento').empty().append('<option value="#">Sem orçamento</option>');
 			}				
@@ -263,7 +300,7 @@ if(isset($_POST['inputData'])){
 							<h5 class="mb-0 font-weight-semibold">Dados do Orçamento</h5>
 							<br>
 							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="cmbFornecedor">Fornecedor</label>
 										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
@@ -285,14 +322,14 @@ if(isset($_POST['inputData'])){
 									</div>
 								</div>
 							
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<label for="cmbOrcamento">Orçamento</label>
 									<select id="cmbOrcamento" name="cmbOrcamento" class="form-control form-control-select2">
 										<option value="#">Selecione</option>
 									</select>
 								</div>	
 								
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="cmbCategoria">Categoria</label>
 										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
@@ -300,7 +337,15 @@ if(isset($_POST['inputData'])){
 										</select>
 									</div>
 								</div>
-							
+								
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="cmbSubCategoria">SubCategoria</label>
+										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+											<option value="#">Selecione</option>
+										</select>
+									</div>
+								</div>							
 							</div>
 							
 							<h5 class="mb-0 font-weight-semibold">Dados do Contrato</h5>

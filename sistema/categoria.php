@@ -6,11 +6,11 @@ $_SESSION['PaginaAtual'] = 'Categoria';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT CategId, CategNome, CategStatus
-		 FROM Categoria
-	     WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY CategNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT CategId, CategNome, CategStatus
+		FROM Categoria
+	    WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
+		ORDER BY CategNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 //var_dump($count);die;
@@ -51,10 +51,7 @@ $count = count($row);
 				confirmaExclusao(document.formCategoria, "Tem certeza que deseja excluir essa categoria?", "categoriaExclui.php");
 			} else if (Tipo == 'mudaStatus'){
 				document.formCategoria.action = "categoriaMudaSituacao.php";
-			} else if (Tipo == 'imprime'){
-				document.formCategoria.action = "categoriaImprime.php";
-				document.formCategoria.setAttribute("target", "_blank");
-			}
+			} 
 			
 			document.formCategoria.submit();
 		}		
@@ -146,7 +143,7 @@ $count = count($row);
 				
 				<!-- /info blocks -->
 				
-				<form name="formCategoria" method="post" action="cEdita.php">
+				<form name="formCategoria" method="post" action="categoriaEdita.php">
 					<input type="hidden" id="inputCategoriaId" name="inputCategoriaId" >
 					<input type="hidden" id="inputCategoriaNome" name="inputCategoriaNome" >
 					<input type="hidden" id="inputCategoriaStatus" name="inputCategoriaStatus" >

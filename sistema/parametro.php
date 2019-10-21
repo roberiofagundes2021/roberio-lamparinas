@@ -64,6 +64,9 @@ if(isset($_POST['inputIdEmpresa'])){
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
+	
+	<script src="global_assets/js/plugins/forms/styling/switch.min.js"></script>	
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 	<!-- /theme JS files -->	
 	
@@ -143,7 +146,24 @@ if(isset($_POST['inputIdEmpresa'])){
 							</div>
 							
 							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-5">
+									<!-- Switch single -->
+									<div class="form-group row">
+										<label class="col-lg-3 col-form-label">Empresa Pública <span class="text-danger">*</span></label>
+										<div class="col-lg-9">
+											<div class="form-check form-check-switch form-check-switch-left">
+												<label class="form-check-label d-flex align-items-center">
+													<input type="checkbox" name="inputEmpresaPublica" id="inputEmpresaPublica" data-on-text="Sim" data-off-text="Não" class="form-input-switch" required>
+												</label>
+											</div>
+										</div>
+									</div>
+									<!-- /switch single -->
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="cmbValorAtualizado">Valor do Produto será atualizado:</label>
 										<select id="cmbValorAtualizado" name="cmbValorAtualizado" class="form-control form-control-select2">

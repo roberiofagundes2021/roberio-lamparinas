@@ -85,47 +85,37 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			document.formPrOrc.submit();
 		}
 
-  
+  $(document).ready(function() {
 
         /* Início: Tabela Personalizada */
 			$('#tblProduto').DataTable( {
-				"order": [[ 1, "asc" ]],
+				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{ 
-					orderable: true,   //Codigo
+					orderable: true,   //Produto
 					width: "10%",
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Produto
+					orderable: true,   //Categoria
 					width: "25%",
 					targets: [1]
 				},				
 				{ 
-					orderable: true,   //Categoria
+					orderable: true,   //SubCategoria
 					width: "20%",
 					targets: [2]
 				},
 				{ 
-					orderable: true,   //SubCategoria
-					width: "20%",
-					targets: [3]
-				},
-				{ 
-					orderable: true,   //Preço Venda
-					width: "15%",
-					targets: [4]
-				},
-				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [5]
+					targets: [3]
 				},
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [6]
+					targets: [4]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -135,7 +125,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
 				}
 			});
-
+});
 			
 	</script>
 
@@ -179,7 +169,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="text-right"><a href="produtoOrcamentoNovo.php" class="btn btn-success" role="button">Novo Produto</a></div>
 							</div>
 							
-							<table class="table datatable-responsive">
+							<table class="table" id="tblProduto">
 								<thead>
 									<tr class="bg-slate">
 										<th>Produto</th>
