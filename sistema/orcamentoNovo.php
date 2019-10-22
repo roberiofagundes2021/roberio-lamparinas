@@ -26,9 +26,9 @@ if(isset($_POST['inputData'])){
 		$sNumero = (int)$rowNumero['Numero'] + 1;
 		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 			
-		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamSubCategoria, OrcamConteudo, OrcamFornecedor,
+		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor,
 									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamEmpresa)
-				VALUES (:sNumero, :sTipo, :dData, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
+				VALUES (:sNumero, :sTipo, :dData, :iCategoria,:sConteudo, :iFornecedor, :iSolicitante, 
 						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
@@ -40,7 +40,7 @@ if(isset($_POST['inputData'])){
 						':sTipo' => $_POST['inputTipo'],
 						':dData' => gravaData($_POST['inputData']),
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						//':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iFornecedor' => $iFornecedor,
 						':iSolicitante' => $_SESSION['UsuarId'],
@@ -48,6 +48,32 @@ if(isset($_POST['inputData'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
+		$insertId = $conn->lastInsertId(); 
+
+
+		if (isset($_POST['cmbSubCategoria'])){
+			
+			try{
+				$sql = "INSERT INTO OrcamentoXSubCategoria 
+							(OrXSCOrcamento, OrXSCSubCategoria, OrXSCEmpresa)
+						VALUES 
+							(:iFornecedor, :iSubCategoria, :iEmpresa)";
+				$result = $conn->prepare($sql);
+
+				foreach ($_POST['cmbSubCategoria'] as $key => $value){
+
+					$result->execute(array(
+									':iFornecedor' => $insertId,
+									':iSubCategoria' => $value,
+									':iEmpresa' => $_SESSION['EmpreId']
+									));
+				}
+				
+			} catch(PDOException $e) {
+				$conn->rollback();
+				echo 'Error: ' . $e->getMessage();exit;
+			}
+		}
 /*		$insertId = $conn->lastInsertId();
 		
 		$sql = "UPDATE Orcamento SET OrcamNumero = :sNumero
@@ -59,6 +85,7 @@ if(isset($_POST['inputData'])){
 						':iOrcamento' => $insertId,
 						));
 */		
+
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Orçamento incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
@@ -142,6 +169,7 @@ if(isset($_POST['inputData'])){
 						ResetSubCategoria();
 					}					
 				});
+                
 				
 				$.getJSON('filtraFornecedor.php?idCategoria='+cmbCategoria, function (dados){
 					
@@ -160,6 +188,19 @@ if(isset($_POST['inputData'])){
 				});				
 				
 			});
+
+			 // Limpa os campos de fornecedor quando uma nova categoria é selecionada
+			$('#cmbCategoria').on('change', function(){
+				let inputContato = $('#inputContato')
+				let inputEmailFornecedor = $('#inputEmailFornecedor')
+				let inputTelefoneFornecedor = $('#inputTelefoneFornecedor')
+
+				if(inputContato.val() || inputEmailFornecedor.val() || inputTelefoneFornecedor.val()){
+                    inputContato.val('')
+                    inputEmailFornecedor.val('')
+                    inputTelefoneFornecedor.val('')
+				} 
+			})
 			
 			$("#enviar").on('click', function(e){
 				

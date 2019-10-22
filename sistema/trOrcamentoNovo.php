@@ -127,6 +127,62 @@ if(isset($_POST['inputData'])){
 					$('#inputTelefoneFornecedor').val(Forne[4]);
 				}
 			});
+
+
+			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function(e){
+				
+				Filtrando();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option value="#">Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});
+				
+				$.getJSON('filtraFornecedor.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option value="#">Selecione o Fornecedor</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ForneId+'#'+obj.ForneContato+'#'+obj.ForneEmail+'#'+obj.ForneTelefone+'#'+obj.ForneCelular+'">'+obj.ForneNome+'</option>';
+						});						
+						
+						$('#cmbFornecedor').html(option).show();
+					} else {
+						ResetFornecedor();
+					}					
+				});				
+				
+			});
+
+
+			// Limpa os campos de fornecedor quando uma nova categoria é selecionada
+			$('#cmbCategoria').on('change', function(){
+				let inputContato = $('#inputContato')
+				let inputEmailFornecedor = $('#inputEmailFornecedor')
+				let inputTelefoneFornecedor = $('#inputTelefoneFornecedor')
+
+				if(inputContato.val() || inputEmailFornecedor.val() || inputTelefoneFornecedor.val()){
+                    inputContato.val('')
+                    inputEmailFornecedor.val('')
+                    inputTelefoneFornecedor.val('')
+				} 
+			})
 			
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
@@ -294,7 +350,7 @@ if(isset($_POST['inputData'])){
 												<label for="cmbFornecedor">Fornecedor</label>
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
-													<?php 
+													<!--<?php/* 
 														$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																 FROM Fornecedor														     
 																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
@@ -306,7 +362,7 @@ if(isset($_POST['inputData'])){
 															print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'">'.$item['ForneNome'].'</option>');
 														}
 													
-													?>
+													*/?>-->
 												</select>
 											</div>
 										</div>

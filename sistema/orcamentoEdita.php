@@ -13,14 +13,25 @@ if(isset($_POST['inputOrcamentoId'])){
 	
 	try{
 		
-		$sql = "SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamSubCategoria, OrcamConteudo, OrcamFornecedor, 
-					   ForneContato, ForneEmail, ForneTelefone, ForneCelular, OrcamSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
+		$sql = "SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor, 
+					   ForneId, ForneContato, ForneEmail, ForneTelefone, ForneCelular, OrcamSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
 				FROM Orcamento
 				JOIN Usuario on UsuarId = OrcamSolicitante
 				JOIN Fornecedor on ForneId = OrcamFornecedor
 				WHERE OrcamId = $iOrcamento ";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		$sql = ("SELECT SbCatId, SbCatNome
+				 FROM SubCategoria
+				 JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
+				 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = $iOrcamento
+				 ORDER BY SbCatNome ASC");
+		$result = $conn->query("$sql");
+		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($rowBD as $item){
+			$aSubCategorias[] = $item['SbCatId'];
+		}
 		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
@@ -39,7 +50,7 @@ if(isset($_POST['inputTipo'])){
 		
 		$iOrcamento = $_POST['inputOrcamentoId'];
 		
-		$sql = "UPDATE Orcamento SET OrcamTipo = :sTipo, OrcamCategoria = :iCategoria, OrcamSubCategoria = :iSubCategoria, OrcamConteudo = :sConteudo,
+		$sql = "UPDATE Orcamento SET OrcamTipo = :sTipo, OrcamCategoria = :iCategoria, OrcamConteudo = :sConteudo,
 									 OrcamFornecedor = :iFornecedor, OrcamUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE OrcamId = :iOrcamento";
 		$result = $conn->prepare($sql);
@@ -52,12 +63,46 @@ if(isset($_POST['inputTipo'])){
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						//':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iFornecedor' => $iFornecedor,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iOrcamento' => $iOrcamento
 						));
+
+
+        $sql = "DELETE FROM OrcamentoXSubCategoria
+				WHERE OrXSCOrcamento = :iOrcamento and OrXSCEmpresa = :iEmpresa";
+		$result = $conn->prepare($sql);	
+		
+		$result->execute(array(
+							':iOrcamento' => $_POST['inputOrcamentoId'],
+							':iEmpresa' => $_SESSION['EmpreId']));
+
+
+		if (isset($_POST['cmbSubCategoria'])){
+			
+			try{
+				$sql = "INSERT INTO OrcamentoXSubCategoria 
+							(OrXSCOrcamento, OrXSCSubCategoria, OrXSCEmpresa)
+						VALUES 
+							(:iOrcamento, :iSubCategoria, :iEmpresa)";
+				$result = $conn->prepare($sql);
+
+				foreach ($_POST['cmbSubCategoria'] as $key => $value){
+
+					$result->execute(array(
+									':iOrcamento' => $_POST['inputOrcamentoId'],
+									':iSubCategoria' => $value,
+									':iEmpresa' => $_SESSION['EmpreId']
+									));
+				}
+							
+			} catch(PDOException $e) {
+				$conn->rollback();
+				echo 'Error: ' . $e->getMessage();exit;
+			}
+		}
 		
 		if (isset($_POST['inputOrcamentoProdutoExclui']) and $_POST['inputOrcamentoProdutoExclui']){
 			
@@ -115,6 +160,14 @@ if(isset($_POST['inputTipo'])){
 
 	<!-- Uniform plugin file path -->
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
+
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>	
+
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -178,7 +231,20 @@ if(isset($_POST['inputTipo'])){
 					}					
 				});				
 				
-			}); 
+			});
+
+			// Limpa os campos de fornecedor quando uma nova categoria é selecionada
+			$('#cmbCategoria').on('change', function(){
+				let inputContato = $('#inputContato')
+				let inputEmailFornecedor = $('#inputEmailFornecedor')
+				let inputTelefoneFornecedor = $('#inputTelefoneFornecedor')
+
+				if(inputContato.val() || inputEmailFornecedor.val() || inputTelefoneFornecedor.val()){
+                    inputContato.val('')
+                    inputEmailFornecedor.val('')
+                    inputTelefoneFornecedor.val('')
+				} 
+			})
 
 			$("#enviar").on('click', function(e){
 				
@@ -319,7 +385,7 @@ if(isset($_POST['inputTipo'])){
 											</div>
 										</div>
 																				
-										<div class="col-lg-4">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
@@ -342,25 +408,29 @@ if(isset($_POST['inputTipo'])){
 											</div>
 										</div>
 										
-										<div class="col-lg-4">
+										<div class="col-lg-5">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
-													<?php 
-														$sql = "SELECT SbCatId, SbCatNome
-																FROM SubCategoria															     
-																WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-																ORDER BY SbCatNome ASC";
-														$result = $conn->query($sql);
-														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowSubCategoria as $item){
-															$seleciona = $item['SbCatId'] == $row['OrcamSubCategoria'] ? "selected" : "";
-															print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
-														}
-													
-													?>
+												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
+													<!--<option value="#">Selecione uma subcategoria</option>-->
+													<?php
+												        if (isset($row['OrcamCategoria'])){
+													        $sql = ("SELECT SbCatId, SbCatNome
+															    FROM SubCategoria														 
+															     WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SbCatStatus = 1
+															     ORDER BY SbCatNome ASC");
+													        $result = $conn->query("$sql");
+													        $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+													        $count = count($rowSubCategoria);
+
+													        
+														        foreach ($rowSubCategoria as $item){
+															        $seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
+															        print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
+														        }
+													        
+												        }
+											        ?>
 												</select>
 											</div>
 										</div>
@@ -388,20 +458,20 @@ if(isset($_POST['inputTipo'])){
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor</label>
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
-													<?php 
+													<?php
 														$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																 FROM Fornecedor														     
-																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
+																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1 and ForneCategoria = ".$row['OrcamCategoria']."
 															     ORDER BY ForneNome ASC");
 														$result = $conn->query("$sql");
-														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowFornecedor as $item){
-															$seleciona = $item['ForneId'] == $row['OrcamFornecedor'] ? "selected" : "";
-															print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'" '. $seleciona .'>'.$item['ForneNome'].'</option>');
-														}
-													
+														$fornecedores = $result->fetchAll(PDO::FETCH_ASSOC);
+														foreach($fornecedores as $fornecedor){
+															if($fornecedor['ForneId'] == $row['ForneId']){
+																print('<option selected value="'.$fornecedor['ForneId'].'#'.$fornecedor['ForneContato'].'#'.$fornecedor['ForneEmail'].'#'.$fornecedor['ForneTelefone'].'#'.$fornecedor['ForneCelular'].'" '. $seleciona .'>'.$fornecedor['ForneNome'].'</option>');
+															} else {
+																print('<option value="'.$fornecedor['ForneId'].'#'.$fornecedor['ForneContato'].'#'.$fornecedor['ForneEmail'].'#'.$fornecedor['ForneTelefone'].'#'.$fornecedor['ForneCelular'].'" '. $seleciona .'>'.$fornecedor['ForneNome'].'</option>');
+															}
+														};
 													?>
 												</select>
 											</div>

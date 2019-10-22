@@ -270,7 +270,7 @@ try{
 															$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
 														}
 														
-														$sql .= " ORDER BY ProduNome ASC";
+														$sql .= " ORDER BY ProduId ASC";
 														$result = $conn->query($sql);
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 														
@@ -278,11 +278,13 @@ try{
 															
 															if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
 																$seleciona = "selected";
+																print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
 															} else {
 																$seleciona = "";
+																print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
 															}													
 															
-															print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
+															
 														}
 													
 													?>

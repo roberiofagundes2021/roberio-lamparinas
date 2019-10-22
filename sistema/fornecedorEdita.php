@@ -636,7 +636,7 @@ if(isset($_POST['inputTipo'])){
 								</div>
 
 								<div class="col-lg-6">
-									<div class="form-group" style="border-bottom:1px solid #ddd;">
+									<div class="form-group">
 										<label for="cmbSubCategoria">SubCategoria</label>
 										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
 											<!--<option value="#">Selecione uma subcategoria</option>-->

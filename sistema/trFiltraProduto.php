@@ -24,18 +24,18 @@ if (isset($_POST['produtos']) and $_POST['produtos'] != ''){
 
 if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != ''){
 
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
-			FROM Produto
-			JOIN Categoria on CategId = ProduCategoria
-			LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduSubCategoria = '". $_POST['idSubCategoria']."' and ProduId in (".$lista.")
+	$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida
+			FROM ProdutoOrcamento
+			JOIN Categoria on CategId = PrOrcCategoria
+			LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+			WHERE PrOrcEmpresa = ".$_SESSION['EmpreId']." and PrOrcSubCategoria = '". $_POST['idSubCategoria']."' and PrOrcId in (".$lista.")
 			";
 } else {
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
-			FROM Produto
-			JOIN Categoria on CategId = ProduCategoria
-			LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = '". $_POST['idCategoria']."' and ProduId in (".$lista.")
+	$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida
+			FROM ProdutoOrcamento
+			JOIN Categoria on CategId = PrOrcCategoria
+			LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+			WHERE PrOrcEmpresa = ".$_SESSION['EmpreId']." and PrOrcuCategoria = '". $_POST['idCategoria']."' and PrOrcId in (".$lista.")
 			";
 }
 
@@ -54,7 +54,7 @@ foreach ($row as $item){
 	
 	$cont++;
 	
-	$id = $item['ProduId'];
+	$id = $item['PrOrcId'];
 	
 	$quantidade = isset($_POST['produtoQuant'][$id]) ? $_POST['produtoQuant'][$id] : '';
 	$valorUnitario = isset($_POST['produtoValor'][$id]) ? $_POST['produtoValor'][$id] : '';
@@ -65,15 +65,15 @@ foreach ($row as $item){
 						<div class="row">
 							<div class="col-lg-1">
 								<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-								<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
+								<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['PrOrcId'].'" class="idProduto">
 							</div>
 							<div class="col-lg-11">
-								<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+								<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['PrOrcDetalhamento'].'" value="'.$item['PrOrcNome'].'" readOnly>
 							</div>
 						</div>
 					</div>								
 					<div class="col-lg-1">
-						<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
+						<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['PrOrcUnidadeMedida'].'" readOnly>
 					</div>
 					<div class="col-lg-1">
 						<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" value="'.$quantidade.'">

@@ -14,7 +14,7 @@ if(isset($_POST['inputOrcamentoId'])){
 	try{
 		
 		$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrTipo, TrXOrData, TrXOrCategoria, TrXOrSubCategoria, TrXOrConteudo, TrXOrFornecedor, 
-					   ForneContato, ForneEmail, ForneTelefone, ForneCelular, TrXOrSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
+					   ForneId, ForneContato, ForneEmail, ForneTelefone, ForneCelular, TrXOrSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
 				FROM TRXOrcamento
 				JOIN Usuario on UsuarId = TrXOrSolicitante
 				LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
@@ -163,6 +163,61 @@ if(isset($_POST['inputTipo'])){
 				});
 				
 			}); 
+
+			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function(e){
+				
+				Filtrando();
+				
+				var cmbCategoria = $('#cmbCategoria').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option value="#">Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});
+				
+				$.getJSON('filtraFornecedor.php?idCategoria='+cmbCategoria, function (dados){
+					
+					var option = '<option value="#">Selecione o Fornecedor</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.ForneId+'#'+obj.ForneContato+'#'+obj.ForneEmail+'#'+obj.ForneTelefone+'#'+obj.ForneCelular+'">'+obj.ForneNome+'</option>';
+						});						
+						
+						$('#cmbFornecedor').html(option).show();
+					} else {
+						ResetFornecedor();
+					}					
+				});				
+				
+			});
+
+
+			// Limpa os campos de fornecedor quando uma nova categoria é selecionada
+			$('#cmbCategoria').on('change', function(){
+				let inputContato = $('#inputContato')
+				let inputEmailFornecedor = $('#inputEmailFornecedor')
+				let inputTelefoneFornecedor = $('#inputTelefoneFornecedor')
+
+				if(inputContato.val() || inputEmailFornecedor.val() || inputTelefoneFornecedor.val()){
+                    inputContato.val('')
+                    inputEmailFornecedor.val('')
+                    inputTelefoneFornecedor.val('')
+				} 
+			})
 
 			$("#enviar").on('click', function(e){
 				
@@ -368,20 +423,20 @@ if(isset($_POST['inputTipo'])){
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor</label>
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
-													<?php 
+													<?php
 														$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																 FROM Fornecedor														     
-																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
+																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1 and ForneCategoria = ".$row['TrXOrCategoria']."
 															     ORDER BY ForneNome ASC");
 														$result = $conn->query("$sql");
-														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowFornecedor as $item){
-															$seleciona = $item['ForneId'] == $row['TrXOrFornecedor'] ? "selected" : "";
-															print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'" '. $seleciona .'>'.$item['ForneNome'].'</option>');
-														}
-													
+														$fornecedores = $result->fetchAll(PDO::FETCH_ASSOC);
+														foreach($fornecedores as $fornecedor){
+															if($fornecedor['ForneId'] == $row['ForneId']){
+																print('<option selected value="'.$fornecedor['ForneId'].'#'.$fornecedor['ForneContato'].'#'.$fornecedor['ForneEmail'].'#'.$fornecedor['ForneTelefone'].'#'.$fornecedor['ForneCelular'].'" '. $seleciona .'>'.$fornecedor['ForneNome'].'</option>');
+															} else {
+																print('<option value="'.$fornecedor['ForneId'].'#'.$fornecedor['ForneContato'].'#'.$fornecedor['ForneEmail'].'#'.$fornecedor['ForneTelefone'].'#'.$fornecedor['ForneCelular'].'" '. $seleciona .'>'.$fornecedor['ForneNome'].'</option>');
+															}
+														};
 													?>
 												</select>
 											</div>

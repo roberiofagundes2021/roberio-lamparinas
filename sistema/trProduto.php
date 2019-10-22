@@ -63,11 +63,11 @@ try{
 	
 	$sql = "SELECT TRXPrProduto
 			FROM TermoReferenciaXProduto
-			JOIN Produto on ProduId = TRXPrProduto
-			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$iCategoria;
+			JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
+			WHERE PrOrcEmpresa = ". $_SESSION['EmpreId'] ." and PrOrcCategoria = ".$iCategoria;
 	
 	if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null){
-		$sql .= " and ProduSubCategoria = ".$row['TrRefSubCategoria'];
+		$sql .= " and PrOrcSubCategoria = ".$row['TrRefSubCategoria'];
 	}	
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -123,7 +123,7 @@ try{
 				var produtoValor = [];
 				
 				// Aqui é para cada "class" faça
-				$.each( $(".idProduto"), function() {			
+				$.each( $(".idProduto"), function() {
 					produtoId[cont] = $(this).val();
 					cont++;
 				});
@@ -205,16 +205,12 @@ try{
 				
 				<!-- Info blocks -->
 				<div class="card">
-					
 					<form name="formTRProduto" id="formTRProduto" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Listar Produtos - TR Nº "<?php echo $row['TrRefNumero']; ?>"</h5>
 						</div>					
-						
 						<input type="hidden" id="inputIdTR" name="inputIdTR" class="form-control" value="<?php echo $row['TrRefId']; ?>">
-						
-						<div class="card-body">		
-								
+						<div class="card-body">
 							<div class="row">				
 								<div class="col-lg-12">
 									<div class="row">
@@ -225,7 +221,6 @@ try{
 												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['TrRefCategoria']; ?>">
 											</div>
 										</div>
-									
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputSubCategoria">Sub Categoria</label>
@@ -240,29 +235,25 @@ try{
 												<label for="cmbProduto">Produto</label>
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 													<?php 
-														$sql = "SELECT ProduId, ProduNome
-																FROM Produto										     
-																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria;
-														
+														$sql = "SELECT PrOrcId, PrOrcNome
+																FROM ProdutoOrcamento										     
+																WHERE PrOrcEmpresa = ". $_SESSION['EmpreId'] ." and PrOrcSituacao = 1 and PrOrcCategoria = ".$iCategoria;
 														if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null){
-															$sql .= " and ProduSubCategoria = ".$row['TrRefSubCategoria'];
+															$sql .= " and PrOrcSubCategoria = ".$row['TrRefSubCategoria'];
 														}
-														
-														$sql .= " ORDER BY ProduNome ASC";
+														$sql .= " ORDER BY PrOrcNome ASC";
 														$result = $conn->query($sql);
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
-														
 														foreach ($rowProduto as $item){	
-															
-															if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
+															if (in_array($item['PrOrcId'], $aProdutos) or $countProdutoUtilizado == 0) {
 																$seleciona = "selected";
+																print('<option value="'.$item['PrOrcId'].'" '.$seleciona.'>'.$item['PrOrcNome'].'</option>');
 															} else {
 																$seleciona = "";
-															}													
+																print('<option value="'.$item['PrOrcId'].'" '.$seleciona.'>'.$item['PrOrcNome'].'</option>');
+															}														
 															
-															print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
 														}
-													
 													?>
 												</select>
 											</div>
@@ -293,23 +284,23 @@ try{
 									
 									<?php									
 
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, TRXPrQuantidade, TRXPrValorUnitario
-												FROM Produto
-												JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
-												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and TRXPrTermoReferencia = ".$iTR;
+										$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, TRXPrValorUnitario
+												FROM ProdutoOrcamento
+												JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
+												LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+												WHERE PrOrcEmpresa = ".$_SESSION['EmpreId']." and TRXPrTermoReferencia = ".$iTR;
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
 										
 										if (!$count){
-											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
-													FROM Produto
-													LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and ProduStatus = 1 ";
+											$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida
+													FROM ProdutoOrcamento
+													LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+													WHERE PrOrcEmpresa = ".$_SESSION['EmpreId']." and PrOrcCategoria = ".$iCategoria." and PrOrcSituacao = 1 ";
 													
 											if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null){
-												$sql .= " and ProduSubCategoria = ".$row['TrRefSubCategoria'];
+												$sql .= " and PrOrcSubCategoria = ".$row['TrRefSubCategoria'];
 											}
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -367,15 +358,15 @@ try{
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
+															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['PrOrcId'].'" class="idProduto">
 														</div>
 														<div class="col-lg-11">
-															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['PrOrcDetalhamento'].'" value="'.$item['PrOrcNome'].'" readOnly>
 														</div>
 													</div>
 												</div>								
 												<div class="col-lg-1">
-													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
+													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['PrOrcUnidadeMedida'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
 													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'">
@@ -395,12 +386,9 @@ try{
 										print('</div>');									
 										
 									?>
-									
 								</div>
 							</div>
-							<!-- /custom header text -->
-							
-															
+							<!-- /custom header text -->								
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
@@ -412,22 +400,15 @@ try{
 						</div>
 						<!-- /card-body -->
 					</form>
-					
 				</div>
 				<!-- /info blocks -->
-
 			</div>
 			<!-- /content area -->			
-			
 			<?php include_once("footer.php"); ?>
-
 		</div>
 		<!-- /main content -->
-
 	</div>
 	<!-- /page content -->
-	
 	<?php include_once("alerta.php"); ?>
-
 </body>
 </html>
