@@ -16,6 +16,8 @@ if(isset($_POST['inputCnpj'])){
 				VALUES (:sCnpj, :sRazaoSocial, :sNomeFantasia,  :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, :sCidade, 
 						:sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
+		
+		$conn->beginTransaction();
 				
 		$result->execute(array(
 						':sCnpj' => limpaCPF_CNPJ($_POST['inputCnpj']),
@@ -36,13 +38,39 @@ if(isset($_POST['inputCnpj'])){
 						':sObservacao' => $_POST['txtareaObservacao'],						
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']
-						));	
+						));
+						
+		$insertId = $conn->lastInsertId();
+		
+		try{
+			$sql = "INSERT INTO Parametro 
+						(ParamTipo, ParamValorAtualizado, ParamUsuarioAtualizador, ParamEmpresa)
+					VALUES 
+						(:sTipo, :sValorAtualizado, :iUsuarioAtualizador, :iEmpresa)";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+							':sTipo' => $insertId,
+							':sValorAtualizado' => $value,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $insertId
+							));
+			}
+			
+		} catch(PDOException $e) {
+			$conn->rollback();
+			echo 'Error: ' . $e->getMessage();exit;
+		}
+		
+		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Empresa incluída!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
+		
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir empresa!!!";

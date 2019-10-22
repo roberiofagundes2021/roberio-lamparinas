@@ -34,7 +34,7 @@ if(isset($_POST['inputDataInicio'])){
 
 	try{
 		
-		$sql = "UPDATE FluxoOperacional SET FlOpeFornecedor = :iFornecedor, FlOpeCategoria = :iCategoria, FlOpeOrcamento = :iOrcamento, 
+		$sql = "UPDATE FluxoOperacional SET FlOpeFornecedor = :iFornecedor, FlOpeCategoria = :iCategoria, FlOpeSubCategoria = :iSubCategoria, 
 										    FlOpeDataInicio = :dDataInicio, FlOpeDataFim = :dDataFim, FlOpeNumContrato = :iNumContrato, 
 										    FlOpeNumProcesso = :iNumProcesso, FlOpeValor = :fValor, FlOpeUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE FlOpeId = ".$_POST['inputFluxoOperacionalId']."
@@ -44,7 +44,7 @@ if(isset($_POST['inputDataInicio'])){
 		$result->execute(array(
 						':iFornecedor' => $_POST['cmbFornecedor'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iOrcamento' => $_POST['cmbOrcamento'] == '#' ? null : $_POST['cmbOrcamento'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 						':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 						':iNumContrato' => $_POST['inputNumContrato'],
@@ -103,7 +103,8 @@ if(isset($_POST['inputDataInicio'])){
 			//Ao mudar o Fornecedor, filtra a categoria e o Orçamento via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e){
 				
-				Filtrando();
+				FiltraCategoria();
+				FiltraSubCategoria();
 				
 				var cmbFornecedor = $('#cmbFornecedor').val();
 
@@ -124,10 +125,10 @@ if(isset($_POST['inputDataInicio'])){
 					}					
 				});
 				
-				$.getJSON('filtraOrcamento.php?idFornecedor='+cmbFornecedor, function (dados){
+				$.getJSON('filtraSubCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
 					
 					if (dados.length > 1){
-						var option = '<option value="#" "selected">Selecione o Orçamento</option>';
+						var option = '<option value="#" "selected">Selecione a SubCategoria</option>';
 					} else {
 						var option = '';
 					}
@@ -135,37 +136,34 @@ if(isset($_POST['inputDataInicio'])){
 					if (dados.length){
 						
 						$.each(dados, function(i, obj){							
-							option += '<option value="'+obj.OrcamId+'">Nº: ' + obj.OrcamNumero + ' - Data: ' + obj.OrcamData +'</option>';
+							option += '<option value="'+obj.SbCatId+'">' + obj.SbCatNome + '</option>';
 						});						
 						
-						$('#cmbOrcamento').html(option).show();
+						$('#cmbSubCategoria').html(option).show();
 					} else {
-						ResetOrcamento();
+						ResetSubCategoria();
 					}					
-				});				
+				});		
 				
 			});	
 			
-			//Mostra o "Filtrando..." na combo Categoria e Orcamento ao mesmo tempo
-			function Filtrando(){
+			//Mostra o "Filtrando..." na combo Categoria
+			function FiltraCategoria(){
 				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
-				FiltraOrcamento();
-			}		
-			
-			//Mostra o "Filtrando..." na combo Orcamento
-			function FiltraOrcamento(){
-				$('#cmbOrcamento').empty().append('<option>Filtrando...</option>');
-			}		
-			
-			function ResetCategoria(){
-				$('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
 			}
 			
-			function ResetOrcamento(){
-				$('#cmbOrcamento').empty().append('<option>Sem orçamento</option>');
-			}				
+			//Mostra o "Filtrando..." na combo SubCategoria
+			function FiltraSubCategoria(){
+				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+			}
 			
+			function ResetCategoria(){
+				$('#cmbCategoria').empty().append('<option value="#">Sem Categoria</option>');
+			}
 
+			function ResetSubCategoria(){
+				$('#cmbSubCategoria').empty().append('<option value="#">Sem SubCategoria</option>');
+			}
 					
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
@@ -174,7 +172,7 @@ if(isset($_POST['inputDataInicio'])){
 				
 				var cmbFornecedor = $('#cmbFornecedor').val();
 				var cmbCategoria = $('#cmbCategoria').val();
-				var cmbOrcamento = $('#cmbOrcamento').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				var inputDataInicio = $('#inputDataInicio').val();
 				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');				
 
@@ -190,9 +188,9 @@ if(isset($_POST['inputDataInicio'])){
 					return false;				
 				}
 
-				if (cmbOrcamento == '#'){
-					alerta('Atenção','Informe o orçamento!','error');
-					$('#cmbOrcamento').focus();
+				if (cmbSubCategoria == '#'){
+					alerta('Atenção','Informe a subcategoria!','error');
+					$('#cmbSubCategoria').focus();
 					return false;				
 				}				
 				
@@ -247,7 +245,7 @@ if(isset($_POST['inputDataInicio'])){
 						
 						<div class="card-body">								
 														
-							<h5 class="mb-0 font-weight-semibold">Dados do Orçamento</h5>
+							<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
 							<br>
 							<div class="row">
 								<div class="col-lg-4">
@@ -280,8 +278,9 @@ if(isset($_POST['inputDataInicio'])){
 											<option value="#">Selecione</option>
 											<?php 
 												$sql = ("SELECT CategId, CategNome
-														 FROM Categoria															     
-														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
+														 FROM Categoria
+														 JOIN Fornecedor on ForneCategoria = CategId
+														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and ForneId = ".$row['FlOpeFornecedor']."
 														 ORDER BY CategNome ASC");
 												$result = $conn->query("$sql");
 												$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -297,21 +296,22 @@ if(isset($_POST['inputDataInicio'])){
 								</div>
 								
 								<div class="col-lg-4">
-									<label for="cmbOrcamento">Orçamento</label>
-									<select id="cmbOrcamento" name="cmbOrcamento" class="form-control form-control-select2">
+									<label for="cmbSubCategoria">SubCategoria</label>
+									<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
 										<option value="#">Selecione</option>
 										<?php 
 										 
-											$sql = ("SELECT OrcamId, OrcamNumero, OrcamData
-													 FROM Orcamento
-													 WHERE OrcamEmpresa = ".$_SESSION['EmpreId']." and OrcamFornecedor = '". $row['FlOpeFornecedor']."' and OrcamStatus = 1
-													 Order By OrcamId DESC");													 
-											$result = $conn->query("$sql");
-											$rowOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
+											$sql = "SELECT SbCatId, SbCatNome
+													FROM SubCategoria
+													LEFT JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
+													WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and FrXSCFornecedor = '". $row['FlOpeFornecedor']."' and SbCatStatus = 1
+													Order By SbCatNome ASC";
+											$result = $conn->query($sql);
+											$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 											
-											foreach ($rowOrcamento as $item){			
-												$seleciona = $item['OrcamId'] == $row['FlOpeOrcamento'] ? "selected" : "";
-												print('<option value="'.$item['OrcamId'].'" '. $seleciona .'>Nº: '.$item['OrcamNumero'].' - Data: ' .mostraData($item['OrcamData']).'</option>');
+											foreach ($rowSubCategoria as $item){			
+												$seleciona = $item['SbCatId'] == $row['FlOpeSubCategoria'] ? "selected" : "";
+												print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
 											}
 										
 										?>										
