@@ -23,142 +23,64 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<<<<<<< HEAD
-	<title>Lamparinas | Produtos para Orçamento</title>
-=======
-	<title>Lamparinas | Modelo</title>
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
+	<title>Lamparinas | Produto</title>
 
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-<<<<<<< HEAD
 	
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>	
-=======
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script
 	<!-- /theme JS files -->	
 	
-	<script>
-			
-		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaModelo(ModelId, ModelNome, ModelStatus, Tipo){
+	<script type="text/javascript">
 		
-			document.getElementById('inputModeloId').value = ModelId;
-			document.getElementById('inputModeloNome').value = ModelNome;
-			document.getElementById('inputModeloStatus').value = ModelStatus;
-					
-			if (Tipo == 'edita'){	
-				document.formModelo.action = "modeloEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formModelo, "Tem certeza que deseja excluir esse modelo?", "modeloExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formModelo.action = "modeloMudaSituacao.php";
-			} else if (Tipo == 'imprime'){
-				document.formModelo.action = "modeloImprime.php";
-				document.formModelo.setAttribute("target", "_blank");
-			}
+		$(document).ready(function() {
 			
-			document.formModelo.submit();
-		}		
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
-			
-	</script>
-
-	<script>
-<<<<<<< HEAD
-
-		$(document).ready(function (){	
-			$('#tblProdutoOrcamento').DataTable( {
+			/* Início: Tabela Personalizada */
+			$('#tblProduto').DataTable( {
 				"order": [[ 1, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
-			    columnDefs: [
-				{
-					orderable: true,   //Produto
-					width: "25%",
-					targets: [0]
-				},	
-				{
-					orderable: true,   //Categoria
-					width: "25%",
-					targets: [1]
-				},
-				{ 
-					orderable: true,   //SubCategoria
-					width: "25%",
-=======
-			
-		function atualizaModelo(PrOrcId, PrOrcNome, PrOrcStatus, Tipo){
-		
-			document.getElementById('inputPrOrcId').value = PrOrcId;
-			document.getElementById('inputPrOrcNome').value = PrOrcNome;
-			document.getElementById('inputPrOrcStatus').value = PrOrcStatus;
-					
-			if (Tipo == 'edita'){	
-				document.formPrOrc.action = "produtoOrcamentoEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formPrOrc, "Tem certeza que deseja excluir esse Produto?", "produtoOrcamentoExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formPrOrc.action = "produtoOrcamentoMudaStatus.php";
-			}
-
-			document.formPrOrc.submit();
-		}
-
-  $(document).ready(function() {
-
-        /* Início: Tabela Personalizada */
-			$('#tblProduto').DataTable( {
-				"order": [[ 0, "asc" ]],
-			    autoWidth: false,
-				responsive: true,
 			    columnDefs: [{ 
-					orderable: true,   //Produto
+					orderable: true,   //Codigo
 					width: "10%",
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Categoria
+					orderable: true,   //Produto
 					width: "25%",
 					targets: [1]
 				},				
 				{ 
-					orderable: true,   //SubCategoria
+					orderable: true,   //Categoria
 					width: "20%",
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 					targets: [2]
 				},
 				{ 
-					orderable: true,   //Situação
-<<<<<<< HEAD
-					width: "12%",
-=======
-					width: "5%",
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
+					orderable: true,   //SubCategoria
+					width: "20%",
 					targets: [3]
 				},
 				{ 
-					orderable: false,  //Ações
-<<<<<<< HEAD
-					width: "13%",
-=======
-					width: "5%",
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
+					orderable: true,   //Preço Venda
+					width: "15%",
 					targets: [4]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "5%",
+					targets: [5]
+				},
+				{ 
+					orderable: false,  //Ações
+					width: "5%",
+					targets: [6]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -168,9 +90,67 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
 				}
 			});
-<<<<<<< HEAD
-		})
 			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			/* Fim: Tabela Personalizada */		
+			
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var arquivo = $('#arquivo').val();
+				var id = $("input:file").attr('id');
+				var tamanho =  1024 * 1024 * 10; //10MB
+
+				//Verifica se o campo só possui espaços em branco
+				if (arquivo == ''){
+					alerta('Atenção','Selecione o arquivo de importação!','error');
+					$('#arquivo').focus();
+					return false;
+				}
+				
+				//Verifica se a extensão é  diferente de CSV
+				if (ext(arquivo) != 'csv'){
+					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: CSV!','error');
+					$('#arquivo').focus();
+					return false;
+				}
+				
+				//Verifica o tamanho do arquivo
+				if ($('#'+id)[0].files[0].size > tamanho){
+					alerta('Atenção','O arquivo enviado é muito grande, envie arquivos de até 10MB.','error');
+					$('#arquivo').focus();
+					return false;
+				}								
+				
+				$( "#formUpload" ).submit();
+				
+			}); // enviar			
+		});
+		
+		function ext(path) {
+			var final = path.substr(path.lastIndexOf('/')+1);
+			var separador = final.lastIndexOf('.');
+			return separador <= 0 ? '' : final.substr(separador + 1);
+		}			
+			
+		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaModelo(PrOrcId, PrOrcNome, PrOrcStatus, Tipo){
 		
 			document.getElementById('inputPrOrcId').value = PrOrcId;
@@ -182,14 +162,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formPrOrc, "Tem certeza que deseja excluir esse Produto?", "produtoOrcamentoExclui.php");
 			} else if (Tipo == 'mudaStatus'){
-				document.formPrOrc.action = "produtoOrcamentoMudaStatus.php";
+				document.formPrOrc.action = "modeloMudaSituacao.php";
+			} else if (Tipo == 'imprime'){
+				document.formPrOrc.action = "modeloImprime.php";
+				document.formPrOrc.setAttribute("target", "_blank");
 			}
-
+			
 			document.formPrOrc.submit();
-		}
-=======
-});
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
+		}		
 			
 	</script>
 
@@ -218,26 +198,70 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Produtos para Orçamento</h3>
+								<h3 class="card-title">Relação de Produtos</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="modelo.php" class="list-icons-item" data-action="reload"></a>
+										<a href="perfil.php" class="list-icons-item" data-action="reload"></a>
 										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos produtos para orçamento da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
-								<div class="text-right"><a href="produtoOrcamentoNovo.php" class="btn btn-success" role="button">Novo Produto</a></div>
+								<p class="font-size-lg">A relação abaixo faz referência aos produtos da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<div class="text-right">
+									<a href="produtoNovo.php" class="btn btn-success" role="button">Novo Produto</a>
+									<a href="#" style="float:right; margin-left: 5px;" onclick="atualizaProduto(0, '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>
+									<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
+										<a href="#collapse-imprimir-relacao" class="dropdown-toggle btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
+											<i class="icon-drawer-in"></i>																						
+										</a>
+									</div>	
+									<!--<a href="produtoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Imprimir</a></div>-->
+								</div>
+								
+									<!--<a href="produtoImportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>-->
+								<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 15px; border-top:1px solid #ddd; padding-top: 10px;">
+									<div class="row">
+										<div class="col-lg-9">
+											<a href="#"><h2>Modelo de importação</h2></a>
+											<p style="font-weight: bold;">CodigoBarras | Nome do Produto | Detalhamento do Produto</p>
+											<p>Observação: Favor utilizar o ; (ponto-e-vírgula) como delimitador ao gerar o arquivo CSV. O arquivo deve conter 3 colunas apenas, sendo que a primeira linha deve ter o cabeçalho acima.</p>
+										</div>
+										<div class="col-lg-3">
+											<form name="formUpload" id="formUpload" method="post" enctype="multipart/form-data" action="produtoImporta.php">
+												<input type="file" class="form-control" id="arquivo" name="arquivo">
+												<button class="btn bg-slate-700 btn-icon" id="enviar"><i class="icon-printer2"> Importar produtos</i></button>												
+											</form>
+										</div>
+									</div>
+								</div>
+								
+								
+								<?php 
+									
+									if (isset($_SESSION['RelImportacao']) and $_SESSION['RelImportacao'] != '') {
+										
+										if (isset($_SESSION['Importacao']) and $_SESSION['Importacao'] == 'Erro'){
+											$classe = 'alert alert-warning';
+										} else {
+											$classe = 'alert alert-success';
+										}
+										
+										print('<div class="'.$classe.' alert-dismissible fade show" role="alert" style="margin-top: 10px;">'.$_SESSION['RelImportacao'].'
+										          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+												  <span aria-hidden="true">&times;</span>
+												  </button>
+											   </div>');										
+										unset($_SESSION['RelImportacao']);
+										//echo "<script> alerta('Atenção','".$_SESSION['RelImportacao']."','error'); </script>";  //Nao sei porque nao aparece
+									}
+								
+								?>
 							</div>
 							
-<<<<<<< HEAD
-							<table class="table" id="tblProdutoOrcamento">
-=======
 							<table class="table" id="tblProduto">
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 								<thead>
 									<tr class="bg-slate">
 										<th>Produto</th>
@@ -300,10 +324,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<!-- /info blocks -->
 				
-				<form name="formPrOrc" method="post">
-					<input type="hidden" id="inputPrOrcId" name="inputPrOrcId" >
-					<input type="hidden" id="inputPrOrcNome" name="inputPrOrcNome" >
-					<input type="hidden" id="inputPrOrcStatus" name="inputPrOrcStatus" >
+				<form name="formProduto" method="post">
+					<input type="hidden" id="inputProdutoId" name="inputProdutoId" >
+					<input type="hidden" id="inputProdutoNome" name="inputProdutoNome" >
+					<input type="hidden" id="inputProdutoStatus" name="inputProdutoStatus" >
 				</form>
 
 			</div>

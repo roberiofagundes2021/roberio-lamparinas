@@ -2,7 +2,11 @@
 
 include_once("sessao.php");
 
+<<<<<<< HEAD
 $_SESSION['PaginaAtual'] = 'Editar Produto de Orçamento';
+=======
+$_SESSION['PaginaAtual'] = 'Editar Produto';
+>>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 
 include('global_assets/php/conexao.php');
 
@@ -113,6 +117,103 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 			    }
 	    	})
 		</script>
+<<<<<<< HEAD
+
+		<script type="text/javascript" >
+ 
+        $(document).ready(function() {
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+
+=======
+ 
+
+
+
+		<script type="text/javascript">
+			$('#enviar').on('click', function(e){
+>>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
+				
+				e.preventDefault();
+				
+				let inputNome = $('#inputNome').val();
+
+<<<<<<< HEAD
+				// Até tudo funcionando --- Agora é só validar e persistir no banco.
+
+
+=======
+
+				let inputDetalhamento = $('#txtDetalhamento').val();
+				let inputCategoria = $('#cmbCategoria').val();
+				let inputSubCategoria = $('#cmbSubCategoria').val();
+				let inputPrOrcSituacao = $('#PrOrcSituacao').val();
+				let inputPrOrcUsuarioAtualizador = $('#PrOrcUsuarioAtualizador').val();
+				let inputPrOrcEmpresa = $('#PrOrcEmpresa').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNome.trim();
+				inputDetalhamento = inputNome.trim();
+				inputCategoria = inputNome.trim();
+				inputSubCategoria = inputNome.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == ''){
+					alerta('Atenção','Informe o nome do produto!','error');
+					$('#inputNome').focus();
+					return false;
+				}
+				
+				$( "#formProduto" ).attr('action', 'produtoOrcamentoEditaAction.php').submit();
+				
+			}); // enviar
+		</script>
+
+
+        <script type="text/javascript">
+        	$(document).ready(()=>{
+        		$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputNome = $('#inputNome').val();
+				
+				console.log('teste')
+>>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNome.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == ''){
+<<<<<<< HEAD
+					alerta('Atenção','Informe um nome para o produto!','error');
+					$('#inputNome').focus();
+					return false;
+				} 
+				$( "#formProduto" ).attr('action', 'produtoOrcamentoEditaAction.php').submit();
+			})
+
+			$('#cancelar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputFoto = $('#inputFoto').val();
+				
+				$(window.document.location).attr('href',"produtoOrcamento.php");
+				
+			}); // cancelar
+=======
+					alerta('Atenção','Informe o nome do produto!','error');
+					$('#inputNome').focus();
+					return false;
+				}
+				
+				$( "#formProduto" ).attr('action', 'produtoOrcamentoEditaAction.php').submit();
+				
+			}); // enviar
+        	})
+        </script>
+
 
 		<script type="text/javascript" >
  
@@ -132,23 +233,29 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				inputNome = inputNome.trim();
 				
 				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe um nome para o produto!','error');
+				/*if (inputNome == ''){
+					alerta('Atenção','Informe o modelo!','error');
 					$('#inputNome').focus();
 					return false;
-				} 
-				$( "#formProduto" ).attr('action', 'produtoOrcamentoEditaAction.php').submit();
+				}*/
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "modeloValida.php",
+					data: ('nome='+inputNome),
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Esse registro já existe!','error');
+							return false;
+						}
+						
+						$( "#formModelo" ).submit();
+					}
+				})
 			})
-
-			$('#cancelar').on('click', function(e){
-				
-				e.preventDefault();
-				
-				var inputFoto = $('#inputFoto').val();
-				
-				$(window.document.location).attr('href',"produtoOrcamento.php");
-				
-			}); // cancelar
+>>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 		})
 	</script>	
 <!------------------------------------Fim de validação do formulário e Seleção altomatica de Subcategorias------------------------------------>
@@ -188,7 +295,11 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 					
 					<form id="formProduto" name="formProduto" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
+<<<<<<< HEAD
 							<h5 class="text-uppercase font-weight-bold">Editar Produto</h5>
+=======
+							<h5 class="text-uppercase font-weight-bold">Editar Produto de Orçamento</h5>
+>>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 						</div>
 						<div class="card-body">
 							<div class="media">
@@ -288,7 +399,11 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 								<div class="row" style="margin-top: 40px;">
 									<div class="col-lg-12">								
 										<div class="form-group">
+<<<<<<< HEAD
 											<button class="btn btn-lg btn-success" id="enviar">Editar</button>
+=======
+											<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
+>>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 											<button class="btn btn-lg btn-basic" id="cancelar">Cancelar</button>
 										</div>
 									</div>

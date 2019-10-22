@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Novo TR';
+$_SESSION['PaginaAtual'] = 'Novo Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
@@ -166,7 +166,7 @@ if(isset($_POST['inputData'])){
 					
 					<form name="formTR" id="formTR" method="post" class="form-validate" action="trNovo.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo TR</h5>
+							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Termo de Referência</h5>
 						</div>
 						
 						<div class="card-body">								

@@ -4,15 +4,20 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if (isset($_GET['idFornecedor'])){
-	$sql = ("SELECT SbCatId, SbCatNome
-			 FROM SubCategoria
-			 JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
-			 WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and FrXSCFornecedor = '". $_GET['idFornecedor']."' and SbCatStatus = 1");
+if (isset($_GET['idOrcamento'])){
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria
+			JOIN OrcamentoXSubCategoria on OrXSCSubcategoria = SbCatId
+			WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and OrXSCOrcamento = '". $_GET['idOrcamento']."' and SbCatStatus = 1";
+} else if (isset($_GET['idFornecedor'])){
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria
+			JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
+			WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and FrXSCFornecedor = '". $_GET['idFornecedor']."' and SbCatStatus = 1";
 } else {
-	$sql = ("SELECT SbCatId, SbCatNome
-			 FROM SubCategoria
-			 WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and SbCatCategoria = '". $_GET['idCategoria']."' and SbCatStatus = 1");
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria
+			WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and SbCatCategoria = '". $_GET['idCategoria']."' and SbCatStatus = 1";
 }
 
 $result = $conn->query("$sql");
