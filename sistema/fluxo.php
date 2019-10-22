@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Operacional';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT FlOpeId, ForneNome, FlOpeOrcamento, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, 
+$sql = ("SELECT FlOpeId, ForneNome, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
 				FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome
 		 FROM FluxoOperacional
 		 JOIN Categoria on CategId = FlOpeCategoria

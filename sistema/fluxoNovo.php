@@ -12,16 +12,16 @@ if(isset($_POST['inputData'])){
 		
 		$conn->beginTransaction();
 		
-		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeOrcamento, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, 
+		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, 
 											  FlOpeValor, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa)
-				VALUES (:iFornecedor, :iCategoria, :iOrcamento, :dDataInicio, :dDataFim, :iNumContrato, :iNumProcesso, 
+				VALUES (:iFornecedor, :iCategoria, :iSubCategoria, :dDataInicio, :dDataFim, :iNumContrato, :iNumProcesso, 
 						:fValor, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':iFornecedor' => $_POST['cmbFornecedor'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iOrcamento' => $_POST['cmbOrcamento'] == '#' ? null : $_POST['cmbOrcamento'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 						':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 						':iNumContrato' => $_POST['inputNumContrato'],
@@ -35,12 +35,14 @@ if(isset($_POST['inputData'])){
 		$insertId = $conn->lastInsertId();	
 		
 		$sql = "SELECT *
-				FROM OrcamentoXProduto
-				Where OrXPrOrcamento = ".$_POST['cmbOrcamento'];
-		$result = $conn->query("$sql");
-		$rowOrcamentoProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+				FROM Produto
+				JOIN Categoria on CategId = ProduCategoria
+				JOIN SubCategoria on SbCatId = ProduSubCategoria
+				Where CategId = ".$_POST['cmbCategoria']." and SbCatId = ".$_POST['cmbSubCategoria'];
+		$result = $conn->query($sql);
+		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 		
-		foreach ($rowOrcamentoProdutos as $item){
+		foreach ($rowProdutos as $item){
 		
 			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario, FOXPrUsuarioAtualizador, FOXPrEmpresa)
 					VALUES (:iFluxoOperacional, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
@@ -48,13 +50,13 @@ if(isset($_POST['inputData'])){
 					
 			$result->execute(array(
 							':iFluxoOperacional' => $insertId,
-							':iProduto' => $item['OrXPrProduto'],
-							':iQuantidade' => $item['OrXPrQuantidade'],
-							':fValorUnitario' => $item['OrXPrValorUnitario'],
+							':iProduto' => $item['ProduId'],
+							':iQuantidade' => NULL,
+							':fValorUnitario' => NULL,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iEmpresa' => $_SESSION['EmpreId']
 							));		
-		}
+		} 
 						
 		$conn->commit();
 		
@@ -98,6 +100,7 @@ if(isset($_POST['inputData'])){
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	
 	<!-- /theme JS files -->	
 	
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
@@ -107,44 +110,15 @@ if(isset($_POST['inputData'])){
 
         $(document).ready(function() {	
 
-			//Ao mudar o Fornecedor, filtra a categoria e o Orçamento via ajax (retorno via JSON)
+			//Ao mudar o Fornecedor, filtra a categoria e a SubCategoria via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e){
-				
-				FiltraOrcamento();
-				
-				var cmbFornecedor = $('#cmbFornecedor').val();
-				
-				$.getJSON('filtraOrcamento.php?idFornecedor='+cmbFornecedor, function (dados){
-					
-					if (dados.length > 1){
-						var option = '<option value="#" "selected">Selecione o Orçamento</option>';
-					} else {
-						var option = '';
-					}
-					
-					if (dados.length){
-						
-						$.each(dados, function(i, obj){							
-							option += '<option value="'+obj.OrcamId+'">Nº: ' + obj.OrcamNumero + ' - Data: ' + obj.OrcamData +'</option>';
-						});						
-						
-						$('#cmbOrcamento').html(option).show();
-					} else {
-						ResetOrcamento();
-					}					
-				});				
-				
-			});	
-			
-			//Ao mudar o Fornecedor, filtra a categoria e o Orçamento via ajax (retorno via JSON)
-			$('#cmbOrcamento').on('change', function(e){
 				
 				FiltraCategoria();
 				FiltraSubCategoria();
 				
-				var cmbOrcamento = $('#cmbOrcamento').val();
-
-				$.getJSON('filtraCategoria.php?idOrcamento='+cmbOrcamento, function (dados){
+				var cmbFornecedor = $('#cmbFornecedor').val();
+				
+				$.getJSON('filtraCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
 					
 					//var option = '<option value="#">Selecione a Categoria</option>';
 					var option = '';
@@ -161,7 +135,7 @@ if(isset($_POST['inputData'])){
 					}					
 				});
 				
-				$.getJSON('filtraSubCategoria.php?idOrcamento='+cmbOrcamento, function (dados){
+				$.getJSON('filtraSubCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
 					
 					if (dados.length > 1){
 						var option = '<option value="#" "selected">Selecione a SubCategoria</option>';
@@ -179,15 +153,10 @@ if(isset($_POST['inputData'])){
 					} else {
 						ResetSubCategoria();
 					}					
-				});				
+				});
 				
 			});	
-			
-			//Mostra o "Filtrando..." na combo Orcamento
-			function FiltraOrcamento(){
-				$('#cmbOrcamento').empty().append('<option>Filtrando...</option>');
-			}
-			
+						
 			//Mostra o "Filtrando..." na combo Categoria
 			function FiltraCategoria(){
 				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
@@ -205,12 +174,6 @@ if(isset($_POST['inputData'])){
 			function ResetSubCategoria(){
 				$('#cmbSubCategoria').empty().append('<option value="#">Sem SubCategoria</option>');
 			}
-						
-			function ResetOrcamento(){
-				$('#cmbOrcamento').empty().append('<option value="#">Sem orçamento</option>');
-			}				
-			
-
 					
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
@@ -219,7 +182,7 @@ if(isset($_POST['inputData'])){
 				
 				var cmbFornecedor = $('#cmbFornecedor').val();
 				var cmbCategoria = $('#cmbCategoria').val();
-				var cmbOrcamento = $('#cmbOrcamento').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				var inputDataInicio = $('#inputDataInicio').val();
 				var inputDataFim = $('#inputDataFim').val();
 				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');				
@@ -236,9 +199,9 @@ if(isset($_POST['inputData'])){
 					return false;				
 				}
 
-				if (cmbOrcamento == '#'){
-					alerta('Atenção','Informe o orçamento!','error');
-					$('#cmbOrcamento').focus();
+				if (cmbSubCategoria == '#'){
+					alerta('Atenção','Informe a subcategoria!','error');
+					$('#cmbSubCategoria').focus();
 					return false;				
 				}				
 				
@@ -297,10 +260,10 @@ if(isset($_POST['inputData'])){
 						
 						<div class="card-body">								
 														
-							<h5 class="mb-0 font-weight-semibold">Dados do Orçamento</h5>
+							<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
 							<br>
 							<div class="row">
-								<div class="col-lg-3">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbFornecedor">Fornecedor</label>
 										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
@@ -321,15 +284,8 @@ if(isset($_POST['inputData'])){
 										</select>
 									</div>
 								</div>
-							
-								<div class="col-lg-3">
-									<label for="cmbOrcamento">Orçamento</label>
-									<select id="cmbOrcamento" name="cmbOrcamento" class="form-control form-control-select2">
-										<option value="#">Selecione</option>
-									</select>
-								</div>	
 								
-								<div class="col-lg-3">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbCategoria">Categoria</label>
 										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
@@ -338,7 +294,7 @@ if(isset($_POST['inputData'])){
 									</div>
 								</div>
 								
-								<div class="col-lg-3">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbSubCategoria">SubCategoria</label>
 										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
@@ -392,7 +348,7 @@ if(isset($_POST['inputData'])){
 								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputValor">Valor Total</label>
-										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total">
+										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" onKeyUp="moeda(this)" maxLength="12">
 									</div>
 								</div>								
 							</div>							

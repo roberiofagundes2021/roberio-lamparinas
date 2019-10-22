@@ -10,9 +10,13 @@ $sql = "SELECT ParamId, ParamTipo, ParamValorAtualizado
 		FROM Parametro
 	    WHERE ParamEmpresa = ". $_SESSION['EmpresaId'];
 $result = $conn->query($sql);
-$row = $result->fetch(PDO::FETCH_ASSOC);
-$count = count($row);
-//var_dump($count);die;
+$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$aParametros = array();
+
+foreach ($row as $item){
+	$aParametros[$item['ParamTipo']] = $item['ParamValorAtualizado'];
+}
 
 if(isset($_POST['inputIdEmpresa'])){
 
@@ -125,35 +129,17 @@ if(isset($_POST['inputIdEmpresa'])){
 						
 						<input type="hidden" id="inputIdEmpresa" name="inputIdEmpresa" class="form-control" value="<?php echo $idEmpresa; ?>">
 						
-						<div class="card-body">								
-							<div class="row">
-								<div class="col-lg-12">
-									<div class="form-group">							
-										<div class="form-check form-check-inline">
-											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" value="Pr" class="form-input-styled" data-fouc <?php if ($row['ParamTipo'] == 'Pu') echo "checked"; ?>>
-												Empresa Pública
-											</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" value="Pu" class="form-input-styled" data-fouc <?php if ($row['ParamTipo'] == 'Pr') echo "checked"; ?>>
-												Empresa Privada
-											</label>
-										</div>										
-									</div>
-								</div>
-							</div>
+						<div class="card-body">
 							
 							<div class="row">
-								<div class="col-lg-5">
+								<div class="col-lg-6">
 									<!-- Switch single -->
 									<div class="form-group row">
 										<label class="col-lg-3 col-form-label">Empresa Pública <span class="text-danger">*</span></label>
 										<div class="col-lg-9">
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
-													<input type="checkbox" name="inputEmpresaPublica" id="inputEmpresaPublica" data-on-text="Sim" data-off-text="Não" class="form-input-switch" required>
+													<input type="checkbox" name="inputEmpresaPublica" id="inputEmpresaPublica" data-on-text="Sim" data-off-text="Não" class="form-input-switch" >
 												</label>
 											</div>
 										</div>
@@ -163,8 +149,30 @@ if(isset($_POST['inputIdEmpresa'])){
 							</div>
 							
 							<div class="row">
-								<div class="col-lg-3">
-									<div class="form-group">
+								<div class="col-lg-6">
+									<!-- Switch group -->
+									<div class="form-group row">
+										<label class="col-form-label col-lg-3">Valor do Produto será atualizado <span class="text-danger">*</span></label>
+										<div class="col-lg-9">
+											<div class="form-check form-check-switch form-check-switch-left">
+												<label class="form-check-label d-flex align-items-center">
+													<input type="checkbox" name="switch_group" data-on-text="Sim" data-off-text="Não" class="form-input-switch" required>
+													Fluxo Previsto
+												</label>
+											</div>
+
+											<div class="form-check form-check-switch form-check-switch-left">
+												<label class="form-check-label d-flex align-items-center">
+													<input type="checkbox" name="switch_group" data-on-text="Sim" data-off-text="Não" class="form-input-switch">
+													Ordem de Compra/Carta Contrato
+												</label>
+											</div>
+										</div>
+									</div>
+									<!-- /switch group -->
+
+									
+									<div class="form-group" style="display:none;">
 										<label for="cmbValorAtualizado">Valor do Produto será atualizado:</label>
 										<select id="cmbValorAtualizado" name="cmbValorAtualizado" class="form-control form-control-select2">
 											<option value="PREVISTO">Somente no Fluxo Previsto</option>
