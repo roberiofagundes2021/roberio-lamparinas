@@ -2,11 +2,7 @@
 
 include_once("sessao.php");
 
-<<<<<<< HEAD
 $_SESSION['PaginaAtual'] = 'Novo Produto de Orçamento';
-=======
-$_SESSION['PaginaAtual'] = 'Unidade de Medida';
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 
 include('global_assets/php/conexao.php');
 
@@ -48,8 +44,8 @@ if(isset($_POST['inputNome'])){
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
-						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' or 'Sem Subcategoria' ? null : $_POST['cmbSubCategoria'],
+						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' or 'Selecione' ? null : $_POST['cmbUnidadeMedida'],
 						':iSituacao' => $_POST['inputSituacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
@@ -83,11 +79,7 @@ if(isset($_POST['inputNome'])){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<<<<<<< HEAD
 	<title>Lamparinas | Novo Produto para Orçamento</title>
-=======
-	<title>Lamparinas | UnidadeMedida</title>
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 
 <!---------------------------------Scripts Universais------------------------------------>
     <script src="http://malsup.github.com/jquery.form.js"></script>
@@ -178,7 +170,6 @@ if(isset($_POST['inputNome'])){
 					}
 				})
 			})
-<<<<<<< HEAD
 
 			$('#cancelar').on('click', function(e){
 				
@@ -189,8 +180,6 @@ if(isset($_POST['inputNome'])){
 				$(window.document.location).attr('href',"produtoOrcamento.php");
 				
 			}); // cancelar
-=======
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 		})
 	</script>
 <!------------------------------------Fim de validação do formulário e Seleção altomatica de Subcategorias------------------------------------>
@@ -205,35 +194,7 @@ if(isset($_POST['inputNome'])){
 	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
 	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-<<<<<<< HEAD
 	<script src="global_assets/js/demo_pages/components_popups.js"></script>		
-=======
-	<script src="global_assets/js/demo_pages/components_popups.js"></script
-	<!-- /theme JS files -->	
-	
-	<script>
-
-	//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-	function atualizaUnidadeMedida(UnMedId, UnMedNome, UnMedStatus, Tipo){
-		
-		document.getElementById('inputUnidadeMedidaId').value = UnMedId;
-		document.getElementById('inputUnidadeMedidaNome').value = UnMedNome;
-		document.getElementById('inputUnidadeMedidaStatus').value = UnMedStatus;
-
-		if (Tipo == 'edita'){	
-			document.formUnidadeMedida.action = "unidademedidaEdita.php";		
-		} else if (Tipo == 'exclui'){
-			confirmaExclusao(document.formUnidadeMedida, "Tem certeza que deseja excluir essa unidade de medida?", "unidademedidaExclui.php");
-		} else if (Tipo == 'mudaStatus'){
-			document.formUnidadeMedida.action = "unidademedidaMudaSituacao.php";
-		} else if (Tipo == 'imprime'){
-			document.formUnidadeMedida.action = "unidademedidaImprime.php";
-			document.formUnidadeMedida.setAttribute("target", "_blank");
-		}
-
-		document.formUnidadeMedida.submit();
-	}		
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 
 </script>
 
@@ -260,11 +221,7 @@ if(isset($_POST['inputNome'])){
 					
 					<form id="formProduto" name="formProduto" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-<<<<<<< HEAD
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Produto</h5>
-=======
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Produto Para Licitação</h5>
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 						</div>
 						<input id="inputSituacao" type="hidden" value="1" name="inputSituacao">
 						<div class="card-body">

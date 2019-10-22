@@ -7,11 +7,13 @@ $_SESSION['PaginaAtual'] = 'Produto Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubcategoria, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcId
-		 FROM ProdutoOrcamento
-	     WHERE PrOrcEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY PrOrcNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT PrOrcNome, CategNome, SbCatNome, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcId
+		FROM ProdutoOrcamento
+		JOIN Categoria on CategId = PrOrcCategoria
+		LEFT JOIN SubCategoria on SbCatId = PrOrcSubcategoria
+	    WHERE PrOrcEmpresa = ". $_SESSION['EmpreId'] ."
+		ORDER BY PrOrcNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -23,63 +25,22 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<<<<<<< HEAD
 	<title>Lamparinas | Produtos para Orçamento</title>
-=======
-	<title>Lamparinas | Modelo</title>
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-<<<<<<< HEAD
 	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>	
-=======
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script
-	<!-- /theme JS files -->	
-	
-	<script>
-			
-		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaModelo(ModelId, ModelNome, ModelStatus, Tipo){
-		
-			document.getElementById('inputModeloId').value = ModelId;
-			document.getElementById('inputModeloNome').value = ModelNome;
-			document.getElementById('inputModeloStatus').value = ModelStatus;
-					
-			if (Tipo == 'edita'){	
-				document.formModelo.action = "modeloEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formModelo, "Tem certeza que deseja excluir esse modelo?", "modeloExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formModelo.action = "modeloMudaSituacao.php";
-			} else if (Tipo == 'imprime'){
-				document.formModelo.action = "modeloImprime.php";
-				document.formModelo.setAttribute("target", "_blank");
-			}
-			
-			document.formModelo.submit();
-		}		
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 			
 	</script>
 
 	<script>
-<<<<<<< HEAD
 
 		$(document).ready(function (){	
 			$('#tblProdutoOrcamento').DataTable( {
@@ -100,64 +61,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				{ 
 					orderable: true,   //SubCategoria
 					width: "25%",
-=======
-			
-		function atualizaModelo(PrOrcId, PrOrcNome, PrOrcStatus, Tipo){
-		
-			document.getElementById('inputPrOrcId').value = PrOrcId;
-			document.getElementById('inputPrOrcNome').value = PrOrcNome;
-			document.getElementById('inputPrOrcStatus').value = PrOrcStatus;
-					
-			if (Tipo == 'edita'){	
-				document.formPrOrc.action = "produtoOrcamentoEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formPrOrc, "Tem certeza que deseja excluir esse Produto?", "produtoOrcamentoExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formPrOrc.action = "produtoOrcamentoMudaStatus.php";
-			}
-
-			document.formPrOrc.submit();
-		}
-
-  $(document).ready(function() {
-
-        /* Início: Tabela Personalizada */
-			$('#tblProduto').DataTable( {
-				"order": [[ 0, "asc" ]],
-			    autoWidth: false,
-				responsive: true,
-			    columnDefs: [{ 
-					orderable: true,   //Produto
-					width: "10%",
-					targets: [0]
-				},
-				{ 
-					orderable: true,   //Categoria
-					width: "25%",
-					targets: [1]
-				},				
-				{ 
-					orderable: true,   //SubCategoria
-					width: "20%",
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 					targets: [2]
 				},
 				{ 
 					orderable: true,   //Situação
-<<<<<<< HEAD
 					width: "12%",
-=======
-					width: "5%",
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 					targets: [3]
 				},
 				{ 
 					orderable: false,  //Ações
-<<<<<<< HEAD
 					width: "13%",
-=======
-					width: "5%",
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 					targets: [4]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -168,7 +81,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
 				}
 			});
-<<<<<<< HEAD
 		})
 			
 		function atualizaModelo(PrOrcId, PrOrcNome, PrOrcStatus, Tipo){
@@ -187,9 +99,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			document.formPrOrc.submit();
 		}
-=======
-});
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 			
 	</script>
 
@@ -233,11 +142,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="text-right"><a href="produtoOrcamentoNovo.php" class="btn btn-success" role="button">Novo Produto</a></div>
 							</div>
 							
-<<<<<<< HEAD
 							<table class="table" id="tblProdutoOrcamento">
-=======
-							<table class="table" id="tblProduto">
->>>>>>> a7a5cf95908e606cec3c40cb7827128c33476de9
 								<thead>
 									<tr class="bg-slate">
 										<th>Produto</th>
@@ -249,22 +154,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								</thead>
 								<tbody>
 								<?php
-									foreach ($row as $item){
-
-										$sql = ("SELECT CategNome
-											FROM Categoria															     
-											WHERE CategId = ".$item['PrOrcCategoria']." and CategStatus = 1 and CategEmpresa = ". $_SESSION['EmpreId'] ."
-												ORDER BY CategNome ASC");
-											$result = $conn->query("$sql");
-											$categ = $result->fetch(PDO::FETCH_ASSOC);
-
-										$sql = ("SELECT SbCatNome
-											FROM SubCategoria															     
-											WHERE SbCatId = ".$item['PrOrcSubcategoria']." and SbCatStatus = 1 and SBCatEmpresa = ". $_SESSION['EmpreId'] ."
-												ORDER BY SbCatNome ASC");
-											$result = $conn->query("$sql");
-											$subCateg = $result->fetch(PDO::FETCH_ASSOC);
-													
+									foreach ($row as $item){											
 										
 										$situacao = $item['PrOrcSituacao'] ? 'Ativo' : 'Inativo';
 										$situacaoClasse = $item['PrOrcSituacao'] ? 'badge-success' : 'badge-secondary';
@@ -272,8 +162,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('
 										<tr>
 											<td>'.$item['PrOrcNome'].'</td>
-											<td>'.$categ['CategNome'].'</td>
-											<td>'.$subCateg['SbCatNome'].'</td>
+											<td>'.$item['CategNome'].'</td>
+											<td>'.$item['SbCatNome'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaModelo('.$item['PrOrcId'].', \''.$item['PrOrcNome'].'\','.$item['PrOrcSituacao'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
