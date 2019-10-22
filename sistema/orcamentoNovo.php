@@ -57,13 +57,13 @@ if(isset($_POST['inputData'])){
 				$sql = "INSERT INTO OrcamentoXSubCategoria 
 							(OrXSCOrcamento, OrXSCSubCategoria, OrXSCEmpresa)
 						VALUES 
-							(:iFornecedor, :iSubCategoria, :iEmpresa)";
+							(:iOrcamento, :iSubCategoria, :iEmpresa)";
 				$result = $conn->prepare($sql);
 
 				foreach ($_POST['cmbSubCategoria'] as $key => $value){
 
 					$result->execute(array(
-									':iFornecedor' => $insertId,
+									':iOrcamento' => $insertId,
 									':iSubCategoria' => $value,
 									':iEmpresa' => $_SESSION['EmpreId']
 									));
