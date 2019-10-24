@@ -51,6 +51,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $output = '';
 
 $cont = 0;
+$fTotalGeral = 0;
 
 foreach ($row as $item){
 	
@@ -61,6 +62,8 @@ foreach ($row as $item){
 	$quantidade = isset($_POST['produtoQuant'][$id]) ? $_POST['produtoQuant'][$id] : '';
 	$valorUnitario = isset($_POST['produtoValor'][$id]) ? $_POST['produtoValor'][$id] : '';
 	$valorTotal = (isset($_POST['produtoQuant'][$id]) && isset($_POST['produtoValor'][$id])) ? mostraValor((float)$quantidade * (float)$valorUnitario) : '';
+	
+	$fTotalGeral += (isset($_POST['produtoQuant'][$id]) and isset($_POST['produtoValor'][$id])) ? (float)$quantidade * (float)$valorUnitario : 0;
 	
 	$output .= ' <div class="row" style="margin-top: 8px;">
 					<div class="col-lg-8">
@@ -81,7 +84,7 @@ foreach ($row as $item){
 						<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 					</div>
 					<div class="col-lg-1">
-						<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" value="'.$quantidade.'">
+						<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$quantidade.'">
 					</div>	
 					<div class="col-lg-1">
 						<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$valorUnitario.'">
@@ -90,7 +93,37 @@ foreach ($row as $item){
 						<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$valorTotal.'" readOnly>
 					</div>
 				</div>';	
+				
 }
+
+$output .= ' <div class="row" style="margin-top: 8px;">
+				<div class="col-lg-8">
+					<div class="row">
+						<div class="col-lg-1">
+							
+						</div>
+						<div class="col-lg-8">
+							
+						</div>
+						<div class="col-lg-3">
+							
+						</div>
+					</div>
+				</div>								
+				<div class="col-lg-1">
+					
+				</div>
+				<div class="col-lg-1">
+					
+				</div>	
+				<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+					<h3><b>Total:</b></h3>
+				</div>	
+				<div class="col-lg-1">
+					<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
+				</div>											
+			</div>';
+
 
 $output .= '<input type="hidden" id="totalRegistros" name="totalRegistros" value="'.$cont.'" >';
 
