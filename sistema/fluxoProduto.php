@@ -54,17 +54,16 @@ try{
 	
 	$sql = "SELECT *
 			FROM FluxoOperacional
-			LEFT JOIN Fornecedor on ForneId = FlOpeFornecedor
+			JOIN Fornecedor on ForneId = FlOpeFornecedor
 			JOIN Categoria on CategId = FlopeCategoria
 			WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ." and FlOpeId = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
-	
 	$sql = "SELECT FOXPrProduto
 			FROM FluxoOperacionalXProduto
 			JOIN Produto on ProduId = FOXPrProduto
-			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$iCategoria;
+			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
@@ -185,17 +184,15 @@ try{
 		
 		function calculaValorTotal(id){
 			
-			var ValorTotalAnterior = $('#inputValorTotal'+id+'').val().replace('.', '').replace(',', '.');
-			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');			
+			var ValorTotalAnterior = $('#inputValorTotal'+id+'').val() == '' ? 0 : $('#inputValorTotal'+id+'').val().replace('.', '').replace(',', '.');
+			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
 			
-			var Quantidade = $('#inputQuantidade'+id+'').val();
-			var ValorUnitario = $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
+			var Quantidade = $('#inputQuantidade'+id+'').val().trim() == '' ? 0 : $('#inputQuantidade'+id+'').val();
+			var ValorUnitario = $('#inputValorUnitario'+id+'').val() == '' ? 0 : $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
 			var ValorTotal = 0;
 			
 			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
-			
 			var TotalGeral = float2moeda(parseFloat(TotalGeralAnterior) - parseFloat(ValorTotalAnterior) + ValorTotal).toString();
-			
 			ValorTotal = float2moeda(ValorTotal).toString();
 			
 			$('#inputValorTotal'+id+'').val(ValorTotal);
@@ -295,8 +292,8 @@ try{
 													<?php 
 														$sql = "SELECT ProduId, ProduNome
 																FROM Produto										     
-																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria;
-														$sql .= " ORDER BY ProduNome ASC";
+																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria."
+																ORDER BY ProduNome ASC";
 														$result = $conn->query($sql);
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 														
@@ -433,7 +430,7 @@ try{
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
 												</div>	
 												<div class="col-lg-1">
 													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
