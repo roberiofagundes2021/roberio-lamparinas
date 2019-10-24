@@ -386,7 +386,7 @@ try{
 											</div>	
 											<div class="col-lg-1">
 												<div class="form-group">
-													<label for="inputValorUnitario"><strong>Valor Unitário</strong></label>
+													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
 											<div class="col-lg-1">
@@ -464,7 +464,7 @@ try{
 													
 												</div>	
 												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
-													<h3><b>Total:</b></h3>
+													<h5><b>Total:</b></h5>
 												</div>	
 												<div class="col-lg-1">
 													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
