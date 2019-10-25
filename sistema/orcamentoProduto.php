@@ -65,11 +65,7 @@ try{
 	$sql = "SELECT OrXPrProduto
 			FROM OrcamentoXProduto
 			JOIN Produto on ProduId = OrXPrProduto
-			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$iCategoria;
-	
-	if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-		$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
-	}	
+			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and OrXPrOrcamento = ".$iOrcamento;	
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
@@ -172,17 +168,23 @@ try{
 		}
 		
 		function calculaValorTotal(id){
-			var Quantidade = $('#inputQuantidade'+id+'').val();
-			var ValorUnitario = $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
+			
+			var ValorTotalAnterior = $('#inputValorTotal'+id+'').val() == '' ? 0 : $('#inputValorTotal'+id+'').val().replace('.', '').replace(',', '.');
+			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+			
+			var Quantidade = $('#inputQuantidade'+id+'').val().trim() == '' ? 0 : $('#inputQuantidade'+id+'').val();
+			var ValorUnitario = $('#inputValorUnitario'+id+'').val() == '' ? 0 : $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
 			var ValorTotal = 0;
 			
 			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
-			
+			var TotalGeral = float2moeda(parseFloat(TotalGeralAnterior) - parseFloat(ValorTotalAnterior) + ValorTotal).toString();
 			ValorTotal = float2moeda(ValorTotal).toString();
 			
 			$('#inputValorTotal'+id+'').val(ValorTotal);
+			
+			$('#inputTotalGeral').val(TotalGeral);
 		}
-							
+
 	</script>
 
 </head>
@@ -343,7 +345,7 @@ try{
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-6">
+											<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
@@ -363,12 +365,12 @@ try{
 													<label for="inputQuantidade"><strong>Quantidade</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-2">
+											<div class="col-lg-1">
 												<div class="form-group">
-													<label for="inputValorUnitario"><strong>Valor Unitário</strong></label>
+													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-2">
+											<div class="col-lg-1">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -376,6 +378,8 @@ try{
 										</div>');
 										
 										print('<div id="tabelaProdutos">');
+										
+										$fTotalGeral = 0;
 										
 										foreach ($rowProdutos as $item){
 											
@@ -385,9 +389,11 @@ try{
 											$fValorUnitario = isset($item['OrXPrValorUnitario']) ? mostraValor($item['OrXPrValorUnitario']) : '';											
 											$fValorTotal = (isset($item['OrXPrQuantidade']) and isset($item['OrXPrValorUnitario'])) ? mostraValor($item['OrXPrQuantidade'] * $item['OrXPrValorUnitario']) : '';
 											
+											$fTotalGeral += (isset($item['OrXPrQuantidade']) and isset($item['OrXPrValorUnitario'])) ? $item['OrXPrQuantidade'] * $item['OrXPrValorUnitario'] : 0;
+											
 											print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-6">
+												<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
@@ -402,17 +408,47 @@ try{
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
 												</div>	
-												<div class="col-lg-2">
+												<div class="col-lg-1">
 													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
 												</div>	
-												<div class="col-lg-2">
+												<div class="col-lg-1">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>
 												</div>											
 											</div>');											
 											
 										}
+										
+										print('
+										<div class="row" style="margin-top: 8px;">
+												<div class="col-lg-8">
+													<div class="row">
+														<div class="col-lg-1">
+															
+														</div>
+														<div class="col-lg-8">
+															
+														</div>
+														<div class="col-lg-3">
+															
+														</div>
+													</div>
+												</div>								
+												<div class="col-lg-1">
+													
+												</div>
+												<div class="col-lg-1">
+													
+												</div>	
+												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+													<h5><b>Total:</b></h5>
+												</div>	
+												<div class="col-lg-1">
+													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
+												</div>											
+											</div>'										
+										);
 										
 										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="'.$cont.'" >');
 										

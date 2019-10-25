@@ -39,7 +39,7 @@ if(isset($_POST['inputIdTR'])){
 						':iTR' => $iTR,
 						':iProduto' => $_POST['inputIdProduto'.$i],
 						':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-						':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+						':fValorUnitario' => null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
@@ -64,11 +64,7 @@ try{
 	$sql = "SELECT TRXPrProduto
 			FROM TermoReferenciaXProduto
 			JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
-			WHERE PrOrcEmpresa = ". $_SESSION['EmpreId'] ." and PrOrcCategoria = ".$iCategoria;
-	
-	if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null){
-		$sql .= " and PrOrcSubCategoria = ".$row['TrRefSubCategoria'];
-	}	
+			WHERE PrOrcEmpresa = ". $_SESSION['EmpreId'] ." and TRXPrTermoReferencia = ".$iTR;			
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
@@ -120,7 +116,6 @@ try{
 				var cont = 1;
 				var produtoId = [];
 				var produtoQuant = [];
-				var produtoValor = [];
 				
 				// Aqui é para cada "class" faça
 				$.each( $(".idProduto"), function() {
@@ -137,18 +132,10 @@ try{
 					cont++;
 				});				
 				
-				cont = 1;
-				$.each( $(".ValorUnitario"), function() {
-					$id = produtoId[cont];
-					
-					produtoValor[$id] = $(this).val();
-					cont++;
-				});
-				
 				$.ajax({
 					type: "POST",
 					url: "trFiltraProduto.php",
-					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
+					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant},
 					success: function(resposta){
 						//alert(resposta);
 						$("#tabelaProdutos").html(resposta).show();
@@ -170,18 +157,6 @@ try{
 			$('#cmbProduto').empty().append('<option>Sem produto</option>');
 		}
 		
-		function calculaValorTotal(id){
-			var Quantidade = $('#inputQuantidade'+id+'').val();
-			var ValorUnitario = $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
-			var ValorTotal = 0;
-			
-			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
-			
-			ValorTotal = float2moeda(ValorTotal).toString();
-			
-			$('#inputValorTotal'+id+'').val(ValorTotal);
-		}
-							
 	</script>
 
 </head>
@@ -276,7 +251,7 @@ try{
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
+									<p class="mb-3">Abaixo estão listados todos os produtos selecionadas acima. Para atualizar os valores, basta preencher a coluna <code>Quantidade</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<!--<div class="hot-container">
 										<div id="example"></div>
@@ -284,7 +259,7 @@ try{
 									
 									<?php									
 
-										$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, TRXPrValorUnitario
+										$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade
 												FROM ProdutoOrcamento
 												JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 												LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
@@ -310,7 +285,7 @@ try{
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-6">
+											<div class="col-lg-9">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
@@ -325,21 +300,11 @@ try{
 													<label for="inputUnidade"><strong>Unidade</strong></label>
 												</div>
 											</div>
-											<div class="col-lg-1">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputQuantidade"><strong>Quantidade</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="inputValorUnitario"><strong>Valor Unitário</strong></label>
-												</div>
-											</div>	
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="inputValorTotal"><strong>Valor Total</strong></label>
-												</div>
-											</div>											
 										</div>');
 										
 										print('<div id="tabelaProdutos">');
@@ -349,12 +314,10 @@ try{
 											$cont++;
 											
 											$iQuantidade = isset($item['TRXPrQuantidade']) ? $item['TRXPrQuantidade'] : '';
-											$fValorUnitario = isset($item['TRXPrValorUnitario']) ? mostraValor($item['TRXPrValorUnitario']) : '';											
-											$fValorTotal = (isset($item['TRXPrQuantidade']) and isset($item['TRXPrValorUnitario'])) ? mostraValor($item['TRXPrQuantidade'] * $item['TRXPrValorUnitario']) : '';
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-6">
+												<div class="col-lg-9">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
@@ -368,15 +331,9 @@ try{
 												<div class="col-lg-1">
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['PrOrcUnidadeMedida'].'" readOnly>
 												</div>
-												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'">
-												</div>	
 												<div class="col-lg-2">
-													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
 												</div>	
-												<div class="col-lg-2">
-													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>
-												</div>											
 											</div>');											
 											
 										}
