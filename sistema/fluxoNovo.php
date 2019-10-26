@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Novo Fluxo Operacional';
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputData'])){
+if(isset($_POST['inputDataInicio'])){
 
 	try{
 		
@@ -31,14 +31,14 @@ if(isset($_POST['inputData'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
-
+		
 		$insertId = $conn->lastInsertId();	
 		
 		$sql = "SELECT *
 				FROM Produto
 				JOIN Categoria on CategId = ProduCategoria
 				JOIN SubCategoria on SbCatId = ProduSubCategoria
-				Where CategId = ".$_POST['cmbCategoria']." and SbCatId = ".$_POST['cmbSubCategoria'];
+				Where ProduEmpresa = ".$_SESSION['EmpreId']." and CategId = ".$_POST['cmbCategoria']." and SbCatId = ".$_POST['cmbSubCategoria'];
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 		
@@ -90,20 +90,13 @@ if(isset($_POST['inputData'])){
 
 	<?php include_once("head.php"); ?>
 	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	
-	<!-- /theme JS files -->	
-	
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	<!-- CV Documentacao: https://jqueryvalidation.org/ -->
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -168,11 +161,11 @@ if(isset($_POST['inputData'])){
 			}
 			
 			function ResetCategoria(){
-				$('#cmbCategoria').empty().append('<option value="#">Sem Categoria</option>');
+				$('#cmbCategoria').empty().append('<option value="">Sem Categoria</option>');
 			}
 
 			function ResetSubCategoria(){
-				$('#cmbSubCategoria').empty().append('<option value="#">Sem SubCategoria</option>');
+				$('#cmbSubCategoria').empty().append('<option value="">Sem SubCategoria</option>');
 			}
 					
 			//Valida Registro Duplicado
@@ -186,7 +179,7 @@ if(isset($_POST['inputData'])){
 				var inputDataInicio = $('#inputDataInicio').val();
 				var inputDataFim = $('#inputDataFim').val();
 				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');				
-
+/*
 				if (cmbFornecedor == '#'){
 					alerta('Atenção','Informe o fornecedor!','error');
 					$('#cmbFornecedor').focus();
@@ -210,22 +203,22 @@ if(isset($_POST['inputData'])){
 					$('#inputDataInicio').focus();
 					return false;				
 				}
-				
+*/				
 				if (inputDataFim < inputDataInicio){
 					alerta('Atenção','A Data Fim deve ser maior que a Data Início!','error');
 					$('#inputDataFim').focus();
 					return false;				
 				}				
-
+/*
 				if (inputValor == '' || inputValor <= 0){
 					alerta('Atenção','Informe o valor total do contrato!','error');
 					$('#inputValor').focus();
 					return false;				
 				}				
-				
+*/				
 				$( "#formFluxoOperacional" ).submit();				
 				
-			});	
+			});
 		
 		});	
 		
@@ -253,7 +246,7 @@ if(isset($_POST['inputData'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formFluxoOperacional" id="formFluxoOperacional" method="post" class="form-validate">
+					<form name="formFluxoOperacional" id="formFluxoOperacional" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Fluxo Operacional</h5>
 						</div>
@@ -265,15 +258,15 @@ if(isset($_POST['inputData'])){
 							<div class="row">
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="cmbFornecedor">Fornecedor</label>
-										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
+										<label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
+										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
+											<option value="">Selecione</option>
 											<?php 
-												$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-														 FROM Fornecedor														     
-														 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
-														 ORDER BY ForneNome ASC");
-												$result = $conn->query("$sql");
+												$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+														FROM Fornecedor														     
+														WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
+														ORDER BY ForneNome ASC";
+												$result = $conn->query($sql);
 												$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 												
 												foreach ($rowFornecedor as $item){															
@@ -287,18 +280,18 @@ if(isset($_POST['inputData'])){
 								
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="cmbCategoria">Categoria</label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
+										<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
+										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+											<option value="">Selecione</option>
 										</select>
 									</div>
 								</div>
 								
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="cmbSubCategoria">SubCategoria</label>
-										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
+										<label for="cmbSubCategoria">SubCategoria <span class="text-danger">*</span></label>
+										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
+											<option value="">Selecione</option>
 										</select>
 									</div>
 								</div>							
@@ -309,7 +302,7 @@ if(isset($_POST['inputData'])){
 							<div class="row">
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputData">Data Início</label>
+										<label for="inputDataInicio">Data Início <span class="text-danger">*</span></label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
@@ -321,7 +314,7 @@ if(isset($_POST['inputData'])){
 								
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputData">Data Fim</label>
+										<label for="inputDataFim">Data Fim <span class="text-danger">*</span></label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
@@ -347,8 +340,8 @@ if(isset($_POST['inputData'])){
 								
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputValor">Valor Total</label>
-										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" onKeyUp="moeda(this)" maxLength="12">
+										<label for="inputValor">Valor Total <span class="text-danger">*</span></label>
+										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" onKeyUp="moeda(this)" maxLength="12" required>
 									</div>
 								</div>								
 							</div>							

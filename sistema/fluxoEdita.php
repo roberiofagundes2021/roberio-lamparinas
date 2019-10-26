@@ -82,19 +82,14 @@ if(isset($_POST['inputDataInicio'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	<!-- /theme JS files -->	
-	
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
-	
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	<!-- CV Documentacao: https://jqueryvalidation.org/ -->
+		
 	<!-- Adicionando Javascript -->
     <script type="text/javascript">
 
@@ -158,11 +153,11 @@ if(isset($_POST['inputDataInicio'])){
 			}
 			
 			function ResetCategoria(){
-				$('#cmbCategoria').empty().append('<option value="#">Sem Categoria</option>');
+				$('#cmbCategoria').empty().append('<option value="">Sem Categoria</option>');
 			}
 
 			function ResetSubCategoria(){
-				$('#cmbSubCategoria').empty().append('<option value="#">Sem SubCategoria</option>');
+				$('#cmbSubCategoria').empty().append('<option value="">Sem SubCategoria</option>');
 			}
 					
 			//Valida Registro Duplicado
@@ -174,8 +169,9 @@ if(isset($_POST['inputDataInicio'])){
 				var cmbCategoria = $('#cmbCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				var inputDataInicio = $('#inputDataInicio').val();
+				var inputDataFim = $('#inputDataFim').val();
 				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');				
-
+/*
 				if (cmbFornecedor == '#'){
 					alerta('Atenção','Informe o fornecedor!','error');
 					$('#cmbFornecedor').focus();
@@ -203,6 +199,12 @@ if(isset($_POST['inputDataInicio'])){
 				if (inputValor == '' || inputValor <= 0){
 					alerta('Atenção','Informe o valor total do contrato!','error');
 					$('#inputValor').focus();
+					return false;				
+				}
+*/				
+				if (inputDataFim < inputDataInicio){
+					alerta('Atenção','A Data Fim deve ser maior que a Data Início!','error');
+					$('#inputDataFim').focus();
 					return false;				
 				}
 				
@@ -236,7 +238,7 @@ if(isset($_POST['inputDataInicio'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formFluxoOperacional" id="formFluxoOperacional" method="post" class="form-validate" action="fluxoEdita.php">
+					<form name="formFluxoOperacional" id="formFluxoOperacional" method="post" class="form-validate-jquery" action="fluxoEdita.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Fluxo Operacional</h5>
 						</div>
@@ -251,14 +253,14 @@ if(isset($_POST['inputDataInicio'])){
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbFornecedor">Fornecedor</label>
-										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
+										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
+											<option value="">Selecione</option>
 											<?php 
-												$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-														 FROM Fornecedor														     
-														 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
-														 ORDER BY ForneNome ASC");
-												$result = $conn->query("$sql");
+												$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+														FROM Fornecedor														     
+														WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
+														ORDER BY ForneNome ASC";
+												$result = $conn->query($sql);
 												$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 												
 												foreach ($rowFornecedor as $item){	
@@ -274,15 +276,15 @@ if(isset($_POST['inputDataInicio'])){
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbCategoria">Categoria</label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
+										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+											<option value="">Selecione</option>
 											<?php 
-												$sql = ("SELECT CategId, CategNome
-														 FROM Categoria
-														 JOIN Fornecedor on ForneCategoria = CategId
-														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and ForneId = ".$row['FlOpeFornecedor']."
-														 ORDER BY CategNome ASC");
-												$result = $conn->query("$sql");
+												$sql = "SELECT CategId, CategNome
+														FROM Categoria
+														JOIN Fornecedor on ForneCategoria = CategId
+														WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and ForneId = ".$row['FlOpeFornecedor']."
+														ORDER BY CategNome ASC";
+												$result = $conn->query($sql);
 												$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 												
 												foreach ($rowCategoria as $item){			
@@ -297,8 +299,8 @@ if(isset($_POST['inputDataInicio'])){
 								
 								<div class="col-lg-4">
 									<label for="cmbSubCategoria">SubCategoria</label>
-									<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-										<option value="#">Selecione</option>
+									<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
+										<option value="">Selecione</option>
 										<?php 
 										 
 											$sql = "SELECT SbCatId, SbCatNome
@@ -324,24 +326,24 @@ if(isset($_POST['inputDataInicio'])){
 							<div class="row">
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputData">Data Início</label>
+										<label for="inputDataInicio">Data Início</label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['FlOpeDataInicio']; ?>">
+											<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['FlOpeDataInicio']; ?>" required>
 										</div>
 									</div>
 								</div>
 								
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputData">Data Fim</label>
+										<label for="inputDataFim">Data Fim</label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['FlOpeDataFim']; ?>">
+											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['FlOpeDataFim']; ?>" required>
 										</div>
 									</div>
 								</div>								
@@ -363,7 +365,7 @@ if(isset($_POST['inputDataInicio'])){
 								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputValor">Valor Total</label>
-										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" value="<?php echo mostraValor($row['FlOpeValor']); ?>" onKeyUp="moeda(this)" maxLength="12">
+										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" value="<?php echo mostraValor($row['FlOpeValor']); ?>" onKeyUp="moeda(this)" maxLength="12" required>
 									</div>
 								</div>
 							</div>							

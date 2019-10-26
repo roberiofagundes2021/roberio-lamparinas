@@ -52,10 +52,12 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 
 try{
 	
-	$sql = "SELECT *
+	$sql = "SELECT FlOpeId, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
+			SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor
 			FROM FluxoOperacional
 			JOIN Fornecedor on ForneId = FlOpeFornecedor
-			JOIN Categoria on CategId = FlopeCategoria
+			JOIN Categoria on CategId = FlOpeCategoria
+			JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 			WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ." and FlOpeId = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -257,11 +259,18 @@ try{
 										</div>
 									</div>
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputCategoriaNome">Categoria</label>
 												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" value="<?php echo $row['CategNome']; ?>" readOnly>
 												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['FlOpeCategoria']; ?>">
+											</div>
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputCategoriaNome">SubCategoria</label>
+												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo $row['SbCatNome']; ?>" readOnly>
+												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['FlOpeSubCategoria']; ?>">
 											</div>
 										</div>
 										<div class="col-lg-2">
@@ -288,7 +297,7 @@ try{
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="cmbProduto">Produto</label>
-												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc <?php if ($_SESSION['PerfiChave'] != 'SUPER' and $_SESSION['PerfiChave'] != 'CONTROLADORIA') { echo "disabled";} ?> >
 													<?php 
 														$sql = "SELECT ProduId, ProduNome
 																FROM Produto										     
@@ -330,7 +339,7 @@ try{
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
+									<p class="mb-3">Abaixo estão listados todos os produtos selecionados acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<!--<div class="hot-container">
 										<div id="example"></div>
@@ -486,7 +495,13 @@ try{
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
+										<?php 
+										
+											if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'CONTROLADORIA'){
+												print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
+											} 
+										
+										?>
 										<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
