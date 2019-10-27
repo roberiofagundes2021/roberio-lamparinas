@@ -32,9 +32,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>	
 			
@@ -179,17 +176,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										</tr>');
 									}
 								?>
-
 								</tbody>
 							</table>
 						</div>
-						<!-- /basic responsive configuration -->
-
 					</div>
 				</div>				
-				
-				<!-- /info blocks -->
-				
 				<form name="formPrOrc" method="post">
 					<input type="hidden" id="inputPrOrcId" name="inputPrOrcId" >
 					<input type="hidden" id="inputPrOrcNome" name="inputPrOrcNome" >

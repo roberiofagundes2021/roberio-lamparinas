@@ -209,15 +209,38 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacaoClasse = $item['OrcamStatus'] ? 'badge-success' : 'badge-secondary';
 										
 										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
-										
+
+										 $sql = "SELECT SbCatId, SbCatNome
+				                                        FROM SubCategoria
+				                                        JOIN OrcamentoXSubcategoria on OrXSCSubcategoria = SbCatId
+				                                        WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = ".$item['OrcamId']."
+				                                            ORDER BY SbCatNome ASC";
+		                                        $result = $conn->query($sql);
+		                                        $rowSC = $result->fetchAll(PDO::FETCH_ASSOC);
+
 										print('
-										<tr>
-											<td>'.mostraData($item['OrcamData']).'</td>
-											<td>'.$item['OrcamNumero'].'</td>
-											<td>'.$item['ForneNome'].'</td>
-											<td>'.$item['CategNome'].'</td>
-											<td>'.$item['SbCatNome'].'</td>
+										    <tr>
+											    <td>'.mostraData($item['OrcamData']).'</td>
+											    <td>'.$item['OrcamNumero'].'</td>
+											    <td>'.$item['ForneNome'].'</td>
+											    <td>'.$item['CategNome'].'</td>
+										');
+                                       
+                                        if(!$rowSC){
+											$seleciona = $item['SbCatNome'];
+                                      
+											print('
+											    <td>'.$seleciona.'</td>
 											');
+										} else {
+											print('<td>');
+                                            foreach ($rowSC as $a) {
+											    print('
+											        '.$a['SbCatNome'].' |
+											    ');
+											}
+											print('</td>');
+										}
 										
 										print('<td><a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrcamStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										

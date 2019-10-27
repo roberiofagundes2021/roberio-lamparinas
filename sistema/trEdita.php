@@ -18,6 +18,19 @@ if(isset($_POST['inputTRId'])){
 				WHERE TrRefId = $iTR ";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+
+		$sql = "SELECT SbCatId, SbCatNome
+				 FROM SubCategoria
+				 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
+				 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and TRXSCTermoReferencia = $iTR
+				 ORDER BY SbCatNome ASC";
+		$result = $conn->query($sql);
+		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($rowBD as $item){
+			$aSubCategorias[] = $item['SbCatId'];
+		}
+		
 		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
@@ -36,7 +49,7 @@ if(isset($_POST['inputData'])){
 		
 		$iTR = $_POST['inputTRId'];
 		
-		$sql = "UPDATE TermoReferencia SET TrRefCategoria = :iCategoria, TrRefSubCategoria = :iSubCategoria, TrRefConteudo = :sConteudo,
+		$sql = "UPDATE TermoReferencia SET TrRefCategoria = :iCategoria, TrRefConteudo = :sConteudo,
 										   TrRefUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE TrRefId = :iTR";
 		$result = $conn->prepare($sql);
@@ -45,11 +58,45 @@ if(isset($_POST['inputData'])){
 		
 		$result->execute(array(
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						//':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iTR' => $iTR
 						));
+
+        $sql = "DELETE FROM TRXSubcategoria
+				WHERE TRXSCTermoReferencia = :iTermoReferencia and TRXSCEmpresa = :iEmpresa";
+		$result = $conn->prepare($sql);	
+		
+		$result->execute(array(
+							':iTermoReferencia' => $_POST['inputTRId'],
+							':iEmpresa' => $_SESSION['EmpreId']));
+
+
+		if (isset($_POST['cmbSubCategoria'])){
+			
+			try{
+				$sql = "INSERT INTO TRXSubcategoria
+							(TRXSCTermoReferencia, TRXSCSubcategoria, TRXSCEmpresa)
+						VALUES 
+							(:iTermoReferencia, :iTrSubCategoria, :iTrEmpresa)";
+				$result = $conn->prepare($sql);
+
+				foreach ($_POST['cmbSubCategoria'] as $key => $value){
+
+					$result->execute(array(
+									':iTermoReferencia' => $_POST['inputTRId'],
+									':iTrSubCategoria' => $value,
+									':iTrEmpresa' => $_SESSION['EmpreId']
+									));
+				}
+							
+			} catch(PDOException $e) {
+				//$conn->rollback();
+				echo 'Error: ' . $e->getMessage();exit;
+			}
+		}
+
 		
 		if (isset($_POST['inputTRProdutoExclui']) and $_POST['inputTRProdutoExclui']){
 			
@@ -282,24 +329,29 @@ if(isset($_POST['inputData'])){
 										</div>
 										
 										<div class="col-lg-5">
-											<div class="form-group">
+											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select form-control-select2" multiple="multiple" data-fouc>
 													<option value="#">Selecione</option>
-													<?php 
-														$sql = "SELECT SbCatId, SbCatNome
-																FROM SubCategoria															     
-																WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-																ORDER BY SbCatNome ASC";
-														$result = $conn->query($sql);
-														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowSubCategoria as $item){
-															$seleciona = $item['SbCatId'] == $row['TrRefSubCategoria'] ? "selected" : "";
-															print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
-														}
-													
-													?>
+													<?php
+												        if (isset($row['TrRefCategoria'])){
+													        $sql = ("SELECT SbCatId, SbCatNome
+															         FROM SubCategoria														 
+															         WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['TrRefCategoria']." and SbCatStatus = 1
+															         ORDER BY SbCatNome ASC");
+													        $result = $conn->query("$sql");
+													        $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+													        $count = count($rowSubCategoria);
+
+														    if($count){
+														        foreach ($rowSubCategoria as $item){
+															        $seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
+															        print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
+														        }
+													        } 
+													        
+												        }
+											        ?>
 												</select>
 											</div>
 										</div>

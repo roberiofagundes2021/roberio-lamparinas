@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, CategNome, SbCatNome, TrRefStatus
+$sql = ("SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefSubCategoria, CategNome, SbCatNome, TrRefStatus
 		 FROM TermoReferencia
 		 JOIN Categoria on CategId = TrRefCategoria
 		 LEFT JOIN SubCategoria on SbCatId = TrRefSubCategoria
@@ -197,19 +197,45 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<tbody>
 								<?php
 									foreach ($row as $item){
+
+										 $sql = "SELECT SbCatId, SbCatNome
+				                                        FROM SubCategoria
+				                                        JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
+				                                        WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and TRXSCTermoReferencia = ".$item['TrRefId']."
+				                                            ORDER BY SbCatNome ASC";
+		                                        $result = $conn->query($sql);
+		                                        $rowSC = $result->fetchAll(PDO::FETCH_ASSOC);
+													        
 										
 										$situacao = $item['TrRefStatus'] ? 'Ativo' : 'Inativo';
 										$situacaoClasse = $item['TrRefStatus'] ? 'badge-success' : 'badge-secondary';
 										
 										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
-										
+
 										print('
-										<tr>
-											<td>'.mostraData($item['TrRefData']).'</td>
-											<td>'.$item['TrRefNumero'].'</td>
-											<td>'.$item['CategNome'].'</td>
-											<td>'.$item['SbCatNome'].'</td>
+										    <tr>
+											    <td>'.mostraData($item['TrRefData']).'</td>
+											    <td>'.$item['TrRefNumero'].'</td>
+											    <td>'.$item['CategNome'].'</td>
+										');
+                                       
+                                        if(!$rowSC){
+											$seleciona = $item['SbCatNome'];
+                                      
+											print('
+											    <td>'.$seleciona.'</td>
 											');
+										} else {
+											print('<td>');
+                                            foreach ($rowSC as $a) {
+											    print('
+											        '.$a['SbCatNome']. ' | 
+											    ');
+											}
+											print('</td>');
+										}
+										
+										
 										
 										print('<td><a href="#" onclick="atualizaTR('.$item['TrRefId'].', \''.$item['TrRefNumero'].'\', \''.$item['TrRefCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrRefStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										

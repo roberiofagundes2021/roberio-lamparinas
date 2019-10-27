@@ -409,9 +409,9 @@ if(isset($_POST['inputTipo'])){
 										</div>
 										
 										<div class="col-lg-5">
-											<div class="form-group">
+											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
+												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control form-control-select2" multiple="multiple" data-fouc>
 													<!--<option value="#">Selecione uma subcategoria</option>-->
 													<?php
 												        if (isset($row['OrcamCategoria'])){

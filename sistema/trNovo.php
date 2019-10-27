@@ -19,9 +19,9 @@ if(isset($_POST['inputData'])){
 		$sNumero = (int)$rowNumero['Numero'] + 1;
 		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 			
-		$sql = "INSERT INTO TermoReferencia (TrRefNumero, TrRefData, TrRefCategoria, TrRefSubCategoria, TrRefConteudo,
+		$sql = "INSERT INTO TermoReferencia (TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudo,
 											 TrRefStatus, TrRefUsuarioAtualizador, TrRefEmpresa)
-				VALUES (:sNumero, :dData, :iCategoria, :iSubCategoria, :sConteudo, 
+				VALUES (:sNumero, :dData, :iCategoria, :sConteudo, 
 						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 			
@@ -29,12 +29,41 @@ if(isset($_POST['inputData'])){
 						':sNumero' => $sNumero,
 						':dData' => gravaData($_POST['inputData']),
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
+
+		// Começo do cadastro de subcategorias da TR
+		$insertId = $conn->lastInsertId(); 
+
+
+		if (isset($_POST['cmbSubCategoria'])){
+			
+			try{
+				$sql = "INSERT INTO TRXSubcategoria
+							(TRXSCTermoReferencia, TRXSCSubCategoria, TRXSCEmpresa)
+						VALUES 
+							(:iTermoReferencia, :iSubCategoria, :iEmpresa)";
+				$result = $conn->prepare($sql);
+
+				foreach ($_POST['cmbSubCategoria'] as $key => $value){
+
+					$result->execute(array(
+									':iTermoReferencia' => $insertId,
+									':iSubCategoria' => $value,
+									':iEmpresa' => $_SESSION['EmpreId']
+									));
+				}
+				
+			} catch(PDOException $e) {
+				$conn->rollback();
+				echo 'Error: ' . $e->getMessage();exit;
+			}
+		}
+
+        // Fim de cadastro
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Termo de referência incluído!!!";
@@ -205,9 +234,9 @@ if(isset($_POST['inputData'])){
 										</div>
 										
 										<div class="col-lg-5">
-											<div class="form-group">
+											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control form-control-select2 select" multiple="multiple" data-fouc>
 													<option value="#">Selecione</option>
 												</select>
 											</div>

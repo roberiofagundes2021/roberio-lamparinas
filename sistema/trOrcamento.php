@@ -218,15 +218,40 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacaoClasse = $item['TrXOrStatus'] ? 'badge-success' : 'badge-secondary';
 										
 										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
-										
+
+
+                                        
+										 $sql = "SELECT SbCatId, SbCatNome
+				                                        FROM SubCategoria
+				                                        JOIN TRXOrcamentoXSubcategoria on TXOXSCSubcategoria = SbCatId
+				                                        WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and TXOXSCOrcamento = ".$item['TrXOrId']."
+				                                            ORDER BY SbCatNome ASC";
+		                                        $result = $conn->query($sql);
+		                                        $rowSC = $result->fetchAll(PDO::FETCH_ASSOC);
+
 										print('
-										<tr>
-											<td>'.mostraData($item['TrXOrData']).'</td>
-											<td>'.$item['TrXOrNumero'].'</td>
-											<td>'.$item['ForneNome'].'</td>
-											<td>'.$item['CategNome'].'</td>
-											<td>'.$item['SbCatNome'].'</td>
+										    <tr>
+											    <td>'.mostraData($item['TrXOrData']).'</td>
+											    <td>'.$item['TrXOrNumero'].'</td>
+											    <td>'.$item['ForneNome'].'</td>
+											    <td>'.$item['CategNome'].'</td>
+										');
+                                       
+                                        if(!$rowSC){
+											$seleciona = $item['SbCatNome'];
+                                      
+											print('
+											    <td>'.$seleciona.'</td>
 											');
+										} else {
+											print('<td>');
+                                            foreach ($rowSC as $a) {
+											    print('
+											        '.$a['SbCatNome']. ' |
+											    ');
+											}
+											print('</td>');
+										}
 										
 										print('<td><a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										

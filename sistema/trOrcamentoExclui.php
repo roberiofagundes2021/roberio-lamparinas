@@ -24,6 +24,12 @@ if(isset($_POST['inputOrcamentoId'])){
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iOrcamento); 
 		$result->execute();
+
+		$sql = "DELETE FROM TRXOrcamentoXSubcategoria
+				WHERE TXOXSCOrcamento = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iOrcamento); 
+		$result->execute();
 		
 		$conn->commit();
 		

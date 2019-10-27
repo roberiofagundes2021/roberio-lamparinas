@@ -6,11 +6,11 @@ $_SESSION['PaginaAtual'] = 'Novo Produto de Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus
+$sql = "SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus
 	FROM UnidadeMedida
 	WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ."
-	ORDER BY UnMedNome ASC");
-$result = $conn->query("$sql");
+	ORDER BY UnMedNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -24,7 +24,7 @@ if(isset($_POST['inputNome'])){
 				FROM Produto
 				Where ProduEmpresa = ".$_SESSION['EmpreId']."";
 		//echo $sql;die;
-		$result = $conn->query("$sql");
+		$result = $conn->query($sql);
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);
 		
 		$sCodigo = (int)$rowCodigo['Codigo'] + 1;
@@ -81,24 +81,19 @@ if(isset($_POST['inputNome'])){
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Lamparinas | Novo Produto para Orçamento</title>
 
+	<?php include_once("head.php"); ?>
+
 <!---------------------------------Scripts Universais------------------------------------>
-    <script src="http://malsup.github.com/jquery.form.js"></script>
+     <script src="http://malsup.github.com/jquery.form.js"></script>
 
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	<!--<script src="global_assets/js/main/jquery.form.js"></script>-->
-	
-	<!-- /theme JS files -->
-	
-	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 <!-----------------------------------------Validação do formulário e Seleção altomatica de Subcategorias---------------------------------------->
-	<?php include_once("head.php"); ?>
-
 	    <script type="text/javascript">
 	    	$(document).ready(()=>{
                 $("#cmbCategoria").change((e)=>{
@@ -130,12 +125,7 @@ if(isset($_POST['inputNome'])){
 			    function Reset(){
 				   $('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
 			    }
-	    	})
-		</script>
 
-		<script type="text/javascript" >
- 
-        $(document).ready(function() {
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
 
@@ -166,35 +156,15 @@ if(isset($_POST['inputNome'])){
 							return false;
 						}
 						
-						$( "#formProduto" ).submit();
+						$( "#formularioValidation" ).submit();
 					}
 				})
 			})
-
-			$('#cancelar').on('click', function(e){
-				
-				e.preventDefault();
-				
-				var inputFoto = $('#inputFoto').val();
-				
-				$(window.document.location).attr('href',"produtoOrcamento.php");
-				
-			}); // cancelar
 		})
 	</script>
 <!------------------------------------Fim de validação do formulário e Seleção altomatica de Subcategorias------------------------------------>
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script>		
 
 </script>
 
@@ -219,7 +189,7 @@ if(isset($_POST['inputNome'])){
 				<!-------------------------------------------------------------------------------------------------------------------------------->
 				<div class="card">
 					
-					<form id="formProduto" name="formProduto" method="post" class="form-validate">
+					<form id="formularioValidation" name="formProduto" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Produto</h5>
 						</div>
@@ -238,18 +208,18 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="inputUnidadeMedida">Unidade de Medida</label>
 												<select id="cmbUnidadeMedida" class="form-control form-control-select2" name="cmbUnidadeMedida">
-													<option>Selecione</option>
+													<option value="">Selecione</option>
 													<?php 
-													$sql = ("SELECT UnMedNome, UnMedSigla
-														FROM UnidadeMedida													     
-														WHERE UnMedStatus = 1 and UnMedEmpresa = ". $_SESSION['EmpreId'] ."
-														ORDER BY UnMedNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													    $sql = "SELECT UnMedNome, UnMedSigla
+														    FROM UnidadeMedida													     
+														    WHERE UnMedStatus = 1 and UnMedEmpresa = ". $_SESSION['EmpreId'] ."
+														    ORDER BY UnMedNome ASC";
+													    $result = $conn->query($sql);
+													    $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($row as $item){															
-														print('<option value="'.$item['UnMedSigla'].'">'.$item['UnMedNome'].'</option>');
-													}
+													    foreach ($row as $item){															
+														    print('<option value="'.$item['UnMedSigla'].'">'.$item['UnMedNome'].'</option>');
+													    }
 													
 													?>
 												</select>
@@ -288,11 +258,11 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php 
-													$sql = ("SELECT CategId, CategNome
+													$sql = "SELECT CategId, CategNome
 														FROM Categoria															     
 														WHERE CategStatus = 1 and CategEmpresa = ". $_SESSION['EmpreId'] ."
-														ORDER BY CategNome ASC");
-													$result = $conn->query("$sql");
+														ORDER BY CategNome ASC";
+													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($row as $item){															
@@ -319,7 +289,7 @@ if(isset($_POST['inputNome'])){
 									<div class="col-lg-12">								
 										<div class="form-group">
 											<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
-											<button class="btn btn-lg btn-basic" id="cancelar">Cancelar</button>
+											<a href="produtoOrcamento.php" class="btn btn-basic" role="button">Cancelar</a>
 										</div>
 									</div>
 								</div>

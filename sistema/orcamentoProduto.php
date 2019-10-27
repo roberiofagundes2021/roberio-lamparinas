@@ -270,7 +270,7 @@ try{
 															$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
 														}
 														
-														$sql .= " ORDER BY ProduId ASC";
+														$sql .= " ORDER BY ProduNome ASC";
 														$result = $conn->query($sql);
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 														
