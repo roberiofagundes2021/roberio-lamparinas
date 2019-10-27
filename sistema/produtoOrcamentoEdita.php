@@ -80,6 +80,10 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				let option = '<option>Selecione a SubCategoria</option>';
 				const categId = $('#cmbCategoria').val()
 				const selectedId = $('#cmbSubCategoria').attr('valId')
+<<<<<<< HEAD
+=======
+				console.log(selectedId)
+>>>>>>> 296a357a9d667b8ea6abbd0fd9c9d9e321577d17
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
 					//let option = '<option>Selecione a SubCategoria</option>';

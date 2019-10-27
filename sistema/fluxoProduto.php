@@ -52,19 +52,20 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 
 try{
 	
-	$sql = "SELECT *
+	$sql = "SELECT FlOpeId, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
+			SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor
 			FROM FluxoOperacional
-			LEFT JOIN Fornecedor on ForneId = FlOpeFornecedor
-			JOIN Categoria on CategId = FlopeCategoria
+			JOIN Fornecedor on ForneId = FlOpeFornecedor
+			JOIN Categoria on CategId = FlOpeCategoria
+			JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 			WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ." and FlOpeId = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
-	
 	$sql = "SELECT FOXPrProduto
 			FROM FluxoOperacionalXProduto
 			JOIN Produto on ProduId = FOXPrProduto
-			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$iCategoria;
+			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
@@ -185,17 +186,15 @@ try{
 		
 		function calculaValorTotal(id){
 			
-			var ValorTotalAnterior = $('#inputValorTotal'+id+'').val().replace('.', '').replace(',', '.');
-			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');			
+			var ValorTotalAnterior = $('#inputValorTotal'+id+'').val() == '' ? 0 : $('#inputValorTotal'+id+'').val().replace('.', '').replace(',', '.');
+			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
 			
-			var Quantidade = $('#inputQuantidade'+id+'').val();
-			var ValorUnitario = $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
+			var Quantidade = $('#inputQuantidade'+id+'').val().trim() == '' ? 0 : $('#inputQuantidade'+id+'').val();
+			var ValorUnitario = $('#inputValorUnitario'+id+'').val() == '' ? 0 : $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
 			var ValorTotal = 0;
 			
 			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
-			
 			var TotalGeral = float2moeda(parseFloat(TotalGeralAnterior) - parseFloat(ValorTotalAnterior) + ValorTotal).toString();
-			
 			ValorTotal = float2moeda(ValorTotal).toString();
 			
 			$('#inputValorTotal'+id+'').val(ValorTotal);
@@ -260,11 +259,18 @@ try{
 										</div>
 									</div>
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputCategoriaNome">Categoria</label>
 												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" value="<?php echo $row['CategNome']; ?>" readOnly>
 												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['FlOpeCategoria']; ?>">
+											</div>
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputCategoriaNome">SubCategoria</label>
+												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo $row['SbCatNome']; ?>" readOnly>
+												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['FlOpeSubCategoria']; ?>">
 											</div>
 										</div>
 										<div class="col-lg-2">
@@ -291,12 +297,12 @@ try{
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="cmbProduto">Produto</label>
-												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc <?php if ($_SESSION['PerfiChave'] != 'SUPER' and $_SESSION['PerfiChave'] != 'CONTROLADORIA') { echo "disabled";} ?> >
 													<?php 
 														$sql = "SELECT ProduId, ProduNome
 																FROM Produto										     
-																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria;
-														$sql .= " ORDER BY ProduNome ASC";
+																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria."
+																ORDER BY ProduNome ASC";
 														$result = $conn->query($sql);
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 														
@@ -333,7 +339,7 @@ try{
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
+									<p class="mb-3">Abaixo estão listados todos os produtos selecionados acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<!--<div class="hot-container">
 										<div id="example"></div>
@@ -389,7 +395,7 @@ try{
 											</div>	
 											<div class="col-lg-1">
 												<div class="form-group">
-													<label for="inputValorUnitario"><strong>Valor Unitário</strong></label>
+													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
 											<div class="col-lg-1">
@@ -433,7 +439,7 @@ try{
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
 												</div>	
 												<div class="col-lg-1">
 													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
@@ -467,7 +473,7 @@ try{
 													
 												</div>	
 												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
-													<h3><b>Total:</b></h3>
+													<h5><b>Total:</b></h5>
 												</div>	
 												<div class="col-lg-1">
 													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
@@ -489,7 +495,13 @@ try{
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
+										<?php 
+										
+											if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'CONTROLADORIA'){
+												print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
+											} 
+										
+										?>
 										<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

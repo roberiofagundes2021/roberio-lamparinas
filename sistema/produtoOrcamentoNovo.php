@@ -44,8 +44,8 @@ if(isset($_POST['inputNome'])){
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' or 'Sem Subcategoria' ? null : $_POST['cmbSubCategoria'],
-						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' or 'Selecione' ? null : $_POST['cmbUnidadeMedida'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
 						':iSituacao' => $_POST['inputSituacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
@@ -80,15 +80,25 @@ if(isset($_POST['inputNome'])){
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Lamparinas | Novo Produto para Orçamento</title>
+	
+	<?php include_once("head.php"); ?>
 
 	<?php include_once("head.php"); ?>
 
 <!---------------------------------Scripts Universais------------------------------------>
+<<<<<<< HEAD
      <script src="http://malsup.github.com/jquery.form.js"></script>
+=======
+    
+    <!-- Theme JS files -->
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+>>>>>>> 296a357a9d667b8ea6abbd0fd9c9d9e321577d17
 
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+<<<<<<< HEAD
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
@@ -99,36 +109,61 @@ if(isset($_POST['inputNome'])){
                 $("#cmbCategoria").change((e)=>{
                   
                     Filtrando()
+=======
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
+	
+	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
+	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
+	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
+	<script src="global_assets/js/demo_pages/components_popups.js"></script>
 
-                    const categId = $(e.target).val()
+	<!-- /theme JS files -->
 
-                    $.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
-					    let option = '<option>Selecione a SubCategoria</option>';
-					
-					    if (dados.length){
-						
-						    $.each(dados, function(i, obj){
-							    option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						    });						
-						
-						    $('#cmbSubCategoria').html(option).show();
-					    } else {
-						    Reset();
-					    }					
-				    });
-                })
-
-                function Filtrando(){
-				   $('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-			    }
+<!-----------------------------------------Validação do formulário e Seleção altomatica de Subcategorias---------------------------------------->
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
 			
+			$("#cmbCategoria").change((e)=>{
+			  
+				Filtrando()
+>>>>>>> 296a357a9d667b8ea6abbd0fd9c9d9e321577d17
+
+				const categId = $(e.target).val()
+
+				$.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
+					let option = '<option value="#">Selecione a SubCategoria</option>';
+				
+					if (dados.length){
+					
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+					
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						Reset();
+					}					
+				});
+			})
+			
+<<<<<<< HEAD
 			    function Reset(){
 				   $('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
 			    }
 
+=======
+			function Filtrando(){
+			   $('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
+			}
+		
+			function Reset(){
+			   $('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
+			}			
+      
+>>>>>>> 296a357a9d667b8ea6abbd0fd9c9d9e321577d17
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
-
 				
 				e.preventDefault();
 				
@@ -161,12 +196,16 @@ if(isset($_POST['inputNome'])){
 				})
 			})
 		})
+				
 	</script>
 <!------------------------------------Fim de validação do formulário e Seleção altomatica de Subcategorias------------------------------------>
+<<<<<<< HEAD
 	<!-- Theme JS files -->
 	
 
 </script>
+=======
+>>>>>>> 296a357a9d667b8ea6abbd0fd9c9d9e321577d17
 
 </head>
 
@@ -195,6 +234,7 @@ if(isset($_POST['inputNome'])){
 						</div>
 						<input id="inputSituacao" type="hidden" value="1" name="inputSituacao">
 						<div class="card-body">
+<<<<<<< HEAD
 							<div class="media">
 								<div class="media-body">
 									<div class="row">
@@ -225,27 +265,46 @@ if(isset($_POST['inputNome'])){
 												</select>
 											</div>
 										</div>
+=======
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label for="inputNome">Nome</label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
+>>>>>>> 296a357a9d667b8ea6abbd0fd9c9d9e321577d17
 									</div>
-									<div class="row">
-										<div class="col-lg-12">
-											<div class="form-group">
-												<label for="txtDetalhamento">Detalhamento</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do produto"></textarea>
-											</div>
-										</div>
-									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label for="inputUnidadeMedida">Unidade de Medida</label>
+										<select id="cmbUnidadeMedida" class="form-control form-control-select2" name="cmbUnidadeMedida">
+											<option value="#">Selecione</option>
+											<?php 
+											$sql = ("SELECT UnMedNome, UnMedSigla
+												FROM UnidadeMedida													     
+												WHERE UnMedStatus = 1 and UnMedEmpresa = ". $_SESSION['EmpreId'] ."
+												ORDER BY UnMedNome ASC");
+											$result = $conn->query("$sql");
+											$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-								</div> <!-- media-body -->
-								
-								<!--<div style="text-align:center;">
-									<div id="visualizar">										
-										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:250px; border:2px solid #ccc;">
+											foreach ($row as $item){															
+												print('<option value="'.$item['UnMedSigla'].'">'.$item['UnMedNome'].'</option>');
+											}
+											
+											?>
+										</select>
 									</div>
-									<br>
-									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%">Adicionar Foto...</button>	
-								</div>-->
-								
-							</div> <!-- media -->
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtDetalhamento">Detalhamento</label>
+										<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do produto"></textarea>
+									</div>
+								</div>
+							</div>
 
 							<div class="row">
 								<div class="col-lg-12">

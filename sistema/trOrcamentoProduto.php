@@ -20,8 +20,8 @@ if(isset($_POST['inputOrcamentoId'])){
 //Se está alterando
 if(isset($_POST['inputIdOrcamento'])){
 	
-	$sql = "DELETE FROM OrcamentoXProduto
-			WHERE OrXPrOrcamento = :iOrcamento AND OrXPrEmpresa = :iEmpresa";
+	$sql = "DELETE FROM TRXOrcamentoXProduto
+			WHERE TXOXPOrcamento = :iOrcamento AND TXOXPEmpresa = :iEmpresa";
 	$result = $conn->prepare($sql);
 	
 	$result->execute(array(
@@ -31,7 +31,7 @@ if(isset($_POST['inputIdOrcamento'])){
 	
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 	
-		$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrEmpresa)
+		$sql = "INSERT INTO TRXOrcamentoXProduto (TXOXPOrcamento, TXOXPProduto, TXOXPQuantidade, TXOXPValorUnitario, TXOXPUsuarioAtualizador, TXOXPEmpresa)
 				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
@@ -53,29 +53,24 @@ if(isset($_POST['inputIdOrcamento'])){
 try{
 	
 	$sql = "SELECT *
-			FROM Orcamento
-			LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
-			JOIN Categoria on CategId = OrcamCategoria
-			LEFT JOIN SubCategoria on SbCatId = OrcamSubCategoria
-			WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = ".$iOrcamento;
+			FROM TRXOrcamento
+			LEFT JOIN Fornecedor on ForneId = TRXOrFornecedor
+			JOIN Categoria on CategId = TRXOrCategoria
+			LEFT JOIN SubCategoria on SbCatId = TRXOrSubCategoria
+			WHERE TRXOrEmpresa = ". $_SESSION['EmpreId'] ." and TRXOrId = ".$iOrcamento;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
-	
-	$sql = "SELECT OrXPrProduto
-			FROM OrcamentoXProduto
-			JOIN Produto on ProduId = OrXPrProduto
-			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$iCategoria;
-	
-	if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-		$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
-	}	
+	$sql = "SELECT TXOXPProduto
+			FROM TRXOrcamentoXProduto
+			JOIN Produto on ProduId = TXOXPProduto
+			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and TXOXPOrcamento = ".$iOrcamento;	
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
 	
 	foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
-		$aProdutos[] = $itemProdutoUtilizado['OrXPrProduto'];
+		$aProdutos[] = $itemProdutoUtilizado['TXOXPProduto'];
 	}
 	
 } catch(PDOException $e) {
@@ -114,7 +109,7 @@ try{
 			$('#cmbProduto').on('change', function(e){
 				
 				var inputCategoria = $('#inputIdCategoria').val();
-				var inputSubCategoria = $('#inputIdSubCategoria').val(); alert(inputSubCategoria);
+				var inputSubCategoria = $('#inputIdSubCategoria').val();
 				var produtos = $(this).val();
 				//console.log(produtos);
 				
@@ -172,17 +167,22 @@ try{
 		}
 		
 		function calculaValorTotal(id){
-			var Quantidade = $('#inputQuantidade'+id+'').val();
-			var ValorUnitario = $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
+			
+			var ValorTotalAnterior = $('#inputValorTotal'+id+'').val() == '' ? 0 : $('#inputValorTotal'+id+'').val().replace('.', '').replace(',', '.');
+			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');		
+			
+			var Quantidade = $('#inputQuantidade'+id+'').val().trim() == '' ? 0 : $('#inputQuantidade'+id+'').val();
+			var ValorUnitario = $('#inputValorUnitario'+id+'').val() == '' ? 0 : $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
 			var ValorTotal = 0;
 			
 			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
-			
+			var TotalGeral = float2moeda(parseFloat(TotalGeralAnterior) - parseFloat(ValorTotalAnterior) + ValorTotal).toString();
 			ValorTotal = float2moeda(ValorTotal).toString();
 			
 			$('#inputValorTotal'+id+'').val(ValorTotal);
+			$('#inputTotalGeral').val(TotalGeral);
 		}
-							
+		
 	</script>
 
 </head>
@@ -209,10 +209,10 @@ try{
 					
 					<form name="formOrcamentoProduto" id="formOrcamentoProduto" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Listar Produtos - Orçamento Nº "<?php echo $row['OrcamNumero']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Listar Produtos - Orçamento Nº "<?php echo $row['TrXOrNumero']; ?>"</h5>
 						</div>					
 						
-						<input type="hidden" id="inputIdOrcamento" name="inputIdOrcamento" class="form-control" value="<?php echo $row['OrcamId']; ?>">
+						<input type="hidden" id="inputIdOrcamento" name="inputIdOrcamento" class="form-control" value="<?php echo $row['TrXOrId']; ?>">
 						
 						<div class="card-body">		
 								
@@ -244,7 +244,7 @@ try{
 											<div class="form-group">
 												<label for="inputCategoriaNome">Categoria</label>
 												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" value="<?php echo $row['CategNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['OrcamCategoria']; ?>">
+												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['TrXOrCategoria']; ?>">
 											</div>
 										</div>
 									
@@ -252,7 +252,7 @@ try{
 											<div class="form-group">
 												<label for="inputSubCategoria">Sub Categoria</label>
 												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo $row['SbCatNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['OrcamSubCategoria']; ?>">
+												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['TrXOrSubCategoria']; ?>">
 											</div>
 										</div>
 									</div>
@@ -315,11 +315,11 @@ try{
 									
 									<?php									
 
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OrXPrQuantidade, OrXPrValorUnitario
+										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, TXOXPQuantidade, TXOXPValorUnitario
 												FROM Produto
-												JOIN OrcamentoXProduto on OrXPrProduto = ProduId
+												JOIN TRXOrcamentoXProduto on TXOXPProduto = ProduId
 												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OrXPrOrcamento = ".$iOrcamento;
+												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and TXOXPOrcamento = ".$iOrcamento;
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
@@ -341,7 +341,7 @@ try{
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-6">
+											<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
@@ -361,12 +361,12 @@ try{
 													<label for="inputQuantidade"><strong>Quantidade</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-2">
+											<div class="col-lg-1">
 												<div class="form-group">
-													<label for="inputValorUnitario"><strong>Valor Unitário</strong></label>
+													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-2">
+											<div class="col-lg-1">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -375,17 +375,21 @@ try{
 										
 										print('<div id="tabelaProdutos">');
 										
+										$fTotalGeral = 0;
+										
 										foreach ($rowProdutos as $item){
 											
 											$cont++;
 											
-											$iQuantidade = isset($item['OrXPrQuantidade']) ? $item['OrXPrQuantidade'] : '';
-											$fValorUnitario = isset($item['OrXPrValorUnitario']) ? mostraValor($item['OrXPrValorUnitario']) : '';											
-											$fValorTotal = (isset($item['OrXPrQuantidade']) and isset($item['OrXPrValorUnitario'])) ? mostraValor($item['OrXPrQuantidade'] * $item['OrXPrValorUnitario']) : '';
+											$iQuantidade = isset($item['TXOXPQuantidade']) ? $item['TXOXPQuantidade'] : '';
+											$fValorUnitario = isset($item['TXOXPValorUnitario']) ? mostraValor($item['TXOXPValorUnitario']) : '';											
+											$fValorTotal = (isset($item['TXOXPQuantidade']) and isset($item['TXOXPValorUnitario'])) ? mostraValor($item['TXOXPQuantidade'] * $item['TXOXPValorUnitario']) : '';
+											
+											$fTotalGeral += (isset($item['TXOXPQuantidade']) and isset($item['TXOXPValorUnitario'])) ? $item['TXOXPQuantidade'] * $item['TXOXPValorUnitario'] : 0;
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-6">
+												<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
@@ -400,17 +404,47 @@ try{
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
 												</div>	
-												<div class="col-lg-2">
+												<div class="col-lg-1">
 													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
 												</div>	
-												<div class="col-lg-2">
+												<div class="col-lg-1">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>
 												</div>											
 											</div>');											
 											
 										}
+										
+										print('
+										<div class="row" style="margin-top: 8px;">
+												<div class="col-lg-8">
+													<div class="row">
+														<div class="col-lg-1">
+															
+														</div>
+														<div class="col-lg-8">
+															
+														</div>
+														<div class="col-lg-3">
+															
+														</div>
+													</div>
+												</div>								
+												<div class="col-lg-1">
+													
+												</div>
+												<div class="col-lg-1">
+													
+												</div>	
+												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+													<h5><b>Total:</b></h5>
+												</div>	
+												<div class="col-lg-1">
+													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
+												</div>											
+											</div>'										
+										);										
 										
 										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="'.$cont.'" >');
 										
@@ -427,7 +461,7 @@ try{
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
-										<a href="orcamento.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="trOrcamento.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

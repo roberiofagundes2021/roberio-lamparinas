@@ -251,5 +251,6 @@
 		$numero = str_pad($numero, 6, '0', STR_PAD_LEFT);
 		return $numero;
 	}
+
 	
 ?>
