@@ -83,22 +83,24 @@ if(isset($_POST['inputNome'])){
 	
 	<?php include_once("head.php"); ?>
 
+
 	<?php include_once("head.php"); ?>
 
 <!---------------------------------Scripts Universais------------------------------------>
-<<<<<<< HEAD
+
      <script src="http://malsup.github.com/jquery.form.js"></script>
-=======
+
+
+<!---------------------------------Scripts Universais------------------------------------>
     
     <!-- Theme JS files -->
     <script src="http://malsup.github.com/jquery.form.js"></script>
->>>>>>> 296a357a9d667b8ea6abbd0fd9c9d9e321577d17
+
 
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-<<<<<<< HEAD
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
@@ -109,7 +111,7 @@ if(isset($_POST['inputNome'])){
                 $("#cmbCategoria").change((e)=>{
                   
                     Filtrando()
-=======
+
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 	
 	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
@@ -127,7 +129,26 @@ if(isset($_POST['inputNome'])){
 			$("#cmbCategoria").change((e)=>{
 			  
 				Filtrando()
->>>>>>> 296a357a9d667b8ea6abbd0fd9c9d9e321577d17
+
+				const categId = $(e.target).val()
+
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
+	
+	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
+	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
+	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
+	<script src="global_assets/js/demo_pages/components_popups.js"></script>
+
+	<!-- /theme JS files -->
+
+<!-----------------------------------------Validação do formulário e Seleção altomatica de Subcategorias---------------------------------------->
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+			
+			$("#cmbCategoria").change((e)=>{
+			  
+				Filtrando()
 
 				const categId = $(e.target).val()
 
@@ -147,12 +168,10 @@ if(isset($_POST['inputNome'])){
 				});
 			})
 			
-<<<<<<< HEAD
 			    function Reset(){
 				   $('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
 			    }
 
-=======
 			function Filtrando(){
 			   $('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
 			}
@@ -161,7 +180,6 @@ if(isset($_POST['inputNome'])){
 			   $('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
 			}			
       
->>>>>>> 296a357a9d667b8ea6abbd0fd9c9d9e321577d17
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
 				
@@ -199,13 +217,11 @@ if(isset($_POST['inputNome'])){
 				
 	</script>
 <!------------------------------------Fim de validação do formulário e Seleção altomatica de Subcategorias------------------------------------>
-<<<<<<< HEAD
 	<!-- Theme JS files -->
 	
 
 </script>
-=======
->>>>>>> 296a357a9d667b8ea6abbd0fd9c9d9e321577d17
+
 
 </head>
 
@@ -234,7 +250,6 @@ if(isset($_POST['inputNome'])){
 						</div>
 						<input id="inputSituacao" type="hidden" value="1" name="inputSituacao">
 						<div class="card-body">
-<<<<<<< HEAD
 							<div class="media">
 								<div class="media-body">
 									<div class="row">
@@ -265,13 +280,11 @@ if(isset($_POST['inputNome'])){
 												</select>
 											</div>
 										</div>
-=======
 							<div class="row">
 								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputNome">Nome</label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
->>>>>>> 296a357a9d667b8ea6abbd0fd9c9d9e321577d17
 									</div>
 								</div>
 								<div class="col-lg-6">
