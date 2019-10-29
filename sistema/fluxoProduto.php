@@ -10,9 +10,11 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputFluxoOperacionalId'])){
 	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
 	$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
+	$iSubCategoria = $_POST['inputFluxoOperacionalSubCategoria'];
 } else if (isset($_POST['inputIdFluxoOperacional'])){
 	$iFluxoOperacional = $_POST['inputIdFluxoOperacional'];
 	$iCategoria = $_POST['inputIdCategoria'];
+	$iSubCategoria = $_POST['inputIdSubCategoria'];
 } else {
 	irpara("fluxo.php");
 }
@@ -297,7 +299,7 @@ try{
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="cmbProduto">Produto</label>
-												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc <?php if ($_SESSION['PerfiChave'] != 'SUPER' and $_SESSION['PerfiChave'] != 'CONTROLADORIA') { echo "disabled";} ?> >
+												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc <?php if ($countProdutoUtilizado and $_SESSION['PerfiChave'] != 'SUPER' and $_SESSION['PerfiChave'] != 'CONTROLADORIA') { echo "disabled";} ?> >
 													<?php 
 														$sql = "SELECT ProduId, ProduNome
 																FROM Produto										     
@@ -361,7 +363,7 @@ try{
 											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
 													FROM Produto
 													LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and ProduStatus = 1 ";
+													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and ProduSubCategoria = ".$iSubCategoria." and ProduStatus = 1 ";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										} 
@@ -497,7 +499,11 @@ try{
 									<div class="form-group">
 										<?php 
 										
-											if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'CONTROLADORIA'){
+											if ($countProdutoUtilizado){
+												if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'CONTROLADORIA'){
+													print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
+												}
+											} else{ 
 												print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
 											} 
 										
