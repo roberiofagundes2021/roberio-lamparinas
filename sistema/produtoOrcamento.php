@@ -81,7 +81,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		})
 			
 		function atualizaModelo(PrOrcId, PrOrcNome, PrOrcStatus, Tipo){
-		
+
 			document.getElementById('inputPrOrcId').value = PrOrcId;
 			document.getElementById('inputPrOrcNome').value = PrOrcNome;
 			document.getElementById('inputPrOrcStatus').value = PrOrcStatus;
