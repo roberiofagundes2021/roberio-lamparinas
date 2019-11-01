@@ -144,7 +144,7 @@
 								?>
 							</li>-->
 							<li class="nav-item">
-								<a href="parametro.php" class="nav-link"><i class="icon-cabinet"></i> Parâmetro</a>
+								<a href="parametro.php" class="nav-link"><i class="icon-equalizer"></i> Parâmetro</a>
 							</li>
 							<li class="nav-item-divider"></li>
 							<li class="nav-item">

@@ -19,19 +19,21 @@ foreach ($row as $item){
 }
 
 if(isset($_POST['inputIdEmpresa'])){
-
+var_dump($_POST);die;
 	try{
 		
-		$sql = "UPDATE Parametro SET ParamTipo = :sTipo, ParamValorAtualizado = :sValorAtualizado, ParamUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE ParamEmpresa = :iEmpresa";
-		$result = $conn->prepare($sql);
+		foreach ($_POST as $key => $value) {
+			$sql = "UPDATE Parametro SET ParamTipo = :sTipo, ParamValorAtualizado = :sValorAtualizado, ParamUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE ParamEmpresa = :iEmpresa";
+			$result = $conn->prepare($sql);
 				
-		$result->execute(array(
-						':sTipo' => $_POST['inputTipo'],
-						':sValorAtualizado' => $_POST['cmbValorAtualizado'],
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpresaId']
-						));
+			$result->execute(array(
+							':sTipo' => $key,
+							':sValorAtualizado' => $value == "on" ? 1 : 0,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpresaId']
+							));
+		}
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Parâmetro atualizado!!!";
@@ -62,16 +64,16 @@ if(isset($_POST['inputIdEmpresa'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 	
-	<script src="global_assets/js/plugins/forms/styling/switch.min.js"></script>	
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
-
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	<!-- CV Documentacao: https://jqueryvalidation.org/ -->	
+	
+	<script src="global_assets/js/plugins/forms/styling/switch.min.js"></script>
 	<!-- /theme JS files -->	
 	
 	<!-- Adicionando Javascript -->
@@ -118,7 +120,7 @@ if(isset($_POST['inputIdEmpresa'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formParametro" id="formParametro" method="post" class="form-validate">
+					<form name="formParametro" id="formParametro" method="post">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Parâmetros</h5>
 						</div>
@@ -139,7 +141,7 @@ if(isset($_POST['inputIdEmpresa'])){
 										<div class="col-lg-9">
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
-													<input type="checkbox" name="inputEmpresaPublica" id="inputEmpresaPublica" data-on-text="Sim" data-off-text="Não" class="form-input-switch" >
+													<input type="checkbox" name="inputEmpresaPublica" id="inputEmpresaPublica" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($aParametros['EmpresaPublica']) echo "checked"; ?>>
 												</label>
 											</div>
 										</div>
@@ -156,14 +158,14 @@ if(isset($_POST['inputIdEmpresa'])){
 										<div class="col-lg-9">
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
-													<input type="checkbox" name="switch_group" data-on-text="Sim" data-off-text="Não" class="form-input-switch" required>
+													<input type="checkbox" name="ValorFluxo" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($aParametros['ValorAtualizadoFluxoPrevisto']) echo "checked"; ?>>
 													Fluxo Previsto
 												</label>
 											</div>
 
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
-													<input type="checkbox" name="switch_group" data-on-text="Sim" data-off-text="Não" class="form-input-switch">
+													<input type="checkbox" name="ValorOrdem" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($aParametros['ValorAtualizadoOrdemCompra']) echo "checked"; ?>>
 													Ordem de Compra/Carta Contrato
 												</label>
 											</div>
@@ -171,15 +173,6 @@ if(isset($_POST['inputIdEmpresa'])){
 									</div>
 									<!-- /switch group -->
 
-									
-									<div class="form-group" style="display:none;">
-										<label for="cmbValorAtualizado">Valor do Produto será atualizado:</label>
-										<select id="cmbValorAtualizado" name="cmbValorAtualizado" class="form-control form-control-select2">
-											<option value="PREVISTO">Somente no Fluxo Previsto</option>
-											<option value="ORDEMCOMPRA">Somente na Ordem de Compra/Carta Contrato</option>
-											<option value="AMBOS">Ambos</option>
-										</select>
-									</div>
 								</div>
 							</div>
 

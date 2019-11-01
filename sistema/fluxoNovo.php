@@ -31,7 +31,7 @@ if(isset($_POST['inputDataInicio'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
-		
+	    /*	
 		$insertId = $conn->lastInsertId();	
 		
 		$sql = "SELECT *
@@ -57,7 +57,7 @@ if(isset($_POST['inputDataInicio'])){
 							':iEmpresa' => $_SESSION['EmpreId']
 							));		
 		} 
-						
+		*/				
 		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

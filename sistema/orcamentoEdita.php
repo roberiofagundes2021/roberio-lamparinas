@@ -22,12 +22,12 @@ if(isset($_POST['inputOrcamentoId'])){
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 
-		$sql = ("SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
-				 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = $iOrcamento
-				 ORDER BY SbCatNome ASC");
-		$result = $conn->query("$sql");
+		$sql = "SELECT SbCatId, SbCatNome
+				FROM SubCategoria
+				JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
+				WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = $iOrcamento
+				ORDER BY SbCatNome ASC";
+		$result = $conn->query($sql);
 		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($rowBD as $item){
 			$aSubCategorias[] = $item['SbCatId'];
@@ -148,19 +148,7 @@ if(isset($_POST['inputTipo'])){
 
 	<?php include_once("head.php"); ?>
 	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<!-- /theme JS files -->
-	
 	<!-- JS file path -->
-	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-
-	<!-- Uniform plugin file path -->
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
-
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>	
 
@@ -168,6 +156,8 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+	
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>	
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -411,24 +401,24 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-5">
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control form-control-select2" multiple="multiple" data-fouc>
+												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>												
 													<!--<option value="#">Selecione uma subcategoria</option>-->
 													<?php
 												        if (isset($row['OrcamCategoria'])){
-													        $sql = ("SELECT SbCatId, SbCatNome
-															    FROM SubCategoria														 
-															     WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SbCatStatus = 1
-															     ORDER BY SbCatNome ASC");
-													        $result = $conn->query("$sql");
+													        $sql = "SELECT SbCatId, SbCatNome
+																	FROM SubCategoria														 
+																	WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SbCatStatus = 1
+																	ORDER BY SbCatNome ASC";
+													        $result = $conn->query($sql);
 													        $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 													        $count = count($rowSubCategoria);
-
-													        
-														        foreach ($rowSubCategoria as $item){
-															        $seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
-															        print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
-														        }
-													        
+															
+															if($count){
+																foreach ($rowSubCategoria as $item){
+																	$seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
+																	print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
+																}
+															}
 												        }
 											        ?>
 												</select>
@@ -556,5 +546,9 @@ if(isset($_POST['inputTipo'])){
 
 	</div>
 	<!-- /page content -->
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9adb484b421426b5447b16befc4f409c3c206075
 </body>
 </html>
