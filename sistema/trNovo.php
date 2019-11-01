@@ -127,7 +127,7 @@ if(isset($_POST['inputData'])){
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
 					
-					var option = '<option value="#">Selecione a SubCategoria</option>';
+					var option = null;
 					
 					if (dados.length){						
 						
@@ -237,7 +237,6 @@ if(isset($_POST['inputData'])){
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control form-control-select2 select" multiple="multiple" data-fouc>
-													<option value="#">Selecione</option>
 												</select>
 											</div>
 										</div>										

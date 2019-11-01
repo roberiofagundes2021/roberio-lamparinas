@@ -6,11 +6,10 @@ $_SESSION['PaginaAtual'] = 'Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT OrcamId, OrcamNumero, OrcamData, OrcamCategoria, ForneNome, CategNome, SbCatNome, OrcamStatus
+$sql = ("SELECT OrcamId, OrcamNumero, OrcamData, OrcamCategoria, ForneNome, CategNome, OrcamStatus
 		 FROM Orcamento
 		 LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
 		 JOIN Categoria on CategId = OrcamCategoria
-		 LEFT JOIN SubCategoria on SbCatId = OrcamSubCategoria
 	     WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ."
 		 ORDER BY OrcamData DESC");
 $result = $conn->query("$sql");
@@ -226,13 +225,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											    <td>'.$item['CategNome'].'</td>
 										');
                                        
-                                        if(!$rowSC){
+                                        /*if(!$rowSC){
 											$seleciona = $item['SbCatNome'];
                                       
 											print('
 											    <td>'.$seleciona.'</td>
 											');
-										} else {
+										} else {*/
 											print('<td>');
                                             foreach ($rowSC as $a) {
 											    print('
@@ -240,7 +239,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											    ');
 											}
 											print('</td>');
-										}
+										/*}*/
 										
 										print('<td><a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrcamStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										

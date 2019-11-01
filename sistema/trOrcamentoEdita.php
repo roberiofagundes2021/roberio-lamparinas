@@ -78,10 +78,12 @@ if(isset($_POST['inputTipo'])){
 		
 		$iOrcamento = $_POST['inputOrcamentoId'];
 		
-		$sql = "UPDATE TRXOrcamento SET TrXOrTipo = :sTipo, TrXOrConteudo = :sConteudo,
+		$sql = "UPDATE TRXOrcamento SET TrXOrTipo = :sTipo, TrXOrConteudo = :sConteudo, TrXOrCategoria = :iCategoria,
 									 TrXOrFornecedor = :iFornecedor, TrXOrUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE TrXOrId = :iOrcamento";
 		$result = $conn->prepare($sql);
+
+		// Alterando a subcategoria
 		
 		$conn->beginTransaction();		
 
@@ -90,13 +92,38 @@ if(isset($_POST['inputTipo'])){
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
-						//':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+						':iCategoria' => $_POST['inputCategoria'] == '#' ? null : $_POST['inputCategoria'],
 						//':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iFornecedor' => $iFornecedor,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iOrcamento' => $iOrcamento
 						));
+        //$conn->beginTransaction();
+
+
+        ////////////////////// Alterando a subcategoria\\\\\\\\\\\\\\\\\\
+        $sql = "DELETE FROM TRXOrcamentoXSubcategoria
+				WHERE TXOXSCOrcamento = :iOrcamento and TXOXSCEmpresa = :iEmpresa";
+		$resultSubCatDel = $conn->prepare($sql);
+        $resultSubCatDel->execute(array(
+			            ':iOrcamento' => $iOrcamento,
+						':iEmpresa' => $_SESSION['EmpreId']
+						));
+
+        foreach ($rowSubCategoria as $subcategoria) {
+
+            $sql = "INSERT INTO TRXOrcamentoXSubcategoria (TXOXSCOrcamento, TXOXSCSubcategoria, TXOXSCEmpresa) 
+		            VALUES(:iOrcamento, :iSubCategoria, :iEmpresa)";
+		    $resultSubCatCadast = $conn->prepare($sql);
+		    $resultSubCatCadast->execute(array(
+			            ':iOrcamento' => $iOrcamento,
+						':iSubCategoria' => $subcategoria['SbCatId'] == '#' ? null : $subcategoria['SbCatId'],
+						':iEmpresa' => $_SESSION['EmpreId']
+						));
+        }
+		
+
 		
 		if (isset($_POST['inputOrcamentoProdutoExclui']) and $_POST['inputOrcamentoProdutoExclui']){
 			
@@ -179,7 +206,7 @@ if(isset($_POST['inputTipo'])){
 				}
 			});
 			
-			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
+			/*//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
 				
 				Filtrando();
@@ -202,7 +229,7 @@ if(isset($_POST['inputTipo'])){
 					}					
 				});
 				
-			}); 
+			}); */
 
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
@@ -264,7 +291,7 @@ if(isset($_POST['inputTipo'])){
 				
 				e.preventDefault();				
 				
-				//Antes
+				/*/Antes
 				var inputCategoria = $('#inputOrcamentoCategoria').val();
 				var inputSubCategoria = $('#inputOrcamentoSubCategoria').val();
 				if (inputSubCategoria == '' || inputSubCategoria == null){
@@ -273,13 +300,13 @@ if(isset($_POST['inputTipo'])){
 				
 				//Depois
 				var cmbCategoria = $('#cmbCategoria').val();
-				var cmbSubCategoria = $('#cmbSubCategoria').val();
+				var cmbSubCategoria = $('#c').val();
 				
 				if (cmbCategoria == '' || cmbCategoria == '#'){
 					alerta('Atenção','Informe a categoria!','error');
 					$('#cmbCategoria').focus();
 					return false;
-				}
+				}*/
 				
 				//Tem produto cadastrado para esse orçamento na tabela OrcamentoXProduto?
 				var inputProduto = $('#inputOrcamentoProduto').val();
@@ -408,6 +435,7 @@ if(isset($_POST['inputTipo'])){
 													<?php 
                                                         foreach ($rowSubCategoria as $itemSC) {
                                                         	print('<input type="text" class="form-control pb-0" value="'.$itemSC['SbCatNome'].'" readOnly>');
+                                                        	print('<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="'.$itemSC['SbCatId'].'">');
                                                         }
 													?>
 												</div>
@@ -437,10 +465,10 @@ if(isset($_POST['inputTipo'])){
 												<label for="cmbFornecedor">Fornecedor</label>
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
 													<?php
-														$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																 FROM Fornecedor														     
 																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1 and ForneCategoria = ".$rowCategoria['CategId']."
-															     ORDER BY ForneNome ASC");
+															     ORDER BY ForneNome ASC";
 														$result = $conn->query("$sql");
 														$fornecedores = $result->fetchAll(PDO::FETCH_ASSOC);
 														foreach($fornecedores as $fornecedor){

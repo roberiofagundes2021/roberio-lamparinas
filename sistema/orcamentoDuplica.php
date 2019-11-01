@@ -8,12 +8,13 @@ include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputOrcamentoId'])){
 
-	$sql = "SELECT OrcamId, OrcamTipo, OrcamCategoria, OrcamSubCategoria, OrcamConteudo, OrcamFornecedor, OrcamStatus
+	$sql = "SELECT OrcamId, OrcamTipo, OrcamCategoria, OrcamConteudo, OrcamFornecedor, OrcamStatus
 			FROM Orcamento
 			WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = ".$_POST['inputOrcamentoId']."";
 	$result = $conn->query($sql);
 	$rowOrcamento = $result->fetch(PDO::FETCH_ASSOC);
 	//$count = count($rowOrcamento);
+
 	
 	$sql = ("SELECT COUNT(isnull(OrcamNumero,0)) as Numero
 			 FROM Orcamento
@@ -24,9 +25,9 @@ if (isset($_POST['inputOrcamentoId'])){
 	$sNumero = (int)$rowNumero['Numero'] + 1;
 	$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 		
-	$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamSubCategoria, OrcamConteudo, OrcamFornecedor,
+	$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor,
 								   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamEmpresa)
-			VALUES (:sNumero, :sTipo, :dData, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
+			VALUES (:sNumero, :sTipo, :dData, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
 					:bStatus, :iUsuarioAtualizador, :iEmpresa)";
 	$result = $conn->prepare($sql);
 	
@@ -35,7 +36,6 @@ if (isset($_POST['inputOrcamentoId'])){
 					':sTipo' => $rowOrcamento['OrcamTipo'],
 					':dData' => gravaData(date('d/m/Y')),
 					':iCategoria' => $rowOrcamento['OrcamCategoria'] == '' ? null : $rowOrcamento['OrcamCategoria'],
-					':iSubCategoria' => $rowOrcamento['OrcamSubCategoria'] == '' ? null : $rowOrcamento['OrcamSubCategoria'],
 					':sConteudo' => $rowOrcamento['OrcamConteudo'],
 					':iFornecedor' => $rowOrcamento['OrcamFornecedor'],
 					':iSolicitante' => $_SESSION['UsuarId'],
@@ -70,6 +70,30 @@ if (isset($_POST['inputOrcamentoId'])){
 			echo 'Error2: ' . $e->getMessage();die;
 		}
 	}
+
+	// Select Subcategoria
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria
+			JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
+			WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = ".$rowOrcamento['OrcamId']."";
+	$result = $conn->query($sql);
+	$rowSBC = $result->fetchAll(PDO::FETCH_ASSOC);
+
+	$sql = "INSERT INTO OrcamentoXSubCategoria 
+							(OrXSCOrcamento, OrXSCSubCategoria, OrXSCEmpresa)
+						VALUES 
+							(:iOrcamento, :iSubCategoria, :iEmpresa)";
+				$result = $conn->prepare($sql);
+
+				foreach ($rowSBC as $subcategoria){
+
+					$result->execute(array(
+									':iOrcamento' => $insertId,
+									':iSubCategoria' => $subcategoria['SbCatId'],
+									':iEmpresa' => $_SESSION['EmpreId']
+									));
+				}
+
 	
 	$_SESSION['msg']['titulo'] = "Sucesso";
 	$_SESSION['msg']['mensagem'] = "Orçamento duplicado!!!";

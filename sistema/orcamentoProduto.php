@@ -56,8 +56,7 @@ try{
 			FROM Orcamento
 			LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
 			JOIN Categoria on CategId = OrcamCategoria
-			LEFT JOIN SubCategoria on SbCatId = OrcamSubCategoria
-			WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = ".$iOrcamento;
+			WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = $iOrcamento ";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
@@ -73,6 +72,17 @@ try{
 	foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 		$aProdutos[] = $itemProdutoUtilizado['OrXPrProduto'];
 	}
+
+	$sql = ("SELECT SbCatId, SbCatNome
+				 FROM SubCategoria
+				 JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
+				 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = $iOrcamento
+				 ORDER BY SbCatNome ASC");
+		$result = $conn->query("$sql");
+		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($rowBD as $item){
+			$aSubCategorias[] = $item['SbCatId'];
+		}
 	
 } catch(PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
@@ -251,10 +261,29 @@ try{
 										</div>
 									
 										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputSubCategoria">Sub Categoria</label>
-												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo $row['SbCatNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['OrcamSubCategoria']; ?>">
+											<div class="form-group" style="border-bottom:1px solid #ddd;">
+												<label for="cmbSubCategoria">SubCategoria</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control form-control-select2" multiple="multiple" data-fouc>
+													<!--<option value="#">Selecione uma subcategoria</option>-->
+													<?php
+												        if (isset($row['OrcamCategoria'])){
+													        $sql = ("SELECT SbCatId, SbCatNome
+															    FROM SubCategoria														 
+															     WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SbCatStatus = 1
+															     ORDER BY SbCatNome ASC");
+													        $result = $conn->query("$sql");
+													        $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+													        $count = count($rowSubCategoria);
+
+													        
+														        foreach ($rowSubCategoria as $item){
+															        $seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
+															        print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
+														        }
+													        
+												        }
+											        ?>
+												</select>
 											</div>
 										</div>
 									</div>

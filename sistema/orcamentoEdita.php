@@ -556,42 +556,5 @@ if(isset($_POST['inputTipo'])){
 
 	</div>
 	<!-- /page content -->
-	
-	<!-- Adicionando Javascript -->
-    <script type="text/javascript" >
-	
-		//Ao carregar a página tive que executar o que o onChange() executa para que a combo da SubCategoria já venha filtrada, além de selecionada, é claro.
-		window.onload = function(){
-
-			var cmbSubCategoria = $('#cmbSubCategoria').val();
-			
-			Filtrando();
-			
-			var cmbCategoria = $('#cmbCategoria').val();
-
-			$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
-				
-				var option = '<option value="#">Selecione a SubCategoria</option>';
-				
-				if (dados.length){						
-					
-					$.each(dados, function(i, obj){
-
-						if(obj.SbCatId == cmbSubCategoria){							
-							option += '<option value="'+obj.SbCatId+'" selected>'+obj.SbCatNome+'</option>';
-						} else {							
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						}
-					});
-					
-					$('#cmbSubCategoria').html(option).show();
-				} else {
-					ResetSubCategoria();
-				}					
-			});
-		}
-		
-	</script>
-
 </body>
 </html>

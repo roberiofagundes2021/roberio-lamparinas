@@ -61,6 +61,7 @@ if(isset($_POST['inputData'])){
 						//':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						
 						':iTR' => $iTR
 						));
 
@@ -332,7 +333,6 @@ if(isset($_POST['inputData'])){
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select form-control-select2" multiple="multiple" data-fouc>
-													<option value="#">Selecione</option>
 													<?php
 												        if (isset($row['TrRefCategoria'])){
 													        $sql = ("SELECT SbCatId, SbCatNome
@@ -395,42 +395,5 @@ if(isset($_POST['inputData'])){
 
 	</div>
 	<!-- /page content -->
-	
-	<!-- Adicionando Javascript -->
-    <script type="text/javascript" >
-	
-		//Ao carregar a página tive que executar o que o onChange() executa para que a combo da SubCategoria já venha filtrada, além de selecionada, é claro.
-		window.onload = function(){
-
-			var cmbSubCategoria = $('#cmbSubCategoria').val();
-			
-			Filtrando();
-			
-			var cmbCategoria = $('#cmbCategoria').val();
-
-			$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
-				
-				var option = '<option value="#">Selecione a SubCategoria</option>';
-				
-				if (dados.length){						
-					
-					$.each(dados, function(i, obj){
-
-						if(obj.SbCatId == cmbSubCategoria){							
-							option += '<option value="'+obj.SbCatId+'" selected>'+obj.SbCatNome+'</option>';
-						} else {							
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						}
-					});
-					
-					$('#cmbSubCategoria').html(option).show();
-				} else {
-					ResetSubCategoria();
-				}					
-			});
-		}
-		
-	</script>
-
 </body>
 </html>
