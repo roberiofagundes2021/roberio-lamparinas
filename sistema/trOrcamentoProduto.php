@@ -314,7 +314,7 @@ try{
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
+									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher a coluna <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<!--<div class="hot-container">
 										<div id="example"></div>
@@ -332,14 +332,25 @@ try{
 	                                    $row = $result->fetch(PDO::FETCH_ASSOC);
 	                                    $iTR = $row['TrXOrTermoReferencia'];	
 
-										$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, TRXPrValorUnitario
-												FROM ProdutoOrcamento
-												JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
-												LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-												WHERE PrOrcEmpresa = ".$_SESSION['EmpreId']." and TRXPrTermoReferencia = ".$iTR;
+										
+										$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade
+											FROM ProdutoOrcamento
+											JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
+											LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+											WHERE PrOrcEmpresa = ".$_SESSION['EmpreId']." and TRXPrTermoReferencia = ".$iTR;
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
+										print("".$count."");
+
+
+                                        $sql = "SELECT *
+											    FROM TRXOrcamentoXProduto 
+											    WHERE TXOXPEmpresa = ".$_SESSION['EmpreId']." and TXOXPOrcamento = ".$iOrcamento;
+										$result = $conn->query($sql);
+										$rowProdutosOrc = $result->fetchAll(PDO::FETCH_ASSOC);
+										$countProdutoOrc = count($rowProdutos);
+
 										
 										if (!$count){
 											$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida
@@ -395,41 +406,84 @@ try{
 										$fTotalGeral = 0;
 										
 										foreach ($rowProdutos as $item){
+											if($countProdutoOrc >= 1){
+
+											    $sql = "SELECT TXOXPValorUnitario
+											            FROM TRXOrcamentoXProduto 
+											            WHERE TXOXPEmpresa = ".$_SESSION['EmpreId']." and TXOXPProduto = ".$item['PrOrcId']." and TXOXPOrcamento = ".$iOrcamento."";
+										        $result = $conn->query($sql);
+										        $rowProdutosOrc = $result->fetch(PDO::FETCH_ASSOC);
 											
-											$cont++;
+											    $cont++;
 											
-											$iQuantidade = isset($item['TRXPrQuantidade']) ? $item['TRXPrQuantidade'] : '';
-											$fValorUnitario = isset($item['TXOXPValorUnitario']) ? mostraValor($item['TXOXPValorUnitario']) : '';											
-											$fValorTotal = (isset($item['TXOXPQuantidade']) and isset($item['TXOXPValorUnitario'])) ? mostraValor($item['TXOXPQuantidade'] * $item['TXOXPValorUnitario']) : '';
+											    $iQuantidade = isset($item['TRXPrQuantidade']) ? $item['TRXPrQuantidade'] : '';
+											    $fValorUnitario = isset($rowProdutosOrc['TXOXPValorUnitario']) ? mostraValor($rowProdutosOrc['TXOXPValorUnitario']) : '';											
+											    $fValorTotal = (isset($item['TRXPrQuantidade']) and isset($rowProdutosOrc['TXOXPValorUnitario'])) ? mostraValor($item['TRXPrQuantidade'] * $rowProdutosOrc['TXOXPValorUnitario']) : '';
 											
-											$fTotalGeral += (isset($item['TXOXPQuantidade']) and isset($item['TXOXPValorUnitario'])) ? $item['TXOXPQuantidade'] * $item['TXOXPValorUnitario'] : 0;
+											    $fTotalGeral += (isset($item['TRXPrQuantidade']) and isset($rowProdutosOrc['TXOXPValorUnitario'])) ? $item['TRXPrQuantidade'] * $rowProdutosOrc['TXOXPValorUnitario'] : 0;
 											
-											print('
-											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
-													<div class="row">
-														<div class="col-lg-1">
-															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['PrOrcId'].'" class="idProduto">
-														</div>
-														<div class="col-lg-11">
-															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['PrOrcDetalhamento'].'" value="'.$item['PrOrcNome'].'" readOnly>
-														</div>
-													</div>
-												</div>								
-												<div class="col-lg-1">
-													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['PrOrcUnidadeMedida'].'" readOnly>
-												</div>
-												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border-off Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" readOnly value="'.$iQuantidade.'">
-												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
-												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>
-												</div>											
-											</div>');											
+											    print('
+											        <div class="row" style="margin-top: 8px;">
+												        <div class="col-lg-8">
+													        <div class="row">
+														        <div class="col-lg-1">
+															        <input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
+															        <input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['PrOrcId'].'" class="idProduto">
+														       </div>
+														       <div class="col-lg-11">
+															        <input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['PrOrcDetalhamento'].'" value="'.$item['PrOrcNome'].'" readOnly>
+														        </div>
+													        </div>
+												        </div>								
+												        <div class="col-lg-1">
+													        <input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['PrOrcUnidadeMedida'].'" readOnly>
+												        </div>
+												        <div class="col-lg-1">
+													        <input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border-off Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" readOnly value="'.$iQuantidade.'">
+												        </div>	
+												        <div class="col-lg-1">
+													         <input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
+												        </div>	
+												        <div class="col-lg-1">
+													        <input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>
+												        </div>											
+											        </div>');
+											} else {
+												$cont++;
+											
+											    $iQuantidade = isset($item['TRXPrQuantidade']) ? $item['TRXPrQuantidade'] : '';
+											    $fValorUnitario = isset($item['TXOXPValorUnitario']) ? mostraValor($item['TXOXPValorUnitario']) : '';											
+											    $fValorTotal = (isset($item['TXOXPQuantidade']) and isset($item['TXOXPValorUnitario'])) ? mostraValor($item['TXOXPQuantidade'] * $item['TXOXPValorUnitario']) : '';
+											
+											    $fTotalGeral += (isset($item['TXOXPQuantidade']) and isset($item['TXOXPValorUnitario'])) ? $item['TXOXPQuantidade'] * $item['TXOXPValorUnitario'] : 0;
+											
+											    print('
+											        <div class="row" style="margin-top: 8px;">
+												        <div class="col-lg-8">
+													        <div class="row">
+														        <div class="col-lg-1">
+															        <input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
+															        <input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['PrOrcId'].'" class="idProduto">
+														        </div>
+														        <div class="col-lg-11">
+															        <input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['PrOrcDetalhamento'].'" value="'.$item['PrOrcNome'].'" readOnly>
+														        </div>
+													        </div>
+												        </div>								
+												        <div class="col-lg-1">
+													        <input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['PrOrcUnidadeMedida'].'" readOnly>
+												        </div>
+												        <div class="col-lg-1">
+													        <input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border-off Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" readOnly value="'.$iQuantidade.'">
+												        </div>	
+												        <div class="col-lg-1">
+													        <input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12">
+												        </div>	
+												        <div class="col-lg-1">
+													        <input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>
+												        </div>											
+											       </div>');
+											}											
 											
 										}
 										

@@ -23,22 +23,6 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Lamparinas | UnidadeMedida</title>
-
-<!---------------------------------Scripts Universais------------------------------------>
-    <script src="http://malsup.github.com/jquery.form.js"></script>
-
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	<!--<script src="global_assets/js/main/jquery.form.js"></script>-->
-	
-	<!-- /theme JS files -->
-	
-	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
-
 <!-----------------------------------------Validação do formulário e Seleção altomatica de Subcategorias---------------------------------------->
 	<?php include_once("head.php"); ?>
 
@@ -49,7 +33,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
                 $("#cmbCategoria").change((e)=>{
                   
                     Filtrando()
-                    let option = '<option>Selecione a SubCategoria</option>';
+                    let option = null; //'<option>Selecione a SubCategoria</option>';
                     const categId = $('#cmbCategoria').val()
                     const selectedId = $('#cmbSubCategoria').attr('valId')
                     console.log(selectedId)
@@ -78,7 +62,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
                 // No carregamento da pagina é regatada a opção já cadastrada no banco
                 $(document).ready(()=>{
                 	Filtrando()
-                    let option = '<option>Selecione a SubCategoria</option>';
+                    let option = null; //'<option>Selecione a SubCategoria</option>';
                     const categId = $('#cmbCategoria').val()
                     const selectedId = $('#cmbSubCategoria').attr('valId')
                     console.log(selectedId)
@@ -112,9 +96,9 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				   $('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
 			    }
 	    	})
-		</script>
+	</script>
 
-		<script type="text/javascript" >
+	<script type="text/javascript" >
  
         $(document).ready(function() {
 			//Valida Registro Duplicado
@@ -139,31 +123,16 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				} 
 				$( "#formProduto" ).attr('action', 'produtoOrcamentoEditaAction.php').submit();
 			})
-
-			$('#cancelar').on('click', function(e){
-				
-				e.preventDefault();
-				
-				var inputFoto = $('#inputFoto').val();
-				
-				$(window.document.location).attr('href',"produtoOrcamento.php");
-				
-			}); // cancelar
 		})
-	</script>	
-<!------------------------------------Fim de validação do formulário e Seleção altomatica de Subcategorias------------------------------------>
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	</script>
+	<!---------------------------------Scripts Universais------------------------------------>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script>
+<!------------------------------------Fim de validação do formulário e Seleção altomatica de Subcategorias------------------------------------>
 
 </head>
 
@@ -231,19 +200,8 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 											</div>
 										</div>
 									</div>
-
-								</div> <!-- media-body -->
-								
-								<!--<div style="text-align:center;">
-									<div id="visualizar">										
-										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:250px; border:2px solid #ccc;">
-									</div>
-									<br>
-									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%">Adicionar Foto...</button>	
-								</div>-->
-								
-							</div> <!-- media -->
-
+								</div>
+							</div>
 							<div class="row">
 								<div class="col-lg-12">
 									<h5 class="mb-0 font-weight-semibold">Classificação</h5>
@@ -289,7 +247,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 									<div class="col-lg-12">								
 										<div class="form-group">
 											<button class="btn btn-lg btn-success" id="enviar">Editar</button>
-											<button class="btn btn-lg btn-basic" id="cancelar">Cancelar</button>
+											<a href="produtoOrcamento.php" class="btn btn-basic" id="cancelar">Cancelar</a>
 										</div>
 									</div>
 								</div>

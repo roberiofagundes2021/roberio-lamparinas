@@ -35,3 +35,8 @@ Copyright (c) 2018 Carlos Victor
     box-shadow: 0 0 0 0 transparent;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
+
+.btn-desable{
+    cursor: default;
+
+}

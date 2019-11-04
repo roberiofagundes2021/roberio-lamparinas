@@ -31,6 +31,12 @@ if(isset($_POST['inputTRId'])){
 			$aSubCategorias[] = $item['SbCatId'];
 		}
 		
+
+		$sql = "SELECT *
+		        FROM TRXOrcamento
+		        WHERE TrXOrTermoReferencia = ".$row['TrRefId']."";
+		$result = $conn->query($sql);
+		$rowTrOr = $result->fetchAll(PDO::FETCH_ASSOC);
 		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
@@ -273,8 +279,39 @@ if(isset($_POST['inputData'])){
 					<form name="formTR" id="formTR" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar TR Nº "<?php echo $_POST['inputTRNumero']; ?>"</h5>
-						</div>						
-						
+						</div>
+						<?php 
+						   $countExt = 0;
+                           foreach ($rowTrOr as $Orcamento) {
+                               if($Orcamento){
+                               	   $sql = "SELECT TXOXPValorUnitario
+                                       FROM TRXOrcamentoXProduto
+                                       WHERE TXOXPOrcamento = ".$Orcamento['TrXOrId']."";
+                                   $result = $conn->query($sql);
+                                   $rowOrPr = $result->fetchAll(PDO::FETCH_ASSOC);
+                                   $countInt = 0;
+                                   foreach ($rowOrPr as $produto) {
+                                   	   if($produto['TXOXPValorUnitario']){
+                                           $countInt++;
+                                       }
+                                   }
+
+                                   if($countInt > 0){
+                                   	  $countExt++;
+                                   }
+                                } 
+                           }
+                            if($countExt >= 1){
+                               
+                                    print(' <div class="d-flex flex-row" style="width: 100%">
+							                    <div class="alert-danger col-12">
+								                    <p class="h5 m-0 py-2">Este Termo de Referência já possui '.$countExt.' Orçamentos com preços de produtos definidos. Para alteração, exclua estes Orçamentos da TR.</p>
+								                    <input type="hidden" id="OrPrValidacao" value="'.$countExt.'">
+							                    </div>
+						                    </div>');
+                                
+                            }    
+						?>	
 						<input type="hidden" id="inputTRId" name="inputTRId" value="<?php echo $row['TrRefId']; ?>" >
 						<input type="hidden" id="inputTRNumero" name="inputTRNumero" value="<?php echo $row['TrRefNumero']; ?>" >	
 						<input type="hidden" id="inputTRCategoria" name="inputTRCategoria" value="<?php echo $row['TrRefCategoria']; ?>" >
@@ -373,8 +410,14 @@ if(isset($_POST['inputData'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<div class="btn btn-lg btn-success" id="enviar">Alterar</div>
-										<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
+										<?php 
+                                           if($countExt >= 1){
+                                                print('<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>');
+                                           } else {
+                                            	print('<div class="btn btn-lg btn-success" id="enviar">Alterar</div>');
+                                           	    print('<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>');
+                                           }
+										?>
 									</div>
 								</div>
 							</div>

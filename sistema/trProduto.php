@@ -198,9 +198,23 @@ try{
 										</div>
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputSubCategoria">Sub Categoria</label>
-												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo $row['SbCatNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['TrRefSubCategoria']; ?>">
+												<label for="cmbSubCategoria">SubCategoria(as)</label>
+												<div class="d-flex flex-row" style="padding-top: 7px;">
+												    <?php
+                                                        $sql = "SELECT SbCatId, SbCatNome
+                                                            FROM SubCategoria
+                                                            JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
+                                                            WHERE SBCatEmpresa = ".$_SESSION['EmpreId']." and TRXSCTermoReferencia = ".$iTR;
+                                                        $result = $conn->query($sql);
+	                                                    $rowSbCat = $result->fetchAll(PDO::FETCH_ASSOC);
+
+	                                                    foreach ($rowSbCat as $subcategoria) {
+	                                                        print('<input type="text" class="form-control pb-0" value="'.$subcategoria['SbCatNome'].'" readOnly>');
+                                                            print('<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="'.$subcategoria['SbCatId'].'">');
+	                                                    
+	                                                    }
+												    ?>
+											    </div>
 											</div>
 										</div>
 									</div>

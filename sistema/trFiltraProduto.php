@@ -35,7 +35,7 @@ if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POS
 			FROM ProdutoOrcamento
 			JOIN Categoria on CategId = PrOrcCategoria
 			LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-			WHERE PrOrcEmpresa = ".$_SESSION['EmpreId']." and PrOrcuCategoria = '". $_POST['idCategoria']."' and PrOrcId in (".$lista.")
+			WHERE PrOrcEmpresa = ".$_SESSION['EmpreId']." and PrOrcCategoria = '". $_POST['idCategoria']."' and PrOrcId in (".$lista.")
 			";
 }
 
