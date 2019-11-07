@@ -291,7 +291,7 @@ if(isset($_POST['inputTipo'])){
 				
 				e.preventDefault();				
 				
-				/*/Antes
+				//Antes
 				var inputCategoria = $('#inputOrcamentoCategoria').val();
 				var inputSubCategoria = $('#inputOrcamentoSubCategoria').val();
 				if (inputSubCategoria == '' || inputSubCategoria == null){
@@ -306,7 +306,7 @@ if(isset($_POST['inputTipo'])){
 					alerta('Atenção','Informe a categoria!','error');
 					$('#cmbCategoria').focus();
 					return false;
-				}*/
+				}
 				
 				//Tem produto cadastrado para esse orçamento na tabela OrcamentoXProduto?
 				var inputProduto = $('#inputOrcamentoProduto').val();
@@ -323,7 +323,7 @@ if(isset($_POST['inputTipo'])){
 						inputExclui = 1;
 						$('#inputOrcamentoProdutoExclui').val(inputExclui);
 						
-						confirmaExclusao(document.formOrcamento, "Tem certeza que deseja alterar o orçamento? Existem produtos com quantidades ou valores lançados!", "orcamentoEdita.php");
+						confirmaExclusao(document.formOrcamento, "Tem certeza que deseja alterar o orçamento? Existem produtos com quantidades ou valores lançados!", "trOrcamentoEdita.php");
 						
 					} else{
 						inputExclui = 0;

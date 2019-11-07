@@ -165,7 +165,12 @@ if(isset($_POST['inputData'])){
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 
-        $(document).ready(function() {	
+        $(document).ready(function() {
+            function validarSubcategoria(inputValida){
+            	confirmaExclusao(document.formTR, "A Categoria e Subcategorias não podem ser alteradas. Existem produtos com quantidades ou valores lançados em "+inputValida+" orçamentos desta TR. Confirmar outras alterações?", "trEdita.php");
+            }	
+
+        	
 		
 			$('#summernote').summernote();
 			
@@ -193,6 +198,18 @@ if(isset($_POST['inputData'])){
 				});
 				
 			}); 
+
+			if($('#inputValidar').val() >= 1){
+                $('.select2-selection__choice__remove').each((i, elem) => {
+            	    console.log($(elem).remove());
+                })
+
+                setInterval(()=>{
+                    if($('.select2-container--default').hasClass('select2-container--open')){
+               	        $('.select2-container--default').removeClass('select2-container--open');
+                    }
+                }, 1)
+			}
 
 			$("#enviar").on('click', function(e){
 				
@@ -222,7 +239,7 @@ if(isset($_POST['inputData'])){
 				var inputExclui = $('#inputTRProdutoExclui').val();
 				
 				//Aqui verifica primeiro se tem produtos preenchidos, porque do contrário deixa mudar
-				if (inputProduto > 0){
+				/*if (inputProduto > 0){
 
 					//Verifica se o a categoria ou subcategoria foi alterada
 					if (inputSubCategoria != cmbSubCategoria){
@@ -236,6 +253,20 @@ if(isset($_POST['inputData'])){
 						inputExclui = 0;
 						$('#inputTRProdutoExclui').val(inputExclui);
 					}
+				}*/
+
+				if($('#inputValidar').val() >= 1){
+                   validarSubcategoria($('#inputValidar').val())
+
+                    $('.select2-selection__choice__remove').each((i, elem) => {
+            	        console.log($(elem).remove());
+                    })
+
+                    setInterval(()=>{
+                        if($('.select2-container--default').hasClass('select2-container--open')){
+               	            $('.select2-container--default').removeClass('select2-container--open');
+                        }
+                    }, 1)
 				}
 				
 				$( "#formTR" ).submit();
@@ -302,14 +333,12 @@ if(isset($_POST['inputData'])){
                                 } 
                            }
                             if($countExt >= 1){
-                               
-                                    print(' <div class="d-flex flex-row" style="width: 100%">
-							                    <div class="alert-danger col-12">
-								                    <p class="h5 m-0 py-2">Este Termo de Referência já possui '.$countExt.' Orçamentos com preços de produtos definidos. Para alteração, exclua estes Orçamentos da TR.</p>
-								                    <input type="hidden" id="OrPrValidacao" value="'.$countExt.'">
-							                    </div>
-						                    </div>');
-                                
+                            	print('<input type="hidden" id="inputValidar" name="inputValidar" value="'.$countExt.' "  >');
+                                if($rowBD){
+                            	foreach ($rowBD as $subcategoria) {
+                           	       print('<input type="hidden" class="inputSubCategoriaValidacao" name="inputSubCategoriaValidacao" value="'.$subcategoria['SbCatId'].' "  >');
+                                   }
+                                }
                             }    
 						?>	
 						<input type="hidden" id="inputTRId" name="inputTRId" value="<?php echo $row['TrRefId']; ?>" >
@@ -317,6 +346,10 @@ if(isset($_POST['inputData'])){
 						<input type="hidden" id="inputTRCategoria" name="inputTRCategoria" value="<?php echo $row['TrRefCategoria']; ?>" >
 						<input type="hidden" id="inputTRSubCategoria" name="inputTRSubCategoria" value="<?php echo $row['TrRefSubCategoria']; ?>" >
 						<input type="hidden" id="inputTRProdutoExclui" name="inputTRProdutoExclui" value="0" >
+
+						<?php 
+                           
+						?>
 						
 						<?php
 						
@@ -410,14 +443,8 @@ if(isset($_POST['inputData'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<?php 
-                                           if($countExt >= 1){
-                                                print('<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>');
-                                           } else {
-                                            	print('<div class="btn btn-lg btn-success" id="enviar">Alterar</div>');
-                                           	    print('<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>');
-                                           }
-										?>
+                                        <div class="btn btn-lg btn-success" id="enviar">Alterar</div>
+                                        <a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

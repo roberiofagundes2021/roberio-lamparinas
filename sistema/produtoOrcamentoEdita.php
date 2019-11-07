@@ -116,11 +116,11 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				inputNome = inputNome.trim();
 				
 				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe um nome para o produto!','error');
-					$('#inputNome').focus();
-					return false;
-				} 
+				//if (inputNome == ''){
+					//alerta('Atenção','Informe um nome para o produto!','error');
+					//$('#inputNome').focus();
+					//return false;
+				//} 
 				$( "#formProduto" ).attr('action', 'produtoOrcamentoEditaAction.php').submit();
 			})
 		})
@@ -132,6 +132,9 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 <!------------------------------------Fim de validação do formulário e Seleção altomatica de Subcategorias------------------------------------>
 
 </head>
@@ -155,7 +158,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				<!-------------------------------------------------------------------------------------------------------------------------------->
 				<div class="card">
 					
-					<form id="formProduto" name="formProduto" method="post" class="form-validate">
+					<form id="formProduto" name="formProduto" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Produto</h5>
 						</div>
@@ -173,7 +176,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputUnidadeMedida">Unidade de Medida</label>
-												<select id="cmbUnidadeMedida" class="form-control form-control-select2" name="cmbUnidadeMedida">
+												<select id="cmbUnidadeMedida" class="form-control form-control-select2" name="cmbUnidadeMedida" required>
 													<option><?php echo $row['PrOrcUnidadeMedida'] ?></option>
 													<?php 
 													$sql = ("SELECT UnMedNome, UnMedSigla
@@ -210,7 +213,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 													<?php 
 													$sql = ("SELECT CategId, CategNome
 														FROM Categoria															     
@@ -235,7 +238,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" valId="<?php echo $row['PrOrcSubcategoria']; ?>">
-													<option id="selec"></option>
+													<option id="selec" required></option>
 												</select>
 											</div>
 										</div>

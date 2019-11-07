@@ -95,7 +95,7 @@ if(isset($_POST['inputNome'])){
 				inputNomeNovo = inputNomeNovo.trim();
 				
 				//Verifica se o campo só possui espaços em branco
-				if (inputNomeNovo == ''){
+				/*if (inputNomeNovo == ''){
 					alerta('Atenção','Informe a sub categoria!','error');
 					$('#inputNome').focus();
 					return false;
@@ -106,7 +106,7 @@ if(isset($_POST['inputNome'])){
 					alerta('Atenção','Informe a categoria!','error');
 					$('#cmbCategoria').focus();
 					return false;
-				}
+				}*/
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -125,8 +125,11 @@ if(isset($_POST['inputNome'])){
 				})
 			})
 		})
-	</script>	
-
+	</script>
+	<script src="http://malsup.github.com/jquery.form.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 </head>
 
 <body class="navbar-top">
@@ -149,13 +152,13 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formSubCategoria" id="formSubCategoria" method="post" class="form-validate">
+					<form name="formSubCategoria" id="formSubCategoria" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Sub Categoria "<?php echo $row['SbCatNome']; ?>"</h5>
 						</div>
 						
-						<input type="hidden" id="inputSubCategoriaId" name="inputSubCategoriaId" value="<?php echo $row['SbCatId']; ?>" >
-						<input type="hidden" id="inputSubCategoriaNome" name="inputSubCategoriaNome" value="<?php echo $row['SbCatNome']; ?>" >
+						<input type="hidden" id="inputSubCategoriaId" name="inputSubCategoriaId" value="<?php echo $row['SbCatId']; ?>" required >
+						<input type="hidden" id="inputSubCategoriaNome" name="inputSubCategoriaNome" value="<?php echo $row['SbCatNome']; ?>" required >
 						
 						<div class="card-body">								
 							<div class="row">
@@ -167,8 +170,8 @@ if(isset($_POST['inputNome'])){
 								</div>
 								<div class="col-lg-6">
 									<label for="cmbCategoria">Categoria</label>
-									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-										<option value="#">Selecione</option>
+									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+										<option value="">Selecione</option>
 										<?php 
 											$sql = ("SELECT CategId, CategNome
 													 FROM Categoria

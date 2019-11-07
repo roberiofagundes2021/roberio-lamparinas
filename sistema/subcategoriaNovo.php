@@ -70,10 +70,10 @@ if(isset($_POST['inputNome'])){
 				var cmbCategoria = $('#cmbCategoria').val();
 				
 				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
+				//inputNome = inputNome.trim();
 				
 				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
+				/*if (inputNome == ''){
 					alerta('Atenção','Informe a sub categoria!','error');
 					$('#inputNome').focus();
 					return false;
@@ -84,7 +84,7 @@ if(isset($_POST['inputNome'])){
 					alerta('Atenção','Informe a categoria!','error');
 					$('#cmbCategoria').focus();
 					return false;
-				}
+				}*/
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -104,7 +104,10 @@ if(isset($_POST['inputNome'])){
 			})
 		})
 	</script>
-		
+	<script src="http://malsup.github.com/jquery.form.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 </head>
 
 <body class="navbar-top">
@@ -127,7 +130,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formSubCategoria" id="formSubCategoria" method="post" class="form-validate">
+					<form name="formSubCategoria" id="formSubCategoria" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Sub Categoria</h5>
 						</div>
@@ -140,11 +143,10 @@ if(isset($_POST['inputNome'])){
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Sub Categoria" required autofocus>
 									</div>
 								</div>
-
 								<div class="col-lg-6">
 									<label for="cmbCategoria">Categoria</label>
-									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-										<option value="#">Selecione</option>
+									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+										<option value="">Selecione</option>
 										<?php 
 											$sql = ("SELECT CategId, CategNome
 													 FROM Categoria

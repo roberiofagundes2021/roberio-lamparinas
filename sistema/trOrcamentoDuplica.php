@@ -8,7 +8,7 @@ include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputOrcamentoId'])){
 
-	$sql = "SELECT TrXOrId, TrXOrTermoReferencia, TrXOrTipo, TrXOrCategoria, TrXOrConteudo, TrXOrFornecedor, TrXOrStatus
+	$sql = "SELECT TrXOrId, TrXOrTermoReferencia, TrXOrTipo, TrXOrCategoria, TrXOrConteudo, TrXOrStatus
 			FROM TRXOrcamento
 			WHERE TrXOrEmpresa = ". $_SESSION['EmpreId'] ." and TrXOrId = ".$_POST['inputOrcamentoId']."";
 	$result = $conn->query($sql);
@@ -37,7 +37,7 @@ if (isset($_POST['inputOrcamentoId'])){
 					':dData' => gravaData(date('d/m/Y')),
 					':iCategoria' => $rowOrcamento['TrXOrCategoria'] == '' ? null : $rowOrcamento['TrXOrCategoria'],
 					':sConteudo' => $rowOrcamento['TrXOrConteudo'],
-					':iFornecedor' => $rowOrcamento['TrXOrFornecedor'],
+					':iFornecedor' => 0,
 					':iSolicitante' => $_SESSION['UsuarId'],
 					':bStatus' => $rowOrcamento['TrXOrStatus'],
 					':iUsuarioAtualizador' => $_SESSION['UsuarId'],

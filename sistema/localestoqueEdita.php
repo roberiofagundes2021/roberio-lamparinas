@@ -95,7 +95,7 @@ if(isset($_POST['inputNome'])){
 				inputNomeNovo = inputNomeNovo.trim();
 				
 				//Verifica se o campo só possui espaços em branco
-				if (inputNomeNovo == ''){
+				/*if (inputNomeNovo == ''){
 					alerta('Atenção','Informe o local do estoque!','error');
 					$('#inputNome').focus();
 					return false;
@@ -106,7 +106,7 @@ if(isset($_POST['inputNome'])){
 					alerta('Atenção','Informe a unidade!','error');
 					$('#cmbUnidade').focus();
 					return false;
-				}
+				}*/
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -126,7 +126,10 @@ if(isset($_POST['inputNome'])){
 			})
 		})
 	</script>	
-
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 </head>
 
 <body class="navbar-top">
@@ -149,7 +152,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formLocalEstoque" id="formLocalEstoque" method="post" class="form-validate">
+					<form name="formLocalEstoque" id="formLocalEstoque" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Local do Estoque "<?php echo $row['LcEstNome']; ?>"</h5>
 						</div>
@@ -167,8 +170,8 @@ if(isset($_POST['inputNome'])){
 								</div>
 								<div class="col-lg-6">
 									<label for="cmbUnidade">Unidade</label>
-									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
-										<option value="#">Selecione</option>
+									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
+										<option value="">Selecione</option>
 										<?php 
 											$sql = ("SELECT UnidaId, UnidaNome
 													 FROM Unidade

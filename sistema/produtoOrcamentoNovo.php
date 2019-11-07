@@ -91,7 +91,7 @@ if(isset($_POST['inputNome'])){
                 const categId = $(e.target).val()
 
                 $.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
-					let option = '<option value="#" "selected">Selecione a SubCategoria</option>';
+					let option = '<option value="">Selecione a SubCategoria</option>';
 					
 					if (dados.length){
 						

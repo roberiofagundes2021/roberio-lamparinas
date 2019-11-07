@@ -86,11 +86,11 @@ if(isset($_POST['inputNome'])){
 				inputNomeNovo = inputNomeNovo.trim();
 				
 				//Verifica se o campo só possui espaços em branco
-				if (inputNomeNovo == ''){
+				/*if (inputNomeNovo == ''){
 					alerta('Atenção','Informe o fabricante!','error');
 					$('#inputNome').focus();
 					return false;
-				}
+				}*/
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -112,7 +112,10 @@ if(isset($_POST['inputNome'])){
 		})
 	
 	</script>
-
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 </head>
 
 <body class="navbar-top">
@@ -135,7 +138,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formFabricante" id="formFabricante" method="post" class="form-validate">
+					<form name="formFabricante" id="formFabricante" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Fabricante "<?php echo $row['FabriNome']; ?>"</h5>
 						</div>
