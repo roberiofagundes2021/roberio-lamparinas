@@ -103,7 +103,7 @@
 								<li class="nav-item"><a href="modelo.php" class="nav-link">Modelo</a></li>
 								<li class="nav-item"><a href="fabricante.php" class="nav-link">Fabricante</a></li>
 								<li class="nav-item"><a href="unidademedida.php" class="nav-link">Unidade de Medida</a></li>
-								<li class="nav-item"><a href="produtoOrcamento.php" class="nav-link">Produtos para Orçamento</a></li>		
+								<li class="nav-item"><a href="produtoOrcamento.php" class="nav-link">Produtos para Orçamento</a></li>
 								<li class="nav-item"><a href="localestoque.php" class="nav-link">Local do Estoque</a></li>
 							</ul>
 						</li>
@@ -113,6 +113,9 @@
 						</li>
 						<li class="nav-item">
 							<a href="produto.php" class="nav-link"><i class="icon-gift"></i> <span>Produto</span></a>
+						</li>
+						<li class="new-item">
+							<a href="servico.php" class="nav-link"><i class="icon-cogs"></i><span>Serviços</span></a>
 						</li>
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-bag"></i> <span>Compras</span></a>

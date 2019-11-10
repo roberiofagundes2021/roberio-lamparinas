@@ -2,16 +2,16 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Novo Produto';
+$_SESSION['PaginaAtual'] = 'Novo Serviço';
 
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputNome'])){
 	
 	try{		
-		$sql = "SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
-				FROM Produto
-				Where ProduEmpresa = ".$_SESSION['EmpreId']."";
+		$sql = "SELECT COUNT(isnull(ServCodigo,0)) as Codigo
+				FROM Servico
+				Where ServEmpresa = ".$_SESSION['EmpreId']."";
 		//echo $sql;die;
 		$result = $conn->query("$sql");
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
@@ -24,23 +24,19 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduDetalhamento, ProduFoto, ProduCategoria, ProduSubCategoria, ProduValorCusto, 
-									 ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
-									 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, ProduFabricante, ProduUnidadeMedida, 
-									 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
-									 ProduUsuarioAtualizador, ProduEmpresa) 
-				VALUES (:sCodigo, :sCodigoBarras, :sNome, :sDetalhamento, :sFoto, :iCategoria, :iSubCategoria, :fValorCusto, 
+		$sql = "INSERT INTO Servico (ServCodigo, ServNome, ServDetalhamento, ServCategoria, ServSubCategoria, ServValorCusto, 
+									 ServOutrasDespesas, ServCustoFinal, ServMargemLucro, ServValorVenda, 
+									 ServEstoqueMinimo, ServMarca, ServModelo, ServNumSerie, ServFabricante, ServStatus, 
+									 ServUsuarioAtualizador, ServEmpresa) 
+				VALUES (:sCodigo, :sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :fValorCusto, 
 						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, :sNumSerie, 
-						:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
-						:iUsuarioAtualizador, :iEmpresa)";
+						:iFabricante, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 						':sCodigo' => $sCodigo,
-						':sCodigoBarras' => $_POST['inputCodigoBarras'],
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
-						':sFoto' => isset($_POST['inputFoto']) ? $_POST['inputFoto'] : null,
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
@@ -53,11 +49,6 @@ if(isset($_POST['inputNome'])){
 						':iModelo' => $_POST['cmbModelo'] == '#' ? null : $_POST['cmbModelo'],
 						':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
 						':iFabricante' => $_POST['cmbFabricante'] == '#' ? null : $_POST['cmbFabricante'],
-						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
-						':iTipoFiscal' => $_POST['cmbTipoFiscal'] == '#' ? null : $_POST['cmbTipoFiscal'],
-						':iNcmFiscal' => $_POST['cmbNcmFiscal'] == '#' ? null : $_POST['cmbNcmFiscal'],
-						':iOrigemFiscal' => $_POST['cmbOrigemFiscal'] == '#' ? null : $_POST['cmbOrigemFiscal'],
-						':iCest' => $_POST['inputCest'] == '' ? null : $_POST['inputCest'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
@@ -77,7 +68,7 @@ if(isset($_POST['inputNome'])){
 		
 	}
 	
-	irpara("produto.php");
+	irpara("servico.php");
 } 
 
 ?>
@@ -88,7 +79,7 @@ if(isset($_POST['inputNome'])){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Produto</title>
+	<title>Lamparinas | Serviço</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -119,7 +110,7 @@ if(isset($_POST['inputNome'])){
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
 					
-					var option = '<option>Selecione a SubCategoria</option>';
+					var option = '<option value="">Selecione a SubCategoria</option>';
 					
 					if (dados.length){
 						
@@ -238,70 +229,18 @@ if(isset($_POST['inputNome'])){
 				inputValorVenda = float2moeda(inputValorVenda).toString();
 				
 				$('#inputValorVenda').val(inputValorVenda);
-			}
-			
-			//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
-			$('#addFoto').on('click', function(e){	
-				e.preventDefault(); // Isso aqui não deixa o formulário "formProduto" ser submetido ao clicar no INcluir Foto, ou seja, ao executar o método ajax
-			
-				$('#imagem').trigger("click");
-			});			
-			
-			// #imagem é o id do input, ao alterar o conteudo do input execurará a função abaixo
-			$('#imagem').on('change',function(){
-
-				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
-								
-				// Get form
-				var form = $('#formFoto')[0];
-				var formData = new FormData(form);
-				//var inputFoto = $('#inputFoto').val();
-				//alert($('#imagem')[0].files[0]);
-				
-				formData.append('file', $('#imagem')[0].files[0] );
-				//formData.append('foto', inputFoto );
-				
-				$.ajax({
-					type: "POST",
-					enctype: 'multipart/form-data',
-					url: "upload.php",
-					processData: false,  // impedir que o jQuery tranforma a "data" em querystring					
-					contentType: false,  // desabilitar o cabeçalho "Content-Type"
-					cache: false, // desabilitar o "cache"
-					data: formData,//{imagem: inputImagem},
-					success: function(resposta){
-						//console.log(resposta);
-						
-						$('#visualizar').html(resposta);
-						$('#addFoto').text("Alterar Foto...");
-						
-						//Aqui sou obrigado a instanciar novamente a utilização do fancybox
-						$(".fancybox").fancybox({
-							// options
-						});	
-						
-						return false;						
-					}
-				}); //ajax
-				
-				//$('#formFoto').submit();
-				
-				// Efetua o Upload sem dar refresh na pagina
-				$('#formFoto').ajaxForm({
-					target:'#visualizar' // o callback será no elemento com o id #visualizar
-				}).submit();
-			});			
+			}	
 			
 			function Filtrando(){
 				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
 			}
 			
 			function Reset(){
-				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+				$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
 			}
 
 			//Valida Registro Duplicado
-			$('#enviar').on('click', function(e){
+			/*$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
 				
@@ -312,33 +251,21 @@ if(isset($_POST['inputNome'])){
 				
 				//Verifica se o campo só possui espaços em branco
 				if (inputNome == ''){
-					alerta('Atenção','Informe o nome do produto!','error');
+					alerta('Atenção','Informe o nome do servico!','error');
 					$('#inputNome').focus();
 					return false;
 				}
 				
-				$( "#formProduto" ).submit();
+				$( "#formServico" ).submit();
 				
-			}); // enviar
+			}); // enviar*/
 			
 			//Valida Registro Duplicado
 			$('#cancelar').on('click', function(e){
 				
-				e.preventDefault();
+				e.preventDefault();		
 				
-				var inputFoto = $('#inputFoto').val();
-				
-				//Esse ajax está sendo usado para excluir a imagem que nao será mais usada
-				$.ajax({
-					type: "POST",
-					url: "produtoExcluiImagem.php",
-					data: ('foto='+inputFoto),
-					success: function(resposta){
-						
-					}
-				})				
-				
-				$(window.document.location).attr('href',"produto.php");
+				$(window.document.location).attr('href',"servico.php");
 				
 			}); // cancelar		
 		});			
@@ -368,6 +295,9 @@ if(isset($_POST['inputNome'])){
 		}		
 		
 	</script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	
 </head>
 
@@ -391,9 +321,9 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form id="formProduto" name="formProduto" method="post" class="form-validate">
+					<form id="formServico" name="formServico" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Produto</h5>
+							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Serviço</h5>
 						</div>
 						
 						<div class="card-body">								
@@ -401,30 +331,19 @@ if(isset($_POST['inputNome'])){
 							<div class="media">								
 								
 								<div class="media-body">
-									
-									<div class="row">
-										<div class="col-lg-8">
-											<div class="form-group">
-												<label for="inputCodigoBarras">Código de Barras</label>
-												<input type="text" id="inputCodigoBarras" name="inputCodigoBarras" class="form-control" placeholder="Código de Barras" autofocus>
-											</div>	
-										</div>
-										
-										<div class="col-lg-4">
-											<div class="form-group">				
-												<label for="inputEstoqueMinimo">Estoque Mínimo</label>
-												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo">
-											</div>	
-										</div>						
-									</div>
-									
 									<div class="row">	
-										<div class="col-lg-12">
+										<div class="col-lg-8">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
 										</div>
+										<div class="col-lg-4">
+											<div class="form-group">				
+												<label for="inputEstoqueMinimo">Estoque Mínimo</label>
+												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo" required>
+											</div>	
+										</div>		
 									</div>
 									
 									<div class="row">
@@ -438,14 +357,6 @@ if(isset($_POST['inputNome'])){
 																		
 								</div> <!-- media-body -->
 								
-								<div style="text-align:center;">
-									<div id="visualizar">										
-										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:250px; border:2px solid #ccc;">
-									</div>
-									<br>
-									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%">Adicionar Foto...</button>	
-								</div>
-								
 							</div> <!-- media -->
 														
 							<div class="row">
@@ -456,8 +367,8 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php 
 														$sql = ("SELECT CategId, CategNome
 																 FROM Categoria															     
@@ -478,8 +389,8 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php 
 														/*$sql = ("SELECT SbCatId, SbCatNome
 																 FROM SubCategoria															     
@@ -516,7 +427,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorCusto">Valor de Custo</label>
-												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" onKeyUp="moeda(this)" maxLength="12">
+												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" onKeyUp="moeda(this)" maxLength="12" required>
 											</div>
 										</div>
 										
@@ -557,8 +468,8 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbMarca">Marca</label>
-												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php 
 														$sql = ("SELECT MarcaId, MarcaNome
 																 FROM Marca															     
@@ -580,7 +491,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbModelo">Modelo</label>
 												<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+													<option value="">Selecione</option>
 													<?php 
 														$sql = ("SELECT ModelId, ModelNome
 																 FROM Modelo
@@ -602,7 +513,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbFabricante">Fabricante</label>
 												<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+													<option value="">Selecione</option>
 													<?php 
 														$sql = ("SELECT FabriId, FabriNome
 																 FROM Fabricante
@@ -619,121 +530,21 @@ if(isset($_POST['inputNome'])){
 												</select>
 											</div>
 										</div>
-
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputNumSerie">Número de Série</label>
-												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série">
+												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série" required>
 											</div>
 										</div>	
 									</div>
 								</div>
 							</div>
 							<br>
-							
-							<div class="row">
-								<div class="col-lg-12">									
-									<h5 class="mb-0 font-weight-semibold">Dados Fiscais</h5>
-									<br>
-									<div class="row">								
-										<div class="col-lg-3">
-											<label for="cmbUnidadeMedida">Unidade de Medida</label>
-											<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control form-control-select2">
-												<option value="#">Selecione</option>
-												<?php 
-													$sql = ("SELECT UnMedId, UnMedNome, UnMedSigla
-															 FROM UnidadeMedida
-															 WHERE UnMedStatus = 1 and UnMedEmpresa = ".$_SESSION['EmpreId']."
-															 ORDER BY UnMedNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($row as $item){
-														print('<option value="'.$item['UnMedId'].'">'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
-													}
-												
-												?>
-											</select>
-										</div>
-										
-										<div class="col-lg-3">
-											<label for="cmbTipoFiscal">Tipo</label>
-											<select id="cmbTipoFiscal" name="cmbTipoFiscal" class="form-control form-control-select2">
-												<option value="#">Selecione</option>
-												<?php 
-													$sql = ("SELECT TpFisId, TpFisNome
-															 FROM TipoFiscal
-															 WHERE TpFisStatus = 1
-															 ORDER BY TpFisNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($row as $item){
-														print('<option value="'.$item['TpFisId'].'">'.$item['TpFisNome'].'</option>');
-													}
-												
-												?>
-											</select>
-										</div>
-																			
-										<div class="col-lg-4">
-											<label for="cmbOrigemFiscal">Origem</label>
-											<select id="cmbOrigemFiscal" name="cmbOrigemFiscal" class="form-control form-control-select2">
-												<option value="#">Selecione</option>
-												<?php 
-													$sql = ("SELECT OrFisId, OrFisNome
-															 FROM OrigemFiscal
-															 WHERE OrFisStatus = 1
-															 ORDER BY OrFisNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($row as $item){
-														$seleciona = $item['OrFisNome'] == 'Nacional' ? "selected" : "";
-														print('<option value="'.$item['OrFisId'].'" '.$seleciona.'>'.$item['OrFisNome'].'</option>');
-													}
-												
-												?>
-											</select>
-										</div>
-
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputCest">CEST</label>
-												<input type="text" id="inputCest" name="inputCest" class="form-control" placeholder="CEST">
-											</div>
-										</div>										
-									</div> <!-- /row -->
-									
-									<div class="row">
-										<div class="col-lg-12">
-											<label for="cmbNcmFiscal">NCM</label>
-											<select id="cmbNcmFiscal" name="cmbNcmFiscal" class="form-control form-control-select2">
-												<option value="#">Selecione um NCM</option>
-												<?php 
-													$sql = ("SELECT BancoId, BancoCodigo, BancoNome
-															 FROM Banco
-															 WHERE BancoStatus = 1
-															 ORDER BY BancoCodigo ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($row as $item){
-														print('<option value="'.$item['BancoId'].'">'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
-													}
-												
-												?>
-											</select>
-										</div>
-									</div>
-								</div> <!-- /col -->
-							</div>	<!-- /row -->
-
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
-										<a href="produto.php" class="btn btn-lg" id="cancelar">Cancelar</a>
+										<a href="servico.php" class="btn btn-lg" id="cancelar">Cancelar</a>
 									</div>
 								</div>
 							</div>
@@ -742,11 +553,6 @@ if(isset($_POST['inputNome'])){
 						<!-- /card-body -->
 
 					</form>
-					
-					<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
-						<input type="file" id="imagem" name="imagem" style="display:none;" />
-					</form>	
-					
 				</div>
 				<!-- /info blocks -->
 
