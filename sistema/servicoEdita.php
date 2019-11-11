@@ -333,7 +333,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-2">
 											<div class="form-group">				
 												<label for="inputEstoqueMinimo">Estoque Mínimo</label>
-												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo" value="<?php echo $row['ServEstoqueMinimo']; ?>" required>
+												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo" value="<?php echo $row['ServEstoqueMinimo']; ?>">
 											</div>	
 										</div>															
 									</div>
@@ -422,7 +422,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorCusto">Valor de Custo</label>
-												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="<?php echo $valorCusto; ?>" onKeyUp="moeda(this)" maxLength="12" required>
+												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="<?php echo $valorCusto; ?>" onKeyUp="moeda(this)" maxLength="12">
 											</div>
 										</div>
 										
@@ -463,7 +463,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbMarca">Marca</label>
-												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2" required>
+												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													<?php 
 														$sql = ("SELECT MarcaId, MarcaNome
@@ -532,7 +532,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputNumSerie">Número de Série</label>
-												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série" value="<?php echo $numSerie; ?>" required>
+												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série" value="<?php echo $numSerie; ?>">
 											</div>
 										</div>								
 									</div>

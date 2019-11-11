@@ -341,7 +341,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">				
 												<label for="inputEstoqueMinimo">Estoque Mínimo</label>
-												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo" required>
+												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo">
 											</div>	
 										</div>		
 									</div>
@@ -350,7 +350,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtDetalhamento">Detalhamento</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do produto"></textarea>
+												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do Serviço"></textarea>
 											</div>
 										</div>
 									</div>
@@ -427,7 +427,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorCusto">Valor de Custo</label>
-												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" onKeyUp="moeda(this)" maxLength="12" required>
+												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" onKeyUp="moeda(this)" maxLength="12">
 											</div>
 										</div>
 										
@@ -468,7 +468,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbMarca">Marca</label>
-												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2" required>
+												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													<?php 
 														$sql = ("SELECT MarcaId, MarcaNome
@@ -533,7 +533,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputNumSerie">Número de Série</label>
-												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série" required>
+												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série">
 											</div>
 										</div>	
 									</div>
