@@ -105,6 +105,9 @@
 								<li class="nav-item"><a href="unidademedida.php" class="nav-link">Unidade de Medida</a></li>
 								<li class="nav-item"><a href="produtoOrcamento.php" class="nav-link">Produtos para Orçamento</a></li>
 								<li class="nav-item"><a href="localestoque.php" class="nav-link">Local do Estoque</a></li>
+								<li class="nav-item"><a href="centroCusto.php" class="nav-link">Centro de Custo</a></li>
+								<li class="nav-item"><a href="planoContas.php" class="nav-link">Plano de Contas</a></li>
+								<li class="nav-item"><a href="formaPagamento.php" class="nav-link">Forma de Pagamento</a></li>
 							</ul>
 						</li>
 						
