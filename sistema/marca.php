@@ -41,6 +41,37 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- /theme JS files -->	
 	
 	<script>
+
+		$(document).ready(function (){	
+			$('#tblMarca').DataTable( {
+				"order": [[ 1, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+				{
+					orderable: true,   //Marca
+					width: "70%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "15%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //Ações
+					width: "15%",
+					targets: [2]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+		})
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaMarca(MarcaId, MarcaNome, MarcaStatus, Tipo){
@@ -105,7 +136,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="text-right"><a href="marcaNovo.php" class="btn btn-success" role="button">Nova Marca</a></div>
 							</div>
 							
-							<table class="table datatable-responsive">
+							<table id="tblMarca" class="table">
 								<thead>
 									<tr class="bg-slate">
 										<th>Marca</th>

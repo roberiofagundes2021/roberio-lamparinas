@@ -2,15 +2,16 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Fabricante';
+$_SESSION['PaginaAtual'] = 'Plano de Contas';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT FabriId, FabriNome, FabriStatus
-		 FROM Fabricante
-	     WHERE FabriEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY FabriNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT PlConId, PlConNome, PlConStatus, CeCusNome
+		 FROM PlanoContas
+		 JOIN CentroCusto on CeCusId = PlConCentroCusto
+	     WHERE PlConEmpresa = ". $_SESSION['EmpreId'] ."
+		 ORDER BY PlConNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -22,13 +23,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Fabricante</title>
+	<title>Lamparinas | Plano de Contas</title>
 
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
+	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
@@ -38,30 +41,37 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
 	<script src="global_assets/js/demo_pages/components_popups.js"></script>
+
+
 	<!-- /theme JS files -->	
 	
 	<script>
 
 		$(document).ready(function (){	
-			$('#tblFabricante').DataTable( {
+			$('#tblPlanoContas').DataTable( {
 				"order": [[ 1, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [
 				{
-					orderable: true,   //Fabricante
-					width: "70%",
+					orderable: true,   //Plano de Contas
+					width: "35%",
 					targets: [0]
+				},	
+				{
+					orderable: true,   //Centro de Custo
+					width: "35%",
+					targets: [1]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "15%",
-					targets: [1]
+					targets: [2]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "15%",
-					targets: [2]
+					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -74,24 +84,21 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		})
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaFabricante(FabriId, FabriNome, FabriStatus, Tipo){
+		function atualizaPlanoContas(PlConId, PlConNome, PlConStatus, Tipo){
 		
-			document.getElementById('inputFabricanteId').value = FabriId;
-			document.getElementById('inputFabricanteNome').value = FabriNome;
-			document.getElementById('inputFabricanteStatus').value = FabriStatus;
+			document.getElementById('inputPlanoContasId').value = PlConId;
+			document.getElementById('inputPlanoContasNome').value = PlConNome;
+			document.getElementById('inputPlanoContasStatus').value = PlConStatus;
 					
 			if (Tipo == 'edita'){	
-				document.formFabricante.action = "fabricanteEdita.php";		
+				document.formPlanoContas.action = "planoContasEdita.php";		
 			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formFabricante, "Tem certeza que deseja excluir esse fabricante?", "fabricanteExclui.php");
+				confirmaExclusao(document.formPlanoContas, "Tem certeza que deseja excluir esse Plano de Contas?", "planoContasExclui.php");
 			} else if (Tipo == 'mudaStatus'){
-				document.formFabricante.action = "fabricanteMudaSituacao.php";
-			} else if (Tipo == 'imprime'){
-				document.formFabricante.action = "fabricanteImprime.php";
-				document.formFabricante.setAttribute("target", "_blank");
+				document.formPlanoContas.action = "planoContasMudaSituacao.php";
 			}
 			
-			document.formFabricante.submit();
+			document.formPlanoContas.submit();
 		}		
 			
 	</script>
@@ -121,25 +128,26 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Fabricantes</h3>
+								<h3 class="card-title">Relação de Planos de Contas</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="fabricante.php" class="list-icons-item" data-action="reload"></a>
+										<a href="subcategoria.php" class="list-icons-item" data-action="reload"></a>
 										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos fabricantes da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
-								<div class="text-right"><a href="fabricanteNovo.php" class="btn btn-success" role="button">Novo Fabricante</a></div>
+								<p class="font-size-lg">A relação abaixo faz referência às Planos de Contas da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<div class="text-right"><a href="planoContasNovo.php" class="btn btn-success" role="button">Novo Plano de Contas</a></div>
 							</div>
 							
-							<table id="tblFabricante" class="table">
+							<table id="tblPlanoContas" class="table">
 								<thead>
 									<tr class="bg-slate">
-										<th>Fabricante</th>
+										<th>Plano de Contas</th>
+										<th>Centro de Custo</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -148,21 +156,22 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['FabriStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['FabriStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['PlConStatus'] ? 'Ativo' : 'Inativo';
+										$situacaoClasse = $item['PlConStatus'] ? 'badge-success' : 'badge-secondary';
 										
 										print('
 										<tr>
-											<td>'.$item['FabriNome'].'</td>
+											<td>'.$item['PlConNome'].'</td>
+											<td>'.$item['CeCusNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaFabricante('.$item['FabriId'].', \''.$item['FabriNome'].'\','.$item['FabriStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaPlanoContas('.$item['PlConId'].', \''.$item['PlConNome'].'\','.$item['PlConStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaFabricante('.$item['FabriId'].', \''.$item['FabriNome'].'\','.$item['FabriStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaFabricante('.$item['FabriId'].', \''.$item['FabriNome'].'\','.$item['FabriStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														<a href="#" onclick="atualizaPlanoContas('.$item['PlConId'].', \''.$item['PlConNome'].'\','.$item['PlConStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaPlanoContas('.$item['PlConId'].', \''.$item['PlConNome'].'\','.$item['PlConStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
 											</td>
@@ -180,10 +189,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<!-- /info blocks -->
 				
-				<form name="formFabricante" method="post">
-					<input type="hidden" id="inputFabricanteId" name="inputFabricanteId" >
-					<input type="hidden" id="inputFabricanteNome" name="inputFabricanteNome" >
-					<input type="hidden" id="inputFabricanteStatus" name="inputFabricanteStatus" >
+				<form name="formPlanoContas" method="post">
+					<input type="hidden" id="inputPlanoContasId" name="inputPlanoContasId" >
+					<input type="hidden" id="inputPlanoContasNome" name="inputPlanoContasNome" >
+					<input type="hidden" id="inputPlanoContasStatus" name="inputPlanoContasStatus" >
 				</form>
 
 			</div>

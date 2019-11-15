@@ -38,10 +38,46 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
 	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script
+	<script src="global_assets/js/demo_pages/components_popups.js"></script>
 	<!-- /theme JS files -->	
 	
 	<script>
+
+		$(document).ready(function (){	
+			$('#tblSubCategoria').DataTable( {
+				"order": [[ 1, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+				{
+					orderable: true,   //SubCategoria
+					width: "35%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Categoria
+					width: "35%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "15%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //Ações
+					width: "15%",
+					targets: [2]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+		})
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaSubCategoria(SbCatId, SbCatNome, SbCatStatus, Tipo){
@@ -106,7 +142,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="text-right"><a href="subcategoriaNovo.php" class="btn btn-success" role="button">Nova Sub Categoria</a></div>
 							</div>
 							
-							<table class="table datatable-responsive">
+							<table id="tblSubCategoria" class="table">
 								<thead>
 									<tr class="bg-slate">
 										<th>Sub Categoria</th>

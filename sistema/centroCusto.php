@@ -30,13 +30,43 @@ $count = count($row);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	
 	<!-- /theme JS files -->	
 	
 	<script>
+
+		$(document).ready(function (){	
+			$('#tblCentroCusto').DataTable( {
+				"order": [[ 1, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+				{
+					orderable: true,   //Centro de Custo
+					width: "70%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "15%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //Ações
+					width: "15%",
+					targets: [2]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+		})
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaCentroCusto(CeCusId, CeCusNome, CeCusStatus, Tipo){
@@ -99,7 +129,7 @@ $count = count($row);
 							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->
-							<table class="table datatable-responsive">
+							<table id="tblCentroCusto" class="table">
 								<thead>
 									<tr class="bg-slate">
 										<th data-filter>Centro de Custo</th>

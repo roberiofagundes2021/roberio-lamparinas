@@ -6,10 +6,10 @@ $_SESSION['PaginaAtual'] = 'Forma de Pagamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT FoPagId, FoPagNome, FoPagStatus
+$sql = "SELECT FrPagId, FrPagNome, FrPagStatus
 		FROM FormaPagamento
-	    WHERE FoPagEmpresa = ". $_SESSION['EmpreId'] ."
-		ORDER BY FoPagNome ASC";
+	    WHERE FrPagEmpresa = ". $_SESSION['EmpreId'] ."
+		ORDER BY FrPagNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
@@ -37,20 +37,51 @@ $count = count($row);
 	<!-- /theme JS files -->	
 	
 	<script>
+
+		$(document).ready(function (){	
+			$('#tblFormaPagamento').DataTable( {
+				"order": [[ 1, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+				{
+					orderable: true,   //Forma Pagamento
+					width: "70%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "15%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //Ações
+					width: "15%",
+					targets: [2]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+		})
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaCentroCusto(FoPagId, FoPagNome, FoPagStatus, Tipo){
+		function atualizaFormaPagamento(FrPagId, FrPagNome, FrPagStatus, Tipo){
 		
-			document.getElementById('inputFormaPagamentoId').value = FoPagId;
-			document.getElementById('inputFormaPagamentoNome').value = FoPagNome;
-			document.getElementById('inputFormaPagamentoStatus').value = FoPagStatus;
+			document.getElementById('inputFormaPagamentoId').value = FrPagId;
+			document.getElementById('inputFormaPagamentoNome').value = FrPagNome;
+			document.getElementById('inputFormaPagamentoStatus').value = FrPagStatus;
 					
 			if (Tipo == 'edita'){	
-				document.formCentroCusto.action = "formaPagamentoEdita.php";		
+				document.formFormaPagamento.action = "formaPagamentoEdita.php";		
 			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formCentroCusto, "Tem certeza que deseja excluir essa Forma de Pagamento?", "formaPagamentoExclui.php");
+				confirmaExclusao(document.formFormaPagamento, "Tem certeza que deseja excluir essa Forma de Pagamento?", "formaPagamentoExclui.php");
 			} else if (Tipo == 'mudaStatus'){
-				document.formCentroCusto.action = "formaPagamentoSituacao.php";
+				document.formFormaPagamento.action = "formaPagamentoMudaSituacao.php";
 			} 
 			
 			document.formFormaPagamento.submit();
@@ -99,7 +130,7 @@ $count = count($row);
 							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->
-							<table class="table datatable-responsive">
+							<table id="tblFormaPagamento" class="table">
 								<thead>
 									<tr class="bg-slate">
 										<th data-filter>Forma de Pagamento</th>
@@ -111,21 +142,21 @@ $count = count($row);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['FoPagStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['FoPagStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['FrPagStatus'] ? 'Ativo' : 'Inativo';
+										$situacaoClasse = $item['FrPagStatus'] ? 'badge-success' : 'badge-secondary';
 										
 										print('
 										<tr>
-											<td>'.$item['FoPagNome'].'</td>
+											<td>'.$item['FrPagNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaCentroCusto('.$item['FoPagId'].', \''.$item['FoPagNome'].'\','.$item['FoPagStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\','.$item['FrPagStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCentroCusto('.$item['FoPagId'].', \''.$item['FoPagNome'].'\','.$item['FoPagStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCentroCusto('.$item['FoPagId'].', \''.$item['FoPagNome'].'\','.$item['FoPagStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\','.$item['FrPagStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\','.$item['FrPagStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>
@@ -142,7 +173,7 @@ $count = count($row);
 				
 				<!-- /info blocks -->
 				
-				<form name="formFormaPagamento" method="post" action="centroCustoEdita.php">
+				<form name="formFormaPagamento" method="post" action="formaPagamentoEdita.php">
 					<input type="hidden" id="inputFormaPagamentoId" name="inputFormaPagamentoId" >
 					<input type="hidden" id="inputFormaPagamentoNome" name="inputFormaPagamentoNome" >
 					<input type="hidden" id="inputFormaPagamentoStatus" name="inputFormaPagamentoStatus" >
