@@ -23,10 +23,10 @@ if(isset($_POST['inputCategoriaId'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir categoria!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir categoria!!! Geralmente isso ocorre quando o registro a ser excluido esta sendo usado em outro local.";
 		$_SESSION['msg']['tipo'] = "error";			
 		
-		echo 'Error: ' . $e->getMessage();
+		//echo 'Error: ' . $e->getMessage();die;
 	}
 }
 
