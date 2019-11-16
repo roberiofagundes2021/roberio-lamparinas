@@ -143,7 +143,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="inputNome">Nome da Forma de Pagamento</label>
+										<label for="inputNome">Forma de Pagamento</label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Forma de Pagamento" value="<?php echo $row['FrPagNome']; ?>" required autofocus>
 									</div>
 								</div>

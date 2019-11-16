@@ -17,13 +17,13 @@ if(isset($_POST['inputFormaPagamentoId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "FormaPagamento excluída!!!";
+		$_SESSION['msg']['mensagem'] = "Forma de Pagamento excluída!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir FormaPagamento!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir Forma de Pagamento!!!";
 		$_SESSION['msg']['tipo'] = "error";			
 		
 		echo 'Error: ' . $e->getMessage();

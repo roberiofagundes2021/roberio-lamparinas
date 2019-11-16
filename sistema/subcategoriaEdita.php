@@ -112,11 +112,11 @@ if(isset($_POST['inputNome'])){
 				$.ajax({
 					type: "POST",
 					url: "subcategoriaValida.php",
-					data: ('nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho),
+					data: {nome : inputNomeNovo, categoria: cmbCategoria},
 					success: function(resposta){
 						
 						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
+							alerta('Atenção','Uma subcategoria com esse nome já está ligada a categoria selecionada.','error');
 							return false;
 						}
 						

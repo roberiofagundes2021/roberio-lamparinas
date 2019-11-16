@@ -88,7 +88,7 @@ if(isset($_POST['inputNome'])){
 				e.preventDefault();
 				
 				var inputNomeNovo  = $('#inputNome').val();
-				var inputNomeVelho = $('#inputPlanoContasNome').val();
+				//var inputNomeVelho = $('#inputPlanoContasNome').val();
 				var cmbCentroCusto   = $('#cmbCentroCusto').val();
 				
 				//remove os espaços desnecessários antes e depois
@@ -112,11 +112,11 @@ if(isset($_POST['inputNome'])){
 				$.ajax({
 					type: "POST",
 					url: "planoContasValida.php",
-					data: ('nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho),
+					data: {nome : inputNomeNovo, centroCusto : cmbCentroCusto},
 					success: function(resposta){
 						
 						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
+							alerta('Atenção','Já exite Centro de Custo ligado a um Plano de Contas com este nome!!','error');
 							return false;
 						}
 						
@@ -169,7 +169,7 @@ if(isset($_POST['inputNome'])){
 									</div>
 								</div>
 								<div class="col-lg-6">
-									<label for="cmbCentroCusto">Categoria</label>
+									<label for="cmbCentroCusto">Centro de Custo</label>
 									<select id="cmbCentroCusto" name="cmbCentroCusto" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 

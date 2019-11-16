@@ -90,13 +90,14 @@ if(isset($_POST['inputNome'])){
 				$.ajax({
 					type: "POST",
 					url: "planoContasValida.php",
-					data: ('nome='+inputNome),
+					data: {nome : inputNome, centroCusto : cmbCentroCusto},
 					success: function(resposta){
 						
 						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
+							alerta('Atenção','Já exite Centro de Custo ligado a um Plano de Contas com este nome!','error');
 							return false;
 						}
+						console.log(resposta)
 						
 						$( "#formPlanoContas" ).submit();
 					}

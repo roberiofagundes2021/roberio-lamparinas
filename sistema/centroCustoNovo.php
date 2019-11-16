@@ -116,7 +116,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="inputNome">Nome do Centro de Custo</label>
+										<label for="inputNome">Centro de Custo</label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Centro de Custo" required autofocus>
 									</div>
 								</div>
