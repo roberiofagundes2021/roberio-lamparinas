@@ -95,6 +95,13 @@ if(isset($_POST['inputNome'])){
 				inputNomeNovo = inputNomeNovo.trim();
 				
 				//Verifica se o campo só possui espaços em branco
+				if (inputNomeNovo == ''){
+					alerta('Atenção','Informe o local de estoque!','error');
+					$('#inputNome').focus();
+					return false;
+				}
+				
+				//Verifica se o campo só possui espaços em branco
 				/*if (inputNomeNovo == ''){
 					alerta('Atenção','Informe o local do estoque!','error');
 					$('#inputNome').focus();

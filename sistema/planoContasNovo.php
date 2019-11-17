@@ -70,7 +70,15 @@ if(isset($_POST['inputNome'])){
 				var cmbCentroCusto = $('#cmbCentroCusto').val();
 				
 				//remove os espaços desnecessários antes e depois
-				//inputNome = inputNome.trim();
+				inputNome = inputNome.trim();
+
+
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == ''){
+					alerta('Atenção','Informe o Plano de Contas!','error');
+					$('#inputNome').focus();
+					return false;
+				}
 				
 				//Verifica se o campo só possui espaços em branco
 				/*if (inputNome == ''){

@@ -70,6 +70,16 @@ if(isset($_POST['inputNome'])){
 				var cmbCategoria = $('#cmbCategoria').val();
 				
 				//remove os espaços desnecessários antes e depois
+				inputNomeNovo = inputNome.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNomeNovo == ''){
+					alerta('Atenção','Informe a subcategoria!','error');
+					$('#inputNome').focus();
+					return false;
+				}
+				
+				//remove os espaços desnecessários antes e depois
 				//inputNome = inputNome.trim();
 				
 				//Verifica se o campo só possui espaços em branco

@@ -25,7 +25,7 @@ if(isset($_POST['inputPlanoContasId'])){
 	$_SESSION['msg'] = array();
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
-	irpara("planoContas.php");
+	//irpara("planoContas.php");
 }
 
 if(isset($_POST['inputNome'])){
@@ -90,9 +90,17 @@ if(isset($_POST['inputNome'])){
 				var inputNomeNovo  = $('#inputNome').val();
 				//var inputNomeVelho = $('#inputPlanoContasNome').val();
 				var cmbCentroCusto   = $('#cmbCentroCusto').val();
+				var inputPlanoContasId = $('#inputPlanoContasId').val();
 				
 				//remove os espaços desnecessários antes e depois
 				inputNomeNovo = inputNomeNovo.trim();
+
+				//Verifica se o campo só possui espaços em branco
+				if (inputNomeNovo == ''){
+					alerta('Atenção','Informe o Plano de Contas!','error');
+					$('#inputNome').focus();
+					return false;
+				}
 				
 				//Verifica se o campo só possui espaços em branco
 				/*if (inputNomeNovo == ''){
@@ -112,9 +120,9 @@ if(isset($_POST['inputNome'])){
 				$.ajax({
 					type: "POST",
 					url: "planoContasValida.php",
-					data: {nome : inputNomeNovo, centroCusto : cmbCentroCusto},
+					data: {nome : inputNomeNovo, centroCusto : cmbCentroCusto, planoContasId : inputPlanoContasId},
 					success: function(resposta){
-						
+						console.log(resposta)
 						if(resposta == 1){
 							alerta('Atenção','Já exite Centro de Custo ligado a um Plano de Contas com este nome!!','error');
 							return false;

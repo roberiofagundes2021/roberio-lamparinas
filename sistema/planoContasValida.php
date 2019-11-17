@@ -17,7 +17,17 @@ $count = count($row);
 
 //Verifica se já existe esse registro (se existir, retorna true )
 if($count){
-	echo 1;
+	if(isset($_POST['planoContasId'])){
+        foreach ($row as $PlanoContas) {
+	        if($PlanoContas['PlConId'] == $_POST['planoContasId']){
+		       echo 0;
+	        } else {
+               echo 1;
+	        }
+	    }
+	} else {
+		echo 1;
+	}
 } else{
 	echo 0;
 }

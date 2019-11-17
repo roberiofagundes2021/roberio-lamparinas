@@ -65,6 +65,15 @@ if(isset($_POST['inputNome'])){
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
 				inputSigla = inputSigla.trim();
+
+
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == ''){
+					alerta('Atenção','Informe a Unidade de Medida!','error');
+					$('#inputNome').focus();
+					return false;
+				}
 				
 				//Verifica se o campo só possui espaços em branco
 				/*if (inputNome == ''){

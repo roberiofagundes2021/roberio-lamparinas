@@ -61,7 +61,14 @@ if(isset($_POST['inputNome'])){
 				var inputNome = $('#inputNome').val();
 				
 				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
+				inputNomeNovo = inputNome.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNomeNovo == ''){
+					alerta('Atenção','Informe a marca!','error');
+					$('#inputNome').focus();
+					return false;
+				}
 				
 				//Verifica se o campo só possui espaços em branco
 				/*if (inputNome == ''){

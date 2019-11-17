@@ -90,9 +90,18 @@ if(isset($_POST['inputNome'])){
 				var inputNomeNovo  = $('#inputNome').val();
 				var inputNomeVelho = $('#inputSubCategoriaNome').val();
 				var cmbCategoria   = $('#cmbCategoria').val();
+				var subCategoriaId = $('#inputSubCategoriaId').val();
 				
+
 				//remove os espaços desnecessários antes e depois
-				inputNomeNovo = inputNomeNovo.trim();
+				inputNome = inputNomeNovo.trim();
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == ''){
+					alerta('Atenção','Informe a subcategoria!','error');
+					$('#inputNome').focus();
+					return false;
+				}
 				
 				//Verifica se o campo só possui espaços em branco
 				/*if (inputNomeNovo == ''){
@@ -112,9 +121,9 @@ if(isset($_POST['inputNome'])){
 				$.ajax({
 					type: "POST",
 					url: "subcategoriaValida.php",
-					data: {nome : inputNomeNovo, categoria: cmbCategoria},
+					data: {nome : inputNomeNovo, categoria: cmbCategoria, subcategoriaId : subCategoriaId},
 					success: function(resposta){
-						
+						console.log(resposta)
 						if(resposta == 1){
 							alerta('Atenção','Uma subcategoria com esse nome já está ligada a categoria selecionada.','error');
 							return false;

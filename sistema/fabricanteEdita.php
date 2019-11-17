@@ -86,6 +86,13 @@ if(isset($_POST['inputNome'])){
 				inputNomeNovo = inputNomeNovo.trim();
 				
 				//Verifica se o campo só possui espaços em branco
+				if (inputNomeNovo == ''){
+					alerta('Atenção','Informe a marca!','error');
+					$('#inputNome').focus();
+					return false;
+				}
+				
+				//Verifica se o campo só possui espaços em branco
 				/*if (inputNomeNovo == ''){
 					alerta('Atenção','Informe o fabricante!','error');
 					$('#inputNome').focus();
