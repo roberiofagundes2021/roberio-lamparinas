@@ -32,8 +32,7 @@ $count = count($row);
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	
+	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>	
 	<!-- /theme JS files -->	
 	
 	<script type="text/javascript">
@@ -43,12 +42,27 @@ $count = count($row);
 			/* Início: Tabela Personalizada */
 			$('#tblBanco').DataTable( {
 				"order": [[ 0, "asc" ]],
-			    autoWidth: true,
+			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{ 
-					orderable: false,
-					width: 100,
-					targets: [ 3 ]
+					orderable: true,  //Codigo
+					width: "15%",
+					targets: [0]
+				},	
+				{
+					orderable: true,   //Nome do Banco
+					width: "55%",
+					targets: [1]
+				},	
+				{
+					orderable: true,   //Situacao
+					width: "15%",
+					targets: [2]
+				},	
+				{
+					orderable: false,   //Acoes
+					width: "15%",
+					targets: [3]
 				}], 
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -138,7 +152,7 @@ $count = count($row);
 								<div class="text-right"><a href="bancoNovo.php" class="btn btn-success" role="button">Novo Banco</a></div>
 							</div>							
 
-							<table class="table" id="tblBanco">
+							<table id="tblBanco" class="table">
 								<thead>
 									<tr class="bg-slate">
 										<th>Código do Banco</th>

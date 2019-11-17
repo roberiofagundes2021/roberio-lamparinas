@@ -103,11 +103,11 @@
 								<li class="nav-item"><a href="modelo.php" class="nav-link">Modelo</a></li>
 								<li class="nav-item"><a href="fabricante.php" class="nav-link">Fabricante</a></li>
 								<li class="nav-item"><a href="unidademedida.php" class="nav-link">Unidade de Medida</a></li>
-								<li class="nav-item"><a href="produtoOrcamento.php" class="nav-link">Produtos para Orçamento</a></li>
+								<li class="nav-item"><a href="produtoOrcamento.php" class="nav-link">Produtos para Orçamento</a></li>		
 								<li class="nav-item"><a href="localestoque.php" class="nav-link">Local do Estoque</a></li>
 								<li class="nav-item"><a href="centroCusto.php" class="nav-link">Centro de Custo</a></li>
 								<li class="nav-item"><a href="planoContas.php" class="nav-link">Plano de Contas</a></li>
-								<li class="nav-item"><a href="formaPagamento.php" class="nav-link">Forma de Pagamento</a></li>
+								<li class="nav-item"><a href="formaPagamento.php" class="nav-link">Forma de Pagamento</a></li>								
 							</ul>
 						</li>
 						
@@ -117,9 +117,9 @@
 						<li class="nav-item">
 							<a href="produto.php" class="nav-link"><i class="icon-gift"></i> <span>Produto</span></a>
 						</li>
-						<li class="new-item">
+						<li class="nav-item">
 							<a href="servico.php" class="nav-link"><i class="icon-cogs"></i><span>Serviços</span></a>
-						</li>
+						</li>						
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-bag"></i> <span>Compras</span></a>
 							<ul class="nav nav-group-sub" data-submenu-title="Text editors">

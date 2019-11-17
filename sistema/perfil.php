@@ -28,18 +28,64 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script
 	<!-- /theme JS files -->	
 	
-	<script>
+	<script type="text/javascript">
+	
+		$(document).ready(function (){	
+			$('#tblPerfil').DataTable( {
+				"order": [[ 1, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+				{
+					orderable: true,   //Perfil
+					width: "70%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "15%",
+					targets: [1]
+				},
+				{ 
+					orderable: false,   //Ações
+					width: "15%",
+					targets: [2]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */					
+		});	
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaPerfil(PerfilId, PerfilNome, PerfilStatus, Tipo){
@@ -101,7 +147,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="text-right"><a href="perfilNovo.php" class="btn btn-success" role="button">Novo Perfil</a></div>
 							</div>
 							
-							<table class="table datatable-responsive">
+							<table id="tblPerfil" class="table">
 								<thead>
 									<tr class="bg-slate">
 										<th width="75%">Perfil</th>

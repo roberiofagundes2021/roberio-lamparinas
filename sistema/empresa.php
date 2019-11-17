@@ -28,18 +28,80 @@ $count = count($row);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script>
 	<!-- /theme JS files -->	
 	
-	<script>
+	<script type="text/javascript">
+	
+		$(document).ready(function (){	
+			$('#tblEmpresa').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+				{
+					orderable: true,   //Nome Fantasia
+					width: "27%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Razao Social
+					width: "28%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //CNPJ
+					width: "10%",
+					targets: [2]
+				},
+				{ 
+					orderable: true,   //Situacao
+					width: "10%",
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //Fim Licenca
+					width: "15%",
+					targets: [4]
+				},
+				{ 
+					orderable: true,   //Ações
+					width: "10%",
+					targets: [5]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */					
+		});
+				
 				
 		function atualizaEmpresa(EmpresaId, EmpresaNome, EmpresaStatus, Tipo){
 
@@ -119,7 +181,7 @@ $count = count($row);
 								<div class="text-right"><a href="empresaNovo.php" class="btn btn-success" role="button">Nova Empresa</a></div>
 							</div>							
 
-							<table class="table datatable-responsive">
+							<table id="tblEmpresa" class="table">
 								<thead>
 									<tr class="bg-slate">
 										<th>Nome Fantasia</th>

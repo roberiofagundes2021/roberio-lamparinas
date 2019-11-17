@@ -6,46 +6,40 @@ $_SESSION['PaginaAtual'] = 'Parâmetro';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ParamId, ParamTipo, ParamValorAtualizado
+$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra
 		FROM Parametro
 	    WHERE ParamEmpresa = ". $_SESSION['EmpresaId'];
 $result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-$aParametros = array();
-
-foreach ($row as $item){
-	$aParametros[$item['ParamTipo']] = $item['ParamValorAtualizado'];
-}
+$row = $result->fetch(PDO::FETCH_ASSOC);
 
 if(isset($_POST['inputIdEmpresa'])){
-var_dump($_POST);die;
+
 	try{
-		
-		foreach ($_POST as $key => $value) {
-			$sql = "UPDATE Parametro SET ParamTipo = :sTipo, ParamValorAtualizado = :sValorAtualizado, ParamUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE ParamEmpresa = :iEmpresa";
-			$result = $conn->prepare($sql);
-				
-			$result->execute(array(
-							':sTipo' => $key,
-							':sValorAtualizado' => $value == "on" ? 1 : 0,
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iEmpresa' => $_SESSION['EmpresaId']
-							));
-		}
-		
+		//var_dump($_POST);die;
+		$sql = "UPDATE Parametro SET ParamEmpresaPublica = :iEmpresaPublica, ParamValorAtualizadoFluxo = :iValorAtualizadoFluxo, 
+					   ParamValorAtualizadoOrdemCompra = :iValorAtualizadoOrdemCompra, ParamUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE ParamEmpresa = :iEmpresa";
+		$result = $conn->prepare($sql);
+			
+		$result->execute(array(
+						':iEmpresaPublica' => isset($_POST['inputEmpresaPublica']) && $_POST['inputEmpresaPublica'] == "on" ? 1 : 0,
+						':iValorAtualizadoFluxo' => isset($_POST['inputValorFluxo']) && $_POST['inputValorFluxo'] == "on" ? 1 : 0,
+						':iValorAtualizadoOrdemCompra' => isset($_POST['inputValorOrdemCompra']) && $_POST['inputValorOrdemCompra'] == "on" ? 1 : 0,						
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iEmpresa' => $_SESSION['EmpresaId']
+						));
+		//die;
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Parâmetro atualizado!!!";
 		$_SESSION['msg']['tipo'] = "success";	
-		
+
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao atualizar parâmetro!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 	
 	irpara("parametro.php");
@@ -129,7 +123,7 @@ var_dump($_POST);die;
 							<p class="font-size-lg">Parâmetros da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>							
 						</div>
 						
-						<input type="hidden" id="inputIdEmpresa" name="inputIdEmpresa" class="form-control" value="<?php echo $idEmpresa; ?>">
+						<input type="hidden" id="inputIdEmpresa" name="inputIdEmpresa" class="form-control" value="<?php echo $row['ParamId']; ?>">
 						
 						<div class="card-body">
 							
@@ -141,7 +135,7 @@ var_dump($_POST);die;
 										<div class="col-lg-9">
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
-													<input type="checkbox" name="inputEmpresaPublica" id="inputEmpresaPublica" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($aParametros['EmpresaPublica']) echo "checked"; ?>>
+													<input type="checkbox" name="inputEmpresaPublica" id="inputEmpresaPublica" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamEmpresaPublica']) echo "checked"; ?>>
 												</label>
 											</div>
 										</div>
@@ -158,14 +152,14 @@ var_dump($_POST);die;
 										<div class="col-lg-9">
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
-													<input type="checkbox" name="ValorFluxo" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($aParametros['ValorAtualizadoFluxoPrevisto']) echo "checked"; ?>>
+													<input type="checkbox" name="inputValorFluxo" id="inputValorFluxo" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamValorAtualizadoFluxo']) echo "checked"; ?>>
 													Fluxo Previsto
 												</label>
 											</div>
 
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
-													<input type="checkbox" name="ValorOrdem" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($aParametros['ValorAtualizadoOrdemCompra']) echo "checked"; ?>>
+													<input type="checkbox" name="inputValorOrdemCompra" id="inputValorOrdemCompra" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamValorAtualizadoOrdemCompra']) echo "checked"; ?>>
 													Ordem de Compra/Carta Contrato
 												</label>
 											</div>

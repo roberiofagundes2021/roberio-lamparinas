@@ -32,6 +32,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
+	
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
@@ -187,11 +191,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">												
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2 dropdown-item">
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 													<option value="#">Filtrar por: Categoria (todas)</option>
 													<?php 
 														$sql = ("SELECT CategId, CategNome
-																 FROM Categoria															     
+																 FROM Categoria		  
 																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
 																 ORDER BY CategNome ASC");
 														$result = $conn->query("$sql");

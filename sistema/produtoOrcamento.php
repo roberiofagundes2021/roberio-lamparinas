@@ -32,12 +32,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>	
 			
 	</script>
 
-	<script>
+	<script type="text/javascript">
 
 		$(document).ready(function (){	
 			$('#tblProdutoOrcamento').DataTable( {
@@ -78,7 +81,26 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
 				}
 			});
-		})
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */			
+		});
 			
 		function atualizaModelo(PrOrcId, PrOrcNome, PrOrcStatus, Tipo){
 

@@ -1,6 +1,6 @@
 			<!-- Page header -->
 			<div class="page-header page-header-light">
-				<div class="page-header-content header-elements-md-inline">
+				<div class="page-header-content header-elements-md-inline" style="display:none;">
 					<div class="page-title d-flex">
 						<h4><i class="icon-new-tab2 mr-2"></i> <span class="font-weight-semibold"><?php echo $_SESSION['PaginaAtual']; ?></h4>
 						<a href="faq.php" class="header-elements-toggle text-default d-md-none"><i class="icon-more"></i></a>
@@ -24,7 +24,7 @@
 					</div>
 				</div>
 
-				<div class="breadcrumb-line breadcrumb-line-light header-elements-md-inline">
+				<div class="breadcrumb-line breadcrumb-line-light header-elements-md-inline" style="margin-top:8px;">
 					<div class="d-flex">
 						<div class="breadcrumb">
 							<a href="index.php" class="breadcrumb-item"><i class="icon-home2 mr-2"></i> Home</a>

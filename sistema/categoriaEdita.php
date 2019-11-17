@@ -86,11 +86,11 @@ if(isset($_POST['inputNome'])){
 				inputNomeNovo = inputNomeNovo.trim();
 				
 				//Verifica se o campo só possui espaços em branco
-				//if (inputNomeNovo == ''){
-					//alerta('Atenção','Informe a categoria!','error');
-					//$('#inputNome').focus();
-					//return false;
-				//}
+				if (inputNomeNovo == ''){
+					alerta('Atenção','Informe a categoria!','error');
+					$('#inputNome').focus();
+					return false;
+				}
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
