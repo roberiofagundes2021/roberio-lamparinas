@@ -42,25 +42,19 @@ if(isset($_POST['inputCnpj'])){
 						
 		$insertId = $conn->lastInsertId();
 		
-		try{
-			$sql = "INSERT INTO Parametro 
-						(ParamTipo, ParamValorAtualizado, ParamUsuarioAtualizador, ParamEmpresa)
-					VALUES 
-						(:sTipo, :sValorAtualizado, :iUsuarioAtualizador, :iEmpresa)";
-			$result = $conn->prepare($sql);
+		$sql = "INSERT INTO Parametro 
+					(ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamUsuarioAtualizador, ParamEmpresa)
+				VALUES 
+					(:iEmpresaPublica, :iValorAtualizadoFluxo, :iValorAtualizadoOrdemCompra, :iUsuarioAtualizador, :iEmpresa)";
+		$result = $conn->prepare($sql);
 
-			$result->execute(array(
-							':sTipo' => $insertId,
-							':sValorAtualizado' => $value,
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iEmpresa' => $insertId
-							));
-			}
-			
-		} catch(PDOException $e) {
-			$conn->rollback();
-			echo 'Error: ' . $e->getMessage();exit;
-		}
+		$result->execute(array(
+						':iEmpresaPublica' => 0,
+						':iValorAtualizadoFluxo' => 0,
+						':iValorAtualizadoOrdemCompra' => 0,
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iEmpresa' => $insertId
+						));
 		
 		$conn->commit();
 		
@@ -257,7 +251,7 @@ if(isset($_POST['inputCnpj'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputCnpj">CNPJ</label>
 										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" required>

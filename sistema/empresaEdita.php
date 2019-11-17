@@ -255,7 +255,7 @@ if(isset($_POST['inputCnpj'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputCnpj">CNPJ</label>
 										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" value="<?php echo formatarCPF_Cnpj($row['EmpreCnpj']); ?>" data-mask="99.999.999/9999-99" required>
