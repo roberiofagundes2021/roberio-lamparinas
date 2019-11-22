@@ -166,7 +166,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				document.getElementById('inputServicoStatus').value = ServicoStatus;
 						
 				if (Tipo == 'edita'){	
-					document.formServico.action = "ServicoEdita.php";		
+					document.formServico.action = "servicoEdita.php";		
 				} else if (Tipo == 'exclui'){
 					confirmaExclusao(document.formServico, "Tem certeza que deseja excluir esse serviço?", "servicoExclui.php");
 				} else if (Tipo == 'mudaStatus'){

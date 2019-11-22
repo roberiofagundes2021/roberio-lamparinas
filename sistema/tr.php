@@ -223,16 +223,29 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											$seleciona = $item['SbCatNome'];
                                       
 											print('
-											    <td>'.$seleciona.'</td>
+												<td>
+											        <div class="d-flex flex-row">
+                                                        <div class="p-1">
+                                                            <div class="subcat">'.$seleciona.'</div>
+                                                        </div>
+											        </div>
+											    </td>
 											');
 										} else {
-											print('<td>');
+											print('<td>
+                                                      <div class="d-flex flex-row">
+												');
                                             foreach ($rowSC as $a) {
 											    print('
-											        '.$a['SbCatNome']. ' | 
+                                                    <div class="p-1 ">
+                                                        <div class="subcat">'.$a['SbCatNome'].'</div>
+                                                    </div>
 											    ');
 											}
-											print('</td>');
+											print('
+                                                   </div>
+												</td>
+											');
 										}
 										
 										

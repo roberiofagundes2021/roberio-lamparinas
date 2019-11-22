@@ -37,7 +37,7 @@ if (isset($_POST['inputOrcamentoId'])){
 					':dData' => gravaData(date('d/m/Y')),
 					':iCategoria' => $rowOrcamento['TrXOrCategoria'] == '' ? null : $rowOrcamento['TrXOrCategoria'],
 					':sConteudo' => $rowOrcamento['TrXOrConteudo'],
-					':iFornecedor' => 0,
+					':iFornecedor' => null,
 					':iSolicitante' => $_SESSION['UsuarId'],
 					':bStatus' => $rowOrcamento['TrXOrStatus'],
 					':iUsuarioAtualizador' => $_SESSION['UsuarId'],

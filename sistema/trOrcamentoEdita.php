@@ -170,7 +170,7 @@ if(isset($_POST['inputTipo'])){
 	<?php include_once("head.php"); ?>
 
     <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-        <script src="global_assets/js/demo_pages/form_select2.js"></script>
+    <script src="global_assets/js/demo_pages/form_select2.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
@@ -180,9 +180,9 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>	
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
+	<link rel="stylesheet" type="text/css" href="global_assets/css/lamparinas/custon.css">	
 
     <script type="text/javascript" >
 
@@ -346,7 +346,6 @@ if(isset($_POST['inputTipo'])){
 		}
 							
 	</script>
-
 </head>
 
 <body class="navbar-top">
@@ -464,6 +463,7 @@ if(isset($_POST['inputTipo'])){
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor</label>
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
 													<?php
 														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																 FROM Fornecedor														     

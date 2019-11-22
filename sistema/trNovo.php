@@ -56,6 +56,40 @@ if(isset($_POST['inputData'])){
 									':iEmpresa' => $_SESSION['EmpreId']
 									));
 				}
+
+
+				foreach ($_POST['cmbSubCategoria'] as $value) {
+					$sql = "SELECT PrOrcId
+				            FROM ProdutoOrcamento
+				            WHERE PrOrcSubcategoria = ".$value."";
+				    $result = $conn->query($sql);
+				    $produtos = $result->fetchAll(PDO::FETCH_ASSOC);
+
+
+                    foreach ($produtos as $produto) {
+                    	try{
+               	            $sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrUsuarioAtualizador, TRXPrEmpresa)
+				                    VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+		                    $result = $conn->prepare($sql);
+
+				            if($produto){
+					        
+						        $result->execute(array(
+                                   ':iTR' => $insertId,
+                                   ':iProduto' => $produto['PrOrcId'],
+                                   ':iQuantidade' => null,
+                                   ':fValorUnitario' => null,
+                                   ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                   ':iEmpresa' => $_SESSION['EmpreId'],
+                                ));
+					        }
+                        } catch(PDOException $e){
+               	   
+				            echo 'Error: ' . $e->getMessage();exit;
+                        }
+                    }
+				}
+                
 				
 			} catch(PDOException $e) {
 				$conn->rollback();

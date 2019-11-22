@@ -341,7 +341,6 @@ try{
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
-										print("".$count."");
 
 
                                         $sql = "SELECT *

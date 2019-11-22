@@ -36,7 +36,16 @@ Copyright (c) 2018 Carlos Victor
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-.btn-desable{
-    cursor: default;
+.subcat{
+    background-color: #eee!important;
+    height: 20px;
+    color: #000;
+    border-radius:3rem;
+    padding: 7px;
+    box-sizing: content-box;
+    transition: background .3s ease-in-out;
+}
 
+.subcat:hover{
+    background-color: #03a9f4!important;
 }

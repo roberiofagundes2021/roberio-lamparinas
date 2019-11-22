@@ -167,9 +167,8 @@ if(isset($_POST['inputData'])){
 
         $(document).ready(function() {
             function validarSubcategoria(inputValida){
-            	confirmaExclusao(document.formTR, "A Categoria e Subcategorias não podem ser alteradas. Existem produtos com quantidades ou valores lançados em "+inputValida+" orçamentos desta TR. Confirmar outras alterações?", "trEdita.php");
+            	confirmaExclusao(document.formTR, "Existem produtos com quantidades ou valores lançados em orçamentos dessa TR, portanto, a Categoria e Subcategoria não podem ser alteradas. Apenas alterações no Conteúdo Personalizado são permitidas. Confirmar alteração?", "trEdita.php");
             }	
-
         	
 		
 			$('#summernote').summernote();
