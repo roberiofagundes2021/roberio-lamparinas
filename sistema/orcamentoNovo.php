@@ -129,6 +129,17 @@ if(isset($_POST['inputData'])){
     <script type="text/javascript" >
 
         $(document).ready(function() {	
+
+
+            // Ao usar a validação de formulário junto com a seleção multipla de subcategorias ocorreu um erro, onde o aviso de capo obrigatório
+            // crebava o layout do form-group da subcategoria, deixando a borda do elemento abaixo de se, o que causa um efeito estranho no visual.
+            // O código a baixo corrige isso.
+            /**/
+        	$('.select2-selection').css('border-bottom', '1px solid #ddd')
+        	$('.form-group').each((i, item)=>{
+        		$(item).css('border-bottom', '0px')
+        	})
+        	/**/
 		
 			$('#summernote').summernote();
 			
@@ -208,11 +219,11 @@ if(isset($_POST['inputData'])){
 				
 				var cmbCategoria = $('#cmbCategoria').val();
 				
-				if (cmbCategoria == '' || cmbCategoria == '#'){
+				/*if (cmbCategoria == '' || cmbCategoria == '#'){
 					alerta('Atenção','Informe a categoria!','error');
 					$('#cmbCategoria').focus();
 					return false;
-				}
+				}*/
 			
 				$("#formOrcamento").submit();
 			});
@@ -233,6 +244,9 @@ if(isset($_POST['inputData'])){
 		}	
 		
 	</script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 </head>
 
@@ -256,11 +270,10 @@ if(isset($_POST['inputData'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formOrcamento" id="formOrcamento" method="post" class="form-validate" action="orcamentoNovo.php">
+					<form name="formOrcamento" id="formOrcamento" method="post" class="form-validate-jquery" action="orcamentoNovo.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Orçamento</h5>
 						</div>
-						
 						<div class="card-body">								
 								
 							<div class="row">				
@@ -294,8 +307,8 @@ if(isset($_POST['inputData'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php 
 														$sql = ("SELECT CategId, CategNome
 																 FROM Categoria															     
@@ -312,15 +325,13 @@ if(isset($_POST['inputData'])){
 												</select>
 											</div>
 										</div>
-										
 										<div class="col-lg-4">
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
+												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc required><option value="#">Selecione</option>
 												</select>
 											</div>
 										</div>										
-
 									</div>
 								</div>
 							</div>
@@ -344,8 +355,8 @@ if(isset($_POST['inputData'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor</label>
-												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php 
 														$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																 FROM Fornecedor														     
@@ -396,7 +407,7 @@ if(isset($_POST['inputData'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputNomeSolicitante">Solicitante</label>
-												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly>
+												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly required>
 											</div>
 										</div>
 										
