@@ -6,6 +6,18 @@ $_SESSION['PaginaAtual'] = 'Novo Fluxo Operacional';
 
 include('global_assets/php/conexao.php');
 
+$sql = "SELECT ParamEmpresaPublica
+		FROM Parametro
+	    WHERE ParamEmpresa = ". $_SESSION['EmpreId'];
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+
+if ($row['ParamEmpresaPublica']){
+	$bObrigatorio = "required";
+} else {
+	$bObrigatorio = "";
+}
+
 //Se veio do fluxo.php
 if(isset($_POST['inputFluxoOperacionalId'])){
 	
@@ -252,7 +264,7 @@ if(isset($_POST['inputDataInicio'])){
 							<div class="row">
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="cmbFornecedor">Fornecedor</label>
+										<label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
 										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
 											<option value="">Selecione</option>
 											<?php 
@@ -275,7 +287,7 @@ if(isset($_POST['inputDataInicio'])){
 								
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="cmbCategoria">Categoria</label>
+										<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
 										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 											<option value="">Selecione</option>
 											<?php 
@@ -298,7 +310,7 @@ if(isset($_POST['inputDataInicio'])){
 								</div>
 								
 								<div class="col-lg-4">
-									<label for="cmbSubCategoria">SubCategoria</label>
+									<label for="cmbSubCategoria">SubCategoria <span class="text-danger">*</span></label>
 									<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 
@@ -326,7 +338,7 @@ if(isset($_POST['inputDataInicio'])){
 							<div class="row">
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputDataInicio">Data Início</label>
+										<label for="inputDataInicio">Data Início <span class="text-danger">*</span></label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
@@ -338,7 +350,7 @@ if(isset($_POST['inputDataInicio'])){
 								
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputDataFim">Data Fim</label>
+										<label for="inputDataFim">Data Fim <span class="text-danger">*</span></label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
@@ -350,21 +362,21 @@ if(isset($_POST['inputDataInicio'])){
 								
 								<div class="col-lg-3">
 									<div class="form-group">
-										<label for="inputNumContrato">Número do Contrato</label>
-										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>">
+										<label for="inputNumContrato">Número do Contrato <?php if($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
+										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>"  <?php echo $bObrigatorio; ?>>
 									</div>
 								</div>
 										
 								<div class="col-lg-3">
 									<div class="form-group">
-										<label for="inputNumProcesso">Número do Processo</label>
-										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>">
+										<label for="inputNumProcesso">Número do Processo <?php if($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
+										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>"  <?php echo $bObrigatorio; ?>>
 									</div>
 								</div>
 								
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputValor">Valor Total</label>
+										<label for="inputValor">Valor Total <span class="text-danger">*</span></label>
 										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" value="<?php echo mostraValor($row['FlOpeValor']); ?>" onKeyUp="moeda(this)" maxLength="12" required>
 									</div>
 								</div>

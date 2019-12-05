@@ -50,12 +50,12 @@ $count = count($row);
 				},
 				{ 
 					orderable: true,   //Razao Social
-					width: "28%",
+					width: "27%",
 					targets: [1]
 				},
 				{ 
 					orderable: true,   //CNPJ
-					width: "10%",
+					width: "11%",
 					targets: [2]
 				},
 				{ 

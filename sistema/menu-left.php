@@ -104,10 +104,7 @@
 								<li class="nav-item"><a href="fabricante.php" class="nav-link">Fabricante</a></li>
 								<li class="nav-item"><a href="unidademedida.php" class="nav-link">Unidade de Medida</a></li>
 								<li class="nav-item"><a href="produtoOrcamento.php" class="nav-link">Produtos para Orçamento</a></li>		
-								<li class="nav-item"><a href="localestoque.php" class="nav-link">Local do Estoque</a></li>
-								<li class="nav-item"><a href="centroCusto.php" class="nav-link">Centro de Custo</a></li>
-								<li class="nav-item"><a href="planoContas.php" class="nav-link">Plano de Contas</a></li>
-								<li class="nav-item"><a href="formaPagamento.php" class="nav-link">Forma de Pagamento</a></li>								
+								<li class="nav-item"><a href="localestoque.php" class="nav-link">Local do Estoque</a></li>						
 							</ul>
 						</li>
 						
@@ -149,8 +146,20 @@
 								<li class="nav-item"><a href="form_layout_horizontal.html" class="nav-link">Horizontal form</a></li>
 							</ul>
 						</li>
-						<!-- /forms -->
+						<!-- /Controle de Estoque -->
 
+						<!-- Financeiro -->
+						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Financeiro</div> <i class="icon-menu" title="Forms"></i></li>
+						
+						<li class="nav-item nav-item-submenu">
+							<a href="#" class="nav-link"> <span>Apoio</span></a>
+							<ul class="nav nav-group-sub" data-submenu-title="Text editors">
+								<li class="nav-item"><a href="centroCusto.php" class="nav-link">Centro de Custo</a></li>								
+								<li class="nav-item"><a href="planoContas.php" class="nav-link">Plano de Contas</a></li>
+								<li class="nav-item"><a href="formaPagamento.php" class="nav-link">Forma de Pagamento</a></li>
+							</ul>
+						</li>
+						<!-- /Controle de Estoque -->
 					</ul>
 				</div>
 				<!-- /main navigation -->

@@ -6,6 +6,18 @@ $_SESSION['PaginaAtual'] = 'Novo Fluxo Operacional';
 
 include('global_assets/php/conexao.php');
 
+$sql = "SELECT ParamEmpresaPublica
+		FROM Parametro
+	    WHERE ParamEmpresa = ". $_SESSION['EmpreId'];
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+
+if ($row['ParamEmpresaPublica']){
+	$bObrigatorio = "required";
+} else {
+	$bObrigatorio = "";
+}
+
 if(isset($_POST['inputDataInicio'])){
 
 	try{
@@ -326,15 +338,15 @@ if(isset($_POST['inputDataInicio'])){
 								
 								<div class="col-lg-3">
 									<div class="form-group">
-										<label for="inputNumContrato">Nº Ata Registro</label>
-										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº Ata Registro">
+										<label for="inputNumContrato">Nº Ata Registro <?php if($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
+										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº Ata Registro" <?php echo $bObrigatorio; ?>>
 									</div>
 								</div>
 										
 								<div class="col-lg-3">
 									<div class="form-group">
-										<label for="inputNumProcesso">Número do Processo</label>
-										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo">
+										<label for="inputNumProcesso">Número do Processo <?php if($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
+										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo"  <?php echo $bObrigatorio; ?>>
 									</div>
 								</div>
 								
