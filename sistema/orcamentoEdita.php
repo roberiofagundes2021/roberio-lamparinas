@@ -97,7 +97,7 @@ if(isset($_POST['inputTipo'])){
 									':iEmpresa' => $_SESSION['EmpreId']
 									));
 				}
-							
+	
 			} catch(PDOException $e) {
 				$conn->rollback();
 				echo 'Error: ' . $e->getMessage();exit;

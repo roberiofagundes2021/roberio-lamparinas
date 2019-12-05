@@ -29,9 +29,6 @@ if(isset($_POST['inputIdEmpresa'])){
 						':iEmpresa' => $_SESSION['EmpresaId']
 						));
 		//die;
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Parâmetro atualizado!!!";
-		$_SESSION['msg']['tipo'] = "success";	
 
 	} catch(PDOException $e) {
 		
@@ -83,7 +80,8 @@ if(isset($_POST['inputIdEmpresa'])){
 
 				e.preventDefault();
 				
-				$( "#formParametro" ).submit();				
+				$( "#formParametro" ).submit();
+				alerta("Sucesso", "Parâmetro atualizado!!!",  "success")				
 				
 			});		
 		
