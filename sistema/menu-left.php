@@ -131,6 +131,7 @@
 							<ul class="nav nav-group-sub" data-submenu-title="Text editors">
 								<li class="nav-item"><a href="movimentacao.php" class="nav-link">Movimentação</a></li>
 								<li class="nav-item"><a href="fluxo.php" class="nav-link">Fluxo Operacional</a></li>
+								<li class="nav-item"><a href="estoqueMinimoImprime.php" class="nav-link">Estoque Minimo</a></li>
 							</ul>
 						</li>						
 						
