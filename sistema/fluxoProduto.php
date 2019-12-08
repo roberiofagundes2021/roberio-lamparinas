@@ -1,5 +1,30 @@
 <?php 
 
+function calculaValorProduto($valorProduto, $outrasDespesas = 0, $margemLucro){
+   
+   $porcentMargemLucro = ($margemLucro / 100);
+   $valorProdutoA = floatval(str_replace(',', '.', str_replace('.', '', $valorProduto)));
+   
+    if($margemLucro != 0.00){
+   	    if($outrasDespesas != 0.00){
+            $valorProdutoTotal = $valorProdutoA + $outrasDespesas;
+            $novoValorVenda = $valorProdutoTotal + ($valorProdutoTotal * $porcentMargemLucro);
+ 
+            $valores['valorVenda'] = round($novoValorVenda, 2);
+            $valores['valorTotal'] = $valorProdutoTotal;
+        } else {
+   	        //$novoValorVenda = floatval($valorProduto) + (floatval($valorProduto) * $porcentMargemLucro);
+   	        $valorProdutoTotal = $valorProdutoA + $outrasDespesas;
+   	        $novoValorVenda = $valorProdutoTotal + ($valorProdutoTotal * $porcentMargemLucro);
+   	        $valores['valorVenda'] = round($novoValorVenda, 2);
+   	        $valores['valorTotal'] = $valorProdutoTotal;
+        }
+   }
+   return  $valores;
+}
+
+
+
 include_once("sessao.php"); 
 
 $_SESSION['PaginaAtual'] = 'Fluxo Operacional Produto';
@@ -21,6 +46,14 @@ if(isset($_POST['inputFluxoOperacionalId'])){
 
 //Se está alterando
 if(isset($_POST['inputIdFluxoOperacional'])){
+
+	$sql = "SELECT ParamId, ParamValorAtualizadoFluxo
+	        FROM Parametro
+	        WHERE ParamEmpresa = ".$_SESSION["EmpreId"]."
+	       ";
+	$result = $conn->query($sql);
+	$Parametro = $result->fetch(PDO::FETCH_ASSOC);
+    // Selecionando dados de parametro.
 	
 	$sql = "DELETE FROM FluxoOperacionalXProduto
 			WHERE FOXPrFluxoOperacional = :iFluxoOperacional AND FOXPrEmpresa = :iEmpresa";
@@ -45,6 +78,68 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
+
+		if($Parametro['ParamValorAtualizadoFluxo'] == 1){
+
+			$sql = "SELECT *
+                    FROM Produto
+                    WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduId = ".$_POST['inputIdProduto'.$i]."
+                   ";
+            $result = $conn->query($sql);
+	        $Produto = $result->fetch(PDO::FETCH_ASSOC);
+            // Selecionando dados de produto.
+
+			if($Produto['ProduMargemLucro'] != 0.00 ){
+			   $valores = calculaValorProduto($_POST['inputValorUnitario'.$i], $Produto['ProduOutrasDespesas'], $Produto['ProduMargemLucro'] );
+               //var_dump($Produto['ProduNome'], $custoFinal);
+
+               try{
+               	    $sql = "UPDATE Produto SET ProduValorCusto = :pValorUnitario, ProduCustoFinal = :pCustoFinal, ProduValorVenda = :pValorVenda
+                        WHERE ProduId = ".$Produto['ProduId']."
+		               ";
+		            $result = $conn->prepare($sql);
+		
+		            $conn->beginTransaction();
+		            $conn->rollback();		
+		            $result->execute(array(
+						':pValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+						':pCustoFinal' => $valores['valorTotal'],
+						':pValorVenda' => $valores['valorVenda'],
+						));
+               } catch(PDOException $e){
+               	    $conn->rollback();
+               	    echo 'Error: ' . $e->getMessage();exit;
+               }
+			} else {
+				try{
+               	    $sql = "UPDATE Produto SET ProduValorCusto = :pValorUnitario
+                        WHERE ProduId = ".$Produto['ProduId']."
+		               ";
+		            $result = $conn->prepare($sql);
+		
+		            $conn->beginTransaction();
+		            $conn->rollback();		
+		            $result->execute(array(
+						':pValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+						));
+               } catch(PDOException $e){
+               	    $conn->rollback();
+               	    echo 'Error: ' . $e->getMessage();exit;
+               }
+			}
+
+		    /*$sql = "UPDATE Produto SET
+                    WHERE ProduId = 
+		            ";
+		    $result = $conn->prepare($sql);
+		
+		    $conn->beginTransaction();		
+		
+		    $result->execute(array(
+						':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+						));
+		    */
+	    }
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Fluxo Operacional alterado!!!";
@@ -162,7 +257,7 @@ try{
 				
 				e.preventDefault();
 				
-				var inputValor = $('#inputValor').val();
+				var inputValor = parseFloat($('#inputValor').val());
 				var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
 				
 				//Verifica se o valor ultrapassou o total
