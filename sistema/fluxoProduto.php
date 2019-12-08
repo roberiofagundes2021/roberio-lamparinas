@@ -19,6 +19,9 @@ function calculaValorProduto($valorProduto, $outrasDespesas = 0, $margemLucro){
    	        $valores['valorVenda'] = round($novoValorVenda, 2);
    	        $valores['valorTotal'] = $valorProdutoTotal;
         }
+   } else {
+   	    $valorProdutoTotal = $valorProdutoA + $outrasDespesas;
+   	    $valores['valorTotal'] = $valorProdutoTotal;
    }
    return  $valores;
 }
@@ -111,8 +114,9 @@ if(isset($_POST['inputIdFluxoOperacional'])){
                	    echo 'Error: ' . $e->getMessage();exit;
                }
 			} else {
+				$valores = calculaValorProduto($_POST['inputValorUnitario'.$i], $Produto['ProduOutrasDespesas'], $Produto['ProduMargemLucro'] );
 				try{
-               	    $sql = "UPDATE Produto SET ProduValorCusto = :pValorUnitario
+               	    $sql = "UPDATE Produto SET ProduValorCusto = :pValorUnitario, ProduCustoFinal = :pCustoFinal
                         WHERE ProduId = ".$Produto['ProduId']."
 		               ";
 		            $result = $conn->prepare($sql);
@@ -121,6 +125,7 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 		            $conn->rollback();		
 		            $result->execute(array(
 						':pValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+						':pCustoFinal' => $valores['valorTotal']
 						));
                } catch(PDOException $e){
                	    $conn->rollback();
