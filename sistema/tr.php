@@ -226,7 +226,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												<td>
 											        <div class="d-flex flex-row">
                                                         <div class="p-1">
-                                                            <div class="subcat">'.$seleciona.'</div>
+                                                            <div>'.$seleciona.'</div>
                                                         </div>
 											        </div>
 											    </td>
@@ -235,12 +235,20 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											print('<td>
                                                       <div class="d-flex flex-row">
 												');
-                                            foreach ($rowSC as $a) {
-											    print('
-                                                    <div class="p-1 ">
-                                                        <div class="subcat">'.$a['SbCatNome'].'</div>
-                                                    </div>
-											    ');
+                                            foreach ($rowSC as $key => $a) {
+                                            	if(count($rowSC) == $key + 1){
+                                                    print('
+                                                        <div class="py-1 pr-1 pl-0 ">
+                                                            <div>'.$a['SbCatNome'].'</div>
+                                                        </div>
+											        ');
+                                            	} else {
+                                            		print('
+                                                        <div class="py-1 pl-1 pr-0 ">
+                                                            <div style="margin-right: 3px;">'.$a['SbCatNome'].'  |</div>
+                                                        </div>
+											        ');
+                                            	}
 											}
 											print('
                                                    </div>
