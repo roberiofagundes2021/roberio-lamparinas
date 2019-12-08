@@ -26,10 +26,10 @@ if(isset($_POST['inputNome'])){
 		
 		$sql = "INSERT INTO Servico (ServCodigo, ServNome, ServDetalhamento, ServCategoria, ServSubCategoria, ServValorCusto, 
 									 ServOutrasDespesas, ServCustoFinal, ServMargemLucro, ServValorVenda, 
-									 ServEstoqueMinimo, ServMarca, ServModelo, ServNumSerie, ServFabricante, ServStatus, 
+									 ServMarca, ServModelo, ServNumSerie, ServFabricante, ServStatus, 
 									 ServUsuarioAtualizador, ServEmpresa) 
 				VALUES (:sCodigo, :sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :fValorCusto, 
-						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, :sNumSerie, 
+						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iMarca, :iModelo, :sNumSerie, 
 						:iFabricante, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
@@ -44,7 +44,6 @@ if(isset($_POST['inputNome'])){
 						':fCustoFinal' => $_POST['inputCustoFinal'] == null ? null : gravaValor($_POST['inputCustoFinal']),
 						':fMargemLucro' => $_POST['inputMargemLucro'] == null ? null : gravaValor($_POST['inputMargemLucro']),
 						':fValorVenda' => $_POST['inputValorVenda'] == null ? null : gravaValor($_POST['inputValorVenda']),
-						':iEstoqueMinimo' => $_POST['inputEstoqueMinimo'] == '' ? null : $_POST['inputEstoqueMinimo'],
 						':iMarca' => $_POST['cmbMarca'] == '#' ? null : $_POST['cmbMarca'],
 						':iModelo' => $_POST['cmbModelo'] == '#' ? null : $_POST['cmbModelo'],
 						':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
@@ -332,18 +331,12 @@ if(isset($_POST['inputNome'])){
 								
 								<div class="media-body">
 									<div class="row">	
-										<div class="col-lg-8">
+										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
 										</div>
-										<div class="col-lg-4">
-											<div class="form-group">				
-												<label for="inputEstoqueMinimo">Estoque Mínimo</label>
-												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo">
-											</div>	
-										</div>		
 									</div>
 									
 									<div class="row">

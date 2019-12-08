@@ -40,7 +40,7 @@ if(isset($_POST['inputNome'])){
 		
 	try{
 		
-		$sql = "UPDATE Servico SET ServCodigo = :sCodigo, ServNome = :sNome, ServEstoqueMinimo = :iEstoqueMinimo, ServDetalhamento = :sDetalhamento, 
+		$sql = "UPDATE Servico SET ServCodigo = :sCodigo, ServNome = :sNome, ServDetalhamento = :sDetalhamento, 
 		               ServCategoria = :iCategoria, ServSubCategoria = :iSubCategoria, ServValorCusto = :fValorCusto, ServOutrasDespesas = :fOutrasDespesas,
 		               ServCustoFinal = :fCustoFinal, ServMargemLucro = :fMargemLucro, ServValorVenda = :fValorVenda, ServFabricante = :iFabricante, 
 		               ServMarca = :iMarca, ServModelo = :iModelo, ServNumSerie = :sNumSerie, ServUsuarioAtualizador = :iUsuarioAtualizador 
@@ -50,7 +50,6 @@ if(isset($_POST['inputNome'])){
 		$result->execute(array(
 						':sCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
-						':iEstoqueMinimo' => $_POST['inputEstoqueMinimo'] == '' ? null : $_POST['inputEstoqueMinimo'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
@@ -318,24 +317,18 @@ if(isset($_POST['inputNome'])){
 								<div class="media-body">
 
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputCodigo">Código do Serviço</label>
+												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código Interno" value="<?php echo $row['ServCodigo']; ?>" readOnly>
+											</div>
+										</div>
+										<div class="col-lg-10">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['ServNome']; ?>" required>
 											</div>
-										</div>
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputCodigo">Código do Produto</label>
-												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código Interno" value="<?php echo $row['ServCodigo']; ?>" readOnly>
-											</div>
-										</div>
-										<div class="col-lg-2">
-											<div class="form-group">				
-												<label for="inputEstoqueMinimo">Estoque Mínimo</label>
-												<input type="text" id="inputEstoqueMinimo" name="inputEstoqueMinimo" class="form-control" placeholder="Estoque Mínimo" value="<?php echo $row['ServEstoqueMinimo']; ?>">
-											</div>	
-										</div>															
+										</div>																								
 									</div>
 
 									<div class="row">
