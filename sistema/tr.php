@@ -238,7 +238,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                             foreach ($rowSC as $key => $a) {
                                             	if(count($rowSC) == $key + 1){
                                                     print('
-                                                        <div class="py-1 pr-1 pl-0 ">
+                                                        <div class="py-1 pl-1 pr-1 pl-0 ">
                                                             <div>'.$a['SbCatNome'].'</div>
                                                         </div>
 											        ');
