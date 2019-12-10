@@ -127,14 +127,16 @@ if(isset($_POST['inputData'])){
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.	min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+
+	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
+	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<script src="global_assets/js/lamparinas/jquery.maskMoney.js"></script>  <!-- http://www.fabiobmed.com.br/criando-mascaras-para-moedas-com-jquery/ -->
 	<!-- /theme JS files -->
 	
@@ -335,7 +337,7 @@ if(isset($_POST['inputData'])){
 					$("select#cmbFornecedor").trigger("change"); //Simula o change do select
 				}				
 				
-				$.getJSON('movimentacaoSituacao.php?tipo='+inputTipo, function (dados){
+				$.getJSON('movimentacaoSituacao.php', function (dados){
 					
 					var option = '<option value="#">Selecione</option>';
 					
