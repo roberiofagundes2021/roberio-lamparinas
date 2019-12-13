@@ -17,10 +17,10 @@ if(isset($_POST['inputData'])){
 			$iMotivo = null;
 		}
 		
-		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimClassificacao, MovimMotivo, MovimData, MovimFinalidade, MovimOrigem, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
+		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigem, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
 										  MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimEmpresa)
-				VALUES (:sTipo, :iClassificacao, :iMotivo, :dData, :iFinalidade, :iOrigem, :iDestinoLocal, :iDestinoSetor, :sDestinoManual, 
+				VALUES (:sTipo, :iMotivo, :dData, :iFinalidade, :iOrigem, :iDestinoLocal, :iDestinoSetor, :sDestinoManual, 
 						:sObservacao, :iFornecedor, :iOrdemCompra, :sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, 
 						:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);	
@@ -36,7 +36,6 @@ if(isset($_POST['inputData'])){
 				
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
-						':iClassificacao' => $_POST['cmbClassificacao'] == '#' ? null : $_POST['cmbClassificacao'],
 						':iMotivo' => $iMotivo,
 						':dData' => gravaData($_POST['inputData']),
 						':iFinalidade' => $_POST['cmbFinalidade'] == '#' ? null : $_POST['cmbFinalidade'],
@@ -61,9 +60,9 @@ if(isset($_POST['inputData'])){
 					
 		try{
 			$sql = "INSERT INTO MovimentacaoXProduto
-						(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrUsuarioAtualizador, MvXPrEmpresa)
+						(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa)
 					VALUES 
-						(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iUsuarioAtualizador, :iEmpresa)";
+						(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 		
 			for ($i=1; $i <= $_POST['inputNumItens']; $i++) {
@@ -81,6 +80,7 @@ if(isset($_POST['inputData'])){
 									':fValorUnitario' => gravaValor($registro[2]),
 									':sLote' => $registro[3],
 									':dValidade' => gravaData($registro[4]),
+									':iClassificacao' => $registro[5],
 									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 									':iEmpresa' => $_SESSION['EmpreId']
 									));
@@ -378,6 +378,7 @@ if(isset($_POST['inputData'])){
 				var inputTotal = $('#inputTotal').val();
 				var inputLote = $('#inputLote').val();
 				var inputValidade = $('#inputValidade').val();
+				var cmbClassificacao = $('#cmbClassificacao').val();
 				var inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
 
 				//remove os espaços desnecessários antes e depois
@@ -403,6 +404,13 @@ if(isset($_POST['inputData'])){
 					$('#cmbProduto').focus();
 					return false;
 				}
+
+				//Verifica se a combo Classificação foi informada
+				if (cmbClassificacao == '#'){
+					alerta('Atenção','Informe a Classificação/Bens!','error');
+					$('#cmbClassificacao').focus();
+					return false;
+				}				
 							
 				//Verifica se o campo já está no array
 				if ( inputIdProdutos.includes(Produto[0]) ){
@@ -439,7 +447,7 @@ if(isset($_POST['inputData'])){
 						$('#inputLote').val('');
 						$('#inputValidade').val('');
 						
-						$('#inputProdutos').append('<input type="hidden" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+Produto[0]+'#'+inputQuantidade+'#'+inputValorUnitario+'#'+inputLote+'#'+inputValidade+'">');												
+						$('#inputProdutos').append('<input type="hidden" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+Produto[0]+'#'+inputQuantidade+'#'+inputValorUnitario+'#'+inputLote+'#'+inputValidade+'#'+cmbClassificacao+'">');												
 						
 						inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
 
@@ -506,7 +514,6 @@ if(isset($_POST['inputData'])){
 
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputTotal = $('#inputTotal').val();
-				var cmbClassificacao = $('#cmbClassificacao').val();
 				var cmbFinalidade = $('#cmbFinalidade').val();
 				var cmbMotivo = $('#cmbMotivo').val();
 				var cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val();
@@ -521,13 +528,6 @@ if(isset($_POST['inputData'])){
 				inputDestinoManual = inputDestinoManual.trim();
 				
 				if (inputTipo == 'E'){
-
-					//Verifica se a combo Classificação foi informada
-					if (cmbClassificacao == '#'){
-						alerta('Atenção','Informe a Classificação/Bens!','error');
-						$('#cmbClassificacao').focus();
-						return false;
-					}
 					
 					//Verifica se a combo Finalidade foi informada
 					if (cmbFinalidade == '#'){
@@ -543,13 +543,6 @@ if(isset($_POST['inputData'])){
 						return false;
 					}
 				} else if (inputTipo == 'S'){
-					
-					//Verifica se a combo Classificação foi informada
-					if (cmbClassificacao == '#'){
-						alerta('Atenção','Informe a Classificação/Bens!','error');
-						$('#cmbClassificacao').focus();
-						return false;
-					}
 					
 					//Verifica se a combo Finalidade foi informada
 					if (cmbFinalidade == '#'){
@@ -783,28 +776,6 @@ if(isset($_POST['inputData'])){
 												Transferência
 											</label>
 										</div>										
-									</div>
-								</div>
-
-								<div class="col-lg-4" id="classificacao">
-									<div class="form-group">
-										<label for="cmbClassificacao">Classificação/Bens</label>
-										<select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
-											<?php 
-												$sql = ("SELECT ClassId, ClassNome
-														 FROM Classificacao
-														 WHERE ClassStatus = 1
-														 ORDER BY ClassNome ASC");
-												$result = $conn->query("$sql");
-												$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($rowClassificacao as $item){
-													print('<option value="'.$item['ClassId'].'">'.$item['ClassNome'].'</option>');
-												}
-											
-											?>
-										</select>
 									</div>
 								</div>
 								
@@ -1117,7 +1088,29 @@ if(isset($_POST['inputData'])){
 												<label for="inputValidade">Validade</label>
 												<input type="text" id="inputValidade" name="inputValidade" class="form-control">
 											</div>
-										</div>										
+										</div>
+
+										<div class="col-lg-2" id="classificacao">
+											<div class="form-group">
+												<label for="cmbClassificacao">Classificação/Bens</label>
+												<select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+														$sql = ("SELECT ClassId, ClassNome
+																 FROM Classificacao
+																 WHERE ClassStatus = 1
+																 ORDER BY ClassNome ASC");
+														$result = $conn->query("$sql");
+														$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($rowClassificacao as $item){
+															print('<option value="'.$item['ClassId'].'">'.$item['ClassNome'].'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>
 										
 										<div class="col-lg-2">
 											<div class="form-group">												

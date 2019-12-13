@@ -14,7 +14,7 @@ $sql = ("SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, ProduValo
 		 LEFT JOIN Categoria on CategId = ProduCategoria
 		 LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 	     WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY ProduNome ASC");
+		 ORDER BY ProduCodigo ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -38,7 +38,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>	
 	
 	<!-- /theme JS files -->	
 	
@@ -48,7 +48,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 			/* Início: Tabela Personalizada */
 			$('#tblProduto').DataTable( {
-				"order": [[ 1, "asc" ]],
+				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{ 
