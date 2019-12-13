@@ -27,7 +27,6 @@ function calculaValorProduto($valorProduto, $outrasDespesas = 0, $margemLucro){
 }
 
 
-
 include_once("sessao.php"); 
 
 $_SESSION['PaginaAtual'] = 'Fluxo Operacional Produto';
@@ -46,6 +45,7 @@ if(isset($_POST['inputFluxoOperacionalId'])){
 } else {
 	irpara("fluxo.php");
 }
+
 
 //Se está alterando
 if(isset($_POST['inputIdFluxoOperacional'])){
@@ -82,7 +82,10 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
 
-		if($Parametro['ParamValorAtualizadoFluxo'] == 1){
+		$valorTotal = floatval(str_replace(',', '.', str_replace(',', '.', $_POST['inputValor'])));
+		$TotalGeral = floatval(str_replace(',', '.', str_replace('.', '.', $_POST['inputTotalGeral'])));
+        
+		if($Parametro['ParamValorAtualizadoFluxo'] == 1 && $valorTotal === $TotalGeral){
 
 			$sql = "SELECT *
                     FROM Produto

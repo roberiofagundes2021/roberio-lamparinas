@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Parâmetro';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra
+$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada
 		FROM Parametro
 	    WHERE ParamEmpresa = ". $_SESSION['EmpresaId'];
 $result = $conn->query($sql);
@@ -17,14 +17,15 @@ if(isset($_POST['inputIdEmpresa'])){
 	try{
 		//var_dump($_POST);die;
 		$sql = "UPDATE Parametro SET ParamEmpresaPublica = :iEmpresaPublica, ParamValorAtualizadoFluxo = :iValorAtualizadoFluxo, 
-					   ParamValorAtualizadoOrdemCompra = :iValorAtualizadoOrdemCompra, ParamUsuarioAtualizador = :iUsuarioAtualizador
+					   ParamValorAtualizadoOrdemCompra = :iValorAtualizadoOrdemCompra, ParamUsuarioAtualizador = :iUsuarioAtualizador, ParamValorObsImpreRetirada = :iValorObsImpreRetirada
 				WHERE ParamEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
 			
 		$result->execute(array(
 						':iEmpresaPublica' => isset($_POST['inputEmpresaPublica']) && $_POST['inputEmpresaPublica'] == "on" ? 1 : 0,
 						':iValorAtualizadoFluxo' => isset($_POST['inputValorFluxo']) && $_POST['inputValorFluxo'] == "on" ? 1 : 0,
-						':iValorAtualizadoOrdemCompra' => isset($_POST['inputValorOrdemCompra']) && $_POST['inputValorOrdemCompra'] == "on" ? 1 : 0,						
+						':iValorAtualizadoOrdemCompra' => isset($_POST['inputValorOrdemCompra']) && $_POST['inputValorOrdemCompra'] == "on" ? 1 : 0,
+						':iValorObsImpreRetirada' => isset($_POST['inputValorObsImpreRetirada'])	&& $_POST['inputValorObsImpreRetirada'] == "on" ? 1 : 0,				
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpresaId']
 						));
@@ -164,10 +165,24 @@ if(isset($_POST['inputIdEmpresa'])){
 										</div>
 									</div>
 									<!-- /switch group -->
-
 								</div>
 							</div>
-
+							<div class="row">
+								<div class="col-lg-6">
+									<!-- Switch single -->
+									<div class="form-group row">
+										<label class="col-lg-3 col-form-label">Mostrar "Observação" na impressão das saídas e transferências<span class="text-danger">*</span></label>
+										<div class="col-lg-9">
+											<div class="form-check form-check-switch form-check-switch-left">
+												<label class="form-check-label d-flex align-items-center">
+													<input type="checkbox" name="inputValorObsImpreRetirada" id="inputValorObsImpreRetirada" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamValorObsImpreRetirada']) echo "checked"; ?>>
+												</label>
+											</div>
+										</div>
+									</div>
+									<!-- /switch single -->
+								</div>
+							</div>
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
