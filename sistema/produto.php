@@ -295,13 +295,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.formataMoeda($item['ProduValorVenda']).'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\','.$item['ProduStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.$item['ProduNome'].'\','.$item['ProduStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\','.$item['ProduStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\','.$item['ProduStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>

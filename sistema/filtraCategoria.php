@@ -10,7 +10,7 @@ if (isset($_GET['idOrcamento'])){
 			JOIN Orcamento on OrcamCategoria = CategId
 			WHERE CategEmpresa = ".$_SESSION['EmpreId']." and CategStatus = 1 and OrcamId = ".$_GET['idOrcamento']."
 			ORDER BY CategNome ASC";
-} else if (isset($_GET['idFornecedor'])){
+} else if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != -1){
 	$sql = "SELECT CategId, CategNome
 			FROM Categoria
 			JOIN Fornecedor on ForneCategoria = CategId

@@ -313,6 +313,7 @@ if(isset($_POST['inputData'])){
 				var valor = Produto[1].replace(".",",");
 				
 				$('#inputValorUnitario').val(valor);
+				$('#inputQuantidade').focus();
 			});	
 			
 			$("input[type=radio][name=inputTipo]").click(function(){
@@ -667,7 +668,7 @@ if(isset($_POST['inputData'])){
 				document.getElementById('EstoqueOrigem').style.display = "none";
 				document.getElementById('DestinoLocal').style.display = "block";
 				document.getElementById('DestinoSetor').style.display = "none";
-				document.getElementById('classificacao').style.display = "block";
+				document.getElementById('classificacao').style.display = "none";
 				document.getElementById('motivo').style.display = "none";
 				document.getElementById('dadosNF').style.display = "block";
 			} else if (tipo == 'S') {
@@ -681,7 +682,7 @@ if(isset($_POST['inputData'])){
 				document.getElementById('EstoqueOrigem').style.display = "block";
 				document.getElementById('DestinoLocal').style.display = "block";
 				document.getElementById('DestinoSetor').style.display = "none";
-				document.getElementById('classificacao').style.display = "none";
+				document.getElementById('classificacao').style.display = "block";
 				document.getElementById('motivo').style.display = "block";
 				document.getElementById('dadosNF').style.display = "none";
 			}
@@ -1090,7 +1091,7 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 
-										<div class="col-lg-2" id="classificacao">
+										<div class="col-lg-2" id="classificacao" style="display:none;">
 											<div class="form-group">
 												<label for="cmbClassificacao">Classificação/Bens</label>
 												<select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">

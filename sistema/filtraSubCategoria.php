@@ -9,7 +9,7 @@ if (isset($_GET['idOrcamento'])){
 			FROM SubCategoria
 			JOIN OrcamentoXSubCategoria on OrXSCSubcategoria = SbCatId
 			WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and OrXSCOrcamento = '". $_GET['idOrcamento']."' and SbCatStatus = 1";
-} else if (isset($_GET['idFornecedor'])){
+} else if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != -1){
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria
 			JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId

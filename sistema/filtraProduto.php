@@ -4,7 +4,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#'){
+if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#' && $_GET['idFornecedor'] != '-1'){
 
 	if (isset($_GET['idSubCategoria']) && $_GET['idSubCategoria'] != '#'){
 		$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
