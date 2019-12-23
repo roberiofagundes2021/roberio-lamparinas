@@ -98,7 +98,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				document.formMovimentacao.action = "movimentacaoEdita.php";		
 			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir esse movimentacao?", "movimentacaoExclui.php");
-			} 		
+			} else if (Tipo == 'imprimir'){
+				document.formMovimentacao.action = "movimentacaoImprime.php";
+			}
 			
 			document.formMovimentacao.submit();
 		}		
@@ -186,6 +188,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 													<div class="list-icons list-icons-extended">
 														<a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
 														<a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a id="imprimir" target="_blank" href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'imprimir\');" class="list-icons-item"><i class="icon-printer2"></i></a>
 													</div>
 												</div>
 											</td>
@@ -203,7 +206,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<!-- /info blocks -->
 				
-				<form name="formMovimentacao" method="post">
+				<form name="formMovimentacao" method="post" target="_blank">
 					<input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId" >
 					<input type="hidden" id="inputMovimentacaoNotaFiscal" name="inputMovimentacaoNotaFiscal" >
 				</form>
