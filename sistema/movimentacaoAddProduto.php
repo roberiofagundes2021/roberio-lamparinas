@@ -4,11 +4,11 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla
-		 FROM Produto
-		 LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduId = ". $_POST['idProduto']);
-$result = $conn->query("$sql");
+$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla
+		FROM Produto
+		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+		WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduId = ". $_POST['idProduto'];
+$result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 $count = count($row);
 

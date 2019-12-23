@@ -1,5 +1,24 @@
 <?php 
 
+include_once("sessao.php"); 
+
+$_SESSION['PaginaAtual'] = 'Fluxo Operacional Produto';
+
+include('global_assets/php/conexao.php');
+
+//Se veio do fluxo.php
+if(isset($_POST['inputFluxoOperacionalId'])){
+	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
+	$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
+	$iSubCategoria = $_POST['inputFluxoOperacionalSubCategoria'];
+} else if (isset($_POST['inputIdFluxoOperacional'])){
+	$iFluxoOperacional = $_POST['inputIdFluxoOperacional'];
+	$iCategoria = $_POST['inputIdCategoria'];
+	$iSubCategoria = $_POST['inputIdSubCategoria'];
+} else {
+	irpara("fluxo.php");
+}
+
 function calculaValorProduto($valorProduto, $outrasDespesas = 0, $margemLucro){
    
    $porcentMargemLucro = ($margemLucro / 100);
@@ -26,139 +45,111 @@ function calculaValorProduto($valorProduto, $outrasDespesas = 0, $margemLucro){
    return  $valores;
 }
 
-
-include_once("sessao.php"); 
-
-$_SESSION['PaginaAtual'] = 'Fluxo Operacional Produto';
-
-include('global_assets/php/conexao.php');
-
-//Se veio do fluxo.php
-if(isset($_POST['inputFluxoOperacionalId'])){
-	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
-	$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
-	$iSubCategoria = $_POST['inputFluxoOperacionalSubCategoria'];
-} else if (isset($_POST['inputIdFluxoOperacional'])){
-	$iFluxoOperacional = $_POST['inputIdFluxoOperacional'];
-	$iCategoria = $_POST['inputIdCategoria'];
-	$iSubCategoria = $_POST['inputIdSubCategoria'];
-} else {
-	irpara("fluxo.php");
-}
-
-
 //Se está alterando
 if(isset($_POST['inputIdFluxoOperacional'])){
 
+	// Selecionando dados de parametro
 	$sql = "SELECT ParamId, ParamValorAtualizadoFluxo
 	        FROM Parametro
 	        WHERE ParamEmpresa = ".$_SESSION["EmpreId"]."
 	       ";
 	$result = $conn->query($sql);
-	$Parametro = $result->fetch(PDO::FETCH_ASSOC);
-    // Selecionando dados de parametro.
+	$Parametro = $result->fetch(PDO::FETCH_ASSOC);    
+
+    $conn->beginTransaction();
 	
-	$sql = "DELETE FROM FluxoOperacionalXProduto
-			WHERE FOXPrFluxoOperacional = :iFluxoOperacional AND FOXPrEmpresa = :iEmpresa";
-	$result = $conn->prepare($sql);
-	
-	$result->execute(array(
-					':iFluxoOperacional' => $iFluxoOperacional,
-					':iEmpresa' => $_SESSION['EmpreId']
-					));		
-	
-	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
-	
-		$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario, FOXPrUsuarioAtualizador, FOXPrEmpresa)
-				VALUES (:iFluxoOperacional, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+	try{
+		$sql = "DELETE FROM FluxoOperacionalXProduto
+				WHERE FOXPrFluxoOperacional = :iFluxoOperacional AND FOXPrEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
 		
 		$result->execute(array(
 						':iFluxoOperacional' => $iFluxoOperacional,
-						':iProduto' => $_POST['inputIdProduto'.$i],
-						':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-						':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
+		
+		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+		
+			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario, FOXPrUsuarioAtualizador, FOXPrEmpresa)
+					VALUES (:iFluxoOperacional, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+			$result = $conn->prepare($sql);
+			
+			$result->execute(array(
+							':iFluxoOperacional' => $iFluxoOperacional,
+							':iProduto' => $_POST['inputIdProduto'.$i],
+							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId']
+							));
 
-		$valorTotal = floatval(str_replace(',', '.', str_replace(',', '.', $_POST['inputValor'])));
-		$TotalGeral = floatval(str_replace(',', '.', str_replace('.', '.', $_POST['inputTotalGeral'])));
-        
-		if($Parametro['ParamValorAtualizadoFluxo'] == 1 && $valorTotal === $TotalGeral){
+			$valorTotal = floatval($_POST['inputValor']);
+			$TotalGeral = floatval(str_replace(',', '.', str_replace('.', '', $_POST['inputTotalGeral'])));
 
-			$sql = "SELECT *
-                    FROM Produto
-                    WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduId = ".$_POST['inputIdProduto'.$i]."
-                   ";
-            $result = $conn->query($sql);
-	        $Produto = $result->fetch(PDO::FETCH_ASSOC);
-            // Selecionando dados de produto.
+	        //Se o parâmetro de atualizar estiver ativo e o fluxo estiver fechado
+			if($Parametro['ParamValorAtualizadoFluxo'] == 1 && $valorTotal === $TotalGeral){
 
-			if($Produto['ProduMargemLucro'] != 0.00 ){
-			   $valores = calculaValorProduto($_POST['inputValorUnitario'.$i], $Produto['ProduOutrasDespesas'], $Produto['ProduMargemLucro'] );
-               //var_dump($Produto['ProduNome'], $custoFinal);
+				// Selecionando dados de produto
+				$sql = "SELECT *
+	                    FROM Produto
+	                    WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduId = ".$_POST['inputIdProduto'.$i]."
+	                   ";
+	            $result = $conn->query($sql);
+		        $Produto = $result->fetch(PDO::FETCH_ASSOC);
 
-               try{
+				if($Produto['ProduMargemLucro'] != 0.00 || $Produto['ProduValorVenda'] != 0.00){
+				   	
+				   $valores = calculaValorProduto($_POST['inputValorUnitario'.$i], $Produto['ProduOutrasDespesas'], $Produto['ProduMargemLucro'] );
+	               //var_dump($Produto['ProduNome'], $custoFinal);
+	               
                	    $sql = "UPDATE Produto SET ProduValorCusto = :pValorUnitario, ProduCustoFinal = :pCustoFinal, ProduValorVenda = :pValorVenda
                         WHERE ProduId = ".$Produto['ProduId']."
 		               ";
 		            $result = $conn->prepare($sql);
-		
-		            $conn->beginTransaction();
-		            $conn->rollback();		
+				
 		            $result->execute(array(
 						':pValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 						':pCustoFinal' => $valores['valorTotal'],
 						':pValorVenda' => $valores['valorVenda'],
 						));
-               } catch(PDOException $e){
-               	    $conn->rollback();
-               	    echo 'Error: ' . $e->getMessage();exit;
-               }
-			} else {
-				$valores = calculaValorProduto($_POST['inputValorUnitario'.$i], $Produto['ProduOutrasDespesas'], $Produto['ProduMargemLucro'] );
-				try{
+
+				} else {
+					
+					$valores = calculaValorProduto($_POST['inputValorUnitario'.$i], $Produto['ProduOutrasDespesas'], $Produto['ProduMargemLucro'] );
+					
                	    $sql = "UPDATE Produto SET ProduValorCusto = :pValorUnitario, ProduCustoFinal = :pCustoFinal
                         WHERE ProduId = ".$Produto['ProduId']."
 		               ";
 		            $result = $conn->prepare($sql);
-		
-		            $conn->beginTransaction();
-		            $conn->rollback();		
+
 		            $result->execute(array(
 						':pValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 						':pCustoFinal' => $valores['valorTotal']
 						));
-               } catch(PDOException $e){
-               	    $conn->rollback();
-               	    echo 'Error: ' . $e->getMessage();exit;
-               }
-			}
+				}
 
-		    /*$sql = "UPDATE Produto SET
-                    WHERE ProduId = 
-		            ";
-		    $result = $conn->prepare($sql);
-		
-		    $conn->beginTransaction();		
-		
-		    $result->execute(array(
-						':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-						));
-		    */
-	    }
-		
+		    }
+
+		}
+
+		$conn->commit();
+
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Fluxo Operacional alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
-	}
+
+    } catch(PDOException $e){
+   	    $conn->rollback();
+   	    echo "Eita! ";
+
+   	    echo 'Error: ' . $e->getMessage();exit;
+    }
 }	
 
 try{
 	
 	$sql = "SELECT FlOpeId, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
-			SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor
+				   SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor
 			FROM FluxoOperacional
 			JOIN Fornecedor on ForneId = FlOpeFornecedor
 			JOIN Categoria on CategId = FlOpeCategoria

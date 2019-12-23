@@ -416,7 +416,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['ProduNome']; ?>" required>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo htmlentities($row['ProduNome'],ENT_QUOTES); ?>" required>
 											</div>
 										</div>
 									</div>
