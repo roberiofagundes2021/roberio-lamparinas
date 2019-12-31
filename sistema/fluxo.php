@@ -104,6 +104,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				document.formFluxoOperacional.action = "fluxoMudaSituacao.php";
 			} else if (Tipo == 'produto'){
 				document.formFluxoOperacional.action = "fluxoProduto.php";
+			} else if (Tipo == 'realizado'){
+				document.formFluxoOperacional.action = "fluxoRealizado.php";
 			} else if (Tipo == 'imprime'){
 				document.formFluxoOperacional.action = "fluxoImprime.php";
 				document.formFluxoOperacional.setAttribute("target", "_blank");
