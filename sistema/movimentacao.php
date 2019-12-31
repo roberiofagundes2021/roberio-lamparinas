@@ -99,7 +99,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir esse movimentacao?", "movimentacaoExclui.php");
 			} else if (Tipo == 'imprimir'){
-				document.formMovimentacao.action = "movimentacaoImprime2.php";
+				document.formMovimentacao.action = "movimentacaoImprime.php";
 				document.formMovimentacao.setAttribute("target", "_blank");
 			}
 			
@@ -184,16 +184,28 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										print('<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>');
 										
-										print('<td class="text-center">
+										if($item['MovimTipo'] == 'T' || $item['MovimTipo'] == 'S'){
+											print('<td class="text-center">
+											    	    <div class="list-icons">
+												    	    <div class="list-icons list-icons-extended">
+													    	    <a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														        <a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														        <a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'imprimir\');" class="list-icons-item"><i class="icon-printer2"></i></a>
+													        </div>
+												        </div>
+											        </td>
+										        </tr>');
+										} else {
+											print('<td class="text-center">
 												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
+													<div class="list-icons list-icons-extended" style="margin-right: 28px">
 														<a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
 														<a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
-														<a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'imprimir\');" class="list-icons-item"><i class="icon-printer2"></i></a>
 													</div>
 												</div>
 											</td>
 										</tr>');
+										}
 									}
 								?>
 
