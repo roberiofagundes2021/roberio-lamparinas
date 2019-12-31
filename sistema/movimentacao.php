@@ -38,17 +38,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	
-	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
-	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>	
-
 	<!-- /theme JS files -->	
 	
 	 <script type="text/javascript">
 		
 		$(document).ready(function() {
-
-			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
 			
 			/* Início: Tabela Personalizada */
 			$('#tblMovimentacao').DataTable( {
@@ -152,7 +146,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<p class="font-size-lg">A relação abaixo faz referência às movimentações do estoque da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
 								<div class="text-right">
 									<a href="movimentacaoNovo.php" class="btn btn-success" role="button">Nova Movimentação</a>
-									<a href="index.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Ver Requisições">Requisições</a></div>
+									<a href="movimentacaoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Requisições</a></div>
 							</div>
 							
 							<table class="table" id="tblMovimentacao">
