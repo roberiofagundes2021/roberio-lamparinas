@@ -232,7 +232,7 @@ try {
                 }
             }
 
-            if ($rowMv['ParamValorObsImpreRetirada'] == 1) {
+            if ($rowMv['ParamValorObsImpreRetirada'] == 1 && $cont == ceil($numPaginas)) {
                 $html .= ' 
                         <div style="margin-top: 7px ;">
                             <div style="margin-right: 12px ;float: left ;width: 100%; border: 1px solid #c9d0d4; background-color: #d8d8d8">
@@ -439,7 +439,7 @@ try {
                                         <p style='font-size: 0.8rem ;margin: 0px; padding: 8px'>Série: " . $value['ProduNumSerie'] . "</p>
                                     </div>
                                 </div>
-                                <div style='border: 1px solid #333;margin-bottom: 8px ;margin-top: 2px; margin-bottom 4px; max-height: 200px !important'>
+                                <div style='margin-bottom: 8px ;margin-top: 2px; margin-bottom 4px; max-height: 200px !important'>
                                     <div style='margin-right: 12px ;float: left ;width: 20%; border: 1px solid #c9d0d4'>
                                         <p style='font-size: 0.6rem; margin: 0px; padding: 8px'>Classificação: " . $value['ClassNome'] . "</p>
                                     </div>
@@ -455,7 +455,7 @@ try {
                                     <div style='margin: 0px 2px 0px 2px ;float: left; width: 15%; border: 1px solid #c9d0d4'>
                                         <p style='font-size: 0.6rem ;margin: 0px; padding: 8px'>Unidade: " . $value['UnMedNome'] . "</p>
                                     </div>
-                                    <div style='margin: 0px 2px 0px 2px ;float: left; width: 15%; border: 1px solid #c9d0d4; background-color: #e9e9e9'>
+                                    <div style='heigth: 5vmin;margin: 0px 2px 0px 2px ;float: left; width: 15%; border: 1px solid #c9d0d4; background-color: #e9e9e9'>
                                         <p style='heigth: 100% ;font-size: 0.6rem ;margin: 0px; padding: 8px'>Quantidade1: " . $value['MvXPrQuantidade'] . "</p>
                                     </div>
                                 </div>
@@ -484,7 +484,7 @@ try {
                                         <p style='font-size: 0.8rem ;margin: 0px; padding: 8px'>Série: " . $value['ProduNumSerie'] . "</p>
                                     </div>
                                 </div>
-                                <div style='margin-bottom: 8px ;margin-top: 2px; margin-bottom 4px; '>
+                                <div style='margin-bottom: 8px ;margin-top: 2px; margin-bottom 4px; background-color: #e9e9e9!important'>
                                     <div style='margin-right: 12px ;float: left ;width: 20%; border: 1px solid #c9d0d4'>
                                         <p style='font-size: 0.6rem; margin: 0px; padding: 8px'>Classificação: " . $value['ClassNome'] . "</p>
                                     </div>
@@ -508,7 +508,7 @@ try {
                 }
             }
 
-            if ($rowMv['ParamValorObsImpreRetirada'] == 1) {
+            if ($rowMv['ParamValorObsImpreRetirada'] == 1 && $cont == ceil($numPaginas)) {
                 $html .= ' 
                         <div style="margin-top: 7px ;">
                             <div style="margin-right: 12px ;float: left ;width: 100%; border: 1px solid #c9d0d4; background-color: #d8d8d8">
