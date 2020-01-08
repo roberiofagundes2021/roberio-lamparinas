@@ -142,6 +142,7 @@
 							<a href="#" class="nav-link"><i class="icon-stack-text"></i> <span>Relatórios</span></a>
 							<ul class="nav nav-group-sub" data-submenu-title="Form layouts">
 								<li class="nav-item"><a href="relatorioMovimentacao.php" class="nav-link">Movimentação</a></li>
+								<li class="nav-item"><a href="relatorioMovimentacaoPatrimonio.php" class="nav-link">Movimentação do Patrimônio</a></li>
 								<li class="nav-item"><a href="form_layout_vertical_styled.html" class="nav-link disabled">Custom styles <span class="badge bg-transparent align-self-center ml-auto">Coming soon</span></a></li>
 								<li class="nav-item-divider"></li>
 								<li class="nav-item"><a href="form_layout_horizontal.html" class="nav-link">Horizontal form</a></li>
