@@ -94,11 +94,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
             /* Fim: Tabela Personalizada */
 
             (function selectSubcateg() {
-
-                Filtrando()
                 const cmbCategoria = $('#cmbCategoria')
 
                 cmbCategoria.on('change', () => {
+                    Filtrando()
                     const valCategoria = $('#cmbCategoria').val()
 
                     $.getJSON('filtraSubCategoria.php?idCategoria=' + valCategoria, function(dados) {
@@ -134,13 +133,26 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
                     let dataDe = $('#inputDataDe').val()
                     let dataAte = $('#inputDataAte').val()
-                    let localEstoque = $('#inputLocalEstoque').val()
-                    let setor = $('#inputSetor').val()
-                    let categoria = $('#inputCategoria').val()
-                    let subCategoria = $('#inputSubCategoria').val()
+                    let localEstoque = $('#cmbLocalEstoque').val()
+                    let setor = $('#cmbSetor').val()
+                    let categoria = $('#cmbCategoria').val()
+                    let subCategoria = $('#cmbSubCategoria').val()
+                    let inputProduto = $('#inputProduto').val()
                     let url = "relatorioMovimentacaoPatrimonioFiltra.php";
+                    console.log(categoria)
 
-                    $.post(url,{inputDataDe: dataDe, inputDataAte: dataAte, inputLocalEstoque: localEstoque, inputSetor: setor, inputCategoria: categoria, inputSubCategoria: subCategoria}, (data) => {
+                    $.post(
+                        url,
+                        {
+                            inputDataDe: dataDe, 
+                            inputDataAte: dataAte, 
+                            inputLocalEstoque: localEstoque, 
+                            inputSetor: setor, 
+                            inputCategoria: categoria, 
+                            inputSubCategoria: subCategoria,
+                            inputProduto: inputProduto
+                        }, 
+                        (data) => {
                             $('tbody').html(data)
                         });
                 })
@@ -227,7 +239,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                                 <div class="row col-lg-5">
                                                     <div class="col-lg-6 row">
                                                         <div class="form-group col-12">
-                                                            <select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
+                                                            <select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2">
                                                                 <option value="">Local Estoque</option>
                                                                 <?php
                                                                 $sql = ("SELECT LcEstId, LcEstNome
@@ -246,7 +258,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                                     </div>
                                                     <div class="col-lg-6 row">
                                                         <div class="form-group col-12">
-                                                            <select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
+                                                            <select id="cmbSetor" name="cmbSetor" class="form-control form-control-select2">
                                                                 <option value="">Setor</option>
                                                                 <?php
                                                                 $sql = ("SELECT SetorId, SetorNome
@@ -301,7 +313,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                                             <label for="inputProduto">Produto</label>
                                                         </div>
                                                         <div class="col-6 form-group row">
-                                                            <input type="search" id="inputNome" name="inputNome" class="form-control pb-0 imput-pesquisa-filtro" placeholder="Nome" required>
+                                                            <input type="search" id="inputProduto" name="inputProduto" class="form-control pb-0 imput-pesquisa-filtro" placeholder="Nome" required>
                                                         </div>
                                                     </div>
                                                 </div>
