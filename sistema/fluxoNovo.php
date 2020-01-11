@@ -23,6 +23,12 @@ if(isset($_POST['inputDataInicio'])){
 	try{
 		
 		$conn->beginTransaction();
+
+		$sql = "SELECT SituaId
+		FROM Situacao
+		Where SituaChave = 'PENDENTE' ";
+		$result = $conn->query("$sql");
+		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 		
 		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, 
 											  FlOpeValor, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa)
@@ -39,7 +45,7 @@ if(isset($_POST['inputDataInicio'])){
 						':iNumContrato' => $_POST['inputNumContrato'],
 						':iNumProcesso' => $_POST['inputNumProcesso'],
 						':fValor' => gravaValor($_POST['inputValor']),
-						':bStatus' => 1,
+						':bStatus' => $rowSituacao['SituaId'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
@@ -106,6 +112,7 @@ if(isset($_POST['inputDataInicio'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
+
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>	<!-- CV Documentacao: https://jqueryvalidation.org/ -->
@@ -122,6 +129,9 @@ if(isset($_POST['inputDataInicio'])){
 				FiltraSubCategoria();
 				
 				var cmbFornecedor = $('#cmbFornecedor').val();
+				var validator = $( "#formFluxoOperacional" ).validate();
+
+				validator.element( "#cmbFornecedor" ); //Valida apenas esse elemento nesse momento de alteração
 				
 				$.getJSON('filtraCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
 					
@@ -138,12 +148,14 @@ if(isset($_POST['inputDataInicio'])){
 					} else {
 						ResetCategoria();
 					}					
-				});
+
+					validator.element( "#cmbCategoria" ); //Valida apenas esse elemento nesse momento de alteração
+				});					
 				
 				$.getJSON('filtraSubCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
 					
 					if (dados.length > 1){
-						var option = '<option value="#" "selected">Selecione a SubCategoria</option>';
+						var option = '<option value="">Selecione a SubCategoria</option>';
 					} else {
 						var option = '';
 					}
@@ -158,8 +170,12 @@ if(isset($_POST['inputDataInicio'])){
 					} else {
 						ResetSubCategoria();
 					}					
+
+					validator.element( "#cmbSubCategoria" ); //Valida apenas esse elemento nesse momento de alteração
 				});
-				
+
+
+
 			});	
 						
 			//Mostra o "Filtrando..." na combo Categoria

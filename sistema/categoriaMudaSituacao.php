@@ -9,14 +9,21 @@ $_SESSION['msg'] = array();
 if(isset($_POST['inputCategoriaId'])){
 	
 	$iCategoria = $_POST['inputCategoriaId'];
-	$bStatus = $_POST['inputCategoriaStatus'] ? 0 : 1;
+	$sStatus = $_POST['inputCategoriaStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
         	
 	try{
+
+		$sql = "SELECT SituaId
+				FROM Situacao
+			    WHERE SituaChave = '". $sStatus."'";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+		$iStatus = $row['SituaId'];
 		
-		$sql = "UPDATE Categoria SET CategStatus = :bStatus
+		$sql = "UPDATE Categoria SET CategStatus = :iStatus
 				WHERE CategId = :id";
 		$result = $conn->prepare("$sql");
-		$result->bindParam(':bStatus', $bStatus); 
+		$result->bindParam(':iStatus', $iStatus); 
 		$result->bindParam(':id', $iCategoria); 
 		$result->execute();
 		

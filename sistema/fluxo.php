@@ -6,14 +6,15 @@ $_SESSION['PaginaAtual'] = 'Fluxo Operacional';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT FlOpeId, ForneNome, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
-				FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome
-		 FROM FluxoOperacional
-		 JOIN Categoria on CategId = FlOpeCategoria
-		 JOIN Fornecedor on ForneId = FlOpeFornecedor
-	     WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY FlOpeDataInicio DESC, FlOpeCategoria ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT FlOpeId, ForneNome, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
+				FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome, SituaChave, SituaNome, SituaCor
+		FROM FluxoOperacional
+		JOIN Categoria on CategId = FlOpeCategoria
+		JOIN Fornecedor on ForneId = FlOpeFornecedor
+		JOIN Situacao on SituaId = FlOpeStatus
+	    WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ."
+		ORDER BY FlOpeDataInicio DESC, FlOpeCategoria ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -106,6 +107,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				document.formFluxoOperacional.action = "fluxoProduto.php";
 			} else if (Tipo == 'realizado'){
 				document.formFluxoOperacional.action = "fluxoRealizado.php";
+			} else if (Tipo == 'aditivo'){
+				document.formFluxoOperacional.action = "fluxoAditivo.php";
 			} else if (Tipo == 'imprime'){
 				document.formFluxoOperacional.action = "fluxoImprime.php";
 				document.formFluxoOperacional.setAttribute("target", "_blank");
@@ -172,22 +175,34 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<tbody>
 								<?php
 									foreach ($row as $item){
+
+										$sql = "SELECT Top 1 isnull(AditiDtFim, FlOpeDataFim) as DataFim
+												FROM FluxoOperacional
+												LEFT JOIN Aditivo on AditiFluxoOperacional = FlOpeId
+												WHERE FlOpeId = ".$item['FlOpeId']."
+												ORDER BY AditiDtFim DESC";
+										$result = $conn->query($sql);
+										$rowDataFim = $result->fetch(PDO::FETCH_ASSOC);
+										$dataFim = $rowDataFim['DataFim'];
+
 										
-										$situacao = $item['FlOpeStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['FlOpeStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge-'.$item['SituaCor'];
 										
 										print('
 										<tr>
 											<td>'.mostraData($item['FlOpeDataInicio']).'</td>
-											<td>'.mostraData($item['FlOpeDataFim']).'</td>
+											<td>'.mostraData($dataFim).'</td>
 											<td>'.$item['FlOpeNumContrato'].'</td>
 											<td>'.$item['FlOpeNumProcesso'].'</td>
 											<td>'.$item['ForneNome'].'</td>
 											<td>'.$item['CategNome'].'</td>
+											<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span>
 											');
 										
-										print('<td><a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\','.$item['FlOpeStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
-										
+										/*
+										print('<td><a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\','.$item['FlOpeStatus'].', \'mudaStatus\');"><span class="badge badge-flat '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										*/
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
@@ -201,6 +216,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'produto\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'aditivo\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
 																<div class="dropdown-divider"></div>
 																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\','.$item['FlOpeStatus'].', \'realizado\');" class="dropdown-item"><i class="icon-statistics" data-popup="tooltip" data-placement="bottom" title="Fluxo Realizado"></i> Fluxo Realizado</a>
 															</div>

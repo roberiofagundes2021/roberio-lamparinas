@@ -6,8 +6,9 @@ $_SESSION['PaginaAtual'] = 'Categoria';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT CategId, CategNome, CategStatus
+$sql = "SELECT CategId, CategNome, CategStatus, SituaNome, SituaChave, SituaCor
 		FROM Categoria
+		JOIN Situacao on SituaId = CategStatus
 	    WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
 		ORDER BY CategNome ASC";
 $result = $conn->query($sql);
@@ -163,21 +164,21 @@ $count = count($row);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['CategStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['CategStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge-'.$item['SituaCor'];
 										
 										print('
 										<tr>
 											<td>'.$item['CategNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\','.$item['CategStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\','.$item['CategStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\','.$item['CategStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>

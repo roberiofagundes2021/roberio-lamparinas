@@ -385,7 +385,34 @@ if(isset($_POST['inputDataInicio'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
+										<?php 
+
+											$sql = "SELECT SUM(FOXPrQuantidade * FOXPrValorUnitario) as total
+													FROM FluxoOperacionalXProduto
+													WHERE FOXPrEmpresa = ".$_SESSION['EmpreId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+											$result = $conn->query($sql);
+											$rowTotal = $result->fetch(PDO::FETCH_ASSOC);
+											$count = count($rowTotal);
+
+											if ($count){
+												if ($rowTotal['total'] == $row['FlOpeValor']){
+													$bFechado = 1;
+												} else {
+													$bFechado = 0;
+												}
+											} else {
+												$bFechado = 0;
+											}										
+										
+											if ($bFechado){
+												if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'ADMINISTRADOR' or $_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' or $_SESSION['PerfiChave'] == 'CONTROLADORIA'){
+													print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
+												}
+											} else{ 
+												print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
+											} 
+										
+										?>
 										<a href="fluxo.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 									</div>
 								</div>

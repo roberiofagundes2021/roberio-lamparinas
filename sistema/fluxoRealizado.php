@@ -422,13 +422,13 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 											<th width="4%">Item</th>
 											<th width="26%">Produto</th>
 											<th width="15%">Marca</th>
-											<th width="10%">Unidade</th>
-											<th width="10%">Quant.</th>									
-											<th width="10%">Valor Unit.</th>										
-											<th width="10%">Valor Total</th>
-											<th width="5%"></th>
-											<th width="5%"></th>
-											<th width="5%">%</th>
+											<th width="9%">Unidade</th>
+											<th width="9%">Quant.</th>									
+											<th width="9%">Valor Unit.</th>										
+											<th width="9%">Valor Total</th>
+											<th width="7%" style="background-color: #ccc; color:#333;">Saldo (Qt)</th>
+											<th width="7%" style="background-color: #ccc; color:#333;">Saldo (R$)</th>
+											<th width="5%" style="background-color: #ccc; color:#333;">%</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -438,20 +438,24 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 											foreach ($rowPrevisto as $item){
 
 												$iQuantidadePrevista = isset($item['FOXPrQuantidade']) ? $item['FOXPrQuantidade'] : '';
-												$fValorUnitario = isset($item['FOXPrValorUnitario']) ? mostraValor($item['FOXPrValorUnitario']) : '';											
-												$fValorTotal = (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? mostraValor($item['FOXPrQuantidade'] * $item['FOXPrValorUnitario']) : '';
+												$fValorUnitarioPrevisto = isset($item['FOXPrValorUnitario']) ? mostraValor($item['FOXPrValorUnitario']) : '';											
+												$fValorTotalPrevisto = (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? $item['FOXPrQuantidade'] * $item['FOXPrValorUnitario'] : '';
 
 
-												$sql = "SELECT ISNULL(SUM(MvXPrQuantidade), 0) as Controle
+												$sql = "SELECT ISNULL(SUM(MvXPrQuantidade), 0) as Controle, MvXPrValorUnitario
 														FROM Movimentacao														
 														JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-														WHERE MovimEmpresa = ".$_SESSION['EmpreId']." and MvXPrProduto = ".$item['ProduId']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$dataFim."' and MovimTipo = 'E' ";
+														WHERE MovimEmpresa = ".$_SESSION['EmpreId']." and MvXPrProduto = ".$item['ProduId']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$dataFim."' and MovimTipo = 'E' 
+														GROUP By MvXPrQuantidade, MvXPrValorUnitario";
 												$result = $conn->query($sql);
 												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
 
 												$iQuantidadeRealizada = $rowMovimentacao['Controle'] != '' ? $rowMovimentacao['Controle'] : 0;
+												$fValorUnitarioRealizado = isset($rowMovimentacao['MvXPrValorUnitario']) ? mostraValor($rowMovimentacao['MvXPrValorUnitario']) : 0;						
+												$fValorTotalRealizado = (isset($iQuantidadeRealizada) and isset($rowMovimentacao['MvXPrValorUnitario'])) ? $iQuantidadeRealizada * $rowMovimentacao['MvXPrValorUnitario'] : 0;
 
 												$controle = $iQuantidadePrevista - $iQuantidadeRealizada;
+												$saldo = mostraValor($fValorTotalPrevisto - $fValorTotalRealizado);
 												$porcentagem = $controle * 100 / $iQuantidadePrevista;
 
 												print('
@@ -461,11 +465,11 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 													<td>'.$item['MarcaNome'].'</td>
 													<td>'.$item['UnMedSigla'].'</td>
 													<td>'.$iQuantidadePrevista.'</td>
-													<td>'.$fValorUnitario.'</td>											
-													<td>'.$fValorTotal.'</td>
-													<td></td>
-													<td></td>
-													<td>'.$porcentagem.'%</td>
+													<td>'.$fValorUnitarioPrevisto.'</td>											
+													<td>'.mostraValor($fValorTotalPrevisto).'</td>
+													<td style="background-color: #eee; color:#333;">'.$controle.'</td>
+													<td style="background-color: #eee; color:#333;">'.$saldo.'</td>
+													<td style="background-color: #eee; color:#333;">'.$porcentagem.'%</td>
 												</tr>');
 
 												$cont++;
@@ -518,13 +522,13 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 											<th width="4%">Item</th>
 											<th width="26%">Produto</th>
 											<th width="15%">Marca</th>
-											<th width="10%">Unidade</th>
-											<th width="10%">Quant.</th>									
-											<th width="10%">Valor Unit.</th>										
-											<th width="10%">Valor Total</th>
-											<th width="5%">Controle</th>
-											<th width="5%">Saldo</th>
-											<th width="5%">%</th>
+											<th width="9%">Unidade</th>
+											<th width="9%">Quant.</th>									
+											<th width="9%">Valor Unit.</th>										
+											<th width="9%">Valor Total</th>
+											<th width="7%" style="background-color: #ccc; color:#333;">Total (Qt)</th>
+											<th width="7%" style="background-color: #ccc; color:#333;">Total (R$)</th>
+											<th width="5%" style="background-color: #ccc; color:#333;">%</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -562,9 +566,9 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 													<td>'.$iQuantidadeRealizada.'</td>
 													<td>'.$fValorUnitarioRealizado.'</td>											
 													<td>'.mostraValor($fValorTotalRealizado).'</td>
-													<td>'.$controle.'</td>
-													<td>'.$saldo.'</td>
-													<td>'.$porcentagem.'%</td>
+													<td style="background-color: #eee; color:#333;">'.$iQuantidadeRealizada.'</td>
+													<td style="background-color: #eee; color:#333;">'.mostraValor($fValorTotalRealizado).'</td>
+													<td style="background-color: #eee; color:#333;">'.$porcentagem.'%</td>
 												</tr>');
 
 												$cont++;

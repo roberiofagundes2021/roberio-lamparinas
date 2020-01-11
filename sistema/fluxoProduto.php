@@ -86,6 +86,33 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 			$valorTotal = floatval($_POST['inputValor']);
 			$TotalGeral = floatval(str_replace(',', '.', str_replace('.', '', $_POST['inputTotalGeral'])));
 
+
+			$sql = "SELECT SituaId
+					FROM Situacao
+					Where SituaChave = 'PENDENTE' ";
+			$result = $conn->query("$sql");
+			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+			//Atualiza a Situação do Fluxo se estiver fechado o valor total dos produtos com o valor total do Fluxo e a situação estiver PENDENTE. Daí deve passar para ATIVO.
+			if ($valorTotal === $TotalGeral && $_POST['inputStatus'] == $rowSituacao['SituaId']){
+
+				$sql = "SELECT SituaId
+						FROM Situacao
+						Where SituaChave = 'ATIVO' ";
+				$result = $conn->query("$sql");
+				$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+				$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
+                        WHERE FluxoId = :iFluxo 
+		               ";
+	            $result = $conn->prepare($sql);
+			
+	            $result->execute(array(
+					':bStatus' => $rowSituacao['SituaId'],
+					':iFluxo' => $iFluxoOperacional					
+					));
+			}
+
 	        //Se o parâmetro de atualizar estiver ativo e o fluxo estiver fechado
 			if($Parametro['ParamValorAtualizadoFluxo'] == 1 && $valorTotal === $TotalGeral){
 
@@ -149,7 +176,7 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 try{
 	
 	$sql = "SELECT FlOpeId, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
-				   SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor
+				   SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus
 			FROM FluxoOperacional
 			JOIN Fornecedor on ForneId = FlOpeFornecedor
 			JOIN Categoria on CategId = FlOpeCategoria
@@ -328,6 +355,7 @@ try{
 						</div>					
 						
 						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional" class="form-control" value="<?php echo $row['FlOpeId']; ?>">
+						<input type="hidden" id="inputStatus" name="inputStatus" class="form-control" value="<?php echo $row['FlOpeStatus']; ?>">
 						
 						<div class="card-body">		
 								
@@ -393,7 +421,7 @@ try{
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="cmbProduto">Produto</label>
-												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc <?php if ($countProdutoUtilizado and $_SESSION['PerfiChave'] != 'SUPER' and $_SESSION['PerfiChave'] != 'CONTROLADORIA') { echo "disabled";} ?> >
+												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc <?php if ($countProdutoUtilizado and $_SESSION['PerfiChave'] != 'SUPER' and $_SESSION['PerfiChave'] != 'ADMINISTRADOR' and $_SESSION['PerfiChave'] != 'CONTROLADORIA' and $_SESSION['PerfiChave'] != 'CENTROADMINISTRATIVO') { echo "disabled";} ?> >
 													<?php 
 														$sql = "SELECT ProduId, ProduNome
 																FROM Produto										     
@@ -514,6 +542,12 @@ try{
 											$fValorTotal = (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? mostraValor($item['FOXPrQuantidade'] * $item['FOXPrValorUnitario']) : '';
 											
 											$fTotalGeral += (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? $item['FOXPrQuantidade'] * $item['FOXPrValorUnitario'] : 0;
+
+											if ($fTotalGeral == $row['FlOpeValor']){
+												$bFechado = 1;
+											} else {
+												$bFechado = 0;
+											}
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
@@ -593,8 +627,8 @@ try{
 									<div class="form-group">
 										<?php 
 										
-											if ($countProdutoUtilizado){
-												if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'CONTROLADORIA'){
+											if ($bFechado){
+												if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'ADMINISTRADOR' or $_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' or $_SESSION['PerfiChave'] == 'CONTROLADORIA'){
 													print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
 												}
 											} else{ 
