@@ -128,8 +128,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 
             (function Filtrar() {
+                let cont = false;
+
                 $('#submitFiltro').on('click', (e) => {
                     e.preventDefault()
+
+                    const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>')
+
 
                     let dataDe = $('#inputDataDe').val()
                     let dataAte = $('#inputDataAte').val()
@@ -139,43 +144,44 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                     let subCategoria = $('#cmbSubCategoria').val()
                     let inputProduto = $('#inputProduto').val()
                     let url = "relatorioMovimentacaoPatrimonioFiltra.php";
-                    console.log(categoria)
 
                     $.post(
-                        url,
-                        {
-                            inputDataDe: dataDe, 
-                            inputDataAte: dataAte, 
-                            inputLocalEstoque: localEstoque, 
-                            inputSetor: setor, 
-                            inputCategoria: categoria, 
+                        url, {
+                            inputDataDe: dataDe,
+                            inputDataAte: dataAte,
+                            inputLocalEstoque: localEstoque,
+                            inputSetor: setor,
+                            inputCategoria: categoria,
                             inputSubCategoria: subCategoria,
                             inputProduto: inputProduto
-                        }, 
+                        },
                         (data) => {
-                            $('tbody').html(data)
+
+                            if(data){ 
+                                $('tbody').html(data)
+                                $('#imprimir').removeAttr('disabled')
+                                    }else{ 
+                                        $('tbody').html(msg)
+                                        $('#imprimir').attr('disabled', '')
+                                    }
                         });
+
                 })
+
+               /* $('#submitFiltro').on('mouseup', (e) => {
+                    setTimeout(() => {
+                        if ($('td').length > 3) {
+                            $('#imprimir').removeAttr('disabled')
+                            console.log('teste')
+                        } else {
+                            $('#imprimir').attr('disabled', '')
+                        }
+                    }, 400)
+
+
+                })*/
             })()
         });
-
-        //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-        function atualizaMovimentacao(MovimId, MovimNotaFiscal, Tipo) {
-
-            document.getElementById('inputMovimentacaoId').value = MovimId;
-            document.getElementById('inputMovimentacaoNotaFiscal').value = MovimNotaFiscal;
-
-            if (Tipo == 'edita') {
-                document.formMovimentacao.action = "movimentacaoEdita.php";
-            } else if (Tipo == 'exclui') {
-                confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir esse movimentacao?", "movimentacaoExclui.php");
-            } else if (Tipo == 'imprimir') {
-                document.formMovimentacao.action = "movimentacaoImprime.php";
-                document.formMovimentacao.setAttribute("target", "_blank");
-            }
-
-            document.formMovimentacao.submit();
-        }
     </script>
 
 </head>
@@ -213,144 +219,139 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                             </div>
 
-                            <form name="formFiltro" id="formFiltro" method="POST" class="form-validate-jquery pl-3">
-                                <div class="row col-lg-12" style="width: 100%">
-                                    <div class="row col-11 pl-0">
-                                        <div class="d-flex flex-column col-12">
-                                            <div class="row m-0 " style="background-color: #eeeded">
-                                                <div class="row col-lg-7">
-                                                    <div class="col-lg-6 row">
-                                                        <div class="row col-6 justify-content-center align-content-center">
-                                                            <label for="inputDataDe">Período de</label>
-                                                        </div>
-                                                        <div class="col-6 form-group row">
-                                                            <input type="date" id="inputDataDe" name="inputDataDe" class="form-control pb-0" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6 row">
-                                                        <div class="row col-6 justify-content-center align-content-center">
-                                                            <label for="inputDataAte">Até</label>
-                                                        </div>
-                                                        <div class="col-6 form-group row">
-                                                            <input type="date" id="inputDataAte" name="inputDataAte" class="form-control pb-0" required>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row col-lg-5">
-                                                    <div class="col-lg-6 row">
-                                                        <div class="form-group col-12">
-                                                            <select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2">
-                                                                <option value="">Local Estoque</option>
-                                                                <?php
-                                                                $sql = ("SELECT LcEstId, LcEstNome
-																          FROM LocalEstoque															     
-																          WHERE LcEstStatus = 1 and LcEstEmpresa = " . $_SESSION['EmpreId'] . "
-																          ORDER BY LcEstNome ASC");
-                                                                $result = $conn->query($sql);
-                                                                $rowLcEst = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                                foreach ($rowLcEst as $item) {
-                                                                    print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
-                                                                }
-                                                                ?>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6 row">
-                                                        <div class="form-group col-12">
-                                                            <select id="cmbSetor" name="cmbSetor" class="form-control form-control-select2">
-                                                                <option value="">Setor</option>
-                                                                <?php
-                                                                $sql = ("SELECT SetorId, SetorNome
-																             FROM Setor													     
-																             WHERE SetorStatus = 1 and SetorEmpresa = " . $_SESSION['EmpreId'] . "
-																             ORDER BY SetorNome ASC");
-                                                                $result = $conn->query("$sql");
-                                                                $rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                                foreach ($rowSetor as $item) {
-                                                                    print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
-                                                                }
-                                                                ?>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row m-0 mt-3 " style="background-color: #eeeded">
-                                                <div class="row col-lg-5 ml-2">
-                                                    <div class="col-lg-6 row">
-                                                        <div class="form-group col-12">
-                                                            <select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-                                                                <option value="">Categoria</option>
-                                                                <?php
-                                                                $sql = ("SELECT CategId, CategNome
-																             FROM Categoria														     
-																             WHERE CategStatus = 1 and CategEmpresa = " . $_SESSION['EmpreId'] . "
-																             ORDER BY CategNome ASC");
-                                                                $result = $conn->query("$sql");
-                                                                $rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                                foreach ($rowCateg as $item) {
-                                                                    print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
-                                                                }
-                                                                ?>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6 row">
-                                                        <div class="form-group col-12">
-                                                            <select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-                                                                <option value="">Subcategoria</option>
-
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row col-lg-7">
-                                                    <div class="col-lg-8 row">
-                                                        <div class="row col-4 justify-content-center align-content-center">
-                                                            <label for="inputProduto">Produto</label>
-                                                        </div>
-                                                        <div class="col-6 form-group row">
-                                                            <input type="search" id="inputProduto" name="inputProduto" class="form-control pb-0 imput-pesquisa-filtro" placeholder="Nome" required>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                            <form name="formFiltro" id="formFiltro" method="POST" class="form-validate-jquery p-3">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <div class="form-group">
+                                            <label for="inputDataDe">Período de</label>
+                                            <div class="input-group">
+                                                <span class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="icon-calendar22"></i></span>
+                                                </span>
+                                                <input type="date" id="inputDataDe" name="inputDataDe" class="form-control">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row col-lg-1 ml-1">
-                                        <div class="d-flex flex-column">
-                                            <div class="row" style="height: 57%">
-
+                                    <div class="col-lg-3">
+                                        <div class="form-group">
+                                            <label for="inputDataAte">Até</label>
+                                            <div class="input-group">
+                                                <span class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="icon-calendar22"></i></span>
+                                                </span>
+                                                <input type="date" id="inputDataAte" name="inputDataAte" class="form-control">
                                             </div>
-                                            <div class="d-flex flex-column justify-content-between align-content-center" style="height: 43%; padding: 4px">
-                                                <button id="submitFiltro" class="btn btn-success btn-sm" style="padding: 0px 14px 0px 14px; text-transform: none;">Consultar</button>
-                                                <button class="btn btn-success btn-sm" disabled style="padding: 0px 14px 0px 14px;  text-transform: none">Imprimir</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div class="form-group">
+                                            <label for="cmbLocalEstoque">Local Estoque</label>
+                                            <select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2">
+                                                <option value="">Selecionar</option>
+                                                <?php
+                                                $sql = ("SELECT LcEstId, LcEstNome
+																          FROM LocalEstoque															     
+																          WHERE LcEstStatus = 1 and LcEstEmpresa = " . $_SESSION['EmpreId'] . "
+																          ORDER BY LcEstNome ASC");
+                                                $result = $conn->query($sql);
+                                                $rowLcEst = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                foreach ($rowLcEst as $item) {
+                                                    print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div class="form-group">
+                                            <label for="cmbSetor">Setor</label>
+                                            <select id="cmbSetor" name="cmbSetor" class="form-control form-control-select2">
+                                                <option value="">Selecionar</option>
+                                                <?php
+                                                $sql = ("SELECT SetorId, SetorNome
+																             FROM Setor													     
+																             WHERE SetorStatus = 1 and SetorEmpresa = " . $_SESSION['EmpreId'] . "
+																             ORDER BY SetorNome ASC");
+                                                $result = $conn->query("$sql");
+                                                $rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                foreach ($rowSetor as $item) {
+                                                    print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <div class="form-group">
+                                            <label for="cmbCategoria">Categoria</label>
+                                            <select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+                                                <option value="">Selecionar</option>
+                                                <?php
+                                                $sql = ("SELECT CategId, CategNome
+																             FROM Categoria														     
+																             WHERE CategStatus = 1 and CategEmpresa = " . $_SESSION['EmpreId'] . "
+																             ORDER BY CategNome ASC");
+                                                $result = $conn->query("$sql");
+                                                $rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                foreach ($rowCateg as $item) {
+                                                    print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div class="form-group">
+                                            <label for="cmbSubCategoria">SubCategoria</label>
+                                            <select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+                                                <option value="">Selecionar</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label for="inputPoduto">Produto</label>
+                                            <div class="input-group">
+                                                <span class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="icon-calendar22"></i></span>
+                                                </span>
+                                                <input type="text" id="inputProduto" name="inputProduto" class="form-control">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="text-right">
+                                    <div>
+                                        <button id="submitFiltro" class="btn btn-success"><i class="icon-search">Consultar</i></button>
+                                        <button id="imprimir" type="submit" class="btn btn-success btn-icon" disabled>
+                                            <i class="icon-printer2"> Imprimir</i>
+                                        </button>
+                                    </div>
+                                </div>
                             </form>
-
 
                             <table class="table" id="tblMovimentacao">
                                 <thead>
                                     <tr class="bg-slate">
-                                        <th>Id</th>
-                                        <th>Data</th>
-                                        <th>Tipo</th>
-                                        <th>Nota Fiscal</th>
-                                        <th>Fornecedor</th>
-                                        <th>Estoque Destino</th>
-                                        <th>Situação</th>
-                                        <th class="text-center">Ações</th>
+                                        <th>Descrição do Produto</th>
+                                        <th>Item</th>
+                                        <th>Descrição do Produto</th>
+                                        <th>N° Patrimônio</th>
+                                        <th>N° Nota Fiscal</th>
+                                        <th>Valor/Aquisição</th>
+                                        <th>Valor/Depreciação</th>
+                                        <th>Validade</th>
+                                        <th>Local/Origem</th>
+                                        <th>Setor/Destino</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     
-
                                 </tbody>
                             </table>
                         </div>
@@ -358,13 +359,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
                     </div>
                 </div>
-
                 <!-- /info blocks -->
-
-                <form name="formMovimentacao" method="post" target="_blank">
-                    <input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId">
-                    <input type="hidden" id="inputMovimentacaoNotaFiscal" name="inputMovimentacaoNotaFiscal">
-                </form>
 
             </div>
             <!-- /content area -->
