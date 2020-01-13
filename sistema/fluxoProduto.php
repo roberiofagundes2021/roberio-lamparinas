@@ -48,17 +48,18 @@ function calculaValorProduto($valorProduto, $outrasDespesas = 0, $margemLucro){
 //Se está alterando
 if(isset($_POST['inputIdFluxoOperacional'])){
 
-	// Selecionando dados de parametro
-	$sql = "SELECT ParamId, ParamValorAtualizadoFluxo
-	        FROM Parametro
-	        WHERE ParamEmpresa = ".$_SESSION["EmpreId"]."
-	       ";
-	$result = $conn->query($sql);
-	$Parametro = $result->fetch(PDO::FETCH_ASSOC);    
-
-    $conn->beginTransaction();
-	
 	try{
+
+		$conn->beginTransaction();
+
+		// Selecionando dados de parametro
+		$sql = "SELECT ParamId, ParamValorAtualizadoFluxo
+		        FROM Parametro
+		        WHERE ParamEmpresa = ".$_SESSION["EmpreId"]."
+		       ";
+		$result = $conn->query($sql);
+		$Parametro = $result->fetch(PDO::FETCH_ASSOC);
+
 		$sql = "DELETE FROM FluxoOperacionalXProduto
 				WHERE FOXPrFluxoOperacional = :iFluxoOperacional AND FOXPrEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
@@ -83,9 +84,8 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 							':iEmpresa' => $_SESSION['EmpreId']
 							));
 
-			$valorTotal = floatval($_POST['inputValor']);
+			$valorTotal = floatval(str_replace(',', '.', str_replace('.', '', $_POST['inputValor'])));
 			$TotalGeral = floatval(str_replace(',', '.', str_replace('.', '', $_POST['inputTotalGeral'])));
-
 
 			$sql = "SELECT SituaId
 					FROM Situacao
@@ -94,16 +94,17 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 			//Atualiza a Situação do Fluxo se estiver fechado o valor total dos produtos com o valor total do Fluxo e a situação estiver PENDENTE. Daí deve passar para ATIVO.
-			if ($valorTotal === $TotalGeral && $_POST['inputStatus'] == $rowSituacao['SituaId']){
-
+			if ($valorTotal === $TotalGeral && $_POST['inputStatus'] == $rowSituacao['SituaId']){		
+					
+				/* Atualiza o Status do Fluxo para Aguardando Liberação */
 				$sql = "SELECT SituaId
 						FROM Situacao
-						Where SituaChave = 'ATIVO' ";
+						Where SituaChave = 'AGUARDANDOLIBERACAO' ";
 				$result = $conn->query("$sql");
 				$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 				$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
-                        WHERE FluxoId = :iFluxo 
+                        WHERE FlOpeId = :iFluxo 
 		               ";
 	            $result = $conn->prepare($sql);
 			
@@ -111,6 +112,57 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 					':bStatus' => $rowSituacao['SituaId'],
 					':iFluxo' => $iFluxoOperacional					
 					));
+	            /* Fim Atualiza */
+
+	            /* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
+				$sql = "SELECT PerfiId
+						FROM Perfil
+						Where PerfiChave IN ('ADMINISTRADOR','CONTROLADORIA') ";
+				$result = $conn->query("$sql");
+				$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
+
+				$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso
+						FROM FluxoOperacional
+						Where FlOpeId = ".$iFluxoOperacional;
+				$result = $conn->query("$sql");
+				$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
+				
+				$sIdentificacao = 'Fluxo Operacional (Nº Contrato: '.$rowFluxo['FlOpeNumContrato'].' | Nº Processo: '.$rowFluxo['FlOpeNumProcesso'].')';
+			
+				$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, BandeSolicitante, BandeTabela, BandeTabelaId,
+											 BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
+						VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+				$result = $conn->prepare($sql);
+						
+				$result->execute(array(
+								':sIdentificacao' => $sIdentificacao,
+								':dData' => gravaData($_POST['inputData']),
+								':sDescricao' => 'Liberar Fluxo',
+								':sURL' => '',
+								':iPerfilDestino' => $rowPerfil['PerfiId'],
+								':iSolicitante' => $_SESSION['UsuarId'],
+								':sTabela' => 'FluxoOperacional',
+								':iTabelaId' => $iFluxoOperacional,
+								':bStatus' => $rowSituacao['SituaId'],
+								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+								':iEmpresa' => $_SESSION['EmpreId']						
+								));
+
+				$insertId = $conn->lastInsertId();
+
+				foreach ($rowPerfil as $item){
+				
+					$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeEmpresa)
+							VALUES (:iBandeja, :iPerfil, :iEmpresa)";
+					$result = $conn->prepare($sql);
+							
+					$result->execute(array(
+									':iBandeja' => $insertId,
+									':iPerfil' => $item['PerfiId'],
+									':iEmpresa' => $_SESSION['EmpreId']						
+									));					
+				}
+				/* Fim Insere Bandeja */
 			}
 
 	        //Se o parâmetro de atualizar estiver ativo e o fluxo estiver fechado
@@ -283,7 +335,7 @@ try{
 				
 				e.preventDefault();
 				
-				var inputValor = parseFloat($('#inputValor').val());
+				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
 				var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
 				
 				//Verifica se o valor ultrapassou o total
@@ -412,7 +464,7 @@ try{
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValor">Valor Total</label>
-												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo $row['FlOpeValor']; ?>" readOnly>
+												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
 											</div>
 										</div>											
 									</div>

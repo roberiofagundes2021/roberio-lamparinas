@@ -14,8 +14,9 @@ if (isset($_POST['cmbPerfil'])){
 	$idPerfilLogado = $_POST['cmbPerfil'];
 } else {
 	$sql = "SELECT PerfiId
-			FROM Perfil		
-			WHERE PerfiChave = '". $_SESSION['PerfiChave'] ."' and PerfiStatus = 1";
+			FROM Perfil
+			JOIN Situacao on SituaId = PerfiStatus		
+			WHERE PerfiChave = '". $_SESSION['PerfiChave'] ."' and SituaChave = 'ATIVO'";
 	$result = $conn->query($sql);
 	$rowPerfilLogado = $result->fetch(PDO::FETCH_ASSOC);
 	$idPerfilLogado = $rowPerfilLogado['PerfiId'];
@@ -30,7 +31,7 @@ $sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, 
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao		
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado."
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandePerfilDestino = ".$idPerfilLogado."
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowPendente = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -39,7 +40,7 @@ $sql = "SELECT COUNT(BandeId) as TotalPendente
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado;
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandePerfilDestino = ".$idPerfilLogado;
 $result = $conn->query($sql);
 $rowTotalPendente = $result->fetch(PDO::FETCH_ASSOC);
 $totalPendente = $rowTotalPendente['TotalPendente'];
@@ -51,7 +52,7 @@ $sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, 
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado."
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandePerfilDestino = ".$idPerfilLogado."
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -60,7 +61,7 @@ $sql = "SELECT COUNT(BandeId) as TotalLiberado
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado;
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandePerfilDestino = ".$idPerfilLogado;
 $result = $conn->query($sql);
 $rowTotalLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalLiberado = $rowTotalLiberado['TotalLiberado'];
@@ -72,7 +73,7 @@ $sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, 
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado."
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandePerfilDestino = ".$idPerfilLogado."
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowNaoLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -81,7 +82,7 @@ $sql = "SELECT COUNT(BandeId) as TotalNaoLiberado
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandeStatus = 1 and BandePerfilDestino = ".$idPerfilLogado;
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandePerfilDestino = ".$idPerfilLogado;
 $result = $conn->query($sql);
 $rowTotalNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
@@ -354,7 +355,7 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 												if (isset($_POST['cmbSituacao'])){
 													$seleciona = $item['SituaChave'] == $_POST['cmbSituacao'] ? "selected" : "";
 												} else{
-													$seleciona = '';
+													$seleciona = $item['SituaChave'] == 'PENDENTE' ? "selected" : "";
 												}
 												
 												print('<option value="'.$item['SituaChave'].'" '.$seleciona.'>'.$item['SituaNome'].'</option>');
@@ -435,8 +436,8 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 										} else { // quando não tiver POST e vier do menu index.php
 											
 											include('bandejaPendente.php');
-											include('bandejaLiberado.php');
-											include('bandejaNaoLiberado.php');
+											//include('bandejaLiberado.php');
+											//include('bandejaNaoLiberado.php');
 										}
 									?>
 										
