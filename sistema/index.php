@@ -30,8 +30,9 @@ $sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, 
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
+		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao		
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandePerfilDestino = ".$idPerfilLogado."
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'AGUARDANDOLIBERACAO' and BandePerfilDestino = ".$idPerfilLogado."
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowPendente = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -40,7 +41,7 @@ $sql = "SELECT COUNT(BandeId) as TotalPendente
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'PENDENTE' and BandePerfilDestino = ".$idPerfilLogado;
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'AGUARDANDOLIBERACAO' and BandePerfilDestino = ".$idPerfilLogado;
 $result = $conn->query($sql);
 $rowTotalPendente = $result->fetch(PDO::FETCH_ASSOC);
 $totalPendente = $rowTotalPendente['TotalPendente'];

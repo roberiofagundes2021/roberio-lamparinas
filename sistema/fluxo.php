@@ -187,7 +187,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 										
 										$situacao = $item['SituaNome'];
-										$situacaoClasse = 'badge-'.$item['SituaCor'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
@@ -197,7 +197,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['FlOpeNumProcesso'].'</td>
 											<td>'.$item['ForneNome'].'</td>
 											<td>'.$item['CategNome'].'</td>
-											<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span>
+											<td><span class="'.$situacaoClasse.'">'.$situacao.'</span>
 											');
 										
 										/*

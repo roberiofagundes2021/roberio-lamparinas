@@ -96,7 +96,7 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 			//Atualiza a Situação do Fluxo se estiver fechado o valor total dos produtos com o valor total do Fluxo e a situação estiver PENDENTE. Daí deve passar para ATIVO.
 			if ($valorTotal === $TotalGeral && $_POST['inputStatus'] == $rowSituacao['SituaId']){		
 					
-				/* Atualiza o Status do Fluxo para Aguardando Liberação */
+				/* Atualiza o Status do Fluxo para "Aguardando Liberação" */
 				$sql = "SELECT SituaId
 						FROM Situacao
 						Where SituaChave = 'AGUARDANDOLIBERACAO' ";
@@ -114,7 +114,6 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 					));
 	            /* Fim Atualiza */
 
-	            /* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
 				$sql = "SELECT PerfiId
 						FROM Perfil
 						Where PerfiChave IN ('ADMINISTRADOR','CONTROLADORIA') ";
@@ -126,43 +125,55 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 						Where FlOpeId = ".$iFluxoOperacional;
 				$result = $conn->query("$sql");
 				$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
-				
-				$sIdentificacao = 'Fluxo Operacional (Nº Contrato: '.$rowFluxo['FlOpeNumContrato'].' | Nº Processo: '.$rowFluxo['FlOpeNumProcesso'].')';
-			
-				$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, BandeSolicitante, BandeTabela, BandeTabelaId,
-											 BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
-						VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
-				$result = $conn->prepare($sql);
-						
-				$result->execute(array(
-								':sIdentificacao' => $sIdentificacao,
-								':dData' => gravaData($_POST['inputData']),
-								':sDescricao' => 'Liberar Fluxo',
-								':sURL' => '',
-								':iPerfilDestino' => $rowPerfil['PerfiId'],
-								':iSolicitante' => $_SESSION['UsuarId'],
-								':sTabela' => 'FluxoOperacional',
-								':iTabelaId' => $iFluxoOperacional,
-								':bStatus' => $rowSituacao['SituaId'],
-								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iEmpresa' => $_SESSION['EmpreId']						
-								));
 
-				$insertId = $conn->lastInsertId();
+				/* Verifica se a Bandeja já tem um registro com BandeTabela: FluxoOperacional e BandeTabelaId: IdFluxoAtual, evitando dupliacação */
+				$sql = "SELECT BandeId
+						FROM Bandeja
+						Where BandeTabela = 'FluxoOperacional' and BandeTabelaId =  ".$iFluxoOperacional;
+				$result = $conn->query("$sql");
+				$rowBandeja = $result->fetchAll(PDO::FETCH_ASSOC);
+				$count = count($rowBandeja);
 
-				foreach ($rowPerfil as $item){
+				if (!$count){
 				
-					$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeEmpresa)
-							VALUES (:iBandeja, :iPerfil, :iEmpresa)";
+					/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
+					$sIdentificacao = 'Fluxo Operacional (Nº Contrato: '.$rowFluxo['FlOpeNumContrato'].' | Nº Processo: '.$rowFluxo['FlOpeNumProcesso'].')';
+				
+					$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, BandeSolicitante, BandeTabela, BandeTabelaId,
+												 BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
+							VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 					$result = $conn->prepare($sql);
 							
 					$result->execute(array(
-									':iBandeja' => $insertId,
-									':iPerfil' => $item['PerfiId'],
+									':sIdentificacao' => $sIdentificacao,
+									':dData' => gravaData($_POST['inputData']),
+									':sDescricao' => 'Liberar Fluxo',
+									':sURL' => '',
+									':iPerfilDestino' => $rowPerfil['PerfiId'],
+									':iSolicitante' => $_SESSION['UsuarId'],
+									':sTabela' => 'FluxoOperacional',
+									':iTabelaId' => $iFluxoOperacional,
+									':bStatus' => $rowSituacao['SituaId'],
+									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 									':iEmpresa' => $_SESSION['EmpreId']						
-									));					
+									));
+
+					$insertId = $conn->lastInsertId();
+
+					foreach ($rowPerfil as $item){
+					
+						$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeEmpresa)
+								VALUES (:iBandeja, :iPerfil, :iEmpresa)";
+						$result = $conn->prepare($sql);
+								
+						$result->execute(array(
+										':iBandeja' => $insertId,
+										':iPerfil' => $item['PerfiId'],
+										':iEmpresa' => $_SESSION['EmpreId']						
+										));					
+					}
+					/* Fim Insere Bandeja */
 				}
-				/* Fim Insere Bandeja */
 			}
 
 	        //Se o parâmetro de atualizar estiver ativo e o fluxo estiver fechado

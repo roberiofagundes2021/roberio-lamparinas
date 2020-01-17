@@ -49,17 +49,17 @@ $count = count($row);
 			    columnDefs: [
 				{
 					orderable: true,   //Categoria
-					width: "70%",
+					width: "80%",
 					targets: [0]
 				},
 				{ 
 					orderable: true,   //Situação
-					width: "15%",
+					width: "10%",
 					targets: [1]
 				},
 				{ 
 					orderable: true,   //Ações
-					width: "15%",
+					width: "10%",
 					targets: [2]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -165,7 +165,7 @@ $count = count($row);
 									foreach ($row as $item){
 										
 										$situacao = $item['SituaNome'];
-										$situacaoClasse = 'badge-'.$item['SituaCor'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
