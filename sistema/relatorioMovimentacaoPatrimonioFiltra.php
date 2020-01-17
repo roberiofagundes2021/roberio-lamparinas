@@ -62,12 +62,17 @@ function queryPesquisa(){
 
             $string = implode( " and ",$args );
 
-            $sql = "SELECT MvXPrId, MovimId ,MovimData, MovimNotaFiscal, MovimOrigem, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValidade, ProduNome
+            if ($string != ''){
+                $string .= ' and ';
+            }
+
+            $sql = "SELECT MvXPrId, MovimId ,MovimData, MovimNotaFiscal, MovimOrigem, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, SetorNome
                     FROM Movimentacao
                     JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
                     JOIN Produto on ProduId = MvXPrProduto
                     JOIN LocalEstoque on LcEstId = MovimDestinoLocal
-                    WHERE ".$string." and ProduEmpresa = ".$_SESSION['EmpreId']."
+                    LEFT JOIN Setor on SetorId = MovimDestinoSetor
+                    WHERE ".$string." ProduEmpresa = ".$_SESSION['EmpreId']."
                     ";
             $result = $conn->query("$sql");
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -86,16 +91,15 @@ function queryPesquisa(){
             print("
                 
                 <tr>
-                   <td>" . $cont . "</td>
-                   <td>" . $item['ProduNome'] . "</td>
-                   <td></td>
-                   <td>" . $item['MovimNotaFiscal'] . "</td>
-                   <td></td>
-                   <td>" . $item['MovimNotaFiscal'] . "</td>
-                   <td>" . mostraData($item['MvXPrValidade']) . "</td>
-                   <td>" . $item['LcEstNome'] . "</td>
-                   <td>" . $item['MovimDestinoSetor'] . "</td>
-                   <td>" . count($result) . "</td>
+                   <td class='even'>" . $cont . "</td>
+                   <td class='odd'>" . $item['ProduNome'] . "</td>
+                   <td class='even'></td>
+                   <td class='odd'>" . $item['MovimNotaFiscal'] . "</td>
+                   <td class='even'></td>
+                   <td class='odd'>" . $item['MovimNotaFiscal'] . "</td>
+                   <td class='even'>".mostraData($item['MvXPrValidade'])."</td>
+                   <td class='odd'>" . $item['LcEstNome'] . "</td>
+                   <td class='even'>" . $item['SetorNome'] . "</td>
                 </tr>
              ");
         }

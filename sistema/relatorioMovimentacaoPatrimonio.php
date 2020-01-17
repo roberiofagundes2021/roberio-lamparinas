@@ -127,6 +127,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
             }
 
 
+
+            let resultadosConsulta = '';
+            let inputsValues = {};
+
             (function Filtrar() {
                 let cont = false;
 
@@ -145,42 +149,57 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                     let inputProduto = $('#inputProduto').val()
                     let url = "relatorioMovimentacaoPatrimonioFiltra.php";
 
+                    inputsValues = {
+                        inputDataDe: dataDe,
+                        inputDataAte: dataAte,
+                        inputLocalEstoque: localEstoque,
+                        inputSetor: setor,
+                        inputCategoria: categoria,
+                        inputSubCategoria: subCategoria,
+                        inputProduto: inputProduto
+                    };
+
                     $.post(
-                        url, {
-                            inputDataDe: dataDe,
-                            inputDataAte: dataAte,
-                            inputLocalEstoque: localEstoque,
-                            inputSetor: setor,
-                            inputCategoria: categoria,
-                            inputSubCategoria: subCategoria,
-                            inputProduto: inputProduto
-                        },
+                        url,
+                        inputsValues,
                         (data) => {
 
-                            if(data){ 
+                            if (data) {
                                 $('tbody').html(data)
                                 $('#imprimir').removeAttr('disabled')
-                                    }else{ 
-                                        $('tbody').html(msg)
-                                        $('#imprimir').attr('disabled', '')
-                                    }
-                        });
-
-                })
-
-               /* $('#submitFiltro').on('mouseup', (e) => {
-                    setTimeout(() => {
-                        if ($('td').length > 3) {
-                            $('#imprimir').removeAttr('disabled')
-                            console.log('teste')
-                        } else {
-                            $('#imprimir').attr('disabled', '')
+                                resultadosConsulta = data
+                            } else {
+                                $('tbody').html(msg)
+                                $('#imprimir').attr('disabled', '')
+                            }
                         }
-                    }, 400)
-
-
-                })*/
+                    );
+                })
             })()
+
+            function imprime() {
+                url = 'relatorioMovimentacaoPatrimonioImprime.php';
+
+                $('#imprimir').on('click', (e) => {
+                    e.preventDefault()
+                    if (resultadosConsulta) {
+
+                        $('#inputResultado').val(resultadosConsulta)
+                        $('#inputDataDe_imp').val(inputsValues.inputDataDe)
+                        $('#inputDataAte_imp').val(inputsValues.inputDataAte)
+                        $('#inputLocalEstoque_imp').val(inputsValues.inputlocalEstoque)
+                        $('#inputSetor_imp').val(inputsValues.inputSetor)
+                        $('#inputCategoria_imp').val(inputsValues.inputCategoria)
+                        $('#inputSubCategoria_imp').val(inputsValues.inputSubCategoria)
+                        $('#inputProduto_imp').val(inputsValues.inputProduto)
+                        
+                        $('#formImprime').attr('action', url)
+                        
+                        $('#formImprime').submit()
+                    }
+                })
+            }
+            imprime()
         });
     </script>
 
@@ -218,6 +237,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                     </div>
                                 </div>
                             </div>
+
+                            <form id="formImprime" method="POST" target="_blank">
+                                <input id="inputResultado" type="hidden" name="resultados"></input>
+                                <input id="inputDataDe_imp" type="hidden" name="inputDataDe_imp"></input>
+                                <input id="inputDataAte_imp" type="hidden" name="inputDataAte_imp"></input>
+                                <input id="inputLocalEstoque_imp" type="hidden" name="inputLocalEstoque_imp"></input>
+                                <input id="inputSetor_imp" type="hidden" name="inputSetor_imp"></input>
+                                <input id="inputCategoria_imp" type="hidden" name="inputCategoria_imp"></input>
+                                <input id="inputSubCategoria_imp" type="hidden" name="inputSubCategoria_imp"></input>
+                                <input id="inputProduto_imp" type="hidden" name="inputProduto_imp"></input>
+                            </form>
 
                             <form name="formFiltro" id="formFiltro" method="POST" class="form-validate-jquery p-3">
                                 <div class="row">
@@ -328,7 +358,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="text-right">
                                     <div>
                                         <button id="submitFiltro" class="btn btn-success"><i class="icon-search">Consultar</i></button>
-                                        <button id="imprimir" type="submit" class="btn btn-success btn-icon" disabled>
+                                        <button id="imprimir" class="btn btn-secondary btn-icon" disabled>
                                             <i class="icon-printer2"> Imprimir</i>
                                         </button>
                                     </div>
@@ -351,7 +381,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    
+
                                 </tbody>
                             </table>
                         </div>
