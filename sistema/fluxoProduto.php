@@ -126,12 +126,13 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 				$result = $conn->query("$sql");
 				$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
 
-				/* Verifica se a Bandeja já tem um registro com BandeTabela: FluxoOperacional e BandeTabelaId: IdFluxoAtual, evitando dupliacação */
-				$sql = "SELECT BandeId
+				/* Verifica se a Bandeja já tem um registro com BandeTabela: FluxoOperacional e BandeTabelaId: IdFluxoAtual, evitando duplicação */
+				$sql = "SELECT BandeId, SituaChave
 						FROM Bandeja
+						JOIN Situacao on SituaId = BandeStatus
 						Where BandeTabela = 'FluxoOperacional' and BandeTabelaId =  ".$iFluxoOperacional;
 				$result = $conn->query("$sql");
-				$rowBandeja = $result->fetchAll(PDO::FETCH_ASSOC);
+				$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 				$count = count($rowBandeja);
 
 				if (!$count){
@@ -173,6 +174,11 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 										));					
 					}
 					/* Fim Insere Bandeja */
+				
+				} else{
+					if ($rowBandeja['SituaChave'] == 'AGUARDANDOLIBERACAO'){
+						
+					}
 				}
 			}
 
@@ -239,11 +245,12 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 try{
 	
 	$sql = "SELECT FlOpeId, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
-				   SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus
+				   SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, SituaNome
 			FROM FluxoOperacional
 			JOIN Fornecedor on ForneId = FlOpeFornecedor
 			JOIN Categoria on CategId = FlOpeCategoria
 			JOIN SubCategoria on SbCatId = FlOpeSubCategoria
+			JOIN Situacao on SituaId = FlOpeStatus
 			WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ." and FlOpeId = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -488,8 +495,11 @@ try{
 													<?php 
 														$sql = "SELECT ProduId, ProduNome
 																FROM Produto										     
-																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria."
-																ORDER BY ProduNome ASC";
+																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria;
+														if ($iSubCategoria){
+															$sql .= " and ProduSubCategoria = ".$iSubCategoria;
+														}
+														$sql .=	" ORDER BY ProduNome ASC";
 														$result = $conn->query($sql);
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 														
@@ -551,6 +561,7 @@ try{
 													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and ProduSubCategoria = ".$iSubCategoria." and ProduStatus = 1 ";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+											$countProduto = count($rowProdutos);
 										} 
 										
 										$cont = 0;
@@ -686,22 +697,34 @@ try{
 							
 															
 							<div class="row" style="margin-top: 10px;">
-								<div class="col-lg-12">								
+								<div class="col-lg-6">
 									<div class="form-group">
 										<?php 
 										
-											if ($bFechado){
-												if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'ADMINISTRADOR' or $_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' or $_SESSION['PerfiChave'] == 'CONTROLADORIA'){
+											if ($bFechado){												
+												print('<button class="btn btn-lg btn-success" id="enviar" disabled>Alterar</button>');
+											} else{ 
+												if (!$countProduto){
+													print('<button class="btn btn-lg btn-success" id="enviar" disabled>Alterar</button>');
+												} else {
 													print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
 												}
-											} else{ 
-												print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
 											} 
 										
 										?>
 										<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
+
+								<div class="col-lg-6" style="text-align: right; padding-right: 35px; color: red;">
+								<?php	
+									if ($bFechado){
+										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído ('.$row['SituaNome'].')');
+									} else if (!$countProduto){
+										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Não há produtos cadastrados para a Categoria e SubCategoria informada');
+									}
+								?>
+								</div>	
 							</div>
 						</div>
 						<!-- /card-body -->
