@@ -36,7 +36,7 @@ if($rowNumero['Aditivo'] > 0) {
 	$rowDataFim = $result->fetch(PDO::FETCH_ASSOC);
 	
 	if($rowDataFim['ProxData'] != '1900-01-01'){
-		$iProxData = date('Y-m-d',strtotime("+1 day", strtotime($rowFluxo['ProxData'])));	//Adiciona 1 dia na data
+		$iProxData = date('Y-m-d',strtotime("+1 day", strtotime($rowDataFim['ProxData'])));	//Adiciona 1 dia na data
 	}
 }
 
@@ -215,7 +215,7 @@ if(isset($_POST['inputDataInicio'])){
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim">
+											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" autofocus>
 										</div>
 									</div>
 								</div>

@@ -161,13 +161,13 @@ if (isset($_POST['resultados'])) {
 			if(!empty($_POST['inputDataDe_imp']) && !empty($_POST['inputDataAte_imp'])){
 				$html .= '
             		<div style="font-weight: bold; font-size: 0.8rem; position:relative; margin-top: 10px; padding: 5px;">
-			            Período: De '.mostraData($_POST['inputDataDe_imp']).' à '.mostraData($_POST['inputDataAte_imp']).' 
+			            Período: '.mostraData($_POST['inputDataDe_imp']).' à '.mostraData($_POST['inputDataAte_imp']).' 
 		            </div>
 		        ';
 			} else if(!empty($_POST['inputDataDe_imp'])){
 				$html .= '
             		<div style="font-weight: bold; font-size: 0.8rem; position:relative; margin-top: 20px; padding: 5px;">
-			            Período: De '.mostraData($_POST['inputDataDe_imp']).' à '.date('d/m/Y').' 
+			            Período: '.mostraData($_POST['inputDataDe_imp']).' à '.date('d/m/Y').' 
 		            </div>
 		        ';
 			} else {
@@ -205,11 +205,11 @@ if (isset($_POST['resultados'])) {
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:17%; font-size: 0.6rem">Descrição</th>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%; font-size: 0.6rem">Patrimônio</th>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%; font-size: 0.6rem">Nota Fiscal</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:11%; font-size: 0.6rem">R$ Aquisição</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%; font-size: 0.6rem">R$ Depreciação</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:11%; font-size: 0.6rem">Aquisição (R$)</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%; font-size: 0.6rem">Depreciação (R$)</th>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%; font-size: 0.6rem">Validade</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%; font-size: 0.6rem">Local/Origem</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%; font-size: 0.6rem">Setor/Destino</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%; font-size: 0.6rem">Origem</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%; font-size: 0.6rem">Destino</th>
 			</tr>
 		';
 
@@ -224,8 +224,8 @@ if (isset($_POST['resultados'])) {
 				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['ProduNome'] . "</td>
 				<td style='font-size: 0.6rem; padding-top: 7px'></td>
 				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['MovimNotaFiscal'] . "</td>
-				<td style='font-size: 0.6rem; padding-top: 7px'>".$produto['MvXPrValorUnitario']."</td>
-				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['MovimNotaFiscal'] . "</td>
+				<td style='font-size: 0.6rem; padding-top: 7px'>".mostraValor($produto['MvXPrValorUnitario'])."</td>
+				<td style='font-size: 0.6rem; padding-top: 7px'></td>
 				<td style='font-size: 0.6rem; padding-top: 7px'>".mostraData($produto['MvXPrValidade'])."</td>
 				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['LcEstNome'] . "</td>
 				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['SetorNome'] . "</td>

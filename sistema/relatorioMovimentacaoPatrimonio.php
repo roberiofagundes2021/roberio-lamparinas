@@ -371,13 +371,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                         <th>Descrição do Produto</th>
                                         <th>Item</th>
                                         <th>Descrição do Produto</th>
-                                        <th>N° Patrimônio</th>
-                                        <th>N° Nota Fiscal</th>
-                                        <th>Valor/Aquisição</th>
-                                        <th>Valor/Depreciação</th>
+                                        <th>Patrimônio</th>
+                                        <th>Nota Fiscal</th>
+                                        <th>Aquisição (R$)</th>
+                                        <th>Depreciação (R$)</th>
                                         <th>Validade</th>
-                                        <th>Local/Origem</th>
-                                        <th>Setor/Destino</th>
+                                        <th>Origem</th>
+                                        <th>Destino</th>
                                     </tr>
                                 </thead>
                                 <tbody>

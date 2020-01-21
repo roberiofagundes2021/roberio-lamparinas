@@ -31,6 +31,7 @@ try{
 			WHERE AditiEmpresa = ". $_SESSION['EmpreId'] ." and AditiFluxoOperacional = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$rowAditivo = $result->fetchAll(PDO::FETCH_ASSOC);
+	$countAditivos = count($rowAditivo);
 
 	$sql = "SELECT Top 1 isnull(AditiDtFim, FlOpeDataFim) as DataFim
 			FROM FluxoOperacional
@@ -182,24 +183,24 @@ try{
 												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['FlOpeSubCategoria']; ?>">
 											</div>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputContrato">Contrato</label>
 												<input type="text" id="inputContrato" name="inputContrato" class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly>
 											</div>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputProcesso">Processo</label>
 												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
 											</div>
 										</div>	
-										<div class="col-lg-2">
+										<!--<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValor">Valor Total</label>
 												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
 											</div>
-										</div>											
+										</div>-->											
 									</div>
 								</div>
 							</div>
@@ -255,7 +256,9 @@ try{
 													<td></td>
 													<td></td>
 												</tr>
-												');												
+												');	
+
+												$cont = 1;											
 
 												foreach ($rowAditivo as $item){
 													
@@ -268,17 +271,23 @@ try{
 														<td>'.mostraData($item['AditiDtFim']).'</td>
 														<td>'.mostraValor($item['AditiValor']).'</td>
 														<td>'.mostraData($item['AditiDtCelebracao']).'</td>
-														');													
-													
-													print('<td class="text-center">
-															<div class="list-icons">
-																<div class="list-icons list-icons-extended">
-																	<a href="#" onclick="atualizaAditivo('.$row['FlOpeId'].', '.$item['AditiId'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-																	<a href="#" onclick="atualizaAditivo('.$row['FlOpeId'].', '.$item['FlOpeId'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
-																</div>
-															</div>
-														</td>
-													</tr>');
+														');
+
+														print('<td class="text-center">');
+
+														if ($cont == $countAditivos){
+															print('<div class="list-icons">
+																		<div class="list-icons list-icons-extended">
+																		
+																			<!--<a href="#" onclick="atualizaAditivo('.$row['FlOpeId'].', '.$item['AditiId'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>-->
+																				<a href="#" onclick="atualizaAditivo('.$row['FlOpeId'].', '.$item['FlOpeId'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
+																		</div>
+																	</div>');
+														}
+														print('</td>');
+													print('</tr>');													
+
+													$cont++;
 												}
 												
 												print('

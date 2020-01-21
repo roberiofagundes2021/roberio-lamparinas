@@ -142,19 +142,19 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 				
 					$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, BandeSolicitante, BandeTabela, BandeTabelaId,
 												 BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
-							VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+							VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
 					$result = $conn->prepare($sql);
 							
 					$result->execute(array(
 									':sIdentificacao' => $sIdentificacao,
-									':dData' => gravaData($_POST['inputData']),
+									':dData' => date("Y-m-d"),
 									':sDescricao' => 'Liberar Fluxo',
 									':sURL' => '',
 									':iPerfilDestino' => $rowPerfil['PerfiId'],
 									':iSolicitante' => $_SESSION['UsuarId'],
 									':sTabela' => 'FluxoOperacional',
 									':iTabelaId' => $iFluxoOperacional,
-									':bStatus' => $rowSituacao['SituaId'],
+									':iStatus' => $rowSituacao['SituaId'],
 									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 									':iEmpresa' => $_SESSION['EmpreId']						
 									));
@@ -176,8 +176,19 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 					/* Fim Insere Bandeja */
 				
 				} else{
-					if ($rowBandeja['SituaChave'] == 'AGUARDANDOLIBERACAO'){
-						
+					if ($rowBandeja['SituaChave'] == 'ATIVO'){
+						$sql = "UPDATE Bandeja SET BandeData = :dData, BandeSolicitante = :iSolicitante, BandeStatus = :iStatus, BandeUsuarioAtualizador = :iUsuarioAtualizador
+								WHERE BandeEmpresa = :iEmpresa and BandeId = :iIdBandeja";
+						$result = $conn->prepare($sql);
+								
+						$result->execute(array(
+										':dData' => date("Y-m-d"),
+										':iSolicitante' => $_SESSION['UsuarId'],
+										':iStatus' => $rowSituacao['SituaId'],
+										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+										':iEmpresa' => $_SESSION['EmpreId'],
+										':iIdBandeja' => $rowBandeja['BandeId']														
+										));						
 					}
 				}
 			}
