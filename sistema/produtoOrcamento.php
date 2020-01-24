@@ -7,10 +7,11 @@ $_SESSION['PaginaAtual'] = 'Produto Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT PrOrcNome, CategNome, SbCatNome, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcId
+$sql = "SELECT PrOrcNome, CategNome, SbCatNome, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcId, SituaNome, SituaCor, SituaChave
 		FROM ProdutoOrcamento
 		JOIN Categoria on CategId = PrOrcCategoria
 		LEFT JOIN SubCategoria on SbCatId = PrOrcSubcategoria
+		JOIN Situacao on SituaId = PrOrcSituacao
 	    WHERE PrOrcEmpresa = ". $_SESSION['EmpreId'] ."
 		ORDER BY PrOrcNome ASC";
 $result = $conn->query($sql);
@@ -175,8 +176,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){											
 										
-										$situacao = $item['PrOrcSituacao'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['PrOrcSituacao'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
@@ -185,7 +186,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['SbCatNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaModelo('.$item['PrOrcId'].', \''.$item['PrOrcNome'].'\','.$item['PrOrcSituacao'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaModelo('.$item['PrOrcId'].', \''.$item['PrOrcNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">

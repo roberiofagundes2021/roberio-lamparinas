@@ -6,8 +6,9 @@ $_SESSION['PaginaAtual'] = 'Modelo';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ModelId, ModelNome, ModelStatus
+$sql = ("SELECT ModelId, ModelNome, ModelStatus, SituaNome, SituaCor, SituaChave
 		 FROM Modelo
+		 JOIN Situacao on SituaId = ModelStatus
 	     WHERE ModelEmpresa = ". $_SESSION['EmpreId'] ."
 		 ORDER BY ModelNome ASC");
 $result = $conn->query("$sql");
@@ -46,17 +47,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [
 				{
 					orderable: true,   //Modelo
-					width: "70%",
+					width: "80%",
 					targets: [0]
 				},
 				{ 
 					orderable: true,   //Situação
-					width: "15%",
+					width: "10%",
 					targets: [1]
 				},
 				{ 
 					orderable: true,   //Ações
-					width: "15%",
+					width: "10%",
 					targets: [2]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -163,15 +164,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['ModelStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['ModelStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'] ? 'Ativo' : 'Inativo';
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
 											<td>'.$item['ModelNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaModelo('.$item['ModelId'].', \''.$item['ModelNome'].'\','.$item['ModelStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaModelo('.$item['ModelId'].', \''.htmlentities(addslashes($item['ModelNome']),ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">

@@ -6,8 +6,9 @@ $_SESSION['PaginaAtual'] = 'Unidade de Medida';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus
+$sql = ("SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus, SituaNome, SituaCor, SituaChave
 		 FROM UnidadeMedida
+		 JOIN Situacao on SituaId = UnMedStatus
 	     WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ."
 		 ORDER BY UnMedNome ASC");
 $result = $conn->query("$sql");
@@ -169,8 +170,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['UnMedStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['UnMedStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
@@ -178,7 +179,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['UnMedSigla'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaUnidadeMedida('.$item['UnMedId'].', \''.$item['UnMedNome'].'\','.$item['UnMedStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaUnidadeMedida('.$item['UnMedId'].', \''.$item['UnMedNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">

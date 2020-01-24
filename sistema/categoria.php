@@ -43,7 +43,7 @@ $count = count($row);
 
 		$(document).ready(function (){	
 			$('#tblCategoria').DataTable( {
-				"order": [[ 1, "asc" ]],
+				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [

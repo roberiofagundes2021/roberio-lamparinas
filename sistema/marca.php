@@ -6,8 +6,9 @@ $_SESSION['PaginaAtual'] = 'Marca';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT MarcaId, MarcaNome, MarcaStatus
+$sql = ("SELECT MarcaId, MarcaNome, MarcaStatus, SituaNome, SituaCor, SituaChave
 		 FROM Marca
+		 JOIN Situacao on SituaId = MarcaStatus
 	     WHERE MarcaEmpresa = ". $_SESSION['EmpreId'] ."
 		 ORDER BY MarcaNome ASC");
 $result = $conn->query("$sql");
@@ -46,17 +47,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [
 				{
 					orderable: true,   //Marca
-					width: "70%",
+					width: "80%",
 					targets: [0]
 				},
 				{ 
 					orderable: true,   //Situação
-					width: "15%",
+					width: "10%",
 					targets: [1]
 				},
 				{ 
 					orderable: true,   //Ações
-					width: "15%",
+					width: "10%",
 					targets: [2]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -164,14 +165,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									foreach ($row as $item){
 										
 										$situacao = $item['MarcaStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['MarcaStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
+										$situacaoChave ='\''.$item['SituaChave'].'\'';
 										
 										print('
 										<tr>
 											<td>'.$item['MarcaNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaMarca('.$item['MarcaId'].', \''.$item['MarcaNome'].'\','.$item['MarcaStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaMarca('.$item['MarcaId'].', \''.$item['MarcaNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
