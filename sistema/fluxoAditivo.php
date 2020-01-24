@@ -96,12 +96,15 @@ try{
 		}); //document.ready
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaAditivo(FluxoId, AditiId, Tipo){
+		function atualizaAditivo(FluxoId, AditiId, Situacao, Tipo){
 
 			document.getElementById('inputFluxoId').value = FluxoId;
 			document.getElementById('inputAditivoId').value = AditiId;
-					
-			if (Tipo == 'novo'){
+
+			if (Situacao != 'ATIVO'){
+				alerta('Atenção', 'Aditivos só podem ser criados com o Fluxo Operacional com a situação ATIVO.','error');
+				return false;
+			} else if (Tipo == 'novo'){
 				document.formAditivo.action = "fluxoAditivoNovo.php";
 			} else if (Tipo == 'edita'){	
 				document.formAditivo.action = "fluxoAditivoEdita.php";		
@@ -227,7 +230,7 @@ try{
 												<div class="col-lg-6 font-size-lg">A relação abaixo faz referência aos aditivos do fluxo acima</div>
 												<div class="col-lg-6 text-right">
 													<a href="fluxo.php" class="btn btn-classic" role="button">Voltar</a>
-													<a href="#" onclick="atualizaAditivo(<?php echo $row['FlOpeId']; ?>, 0, 'novo');" class="btn btn-success" role="button">Novo Aditivo</a>
+													<a href="#" onclick="atualizaAditivo(<?php echo $row['FlOpeId']; ?>, 0, '<?php echo $row['SituaChave']; ?>', 'novo');" class="btn btn-success" role="button">Novo Aditivo</a>
 												</div>
 											</div>
 										</div>
@@ -280,8 +283,8 @@ try{
 															print('<div class="list-icons">
 																		<div class="list-icons list-icons-extended">
 																		
-																			<!--<a href="#" onclick="atualizaAditivo('.$row['FlOpeId'].', '.$item['AditiId'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>-->
-																				<a href="#" onclick="atualizaAditivo('.$row['FlOpeId'].', '.$item['FlOpeId'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
+																			<!--<a href="#" onclick="atualizaAditivo('.$row['FlOpeId'].', '.$item['AditiId'].', \''.$row['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>-->
+																				<a href="#" onclick="atualizaAditivo('.$row['FlOpeId'].', '.$item['FlOpeId'].', \''.$row['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
 																		</div>
 																	</div>');
 														}
