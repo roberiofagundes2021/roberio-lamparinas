@@ -6,9 +6,10 @@ $_SESSION['PaginaAtual'] = 'Local do Estoque';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT LcEstId, LcEstNome, LcEstStatus, UnidaNome
+$sql = ("SELECT LcEstId, LcEstNome, LcEstStatus, UnidaNome, SituaNome, SituaCor, SituaChave
 		 FROM LocalEstoque
 		 JOIN Unidade on UnidaId = LcEstUnidade
+		 JOIN Situacao on SituaId = LcEstStatus
 	     WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ."
 		 ORDER BY LcEstNome ASC");
 $result = $conn->query("$sql");
@@ -47,7 +48,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [
 				{
 					orderable: true,   //Local de Estoque
-					width: "30%",
+					width: "40%",
 					targets: [0]
 				},
 				{ 
@@ -57,12 +58,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Situação
-					width: "15%",
+					width: "10%",
 					targets: [1]
 				},
 				{ 
 					orderable: true,   //Ações
-					width: "15%",
+					width: "10%",
 					targets: [2]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -170,8 +171,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['LcEstStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['LcEstStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
@@ -179,7 +180,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['UnidaNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaLocalEstoque('.$item['LcEstId'].', \''.$item['LcEstNome'].'\','.$item['LcEstStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaLocalEstoque('.$item['LcEstId'].', \''.$item['LcEstNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
