@@ -16,15 +16,12 @@
 	<!-- /core JS files -->
 
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/visualization/d3/d3.min.js"></script>
-	<script src="global_assets/js/plugins/visualization/d3/d3_tooltip.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/switchery.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
 	<script src="global_assets/js/plugins/ui/moment/moment.min.js"></script>
 	<script src="global_assets/js/plugins/pickers/daterangepicker.js"></script>
 
 	<script src="layout_1/LTR/material/full/assets/js/app.js"></script>
-	<script src="global_assets/js/demo_pages/dashboard.js"></script>
 	
 	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>

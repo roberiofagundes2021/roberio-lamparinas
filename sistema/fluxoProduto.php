@@ -150,7 +150,7 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 									':dData' => date("Y-m-d"),
 									':sDescricao' => 'Liberar Fluxo',
 									':sURL' => '',
-									':iPerfilDestino' => $rowPerfil['PerfiId'],
+									':iPerfilDestino' => $rowPerfil['PerfiId'],  //Tem que tirar esse campo do banco, já que agora tem uma tabela BandejaXPerfil
 									':iSolicitante' => $_SESSION['UsuarId'],
 									':sTabela' => 'FluxoOperacional',
 									':iTabelaId' => $iFluxoOperacional,
@@ -188,7 +188,7 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 										':iEmpresa' => $_SESSION['EmpreId'],
 										':iIdBandeja' => $rowBandeja['BandeId']														
-										));						
+										));
 					}
 				}
 			}

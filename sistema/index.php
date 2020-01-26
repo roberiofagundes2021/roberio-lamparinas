@@ -23,37 +23,43 @@ if (isset($_POST['cmbPerfil'])){
 }
 //echo $idPerfilLogado;die;
 
-/* PENDENTES */
-$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, 
+/* AGUARDANDOLIBERACAO */
+$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabela,
 			   BandeTabelaId, SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, OrComNumero, OrComSituacao, OrComTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
-		LEFT JOIN Situacao on SituaId = OrComSituacao		
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'AGUARDANDOLIBERACAO' and BandePerfilDestino = ".$idPerfilLogado."
+		LEFT JOIN Situacao on SituaId = BandeStatus
+		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'AGUARDANDOLIBERACAO' and BnXPePerfil in (".$idPerfilLogado.")
 		ORDER BY BandeData DESC";
+//echo $sql;die;		
 $result = $conn->query($sql);
 $rowPendente = $result->fetchAll(PDO::FETCH_ASSOC);
 
 $sql = "SELECT COUNT(BandeId) as TotalPendente
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
-		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'AGUARDANDOLIBERACAO' and BandePerfilDestino = ".$idPerfilLogado;
+		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = BandeStatus
+		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'AGUARDANDOLIBERACAO' and BnXPePerfil in (".$idPerfilLogado.")";
 $result = $conn->query($sql);
 $rowTotalPendente = $result->fetch(PDO::FETCH_ASSOC);
 $totalPendente = $rowTotalPendente['TotalPendente'];
 
 /* LIBERADAS */
-$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
+$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabela, BandeTabelaId, SituaNome
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
-		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandePerfilDestino = ".$idPerfilLogado."
+		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = BandeStatus
+		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BnXPePerfil in (".$idPerfilLogado.")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -61,20 +67,24 @@ $rowLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT COUNT(BandeId) as TotalLiberado
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
-		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BandePerfilDestino = ".$idPerfilLogado;
+		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = BandeStatus
+		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BnXPePerfil in (".$idPerfilLogado.")";
 $result = $conn->query($sql);
 $rowTotalLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalLiberado = $rowTotalLiberado['TotalLiberado'];
 
 /* NÃO LIBERADAS */
-$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabelaId, SituaNome
+$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabela, BandeTabelaId, SituaNome
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
-		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandePerfilDestino = ".$idPerfilLogado."
+		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = BandeStatus
+		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BnXPePerfil in (".$idPerfilLogado.")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowNaoLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -82,14 +92,58 @@ $rowNaoLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT COUNT(BandeId) as TotalNaoLiberado
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
-		LEFT JOIN Situacao on SituaId = OrComSituacao
-	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BandePerfilDestino = ".$idPerfilLogado;
+		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = BandeStatus
+		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
+	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BnXPePerfil in (".$idPerfilLogado.")";
 $result = $conn->query($sql);
 $rowTotalNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 
+$totalPorcentagem = 0;
+$todos = 0;
+$totalTodasAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 
-$totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
+if (isset($_POST['cmbSituacao'])){
+
+	if ($_POST['cmbSituacao'] == 'AGUARDANDOLIBERACAO'){
+		
+		$totalAcoes = $totalPendente;
+		$situacaoPorcentagem = "Aguardando Liberação";	
+
+	} else if ($_POST['cmbSituacao'] == 'LIBERADO'){
+		
+		$totalAcoes = $totalLiberado;
+		$situacaoPorcentagem = "Liberado";
+		
+	} else if ($_POST['cmbSituacao'] == 'NAOLIBERADO'){
+		
+		$totalAcoes = $totalNaoLiberado;
+		$situacaoPorcentagem = "Não Liberado";
+
+	} else { //Todos
+		
+		$totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
+		$situacaoPorcentagem = "Aguardando Liberação";
+		$todos = 1;
+	}
+
+} else { //Por padrão lista só os Pendentes
+	
+	$totalAcoes = $totalPendente;
+	$situacaoPorcentagem = "Aguardando Liberação";
+}
+
+if($totalAcoes){
+	if ($todos){ // Se selecionou a Situação TODOS, mostre como padrão apenas o valor do AGUARDANDOLIBERACAO
+		$totalPorcentagem = mostraValor($totalPendente / $totalTodasAcoes * 100);
+	} else {
+		$totalPorcentagem = mostraValor($totalAcoes / $totalTodasAcoes * 100);
+	}
+} else {
+	$totalPorcentagem = 0;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -109,6 +163,14 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+
+	<!-- Gráfico das Ações - Formato Pizza -->
+	<script src="global_assets/js/plugins/visualization/d3/d3.min.js"></script>
+	<script src="global_assets/js/plugins/visualization/d3/d3_tooltip.js"></script>
+	<script src="global_assets/js/demo_pages/dashboard.js"></script>
+
+	<!-- Modal -->
+	<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>
 	
     <script type="text/javascript" >
 
@@ -124,32 +186,266 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 			$('#cmbSituacao').on('change', function(e){
 				
 				$("#formWorkflow").submit();
-			});			
+			});		
+
+			
+			/* Gráfico na Bandeja */
+		    var _bandeja = function(element, size, pendente, liberado, naoliberado) {
+		        
+		        if (typeof d3 == 'undefined') {
+		            console.warn('Warning - d3.min.js is not loaded.');
+		            return;
+		        }
+
+		        // Initialize chart only if element exsists in the DOM
+		        if($(element).length > 0) {		        	
+
+		            // Basic setup
+		            // ------------------------------
+
+		            // Add data set
+		            var data = [
+		                {
+		                    "status": "Aguardando Liberação",
+		                    "icon": "<i class='status-mark border-blue-300 mr-2'></i>",
+		                    "value": pendente,
+		                    "color": "#29B6F6"
+		                }, {
+		                    "status": "Liberados",
+		                    "icon": "<i class='status-mark border-success-300 mr-2'></i>",
+		                    "value": liberado,
+		                    "color": "#66BB6A"
+		                }, {
+		                    "status": "Não Liberados",
+		                    "icon": "<i class='status-mark border-danger-300 mr-2'></i>",
+		                    "value": naoliberado,
+		                    "color": "#EF5350"
+		                }
+		            ];
+
+		            // Main variables
+		            var d3Container = d3.select(element),
+		                distance = 2, // reserve 2px space for mouseover arc moving
+		                radius = (size/2) - distance,
+		                sum = d3.sum(data, function(d) { return d.value; })
+
+		            // Tooltip
+		            // ------------------------------
+
+		            var tip = d3.tip()
+		                .attr('class', 'd3-tip')
+		                .offset([-10, 0])
+		                .direction('e')
+		                .html(function (d) {
+		                    return '<ul class="list-unstyled mb-1">' +
+		                        '<li>' + '<div class="font-size-base mb-1 mt-1">' + d.data.icon + d.data.status + '</div>' + '</li>' +
+		                        '<li>' + 'Total: &nbsp;' + '<span class="font-weight-semibold float-right">' + d.value + '</span>' + '</li>' +
+		                        '<li>' + '(%): &nbsp;' + '<span class="font-weight-semibold float-right">' + (100 / (sum / d.value)).toFixed(2) + '%' + '</span>' + '</li>' +
+		                    '</ul>';
+		                })
+
+		            // Create chart
+		            // ------------------------------
+
+		            // Add svg element
+		            var container = d3Container.append('svg').call(tip);
+		            
+		            // Add SVG group
+		            var svg = container
+		                .attr('width', size)
+		                .attr('height', size)
+		                .append('g')
+		                    .attr('transform', 'translate(' + (size / 2) + ',' + (size / 2) + ')'); 
+
+		            // Construct chart layout
+		            // ------------------------------
+
+		            // Pie
+		            var pie = d3.layout.pie()
+		                .sort(null)
+		                .startAngle(Math.PI)
+		                .endAngle(3 * Math.PI)
+		                .value(function (d) { 
+		                    return d.value;
+		                }); 
+
+		            // Arc
+		            var arc = d3.svg.arc()
+		                .outerRadius(radius)
+		                .innerRadius(radius / 2);
+
+		            //
+		            // Append chart elements
+		            //
+
+		            // Group chart elements
+		            var arcGroup = svg.selectAll('.d3-arc')
+		                .data(pie(data))
+		                .enter()
+		                .append('g') 
+		                    .attr('class', 'd3-arc')
+		                    .style('stroke', '#fff')
+		                    .style('cursor', 'pointer');
+		            
+		            // Append path
+		            var arcPath = arcGroup
+		                .append('path')
+		                .style('fill', function (d) { return d.data.color; });
+
+		            // Add tooltip
+		            arcPath
+		                .on('mouseover', function (d, i) {
+
+		                    // Transition on mouseover
+		                    d3.select(this)
+		                    .transition()
+		                        .duration(500)
+		                        .ease('elastic')
+		                        .attr('transform', function (d) {
+		                            d.midAngle = ((d.endAngle - d.startAngle) / 2) + d.startAngle;
+		                            var x = Math.sin(d.midAngle) * distance;
+		                            var y = -Math.cos(d.midAngle) * distance;
+		                            return 'translate(' + x + ',' + y + ')';
+		                        });
+		                })
+
+		                .on('mousemove', function (d) {
+		                    
+		                    // Show tooltip on mousemove
+		                    tip.show(d)
+		                        .style('top', (d3.event.pageY - 40) + 'px')
+		                        .style('left', (d3.event.pageX + 30) + 'px');
+		                })
+
+		                .on('mouseout', function (d, i) {
+
+		                    // Mouseout transition
+		                    d3.select(this)
+		                    .transition()
+		                        .duration(500)
+		                        .ease('bounce')
+		                        .attr('transform', 'translate(0,0)');
+
+		                    // Hide tooltip
+		                    tip.hide(d);
+		                });
+
+		            // Animate chart on load
+		            arcPath
+		                .transition()
+		                    .delay(function(d, i) { return i * 500; })
+		                    .duration(500)
+		                    .attrTween('d', function(d) {
+		                        var interpolate = d3.interpolate(d.startAngle,d.endAngle);
+		                        return function(t) {
+		                            d.endAngle = interpolate(t);
+		                            return arc(d);  
+		                        }; 
+		                    });
+		        }
+		    };
+		    /* Fim Gráfico Bandeja */
+
+		    var pendente = $('#inputTotalPendente').val();
+		    var liberado = $('#inputTotalLiberado').val();
+		    var naoliberado = $('#inputTotalNaoLiberado').val();
+
+		    //O if é apenas para corrigir um bug que fica quando se tem todos os valores zerados no gráfico. Tipo fica piscando e não aparece nada.
+		    if (pendente != 0 || liberado != 0 || naoliberado != 0){
+		    	_bandeja('#grafico', 52, pendente, liberado, naoliberado);
+		    }
+
+	        // Motivo de não ter liberado
+	        $('#motivo').on('click', function() {
+	        });
 			
 		});
 		
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaOrdemCompra(OrComId, OrComNumero, OrComSituacao, OrComTipo, Tipo){
-		
-			document.getElementById('inputOrdemCompraId').value = OrComId;
-			document.getElementById('inputOrdemCompraNumero').value = OrComNumero;			
-			document.getElementById('inputOrdemCompraTipo').value = OrComTipo;
-			
-			if (Tipo == 'imprimir'){
-				document.formOrdemCompra.action = "ordemcompraImprime.php";
-				document.formOrdemCompra.setAttribute("target", "_blank");
-			} else {
-				if (Tipo == 'liberar'){	
-					document.getElementById('inputOrdemCompraStatus').value = 'LIBERADO';
-					document.formOrdemCompra.action = "ordemcompraMudaSituacao.php";		
-				} else if (Tipo == 'naoliberar'){
-					document.getElementById('inputOrdemCompraStatus').value = 'NAOLIBERADO';
-					document.formOrdemCompra.action = "ordemcompraMudaSituacao.php";
+		function atualizaBandeja(BandeId, BandeTabela, BandeTabelaId, OrComNumero, OrComSituacao, OrComTipo, Tipo){
+
+			document.getElementById('inputBandejaId').value = BandeId;
+
+			if(BandeTabela == 'OrdemCompra'){
+				document.getElementById('inputOrdemCompraId').value = BandeTabelaId;
+				document.getElementById('inputOrdemCompraNumero').value = OrComNumero;			
+				document.getElementById('inputOrdemCompraTipo').value = OrComTipo;
+				
+				if (Tipo == 'imprimir'){
+					document.formBandeja.action = "ordemcompraImprime.php";
+					document.formBandeja.setAttribute("target", "_blank");
+				} else {
+					if (Tipo == 'liberar'){	
+						document.getElementById('inputOrdemCompraStatus').value = 'ATIVO'; //Liberado
+						document.formBandeja.action = "ordemcompraMudaSituacao.php";		
+					} else if (Tipo == 'naoliberar'){
+						document.getElementById('inputOrdemCompraStatus').value = 'NAOLIBERADO';
+						document.formBandeja.action = "ordemcompraMudaSituacao.php";
+					}
+					document.formBandeja.setAttribute("target", "_self");
 				}
-				document.formOrdemCompra.setAttribute("target", "_self");
 			}
+
+			if (BandeTabela == 'FluxoOperacional'){
+				
+				document.getElementById('inputFluxoId').value = BandeTabelaId;
+				
+				if (Tipo == 'imprimir'){
+					document.formBandeja.action = "fluxoBandejaImprime.php";
+					document.formBandeja.setAttribute("target", "_blank");
+					document.formBandeja.submit();
+				} else {
+					if (Tipo == 'liberar'){	
+						document.getElementById('inputFluxoStatus').value = 'ATIVO'; //LIberado
+						document.formBandeja.action = "fluxoBandejaMudaSituacao.php";	
+						document.formBandeja.setAttribute("target", "_self");
+						document.formBandeja.submit();	
+					} else if (Tipo == 'naoliberar'){
+
+			            bootbox.prompt({
+			                title: 'Informe o motivo da não liberação',
+			                inputType: 'textarea',
+			                buttons: {
+			                    confirm: {
+			                        label: 'Enviar',
+			                        className: 'btn-success'
+			                    },
+			                    cancel: {
+			                        label: 'Cancelar',
+			                        className: 'btn-link'
+			                    }
+			                },
+			                callback: function (result) {
+
+			                    if (result === null) {                                             
+			                        bootbox.alert({
+			                            title: 'Não Liberar',
+			                            message: 'A não liberação foi cancelada!'
+			                        });                              
+			                    } else {
+			                       
+			                        document.getElementById('inputMotivo').value = result;
+									document.getElementById('inputFluxoStatus').value = 'NAOLIBERADO';
+									document.formBandeja.action = "fluxoBandejaMudaSituacao.php";
+									document.formBandeja.setAttribute("target", "_self");
+									document.formBandeja.submit();
+									
+									/*
+			                        bootbox.alert({
+			                            title: 'Hi <strong>' + result + '</strong>',
+			                            message: 'How are you doing today?'
+			                        });*/                               
+			                    }
+			                }
+			            });
+
+
+					}
+				}
+			}
+
 			
-			document.formOrdemCompra.submit();
+
 		}		
 		
 	</script>
@@ -174,123 +470,6 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 			<!-- Content area -->
 			<div class="content">
 
-				<!-- Main charts --
-				<div class="row">
-					<div class="col-xl-7">
-
-						<!-- Traffic sources --
-						<div class="card">
-							<div class="card-header header-elements-inline">
-								<h6 class="card-title">Traffic sources</h6>
-								<div class="header-elements">
-									<div class="form-check form-check-right form-check-switchery form-check-switchery-sm">
-										<label class="form-check-label">
-											Live update:
-											<input type="checkbox" class="form-input-switchery" checked data-fouc>
-										</label>
-									</div>
-								</div>
-							</div>
-
-							<div class="card-body py-0">
-								<div class="row">
-									<div class="col-sm-4">
-										<div class="d-flex align-items-center justify-content-center mb-2">
-											<a href="#" class="btn bg-transparent border-teal text-teal rounded-round border-2 btn-icon mr-3">
-												<i class="icon-plus3"></i>
-											</a>
-											<div>
-												<div class="font-weight-semibold">New visitors</div>
-												<span class="text-muted">2,349 avg</span>
-											</div>
-										</div>
-										<div class="w-75 mx-auto mb-3" id="new-visitors"></div>
-									</div>
-
-									<div class="col-sm-4">
-										<div class="d-flex align-items-center justify-content-center mb-2">
-											<a href="#" class="btn bg-transparent border-warning-400 text-warning-400 rounded-round border-2 btn-icon mr-3">
-												<i class="icon-watch2"></i>
-											</a>
-											<div>
-												<div class="font-weight-semibold">New sessions</div>
-												<span class="text-muted">08:20 avg</span>
-											</div>
-										</div>
-										<div class="w-75 mx-auto mb-3" id="new-sessions"></div>
-									</div>
-
-									<div class="col-sm-4">
-										<div class="d-flex align-items-center justify-content-center mb-2">
-											<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon mr-3">
-												<i class="icon-people"></i>
-											</a>
-											<div>
-												<div class="font-weight-semibold">Total online</div>
-												<span class="text-muted"><span class="badge badge-mark border-success mr-2"></span> 5,378 avg</span>
-											</div>
-										</div>
-										<div class="w-75 mx-auto mb-3" id="total-online"></div>
-									</div>
-								</div>
-							</div>
-
-							<div class="chart position-relative" id="traffic-sources"></div>
-						</div>
-						<!-- /traffic sources --
-
-					</div>
-
-					<div class="col-xl-5">
-
-						<!-- Sales stats --
-						<div class="card">
-							<div class="card-header header-elements-inline">
-								<h6 class="card-title">Sales statistics</h6>
-								<div class="header-elements">
-									<select class="form-control" id="select_date" data-fouc>
-										<option value="val1">June, 29 - July, 5</option>
-										<option value="val2">June, 22 - June 28</option>
-										<option value="val3" selected>June, 15 - June, 21</option>
-										<option value="val4">June, 8 - June, 14</option>
-									</select>
-			                	</div>
-							</div>
-
-							<div class="card-body py-0">
-								<div class="row text-center">
-									<div class="col-4">
-										<div class="mb-3">
-											<h5 class="font-weight-semibold mb-0">5,689</h5>
-											<span class="text-muted font-size-sm">new orders</span>
-										</div>
-									</div>
-
-									<div class="col-4">
-										<div class="mb-3">
-											<h5 class="font-weight-semibold mb-0">32,568</h5>
-											<span class="text-muted font-size-sm">this month</span>
-										</div>
-									</div>
-
-									<div class="col-4">
-										<div class="mb-3">
-											<h5 class="font-weight-semibold mb-0">$23,464</h5>
-											<span class="text-muted font-size-sm">expected profit</span>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="chart mb-2" id="app_sales"></div>
-							<div class="chart" id="monthly-sales-stats"></div>
-						</div>
-						<!-- /sales stats --
-
-					</div>
-				</div>
-				<!-- /main charts -->
-
 				<!-- Support tickets -->
 				<div class="card">
 					
@@ -301,13 +480,17 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 							<div class="header-elements">
 								
 							</div>
+
+							<input type="hidden" id="inputTotalPendente" class="form-control" value="<?php echo $totalPendente; ?>">
+							<input type="hidden" id="inputTotalLiberado" class="form-control" value="<?php echo $totalLiberado; ?>">
+							<input type="hidden" id="inputTotalNaoLiberado" class="form-control" value="<?php echo $totalNaoLiberado; ?>">
 						</div>
 
 						<div class="card-body d-md-flex align-items-md-center justify-content-md-between flex-md-wrap">
 							<div class="d-flex align-items-center mb-3 mb-md-0">
-								<div id="tickets-status"></div>
+								<div id="grafico"></div>
 								<div class="ml-3">
-									<h5 class="font-weight-semibold mb-0">50% <span class="text-blue font-size-sm font-weight-normal"><i class="icon-arrow-up12"></i> (Pendente)</span></h5>
+									<h5 class="font-weight-semibold mb-0"><?php echo $totalPorcentagem; ?>% <span class="text-blue font-size-sm font-weight-normal"><i class="icon-arrow-up12"></i> (<?php echo $situacaoPorcentagem; ?>)</span></h5>
 									<span class="badge badge-mark border-blue mr-1"></span> <span class="text-muted">Gráfico de ações</span>
 								</div>
 							</div>
@@ -321,19 +504,6 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 									<span class="text-muted">Total de ações</span>
 								</div>
 							</div>
-
-							<div class="d-flex align-items-center mb-3 mb-md-0">
-								<a href="#" class="btn bg-transparent border-indigo-400 text-indigo-400 rounded-round border-2 btn-icon" style="display:none;">
-									<i class="icon-spinner11"></i>
-								</a>
-								<div class="ml-3" style="display:none;">
-									<a class="text-default daterange-ranges font-weight-semibold cursor-pointer dropdown-toggle">
-									<i class="icon-calendar3 mr-2"></i>
-									<span></span>
-									</a>
-									
-								</div>
-							</div>
 							
 							<?php 
 								
@@ -344,7 +514,7 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 											
 											$sql = "SELECT SituaId, SituaNome, SituaChave
 													FROM Situacao
-													WHERE SituaStatus = 1 and SituaChave in ('PENDENTE', 'LIBERADO', 'NAOLIBERADO')
+													WHERE SituaStatus = 1 and SituaChave in ('AGUARDANDOLIBERACAO', 'LIBERADO', 'NAOLIBERADO')
 													ORDER BY SituaNome ASC";
 											$result = $conn->query($sql);
 											$rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -356,7 +526,7 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 												if (isset($_POST['cmbSituacao'])){
 													$seleciona = $item['SituaChave'] == $_POST['cmbSituacao'] ? "selected" : "";
 												} else{
-													$seleciona = $item['SituaChave'] == 'PENDENTE' ? "selected" : "";
+													$seleciona = $item['SituaChave'] == 'AGUARDANDOLIBERACAO' ? "selected" : "";
 												}
 												
 												print('<option value="'.$item['SituaChave'].'" '.$seleciona.'>'.$item['SituaNome'].'</option>');
@@ -377,25 +547,21 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 												
 												$sql = "SELECT PerfiId, PerfiNome
 														FROM Perfil
-														WHERE PerfiStatus = 1
+														JOIN Situacao on SituaId = PerfiStatus
+														WHERE SituaChave = 'ATIVO'
 														ORDER BY PerfiNome ASC";
 												$result = $conn->query($sql);
 												$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 												
 												foreach ($rowPerfil as $item){
 													
-													if (isset($_POST['cmbPerfil'])){
-														$seleciona = $item['PerfiId'] == $_POST['cmbPerfil'] ? "selected" : "";
-													} else{
-														$seleciona = '';
-													}
+													$seleciona = $item['PerfiId'] == $idPerfilLogado ? "selected" : "";
 													
 													print('<option value="'.$item['PerfiId'].'" '.$seleciona.'>'.$item['PerfiNome'].'</option>');
 												}
 												
 											print('	
-											</select>
-											<!--<a href="#" class="btn bg-teal-400"><i class="icon-statistics mr-2"></i> Report</a>-->
+											</select>											
 										</div>');
 								}
 							?>
@@ -422,7 +588,7 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 											include('bandejaLiberado.php');
 											include('bandejaNaoLiberado.php');
 											
-										} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'PENDENTE'){
+										} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'AGUARDANDOLIBERACAO'){
 											
 											include('bandejaPendente.php');
 											
@@ -449,1146 +615,17 @@ $totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
 				</div>
 				<!-- /support tickets -->
 				
-				<form name="formOrdemCompra" method="post">
+				<form name="formBandeja" method="post">
+					<input type="hidden" id="inputBandejaId" name="inputBandejaId" >
+					<input type="hidden" id="inputFluxoId" name="inputFluxoId" >
+					<input type="hidden" id="inputFluxoStatus" name="inputFluxoStatus" >
 					<input type="hidden" id="inputOrdemCompraId" name="inputOrdemCompraId" >
 					<input type="hidden" id="inputOrdemCompraNumero" name="inputOrdemCompraNumero" >
 					<input type="hidden" id="inputOrdemCompraStatus" name="inputOrdemCompraStatus" >
 					<input type="hidden" id="inputOrdemCompraTipo" name="inputOrdemCompraTipo" >
+					<input type="hidden" id="inputMotivo" name="inputMotivo" >
 				</form>				
 				
-
-				<!-- Dashboard content -->
-				<div class="row" style="display:none">
-					<div class="col-xl-8">
-
-						<!-- Marketing campaigns -->
-						<div class="card">
-							<div class="card-header header-elements-sm-inline">
-								<h6 class="card-title">Marketing campaigns</h6>
-								<div class="header-elements">
-									<span class="badge bg-success badge-pill">28 active</span>
-									<div class="list-icons ml-3">
-				                		<div class="list-icons-item dropdown">
-				                			<a href="#" class="list-icons-item dropdown-toggle" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-											<div class="dropdown-menu">
-												<a href="#" class="dropdown-item"><i class="icon-sync"></i> Update data</a>
-												<a href="#" class="dropdown-item"><i class="icon-list-unordered"></i> Detailed log</a>
-												<a href="#" class="dropdown-item"><i class="icon-pie5"></i> Statistics</a>
-												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item"><i class="icon-cross3"></i> Clear list</a>
-											</div>
-				                		</div>
-				                	</div>
-			                	</div>
-							</div>
-
-							<div class="card-body d-sm-flex align-items-sm-center justify-content-sm-between flex-sm-wrap">
-								<div class="d-flex align-items-center mb-3 mb-sm-0">
-									<div id="campaigns-donut"></div>
-									<div class="ml-3">
-										<h5 class="font-weight-semibold mb-0">38,289 <span class="text-success font-size-sm font-weight-normal"><i class="icon-arrow-up12"></i> (+16.2%)</span></h5>
-										<span class="badge badge-mark border-success mr-1"></span> <span class="text-muted">May 12, 12:30 am</span>
-									</div>
-								</div>
-
-								<div class="d-flex align-items-center mb-3 mb-sm-0">
-									<div id="campaign-status-pie"></div>
-									<div class="ml-3">
-										<h5 class="font-weight-semibold mb-0">2,458 <span class="text-danger font-size-sm font-weight-normal"><i class="icon-arrow-down12"></i> (-4.9%)</span></h5>
-										<span class="badge badge-mark border-danger mr-1"></span> <span class="text-muted">Jun 4, 4:00 am</span>
-									</div>
-								</div>
-
-								<div>
-									<a href="#" class="btn bg-indigo-300"><i class="icon-statistics mr-2"></i> View report</a>
-								</div>
-							</div>
-
-							<div class="table-responsive">
-								<table class="table text-nowrap">
-									<thead>
-										<tr>
-											<th>Campaign</th>
-											<th>Client</th>
-											<th>Changes</th>
-											<th>Budget</th>
-											<th>Status</th>
-											<th class="text-center" style="width: 20px;"><i class="icon-arrow-down12"></i></th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr class="table-active table-border-double">
-											<td colspan="5">Today</td>
-											<td class="text-right">
-												<span class="progress-meter" id="today-progress" data-progress="30"></span>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#">
-															<img src="global_assets/images/brands/facebook.png" class="rounded-circle" width="32" height="32" alt="">
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold">Facebook</a>
-														<div class="text-muted font-size-sm">
-															<span class="badge badge-mark border-blue mr-1"></span>
-															02:00 - 03:00
-														</div>
-													</div>
-												</div>
-											</td>
-											<td><span class="text-muted">Mintlime</span></td>
-											<td><span class="text-success-600"><i class="icon-stats-growth2 mr-2"></i> 2.43%</span></td>
-											<td><h6 class="font-weight-semibold mb-0">$5,489</h6></td>
-											<td><span class="badge bg-blue">Active</span></td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-file-stats"></i> View statement</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-text2"></i> Edit campaign</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-locked"></i> Disable campaign</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-gear"></i> Settings</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#">
-															<img src="global_assets/images/brands/youtube.png" class="rounded-circle" width="32" height="32" alt="">
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold">Youtube videos</a>
-														<div class="text-muted font-size-sm">
-															<span class="badge badge-mark border-danger mr-1"></span>
-															13:00 - 14:00
-														</div>
-													</div>
-												</div>
-											</td>
-											<td><span class="text-muted">CDsoft</span></td>
-											<td><span class="text-success-600"><i class="icon-stats-growth2 mr-2"></i> 3.12%</span></td>
-											<td><h6 class="font-weight-semibold mb-0">$2,592</h6></td>
-											<td><span class="badge bg-danger">Closed</span></td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-file-stats"></i> View statement</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-text2"></i> Edit campaign</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-locked"></i> Disable campaign</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-gear"></i> Settings</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#">
-															<img src="global_assets/images/brands/spotify.png" class="rounded-circle" width="32" height="32" alt="">
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold">Spotify ads</a>
-														<div class="text-muted font-size-sm">
-															<span class="badge badge-mark border-grey-400 mr-1"></span>
-															10:00 - 11:00
-														</div>
-													</div>
-												</div>
-											</td>
-											<td><span class="text-muted">Diligence</span></td>
-											<td><span class="text-danger"><i class="icon-stats-decline2 mr-2"></i> - 8.02%</span></td>
-											<td><h6 class="font-weight-semibold mb-0">$1,268</h6></td>
-											<td><span class="badge bg-grey-400">On hold</span></td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-file-stats"></i> View statement</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-text2"></i> Edit campaign</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-locked"></i> Disable campaign</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-gear"></i> Settings</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#">
-															<img src="global_assets/images/brands/twitter.png" class="rounded-circle" width="32" height="32" alt="">
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold">Twitter ads</a>
-														<div class="text-muted font-size-sm">
-															<span class="badge badge-mark border-grey-400 mr-1"></span>
-															04:00 - 05:00
-														</div>
-													</div>
-												</div>
-											</td>
-											<td><span class="text-muted">Deluxe</span></td>
-											<td><span class="text-success-600"><i class="icon-stats-growth2 mr-2"></i> 2.78%</span></td>
-											<td><h6 class="font-weight-semibold mb-0">$7,467</h6></td>
-											<td><span class="badge bg-grey-400">On hold</span></td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-file-stats"></i> View statement</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-text2"></i> Edit campaign</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-locked"></i> Disable campaign</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-gear"></i> Settings</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-
-										<tr class="table-active table-border-double">
-											<td colspan="5">Yesterday</td>
-											<td class="text-right">
-												<span class="progress-meter" id="yesterday-progress" data-progress="65"></span>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#">
-															<img src="global_assets/images/brands/bing.png" class="rounded-circle" width="32" height="32" alt="">
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold">Bing campaign</a>
-														<div class="text-muted font-size-sm">
-															<span class="badge badge-mark border-success mr-1"></span>
-															15:00 - 16:00
-														</div>
-													</div>
-												</div>
-											</td>
-											<td><span class="text-muted">Metrics</span></td>
-											<td><span class="text-danger"><i class="icon-stats-decline2 mr-2"></i> - 5.78%</span></td>
-											<td><h6 class="font-weight-semibold mb-0">$970</h6></td>
-											<td><span class="badge bg-success-400">Pending</span></td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-file-stats"></i> View statement</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-text2"></i> Edit campaign</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-locked"></i> Disable campaign</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-gear"></i> Settings</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#">
-															<img src="global_assets/images/brands/amazon.png" class="rounded-circle" width="32" height="32" alt="">
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold">Amazon ads</a>
-														<div class="text-muted font-size-sm">
-															<span class="badge badge-mark border-danger mr-1"></span>
-															18:00 - 19:00
-														</div>
-													</div>
-												</div>
-											</td>
-											<td><span class="text-muted">Blueish</span></td>
-											<td><span class="text-success-600"><i class="icon-stats-growth2 mr-2"></i> 6.79%</span></td>
-											<td><h6 class="font-weight-semibold mb-0">$1,540</h6></td>
-											<td><span class="badge bg-blue">Active</span></td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-file-stats"></i> View statement</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-text2"></i> Edit campaign</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-locked"></i> Disable campaign</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-gear"></i> Settings</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#">
-															<img src="global_assets/images/brands/dribbble.png" class="rounded-circle" width="32" height="32" alt="">
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold">Dribbble ads</a>
-														<div class="text-muted font-size-sm">
-															<span class="badge badge-mark border-blue mr-1"></span>
-															20:00 - 21:00
-														</div>
-													</div>
-												</div>
-											</td>
-											<td><span class="text-muted">Teamable</span></td>
-											<td><span class="text-danger"><i class="icon-stats-decline2 mr-2"></i> 9.83%</span></td>
-											<td><h6 class="font-weight-semibold mb-0">$8,350</h6></td>
-											<td><span class="badge bg-danger">Closed</span></td>
-											<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons-item dropdown">
-														<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-														<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" class="dropdown-item"><i class="icon-file-stats"></i> View statement</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-text2"></i> Edit campaign</a>
-															<a href="#" class="dropdown-item"><i class="icon-file-locked"></i> Disable campaign</a>
-															<div class="dropdown-divider"></div>
-															<a href="#" class="dropdown-item"><i class="icon-gear"></i> Settings</a>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<!-- /marketing campaigns -->
-
-
-						<!-- Quick stats boxes -->
-						<div class="row">
-							<div class="col-lg-4">
-
-								<!-- Members online -->
-								<div class="card bg-teal-400">
-									<div class="card-body">
-										<div class="d-flex">
-											<h3 class="font-weight-semibold mb-0">3,450</h3>
-											<span class="badge bg-teal-800 badge-pill align-self-center ml-auto">+53,6%</span>
-					                	</div>
-					                	
-					                	<div>
-											Members online
-											<div class="font-size-sm opacity-75">489 avg</div>
-										</div>
-									</div>
-
-									<div class="container-fluid">
-										<div id="members-online"></div>
-									</div>
-								</div>
-								<!-- /members online -->
-
-							</div>
-
-							<div class="col-lg-4">
-
-								<!-- Current server load -->
-								<div class="card bg-pink-400">
-									<div class="card-body">
-										<div class="d-flex">
-											<h3 class="font-weight-semibold mb-0">49.4%</h3>
-											<div class="list-icons ml-auto">
-						                		<div class="list-icons-item dropdown">
-						                			<a href="#" class="list-icons-item dropdown-toggle" data-toggle="dropdown"><i class="icon-cog3"></i></a>
-													<div class="dropdown-menu dropdown-menu-right">
-														<a href="#" class="dropdown-item"><i class="icon-sync"></i> Update data</a>
-														<a href="#" class="dropdown-item"><i class="icon-list-unordered"></i> Detailed log</a>
-														<a href="#" class="dropdown-item"><i class="icon-pie5"></i> Statistics</a>
-														<a href="#" class="dropdown-item"><i class="icon-cross3"></i> Clear list</a>
-													</div>
-						                		</div>
-					                		</div>
-					                	</div>
-					                	
-					                	<div>
-											Current server load
-											<div class="font-size-sm opacity-75">34.6% avg</div>
-										</div>
-									</div>
-
-									<div id="server-load"></div>
-								</div>
-								<!-- /current server load -->
-
-							</div>
-
-							<div class="col-lg-4">
-
-								<!-- Today's revenue -->
-								<div class="card bg-blue-400">
-									<div class="card-body">
-										<div class="d-flex">
-											<h3 class="font-weight-semibold mb-0">$18,390</h3>
-											<div class="list-icons ml-auto">
-						                		<a class="list-icons-item" data-action="reload"></a>
-						                	</div>
-					                	</div>
-					                	
-					                	<div>
-											Today's revenue
-											<div class="font-size-sm opacity-75">$37,578 avg</div>
-										</div>
-									</div>
-
-									<div id="today-revenue"></div>
-								</div>
-								<!-- /today's revenue -->
-
-							</div>
-						</div>
-						<!-- /quick stats boxes -->
-
-
-						<!-- Latest posts --
-						<div class="card">
-							<div class="card-header header-elements-inline">
-								<h6 class="card-title">Latest posts</h6>
-								<div class="header-elements">
-									<div class="list-icons">
-				                		<a class="list-icons-item" data-action="collapse"></a>
-				                		<a class="list-icons-item" data-action="reload"></a>
-				                		<a class="list-icons-item" data-action="remove"></a>
-				                	</div>
-			                	</div>
-		                	</div>
-
-							<div class="card-body pb-0">
-								<div class="row">
-									<div class="col-xl-6">
-										<div class="media flex-column flex-sm-row mt-0 mb-3">
-				        					<div class="mr-sm-3 mb-2 mb-sm-0">
-												<div class="card-img-actions">
-													<a href="#">
-														<img src="global_assets/images/placeholders/placeholder.jpg" class="img-fluid img-preview rounded" alt="">
-														<span class="card-img-actions-overlay card-img"><i class="icon-play3 icon-2x"></i></span>
-													</a>
-												</div>
-											</div>
-
-				        					<div class="media-body">
-												<h6 class="media-title"><a href="#">Up unpacked friendly</a></h6>
-					                    		<ul class="list-inline list-inline-dotted text-muted mb-2">
-					                    			<li class="list-inline-item"><i class="icon-book-play mr-2"></i> Video tutorials</li>
-					                    		</ul>
-												The him father parish looked has sooner. Attachment frequently terminated son hello...
-											</div>
-										</div>
-
-										<div class="media flex-column flex-sm-row mt-0 mb-3">
-				        					<div class="mr-sm-3 mb-2 mb-sm-0">
-												<div class="card-img-actions">
-													<a href="#">
-														<img src="global_assets/images/placeholders/placeholder.jpg" class="img-fluid img-preview rounded" alt="">
-														<span class="card-img-actions-overlay card-img"><i class="icon-play3 icon-2x"></i></span>
-													</a>
-												</div>
-											</div>
-
-				        					<div class="media-body">
-												<h6 class="media-title"><a href="#">It allowance prevailed</a></h6>
-					                    		<ul class="list-inline list-inline-dotted text-muted mb-2">
-					                    			<li class="list-inline-item"><i class="icon-book-play mr-2"></i> Video tutorials</li>
-					                    		</ul>
-												Alteration literature to or an sympathize mr imprudence. Of is ferrars subject enjoyed...
-											</div>
-										</div>
-									</div>
-
-									<div class="col-xl-6">
-										<div class="media flex-column flex-sm-row mt-0 mb-3">
-				        					<div class="mr-sm-3 mb-2 mb-sm-0">
-												<div class="card-img-actions">
-													<a href="#">
-														<img src="global_assets/images/placeholders/placeholder.jpg" class="img-fluid img-preview rounded" alt="">
-														<span class="card-img-actions-overlay card-img"><i class="icon-play3 icon-2x"></i></span>
-													</a>
-												</div>
-											</div>
-
-				        					<div class="media-body">
-												<h6 class="media-title"><a href="#">Case read they must</a></h6>
-					                    		<ul class="list-inline list-inline-dotted text-muted mb-2">
-					                    			<li class="list-inline-item"><i class="icon-book-play mr-2"></i> Video tutorials</li>
-					                    		</ul>
-												On it differed repeated wandered required in. Then girl neat why yet knew rose spot...
-											</div>
-										</div>
-
-										<div class="media flex-column flex-sm-row mt-0 mb-3">
-				        					<div class="mr-sm-3 mb-2 mb-sm-0">
-												<div class="card-img-actions">
-													<a href="#">
-														<img src="global_assets/images/placeholders/placeholder.jpg" class="img-fluid img-preview rounded" alt="">
-														<span class="card-img-actions-overlay card-img"><i class="icon-play3 icon-2x"></i></span>
-													</a>
-												</div>
-											</div>
-
-				        					<div class="media-body">
-												<h6 class="media-title"><a href="#">Too carriage attended</a></h6>
-					                    		<ul class="list-inline list-inline-dotted text-muted mb-2">
-					                    			<li class="list-inline-item"><i class="icon-book-play mr-2"></i> FAQ section</li>
-					                    		</ul>
-												Marianne or husbands if at stronger ye. Considered is as middletons uncommonly...
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<!-- /latest posts -->
-
-					</div>
-
-					<div class="col-xl-4">
-
-						<!-- Progress counters -->
-						<div class="row">
-							<div class="col-sm-6">
-
-								<!-- Available hours -->
-								<div class="card text-center">
-									<div class="card-body">
-
-					                	<!-- Progress counter -->
-										<div class="svg-center position-relative" id="hours-available-progress"></div>
-										<!-- /progress counter -->
-
-
-										<!-- Bars -->
-										<div id="hours-available-bars"></div>
-										<!-- /bars -->
-
-									</div>
-								</div>
-								<!-- /available hours -->
-
-							</div>
-
-							<div class="col-sm-6">
-
-								<!-- Productivity goal -->
-								<div class="card text-center">
-									<div class="card-body">
-
-										<!-- Progress counter -->
-										<div class="svg-center position-relative" id="goal-progress"></div>
-										<!-- /progress counter -->
-
-										<!-- Bars -->
-										<div id="goal-bars"></div>
-										<!-- /bars -->
-
-									</div>
-								</div>
-								<!-- /productivity goal -->
-
-							</div>
-						</div>
-						<!-- /progress counters -->
-
-
-						<!-- Daily sales --
-						<div class="card">
-							<div class="card-header header-elements-inline">
-								<h6 class="card-title">Daily sales stats</h6>
-								<div class="header-elements">
-									<span class="font-weight-bold text-danger-600 ml-2">$4,378</span>
-									<div class="list-icons ml-3">
-				                		<div class="list-icons-item dropdown">
-				                			<a href="#" class="list-icons-item dropdown-toggle" data-toggle="dropdown"><i class="icon-cog3"></i></a>
-											<div class="dropdown-menu">
-												<a href="#" class="dropdown-item"><i class="icon-sync"></i> Update data</a>
-												<a href="#" class="dropdown-item"><i class="icon-list-unordered"></i> Detailed log</a>
-												<a href="#" class="dropdown-item"><i class="icon-pie5"></i> Statistics</a>
-												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item"><i class="icon-cross3"></i> Clear list</a>
-											</div>
-				                		</div>
-				                	</div>
-								</div>
-							</div>
-
-							<div class="card-body">
-								<div class="chart" id="sales-heatmap"></div>
-							</div>
-
-							<div class="table-responsive">
-								<table class="table text-nowrap">
-									<thead>
-										<tr>
-											<th class="w-100">Application</th>
-											<th>Time</th>
-											<th>Price</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-primary-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Sigma application</a>
-														<div class="text-muted font-size-sm"><i class="icon-checkmark3 font-size-sm mr-1"></i> New order</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<span class="text-muted font-size-sm">06:28 pm</span>
-											</td>
-											<td>
-												<h6 class="font-weight-semibold mb-0">$49.90</h6>
-											</td>
-										</tr>
-
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-danger-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Alpha application</a>
-														<div class="text-muted font-size-sm"><i class="icon-spinner11 font-size-sm mr-1"></i> Renewal</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<span class="text-muted font-size-sm">04:52 pm</span>
-											</td>
-											<td>
-												<h6 class="font-weight-semibold mb-0">$90.50</h6>
-											</td>
-										</tr>
-
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-indigo-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Delta application</a>
-														<div class="text-muted font-size-sm"><i class="icon-lifebuoy font-size-sm mr-1"></i> Support</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<span class="text-muted font-size-sm">01:26 pm</span>
-											</td>
-											<td>
-												<h6 class="font-weight-semibold mb-0">$60.00</h6>
-											</td>
-										</tr>
-
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-success-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Omega application</a>
-														<div class="text-muted font-size-sm"><i class="icon-lifebuoy font-size-sm mr-1"></i> Support</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<span class="text-muted font-size-sm">11:46 am</span>
-											</td>
-											<td>
-												<h6 class="font-weight-semibold mb-0">$55.00</h6>
-											</td>
-										</tr>
-
-										<tr>
-											<td>
-												<div class="d-flex align-items-center">
-													<div class="mr-3">
-														<a href="#" class="btn bg-danger-400 rounded-round btn-icon btn-sm">
-															<span class="letter-icon"></span>
-														</a>
-													</div>
-													<div>
-														<a href="#" class="text-default font-weight-semibold letter-icon-title">Alpha application</a>
-														<div class="text-muted font-size-sm"><i class="icon-spinner11 font-size-sm mr-2"></i> Renewal</div>
-													</div>
-												</div>
-											</td>
-											<td>
-												<span class="text-muted font-size-sm">10:29 am</span>
-											</td>
-											<td>
-												<h6 class="font-weight-semibold mb-0">$90.50</h6>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<!-- /daily sales -->
-
-
-						<!-- My messages -->
-						<div class="card">
-							<div class="card-header header-elements-inline">
-								<h6 class="card-title">My messages</h6>
-								<div class="header-elements">
-									<span><i class="icon-history text-warning mr-2"></i> Jul 7, 10:30</span>
-									<span class="badge bg-success align-self-start ml-3">Online</span>
-								</div>
-							</div>
-
-							<!-- Numbers -->
-							<div class="card-body py-0">
-								<div class="row text-center">
-									<div class="col-4">
-										<div class="mb-3">
-											<h5 class="font-weight-semibold mb-0">2,345</h5>
-											<span class="text-muted font-size-sm">this week</span>
-										</div>
-									</div>
-
-									<div class="col-4">
-										<div class="mb-3">
-											<h5 class="font-weight-semibold mb-0">3,568</h5>
-											<span class="text-muted font-size-sm">this month</span>
-										</div>
-									</div>
-
-									<div class="col-4">
-										<div class="mb-3">
-											<h5 class="font-weight-semibold mb-0">32,693</h5>
-											<span class="text-muted font-size-sm">all messages</span>
-										</div>
-									</div>
-								</div>
-							</div>
-							<!-- /numbers -->
-
-
-							<!-- Area chart -->
-							<div id="messages-stats"></div>
-							<!-- /area chart -->
-
-
-							<!-- Tabs -->
-		                	<ul class="nav nav-tabs nav-tabs-solid nav-justified bg-indigo-400 border-x-0 border-bottom-0 border-top-indigo-300 mb-0">
-								<li class="nav-item">
-									<a href="#messages-tue" class="nav-link font-size-sm text-uppercase active" data-toggle="tab">
-										Tuesday
-									</a>
-								</li>
-
-								<li class="nav-item">
-									<a href="#messages-mon" class="nav-link font-size-sm text-uppercase" data-toggle="tab">
-										Monday
-									</a>
-								</li>
-
-								<li class="nav-item">
-									<a href="#messages-fri" class="nav-link font-size-sm text-uppercase" data-toggle="tab">
-										Friday
-									</a>
-								</li>
-							</ul>
-							<!-- /tabs -->
-
-
-							<!-- Tabs content -->
-							<div class="tab-content card-body">
-								<div class="tab-pane active fade show" id="messages-tue">
-									<ul class="media-list">
-										<li class="media">
-											<div class="mr-3 position-relative">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-												<span class="badge bg-danger-400 badge-pill badge-float border-2 border-white">8</span>
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">James Alexander</a>
-													<span class="font-size-sm text-muted">14:58</span>
-												</div>
-
-												The constitutionally inventoried precariously...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3 position-relative">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-												<span class="badge bg-danger-400 badge-pill badge-float border-2 border-white">6</span>
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Margo Baker</a>
-													<span class="font-size-sm text-muted">12:16</span>
-												</div>
-
-												Pinched a well more moral chose goodness...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Jeremy Victorino</a>
-													<span class="font-size-sm text-muted">09:48</span>
-												</div>
-
-												Pert thickly mischievous clung frowned well...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Beatrix Diaz</a>
-													<span class="font-size-sm text-muted">05:54</span>
-												</div>
-
-												Nightingale taped hello bucolic fussily cardinal...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">												
-												<div class="d-flex justify-content-between">
-													<a href="#">Richard Vango</a>
-													<span class="font-size-sm text-muted">01:43</span>
-												</div>
-
-												Amidst roadrunner distantly pompously where...
-											</div>
-										</li>
-									</ul>
-								</div>
-
-								<div class="tab-pane fade" id="messages-mon">
-									<ul class="media-list">
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Isak Temes</a>
-													<span class="font-size-sm text-muted">Tue, 19:58</span>
-												</div>
-
-												Reasonable palpably rankly expressly grimy...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Vittorio Cosgrove</a>
-													<span class="font-size-sm text-muted">Tue, 16:35</span>
-												</div>
-
-												Arguably therefore more unexplainable fumed...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Hilary Talaugon</a>
-													<span class="font-size-sm text-muted">Tue, 12:16</span>
-												</div>
-
-												Nicely unlike porpoise a kookaburra past more...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Bobbie Seber</a>
-													<span class="font-size-sm text-muted">Tue, 09:20</span>
-												</div>
-
-												Before visual vigilantly fortuitous tortoise...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Walther Laws</a>
-													<span class="font-size-sm text-muted">Tue, 03:29</span>
-												</div>
-
-												Far affecting more leered unerringly dishonest...
-											</div>
-										</li>
-									</ul>
-								</div>
-
-								<div class="tab-pane fade" id="messages-fri">
-									<ul class="media-list">
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Owen Stretch</a>
-													<span class="font-size-sm text-muted">Mon, 18:12</span>
-												</div>
-
-												Tardy rattlesnake seal raptly earthworm...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Jenilee Mcnair</a>
-													<span class="font-size-sm text-muted">Mon, 14:03</span>
-												</div>
-
-												Since hello dear pushed amid darn trite...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Alaster Jain</a>
-													<span class="font-size-sm text-muted">Mon, 13:59</span>
-												</div>
-
-												Dachshund cardinal dear next jeepers well...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Sigfrid Thisted</a>
-													<span class="font-size-sm text-muted">Mon, 09:26</span>
-												</div>
-
-												Lighted wolf yikes less lemur crud grunted...
-											</div>
-										</li>
-
-										<li class="media">
-											<div class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-
-											<div class="media-body">
-												<div class="d-flex justify-content-between">
-													<a href="#">Sherilyn Mckee</a>
-													<span class="font-size-sm text-muted">Mon, 06:38</span>
-												</div>
-
-												Less unicorn a however careless husky...
-											</div>
-										</li>
-									</ul>
-								</div>
-							</div>
-							<!-- /tabs content -->
-
-						</div>
-						<!-- /my messages -->
-
-
-						<!-- Daily financials --
-						<div class="card">
-							<div class="card-header header-elements-inline">
-								<h6 class="card-title">Daily financials</h6>
-								<div class="header-elements">
-									<div class="form-check form-check-inline form-check-right form-check-switchery form-check-switchery-sm">
-										<label class="form-check-label">
-											<input type="checkbox" class="form-input-switchery" id="realtime" checked data-fouc>
-											Realtime
-										</label>
-									</div>
-									<span class="badge bg-danger-400 badge-pill">+86</span>
-								</div>
-							</div>
-
-							<div class="card-body">
-								<div class="chart mb-3" id="bullets"></div>
-
-								<ul class="media-list">
-									<li class="media">
-										<div class="mr-3">
-											<a href="#" class="btn bg-transparent border-pink text-pink rounded-round border-2 btn-icon"><i class="icon-statistics"></i></a>
-										</div>
-										
-										<div class="media-body">
-											Stats for July, 6: <span class="font-weight-semibold">1938</span> orders, <span class="font-weight-semibold text-danger">$4220</span> revenue
-											<div class="text-muted">2 hours ago</div>
-										</div>
-
-										<div class="ml-3 align-self-center">
-											<a href="#" class="list-icons-item"><i class="icon-more"></i></a>
-										</div>
-									</li>
-
-									<li class="media">
-										<div class="mr-3">
-											<a href="#" class="btn bg-transparent border-success text-success rounded-round border-2 btn-icon"><i class="icon-checkmark3"></i></a>
-										</div>
-										
-										<div class="media-body">
-											Invoices <a href="#">#4732</a> and <a href="#">#4734</a> have been paid
-											<div class="text-muted">Dec 18, 18:36</div>
-										</div>
-
-										<div class="ml-3 align-self-center">
-											<a href="#" class="list-icons-item"><i class="icon-more"></i></a>
-										</div>
-									</li>
-
-									<li class="media">
-										<div class="mr-3">
-											<a href="#" class="btn bg-transparent border-primary text-primary rounded-round border-2 btn-icon"><i class="icon-alignment-unalign"></i></a>
-										</div>
-										
-										<div class="media-body">
-											Affiliate commission for June has been paid
-											<div class="text-muted">36 minutes ago</div>
-										</div>
-
-										<div class="ml-3 align-self-center">
-											<a href="#" class="list-icons-item"><i class="icon-more"></i></a>
-										</div>
-									</li>
-
-									<li class="media">
-										<div class="mr-3">
-											<a href="#" class="btn bg-transparent border-warning-400 text-warning-400 rounded-round border-2 btn-icon"><i class="icon-spinner11"></i></a>
-										</div>
-
-										<div class="media-body">
-											Order <a href="#">#37745</a> from July, 1st has been refunded
-											<div class="text-muted">4 minutes ago</div>
-										</div>
-
-										<div class="ml-3 align-self-center">
-											<a href="#" class="list-icons-item"><i class="icon-more"></i></a>
-										</div>
-									</li>
-
-									<li class="media">
-										<div class="mr-3">
-											<a href="#" class="btn bg-transparent border-teal text-teal rounded-round border-2 btn-icon"><i class="icon-redo2"></i></a>
-										</div>
-										
-										<div class="media-body">
-											Invoice <a href="#">#4769</a> has been sent to <a href="#">Robert Smith</a>
-											<div class="text-muted">Dec 12, 05:46</div>
-										</div>
-
-										<div class="ml-3 align-self-center">
-											<a href="#" class="list-icons-item"><i class="icon-more"></i></a>
-										</div>
-									</li>
-								</ul>
-							</div>
-						</div>
-						<!-- /daily financials -->
-
-					</div>
-				</div>
-				<!-- /dashboard content -->
-
 			</div>
 			<!-- /content area -->
 

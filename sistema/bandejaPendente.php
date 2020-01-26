@@ -2,7 +2,7 @@
 
 	print('
 	<tr class="table-active table-border-double">
-		<td colspan="3">Ações Pendentes</td>
+		<td colspan="3">Ações Aguardando Liberação</td>
 		<td class="text-right">
 			<span class="badge bg-blue badge-pill">'.$totalPendente.'</span>
 		</td>
@@ -14,7 +14,9 @@
 			$dias = 'dias';
 		} else{
 			$dias = 'dia';
-		}										
+		}
+
+		$situacaoOrdemCompra = $item['OrComSituacao'] == null ? 0 : $item['OrComSituacao'];
 
 		print('
 		<tr>
@@ -46,10 +48,11 @@
 					<div class="list-icons-item dropdown">
 						<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
 						<div class="dropdown-menu dropdown-menu-right">
-							<a href="#" onclick="atualizaOrdemCompra('.$item['BandeTabelaId'].', \''.$item['OrComNumero'].'\', '.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'imprimir\');" class="dropdown-item"><i class="icon-printer2"></i> Visualizar</a>
-							<div class="dropdown-divider"></div>
-							<a href="#" onclick="atualizaOrdemCompra('.$item['BandeTabelaId'].', \''.$item['OrComNumero'].'\', '.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'liberar\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
-							<a href="#" onclick="atualizaOrdemCompra('.$item['BandeTabelaId'].', \''.$item['OrComNumero'].'\', '.$item['OrComSituacao'].', \''.$item['OrComTipo'].'\', \'naoliberar\');" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
+							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['OrComNumero'].'\', '.$situacaoOrdemCompra.', \''.$item['OrComTipo'].'\', \'imprimir\');" class="dropdown-item"><i class="icon-printer2"></i> Visualizar</a>
+							
+							<div class="dropdown-divider"></div>							
+							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['OrComNumero'].'\', '.$situacaoOrdemCompra.', \''.$item['OrComTipo'].'\', \'liberar\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
+							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['OrComNumero'].'\', '.$situacaoOrdemCompra.', \''.$item['OrComTipo'].'\', \'naoliberar\');" class="dropdown-item" id="motivo"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
 						</div>
 					</div>
 				</div>
