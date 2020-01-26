@@ -9,14 +9,20 @@ $_SESSION['msg'] = array();
 if(isset($_POST['inputLocalEstoqueId'])){
 	
 	$iLocalEstoque = $_POST['inputLocalEstoqueId'];
-	$bStatus = $_POST['inputLocalEstoqueStatus'] ? 0 : 1;
+	$sStatus = $_POST['inputLocalEstoqueStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
         	
 	try{
+		$sql = "SELECT SituaId
+				FROM Situacao
+			    WHERE SituaChave = '". $sStatus."'";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+		$iStatus = $row['SituaId'];
 		
 		$sql = "UPDATE LocalEstoque SET LcEstStatus = :bStatus
 				WHERE LcEstId = :id";
 		$result = $conn->prepare("$sql");
-		$result->bindParam(':bStatus', $bStatus); 
+		$result->bindParam(':bStatus', $iStatus); 
 		$result->bindParam(':id', $iLocalEstoque); 
 		$result->execute();
 		

@@ -15,7 +15,7 @@ if(isset($_POST['inputPrOrcId'])){
 
 		$sql = "SELECT SituaId
 				FROM Situacao
-			    WHERE SituaChave = ". $inputPrOrcStatus." ";
+			    WHERE SituaChave = '$inputPrOrcStatus'  "; // ver essa sintaxe
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iStatus = $row['SituaId'];

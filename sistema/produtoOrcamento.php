@@ -51,7 +51,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [
 				{
 					orderable: true,   //Produto
-					width: "25%",
+					width: "30%",
 					targets: [0]
 				},	
 				{
@@ -66,12 +66,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Situação
-					width: "12%",
+					width: "10%",
 					targets: [3]
 				},
 				{ 
 					orderable: false,  //Ações
-					width: "13%",
+					width: "10%",
 					targets: [4]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
