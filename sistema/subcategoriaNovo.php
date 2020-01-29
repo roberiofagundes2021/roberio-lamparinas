@@ -16,7 +16,7 @@ if(isset($_POST['inputNome'])){
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
-						':sCategoria' => $_POST['cmbCategoria'],
+						':sCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId'],
@@ -32,7 +32,7 @@ if(isset($_POST['inputNome'])){
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir sub categoria!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 	
 	irpara("subcategoria.php");
@@ -55,6 +55,11 @@ if(isset($_POST['inputNome'])){
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	
+	<!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 	<!-- /theme JS files -->	
 
 	<script type="text/javascript" >
@@ -114,10 +119,7 @@ if(isset($_POST['inputNome'])){
 			})
 		})
 	</script>
-	<script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 </head>
 
 <body class="navbar-top">

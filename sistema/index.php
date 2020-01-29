@@ -355,10 +355,6 @@ if($totalAcoes){
 		    	_bandeja('#grafico', 52, pendente, liberado, naoliberado);
 		    }
 
-	        // Motivo de não ter liberado
-	        $('#motivo').on('click', function() {
-	        });
-			
 		});
 		
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL

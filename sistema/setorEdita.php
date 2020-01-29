@@ -94,20 +94,6 @@ if(isset($_POST['inputNome'])){
 				//remove os espaços desnecessários antes e depois
 				inputNomeNovo = inputNomeNovo.trim();
 				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNomeNovo == ''){
-					alerta('Atenção','Informe o setor!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-				
-				//Verifica se o campo só possui espaços em branco
-				if (cmbUnidade == '#'){
-					alerta('Atenção','Informe a unidade!','error');
-					$('#cmbUnidade').focus();
-					return false;
-				}				
-				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
@@ -153,7 +139,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formSetor" id="formSetor" method="post" class="form-validate">
+					<form name="formSetor" id="formSetor" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Setor "<?php echo $row['SetorNome']; ?>"</h5>
 						</div>
@@ -171,14 +157,15 @@ if(isset($_POST['inputNome'])){
 								</div>
 								<div class="col-lg-6">
 									<label for="cmbUnidade">Unidade</label>
-									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
+									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
 										<option value="#">Selecione</option>
 										<?php 
-											$sql = ("SELECT UnidaId, UnidaNome
-													 FROM Unidade
-													 WHERE UnidaStatus = 1 and UnidaEmpresa = ".$_SESSION['EmpresaId']."
-													 ORDER BY UnidaNome ASC");
-											$result = $conn->query("$sql");
+											$sql = "SELECT UnidaId, UnidaNome
+													FROM Unidade
+													JOIN Situacao on SituaId = UnidaStatus
+													WHERE SituaChave = 'ATIVO' and UnidaEmpresa = ".$_SESSION['EmpresaId']."
+													ORDER BY UnidaNome ASC";
+											$result = $conn->query($sql);
 											$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
 											
 											foreach ($rowUnidade as $item){

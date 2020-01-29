@@ -38,8 +38,8 @@ if(isset($_POST['inputDataInicio'])){
 				
 		$result->execute(array(
 						':iFornecedor' => $_POST['cmbFornecedor'],
-						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
 						':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 						':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 						':iNumContrato' => $_POST['inputNumContrato'],

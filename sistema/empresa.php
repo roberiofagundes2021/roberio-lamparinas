@@ -6,10 +6,10 @@ $_SESSION['PaginaAtual'] = 'Empresa';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreStatus, dbo.fnLicencaVencimento(EmpreId) as Licenca
-		 FROM Empresa
-		 ORDER BY EmpreNomeFantasia ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreStatus, dbo.fnLicencaVencimento(EmpreId) as Licenca
+		FROM Empresa
+		ORDER BY EmpreNomeFantasia ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 //	var_dump($count);die;

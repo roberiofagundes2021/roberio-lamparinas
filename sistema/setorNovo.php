@@ -5,7 +5,7 @@ include_once("sessao.php");
 $_SESSION['PaginaAtual'] = 'Novo Setor';
 
 include('global_assets/php/conexao.php');
-
+echo "EmpresaId: ".$_SESSION['EmpresaId'];
 if(isset($_POST['inputNome'])){
 
 	try{
@@ -32,7 +32,7 @@ if(isset($_POST['inputNome'])){
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir setor!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 	
 	irpara("setor.php");
@@ -55,6 +55,10 @@ if(isset($_POST['inputNome'])){
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 	<!-- /theme JS files -->	
 
 	<script type="text/javascript" >
@@ -68,17 +72,9 @@ if(isset($_POST['inputNome'])){
 				
 				var inputNome = $('#inputNome').val();
 				var cmbUnidade = $('#cmbUnidade').val();
-				alert(cmbUnidade);
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe o setor!','error');
-					$('#inputNome').focus();
-					return false;
-				}
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -123,7 +119,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formSetor" id="formSetor" method="post" class="form-validate" action="setorNovo.php">
+					<form name="formSetor" id="formSetor" method="post" class="form-validate-jquery" action="setorNovo.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Setor</h5>
 						</div>
@@ -139,14 +135,15 @@ if(isset($_POST['inputNome'])){
 								
 								<div class="col-lg-6">
 									<label for="cmbUnidade">Unidade</label>
-									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
-										<option value="#">Selecione</option>
+									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
+										<option value="">Selecione</option>
 										<?php 
-											$sql = ("SELECT UnidaId, UnidaNome
-													 FROM Unidade
-													 WHERE UnidaStatus = 1 and UnidaEmpresa = ".$_SESSION['EmpresaId']."
-													 ORDER BY UnidaNome ASC");
-											$result = $conn->query("$sql");
+											$sql = "SELECT UnidaId, UnidaNome
+													FROM Unidade
+													JOIN Situacao on SituaId = UnidaStatus
+													WHERE SituaChave = 'ATIVO' and UnidaEmpresa = ".$_SESSION['EmpresaId']."
+													ORDER BY UnidaNome ASC";
+											$result = $conn->query($sql);
 											$row = $result->fetchAll(PDO::FETCH_ASSOC);
 											
 											foreach ($row as $item){
