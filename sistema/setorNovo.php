@@ -5,7 +5,7 @@ include_once("sessao.php");
 $_SESSION['PaginaAtual'] = 'Novo Setor';
 
 include('global_assets/php/conexao.php');
-echo "EmpresaId: ".$_SESSION['EmpresaId'];
+
 if(isset($_POST['inputNome'])){
 
 	try{
