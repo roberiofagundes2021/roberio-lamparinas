@@ -343,11 +343,11 @@ if(isset($_POST['inputNome'])){
 
 			
 			function Filtrando(){
-				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+				$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
 			}
 			
 			function Reset(){
-				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+				$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
 			}			
 		
 		});

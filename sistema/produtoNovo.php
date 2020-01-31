@@ -293,11 +293,11 @@ if(isset($_POST['inputNome'])){
 			});			
 			
 			function Filtrando(){
-				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+				$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
 			}
 			
 			function Reset(){
-				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+				$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
 			}
 
 			//Valida Registro Duplicado
@@ -636,95 +636,105 @@ if(isset($_POST['inputNome'])){
 									<h5 class="mb-0 font-weight-semibold">Dados Fiscais</h5>
 									<br>
 									<div class="row">								
-										<div class="col-lg-3">
-											<label for="cmbUnidadeMedida">Unidade de Medida</label>
-											<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control form-control-select2">
-												<option value="#">Selecione</option>
-												<?php 
-													$sql = ("SELECT UnMedId, UnMedNome, UnMedSigla
-															 FROM UnidadeMedida
-															 WHERE UnMedStatus = 1 and UnMedEmpresa = ".$_SESSION['EmpreId']."
-															 ORDER BY UnMedNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbUnidadeMedida">Unidade de Medida</label>
+												<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+														$sql = ("SELECT UnMedId, UnMedNome, UnMedSigla
+																 FROM UnidadeMedida
+																 WHERE UnMedStatus = 1 and UnMedEmpresa = ".$_SESSION['EmpreId']."
+																 ORDER BY UnMedNome ASC");
+														$result = $conn->query("$sql");
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($row as $item){
-														print('<option value="'.$item['UnMedId'].'">'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
-													}
-												
-												?>
-											</select>
+														foreach ($row as $item){
+															print('<option value="'.$item['UnMedId'].'">'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
 										</div>
 										
-										<div class="col-lg-3">
-											<label for="cmbTipoFiscal">Tipo</label>
-											<select id="cmbTipoFiscal" name="cmbTipoFiscal" class="form-control form-control-select2">
-												<option value="#">Selecione</option>
-												<?php 
-													$sql = ("SELECT TpFisId, TpFisNome
-															 FROM TipoFiscal
-															 WHERE TpFisStatus = 1
-															 ORDER BY TpFisNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($row as $item){
-														print('<option value="'.$item['TpFisId'].'">'.$item['TpFisNome'].'</option>');
-													}
-												
-												?>
-											</select>
-										</div>
-																			
 										<div class="col-lg-4">
-											<label for="cmbOrigemFiscal">Origem</label>
-											<select id="cmbOrigemFiscal" name="cmbOrigemFiscal" class="form-control form-control-select2">
-												<option value="#">Selecione</option>
-												<?php 
-													$sql = ("SELECT OrFisId, OrFisNome
-															 FROM OrigemFiscal
-															 WHERE OrFisStatus = 1
-															 ORDER BY OrFisNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($row as $item){
-														$seleciona = $item['OrFisNome'] == 'Nacional' ? "selected" : "";
-														print('<option value="'.$item['OrFisId'].'" '.$seleciona.'>'.$item['OrFisNome'].'</option>');
-													}
-												
-												?>
-											</select>
-										</div>
-
-										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputCest">CEST</label>
-												<input type="text" id="inputCest" name="inputCest" class="form-control" placeholder="CEST">
+												<label for="cmbTipoFiscal">Tipo</label>
+												<select id="cmbTipoFiscal" name="cmbTipoFiscal" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+														$sql = ("SELECT TpFisId, TpFisNome
+																 FROM TipoFiscal
+																 WHERE TpFisStatus = 1
+																 ORDER BY TpFisNome ASC");
+														$result = $conn->query("$sql");
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($row as $item){
+															print('<option value="'.$item['TpFisId'].'">'.$item['TpFisNome'].'</option>');
+														}
+													
+													?>
+												</select>
 											</div>
-										</div>										
+										</div>
+										
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbOrigemFiscal">Origem</label>
+												<select id="cmbOrigemFiscal" name="cmbOrigemFiscal" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php 
+														$sql = "SELECT OrFisId, OrFisNome
+																FROM OrigemFiscal
+																WHERE OrFisStatus = 1
+																ORDER BY OrFisNome ASC";
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($row as $item){
+															$seleciona = $item['OrFisNome'] == 'Nacional' ? "selected" : "";
+															print('<option value="'.$item['OrFisId'].'" '.$seleciona.'>'.$item['OrFisNome'].'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>
+									
 									</div> <!-- /row -->
 									
 									<div class="row">
-										<div class="col-lg-12">
-											<label for="cmbNcmFiscal">NCM</label>
-											<select id="cmbNcmFiscal" name="cmbNcmFiscal" class="form-control form-control-select2">
-												<option value="#">Selecione um NCM</option>
-												<?php 
-													$sql = ("SELECT BancoId, BancoCodigo, BancoNome
-															 FROM Banco
-															 WHERE BancoStatus = 1
-															 ORDER BY BancoCodigo ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+										<div class="col-lg-10">
+											<div class="form-group">
+												<label for="cmbNcmFiscal">NCM</label>
+												<select id="cmbNcmFiscal" name="cmbNcmFiscal" class="form-control form-control-select2">
+													<option value="#">Selecione um NCM</option>
+													<?php 
+														$sql = "SELECT NcFisDescricao
+																FROM NcmFiscal
+																JOIN Situacao on SituaId = NcFisStatus
+																WHERE SituaChave = 'ATIVO'
+																ORDER BY NcFisCodigo ASC";
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($row as $item){
+															print('<option value="'.$item['NcFisId'].'">'.$item['NcFisCodigo'] . " - " . $item['NcFisDescricao'].'</option>');
+														}
 													
-													foreach ($row as $item){
-														print('<option value="'.$item['BancoId'].'">'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
-													}
-												
-												?>
-											</select>
+													?>
+												</select>
+											</div>
 										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputCest">CEST</label>
+												<input type="text" id="inputCest" name="inputCest" class="form-control" placeholder="CEST" readOnly>
+											</div>
+										</div>										
 									</div>
 								</div> <!-- /col -->
 							</div>	<!-- /row -->
