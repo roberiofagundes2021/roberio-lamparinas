@@ -109,13 +109,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							inputsValues,
 							(data) => {
 
-								//if (data) {
+								if (data) {
 									$('#cards-produto').removeClass('justify-content-center px-2')
 									$('#cards-produto').html(data)
-									//resultadosConsulta = data
-								//} else {
-                                  // semResultados()
-								//}
+									resultadosConsulta = data
+								} else {
+									semResultados()
+								}
 							}
 						);
 					})
@@ -125,11 +125,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					const msg = $('<div class="card" style="width: 100%"><p class="text-center m-2">Sem resultados...</p></div>')
 					const pagina0 = $('<li class="page-item active"><a href="#" class="page-link page-link-white">0</a></li>')
 					const btnDireita = $('<li class="page-item"><a href="#" class="page-link page-link-white"><i class="icon-arrow-small-right"></i></a></li>')
-                    const btnEsquerda = $('<li class="page-item"><a href="#" class="page-link page-link-white"><i class="icon-arrow-small-left"></i></a></li>')
-                    
+					const btnEsquerda = $('<li class="page-item"><a href="#" class="page-link page-link-white"><i class="icon-arrow-small-left"></i></a></li>')
+
 					$('#cards-produto').html(msg)
 					$('#cards-produto').addClass('justify-content-center px-2').css('width', '100%')
-                    
+
 					$('.pagination').html('')
 					$('.pagination').append(btnDireita).append(pagina0).append(btnEsquerda)
 				}
@@ -142,6 +142,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			function Reset() {
 				$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
 			}
+
+
+			(function carrinho() {
+				$('.add-cart').each((i, elem) => {
+					$(elem).on('click', () => {	
+						let id = $(elem).attr('produId')
+						
+						$('#inputProdutoId').val(id)
+						$("#addItemCart").attr('action', 'solicitacaoNovoCarrinho.php')
+						$("#addItemCart").submit();
+					})
+				})
+			})()
 		});
 	</script>
 
@@ -289,7 +302,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									</div>
 								</div>
 							</div>
-							<div id="cards-produto" class="row m-0">
+							<div id="cards-produto" class="col-12 row m-0 px-0">
 								<?php
 
 								$sFoto = '';
@@ -343,7 +356,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 					<div class="text-muted mb-3">85 em estoque</div>
 
-					<button type="button" class="btn bg-teal-400"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
+					<button produId='.$item['ProduId'].' type="button" class="btn bg-teal-400 add-cart"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
 				</div>
 			</div>
 		</div>							
@@ -353,7 +366,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								}
 								?>
 							</div>
-
+							<form id="addItemCart" name="addItemCart" action="" method="POST">
+								<input id="inputProdutoId" type="hidden" name="inputProdutoId">
+							</form>
 						</div>
 						<!-- /grid -->
 
