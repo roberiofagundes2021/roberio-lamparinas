@@ -62,6 +62,7 @@
 												
 												<div class="dropdown-divider"></div>
 												<a href="banco.php" class="dropdown-item"><i class="icon-piggy-bank"></i> Bancos</a>
+												<a href="ncm.php" class="dropdown-item"><i class="icon-price-tag"></i> NCM</a>
 											</div>
 										</div>
 									');
