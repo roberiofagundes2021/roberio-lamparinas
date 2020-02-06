@@ -55,3 +55,115 @@ Copyright (c) 2018 Carlos Victor
     width: 100%;
 }
 
+.custon-modal{
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    display: none;
+    overflow: hidden;
+    outline: 0;
+    background-color: rgba(0,0,0,.7);
+}
+
+.custon-modal-show{
+    display: block;
+}
+
+.custon-modal-container{
+    width: 60%;
+    margin: 7% auto;
+}
+
+.custon-modal-content{
+    display: flex;
+    flex-direction: column;
+    background-color:  #FFF;
+    opacity: 1!important;
+    z-index: 9051;
+}
+
+.custon-modal-title{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custon-modal-title p{
+    margin:  0px;
+}
+
+.custon-modal-lista{
+    max-height: 500px;
+    overflow-y: scroll;
+    padding: 4px;
+}
+
+.custon-modal-produto{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    box-shadow: 0.5px 1px 2px rgb(163, 162, 162);
+    padding: 0px 5px 0px 5px;
+    margin: 5px;
+}
+
+.custon-modal-lista p{
+    margin: 0;
+}
+
+.custon-modal-lista p:first-of-type{
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+
+@media (max-width: 767px){
+    .custon-modal-container{
+        width: 80%;
+    }
+}
+
+@media (max-width: 555px){
+    .custon-modal-container{
+        width: 90%;
+    }
+}
+
+@media (max-width: 555px){
+    .custon-modal-container{
+        width: 90%;
+    }
+}
+
+@media (max-width: 400px){
+    .custon-modal-container{
+        width: 90%;
+    }
+
+    .custon-modal-produTitle{
+        align-items: center;
+
+        text-align: center!important;
+    }
+
+    .custon-modal-title{
+        flex-direction: column;
+    }
+}
+
+@media (max-height: 740px){
+    .custon-modal-lista{
+        max-height: 430px;
+    }
+}
+
+@media (max-height: 720px){
+    .custon-modal-lista{
+        max-height: 380px;
+    }
+}
+

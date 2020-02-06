@@ -81,7 +81,7 @@ function queryPesquisa()
 
            print('
 								
-            <div class="col-xl-3 col-sm-6">
+            <div class="col-xl-2 col-sm-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="card-img-actions">
@@ -113,7 +113,7 @@ function queryPesquisa()
 
                         <div class="text-muted mb-3">85 em estoque</div>
 
-                        <button type="button" class="btn bg-teal-400"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
+                        <button produId=' . $item['ProduId'] . ' type="button" class="btn bg-teal-400 add-cart"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
                     </div>
                 </div>
             </div>							

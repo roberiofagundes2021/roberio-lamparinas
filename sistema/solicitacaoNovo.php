@@ -38,9 +38,18 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
 	<script src="global_assets/js/demo_pages/components_popups.js"></script>
-
 	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+
+	<script src="global_assets/js/plugins/loaders/blockui.min.js"></script>
+	<script src="global_assets/js/plugins/ui/fab.min.js"></script>
+	<script src="global_assets/js/plugins/ui/sticky.min.js"></script>
+	<script src="global_assets/js/plugins/ui/prism.min.js"></script>
+	<script src="global_assets/js/demo_pages/extra_fab.js"></script>
+
+	<!-- btn group do modal-->
+	<script src="global_assets/js/plugins/forms/inputs/touchspin.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_input_groups.js"></script>
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
@@ -76,6 +85,99 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					});
 				})
 
+				function editaCarrinho() {
+					$('.quant-edit').each((i, elem) => {
+						$(elem).on('click', function() {
+							//if ($(elem).hasClass('bootstrap-touchspin-down')) {
+							$('[idProdu]').each((i, elemInp) => {
+
+								if ($(elemInp).attr('idProdu') == $(elem).attr('id')) {
+									let quantidade = $(elemInp).val()
+									let id = $(elemInp).attr('idProdu')
+									const url = 'solicitacaoAlteraCarrinho.php'
+
+									let dataPost = {
+										inputQuantidadeProduto: quantidade,
+										inputIdProduto: id
+									}
+									console.log(dataPost)
+
+									$.post(
+										url,
+										dataPost,
+										function(data) {
+											console.log(data)
+											$(elemInp).val(data)
+										}
+									)
+								}
+							})
+							//} else if ($(elem).hasClass('bootstrap-touchspin-up')) {
+							//	console.log('+')
+							//}
+						})
+					})
+				}
+				editaCarrinho()
+
+
+
+				function carrinho() {
+					$('.add-cart').each((i, elem) => {
+						$(elem).on('click', () => {
+							let id = $(elem).attr('produId')
+
+							$.post(
+								'solicitacaoNovoCarrinho.php', {
+									inputProdutoId: id
+								},
+								function(data) {
+									if (data) {
+										elem.setAttribute('disabled', '')
+										$(elem).html('PRODUTO ADICIONADO')
+										$('.custon-modal-lista').append(data)
+										editaCarrinho()
+									}
+								}
+							)
+						})
+					})
+				}
+				carrinho()
+
+				function verificarCarrinho() {
+
+					// Esta função verifica quais produtos já estão no array em $_SESSION['Carrinho'],
+					// para que então eles fiquem com o botão desabilitado no carregamento da página, ou 
+					// na chamada ajax no momento da pesquisa. Para isso, faz uma chamada para 
+					// 'solicitacaoVerificarCarrinho.php', recebendo um JSON criado a partir de 
+					// $_SESSION['Carrinho'], que é utilizado para saber quais produtos carregados
+					// na pagina já estão no carrinho.
+
+					let url = 'solicitacaoVerificarCarrinho.php'
+					$.post(
+						url,
+						function(data) {
+							// Convertendo a string JSON em um array de Objetos
+							if (data) {
+								console.log(data)
+								let carrinho = JSON.parse(data)
+
+								// Iterando sobre o array para ter acesso aos valores id de cada Objeto 
+								carrinho.forEach(item => {
+									$('.add-cart').each((i, elem) => {
+										if ($(elem).attr('produId') == item.id) {
+											// Desabilitando o botão e trocando o conteúdo.
+											elem.setAttribute('disabled', '')
+											$(elem).html('PRODUTO ADICIONADO')
+										}
+									})
+								})
+							}
+						}
+					)
+				}
+				verificarCarrinho()
 
 				let resultadosConsulta = '';
 				let inputsValues = {};
@@ -113,6 +215,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									$('#cards-produto').removeClass('justify-content-center px-2')
 									$('#cards-produto').html(data)
 									resultadosConsulta = data
+
+									// Estas duas funções são chamadas a cada requisição Ajax realizada, onde 
+									// novos elementos são carregados na tela, para que possam agir sobre eles,
+									// como no carregamento da pagina.
+									carrinho()
+									verificarCarrinho()
 								} else {
 									semResultados()
 								}
@@ -143,18 +251,18 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
 			}
 
+			(function modal() {
+				$('#btn-modal').on('click', function() {
+					$('#page-modal').addClass('custon-modal-show')
+					$('body').css('overflow', 'hidden')
 
-			(function carrinho() {
-				$('.add-cart').each((i, elem) => {
-					$(elem).on('click', () => {	
-						let id = $(elem).attr('produId')
-						
-						$('#inputProdutoId').val(id)
-						$("#addItemCart").attr('action', 'solicitacaoNovoCarrinho.php')
-						$("#addItemCart").submit();
+					$('#modal-close').on('click', function() {
+						$('#page-modal').removeClass('custon-modal-show')
+						$('body').css('overflow', 'scroll')
 					})
 				})
 			})()
+			/**/
 		});
 	</script>
 
@@ -176,7 +284,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			<!-- Content area -->
 			<div class="content">
-
 				<!-- Inner container -->
 				<div class="d-flex align-items-start flex-column flex-md-row">
 
@@ -302,6 +409,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									</div>
 								</div>
 							</div>
+
+							<!--Buttom Modal-->
+							<ul id="btn-modal" class="fab-menu fab-menu-fixed fab-menu-bottom-right" data-fab-toggle="click">
+								<li>
+									<a class="fab-menu-btn btn bg-blue btn-float rounded-round btn-icon">
+										<i class="fab-icon-open icon-cart"></i>
+										<i class="fab-icon-close icon-cart"></i>
+									</a>
+								</li>
+							</ul>
+
 							<div id="cards-produto" class="col-12 row m-0 px-0">
 								<?php
 
@@ -323,46 +441,34 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 
 									print('
-	
-		<div class="col-xl-3 col-sm-6">
-			<div class="card">
-				<div class="card-body">
-					<div class="card-img-actions">
-						<a href="' . $sFoto . '" class="fancybox">
-							<img src="' . $sFoto . '" class="card-img"  alt="" style="max-height:290px;">
-							<span class="card-img-actions-overlay card-img">
-								<i class="icon-plus3 icon-2x"></i>
-							</span>
-						</a>
-					</div>
-				</div>
+		                                    <div class="col-xl-3 col-sm-4">
+			                                    <div class="card">
+				                                    <div class="card-body">
+					                                    <div class="card-img-actions">
+						                                    <a href="' . $sFoto . '" class="fancybox">
+							                                    <img src="' . $sFoto . '" class="card-img"  alt="" style="max-height:290px;">
+							                                    <span class="card-img-actions-overlay card-img">
+								                                    <i class="icon-plus3 icon-2x"></i>
+							                                    </span>
+						                                    </a>
+					                                    </div>
+				                                    </div>
 
-				<div class="card-body bg-light text-center">
-					<div class="mb-2">
-						<h6 class="font-weight-semibold mb-0">
-							<a href="#" class="text-default">' . $item['ProduNome'] . '</a>
-						</h6>
+				                                    <div class="card-body bg-light text-center">
+					                                    <div class="mb-2">
+					                                    	<h6 class="font-weight-semibold mb-0">
+						                                    	<a href="#" class="text-default">' . $item['ProduNome'] . '</a>
+						                                    </h6>
 
-						<a href="#" class="text-muted">' . $item['CategNome'] . '</a>
-					</div>
+						                                    <a href="#" class="text-muted">' . $item['CategNome'] . '</a>
+					                                    </div>
+					                                    <div class="text-muted mb-3">85 em estoque</div>
 
-					<div>
-						<i class="icon-star-full2 font-size-base text-warning-300"></i>
-						<i class="icon-star-full2 font-size-base text-warning-300"></i>
-						<i class="icon-star-full2 font-size-base text-warning-300"></i>
-						<i class="icon-star-full2 font-size-base text-warning-300"></i>
-						<i class="icon-star-full2 font-size-base text-warning-300"></i>
-					</div>
-
-					<div class="text-muted mb-3">85 em estoque</div>
-
-					<button produId='.$item['ProduId'].' type="button" class="btn bg-teal-400 add-cart"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
-				</div>
-			</div>
-		</div>							
-	
-	
-	');
+					                                    <button produId=' . $item['ProduId'] . ' type="button" class="btn bg-teal-400 add-cart"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
+				                                    </div>
+			                                    </div>
+	                                	    </div>							
+                                    	');
 								}
 								?>
 							</div>
@@ -392,7 +498,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				</div>
 				<!-- /inner container -->
-
 			</div>
 			<!-- /content area -->
 
@@ -403,6 +508,66 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	</div>
 	<!-- /page content -->
+
+	<!-- /modal -->
+	<div id="page-modal" class="custon-modal">
+		<div class="custon-modal-container">
+			<div class="card custon-modal-content">
+				<div class="custon-modal-title">
+					<i class="fab-icon-open icon-cart p-3"></i>
+					<p class="h3">Produtos Selecionados</p>
+					<i id="modal-close" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+				</div>
+				<div class="custon-modal-lista d-flex flex-column">
+					<?php
+					if (isset($_SESSION['Carrinho'])) {
+
+						foreach ($_SESSION['Carrinho'] as $item) {
+							$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome
+		                            FROM Produto
+		                            JOIN Categoria on CategId = ProduCategoria
+	                                WHERE ProduId = " . $item['id'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduStatus = 1
+		                            ";
+							$result = $conn->query($sql);
+							$row = $result->fetch(PDO::FETCH_ASSOC);
+
+							print('
+							
+							<div class="custon-modal-produto">
+							<div class="custon-modal-produTitle d-flex flex-column col-12 col-sm-9">
+								<p>' . $row['ProduNome'] . '</p>
+								<p>' . $row['CategNome'] . '</p>
+							</div>
+							<div class="col-12 col-sm-3 row justify-content-md-center align-items-center mx-0">
+								<div class="input-group bootstrap-touchspin">
+									<span class="input-group-prepend">
+										<button id="' . $row['ProduId'] . '" class="btn btn-light bootstrap-touchspin-down quant-edit" type="button">–</button>
+									</span>
+									<span class="input-group-prepend bootstrap-touchspin-prefix d-none">
+										<span class="input-group-text"></span>
+									</span>
+									<input idProdu="' . $row['ProduId'] . '" style="text-align: center" type="text" value="' . $item['quantidade'] . '" class="form-control touchspin-set-value" style="display: block;">
+									<span class="input-group-append bootstrap-touchspin-postfix d-none">
+										<span class="input-group-text"></span>
+									</span>
+									<span class="input-group-append">
+										<button id="' . $row['ProduId'] . '" class="btn btn-light bootstrap-touchspin-up quant-edit" type="button">+</button>
+									</span>
+								</div>
+							</div>
+						</div>
+							
+							     ');
+						}
+					}
+					?>
+				</div>
+				<div class="card-footer mt-2">
+					<button class="btn btn-success">Confirmar</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </body>
 
