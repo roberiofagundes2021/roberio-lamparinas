@@ -15,7 +15,7 @@ if(isset($_POST['inputBancoId'])){
 		$sql = "SELECT BancoId, BancoCodigo, BancoNome
 				FROM Banco
 				WHERE BancoId = $iBanco ";
-		$result = $conn->query("$sql");
+		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
 	} catch(PDOException $e) {
@@ -70,8 +70,6 @@ if(isset($_POST['inputNome'])){
 	<title>Lamparinas | Banco</title>
 
 	<?php include_once("head.php"); ?>
-	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 
 	<script type="text/javascript" >
 
@@ -89,20 +87,6 @@ if(isset($_POST['inputNome'])){
 				//remove os espaços desnecessários antes e depois
 				inputCodigo = inputCodigo.trim();
 				inputNomeNovo = inputNomeNovo.trim();
-
-				//Verifica se o campo só possui espaços em branco
-				if (inputCodigo == ''){
-					alerta('Atenção','Informe o código do banco!','error');
-					$('#inputCodigo').focus();
-					return false;
-				}
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNomeNovo == ''){
-					alerta('Atenção','Informe o nome do banco!','error');
-					$('#inputNome').focus();
-					return false;
-				}
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -123,6 +107,10 @@ if(isset($_POST['inputNome'])){
 		})
 	</script>
 
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 </head>
 
 <body class="navbar-top">
@@ -145,7 +133,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formBanco" id="formBanco" method="post" class="form-validate">
+					<form name="formBanco" id="formBanco" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Banco "<?php echo $row['BancoNome']; ?>"</h5>
 						</div>
@@ -157,8 +145,8 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputCodigo">Código da Banco</label>
-										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" data-mask="999" value="<?php echo $row['BancoCodigo']; ?>" required autofocus>
+										<label for="inputCodigo">Código do Banco</label>
+										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="<?php echo $row['BancoCodigo']; ?>" required autofocus>
 									</div>
 								</div>																
 								<div class="col-lg-10">

@@ -6,11 +6,11 @@ include('global_assets/php/conexao.php');
 
 $_SESSION['msg'] = array();
 
-if(isset($_POST['inputBancoId'])){
-	
-	$iBanco = $_POST['inputBancoId'];
-	$sStatus = $_POST['inputBancoStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
-        	
+if(isset($_POST['inputNcmId'])){
+
+	$iNcm = $_POST['inputNcmId'];
+	$sStatus = $_POST['inputNcmStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
+
 	try{
 
 		$sql = "SELECT SituaId
@@ -19,28 +19,28 @@ if(isset($_POST['inputBancoId'])){
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iStatus = $row['SituaId'];
-		
-		$sql = "UPDATE Banco SET BancoStatus = :iStatus
-				WHERE BancoId = :id";
+
+		$sql = "UPDATE Ncm SET NcmStatus = :iStatus
+				WHERE NcmId = :id";
 		$result = $conn->prepare("$sql");
 		$result->bindParam(':iStatus', $iStatus); 
-		$result->bindParam(':id', $iBanco); 
+		$result->bindParam(':id', $iNcm); 
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação do banco alterada!!!";
+		$_SESSION['msg']['mensagem'] = "Situação do NCM alterada!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do banco!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do NCM!!!";
 		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();
 	}
 }
 
-irpara("banco.php");
+irpara("ncm.php");
 
 ?>

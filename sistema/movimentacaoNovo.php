@@ -407,7 +407,7 @@ if(isset($_POST['inputData'])){
 				}
 
 				//Verifica se a combo Classificação foi informada
-				if (cmbClassificacao == '#'){
+				if (inputTipo == 'S' && cmbClassificacao == '#'){
 					alerta('Atenção','Informe a Classificação/Bens!','error');
 					$('#cmbClassificacao').focus();
 					return false;

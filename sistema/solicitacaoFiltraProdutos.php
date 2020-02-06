@@ -46,10 +46,11 @@ function queryPesquisa()
                 $string .= ' and ';
             }
 
-            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome
+            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
                     FROM Produto
                     JOIN Categoria on CategId = ProduCategoria
-                    WHERE " . $string . " ProduEmpresa = " . $_SESSION['EmpreId'] . "
+                    JOIN Situacao on SituaId = ProduStatus
+                    WHERE " . $string . " ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' 
                     ";
             $result = $conn->query("$sql");
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -111,7 +112,7 @@ function queryPesquisa()
                             <i class="icon-star-full2 font-size-base text-warning-300"></i>
                         </div>
 
-                        <div class="text-muted mb-3">85 em estoque</div>
+                        <div class="text-muted mb-3">'.$item['Estoque'].' em estoque</div>
 
                         <button produId=' . $item['ProduId'] . ' type="button" class="btn bg-teal-400 add-cart"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
                     </div>

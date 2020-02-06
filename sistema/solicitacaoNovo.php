@@ -6,10 +6,11 @@ $_SESSION['PaginaAtual'] = 'Nova Solicitação';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome
+$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
-	    WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduStatus = 1
+		JOIN Situacao on SituaId = ProduStatus
+	    WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 		ORDER BY ProduNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -441,7 +442,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 
 									print('
-		                                    <div class="col-xl-3 col-sm-4">
+		                                    <div class="col-xl-2 col-sm-3">
 			                                    <div class="card">
 				                                    <div class="card-body">
 					                                    <div class="card-img-actions">
@@ -462,7 +463,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 						                                    <a href="#" class="text-muted">' . $item['CategNome'] . '</a>
 					                                    </div>
-					                                    <div class="text-muted mb-3">85 em estoque</div>
+					                                    <div class="text-muted mb-3">'.$item['Estoque'].' em estoque</div>
 
 					                                    <button produId=' . $item['ProduId'] . ' type="button" class="btn bg-teal-400 add-cart"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
 				                                    </div>

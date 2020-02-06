@@ -2,19 +2,19 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Editar Categoria';
+$_SESSION['PaginaAtual'] = 'Editar NCM';
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputCategoriaId'])){
+if(isset($_POST['inputNcmId'])){
 	
-	$iCategoria = $_POST['inputCategoriaId'];
+	$iNcm = $_POST['inputNcmId'];
         	
 	try{
 		
-		$sql = "SELECT CategId, CategNome
-				FROM Categoria
-				WHERE CategId = $iCategoria ";
+		$sql = "SELECT NcmId, NcmCodigo, NcmNome
+				FROM Ncm
+				WHERE NcmId = $iNcm ";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
@@ -25,37 +25,38 @@ if(isset($_POST['inputCategoriaId'])){
 	$_SESSION['msg'] = array();
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
-	irpara("categoria.php");
+	irpara("ncm.php");
 }
 
 if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE Categoria SET CategNome = :sNome, CategUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE CategId = :iCategoria";
+		$sql = "UPDATE Ncm SET NcmCodigo = :sCodigo, NcmNome = :sNome, NcmUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE NcmId = :iNcm";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
+						':sCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iCategoria' => $_POST['inputCategoriaId']
+						':iNcm' => $_POST['inputNcmId']
 						));
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Categoria alterada!!!";
+		$_SESSION['msg']['mensagem'] = "NCM alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar categoria!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar NCM!!!";
 		$_SESSION['msg']['tipo'] = "error";		
 		
 		echo 'Error: ' . $e->getMessage();
 	}
 	
-	irpara("categoria.php");
+	irpara("ncm.php");
 }
 
 ?>
@@ -66,44 +67,44 @@ if(isset($_POST['inputNome'])){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Categoria</title>
+	<title>Lamparinas | NCM</title>
 
 	<?php include_once("head.php"); ?>
-	
+
 	<script type="text/javascript" >
 
         $(document).ready(function() {
 			
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
-
+				
 				e.preventDefault();
 				
+				var inputCodigo    = $('#inputCodigo').val();
 				var inputNomeNovo  = $('#inputNome').val();
-				var inputNomeVelho = $('#inputCategoriaNome').val();
-				
-				//remove os espaços desnecessários antes e depois
-				inputNomeNovo = inputNomeNovo.trim();
+				var inputNomeVelho = $('#inputNcmNome').val();
 								
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				//remove os espaços desnecessários antes e depois
+				inputCodigo = inputCodigo.trim();
+				inputNomeNovo = inputNomeNovo.trim();
+				
+				//Esse ajax está sendo usado para verificar no ncm se o registro já existe
 				$.ajax({
 					type: "POST",
-					url: "categoriaValida.php",
-					data: ('nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho),
+					url: "ncmValida.php",
+					data: ('codigo='+inputCodigo+'&nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho),
 					success: function(resposta){
 						
 						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;								
+							alerta('Atenção','Esse registro já existe (código ou nome)!','error');
+							return false;
 						}
 						
-						$( "#formCategoria" ).submit();
+						$( "#formNcm" ).submit();
 					}
 				})
-
 			})
 		})
-	
 	</script>
 
     <!-- Validação -->
@@ -132,20 +133,26 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formCategoria" id="formCategoria" method="post" class="form-validate-jquery">
+					<form name="formNcm" id="formNcm" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Categoria "<?php echo $row['CategNome']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar NCM "<?php echo $row['NcmNome']; ?>"</h5>
 						</div>
 						
-						<input type="hidden" id="inputCategoriaId" name="inputCategoriaId" value="<?php echo $row['CategId']; ?>" >
-						<input type="hidden" id="inputCategoriaNome" name="inputCategoriaNome" value="<?php echo $row['CategNome']; ?>" >
+						<input type="hidden" id="inputNcmId" name="inputNcmId" value="<?php echo $row['NcmId']; ?>" >
+						<input type="hidden" id="inputNcmNome" name="inputNcmNome" value="<?php echo $row['NcmNome']; ?>" >
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-12">
+								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputNome">Nome da Categoria</label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Categoria" value="<?php echo $row['CategNome']; ?>" required autofocus>
+										<label for="inputCodigo">Código NCM</label>
+										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="<?php echo $row['NcmCodigo']; ?>" required autofocus>
+									</div>
+								</div>																
+								<div class="col-lg-10">
+									<div class="form-group">
+										<label for="inputNome">NCM</label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['NcmNome']; ?>" required>
 									</div>
 								</div>
 							</div>
@@ -154,7 +161,7 @@ if(isset($_POST['inputNome'])){
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" id="enviar">Alterar</button>
-										<a href="categoria.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="ncm.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

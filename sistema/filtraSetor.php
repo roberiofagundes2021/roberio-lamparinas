@@ -6,13 +6,15 @@ include('global_assets/php/conexao.php');
 
 //Aqui eu verifico qual ID da Empresa devo usar: $_SESSION['EmpreId'] ou $_SESSION['EmpresaId']? Ou seja, estou adicionando um usu?rio da empresa logada ou de outra empresa?
 if(isset($_SESSION['EmpresaId']) and $_SESSION['EmpresaId'] <> $_SESSION['EmpreId']){
-	$sql = ("SELECT SetorId, SetorNome
-			 FROM Setor
-			 WHERE SetorEmpresa = ".$_SESSION['EmpresaId']." and SetorUnidade = ". $_GET['idUnidade']." and SetorStatus = 1");
+	$sql = "SELECT SetorId, SetorNome
+			FROM Setor
+			JOIN Situacao on SituaId = SetorStatus
+			WHERE SetorEmpresa = ".$_SESSION['EmpresaId']." and SetorUnidade = ". $_GET['idUnidade']." and SituaChave = 'ATIVO'";
 } else {
-	$sql = ("SELECT SetorId, SetorNome
-			 FROM Setor
-			 WHERE SetorEmpresa = ".$_SESSION['EmpreId']." and SetorUnidade = ". $_GET['idUnidade']." and SetorStatus = 1");	
+	$sql = "SELECT SetorId, SetorNome
+			FROM Setor
+			JOIN Situacao on SituaId = SetorStatus
+			WHERE SetorEmpresa = ".$_SESSION['EmpreId']." and SetorUnidade = ". $_GET['idUnidade']." and SituaChave = 'ATIVO'";	
 }
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

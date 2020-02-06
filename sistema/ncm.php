@@ -2,15 +2,15 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Banco';
+$_SESSION['PaginaAtual'] = 'NCM';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT BancoId, BancoCodigo, BancoNome, BancoStatus, SituaNome, SituaChave, SituaCor
-		 FROM Banco
-		 JOIN Situacao on SituaId = BancoStatus
-		 ORDER BY BancoCodigo ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT NcmId, NcmCodigo, NcmNome, NcmStatus, SituaNome, SituaChave, SituaCor
+		FROM Ncm
+		JOIN Situacao on SituaId = NcmStatus
+		ORDER BY NcmCodigo ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 //	var_dump($count);die;
@@ -22,7 +22,7 @@ $count = count($row);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Banco</title>
+	<title>Lamparinas | NCM</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -41,7 +41,7 @@ $count = count($row);
 		$(document).ready(function() {
 			
 			/* Início: Tabela Personalizada */
-			$('#tblBanco').DataTable( {
+			$('#tblNCM').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
@@ -51,7 +51,7 @@ $count = count($row);
 					targets: [0]
 				},	
 				{
-					orderable: true,   //Nome do Banco
+					orderable: true,   //Nome do NCM
 					width: "55%",
 					targets: [1]
 				},	
@@ -94,21 +94,21 @@ $count = count($row);
 			/* Fim: Tabela Personalizada */
 		});
 		
-		function atualizaBanco(BancoId, BancoNome, BancoStatus, Tipo){
+		function atualizaNCM(NcmId, NcmNome, NcmStatus, Tipo){
 
-			document.getElementById('inputBancoId').value = BancoId;
-			document.getElementById('inputBancoNome').value = BancoNome;
-			document.getElementById('inputBancoStatus').value = BancoStatus;
+			document.getElementById('inputNcmId').value = NcmId;
+			document.getElementById('inputNcmNome').value = NcmNome;
+			document.getElementById('inputNcmStatus').value = NcmStatus;
 					
 			if (Tipo == 'edita'){	
-				document.formBanco.action = "bancoEdita.php";		
+				document.formNCM.action = "ncmEdita.php";		
 			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formBanco, "Tem certeza que deseja excluir esse Banco?", "bancoExclui.php");
+				confirmaExclusao(document.formNCM, "Tem certeza que deseja excluir esse NCM?", "ncmExclui.php");
 			} else if (Tipo == 'mudaStatus'){
-				document.formBanco.action = "bancoMudaSituacao.php";
+				document.formNCM.action = "ncmMudaSituacao.php";
 			} 
 			
-			document.formBanco.submit();
+			document.formNCM.submit();
 		}
 			
 	</script>
@@ -138,26 +138,26 @@ $count = count($row);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Bancos</h3>
+								<h3 class="card-title">Relação de NCMs</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="Banco.php" class="list-icons-item" data-action="reload"></a>
+										<a href="ncm.php" class="list-icons-item" data-action="reload"></a>
 										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">Segue abaixo a relação de bancos disponíveis para os usuários do sistema.</p>
-								<div class="text-right"><a href="bancoNovo.php" class="btn btn-success" role="button">Novo Banco</a></div>
+								<p class="font-size-lg">Segue abaixo a relação de NCMs (Nomeclatura Comum Mercosul) disponíveis para os usuários do sistema.</p>
+								<div class="text-right"><a href="ncmNovo.php" class="btn btn-success" role="button">Novo NCM</a></div>
 							</div>							
 
-							<table id="tblBanco" class="table">
+							<table id="tblNCM" class="table">
 								<thead>
 									<tr class="bg-slate">
-										<th>Código do Banco</th>
-										<th>Nome do Banco</th>
+										<th>Código NCM</th>
+										<th>NCM</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -171,17 +171,17 @@ $count = count($row);
 										
 										print('
 										<tr>
-											<td>'.$item['BancoCodigo'].'</td>
-											<td>'.$item['BancoNome'].'</td>
+											<td>'.$item['NcmCodigo'].'</td>
+											<td>'.$item['NcmNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaBanco('.$item['BancoId'].', \''.$item['BancoNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaNCM('.$item['NcmId'].', \''.$item['NcmNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 																				
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaBanco('.$item['BancoId'].', \''.$item['BancoNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaBanco('.$item['BancoId'].', \''.$item['BancoNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaNCM('.$item['NcmId'].', \''.$item['NcmNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaNCM('.$item['NcmId'].', \''.$item['NcmNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
@@ -199,10 +199,10 @@ $count = count($row);
 				
 				<!-- /info blocks -->
 				
-				<form name="formBanco" method="post" action="bancoEdita.php">
-					<input type="hidden" id="inputBancoId" name="inputBancoId" >
-					<input type="hidden" id="inputBancoNome" name="inputBancoNome" >
-					<input type="hidden" id="inputBancoStatus" name="inputBancoStatus" >
+				<form name="formNCM" method="post" action="ncmEdita.php">
+					<input type="hidden" id="inputNcmId" name="inputNcmId" >
+					<input type="hidden" id="inputNcmNome" name="inputNcmNome" >
+					<input type="hidden" id="inputNcmStatus" name="inputNcmStatus" >
 				</form>
 
 			</div>

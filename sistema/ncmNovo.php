@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Novo Banco';
+$_SESSION['PaginaAtual'] = 'Novo NCM';
 
 include('global_assets/php/conexao.php');
 
@@ -10,7 +10,7 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO Banco (BancoCodigo, BancoNome, BancoStatus, BancoUsuarioAtualizador)
+		$sql = "INSERT INTO Ncm (NcmCodigo, NcmNome, NcmStatus, NcmUsuarioAtualizador)
 				VALUES (:sCodigo, :sNome, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 				
@@ -22,19 +22,19 @@ if(isset($_POST['inputNome'])){
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Banco incluído!!!";
+		$_SESSION['msg']['mensagem'] = "NCM incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir banco!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao incluir NCM!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
 	}
 	
-	irpara("banco.php");
+	irpara("ncm.php");
 }
 
 ?>
@@ -45,11 +45,9 @@ if(isset($_POST['inputNome'])){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Banco</title>
+	<title>Lamparinas | NCM</title>
 
 	<?php include_once("head.php"); ?>
-	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	
 	<script type="text/javascript" >
 
@@ -66,11 +64,11 @@ if(isset($_POST['inputNome'])){
 				//remove os espaços desnecessários antes e depois
 				inputCodigo = inputCodigo.trim();
 				inputNome = inputNome.trim();
-
+				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
-					url: "bancoValida.php",
+					url: "ncmValida.php",
 					data: ('codigo='+inputCodigo+'&nome='+inputNome),
 					success: function(resposta){
 						
@@ -79,7 +77,7 @@ if(isset($_POST['inputNome'])){
 							return false;
 						}
 						
-						$( "#formBanco" ).submit();
+						$( "#formNcm" ).submit();
 					}
 				})
 			})
@@ -113,22 +111,22 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formBanco" id="formBanco" method="post" class="form-validate-jquery">
+					<form name="formNcm" id="formNcm" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Banco</h5>
+							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo NCM</h5>
 						</div>
 						
 						<div class="card-body">								
 							<div class="row">
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputCodigo">Código da Banco</label>
+										<label for="inputCodigo">Código NCM</label>
 										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" required autofocus>
 									</div>
 								</div>								
 								<div class="col-lg-10">
 									<div class="form-group">
-										<label for="inputNome">Nome do Banco</label>
+										<label for="inputNome">NCM</label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 									</div>
 								</div>
@@ -138,7 +136,7 @@ if(isset($_POST['inputNome'])){
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
-										<a href="banco.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="ncm.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

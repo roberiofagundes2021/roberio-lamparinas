@@ -63,13 +63,6 @@ if(isset($_POST['inputNome'])){
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
 				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe a categoria!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
@@ -88,7 +81,8 @@ if(isset($_POST['inputNome'])){
 			})
 		})
 	</script>
-	<script src="http://malsup.github.com/jquery.form.js"></script>
+
+	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
