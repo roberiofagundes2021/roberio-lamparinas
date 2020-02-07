@@ -712,16 +712,16 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbNcmFiscal" name="cmbNcmFiscal" class="form-control form-control-select2">
 													<option value="#">Selecione um NCM</option>
 													<?php 
-														$sql = "SELECT NcFisDescricao
-																FROM NcmFiscal
-																JOIN Situacao on SituaId = NcFisStatus
+														$sql = "SELECT NcmNome
+																FROM Ncm
+																JOIN Situacao on SituaId = NcmStatus
 																WHERE SituaChave = 'ATIVO'
-																ORDER BY NcFisCodigo ASC";
+																ORDER BY NcmCodigo ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($row as $item){
-															print('<option value="'.$item['NcFisId'].'">'.$item['NcFisCodigo'] . " - " . $item['NcFisDescricao'].'</option>');
+															print('<option value="'.$item['NcmId'].'">'.$item['NcmCodigo'] . " - " . $item['NcmNome'].'</option>');
 														}
 													
 													?>

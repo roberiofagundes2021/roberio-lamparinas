@@ -25,7 +25,7 @@ $sql = "SELECT MovimData, MovimTipo, ForneNome, LcEstNome as Origem, MovimDestin
 		JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
 		JOIN Produto on ProduId = MvXPrProduto
 		LEFT JOIN Finalidade on FinalId = MovimFinalidade
-		LEFT JOIN Classificacao on ClassId = MovimClassificacao
+		LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
 		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
 		LEFT JOIN LocalEstoque on LcEstId = MovimOrigem
 		Where MovimEmpresa = ".$_SESSION['EmpreId']." and MovimData between '".$dDataInicio."' and '".$dDataFim."' ";
@@ -45,7 +45,6 @@ if ($iProduto != '#' and $iProduto != 0){
 if ($iFornecedor != '#' and $iFornecedor != 0){
 	$sql .= " and MovimFornecedor = $iFornecedor ";
 }
-
 		
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -158,6 +158,11 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>	
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -309,9 +314,6 @@ if(isset($_POST['inputTipo'])){
 		}
 							
 	</script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 </head>
 
@@ -395,8 +397,9 @@ if(isset($_POST['inputTipo'])){
 													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT CategId, CategNome
-																FROM Categoria															     
-																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
+																FROM Categoria
+																JOIN Situacao on SituaId = CategStatus											     
+																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
 															    ORDER BY CategNome ASC";
 														$result = $conn->query($sql);
 														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -414,13 +417,14 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-5">
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc required>												
+												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>												
 													<!--<option value="#">Selecione uma subcategoria</option>-->
 													<?php
 												        if (isset($row['OrcamCategoria'])){
 													        $sql = "SELECT SbCatId, SbCatNome
-																	FROM SubCategoria														 
-																	WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SbCatStatus = 1
+																	FROM SubCategoria
+																	JOIN Situacao on SituaId = SbCatStatus
+																	WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SituaChave = 'ATIVO'
 																	ORDER BY SbCatNome ASC";
 													        $result = $conn->query($sql);
 													        $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -462,11 +466,12 @@ if(isset($_POST['inputTipo'])){
 												<label for="cmbFornecedor">Fornecedor</label>
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
 													<?php
-														$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-																 FROM Fornecedor														     
-																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1 and ForneCategoria = ".$row['OrcamCategoria']."
-															     ORDER BY ForneNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+																FROM Fornecedor
+																JOIN Situacao on SituaId = ForneStatus													     
+																WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO' and ForneCategoria = ".$row['OrcamCategoria']."
+															    ORDER BY ForneNome ASC";
+														$result = $conn->query($sql);
 														$fornecedores = $result->fetchAll(PDO::FETCH_ASSOC);
 														foreach($fornecedores as $fornecedor){
 															if($fornecedor['ForneId'] == $row['ForneId']){
@@ -559,9 +564,5 @@ if(isset($_POST['inputTipo'])){
 
 	</div>
 	<!-- /page content -->
-<<<<<<< HEAD
-=======
-
->>>>>>> 9adb484b421426b5447b16befc4f409c3c206075
 </body>
 </html>

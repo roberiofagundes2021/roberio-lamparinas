@@ -15,9 +15,9 @@ $sql = "SELECT *
 		FROM Orcamento
 		LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
 		JOIN Categoria on CategId = OrcamCategoria
-		LEFT JOIN SubCategoria on SbCatId = OrcamSubCategoria
+		LEFT JOIN OrcamentoXSubCategoria on OrXSCOrcamento = OrcamId
+		LEFT JOIN SubCategoria on SbCatId = OrXSCSubcategoria 
 		WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = ".$iOrcamento;
-
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 

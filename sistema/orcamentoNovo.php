@@ -124,6 +124,11 @@ if(isset($_POST['inputData'])){
 	
 	<!-- JS file path -->
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -244,9 +249,6 @@ if(isset($_POST['inputData'])){
 		}	
 		
 	</script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 </head>
 
@@ -310,11 +312,12 @@ if(isset($_POST['inputData'])){
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php 
-														$sql = ("SELECT CategId, CategNome
-																 FROM Categoria															     
-																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
-															     ORDER BY CategNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT CategId, CategNome
+																FROM Categoria
+																JOIN Situacao on SituaId = CategStatus						     
+																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+															    ORDER BY CategNome ASC";
+														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($row as $item){															
@@ -328,7 +331,8 @@ if(isset($_POST['inputData'])){
 										<div class="col-lg-4">
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc required><option value="#">Selecione</option>
+												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
+													<option value="#">Selecione</option>
 												</select>
 											</div>
 										</div>										
@@ -358,11 +362,12 @@ if(isset($_POST['inputData'])){
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php 
-														$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-																 FROM Fornecedor														     
-																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
-															     ORDER BY ForneNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+																FROM Fornecedor
+																JOIN Situacao on SituaId = ForneStatus
+																WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+															    ORDER BY ForneNome ASC";
+														$result = $conn->query($sql);
 														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowFornecedor as $item){															
