@@ -55,6 +55,12 @@ Copyright (c) 2018 Carlos Victor
     width: 100%;
 }
 
+.btn-produtos{
+    font-size: 0.65rem;
+    padding: 8px 8px;
+    width: 100%;
+}
+
 .custon-modal{
     position: fixed;
     top: 0;
@@ -74,7 +80,7 @@ Copyright (c) 2018 Carlos Victor
 
 .custon-modal-container{
     width: 60%;
-    margin: 7% auto;
+    margin: 3% auto;
 }
 
 .custon-modal-content{
@@ -97,7 +103,7 @@ Copyright (c) 2018 Carlos Victor
 }
 
 .custon-modal-lista{
-    max-height: 500px;
+    max-height: 400px;
     overflow-y: scroll;
     padding: 4px;
 }
@@ -120,16 +126,65 @@ Copyright (c) 2018 Carlos Victor
     font-weight: bold;
 }
 
+@media (max-width: 1300px){
+    .btn-produtos{
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 1000px){
+    .btn-produtos{
+        font-size: 0.55rem;
+    }
+}
+
+@media (max-width: 1424px){
+    .custon-modal-container{
+        width: 64%;
+    }
+}
+
+@media (max-width: 1372px){
+    .custon-modal-container{
+        width: 68%;
+    }
+}
+
+@media (max-width: 1262px){
+    .custon-modal-container{
+        width: 85%;
+    }
+}
 
 @media (max-width: 767px){
     .custon-modal-container{
-        width: 80%;
+        width: 85%;
     }
 }
 
 @media (max-width: 555px){
     .custon-modal-container{
         width: 90%;
+    }
+}
+
+@media (max-width: 575px){
+    .custon-modal-container{
+        width: 90%;
+    }
+
+    .modal-controles{
+        justify-content: center;
+    }
+
+    .modal-controles div{
+        justify-content: end!important;
+    }
+
+    .custon-modal-produTitle{
+        align-items: center;
+
+        text-align: center!important;
     }
 }
 
@@ -144,10 +199,12 @@ Copyright (c) 2018 Carlos Victor
         width: 90%;
     }
 
-    .custon-modal-produTitle{
-        align-items: center;
+    .modal-controles i{
+        font-size: 10px;
+    }
 
-        text-align: center!important;
+    .modal-controles button{
+        padding: 7px;
     }
 
     .custon-modal-title{
@@ -162,8 +219,38 @@ Copyright (c) 2018 Carlos Victor
 }
 
 @media (max-height: 720px){
+
+    .custon-modal{
+        overflow: scroll;
+    }
+
     .custon-modal-lista{
         max-height: 380px;
+    }
+}
+
+@media (max-height: 570px){
+    .custon-modal-lista{
+        max-height: 310px;
+    }
+}
+
+@media (max-height: 430px){
+
+    .custon-modal{
+        overflow: scroll;
+    }
+
+    .custon-modal-container{
+        margin: 1% auto;
+    }
+
+    .custon-modal-lista{
+        max-height: 170px;
+    }
+
+    .textarea-modal{
+        height: 40px;
     }
 }
 

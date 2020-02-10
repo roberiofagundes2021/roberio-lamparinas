@@ -21,7 +21,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 <!DOCTYPE html>
 <html lang="pt-BR">
 
-<head>
+<head id="hea">
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -49,7 +49,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/demo_pages/extra_fab.js"></script>
 
 	<!-- btn group do modal-->
-	<script src="global_assets/js/plugins/forms/inputs/touchspin.min.js"></script>
+	<!--<script src="global_assets/js/plugins/forms/inputs/touchspin.min.js"></script>-->
 	<script src="global_assets/js/demo_pages/form_input_groups.js"></script>
 
 	<!-- Adicionando Javascript -->
@@ -86,6 +86,36 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					});
 				})
 
+				function contaClicks(direc) {
+					return
+				}
+
+				function editaQuantidade() {
+					$('.quant-edit').each((i, elem) => {
+						$(elem).on('click', function() {
+							$('[idProdu]').each((i, elemInp) => {
+								//console.log(contClck)
+								if ($(elemInp).attr('idProdu') == $(elem).attr('id')) {
+									let contClck = $(elemInp).val();
+									if ($(elem).hasClass('bootstrap-touchspin-up')) {
+										contClck++
+										$(elemInp).val(contClck);
+										console.log(contClck)
+									}
+									if ($(elem).hasClass('bootstrap-touchspin-down')) {
+										if (contClck > 0) {
+											contClck--
+											$(elemInp).val(contClck);
+											console.log(contClck)
+										}
+									}
+								}
+							})
+						})
+					})
+				}
+				editaQuantidade()
+
 				function editaCarrinho() {
 					$('.quant-edit').each((i, elem) => {
 						$(elem).on('click', function() {
@@ -108,7 +138,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										dataPost,
 										function(data) {
 											console.log(data)
-											$(elemInp).val(data)
+											if (!data) {
+												$(elemInp).val(0)
+											} else {
+												$(elemInp).val(data)
+											}
 										}
 									)
 								}
@@ -121,6 +155,109 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				}
 				editaCarrinho()
 
+				function verificarCarrinhoButtonConcluir() {
+					let url = 'solicitacaoVerificarCarrinho.php'
+					$.post(
+						url,
+						function(data) {
+							let verifExistProduQuantMaiorZero = 0
+							if (data) {
+								let carrinho = JSON.parse(data)
+
+								carrinho.forEach(item => {
+									if (item.quantidade > 0) {
+										verifExistProduQuantMaiorZero += 1
+									}
+								})
+							}
+							if (verifExistProduQuantMaiorZero >= 1) {
+								$('#confirmar-solicitacao').removeAttr('disabled')
+							}
+						}
+					)
+				}
+
+				function verificarCarrinho() {
+
+					// Esta função verifica quais produtos já estão no array em $_SESSION['Carrinho'],
+					// para que então eles fiquem com o botão desabilitado no carregamento da página, ou 
+					// na chamada ajax no momento da pesquisa. Para isso, faz uma chamada para 
+					// 'solicitacaoVerificarCarrinho.php', recebendo um JSON criado a partir de 
+					// $_SESSION['Carrinho'], que é utilizado para saber quais produtos carregados
+					// na pagina já estão no carrinho.
+
+					let url = 'solicitacaoVerificarCarrinho.php'
+					$.post(
+						url,
+						function(data) {
+							// Convertendo a string JSON em um array de Objetos
+							let verifExistProduQuantMaiorZero = 0
+							if (data) {
+								console.log(data)
+								let carrinho = JSON.parse(data)
+
+								// Iterando sobre o array para ter acesso aos valores id de cada Objeto 
+								carrinho.forEach(item => {
+									if (item.quantidade > 0) {
+										verifExistProduQuantMaiorZero += 1
+									}
+									$('.add-cart').each((i, elem) => {
+										if ($(elem).attr('produId') == item.id && item.quantidade != 0) {
+											// Desabilitando o botão e trocando o conteúdo.
+											elem.setAttribute('disabled', '')
+											$(elem).html('PRODUTO ADICIONADO')
+										}
+									})
+								})
+							}
+							if (verifExistProduQuantMaiorZero >= 1) {
+								$('#confirmar-solicitacao').removeAttr('disabled')
+							} else {
+								$('#confirmar-solicitacao').attr('disabled', '')
+							}
+						}
+					)
+				}
+				verificarCarrinho()
+
+				function excluirItemCarrinho() {
+					$('[indexExcluir]').each((i, elem) => {
+						$(elem).on('click', () => {
+							$('[idProdu]').each((i, elemProdu) => {
+								if ($(elem).attr('indexExcluir') == $(elemProdu).attr('idprodu')) {
+									let elemParent = $(elemProdu).parent().parent().parent()
+
+									let id = $(elemProdu).attr('idprodu')
+									const url = 'solicitacaoAlteraCarrinho.php'
+									elemParent.fadeOut(400)
+
+									let dataPost = {
+										inputQuantidadeProduto: 0,
+										inputIdProduto: id
+									}
+
+									$.post(
+										url,
+										dataPost,
+										function(data) {
+											console.log(data)
+											$('.add-cart').each((i, elemButton) => {
+												if ($(elemButton).attr('produid') == $(elem).attr('indexExcluir')) {
+													let icon = $('<i class="icon-cart-add mr-2"></i>')
+													let text = ' Adicionar ao carrinho'
+													$(elemButton).html(icon).append(text)
+													$(elemButton).removeAttr('disabled')
+												}
+											})
+											verificarCarrinho()
+										}
+									)
+								}
+							})
+						})
+					})
+				}
+				excluirItemCarrinho()
 
 
 				function carrinho() {
@@ -137,7 +274,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										elem.setAttribute('disabled', '')
 										$(elem).html('PRODUTO ADICIONADO')
 										$('.custon-modal-lista').append(data)
+										editaQuantidade()
 										editaCarrinho()
+										excluirItemCarrinho()
+										verificarCarrinho()
 									}
 								}
 							)
@@ -146,39 +286,35 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				}
 				carrinho()
 
-				function verificarCarrinho() {
-
-					// Esta função verifica quais produtos já estão no array em $_SESSION['Carrinho'],
-					// para que então eles fiquem com o botão desabilitado no carregamento da página, ou 
-					// na chamada ajax no momento da pesquisa. Para isso, faz uma chamada para 
-					// 'solicitacaoVerificarCarrinho.php', recebendo um JSON criado a partir de 
-					// $_SESSION['Carrinho'], que é utilizado para saber quais produtos carregados
-					// na pagina já estão no carrinho.
-
-					let url = 'solicitacaoVerificarCarrinho.php'
-					$.post(
-						url,
-						function(data) {
-							// Convertendo a string JSON em um array de Objetos
-							if (data) {
-								console.log(data)
-								let carrinho = JSON.parse(data)
-
-								// Iterando sobre o array para ter acesso aos valores id de cada Objeto 
-								carrinho.forEach(item => {
-									$('.add-cart').each((i, elem) => {
-										if ($(elem).attr('produId') == item.id) {
-											// Desabilitando o botão e trocando o conteúdo.
-											elem.setAttribute('disabled', '')
-											$(elem).html('PRODUTO ADICIONADO')
-										}
-									})
-								})
+				function finalizarSolicitacao() {
+					$('#confirmar-solicitacao').on('click', function() {
+						let url = 'solicitacaoVerificarCarrinho.php'
+						$.post(
+							url,
+							function(data) {
+								if (data) {
+									let carrinho = JSON.parse(data)
+									if (carrinho.length > 0) {
+										console.log('existem produtos para solicitação')
+										console.log(carrinho)
+									} else {
+										console.log('não existem produtos para solicitação')
+									}
+									/*carrinho.forEach(item => {
+										$('.add-cart').each((i, elem) => {
+											if ($(elem).attr('produId') == item.id && item.quantidade != 0) {
+												// Desabilitando o botão e trocando o conteúdo.
+												elem.setAttribute('disabled', '')
+												$(elem).html('PRODUTO ADICIONADO')
+											}
+										})
+									})*/
+								}
 							}
-						}
-					)
+						)
+					})
 				}
-				verificarCarrinho()
+				finalizarSolicitacao()
 
 				let resultadosConsulta = '';
 				let inputsValues = {};
@@ -463,9 +599,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 						                                    <a href="#" class="text-muted">' . $item['CategNome'] . '</a>
 					                                    </div>
-					                                    <div class="text-muted mb-3">'.$item['Estoque'].' em estoque</div>
+					                                    <div class="text-muted mb-3">' . $item['Estoque'] . ' em estoque</div>
 
-					                                    <button produId=' . $item['ProduId'] . ' type="button" class="btn bg-teal-400 add-cart"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
+					                                    <button produId=' . $item['ProduId'] . ' type="button" class="btn btn-produtos bg-teal-400 add-cart"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
 				                                    </div>
 			                                    </div>
 	                                	    </div>							
@@ -524,47 +660,63 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					if (isset($_SESSION['Carrinho'])) {
 
 						foreach ($_SESSION['Carrinho'] as $item) {
-							$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome
+							if ($item['quantidade'] > 0) {
+								$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome
 		                            FROM Produto
 		                            JOIN Categoria on CategId = ProduCategoria
-	                                WHERE ProduId = " . $item['id'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduStatus = 1
+									JOIN Situacao on SituaId = ProduStatus
+	                                WHERE ProduId = " . $item['id'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 		                            ";
-							$result = $conn->query($sql);
-							$row = $result->fetch(PDO::FETCH_ASSOC);
+								$result = $conn->query($sql);
+								$row = $result->fetch(PDO::FETCH_ASSOC);
 
-							print('
+								print('
 							
-							<div class="custon-modal-produto">
-							<div class="custon-modal-produTitle d-flex flex-column col-12 col-sm-9">
-								<p>' . $row['ProduNome'] . '</p>
-								<p>' . $row['CategNome'] . '</p>
-							</div>
-							<div class="col-12 col-sm-3 row justify-content-md-center align-items-center mx-0">
-								<div class="input-group bootstrap-touchspin">
-									<span class="input-group-prepend">
-										<button id="' . $row['ProduId'] . '" class="btn btn-light bootstrap-touchspin-down quant-edit" type="button">–</button>
-									</span>
-									<span class="input-group-prepend bootstrap-touchspin-prefix d-none">
-										<span class="input-group-text"></span>
-									</span>
-									<input idProdu="' . $row['ProduId'] . '" style="text-align: center" type="text" value="' . $item['quantidade'] . '" class="form-control touchspin-set-value" style="display: block;">
-									<span class="input-group-append bootstrap-touchspin-postfix d-none">
-										<span class="input-group-text"></span>
-									</span>
-									<span class="input-group-append">
-										<button id="' . $row['ProduId'] . '" class="btn btn-light bootstrap-touchspin-up quant-edit" type="button">+</button>
-									</span>
-								</div>
-							</div>
-						</div>
+							        <div class="custon-modal-produto">
+							            <div class="custon-modal-produTitle d-flex flex-column col-12 col-sm-5 col-lg-8">
+							            	<p>' . $row['ProduNome'] . '</p>
+							            	<p>' . $row['CategNome'] . '</p>
+							            </div>
+							            <div class="modal-controles col-12 col-sm-7 col-lg-4 row justify-content-md-center align-items-center mx-0">
+							            	<div class="input-group bootstrap-touchspin col-9 col-sm-9">
+							            		<span class="input-group-prepend">
+							            			<button id="' . $row['ProduId'] . '" class="btn btn-light bootstrap-touchspin-down quant-edit" type="button">–</button>
+							            		</span>
+							            		<span class="input-group-prepend bootstrap-touchspin-prefix d-none">
+							            			<span class="input-group-text"></span>
+							            		</span>
+							            		<input idProdu="' . $row['ProduId'] . '" style="text-align: center" type="text" value="' . $item['quantidade'] . '" class="form-control touchspin-set-value" style="display: block;">
+							            		<span class="input-group-append bootstrap-touchspin-postfix d-none">
+							            			<span class="input-group-text"></span>
+							            		</span>
+							            		<span class="input-group-append">
+							            			<button id="' . $row['ProduId'] . '" class="btn btn-light bootstrap-touchspin-up quant-edit" type="button">+</button>
+							            		</span>
+							            	</div>
+							            	<div class="col-3 col-sm-3 row m-0">
+							            	    <button class="btn" indexExcluir=' . $row['ProduId'] . '><i class="fab-icon-open icon-bin2 excluir-item"></i></button>
+							            	</div>
+							            </div>
+						            </div>
 							
 							     ');
+							}
 						}
 					}
 					?>
 				</div>
-				<div class="card-footer mt-2">
-					<button class="btn btn-success">Confirmar</button>
+				<div class="card-footer mt-2 d-flex flex-column">
+					<form id="solicitacao" action="POST">
+						<div class="row">
+							<div class="col-lg-12">
+								<div class="form-group">
+									<label for="txtObservacao">Observação</label>
+									<textarea rows="3" cols="5" class="form-control textarea-modal" id="txtObservacao" name="txtObservacao" placeholder="Observações sobre a solicitação..."></textarea>
+								</div>
+							</div>
+						</div>
+					</form>
+					<button id="confirmar-solicitacao" class="btn btn-success" disabled>Confirmar</button>
 				</div>
 			</div>
 		</div>
