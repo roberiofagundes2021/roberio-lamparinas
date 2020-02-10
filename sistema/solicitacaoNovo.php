@@ -90,7 +90,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					return
 				}
 
-				function editaQuantidade() {
+				/*function editaQuantidade() {
 					$('.quant-edit').each((i, elem) => {
 						$(elem).on('click', function() {
 							$('[idProdu]').each((i, elemInp) => {
@@ -99,13 +99,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									let contClck = $(elemInp).val();
 									if ($(elem).hasClass('bootstrap-touchspin-up')) {
 										contClck++
-										$(elemInp).val(contClck);
+										//$(elemInp).val(contClck);
 										console.log(contClck)
 									}
 									if ($(elem).hasClass('bootstrap-touchspin-down')) {
 										if (contClck > 0) {
 											contClck--
-											$(elemInp).val(contClck);
+											//$(elemInp).val(contClck);
 											console.log(contClck)
 										}
 									}
@@ -114,7 +114,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						})
 					})
 				}
-				editaQuantidade()
+				editaQuantidade()*/
 
 				function editaCarrinho() {
 					$('.quant-edit').each((i, elem) => {
@@ -127,6 +127,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									let id = $(elemInp).attr('idProdu')
 									const url = 'solicitacaoAlteraCarrinho.php'
 
+									if ($(elem).hasClass('bootstrap-touchspin-up')) {
+										quantidade++
+										//$(elemInp).val(contClck);
+										console.log(quantidade)
+									}
+									if ($(elem).hasClass('bootstrap-touchspin-down')) {
+										if (quantidade > 0) {
+											quantidade--
+											//$(elemInp).val(contClck);
+											console.log(quantidade)
+										}
+									}
+
 									let dataPost = {
 										inputQuantidadeProduto: quantidade,
 										inputIdProduto: id
@@ -137,7 +150,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										url,
 										dataPost,
 										function(data) {
-											console.log(data)
+											//console.log(data)
 											if (!data) {
 												$(elemInp).val(0)
 											} else {
@@ -274,7 +287,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										elem.setAttribute('disabled', '')
 										$(elem).html('PRODUTO ADICIONADO')
 										$('.custon-modal-lista').append(data)
-										editaQuantidade()
+										//editaQuantidade()
 										editaCarrinho()
 										excluirItemCarrinho()
 										verificarCarrinho()
@@ -577,7 +590,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									}
 
 
-									print('
+									if ($item['Estoque'] > 0) {
+										print('
 		                                    <div class="col-xl-2 col-sm-3">
 			                                    <div class="card">
 				                                    <div class="card-body">
@@ -606,6 +620,37 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			                                    </div>
 	                                	    </div>							
                                     	');
+									} else {
+										print('
+		                                    <div class="col-xl-2 col-sm-3">
+			                                    <div class="card">
+				                                    <div class="card-body">
+					                                    <div class="card-img-actions">
+						                                    <a href="' . $sFoto . '" class="fancybox">
+							                                    <img src="' . $sFoto . '" class="card-img"  alt="" style="max-height:290px;">
+							                                    <span class="card-img-actions-overlay card-img">
+								                                    <i class="icon-plus3 icon-2x"></i>
+							                                    </span>
+						                                    </a>
+					                                    </div>
+				                                    </div>
+
+				                                    <div class="card-body bg-light text-center">
+					                                    <div class="mb-2">
+					                                    	<h6 class="font-weight-semibold mb-0">
+						                                    	<a href="#" class="text-default">' . $item['ProduNome'] . '</a>
+						                                    </h6>
+
+						                                    <a href="#" class="text-muted">' . $item['CategNome'] . '</a>
+					                                    </div>
+					                                    <div class="text-muted mb-3">' . $item['Estoque'] . ' em estoque</div>
+
+					                                    <button produId=' . $item['ProduId'] . ' type="button" class="btn btn-produtos bg-teal-400 add-cart" disabled><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
+				                                    </div>
+			                                    </div>
+	                                	    </div>							
+                                    	');
+									}
 								}
 								?>
 							</div>
