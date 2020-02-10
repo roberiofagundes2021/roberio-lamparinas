@@ -124,11 +124,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 								if ($(elemInp).attr('idProdu') == $(elem).attr('id')) {
 									let quantidade = $(elemInp).val()
+									let quantidadeEstoque = $(elemInp).attr('quantiestoque')
+									console.log(quantidadeEstoque)
 									let id = $(elemInp).attr('idProdu')
 									const url = 'solicitacaoAlteraCarrinho.php'
 
 									if ($(elem).hasClass('bootstrap-touchspin-up')) {
-										quantidade++
+										if(quantidade <= (quantidadeEstoque - 1)){
+											quantidade++
+										}
 										//$(elemInp).val(contClck);
 										console.log(quantidade)
 									}
@@ -706,7 +710,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 						foreach ($_SESSION['Carrinho'] as $item) {
 							if ($item['quantidade'] > 0) {
-								$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome
+								$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
 		                            FROM Produto
 		                            JOIN Categoria on CategId = ProduCategoria
 									JOIN Situacao on SituaId = ProduStatus
@@ -730,7 +734,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							            		<span class="input-group-prepend bootstrap-touchspin-prefix d-none">
 							            			<span class="input-group-text"></span>
 							            		</span>
-							            		<input idProdu="' . $row['ProduId'] . '" style="text-align: center" type="text" value="' . $item['quantidade'] . '" class="form-control touchspin-set-value" style="display: block;">
+							            		<input quantiEstoque="'.$row['Estoque'].'" idProdu="' . $row['ProduId'] . '" style="text-align: center" type="text" value="' . $item['quantidade'] . '" class="form-control touchspin-set-value" style="display: block;">
 							            		<span class="input-group-append bootstrap-touchspin-postfix d-none">
 							            			<span class="input-group-text"></span>
 							            		</span>
