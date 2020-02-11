@@ -15,7 +15,7 @@ if(isset($_POST['inputLicencaId'])){
 		$sql = "SELECT LicenId, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios
 				FROM Licenca
 				WHERE LicenId = $iLicenca ";
-		$result = $conn->query("$sql");
+		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
 	} catch(PDOException $e) {
@@ -72,32 +72,18 @@ if(isset($_POST['inputDataInicio'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 	
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
-<!--	<script src="global_assets/js/plugins/pickers/daterangepicker.js"></script>	
-	
-	<script src="global_assets/js/plugins/pickers/pickadate/picker.js"></script>
-	<script src="global_assets/js/plugins/pickers/pickadate/picker.date.js"></script>
-	<script src="global_assets/js/plugins/pickers/pickadate/picker.time.js"></script>	
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	<!-- CV Documentacao: https://jqueryvalidation.org/ -->
 	<!-- /theme JS files -->	
 	
-	<script language="javascript">
-		
-		$('#inputDataFim').daterangepicker({
-		   locale: {
-				format: 'DD/MM/YYYY'
-		   }
-		 });
-
-		
-	</script>
-
 </head>
 
 <body class="navbar-top sidebar-xs">
@@ -122,7 +108,7 @@ if(isset($_POST['inputDataInicio'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formLicenca" id="formLicenca" method="post" class="form-validate" action="licencaEdita.php">
+					<form name="formLicenca" id="formLicenca" method="post" class="form-validate-jquery" action="licencaEdita.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Licença</h5>
 						</div>
@@ -133,24 +119,24 @@ if(isset($_POST['inputDataInicio'])){
 							<div class="row">
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputDataInicio">Data Início</label>
+										<label for="inputDataInicio">Data Início <span class="text-danger">*</span></label></label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="text" id="inputDataInicio" name="inputDataInicio" class="form-control pickadate" placeholder="Data Início" value="<?php echo mostraData($row['LicenDtInicio']); ?>" required>
+											<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['LicenDtInicio']; ?>" required>
 										</div>
 									</div>
 								</div>
 								
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputDataFim">Data Fim</label>
+										<label for="inputDataFim">Data Fim <span class="text-danger">*</span></label></label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>																					
-											<input type="text" id="inputDataFim" name="inputDataFim" class="form-control daterange" placeholder="Data Fim" value="<?php echo mostraData($row['LicenDtFim']); ?>">
+											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['LicenDtFim']; ?>" required>
 										</div>
 									</div>
 								</div>

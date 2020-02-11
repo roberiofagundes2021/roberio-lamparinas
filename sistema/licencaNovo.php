@@ -61,6 +61,11 @@ if(isset($_POST['inputDataInicio'])){
 	<!-- /theme JS files -->	
 	
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	<!-- CV Documentacao: https://jqueryvalidation.org/ -->
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -97,7 +102,6 @@ if(isset($_POST['inputDataInicio'])){
 				$('#cmbEmpresa').prop("disabled", false);			
 				$(window.document.location).attr('href', "licenca.php");
 			});
-	
 		
 		});	
 	</script>
@@ -126,7 +130,7 @@ if(isset($_POST['inputDataInicio'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formLicenca" id="formLicenca" method="post" class="form-validate">
+					<form name="formLicenca" id="formLicenca" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Licença</h5>
 						</div>
@@ -135,27 +139,27 @@ if(isset($_POST['inputDataInicio'])){
 							<div class="row">
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputDataInicio">Data Início</label>
+										<label for="inputDataInicio">Data Início <span class="text-danger">*</span></label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="text" id="inputDataInicio" name="inputDataInicio" class="form-control daterange-single" placeholder="Data Início" required>
+											<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" required>
 										</div>
 									</div>
 								</div>
 								
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputDataFim">Data Fim</label>
+										<label for="inputDataFim">Data Fim <span class="text-danger">*</span></label>
 										<div class="input-group">
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
-											</span>																					
-											<input type="text" id="inputDataFim" name="inputDataFim" class="form-control daterange-single" placeholder="Data Fim">
+											</span>
+											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" required>
 										</div>
 									</div>
-								</div>
+								</div>	
 										
 								<div class="col-lg-4">
 									<div class="form-group">

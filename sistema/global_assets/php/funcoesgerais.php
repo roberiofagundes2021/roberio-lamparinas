@@ -150,6 +150,8 @@
 	
 	function saudacoes(){
 		
+		date_default_timezone_set('America/Sao_Paulo');
+
 		$hr = date(" H ");
 		
 		if($hr >= 12 && $hr<18) {

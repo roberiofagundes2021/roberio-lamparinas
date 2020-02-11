@@ -6,13 +6,13 @@ $_SESSION['PaginaAtual'] = 'Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, ForneNome, CategNome, OrcamStatus
-		 FROM Orcamento
-		 LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
-		 JOIN Categoria on CategId = OrcamCategoria
-	     WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY OrcamData DESC");
-$result = $conn->query("$sql");
+$sql = "SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, ForneNome, CategNome, OrcamStatus
+		FROM Orcamento
+		LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
+		JOIN Categoria on CategId = OrcamCategoria
+	    WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ."
+		ORDER BY OrcamData DESC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -65,16 +65,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Nº Orçamento
-					width: "15%",
+					width: "10%",
 					targets: [1]
+				},
+				{ 
+					orderable: true,   //Tipo
+					width: "10%",
+					targets: [2]
 				},				
 				{ 
 					orderable: true,   //Fornecedor
-					width: "25%",
-					targets: [2]
-				},
-				{ 
-					orderable: true,   //Categoria
 					width: "20%",
 					targets: [3]
 				},
@@ -84,14 +84,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					targets: [4]
 				},
 				{ 
+					orderable: true,   //Categoria
+					width: "20%",
+					targets: [5]
+				},
+				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [5]
+					targets: [6]
 				},
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [6]
+					targets: [7]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -201,6 +206,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<tr class="bg-slate">
 										<th>Data</th>
 										<th>Nº Orçamento</th>
+										<th>Tipo</th>
 										<th>Fornecedor</th>
 										<th>Categoria</th>
 										<th>SubCategoria</th>
@@ -214,6 +220,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										$situacao = $item['OrcamStatus'] ? 'Ativo' : 'Inativo';
 										$situacaoClasse = $item['OrcamStatus'] ? 'badge-success' : 'badge-secondary';
+
+										$tipo = $item['OrcamTipo'] == 'P' ? 'Produto' : 'Serviço';
 										
 										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
 
@@ -229,6 +237,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										    <tr>
 											    <td>'.mostraData($item['OrcamData']).'</td>
 											    <td>'.$item['OrcamNumero'].'</td>
+											    <td>'.$tipo.'</td>
 											    <td>'.$item['ForneNome'].'</td>
 											    <td>'.$item['CategNome'].'</td>
 										');
