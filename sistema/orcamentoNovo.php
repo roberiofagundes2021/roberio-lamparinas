@@ -6,21 +6,21 @@ $_SESSION['PaginaAtual'] = 'Novo Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
-		 FROM Usuario
-		 Where UsuarId = ".$_SESSION['UsuarId']."
-		 ORDER BY UsuarNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
+		FROM Usuario
+		Where UsuarId = ".$_SESSION['UsuarId']."
+		ORDER BY UsuarNome ASC";
+$result = $conn->query($sql);
 $rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
 
 if(isset($_POST['inputData'])){
 	
 	try{
 		
-		$sql = ("SELECT COUNT(isnull(OrcamNumero,0)) as Numero
-				 FROM Orcamento
-				 Where OrcamEmpresa = ".$_SESSION['EmpreId']."");
-		$result = $conn->query("$sql");
+		$sql = "SELECT COUNT(isnull(OrcamNumero,0)) as Numero
+				FROM Orcamento
+				Where OrcamEmpresa = ".$_SESSION['EmpreId']."";
+		$result = $conn->query($sql);
 		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);		
 		
 		$sNumero = (int)$rowNumero['Numero'] + 1;
@@ -120,15 +120,14 @@ if(isset($_POST['inputData'])){
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<!-- /theme JS files -->
 	
-	<!-- JS file path -->
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+	<!-- /theme JS files -->
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -189,7 +188,7 @@ if(isset($_POST['inputData'])){
 				
 				$.getJSON('filtraFornecedor.php?idCategoria='+cmbCategoria, function (dados){
 					
-					var option = '<option value="#">Selecione o Fornecedor</option>';
+					var option = '<option value="">Selecione o Fornecedor</option>';
 					
 					if (dados.length){						
 						
@@ -237,15 +236,15 @@ if(isset($_POST['inputData'])){
 		
 		//Mostra o "Filtrando..." na combo SubCategoria
 		function Filtrando(){
-			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+			$('#cmbSubCategoria').empty().append('<option value="">Filtrando...</option>');
 		}
 		
 		function ResetSubCategoria(){
-			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+			$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
 		}	
 		
 		function ResetFornecedor(){
-			$('#cmbFornecedor').empty().append('<option>Sem Fornecedor</option>');
+			$('#cmbFornecedor').empty().append('<option value="">Sem Fornecedor</option>');
 		}	
 		
 	</script>

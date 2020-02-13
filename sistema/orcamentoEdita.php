@@ -154,8 +154,6 @@ if(isset($_POST['inputTipo'])){
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>	
 
@@ -222,7 +220,7 @@ if(isset($_POST['inputTipo'])){
 				
 				$.getJSON('filtraFornecedor.php?idCategoria='+cmbCategoria, function (dados){
 					
-					var option = '<option value="#">Selecione o Fornecedor</option>';
+					var option = '<option value="">Selecione o Fornecedor</option>';
 					
 					if (dados.length){						
 						
@@ -265,13 +263,8 @@ if(isset($_POST['inputTipo'])){
 				//Depois
 				var cmbCategoria = $('#cmbCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
-				
-				/*if (cmbCategoria == '' || cmbCategoria == '#'){
-					alerta('Atenção','Informe a categoria!','error');
-					$('#cmbCategoria').focus();
-					return false;
-				}*/
-				
+				var cmbFornecedor = $('#cmbFornecedor').val();
+								
 				//Tem produto cadastrado para esse orçamento na tabela OrcamentoXProduto?
 				var inputProduto = $('#inputOrcamentoProduto').val();
 				
@@ -283,7 +276,19 @@ if(isset($_POST['inputTipo'])){
 
 					//Verifica se o a categoria ou subcategoria foi alterada
 					if (inputSubCategoria != cmbSubCategoria){
+						
+						if (cmbCategoria == '' || cmbCategoria == '#'){
+							alerta('Atenção','Informe a categoria!','error');
+							$('#cmbCategoria').focus();
+							return false;
+						}						
 
+						if (cmbFornecedor == '' || cmbFornecedor == '#'){
+							alerta('Atenção','Informe o Fornecedor!','error');
+							$('#cmbFornecedor').focus();
+							return false;
+						}					
+					
 						inputExclui = 1;
 						$('#inputOrcamentoProdutoExclui').val(inputExclui);
 						
@@ -302,15 +307,15 @@ if(isset($_POST['inputTipo'])){
 		
 		//Mostra o "Filtrando..." na combo SubCategoria
 		function Filtrando(){
-			$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
+			$('#cmbSubCategoria').empty().append('<option value="">Filtrando...</option>');
 		}		
 		
 		function ResetSubCategoria(){
-			$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
+			$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
 		}
 		
 		function ResetFornecedor(){
-			$('#cmbFornecedor').empty().append('<option>Sem Fornecedor</option>');
+			$('#cmbFornecedor').empty().append('<option value="">Sem Fornecedor</option>');
 		}
 							
 	</script>
