@@ -61,8 +61,8 @@ try{
 	
 	$sql = "SELECT OrXSvServico
 			FROM OrcamentoXServico
-			JOIN Servico on ServId = OrXSvServico
-			WHERE ServEmpresa = ". $_SESSION['EmpreId'] ." and OrXSvOrcamento = ".$iOrcamento;	
+			JOIN Servico on ServiId = OrXSvServico
+			WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and OrXSvOrcamento = ".$iOrcamento;	
 	$result = $conn->query($sql);
 	$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countServicoUtilizado = count($rowServicoUtilizado);
@@ -71,16 +71,17 @@ try{
 		$aServicos[] = $itemServicoUtilizado['OrXSvServico'];
 	}
 
-	$sql = ("SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
-				 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = $iOrcamento
-				 ORDER BY SbCatNome ASC");
-		$result = $conn->query("$sql");
-		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($rowBD as $item){
-			$aSubCategorias[] = $item['SbCatId'];
-		}
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria
+			JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
+			WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = $iOrcamento
+			ORDER BY SbCatNome ASC";
+	$result = $conn->query($sql);
+	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+	
+	foreach ($rowBD as $item){
+		$aSubCategorias[] = $item['SbCatId'];
+	}
 	
 } catch(PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
@@ -230,11 +231,12 @@ try{
 													<!--<option value="#">Selecione uma subcategoria</option>-->
 													<?php
 												        if (isset($row['OrcamCategoria'])){
-													        $sql = ("SELECT SbCatId, SbCatNome
-															    FROM SubCategoria														 
-															     WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SbCatStatus = 1
-															     ORDER BY SbCatNome ASC");
-													        $result = $conn->query("$sql");
+													        $sql = "SELECT SbCatId, SbCatNome
+															    	FROM SubCategoria
+															    	JOIN Situacao on SituaId = SbCatStatus														 
+															     	WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SituaChave = 'ATIVO'
+															     	ORDER BY SbCatNome ASC";
+													        $result = $conn->query($sql);
 													        $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 													        $count = count($rowSubCategoria);
 
@@ -255,26 +257,26 @@ try{
 												<label for="cmbServico">Serviços</label>
 												<select id="cmbServico" name="cmbServico" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 													<?php 
-														$sql = "SELECT ServId, ServNome
+														$sql = "SELECT ServiId, ServiNome
 																FROM Servico										     
-																WHERE ServEmpresa = ". $_SESSION['EmpreId'] ." and ServStatus = 1 and ServCategoria = ".$iCategoria;
+																WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and ServiStatus = 1 and ServiCategoria = ".$iCategoria;
 														
 														if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-															$sql .= " and ServSubCategoria = ".$row['OrcamSubCategoria'];
+															$sql .= " and ServiSubCategoria = ".$row['OrcamSubCategoria'];
 														}
 														
-														$sql .= " ORDER BY ServNome ASC";
+														$sql .= " ORDER BY ServiNome ASC";
 														$result = $conn->query($sql);
 														$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);														
 														
 														foreach ($rowServicos as $item){	
 															
-															if (in_array($item['ServId'], $aServicos) or $countServicoUtilizado == 0) {
+															if (in_array($item['ServiId'], $aServicos) or $countServicoUtilizado == 0) {
 																$seleciona = "selected";
-																print('<option value="'.$item['ServId'].'" '.$seleciona.'>'.$item['ServNome'].'</option>');
+																print('<option value="'.$item['ServiId'].'" '.$seleciona.'>'.$item['ServiNome'].'</option>');
 															} else {
 																$seleciona = "";
-																print('<option value="'.$item['ServId'].'" '.$seleciona.'>'.$item['ServNome'].'</option>');
+																print('<option value="'.$item['ServiId'].'" '.$seleciona.'>'.$item['ServiNome'].'</option>');
 															}													
 															
 															
@@ -310,23 +312,23 @@ try{
 									
 									<?php									
 
-										$sql = "SELECT ServId, ServNome, ServDetalhamento
+										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
 												FROM Servico
-												JOIN OrcamentoXServico on OrXSvServico = ServId
-												WHERE ServEmpresa = ".$_SESSION['EmpreId']." and OrXSvOrcamento = ".$iOrcamento;
+												JOIN OrcamentoXServico on OrXSvServico = ServiId
+												WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and OrXSvOrcamento = ".$iOrcamento;
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowServicos);
 										
 										if (!$count){
-											$sql = "SELECT ServId, ServNome, ServDetalhamento
+											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
 													FROM Servico
-													WHERE ServEmpresa = ".$_SESSION['EmpreId']." and ServCategoria = ".$iCategoria." and ServStatus = 1 
-													ORDER BY ServNome ASC
+													WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiCategoria = ".$iCategoria." and ServiStatus = 1 
+													ORDER BY ServiNome ASC
 													";
 													
 											if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-												$sql .= " and ServSubCategoria = ".$row['OrcamSubCategoria'];
+												$sql .= " and ServiSubCategoria = ".$row['OrcamSubCategoria'];
 											}
 											$result = $conn->query($sql);
 											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -368,10 +370,10 @@ try{
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-															<input type="hidden" id="inputIdServico'.$cont.'" name="inputIdServico'.$cont.'" value="'.$item['ServId'].'" class="idServico">
+															<input type="hidden" id="inputIdServico'.$cont.'" name="inputIdServico'.$cont.'" value="'.$item['ServiId'].'" class="idServico">
 														</div>
 														<div class="col-lg-11">
-															<input type="text" id="inputServico'.$cont.'" name="inputServico'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ServDetalhamento'].'" value="'.$item['ServNome'].'" readOnly>
+															<input type="text" id="inputServico'.$cont.'" name="inputServico'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ServiDetalhamento'].'" value="'.$item['ServiNome'].'" readOnly>
 														</div>
 													</div>
 												</div>										

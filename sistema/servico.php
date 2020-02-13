@@ -9,13 +9,13 @@ if (isset($_SESSION['fotoAtual'])){
 	unset($_SESSION['fotoAtual']);
 }
 
-$sql = ("SELECT ServId, ServCodigo, ServNome, CategNome, SbCatNome, ServValorVenda, ServStatus
-		 FROM Servico
-		 LEFT JOIN Categoria on CategId = ServCategoria
-		 LEFT JOIN SubCategoria on SbCatId = ServSubCategoria
-	     WHERE ServEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY ServNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT ServiId, ServiCodigo, ServiNome, CategNome, SbCatNome, ServiValorVenda, ServiStatus
+		FROM Servico
+		LEFT JOIN Categoria on CategId = ServiCategoria
+		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
+	    WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ."
+		ORDER BY ServiNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -272,25 +272,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['ServStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['ServStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['ServiStatus'] ? 'Ativo' : 'Inativo';
+										$situacaoClasse = $item['ServiStatus'] ? 'badge-success' : 'badge-secondary';
 										
 										print('
 										<tr>
-											<td>'.$item['ServCodigo'].'</td>
-											<td>'.$item['ServNome'].'</td>
+											<td>'.$item['ServiCodigo'].'</td>
+											<td>'.$item['ServiNome'].'</td>
 											<td>'.$item['CategNome'].'</td>
 											<td>'.$item['SbCatNome'].'</td>
-											<td>'.formataMoeda($item['ServValorVenda']).'</td>
+											<td>'.formataMoeda($item['ServiValorVenda']).'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaProduto('.$item['ServId'].', \''.$item['ServNome'].'\','.$item['ServStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaProduto('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaProduto('.$item['ServId'].', \''.$item['ServNome'].'\','.$item['ServStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaProduto('.$item['ServId'].', \''.$item['ServNome'].'\','.$item['ServStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>

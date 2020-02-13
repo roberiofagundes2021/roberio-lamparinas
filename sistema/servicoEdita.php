@@ -14,16 +14,16 @@ if(isset($_POST['inputServicoId'])){
 		
 		$sql = "SELECT *
 				FROM Servico
-				WHERE ServId = $iServico ";
+				WHERE ServiId = $iServico ";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);		
 		
-		$valorCusto = mostraValor($row['ServValorCusto']);
-		$valorVenda	= mostraValor($row['ServValorVenda']);
-		$outrasDespesas = mostraValor($row['ServOutrasDespesas']);
-		$custoFinal = mostraValor($row['ServCustoFinal']);
-		$margemLucro = mostraValor($row['ServMargemLucro']);
-		$numSerie = $row['ServNumSerie'];
+		$valorCusto = mostraValor($row['ServiValorCusto']);
+		$valorVenda	= mostraValor($row['ServiValorVenda']);
+		$outrasDespesas = mostraValor($row['ServiOutrasDespesas']);
+		$custoFinal = mostraValor($row['ServiCustoFinal']);
+		$margemLucro = mostraValor($row['ServiMargemLucro']);
+		$numSerie = $row['ServiNumSerie'];
 		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
@@ -40,11 +40,11 @@ if(isset($_POST['inputNome'])){
 		
 	try{
 		
-		$sql = "UPDATE Servico SET ServCodigo = :sCodigo, ServNome = :sNome, ServDetalhamento = :sDetalhamento, 
-		               ServCategoria = :iCategoria, ServSubCategoria = :iSubCategoria, ServValorCusto = :fValorCusto, ServOutrasDespesas = :fOutrasDespesas,
-		               ServCustoFinal = :fCustoFinal, ServMargemLucro = :fMargemLucro, ServValorVenda = :fValorVenda, ServFabricante = :iFabricante, 
-		               ServMarca = :iMarca, ServModelo = :iModelo, ServNumSerie = :sNumSerie, ServUsuarioAtualizador = :iUsuarioAtualizador 
-		        WHERE ServId = :iServico";
+		$sql = "UPDATE Servico SET ServiCodigo = :sCodigo, ServiNome = :sNome, ServiDetalhamento = :sDetalhamento, 
+		               ServiCategoria = :iCategoria, ServiSubCategoria = :iSubCategoria, ServiValorCusto = :fValorCusto, ServiOutrasDespesas = :fOutrasDespesas,
+		               ServiCustoFinal = :fCustoFinal, ServiMargemLucro = :fMargemLucro, ServiValorVenda = :fValorVenda, ServiFabricante = :iFabricante, 
+		               ServiMarca = :iMarca, ServiModelo = :iModelo, ServiNumSerie = :sNumSerie, ServiUsuarioAtualizador = :iUsuarioAtualizador 
+		        WHERE ServiId = :iServico";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -103,11 +103,12 @@ if(isset($_POST['inputNome'])){
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 	<!-- /theme JS files -->	
-	
-	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>	
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -179,6 +180,7 @@ if(isset($_POST['inputNome'])){
 								
 				var inputValorCusto = $('#inputValorCusto').val().replace('.', '').replace(',', '.');
 				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replace('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replace('.', '').replace(',', '.');
 				
 				if (inputValorCusto == null || inputValorCusto.trim() == '') {
 					inputValorCusto = 0.00;
@@ -193,49 +195,16 @@ if(isset($_POST['inputNome'])){
 				inputCustoFinal = float2moeda(inputCustoFinal).toString();
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
+
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+					atualizaValorVenda();
+				}				
 			});
-			
-			//Ao mudar o Custo, atualiza o CustoFinal
-			$('#inputOutrasDespesas').on('blur', function(e){
-								
-				var inputValorCusto = $('#inputValorCusto').val().replace('.', '').replace(',', '.');
-				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replace('.', '').replace(',', '.');
-				
-				if (inputValorCusto == null || inputValorCusto.trim() == '') {
-					inputValorCusto = 0.00;
-				}
-				
-				if (inputOutrasDespesas == null || inputOutrasDespesas.trim() == '') {
-					inputOutrasDespesas = 0.00;
-				}
-				
-				var inputCustoFinal = parseFloat(inputValorCusto) + parseFloat(inputOutrasDespesas);
-				
-				inputCustoFinal = float2moeda(inputCustoFinal).toString();
-				
-				$('#inputCustoFinal').val(inputCustoFinal);
-			});			
 			
 			//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
 			$('#inputMargemLucro').on('blur', function(e){
 								
-				var inputCustoFinal = $('#inputCustoFinal').val().replace('.', '').replace(',', '.');
-				var inputMargemLucro = $('#inputMargemLucro').val().replace(',', '.');				
-				
-				if (inputCustoFinal == null || inputCustoFinal.trim() == '') {
-					inputCustoFinal = 0.00;
-				}
-				
-				if (inputMargemLucro == null || inputMargemLucro.trim() == '') {
-					inputMargemLucro = 0.00;
-				}
-								
-				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
-				
-				inputValorVenda = float2moeda(inputValorVenda).toString();
-				
-				$('#inputValorVenda').val(inputValorVenda);				
-
+				atualizaValorVenda();
 			});	
 			
 			//Ao mudar o Valor de Venda, atualiza a Margem de Lucro
@@ -253,8 +222,8 @@ if(isset($_POST['inputNome'])){
 				}
 				
 				//alert(parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal));
-				var lucro = parseFloat(inputValorVenda) - parseFloat(inputCustoFinal);		
-
+				var lucro = parseFloat(inputValorVenda) - parseFloat(inputCustoFinal);	
+				
 				inputMargemLucro = 0;
 				
 				if (inputCustoFinal != 0.00){
@@ -265,7 +234,26 @@ if(isset($_POST['inputNome'])){
 				
 				$('#inputMargemLucro').val(inputMargemLucro);				
 
-			});
+			});	
+			
+			function atualizaValorVenda(){
+				var inputCustoFinal = $('#inputCustoFinal').val().replace('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replace(',', '.');				
+				
+				if (inputCustoFinal == null || inputCustoFinal.trim() == '') {
+					inputCustoFinal = 0.00;
+				}
+				
+				if (inputMargemLucro == null || inputMargemLucro.trim() == '') {
+					inputMargemLucro = 0.00;
+				}
+								
+				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
+				
+				inputValorVenda = float2moeda(inputValorVenda).toString();
+				
+				$('#inputValorVenda').val(inputValorVenda);
+			}
 
 			function Filtrando(){
 				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
@@ -273,14 +261,11 @@ if(isset($_POST['inputNome'])){
 			
 			function Reset(){
 				$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
-			}			
+			}
 		
 		});
 
 	</script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 </head>
 
 <body class="navbar-top">
@@ -305,10 +290,10 @@ if(isset($_POST['inputNome'])){
 					
 					<form name="formServico" method="post" class="form-validate-jquery" action="servicoEdita.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Serviço "<?php echo $row['ServNome']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Serviço "<?php echo $row['ServiNome']; ?>"</h5>
 						</div>
 						
-						<input type="hidden" id="inputServicoId" name="inputServicoId" value="<?php echo $row['ServId']; ?>" >
+						<input type="hidden" id="inputServicoId" name="inputServicoId" value="<?php echo $row['ServiId']; ?>" >
 						
 						<div class="card-body">
 							
@@ -320,13 +305,13 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputCodigo">Código do Serviço</label>
-												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código Interno" value="<?php echo $row['ServCodigo']; ?>" readOnly>
+												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código Interno" value="<?php echo $row['ServiCodigo']; ?>" readOnly>
 											</div>
 										</div>
 										<div class="col-lg-10">
 											<div class="form-group">
 												<label for="inputNome">Nome</label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['ServNome']; ?>" required>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['ServiNome']; ?>" required>
 											</div>
 										</div>																								
 									</div>
@@ -335,7 +320,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtDetalhamento">Detalhamento</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do produto"><?php echo $row['ServDetalhamento']; ?></textarea>
+												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do produto"><?php echo $row['ServiDetalhamento']; ?></textarea>
 											</div>
 										</div>
 									</div>
@@ -355,15 +340,16 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php 
-														$sql = ("SELECT CategId, CategNome
-																 FROM Categoria															     
-																 WHERE CategStatus = 1 and CategEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY CategNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT CategId, CategNome
+																FROM Categoria
+																JOIN Situacao on SituaId = CategStatus
+																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY CategNome ASC";
+														$result = $conn->query($sql);
 														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowCategoria as $item){
-															$seleciona = $item['CategId'] == $row['ServCategoria'] ? "selected" : "";
+															$seleciona = $item['CategId'] == $row['ServiCategoria'] ? "selected" : "";
 															print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
 														}
 													
@@ -378,15 +364,16 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php 
-														$sql = ("SELECT SbCatId, SbCatNome
-																 FROM SubCategoria															     
-																 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY SbCatNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT SbCatId, SbCatNome
+																FROM SubCategoria
+																JOIN Situacao on SituaId = SbCatStatus
+																WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY SbCatNome ASC";
+														$result = $conn->query($sql);
 														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowSubCategoria as $item){
-															$seleciona = $item['SbCatId'] == $row['ServSubCategoria'] ? "selected" : "";
+															$seleciona = $item['SbCatId'] == $row['ServiSubCategoria'] ? "selected" : "";
 															print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
 														}
 													
@@ -459,15 +446,16 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													<?php 
-														$sql = ("SELECT MarcaId, MarcaNome
-																 FROM Marca															     
-																 WHERE MarcaStatus = 1 and MarcaEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY MarcaNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT MarcaId, MarcaNome
+																FROM Marca
+																JOIN Situacao on SituaId = MarcaStatus
+																WHERE MarcaEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY MarcaNome ASC";
+														$result = $conn->query($sql);
 														$rowMarca = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowMarca as $item){
-															$seleciona = $item['MarcaId'] == $row['ServMarca'] ? "selected" : "";
+															$seleciona = $item['MarcaId'] == $row['ServiMarca'] ? "selected" : "";
 															print('<option value="'.$item['MarcaId'].'" '. $seleciona .'>'.$item['MarcaNome'].'</option>');
 														}
 													
@@ -482,15 +470,16 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													<?php 
-														$sql = ("SELECT ModelId, ModelNome
-																 FROM Modelo
-																 WHERE ModelStatus = 1 and ModelEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY ModelNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT ModelId, ModelNome
+																FROM Modelo
+																JOIN Situacao on SituaId = ModelStatus
+																WHERE ModelEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY ModelNome ASC";
+														$result = $conn->query($sql);
 														$rowModelo = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowModelo as $item){
-															$seleciona = $item['ModelId'] == $row['ServModelo'] ? "selected" : "";
+															$seleciona = $item['ModelId'] == $row['ServiModelo'] ? "selected" : "";
 															print('<option value="'.$item['ModelId'].'" '. $seleciona .'>'.$item['ModelNome'].'</option>');
 														}
 													
@@ -505,15 +494,16 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													<?php 
-														$sql = ("SELECT FabriId, FabriNome
-																 FROM Fabricante
-																 WHERE FabriStatus = 1 and FabriEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY FabriNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT FabriId, FabriNome
+																FROM Fabricante
+																JOIN Situacao on SituaId = FabriStatus
+																WHERE FabriEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY FabriNome ASC";
+														$result = $conn->query($sql);
 														$rowFabricante = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowFabricante as $item){
-															$seleciona = $item['FabriId'] == $row['ServFabricante'] ? "selected" : "";
+															$seleciona = $item['FabriId'] == $row['ServiFabricante'] ? "selected" : "";
 															print('<option value="'.$item['FabriId'].'" '. $seleciona .'>'.$item['FabriNome'].'</option>');
 														}
 													

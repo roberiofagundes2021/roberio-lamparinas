@@ -13,8 +13,8 @@ if(isset($_POST['inputServicoId'])){
         	
 	try{
 		
-		$sql = "UPDATE Servico SET ServStatus = :bStatus
-				WHERE ServId = :id";
+		$sql = "UPDATE Servico SET ServiStatus = :bStatus
+				WHERE ServiId = :id";
 		$result = $conn->prepare("$sql");
 		$result->bindParam(':bStatus', $bStatus);
 		$result->bindParam(':id', $iServico);

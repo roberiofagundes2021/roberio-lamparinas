@@ -11,7 +11,7 @@ if(isset($_POST['inputServicoId'])){
 	try{
 		
 		$sql = "DELETE FROM Servico
-				WHERE ServId = :id";
+				WHERE ServiId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iServico);
 		$result->execute();

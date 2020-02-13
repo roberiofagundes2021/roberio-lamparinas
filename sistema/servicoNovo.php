@@ -9,9 +9,9 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputNome'])){
 	
 	try{		
-		$sql = "SELECT COUNT(isnull(ServCodigo,0)) as Codigo
+		$sql = "SELECT COUNT(isnull(ServiCodigo,0)) as Codigo
 				FROM Servico
-				Where ServEmpresa = ".$_SESSION['EmpreId']."";
+				Where ServiEmpresa = ".$_SESSION['EmpreId']."";
 		//echo $sql;die;
 		$result = $conn->query("$sql");
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
@@ -24,10 +24,10 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "INSERT INTO Servico (ServCodigo, ServNome, ServDetalhamento, ServCategoria, ServSubCategoria, ServValorCusto, 
-									 ServOutrasDespesas, ServCustoFinal, ServMargemLucro, ServValorVenda, 
-									 ServMarca, ServModelo, ServNumSerie, ServFabricante, ServStatus, 
-									 ServUsuarioAtualizador, ServEmpresa) 
+		$sql = "INSERT INTO Servico (ServiCodigo, ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, ServiValorCusto, 
+									 ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda, 
+									 ServiMarca, ServiModelo, ServiNumSerie, ServiFabricante, ServiStatus, 
+									 ServiUsuarioAtualizador, ServiEmpresa) 
 				VALUES (:sCodigo, :sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :fValorCusto, 
 						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iMarca, :iModelo, :sNumSerie, 
 						:iFabricante, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
@@ -88,13 +88,14 @@ if(isset($_POST['inputNome'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	<!--<script src="global_assets/js/main/jquery.form.js"></script>-->
-	<script src="http://malsup.github.com/jquery.form.js"></script>
+	<!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	<!-- /theme JS files -->
-	
-	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
-		
+
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 
@@ -237,27 +238,6 @@ if(isset($_POST['inputNome'])){
 			function Reset(){
 				$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
 			}
-
-			//Valida Registro Duplicado
-			/*$('#enviar').on('click', function(e){
-				
-				e.preventDefault();
-				
-				var inputNome = $('#inputNome').val();
-				
-				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe o nome do servico!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-				
-				$( "#formServico" ).submit();
-				
-			}); // enviar*/
 			
 			//Valida Registro Duplicado
 			$('#cancelar').on('click', function(e){
@@ -267,36 +247,9 @@ if(isset($_POST['inputNome'])){
 				$(window.document.location).attr('href',"servico.php");
 				
 			}); // cancelar		
-		});			
-		
-		function float2moeda(num) {
-
-		   x = 0;
-
-		   if(num<0) {
-			  num = Math.abs(num);
-			  x = 1;
-		   }
-		   if(isNaN(num)) num = "0";
-			  cents = Math.floor((num*100+0.5)%100);
-
-		   num = Math.floor((num*100+0.5)/100).toString();
-
-		   if(cents < 10) cents = "0" + cents;
-			  for (var i = 0; i < Math.floor((num.length-(1+i))/3); i++)
-				 num = num.substring(0,num.length-(4*i+3))+'.'
-					   +num.substring(num.length-(4*i+3));
-		   ret = num + ',' + cents;
-		   if (x == 1) ret = ' - ' + ret;
-		   
-		   return ret;
-
-		}		
+		});		
 		
 	</script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	
 </head>
 
@@ -363,11 +316,12 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php 
-														$sql = ("SELECT CategId, CategNome
-																 FROM Categoria															     
-																 WHERE CategStatus = 1 and CategEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY CategNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT CategId, CategNome
+																FROM Categoria
+																JOIN Situacao on SituaId = CategStatus
+																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY CategNome ASC";
+														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($row as $item){															
@@ -384,19 +338,6 @@ if(isset($_POST['inputNome'])){
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
-													<?php 
-														/*$sql = ("SELECT SbCatId, SbCatNome
-																 FROM SubCategoria															     
-																 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY SbCatNome ASC");
-														$result = $conn->query("$sql");
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($row as $item){
-															print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
-														}
-													  */
-													?>
 												</select>
 											</div>
 										</div>
@@ -464,11 +405,12 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													<?php 
-														$sql = ("SELECT MarcaId, MarcaNome
-																 FROM Marca															     
-																 WHERE MarcaStatus = 1 and MarcaEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY MarcaNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT MarcaId, MarcaNome
+																FROM Marca
+																JOIN Situacao on SituaId = MarcaStatus
+																WHERE MarcaEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY MarcaNome ASC";
+														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($row as $item){
@@ -486,11 +428,12 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													<?php 
-														$sql = ("SELECT ModelId, ModelNome
-																 FROM Modelo
-																 WHERE ModelStatus = 1 and ModelEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY ModelNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT ModelId, ModelNome
+																FROM Modelo
+																JOIN Situacao on SituaId = ModelStatus
+																WHERE ModelEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY ModelNome ASC";
+														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($row as $item){
@@ -508,11 +451,12 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													<?php 
-														$sql = ("SELECT FabriId, FabriNome
-																 FROM Fabricante
-																 WHERE FabriStatus = 1 and FabriEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY FabriNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT FabriId, FabriNome
+																FROM Fabricante
+																JOIN Situacao on SituaId = FabriStatus
+																WHERE FabriEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY FabriNome ASC";
+														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($row as $item){

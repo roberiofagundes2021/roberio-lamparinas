@@ -24,16 +24,16 @@ if (isset($_POST['servico']) and $_POST['servico'] != ''){
 
 if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != ''){
 
-	$sql = "SELECT ServId, ServNome, ServDetalhamento
+	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
 			FROM Servico
-			JOIN Categoria on CategId = ServCategoria
-			WHERE ServEmpresa = ".$_SESSION['ServId']." and ServSubCategoria = '". $_POST['idSubCategoria']."' and ServId in (".$lista.")
+			JOIN Categoria on CategId = ServiCategoria
+			WHERE ServEmpresa = ".$_SESSION['ServiId']." and ServiSubCategoria = '". $_POST['idSubCategoria']."' and ServiId in (".$lista.")
 			";
 } else {
-	$sql = "SELECT ServId, ServNome, ServDetalhamento
+	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
 			FROM Servico
-			JOIN Categoria on CategId = ServCategoria
-			WHERE ServEmpresa = ".$_SESSION['EmpreId']." and ServCategoria = '". $_POST['idCategoria']."' and ServId in (".$lista.")
+			JOIN Categoria on CategId = ServiCategoria
+			WHERE ServEmpresa = ".$_SESSION['EmpreId']." and ServiCategoria = '". $_POST['idCategoria']."' and ServiId in (".$lista.")
 			";
 }
 
@@ -53,17 +53,17 @@ foreach ($row as $item){
 	
 	$cont++;
 	
-	$id = $item['ServId'];	
+	$id = $item['ServiId'];	
 	
 	$output .= ' <div class="row" style="margin-top: 8px;">
 					<div class="col-lg-8">
 						<div class="row">
 							<div class="col-lg-1">
 								<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-								<input type="hidden" id="inputIdServico'.$cont.'" name="inputIdServico'.$cont.'" value="'.$item['ServId'].'" class="idServico">
+								<input type="hidden" id="inputIdServico'.$cont.'" name="inputIdServico'.$cont.'" value="'.$item['ServiId'].'" class="idServico">
 							</div>
 							<div class="col-lg-11">
-								<input type="text" id="inputServico'.$cont.'" name="inputServico'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ServDetalhamento'].'" value="'.$item['ServNome'].'" readOnly>
+								<input type="text" id="inputServico'.$cont.'" name="inputServico'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ServiDetalhamento'].'" value="'.$item['ServiNome'].'" readOnly>
 							</div>
 						</div>
 					</div>								
