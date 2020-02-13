@@ -40,12 +40,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
 	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>		
-
-<!--	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script>-->
-	<!-- /theme JS files -->	
 	
 	<script type="text/javascript" >
 			
@@ -65,12 +59,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Nº Orçamento
-					width: "10%",
+					width: "12%",
 					targets: [1]
 				},
 				{ 
 					orderable: true,   //Tipo
-					width: "10%",
+					width: "8%",
 					targets: [2]
 				},				
 				{ 
@@ -241,22 +235,21 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											    <td>'.$item['ForneNome'].'</td>
 											    <td>'.$item['CategNome'].'</td>
 										');
-                                       
-                                        /*if(!$rowSC){
-											$seleciona = $item['SbCatNome'];
-                                      
-											print('
-											    <td>'.$seleciona.'</td>
-											');
-										} else {*/
-											print('<td>');
-                                            foreach ($rowSC as $a) {
-											    print('
-											        '.$a['SbCatNome'].' |
-											    ');
-											}
-											print('</td>');
-										/*}*/
+
+										print('<td>');
+										
+										$subCategorias = '';
+										
+										foreach ($rowSC as $a) {
+											
+											$subCategorias .= $a['SbCatNome'].', ';
+										}
+										
+										$subCategorias = substr($subCategorias,0,-2);
+										
+										print($subCategorias);
+										
+										print('</td>');
 										
 										print('<td><a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrcamStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
