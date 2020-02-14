@@ -6,8 +6,10 @@ $_SESSION['PaginaAtual'] = 'Solicitação';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT SolicId, SolicNumero, SolicData, SolicObservacao, SolicSetor, SolicSolicitante, SolicSituacao, SituaNome, SituaChave
+$sql = "SELECT SolicId, SolicNumero, SolicData, SolicObservacao, SolicSetor, SolicSolicitante, SolicSituacao, UsuarNome, SetorNome, SituaNome, SituaChave
 		FROM Solicitacao
+		JOIN Usuario on UsuarId = SolicSolicitante
+		JOIN Setor on SetorId = SolicSetor
 		JOIN Situacao on SituaId = SolicSituacao
 	    WHERE SolicEmpresa = ". $_SESSION['EmpreId'] ."
 		ORDER BY SolicData DESC";

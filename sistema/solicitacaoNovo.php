@@ -16,6 +16,160 @@ $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+		
+			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario, FOXPrUsuarioAtualizador, FOXPrEmpresa)
+					VALUES (:iFluxoOperacional, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+			$result = $conn->prepare($sql);
+			
+			$result->execute(array(
+							':iFluxoOperacional' => $iFluxoOperacional,
+							':iProduto' => $_POST['inputIdProduto'.$i],
+							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId']
+							));
+
+			$valorTotal = floatval(str_replace(',', '.', str_replace('.', '', $_POST['inputValor'])));
+			$TotalGeral = floatval(str_replace(',', '.', str_replace('.', '', $_POST['inputTotalGeral'])));
+
+			$sql = "SELECT SituaId
+					FROM Situacao
+					Where SituaChave = 'PENDENTE' ";
+			$result = $conn->query("$sql");
+			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+			//Atualiza a Situação do Fluxo se estiver fechado o valor total dos produtos com o valor total do Fluxo e a situação estiver PENDENTE. Daí deve passar para ATIVO.
+			if ($valorTotal === $TotalGeral && $_POST['inputStatus'] == $rowSituacao['SituaId']){		
+					
+				/* Atualiza o Status do Fluxo para "Aguardando Liberação"
+				$sql = "SELECT SituaId
+						FROM Situacao
+						Where SituaChave = 'AGUARDANDOLIBERACAO' ";
+				$result = $conn->query("$sql");
+				$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+				$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
+                        WHERE FlOpeId = :iFluxo 
+		               ";
+	            $result = $conn->prepare($sql);
+			
+	            $result->execute(array(
+					':bStatus' => $rowSituacao['SituaId'],
+					':iFluxo' => $iFluxoOperacional					
+					));
+	            // Fim Atualiza 
+
+				$sql = "SELECT PerfiId
+						FROM Perfil
+						Where PerfiChave IN ('ADMINISTRADOR','CONTROLADORIA') ";
+				$result = $conn->query("$sql");
+				$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
+
+				$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso
+						FROM FluxoOperacional
+						Where FlOpeId = ".$iFluxoOperacional;
+				$result = $conn->query("$sql");
+				$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
+
+				// Verifica se a Bandeja já tem um registro com BandeTabela: FluxoOperacional e BandeTabelaId: IdFluxoAtual, evitando duplicação
+				$sql = "SELECT BandeId, SituaChave
+						FROM Bandeja
+						JOIN Situacao on SituaId = BandeStatus
+						Where BandeTabela = 'FluxoOperacional' and BandeTabelaId =  ".$iFluxoOperacional;
+				$result = $conn->query("$sql");
+				$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
+				$count = count($rowBandeja);
+
+				if (!$count){
+				
+					// Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA 
+					$sIdentificacao = 'Fluxo Operacional (Nº Contrato: '.$rowFluxo['FlOpeNumContrato'].' | Nº Processo: '.$rowFluxo['FlOpeNumProcesso'].')';
+				
+					$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, BandeSolicitante, BandeTabela, BandeTabelaId,
+												 BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
+							VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+					$result = $conn->prepare($sql);
+							
+					$result->execute(array(
+									':sIdentificacao' => $sIdentificacao,
+									':dData' => date("Y-m-d"),
+									':sDescricao' => 'Liberar Fluxo',
+									':sURL' => '',
+									':iPerfilDestino' => $rowPerfil['PerfiId'],  //Tem que tirar esse campo do banco, já que agora tem uma tabela BandejaXPerfil
+									':iSolicitante' => $_SESSION['UsuarId'],
+									':sTabela' => 'FluxoOperacional',
+									':iTabelaId' => $iFluxoOperacional,
+									':iStatus' => $rowSituacao['SituaId'],
+									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+									':iEmpresa' => $_SESSION['EmpreId']						
+									));
+
+					$insertId = $conn->lastInsertId();
+
+					foreach ($rowPerfil as $item){
+					
+						$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeEmpresa)
+								VALUES (:iBandeja, :iPerfil, :iEmpresa)";
+						$result = $conn->prepare($sql);
+								
+						$result->execute(array(
+										':iBandeja' => $insertId,
+										':iPerfil' => $item['PerfiId'],
+										':iEmpresa' => $_SESSION['EmpreId']						
+										));					
+					}
+					/* Fim Insere Bandeja 
+				
+				} else{
+					if ($rowBandeja['SituaChave'] == 'ATIVO'){
+						$sql = "UPDATE Bandeja SET BandeData = :dData, BandeSolicitante = :iSolicitante, BandeStatus = :iStatus, BandeUsuarioAtualizador = :iUsuarioAtualizador
+								WHERE BandeEmpresa = :iEmpresa and BandeId = :iIdBandeja";
+						$result = $conn->prepare($sql);
+								
+						$result->execute(array(
+										':dData' => date("Y-m-d"),
+										':iSolicitante' => $_SESSION['UsuarId'],
+										':iStatus' => $rowSituacao['SituaId'],
+										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+										':iEmpresa' => $_SESSION['EmpreId'],
+										':iIdBandeja' => $rowBandeja['BandeId']														
+										));
+					}
+				}
+			}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -130,7 +284,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									const url = 'solicitacaoAlteraCarrinho.php'
 
 									if ($(elem).hasClass('bootstrap-touchspin-up')) {
-										if(quantidade <= (quantidadeEstoque - 1)){
+										if (quantidade <= (quantidadeEstoque - 1)) {
 											quantidade++
 										}
 										//$(elemInp).val(contClck);
@@ -314,6 +468,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									if (carrinho.length > 0) {
 										console.log('existem produtos para solicitação')
 										console.log(carrinho)
+                                       // let observacao = $('#txtObservacao').val()
+										//$('#inputObservacao').val(observacao)
+
+										$('#solicitacao').submit()
 									} else {
 										console.log('não existem produtos para solicitação')
 									}
@@ -734,7 +892,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							            		<span class="input-group-prepend bootstrap-touchspin-prefix d-none">
 							            			<span class="input-group-text"></span>
 							            		</span>
-							            		<input quantiEstoque="'.$row['Estoque'].'" idProdu="' . $row['ProduId'] . '" style="text-align: center" type="text" value="' . $item['quantidade'] . '" class="form-control touchspin-set-value" style="display: block;">
+							            		<input quantiEstoque="' . $row['Estoque'] . '" idProdu="' . $row['ProduId'] . '" style="text-align: center" type="text" value="' . $item['quantidade'] . '" class="form-control touchspin-set-value" style="display: block;">
 							            		<span class="input-group-append bootstrap-touchspin-postfix d-none">
 							            			<span class="input-group-text"></span>
 							            		</span>
@@ -755,7 +913,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					?>
 				</div>
 				<div class="card-footer mt-2 d-flex flex-column">
-					<form id="solicitacao" action="POST">
+					<form id="solicitacao" method="POST" action="solicitacaoNovoComcluir.php">
+					    <!--<input id="inputObservacao" type="hidden" name="inputObservacao">-->
 						<div class="row">
 							<div class="col-lg-12">
 								<div class="form-group">
