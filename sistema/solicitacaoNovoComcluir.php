@@ -3,6 +3,41 @@
 include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
+function gerarNumeracao()
+{
+	include('global_assets/php/conexao.php');
+
+	$sql = "SELECT MAX(SolicId)
+	        FROM Solicitacao
+			WHERE SolicEmpresa = " . $_SESSION['EmpreId'] . "
+		   ";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+
+	if ($row[""]) {
+		$sql = "SELECT SolicNumero
+	            FROM Solicitacao
+			    WHERE SolicId = " . $row[""] . " and SolicEmpresa = " . $_SESSION['EmpreId'] . "
+		   ";
+		$result = $conn->query($sql);
+		$rowSolic = $result->fetch(PDO::FETCH_ASSOC);
+
+		if (count($rowSolic) >= 1) {
+			$temp = explode('/', $rowSolic['SolicNumero']);
+
+			$int = intval($temp[0]);
+
+			if ($int <= 9) {
+				return '0' . ++$int . '/' . date('Y') . '';
+			} else {
+				return '' . ++$int . '/' . date('Y') . '';
+			}
+		} 
+	} else {
+		return '01/' . date('Y') . '';
+	}
+}
+
 if (isset($_SESSION['Carrinho'])) {
 
 	try {
@@ -43,7 +78,7 @@ if (isset($_SESSION['Carrinho'])) {
 		// var_dump($situaId);
 		//  var_dump($_SESSION['EmpreId']);
 		$result->execute(array(
-			':iNumero' => "01" . date('Y-m-d') . "",
+			':iNumero' => gerarNumeracao(),
 			':iData' => date('Y-m-d'),
 			':iObservacao' => $soliObservacao,
 			':iSetor' => $Setor['EXUXPSetor'],
@@ -98,6 +133,21 @@ if (isset($_SESSION['Carrinho'])) {
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iEmpresa' => $_SESSION['EmpreId']
 		));
+
+		$BandejaId = $conn->lastInsertId();
+
+
+		$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeEmpresa)
+							VALUES (:iBandeja, :iPerfil, :iEmpresa)";
+		$result = $conn->prepare($sql);
+
+		$result->execute(array(
+			':iBandeja' => $BandejaId,
+			':iPerfil' => $rowPerfil['PerfiId'],
+			':iEmpresa' => $_SESSION['EmpreId']
+		));
+
+
 
 		$conn->commit();
 
