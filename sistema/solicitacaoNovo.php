@@ -6,6 +6,7 @@ $_SESSION['PaginaAtual'] = 'Nova Solicitação';
 
 include('global_assets/php/conexao.php');
 
+
 $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
@@ -130,7 +131,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									const url = 'solicitacaoAlteraCarrinho.php'
 
 									if ($(elem).hasClass('bootstrap-touchspin-up')) {
-										if(quantidade <= (quantidadeEstoque - 1)){
+										if (quantidade <= (quantidadeEstoque - 1)) {
 											quantidade++
 										}
 										//$(elemInp).val(contClck);
@@ -314,6 +315,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									if (carrinho.length > 0) {
 										console.log('existem produtos para solicitação')
 										console.log(carrinho)
+                                       // let observacao = $('#txtObservacao').val()
+										//$('#inputObservacao').val(observacao)
+
+										$('#solicitacao').submit()
 									} else {
 										console.log('não existem produtos para solicitação')
 									}
@@ -734,7 +739,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							            		<span class="input-group-prepend bootstrap-touchspin-prefix d-none">
 							            			<span class="input-group-text"></span>
 							            		</span>
-							            		<input quantiEstoque="'.$row['Estoque'].'" idProdu="' . $row['ProduId'] . '" style="text-align: center" type="text" value="' . $item['quantidade'] . '" class="form-control touchspin-set-value" style="display: block;">
+							            		<input quantiEstoque="' . $row['Estoque'] . '" idProdu="' . $row['ProduId'] . '" style="text-align: center" type="text" value="' . $item['quantidade'] . '" class="form-control touchspin-set-value" style="display: block;">
 							            		<span class="input-group-append bootstrap-touchspin-postfix d-none">
 							            			<span class="input-group-text"></span>
 							            		</span>
@@ -755,7 +760,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					?>
 				</div>
 				<div class="card-footer mt-2 d-flex flex-column">
-					<form id="solicitacao" action="POST">
+					<form id="solicitacao" method="POST" action="solicitacaoNovoComcluir.php">
+					    <!--<input id="inputObservacao" type="hidden" name="inputObservacao">-->
 						<div class="row">
 							<div class="col-lg-12">
 								<div class="form-group">

@@ -11,27 +11,29 @@ $sCategoria = '';
 $iCategoria = $_POST['inputFornecedorCategoria'];
 	 
 if ($iCategoria == '#'){
-	$sql = ("SELECT ForneCategoria, CategNome, ForneTipo, ForneRazaoSocial, ForneNome, ForneCpf, ForneCnpj, ForneContato, ForneTelefone, ForneEmail
-			 FROM Fornecedor
-			 JOIN Categoria on CategId = ForneCategoria
-			 WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneStatus = 1
-			 Group By ForneCategoria, CategNome, ForneTipo, ForneRazaoSocial, ForneNome, ForneCpf, ForneCnpj, ForneContato, ForneTelefone, ForneEmail");
+	$sql = "SELECT ForneCategoria, CategNome, ForneTipo, ForneRazaoSocial, ForneNome, ForneCpf, ForneCnpj, ForneContato, ForneTelefone, ForneEmail
+			FROM Fornecedor
+			JOIN Categoria on CategId = ForneCategoria
+			JOIN Situacao on SituaId = ForneStatus
+			WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
+			Group By ForneCategoria, CategNome, ForneTipo, ForneRazaoSocial, ForneNome, ForneCpf, ForneCnpj, ForneContato, ForneTelefone, ForneEmail";
 } else {
 	
-	$sql = ("SELECT CategNome
-			 FROM Categoria
-			 WHERE CategId = ".$iCategoria);
-	$resultCategoria = $conn->query("$sql");
+	$sql = "SELECT CategNome
+			FROM Categoria
+			WHERE CategId = ".$iCategoria;
+	$resultCategoria = $conn->query($sql);
 	$rowCategoria = $resultCategoria->fetch(PDO::FETCH_ASSOC);	
 	
 	$sCategoria = $rowCategoria['CategNome'];
 	
-	$sql = ("SELECT *
-			 FROM Fornecedor
-			 WHERE ForneCategoria = ".$iCategoria." and ForneEmpresa = ".$_SESSION['EmpreId']." and ForneStatus = 1");
+	$sql = "SELECT *
+			FROM Fornecedor
+			JOIN Situacao on SituaId = ForneStatus
+			WHERE ForneCategoria = ".$iCategoria." and ForneEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'";
 }
 
-$result = $conn->query("$sql");
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 try {
