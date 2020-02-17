@@ -100,6 +100,19 @@ if(isset($_POST['inputNome'])){
     <script type="text/javascript" >
 
         $(document).ready(function() {	
+
+			//Limpa o campo Nome quando for digitado só espaços em branco
+			$("#inputNome").on('blur', function(e){
+				
+				var inputNome = $('#inputNome').val();
+
+				inputNome = inputNome.trim();
+				
+				if (inputNome.length == 0){
+					$('#inputNome').val('');
+					//$("#formProduto").submit(); //Isso aqui é para submeter o formulário, validando os campos obrigatórios novamente
+				}	
+			});        	
 	
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
@@ -229,7 +242,7 @@ if(isset($_POST['inputNome'])){
 				inputValorVenda = float2moeda(inputValorVenda).toString();
 				
 				$('#inputValorVenda').val(inputValorVenda);
-			}	
+			}
 			
 			function Filtrando(){
 				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
@@ -286,7 +299,7 @@ if(isset($_POST['inputNome'])){
 									<div class="row">	
 										<div class="col-lg-12">
 											<div class="form-group">
-												<label for="inputNome">Nome</label>
+												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
 										</div>
@@ -312,7 +325,7 @@ if(isset($_POST['inputNome'])){
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
+												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php 
@@ -336,7 +349,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 												</select>
 											</div>

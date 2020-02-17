@@ -41,7 +41,7 @@ if(isset($_POST['inputNome'])){
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':sFoto' => isset($_POST['inputFoto']) ? $_POST['inputFoto'] : null,
-						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
@@ -96,20 +96,34 @@ if(isset($_POST['inputNome'])){
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	<!--<script src="global_assets/js/main/jquery.form.js"></script>-->
-	<script src="http://malsup.github.com/jquery.form.js"></script>
-	<!-- /theme JS files -->
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 	
 	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+	<!-- /theme JS files -->
 		
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 
         $(document).ready(function() {	
 	
+			//Limpa o campo Nome quando for digitado só espaços em branco
+			$("#inputNome").on('blur', function(e){
+				
+				var inputNome = $('#inputNome').val();
+
+				inputNome = inputNome.trim();
+				
+				if (inputNome.length == 0){
+					$('#inputNome').val('');
+					//$("#formProduto").submit(); //Isso aqui é para submeter o formulário, validando os campos obrigatórios novamente
+				}	
+			});
+
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
 				
@@ -305,6 +319,7 @@ if(isset($_POST['inputNome'])){
 				
 				e.preventDefault();
 				
+				/*
 				var inputNome = $('#inputNome').val();
 				
 				//remove os espaços desnecessários antes e depois
@@ -315,7 +330,7 @@ if(isset($_POST['inputNome'])){
 					alerta('Atenção','Informe o nome do produto!','error');
 					$('#inputNome').focus();
 					return false;
-				}
+				}*/
 				
 				$( "#formProduto" ).submit();
 				
@@ -341,31 +356,7 @@ if(isset($_POST['inputNome'])){
 				$(window.document.location).attr('href',"produto.php");
 				
 			}); // cancelar		
-		});			
-		
-		function float2moeda(num) {
-
-		   x = 0;
-
-		   if(num<0) {
-			  num = Math.abs(num);
-			  x = 1;
-		   }
-		   if(isNaN(num)) num = "0";
-			  cents = Math.floor((num*100+0.5)%100);
-
-		   num = Math.floor((num*100+0.5)/100).toString();
-
-		   if(cents < 10) cents = "0" + cents;
-			  for (var i = 0; i < Math.floor((num.length-(1+i))/3); i++)
-				 num = num.substring(0,num.length-(4*i+3))+'.'
-					   +num.substring(num.length-(4*i+3));
-		   ret = num + ',' + cents;
-		   if (x == 1) ret = ' - ' + ret;
-		   
-		   return ret;
-
-		}		
+		});	
 		
 	</script>
 	
@@ -391,7 +382,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form id="formProduto" name="formProduto" method="post" class="form-validate">
+					<form id="formProduto" name="formProduto" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Produto</h5>
 						</div>
@@ -421,7 +412,7 @@ if(isset($_POST['inputNome'])){
 									<div class="row">	
 										<div class="col-lg-12">
 											<div class="form-group">
-												<label for="inputNome">Nome</label>
+												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
 										</div>
@@ -455,9 +446,9 @@ if(isset($_POST['inputNome'])){
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT CategId, CategNome
 																FROM Categoria

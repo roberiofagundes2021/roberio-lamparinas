@@ -107,7 +107,7 @@ if(isset($_POST['inputNome'])){
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	<!-- /theme JS files -->	
 
 	<!-- Adicionando Javascript -->
@@ -144,12 +144,20 @@ if(isset($_POST['inputNome'])){
 			});
 		}	
 
-        $(document).ready(function() {	
-		
-			//Aqui sou obrigado a instanciar novamente a utilização do fancybox
-			$(".fancybox").fancybox({
-				// options
-			});	
+        $(document).ready(function() {
+
+			//Limpa o campo Nome quando for digitado só espaços em branco
+			$("#inputNome").on('blur', function(e){
+
+				var inputNome = $('#inputNome').val();
+
+				inputNome = inputNome.trim();
+				
+				if (inputNome.length == 0){
+					$('#inputNome').val('');
+					//$("#formProduto").submit(); //Isso aqui é para submeter o formulário, validando os campos obrigatórios novamente
+				}
+			});
 	
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
@@ -160,7 +168,7 @@ if(isset($_POST['inputNome'])){
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
 					
-					var option = '<option value="">Selecione a SubCategoria</option>';
+					var option = '<option value="#">Selecione a SubCategoria</option>';
 					
 					if (dados.length){						
 						
@@ -195,11 +203,37 @@ if(isset($_POST['inputNome'])){
 				inputCustoFinal = float2moeda(inputCustoFinal).toString();
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
-
+				
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+					atualizaValorVenda();
+				}
+			});
+			
+			//Ao mudar o Custo, atualiza o CustoFinal
+			$('#inputOutrasDespesas').on('blur', function(e){
+								
+				var inputValorCusto = $('#inputValorCusto').val().replace('.', '').replace(',', '.');
+				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replace('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replace('.', '').replace(',', '.');
+				
+				if (inputValorCusto == null || inputValorCusto.trim() == '') {
+					inputValorCusto = 0.00;
+				}
+				
+				if (inputOutrasDespesas == null || inputOutrasDespesas.trim() == '') {
+					inputOutrasDespesas = 0.00;
+				}
+				
+				var inputCustoFinal = parseFloat(inputValorCusto) + parseFloat(inputOutrasDespesas);
+				
+				inputCustoFinal = float2moeda(inputCustoFinal).toString();
+				
+				$('#inputCustoFinal').val(inputCustoFinal);
+				
 				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
 					atualizaValorVenda();
 				}				
-			});
+			});			
 			
 			//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
 			$('#inputMargemLucro').on('blur', function(e){
@@ -310,7 +344,7 @@ if(isset($_POST['inputNome'])){
 										</div>
 										<div class="col-lg-10">
 											<div class="form-group">
-												<label for="inputNome">Nome</label>
+												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['ServiNome']; ?>" required>
 											</div>
 										</div>																								
@@ -336,7 +370,7 @@ if(isset($_POST['inputNome'])){
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
+												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php 
@@ -361,7 +395,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT SbCatId, SbCatNome
