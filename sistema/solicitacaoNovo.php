@@ -514,7 +514,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							inputSubCategoria: subCategoria,
 							inputMarca: marca,
 							inputFabricante: fabricante,
-							inputModelo: modelo,
+							inputModelo: modelo
 						};
 						console.log(inputsValues)
 
@@ -533,6 +533,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									// como no carregamento da pagina.
 									carrinho()
 									verificarCarrinho()
+
+									$(".fancybox").fancybox({
+										// options
+									});
 								} else {
 									semResultados()
 								}
@@ -754,7 +758,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 									if ($item['Estoque'] > 0) {
 										print('
-		                                    <div class="col-xl-2 col-sm-3">
+		                                    <div class="col-xl-3 col-sm-3">
 			                                    <div class="card">
 				                                    <div class="card-body">
 					                                    <div class="card-img-actions">
@@ -784,7 +788,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                     	');
 									} else {
 										print('
-		                                    <div class="col-xl-2 col-sm-3">
+		                                    <div class="col-xl-3 col-sm-3">
 			                                    <div class="card">
 				                                    <div class="card-body">
 					                                    <div class="card-img-actions">

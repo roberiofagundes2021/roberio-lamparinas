@@ -82,7 +82,7 @@ function queryPesquisa()
 
            print('
 								
-            <div class="col-xl-2 col-sm-4">
+            <div class="col-xl-3 col-sm-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="card-img-actions">
@@ -104,17 +104,9 @@ function queryPesquisa()
                             <a href="#" class="text-muted">' . $item['CategNome'] . '</a>
                         </div>
 
-                        <div>
-                            <i class="icon-star-full2 font-size-base text-warning-300"></i>
-                            <i class="icon-star-full2 font-size-base text-warning-300"></i>
-                            <i class="icon-star-full2 font-size-base text-warning-300"></i>
-                            <i class="icon-star-full2 font-size-base text-warning-300"></i>
-                            <i class="icon-star-full2 font-size-base text-warning-300"></i>
-                        </div>
-
                         <div class="text-muted mb-3">'.$item['Estoque'].' em estoque</div>
 
-                        <button produId=' . $item['ProduId'] . ' type="button" class="btn bg-teal-400 add-cart"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
+                        <button produId=' . $item['ProduId'] . ' type="button" class="btn btn-produtos bg-teal-400 add-cart"><i class="icon-cart-add mr-2"></i> Adicionar ao carrinho</button>
                     </div>
                 </div>
             </div>							
