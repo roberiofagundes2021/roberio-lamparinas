@@ -9,7 +9,7 @@
     $pasta = "global_assets/images/produtos/";
      
     // formatos de imagem permitidos
-    $permitidos = array(".jpg", ".jpeg", ".gif", ".png", ".bmp");   
+    $permitidos = array(".jpg", ".jpeg", ".gif", ".png", ".bmp", ".webp");   
          
     if(isset($_FILES)){
 		

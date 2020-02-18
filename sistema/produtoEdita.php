@@ -70,7 +70,7 @@ if(isset($_POST['inputNome'])){
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':sFoto' => isset($_POST['inputFoto']) ? $_POST['inputFoto'] : null,
-						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
@@ -129,10 +129,13 @@ if(isset($_POST['inputNome'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	<!-- /theme JS files -->	
-	
 	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>	
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+	<!-- /theme JS files -->
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -174,6 +177,19 @@ if(isset($_POST['inputNome'])){
 			$(".fancybox").fancybox({
 				// options
 			});	
+
+			//Limpa o campo Nome quando for digitado só espaços em branco
+			$("#inputNome").on('blur', function(e){
+				
+				var inputNome = $('#inputNome').val();
+
+				inputNome = inputNome.trim();
+				
+				if (inputNome.length == 0){
+					$('#inputNome').val('');
+					//$("#formProduto").submit(); //Isso aqui é para submeter o formulário, validando os campos obrigatórios novamente
+				}	
+			});
 	
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
@@ -204,6 +220,7 @@ if(isset($_POST['inputNome'])){
 								
 				var inputValorCusto = $('#inputValorCusto').val().replace('.', '').replace(',', '.');
 				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replace('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replace('.', '').replace(',', '.');
 				
 				if (inputValorCusto == null || inputValorCusto.trim() == '') {
 					inputValorCusto = 0.00;
@@ -218,6 +235,10 @@ if(isset($_POST['inputNome'])){
 				inputCustoFinal = float2moeda(inputCustoFinal).toString();
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
+				
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+					atualizaValorVenda();
+				}
 			});
 			
 			//Ao mudar o Custo, atualiza o CustoFinal
@@ -225,6 +246,7 @@ if(isset($_POST['inputNome'])){
 								
 				var inputValorCusto = $('#inputValorCusto').val().replace('.', '').replace(',', '.');
 				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replace('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replace('.', '').replace(',', '.');
 				
 				if (inputValorCusto == null || inputValorCusto.trim() == '') {
 					inputValorCusto = 0.00;
@@ -239,28 +261,16 @@ if(isset($_POST['inputNome'])){
 				inputCustoFinal = float2moeda(inputCustoFinal).toString();
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
+				
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+					atualizaValorVenda();
+				}				
 			});			
 			
 			//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
 			$('#inputMargemLucro').on('blur', function(e){
 								
-				var inputCustoFinal = $('#inputCustoFinal').val().replace('.', '').replace(',', '.');
-				var inputMargemLucro = $('#inputMargemLucro').val().replace(',', '.');				
-				
-				if (inputCustoFinal == null || inputCustoFinal.trim() == '') {
-					inputCustoFinal = 0.00;
-				}
-				
-				if (inputMargemLucro == null || inputMargemLucro.trim() == '') {
-					inputMargemLucro = 0.00;
-				}
-								
-				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
-				
-				inputValorVenda = float2moeda(inputValorVenda).toString();
-				
-				$('#inputValorVenda').val(inputValorVenda);				
-
+				atualizaValorVenda();
 			});	
 			
 			//Ao mudar o Valor de Venda, atualiza a Margem de Lucro
@@ -278,8 +288,8 @@ if(isset($_POST['inputNome'])){
 				}
 				
 				//alert(parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal));
-				var lucro = parseFloat(inputValorVenda) - parseFloat(inputCustoFinal);		
-
+				var lucro = parseFloat(inputValorVenda) - parseFloat(inputCustoFinal);	
+				
 				inputMargemLucro = 0;
 				
 				if (inputCustoFinal != 0.00){
@@ -290,7 +300,26 @@ if(isset($_POST['inputNome'])){
 				
 				$('#inputMargemLucro').val(inputMargemLucro);				
 
-			});
+			});	
+			
+			function atualizaValorVenda(){
+				var inputCustoFinal = $('#inputCustoFinal').val().replace('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replace(',', '.');				
+				
+				if (inputCustoFinal == null || inputCustoFinal.trim() == '') {
+					inputCustoFinal = 0.00;
+				}
+				
+				if (inputMargemLucro == null || inputMargemLucro.trim() == '') {
+					inputMargemLucro = 0.00;
+				}
+								
+				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
+				
+				inputValorVenda = float2moeda(inputValorVenda).toString();
+				
+				$('#inputValorVenda').val(inputValorVenda);
+			}
 
 			//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
 			$('#addFoto').on('click', function(e){	
@@ -376,7 +405,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formProduto" method="post" class="form-validate" action="produtoEdita.php">
+					<form name="formProduto" method="post" class="form-validate-jquery" action="produtoEdita.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Produto "<?php echo $row['ProduNome']; ?>"</h5>
 						</div>
@@ -415,7 +444,7 @@ if(isset($_POST['inputNome'])){
 									<div class="row">								
 										<div class="col-lg-12">
 											<div class="form-group">
-												<label for="inputNome">Nome</label>
+												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo htmlentities($row['ProduNome'],ENT_QUOTES); ?>" required>
 											</div>
 										</div>
@@ -434,7 +463,10 @@ if(isset($_POST['inputNome'])){
 									
 								<div style="text-align:center;">
 									<div id="visualizar">
-										<a href="<?php echo $sFoto; ?>" class="fancybox"><img class="ml-3" src="<?php echo $sFoto; ?>" style="max-height:250px; border:2px solid #ccc;"></a>
+										<a href="<?php echo $sFoto; ?>" class="fancybox">
+											<img class="ml-3" src="<?php echo $sFoto; ?>" style="max-height:250px; border:2px solid #ccc;">
+										</a>
+										<input type="hidden" id="inputFoto" name="inputFoto" value="<?php echo $row['ProduFoto']; ?>" >
 									</div>
 									<br>
 									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%"><?php echo $sButtonFoto; ?></button>									
@@ -449,9 +481,9 @@ if(isset($_POST['inputNome'])){
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT CategId, CategNome
 																FROM Categoria

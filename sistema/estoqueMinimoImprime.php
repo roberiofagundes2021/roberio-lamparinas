@@ -24,7 +24,7 @@ try {
     $mpdf = new Mpdf([
         'mode' => 'utf-8', 
         //'format' => [190, 236], 
-        'format' => 'A4-L',
+        'format' => 'A4-P',
         'default_font_size' => 10,
 		'default_font' => 'dejavusans',
         //'orientation' => 'P', //P =>Portrait, L=> Landscape
