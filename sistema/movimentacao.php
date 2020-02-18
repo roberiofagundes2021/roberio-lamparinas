@@ -158,7 +158,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>Tipo</th>
 										<th>Nota Fiscal</th>
 										<th>Fornecedor</th>
-										<th>Estoque Destino</th>
+										<th>Destino</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>

@@ -38,18 +38,16 @@ try {
 			<span style='font-weight:bold;line-height:200px;'>".$_SESSION['EmpreNomeFantasia']."</span><br>
 			<div style='position: absolute; font-size:10px; margin-top: 8px; margin-left:4px;'>Unidade: Secretaria de Saúde / Hospital Padre Manoel</div>
 		</div>
-		<div style='width:300px; float:right; display: inline-block; text-align:right; font-size: 10px; padding-bottom'>
+		<div style='width:300px; float:right; display: inline-block; text-align:right; font-size: 10px; margin-top: -50px;'>
 			<div style='margin-bottom: 20px'>Data: {DATE j/m/Y}</div>
 			<div style='margin-top:8px;font-weight:bold;'>Estoque Mínimo</div>
 		</div> 
 	 </div>
 	";		
-	
-	$html = '<div id="body" style="position: relative; margin: 100px 20px 50px 20px;">';
-    
-    $html .= '<br>
- 			  <div style="border-bottom: 1px solid #333; margin-bottom: -32px; margin-top: -50px">
-                  <h3 style="text-align: center; padding-top: 40px; padding-bottom: -20px; margin-bottom:60px">Relação dos Produtos em estoque mínimo</h3>
+	    
+    $html = '
+ 			  <div style="border-bottom: 1px solid #ccc; margin-bottom: -42px;">
+                  <h3 style="text-align: center; padding-top: 0px; padding-bottom: -20px; margin-bottom:40px">Relação dos Produtos em estoque mínimo</h3>
 	          </div>
 	          <br>';
 
@@ -83,34 +81,27 @@ try {
 		$html .= "
 				<tr>
 					<td style='padding-top: 8px; padding-bottom: 8px; font-size: 11px;'>".$item['ProduCodigo']."</td>
-					<td style='padding-top: 8px; padding-bottom: 12px; font-size: 11px;'>".$item['ProduNome']."</td>
-					<td style='padding-top: 8px; text-align: center; padding-bottom: 12px; font-size: 11px;'>".$item['ProduEstoqueMinimo']."</td>
-					<td style='padding-top: 8px; text-align: center; padding-bottom: 12px; font-size: 11px;'>".$item['saldo']."</td>
+					<td style='padding-top: 8px; padding-bottom: 8px; font-size: 11px;'>".$item['ProduNome']."</td>
+					<td style='padding-top: 8px; text-align: center; padding-bottom: 8px; font-size: 11px;'>".$item['ProduEstoqueMinimo']."</td>
+					<td style='padding-top: 8px; text-align: center; padding-bottom: 8px; font-size: 11px;'>".$item['saldo']."</td>
 				</tr>
 				";
 
 		$categoriaVelha = $categoriaNova;
     }
 
-    $html .= "</table>
-    		</div>
-    ";				  
-			
+    $html .= "</table>";	
     
-    $html .= "    
-    <div style='width:100%; border-top : 1px solid #0000FF; margin-top: 50px;'>
+    $rodape = "<hr/>
+    <div style='width:100%;'>
 		<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
 		<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
-	</div>
-
-	";
+	</div>";
     
-$mpdf->SetHTMLHeader($topo);	
-	
-   // $mpdf->SetHTMLHeader($topo,'O',true);
-    //$mpdf->SetHTMLFooter($rodape);
-    $mpdf->WriteHTML($html);
-    
+	$mpdf->SetHTMLHeader($topo);	
+    //$mpdf->SetHTMLHeader($topo,'O',true);
+    $mpdf->SetHTMLFooter($rodape);
+    $mpdf->WriteHTML($html);    
 
     // Other code
     $mpdf->Output();
