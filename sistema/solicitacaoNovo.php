@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Nova Solicitação';
 include('global_assets/php/conexao.php');
 
 
-$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
+$sql = "SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN Situacao on SituaId = ProduStatus
@@ -117,7 +117,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				}
 				editaQuantidade()*/
 
-				function editaCarrinho() {
+				function editaCarrinhoBotoes() {
 					$('.quant-edit').each((i, elem) => {
 						$(elem).on('click', function() {
 							//if ($(elem).hasClass('bootstrap-touchspin-down')) {
@@ -171,7 +171,88 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						})
 					})
 				}
-				editaCarrinho()
+				editaCarrinhoBotoes()
+
+				function editarCarrinhoInput() {
+					$('[quantiEstoque]').each((i, elem) => {
+						let quantidadeInicial = $(elem).val()
+						$(elem).on('keyup', () => {
+							let quantidade = $(elem).val()
+							let quantidadeEstoque = $(elem).attr('quantiestoque')
+							console.log(quantidade)
+							console.log(quantidadeEstoque)
+							let id = $(elem).attr('idProdu')
+							const url = 'solicitacaoAlteraCarrinho.php'
+
+							if (quantidade != '') {
+								let quantidadeInt = parseInt($(elem).val())
+								let quantidadeEstoqueInt = parseInt($(elem).attr('quantiestoque'))
+                            
+								if (quantidadeInt > parseInt(quantidadeEstoque)) {
+									$(elem).val(quantidadeEstoqueInt)
+
+									let dataPost = {
+										inputQuantidadeProduto: quantidadeEstoqueInt,
+										inputIdProduto: id
+									}
+									console.log(dataPost)
+
+									$.post(
+										url,
+										dataPost,
+										function(data) {
+											//console.log(data)
+											if (!data) {
+												$(elem).val(0)
+											} else {
+												$(elem).val(data)
+											}
+										}
+									)
+								} else {
+									let dataPost = {
+										inputQuantidadeProduto: quantidadeInt,
+										inputIdProduto: id
+									}
+									console.log(dataPost)
+
+									$.post(
+										url,
+										dataPost,
+										function(data) {
+											//console.log(data)
+											if (!data) {
+												$(elem).val(0)
+											} else {
+												$(elem).val(data)
+											}
+										}
+									)
+								}
+							} else {
+								let dataPost = {
+									inputQuantidadeProduto: 0,
+									inputIdProduto: id
+								}
+								console.log(dataPost)
+
+								$.post(
+									url,
+									dataPost,
+									function(data) {
+										//console.log(data)
+										if (!data) {
+											$(elem).val(0)
+										} else {
+											$(elem).val(data)
+										}
+									}
+								)
+							}
+						})
+					})
+				}
+				editarCarrinhoInput()
 
 				function verificarCarrinhoButtonConcluir() {
 					let url = 'solicitacaoVerificarCarrinho.php'
@@ -293,9 +374,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$(elem).html('PRODUTO ADICIONADO')
 										$('.custon-modal-lista').append(data)
 										//editaQuantidade()
-										editaCarrinho()
+										editaCarrinhoBotoes()
 										excluirItemCarrinho()
 										verificarCarrinho()
+										editarCarrinhoInput()
 									}
 								}
 							)
@@ -315,7 +397,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									if (carrinho.length > 0) {
 										console.log('existem produtos para solicitação')
 										console.log(carrinho)
-                                       // let observacao = $('#txtObservacao').val()
+										// let observacao = $('#txtObservacao').val()
 										//$('#inputObservacao').val(observacao)
 
 										$('#solicitacao').submit()
@@ -384,7 +466,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 									$(".fancybox").fancybox({
 										// options
-									});									
+									});
 								} else {
 									semResultados()
 								}
@@ -603,10 +685,27 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$sFoto = "global_assets/images/lamparinas/sem_foto.gif";
 									}
 
+									// Este trecho de código formata o titulo limitando o seu tamanho.
+									$titulo = strlen($item['ProduNome']);
+									$tituloArray = str_split(utf8_decode($item['ProduNome']));
+
+									for ($i = 0; $i <= $titulo - 1; $i++) {
+										if ($i > 70) {
+											unset($tituloArray[$i]);
+										}
+									}
+
+									$novaString = implode("", $tituloArray);
+									$novoTitulo = utf8_encode($novaString);
+
+									if ($titulo > 70) {
+										$novoTitulo .= "...";
+									}
+									//
 
 									if ($item['Estoque'] > 0) {
 										print('
-		                                    <div class="col-xl-3 col-sm-3">
+		                                    <div class="col-xl-3 col-lg-4 col-sm-6">
 			                                    <div class="card">
 				                                    <div class="card-body">
 					                                    <div class="card-img-actions">
@@ -621,8 +720,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				                                    <div class="card-body bg-light text-center">
 					                                    <div class="mb-2">
-					                                    	<h6 class="font-weight-semibold mb-0">
-						                                    	<a href="#" class="text-default">' . $item['ProduNome'] . '</a>
+					                                    	<h6 class="font-weight-semibold mb-0" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" style="height: 46.1667px; overflow: hidden">
+						                                    	<a href="#" class="text-default">' . $novoTitulo . '</a>
 						                                    </h6>
 
 						                                    <a href="#" class="text-muted">' . $item['CategNome'] . '</a>
@@ -636,7 +735,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                     	');
 									} else {
 										print('
-		                                    <div class="col-xl-3 col-sm-3">
+		                                    <div class="col-xl-3 col-lg-4 col-sm-6">
 			                                    <div class="card">
 				                                    <div class="card-body">
 					                                    <div class="card-img-actions">
@@ -651,8 +750,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				                                    <div class="card-body bg-light text-center">
 					                                    <div class="mb-2">
-					                                    	<h6 class="font-weight-semibold mb-0">
-						                                    	<a href="#" class="text-default">' . $item['ProduNome'] . '</a>
+					                                    	<h6 class="font-weight-semibold mb-0" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" style="height: 46.1667px; overflow: hidden">
+						                                    	<a href="#" class="text-default">' . $novoTitulo . '</a>
 						                                    </h6>
 
 						                                    <a href="#" class="text-muted">' . $item['CategNome'] . '</a>
@@ -766,7 +865,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				</div>
 				<div class="card-footer mt-2 d-flex flex-column">
 					<form id="solicitacao" method="POST" action="solicitacaoNovoComcluir.php">
-					    <!--<input id="inputObservacao" type="hidden" name="inputObservacao">-->
+						<!--<input id="inputObservacao" type="hidden" name="inputObservacao">-->
 						<div class="row">
 							<div class="col-lg-12">
 								<div class="form-group">
