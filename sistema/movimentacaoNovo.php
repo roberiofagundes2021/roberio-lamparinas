@@ -838,7 +838,7 @@ if(isset($_POST['inputData'])){
 
 										<div class="col-lg-4" id="EstoqueOrigem" style="display:none;">
 											<div class="form-group">
-												<label for="cmbEstoqueOrigem">Estoque Origem</label>
+												<label for="cmbEstoqueOrigem">Origem</label>
 												<select id="cmbEstoqueOrigem" name="cmbEstoqueOrigem" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php 
@@ -860,7 +860,7 @@ if(isset($_POST['inputData'])){
 										
 										<div class="col-lg-4" id="DestinoLocal">
 											<div class="form-group">
-												<label for="cmbDestinoLocal">Estoque Destino</label>
+												<label for="cmbDestinoLocal">Destino</label>
 												<select id="cmbDestinoLocal" name="cmbDestinoLocal" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php 
@@ -881,7 +881,7 @@ if(isset($_POST['inputData'])){
 										
 										<div class="col-lg-4" id="DestinoSetor" style="display:none">
 											<div class="form-group">
-												<label for="cmbDestinoSetor">Destino (Setor)</label>
+												<label for="cmbDestinoSetor">Destino</label>
 												<select id="cmbDestinoSetor" name="cmbDestinoSetor" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php 

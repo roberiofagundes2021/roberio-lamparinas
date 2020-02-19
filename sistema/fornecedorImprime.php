@@ -165,8 +165,7 @@ try {
 		<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
 	</div>";
     
-$mpdf->SetHTMLHeader($topo);	
-	
+	$mpdf->SetHTMLHeader($topo);	
    // $mpdf->SetHTMLHeader($topo,'O',true);
     $mpdf->SetHTMLFooter($rodape);
     $mpdf->WriteHTML($html);
