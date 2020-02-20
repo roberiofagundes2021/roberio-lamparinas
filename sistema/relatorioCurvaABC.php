@@ -11,22 +11,24 @@ if(isset($_POST['inputDataInicio'])) {
 
 	$dataInicio = $_POST['inputDataInicio'];
 	$dataFim = $_POST['inputDataFim'];
-	$iUnidade = isset($_POST['cmbUnidade']) ? $_POST['cmbUnidade'] : 0;
-	$iSetor = isset($_POST['cmbSetor']) ? $_POST['cmbSetor'] : 0;
-	$iCategoria = isset($_POST['cmbCategoria']) ? $_POST['cmbCategoria'] : 0;
-	$iSubCategoria = isset($_POST['cmbSubCategoria']) ? $_POST['cmbSubCategoria'] : 0;
-	$iClassificacao = isset($_POST['cmbClassificacao']) ? $_POST['cmbClassificacao'] : 0;
+	$iUnidade = isset($_POST['cmbUnidade']) ? $_POST['cmbUnidade'] : 'NULL';
+	$iSetor = isset($_POST['cmbSetor']) ? $_POST['cmbSetor'] : 'Teste';
+	$iCategoria = isset($_POST['cmbCategoria']) ? $_POST['cmbCategoria'] : NULL;
+	$iSubCategoria = isset($_POST['cmbSubCategoria']) ? $_POST['cmbSubCategoria'] : NULL;
+	$iClassificacao = isset($_POST['cmbClassificacao']) ? $_POST['cmbClassificacao'] : NULL;
 									
-	$sql = "SELECT ProduId, ProduNome
+	$sql = "SELECT ProduId, ProduNome, MvXPrValorUnitario, dbo.fnTotalSaidas(ProduEmpresa, ProduId, NULL, ". $iSetor .", $iCategoria, $iSubCategoria, $iClassificacao, $dataInicio, $dataFim) as Saidas,
+				   (MvXPrValorUnitario * dbo.fnTotalSaidas(ProduEmpresa, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, $dataInicio, $dataFim)) as ValorTotal
 			FROM Produto
 			JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 			JOIN Movimentacao on MovimId = MvXPrMovimentacao
-			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and MovimTipo = 'S' and MovimData between ".$dataInicio." and ".$dataFim;
+			JOIN Situacao on SituaId = MovimSituacao
+			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and MovimTipo = 'S' and SituaChave = 'FINALIZADO' and MovimData between ".$dataInicio." and ".$dataFim;
 
 	if ($iUnidade){
 		
 		if($iSetor){
-			$sql .= " and MovimDestino = ".$iSetor;
+			$sql .= " and MovimDestinoSetor = ".$iSetor;
 		} else {
 			$sql .= " and MovimDestinoLocal = ".$iSetor; //Só que pra isso a combo Setor deveria vir Setores e Locais de Estoque. Será assim mesmo ou é pra vir só Setor?
 		}
@@ -44,10 +46,16 @@ if(isset($_POST['inputDataInicio'])) {
 		$sql .= " and MvXPrClassificacao = ".$iClassificacao;
 	}
 
+	echo $sql;die;
+	
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
 	
 	$cont = 0;
+	
+	$esconder = ' style="display:block;" ';
+} else {
+	$esconder = ' style="display:none;" ';
 }
 
 
@@ -343,7 +351,7 @@ $dataFim = date('Y-m-d');
 				<!-- /info blocks -->
 
 				<!-- Info blocks -->		
-				<div class="row" id="resultado" style="display:block;">
+				<div class="row" id="resultado" <?php echo $esconder; ?>>
 					<div class="col-lg-12">
 						<!-- Basic responsive configuration -->
 						<div class="card">
@@ -378,36 +386,15 @@ $dataFim = date('Y-m-d');
 
 											foreach ($row as $item){
 
-												$iQuantidadePrevista = isset($item['FOXPrQuantidade']) ? $item['FOXPrQuantidade'] : '';
-												$fValorUnitarioPrevisto = isset($item['FOXPrValorUnitario']) ? mostraValor($item['FOXPrValorUnitario']) : '';											
-												$fValorTotalPrevisto = (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? $item['FOXPrQuantidade'] * $item['FOXPrValorUnitario'] : '';
-
-
-												$sql = "SELECT ISNULL(SUM(MvXPrQuantidade), 0) as Controle, MvXPrValorUnitario
-														FROM Movimentacao														
-														JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-														WHERE MovimEmpresa = ".$_SESSION['EmpreId']." and MvXPrProduto = ".$item['ProduId']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$dataFim."' and MovimTipo = 'E' 
-														GROUP By MvXPrQuantidade, MvXPrValorUnitario";
-												$result = $conn->query($sql);
-												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
-
-												$iQuantidadeRealizada = $rowMovimentacao['Controle'] != '' ? $rowMovimentacao['Controle'] : 0;
-												$fValorUnitarioRealizado = isset($rowMovimentacao['MvXPrValorUnitario']) ? mostraValor($rowMovimentacao['MvXPrValorUnitario']) : 0;						
-												$fValorTotalRealizado = (isset($iQuantidadeRealizada) and isset($rowMovimentacao['MvXPrValorUnitario'])) ? $iQuantidadeRealizada * $rowMovimentacao['MvXPrValorUnitario'] : 0;
-
-												$controle = $iQuantidadePrevista - $iQuantidadeRealizada;
-												$saldo = mostraValor($fValorTotalPrevisto - $fValorTotalRealizado);
-												$porcentagem = $controle * 100 / $iQuantidadePrevista;
-
 												print('
 												<tr>
 													<td>'.$item['ProduNome'].'</td>
-													<td>'.$item['MarcaNome'].'</td>
-													<td>'.$item['UnMedSigla'].'</td>
-													<td>'.$iQuantidadePrevista.'</td>
-													<td>'.$fValorUnitarioPrevisto.'</td>											
-													<td>'.mostraValor($fValorTotalPrevisto).'</td>
-													<td style="background-color: #eee; color:#333;">'.$controle.'</td>
+													<td>'.mostraValor($item['MvXPrValorUnitario']).'</td>
+													<td>'.$item['Saidas'].'</td>
+													<td>'.mostraValor($item['ValorTotal']).'</td>
+													<td></td>											
+													<td></td>
+													<td style="background-color: #eee; color:#333;"></td>
 												</tr>');
 
 												$cont++;
