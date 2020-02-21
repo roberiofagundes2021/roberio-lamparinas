@@ -31,26 +31,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<?php include_once("head.php"); ?>
 
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script>
 	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-
-	<script src="global_assets/js/plugins/loaders/blockui.min.js"></script>
-	<script src="global_assets/js/plugins/ui/fab.min.js"></script>
-	<script src="global_assets/js/plugins/ui/sticky.min.js"></script>
-	<script src="global_assets/js/plugins/ui/prism.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_fab.js"></script>
-
 	<!-- btn group do modal-->
-	<!--<script src="global_assets/js/plugins/forms/inputs/touchspin.min.js"></script>-->
 	<script src="global_assets/js/demo_pages/form_input_groups.js"></script>
 
 	<!-- Adicionando Javascript -->
@@ -91,42 +76,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					return
 				}
 
-				/*function editaQuantidade() {
-					$('.quant-edit').each((i, elem) => {
-						$(elem).on('click', function() {
-							$('[idProdu]').each((i, elemInp) => {
-								//console.log(contClck)
-								if ($(elemInp).attr('idProdu') == $(elem).attr('id')) {
-									let contClck = $(elemInp).val();
-									if ($(elem).hasClass('bootstrap-touchspin-up')) {
-										contClck++
-										//$(elemInp).val(contClck);
-										console.log(contClck)
-									}
-									if ($(elem).hasClass('bootstrap-touchspin-down')) {
-										if (contClck > 0) {
-											contClck--
-											//$(elemInp).val(contClck);
-											console.log(contClck)
-										}
-									}
-								}
-							})
-						})
-					})
-				}
-				editaQuantidade()*/
-
 				function editaCarrinhoBotoes() {
 					$('.quant-edit').each((i, elem) => {
 						$(elem).on('click', function() {
-							//if ($(elem).hasClass('bootstrap-touchspin-down')) {
 							$('[idProdu]').each((i, elemInp) => {
 
 								if ($(elemInp).attr('idProdu') == $(elem).attr('id')) {
 									let quantidade = $(elemInp).val()
 									let quantidadeEstoque = $(elemInp).attr('quantiestoque')
-									console.log(quantidadeEstoque)
 									let id = $(elemInp).attr('idProdu')
 									const url = 'solicitacaoAlteraCarrinho.php'
 
@@ -134,14 +91,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										if (quantidade <= (quantidadeEstoque - 1)) {
 											quantidade++
 										}
-										//$(elemInp).val(contClck);
-										console.log(quantidade)
 									}
 									if ($(elem).hasClass('bootstrap-touchspin-down')) {
 										if (quantidade > 0) {
 											quantidade--
-											//$(elemInp).val(contClck);
-											console.log(quantidade)
 										}
 									}
 
@@ -149,13 +102,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										inputQuantidadeProduto: quantidade,
 										inputIdProduto: id
 									}
-									console.log(dataPost)
 
 									$.post(
 										url,
 										dataPost,
 										function(data) {
-											//console.log(data)
 											if (!data) {
 												$(elemInp).val(0)
 											} else {
@@ -165,9 +116,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									)
 								}
 							})
-							//} else if ($(elem).hasClass('bootstrap-touchspin-up')) {
-							//	console.log('+')
-							//}
 						})
 					})
 				}
@@ -179,8 +127,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						$(elem).on('keyup', () => {
 							let quantidade = $(elem).val()
 							let quantidadeEstoque = $(elem).attr('quantiestoque')
-							console.log(quantidade)
-							console.log(quantidadeEstoque)
 							let id = $(elem).attr('idProdu')
 							const url = 'solicitacaoAlteraCarrinho.php'
 
@@ -195,13 +141,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										inputQuantidadeProduto: quantidadeEstoqueInt,
 										inputIdProduto: id
 									}
-									console.log(dataPost)
 
 									$.post(
 										url,
 										dataPost,
 										function(data) {
-											//console.log(data)
 											if (!data) {
 												$(elem).val(0)
 											} else {
@@ -214,13 +158,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										inputQuantidadeProduto: quantidadeInt,
 										inputIdProduto: id
 									}
-									console.log(dataPost)
 
 									$.post(
 										url,
 										dataPost,
 										function(data) {
-											//console.log(data)
 											if (!data) {
 												$(elem).val(0)
 											} else {
@@ -234,13 +176,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									inputQuantidadeProduto: 0,
 									inputIdProduto: id
 								}
-								console.log(dataPost)
 
 								$.post(
 									url,
 									dataPost,
 									function(data) {
-										//console.log(data)
 										if (!data) {
 											$(elem).val(0)
 										} else {
@@ -292,7 +232,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							// Convertendo a string JSON em um array de Objetos
 							let verifExistProduQuantMaiorZero = 0
 							if (data) {
-								console.log(data)
 								let carrinho = JSON.parse(data)
 
 								// Iterando sobre o array para ter acesso aos valores id de cada Objeto 
@@ -339,7 +278,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										url,
 										dataPost,
 										function(data) {
-											console.log(data)
 											$('.add-cart').each((i, elemButton) => {
 												if ($(elemButton).attr('produid') == $(elem).attr('indexExcluir')) {
 													let icon = $('<i class="icon-cart-add mr-2"></i>')
@@ -395,24 +333,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								if (data) {
 									let carrinho = JSON.parse(data)
 									if (carrinho.length > 0) {
-										console.log('existem produtos para solicitação')
-										console.log(carrinho)
-										// let observacao = $('#txtObservacao').val()
-										//$('#inputObservacao').val(observacao)
-
 										$('#solicitacao').submit()
 									} else {
 										console.log('não existem produtos para solicitação')
 									}
-									/*carrinho.forEach(item => {
-										$('.add-cart').each((i, elem) => {
-											if ($(elem).attr('produId') == item.id && item.quantidade != 0) {
-												// Desabilitando o botão e trocando o conteúdo.
-												elem.setAttribute('disabled', '')
-												$(elem).html('PRODUTO ADICIONADO')
-											}
-										})
-									})*/
 								}
 							}
 						)
@@ -445,7 +369,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							inputFabricante: fabricante,
 							inputModelo: modelo,
 						};
-						console.log(inputsValues)
 
 						$.post(
 							url,
@@ -560,11 +483,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 															<option value="">Selecionar</option>
 															<?php
-															$sql = ("SELECT CategId, CategNome
-																             FROM Categoria														     
-																             WHERE CategStatus = 1 and CategEmpresa = " . $_SESSION['EmpreId'] . "
-																             ORDER BY CategNome ASC");
-															$result = $conn->query("$sql");
+															$sql = "SELECT CategId, CategNome
+																             FROM Categoria		
+																			 JOIN Situacao on SituaId = CategStatus											     
+																             WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																             ORDER BY CategNome ASC";
+															$result = $conn->query($sql);
 															$rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);
 
 															foreach ($rowCateg as $item) {
@@ -590,11 +514,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
 															<option value="">Selecionar</option>
 															<?php
-															$sql = ("SELECT MarcaId, MarcaNome
-																             FROM Marca														     
-																             WHERE MarcaStatus = 1 and MarcaEmpresa = " . $_SESSION['EmpreId'] . "
-																             ORDER BY MarcaNome ASC");
-															$result = $conn->query("$sql");
+															$sql = "SELECT MarcaId, MarcaNome
+																             FROM Marca
+																			 JOIN Situacao on SituaId = MarcaStatus											     
+																             WHERE MarcaEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																             ORDER BY MarcaNome ASC";
+															$result = $conn->query($sql);
 															$rowMarca = $result->fetchAll(PDO::FETCH_ASSOC);
 
 															foreach ($rowMarca as $item) {
@@ -612,7 +537,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<?php
 															$sql = ("SELECT FabriId, FabriNome
 																             FROM Fabricante														     
-																             WHERE FabriStatus = 1 and FabriEmpresa = " . $_SESSION['EmpreId'] . "
+																             JOIN Situacao on SituaId = FabriStatus											     
+																             WHERE FabriEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 																             ORDER BY FabriNome ASC");
 															$result = $conn->query("$sql");
 															$rowFabri = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -633,7 +559,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<?php
 															$sql = ("SELECT ModelId, ModelNome
 																             FROM Modelo														     
-																             WHERE ModelStatus = 1 and ModelEmpresa = " . $_SESSION['EmpreId'] . "
+																			 JOIN Situacao on SituaId = ModelStatus											     
+																             WHERE ModelEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 																             ORDER BY ModelNome ASC");
 															$result = $conn->query("$sql");
 															$rowModel = $result->fetchAll(PDO::FETCH_ASSOC);

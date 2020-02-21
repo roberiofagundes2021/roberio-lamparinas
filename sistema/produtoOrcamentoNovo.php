@@ -268,7 +268,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													</select>
 												</div>

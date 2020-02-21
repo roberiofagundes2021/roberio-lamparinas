@@ -43,16 +43,17 @@ if(isset($_POST['inputCnpj'])){
 		$insertId = $conn->lastInsertId();
 		
 		$sql = "INSERT INTO Parametro 
-					(ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamUsuarioAtualizador, ParamEmpresa)
+					(ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamProdutoOrcamento, ParamUsuarioAtualizador, ParamEmpresa)
 				VALUES 
-					(:iEmpresaPublica, :iValorAtualizadoFluxo, :iValorAtualizadoOrdemCompra, :iUsuarioAtualizador, :iEmpresa)";
+					(:iEmpresaPublica, :iValorAtualizadoFluxo, :iValorAtualizadoOrdemCompra, :iProdutoOrcamento, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
-						':iEmpresaPublica' => 0,
+						':iEmpresaPublica' => 1,
 						':iValorAtualizadoFluxo' => 0,
 						':iValorAtualizadoOrdemCompra' => 0,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iProdutoOrcamento' => 1,
 						':iEmpresa' => $insertId
 						));
 		
