@@ -11,42 +11,42 @@ if(isset($_POST['inputDataInicio'])) {
 
 	$dataInicio = $_POST['inputDataInicio'];
 	$dataFim = $_POST['inputDataFim'];
-	$iUnidade = isset($_POST['cmbUnidade']) ? $_POST['cmbUnidade'] : 'NULL';
-	$iSetor = isset($_POST['cmbSetor']) ? $_POST['cmbSetor'] : 'Teste';
-	$iCategoria = isset($_POST['cmbCategoria']) ? $_POST['cmbCategoria'] : NULL;
-	$iSubCategoria = isset($_POST['cmbSubCategoria']) ? $_POST['cmbSubCategoria'] : NULL;
-	$iClassificacao = isset($_POST['cmbClassificacao']) ? $_POST['cmbClassificacao'] : NULL;
-									
-	$sql = "SELECT ProduId, ProduNome, MvXPrValorUnitario, dbo.fnTotalSaidas(ProduEmpresa, ProduId, NULL, ". $iSetor .", $iCategoria, $iSubCategoria, $iClassificacao, $dataInicio, $dataFim) as Saidas,
-				   (MvXPrValorUnitario * dbo.fnTotalSaidas(ProduEmpresa, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, $dataInicio, $dataFim)) as ValorTotal
+	$iUnidade = isset($_POST['cmbUnidade']) && $_POST['cmbUnidade'] != '' ? $_POST['cmbUnidade'] : 'NULL';
+	$iSetor = isset($_POST['cmbSetor']) && $_POST['cmbSetor'] != '' ? $_POST['cmbSetor'] : 'NULL';
+	$iCategoria = isset($_POST['cmbCategoria']) && $_POST['cmbCategoria'] != '' ? $_POST['cmbCategoria'] : 'NULL';
+	$iSubCategoria = isset($_POST['cmbSubCategoria']) && $_POST['cmbSubCategoria'] != '' ? $_POST['cmbSubCategoria'] : 'NULL';
+	$iClassificacao = isset($_POST['cmbClassificacao']) && $_POST['cmbClassificacao'] != '' ? $_POST['cmbClassificacao'] : 'NULL';
+
+	$sql = "SELECT ProduId, ProduNome, MvXPrValorUnitario, dbo.fnTotalSaidas(ProduEmpresa, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim') as Saidas,
+				   (MvXPrValorUnitario * dbo.fnTotalSaidas(ProduEmpresa, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim')) as ValorTotal
 			FROM Produto
 			JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 			JOIN Movimentacao on MovimId = MvXPrMovimentacao
 			JOIN Situacao on SituaId = MovimSituacao
-			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and MovimTipo = 'S' and SituaChave = 'FINALIZADO' and MovimData between ".$dataInicio." and ".$dataFim;
+			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and MovimTipo = 'S' and SituaChave = 'FINALIZADO' and MovimData between '".$dataInicio."' and '".$dataFim."' ";
 
-	if ($iUnidade){
+	if ($iUnidade != 'NULL'){
 		
-		if($iSetor){
+		if($iSetor != 'NULL'){
 			$sql .= " and MovimDestinoSetor = ".$iSetor;
 		} else {
 			$sql .= " and MovimDestinoLocal = ".$iSetor; //Só que pra isso a combo Setor deveria vir Setores e Locais de Estoque. Será assim mesmo ou é pra vir só Setor?
 		}
 	}
 
-	if ($iCategoria){
+	if ($iCategoria != 'NULL'){
 		$sql .= " and ProduCategoria = ".$iCategoria;
 	}
 
-	if ($iSubCategoria){
+	if ($iSubCategoria != 'NULL'){
 		$sql .= " and ProduSubCategoria = ".$iSubCategoria;
 	}
 
-	if ($iClassificacao){
+	if ($iClassificacao != 'NULL'){
 		$sql .= " and MvXPrClassificacao = ".$iClassificacao;
 	}
-
-	echo $sql;die;
+	
+	//echo $sql;die;
 	
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -89,11 +89,15 @@ $dataFim = date('Y-m-d');
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>	<!-- CV Documentacao: https://jqueryvalidation.org/ -->	
+	
+	<script src="global_assets/js/plugins/buttons/spin.min.js"></script>
+	<script src="global_assets/js/plugins/buttons/ladda.min.js"></script>	
+	<script src="global_assets/js/demo_pages/components_buttons.js"></script>
 	<!-- /theme JS files -->	
 	
 	<script type="text/javascript">
 		
-		$(document).ready(function() {			
+		$(document).ready(function() {		
 		
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
@@ -104,7 +108,7 @@ $dataFim = date('Y-m-d');
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
 					
-					var option = '<option value="#">Selecione a SubCategoria</option>';
+					var option = '<option value="">Selecione a SubCategoria</option>';
 					
 					if (dados.length){						
 						
@@ -128,7 +132,7 @@ $dataFim = date('Y-m-d');
 
 				$.getJSON('filtraSetor.php?idUnidade='+cmbUnidade, function (dados){
 					
-					var option = '<option value="#">Selecione o Setor</option>';
+					var option = '<option value="">Selecione o Setor</option>';
 					
 					if (dados.length){						
 						
@@ -142,7 +146,70 @@ $dataFim = date('Y-m-d');
 					}					
 				});				
 			});	
+			
+			Ladda.bind('.btn-ladda-progress1', {
+				callback: function(instance) {
+					var progress = 0;
+					var interval = setInterval(function() {
+						progress = Math.min(progress + Math.random() * 0.1, 1);
+						instance.setProgress(progress);
 
+						if( progress === 1 ) {
+							instance.stop();
+							clearInterval(interval);
+						}
+					}, 200);
+				}
+			});				
+					
+			$('#enviar').on('click', (e) => {
+				
+				e.preventDefault();		
+
+				let inputDataInicio = $('#inputDataInicio').val();
+				let inputDataFim = $('#inputDataFim').val();
+				let cmbUnidade = $('#cmbUnidade').val();
+				let cmbSetor = $('#cmbSetor').val();
+				let cmbCategoria = $('#cmbCategoria').val();
+				let cmbSubCategoria = $('#cmbSubCategoria').val();
+				let cmbClassificacao = $('#cmbClassificacao').val();
+
+				let url = "relatorioCurvaABCFiltra.php";
+
+				inputsValues = {
+					inputDataInicio: inputDataInicio,
+					inputDataFim: inputDataFim,
+					cmbUnidade: cmbUnidade,
+					cmbSetor: cmbSetor,
+					cmbCategoria: cmbCategoria,
+					cmbSubCategoria: cmbSubCategoria,
+					cmbClassificacao: cmbClassificacao
+				};
+				console.log(inputsValues)
+
+				$.post(
+					url,
+					inputsValues,
+					(data) => {
+
+						if (data) {
+							$('#resultado').removeClass('justify-content-center px-2');
+							$('#resultado').html(data);
+						} else {
+							semResultados();
+						}
+						
+						//$('#enviar').removeClass('btn-ladda btn-ladda-progress');
+					}
+				)
+			});	
+
+			function semResultados() {
+				const msg = $('<div class="card" style="width: 100%"><p class="text-center m-2">Sem resultados...</p></div>');
+
+				$('#resultado').html(msg);
+				$('#resultado').addClass('justify-content-center px-2').css('width', '100%');
+			}			
 		});
 
 		//Mostra o "Filtrando..." na combo SubCategoria
@@ -336,7 +403,7 @@ $dataFim = date('Y-m-d');
 									</div>
 
 									<div class="text-right">
-										<button id="enviar" class="btn btn-success" role="button">Filtrar</button> 
+										<button id="enviar" class="btn bg-success btn-ladda btn-ladda-progress1" data-style="expand-left" data-spinner-size="20" role="button">Filtrar</button> 
 										<button id="imprimir" class="btn btn-secondary btn-icon" disabled>
                                             <i class="icon-printer2"> Imprimir</i>
                                         </button>
@@ -351,60 +418,8 @@ $dataFim = date('Y-m-d');
 				<!-- /info blocks -->
 
 				<!-- Info blocks -->		
-				<div class="row" id="resultado" <?php echo $esconder; ?>>
-					<div class="col-lg-12">
-						<!-- Basic responsive configuration -->
-						<div class="card">
-							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Resultado da Pesquisa</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="relatorioCurvaABC.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
-							</div>
+				<div class="row" id="resultado">
 
-							<div class="card-body">
-								
-								<table class="table" id="tblCurvaABC">
-									<thead>
-										<tr class="bg-slate">											
-											<th width="40%">Produto</th>
-											<th width="10%">Valor Unit.</th>
-											<th width="10%">Saída</th>
-											<th width="10%">Valor Total</th>									
-											<th width="10%">Porcentagem</th>										
-											<th width="10%">% Acumulada</th>
-											<th width="10%" style="background-color: #ccc; color:#333;">Classificação</th>
-										</tr>
-									</thead>
-									<tbody>
-										<?php
-											$cont = 1;
-
-											foreach ($row as $item){
-
-												print('
-												<tr>
-													<td>'.$item['ProduNome'].'</td>
-													<td>'.mostraValor($item['MvXPrValorUnitario']).'</td>
-													<td>'.$item['Saidas'].'</td>
-													<td>'.mostraValor($item['ValorTotal']).'</td>
-													<td></td>											
-													<td></td>
-													<td style="background-color: #eee; color:#333;"></td>
-												</tr>');
-
-												$cont++;
-											}
-										?>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
 				</div>				
 				<!-- /info blocks -->
 
