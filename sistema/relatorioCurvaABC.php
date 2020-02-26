@@ -204,10 +204,10 @@ $dataFim = date('Y-m-d');
 
 							$('#grafico').show();
 
-							var line_basic_element = document.getElementById('line_basic');
+							var line_basic_element1 = document.getElementById('line_basic1');
 
 				            // Initialize chart
-				            var line_basic = echarts.init(line_basic_element);
+				            var line_basic1 = echarts.init(line_basic_element1);
 
 
 				            //
@@ -215,10 +215,10 @@ $dataFim = date('Y-m-d');
 				            //
 
 				            // Options
-				            line_basic.setOption({
+				            line_basic1.setOption({
 
 				                // Define colors
-				                color: ['#EF5350', '#66BB6A'],
+				                color: ['#666'],  //color: ['#EF5350', '#66BB6A'],
 
 				                // Global text styles
 				                textStyle: {
@@ -240,7 +240,7 @@ $dataFim = date('Y-m-d');
 
 				                // Add legend
 				                legend: {
-				                    data: ['Maximum', 'Minimum'],
+				                    data: ['CurvaABC'],
 				                    itemHeight: 8,
 				                    itemGap: 20
 				                },
@@ -260,7 +260,7 @@ $dataFim = date('Y-m-d');
 				                xAxis: [{
 				                    type: 'category',
 				                    boundaryGap: false,
-				                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+				                    data: ['0', '000009', '000005', '000001', '000011', '000006', '000002', '000008'],
 				                    axisLabel: {
 				                        color: '#333'
 				                    },
@@ -280,7 +280,7 @@ $dataFim = date('Y-m-d');
 				                yAxis: [{
 				                    type: 'value',
 				                    axisLabel: {
-				                        formatter: '{value} °C',
+				                        formatter: '{value} %',
 				                        color: '#333'
 				                    },
 				                    axisLine: {
@@ -306,21 +306,48 @@ $dataFim = date('Y-m-d');
 				                    {
 				                        name: 'Maximum',
 				                        type: 'line',
-				                        data: [11, 11, 15, 13, 12, 13, 10],
+				                        data: [0, 64.62, 77.90, 86.37, 91.33, 95.24, 98.01, 100],
 				                        smooth: true,
 				                        symbolSize: 7,
 				                        markLine: {
 				                            data: [{
-				                                type: 'average',
-				                                name: 'Average'
-				                            }]
+												name: 'Classe A',
+												yAxis: 80
+											},
+											{
+												name: 'Classe B',
+												yAxis: 95
+											},
+											{
+												name: 'Classe C',
+												yAxis: 100
+											},
+											[
+												{
+													name: 'Classe B',
+													coord: ['000009', 80]
+												},
+												{
+													coord: ['000009', 95]
+												}
+											],
+											[
+												{
+													name: 'Classe C',
+													coord: ['000005', 95]
+												},
+												{
+													coord: ['000005', 100]
+												}
+											]
+											]
 				                        },
 				                        itemStyle: {
 				                            normal: {
 				                                borderWidth: 2
 				                            }
 				                        }
-				                    },
+				                    } /*,
 				                    {
 				                        name: 'Minimum',
 				                        type: 'line',
@@ -338,7 +365,7 @@ $dataFim = date('Y-m-d');
 				                                borderWidth: 2
 				                            }
 				                        }
-				                    }
+				                    } */
 				                ]
 				            });
 
@@ -347,10 +374,10 @@ $dataFim = date('Y-m-d');
 
 
 
-							var area_basic_element = document.getElementById('area_basic');
+							var area_basic_element1 = document.getElementById('area_basic');
 
 				            // Initialize chart
-				            var area_basic = echarts.init(area_basic_element);
+				            var area_basic1 = echarts.init(area_basic_element1);
 
 
 				            //
@@ -358,7 +385,7 @@ $dataFim = date('Y-m-d');
 				            //
 
 				            // Options
-				            area_basic.setOption({
+				            area_basic1.setOption({
 
 				                // Define colors
 				                color: ['#f55246','#2ec7c9', '#5ab1ef','#ffb980','#d87a80'], //2ec7c9
@@ -507,8 +534,8 @@ $dataFim = date('Y-m-d');
 
 					        // Resize function
 					        var triggerChartResize = function() {
-					        	line_basic_element && line_basic.resize();
-					            area_basic_element && area_basic.resize();
+					        	line_basic_element1 && line_basic1.resize();
+					            area_basic_element1 && area_basic1.resize();
 					        };
 
 					        // On sidebar width change
@@ -762,7 +789,7 @@ $dataFim = date('Y-m-d');
 
 				<div class="card" id="grafico">
 					<div class="card-body">
-						<div class="chart has-fixed-height" id="line_basic"></div>
+						<div class="chart has-fixed-height" id="line_basic1"></div>
 					</div>
 				</div>
 			</div>

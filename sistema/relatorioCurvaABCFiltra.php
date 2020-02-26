@@ -63,7 +63,7 @@ function queryPesquisa()
 
     try {
 		
-		$sql = "SELECT distinct ProduId, ProduNome, MvXPrValorUnitario, 
+		$sql = "SELECT distinct ProduId, ProduCodigo, ProduNome, MvXPrValorUnitario, 
 				dbo.fnTotalSaidas(ProduEmpresa, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim') as Saidas,
 			   (MvXPrValorUnitario * dbo.fnTotalSaidas(ProduEmpresa, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim')) as ValorTotal
 		FROM Produto
@@ -103,12 +103,12 @@ function queryPesquisa()
 									Grid
 								</a>
 							</li>
-							<li class="nav-item">
+							<!--<li class="nav-item">
 								<a href="#card-tab2" class="nav-link" data-toggle="tab">
 									<i class="icon-stats-bars mr-2"></i>
 									Gráfico
 								</a>
-							</li>
+							</li>-->
 						</ul>
                 	</div>
 	            </div>
@@ -119,7 +119,8 @@ function queryPesquisa()
 						<table class="table" id="tblCurvaABC">
 							<thead>
 								<tr class="bg-slate">											
-									<th width="40%">Produto</th>
+									<th width="5%">Código</th>
+									<th width="35%">Produto</th>
 									<th width="10%" style="text-align:right;">Valor Unitário</th>
 									<th width="10%" style="text-align:right;">Saída</th>
 									<th width="10%" style="text-align:right;">Valor Total</th>									
@@ -131,9 +132,9 @@ function queryPesquisa()
 							<tbody>
 			';
 
-		$fValorUnit = 0;
+		$fTotalUnit = 0;
 		$iTotalSaidas = 0;
-		$fValorTotal = 0;
+		$fTotalGeral = 0;
      
 		foreach ($rowData as $item) {
 
@@ -161,20 +162,21 @@ function queryPesquisa()
 
 			if ($fAcumulada < 85){
 				$cor = 'background-color:#fde1df; padding: 10px 20px 10px 20px; border: 1px solid #f55246; color:#7f231c;'; //color:#5b071d
-				$classificacao = A;
+				$classificacao = 'A';
 				$saidasA += $item['Saidas'];
 			} else if ($fAcumulada > 85 and $fAcumulada < 95){
 				$cor = 'background-color:#e0f2f1; padding: 10px 20px 10px 20px; border: 1px solid #009688; color: #00695c;'; //color: #8e6d08
-				$classificacao = B;
+				$classificacao = 'B';
 				$saidasB += $item['Saidas'];
 			} else{
 				$cor = 'background-color:#dbeefd; padding: 10px 20px 10px 20px; border: 1px solid #339ef4; color: #114e7e;'; //color: #0b5282
-				$classificacao = C;
+				$classificacao = 'C';
 				$saidasC += $item['Saidas'];
 			}	
 
 			$resultado .= '
 			<tr>
+				<td>'.$item['ProduCodigo'].'</td>
 				<td>'.$item['ProduNome'].'</td>
 				<td style="text-align:right;">'.mostraValor($item['MvXPrValorUnitario']).'</td>
 				<td style="text-align:right;">'.$item['Saidas'].'</td>
@@ -189,7 +191,7 @@ function queryPesquisa()
 
 		$resultado .= '			
 		<tr style="font-weight:bold;background-color: #eee;">
-			<td>Totais</td>
+			<td colspan="2">Totais</td>
 			<td style="text-align:right;">'.mostraValor($fTotalUnit).'</td>
 			<td style="text-align:right;">'.$iTotalSaidas.'</td>
 			<td style="text-align:right;">'.mostraValor($fTotalGeral).'</td>
@@ -207,12 +209,13 @@ function queryPesquisa()
 						</table>
 					</div>
 
+					<!--
 					<div class="tab-pane fade" id="card-tab2">
 						<div class="chart-container">
-							<!--<div class="chart has-fixed-height" id="area_basic"></div>-->
+							<div class="chart has-fixed-height" id="area_basic"></div>
 							<div class="chart has-fixed-height" id="line_basic"></div>
 						</div>
-					</div>
+					</div>-->
 
 				</div>
 				<div class="card-footer bg-white justify-content-between align-items-center">
