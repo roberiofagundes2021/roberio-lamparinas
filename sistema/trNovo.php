@@ -10,6 +10,8 @@ if(isset($_POST['inputData'])){
 	
 	try{
 		
+		$conn->beginTransaction();
+
 		$sql = ("SELECT COUNT(isnull(TrRefNumero,0)) as Numero
 				 FROM TermoReferencia
 				 Where TrRefEmpresa = ".$_SESSION['EmpreId']."");
@@ -96,6 +98,8 @@ if(isset($_POST['inputData'])){
 				echo 'Error: ' . $e->getMessage();exit;
 			}
 		}
+
+		$conn->commit();
 
         // Fim de cadastro
 		
