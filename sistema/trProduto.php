@@ -68,6 +68,13 @@ try {
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 
+	$sql = " SELECT TRXSCSubcategoria
+		     FROM TRXSubcategoria
+		     WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCEmpresa = " . $_SESSION['EmpreId'] . "
+		";
+	$result = $conn->query($sql);
+	$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
+
 
 	$sql = "SELECT TRXPrProduto
 			    FROM TermoReferenciaXProduto
@@ -77,10 +84,15 @@ try {
 	$rowProdutoUtilizado1 = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado1 = count($rowProdutoUtilizado1);
 
-	foreach ($rowProdutoUtilizado1 as $itemProdutoUtilizado) {
-		$aProdutos1[] = $itemProdutoUtilizado['TRXPrProduto'];
+	if (count($rowProdutoUtilizado1) >= 1) {
+		foreach ($rowProdutoUtilizado1 as $itemProdutoUtilizado) {
+			$aProdutos1[] = $itemProdutoUtilizado['TRXPrProduto'];
+		}
+	} else {
+		$aProdutos1[] = [];
 	}
 
+	var_dump($rowProdutoUtilizado1);
 	$sql = "SELECT TRXPrProduto
 			    FROM TermoReferenciaXProduto
 			    JOIN Produto on ProduId = TRXPrProduto
@@ -89,8 +101,12 @@ try {
 	$rowProdutoUtilizado2 = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado2 = count($rowProdutoUtilizado2);
 
-	foreach ($rowProdutoUtilizado2 as $itemProdutoUtilizado) {
-		$aProdutos2[] = $itemProdutoUtilizado['TRXPrProduto'];
+	if (count($rowProdutoUtilizado2) >= 1) {
+		foreach ($rowProdutoUtilizado2 as $itemProdutoUtilizado) {
+			$aProdutos2[] = $itemProdutoUtilizado['TRXPrProduto'];
+		}
+	} else {
+		$aProdutos2[] = [];
 	}
 
 	//var_dump($iTR);
@@ -247,25 +263,27 @@ try {
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="cmbProduto">Produto</label>
+                                               <?php var_dump( $aProdutos1 ) ?>
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 													<?php
-													if ($rowParametro['ParamProdutoOrcamento'] == 0 || count($aProdutos1) >= 1) {
-														$sql = "SELECT PrOrcId, PrOrcNome
-														        FROM ProdutoOrcamento									     
-														        WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and PrOrcSituacao = 1 and PrOrcCategoria = " . $iCategoria;
-														if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null) {
-															$sql .= " and PrOrcSubCategoria = " . $row['TrRefSubCategoria'];
-														}
-														$sql .= " ORDER BY PrOrcNome ASC";
-														$result = $conn->query($sql);
-														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
-														foreach ($rowProduto as $item) {
-															if (in_array($item['PrOrcId'], $aProdutos1) or $countProdutoUtilizado1 == 0) {
-																$seleciona = "selected";
-																print('<option value="' . $item['PrOrcId'] . '" ' . $seleciona . '>' . $item['PrOrcNome'] . '</option>');
-															} else {
-																$seleciona = "";
-																print('<option value="' . $item['PrOrcId'] . '" ' . $seleciona . '>' . $item['PrOrcNome'] . '</option>');
+													if (intval($rowParametro['ParamProdutoOrcamento']) != 0 || count($aProdutos1) >= 1) {
+														if (count($rowSubCat) >= 1) {
+															foreach ($rowSubCat as $valueSubCat) {
+																$sql = "SELECT PrOrcId, PrOrcNome
+														                FROM ProdutoOrcamento							     
+														                WHERE PrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " and PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and PrOrcSituacao = 1 and PrOrcCategoria = " . $iCategoria;
+																$sql .= " ORDER BY PrOrcNome ASC";
+																$result = $conn->query($sql);
+																$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+																foreach ($rowProduto as $item) {
+																	if (in_array($item['PrOrcId'], $aProdutos1) or $countProdutoUtilizado1 == 0) {
+																		$seleciona = "selected";
+																		print('<option value="' . $item['PrOrcId'] . '" ' . $seleciona . '>' . $item['PrOrcNome'] . '</option>');
+																	} else {
+																		$seleciona = "";
+																		print('<option value="' . $item['PrOrcId'] . '" ' . $seleciona . '>' . $item['PrOrcNome'] . '</option>');
+																	}
+																}
 															}
 														}
 													} else {
