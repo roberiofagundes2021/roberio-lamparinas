@@ -6,10 +6,10 @@ $_SESSION['PaginaAtual'] = 'Editar Produto de Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubcategoria, PrOrcUnidadeMedida 
-	FROM ProdutoOrcamento
-	WHERE PrOrcId = ". $_POST['inputPrOrcId'] ." and PrOrcEmpresa = ". $_SESSION['EmpreId'] ." ");
-$result = $conn->query("$sql");
+$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubcategoria, PrOrcUnidadeMedida 
+		FROM ProdutoOrcamento
+		WHERE PrOrcId = ". $_POST['inputPrOrcId'] ." and PrOrcEmpresa = ". $_SESSION['EmpreId'];
+$result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -22,120 +22,104 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | UnidadeMedida</title>
-<!-----------------------------------------Validação do formulário e Seleção altomatica de Subcategorias---------------------------------------->
+	<title>Lamparinas | Produto para Orçamento</title>
+
+	<!-----------------------------------------Validação do formulário e Seleção altomatica de Subcategorias---------------------------------------->
 	<?php include_once("head.php"); ?>
 
-	    <script type="text/javascript">
-	    	$(document).ready(()=>{
+	<script type="text/javascript">
+		
+		$(document).ready(()=>{
 
-	    		// No evento de selecionar a categoria as subcategorias são carregadas altomaticamente
-                $("#cmbCategoria").change((e)=>{
-                  
-                    Filtrando()
-                    let option = null; //'<option>Selecione a SubCategoria</option>';
-                    const categId = $('#cmbCategoria').val()
-                    const selectedId = $('#cmbSubCategoria').attr('valId')
-                    console.log(selectedId)
+			// No evento de selecionar a categoria as subcategorias são carregadas altomaticamente
+			$("#cmbCategoria").change((e)=>{
+			  
+				Filtrando();
+				let option = null; //'<option>Selecione a SubCategoria</option>';
+				const categId = $('#cmbCategoria').val();
+				const selectedId = $('#cmbSubCategoria').attr('valId');
 
-                    $.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
-					    //let option = '<option>Selecione a SubCategoria</option>';
+				$.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
+					//let option = '<option>Selecione a SubCategoria</option>';
+				
+					if (dados.length){
 					
-					    if (dados.length){
-						
-						    $.each(dados, function(i, obj){
-						    	if(obj.SbCatId == selectedId){
-						    		console.log('teste')
-						    		option +=`<option value="${obj.SbCatId}" selected>${obj.SbCatNome}</option>`
-						    	} else{
-						    		option +=`<option value="${obj.SbCatId}">${obj.SbCatNome}</option>`
-						    	}
-						    });						
-						
-						    $('#cmbSubCategoria').html(option).show();
-					    } else {
-						    Reset();
-					    }					
-				    });
-                })
-
-                // No carregamento da pagina é regatada a opção já cadastrada no banco
-                $(document).ready(()=>{
-                	Filtrando()
-                    let option = null; //'<option>Selecione a SubCategoria</option>';
-                    const categId = $('#cmbCategoria').val()
-                    const selectedId = $('#cmbSubCategoria').attr('valId')
-                    console.log(selectedId)
-
-                    $.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
-					    //let option = '<option>Selecione a SubCategoria</option>';
+						$.each(dados, function(i, obj){
+							if(obj.SbCatId == selectedId){
+								option += '<option value="'+obj.SbCatId+'" selected>'+obj.SbCatNome+'</option>';
+							} else{
+								option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+							}
+						});						
 					
-					    if (dados.length){
-						
-						    $.each(dados, function(i, obj){
-						    	if(obj.SbCatId == selectedId){
-						    		console.log('teste')
-						    		option +=`<option value="${obj.SbCatId}" selected>${obj.SbCatNome}</option>`
-						    	} else{
-						    		option +=`<option value="${obj.SbCatId}">${obj.SbCatNome}</option>`
-						    	}
-						    });						
-						
-						    $('#cmbSubCategoria').html(option).show();
-					    } else {
-						    Reset();
-					    }					
-				    });
-                })
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						Reset();
+					}					
+				});
+			});
 
-                function Filtrando(){
-				   $('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-			    }
-			
-			    function Reset(){
-				   $('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
-			    }
-	    	})
-	</script>
+			// No carregamento da pagina é regatada a opção já cadastrada no banco
+			$(document).ready(()=>{
+				Filtrando();
+				let option = null; //'<option>Selecione a SubCategoria</option>';
+				const categId = $('#cmbCategoria').val()
+				const selectedId = $('#cmbSubCategoria').attr('valId')
+				console.log(selectedId)
 
-	<script type="text/javascript" >
- 
-        $(document).ready(function() {
+				$.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
+					//let option = '<option>Selecione a SubCategoria</option>';
+				
+					if (dados.length){
+					
+						$.each(dados, function(i, obj){
+							if(obj.SbCatId == selectedId){
+								option += '<option value="'+obj.SbCatId+'" selected>'+obj.SbCatNome+'</option>';
+							} else{
+								option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+							}
+						});						
+					
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						Reset();
+					}					
+				});
+			})
+
+			function Filtrando(){
+			   $('#cmbSubCategoria').empty().append('<option value="">Filtrando...</option>');
+			}
+		
+			function Reset(){
+			   $('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
+			}
+		
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
 
-				
 				e.preventDefault();
 				
 				let inputNome = $('#inputNome').val();
-
-				// Até tudo funcionando --- Agora é só validar e persistir no banco.
-
-
+				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
 				
-				//Verifica se o campo só possui espaços em branco
-				//if (inputNome == ''){
-					//alerta('Atenção','Informe um nome para o produto!','error');
-					//$('#inputNome').focus();
-					//return false;
-				//} 
 				$( "#formProduto" ).attr('action', 'produtoOrcamentoEditaAction.php').submit();
-			})
-		})
+			});
+		});
 	</script>
 	<!---------------------------------Scripts Universais------------------------------------>
-    <script src="http://malsup.github.com/jquery.form.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
+	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
-<!------------------------------------Fim de validação do formulário e Seleção altomatica de Subcategorias------------------------------------>
+	
+	<!------------------------------------Fim de validação do formulário e Seleção altomatica de Subcategorias------------------------------------>
 
 </head>
 
@@ -168,26 +152,27 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNome">Nome</label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required value="<?php echo $row['PrOrcNome']; ?>">
+												<label for="inputNome">Nome <span class="text-danger">*</span></label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['PrOrcNome']; ?>" required>
 												<input id="inputId" type="hidden" value="<?php echo $row['PrOrcId'] ?>" name="inputId">
 											</div>
 										</div>
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputUnidadeMedida">Unidade de Medida</label>
+												<label for="inputUnidadeMedida">Unidade de Medida <span class="text-danger">*</span></label>
 												<select id="cmbUnidadeMedida" class="form-control form-control-select2" name="cmbUnidadeMedida" required>
-													<option><?php echo $row['PrOrcUnidadeMedida'] ?></option>
 													<?php 
-													$sql = ("SELECT UnMedNome, UnMedSigla
-														FROM UnidadeMedida													     
-														WHERE UnMedStatus = 1 and UnMedEmpresa = ". $_SESSION['EmpreId'] ."
-														ORDER BY UnMedNome ASC");
-													$result = $conn->query("$sql");
+													$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
+															FROM UnidadeMedida
+															JOIN Situacao on SituaId = UnMedStatus
+															WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+															ORDER BY UnMedNome ASC";
+													$result = $conn->query($sql);
 													$rowUnMed = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowUnMed as $item){															
-														print('<option value="'.$item['UnMedSigla'].'">'.$item['UnMedNome'].'</option>');
+													foreach ($rowUnMed as $item){
+														$seleciona = $item['UnMedId'] == $row['PrOrcUnidadeMedida'] ? "selected" : "";
+														print('<option value="'.$item['UnMedId'].'" '. $seleciona .'>'.$item['UnMedNome'].'</option>');
 													}
 													
 													?>
@@ -212,22 +197,20 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
+												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 													<?php 
-													$sql = ("SELECT CategId, CategNome
-														FROM Categoria															     
-														WHERE CategStatus = 1 and CategEmpresa = ". $_SESSION['EmpreId'] ."
-														ORDER BY CategNome ASC");
-													$result = $conn->query("$sql");
+													$sql = "SELECT CategId, CategNome
+															FROM Categoria
+															JOIN Situacao on SituaId = CategStatus
+															WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+															ORDER BY CategNome ASC";
+													$result = $conn->query($sql);
 													$rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowCateg as $item){															
-														if($item['CategId'] == $row['PrOrcCategoria']){
-															print('<option value="'.$item['CategId'].'" selected>'.$item['CategNome'].'</option>');
-														} else {
-															print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-														}
+													foreach ($rowCateg as $item){
+														$seleciona = $item['CategId'] == $row['PrOrcCategoria'] ? "selected" : "";
+														print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
 													}
 													
 													?>

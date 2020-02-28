@@ -7,15 +7,12 @@ $_SESSION['PaginaAtual'] = 'Novo Produto de Orçamento';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus
-	FROM UnidadeMedida
-	WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ."
-	ORDER BY UnMedNome ASC";
+		FROM UnidadeMedida
+		WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ."
+		ORDER BY UnMedNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
-
-?>
-<?php
 
 if(isset($_POST['inputNome'])){
 
@@ -29,12 +26,7 @@ if(isset($_POST['inputNome'])){
 		
 		$sCodigo = (int)$rowCodigo['Codigo'] + 1;
 		$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
-	} catch(PDOException $e) {
-		echo 'Error1: ' . $e->getMessage();die;
-	}
-	
-	try{
-		
+
 		$sql = "INSERT INTO ProdutoOrcamento (PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubcategoria, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcUsuarioAtualizador, PrOrcEmpresa) 
 				VALUES (:sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :iUnidadeMedida, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
@@ -43,9 +35,9 @@ if(isset($_POST['inputNome'])){
 						
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
-						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
-						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
+						':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
+						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '' ? null : $_POST['cmbUnidadeMedida'],
 						':iSituacao' => $_POST['inputSituacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
@@ -83,14 +75,17 @@ if(isset($_POST['inputNome'])){
 	<?php include_once("head.php"); ?>
 
 	<script type="text/javascript">
-	    $(document).ready(()=>{
-            $("#cmbCategoria").change((e)=>{
-                  
+	    
+		$(document).ready(()=>{
+        
+			$("#cmbCategoria").change((e)=>{
+               
                 Filtrando()
 
                 const categId = $(e.target).val()
 
                 $.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
+				
 					let option = '<option value="">Selecione a SubCategoria</option>';
 					
 					if (dados.length){
@@ -113,9 +108,7 @@ if(isset($_POST['inputNome'])){
 			function Reset(){
 				$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
 			}
-	    })
- 
-        $(document).ready(function() {
+	    
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
 
@@ -144,9 +137,7 @@ if(isset($_POST['inputNome'])){
 						if(resposta == 1){
 							alerta('Atenção','Já existe um produto com esse nome!','error');
 							return false;
-						}
-						
-						$( "#formProduto" ).submit();
+						}						
 					}
 				})
 
@@ -160,15 +151,15 @@ if(isset($_POST['inputNome'])){
 				$(window.document.location).attr('href',"produtoOrcamento.php");
 				
 			}); // cancelar
-		})
+		});
 	</script>
+
 	<!---------------------------------Scripts Universais------------------------------------>
-    <script src="http://malsup.github.com/jquery.form.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
+	<!-- Validação -->
     <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
@@ -204,25 +195,26 @@ if(isset($_POST['inputNome'])){
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNome">Nome</label>
+												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
 										</div>
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputUnidadeMedida">Unidade de Medida</label>
+												<label for="inputUnidadeMedida">Unidade de Medida <span class="text-danger">*</span></label>
 												<select id="cmbUnidadeMedida" class="form-control form-control-select2" name="cmbUnidadeMedida" required>
 													<option value="">Selecione</option>
 													<?php 
-													$sql = ("SELECT UnMedNome, UnMedSigla
-														FROM UnidadeMedida													     
-														WHERE UnMedStatus = 1 and UnMedEmpresa = ". $_SESSION['EmpreId'] ."
-														ORDER BY UnMedNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
+															FROM UnidadeMedida
+															JOIN Situacao on SituaId = UnMedStatus
+															WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+															ORDER BY UnMedNome ASC";
+													$result = $conn->query($sql);
+													$rowUnidadeMedida = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($row as $item){															
-														print('<option value="'.$item['UnMedSigla'].'">'.$item['UnMedNome'].'</option>');
+													foreach ($rowUnidadeMedida as $item){
+														print('<option value="'.$item['UnMedId'].'">'.$item['UnMedNome'].'</option>');
 													}
 													?>
 												</select>
@@ -246,18 +238,19 @@ if(isset($_POST['inputNome'])){
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
+												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php 
-													$sql = ("SELECT CategId, CategNome
-														FROM Categoria															     
-														WHERE CategStatus = 1 and CategEmpresa = ". $_SESSION['EmpreId'] ."
-														ORDER BY CategNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$sql = "SELECT CategId, CategNome
+															FROM Categoria
+															JOIN Situacao on SituaId = CategStatus
+															WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+															ORDER BY CategNome ASC";
+													$result = $conn->query($sql);
+													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($row as $item){															
+													foreach ($rowCategoria as $item){
 														print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
 													}
 													

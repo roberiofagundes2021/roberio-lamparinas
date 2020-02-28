@@ -292,8 +292,9 @@ if(isset($_POST['inputDataInicio'])){
 											<option value="">Selecione</option>
 											<?php 
 												$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-														FROM Fornecedor														     
-														WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
+														FROM Fornecedor
+														JOIN Situacao on SituaId = ForneStatus
+														WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
 														ORDER BY ForneNome ASC";
 												$result = $conn->query($sql);
 												$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
