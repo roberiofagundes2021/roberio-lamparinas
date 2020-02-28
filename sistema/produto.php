@@ -9,13 +9,13 @@ if (isset($_SESSION['fotoAtual'])){
 	unset($_SESSION['fotoAtual']);
 }
 
-$sql = ("SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, ProduValorVenda, ProduStatus
-		 FROM Produto
-		 LEFT JOIN Categoria on CategId = ProduCategoria
-		 LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-	     WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY ProduCodigo ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, ProduValorVenda, ProduStatus
+		FROM Produto
+		LEFT JOIN Categoria on CategId = ProduCategoria
+		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
+	    WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ."
+		ORDER BY ProduCodigo ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 

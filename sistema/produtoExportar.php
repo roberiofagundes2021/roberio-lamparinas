@@ -6,24 +6,24 @@ $_SESSION['PaginaAtual'] = 'Produto Excel';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ProduCodigo, ProduCodigoBarras, ProduNome, CategNome, SbCatNome, ProduDetalhamento,
-		 ProduValorCusto, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda,
-		 ProduEstoqueMinimo, MarcaNome, ModelNome, ProduNumSerie, FabriNome, UnMedNome, TpFisNome,
-		 NcFisDescricao, OrFisNome, ProduCest, SituaNome
-		 FROM Produto
-		 LEFT JOIN Categoria on CategId = ProduCategoria
-		 LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-		 LEFT JOIN Marca on MarcaId = ProduMarca
-		 LEFT JOIN Modelo on ModelId = ProduModelo
-		 LEFT JOIN Fabricante on FabriId = ProduFabricante
-		 LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		 LEFT JOIN TipoFiscal on TpFisId = ProduTipoFiscal
-		 LEFT JOIN NcmFiscal on NcFisId = ProduNcmFiscal
-		 LEFT JOIN OrigemFiscal on OrFisId = ProduOrigemFiscal
-		 LEFT JOIN Situacao on SituaId = ProduStatus
-		 WHERE ProduEmpresa = ".$_SESSION['EmpreId']."
-		 ORDER BY ProduNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT ProduCodigo, ProduCodigoBarras, ProduNome, CategNome, SbCatNome, ProduDetalhamento,
+		ProduValorCusto, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda,
+		ProduEstoqueMinimo, MarcaNome, ModelNome, ProduNumSerie, FabriNome, UnMedNome, TpFisNome,
+		NcmNome, OrFisNome, ProduCest, SituaNome
+		FROM Produto
+		LEFT JOIN Categoria on CategId = ProduCategoria
+		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
+		LEFT JOIN Marca on MarcaId = ProduMarca
+		LEFT JOIN Modelo on ModelId = ProduModelo
+		LEFT JOIN Fabricante on FabriId = ProduFabricante
+		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+		LEFT JOIN TipoFiscal on TpFisId = ProduTipoFiscal
+		LEFT JOIN Ncm on NcmId = ProduNcmFiscal
+		LEFT JOIN OrigemFiscal on OrFisId = ProduOrigemFiscal
+		LEFT JOIN Situacao on SituaId = ProduStatus
+		WHERE ProduEmpresa = ".$_SESSION['EmpreId']."
+		ORDER BY ProduNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 //	var_dump($count);die;
@@ -77,7 +77,7 @@ foreach($row as $item){
 	$dadosXls .= "      <td>".utf8_decode($item['FabriNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['UnMedNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['TpFisNome'])."</td>";
-	$dadosXls .= "      <td>".utf8_decode($item['NcFisDescricao'])."</td>";
+	$dadosXls .= "      <td>".utf8_decode($item['NcmNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['OrFisNome'])."</td>";
 	$dadosXls .= "      <td>".$item['ProduCest']."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['SituaNome'])."</td>";
