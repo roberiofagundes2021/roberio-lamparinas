@@ -79,24 +79,21 @@ else {
 		$arquivo        = fopen($nome_arquivo, "r");
 		$qtd            = 0;
 		$importados     = 0;
-		$identificador = date('now').time('now');
 		
 		$produtosimportados = "";
 		$erroFormato = "";
 		$erro = "";
 		$cont = 0;
 	
-		while ($linha_arquivo = fgets($arquivo)) {
-	
-			$coluna  = explode(";",$linha_arquivo);
-			//var_dump($coluna);
-			$codigoBarras = $coluna[0];
-			$nomeProduto = $coluna[1];
-			$detalhamentoProduto = $coluna[2];
-			
+		while ($linha = fgetcsv($arquivo, 1000, ",")) {
+				
+			$Codigo = $linha[0];	
+			$Nome = $linha[1];
+			$Detalhamento = $linha[2];
+				
 			if ($cont == 0) {  //só ler isso uma única vez (no cabeçalho apenas)
 
-				if ($codigoBarras == 'CodigoBarras') {
+				if (strtoupper(substr($codigo, 0, 3)) == 'COD') {
 				
 				   $cont++;
 				   
@@ -200,13 +197,14 @@ else {
 				   $erro.= " (1 registro em branco na linha: ".$linha."), ";					
 				}
 				
-			} // fim do else			
+			} // fim do else	*/		
 							
 		} //fim do while
 							
 	
 		fclose($arquivo);
-		
+		die;
+		/*
 		$relatorio = "<b>Relatório de Importação</b><br><br>";
 		
 		if ($erro != "" or $erroFormato != "") {
@@ -228,7 +226,6 @@ else {
 			   $relatorio .= "<div style=\"width:600px\"><b>Produtos Importados:</b> ".$produtosimportados."</div><br>";
 			   $relatorio .= "<br>";
 		   }
-		   //echo "<a href=\"importacaogerar.php?identificador=$identificador\">Gerar empenhos>></a>";
 			
 		   $_SESSION['RelImportacao'] = $relatorio;
 		   $_SESSION['Importacao'] = 'Erro';
@@ -245,12 +242,12 @@ else {
 		   $relatorio .= "Total de registros importados: ".$importados."<br><br>";
 
 		   $relatorio .= "<div style=\"width:600px\"><b>Produtos Importados:</b> ".$produtosimportados."</div>";
-		   //echo "<a href=\"importacaogerar.php?identificador=$identificador\">Gerar empenhos>></a>";
 		   
 		   $_SESSION['RelImportacao'] = $relatorio; 
 		   $_SESSION['Importacao'] = 'Sucesso';	
 		}
 	
+		*/
 	} else {
 
 		// Não foi possível fazer o upload, provavelmente a pasta está incorreta
