@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'TR Produto';
+$_SESSION['PaginaAtual'] = 'TR Servico';
 
 include('global_assets/php/conexao.php');
 
@@ -20,8 +20,8 @@ if (isset($_POST['inputTRId'])) {
 //Se está alterando
 if (isset($_POST['inputIdTR'])) {
 
-	$sql = "DELETE FROM TermoReferenciaXProduto
-			WHERE TRXPrTermoReferencia = :iTR AND TRXPrEmpresa = :iEmpresa";
+	$sql = "DELETE FROM TermoReferenciaXServico
+			WHERE TRXSrTermoReferencia = :iTR AND TRXSrEmpresa = :iEmpresa";
 	$result = $conn->prepare($sql);
 
 	$result->execute(array(
@@ -32,16 +32,16 @@ if (isset($_POST['inputIdTR'])) {
 
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
-		$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrEmpresa)
-				VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
+				VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 			':iTR' => $iTR,
-			':iProduto' => $_POST['inputIdProduto' . $i],
+			':iServico' => $_POST['inputIdServico' . $i],
 			':iQuantidade' => $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
 			':fValorUnitario' => null,
-			':sTabela' => $_POST['inputTabelaProduto' . $i],
+			':sTabela' => $_POST['inputTabelaServico' . $i],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iEmpresa' => $_SESSION['EmpreId']
 		));
@@ -59,11 +59,11 @@ try {
 			WHERE TrXOrEmpresa = " . $_SESSION['EmpreId'] . " and TrXOrTermoReferencia = ".$iTR."
 			";
 	$result = $conn->query($sql);
-	$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
+	$rowOrcamentosTR = $result->fetch(PDO::FETCH_ASSOC);
 
 
-	// Select para verificar o parametro ParamProdutoOrcamento.
-	$sql = "SELECT ParamProdutoOrcamento
+	// Select para verificar o parametro ParamServicoOrcamento.
+	$sql = "SELECT ParamServicoOrcamento
 			FROM Parametro
 			WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
 			";
@@ -89,38 +89,38 @@ try {
 	$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
 	
 
-	//Select que verifica a tabela de origem dos produtos dessa TR.
-	$sql = "SELECT TRXPrProduto
-			FROM TermoReferenciaXProduto
-			JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
-			WHERE TRXPrEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
+	//Select que verifica a tabela de origem dos Servico dessa TR.
+	$sql = "SELECT TRXSrServico
+			FROM TermoReferenciaXServico
+			JOIN ServicoOrcamento on SrOrcId = TRXSrServico
+			WHERE TRXSrEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'";
 	$result = $conn->query($sql);
-	$rowProdutoUtilizado1 = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countProdutoUtilizado1 = count($rowProdutoUtilizado1);
+	$rowServicoUtilizado1 = $result->fetchAll(PDO::FETCH_ASSOC);
+	$countServicoUtilizado1 = count($rowServicoUtilizado1);
 
-	if (count($rowProdutoUtilizado1) >= 1) {
-		foreach ($rowProdutoUtilizado1 as $itemProdutoUtilizado) {
-			$aProdutos1[] = $itemProdutoUtilizado['TRXPrProduto'];
+	if (count($rowServicoUtilizado1) >= 1) {
+		foreach ($rowServicoUtilizado1 as $itemServicoUtilizado) {
+			$aServico1[] = $itemServicoUtilizado['TRXSrServico'];
 		}
 	} else {
-		$aProdutos1 = [];
+		$aServico1 = [];
 	}
 
 
-	$sql = "SELECT TRXPrProduto
-			FROM TermoReferenciaXProduto
-			JOIN Produto on ProduId = TRXPrProduto
-			WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+	$sql = "SELECT TRXSrServico
+			FROM TermoReferenciaXServico
+			JOIN Servico on ServiId = TRXSrServico
+			WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
 	$result = $conn->query($sql);
-	$rowProdutoUtilizado2 = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countProdutoUtilizado2 = count($rowProdutoUtilizado2);
+	$rowServicoUtilizado2 = $result->fetchAll(PDO::FETCH_ASSOC);
+	$countServicoUtilizado2 = count($rowServicoUtilizado2);
 	
-	if (count($rowProdutoUtilizado2) >= 1) {
-		foreach ($rowProdutoUtilizado2 as $itemProdutoUtilizado) {
-			$aProdutos2[] = $itemProdutoUtilizado['TRXPrProduto'];
+	if (count($rowServicoUtilizado2) >= 1) {
+		foreach ($rowServicoUtilizado2 as $itemServicoUtilizado) {
+			$aServico2[] = $itemServicoUtilizado['TRXSrServico'];
 		}
 	} else {
-		$aProdutos2[] = [];
+		$aServico2[] = [];
 	}
 
 } catch (PDOException $e) {
@@ -136,7 +136,7 @@ try {
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Listando produtos do TR</title>
+	<title>Lamparinas | Listando Servico do TR</title>
 
 	<?php include_once("head.php"); ?>
 
@@ -155,50 +155,49 @@ try {
 	<script type="text/javascript">
 		$(document).ready(function() {
 
-			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
-			$('#cmbProduto').on('change', function(e) {
+			//Ao mudar a SubCategoria, filtra o servico via ajax (retorno via JSON)
+			$('#cmbServico').on('change', function(e) {
 
 				var inputCategoria = $('#inputIdCategoria').val();
 				var inputSubCategoria = $('#inputIdSubCategoria').val();
-				var produtos = $(this).val();
-				console.log(produtos)
+				var servico = $(this).val();
+				console.log(servico)
 				var tr = $('#inputIdTR').val();
-				//console.log(produtos);
+				//console.log(servico);
 
 				var cont = 1;
-				var produtoId = [];
-				var produtoQuant = [];
+				var servicoId = [];
+				var servicoQuant = [];
 
 				// Aqui é para cada "class" faça
-				$.each($(".idProduto"), function() {
-					produtoId[cont] = $(this).val();
+				$.each($(".idServico"), function() {
+					servicoId[cont] = $(this).val();
 					cont++;
 				});
 
 				cont = 1;
 				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
 				$.each($(".Quantidade"), function() {
-					$id = produtoId[cont];
+					$id = servicoId[cont];
 
-					produtoQuant[$id] = $(this).val();
+					servicoQuant[$id] = $(this).val();
 					cont++;
 				});
 
 				$.ajax({
 					type: "POST",
-					url: "trFiltraProduto.php",
+					url: "trFiltraServico.php",
 					data: {
 						idTr: tr,
 						idCategoria: inputCategoria,
 						idSubCategoria: inputSubCategoria,
-						produtos: produtos,
-						produtoId: produtoId,
-						produtoQuant: produtoQuant
+						servico: servico,
+						servicoId: servicoId,
+						servicoQuant: servicoQuant
 					},
 					success: function(resposta) {
 						//alert(resposta);
-						console.log(resposta)
-						$("#tabelaProdutos").html(resposta).show();
+						$("#tabelaServicos").html(resposta).show();
 
 						return false;
 
@@ -208,23 +207,23 @@ try {
 
 			function disabledSelect(){
 				let btnSubmit = $('#btnsubmit')
-				let selectProdutos = $('#ProdutoRow')
+				let selectServicos = $('#ServicoRow')
 
 				if(btnSubmit.attr('disabled')){
-                    selectProdutos.css('display', 'none')
+                    selectServicos.css('display', 'none')
 				}
 			}
 			disabledSelect()
 
 		}); //document.ready
 
-		//Mostra o "Filtrando..." na combo Produto
-		function FiltraProduto() {
-			$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+		//Mostra o "Filtrando..." na combo Servico
+		function FiltraServico() {
+			$('#cmbServico').empty().append('<option>Filtrando...</option>');
 		}
 
-		function ResetProduto() {
-			$('#cmbProduto').empty().append('<option>Sem produto</option>');
+		function ResetServico() {
+			$('#cmbServico').empty().append('<option>Sem servicos</option>');
 		}
 	</script>
 
@@ -249,9 +248,9 @@ try {
 
 				<!-- Info blocks -->
 				<div class="card">
-					<form name="formTRProduto" id="formTRProduto" method="post" class="form-validate">
+					<form name="formTRServico" id="formTRServico" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Listar Produtos - TR Nº "<?php echo $row['TrRefNumero']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Listar Serviços - TR Nº "<?php echo $row['TrRefNumero']; ?>"</h5>
 						</div>
 						<input type="hidden" id="inputIdTR" name="inputIdTR" class="form-control" value="<?php echo $row['TrRefId']; ?>">
 						<div class="card-body">
@@ -286,32 +285,32 @@ try {
 											</div>
 										</div>
 									</div>
-									<div id="ProdutoRow" class="row">
+									<div id="ServicoRow" class="row">
 										<div class="col-lg-12">
 											<div class="form-group">
-												<label for="cmbProduto">Produto</label>
-												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+												<label for="cmbServico">Serviço</label>
+												<select id="cmbServico" name="cmbServico" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 													<?php
-													if (count($aProdutos1) >= 1) {
+													if (count($aServico1) >= 1) {
 														if (count($rowSubCat) >= 1) {
 															foreach ($rowSubCat as $valueSubCat) {
-																$sql = "SELECT PrOrcId, PrOrcNome
-														                FROM ProdutoOrcamento
-																		JOIN Situacao on SituaId = PrOrcSituacao				     
-																		WHERE PrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " and SituaChave = 'ATIVO' and PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and PrOrcCategoria = " . $iCategoria;
+																$sql = "SELECT SrOrcId, SrOrcNome
+														                FROM ServicoOrcamento
+																		JOIN Situacao on SituaId = SrOrcSituacao				     
+																		WHERE SrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " and SituaChave = 'ATIVO' and SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and SrOrcCategoria = " . $iCategoria;
 																if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null) {
-																	$sql .= " and PrOrcSubCategoria = " . $row['TrRefSubCategoria'];
+																	$sql .= " and SrOrcSubCategoria = " . $row['TrRefSubCategoria'];
 																}
-																$sql .= " ORDER BY PrOrcNome ASC";
+																$sql .= " ORDER BY SrOrcNome ASC";
 																$result = $conn->query($sql);
-																$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
-																foreach ($rowProduto as $item) {
-																	if (in_array($item['PrOrcId'], $aProdutos1) or $countProdutoUtilizado1 == 0) {
+																$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
+																foreach ($rowServico as $item) {
+																	if (in_array($item['SrOrcId'], $aServico1) or $countServicoUtilizado1 == 0) {
 																		$seleciona = "selected";
-																		print('<option value="' . $item['PrOrcId'] . '" ' . $seleciona . '>' . $item['PrOrcNome'] . '</option>');
+																		print('<option value="' . $item['SrOrcId'] . '" ' . $seleciona . '>' . $item['SrOrcNome'] . '</option>');
 																	} else {
 																		$seleciona = "";
-																		print('<option value="' . $item['PrOrcId'] . '" ' . $seleciona . '>' . $item['PrOrcNome'] . '</option>');
+																		print('<option value="' . $item['SrOrcId'] . '" ' . $seleciona . '>' . $item['SrOrcNome'] . '</option>');
 																	}
 																}
 															}
@@ -319,23 +318,23 @@ try {
 													} else {
 														if (count($rowSubCat) >= 1) {
 															foreach ($rowSubCat as $subcategoria) {
-																$sql = "SELECT ProduId, ProduNome
-																         FROM Produto
-																		 JOIN Situacao on SituaId = ProduStatus		
-																         WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' and ProduCategoria = " . $iCategoria . "";
+																$sql = "SELECT ServiId, ServiNome
+																         FROM Servico
+																		 JOIN Situacao on SituaId = ServiStatus		
+																         WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria . "";
 																if ($subcategoria['TRXSCSubcategoria'] != '' and $subcategoria['TRXSCSubcategoria'] != null) {
-																	$sql .= " and ProduSubCategoria = " . $subcategoria['TRXSCSubcategoria'];
+																	$sql .= " and ServiSubCategoria = " . $subcategoria['TRXSCSubcategoria'];
 																}
-																$sql .= " ORDER BY ProduNome ASC";
+																$sql .= " ORDER BY ServiNome ASC";
 																$result = $conn->query($sql);
-																$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
-																foreach ($rowProduto as $item) {
-																	if (in_array($item['ProduId'], $aProdutos2) or $countProdutoUtilizado2 == 0) {
+																$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
+																foreach ($rowServico as $item) {
+																	if (in_array($item['ServiId'], $aServico2) or $countServicoUtilizado2 == 0) {
 																		$seleciona = "selected";
-																		print('<option value="' . $item['ProduId'] . '" ' . $seleciona . '>' . $item['ProduNome'] . '</option>');
+																		print('<option value="' . $item['ServiId'] . '" ' . $seleciona . '>' . $item['ServiNome'] . '</option>');
 																	} else {
 																		$seleciona = "";
-																		print('<option value="' . $item['ProduId'] . '" ' . $seleciona . '>' . $item['ProduNome'] . '</option>');
+																		print('<option value="' . $item['ServiId'] . '" ' . $seleciona . '>' . $item['ServiNome'] . '</option>');
 																	}
 																}
 															}
@@ -352,7 +351,7 @@ try {
 							<!-- Custom header text -->
 							<div class="card">
 								<div class="card-header header-elements-inline">
-									<h5 class="card-title">Relação de Produtos</h5>
+									<h5 class="card-title">Relação de Servicos</h5>
 									<div class="header-elements">
 										<div class="list-icons">
 											<a class="list-icons-item" data-action="collapse"></a>
@@ -363,7 +362,7 @@ try {
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os produtos selecionadas acima. Para atualizar os valores, basta preencher a coluna <code>Quantidade</code> e depois clicar em <b>ALTERAR</b>.</p>
+									<p class="mb-3">Abaixo estão listados todos os Servicos selecionados acima. Para atualizar os valores, basta preencher a coluna <code>Quantidade</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<!--<div class="hot-container">
 										<div id="example"></div>
@@ -371,15 +370,14 @@ try {
 
 									<?php
 
-									if (count($aProdutos1) >= 1) {
+									if (count($aServico1) >= 1) {
 
-										$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, TRXPrTabela, UnMedNome
-									            FROM ProdutoOrcamento
-									            JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
-									            LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-									            WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR  . " and TRXPrTabela = 'ProdutoOrcamento'";
+										$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, SrOrcUnidadeMedida, TRXSrQuantidade, TRXSrTabela
+									            FROM ServicoOrcamento
+									            JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
+									            WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR  . " and TRXSrTabela = 'ServicoOrcamento'";
 										$result = $conn->query($sql);
-										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 
 										$cont = 0;
 
@@ -391,15 +389,10 @@ try {
 							                    					<label for="inputCodigo"><strong>Item</strong></label>
 							                    				</div>
 							                    				<div class="col-lg-11">
-							                    					<label for="inputProduto"><strong>Produto</strong></label>
+							                    					<label for="inputServico"><strong>Servico</strong></label>
 							                    				</div>
 							                    			</div>
 							                    		</div>												
-							                    	<div class="col-lg-1">
-							                    		<div class="form-group">
-							                    			<label for="inputUnidade"><strong>Unidade</strong></label>
-							                    		</div>
-							                    	</div>
 							                    	<div class="col-lg-2">
 							                    		<div class="form-group">
 							                    			<label for="inputQuantidade"><strong>Quantidade</strong></label>
@@ -407,13 +400,13 @@ try {
 							                    	</div>	
 							                    </div>');
 
-										print('<div id="tabelaProdutos">');
+										print('<div id="tabelaServicos">');
 
-										foreach ($rowProdutos as $item) {
+										foreach ($rowServicos as $item) {
 
 											$cont++;
 
-											$iQuantidade = isset($item['TRXPrQuantidade']) ? $item['TRXPrQuantidade'] : '';
+											$iQuantidade = isset($item['TRXSrQuantidade']) ? $item['TRXSrQuantidade'] : '';
 
 											print('
 								                    <div class="row" style="margin-top: 8px;">
@@ -421,22 +414,19 @@ try {
 								                    		<div class="row">
 								                    			<div class="col-lg-1">
 								                    				<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
-																	<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['PrOrcId'] . '" class="idProduto">
+																	<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['SrOrcId'] . '" class="idServico">
 								                    			</div>
 								                    			<div class="col-lg-11">
-								                    				<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['PrOrcDetalhamento'] . '" value="' . $item['PrOrcNome'] . '" readOnly>
+								                    				<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['SrOrcDetalhamento'] . '" value="' . $item['SrOrcNome'] . '" readOnly>
 								                    			</div>
 								                    		</div>
 								                    	</div>								
-								                    	<div class="col-lg-1">
-								                    		<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
-								                    	</div>
 								                    	<div class="col-lg-2">
 								                    		<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
 								                    	</div>	
 													</div>');
 
-											print('<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . $item['TRXPrTabela'] . '">');
+											print('<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . $item['TRXSrTabela'] . '">');
 										}
 
 										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >');
@@ -444,16 +434,15 @@ try {
 										print('</div>');
 									} else {
 
-										$sql = "SELECT TRXPrQuantidade, TRXPrTabela, ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, UnMedNome
-									            FROM TermoReferenciaXProduto
-									            JOIN Produto on ProduId = TRXPrProduto
-												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-									            WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+										$sql = "SELECT TRXSrQuantidade, TRXSrTabela, ServiId, ServiNome, ServiDetalhamento
+									            FROM TermoReferenciaXServico
+									            JOIN Servico on ServiId = TRXSrServico
+									            WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
 										$result = $conn->query($sql);
-										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-										$count = count($rowProdutos);
+										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+										$count = count($rowServicos);
 
-
+var_dump($rowServicos);
 										$cont = 0;
 
 										print('
@@ -464,29 +453,24 @@ try {
 							                    					<label for="inputCodigo"><strong>Item</strong></label>
 							                    				</div>
 							                    				<div class="col-lg-11">
-							                    					<label for="inputProduto"><strong>Produto</strong></label>
+							                    					<label for="inputServico"><strong>Servico</strong></label>
 							                    				</div>
 							                    			</div>
 							                    		</div>												
-							                    	<div class="col-lg-1">
-							                    		<div class="form-group">
-							                    			<label for="inputUnidade"><strong>Unidade</strong></label>
-							                    		</div>
-							                    	</div>
-							                    	<div class="col-lg-2">
+							                    	<div class="col-lg-3">
 							                    		<div class="form-group">
 							                    			<label for="inputQuantidade"><strong>Quantidade</strong></label>
 							                    		</div>
 							                    	</div>	
 							                    </div>');
 
-										print('<div id="tabelaProdutos">');
+										print('<div id="tabelaServicos">');
 
-										foreach ($rowProdutos as $item) {
+										foreach ($rowServicos as $item) {
 
 											$cont++;
 
-											$iQuantidade = isset($item['TRXPrQuantidade']) ? $item['TRXPrQuantidade'] : '';
+											$iQuantidade = isset($item['TRXSrQuantidade']) ? $item['TRXSrQuantidade'] : '';
 
 											print('
 								                    <div class="row" style="margin-top: 8px;">
@@ -494,23 +478,20 @@ try {
 								                    		<div class="row">
 								                    			<div class="col-lg-1">
 								                    				<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
-																	<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['ProduId'] . '" class="idProduto">
-																	<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . $item['TRXPrTabela'] . '">
+																	<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
+																	<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . $item['TRXSrTabela'] . '">
 								                    			</div>
 								                    			<div class="col-lg-11">
-								                    				<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+								                    				<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
 								                    			</div>
 								                    		</div>
 								                    	</div>								
-								                    	<div class="col-lg-1">
-								                    		<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
-								                    	</div>
 								                    	<div class="col-lg-2">
 								                    		<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
 								                    	</div>	
 													</div>');
 
-											print('<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . $item['TRXPrTabela'] . '">');
+											print('<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . $item['TRXSrTabela'] . '">');
 										}
 
 										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >');
@@ -533,7 +514,7 @@ try {
 										        <a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
 											</div>
 											<div class="row justify-content-end align-content-center col-12 col-lg-6">
-											    <p style="color: red; margin: 0px"><i class="icon-info3"></i>A lista de produtos não pode ser alterada enquanto houver orçamentos para essa TR.</p>
+											    <p style="color: red; margin: 0px"><i class="icon-info3"></i>A lista de Servicos não pode ser alterada enquanto houver orçamentos para essa TR.</p>
 										    </div>
 								        </div>
 							        </div>

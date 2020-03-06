@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Parâmetro';
 include('global_assets/php/conexao.php');
 
 if (isset($_SESSION['EmpresaId'])) {
-	$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento
+	$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamServicoOrcamento
 	        FROM Parametro
 	        WHERE ParamEmpresa = " . $_SESSION['EmpresaId'] . "";
 	$result = $conn->query($sql);
@@ -21,7 +21,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 	try {
 		//var_dump($_POST);die;
 		$sql = "UPDATE Parametro SET ParamEmpresaPublica = :iEmpresaPublica, ParamValorAtualizadoFluxo = :iValorAtualizadoFluxo, 
-					   ParamValorAtualizadoOrdemCompra = :iValorAtualizadoOrdemCompra, ParamProdutoOrcamento = :iProdutoOrcamento, ParamUsuarioAtualizador = :iUsuarioAtualizador, ParamValorObsImpreRetirada = :iValorObsImpreRetirada
+					   ParamValorAtualizadoOrdemCompra = :iValorAtualizadoOrdemCompra, ParamProdutoOrcamento = :iProdutoOrcamento, ParamServicoOrcamento = :iServicoOrcamento, ParamUsuarioAtualizador = :iUsuarioAtualizador, ParamValorObsImpreRetirada = :iValorObsImpreRetirada
 				WHERE ParamEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
 
@@ -31,6 +31,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 			':iValorAtualizadoOrdemCompra' => isset($_POST['inputValorOrdemCompra']) && $_POST['inputValorOrdemCompra'] == "on" ? 1 : 0,
 			':iValorObsImpreRetirada' => isset($_POST['inputValorObsImpreRetirada']) && $_POST['inputValorObsImpreRetirada'] == "on" ? 1 : 0,
 			':iProdutoOrcamento' => isset($_POST['inputProdutoOrcamento']) && $_POST['inputProdutoOrcamento'] == "on" ? 1 : 0,
+			':iServicoOrcamento' => isset($_POST['inputServicoOrcamento']) && $_POST['inputServicoOrcamento'] == "on" ? 1 : 0,
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iEmpresa' => $_SESSION['EmpresaId']
 		));
@@ -198,6 +199,22 @@ if (isset($_POST['inputIdEmpresa'])) {
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
 													<input type="checkbox" name="inputProdutoOrcamento" id="inputProdutoOrcamento" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamProdutoOrcamento']) echo "checked"; ?>>
+												</label>
+											</div>
+										</div>
+									</div>
+									<!-- /switch single -->
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-lg-6">
+									<!-- Switch single -->
+									<div class="form-group row">
+										<label class="col-lg-3 col-form-label">Usar "Serviços para Orçamento" nos Orçamentos da TR<span class="text-danger">*</span></label>
+										<div class="col-lg-9">
+											<div class="form-check form-check-switch form-check-switch-left">
+												<label class="form-check-label d-flex align-items-center">
+													<input type="checkbox" name="inputServicoOrcamento" id="inputServicoOrcamento" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamServicoOrcamento']) echo "checked"; ?>>
 												</label>
 											</div>
 										</div>
