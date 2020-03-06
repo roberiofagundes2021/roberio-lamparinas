@@ -55,8 +55,10 @@ if ($extensao != 'csv') {
 
 // Faz a verificação do tamanho do arquivo
 else if ($_UP['tamanho'] < $_FILES['arquivo']['size']) {
-
-	echo "O arquivo enviado é muito grande, envie arquivos de até 10MB.";
+	
+	// Não foi possível fazer o upload, provavelmente a pasta está incorreta
+	$_SESSION['RelImportacao'] = "Não foi possível enviar o arquivo. O arquivo enviado é muito grande, envie arquivos de até 10MB.";
+	$_SESSION['Importacao'] = 'Erro';	
 }
 
 // O arquivo passou em todas as verificações, hora de tentar movê-lo para a pasta
@@ -229,11 +231,6 @@ else {
 
 	}
 
-} else {
-
-	// Não foi possível fazer o upload, provavelmente a pasta está incorreta
-	$_SESSION['RelImportacao'] = "Não foi possível enviar o arquivo, tente novamente";
-	$_SESSION['Importacao'] = 'Erro';
 }
 
 irpara("produto.php");

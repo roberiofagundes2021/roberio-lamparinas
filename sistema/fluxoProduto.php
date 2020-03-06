@@ -19,6 +19,9 @@ if(isset($_POST['inputFluxoOperacionalId'])){
 	irpara("fluxo.php");
 }
 
+$bFechado = 0;
+$countProduto = 0;
+
 function calculaValorProduto($valorProduto, $outrasDespesas = 0, $margemLucro){
    
    $porcentMargemLucro = ($margemLucro / 100);
