@@ -85,6 +85,7 @@ else {
 	$qtd           = 0;
 	$importados    = 0;
 	$produtosimportados = "";
+	$erro = "";
 	
 	foreach ($linhas as $linha){
 		
@@ -93,7 +94,7 @@ else {
 			$codigo = $linha->getElementsByTagName("Data")->item(0)->nodeValue;
 			
 			if (is_numeric($codigo)) {
-			   $erroFormato = "O formato do arquivo de importação provavelmente não está correto. Verifique Modelo: <a href='global_assets/importacao/modelo.xml'>Modelo de Importação de Produtos</a>";
+			   $erro = "O formato do arquivo de importação provavelmente não está correto. Verifique Modelo: <a href='global_assets/importacao/modelo.xml'>Modelo de Importação de Produtos</a>";
 			   break; //sai do while	
 			}
 			
@@ -142,12 +143,12 @@ else {
 				$sCodigo = (int)$rowCodigo['Codigo'] + 1;
 				$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
 				
-				$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduDetalhamento, ProduFoto, ProduCategoria, ProduSubCategoria, ProduValorCusto, 
-											 ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
+				$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduCategoria, ProduSubCategoria, ProduDetalhamento, ProduFoto, 
+											 ProduValorCusto, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
 											 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, ProduFabricante, ProduUnidadeMedida, 
 											 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
 											 ProduUsuarioAtualizador, ProduEmpresa) 
-						VALUES (:sCodigo, :sCodigoBarras, :sNome, :sDetalhamento, :sFoto, :iCategoria, :iSubCategoria, :fValorCusto, 
+						VALUES (:sCodigo, :sCodigoBarras, :sNome, :iCategoria, :iSubCategoria, :sDetalhamento, :sFoto, :fValorCusto, 
 								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, :sNumSerie, 
 								:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
 								:iUsuarioAtualizador, :iEmpresa);";
@@ -155,12 +156,12 @@ else {
 						
 				$result->execute(array(
 								':sCodigo' => $sCodigo,
-								':sCodigoBarras' => $codigoBarras,
-								':sNome' => $nomeProduto,
-								':sDetalhamento' => $detalhamentoProduto,
-								':sFoto' => null,
+								':sCodigoBarras' => $codigo,
+								':sNome' => $nome,
 								':iCategoria' => null,
 								':iSubCategoria' => null,
+								':sDetalhamento' => $detalhamento,
+								':sFoto' => null,
 								':fValorCusto' => null,						
 								':fOutrasDespesas' => null,
 								':fCustoFinal' => null,
@@ -183,18 +184,58 @@ else {
 				 	    
 				$produtosimportados.= $nome.', ';
 				$importados++;
-			}
-				
-		} else {
-		   
-		   $qtd++;
-		   $linha = $qtd + 1;
-		   $erro.= " (1 registro em branco na linha: ".$linha."), ";					
-		}
-			
+			}		
 		}
 	}
 
+	$relatorio = "<b>Relatório de Importação</b><br><br>";
+		
+	if ($erro != "") {
+		      
+	   $relatorio .= "<span style='color:#FF0000;'>Erro na importação</span><br><br>";
+	   $relatorio .= $erro; //substr($erro, 0, -1);
+	   $relatorio .= "<br><br>";
+	   
+	   //usado para remover os 2 ultimos caracteres da string, para desaparecer com a ultima vírgula
+	   $size = strlen($produtosimportados);
+	   $produtosimportados = substr($produtosimportados,0, $size-2);
+	   
+	   if ($erro == ""){
+		   $relatorio .= "Total de registros no arquivo: ".$qtd."<br>";
+		   $relatorio .= "Total de registros importados: ".$importados."<br><br>";
+
+		   $relatorio .= "<div style=\"width:600px\"><b>Produtos Importados:</b> ".$produtosimportados."</div><br>";
+		   $relatorio .= "<br>";
+	   }
+		
+	   $_SESSION['RelImportacao'] = $relatorio;
+	   $_SESSION['Importacao'] = 'Erro';
+			
+	} else {
+		   
+	   $relatorio .= "<span style='color:#0080FF;'>Importação realizada com sucesso!</span><br><br>";	
+		
+		//usado para remover os 2 ultimos caracteres da string, para desaparecer com a ultima vírgula
+	   $size = strlen($produtosimportados);
+	   $produtosimportados = substr($produtosimportados,0, $size-2);
+
+	   $relatorio .= "Total de registros no arquivo: ".$qtd."<br>";
+	   $relatorio .= "Total de registros importados: ".$importados."<br><br>";
+
+	   $relatorio .= "<div style=\"width:600px\"><b>Produtos Importados:</b> ".$produtosimportados."</div>";
+	   
+	   $_SESSION['RelImportacao'] = $relatorio; 
+	   $_SESSION['Importacao'] = 'Sucesso';
+
+	}
+
+} else {
+
+	// Não foi possível fazer o upload, provavelmente a pasta está incorreta
+	$_SESSION['RelImportacao'] = "Não foi possível enviar o arquivo, tente novamente";
+	$_SESSION['Importacao'] = 'Erro';
 }
+
+irpara("produto.php");
 
 ?>
