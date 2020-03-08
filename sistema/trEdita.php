@@ -161,6 +161,8 @@ if(isset($_POST['inputData'])){
 
 	<!-- Uniform plugin file path -->
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
+
+	<script src="global_assets/js/demo_pages/form_checkboxes_radios.js"></script>
 	
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -374,8 +376,22 @@ if(isset($_POST['inputData'])){
 												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo mostraData($row['TrRefData']); ?>" readOnly>
 											</div>
 										</div>
-										
-										<div class="col-lg-5">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputData">O TR terá:</label>
+												<div class="d-flex flex-row">
+													<div class="p-1 m-0 d-flex flex-row">
+														<input id="TrProduto" value="P" name="TrProduto" class="form-check-input-styled" type="checkbox">
+														<label for="TrProduto" class="ml-1" style="margin-bottom: 2px">Produto</label>
+													</div>
+													<div class="p-1 m-0 d-flex flex-row">
+														<input id="TrServico" value="S" name="TrServico" class="form-check-input-styled" type="checkbox">
+														<label for="TrServico" class="ml-1" style="margin-bottom: 2px">Serviço</label>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
@@ -398,7 +414,7 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 										
-										<div class="col-lg-5">
+										<div class="col-lg-4">
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select form-control-select2" multiple="multiple" data-fouc>

@@ -414,7 +414,7 @@ try {
 											$cont++;
 
 											$iQuantidade = isset($item['TRXPrQuantidade']) ? $item['TRXPrQuantidade'] : '';
-
+										
 											print('
 								                    <div class="row" style="margin-top: 8px;">
 								                    	<div class="col-lg-9">

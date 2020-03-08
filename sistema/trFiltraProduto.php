@@ -43,7 +43,7 @@ $countProdutosTr2 = count($rowProdutos);
 if (count($rowProdutosOrcamento) >= 1) {
 	if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != '') {
 
-		$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrTabela
+		$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrTabela, UnMedNome
 				FROM ProdutoOrcamento
 				LEFT JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 				JOIN Categoria on CategId = PrOrcCategoria
@@ -51,7 +51,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 				WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and PrOrcSubCategoria = '" . $_POST['idSubCategoria'] . "' and PrOrcId in (" . $lista . ")
 				";
 	} else {
-		$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrTabela
+		$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrTabela, UnMedNome
 				FROM ProdutoOrcamento
 				LEFT JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 				JOIN Categoria on CategId = PrOrcCategoria
@@ -92,7 +92,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 						</div>
 					</div>								
 					<div class="col-lg-1">
-						<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['PrOrcUnidadeMedida'] . '" readOnly>
+						<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
 					</div>
 					<div class="col-lg-2">
 						<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $quantidade . '">
@@ -112,7 +112,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 } else {
 	if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != '') {
 
-		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrTabela
+		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrTabela, UnMedNome
 				FROM Produto
 				LEFT JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 				JOIN Categoria on CategId = ProduCategoria
@@ -120,7 +120,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 				WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduSubCategoria = '" . $_POST['idSubCategoria'] . "' and ProduId in (" . $lista . ")
 				";
 	} else {
-		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrTabela
+		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrTabela, UnMedNome
 				FROM Produto
 				LEFT JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 				JOIN Categoria on CategId = ProduCategoria
@@ -161,7 +161,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 						</div>
 					</div>								
 					<div class="col-lg-1">
-						<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['ProduUnidadeMedida'] . '" readOnly>
+						<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
 					</div>
 					<div class="col-lg-2">
 						<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $quantidade . '">
