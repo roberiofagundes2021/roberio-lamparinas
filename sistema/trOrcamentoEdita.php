@@ -41,7 +41,7 @@ if(isset($_POST['inputOrcamentoId'])){
 	
 	try{
 		
-		$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrTipo, TrXOrData, TrXOrConteudo, TrXOrFornecedor, 
+		$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrConteudo, TrXOrFornecedor, 
 					   ForneId, ForneContato, ForneEmail, ForneTelefone, ForneCelular, TrXOrSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
 				FROM TRXOrcamento
 				JOIN Usuario on UsuarId = TrXOrSolicitante
@@ -72,13 +72,13 @@ if(isset($_POST['inputOrcamentoId'])){
 	irpara("trOrcamento.php");
 }
 
-if(isset($_POST['inputTipo'])){	
+if(isset($_POST['inputData'])){	
 
 	try{
 		
 		$iOrcamento = $_POST['inputOrcamentoId'];
 		
-		$sql = "UPDATE TRXOrcamento SET TrXOrTipo = :sTipo, TrXOrConteudo = :sConteudo, TrXOrCategoria = :iCategoria,
+		$sql = "UPDATE TRXOrcamento SET TrXOrConteudo = :sConteudo, TrXOrCategoria = :iCategoria,
 									 TrXOrFornecedor = :iFornecedor, TrXOrUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE TrXOrId = :iOrcamento";
 		$result = $conn->prepare($sql);
@@ -91,7 +91,6 @@ if(isset($_POST['inputTipo'])){
 		$iFornecedor = $aFornecedor[0];
 		
 		$result->execute(array(
-						':sTipo' => $_POST['inputTipo'],
 						':iCategoria' => $_POST['inputCategoria'] == '#' ? null : $_POST['inputCategoria'],
 						//':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
@@ -393,24 +392,7 @@ if(isset($_POST['inputTipo'])){
 								
 							<div class="row">				
 								<div class="col-lg-12">
-									<div class="row">
-										
-										<div class="col-lg-3">
-											<div class="form-group">							
-												<div class="form-check form-check-inline">
-													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="P" name="inputTipo" class="form-input-styled" data-fouc <?php if ($row['TrXOrTipo'] == 'P') echo "checked"; ?>>
-														Produto
-													</label>
-												</div>
-												<div class="form-check form-check-inline">
-													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="S" name="inputTipo" class="form-input-styled" data-fouc <?php if ($row['TrXOrTipo'] == 'S') echo "checked"; ?>>
-														Serviço
-													</label>
-												</div>										
-											</div>
-										</div>										
+									<div class="row">								
 										
 										<div class="col-lg-1">
 											<div class="form-group">

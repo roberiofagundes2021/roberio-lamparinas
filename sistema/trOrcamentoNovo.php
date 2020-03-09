@@ -52,9 +52,9 @@ if(isset($_POST['inputData'])){
 		$sNumero = (int)$rowNumero['Numero'] + 1;
 		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 			
-		$sql = "INSERT INTO TRXOrcamento (TrXOrTermoReferencia, TrXOrNumero, TrXOrTipo, TrXOrData, TrXOrCategoria, TrXOrConteudo, TrXOrFornecedor,
+		$sql = "INSERT INTO TRXOrcamento (TrXOrTermoReferencia, TrXOrNumero, TrXOrData, TrXOrCategoria, TrXOrConteudo, TrXOrFornecedor,
 									   TrXOrSolicitante, TrXOrStatus, TrXOrUsuarioAtualizador, TrXOrEmpresa)
-				VALUES (:iTR, :sNumero, :sTipo, :dData, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
+				VALUES (:iTR, :sNumero, :dData, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
 						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
@@ -64,7 +64,6 @@ if(isset($_POST['inputData'])){
 		$result->execute(array(
 						':iTR' => $_SESSION['TRId'],
 						':sNumero' => $sNumero,
-						':sTipo' => $_POST['inputTipo'],
 						':dData' => gravaData($_POST['inputData']),
 						':iCategoria' => $_POST['inputCategoria'] == '#' ? null : $_POST['inputCategoria'],
 						':sConteudo' => $_POST['txtareaConteudo'],
@@ -295,25 +294,8 @@ if(isset($_POST['inputData'])){
 								
 							<div class="row">				
 								<div class="col-lg-12">
-									<div class="row">								
-										
-										<div class="col-lg-3">
-											<div class="form-group">							
-												<div class="form-check form-check-inline">
-													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" value="P" class="form-input-styled" checked data-fouc>
-														Produto
-													</label>
-												</div>
-												<div class="form-check form-check-inline">
-													<label class="form-check-label">
-														<input type="radio" id="inputTipo" name="inputTipo" value="S" class="form-input-styled" data-fouc>
-														Serviço
-													</label>
-												</div>										
-											</div>
-										</div>										
-										
+									<div class="row">													
+			
 										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputData">Data</label>

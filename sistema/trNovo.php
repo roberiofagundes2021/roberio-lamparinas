@@ -477,21 +477,6 @@ if (isset($_POST['inputData'])) {
 
 			});
 
-			$("#enviar").on('click', function(e) {
-
-				e.preventDefault();
-
-				var cmbCategoria = $('#cmbCategoria').val();
-
-				if (cmbCategoria == '' || cmbCategoria == '#') {
-					alerta('Atenção', 'Informe a categoria!', 'error');
-					$('#cmbCategoria').focus();
-					return false;
-				}
-
-				$("#formTR").submit();
-			});
-
 		}); //document.ready
 
 		//Mostra o "Filtrando..." na combo SubCategoria
