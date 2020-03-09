@@ -103,7 +103,7 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 				$sql = "SELECT SituaId
 						FROM Situacao
 						Where SituaChave = 'AGUARDANDOLIBERACAO' ";
-				$result = $conn->query("$sql");
+				$result = $conn->query($sql);
 				$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 				$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
@@ -120,13 +120,13 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 				$sql = "SELECT PerfiId
 						FROM Perfil
 						Where PerfiChave IN ('ADMINISTRADOR','CONTROLADORIA') ";
-				$result = $conn->query("$sql");
+				$result = $conn->query($sql);
 				$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso
 						FROM FluxoOperacional
 						Where FlOpeId = ".$iFluxoOperacional;
-				$result = $conn->query("$sql");
+				$result = $conn->query($sql);
 				$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
 
 				/* Verifica se a Bandeja já tem um registro com BandeTabela: FluxoOperacional e BandeTabelaId: IdFluxoAtual, evitando duplicação */

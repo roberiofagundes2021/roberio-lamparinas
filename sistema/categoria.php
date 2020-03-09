@@ -9,7 +9,7 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT CategId, CategNome, CategStatus, SituaNome, SituaChave, SituaCor
 		FROM Categoria
 		JOIN Situacao on SituaId = CategStatus
-	    WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
+	    WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave != 'INVISIVEL'
 		ORDER BY CategNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

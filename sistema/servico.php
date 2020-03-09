@@ -5,10 +5,6 @@ include('global_assets/php/conexao.php');
 
 $_SESSION['PaginaAtual'] = 'Serviço';
 
-if (isset($_SESSION['fotoAtual'])){
-	unset($_SESSION['fotoAtual']);
-}
-
 $sql = "SELECT ServiId, ServiCodigo, ServiNome, CategNome, SbCatNome, ServiValorVenda, ServiStatus
 		FROM Servico
 		LEFT JOIN Categoria on CategId = ServiCategoria
@@ -129,9 +125,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					return false;
 				}
 				
-				//Verifica se a extensão é  diferente de CSV
-				if (ext(arquivo) != 'csv'){
-					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: CSV!','error');
+				//Verifica se a extensão é  diferente de XML
+				if (ext(arquivo) != 'xml'){
+					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: XML!','error');
 					$('#arquivo').focus();
 					return false;
 				}
@@ -155,7 +151,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		}			
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaProduto(ServicoId, ServicoNome, ServicoStatus, Tipo){
+		function atualizaServico(ServicoId, ServicoNome, ServicoStatus, Tipo){
 		
 			if (Tipo == 'exportar'){	
 				document.formServico.action = "servicoExportar.php";
@@ -218,24 +214,34 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<p class="font-size-lg">A relação abaixo faz referência aos serviços da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
 								<div class="text-right">
 									<a href="servicoNovo.php" class="btn btn-success" role="button">Novo Serviço</a>
+									<a href="#" style="float:right; margin-left: 5px;" onclick="atualizaServico(0, '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Serviços"><i class="icon-drawer-out"></i></a>
+									<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
+										<a href="#collapse-imprimir-relacao" class="dropdown-toggle btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
+											<i class="icon-drawer-in"></i>																						
+										</a>
+									</div>	
+									<!--<a href="produtoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Imprimir</a></div>-->
 								</div>
+
 								<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 15px; border-top:1px solid #ddd; padding-top: 10px;">
 									<div class="row">
 										<div class="col-lg-9">
 											<a href="#"><h2>Modelo de importação</h2></a>
 											<p style="font-weight: bold;">Nome do Serviço | Detalhamento do Serviço</p>
-											<p>Observação: Favor utilizar o ; (ponto-e-vírgula) como delimitador ao gerar o arquivo CSV. O arquivo deve conter 3 colunas apenas, sendo que a primeira linha deve ter o cabeçalho acima.</p>
+											<p>Observação: Favor salvar a planilha como tipo (Planilha XML 2003). O arquivo deve conter 2 colunas apenas, sendo que a primeira linha deve ter o cabeçalho acima.</p>
 										</div>
 										<div class="col-lg-3">
 											<form name="formUpload" id="formUpload" method="post" enctype="multipart/form-data" action="servicoImporta.php">
 												<input type="file" class="form-control" id="arquivo" name="arquivo">
-												<button class="btn bg-slate-700 btn-icon" id="enviar"><i class="icon-printer2"> Importar serviços</i></button>
+												<button class="btn bg-slate-700 btn-icon" id="enviar"><i class="icon-printer2"> Importar serviços</i></button>	
 											</form>
 										</div>
 									</div>
 								</div>
+								
+								
 								<?php 
-
+									
 									if (isset($_SESSION['RelImportacao']) and $_SESSION['RelImportacao'] != '') {
 										
 										if (isset($_SESSION['Importacao']) and $_SESSION['Importacao'] == 'Erro'){
@@ -251,8 +257,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											   </div>');										
 										unset($_SESSION['RelImportacao']);
 										//echo "<script> alerta('Atenção','".$_SESSION['RelImportacao']."','error'); </script>";  //Nao sei porque nao aparece
-									}
-								
+									}								
 								?>
 							</div>
 							
@@ -284,13 +289,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.formataMoeda($item['ServiValorVenda']).'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaProduto('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaProduto('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaProduto('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>

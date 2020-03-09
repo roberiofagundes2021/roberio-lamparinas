@@ -4,7 +4,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Importa Produto';
+$_SESSION['PaginaAtual'] = 'Importa Serviço';
 $_SESSION['RelImportacao'] = '';
 $_SESSION['Importacao'] = '';
 
@@ -38,7 +38,7 @@ $_UP['erros'][4] = 'Não foi feito o upload do arquivo';
 if ($_FILES['arquivo']['error'] != 0) {
 
 	alerta($_UP['erros'][$_FILES['arquivo']['error']]);
-	irpara("produto.php");
+	irpara("servico.php");
 }
 
 // Caso script chegue a esse ponto, não houve erro com o upload e o PHP pode continuar
@@ -49,7 +49,7 @@ $extensao = strtolower(end(explode(".", $_FILES['arquivo']['name'])));
 if ($extensao != 'csv') {
 
 	alerta("Por favor, envie arquivos com a seguinte extensão: CSV!");
-	irpara("produto.php");
+	irpara("servico.php");
 
 } */
 
@@ -86,51 +86,48 @@ else {
 	$primeiraLinha = true;
 	$qtd           = 0;
 	$importados    = 0;
-	$produtosimportados = "";
+	$servicosimportados = "";
 	$erro = "";
 	
 	foreach ($linhas as $linha){
 		
 		if($primeiraLinha){
 
-			$codigo = $linha->getElementsByTagName("Data")->item(0)->nodeValue;
+			$nome = $linha->getElementsByTagName("Data")->item(0)->nodeValue;
 			
-			if (is_numeric($codigo)) {
-			   $erro = "O formato do arquivo de importação provavelmente não está correto. Verifique Modelo: <a href='global_assets/importacao/modelo.xml'>Modelo de Importação de Produtos</a>";
+			if (strtoupper(substr($nome, 0, 4)) != 'NOME' and strtoupper(substr($nome, 0, 4)) != 'SERVI') {
+			   $erro = "O formato do arquivo de importação provavelmente não está correto. Verifique Modelo: <a href='global_assets/importacao/modelo.xml'>Modelo de Importação de Serviços</a>";
 			   break; //sai do while	
 			}
 			
 			$primeiraLinha = false;
 		} else {
-			$codigo = $linha->getElementsByTagName("Data")->item(0)->nodeValue;
-			$nome = $linha->getElementsByTagName("Data")->item(1)->nodeValue;
-			$detalhamento = $linha->getElementsByTagName("Data")->item(2)->nodeValue;
-			
+			$nome = $linha->getElementsByTagName("Data")->item(0)->nodeValue;
+			$detalhamento = $linha->getElementsByTagName("Data")->item(1)->nodeValue;
 			
 			$qtd++;
 			
-			$sql = "SELECT ProduId
-					FROM Produto
-					WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCodigoBarras = '".$codigo."'";
+			$sql = "SELECT ServiId
+					FROM Servico
+					WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and ServiNome = '".$nome."'";
 			$result = $conn->query($sql);
 			$row = $result->fetch(PDO::FETCH_ASSOC);
 			//$count = count($row);
 			
 			if ($row){
 
-				$sql = "UPDATE Produto SET ProduNome = :sNome, ProduDetalhamento = :sDetalhamento, ProduUsuarioAtualizador = :iUsuarioAtualizador
-						WHERE ProduCodigoBarras = :sCodigoBarras and ProduEmpresa = :iEmpresa";
+				$sql = "UPDATE Servico SET ServiDetalhamento = :sDetalhamento, ServiUsuarioAtualizador = :iUsuarioAtualizador
+						WHERE ServiNome = :sNome and ServiEmpresa = :iEmpresa";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
 								':sNome' => $nome,
 								':sDetalhamento' => $detalhamento,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':sCodigoBarras' => $codigo,
 								':iEmpresa' => $_SESSION['EmpreId']
 								));
 
-				$produtosimportados .= $nome.', ';
+				$servicosimportados .= $nome.', ';
 				$importados++;
 			}
 			else {
@@ -142,9 +139,9 @@ else {
 				$result = $conn->query($sql);
 				$rowCategoria = $result->fetch(PDO::FETCH_ASSOC);
 				
-				$sql = "SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
-						FROM Produto
-						Where ProduEmpresa = ".$_SESSION['EmpreId']."";
+				$sql = "SELECT COUNT(isnull(ServiCodigo,0)) as Codigo
+						FROM Servico
+						Where ServiEmpresa = ".$_SESSION['EmpreId']."";
 				//echo $sql;die;
 				$result = $conn->query("$sql");
 				$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
@@ -152,46 +149,36 @@ else {
 				$sCodigo = (int)$rowCodigo['Codigo'] + 1;
 				$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
 				
-				$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduCategoria, ProduSubCategoria, ProduDetalhamento, ProduFoto, 
-											 ProduValorCusto, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
-											 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, ProduFabricante, ProduUnidadeMedida, 
-											 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
-											 ProduUsuarioAtualizador, ProduEmpresa) 
-						VALUES (:sCodigo, :sCodigoBarras, :sNome, :iCategoria, :iSubCategoria, :sDetalhamento, :sFoto, :fValorCusto, 
-								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, :sNumSerie, 
-								:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
-								:iUsuarioAtualizador, :iEmpresa);";
+				$sql = "INSERT INTO Servico (ServiCodigo, ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, 
+											 ServiValorCusto, ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda, 
+											 ServiFabricante, ServiMarca, ServiModelo, ServiNumSerie, ServiStatus, ServiEmpresa,
+											 ServiUsuarioAtualizador) 
+						VALUES (:sCodigo, :sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :fValorCusto, 
+								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iFabricante, :iMarca, 
+								:iModelo, :sNumSerie, :bStatus, :iEmpresa, :iUsuarioAtualizador);";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
 								':sCodigo' => $sCodigo,
-								':sCodigoBarras' => $codigo,
 								':sNome' => $nome,
+								':sDetalhamento' => $detalhamento,								
 								':iCategoria' => $rowCategoria['CategId'],
 								':iSubCategoria' => null,
-								':sDetalhamento' => $detalhamento,
-								':sFoto' => null,
 								':fValorCusto' => null,						
 								':fOutrasDespesas' => null,
 								':fCustoFinal' => null,
 								':fMargemLucro' => null,
 								':fValorVenda' => null,
-								':iEstoqueMinimo' => null,
+								':iFabricante' => null,								
 								':iMarca' => null,
 								':iModelo' => null,
 								':sNumSerie' => null,
-								':iFabricante' => null,
-								':iUnidadeMedida' => null,
-								':iTipoFiscal' => null,
-								':iNcmFiscal' => null,
-								':iOrigemFiscal' => null,
-								':iCest' => null,
 								':bStatus' => 1,
-								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iEmpresa' => $_SESSION['EmpreId']
+								':iEmpresa' => $_SESSION['EmpreId'],								
+								':iUsuarioAtualizador' => $_SESSION['UsuarId']
 								));
 				 	    
-				$produtosimportados.= $nome.', ';
+				$servicosimportados.= $nome.', ';
 				$importados++;
 			}		
 		}
@@ -206,14 +193,14 @@ else {
 	   $relatorio .= "<br><br>";
 	   
 	   //usado para remover os 2 ultimos caracteres da string, para desaparecer com a ultima vírgula
-	   $size = strlen($produtosimportados);
-	   $produtosimportados = substr($produtosimportados,0, $size-2);
+	   $size = strlen($servicosimportados);
+	   $servicosimportados = substr($servicosimportados,0, $size-2);
 	   
 	   if ($erro == ""){
 		   $relatorio .= "Total de registros no arquivo: ".$qtd."<br>";
 		   $relatorio .= "Total de registros importados: ".$importados."<br><br>";
 
-		   $relatorio .= "<div style=\"width:600px\"><b>Produtos Importados:</b> ".$produtosimportados."</div><br>";
+		   $relatorio .= "<div style=\"width:600px\"><b>Serviços Importados:</b> ".$servicosimportados."</div><br>";
 		   $relatorio .= "<br>";
 	   }
 		
@@ -222,16 +209,16 @@ else {
 			
 	} else {
 		   
-	   $relatorio .= "<span style='color:#0080FF;'>Importação realizada com sucesso!</span><br><br>";	
+	   $relatorio .= "<b>Importação realizada com sucesso!</b><br><br>";	
 		
 		//usado para remover os 2 ultimos caracteres da string, para desaparecer com a ultima vírgula
-	   $size = strlen($produtosimportados);
-	   $produtosimportados = substr($produtosimportados,0, $size-2);
+	   $size = strlen($servicosimportados);
+	   $servicosimportados = substr($servicosimportados,0, $size-2);
 
 	   $relatorio .= "Total de registros no arquivo: ".$qtd."<br>";
 	   $relatorio .= "Total de registros importados: ".$importados."<br><br>";
 
-	   $relatorio .= "<div style=\"width:600px\"><b>Produtos Importados:</b> ".$produtosimportados."</div>";
+	   $relatorio .= "<div style=\"width:600px\"><b>Serviços Importados:</b> ".$servicosimportados."</div>";
 	   
 	   $_SESSION['RelImportacao'] = $relatorio; 
 	   $_SESSION['Importacao'] = 'Sucesso';
@@ -240,6 +227,6 @@ else {
 
 }
 
-irpara("produto.php");
+irpara("servico.php");
 
 ?>

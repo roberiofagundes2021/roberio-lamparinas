@@ -41,19 +41,19 @@
     <Cell><Data ss:Type="String">Detalhamento do Produto</Data></Cell>
    </Row>
    <Row>
-    <Cell><Data ss:Type="Number">100100</Data></Cell>
-    <Cell><Data ss:Type="String">Produto1 - A vida é assim, mas e agora, o que faço Senhor?</Data></Cell>
-    <Cell><Data ss:Type="String">Auxilia na medição da temperatura corporal via oral ou axilar, com memória da última leitura, com aviso sonoro.</Data></Cell>
+    <Cell><Data ss:Type="Number">100110</Data></Cell>
+    <Cell><Data ss:Type="String">Papel Toalha</Data></Cell>
+    <Cell><Data ss:Type="String">Detalhamento do papel toalha</Data></Cell>
    </Row>
    <Row>
-    <Cell><Data ss:Type="Number">100101</Data></Cell>
-    <Cell><Data ss:Type="String">Produto 2 - A vida é assim, Meu Deus!!</Data></Cell>
-    <Cell><Data ss:Type="String">Auxilia na medição da temperatura corporal via oral ou axilar, com memória da última leitura, com aviso sonoro.</Data></Cell>
+    <Cell><Data ss:Type="Number">100111</Data></Cell>
+    <Cell><Data ss:Type="String">Papel Lençol</Data></Cell>
+    <Cell><Data ss:Type="String">Detalhamento do papel lençol.</Data></Cell>
    </Row>
    <Row>
-    <Cell><Data ss:Type="Number">100102</Data></Cell>
-    <Cell><Data ss:Type="String">Produto 3 - Nome com vírgulas, né, joia.</Data></Cell>
-    <Cell><Data ss:Type="String">Auxilia na medição da temperatura corporal via oral ou axilar, com memória da última leitura, com aviso sonoro.</Data></Cell>
+    <Cell><Data ss:Type="Number">100112</Data></Cell>
+    <Cell><Data ss:Type="String">Algodão</Data></Cell>
+    <Cell><Data ss:Type="String">Detalhamento do Algodão</Data></Cell>
    </Row>
   </Table>
   <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">

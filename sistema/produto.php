@@ -233,7 +233,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<div class="col-lg-9">
 											<a href="#"><h2>Modelo de importação</h2></a>
 											<p style="font-weight: bold;">CodigoBarras | Nome do Produto | Detalhamento do Produto</p>
-											<p>Observação: Favor ao salvar a planilha salvar como arquivo XML. O arquivo deve conter 3 colunas apenas, sendo que a primeira linha deve ter o cabeçalho acima.</p>
+											<p>Observação: Favor salvar a planilha como tipo (Planilha XML 2003). O arquivo deve conter 3 colunas apenas, sendo que a primeira linha deve ter o cabeçalho acima.</p>
 										</div>
 										<div class="col-lg-3">
 											<form name="formUpload" id="formUpload" method="post" enctype="multipart/form-data" action="produtoImporta.php">
