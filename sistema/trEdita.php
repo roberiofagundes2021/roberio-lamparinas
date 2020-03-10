@@ -10,6 +10,7 @@ include('global_assets/php/conexao.php');
 if (isset($_POST['inputTRId'])) {
 
 	$iTR = $_POST['inputTRId'];
+	
 	///////////////////////////////////////////////////////
 	$sql = "SELECT *
 	        FROM TermoReferencia 
@@ -74,7 +75,12 @@ if (isset($_POST['inputTRId'])) {
 	irpara("tr.php");
 }
 
-if (isset($_POST['inputData'])) {
+if (isset($_POST['inputTRData'])) {
+
+	var_dump($_POST['cmbSubCategoria']);
+	var_dump($_POST['cmbCategoria']);
+	var_dump($_POST['TrProduto']);
+	var_dump($_POST['TrServico']);
 
 	try {
 
@@ -131,14 +137,14 @@ if (isset($_POST['inputData'])) {
 		// Excluindo os produtos de TermoReferenciaXProduto atrelados a esta TR.
 		//if (isset($_POST['inputTRProdutoExclui']) and $_POST['inputTRProdutoExclui']) {
 
-			$sql = "DELETE FROM TermoReferenciaXProduto
+		$sql = "DELETE FROM TermoReferenciaXProduto
 					WHERE TRXPrTermoReferencia = :iTr and TRXPrEmpresa = :iEmpresa";
-			$result = $conn->prepare($sql);
+		$result = $conn->prepare($sql);
 
-			$result->execute(array(
-				':iTr' => $iTR,
-				':iEmpresa' => $_SESSION['EmpreId']
-			));
+		$result->execute(array(
+			':iTr' => $iTR,
+			':iEmpresa' => $_SESSION['EmpreId']
+		));
 		//}
 
 
@@ -446,7 +452,7 @@ if (isset($_POST['inputData'])) {
 		exit;
 	}
 
-	irpara("tr.php");
+	//irpara("tr.php");
 }
 
 ?>
@@ -535,6 +541,31 @@ if (isset($_POST['inputData'])) {
 					inputSubCategoria = '#';
 				}
 
+				var postTRId = $('#inputTRId').val()
+				var postTRData = $('#inputData').val()
+				var postTRCategoria = $('#cmbCategoria').val()
+				var postTRSubCategoria = $('#cmbSubCategoria').val()
+				var postTRProduto = $('#TrProduto').val()
+				var postTRServico = $('#TrServico').val()
+				var postTRTxtarea = $('#summernote').val()
+
+				$('#postTRId').val(postTRId)
+				$('#postTRData').val(postTRData)
+				$('#postTRCategoria').val(postTRCategoria)
+				$('#postTRSubCategoria').val(postTRSubCategoria)
+				$('#postTRProduto').val(postTRProduto)
+				$('#postTRServico').val(postTRServico)
+				$('#postTRTxtarea').val(postTRTxtarea)
+				
+				console.log(postTRId)
+				console.log(postTRData)
+				console.log(postTRCategoria)
+				console.log(postTRSubCategoria)
+				console.log(postTRProduto)
+				console.log(postTRServico)
+
+
+
 				//Depois
 				var cmbCategoria = $('#cmbCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
@@ -582,7 +613,7 @@ if (isset($_POST['inputData'])) {
 					}, 1)
 				}
 
-				$("#formTR").submit();
+				//$("#formTrEdita").submit();
 
 			}); // enviar			
 		}); //document.ready
@@ -620,6 +651,7 @@ if (isset($_POST['inputData'])) {
 				<div class="card">
 
 					<form name="formTR" id="formTR" method="post" class="form-validate">
+						<input id="inputTRId" type="hidden" name="inputTRId" value="<?php echo $row['TrRefId'] ?>">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar TR Nº "<?php echo $_POST['inputTRNumero']; ?>"</h5>
 						</div>
@@ -653,11 +685,6 @@ if (isset($_POST['inputData'])) {
 							}
 						}
 						?>
-						<input type="hidden" id="inputTRId" name="inputTRId" value="<?php echo $row['TrRefId']; ?>">
-						<input type="hidden" id="inputTRNumero" name="inputTRNumero" value="<?php echo $row['TrRefNumero']; ?>">
-						<input type="hidden" id="inputTRCategoria" name="inputTRCategoria" value="<?php echo $row['TrRefCategoria']; ?>">
-						<input type="hidden" id="inputTRSubCategoria" name="inputTRSubCategoria" value="<?php echo $row['TrRefSubCategoria']; ?>">
-						<input type="hidden" id="inputTRProdutoExclui" name="inputTRProdutoExclui" value="0">
 
 						<?php
 
@@ -771,27 +798,27 @@ if (isset($_POST['inputData'])) {
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
 												<?php
-												    if (count($rowTrOr) >= 1){
-												    	print('<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" value="'.$row['TrRefCategoria'].'" disabled>');
-												    } else {
-														print('<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">');
-													}
+												if (count($rowTrOr) >= 1) {
+													print('<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" value="' . $row['TrRefCategoria'] . '" disabled>');
+												} else {
+													print('<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">');
+												}
 												?>
-													<option value="#">Selecione</option>
-													<?php
-													$sql = "SELECT CategId, CategNome
+												<option value="#">Selecione</option>
+												<?php
+												$sql = "SELECT CategId, CategNome
 																FROM Categoria															     
 																WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and CategStatus = 1
 															    ORDER BY CategNome ASC";
-													$result = $conn->query($sql);
-													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+												$result = $conn->query($sql);
+												$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowCategoria as $item) {
-														$seleciona = $item['CategId'] == $row['TrRefCategoria'] ? "selected" : "";
-														print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
-													}
+												foreach ($rowCategoria as $item) {
+													$seleciona = $item['CategId'] == $row['TrRefCategoria'] ? "selected" : "";
+													print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
+												}
 
-													?>
+												?>
 												</select>
 											</div>
 										</div>
@@ -800,30 +827,30 @@ if (isset($_POST['inputData'])) {
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<?php
-												    if (count($rowTrOr) >= 1){
-												    	print('<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select form-control-select2" multiple="multiple" data-fouc disabled>');
-												    } else {
-														print('<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select form-control-select2" multiple="multiple" data-fouc>');
-													}
+												if (count($rowTrOr) >= 1) {
+													print('<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select form-control-select2" multiple="multiple" data-fouc disabled>');
+												} else {
+													print('<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select form-control-select2" multiple="multiple" data-fouc>');
+												}
 												?>
-													<?php
-													if (isset($row['TrRefCategoria'])) {
-														$sql = ("SELECT SbCatId, SbCatNome
+												<?php
+												if (isset($row['TrRefCategoria'])) {
+													$sql = ("SELECT SbCatId, SbCatNome
 															         FROM SubCategoria														 
 															         WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and SbCatCategoria = " . $row['TrRefCategoria'] . " and SbCatStatus = 1
 															         ORDER BY SbCatNome ASC");
-														$result = $conn->query("$sql");
-														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-														$count = count($rowSubCategoria);
+													$result = $conn->query("$sql");
+													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+													$count = count($rowSubCategoria);
 
-														if ($count) {
-															foreach ($rowSubCategoria as $item) {
-																$seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
-																print('<option value="' . $item['SbCatId'] . '" ' . $seleciona . '>' . $item['SbCatNome'] . '</option>');
-															}
+													if ($count) {
+														foreach ($rowSubCategoria as $item) {
+															$seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
+															print('<option value="' . $item['SbCatId'] . '" ' . $seleciona . '>' . $item['SbCatNome'] . '</option>');
 														}
 													}
-													?>
+												}
+												?>
 												</select>
 											</div>
 										</div>
@@ -852,6 +879,15 @@ if (isset($_POST['inputData'])) {
 							</div>
 						</div>
 						<!-- /card-body -->
+					</form>
+					<form id="formTrEdita" name="formTrEdita" method="POST">
+						<input type="hidden" id="postTRId" name="inputTRId">
+						<input type="hidden" id="postTRData" name="inputTRData">
+						<input type="hidden" id="postTRProduto" name="TrProduto">
+						<input type="hidden" id="postTRServico" name="TrServico">
+						<input type="hidden" id="postTRCategoria" name="cmbCategoria">
+						<input type="hidden" id="postTRSubCategoria" name="cmbSubCategoria">
+						<input type="hidden" id="postTRTxtarea" name="txtareaConteudo">
 					</form>
 
 				</div>
