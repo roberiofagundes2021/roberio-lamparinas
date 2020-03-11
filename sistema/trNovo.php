@@ -6,17 +6,17 @@ $_SESSION['PaginaAtual'] = 'Novo Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
+$sql = "SELECT ParamProdutoOrcamento, ParamServicoOrcamento
+		FROM Parametro
+		WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
+		";
+$result = $conn->query($sql);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
+
+isset($rowParametro['ParamProdutoOrcamento']) && $rowParametro['ParamProdutoOrcamento'] == 1 ? $parametroProduto = 'ProdutoOrcamento' : $parametroProduto = 'Produto';
+isset($rowParametro['ParamServicoOrcamento']) && $rowParametro['ParamServicoOrcamento'] == 1 ? $parametroServico = 'ServicoOrcamento' : $parametroServico = 'Servico';
+
 if (isset($_POST['inputData'])) {
-
-	$sql = "SELECT ParamProdutoOrcamento, ParamServicoOrcamento
-	        FROM Parametro
-	        WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
-	        ";
-	$result = $conn->query($sql);
-	$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
-
-	$parametro = '';
-	isset($rowParametro['ParamProdutoOrcamento']) && $rowParametro['ParamProdutoOrcamento'] != 0 ? $parametro = 'ProdutoOrcamento' : $parametro = 'Produto';
 
 	$tipoTr = '';
 
@@ -32,10 +32,11 @@ if (isset($_POST['inputData'])) {
 
 		$conn->beginTransaction();
 
-		$sql = ("SELECT COUNT(isnull(TrRefNumero,0)) as Numero
-				 FROM TermoReferencia
-				 Where TrRefEmpresa = " . $_SESSION['EmpreId'] . "");
-		$result = $conn->query("$sql");
+		//Gera o novo Número (incremental)
+		$sql = "SELECT COUNT(isnull(TrRefNumero,0)) as Numero
+				FROM TermoReferencia
+				Where TrRefEmpresa = " . $_SESSION['EmpreId'] . "";
+		$result = $conn->query($sql);
 		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sNumero = (int) $rowNumero['Numero'] + 1;
@@ -50,7 +51,7 @@ if (isset($_POST['inputData'])) {
 		$result->execute(array(
 			':sNumero' => $sNumero,
 			':dData' => gravaData($_POST['inputData']),
-			':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+			':iCategoria' => $_POST['cmbCategoria'],
 			':sConteudo' => $_POST['txtareaConteudo'],
 			':sTipo' => $tipoTr,
 			':bStatus' => 1,
@@ -61,318 +62,48 @@ if (isset($_POST['inputData'])) {
 		// Começo do cadastro de subcategorias da TR
 		$insertId = $conn->lastInsertId();
 
-
-
+		$possuiSubCategoria = 0;
+		
 		if (isset($_POST['cmbSubCategoria'])) {
+			
+			$possuiSubCategoria = 1;
 
-			try {
-				$sql = "INSERT INTO TRXSubcategoria
-							(TRXSCTermoReferencia, TRXSCSubCategoria, TRXSCEmpresa)
-						VALUES 
-							(:iTermoReferencia, :iSubCategoria, :iEmpresa)";
-				$result = $conn->prepare($sql);
+			$sql = "INSERT INTO TRXSubcategoria
+						(TRXSCTermoReferencia, TRXSCSubCategoria, TRXSCEmpresa)
+					VALUES 
+						(:iTermoReferencia, :iSubCategoria, :iEmpresa)";
+			$result = $conn->prepare($sql);
 
-				foreach ($_POST['cmbSubCategoria'] as $key => $value) {
+			foreach ($_POST['cmbSubCategoria'] as $key => $value) {
 
-					$result->execute(array(
-						':iTermoReferencia' => $insertId,
-						':iSubCategoria' => $value,
-						':iEmpresa' => $_SESSION['EmpreId']
-					));
-				}
-
-				if ($tipoTr == 'PS') {
-					// Gravando os produtos da categoria e subcategoria(s)
-					if ($rowParametro['ParamProdutoOrcamento'] != 0) {
-						foreach ($_POST['cmbSubCategoria'] as $value) {
-							$sql = "SELECT PrOrcId
-									FROM ProdutoOrcamento
-									WHERE PrOrcSubcategoria = " . $value . "";
-							$result = $conn->query($sql);
-							$produtos = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-							foreach ($produtos as $produto) {
-								try {
-									$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrEmpresa)
-											VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
-									$result = $conn->prepare($sql);
-
-									if ($produto) {
-
-										$result->execute(array(
-											':iTR' => $insertId,
-											':iProduto' => $produto['PrOrcId'],
-											':iQuantidade' => null,
-											':fValorUnitario' => null,
-											':sTabela' => $parametro,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId'],
-										));
-									}
-								} catch (PDOException $e) {
-
-									echo 'Error: ' . $e->getMessage();
-									exit;
-								}
-							}
-						}
-					} else {
-						foreach ($_POST['cmbSubCategoria'] as $value) {
-							$sql = "SELECT ProduId
-									FROM Produto
-									WHERE ProduSubCategoria = " . $value . "";
-							$result = $conn->query($sql);
-							$produtos = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-							foreach ($produtos as $produto) {
-								try {
-									$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrEmpresa)
-											VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
-									$result = $conn->prepare($sql);
-
-									if ($produto) {
-
-										$result->execute(array(
-											':iTR' => $insertId,
-											':iProduto' => $produto['ProduId'],
-											':iQuantidade' => null,
-											':fValorUnitario' => null,
-											':sTabela' => $parametro,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId'],
-										));
-									}
-								} catch (PDOException $e) {
-
-									echo 'Error: ' . $e->getMessage();
-									exit;
-								}
-							}
-						}
-					}
-
-					// Gravando os serviços da categoria e subcategoria(s)
-					if ($rowParametro['ParamServicoOrcamento'] != 0) {
-						foreach ($_POST['cmbSubCategoria'] as $value) {
-							$sql = "SELECT SrOrcId
-									FROM ServicoOrcamento
-									WHERE SrOrcSubcategoria = " . $value . "";
-							$result = $conn->query($sql);
-							$servicos = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-							foreach ($servicos as $servico) {
-								try {
-									$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrProduto, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
-											VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
-									$result = $conn->prepare($sql);
-
-									if ($servico) {
-
-										$result->execute(array(
-											':iTR' => $insertId,
-											':iServico' => $servico['SrOrcId'],
-											':iQuantidade' => null,
-											':fValorUnitario' => null,
-											':sTabela' => $parametro,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId'],
-										));
-									}
-								} catch (PDOException $e) {
-
-									echo 'Error: ' . $e->getMessage();
-									exit;
-								}
-							}
-						}
-					} else {
-						foreach ($_POST['cmbSubCategoria'] as $value) {
-							$sql = "SELECT ServiId
-									FROM Servico
-									WHERE ServiSubCategoria = " . $value . "";
-							$result = $conn->query($sql);
-							$servicos = $result->fetchAll(PDO::FETCH_ASSOC);
-
-							foreach ($servicos as $servico) {
-								try {
-									$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
-											VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
-									$result = $conn->prepare($sql);
-
-									if ($servico) {
-
-										$result->execute(array(
-											':iTR' => $insertId,
-											':iServico' => $servico['ServiId'],
-											':iQuantidade' => null,
-											':fValorUnitario' => null,
-											':sTabela' => $parametro,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId'],
-										));
-									}
-								} catch (PDOException $e) {
-
-									echo 'Error: ' . $e->getMessage();
-									exit;
-								}
-							}
-						}
-					}
-				} else if ($tipoTr == 'P') {
-					// Gravando os produtos da categoria e subcategoria(s)
-					if ($rowParametro['ParamProdutoOrcamento'] != 0) {
-						foreach ($_POST['cmbSubCategoria'] as $value) {
-							$sql = "SELECT PrOrcId
-									FROM ProdutoOrcamento
-									WHERE PrOrcSubcategoria = " . $value . "";
-							$result = $conn->query($sql);
-							$produtos = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-							foreach ($produtos as $produto) {
-								try {
-									$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrEmpresa)
-											VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
-									$result = $conn->prepare($sql);
-
-									if ($produto) {
-
-										$result->execute(array(
-											':iTR' => $insertId,
-											':iProduto' => $produto['PrOrcId'],
-											':iQuantidade' => null,
-											':fValorUnitario' => null,
-											':sTabela' => $parametro,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId'],
-										));
-									}
-								} catch (PDOException $e) {
-
-									echo 'Error: ' . $e->getMessage();
-									exit;
-								}
-							}
-						}
-					} else {
-						foreach ($_POST['cmbSubCategoria'] as $value) {
-							$sql = "SELECT ProduId
-									FROM Produto
-									WHERE ProduSubCategoria = " . $value . "";
-							$result = $conn->query($sql);
-							$produtos = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-							foreach ($produtos as $produto) {
-								try {
-									$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrEmpresa)
-											VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
-									$result = $conn->prepare($sql);
-									var_dump($sql);
-
-									if ($produto) {
-
-										$result->execute(array(
-											':iTR' => $insertId,
-											':iProduto' => $produto['ProduId'],
-											':iQuantidade' => null,
-											':fValorUnitario' => null,
-											':sTabela' => $parametro,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId'],
-										));
-									}
-								} catch (PDOException $e) {
-
-									echo 'Error: ' . $e->getMessage();
-									exit;
-								}
-							}
-						}
-					}
-				} else {
-					// Gravando os serviços da categoria e subcategoria(s)
-					if ($rowParametro['ParamServicoOrcamento'] != 0) {
-						foreach ($_POST['cmbSubCategoria'] as $value) {
-							$sql = "SELECT SrOrcId
-									FROM ServicoOrcamento
-									WHERE SrOrcSubcategoria = " . $value . "";
-							$result = $conn->query($sql);
-							$servicos = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-							foreach ($servicos as $servico) {
-								try {
-									$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrProduto, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
-											VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
-									$result = $conn->prepare($sql);
-
-									if ($servico) {
-
-										$result->execute(array(
-											':iTR' => $insertId,
-											':iServico' => $servico['SrOrcId'],
-											':iQuantidade' => null,
-											':fValorUnitario' => null,
-											':sTabela' => $parametro,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId'],
-										));
-									}
-								} catch (PDOException $e) {
-
-									echo 'Error: ' . $e->getMessage();
-									exit;
-								}
-							}
-						}
-					} else {
-						foreach ($_POST['cmbSubCategoria'] as $value) {
-							$sql = "SELECT ServiId
-									FROM Servico
-									WHERE ServiSubCategoria = " . $value . "";
-							$result = $conn->query($sql);
-							$servicos = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-							foreach ($servicos as $servico) {
-								try {
-									$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrProduto, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
-											VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
-									$result = $conn->prepare($sql);
-
-									if ($servico) {
-
-										$result->execute(array(
-											':iTR' => $insertId,
-											':iServico' => $servico['ServiId'],
-											':iQuantidade' => null,
-											':fValorUnitario' => null,
-											':sTabela' => $parametro,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId'],
-										));
-									}
-								} catch (PDOException $e) {
-
-									echo 'Error: ' . $e->getMessage();
-									exit;
-								}
-							}
-						}
-					}
-				}
-			} catch (PDOException $e) {
-				$conn->rollback();
-				echo 'Error: ' . $e->getMessage();
-				exit;
+				$result->execute(array(
+					':iTermoReferencia' => $insertId,
+					':iSubCategoria' => $value,
+					':iEmpresa' => $_SESSION['EmpreId']
+				));
 			}
 		}
+		
+		//Se for Produto e Serviço
+		if ($tipoTr == 'PS') {
+			
+			//Gravando os Produtos
+			include("trGravaProduto.php");
+			
+			// Gravando os Serviços
+			include("trGravaServico.php");
+			
+		} else if ($tipoTr == 'P') {
 
+			//Gravando os Produtos
+			include("trGravaProduto.php");
+
+		} else if ($tipoTr == 'S') {
+
+			// Gravando os Serviços
+			include("trGravaServico.php");
+		}
+		
 		$conn->commit();
 
 		// Fim de cadastro
@@ -381,6 +112,8 @@ if (isset($_POST['inputData'])) {
 		$_SESSION['msg']['mensagem'] = "Termo de referência incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
 	} catch (PDOException $e) {
+		
+		$conn->rollback();
 
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir termo de referência!!!";
@@ -407,51 +140,28 @@ if (isset($_POST['inputData'])) {
 	<?php include_once("head.php"); ?>
 
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.	min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	<!-- /theme JS files -->
-
-	<!-- JS file path -->
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-
-	<!-- Uniform plugin file path -->
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-
 	<script src="global_assets/js/demo_pages/form_checkboxes_radios.js"></script>
 
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
-
+	<!-- /theme JS files -->
+	
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+
 		$(document).ready(function() {
 
+			//Inicializa o editor de texto que será usado pelo campo "Conteúdo Personalizado"
 			$('#summernote').summernote();
-
-			$('#formTR').validate({ // initialize the plugin
-				rules: {
-					'TrProduto': {
-						required: true,
-						minlength: 1
-					}
-				},
-				messages: {
-					'TrProduto': {
-						required: "*",
-						maxlength: "Check no more than {0} boxes"
-					}
-				}
-			});
-
+			
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e) {
 
@@ -476,16 +186,60 @@ if (isset($_POST['inputData'])) {
 				});
 
 			});
+			
+			
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();		
+				
+				var TrProduto = document.getElementById("TrProduto");
+				var TrServico = document.getElementById("TrServico");
+				var parametroProduto = $('#parametroProduto').val() == 'ProdutoOrcamento' ? 1 : 0;
+				var parametroServico = $('#parametroServico').val() == 'ServicoOrcamento' ? 1 : 0;
+				var cmbCategoria = $('#cmbCategoria').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val() != '' ? $('#cmbSubCategoria').val() : 0;
+				
+				if (!TrProduto.checked && !TrServico.checked){
+					alerta('Atenção','Informe se o Termo de Referência terá Produtos e/ou Serviços!','error');
+					$('#TrProduto').focus();
+					return false;					
+				}
+				
+/*				alert(TrProduto.checked);
+				alert(TrServico.checked);
+				alert(parametroProduto);
+				alert(parametroServico);
+				alert(cmbCategoria);
+				alert(cmbSubCategoria); */
+				
+				//Falta conferir o que tem de errado nessa validação. Caso não dê certo, tentar fazer parecido com a linha 430 do movimentacaoNovo.php
+				$.getJSON('trValidaProdutoServico.php?bProduto='+TrProduto.checked+'&bServico='+TrServico.checked+'&parametroProduto='+parametroProduto+'&parametroServico='+parametroServico+'&iCategoria='+cmbCategoria+'&iSubCategoria='+cmbSubCategoria, function (dados){
+
+					alert(dados.length);
+					if (dados.length){						
+						alert('Entrou1');
+						return false;
+					} else {
+						alert('Entrou2');
+					}	
+				});			
+
+				alert('Chegou aqui');
+				
+				return false;
+				
+				$( "#formTR" ).submit();
+			});
 
 		}); //document.ready
 
 		//Mostra o "Filtrando..." na combo SubCategoria
 		function Filtrando() {
-			$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
+			$('#cmbSubCategoria').empty().append('<option value="">Filtrando...</option>');
 		}
 
 		function ResetSubCategoria() {
-			$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
+			$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
 		}
 	</script>
 
@@ -515,6 +269,9 @@ if (isset($_POST['inputData'])) {
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Termo de Referência</h5>
 						</div>
+						
+						<input type="hidden" id="parametroProduto" name="parametroProduto" value="<?php echo $parametroProduto; ?>" >
+						<input type="hidden" id="parametroServico" name="parametroServico" value="<?php echo $parametroServico; ?>" >
 
 						<div class="card-body">
 
@@ -530,14 +287,14 @@ if (isset($_POST['inputData'])) {
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputData">O TR terá:</label>
+												<label for="inputData">O Termo de Referência terá: <span class="text-danger">*</span></label>
 												<div class="d-flex flex-row">
 													<div class="p-1 m-0 d-flex flex-row">
-														<input id="TrProduto" value="P" name="TrProduto" class="form-check-input-styled" type="checkbox">
+														<input name="TrProduto" id="TrProduto" value="P" class="form-check-input-styled" type="checkbox">
 														<label for="TrProduto" class="ml-1" style="margin-bottom: 2px">Produto</label>
 													</div>
 													<div class="p-1 m-0 d-flex flex-row">
-														<input id="TrServico" value="S" name="TrServico" class="form-check-input-styled" type="checkbox">
+														<input name="TrServico" id="TrServico" value="S" class="form-check-input-styled" type="checkbox">
 														<label for="TrServico" class="ml-1" style="margin-bottom: 2px">Serviço</label>
 													</div>
 												</div>
@@ -546,14 +303,15 @@ if (isset($_POST['inputData'])) {
 
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
+												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT CategId, CategNome
-																 FROM Categoria															     
-																 WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and CategStatus = 1
-															     ORDER BY CategNome ASC";
+															FROM Categoria
+															JOIN Situacao on SituaId = CategStatus
+															WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															ORDER BY CategNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 

@@ -6,13 +6,12 @@ $_SESSION['PaginaAtual'] = 'Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefSubCategoria, TrRefTipo, CategNome, SbCatNome, TrRefStatus
-		 FROM TermoReferencia
-		 JOIN Categoria on CategId = TrRefCategoria
-		 LEFT JOIN SubCategoria on SbCatId = TrRefSubCategoria
-	     WHERE TrRefEmpresa = " . $_SESSION['EmpreId'] . "
-		 ORDER BY TrRefData DESC");
-$result = $conn->query("$sql");
+$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefStatus
+		FROM TermoReferencia
+		JOIN Categoria on CategId = TrRefCategoria
+	    WHERE TrRefEmpresa = " . $_SESSION['EmpreId'] . "
+		ORDER BY TrRefData DESC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -38,12 +37,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script>
-
 	<script type="text/javascript">
+	
 		$(document).ready(function() {
 
 			/* Início: Tabela Personalizada */
@@ -207,10 +202,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									foreach ($row as $item) {
 
 										$sql = "SELECT SbCatId, SbCatNome
-				                                        FROM SubCategoria
-				                                        JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-				                                        WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and TRXSCTermoReferencia = " . $item['TrRefId'] . "
-				                                            ORDER BY SbCatNome ASC";
+												FROM SubCategoria
+												JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
+												WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and TRXSCTermoReferencia = " . $item['TrRefId'] . "
+													ORDER BY SbCatNome ASC";
 										$result = $conn->query($sql);
 										$rowSC = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -228,13 +223,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										');
 
 										if (!$rowSC) {
-											$seleciona = $item['SbCatNome'];
 
 											print('
 												<td>
 											        <div class="d-flex flex-row">
                                                         <div class="p-1">
-                                                            <div>' . $seleciona . '</div>
+                                                            <div></div>
                                                         </div>
 											        </div>
 											    </td>
@@ -253,7 +247,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												} else {
 													print('
                                                         <div class="py-1 pl-1 pr-0 ">
-                                                            <div style="margin-right: 3px;">' . $a['SbCatNome'] . '  |</div>
+                                                            <div style="margin-right: 3px;">' . $a['SbCatNome'] . ',</div>
                                                         </div>
 											        ');
 												}
