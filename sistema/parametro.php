@@ -18,6 +18,13 @@ if (isset($_SESSION['EmpresaId'])) {
 
 if (isset($_POST['inputIdEmpresa'])) {
 
+	if (isset($_POST['inputParamValorProduto'])) {
+		$VAF = null;
+		$VAOC = null;
+		$_POST['inputParamValorProduto'] == 'ValorAtualizadoFluxo' ? $VAF = 1 : $VAF = 0;
+		$_POST['inputParamValorProduto'] == 'ValorAtualizadoOrdemCompra' ? $VAOC = 1 : $VAOC = 0;
+	}
+
 	try {
 		//var_dump($_POST);die;
 		$sql = "UPDATE Parametro SET ParamEmpresaPublica = :iEmpresaPublica, ParamValorAtualizadoFluxo = :iValorAtualizadoFluxo, 
@@ -27,8 +34,8 @@ if (isset($_POST['inputIdEmpresa'])) {
 
 		$result->execute(array(
 			':iEmpresaPublica' => isset($_POST['inputEmpresaPublica']) && $_POST['inputEmpresaPublica'] == "on" ? 1 : 0,
-			':iValorAtualizadoFluxo' => isset($_POST['inputValorFluxo']) && $_POST['inputValorFluxo'] == "on" ? 1 : 0,
-			':iValorAtualizadoOrdemCompra' => isset($_POST['inputValorOrdemCompra']) && $_POST['inputValorOrdemCompra'] == "on" ? 1 : 0,
+			':iValorAtualizadoFluxo' => $VAF,
+			':iValorAtualizadoOrdemCompra' => $VAOC,
 			':iValorObsImpreRetirada' => isset($_POST['inputValorObsImpreRetirada']) && $_POST['inputValorObsImpreRetirada'] == "on" ? 1 : 0,
 			':iProdutoOrcamento' => isset($_POST['inputProdutoOrcamento']) && $_POST['inputProdutoOrcamento'] == "on" ? 1 : 0,
 			':iServicoOrcamento' => isset($_POST['inputServicoOrcamento']) && $_POST['inputServicoOrcamento'] == "on" ? 1 : 0,
@@ -74,6 +81,9 @@ if (isset($_POST['inputIdEmpresa'])) {
 	<script src="global_assets/js/demo_pages/form_validation.js"></script> <!-- CV Documentacao: https://jqueryvalidation.org/ -->
 
 	<script src="global_assets/js/plugins/forms/styling/switch.min.js"></script>
+
+
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 	<!-- /theme JS files -->
 
 	<!-- Adicionando Javascript -->
@@ -153,27 +163,27 @@ if (isset($_POST['inputIdEmpresa'])) {
 							<div class="row">
 								<div class="col-lg-6">
 									<!-- Switch group -->
-									<div class="form-group row">
+									<div class="form-group row" id="inputParamValorProduto">
 										<label class="col-form-label col-lg-3">Valor do Produto será atualizado <span class="text-danger">*</span></label>
-										<div class="col-lg-9">
-											<div class="form-check form-check-switch form-check-switch-left">
-												<label class="form-check-label d-flex align-items-center">
-													<input type="checkbox" name="inputValorFluxo" id="inputValorFluxo" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamValorAtualizadoFluxo']) echo "checked"; ?>>
+										<div class="d-flex flex-column p-2">
+											<div class="form-check form-check-inline">
+												<label class="form-check-label">
+													<input type="radio" name="inputParamValorProduto" id="inputValorFluxo" value="ValorAtualizadoFluxo" class="form-input-styled" data-fouc <?php if ($row['ParamValorAtualizadoFluxo'] != 0) echo "checked"; ?>>
 													Fluxo Previsto
 												</label>
 											</div>
-
-											<div class="form-check form-check-switch form-check-switch-left">
-												<label class="form-check-label d-flex align-items-center">
-													<input type="checkbox" name="inputValorOrdemCompra" id="inputValorOrdemCompra" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamValorAtualizadoOrdemCompra']) echo "checked"; ?>>
+											<div class="form-check form-check-inline">
+												<label class="form-check-label">
+													<input type="radio" name="inputParamValorProduto" id="inputValorOrdemCompra" value="ValorAtualizadoOrdemCompra" class="form-input-styled" data-fouc <?php if ($row['ParamValorAtualizadoOrdemCompra'] != 0) echo "checked"; ?>>
 													Ordem de Compra/Carta Contrato
 												</label>
 											</div>
 										</div>
 									</div>
-									<!-- /switch group -->
 								</div>
+								<!-- /switch group -->
 							</div>
+
 							<div class="row">
 								<div class="col-lg-6">
 									<!-- Switch single -->
@@ -229,22 +239,21 @@ if (isset($_POST['inputIdEmpresa'])) {
 									</div>
 								</div>
 							</div>
-
 						</div>
-						<!-- /card-body -->
-
 					</form>
-
 				</div>
-				<!-- /info blocks -->
+				<!-- /card-body -->
 
 			</div>
-			<!-- /content area -->
+			<!-- /info blocks -->
 
 			<?php include_once("footer.php"); ?>
 
 		</div>
-		<!-- /main content -->
+		<!-- /content area -->
+
+	</div>
+	<!-- /main content -->
 
 	</div>
 	<!-- /page content -->

@@ -230,7 +230,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacao = $item['SituaNome'];
 										
 										if ($item['SituaChave'] == 'PENDENTE'){
-											$situacaoClasse = 'badge badge-flat border-primary text-danger-600';
+											$situacaoClasse = 'badge badge-flat border-warning text-warning-600';
 										} else if ($item['SituaChave'] == 'NAOLIBERADO'){
 											$situacaoClasse = 'badge badge-flat border-danger text-danger-600';
 										} else{

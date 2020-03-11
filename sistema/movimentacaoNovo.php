@@ -137,6 +137,11 @@ if(isset($_POST['inputData'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 	<script src="global_assets/js/lamparinas/jquery.maskMoney.js"></script>  <!-- http://www.fabiobmed.com.br/criando-mascaras-para-moedas-com-jquery/ -->
 	<!-- /theme JS files -->
 	
@@ -219,6 +224,19 @@ if(isset($_POST['inputData'])){
 					} else {
 						ResetProduto();
 					}					
+				});		
+
+
+				$.get('filtraOrdemCompra.php?idFornecedor='+cmbFornecedor, function (dados){
+
+					var option = '<option value="#">Selecione</option>';
+					console.log(dados)
+					if (dados){
+						$('#cmbOrdemCompra').html(option).show();
+						$('#cmbOrdemCompra').append(dados).show();
+					} else {
+						$('#cmbOrdemCompra').html(option).show();
+					}
 				});				
 				
 			});
@@ -420,9 +438,9 @@ if(isset($_POST['inputData'])){
 					return false;
 				}				
 				
-				var resNumItens = parseInt(inputNumItens) + 1;	
-				var total = parseInt(inputQuantidade) * parseInt(inputValorUnitario);
-				
+				var resNumItens = parseInt(inputNumItens) + 1;
+				var total = parseInt(inputQuantidade) * parseFloat(inputValorUnitario.replace(',', '.'));
+
 				total = total + parseFloat(inputTotal);
 				var totalFormatado = "R$ " + float2moeda(total).toString();
 				
@@ -499,6 +517,7 @@ if(isset($_POST['inputData'])){
 
 				$('#inputTotal').val(inputTotal);
 				$('#total').text(totalFormatado);
+				
 				
 				var resNumItens = parseInt(inputNumItens) - 1;
 				$('#inputNumItens').val(resNumItens);
@@ -750,7 +769,7 @@ if(isset($_POST['inputData'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate" action="movimentacaoNovo.php">
+					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovo.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Movimentação</h5>
 						</div>
@@ -951,9 +970,9 @@ if(isset($_POST['inputData'])){
 										
 										<div class="col-lg-3">											
 											<div class="form-group">
-												<label for="cmbOrdemCompra">Nº Ordem Compra / Carta Contrato</label>
-												<select id="cmbOrdemCompra" name="cmbOrdemCompra" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<label for="cmbOrdemCompra">*Nº Ordem Compra / Carta Contrato</label>
+												<select id="cmbOrdemCompra" name="cmbOrdemCompra" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 												</select>
 											</div>											
 										</div>	
