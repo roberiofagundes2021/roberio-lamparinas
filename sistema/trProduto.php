@@ -74,7 +74,6 @@ try {
 	$sql = "SELECT *
 			FROM TermoReferencia
 			JOIN Categoria on CategId = TrRefCategoria
-			LEFT JOIN SubCategoria on SbCatId = TrRefSubCategoria
 			JOIN Situacao on SituaId = TrRefStatus
 			WHERE TrRefEmpresa = " . $_SESSION['EmpreId'] . " and TrRefId = " . $iTR ." and SituaChave = 'ATIVO'";
 	$result = $conn->query($sql);
@@ -373,7 +372,7 @@ try {
 
 									if (count($aProdutos1) >= 1) {
 
-										$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, TRXPrTabela, UnMedNome
+										$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, TRXPrTabela, UnMedNome, UnMedSigla
 									            FROM ProdutoOrcamento
 									            JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 									            LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
@@ -429,7 +428,7 @@ try {
 								                    		</div>
 								                    	</div>								
 								                    	<div class="col-lg-1">
-								                    		<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
+								                    		<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
 								                    	</div>
 								                    	<div class="col-lg-2">
 								                    		<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
@@ -444,7 +443,7 @@ try {
 										print('</div>');
 									} else {
 
-										$sql = "SELECT TRXPrQuantidade, TRXPrTabela, ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, UnMedNome
+										$sql = "SELECT TRXPrQuantidade, TRXPrTabela, ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, UnMedNome, UnMedSigla
 									            FROM TermoReferenciaXProduto
 									            JOIN Produto on ProduId = TRXPrProduto
 												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -503,7 +502,7 @@ try {
 								                    		</div>
 								                    	</div>								
 								                    	<div class="col-lg-1">
-								                    		<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
+								                    		<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
 								                    	</div>
 								                    	<div class="col-lg-2">
 								                    		<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">

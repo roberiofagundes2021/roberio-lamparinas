@@ -31,7 +31,7 @@
 
 					$result->execute(array(
 						':iTR' => $insertId,
-						':iProduto' => $produto['ProduId'],
+						':iProduto' => $rowParametro['ParamProdutoOrcamento'] ? $produto['PrOrcId'] : $produto['ProduId'],
 						':iQuantidade' => null,
 						':fValorUnitario' => null,
 						':sTabela' => $parametroProduto,
@@ -73,7 +73,7 @@
 
 				$result->execute(array(
 					':iTR' => $insertId,
-					':iProduto' => $produto['ProduId'],
+					':iProduto' => $rowParametro['ParamProdutoOrcamento'] ? $produto['PrOrcId'] : $produto['ProduId'],
 					':iQuantidade' => null,
 					':fValorUnitario' => null,
 					':sTabela' => $parametroProduto,

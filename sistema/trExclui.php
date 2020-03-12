@@ -11,9 +11,40 @@ if(isset($_POST['inputTRId'])){
 	try{
 		$conn->beginTransaction();	
 
-		/* Verificar se dá para excluir com Foreign Key on Cascade. Se der não precisaria desse tanto de DELETE. Senão teria que pesquisar todos os 
-		   TRXOrcamentoXProduto e TRXOrcamentoXServico para listar todos que tem o Orçamento a ser excluido. Exclui eles primeiro antes de fazer os deletes abaixo */
+		/* Aqui não estou usando o Foreign Key on Cascade. Portanto, preciso excluir primeiro o TRXOrcamentoXProduto, TRXOrcamentoXServico e TRXOrcamentoXSubCategoria */
 
+		$sql = "SELECT TrXOrcId
+				FROM TRXOrcamento
+				WHERE TrXOrTermoReferencia = :iTR and TrXOrEmpresa = :iEmpresa";
+		$result = $conn->query($sql);
+		$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
+		
+		foreach ($rowOrcamentosTR as $item){
+		   
+		    $iOrcamento = $item['TrXOrcId'];	   
+		   
+			$sql = "DELETE FROM TRXOrcamentoXSubCategoria
+					WHERE TXOXSCOrcamento = :iOrcamento and TXOXSCEmpresa = :iEmpresa";
+			$result = $conn->prepare($sql);
+			$result->bindParam(':iOrcamento', $iOrcamento);
+			$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+			$result->execute();
+			
+			$sql = "DELETE FROM TRXOrcamentoXProduto
+					WHERE TXOXPOrcamento = :iOrcamento and TXOXPEmpresa = :iEmpresa";
+			$result = $conn->prepare($sql);
+			$result->bindParam(':iOrcamento', $iOrcamento);
+			$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+			$result->execute();	
+
+			$sql = "DELETE FROM TRXOrcamentoXServico
+					WHERE TXOXSOrcamento = :iOrcamento and TXOXSEmpresa = :iEmpresa";
+			$result = $conn->prepare($sql);
+			$result->bindParam(':iOrcamento', $iOrcamento);
+			$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+			$result->execute();				
+		}
+		   
 		$sql = "DELETE FROM TRXOrcamento
 				WHERE TrXOrTermoReferencia = :iTR and TrXOrEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
@@ -33,7 +64,7 @@ if(isset($_POST['inputTRId'])){
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
 		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
-		$result->execute();
+		$result->execute();	
 		
 		$sql = "DELETE FROM TermoReferencia
 				WHERE TrRefId = :id";

@@ -74,7 +74,6 @@ try {
 	$sql = "SELECT *
 			FROM TermoReferencia
 			JOIN Categoria on CategId = TrRefCategoria
-			LEFT JOIN SubCategoria on SbCatId = TrRefSubCategoria
 			JOIN Situacao on SituaId = TrRefStatus
 			WHERE TrRefEmpresa = " . $_SESSION['EmpreId'] . " and TrRefId = " . $iTR ." and SituaChave = 'ATIVO'";
 	$result = $conn->query($sql);

@@ -23,7 +23,7 @@
 
 			foreach ($servicos as $servico) {
 
-				$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrProduto, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
+				$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
 						VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
 				$result = $conn->prepare($sql);
 
@@ -31,7 +31,7 @@
 
 					$result->execute(array(
 						':iTR' => $insertId,
-						':iServico' => $servico['SrOrcId'],
+						':iServico' => $rowParametro['ParamServicoOrcamento'] ? $servico['SrOrcId'] : $servico['ServiId'],
 						':iQuantidade' => null,
 						':fValorUnitario' => null,
 						':sTabela' => $parametroServico,
@@ -65,7 +65,7 @@
 
 		foreach ($servicos as $servico) {
 
-			$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrProduto, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
+			$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
 					VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 
@@ -73,7 +73,7 @@
 
 				$result->execute(array(
 					':iTR' => $insertId,
-					':iServico' => $servico['SrOrcId'],
+					':iServico' => $rowParametro['ParamServicoOrcamento'] ? $servico['SrOrcId'] : $servico['ServiId'],
 					':iQuantidade' => null,
 					':fValorUnitario' => null,
 					':sTabela' => $parametroServico,

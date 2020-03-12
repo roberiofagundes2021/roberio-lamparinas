@@ -210,7 +210,7 @@ if (isset($_POST['inputData'])) {
 				alert(parametroProduto);
 				alert(parametroServico);
 				alert(cmbCategoria);
-				alert(cmbSubCategoria); */
+				alert(cmbSubCategoria); 
 				
 				//Falta conferir o que tem de errado nessa validação. Caso não dê certo, tentar fazer parecido com a linha 430 do movimentacaoNovo.php
 				$.getJSON('trValidaProdutoServico.php?bProduto='+TrProduto.checked+'&bServico='+TrServico.checked+'&parametroProduto='+parametroProduto+'&parametroServico='+parametroServico+'&iCategoria='+cmbCategoria+'&iSubCategoria='+cmbSubCategoria, function (dados){
@@ -226,7 +226,7 @@ if (isset($_POST['inputData'])) {
 
 				alert('Chegou aqui');
 				
-				return false;
+				return false; */
 				
 				$( "#formTR" ).submit();
 			});
