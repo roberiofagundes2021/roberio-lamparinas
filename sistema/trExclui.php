@@ -10,6 +10,16 @@ if(isset($_POST['inputTRId'])){
         	
 	try{
 		$conn->beginTransaction();	
+
+		/* Verificar se dá para excluir com Foreign Key on Cascade. Se der não precisaria desse tanto de DELETE. Senão teria que pesquisar todos os 
+		   TRXOrcamentoXProduto e TRXOrcamentoXServico para listar todos que tem o Orçamento a ser excluido. Exclui eles primeiro antes de fazer os deletes abaixo */
+
+		$sql = "DELETE FROM TRXOrcamento
+				WHERE TrXOrTermoReferencia = :iTR and TrXOrEmpresa = :iEmpresa";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':iTR', $iTR);
+		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+		$result->execute();
 		
 		$sql = "DELETE FROM TermoReferenciaXProduto
 				WHERE TRXPrTermoReferencia = :iTR and TRXPrEmpresa = :iEmpresa";
@@ -18,6 +28,12 @@ if(isset($_POST['inputTRId'])){
 		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
 		$result->execute();
 		
+		$sql = "DELETE FROM TermoReferenciaXServico
+				WHERE TRXSrTermoReferencia = :iTR and TRXSrEmpresa = :iEmpresa";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':iTR', $iTR);
+		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+		$result->execute();
 		
 		$sql = "DELETE FROM TermoReferencia
 				WHERE TrRefId = :id";
