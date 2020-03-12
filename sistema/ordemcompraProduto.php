@@ -65,7 +65,7 @@ try{
 	$sql = "SELECT OCXPrProduto
 			FROM OrdemCompraXProduto
 			JOIN Produto on ProduId = OCXPrProduto
-			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$iCategoria;
+			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$iCategoria." and OCXPrOrdemCompra = ".$row['OrComId']."";
 	
 	if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 		$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
