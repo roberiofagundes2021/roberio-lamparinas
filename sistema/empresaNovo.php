@@ -43,18 +43,19 @@ if(isset($_POST['inputCnpj'])){
 		$insertId = $conn->lastInsertId();
 		
 		$sql = "INSERT INTO Parametro 
-					(ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamServicoOrcamento, ParamUsuarioAtualizador, ParamEmpresa)
+					(ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamServicoOrcamento, ParamPrecoGridProduto, ParamUsuarioAtualizador, ParamEmpresa)
 				VALUES 
-					(:iEmpresaPublica, :iValorAtualizadoFluxo, :iValorAtualizadoOrdemCompra, :iValorObsImpreRetirada, :iProdutoOrcamento, :iServicoOrcamento, :iUsuarioAtualizador, :iEmpresa)";
+					(:iEmpresaPublica, :iValorAtualizadoFluxo, :iValorAtualizadoOrdemCompra, :iValorObsImpreRetirada, :iProdutoOrcamento, :iServicoOrcamento, :PrecoGridProduto, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 						':iEmpresaPublica' => 1,
-						':iValorAtualizadoFluxo' => 0,
+						':iValorAtualizadoFluxo' => 1,
 						':iValorAtualizadoOrdemCompra' => 0,
 						':iValorObsImpreRetirada' => 0,
 						':iProdutoOrcamento' => 0,
 						':iServicoOrcamento' => 0,
+						':PrecoGridProduto' => 'precoCustoFinal',
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $insertId
 						));

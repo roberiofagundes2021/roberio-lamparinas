@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Parâmetro';
 include('global_assets/php/conexao.php');
 
 if (isset($_SESSION['EmpresaId'])) {
-	$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamServicoOrcamento
+	$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamPrecoGridProduto, ParamServicoOrcamento
 	        FROM Parametro
 	        WHERE ParamEmpresa = " . $_SESSION['EmpresaId'] . "";
 	$result = $conn->query($sql);
@@ -28,7 +28,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 	try {
 		//var_dump($_POST);die;
 		$sql = "UPDATE Parametro SET ParamEmpresaPublica = :iEmpresaPublica, ParamValorAtualizadoFluxo = :iValorAtualizadoFluxo, 
-					   ParamValorAtualizadoOrdemCompra = :iValorAtualizadoOrdemCompra, ParamProdutoOrcamento = :iProdutoOrcamento, ParamServicoOrcamento = :iServicoOrcamento, ParamUsuarioAtualizador = :iUsuarioAtualizador, ParamValorObsImpreRetirada = :iValorObsImpreRetirada
+					   ParamValorAtualizadoOrdemCompra = :iValorAtualizadoOrdemCompra, ParamProdutoOrcamento = :iProdutoOrcamento, ParamServicoOrcamento = :iServicoOrcamento, ParamPrecoGridProduto = :sPrecoGridProduto, ParamUsuarioAtualizador = :iUsuarioAtualizador, ParamValorObsImpreRetirada = :iValorObsImpreRetirada
 				WHERE ParamEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
 
@@ -39,6 +39,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 			':iValorObsImpreRetirada' => isset($_POST['inputValorObsImpreRetirada']) && $_POST['inputValorObsImpreRetirada'] == "on" ? 1 : 0,
 			':iProdutoOrcamento' => isset($_POST['inputProdutoOrcamento']) && $_POST['inputProdutoOrcamento'] == "on" ? 1 : 0,
 			':iServicoOrcamento' => isset($_POST['inputServicoOrcamento']) && $_POST['inputServicoOrcamento'] == "on" ? 1 : 0,
+			':sPrecoGridProduto' => $_POST['cmbPrecoGridProduto'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iEmpresa' => $_SESSION['EmpresaId']
 		));
@@ -168,13 +169,13 @@ if (isset($_POST['inputIdEmpresa'])) {
 										<div class="d-flex flex-column p-2">
 											<div class="form-check form-check-inline">
 												<label class="form-check-label">
-													<input type="radio" name="inputParamValorProduto" id="inputValorFluxo" value="ValorAtualizadoFluxo" class="form-input-styled" data-fouc <?php if ($row['ParamValorAtualizadoFluxo'] != 0) echo "checked"; ?>>
+													<input type="radio" name="inputParamValorProduto" id="inputValorFluxo" value="ValorAtualizadoFluxo" class="form-input-styled" data-fouc <?php if ($row['ParamValorAtualizadoFluxo'] != 0) echo "checked"; ?> required>
 													Fluxo Previsto
 												</label>
 											</div>
 											<div class="form-check form-check-inline">
 												<label class="form-check-label">
-													<input type="radio" name="inputParamValorProduto" id="inputValorOrdemCompra" value="ValorAtualizadoOrdemCompra" class="form-input-styled" data-fouc <?php if ($row['ParamValorAtualizadoOrdemCompra'] != 0) echo "checked"; ?>>
+													<input type="radio" name="inputParamValorProduto" id="inputValorOrdemCompra" value="ValorAtualizadoOrdemCompra" class="form-input-styled" data-fouc <?php if ($row['ParamValorAtualizadoOrdemCompra'] != 0) echo "checked"; ?> required>
 													Ordem de Compra/Carta Contrato
 												</label>
 											</div>
@@ -232,6 +233,39 @@ if (isset($_POST['inputIdEmpresa'])) {
 									<!-- /switch single -->
 								</div>
 							</div>
+							<div class="row">
+								<div class="col-lg-3">
+									<!-- Switch single -->
+									<div class="form-group">
+										<label for="cmbPrecoGridProduto">Coluna preço na relação dos produtos<span class="text-danger">*</span></label>
+										<select id="cmbPrecoGridProduto" name="cmbPrecoGridProduto" class="form-control form-control-select2">
+											<?php
+											if ($row['ParamPrecoGridProduto'] == 'precoCustoFinal') {
+												print('
+														<option value="precoCustoFinal" selected>Preço de custo final</option>
+														<option value="precoCusto">Preço de custo</option>
+														<option value="precoVenda">Preço de venda</option>
+												   ');
+											} else if ($row['ParamPrecoGridProduto'] == 'precoCusto') {
+												print('
+												        <option value="precoCustoFinal">Preço de custo final</option>
+														<option value="precoCusto" selected>Preço de custo</option>
+														<option value="precoVenda">Preço de venda</option>
+													');
+											} else {
+
+												print('
+												        <option value="precoCustoFinal">Preço de custo final</option>
+														<option value="precoCusto">Preço de custo</option>
+												        <option value="precoVenda" selected>Preço de venda</option>
+												   ');
+											}
+											?>
+										</select>
+									</div>
+									<!-- /switch single -->
+								</div>
+							</div>
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
@@ -241,6 +275,145 @@ if (isset($_POST['inputIdEmpresa'])) {
 							</div>
 						</div>
 					</form>
+					<!--<form name="formParametro" id="formParametro" method="post">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card">
+									<div class="card-header header-elements-inline">
+										<h5 class="text-uppercase font-weight-bold">Parâmetros</h5>
+									</div>
+									<div class="card-body">
+										<ul class="nav nav-tabs">
+											<li class="nav-item"><a href="#parametroGeral" class="nav-link active" data-toggle="tab">Geral</a></li>
+											<li class="nav-item"><a href="#parametroPS" class="nav-link" data-toggle="tab">Produto/Servico</a></li>
+											<li class="nav-item"><a href="#parametroTR" class="nav-link" data-toggle="tab">Termo de Referência</a></li>
+										</ul>
+										<div class="tab-content">
+
+											<div class="tab-pane fade show active" id="parametroGeral">
+												<div class="form-group row mx-0">
+													<p class="font-size-lg m-0 p-0 col-2">Parâmetros da empresa:</p>
+													<input type="text" name="empresa" class="form-control px-1 py-0 col-3" disabled value="<?php echo $_SESSION['EmpresaNome']; ?>">
+												</div>
+												<div class="row">
+													<div class="col-lg-6">
+														
+														<div class="form-group row">
+															<label class="col-lg-4 col-form-label">Empresa Pública <span class="text-danger">*</span></label>
+															<div class="col-lg-8">
+																<div class="form-check form-check-switch form-check-switch-left">
+																	<label class="form-check-label d-flex align-items-center">
+																		<input type="checkbox" name="inputEmpresaPublica" id="inputEmpresaPublica" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamEmpresaPublica']) echo "checked"; ?>>
+																	</label>
+																</div>
+															</div>
+														</div>
+														
+													</div>
+												</div>
+												<div class="row">
+													<div class="col-lg-6">
+														
+														<div class="form-group row">
+															<label class="col-lg-4 col-form-label">Mostrar "Observação" na impressão das saídas e transferências<span class="text-danger">*</span></label>
+															<div class="col-lg-8">
+																<div class="form-check form-check-switch form-check-switch-left">
+																	<label class="form-check-label d-flex align-items-center">
+																		<input type="checkbox" name="inputValorObsImpreRetirada" id="inputValorObsImpreRetirada" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamValorObsImpreRetirada']) echo "checked"; ?>>
+																	</label>
+																</div>
+															</div>
+														</div>
+													
+													</div>
+												</div>
+											</div>
+
+											<div class="tab-pane fade" id="parametroPS">
+												<div class="row">
+													<div class="col-lg-6">
+														
+														<div class="form-group row" id="inputParamValorProduto">
+															<label class="col-form-label col-lg-3">Valor do Produto será atualizado <span class="text-danger">*</span></label>
+															<div class="d-flex flex-column p-2">
+																<div class="form-check form-check-inline">
+																	<label class="form-check-label">
+																		<input type="radio" name="inputParamValorProduto" id="inputValorFluxo" value="ValorAtualizadoFluxo" class="form-input-styled" data-fouc <?php if ($row['ParamValorAtualizadoFluxo'] != 0) echo "checked"; ?>>
+																		Fluxo Previsto
+																	</label>
+																</div>
+																<div class="form-check form-check-inline">
+																	<label class="form-check-label">
+																		<input type="radio" name="inputParamValorProduto" id="inputValorOrdemCompra" value="ValorAtualizadoOrdemCompra" class="form-input-styled" data-fouc <?php if ($row['ParamValorAtualizadoOrdemCompra'] != 0) echo "checked"; ?>>
+																		Ordem de Compra/Carta Contrato
+																	</label>
+																</div>
+															</div>
+														</div>
+													</div>
+													
+												</div>
+												<div class="row">
+													<div class="col-lg-3">
+														
+														<div class="form-group">
+															<label for="cmbEstoqueOrigem">Origem</label>
+															<select id="cmbEstoqueOrigem" name="cmbEstoqueOrigem" class="form-control form-control-select2">
+
+															</select>
+														</div>
+														
+													</div>
+												</div>
+											</div>
+
+											<div class="tab-pane fade" id="parametroTR">
+												<div class="row">
+													<div class="col-lg-6">
+														
+														<div class="form-group row">
+															<label class="col-lg-3 col-form-label">Usar "Produtos para Orçamento" nos Orçamentos da TR<span class="text-danger">*</span></label>
+															<div class="col-lg-9">
+																<div class="form-check form-check-switch form-check-switch-left">
+																	<label class="form-check-label d-flex align-items-center">
+																		<input type="checkbox" name="inputProdutoOrcamento" id="inputProdutoOrcamento" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamProdutoOrcamento']) echo "checked"; ?>>
+																	</label>
+																</div>
+															</div>
+														</div>
+														
+													</div>
+												</div>
+												<div class="row">
+													<div class="col-lg-6">
+														
+														<div class="form-group row">
+															<label class="col-lg-3 col-form-label">Usar "Serviços para Orçamento" nos Orçamentos da TR<span class="text-danger">*</span></label>
+															<div class="col-lg-9">
+																<div class="form-check form-check-switch form-check-switch-left">
+																	<label class="form-check-label d-flex align-items-center">
+																		<input type="checkbox" name="inputServicoOrcamento" id="inputServicoOrcamento" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamServicoOrcamento']) echo "checked"; ?>>
+																	</label>
+																</div>
+															</div>
+														</div>
+														
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row" style="margin-top: 10px;">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<button class="btn btn-lg btn-success" id="enviar">Atualizar</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>-->
 				</div>
 				<!-- /card-body -->
 
