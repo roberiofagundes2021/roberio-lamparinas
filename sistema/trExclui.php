@@ -7,41 +7,42 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputTRId'])){
 	
 	$iTR = $_POST['inputTRId'];
+	$iEmpresa = $_SESSION['EmpreId'];
         	
 	try{
 		$conn->beginTransaction();	
 
 		/* Aqui não estou usando o Foreign Key on Cascade. Portanto, preciso excluir primeiro o TRXOrcamentoXProduto, TRXOrcamentoXServico e TRXOrcamentoXSubCategoria */
 
-		$sql = "SELECT TrXOrcId
+		$sql = "SELECT TrXOrId
 				FROM TRXOrcamento
-				WHERE TrXOrTermoReferencia = :iTR and TrXOrEmpresa = :iEmpresa";
+				WHERE TrXOrTermoReferencia = $iTR and TrXOrEmpresa = $iEmpresa";
 		$result = $conn->query($sql);
 		$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
 		
 		foreach ($rowOrcamentosTR as $item){
 		   
-		    $iOrcamento = $item['TrXOrcId'];	   
+		    $iOrcamento = $item['TrXOrId'];
 		   
 			$sql = "DELETE FROM TRXOrcamentoXSubCategoria
 					WHERE TXOXSCOrcamento = :iOrcamento and TXOXSCEmpresa = :iEmpresa";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
-			$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+			$result->bindParam(':iEmpresa', $iEmpresa); 
 			$result->execute();
 			
 			$sql = "DELETE FROM TRXOrcamentoXProduto
 					WHERE TXOXPOrcamento = :iOrcamento and TXOXPEmpresa = :iEmpresa";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
-			$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+			$result->bindParam(':iEmpresa', $iEmpresa); 
 			$result->execute();	
 
 			$sql = "DELETE FROM TRXOrcamentoXServico
 					WHERE TXOXSOrcamento = :iOrcamento and TXOXSEmpresa = :iEmpresa";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
-			$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+			$result->bindParam(':iEmpresa', $iEmpresa); 
 			$result->execute();				
 		}
 		   
@@ -49,21 +50,21 @@ if(isset($_POST['inputTRId'])){
 				WHERE TrXOrTermoReferencia = :iTR and TrXOrEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
-		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+		$result->bindParam(':iEmpresa', $iEmpresa); 
 		$result->execute();
 		
 		$sql = "DELETE FROM TermoReferenciaXProduto
 				WHERE TRXPrTermoReferencia = :iTR and TRXPrEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
-		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+		$result->bindParam(':iEmpresa', $iEmpresa); 
 		$result->execute();
 		
 		$sql = "DELETE FROM TermoReferenciaXServico
 				WHERE TRXSrTermoReferencia = :iTR and TRXSrEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
-		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+		$result->bindParam(':iEmpresa', $iEmpresa); 
 		$result->execute();	
 		
 		$sql = "DELETE FROM TermoReferencia
@@ -86,7 +87,7 @@ if(isset($_POST['inputTRId'])){
 		
 		$conn->rollback();
 		
-		//echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 }
 

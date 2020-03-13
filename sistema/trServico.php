@@ -54,13 +54,12 @@ if (isset($_POST['inputIdTR'])) {
 
 try {
 
-	$sql = "SELECT TrXOrId
+	//Verifiva se tem algum orçamento para essa TR
+	$sql = "SELECT COUNT(TrXOrId) as QtdeOrcamentos
 			FROM TRXOrcamento
-			WHERE TrXOrEmpresa = " . $_SESSION['EmpreId'] . " and TrXOrTermoReferencia = ".$iTR."
-			";
+			WHERE TrXOrEmpresa = " . $_SESSION['EmpreId'] . " and TrXOrTermoReferencia = ".$iTR;
 	$result = $conn->query($sql);
 	$rowOrcamentosTR = $result->fetch(PDO::FETCH_ASSOC);
-
 
 	// Select para verificar o parametro ParamServicoOrcamento.
 	$sql = "SELECT ParamServicoOrcamento
@@ -79,14 +78,12 @@ try {
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
-
 	$sql = " SELECT TRXSCSubcategoria
 		     FROM TRXSubcategoria
 		     WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCEmpresa = " . $_SESSION['EmpreId'] . "
 		";
 	$result = $conn->query($sql);
 	$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
-	
 
 	//Select que verifica a tabela de origem dos Servico dessa TR.
 	$sql = "SELECT TRXSrServico
@@ -104,7 +101,6 @@ try {
 	} else {
 		$aServico1 = [];
 	}
-
 
 	$sql = "SELECT TRXSrServico
 			FROM TermoReferenciaXServico
@@ -382,7 +378,7 @@ try {
 
 										print('
 							                    <div class="row" style="margin-bottom: -20px;">
-							                    	<div class="col-lg-9">
+							                    	<div class="col-lg-10">
 							                    			<div class="row">
 							                    				<div class="col-lg-1">
 							                    					<label for="inputCodigo"><strong>Item</strong></label>
@@ -441,12 +437,12 @@ try {
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowServicos);
 
-var_dump($rowServicos);
+										//var_dump($rowServicos);
 										$cont = 0;
 
 										print('
 							                    <div class="row" style="margin-bottom: -20px;">
-							                    	<div class="col-lg-9">
+							                    	<div class="col-lg-10">
 							                    			<div class="row">
 							                    				<div class="col-lg-1">
 							                    					<label for="inputCodigo"><strong>Item</strong></label>
@@ -456,7 +452,7 @@ var_dump($rowServicos);
 							                    				</div>
 							                    			</div>
 							                    		</div>												
-							                    	<div class="col-lg-3">
+							                    	<div class="col-lg-2">
 							                    		<div class="form-group">
 							                    			<label for="inputQuantidade"><strong>Quantidade</strong></label>
 							                    		</div>
@@ -473,7 +469,7 @@ var_dump($rowServicos);
 
 											print('
 								                    <div class="row" style="margin-top: 8px;">
-								                    	<div class="col-lg-9">
+								                    	<div class="col-lg-10">
 								                    		<div class="row">
 								                    			<div class="col-lg-1">
 								                    				<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -504,7 +500,7 @@ var_dump($rowServicos);
 							<!-- /custom header text -->
 							<?php 
 							
-							    if(count($rowOrcamentosTR) >= 1){
+							    if($rowOrcamentosTR['QtdeOrcamentos'] >= 1){
 									print('
 									<div class="row" style="margin-top: 10px;">
 								        <div class="row justify-content-center col-lg-12">

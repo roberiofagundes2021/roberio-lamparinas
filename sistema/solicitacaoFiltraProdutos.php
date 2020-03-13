@@ -46,13 +46,13 @@ function queryPesquisa()
                 $string .= ' and ';
             }
 
-            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
+            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduDetalhamento, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
                     FROM Produto
                     JOIN Categoria on CategId = ProduCategoria
                     JOIN Situacao on SituaId = ProduStatus
                     WHERE " . $string . " ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' 
                     ";
-            $result = $conn->query("$sql");
+            $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
@@ -62,13 +62,13 @@ function queryPesquisa()
     } else {
         try {
 
-            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
+            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduDetalhamento, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
                     FROM Produto
                     JOIN Categoria on CategId = ProduCategoria
                     JOIN Situacao on SituaId = ProduStatus
                     WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' 
                     ORDER BY ProduNome ASC ";
-            $result = $conn->query("$sql");
+            $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
             $cont = 1;
@@ -101,9 +101,9 @@ function queryPesquisa()
                     <div class="col-xl-3 col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <div class="card-img-actions">
+                                <div class="card-img-actions" id="Imagens">
                                     <a href="' . $sFoto . '" class="fancybox">
-                                        <img src="' . $sFoto . '" class="card-img"  alt="" style="max-height:290px;">
+                                        <img src="' . $sFoto . '" class="card-img"  alt="" style="max-height:250px;">
                                         <span class="card-img-actions-overlay card-img">
                                             <i class="icon-plus3 icon-2x"></i>
                                         </span>
@@ -113,7 +113,7 @@ function queryPesquisa()
 
                             <div class="card-body bg-light text-center">
                                 <div class="mb-2">
-                                    <h6 class="font-weight-semibold mb-0">
+                                    <h6 class="font-weight-semibold mb-0" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" style="height: 46.1667px; overflow: hidden">
                                         <a href="#" class="text-default">' . $item['ProduNome'] . '</a>
                                     </h6>
 
@@ -131,9 +131,9 @@ function queryPesquisa()
                     <div class="col-xl-3 col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <div class="card-img-actions">
+                                <div class="card-img-actions" id="Imagens">
                                     <a href="' . $sFoto . '" class="fancybox">
-                                        <img src="' . $sFoto . '" class="card-img"  alt="" style="max-height:290px;">
+                                        <img src="' . $sFoto . '" class="card-img"  alt="" style="max-height:250px;">
                                         <span class="card-img-actions-overlay card-img">
                                             <i class="icon-plus3 icon-2x"></i>
                                         </span>
@@ -143,7 +143,7 @@ function queryPesquisa()
 
                             <div class="card-body bg-light text-center">
                                 <div class="mb-2">
-                                    <h6 class="font-weight-semibold mb-0">
+                                    <h6 class="font-weight-semibold mb-0" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" style="height: 46.1667px; overflow: hidden">
                                         <a href="#" class="text-default">' . $item['ProduNome'] . '</a>
                                     </h6>
 

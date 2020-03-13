@@ -29,6 +29,27 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<title>Lamparinas | Nova Solicitação</title>
 
 	<?php include_once("head.php"); ?>
+	
+	<style>
+		#Imagens {
+		  height: 250px;
+
+		  /* habilita o flex nos filhos diretos */
+		  display: -ms-flex;
+		  display: -webkit-flex;
+		  display: flex;
+
+		  /* centraliza na vertical */
+		  -ms-align-items: center;
+		  -webkit-align-items: center;
+		  align-items: center;
+
+		  /* centraliza na horizontal */
+		  -ms-justify-content: center;
+		  -webkit-justify-content: center;
+		  justify-content: center;
+		}	
+	</style>
 
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
@@ -484,10 +505,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<option value="">Selecionar</option>
 															<?php
 															$sql = "SELECT CategId, CategNome
-																             FROM Categoria		
-																			 JOIN Situacao on SituaId = CategStatus											     
-																             WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-																             ORDER BY CategNome ASC";
+																	FROM Categoria		
+																	JOIN Situacao on SituaId = CategStatus											     
+																	WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	ORDER BY CategNome ASC";
 															$result = $conn->query($sql);
 															$rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -515,10 +536,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<option value="">Selecionar</option>
 															<?php
 															$sql = "SELECT MarcaId, MarcaNome
-																             FROM Marca
-																			 JOIN Situacao on SituaId = MarcaStatus											     
-																             WHERE MarcaEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-																             ORDER BY MarcaNome ASC";
+																	FROM Marca
+																	JOIN Situacao on SituaId = MarcaStatus											     
+																	WHERE MarcaEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	ORDER BY MarcaNome ASC";
 															$result = $conn->query($sql);
 															$rowMarca = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -535,12 +556,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
 															<option value="">Selecionar</option>
 															<?php
-															$sql = ("SELECT FabriId, FabriNome
-																             FROM Fabricante														     
-																             JOIN Situacao on SituaId = FabriStatus											     
-																             WHERE FabriEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-																             ORDER BY FabriNome ASC");
-															$result = $conn->query("$sql");
+															$sql = "SELECT FabriId, FabriNome
+																	FROM Fabricante														     
+																	JOIN Situacao on SituaId = FabriStatus											     
+																	WHERE FabriEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	ORDER BY FabriNome ASC";
+															$result = $conn->query($sql);
 															$rowFabri = $result->fetchAll(PDO::FETCH_ASSOC);
 															var_dump($rowFabri);
 
@@ -557,12 +578,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
 															<option value="">Selecionar</option>
 															<?php
-															$sql = ("SELECT ModelId, ModelNome
-																             FROM Modelo														     
-																			 JOIN Situacao on SituaId = ModelStatus											     
-																             WHERE ModelEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-																             ORDER BY ModelNome ASC");
-															$result = $conn->query("$sql");
+															$sql = "SELECT ModelId, ModelNome
+																	FROM Modelo														     
+																	JOIN Situacao on SituaId = ModelStatus											     
+																	WHERE ModelEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	ORDER BY ModelNome ASC";
+															$result = $conn->query($sql);
 															$rowModel = $result->fetchAll(PDO::FETCH_ASSOC);
 
 															foreach ($rowModel as $item) {
@@ -635,9 +656,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		                                    <div class="col-xl-3 col-lg-4 col-sm-6">
 			                                    <div class="card">
 				                                    <div class="card-body">
-					                                    <div class="card-img-actions">
+					                                    <div class="card-img-actions" id="Imagens">
 						                                    <a href="' . $sFoto . '" class="fancybox">
-							                                    <img src="' . $sFoto . '" class="card-img"  alt="" style="max-height:290px;">
+							                                    <img src="' . $sFoto . '" class="card-img"  alt="" style="max-height:250px;">
 							                                    <span class="card-img-actions-overlay card-img">
 								                                    <i class="icon-plus3 icon-2x"></i>
 							                                    </span>
@@ -665,9 +686,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		                                    <div class="col-xl-3 col-lg-4 col-sm-6">
 			                                    <div class="card">
 				                                    <div class="card-body">
-					                                    <div class="card-img-actions">
+					                                    <div class="card-img-actions" id="Imagens">
 						                                    <a href="' . $sFoto . '" class="fancybox">
-							                                    <img src="' . $sFoto . '" class="card-img"  alt="" style="max-height:290px;">
+							                                    <img src="' . $sFoto . '" class="card-img"  alt="" style="max-height:250px;">
 							                                    <span class="card-img-actions-overlay card-img">
 								                                    <i class="icon-plus3 icon-2x"></i>
 							                                    </span>

@@ -122,63 +122,48 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			document.getElementById('inputTRNomeCategoria').value = CategNome;
 			document.getElementById('inputTRStatus').value = TRStatus;
 
-
 			if (Tipo == 'imprimir') {
 				document.formTR.action = "trImprime.php";
 				document.formTR.setAttribute("target", "_blank");
+				document.formTR.submit();
 			} else {
 				if (Tipo == 'edita') {
 					document.formTR.action = "trEdita.php";
+					document.formTR.submit();
 				} else if (Tipo == 'exclui') {
 					confirmaExclusao(document.formTR, "Tem certeza que deseja excluir essa TR?", "trExclui.php");
+					document.formTR.submit();
 				} else if (Tipo == 'mudaStatus') {
 					document.formTR.action = "trMudaSituacao.php";
+					document.formTR.submit();
 				} else if (Tipo == 'P') {
 					document.formTR.action = "trProduto.php";
+					document.formTR.submit();
 				} else if (Tipo == 'S') {
 					document.formTR.action = "trServico.php";
+					document.formTR.submit();
 				} else if (Tipo == 'orcamento') {
-
-					//Esse ajax está sendo usado para verificar no banco se há algum produto se quantidade informada. Caso tenha não deixar ir para o orçamento.
+					
+					
+					alert(TRId);
+					//Esse ajax está sendo usado para verificar no banco se há algum produto sem informar a quantidade. Caso tenha não deixar ir para o orçamento.
 					$.ajax({
 						type: "POST",
 						url: "trValidaQuantidade.php",
 						data: {iTr: TRId},
 						success: function(resposta){
-																		
-							//var newRow = $("<tr>");
-							
-							//newRow.append(resposta);	    
-							$("#tabelaProdutos").append(resposta);
-													
-							//Adiciona mais um item nessa contagem
-							$('#inputNumItens').val(resNumItens);
-							$('#cmbProduto').val("#").change();						
-							$('#inputQuantidade').val('');
-							$('#inputValorUnitario').val('');
-							$('#inputTotal').val(total);
-							$('#total').text(totalFormatado);
-							$('#inputLote').val('');
-							$('#inputValidade').val('');
-							
-							$('#inputProdutos').append('<input type="hidden" id="campo'+resNumItens+'" name="campo'+resNumItens+'" value="'+Produto[0]+'#'+inputQuantidade+'#'+inputValorUnitario+'#'+inputLote+'#'+inputValidade+'#'+cmbClassificacao+'">');												
-							
-							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
-
-							$('#inputIdProdutos').val(inputIdProdutos);					
-							
-							$('#cmbFornecedor').prop('disabled', true);
-							
-							return false;
-							
+						
+							if (resposta){
+								alerta('Atenção','Enquanto todas as quantidades não forem informadas não é possível gerar um orçamento!','error');
+								return false;
+							} else{
+								document.formTR.action = "trOrcamento.php";
+								document.formTR.submit();
+							}
 						}
-					})						
-
-					document.formTR.action = "trOrcamento.php";
+					})					
 				}
 			}
-
-			document.formTR.submit();
 		}
 	</script>
 
