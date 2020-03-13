@@ -14,7 +14,6 @@ $sNumero = $_POST['inputTRNumero'];
 $sql = "SELECT *
 		FROM TermoReferencia
 		JOIN Categoria on CategId = TrRefCategoria
-		LEFT JOIN SubCategoria on SbCatId = TrRefSubCategoria
 		WHERE TrRefEmpresa = ". $_SESSION['EmpreId'] ." and TrRefId = ".$iTR;
 
 $result = $conn->query($sql);
@@ -53,9 +52,13 @@ try {
 		<div>'.$item['TrRefConteudo'].'</div>
 		<br>
 		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
-			Categoria: <span style="font-weight:normal;">'.$item['CategNome'].'</span> &nbsp;&nbsp;<span style="color:#ccc;">|</span> &nbsp;&nbsp; SubCategoria: <span style="font-weight:normal;">'.$item['SbCatNome'].'</span> 
+			Categoria: <span style="font-weight:normal;">'.$item['CategNome'].'</span> 
 		</div>
-		<br>		
+		<br>
+		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
+			SubCategoria: <span style="font-weight:normal;"></span>
+		</div>
+		<br>
 		<table style="width:100%; border-collapse: collapse;">
 			<tr>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:7%">Item</th>
