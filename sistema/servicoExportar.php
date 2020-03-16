@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Servito Excel';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT ServiCodigo, ServiNome, CategNome, SbCatNome, ServiDetalhamento,
-		ServiValorCusto, ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda,
+		ServiValorCusto, ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda, ServiNumSerie,
 		MarcaNome, ModelNome, FabriNome,
 	    SituaNome
 		FROM Servico
@@ -60,6 +60,7 @@ foreach($row as $item){
 	$dadosXls .= "      <td>".mostraValor($item['ServiValorVenda'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['MarcaNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['ModelNome'])."</td>";
+	$dadosXls .= "      <td>".utf8_decode($item['ServiNumSerie'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['FabriNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['SituaNome'])."</td>";
 	$dadosXls .= "   </tr>";

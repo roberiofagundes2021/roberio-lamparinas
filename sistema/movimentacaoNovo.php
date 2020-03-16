@@ -137,11 +137,6 @@ if(isset($_POST['inputData'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
-
 	<script src="global_assets/js/lamparinas/jquery.maskMoney.js"></script>  <!-- http://www.fabiobmed.com.br/criando-mascaras-para-moedas-com-jquery/ -->
 	<!-- /theme JS files -->
 	
@@ -746,6 +741,10 @@ if(isset($_POST['inputData'])){
 		}		
 								
 	</script>
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 </head>
 
@@ -972,7 +971,7 @@ if(isset($_POST['inputData'])){
 											<div class="form-group">
 												<label for="cmbOrdemCompra">*Nº Ordem Compra / Carta Contrato</label>
 												<select id="cmbOrdemCompra" name="cmbOrdemCompra" class="form-control form-control-select2" required>
-													<option value="">Selecione</option>
+													<option value="#">Selecione</option>
 												</select>
 											</div>											
 										</div>	

@@ -87,7 +87,9 @@ try {
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);		
 		
+		$totalRegistros = count($rowProdutos);
 		$cont = 1;
+		$totalGeral = 0;
 		
 		foreach ($rowProdutos as $itemProduto){
 			
@@ -98,21 +100,45 @@ try {
 				$valorUnitario = "__________";
 				$valorTotal = "__________";
 			}
-			
-			$html .= "
+
+			if($totalRegistros == ($cont)){
+				$html .= "
+				<tr>
+					<td style='padding-top: 8px; padding-bottom: 25px'>".$cont."</td>
+					<td style='padding-top: 8px; padding-bottom: 25px'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
+					<td style='padding-top: 8px; padding-bottom: 25px; text-align: center;'>".$itemProduto['OCXPrQuantidade']."</td>
+					<td style='padding-top: 8px; padding-bottom: 25px; text-align: center;'>".$itemProduto['UnMedSigla']."</td>
+					<td style='padding-top: 8px; padding-bottom: 25px'>".$valorUnitario."</td>
+					<td style='padding-top: 8px; padding-bottom: 25px; text-align: right;'>".$valorTotal."</td>
+				</tr>
+			";
+			} else {
+				$html .= "
 				<tr>
 					<td style='padding-top: 8px;'>".$cont."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
 					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['OCXPrQuantidade']."</td>
 					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['UnMedSigla']."</td>
 					<td style='padding-top: 8px;'>".$valorUnitario."</td>
-					<td style='padding-top: 8px;'>".$valorTotal."</td>
+					<td style='padding-top: 8px; text-align: right'>".$valorTotal."</td>
 				</tr>
 			";
+			}
 			
 			$cont++;
+			$totalGeral += $valorTotal;
 		}
+
+		$html .= "<br>";
 		
+		$html .= "  <tr>
+	                	<td style='border-top: 1px solid #333;' colspan='4' height='50' valign='middle'>
+		                    <strong>Total Geral</strong>
+	                    </td>
+					    <td style='border-top: 1px solid #333; text-align: right' colspan='2'>
+					        ".mostraValor($totalGeral)."
+					    </td>
+				    </tr>";
 		$html .= "</table>";
 	}
 	
