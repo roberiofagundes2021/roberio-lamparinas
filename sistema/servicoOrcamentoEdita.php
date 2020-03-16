@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Editar Serviço de Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubCategoria, SrOrcUnidadeMedida 
+$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubCategoria
 		FROM ServicoOrcamento
 		WHERE SrOrcId = ". $_POST['inputSrOrcId'] ." and SrOrcEmpresa = ". $_SESSION['EmpreId'];
 $result = $conn->query($sql);
@@ -149,33 +149,11 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 							<div class="media">
 								<div class="media-body">
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['SrOrcNome']; ?>" required>
 												<input id="inputId" type="hidden" value="<?php echo $row['SrOrcId'] ?>" name="inputId">
-											</div>
-										</div>
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputUnidadeMedida">Unidade de Medida <span class="text-danger">*</span></label>
-												<select id="cmbUnidadeMedida" class="form-control form-control-select2" name="cmbUnidadeMedida" required>
-													<?php 
-													$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
-															FROM UnidadeMedida
-															JOIN Situacao on SituaId = UnMedStatus
-															WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
-															ORDER BY UnMedNome ASC";
-													$result = $conn->query($sql);
-													$rowUnMed = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowUnMed as $item){
-														$seleciona = $item['UnMedId'] == $row['SrOrcUnidadeMedida'] ? "selected" : "";
-														print('<option value="'.$item['UnMedId'].'" '. $seleciona .'>'.$item['UnMedNome'].'</option>');
-													}
-													
-													?>
-												</select>
 											</div>
 										</div>
 									</div>

@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Serviço Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT SrOrcNome, CategNome, SbCatNome, SrOrcUnidadeMedida, SrOrcSituacao, SrOrcId, SituaNome, SituaCor, SituaChave
+$sql = "SELECT SrOrcNome, CategNome, SbCatNome, SrOrcSituacao, SrOrcId, SituaNome, SituaCor, SituaChave
 		FROM ServicoOrcamento
 		JOIN Categoria on CategId = SrOrcCategoria
 		LEFT JOIN SubCategoria on SbCatId = SrOrcSubcategoria

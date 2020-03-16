@@ -6,14 +6,6 @@ $_SESSION['PaginaAtual'] = 'Novo Serviço de Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus
-		FROM UnidadeMedida
-		WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ."
-		ORDER BY UnMedNome ASC";
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
-
 if(isset($_POST['inputNome'])){
 
 	try{
@@ -27,8 +19,8 @@ if(isset($_POST['inputNome'])){
 		$sCodigo = (int)$rowCodigo['Codigo'] + 1;
 		$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
 
-		$sql = "INSERT INTO ServicoOrcamento (SrOrcNome, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubcategoria, SrOrcUnidadeMedida, SrOrcSituacao, SrOrcUsuarioAtualizador, SrOrcEmpresa) 
-				VALUES (:sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :iUnidadeMedida, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO ServicoOrcamento (SrOrcNome, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubcategoria, SrOrcSituacao, SrOrcUsuarioAtualizador, SrOrcEmpresa) 
+				VALUES (:sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -37,7 +29,6 @@ if(isset($_POST['inputNome'])){
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
-						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '' ? null : $_POST['cmbUnidadeMedida'],
 						':iSituacao' => $_POST['inputSituacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
@@ -193,31 +184,10 @@ if(isset($_POST['inputNome'])){
 							<div class="media">
 								<div class="media-body">
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
-											</div>
-										</div>
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputUnidadeMedida">Unidade de Medida <span class="text-danger">*</span></label>
-												<select id="cmbUnidadeMedida" class="form-control form-control-select2" name="cmbUnidadeMedida" required>
-													<option value="">Selecione</option>
-													<?php 
-													$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
-															FROM UnidadeMedida
-															JOIN Situacao on SituaId = UnMedStatus
-															WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
-															ORDER BY UnMedNome ASC";
-													$result = $conn->query($sql);
-													$rowUnidadeMedida = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowUnidadeMedida as $item){
-														print('<option value="'.$item['UnMedId'].'">'.$item['UnMedNome'].'</option>');
-													}
-													?>
-												</select>
 											</div>
 										</div>
 									</div>

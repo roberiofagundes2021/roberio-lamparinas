@@ -1,6 +1,7 @@
 <?php
 include_once("sessao.php");
 include('global_assets/php/conexao.php');
+
 if(isset($_POST['inputNome'])){
 	
 	try{		
@@ -19,7 +20,7 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE ServicoOrcamento SET SrOrcNome = :sNome,  SrOrcDetalhamento = :sDetalhamento, SrOrcCategoria = :iCategoria, SrOrcSubcategoria = :iSubCategoria, SrOrcUnidadeMedida = :iUnidadeMedida, SrOrcUsuarioAtualizador = :iUsuarioAtualizador, SrOrcEmpresa = :iEmpresa 
+		$sql = "UPDATE ServicoOrcamento SET SrOrcNome = :sNome,  SrOrcDetalhamento = :sDetalhamento, SrOrcCategoria = :iCategoria, SrOrcSubcategoria = :iSubCategoria, SrOrcUsuarioAtualizador = :iUsuarioAtualizador, SrOrcEmpresa = :iEmpresa 
 				WHERE SrOrcId = :sId ";
 		$result = $conn->prepare($sql);
 
@@ -29,7 +30,6 @@ if(isset($_POST['inputNome'])){
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
-						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
