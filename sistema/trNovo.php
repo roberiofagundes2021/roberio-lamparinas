@@ -64,7 +64,7 @@ if (isset($_POST['inputData'])) {
 
 		$possuiSubCategoria = 0;
 		
-		if (isset($_POST['cmbSubCategoria'])) {
+		if (isset($_POST['cmbSubCategoria']) and $_POST['cmbSubCategoria'] != "") {
 			
 			$possuiSubCategoria = 1;
 

@@ -329,7 +329,7 @@ try {
 																$result = $conn->query($sql);
 																$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
 																foreach ($rowServico as $item) {
-																	if (in_array($item['ServiId'], $aServicos2) or $countServicoUtilizado2 == 0) {
+																	if (in_array($item['ServiId'], $aServicos2)) {
 																		$seleciona = "selected";
 																		print('<option value="' . $item['ServiId'] . '" ' . $seleciona . '>' . $item['ServiNome'] . '</option>');
 																	} else {

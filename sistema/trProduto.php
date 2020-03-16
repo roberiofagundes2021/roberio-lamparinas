@@ -329,7 +329,7 @@ try {
 																$result = $conn->query($sql);
 																$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 																foreach ($rowProduto as $item) {
-																	if (in_array($item['ProduId'], $aProdutos2) or $countProdutoUtilizado2 == 0) {
+																	if (in_array($item['ProduId'], $aProdutos2)) {
 																		$seleciona = "selected";
 																		print('<option value="' . $item['ProduId'] . '" ' . $seleciona . '>' . $item['ProduNome'] . '</option>');
 																	} else {
