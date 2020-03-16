@@ -6,7 +6,7 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT TrRefTipo
 		FROM TermoReferencia
-		WHERE TRXPrTermoReferencia = ".$_POST['iTr']." and TRXPrEmpresa = ".$_SESSION['EmpreId'];
+		WHERE TrRefId = ".$_POST['iTr']." and TrRefEmpresa = ".$_SESSION['EmpreId'];
 $result = $conn->query($sql);
 $rowTipo = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -26,7 +26,7 @@ if ($rowTipo['TrRefTipo'] == 'P'){
 	$sql = "SELECT Sum(qtde) as Qtde
 			FROM
 			(
-			(SELECT COUNT(TRXPrTermoReferencia) qtde
+			(SELECT COUNT(TRXPrTermoReferencia) Qtde
 			 FROM TermoReferenciaXProduto
 			 WHERE (TRXPrQuantidade is null or TRXPrQuantidade = 0) and TRXPrTermoReferencia = ".$_POST['iTr']." and TRXPrEmpresa = ".$_SESSION['EmpreId'].")
 			UNION

@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'TR Serviço';
+$_SESSION['PaginaAtual'] = 'TR Servico';
 
 include('global_assets/php/conexao.php');
 
@@ -54,13 +54,12 @@ if (isset($_POST['inputIdTR'])) {
 
 try {
 
-	$sql = "SELECT TrXOrId
+	//Verifiva se tem algum orçamento para essa TR
+	$sql = "SELECT COUNT(TrXOrId) as QtdeOrcamentos
 			FROM TRXOrcamento
-			WHERE TrXOrEmpresa = " . $_SESSION['EmpreId'] . " and TrXOrTermoReferencia = ".$iTR."
-			";
+			WHERE TrXOrEmpresa = " . $_SESSION['EmpreId'] . " and TrXOrTermoReferencia = ".$iTR;
 	$result = $conn->query($sql);
-	$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
-
+	$rowOrcamentosTR = $result->fetch(PDO::FETCH_ASSOC);
 
 	// Select para verificar o parametro ParamServicoOrcamento.
 	$sql = "SELECT ParamServicoOrcamento
@@ -79,16 +78,13 @@ try {
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
-
 	$sql = " SELECT TRXSCSubcategoria
 		     FROM TRXSubcategoria
-		     WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCEmpresa = " . $_SESSION['EmpreId'] . "
-		";
+		     WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCEmpresa = " . $_SESSION['EmpreId'];
 	$result = $conn->query($sql);
 	$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
-	
 
-	//Select que verifica a tabela de origem dos servicos dessa TR.
+	//Select que verifica a tabela de origem dos Servico dessa TR.
 	$sql = "SELECT TRXSrServico
 			FROM TermoReferenciaXServico
 			JOIN ServicoOrcamento on SrOrcId = TRXSrServico
@@ -99,12 +95,11 @@ try {
 
 	if (count($rowServicoUtilizado1) >= 1) {
 		foreach ($rowServicoUtilizado1 as $itemServicoUtilizado) {
-			$aServicos1[] = $itemServicoUtilizado['TRXSrServico'];
+			$aServico1[] = $itemServicoUtilizado['TRXSrServico'];
 		}
 	} else {
-		$aServicos1 = [];
+		$aServico1 = [];
 	}
-
 
 	$sql = "SELECT TRXSrServico
 			FROM TermoReferenciaXServico
@@ -116,10 +111,10 @@ try {
 	
 	if (count($rowServicoUtilizado2) >= 1) {
 		foreach ($rowServicoUtilizado2 as $itemServicoUtilizado) {
-			$aServicos2[] = $itemServicoUtilizado['TRXSrServico'];
+			$aServico2[] = $itemServicoUtilizado['TRXSrServico'];
 		}
 	} else {
-		$aServicos2[] = [];
+		$aServico2[] = [];
 	}
 
 } catch (PDOException $e) {
@@ -135,7 +130,7 @@ try {
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Listando servicos do TR</title>
+	<title>Lamparinas | Listando Servico do TR</title>
 
 	<?php include_once("head.php"); ?>
 
@@ -159,10 +154,10 @@ try {
 
 				var inputCategoria = $('#inputIdCategoria').val();
 				var inputSubCategoria = $('#inputIdSubCategoria').val();
-				var servicos = $(this).val();
-				console.log(servicos)
+				var servico = $(this).val();
+				console.log(servico)
 				var tr = $('#inputIdTR').val();
-				//console.log(servicos);
+				//console.log(servico);
 
 				var cont = 1;
 				var servicoId = [];
@@ -190,13 +185,12 @@ try {
 						idTr: tr,
 						idCategoria: inputCategoria,
 						idSubCategoria: inputSubCategoria,
-						servicos: servicos,
+						servico: servico,
 						servicoId: servicoId,
 						servicoQuant: servicoQuant
 					},
 					success: function(resposta) {
 						//alert(resposta);
-						console.log(resposta)
 						$("#tabelaServicos").html(resposta).show();
 
 						return false;
@@ -223,7 +217,7 @@ try {
 		}
 
 		function ResetServico() {
-			$('#cmbServico').empty().append('<option>Sem servico</option>');
+			$('#cmbServico').empty().append('<option>Sem servicos</option>');
 		}
 	</script>
 
@@ -285,13 +279,14 @@ try {
 											</div>
 										</div>
 									</div>
+
 									<div id="ServicoRow" class="row">
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="cmbServico">Serviço</label>
 												<select id="cmbServico" name="cmbServico" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 													<?php
-													if (count($aServicos1) >= 1) {
+													if (count($aServico1) >= 1) {
 														if (count($rowSubCat) >= 1) {
 															foreach ($rowSubCat as $valueSubCat) {
 																$sql = "SELECT SrOrcId, SrOrcNome
@@ -305,7 +300,7 @@ try {
 																$result = $conn->query($sql);
 																$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
 																foreach ($rowServico as $item) {
-																	if (in_array($item['SrOrcId'], $aServicos1) or $countServicoUtilizado1 == 0) {
+																	if (in_array($item['SrOrcId'], $aServico1) or $countServicoUtilizado1 == 0) {
 																		$seleciona = "selected";
 																		print('<option value="' . $item['SrOrcId'] . '" ' . $seleciona . '>' . $item['SrOrcNome'] . '</option>');
 																	} else {
@@ -329,7 +324,7 @@ try {
 																$result = $conn->query($sql);
 																$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
 																foreach ($rowServico as $item) {
-																	if (in_array($item['ServiId'], $aServicos2) or $countServicoUtilizado2 == 0) {
+																	if (in_array($item['ServiId'], $aServico2) or $countServicoUtilizado2 == 0) {
 																		$seleciona = "selected";
 																		print('<option value="' . $item['ServiId'] . '" ' . $seleciona . '>' . $item['ServiNome'] . '</option>');
 																	} else {
@@ -351,7 +346,7 @@ try {
 							<!-- Custom header text -->
 							<div class="card">
 								<div class="card-header header-elements-inline">
-									<h5 class="card-title">Relação de Serviços</h5>
+									<h5 class="card-title">Relação de Servicos</h5>
 									<div class="header-elements">
 										<div class="list-icons">
 											<a class="list-icons-item" data-action="collapse"></a>
@@ -362,7 +357,7 @@ try {
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os serviços selecionadas acima. Para atualizar os valores, basta preencher a coluna <code>Quantidade</code> e depois clicar em <b>ALTERAR</b>.</p>
+									<p class="mb-3">Abaixo estão listados todos os Servicos selecionados acima. Para atualizar os valores, basta preencher a coluna <code>Quantidade</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<!--<div class="hot-container">
 										<div id="example"></div>
@@ -370,12 +365,11 @@ try {
 
 									<?php
 
-									if (count($aServicos1) >= 1) {
+									if (count($aServico1) >= 1) {
 
-										$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, SrOrcUnidadeMedida, TRXSrQuantidade, TRXSrTabela, UnMedNome, UnMedSigla
+										$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, SrOrcUnidadeMedida, TRXSrQuantidade, TRXSrTabela
 									            FROM ServicoOrcamento
 									            JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
-									            LEFT JOIN UnidadeMedida on UnMedId = SrOrcUnidadeMedida
 									            WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR  . " and TRXSrTabela = 'ServicoOrcamento'";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -384,21 +378,16 @@ try {
 
 										print('
 							                    <div class="row" style="margin-bottom: -20px;">
-							                    	<div class="col-lg-9">
+							                    	<div class="col-lg-10">
 							                    			<div class="row">
 							                    				<div class="col-lg-1">
 							                    					<label for="inputCodigo"><strong>Item</strong></label>
 							                    				</div>
 							                    				<div class="col-lg-11">
-							                    					<label for="inputServico"><strong>Serviço</strong></label>
+							                    					<label for="inputServico"><strong>Servico</strong></label>
 							                    				</div>
 							                    			</div>
 							                    		</div>												
-							                    	<div class="col-lg-1">
-							                    		<div class="form-group">
-							                    			<label for="inputUnidade"><strong>Unidade</strong></label>
-							                    		</div>
-							                    	</div>
 							                    	<div class="col-lg-2">
 							                    		<div class="form-group">
 							                    			<label for="inputQuantidade"><strong>Quantidade</strong></label>
@@ -413,7 +402,7 @@ try {
 											$cont++;
 
 											$iQuantidade = isset($item['TRXSrQuantidade']) ? $item['TRXSrQuantidade'] : '';
-										
+
 											print('
 								                    <div class="row" style="margin-top: 8px;">
 								                    	<div class="col-lg-9">
@@ -427,9 +416,6 @@ try {
 								                    			</div>
 								                    		</div>
 								                    	</div>								
-								                    	<div class="col-lg-1">
-								                    		<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
-								                    	</div>
 								                    	<div class="col-lg-2">
 								                    		<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
 								                    	</div>	
@@ -451,7 +437,7 @@ try {
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowServicos);
 
-
+										//var_dump($rowServicos);
 										$cont = 0;
 
 										print('
@@ -462,7 +448,7 @@ try {
 							                    					<label for="inputCodigo"><strong>Item</strong></label>
 							                    				</div>
 							                    				<div class="col-lg-11">
-							                    					<label for="inputServico"><strong>Serviço</strong></label>
+							                    					<label for="inputServico"><strong>Servico</strong></label>
 							                    				</div>
 							                    			</div>
 							                    		</div>												
@@ -514,7 +500,7 @@ try {
 							<!-- /custom header text -->
 							<?php 
 							
-							    if(count($rowOrcamentosTR) >= 1){
+							    if($rowOrcamentosTR['QtdeOrcamentos'] >= 1){
 									print('
 									<div class="row" style="margin-top: 10px;">
 								        <div class="row justify-content-center col-lg-12">
@@ -523,7 +509,7 @@ try {
 										        <a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
 											</div>
 											<div class="row justify-content-end align-content-center col-12 col-lg-6">
-											    <p style="color: red; margin: 0px"><i class="icon-info3"></i>A lista de serviços não pode ser alterada enquanto houver orçamentos para essa TR.</p>
+											    <p style="color: red; margin: 0px"><i class="icon-info3"></i>A lista de Servicos não pode ser alterada enquanto houver orçamentos para essa TR.</p>
 										    </div>
 								        </div>
 							        </div>

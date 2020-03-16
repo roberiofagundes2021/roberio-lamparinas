@@ -191,6 +191,7 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 
 			document.formProduto.submit();
 		}
+		
 	</script>
 
 </head>

@@ -144,16 +144,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					document.formTR.submit();
 				} else if (Tipo == 'orcamento') {
 					
-					
-					alert(TRId);
 					//Esse ajax está sendo usado para verificar no banco se há algum produto sem informar a quantidade. Caso tenha não deixar ir para o orçamento.
 					$.ajax({
 						type: "POST",
 						url: "trValidaQuantidade.php",
 						data: {iTr: TRId},
 						success: function(resposta){
-						
-							if (resposta){
+
+							if (resposta == 1){
 								alerta('Atenção','Enquanto todas as quantidades não forem informadas não é possível gerar um orçamento!','error');
 								return false;
 							} else{
