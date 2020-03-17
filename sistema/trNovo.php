@@ -63,8 +63,8 @@ if (isset($_POST['inputData'])) {
 		$insertId = $conn->lastInsertId();
 
 		$possuiSubCategoria = 0;
-		
-		if (isset($_POST['cmbSubCategoria']) and $_POST['cmbSubCategoria'] != "") {
+
+		if (isset($_POST['cmbSubCategoria']) and $_POST['cmbSubCategoria'][0] != "") {
 			
 			$possuiSubCategoria = 1;
 
@@ -119,7 +119,7 @@ if (isset($_POST['inputData'])) {
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir termo de referência!!!";
 		$_SESSION['msg']['tipo'] = "error";
 
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error1: ' . $e->getMessage();
 		die;
 	}
 
@@ -194,39 +194,16 @@ if (isset($_POST['inputData'])) {
 				
 				var TrProduto = document.getElementById("TrProduto");
 				var TrServico = document.getElementById("TrServico");
-				var parametroProduto = $('#parametroProduto').val() == 'ProdutoOrcamento' ? 1 : 0;
+/*				var parametroProduto = $('#parametroProduto').val() == 'ProdutoOrcamento' ? 1 : 0;
 				var parametroServico = $('#parametroServico').val() == 'ServicoOrcamento' ? 1 : 0;
 				var cmbCategoria = $('#cmbCategoria').val();
-				var cmbSubCategoria = $('#cmbSubCategoria').val() != '' ? $('#cmbSubCategoria').val() : 0;
+				var cmbSubCategoria = $('#cmbSubCategoria').val() != '' ? $('#cmbSubCategoria').val() : 0; */
 				
 				if (!TrProduto.checked && !TrServico.checked){
 					alerta('Atenção','Informe se o Termo de Referência terá Produtos e/ou Serviços!','error');
 					$('#TrProduto').focus();
 					return false;					
 				}
-				
-/*				alert(TrProduto.checked);
-				alert(TrServico.checked);
-				alert(parametroProduto);
-				alert(parametroServico);
-				alert(cmbCategoria);
-				alert(cmbSubCategoria); 
-				
-				//Falta conferir o que tem de errado nessa validação. Caso não dê certo, tentar fazer parecido com a linha 430 do movimentacaoNovo.php
-				$.getJSON('trValidaProdutoServico.php?bProduto='+TrProduto.checked+'&bServico='+TrServico.checked+'&parametroProduto='+parametroProduto+'&parametroServico='+parametroServico+'&iCategoria='+cmbCategoria+'&iSubCategoria='+cmbSubCategoria, function (dados){
-
-					alert(dados.length);
-					if (dados.length){						
-						alert('Entrou1');
-						return false;
-					} else {
-						alert('Entrou2');
-					}	
-				});			
-
-				alert('Chegou aqui');
-				
-				return false; */
 				
 				$( "#formTR" ).submit();
 			});
