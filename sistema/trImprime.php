@@ -26,6 +26,29 @@ $sql = "SELECT *
 $result = $conn->query($sql);
 $rowTermoReferencia = $result->fetchAll(PDO::FETCH_ASSOC);
 
+
+// Selects para identificar a a tabela de origem dos produtos da TR.
+$sql = "SELECT TRXPrProduto
+			FROM TermoReferenciaXProduto
+			JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
+			WHERE TRXPrEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
+$result = $conn->query($sql);
+$rowProdutoUtilizado1 = $result->fetchAll(PDO::FETCH_ASSOC);
+$countProdutoUtilizado1 = count($rowProdutoUtilizado1);
+
+
+$sql = "SELECT TRXPrProduto
+			FROM TermoReferenciaXProduto
+			JOIN Produto on ProduId = TRXPrProduto
+			WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+$result = $conn->query($sql);
+$rowProdutoUtilizado2 = $result->fetchAll(PDO::FETCH_ASSOC);
+$countProdutoUtilizado2 = count($rowProdutoUtilizado2);
+
+
+// Selects para identificar a a tabela de origem dos serviços da TR.
+
+
 try {
 	$mpdf = new Mpdf([
 		'mode' => 'utf-8',
@@ -78,7 +101,7 @@ try {
 		foreach ($rowTermoReferencia as $sbcat) {
 			$html .= '
 			    <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
-			        SubCategoria: <span style="font-weight:normal;">'.$sbcat['SbCatNome'].'</span>
+			        SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
 		        </div>
 		        <br>
 		        <table style="width:100%; border-collapse: collapse;">

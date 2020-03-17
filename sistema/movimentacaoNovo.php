@@ -225,7 +225,7 @@ if(isset($_POST['inputData'])){
 				$.get('filtraOrdemCompra.php?idFornecedor='+cmbFornecedor, function (dados){
 
 					var option = '<option value="#">Selecione</option>';
-					console.log(dados)
+					
 					if (dados){
 						$('#cmbOrdemCompra').html(option).show();
 						$('#cmbOrdemCompra').append(dados).show();
@@ -377,6 +377,10 @@ if(isset($_POST['inputData'])){
 					}					
 				});					
 			});
+
+			$('#cmbDestinoLocal').on('change', ()=>{
+				console.log($('#cmbDestinoLocal').val())
+			})
 			
 			$('#btnAdicionar').click(function(){	
 			
@@ -538,6 +542,10 @@ if(isset($_POST['inputData'])){
 				
 				var Motivo = cmbMotivo.split("#");
 				var chave = Motivo[1];
+
+				if($('#cmbOrdemCompra')){
+					var cmbOrdemCompra = $('#cmbOrdemCompra').val()
+				}
 				
 				//remove os espaços desnecessários antes e depois
 				inputDestinoManual = inputDestinoManual.trim();
@@ -554,6 +562,12 @@ if(isset($_POST['inputData'])){
 					//Verifica se a combo Estoque de Destino foi informada
 					if (cmbDestinoLocal == '#'){
 						alerta('Atenção','Informe o Estoque de Destino!','error');
+						$('#cmbDestinoLocal').focus();
+						return false;
+					}
+
+					if(cmbOrdemCompra == '#'){
+						alerta('Atenção','Informe Ordem Compra / Carta Contrato!','error');
 						$('#cmbDestinoLocal').focus();
 						return false;
 					}
@@ -768,7 +782,7 @@ if(isset($_POST['inputData'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovo.php">
+					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Movimentação</h5>
 						</div>
@@ -801,7 +815,7 @@ if(isset($_POST['inputData'])){
 								<div class="col-lg-4" id="motivo" style="display:none;">
 									<div class="form-group">
 										<label for="cmbMotivo">Motivo</label>
-										<select id="cmbMotivo" name="cmbMotivo" class="form-control form-control-select2" onChange="selecionaMotivo(this.value)">
+										<select id="cmbMotivo" name="cmbMotivo" class="form-control form-control-select2" onChange="selecionaMotivo(this.value)" required>
 											<option value="#">Selecione</option>
 											<?php 
 												$sql = ("SELECT MotivId, MotivNome, MotivChave
@@ -969,7 +983,7 @@ if(isset($_POST['inputData'])){
 										
 										<div class="col-lg-3">											
 											<div class="form-group">
-												<label for="cmbOrdemCompra">*Nº Ordem Compra / Carta Contrato</label>
+												<label for="cmbOrdemCompra"><span style="color: red">*</span>Nº Ordem Compra / Carta Contrato</label>
 												<select id="cmbOrdemCompra" name="cmbOrdemCompra" class="form-control form-control-select2" required>
 													<option value="#">Selecione</option>
 												</select>
