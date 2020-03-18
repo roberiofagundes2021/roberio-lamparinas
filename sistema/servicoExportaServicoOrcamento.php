@@ -7,7 +7,7 @@ include('global_assets/php/conexao.php');
 $_SESSION['msg'] = array();
 
 if (isset($_POST['inputServicoId'])) {
-    $sql = "SELECT ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria
+    $sql = "SELECT ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, ServiStatus
             FROM Servico
             WHERE ServiId = " . $_POST['inputServicoId'] . " and ServiEmpresa = " . $_SESSION['EmpreId'] . "
            ";
@@ -25,7 +25,7 @@ if (isset($_POST['inputServicoId'])) {
                 ':sDetalhamento' => $servico['ServiDetalhamento'],
                 ':iCategoria' => $servico['ServiCategoria'],
                 ':iSubCategoria' => $servico['ServiSubCategoria'],
-                ':iSituacao' => 1,
+                ':iSituacao' => $servico['ServiStatus'],
                 ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                 ':iEmpresa' => $_SESSION['EmpreId']
             ));

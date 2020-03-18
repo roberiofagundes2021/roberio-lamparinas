@@ -5,10 +5,11 @@ include('global_assets/php/conexao.php');
 
 $_SESSION['PaginaAtual'] = 'Serviço';
 
-$sql = "SELECT ServiId, ServiCodigo, ServiNome, CategNome, SbCatNome, ServiValorVenda, ServiStatus
+$sql = "SELECT ServiId, ServiCodigo, ServiNome, CategNome, SbCatNome, ServiValorVenda, ServiStatus, SituaNome, SituaChave, SituaCor
 		FROM Servico
-		LEFT JOIN Categoria on CategId = ServiCategoria
+		JOIN Categoria on CategId = ServiCategoria
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
+		JOIN Situacao on SituaId = CategStatus
 	    WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ."
 		ORDER BY ServiNome ASC";
 $result = $conn->query($sql);
@@ -279,8 +280,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['ServiStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['ServiStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
@@ -291,14 +292,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.formataMoeda($item['ServiValorVenda']).'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'mudaStatus\');" data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-													<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'exporta\');" class="list-icons-item"><i class="icon-drawer-out"></i></a>
-														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'exporta\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Exportar para Serviço Orçamento"><i class="icon-drawer-out"></i></a>
+														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Serviço"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'exclui\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Excluir Serviço"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
