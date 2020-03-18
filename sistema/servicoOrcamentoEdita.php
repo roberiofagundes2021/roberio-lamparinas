@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Editar Serviço de Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubCategoria
+$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubCategoria 
 		FROM ServicoOrcamento
 		WHERE SrOrcId = ". $_POST['inputSrOrcId'] ." and SrOrcEmpresa = ". $_SESSION['EmpreId'];
 $result = $conn->query($sql);

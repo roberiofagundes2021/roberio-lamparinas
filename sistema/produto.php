@@ -186,6 +186,8 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 					confirmaExclusao(document.formProduto, "Tem certeza que deseja excluir esse produto?", "produtoExclui.php");
 				} else if (Tipo == 'mudaStatus') {
 					document.formProduto.action = "produtoMudaSituacao.php";
+				} else if(Tipo == 'exporta') {
+                    document.formProduto.action = "produtoExportaProdutoOrcamento.php";
 				}
 			}
 
@@ -330,8 +332,9 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaProduto(' . $item['ProduId'] . ', \'' . htmlentities(addslashes($item['ProduNome']), ENT_QUOTES) . '\',' . $item['ProduStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaProduto(' . $item['ProduId'] . ', \'' . htmlentities(addslashes($item['ProduNome']), ENT_QUOTES) . '\',' . $item['ProduStatus'] . ', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+													<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\','.$item['ProduStatus'].', \'exporta\');" class="list-icons-item"><i class="icon-drawer-out"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\','.$item['ProduStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\','.$item['ProduStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>

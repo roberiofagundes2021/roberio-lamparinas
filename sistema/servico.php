@@ -156,7 +156,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			if (Tipo == 'exportar'){	
 				document.formServico.action = "servicoExportar.php";
 				document.formServico.setAttribute("target", "_blank");	
-			} else {			
+			} else {
 				document.getElementById('inputServicoId').value = ServicoId;
 				document.getElementById('inputServicoNome').value = ServicoNome;
 				document.getElementById('inputServicoStatus').value = ServicoStatus;
@@ -167,7 +167,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					confirmaExclusao(document.formServico, "Tem certeza que deseja excluir esse serviço?", "servicoExclui.php");
 				} else if (Tipo == 'mudaStatus'){
 					document.formServico.action = "servicoMudaSituacao.php";
-				}		
+				} else if(Tipo == 'exporta') {
+                    document.formServico.action = "servicoExportaServicoOrcamento.php";
+				}
 			}
 			
 			document.formServico.submit();
@@ -294,6 +296,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
+													<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'exporta\');" class="list-icons-item"><i class="icon-drawer-out"></i></a>
 														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
 														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
