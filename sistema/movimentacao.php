@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-include_once("sessao.php"); 
+include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Movimentação';
 
@@ -9,10 +9,10 @@ include('global_assets/php/conexao.php');
 $sql = ("SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave, LcEstNome, SetorNome
 		 FROM Movimentacao
 		 LEFT JOIN Fornecedor on ForneId = MovimFornecedor
-		 LEFT JOIN LocalEstoque on LcEstId = MovimOrigem or LcEstId = MovimDestinoLocal
-		 LEFT JOIN Setor on SetorId = MovimDestinoSetor
+		 LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal or LcEstId = MovimDestinoLocal
+		 LEFT JOIN Setor on SetorId = MovimOrigemSetor or LcEstId = MovimDestinoSetor
 		 JOIN Situacao on SituaId = MovimSituacao
-	     WHERE MovimEmpresa = ". $_SESSION['EmpreId'] ."
+	     WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . "
 		 ORDER BY MovimData DESC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -22,6 +22,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -29,7 +30,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<title>Lamparinas | Movimentação</title>
 
 	<?php include_once("head.php"); ?>
-	
+
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
@@ -37,37 +38,43 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	
-	<!-- /theme JS files -->	
-	
-	 <script type="text/javascript">
-		
+
+	<!-- /theme JS files -->
+
+	<script type="text/javascript">
 		$(document).ready(function() {
-			
+
 			/* Início: Tabela Personalizada */
-			$('#tblMovimentacao').DataTable( {
-				"order": [[ 0, "desc" ]],
-			    autoWidth: false,
+			$('#tblMovimentacao').DataTable({
+				"order": [
+					[0, "desc"]
+				],
+				autoWidth: false,
 				responsive: true,
-			    columnDefs: [
-			    {
-					visible: false,
-					targets: [ 0 ]
-				},
-			    { 
-					orderable: false,
-					width: 50,
-					targets: [ 7 ]
-				}], 
+				columnDefs: [{
+						visible: false,
+						targets: [0]
+					},
+					{
+						orderable: false,
+						width: 50,
+						targets: [7]
+					}
+				],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
 					search: '<span>Filtro:</span> _INPUT_',
 					searchPlaceholder: 'filtra qualquer coluna...',
 					lengthMenu: '<span>Mostrar:</span> _MENU_',
-					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+					paginate: {
+						'first': 'Primeira',
+						'last': 'Última',
+						'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+						'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+					}
 				}
 			});
-			
+
 			// Select2 for length menu styling
 			var _componentSelect2 = function() {
 				if (!$().select2) {
@@ -81,53 +88,52 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					dropdownAutoWidth: true,
 					width: 'auto'
 				});
-			};	
+			};
 
 			_componentSelect2();
-			
+
 			/* Fim: Tabela Personalizada */
-		});		
-			
+		});
+
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaMovimentacao(MovimId, MovimNotaFiscal, Tipo){
-		
+		function atualizaMovimentacao(MovimId, MovimNotaFiscal, Tipo) {
+
 			document.getElementById('inputMovimentacaoId').value = MovimId;
 			document.getElementById('inputMovimentacaoNotaFiscal').value = MovimNotaFiscal;
-					
-			if (Tipo == 'edita'){	
-				document.formMovimentacao.action = "movimentacaoEdita.php";		
-			} else if (Tipo == 'exclui'){
+
+			if (Tipo == 'edita') {
+				document.formMovimentacao.action = "movimentacaoEdita.php";
+			} else if (Tipo == 'exclui') {
 				confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir esse movimentacao?", "movimentacaoExclui.php");
-			} else if (Tipo == 'imprimir'){
+			} else if (Tipo == 'imprimir') {
 				document.formMovimentacao.action = "movimentacaoImprime.php";
 				document.formMovimentacao.setAttribute("target", "_blank");
 			}
-			
+
 			document.formMovimentacao.submit();
-		}		
-			
+		}
 	</script>
 
 </head>
 
 <body class="navbar-top">
 
-	<?php include_once("topo.php"); ?>	
+	<?php include_once("topo.php"); ?>
 
 	<!-- Page content -->
 	<div class="page-content">
-		
+
 		<?php include_once("menu-left.php"); ?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
 
-			<?php include_once("cabecalho.php"); ?>	
+			<?php include_once("cabecalho.php"); ?>
 
 			<!-- Content area -->
 			<div class="content">
 
-				<!-- Info blocks -->		
+				<!-- Info blocks -->
 				<div class="row">
 					<div class="col-lg-12">
 						<!-- Basic responsive configuration -->
@@ -149,7 +155,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<a href="movimentacaoNovo.php" class="btn btn-success" role="button">Nova Movimentação</a>
 									<a href="index.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Listar Requisições">Requisições</a></div>
 							</div>
-							
+
 							<table class="table" id="tblMovimentacao">
 								<thead>
 									<tr class="bg-slate">
@@ -164,33 +170,40 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									</tr>
 								</thead>
 								<tbody>
-								<?php
-									foreach ($row as $item){
-										
+									<?php
+									foreach ($row as $item) {
+
 										$tipo = $item['MovimTipo'] == 'E' ? 'Entrada' : ($item['MovimTipo'] == 'S' ? 'Saída' : 'Transferência');
-										$local = $item['MovimTipo'] == 'S' ? $item['SetorNome'] : $item['LcEstNome'];
+										if ($item['MovimTipo'] == 'S' || $item['MovimTipo'] == 'E') {
+
+											$local = $item['MovimTipo'] == 'S' ? $item['LcEstNome'] : $item['LcEstNome'];
+											
+										} else if ($item['MovimTipo'] == 'T') {
+
+											$local = isset($item['LcEstNome']) ? $item['LcEstNome'] : $item['SetorNome'];
+										}
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = $item['SituaChave'] == 'PENDENTE' ? 'badge-success' : 'badge-secondary';
-										
+
 										print('
 										<tr>
-											<td>'.$item['MovimId'].'</td>
-											<td>'.mostraData($item['MovimData']).'</td>
-											<td>'.$tipo.'</td>
-											<td>'.$item['MovimNotaFiscal'].'</td>
-											<td>'.$item['ForneNome'].'</td>
-											<td>'.$local.'</td>
+											<td>' . $item['MovimId'] . '</td>
+											<td>' . mostraData($item['MovimData']) . '</td>
+											<td>' . $tipo . '</td>
+											<td>' . $item['MovimNotaFiscal'] . '</td>
+											<td>' . $item['ForneNome'] . '</td>
+											<td>' . $local . '</td>
 											');
-										
-										print('<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>');
-										
-										if($item['MovimTipo'] == 'T' || $item['MovimTipo'] == 'S'){
+
+										print('<td><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></td>');
+
+										if ($item['MovimTipo'] == 'T' || $item['MovimTipo'] == 'S') {
 											print('<td class="text-center">
 											    	    <div class="list-icons">
 												    	    <div class="list-icons list-icons-extended">
-													    	    <a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														        <a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
-														        <a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'imprimir\');" class="list-icons-item"><i class="icon-printer2"></i></a>
+													    	    <a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														        <a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														        <a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'imprimir\');" class="list-icons-item"><i class="icon-printer2"></i></a>
 													        </div>
 												        </div>
 											        </td>
@@ -199,15 +212,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended" style="margin-right: 28px">
-														<a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaMovimentacao('.$item['MovimId'].', \''.$item['MovimNotaFiscal'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
 										</tr>');
 										}
 									}
-								?>
+									?>
 
 								</tbody>
 							</table>
@@ -215,18 +228,18 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- /basic responsive configuration -->
 
 					</div>
-				</div>				
-				
+				</div>
+
 				<!-- /info blocks -->
-				
+
 				<form name="formMovimentacao" method="post" target="_blank">
-					<input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId" >
-					<input type="hidden" id="inputMovimentacaoNotaFiscal" name="inputMovimentacaoNotaFiscal" >
+					<input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId">
+					<input type="hidden" id="inputMovimentacaoNotaFiscal" name="inputMovimentacaoNotaFiscal">
 				</form>
 
 			</div>
 			<!-- /content area -->
-			
+
 			<?php include_once("footer.php"); ?>
 
 		</div>

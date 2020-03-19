@@ -16,11 +16,59 @@ if(isset($_POST['inputData'])){
 		} else{
 			$iMotivo = null;
 		}
+
+		$origemArray = null;
+		$idOrigem = null;
+		$tipoOrigem = null;
+		if($_POST['cmbEstoqueOrigemLocalSetor'] != '#'){
+
+			$origemArray = explode('#', $_POST['cmbEstoqueOrigemLocalSetor']);
+
+			if(count($origemArray) > 2){
+				$idOrigem = $origemArray[0];
+				$tipoOrigem = $origemArray[2];
+			 }
+
+		} else if($_POST['cmbEstoqueOrigem'] != '#'){
+			$tipoOrigem = 'OrigemLocalTransferencia';
+			$idOrigem = $_POST['cmbEstoqueOrigem'];
+		} 
+
+		echo($tipoOrigem);
+		echo($idOrigem);
 		
-		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigem, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
+
+		$destinoArray = null;
+		$idDestino = null;
+		$tipoDestino = null;
+		if($_POST['cmbDestinoLocalEstoqueSetor'] != '#'){
+
+			$destinoArray = explode('#', $_POST['cmbDestinoLocalEstoqueSetor']);
+
+			if(count($destinoArray) > 2){
+				$idDestino = $destinoArray[0];
+				$tipoDestino = $destinoArray[2];
+			 }
+
+		} else if($_POST['cmbDestinoLocal'] != '#'){
+			$tipoDestino = 'DestinoLocal';
+			$idDestino = $_POST['cmbDestinoLocal'];
+		} else if($_POST['cmbDestinoSetor'] != '#'){
+            $tipoDestino = 'DestinoSetor';
+			$idDestino = $_POST['cmbDestinoSetor'];
+		}
+
+		
+
+		echo($tipoDestino);
+		echo($idDestino);
+		
+
+		
+		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
 										  MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimEmpresa)
-				VALUES (:sTipo, :iMotivo, :dData, :iFinalidade, :iOrigem, :iDestinoLocal, :iDestinoSetor, :sDestinoManual, 
+				VALUES (:sTipo, :iMotivo, :dData, :iFinalidade, :iOrigemLocal, :iOrigemSetor, :iDestinoLocal, :iDestinoSetor, :sDestinoManual, 
 						:sObservacao, :iFornecedor, :iOrdemCompra, :sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, 
 						:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);	
@@ -39,16 +87,21 @@ if(isset($_POST['inputData'])){
 						':iMotivo' => $iMotivo,
 						':dData' => gravaData($_POST['inputData']),
 						':iFinalidade' => $_POST['cmbFinalidade'] == '#' ? null : $_POST['cmbFinalidade'],
-						':iOrigem' => $_POST['cmbEstoqueOrigem'] == '#' ? null : $_POST['cmbEstoqueOrigem'],
-						':iDestinoLocal' => $_POST['cmbDestinoLocal'] == '#' ? null : $_POST['cmbDestinoLocal'],
-						':iDestinoSetor' => $_POST['cmbDestinoSetor'] == '#' ? null : $_POST['cmbDestinoSetor'],
+
+						':iOrigemLocal' => $tipoOrigem == 'Local' ? $idOrigem : $tipoOrigem == 'OrigemLocalTransferencia' ? $idOrigem : null,
+						':iOrigemSetor' => $tipoOrigem == 'Setor' ? $idOrigem : null,
+
+						':iDestinoLocal' => $tipoDestino == 'Local' ? $idDestino : $tipoDestino == 'DestinoLocal' ? $idDestino : null,
+						
+						':iDestinoSetor' => $tipoDestino == 'Setor' ? $idDestino : $tipoDestino == 'DestinoSetor' ? $idDestino : null,
+
 						':sDestinoManual' => $_POST['inputDestinoManual'] == '' ? null : $_POST['inputDestinoManual'],
 						':sObservacao' => $_POST['txtareaObservacao'],
 						':iFornecedor' => $_POST['cmbFornecedor'] == '-1' ? null : $_POST['cmbFornecedor'],
 						':iOrdemCompra' => $_POST['cmbOrdemCompra'] == '#' ? null : $_POST['cmbOrdemCompra'],
 						':sNotaFiscal' => $_POST['inputNotaFiscal'] == '' ? null : $_POST['inputNotaFiscal'],
 						':dDataEmissao' => $_POST['inputDataEmissao'] == '' ? null : gravaData($_POST['inputDataEmissao']),
-						':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
+		 				':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
 						':fValorTotal' => $_POST['inputValorTotal'] == '' ? null : gravaValor($_POST['inputValorTotal']),
 						':sChaveAcesso' => $_POST['inputChaveAcesso'] == '' ? null : $_POST['inputChaveAcesso'],
 						':iSituacao' => $_POST['cmbSituacao'] == '#' ? null : $_POST['cmbSituacao'],
@@ -109,7 +162,7 @@ if(isset($_POST['inputData'])){
 		echo 'Error: ' . $e->getMessage(); exit;
 	}
 	
-	irpara("movimentacao.php");
+	//irpara("movimentacao.php");
 }
 
 ?>
@@ -136,6 +189,11 @@ if(isset($_POST['inputData'])){
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 	<script src="global_assets/js/lamparinas/jquery.maskMoney.js"></script>  <!-- http://www.fabiobmed.com.br/criando-mascaras-para-moedas-com-jquery/ -->
 	<!-- /theme JS files -->
@@ -225,7 +283,7 @@ if(isset($_POST['inputData'])){
 				$.get('filtraOrdemCompra.php?idFornecedor='+cmbFornecedor, function (dados){
 
 					var option = '<option value="#">Selecione</option>';
-					
+					console.log(dados)
 					if (dados){
 						$('#cmbOrdemCompra').html(option).show();
 						$('#cmbOrdemCompra').append(dados).show();
@@ -377,10 +435,6 @@ if(isset($_POST['inputData'])){
 					}					
 				});					
 			});
-
-			$('#cmbDestinoLocal').on('change', ()=>{
-				console.log($('#cmbDestinoLocal').val())
-			})
 			
 			$('#btnAdicionar').click(function(){	
 			
@@ -536,16 +590,13 @@ if(isset($_POST['inputData'])){
 				var cmbFinalidade = $('#cmbFinalidade').val();
 				var cmbMotivo = $('#cmbMotivo').val();
 				var cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val();
+				var cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val();
 				var cmbDestinoLocal = $('#cmbDestinoLocal').val();
+				var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val();
 				var cmbDestinoSetor = $('#cmbDestinoSetor').val();
 				var inputDestinoManual = $('#inputDestinoManual').val();
-				
 				var Motivo = cmbMotivo.split("#");
 				var chave = Motivo[1];
-
-				if($('#cmbOrdemCompra')){
-					var cmbOrdemCompra = $('#cmbOrdemCompra').val()
-				}
 				
 				//remove os espaços desnecessários antes e depois
 				inputDestinoManual = inputDestinoManual.trim();
@@ -562,12 +613,6 @@ if(isset($_POST['inputData'])){
 					//Verifica se a combo Estoque de Destino foi informada
 					if (cmbDestinoLocal == '#'){
 						alerta('Atenção','Informe o Estoque de Destino!','error');
-						$('#cmbDestinoLocal').focus();
-						return false;
-					}
-
-					if(cmbOrdemCompra == '#'){
-						alerta('Atenção','Informe Ordem Compra / Carta Contrato!','error');
 						$('#cmbDestinoLocal').focus();
 						return false;
 					}
@@ -611,7 +656,7 @@ if(isset($_POST['inputData'])){
 					}
 					
 					//Verifica se a combo Estoque de Origem foi informada
-					if (cmbEstoqueOrigem == '#'){
+					if (cmbEstoqueOrigemLocalSetor == '#'){
 						alerta('Atenção','Informe o Estoque de Origem!','error');
 						$('#cmbEstoqueOrigem').focus();
 						return false;
@@ -628,7 +673,7 @@ if(isset($_POST['inputData'])){
 					} else {
 
 						//Verifica se a combo Estoque de Destino foi informada
-						if (cmbDestinoLocal == '#'){
+						if (cmbDestinoLocalEstoqueSetor == '#'){
 							alerta('Atenção','Informe o Estoque de Destino!','error');
 							$('#cmbDestinoLocal').focus();
 							return false;
@@ -694,6 +739,8 @@ if(isset($_POST['inputData'])){
 			
 			if (tipo == 'E'){				
 				document.getElementById('EstoqueOrigem').style.display = "none";
+				document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
+				document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
 				document.getElementById('DestinoLocal').style.display = "block";
 				document.getElementById('DestinoSetor').style.display = "none";
 				document.getElementById('classificacao').style.display = "none";
@@ -701,14 +748,18 @@ if(isset($_POST['inputData'])){
 				document.getElementById('dadosNF').style.display = "block";
 			} else if (tipo == 'S') {
 				document.getElementById('EstoqueOrigem').style.display = "block";
+				document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
+				document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
 				document.getElementById('DestinoLocal').style.display = "none";
 				document.getElementById('DestinoSetor').style.display = "block";
 				document.getElementById('classificacao').style.display = "block";
 				document.getElementById('motivo').style.display = "none";
 				document.getElementById('dadosNF').style.display = "none";
 			} else {
-				document.getElementById('EstoqueOrigem').style.display = "block";
-				document.getElementById('DestinoLocal').style.display = "block";
+				document.getElementById('EstoqueOrigem').style.display = "none";
+				document.getElementById('EstoqueOrigemLocalSetor').style.display = "block";
+				document.getElementById('DestinoLocalEstoqueSetor').style.display = "block";
+				document.getElementById('DestinoLocal').style.display = "none";
 				document.getElementById('DestinoSetor').style.display = "none";
 				document.getElementById('classificacao').style.display = "block";
 				document.getElementById('motivo').style.display = "block";
@@ -722,10 +773,10 @@ if(isset($_POST['inputData'])){
 			
 			if (chave == 'DOACAO' || chave == 'DESCARTE' || chave == 'DEVOLUCAO' || chave == 'CONSIGNACAO'){
 				document.getElementById('DestinoManual').style.display = "block";
-				document.getElementById('DestinoLocal').style.display = "none";
+				document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
 			} else {
 				document.getElementById('DestinoManual').style.display = "none";
-				document.getElementById('DestinoLocal').style.display = "block";
+				document.getElementById('DestinoLocalEstoqueSetor').style.display = "block";
 				document.getElementById('DestinoManual').value = '';
 			}
 		}	
@@ -755,10 +806,6 @@ if(isset($_POST['inputData'])){
 		}		
 								
 	</script>
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 </head>
 
@@ -782,7 +829,7 @@ if(isset($_POST['inputData'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery">
+					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovo.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Movimentação</h5>
 						</div>
@@ -815,7 +862,7 @@ if(isset($_POST['inputData'])){
 								<div class="col-lg-4" id="motivo" style="display:none;">
 									<div class="form-group">
 										<label for="cmbMotivo">Motivo</label>
-										<select id="cmbMotivo" name="cmbMotivo" class="form-control form-control-select2" onChange="selecionaMotivo(this.value)" required>
+										<select id="cmbMotivo" name="cmbMotivo" class="form-control form-control-select2" onChange="selecionaMotivo(this.value)">
 											<option value="#">Selecione</option>
 											<?php 
 												$sql = ("SELECT MotivId, MotivNome, MotivChave
@@ -889,6 +936,29 @@ if(isset($_POST['inputData'])){
 												</select>
 											</div>
 										</div>
+
+										<div class="col-lg-4" id="EstoqueOrigemLocalSetor" style="display:none;">
+											<div class="form-group">
+												<label for="cmbEstoqueOrigemLocalSetor">Origem</label>
+												<select id="cmbEstoqueOrigemLocalSetor" name="cmbEstoqueOrigemLocalSetor" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php
+													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia FROM LocalEstoque
+														     WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . "
+														     UNION
+														     SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia FROM Setor
+														     WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . "
+														     Order By Nome";
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($row as $item) {
+														print('<option value="' . $item['Id'] . '#'.$item['Nome'].'#'.$item['Referencia'].'">' . $item['Nome'] . '</option>');
+													}
+													?>
+												</select>
+											</div>
+										</div>
 										
 										<div class="col-lg-4" id="DestinoLocal">
 											<div class="form-group">
@@ -931,6 +1001,29 @@ if(isset($_POST['inputData'])){
 												</select>
 											</div>
 										</div>	
+
+										<div class="col-lg-4" id="DestinoLocalEstoqueSetor" style="display:none;">
+											<div class="form-group">
+												<label for="cmbDestinoLocalEstoqueSetor">Destino</label>
+												<select id="cmbDestinoLocalEstoqueSetor" name="cmbDestinoLocalEstoqueSetor" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<?php
+													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia FROM LocalEstoque
+														     WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . "
+														     UNION
+														     SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia FROM Setor
+														     WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . "
+														     Order By Nome";
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($row as $item) {
+														print('<option value="' . $item['Id'] . '#'.$item['Nome'].'#'.$item['Referencia'].'">' . $item['Nome'] . '</option>');
+													}
+													?>
+												</select>
+											</div>
+										</div>
 										
 										<div class="col-lg-4" id="DestinoManual" style="display:none">
 											<div class="form-group">
@@ -983,9 +1076,9 @@ if(isset($_POST['inputData'])){
 										
 										<div class="col-lg-3">											
 											<div class="form-group">
-												<label for="cmbOrdemCompra"><span style="color: red">*</span>Nº Ordem Compra / Carta Contrato</label>
+												<label for="cmbOrdemCompra">*Nº Ordem Compra / Carta Contrato</label>
 												<select id="cmbOrdemCompra" name="cmbOrdemCompra" class="form-control form-control-select2" required>
-													<option value="#">Selecione</option>
+													<option value="">Selecione</option>
 												</select>
 											</div>											
 										</div>	
