@@ -9,7 +9,7 @@ $sql = "SELECT ServiId, ServiCodigo, ServiNome, CategNome, SbCatNome, ServiValor
 		FROM Servico
 		JOIN Categoria on CategId = ServiCategoria
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-		JOIN Situacao on SituaId = CategStatus
+		JOIN Situacao on SituaId = ServiStatus
 	    WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ."
 		ORDER BY ServiNome ASC";
 $result = $conn->query($sql);
@@ -167,9 +167,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				} else if (Tipo == 'exclui'){
 					confirmaExclusao(document.formServico, "Tem certeza que deseja excluir esse serviço?", "servicoExclui.php");
 				} else if (Tipo == 'mudaStatus'){
-					document.formServico.action = "servicoMudaSituacao.php";
+					if(ServicoStatus != 'ALTERAR'){
+						document.formServico.action = "servicoMudaSituacao.php";
+					} else {
+						alerta('Atenção','Edite o serviço e altere a categoria para a situação ficar "ATIVO".','error');
+						return false;
+					}
 				} else if(Tipo == 'exporta') {
-                    document.formServico.action = "servicoExportaServicoOrcamento.php";
+					if(ServicoStatus != 'ALTERAR'){
+                    	document.formServico.action = "servicoExportaServicoOrcamento.php";
+                    } else{
+                    	alerta('Atenção','Edite o serviço e altere a categoria antes de realizar a exportação.','error');
+                    	return false;
+                    }
 				}
 			}
 			
@@ -292,14 +302,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.formataMoeda($item['ServiValorVenda']).'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'mudaStatus\');" data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');" data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'exporta\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Exportar para Serviço Orçamento"><i class="icon-drawer-out"></i></a>
-														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Serviço"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\','.$item['ServiStatus'].', \'exclui\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Excluir Serviço"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'exporta\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Exportar para Serviço Orçamento"><i class="icon-drawer-out"></i></a>
+														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Serviço"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Excluir Serviço"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>

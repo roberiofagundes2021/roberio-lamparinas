@@ -138,7 +138,7 @@ else {
 				$sql = "SELECT CategId
 						FROM Categoria
 						JOIN Situacao on SituaId = CategStatus
-						Where SituaChave = 'INVISIVEL' ";
+						Where SituaChave = 'ALTERAR' ";
 				$result = $conn->query($sql);
 				$rowCategoria = $result->fetch(PDO::FETCH_ASSOC);
 				

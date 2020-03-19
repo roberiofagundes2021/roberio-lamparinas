@@ -186,13 +186,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['SbCatNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaModelo('.$item['PrOrcId'].', \''.$item['PrOrcNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaModelo('.$item['PrOrcId'].', \''.htmlentities(addslashes($item['PrOrcNome']), ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaModelo('.$item['PrOrcId'].', \''.$item['PrOrcNome'].'\','.$item['PrOrcSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaModelo('.$item['PrOrcId'].', \''.$item['PrOrcNome'].'\','.$item['PrOrcSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>							
+														<a href="#" onclick="atualizaModelo('.$item['PrOrcId'].', \''.htmlentities(addslashes($item['PrOrcNome']), ENT_QUOTES).'\','.$item['PrOrcSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar Produto"></i></a>
+														<a href="#" onclick="atualizaModelo('.$item['PrOrcId'].', \''.htmlentities(addslashes($item['PrOrcNome']), ENT_QUOTES).'\','.$item['PrOrcSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir Produto"></i></a>							
 													</div>
 												</div>
 											</td>

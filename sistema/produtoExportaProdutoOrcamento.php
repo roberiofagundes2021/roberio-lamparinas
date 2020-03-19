@@ -7,7 +7,7 @@ include('global_assets/php/conexao.php');
 $_SESSION['msg'] = array();
 
 if (isset($_POST['inputProdutoId'])) {
-    $sql = "SELECT ProduNome, ProduDetalhamento, ProduCategoria, ProduSubCategoria, ProduUnidadeMedida
+    $sql = "SELECT ProduNome, ProduDetalhamento, ProduCategoria, ProduSubCategoria, ProduUnidadeMedida, ProduStatus
             FROM Produto
             WHERE ProduId = " . $_POST['inputProdutoId'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . "
            ";
@@ -26,7 +26,7 @@ if (isset($_POST['inputProdutoId'])) {
                 ':iCategoria' => $Produto['ProduCategoria'],
                 ':iSubCategoria' => $Produto['ProduSubCategoria'],
                 ':iUnidadeMedida' => $Produto['ProduUnidadeMedida'],
-                ':iSituacao' => 1,
+                ':iSituacao' => $Produto['ProduStatus'],
                 ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                 ':iEmpresa' => $_SESSION['EmpreId']
             ));
@@ -44,6 +44,6 @@ if (isset($_POST['inputProdutoId'])) {
             die;
         }
 
-        irpara("Produto.php");
+        irpara("produto.php");
     }
 }

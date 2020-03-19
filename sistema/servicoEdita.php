@@ -12,8 +12,11 @@ if(isset($_POST['inputServicoId'])){
 	
 	try{
 		
-		$sql = "SELECT *
+		$sql = "SELECT ServiId, ServiCodigo, ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, ServiValorCusto,
+					   ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda, ServiFabricante,
+					   ServiMarca, ServiModelo, ServiNumSerie, SituaChave
 				FROM Servico
+				JOIN Situacao on SituaId = ServiStatus
 				WHERE ServiId = $iServico ";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);		
@@ -39,12 +42,30 @@ if(isset($_POST['inputServicoId'])){
 if(isset($_POST['inputNome'])){
 		
 	try{
+
+		$sql = "SELECT SituaId
+				FROM Situacao
+				WHERE SituaChave = 'ATIVO' ";
+		$result = $conn->query($sql);
+		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);		
+
+		$Status = '';
+
+		//Se o Status estiver em 'ALTERAR' mudar para 'ATIVO'
+		if ($_POST['inputServicoStatus'] == 'ALTERAR'){
+			$Status = $rowSituacao['SituaId'];
+		}
 		
 		$sql = "UPDATE Servico SET ServiCodigo = :sCodigo, ServiNome = :sNome, ServiDetalhamento = :sDetalhamento, 
 		               ServiCategoria = :iCategoria, ServiSubCategoria = :iSubCategoria, ServiValorCusto = :fValorCusto, ServiOutrasDespesas = :fOutrasDespesas,
 		               ServiCustoFinal = :fCustoFinal, ServiMargemLucro = :fMargemLucro, ServiValorVenda = :fValorVenda, ServiFabricante = :iFabricante, 
-		               ServiMarca = :iMarca, ServiModelo = :iModelo, ServiNumSerie = :sNumSerie, ServiUsuarioAtualizador = :iUsuarioAtualizador 
-		        WHERE ServiId = :iServico";
+		               ServiMarca = :iMarca, ServiModelo = :iModelo, ServiNumSerie = :sNumSerie, ServiUsuarioAtualizador = :iUsuarioAtualizador ";
+
+		if ($_POST['inputServicoStatus'] == 'ALTERAR'){
+			$sql .= " ServiStatus = ".$Status." ";
+		}
+		
+		$sql .= "      WHERE ServiId = :iServico";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -328,6 +349,7 @@ if(isset($_POST['inputNome'])){
 						</div>
 						
 						<input type="hidden" id="inputServicoId" name="inputServicoId" value="<?php echo $row['ServiId']; ?>" >
+						<input type="hidden" id="inputServicoStatus" name="inputServicoStatus" value="<?php echo $row['SituaChave']; ?>" >
 						
 						<div class="card-body">
 							

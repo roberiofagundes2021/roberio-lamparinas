@@ -9,10 +9,12 @@ if (isset($_SESSION['fotoAtual'])) {
 	unset($_SESSION['fotoAtual']);
 }
 
-$sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, ProduValorVenda, ProduStatus, ProduCustoFinal, ProduValorCusto, ProduValorVenda
+$sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, ProduValorVenda, ProduStatus, 
+			   ProduCustoFinal, ProduValorCusto, ProduValorVenda, SituaNome, SituaChave, SituaCor
 		FROM Produto
-		LEFT JOIN Categoria on CategId = ProduCategoria
+		JOIN Categoria on CategId = ProduCategoria
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
+		JOIN Situacao on SituaId = ProduStatus
 	    WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . "
 		ORDER BY ProduCodigo ASC";
 $result = $conn->query($sql);
@@ -185,9 +187,19 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 				} else if (Tipo == 'exclui') {
 					confirmaExclusao(document.formProduto, "Tem certeza que deseja excluir esse produto?", "produtoExclui.php");
 				} else if (Tipo == 'mudaStatus') {
-					document.formProduto.action = "produtoMudaSituacao.php";
+					if(ProduStatus != 'ALTERAR'){
+						document.formProduto.action = "produtoMudaSituacao.php";
+					} else {
+						alerta('Atenção','Edite o produto e altere a categoria para a situação ficar "ATIVO".','error');
+						return false;
+					}
 				} else if(Tipo == 'exporta') {
-                    document.formProduto.action = "produtoExportaProdutoOrcamento.php";
+					if(ProduStatus != 'ALTERAR'){
+                    	document.formProduto.action = "produtoExportaProdutoOrcamento.php";
+                    } else{
+                    	alerta('Atenção','Edite o produto e altere a categoria antes de realizar a exportação.','error');
+                    	return false;
+                    }
 				}
 			}
 
@@ -306,17 +318,15 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 									<?php
 									foreach ($row as $item) {
 
-										$tipoValorProduto = '';
-
-										
+										$tipoValorProduto = '';										
 
 										if ($parametro['ParamPrecoGridProduto'] == 'precoCustoFinal') $tipoValorProduto = '<td>' . formataMoeda($item['ProduCustoFinal']) . '</td>';
 										else if ($parametro['ParamPrecoGridProduto'] == 'precoCusto') $tipoValorProduto = '<td>' . formataMoeda($item['ProduValorCusto']) . '</td>';
 										else if ($parametro['ParamPrecoGridProduto'] == 'precoVenda') $tipoValorProduto = '<td>' . formataMoeda($item['ProduValorVenda']) . '</td>';
 
 
-										$situacao = $item['ProduStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['ProduStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 
 										print('
 										<tr>
@@ -327,14 +337,14 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 											' . $tipoValorProduto . '
 											');
 
-										print('<td><a href="#" onclick="atualizaProduto(' . $item['ProduId'] . ', \'' . htmlentities(addslashes($item['ProduNome']), ENT_QUOTES) . '\',' . $item['ProduStatus'] . ', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
+										print('<td><a href="#" onclick="atualizaProduto(' . $item['ProduId'] . ', \'' . htmlentities(addslashes($item['ProduNome']), ENT_QUOTES) . '\',\''.$item['SituaChave'].'\', \'mudaStatus\');"  data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
 
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-													<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\','.$item['ProduStatus'].', \'exporta\');" class="list-icons-item"><i class="icon-drawer-out"></i></a>
-														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\','.$item['ProduStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\','.$item['ProduStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+													<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'exporta\');"  class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Exportar para Produto Orçamento" class="list-icons-item"><i class="icon-drawer-out"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Produto"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Produto"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>

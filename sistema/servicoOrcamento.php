@@ -191,8 +191,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaModelo('.$item['SrOrcId'].', \''.$item['SrOrcNome'].'\','.$item['SrOrcSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaModelo('.$item['SrOrcId'].', \''.$item['SrOrcNome'].'\','.$item['SrOrcSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>							
+														<a href="#" onclick="atualizaModelo('.$item['SrOrcId'].', \''.$item['SrOrcNome'].'\','.$item['SrOrcSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar Serviço"></i></a>
+														<a href="#" onclick="atualizaModelo('.$item['SrOrcId'].', \''.$item['SrOrcNome'].'\','.$item['SrOrcSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir Serviço"></i></a>							
 													</div>
 												</div>
 											</td>
