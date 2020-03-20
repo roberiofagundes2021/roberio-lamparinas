@@ -47,6 +47,22 @@ $countProdutoUtilizado2 = count($rowProdutoUtilizado2);
 
 
 // Selects para identificar a a tabela de origem dos serviços da TR.
+$sql = "SELECT TRXSrServico
+			FROM TermoReferenciaXServico
+			JOIN ServicoOrcamento on SrOrcId = TRXSrServico
+			WHERE TRXSrEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'";
+$result = $conn->query($sql);
+$rowServicoUtilizado1 = $result->fetchAll(PDO::FETCH_ASSOC);
+$countServicoUtilizado1 = count($rowServicoUtilizado1);
+
+
+$sql = "SELECT TRXSrServico
+			FROM TermoReferenciaXServico
+			JOIN Servico on ServiId = TRXSrServico
+			WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
+$result = $conn->query($sql);
+$rowServicoUtilizado2 = $result->fetchAll(PDO::FETCH_ASSOC);
+$countServicoUtilizado2 = count($rowServicoUtilizado2);
 
 
 try {

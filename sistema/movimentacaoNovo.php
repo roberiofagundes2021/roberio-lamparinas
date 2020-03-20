@@ -33,9 +33,6 @@ if(isset($_POST['inputData'])){
 			$tipoOrigem = 'OrigemLocalTransferencia';
 			$idOrigem = $_POST['cmbEstoqueOrigem'];
 		} 
-
-		echo($tipoOrigem);
-		echo($idOrigem);
 		
 
 		$destinoArray = null;
@@ -591,6 +588,7 @@ if(isset($_POST['inputData'])){
 				var cmbMotivo = $('#cmbMotivo').val();
 				var cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val();
 				var cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val();
+				var cmbOrdemCompra = $('#cmbOrdemCompra').val()
 				var cmbDestinoLocal = $('#cmbDestinoLocal').val();
 				var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val();
 				var cmbDestinoSetor = $('#cmbDestinoSetor').val();
@@ -613,6 +611,12 @@ if(isset($_POST['inputData'])){
 					//Verifica se a combo Estoque de Destino foi informada
 					if (cmbDestinoLocal == '#'){
 						alerta('Atenção','Informe o Estoque de Destino!','error');
+						$('#cmbDestinoLocal').focus();
+						return false;
+					} 
+
+					if(cmbOrdemCompra == '#'){
+                        alerta('Atenção','Informe a Ordem Compra / Carta Contrato!','error');
 						$('#cmbDestinoLocal').focus();
 						return false;
 					}

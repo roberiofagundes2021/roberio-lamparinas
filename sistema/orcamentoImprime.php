@@ -86,12 +86,14 @@ try {
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$cont = 1;
+		$totalGeral = 0;
 
 		foreach ($rowProdutos as $itemProduto) {
 
-			if ($itemProduto['OrXPrValorUnitario'] != '' and $itemProduto['OrXPrValorUnitario'] != null) {
+			if (($itemProduto['OrXPrValorUnitario'] != '' and $itemProduto['OrXPrValorUnitario'] != null) && ($itemProduto['OrXPrQuantidade'] != '' and $itemProduto['OrXPrQuantidade'] != null)  ) {
 				$valorUnitario = mostraValor($itemProduto['OrXPrValorUnitario']);
 				$valorTotal = mostraValor($itemProduto['OrXPrQuantidade'] * $itemProduto['OrXPrValorUnitario']);
+				$totalGeral = floatval($totalGeral) + mostraValor($itemProduto['OrXPrQuantidade'] * $itemProduto['OrXPrValorUnitario']);
 			} else {
 				$valorUnitario = "__________";
 				$valorTotal = "__________";
@@ -109,6 +111,18 @@ try {
 			";
 
 			$cont++;
+		}
+
+		if($totalGeral > 0){
+			$html .= "  
+			    <tr>
+	            	<td style='border-top: 1px solid #333;' colspan='4' height='50' valign='middle'>
+		                <strong>Total Geral</strong>
+	                </td>
+				    <td style='border-top: 1px solid #333; text-align: right' colspan='2'>
+				        ".mostraValor($totalGeral)."
+				    </td>
+			    </tr>";
 		}
 
 		$html .= "</table>";
