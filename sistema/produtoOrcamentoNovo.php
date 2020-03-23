@@ -201,7 +201,7 @@ if(isset($_POST['inputNome'])){
 										</div>
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputUnidadeMedida">Unidade de Medida <span class="text-danger">*</span></label>
+												<label for="inputUnidadeMedida">Unidade de Medida<span class="text-danger">*</span></label>
 												<select id="cmbUnidadeMedida" class="form-control form-control-select2" name="cmbUnidadeMedida" required>
 													<option value="">Selecione</option>
 													<?php 

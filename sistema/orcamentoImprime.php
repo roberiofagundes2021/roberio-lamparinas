@@ -86,14 +86,17 @@ try {
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$cont = 1;
+		$cont2 = 0;
 		$totalGeral = 0;
 
 		foreach ($rowProdutos as $itemProduto) {
 
-			if (($itemProduto['OrXPrValorUnitario'] != '' and $itemProduto['OrXPrValorUnitario'] != null) && ($itemProduto['OrXPrQuantidade'] != '' and $itemProduto['OrXPrQuantidade'] != null)  ) {
+			if (($itemProduto['OrXPrValorUnitario'] != '' and $itemProduto['OrXPrValorUnitario'] != null) && ($itemProduto['OrXPrQuantidade'] != '' and $itemProduto['OrXPrQuantidade'] != null)) {
 				$valorUnitario = mostraValor($itemProduto['OrXPrValorUnitario']);
 				$valorTotal = mostraValor($itemProduto['OrXPrQuantidade'] * $itemProduto['OrXPrValorUnitario']);
-				$totalGeral = floatval($totalGeral) + mostraValor($itemProduto['OrXPrQuantidade'] * $itemProduto['OrXPrValorUnitario']);
+				$totalGeral = ($itemProduto['OrXPrQuantidade'] * $itemProduto['OrXPrValorUnitario']) + $totalGeral;
+
+				$cont2++;
 			} else {
 				$valorUnitario = "__________";
 				$valorTotal = "__________";
@@ -113,17 +116,28 @@ try {
 			$cont++;
 		}
 
-		if($totalGeral > 0){
+		if ($cont2 == count($rowProdutos)) {
 			$html .= "  
 			    <tr>
 	            	<td style='border-top: 1px solid #333;' colspan='4' height='50' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
 				    <td style='border-top: 1px solid #333; text-align: right' colspan='2'>
-				        ".mostraValor($totalGeral)."
+				        " . mostraValor($totalGeral) . "
 				    </td>
-			    </tr>";
+				</tr>";
+		} else {
+			$html .= "  
+			    <tr>
+	            	<td style='border-top: 1px solid #333;' colspan='4' height='50' valign='middle'>
+		                <strong>Total Geral</strong>
+	                </td>
+				    <td style='border-top: 1px solid #333; text-align: right' colspan='2'>
+					    __________
+				    </td>
+				</tr>";
 		}
+
 
 		$html .= "</table>";
 	} else {
@@ -157,12 +171,17 @@ try {
 		$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$cont = 1;
+		$cont2 = 0;
+		$totalGeral = 0;
 
 		foreach ($rowServicos as $itemServico) {
 
-			if ($itemServico['OrXSvValorUnitario'] != '' and $itemServico['OrXSvValorUnitario'] != null) {
+			if (($itemServico['OrXSvValorUnitario'] != '' and $itemServico['OrXSvValorUnitario'] != null and $itemServico['OrXSvValorUnitario'] != 0) && ($itemServico['OrXSvQuantidade'] != '' and $itemServico['OrXSvQuantidade'] != null and $itemServico['OrXSvQuantidade'] != 0)) {
 				$valorUnitario = mostraValor($itemServico['OrXSvValorUnitario']);
 				$valorTotal = mostraValor($itemServico['OrXSvQuantidade'] * $itemServico['OrXSvValorUnitario']);
+				$totalGeral = ($itemServico['OrXSvQuantidade'] * $itemServico['OrXSvValorUnitario']) + $totalGeral;
+
+				$cont2++;
 			} else {
 				$valorUnitario = "__________";
 				$valorTotal = "__________";
@@ -179,6 +198,28 @@ try {
 			";
 
 			$cont++;
+		}
+
+		if ($cont2 == count($rowServicos)) {
+			$html .= "  
+			    <tr>
+	            	<td style='border-top: 1px solid #333;' colspan='4' height='50' valign='middle'>
+		                <strong>Total Geral</strong>
+	                </td>
+				    <td style='border-top: 1px solid #333; text-align: left' colspan='1'>
+				        " . mostraValor($totalGeral) . "
+				    </td>
+				</tr>";
+		} else {
+			$html .= "  
+			    <tr>
+	            	<td style='border-top: 1px solid #333;' colspan='4' height='50' valign='middle'>
+		                <strong>Total Geral</strong>
+	                </td>
+				    <td style='border-top: 1px solid #333; text-align: left' colspan='1'>
+					    __________
+				    </td>
+				</tr>";
 		}
 
 		$html .= "</table>";

@@ -1080,7 +1080,7 @@ if(isset($_POST['inputData'])){
 										
 										<div class="col-lg-3">											
 											<div class="form-group">
-												<label for="cmbOrdemCompra">*Nº Ordem Compra / Carta Contrato</label>
+												<label for="cmbOrdemCompra">Nº Ordem Compra / Carta Contrato<span style="color: red">*</span></label>
 												<select id="cmbOrdemCompra" name="cmbOrdemCompra" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 												</select>

@@ -621,9 +621,9 @@ if(isset($_POST['inputNome'])){
 									<div class="row">								
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="cmbUnidadeMedida">Unidade de Medida</label>
-												<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<label for="cmbUnidadeMedida">Unidade de Medida<span class="text-danger">*</span></label>
+												<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
 																FROM UnidadeMedida
