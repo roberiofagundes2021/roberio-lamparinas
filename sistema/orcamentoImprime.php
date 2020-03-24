@@ -74,6 +74,8 @@ try {
 				<div style='margin-top:8px;'>Orçamento: " . formatarNumero($sNumero) . "</div>
 			</div> 
 		</div>	 
+
+		<div style='text-align:center; margin-top: 20px;'><h1>ORÇAMENTO</h1></div>
 	";
 
 	if ($row['OrcamTipo'] == 'S') {
@@ -84,7 +86,7 @@ try {
 
 	if ($tipo == "Produto") {
 		$html .= '		            
-		            <div style="font-weight: bold; position:relative; margin-top: 30px; background-color:#ccc; padding: 5px;">
+		            <div style="font-weight: bold; position:relative; margin-top: 10px; background-color:#ccc; padding: 5px;">
 			            Fornecedor: <span style="font-weight:normal;">' . $row['ForneNome'] . '</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">' . $row['ForneCelular'] . '</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">' . $item['ForneEmail'] . '</span>
 		            </div>
 		            <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
@@ -170,7 +172,7 @@ try {
 		$html .= "</table>";
 	} else {
 		$html .= '
-		            <div style="font-weight: bold; position:relative; margin-top: 50px; background-color:#ccc; padding: 5px;">
+		            <div style="font-weight: bold; position:relative; margin-top: 10px; background-color:#ccc; padding: 5px;">
 		            	Fornecedor: <span style="font-weight:normal;">' . $row['ForneNome'] . '</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">' . $row['ForneCelular'] . '</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">' . $row['ForneEmail'] . '</span>
 		            </div>
 		            <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
