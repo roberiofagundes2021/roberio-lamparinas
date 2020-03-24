@@ -40,11 +40,11 @@
     <Cell><Data ss:Type="String">Detalhamento do Serviço</Data></Cell>
    </Row>
    <Row>
-    <Cell><Data ss:Type="String">Aplicação de Botox</Data></Cell>
+    <Cell><Data ss:Type="String">Manutenção de Ar Condicionado</Data></Cell>
     <Cell><Data ss:Type="String">O botox para uso estético é indicado para suavizar as rugas e linhas de expressão do rosto. Entre as linhas tratadas, estão: Rugas da testa. Vinco na glabela (espaço entre as sobrancelhas)</Data></Cell>
    </Row>
    <Row>
-    <Cell><Data ss:Type="String">Gordura Localizada</Data></Cell>
+    <Cell><Data ss:Type="String">Manutenção Elétrica</Data></Cell>
     <Cell><Data ss:Type="String">A Criolipólise é uma técnica para tratamento de gordura localizada, que usa o frio para provocar a morte das células de gordura da região tratada. Este é um tratamento muito seguro, eficaz, com preço atrativo e ótimos resultados, inclusive comprovados cientificamente.
 
 A Carbox é uma terapia baseada na aplicação de gás carbônico no tecido adiposo (tecido das gorduras), com o objetivo de promover uma acidez que agita as moléculas de gordura e oxigena o tecido, além de auxiliar no retorno linfático e venoso do tecido.
@@ -54,7 +54,7 @@ Aplicação de Enzimas é feita para auxiliar a absorção de gordura. O procedi
 Pró-Detox é uma massagem que combina movimentos específicos com cremes especialmente formulados para reduzir medidas e melhorar visivelmente o contorno do seu corpo, energizando o metabolismo em geral.</Data></Cell>
    </Row>
    <Row>
-    <Cell><Data ss:Type="String">Tratamento para Rugas</Data></Cell>
+    <Cell><Data ss:Type="String">Manutenção Hidráulica</Data></Cell>
     <Cell><Data ss:Type="String">O Laser de CO2 Fracionado é um tratamento inovador e eficaz no qual ondas de laser de CO2 são emitidas sobre a pele devidamente anestesiada. A pele se contrai, pois o colágeno tem essa reação a temperaturas acima de 60°C. O laser provoca uma grande produção de colágeno, que ocorre nos próximos seis meses, já que atingirá camadas bem profundas da pele. Com a restituição do colágeno, as rugas são tratadas e a pele volta a ter um aspecto jovial.</Data></Cell>
    </Row>
   </Table>

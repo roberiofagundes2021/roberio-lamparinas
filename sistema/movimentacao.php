@@ -104,7 +104,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			if (Tipo == 'edita') {
 				document.formMovimentacao.action = "movimentacaoEdita.php";
 			} else if (Tipo == 'exclui') {
-				confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir esse movimentacao?", "movimentacaoExclui.php");
+				confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir essa movimentação?", "movimentacaoExclui.php");
 			} else if (Tipo == 'imprimir') {
 				document.formMovimentacao.action = "movimentacaoImprime.php";
 				document.formMovimentacao.setAttribute("target", "_blank");

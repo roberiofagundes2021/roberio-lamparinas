@@ -25,10 +25,10 @@ if (isset($_POST['inputMovimentacaoId'])) {
     $result = $conn->query($sql);
     $rowMvPr = $result->fetchAll(PDO::FETCH_ASSOC);
 
-    $sql = "SELECT MovimData, MovimTipo, MovimFinalidade, MovimOrigem, MovimObservacao, FinalNome, MovimDestinoLocal, MovimDestinoSetor,     MovimDestinoManual, MovimMotivo, LcEstNome, ParamValorObsImpreRetirada
+    $sql = "SELECT MovimData, MovimTipo, MovimFinalidade, MovimOrigemLocal, MovimObservacao, FinalNome, MovimDestinoLocal, MovimDestinoSetor,     MovimDestinoManual, MovimMotivo, LcEstNome, ParamValorObsImpreRetirada
 	    FROM Movimentacao
 	    JOIN Finalidade on FinalId = MovimFinalidade
-	    JOIN LocalEstoque on LcEstId = MovimOrigem
+	    JOIN LocalEstoque on LcEstId = MovimOrigemLocal
 	    JOIN Parametro on ParamEmpresa = MovimEmpresa
 	    WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $_POST['inputMovimentacaoId'] . "
 	    ";
@@ -374,7 +374,7 @@ try {
 
                 $sql = "SELECT MovimDestinoManual, LcEstNome
 	                    FROM Movimentacao
-	                    JOIN LocalEstoque on LcEstId = MovimOrigem
+	                    JOIN LocalEstoque on LcEstId = MovimOrigemLocal
 	                    WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $_POST['inputMovimentacaoId'] . "
 	                   ";
                 $result = $conn->query($sql);
