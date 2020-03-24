@@ -45,7 +45,23 @@ try {
 	 </div>
 	";
 
-	$html = '';
+	$html = '
+
+		<style>
+			th{
+			    text-align: center; 
+			    border: #bbb solid 1px; 
+			    background-color: #f8f8f8; 
+			    padding: 8px;
+			}
+
+			td{
+				padding: 8px;				
+				border: #bbb solid 1px;
+			}
+		</style>
+
+	';
 
 	if ($row['OrcamTipo'] == 'S') {
 		$tipo = "Serviço";
@@ -67,12 +83,12 @@ try {
 		            <br>
 		            <table style="width:100%; border-collapse: collapse;">
 			            <tr>
-			            	<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Item</th>
-				            <th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:53%">' . $tipo . '</th>
-				            <th style="text-align: center; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
-				            <th style="text-align: center; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Unidade</th>
-				            <th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">V. Unit.</th>
-				            <th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">V. Total</th>
+			            	<th style="text-align: center; width:8%">Item</th>
+				            <th style="text-align: left; width:46%">' . $tipo . '</th>
+				            <th style="text-align: center; width:12%">Quant.</th>
+				            <th style="text-align: center; width:11%">Unidade</th>
+				            <th style="text-align: center; width:11%">V. Unit.</th>
+				            <th style="text-align: center; width:12%">V. Total</th>
 			            </tr>
 		            ';
 
@@ -98,18 +114,18 @@ try {
 
 				$cont2++;
 			} else {
-				$valorUnitario = "__________";
-				$valorTotal = "__________";
+				$valorUnitario = "";
+				$valorTotal = "";
 			}
 
 			$html .= "
 				<tr>
-					<td style='padding-top: 8px;'>" . $cont . "</td>
-					<td style='padding-top: 8px;'>" . $itemProduto['ProduNome'] . ": " . $itemProduto['ProduDetalhamento'] . "</td>
-					<td style='padding-top: 8px; text-align: center;'>" . $itemProduto['OrXPrQuantidade'] . "</td>
-					<td style='padding-top: 8px; text-align: center;'>" . $itemProduto['UnMedSigla'] . "</td>
-					<td style='padding-top: 8px;'>" . $valorUnitario . "</td>
-					<td style='padding-top: 8px;'>" . $valorTotal . "</td>
+					<td style='text-align: center;'>" . $cont . "</td>
+					<td style='text-align: left;'>" . $itemProduto['ProduNome'] . ": " . $itemProduto['ProduDetalhamento'] . "</td>
+					<td style='text-align: center;'>" . $itemProduto['OrXPrQuantidade'] . "</td>
+					<td style='text-align: center;'>" . $itemProduto['UnMedSigla'] . "</td>
+					<td style='text-align: right;'>" . $valorUnitario . "</td>
+					<td style='text-align: right; '>" . $valorTotal . "</td>
 				</tr>
 			";
 
@@ -119,21 +135,21 @@ try {
 		if ($cont2 == count($rowProdutos)) {
 			$html .= "  
 			    <tr>
-	            	<td style='border-top: 1px solid #333;' colspan='4' height='50' valign='middle'>
+	            	<td colspan='5' height='50' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
-				    <td style='border-top: 1px solid #333; text-align: right' colspan='2'>
+				    <td style='border-top: 1px solid #bbb; text-align: right;'>
 				        " . mostraValor($totalGeral) . "
 				    </td>
 				</tr>";
 		} else {
 			$html .= "  
 			    <tr>
-	            	<td style='border-top: 1px solid #333;' colspan='4' height='50' valign='middle'>
+	            	<td colspan='5' height='50' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
-				    <td style='border-top: 1px solid #333; text-align: right' colspan='2'>
-					    __________
+				    <td style='border-top: 1px solid #bbb; text-align: right'>
+					    
 				    </td>
 				</tr>";
 		}
@@ -154,11 +170,11 @@ try {
 		            <br>
 		            <table style="width:100%; border-collapse: collapse;">
 		            	<tr>
-		            		<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Item</th>
-		            		<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:53%">' . $tipo . '</th>
-		            		<th style="text-align: center; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
-		            		<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">V. Unit.</th>
-		            		<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">V. Total</th>
+		            		<th style="text-align: center; width:8%">Item</th>
+		            		<th style="text-align: left; width:50%">' . $tipo . '</th>
+		            		<th style="text-align: center; width:12%">Quant.</th>
+		            		<th style="text-align: center; width:15%">V. Unit.</th>
+		            		<th style="text-align: center; width:15%">V. Total</th>
 		            	</tr>
 		            ';
 
@@ -183,17 +199,17 @@ try {
 
 				$cont2++;
 			} else {
-				$valorUnitario = "__________";
-				$valorTotal = "__________";
+				$valorUnitario = "";
+				$valorTotal = "";
 			}
 
 			$html .= "
 				<tr>
-					<td style='padding-top: 8px;'>" . $cont . "</td>
-					<td style='padding-top: 8px;'>" . $itemServico['ServiNome'] . ": " . $itemServico['ServiDetalhamento'] . "</td>
-					<td style='padding-top: 8px; text-align: center;'>" . $itemServico['OrXSvQuantidade'] . "</td>
-					<td style='padding-top: 8px;'>" . $valorUnitario . "</td>
-					<td style='padding-top: 8px;'>" . $valorTotal . "</td>
+					<td style='text-align: center'>" . $cont . "</td>
+					<td style='text-align: left'>" . $itemServico['ServiNome'] . ": " . $itemServico['ServiDetalhamento'] . "</td>
+					<td style='text-align: center'>" . $itemServico['OrXSvQuantidade'] . "</td>
+					<td style='text-align: right'>" . $valorUnitario . "</td>
+					<td style='text-align: right'>" . $valorTotal . "</td>
 				</tr>
 			";
 
@@ -203,21 +219,21 @@ try {
 		if ($cont2 == count($rowServicos)) {
 			$html .= "  
 			    <tr>
-	            	<td style='border-top: 1px solid #333;' colspan='4' height='50' valign='middle'>
+	            	<td colspan='5' height='50' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
-				    <td style='border-top: 1px solid #333; text-align: left' colspan='1'>
+				    <td text-align: left'>
 				        " . mostraValor($totalGeral) . "
 				    </td>
 				</tr>";
 		} else {
 			$html .= "  
 			    <tr>
-	            	<td style='border-top: 1px solid #333;' colspan='4' height='50' valign='middle'>
+	            	<td colspan='4' height='50' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
-				    <td style='border-top: 1px solid #333; text-align: left' colspan='1'>
-					    __________
+				    <td style='border-top: 1px solid #333; text-align: left'>
+					    
 				    </td>
 				</tr>";
 		}
