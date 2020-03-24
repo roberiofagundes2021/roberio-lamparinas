@@ -22,30 +22,32 @@ $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
 try {
-	$mpdf = new Mpdf([
+
+	$mpdf = new mPDF([
+	             'mode' => 'utf-8',    // mode - default ''
+	             'format' => 'A4-P',    // format - A4, for example, default ''
+	             'default_font_size' => 9,     // font size - default 0
+	             'default_font' => '',    // default font family
+	             'margin-left' => 15,    // margin_left
+	             'margin-right' => 15,    // margin right
+	             'margin-top' => 158,     // margin top    -- aumentei aqui para que não ficasse em cima do header
+	             'margin-bottom' => 60,    // margin bottom
+	             'margin-header' => 6,     // margin header
+	             'margin-bottom' => 0,     // margin footer
+	             'orientation' => 'P']);  // L - landscape, P - portrait	
+
+	$mpdf->SetDisplayMode('fullpage','two'); //'fullpage': Ajustar uma página inteira na tela, 'fullwidth': Ajustar a largura da página na tela, 'real': Exibir em tamanho real, 'default': Configuração padrão do usuário no Adobe Reader, 'none'
+
+	/*$mpdf = new Mpdf([
 		'mode' => 'utf-8',
 		//'format' => [190, 236], 
 		'format' => 'A4-P', //A4-L
 		'default_font_size' => 9,
 		'default_font' => 'dejavusans',
 		'orientation' => 'P' //P->Portrait (retrato)    L->Landscape (paisagem)
-	]);
+	]);*/
 
-	$topo = "
-	<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
-		<div style='width:300px; float:left; display: inline;'>
-			<img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
-			<span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
-			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: Hospital Padre Manoel</div>
-		</div>
-		<div style='width:150px; float:right; display: inline; text-align:right;'>
-			<div>{DATE j/m/Y}</div>
-			<div style='margin-top:8px;'>Orçamento: " . formatarNumero($sNumero) . "</div>
-		</div> 
-	 </div>
-	";
-
-	$html = '
+	$html = "
 
 		<style>
 			th{
@@ -60,8 +62,19 @@ try {
 				border: #bbb solid 1px;
 			}
 		</style>
-
-	';
+		
+		<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
+			<div style='width:300px; float:left; display: inline;'>
+				<img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
+				<span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
+				<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: Hospital Padre Manoel</div>
+			</div>
+			<div style='width:150px; float:right; display: inline; text-align:right;'>
+				<div>".date('d/m/Y')."</div>
+				<div style='margin-top:8px;'>Orçamento: " . formatarNumero($sNumero) . "</div>
+			</div> 
+		</div>	 
+	";
 
 	if ($row['OrcamTipo'] == 'S') {
 		$tipo = "Serviço";
@@ -70,9 +83,8 @@ try {
 	}
 
 	if ($tipo == "Produto") {
-		$html .= '
-		            <br>
-		            <div style="font-weight: bold; position:relative; margin-top: 50px; background-color:#ccc; padding: 5px;">
+		$html .= '		            
+		            <div style="font-weight: bold; position:relative; margin-top: 30px; background-color:#ccc; padding: 5px;">
 			            Fornecedor: <span style="font-weight:normal;">' . $row['ForneNome'] . '</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">' . $row['ForneCelular'] . '</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">' . $item['ForneEmail'] . '</span>
 		            </div>
 		            <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
@@ -135,7 +147,7 @@ try {
 		if ($cont2 == count($rowProdutos)) {
 			$html .= "  
 			    <tr>
-	            	<td colspan='5' height='50' valign='middle'>
+	            	<td colspan='5' height='40' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
 				    <td style='border-top: 1px solid #bbb; text-align: right;'>
@@ -145,7 +157,7 @@ try {
 		} else {
 			$html .= "  
 			    <tr>
-	            	<td colspan='5' height='50' valign='middle'>
+	            	<td colspan='5' height='40' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
 				    <td style='border-top: 1px solid #bbb; text-align: right'>
@@ -158,7 +170,6 @@ try {
 		$html .= "</table>";
 	} else {
 		$html .= '
-		            <br>
 		            <div style="font-weight: bold; position:relative; margin-top: 50px; background-color:#ccc; padding: 5px;">
 		            	Fornecedor: <span style="font-weight:normal;">' . $row['ForneNome'] . '</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">' . $row['ForneCelular'] . '</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">' . $row['ForneEmail'] . '</span>
 		            </div>
@@ -219,7 +230,7 @@ try {
 		if ($cont2 == count($rowServicos)) {
 			$html .= "  
 			    <tr>
-	            	<td colspan='5' height='50' valign='middle'>
+	            	<td colspan='5' height='40' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
 				    <td text-align: left'>
@@ -229,7 +240,7 @@ try {
 		} else {
 			$html .= "  
 			    <tr>
-	            	<td colspan='4' height='50' valign='middle'>
+	            	<td colspan='4' height='40' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
 				    <td style='border-top: 1px solid #333; text-align: left'>
@@ -251,7 +262,7 @@ try {
 
 	$html .= '			
 		<br><br>
-		<div style="width: 100%; margin-top: 200px;">
+		<div style="width: 100%; margin-top: 100px;">
 			<div style="position: relative; float: left; text-align: center;">
 				Solicitante: ' . $rowUsuario['UsuarNome'] . '<br>
 				<div style="margin-top:3px;">
@@ -262,20 +273,39 @@ try {
 		</div>
 	';
 
+	//$html .= "</div>";
+
+	$topo = "
+	<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
+		<div style='width:300px; float:left; display: inline;'>
+			<img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
+			<span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
+			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: Hospital Padre Manoel</div>
+		</div>
+		<div style='width:150px; float:right; display: inline; text-align:right;'>
+			<div>{DATE j/m/Y}</div>
+			<div style='margin-top:8px;'>Orçamento: " . formatarNumero($sNumero) . "</div>
+		</div> 
+	 </div>
+	";
+
 	$rodape = "<hr/>
     <div style='width:100%'>
 		<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
 		<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
 	</div>";
+	
+	//ATENÇÃO: Tive que colocar o cabeçalho dentro do HTML, para o cabeçalho não sobrescrever o conteúdo HTML a partir da segunda página. Em compensação o cabeçalho só aparece na primeira página. Foi a única forma que encontrei. Tentei de tudo...
 
-	$mpdf->SetHTMLHeader($topo, 'O', true);
+	//$mpdf->SetHTMLHeader($topo);	//o SetHTMLHeader deve vir antes do WriteHTML para que o cabeçalho apareça em todas as páginas
+	$mpdf->SetHTMLFooter($rodape); 	//o SetHTMLFooter deve vir antes do WriteHTML para que o rodapé apareça em todas as páginas
 	$mpdf->WriteHTML($html);
-	$mpdf->SetHTMLFooter($rodape);
 
 	// Other code
 	$mpdf->Output();
+
 } catch (\Mpdf\MpdfException $e) { // Note: safer fully qualified exception name used for catch
 
 	// Process the exception, log, print etc.
-	echo $e->getMessage();
+	echo 'ERRO: '.$e->getMessage();
 }
