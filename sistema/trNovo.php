@@ -65,7 +65,7 @@ if (isset($_POST['inputData'])) {
 		$possuiSubCategoria = 0;
 
 		if (isset($_POST['cmbSubCategoria']) and $_POST['cmbSubCategoria'][0] != "") {
-			
+
 			$possuiSubCategoria = 1;
 
 			$sql = "INSERT INTO TRXSubcategoria
@@ -83,27 +83,25 @@ if (isset($_POST['inputData'])) {
 				));
 			}
 		}
-		
+
 		//Se for Produto e Serviço
 		if ($tipoTr == 'PS') {
-			
+
 			//Gravando os Produtos
 			include("trGravaProduto.php");
-			
+
 			// Gravando os Serviços
 			include("trGravaServico.php");
-			
 		} else if ($tipoTr == 'P') {
 
 			//Gravando os Produtos
 			include("trGravaProduto.php");
-
 		} else if ($tipoTr == 'S') {
 
 			// Gravando os Serviços
 			include("trGravaServico.php");
 		}
-		
+
 		$conn->commit();
 
 		// Fim de cadastro
@@ -112,7 +110,7 @@ if (isset($_POST['inputData'])) {
 		$_SESSION['msg']['mensagem'] = "Termo de referência incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
 	} catch (PDOException $e) {
-		
+
 		$conn->rollback();
 
 		$_SESSION['msg']['titulo'] = "Erro";
@@ -153,15 +151,15 @@ if (isset($_POST['inputData'])) {
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	<!-- /theme JS files -->
-	
+
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-
+	
 		$(document).ready(function() {
 
 			//Inicializa o editor de texto que será usado pelo campo "Conteúdo Personalizado"
 			$('#summernote').summernote();
-			
+
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e) {
 
@@ -184,30 +182,63 @@ if (isset($_POST['inputData'])) {
 						ResetSubCategoria();
 					}
 				});
-
 			});
-			
-			
-			$('#enviar').on('click', function(e){
-				
-				e.preventDefault();		
-				
+
+			$('#enviar').on('click', function(e) {
+
+				e.preventDefault();
+
 				var TrProduto = document.getElementById("TrProduto");
 				var TrServico = document.getElementById("TrServico");
-/*				var parametroProduto = $('#parametroProduto').val() == 'ProdutoOrcamento' ? 1 : 0;
-				var parametroServico = $('#parametroServico').val() == 'ServicoOrcamento' ? 1 : 0;
-				var cmbCategoria = $('#cmbCategoria').val();
-				var cmbSubCategoria = $('#cmbSubCategoria').val() != '' ? $('#cmbSubCategoria').val() : 0; */
-				
-				if (!TrProduto.checked && !TrServico.checked){
-					alerta('Atenção','Informe se o Termo de Referência terá Produtos e/ou Serviços!','error');
-					$('#TrProduto').focus();
-					return false;					
-				}
-				
-				$( "#formTR" ).submit();
-			});
+				/*				var parametroProduto = $('#parametroProduto').val() == 'ProdutoOrcamento' ? 1 : 0;
+								var parametroServico = $('#parametroServico').val() == 'ServicoOrcamento' ? 1 : 0;
+								var cmbCategoria = $('#cmbCategoria').val();
+								var cmbSubCategoria = $('#cmbSubCategoria').val() != '' ? $('#cmbSubCategoria').val() : 0; */
 
+				if (!TrProduto.checked && !TrServico.checked) {
+					alerta('Atenção', 'Informe se o Termo de Referência terá Produtos e/ou Serviços!', 'error');
+					$('#TrProduto').focus();
+					return false;
+				}
+
+				let tipoTr = '';
+
+				if ($('#TrProduto').parent().hasClass('checked')) {
+					tipoTr = 'P';
+				}
+				if ($('#TrServico').parent().hasClass('checked')) {
+					tipoTr = 'S'
+				}
+				if ($('#TrProduto').parent().hasClass('checked') && $('#TrServico').parent().hasClass('checked')) {
+					tipoTr = 'PS'
+				}
+
+				let cmbCategoriaId = $('#cmbCategoria').val();
+				let cmbSubCategoriaArray = $('#cmbSubCategoria').val()
+
+				$.post(
+					"trVerificaProdutoServico.php", {
+						tipoTr: tipoTr,
+						cmbCategoriaId: cmbCategoriaId,
+						cmbSubCategoriaArray: cmbSubCategoriaArray
+					},
+					function(resposta) {
+						//console.log(resposta)
+						if (resposta == 'existem produtos') {
+							//console.log(resposta)
+							$("#formTR").submit();
+						} else {
+							console.log(resposta)
+							alerta('Atenção', 'A categoria selecionada não possui produtos ou serviços ativos!', 'error');
+							//$('#TrProduto').focus();
+							//$('#TrServico').focus();
+							//$(`#${select}-error`).html('');
+							//$(`#${select}`).html('');
+							//$(`#${select}`).children().first().attr('selected')
+						}
+					}
+				);
+			});
 		}); //document.ready
 
 		//Mostra o "Filtrando..." na combo SubCategoria
@@ -216,7 +247,7 @@ if (isset($_POST['inputData'])) {
 		}
 
 		function ResetSubCategoria() {
-			$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
+			$('#cmbSubCategoria').empty().append('<p>Sem Subcategoria</>');
 		}
 	</script>
 
@@ -246,9 +277,9 @@ if (isset($_POST['inputData'])) {
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Termo de Referência</h5>
 						</div>
-						
-						<input type="hidden" id="parametroProduto" name="parametroProduto" value="<?php echo $parametroProduto; ?>" >
-						<input type="hidden" id="parametroServico" name="parametroServico" value="<?php echo $parametroServico; ?>" >
+
+						<input type="hidden" id="parametroProduto" name="parametroProduto" value="<?php echo $parametroProduto; ?>">
+						<input type="hidden" id="parametroServico" name="parametroServico" value="<?php echo $parametroServico; ?>">
 
 						<div class="card-body">
 
