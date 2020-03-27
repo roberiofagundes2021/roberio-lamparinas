@@ -80,10 +80,9 @@ try {
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 
-	$sql = " SELECT TRXSCSubcategoria
-		     FROM TRXSubcategoria
-		     WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCEmpresa = " . $_SESSION['EmpreId'] . "
-		";
+	$sql = "SELECT TRXSCSubcategoria
+		    FROM TRXSubcategoria
+		    WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCEmpresa = " . $_SESSION['EmpreId'] . "";
 	$result = $conn->query($sql);
 	$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
 	
@@ -104,7 +103,6 @@ try {
 	} else {
 		$aServicos1 = [];
 	}
-
 
 	$sql = "SELECT TRXSrServico
 			FROM TermoReferenciaXServico
@@ -158,7 +156,7 @@ try {
 			$('#cmbServico').on('change', function(e) {
 
 				var inputCategoria = $('#inputIdCategoria').val();
-				var inputSubCategoria = $('#inputIdSubCategoria').val();
+				var inputSubCategoria = $('#inputSubCategoria').val();
 				var servicos = $(this).val();
 				console.log(servicos)
 				var tr = $('#inputIdTR').val();
@@ -338,6 +336,24 @@ try {
 																	}
 																}
 															}
+														} else{
+															$sql = "SELECT ServiId, ServiNome
+															         FROM Servico
+																	 JOIN Situacao on SituaId = ServiStatus		
+															         WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria . "";
+															$sql .= " ORDER BY ServiNome ASC";
+															$result = $conn->query($sql);
+															$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
+															foreach ($rowServico as $item) {
+																if (in_array($item['ServiId'], $aServicos2)) {
+																	$seleciona = "selected";
+																	print('<option value="' . $item['ServiId'] . '" ' . $seleciona . '>' . $item['ServiNome'] . '</option>');
+																} else {
+																	$seleciona = "";
+																	print('<option value="' . $item['ServiId'] . '" ' . $seleciona . '>' . $item['ServiNome'] . '</option>');
+																}
+															}
+
 														}
 													}
 													?>

@@ -20,6 +20,22 @@ if (isset($_POST['servicos']) and $_POST['servicos'] != '') {
 	$lista = 0;
 }
 
+if (isset($_POST['idSubCategoria']) and $_POST['idSubCategoria'] != '') {
+	$subCategorias = $_POST['idSubCategoria'];
+	$numSubCategorias = count($subCategorias);
+
+	$listaSubCategorias = "";
+
+	for ($i = 0; $i < $numSubCategorias; $i++) {
+		$listaSubCategorias .= $subCategorias[$i] . ",";
+	}
+
+	//retira a última vírgula
+	$listaSubCategorias = substr($listaSubCategorias, 0, -1);
+} else {
+	$listaSubCategorias = 0;
+}
+
 $iTR = $_POST['idTr'];
 
 $sql = "SELECT TRXSrServico
@@ -46,16 +62,16 @@ if (count($rowServicosOrcamento) >= 1) {
 
 		$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, TRXSrTabela
 				FROM ServicoOrcamento
-				LEFT JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
+				JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 				JOIN Categoria on CategId = SrOrcCategoria
-				WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and SrOrcSubCategoria = '" . $_POST['idSubCategoria'] . "' and SrOrcId in (" . $lista . ")
+				WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and SrOrcSubCategoria in (" . $listaSubCategorias . ") and SrOrcId in (" . $lista . ")
 				";
 	} else {
 		$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, TRXSrTabela
 				FROM ServicoOrcamento
-				LEFT JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
+				JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 				JOIN Categoria on CategId = SrOrcCategoria
-				WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and SrOrcCategoria = '" . $_POST['idCategoria'] . "' and SrOrcId in (" . $lista . ")
+				WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and SrOrcCategoria = '" . $_POST['idCategoria'] . "' and SrOrcId in (" . $lista . ")
 				";
 	}
 	//echo $sql;
@@ -113,16 +129,16 @@ if (count($rowServicosOrcamento) >= 1) {
 
 		$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, TRXSrTabela
 				FROM Servico
-				LEFT JOIN TermoReferenciaXServico on TRXSrServico = ServiId
+				JOIN TermoReferenciaXServico on TRXSrServico = ServiId
 				JOIN Categoria on CategId = ServiCategoria
-				WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and ServiSubCategoria = '" . $_POST['idSubCategoria'] . "' and ServiId in (" . $lista . ")
+				WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and ServiSubCategoria in (" . $_POST['idSubCategoria'] . ") and ServiId in (" . $lista . ")
 				";
 	} else {
 		$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, TRXSrTabela
 				FROM Servico
-				LEFT JOIN TermoReferenciaXServico on TRXSrServico = ServiId
+				JOIN TermoReferenciaXServico on TRXSrServico = ServiId
 				JOIN Categoria on CategId = ServiCategoria
-				WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and ServiCategoria = '" . $_POST['idCategoria'] . "' and ServiId in (" . $lista . ")
+				WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and ServiCategoria = '" . $_POST['idCategoria'] . "' and ServiId in (" . $lista . ")
 				";
 	}
 

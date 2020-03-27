@@ -20,20 +20,36 @@ if (isset($_POST['produtos']) and $_POST['produtos'] != '') {
 	$lista = 0;
 }
 
+if (isset($_POST['idSubCategoria']) and $_POST['idSubCategoria'] != '') {
+	$subCategorias = $_POST['idSubCategoria'];
+	$numSubCategorias = count($subCategorias);
+
+	$listaSubCategorias = "";
+
+	for ($i = 0; $i < $numSubCategorias; $i++) {
+		$listaSubCategorias .= $subCategorias[$i] . ",";
+	}
+
+	//retira a última vírgula
+	$listaSubCategorias = substr($listaSubCategorias, 0, -1);
+} else {
+	$listaSubCategorias = 0;
+}
+
 $iTR = $_POST['idTr'];
 
 $sql = "SELECT TRXPrProduto
-			FROM TermoReferenciaXProduto
-			JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
-			WHERE TRXPrEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
+		FROM TermoReferenciaXProduto
+		JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
+		WHERE TRXPrEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
 $result = $conn->query($sql);
 $rowProdutosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
 
 $sql = "SELECT TRXPrProduto
-			FROM TermoReferenciaXProduto
-			JOIN Produto on ProduId = TRXPrProduto
-			WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+		FROM TermoReferenciaXProduto
+		JOIN Produto on ProduId = TRXPrProduto
+		WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
 $result = $conn->query($sql);
 $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 $countProdutosTr2 = count($rowProdutos);
@@ -45,18 +61,18 @@ if (count($rowProdutosOrcamento) >= 1) {
 
 		$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrTabela, UnMedNome
 				FROM ProdutoOrcamento
-				LEFT JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
+				JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 				JOIN Categoria on CategId = PrOrcCategoria
-				LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-				WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and PrOrcSubCategoria = '" . $_POST['idSubCategoria'] . "' and PrOrcId in (" . $lista . ")
+				JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+				WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and PrOrcSubCategoria in (" . $listaSubCategorias . ") and PrOrcId in (" . $lista . ")
 				";
 	} else {
 		$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrTabela, UnMedNome
 				FROM ProdutoOrcamento
-				LEFT JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
+				JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 				JOIN Categoria on CategId = PrOrcCategoria
-				LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-				WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and PrOrcCategoria = '" . $_POST['idCategoria'] . "' and PrOrcId in (" . $lista . ")
+				JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+				WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and PrOrcCategoria = '" . $_POST['idCategoria'] . "' and PrOrcId in (" . $lista . ")
 				";
 	}
 	//echo $sql;
@@ -114,18 +130,18 @@ if (count($rowProdutosOrcamento) >= 1) {
 
 		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrTabela, UnMedNome
 				FROM Produto
-				LEFT JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
+				JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 				JOIN Categoria on CategId = ProduCategoria
-				LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-				WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduSubCategoria = '" . $_POST['idSubCategoria'] . "' and ProduId in (" . $lista . ")
+				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+				WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and ProduSubCategoria in (" . $listaSubCategorias . ") and ProduId in (" . $lista . ")
 				";
 	} else {
 		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrTabela, UnMedNome
 				FROM Produto
-				LEFT JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
+				JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 				JOIN Categoria on CategId = ProduCategoria
-				LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-				WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduCategoria = '" . $_POST['idCategoria'] . "' and ProduId in (" . $lista . ")
+				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+				WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and ProduCategoria = '" . $_POST['idCategoria'] . "' and ProduId in (" . $lista . ")
 				";
 	}
 

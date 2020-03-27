@@ -158,7 +158,7 @@ try {
 			$('#cmbProduto').on('change', function(e) {
 
 				var inputCategoria = $('#inputIdCategoria').val();
-				var inputSubCategoria = $('#inputIdSubCategoria').val();
+				var inputSubCategoria = $('#inputSubCategoria').val();
 				var produtos = $(this).val();
 				console.log(produtos)
 				var tr = $('#inputIdTR').val();
@@ -338,6 +338,24 @@ try {
 																	}
 																}
 															}
+														} else {
+															$sql = "SELECT ProduId, ProduNome
+															        FROM Produto
+																	JOIN Situacao on SituaId = ProduStatus		
+															        WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' and 
+															        ProduCategoria = " . $iCategoria . "";
+															$sql .= " ORDER BY ProduNome ASC";
+															$result = $conn->query($sql);
+															$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+															foreach ($rowProduto as $item) {
+																if (in_array($item['ProduId'], $aProdutos2)) {
+																	$seleciona = "selected";
+																	print('<option value="' . $item['ProduId'] . '" ' . $seleciona . '>' . $item['ProduNome'] . '</option>');
+																} else {
+																	$seleciona = "";
+																	print('<option value="' . $item['ProduId'] . '" ' . $seleciona . '>' . $item['ProduNome'] . '</option>');
+																}
+															}
 														}
 													}
 													?>
@@ -372,10 +390,11 @@ try {
 
 									if (count($aProdutos1) >= 1) {
 
-										$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, TRXPrTabela, UnMedNome, UnMedSigla
+										$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, 
+												TRXPrQuantidade, TRXPrTabela, UnMedNome, UnMedSigla
 									            FROM ProdutoOrcamento
 									            JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
-									            LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+									            JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
 									            WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR  . " and TRXPrTabela = 'ProdutoOrcamento'";
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
