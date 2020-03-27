@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Ordem de Compra Produto';
+$_SESSION['PaginaAtual'] = 'Ordem de Compra Serviço';
 
 include('global_assets/php/conexao.php');
 
@@ -20,8 +20,8 @@ if(isset($_POST['inputOrdemCompraId'])){
 //Se está alterando
 if(isset($_POST['inputIdOrdemCompra'])){
 	
-	$sql = "DELETE FROM OrdemCompraXProduto
-			WHERE OCXPrOrdemCompra = :iOrdemCompra AND OCXPrEmpresa = :iEmpresa";
+	$sql = "DELETE FROM OrdemCompraXServico
+			WHERE OCXSrOrdemCompra = :iOrdemCompra AND OCXSrEmpresa = :iEmpresa";
 	$result = $conn->prepare($sql);
 	
 	$result->execute(array(
@@ -31,13 +31,13 @@ if(isset($_POST['inputIdOrdemCompra'])){
 	
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 	
-		$sql = "INSERT INTO OrdemCompraXProduto (OCXPrOrdemCompra, OCXPrProduto, OCXPrQuantidade, OCXPrValorUnitario, OCXPrUsuarioAtualizador, OCXPrEmpresa)
-				VALUES (:iOrdemCompra, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO OrdemCompraXServico (OCXSrOrdemCompra, OCXSrServico, OCXSrQuantidade, OCXSrValorUnitario, OCXSrUsuarioAtualizador, OCXSrEmpresa)
+				VALUES (:iOrdemCompra, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
 		$result->execute(array(
 						':iOrdemCompra' => $iOrdemCompra,
-						':iProduto' => $_POST['inputIdProduto'.$i],
+						':iServico' => $_POST['inputIdServico'.$i],
 						':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
 						':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -62,36 +62,22 @@ try{
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
 	
-	$sql = "SELECT OCXPrProduto
-			FROM OrdemCompraXProduto
-			JOIN Produto on ProduId = OCXPrProduto
-			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCategoria = ".$iCategoria." and OCXPrOrdemCompra = ".$row['OrComId']."";
+	$sql = "SELECT OCXSrServico
+			FROM OrdemCompraXServico
+			JOIN Servico on ServiId = OCXSrServico
+			WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and ServiCategoria = ".$iCategoria." and OCXSrOrdemCompra = ".$row['OrComId']."";
 	
 	if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
-		$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
+		$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
 	}	
 	$result = $conn->query($sql);
-	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countProdutoUtilizado = count($rowProdutoUtilizado);
+	$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+	$countServicoUtilizado = count($rowServicoUtilizado);
 	
-	foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
-		$aProdutos[] = $itemProdutoUtilizado['OCXPrProduto'];
+	foreach ($rowServicoUtilizado as $itemServicoUtilizado){
+		$aServicos[] = $itemServicoUtilizado['OCXSrServico'];
 	}
 	
-	$sql = "SELECT COUNT(OCXPrProduto) as Quant
-			FROM OrdemCompraXProduto
-			WHERE OCXPrEmpresa = ". $_SESSION['EmpreId'] ." and OCXPrOrdemCompra = ".$iOrdemCompra." and 
-			OCXPrQuantidade <> '' and OCXPrQuantidade <> 0 and OCXPrValorUnitario <> 0.00 ";
-	$result = $conn->query($sql);
-	$rowCompleto = $result->fetch(PDO::FETCH_ASSOC);
-
-	$enviar = 0;
-
-	//Verifica se o número de produtos é igual ao número de produtos com a quantidade e valor unitário preenchido para habilitar o botào "Enviar"
-	if ($countProdutoUtilizado == $rowCompleto['Quant']){
-		$enviar = 1;
-	}
-
 } catch(PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
 }
@@ -104,7 +90,7 @@ try{
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Listando produtos da Ordem de Compra</title>
+	<title>Lamparinas | Listando serviços da Ordem de Compra</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -124,73 +110,65 @@ try{
 
         $(document).ready(function() {	
 
-			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
-			$('#cmbProduto').on('change', function(e){
+			//Ao mudar a SubCategoria, filtra o servico via ajax (retorno via JSON)
+			$('#cmbServico').on('change', function(e){
 				
 				var inputCategoria = $('#inputIdCategoria').val();
 				var inputSubCategoria = $('#inputIdSubCategoria').val(); //alert(inputSubCategoria);
-				var produtos = $(this).val();
-				//console.log(produtos);
+				var servicos = $(this).val();
+				//console.log(servicos);
 				
 				var cont = 1;
-				var produtoId = [];
-				var produtoQuant = [];
-				var produtoValor = [];
+				var servicoId = [];
+				var servicoQuant = [];
+				var servicoValor = [];
 				
 				// Aqui é para cada "class" faça
-				$.each( $(".idProduto"), function() {			
-					produtoId[cont] = $(this).val();
+				$.each( $(".idServico"), function() {			
+					servicoId[cont] = $(this).val();
 					cont++;
 				});
 				
 				cont = 1;
 				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
 				$.each( $(".Quantidade"), function() {
-					$id = produtoId[cont];
+					$id = servicoId[cont];
 					
-					produtoQuant[$id] = $(this).val();
+					servicoQuant[$id] = $(this).val();
 					cont++;
 				});				
 				
 				cont = 1;
 				$.each( $(".ValorUnitario"), function() {
-					$id = produtoId[cont];
+					$id = servicoId[cont];
 					
-					produtoValor[$id] = $(this).val();
+					servicoValor[$id] = $(this).val();
 					cont++;
 				});
 				
 				$.ajax({
 					type: "POST",
-					url: "ordemcompraFiltraProduto.php",
-					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
+					url: "ordemcompraFiltraServico.php",
+					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, servicos: servicos, servicoId: servicoId, servicoQuant: servicoQuant, servicoValor: servicoValor},
 					success: function(resposta){
 						//alert(resposta);
-						$("#tabelaProdutos").html(resposta).show();
+						$("#tabelaServicos").html(resposta).show();
 						
 						return false;
 						
 					}	
 				});
 			});
-
-			//Enviar para aprovação do Centro Administrativo (via Bandeja)
-			$('#enviar').on('click', function(e){
-				
-				e.preventDefault();		
-				
-				confirmaExclusao(document.formOrdemCompraProduto, "Essa ação enviará toda a Ordem de Compra (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "ordemcompraEnviar.php");
-			});			
 						
 		}); //document.ready
 		
-		//Mostra o "Filtrando..." na combo Produto
-		function FiltraProduto(){
-			$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+		//Mostra o "Filtrando..." na combo Servico
+		function FiltraServico(){
+			$('#cmbServico').empty().append('<option value="">Filtrando...</option>');
 		}
 		
-		function ResetProduto(){
-			$('#cmbProduto').empty().append('<option>Sem produto</option>');
+		function ResetServico(){
+			$('#cmbServico').empty().append('<option value="">Sem serviço</option>');
 		}
 		
 		function calculaValorTotal(id){
@@ -236,9 +214,9 @@ try{
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formOrdemCompraProduto" id="formOrdemCompraProduto" method="post" class="form-validate">
+					<form name="formOrdemCompraServico" id="formOrdemCompraServico" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Listar Produtos - Ordem de Compra Nº "<?php echo $row['OrComNumero']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Listar Serviços - Ordem de Compra Nº "<?php echo $row['OrComNumero']; ?>"</h5>
 						</div>					
 						
 						<input type="hidden" id="inputIdOrdemCompra" name="inputIdOrdemCompra" class="form-control" value="<?php echo $row['OrComId']; ?>">
@@ -288,32 +266,32 @@ try{
 									<div class="row">	
 										<div class="col-lg-12">
 											<div class="form-group">
-												<label for="cmbProduto">Produto</label>
-												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+												<label for="cmbServico">Serviço</label>
+												<select id="cmbServico" name="cmbServico" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 													<?php 
-														$sql = "SELECT ProduId, ProduNome
-																FROM Produto
-																JOIN Situacao on SituaId = ProduStatus
-																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO' and 
-																ProduCategoria = ".$iCategoria;
+														$sql = "SELECT ServiId, ServiNome
+																FROM Servico
+																JOIN Situacao on SituaId = ServiStatus										     
+																WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO' and 
+																ServiCategoria = ".$iCategoria;
 														
 														if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
-															$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
+															$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
 														}
 														
-														$sql .= " ORDER BY ProduNome ASC";
+														$sql .= " ORDER BY ServiNome ASC";
 														$result = $conn->query($sql);
-														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
+														$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);														
 														
-														foreach ($rowProduto as $item){	
+														foreach ($rowServico as $item){	
 															
-															if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
+															if (in_array($item['ServiId'], $aServicos) or $countServicoUtilizado == 0) {
 																$seleciona = "selected";
 															} else {
 																$seleciona = "";
 															}													
 															
-															print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
+															print('<option value="'.$item['ServiId'].'" '.$seleciona.'>'.$item['ServiNome'].'</option>');
 														}
 													
 													?>
@@ -327,7 +305,7 @@ try{
 							<!-- Custom header text -->
 							<div class="card">
 								<div class="card-header header-elements-inline">
-									<h5 class="card-title">Relação de Produtos</h5>
+									<h5 class="card-title">Relação de Serviços</h5>
 									<div class="header-elements">
 										<div class="list-icons">
 											<a class="list-icons-item" data-action="collapse"></a>
@@ -338,7 +316,7 @@ try{
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
+									<p class="mb-3">Abaixo estão listados todos os serviços da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<!--<div class="hot-container">
 										<div id="example"></div>
@@ -346,47 +324,42 @@ try{
 									
 									<?php									
 
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario
-												FROM Produto
-												JOIN OrdemCompraXProduto on OCXPrProduto = ProduId
-												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OCXPrOrdemCompra = ".$iOrdemCompra;
+										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OCXSrQuantidade, OCXSrValorUnitario
+												FROM Servico
+												JOIN OrdemCompraXServico on OCXSrServico = ServiId
+												WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and OCXSrOrdemCompra = ".$iOrdemCompra;
 										$result = $conn->query($sql);
-										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-										$count = count($rowProdutos);
+										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+										$count = count($rowServicos);
 										
 										if (!$count){
-											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
-													FROM Produto
-													LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and ProduStatus = 1 ";
+											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
+													FROM Servico
+													JOIN Situacao on SituaId = ServiStatus
+													WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiCategoria = ".$iCategoria." and 
+													SituaChave = 'ATIVO' ";
 													
 											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
-												$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
+												$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
 											}
 											$result = $conn->query($sql);
-											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										} 
 										
 										$cont = 0;
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-8">
-													<div class="row">
-														<div class="col-lg-1">
-															<label for="inputCodigo"><strong>Item</strong></label>
-														</div>
-														<div class="col-lg-11">
-															<label for="inputProduto"><strong>Produto</strong></label>
-														</div>
+											<div class="col-lg-9">
+												<div class="row">
+													<div class="col-lg-1">
+														<label for="inputCodigo"><strong>Item</strong></label>
 													</div>
-												</div>												
-											<div class="col-lg-1">
-												<div class="form-group">
-													<label for="inputUnidade"><strong>Unidade</strong></label>
+													<div class="col-lg-11">
+														<label for="inputServico"><strong>Servico</strong></label>
+													</div>
 												</div>
-											</div>
+											</div>												
 											<div class="col-lg-1">
 												<div class="form-group">
 													<label for="inputQuantidade"><strong>Quantidade</strong></label>
@@ -404,35 +377,32 @@ try{
 											</div>											
 										</div>');
 										
-										print('<div id="tabelaProdutos">');
+										print('<div id="tabelaServicos">');
 										
 										$fTotalGeral = 0;
 										
-										foreach ($rowProdutos as $item){
+										foreach ($rowServicos as $item){
 											
 											$cont++;
 											
-											$iQuantidade = isset($item['OCXPrQuantidade']) ? $item['OCXPrQuantidade'] : '';
-											$fValorUnitario = isset($item['OCXPrValorUnitario']) ? mostraValor($item['OCXPrValorUnitario']) : '';											
-											$fValorTotal = (isset($item['OCXPrQuantidade']) and isset($item['OCXPrValorUnitario'])) ? mostraValor($item['OCXPrQuantidade'] * $item['OCXPrValorUnitario']) : '';
+											$iQuantidade = isset($item['OCXSrQuantidade']) ? $item['OCXSrQuantidade'] : '';
+											$fValorUnitario = isset($item['OCXSrValorUnitario']) ? mostraValor($item['OCXSrValorUnitario']) : '';											
+											$fValorTotal = (isset($item['OCXSrQuantidade']) and isset($item['OCXSrValorUnitario'])) ? mostraValor($item['OCXSrQuantidade'] * $item['OCXSrValorUnitario']) : '';
 											
-											$fTotalGeral += (isset($item['OCXPrQuantidade']) and isset($item['OCXPrValorUnitario'])) ? $item['OCXPrQuantidade'] * $item['OCXPrValorUnitario'] : 0;
+											$fTotalGeral += (isset($item['OCXSrQuantidade']) and isset($item['OCXSrValorUnitario'])) ? $item['OCXSrQuantidade'] * $item['OCXSrValorUnitario'] : 0;
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
+												<div class="col-lg-9">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
+															<input type="hidden" id="inputIdServico'.$cont.'" name="inputIdServico'.$cont.'" value="'.$item['ServiId'].'" class="idServico">
 														</div>
 														<div class="col-lg-11">
-															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+															<input type="text" id="inputServico'.$cont.'" name="inputServico'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ServiDetalhamento'].'" value="'.$item['ServiNome'].'" readOnly>
 														</div>
 													</div>
-												</div>								
-												<div class="col-lg-1">
-													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
 													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
@@ -449,7 +419,7 @@ try{
 										
 										print('
 										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
+												<div class="col-lg-9">
 													<div class="row">
 														<div class="col-lg-1">
 															
@@ -461,9 +431,6 @@ try{
 															
 														</div>
 													</div>
-												</div>								
-												<div class="col-lg-1">
-													
 												</div>
 												<div class="col-lg-1">
 													
@@ -493,11 +460,6 @@ try{
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
-										<?php
-											if ($enviar){
-												print('<button class="btn btn-lg btn-default" id="enviar">Enviar para Aprovação</button>');
-											}
-										?>
 										<a href="ordemcompra.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

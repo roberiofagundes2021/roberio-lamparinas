@@ -106,13 +106,12 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 				$result = $conn->query($sql);
 				$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
-				$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
-                        WHERE FlOpeId = :iFluxo 
-		               ";
+				$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :iStatus
+                        WHERE FlOpeId = :iFluxo";
 	            $result = $conn->prepare($sql);
 			
 	            $result->execute(array(
-					':bStatus' => $rowSituacao['SituaId'],
+					':iStatus' => $rowSituacao['SituaId'],
 					':iFluxo' => $iFluxoOperacional					
 					));
 	            /* Fim Atualiza */

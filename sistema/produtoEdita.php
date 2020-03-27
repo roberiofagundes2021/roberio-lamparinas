@@ -14,6 +14,7 @@ if(isset($_POST['inputProdutoId'])){
 		
 		$sql = "SELECT *
 				FROM Produto
+				JOIN Situacao on SituaId = ProduStatus
 				WHERE ProduId = $iProduto ";
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);		
@@ -54,14 +55,34 @@ if(isset($_POST['inputProdutoId'])){
 if(isset($_POST['inputNome'])){
 		
 	try{
+
+		$sql = "SELECT SituaId
+				FROM Situacao
+				WHERE SituaChave = 'ATIVO' ";
+		$result = $conn->query($sql);
+		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);		
+
+		$Status = '';
+
+		//Se o Status estiver em 'ALTERAR' mudar para 'ATIVO'
+		if ($_POST['inputProdutoStatus'] == 'ALTERAR'){
+			$Status = $rowSituacao['SituaId'];
+		}
+
 		
 		$sql = "UPDATE Produto SET ProduCodigo = :sCodigo, ProduCodigoBarras = :sCodigoBarras, ProduNome = :sNome, ProduDetalhamento = :sDetalhamento, 
 								   ProduFoto = :sFoto, ProduCategoria = :iCategoria, ProduSubCategoria = :iSubCategoria, ProduValorCusto = :fValorCusto, 
 								   ProduOutrasDespesas = :fOutrasDespesas, ProduCustoFinal = :fCustoFinal, ProduMargemLucro = :fMargemLucro, 
 								   ProduValorVenda = :fValorVenda, ProduEstoqueMinimo = :iEstoqueMinimo, ProduMarca = :iMarca, ProduModelo = :iModelo, 
-								   ProduNumSerie = :sNumSerie, ProduFabricante = :iFabricante, ProduUnidadeMedida = :iUnidadeMedida, ProduTipoFiscal = :iTipoFiscal, 
-								   ProduNcmFiscal = :iNcmFiscal, ProduOrigemFiscal = :iOrigemFiscal, ProduCest = :iCest, ProduUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE ProduId = :iProduto";
+								   ProduNumSerie = :sNumSerie, ProduFabricante = :iFabricante, ProduUnidadeMedida = :iUnidadeMedida, 
+								   ProduTipoFiscal = :iTipoFiscal, ProduNcmFiscal = :iNcmFiscal, ProduOrigemFiscal = :iOrigemFiscal, 
+								   ProduCest = :iCest, ProduUsuarioAtualizador = :iUsuarioAtualizador ";
+
+		if ($_POST['inputProdutoStatus'] == 'ALTERAR'){
+			$sql .= ", ProduStatus = ".$Status." ";
+		}
+
+		$sql .=	"	WHERE ProduId = :iProduto";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -411,6 +432,7 @@ if(isset($_POST['inputNome'])){
 						</div>
 						
 						<input type="hidden" id="inputProdutoId" name="inputProdutoId" value="<?php echo $row['ProduId']; ?>" >
+						<input type="hidden" id="inputProdutoStatus" name="inputProdutoStatus" value="<?php echo $row['SituaChave']; ?>" >
 						
 						<div class="card-body">
 							

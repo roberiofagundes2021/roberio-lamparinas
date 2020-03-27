@@ -13,8 +13,9 @@ if (isset($_POST['inputOrdemCompraId'])) {
 
 	try {
 
-		$sql = "SELECT OrComId, OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, OrComConteudo, OrComFornecedor, 
-					   ForneContato, ForneEmail, ForneTelefone, ForneCelular, OrComValorFrete, OrComTotalPedido, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
+		$sql = "SELECT OrComId, OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, 
+					   OrComSubCategoria, OrComConteudo, OrComFornecedor, ForneContato, ForneEmail, ForneTelefone, ForneCelular, 
+					   OrComValorFrete, OrComTotalPedido, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
 					   OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, UsuarNome, UsuarEmail, UsuarTelefone
 				FROM OrdemCompra
 				JOIN Usuario on UsuarId = OrComSolicitante
@@ -38,9 +39,10 @@ if (isset($_POST['inputTipo'])) {
 
 		$iOrdemCompra = $_POST['inputOrdemCompraId'];
 
-		$sql = "UPDATE OrdemCompra SET OrComTipo = :sTipo, OrComNumero = :sNumero, OrComLote = :sLote, OrComNumProcesso = :sProcesso, OrComCategoria = :iCategoria, 
-									   OrComSubCategoria = :iSubCategoria, OrComConteudo = :sConteudo,  OrComFornecedor = :iFornecedor, OrComUnidade = :iUnidade,
-									   OrComLocalEntrega = :iLocalEntrega, OrComEnderecoEntrega = :sEnderecoEntrega, OrComDtEntrega = :dDataEntrega, 
+		$sql = "UPDATE OrdemCompra SET OrComTipo = :sTipo, OrComNumero = :sNumero, OrComLote = :sLote, OrComNumProcesso = :sProcesso, 
+									   OrComCategoria = :iCategoria, OrComSubCategoria = :iSubCategoria, OrComConteudo = :sConteudo,  
+									   OrComFornecedor = :iFornecedor, OrComUnidade = :iUnidade, OrComLocalEntrega = :iLocalEntrega, 
+									   OrComEnderecoEntrega = :sEnderecoEntrega, OrComDtEntrega = :dDataEntrega, 
 									   OrComObservacao = :sObservacao,  OrComUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE OrComId = :iOrdemCompra";
 		$result = $conn->prepare($sql);
@@ -55,12 +57,12 @@ if (isset($_POST['inputTipo'])) {
 			':sNumero' => $_POST['inputNumero'],
 			':sLote' => $_POST['inputLote'],
 			':sProcesso' => $_POST['inputProcesso'],
-			':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-			':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+			':iCategoria' => $_POST['cmbCategoria'],
+			':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
 			':sConteudo' => $_POST['txtareaConteudo'],
 			':iFornecedor' => $iFornecedor,
-			':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
-			':iLocalEntrega' => $_POST['cmbLocalEstoque'] == '#' ? null : $_POST['cmbLocalEstoque'],
+			':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
+			':iLocalEntrega' => $_POST['cmbLocalEstoque'] == '' ? null : $_POST['cmbLocalEstoque'],
 			':sEnderecoEntrega' => $_POST['inputEnderecoEntrega'],
 			':dDataEntrega' => gravaData($_POST['inputDataEntrega']),
 			':sObservacao' => $_POST['txtareaObservacao'],
@@ -118,16 +120,18 @@ if (isset($_POST['inputTipo'])) {
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 	<!-- /theme JS files -->
 
-	<!-- JS file path -->
-	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-
-	<!-- Uniform plugin file path -->
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+		
 		window.onload = function() {
 
 			//Ao carregar a página é verificado se é PF ou PJ para aparecer os campos relacionados e esconder o que não estiver
@@ -142,19 +146,52 @@ if (isset($_POST['inputTipo'])) {
 			$('#summernote').summernote();
 
 			//Ao informar o fornecedor, trazer os demais dados dele (contato, e-mail, telefone)
-			$('#cmbFornecedor').on('change', function(e) {
-
+			$('#cmbFornecedor').on('change', function(e){				
+				
 				var Fornecedor = $('#cmbFornecedor').val();
 				var Forne = Fornecedor.split('#');
-
+				
 				$('#inputContato').val(Forne[1]);
 				$('#inputEmailFornecedor').val(Forne[2]);
-
-				if (Forne[3] != "" && Forne[3] != "(__) ____-____") {
+				if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
 					$('#inputTelefoneFornecedor').val(Forne[3]);
 				} else {
 					$('#inputTelefoneFornecedor').val(Forne[4]);
 				}
+				
+				$.getJSON('filtraCategoria.php?idFornecedor='+Forne[0], function (dados){
+					
+					//var option = '<option value="#">Selecione a Categoria</option>';
+					var option = '';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
+						});						
+						
+						$('#cmbCategoria').html(option).show();
+					} else {
+						ResetCategoria();
+					}					
+				});
+				
+				$.getJSON('filtraSubCategoria.php?idFornecedor='+Forne[0], function (dados){
+					
+					var option = '<option value="#">Selecione a SubCategoria</option>';
+					
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+						});						
+						
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}					
+				});				
+				
 			});
 
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
@@ -218,28 +255,22 @@ if (isset($_POST['inputTipo'])) {
 				//Antes
 				var inputCategoria = $('#inputOrdemCompraCategoria').val();
 				var inputSubCategoria = $('#inputOrdemCompraSubCategoria').val();
-				if (inputSubCategoria == '' || inputSubCategoria == null) {
-					inputSubCategoria = '#';
-				}
 
 				//Depois
 				var cmbCategoria = $('#cmbCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 
-				if (cmbCategoria == '' || cmbCategoria == '#') {
-					alerta('Atenção', 'Informe a categoria!', 'error');
-					$('#cmbCategoria').focus();
-					return false;
-				}
-
 				//Tem produto cadastrado para essa ordem de compra na tabela OrdemCompraXProduto?
 				var inputProduto = $('#inputOrdemCompraProduto').val();
+
+				//Tem serviço cadastrado para essa ordem de compra na tabela OrdemCompraXServico?
+				var inputServico = $('#inputOrdemCompraServico').val();
 
 				//Exclui os produtos dessa Ordem de Compra?
 				var inputExclui = $('#inputOrdemCompraProdutoExclui').val();
 
 				//Aqui verifica primeiro se tem produtos preenchidos, porque do contrário deixa mudar
-				if (inputProduto > 0) {
+				if (inputProduto > 0 || inputServico > 0) {
 
 					//Verifica se o a categoria ou subcategoria foi alterada
 					if (inputSubCategoria != cmbSubCategoria) {
@@ -247,7 +278,7 @@ if (isset($_POST['inputTipo'])) {
 						inputExclui = 1;
 						$('#inputOrdemCompraProdutoExclui').val(inputExclui);
 
-						confirmaExclusao(document.formOrdemCompra, "Tem certeza que deseja alterar a ordem de compra? Existem produtos com quantidades ou valores lançados!", "ordemcompraEdita.php");
+						confirmaExclusao(document.formOrdemCompra, "Tem certeza que deseja alterar a ordem de compra? Existem produtos ou serviços com quantidades ou valores lançados!", "ordemcompraEdita.php");
 
 					} else {
 						inputExclui = 0;
@@ -262,19 +293,19 @@ if (isset($_POST['inputTipo'])) {
 
 		//Mostra o "Filtrando..." na combo SubCategoria
 		function Filtrando() {
-			$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
+			$('#cmbSubCategoria').empty().append('<option value="">Filtrando...</option>');
 		}
 
 		function FiltraLocalEstoque() {
-			$('#cmbLocalEstoque').empty().append('<option>Filtrando...</option>');
+			$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
 		}
 
 		function ResetLocalEstoque() {
-			$('#cmbLocalEstoque').empty().append('<option>Sem Local do Estoque</option>');
+			$('#cmbLocalEstoque').empty().append('<option value="">Sem Local do Estoque</option>');
 		}
 
 		function ResetSubCategoria() {
-			$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
+			$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
 		}
 
 		function selecionaTipo(tipo) {
@@ -311,7 +342,7 @@ if (isset($_POST['inputTipo'])) {
 				<!-- Info blocks -->
 				<div class="card">
 
-					<form name="formOrdemCompra" id="formOrdemCompra" method="post" class="form-validate">
+					<form name="formOrdemCompra" id="formOrdemCompra" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Ordem de Compra/Contrato Nº "<?php echo $_POST['inputOrdemCompraNumero']; ?>"</h5>
 						</div>
@@ -325,13 +356,23 @@ if (isset($_POST['inputTipo'])) {
 						<?php
 
 						$sql = "SELECT OCXPrOrdemCompra
-									FROM OrdemCompraXProduto
-									WHERE OCXPrOrdemCompra = " . $iOrdemCompra . " and OCXPrEmpresa = " . $_SESSION['EmpreId'];
+								FROM OrdemCompraXProduto
+								WHERE OCXPrOrdemCompra = " . $iOrdemCompra . " and OCXPrEmpresa = " . $_SESSION['EmpreId'];
 						$result = $conn->query($sql);
 						$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 						$countProduto = count($rowProduto);
 
 						print('<input type="hidden" id="inputOrdemCompraProduto" name="inputOrdemCompraProduto" value="' . $countProduto . '" >');
+
+						$sql = "SELECT OCXSrOrdemCompra
+								FROM OrdemCompraXServico
+								WHERE OCXSrOrdemCompra = " . $iOrdemCompra . " and OCXSrEmpresa = " . $_SESSION['EmpreId'];
+						$result = $conn->query($sql);
+						$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
+						$countServico = count($rowServico);
+
+						print('<input type="hidden" id="inputOrdemCompraServico" name="inputOrdemCompraServico" value="' . $countServico . '" >');
+
 						?>
 
 						<div class="card-body">
@@ -359,15 +400,15 @@ if (isset($_POST['inputTipo'])) {
 
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputData">Data da Emissão</label>
-												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo mostraData($row['OrComDtEmissao']); ?>" readOnly>
+												<label for="inputData">Data da Emissão <span class="text-danger">*</span></label>
+												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo mostraData($row['OrComDtEmissao']); ?>" readOnly required>
 											</div>
 										</div>
 
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputNumero">Número</label>
-												<input type="text" id="inputNumero" name="inputNumero" class="form-control" value="<?php echo $row['OrComNumero']; ?>">
+												<label for="inputNumero">Número <span class="text-danger">*</span></label>
+												<input type="text" id="inputNumero" name="inputNumero" class="form-control" value="<?php echo $row['OrComNumero']; ?>" required>
 											</div>
 										</div>
 
@@ -394,16 +435,72 @@ if (isset($_POST['inputTipo'])) {
 									</div>
 
 									<div class="row">
+										<div class="col-lg-12">
+											<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
+											<br>
+											<div class="row">
+												<div class="col-lg-4">
+													<div class="form-group">
+														<label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
+														<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
+															<option value="">Selecione</option>
+															<?php
+															$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+																	FROM Fornecedor
+																	JOIN Situacao on SituaId = ForneStatus														     
+																	WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	ORDER BY ForneNome ASC";
+															$result = $conn->query($sql);
+															$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+
+															foreach ($rowFornecedor as $item) {
+																$seleciona = $item['ForneId'] == $row['OrComFornecedor'] ? "selected" : "";
+																print('<option value="' . $item['ForneId'] . '#' . $item['ForneContato'] . '#' . $item['ForneEmail'] . '#' . $item['ForneTelefone'] . '#' . $item['ForneCelular'] . '" ' . $seleciona . '>' . $item['ForneNome'] . '</option>');
+															}
+
+															?>
+														</select>
+													</div>
+												</div>
+
+												<div class="col-lg-3">
+													<div class="form-group">
+														<label for="inputContato">Contato</label>
+														<input type="text" id="inputContato" name="inputContato" class="form-control" value="<?php echo $row['ForneContato']; ?>" readOnly>
+													</div>
+												</div>
+
+												<div class="col-lg-3">
+													<div class="form-group">
+														<label for="inputEmailFornecedor">E-mail</label>
+														<input type="text" id="inputEmailFornecedor" name="inputEmailFornecedor" class="form-control" value="<?php echo $row['ForneEmail']; ?>" readOnly>
+													</div>
+												</div>
+
+												<div class="col-lg-2">
+													<div class="form-group">
+														<label for="inputTelefoneFornecedor">Telefone</label>
+														<input type="text" id="inputTelefoneFornecedor" name="inputTelefoneFornecedor" class="form-control" value="<?php echo $row['ForneTelefone']; ?>" readOnly>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<br>
+
+
+									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT CategId, CategNome
-																FROM Categoria															     
-																WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and CategStatus = 1
-															    ORDER BY CategNome ASC";
+															FROM Categoria
+															JOIN Situacao on SituaId = CategStatus
+															WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															ORDER BY CategNome ASC";
 													$result = $conn->query($sql);
 													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -421,12 +518,13 @@ if (isset($_POST['inputTipo'])) {
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT SbCatId, SbCatNome
-																FROM SubCategoria															     
-																WHERE SbCatStatus = 1 and SbCatEmpresa = " . $_SESSION['EmpreId'] . "
-																ORDER BY SbCatNome ASC";
+															FROM SubCategoria
+															JOIN Situacao on SituaId = SbCatStatus															     
+															WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															ORDER BY SbCatNome ASC";
 													$result = $conn->query($sql);
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -456,66 +554,13 @@ if (isset($_POST['inputTipo'])) {
 
 							<div class="row">
 								<div class="col-lg-12">
-									<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
-									<br>
-									<div class="row">
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="cmbFornecedor">Fornecedor</label>
-												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
-													<?php
-													$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-																 FROM Fornecedor														     
-																 WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and ForneStatus = 1
-															     ORDER BY ForneNome ASC");
-													$result = $conn->query("$sql");
-													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowFornecedor as $item) {
-														$seleciona = $item['ForneId'] == $row['OrComFornecedor'] ? "selected" : "";
-														print('<option value="' . $item['ForneId'] . '#' . $item['ForneContato'] . '#' . $item['ForneEmail'] . '#' . $item['ForneTelefone'] . '#' . $item['ForneCelular'] . '" ' . $seleciona . '>' . $item['ForneNome'] . '</option>');
-													}
-
-													?>
-												</select>
-											</div>
-										</div>
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputContato">Contato</label>
-												<input type="text" id="inputContato" name="inputContato" class="form-control" value="<?php echo $row['ForneContato']; ?>" readOnly>
-											</div>
-										</div>
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputEmailFornecedor">E-mail</label>
-												<input type="text" id="inputEmailFornecedor" name="inputEmailFornecedor" class="form-control" value="<?php echo $row['ForneEmail']; ?>" readOnly>
-											</div>
-										</div>
-
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputTelefoneFornecedor">Telefone</label>
-												<input type="text" id="inputTelefoneFornecedor" name="inputTelefoneFornecedor" class="form-control" value="<?php echo $row['ForneTelefone']; ?>" readOnly>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							<br>
-
-							<div class="row">
-								<div class="col-lg-12">
 									<h5 class="mb-0 font-weight-semibold">Dados do Solicitante</h5>
 									<br>
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNomeSolicitante">Solicitante</label>
-												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $row['UsuarNome']; ?>" readOnly>
+												<label for="inputNomeSolicitante">Solicitante <span class="text-danger">*</span></label>
+												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $row['UsuarNome']; ?>" readOnly required>
 											</div>
 										</div>
 
@@ -545,13 +590,14 @@ if (isset($_POST['inputTipo'])) {
 										<div class="col-lg-6">
 											<label for="cmbUnidade">Unidade</label>
 											<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
-												<option value="#">Selecione</option>
+												<option value="">Selecione</option>
 												<?php
-												$sql = ("SELECT UnidaId, UnidaNome
-															 FROM Unidade
-															 WHERE UnidaStatus = 1 and UnidaEmpresa = " . $_SESSION['EmpreId'] . "
-															 ORDER BY UnidaNome ASC");
-												$result = $conn->query("$sql");
+												$sql = "SELECT UnidaId, UnidaNome
+														FROM Unidade
+														JOIN Situacao on SituaId = UnidaStatus
+														WHERE UnidaEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+														ORDER BY UnidaNome ASC";
+												$result = $conn->query($sql);
 												$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
 
 												foreach ($rowUnidade as $item) {
@@ -565,7 +611,7 @@ if (isset($_POST['inputTipo'])) {
 											<div class="form-group">
 												<label for="cmbLocalEstoque">Local / Almoxarifado</label>
 												<select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+													<option value="">Selecione</option>
 													<?php
 													if (isset($row['OrComUnidade'])) {
 														$sql = "SELECT LcEstId, LcEstNome

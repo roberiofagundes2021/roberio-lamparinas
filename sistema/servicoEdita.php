@@ -62,7 +62,7 @@ if(isset($_POST['inputNome'])){
 		               ServiMarca = :iMarca, ServiModelo = :iModelo, ServiNumSerie = :sNumSerie, ServiUsuarioAtualizador = :iUsuarioAtualizador ";
 
 		if ($_POST['inputServicoStatus'] == 'ALTERAR'){
-			$sql .= " ServiStatus = ".$Status." ";
+			$sql .= ", ServiStatus = ".$Status." ";
 		}
 		
 		$sql .= "      WHERE ServiId = :iServico";

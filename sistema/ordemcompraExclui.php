@@ -18,6 +18,12 @@ if(isset($_POST['inputOrdemCompraId'])){
 		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
 		$result->execute();
 		
+		$sql = "DELETE FROM OrdemCompraXServico
+				WHERE OCXSrOrdemCompra = :iOrdemCompra and OCXSrEmpresa = :iEmpresa";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':iOrdemCompra', $iOrdemCompra);
+		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+		$result->execute();
 		
 		$sql = "DELETE FROM OrdemCompra
 				WHERE OrComId = :id";
