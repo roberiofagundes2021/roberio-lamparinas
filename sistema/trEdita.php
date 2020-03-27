@@ -15,7 +15,7 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
 isset($rowParametro['ParamProdutoOrcamento']) && $rowParametro['ParamProdutoOrcamento'] == 1 ? $parametroProduto = 'ProdutoOrcamento' : $parametroProduto = 'Produto';
 isset($rowParametro['ParamServicoOrcamento']) && $rowParametro['ParamServicoOrcamento'] == 1 ? $parametroServico = 'ServicoOrcamento' : $parametroServico = 'Servico';
-
+$aSubCategorias = [];
 if (isset($_POST['inputTRId'])) {
 
 	$iTR = $_POST['inputTRId'];
@@ -44,7 +44,6 @@ if (isset($_POST['inputTRId'])) {
 	$rowTrOr = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	$_SESSION['msg'] = array();
-
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
 	irpara("tr.php");
@@ -62,7 +61,7 @@ if (isset($_POST['inputTRData'])) {
 			$tipoTr = 'P';
 		} else if (isset($_POST['TrServico'])) {
 			$tipoTr = 'S';
-		}		
+		}
 
 		$conn->beginTransaction();
 
@@ -80,77 +79,77 @@ if (isset($_POST['inputTRData'])) {
 		));
 
 		//Compara 2 arrays (se houve alteração na SubCategoria)
-		if (count($aSubCategorias) != count($_POST['cmbSubCategoria']) || array_diff($aSubCategorias, $_POST['cmbSubCategoria'])){
+		if (isset($_POST['cmbSubCategoria'])) {
+			if (count($aSubCategorias) != count($_POST['cmbSubCategoria']) || array_diff($aSubCategorias, $_POST['cmbSubCategoria'])) {
 
-			$sql = "DELETE FROM TRXSubcategoria
-					WHERE TRXSCTermoReferencia = :iTermoReferencia and TRXSCEmpresa = :iEmpresa";
-			$result = $conn->prepare($sql);
-
-			$result->execute(array(
-				':iTermoReferencia' => $_POST['inputTRId'],
-				':iEmpresa' => $_SESSION['EmpreId']
-			));
-
-			$possuiSubCategoria = 0;
-
-			if (isset($_POST['cmbSubCategoria']) and $_POST['cmbSubCategoria'][0] != "") {
-
-				$possuiSubCategoria = 1;
-
-				$sql = "INSERT INTO TRXSubcategoria
-							(TRXSCTermoReferencia, TRXSCSubcategoria, TRXSCEmpresa)
-						VALUES 
-							(:iTermoReferencia, :iTrSubCategoria, :iTrEmpresa)";
+				$sql = "DELETE FROM TRXSubcategoria
+						WHERE TRXSCTermoReferencia = :iTermoReferencia and TRXSCEmpresa = :iEmpresa";
 				$result = $conn->prepare($sql);
 
-				foreach ($_POST['cmbSubCategoria'] as $key => $value) {
+				$result->execute(array(
+					':iTermoReferencia' => $_POST['inputTRId'],
+					':iEmpresa' => $_SESSION['EmpreId']
+				));
 
-					$result->execute(array(
-						':iTermoReferencia' => $_POST['inputTRId'],
-						':iTrSubCategoria' => $value,
-						':iTrEmpresa' => $_SESSION['EmpreId']
-					));
+				$possuiSubCategoria = 0;
+
+				if (isset($_POST['cmbSubCategoria']) and $_POST['cmbSubCategoria'][0] != "") {
+
+					$possuiSubCategoria = 1;
+
+					$sql = "INSERT INTO TRXSubcategoria
+								(TRXSCTermoReferencia, TRXSCSubcategoria, TRXSCEmpresa)
+							VALUES 
+								(:iTermoReferencia, :iTrSubCategoria, :iTrEmpresa)";
+					$result = $conn->prepare($sql);
+
+					foreach ($_POST['cmbSubCategoria'] as $key => $value) {
+
+						$result->execute(array(
+							':iTermoReferencia' => $_POST['inputTRId'],
+							':iTrSubCategoria' => $value,
+							':iTrEmpresa' => $_SESSION['EmpreId']
+						));
+					}
 				}
-			}
 
-			// Excluindo os produtos de TermoReferenciaXProduto atrelados a esta TR.
-			$sql = "DELETE FROM TermoReferenciaXProduto
-					WHERE TRXPrTermoReferencia = :iTr and TRXPrEmpresa = :iEmpresa";
-			$result = $conn->prepare($sql);
+				// Excluindo os produtos de TermoReferenciaXProduto atrelados a esta TR.
+				$sql = "DELETE FROM TermoReferenciaXProduto
+						WHERE TRXPrTermoReferencia = :iTr and TRXPrEmpresa = :iEmpresa";
+				$result = $conn->prepare($sql);
 
-			$result->execute(array(
-				':iTr' => $iTR,
-				':iEmpresa' => $_SESSION['EmpreId']
-			));
+				$result->execute(array(
+					':iTr' => $iTR,
+					':iEmpresa' => $_SESSION['EmpreId']
+				));
 
-			// Excluindo os serviços de TermoReferenciaXServico atrelados a esta TR.
-			$sql = "DELETE FROM TermoReferenciaXServico
-					WHERE TRXPrTermoReferencia = :iTr and TRXPrEmpresa = :iEmpresa";
-			$result = $conn->prepare($sql);
+				// Excluindo os serviços de TermoReferenciaXServico atrelados a esta TR.
+				$sql = "DELETE FROM TermoReferenciaXServico
+						WHERE TRXSrTermoReferencia = :iTr and TRXSrEmpresa = :iEmpresa";
+				$result = $conn->prepare($sql);
 
-			$result->execute(array(
-				':iTr' => $iTR,
-				':iEmpresa' => $_SESSION['EmpreId']
-			));
+				$result->execute(array(
+					':iTr' => $iTR,
+					':iEmpresa' => $_SESSION['EmpreId']
+				));
 
-			//Se for Produto e Serviço
-			if ($tipoTr == 'PS') {
-				
-				//Gravando os Produtos
-				include("trGravaProduto.php");
-				
-				// Gravando os Serviços
-				include("trGravaServico.php");
-				
-			} else if ($tipoTr == 'P') {
+				//Se for Produto e Serviço
+				if ($tipoTr == 'PS') {
 
-				//Gravando os Produtos
-				include("trGravaProduto.php");
+					//Gravando os Produtos
+					include("trGravaProduto.php");
 
-			} else if ($tipoTr == 'S') {
+					// Gravando os Serviços
+					include("trGravaServico.php");
+				} else if ($tipoTr == 'P') {
 
-				// Gravando os Serviços
-				include("trGravaServico.php");
+					//Gravando os Produtos
+					include("trGravaProduto.php");
+				} else if ($tipoTr == 'S') {
+
+					// Gravando os Serviços
+					include("trGravaServico.php");
+				}
 			}
 		}
 
@@ -159,7 +158,6 @@ if (isset($_POST['inputTRData'])) {
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Termo de Referência alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
-
 	} catch (PDOException $e) {
 
 		$_SESSION['msg']['titulo'] = "Erro";
@@ -172,7 +170,7 @@ if (isset($_POST['inputTRData'])) {
 		exit;
 	}
 
-	//irpara("tr.php");
+	irpara("tr.php");
 }
 
 ?>
@@ -200,14 +198,13 @@ if (isset($_POST['inputTRData'])) {
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	<!-- /theme JS files -->
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-
 		$(document).ready(function() {
-		
+
 			function validarSubcategoria(inputValida) {
 				confirmaExclusao(document.formTR, "Existem produtos com quantidades ou valores lançados em orçamentos dessa TR, portanto, a Categoria e Subcategoria não podem ser alteradas. Apenas alterações no Conteúdo Personalizado são permitidas. Confirmar alteração?", "trEdita.php");
 			}
@@ -265,10 +262,10 @@ if (isset($_POST['inputTRData'])) {
 				var TrProduto = document.getElementById("TrProduto");
 				var TrServico = document.getElementById("TrServico");
 
-				if (!TrProduto.checked && !TrServico.checked){
-					alerta('Atenção','Informe se o Termo de Referência terá Produtos e/ou Serviços!','error');
+				if (!TrProduto.checked && !TrServico.checked) {
+					alerta('Atenção', 'Informe se o Termo de Referência terá Produtos e/ou Serviços!', 'error');
 					$('#TrProduto').focus();
-					return false;					
+					return false;
 				}
 
 				//Depois
@@ -312,7 +309,42 @@ if (isset($_POST['inputTRData'])) {
 					}, 1)
 				}
 
-				$("#formTr").submit();
+				let tipoTr = '';
+				let tipoMensagem = '';
+
+				if ($('#TrProduto').parent().hasClass('checked')) {
+					tipoTr = 'P';
+				}
+				if ($('#TrServico').parent().hasClass('checked')) {
+					tipoTr = 'S'
+				}
+				if ($('#TrProduto').parent().hasClass('checked') && $('#TrServico').parent().hasClass('checked')) {
+					tipoTr = 'PS'
+				}
+
+				let cmbCategoriaId = $('#cmbCategoria').val();
+				let cmbSubCategoriaArray = $('#cmbSubCategoria').val()
+
+				$.post(
+					"trVerificaProdutoServico.php", {
+						tipoTr: tipoTr,
+						cmbCategoriaId: cmbCategoriaId,
+						cmbSubCategoriaArray: cmbSubCategoriaArray
+					},
+					function(resposta) {
+
+						tipoTr == 'P' ? tipoMensagem = 'produtos' : tipoTr == 'S' ? tipoMensagem = 'serviços' : tipoMensagem = 'produtos ou serviços'
+
+						if (resposta == 'existem produtos') {
+
+							$("#formTR").submit();
+
+						} else {
+							alerta('Atenção', `A categoria selecionada não possui ${tipoMensagem} ativos!`, 'error');
+
+						}
+					}
+				);
 
 			}); // enviar			
 		}); //document.ready
@@ -351,6 +383,7 @@ if (isset($_POST['inputTRData'])) {
 
 					<form name="formTR" id="formTR" method="post" class="form-validate-jquery">
 						<input id="inputTRId" type="hidden" name="inputTRId" value="<?php echo $row['TrRefId'] ?>">
+						<input id="inputTRNumero" type="hidden" name="inputTRNumero" value="<?php echo $row['TrRefNumero'] ?>">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar TR Nº "<?php echo $_POST['inputTRNumero']; ?>"</h5>
 						</div>
@@ -406,7 +439,7 @@ if (isset($_POST['inputTRData'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputData">Data</label>
-												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo mostraData($row['TrRefData']); ?>" readOnly>
+												<input type="text" id="inputData" name="inputTRData" class="form-control" value="<?php echo mostraData($row['TrRefData']); ?>" readOnly>
 											</div>
 										</div>
 										<div class="col-lg-3">
@@ -419,38 +452,38 @@ if (isset($_POST['inputTRData'])) {
 
 													if (count($rowTrOr) >= 1) {
 														$disabled = " disabled ";
-													} 
+													}
 
 													if ($row['TrRefTipo'] == 'PS') {
 														print('
 															 <div class="p-1 m-0 d-flex flex-row">
-																 <input id="TrProduto" value="P" name="TrProduto" class="form-check-input-styled" type="checkbox" checked '.$disabled.'>
+																 <input id="TrProduto" value="P" name="TrProduto" class="form-check-input-styled" type="checkbox" checked ' . $disabled . '>
 																 <label for="TrProduto" class="ml-1" style="margin-bottom: 2px">Produto</label>
 															 </div>
 															 <div class="p-1 m-0 d-flex flex-row">
-																 <input id="TrServico" value="S" name="TrServico" class="form-check-input-styled" type="checkbox" checked '.$disabled.'>
+																 <input id="TrServico" value="S" name="TrServico" class="form-check-input-styled" type="checkbox" checked ' . $disabled . '>
 																 <label for="TrServico" class="ml-1" style="margin-bottom: 2px">Serviço</label>
 															 </div>
 														');
 													} else if ($row['TrRefTipo'] == 'P') {
 														print('
 															 <div class="p-1 m-0 d-flex flex-row">
-																 <input id="TrProduto" value="P" name="TrProduto" class="form-check-input-styled" type="checkbox" checked '.$disabled.'> 
+																 <input id="TrProduto" value="P" name="TrProduto" class="form-check-input-styled" type="checkbox" checked ' . $disabled . '> 
 																 <label for="TrProduto" class="ml-1" style="margin-bottom: 2px">Produto</label>
 															 </div>
 															 <div class="p-1 m-0 d-flex flex-row">
-																 <input id="TrServico" value="S" name="TrServico" class="form-check-input-styled" type="checkbox" '.$disabled.'>
+																 <input id="TrServico" value="S" name="TrServico" class="form-check-input-styled" type="checkbox" ' . $disabled . '>
 																 <label for="TrServico" class="ml-1" style="margin-bottom: 2px">Serviço</label>
 															 </div>
 														 ');
-													} else if ($row['TrRefTipo'] == 'S'){
+													} else if ($row['TrRefTipo'] == 'S') {
 														print('
 															 <div class="p-1 m-0 d-flex flex-row">
-																 <input id="TrProduto" value="P" name="TrProduto" class="form-check-input-styled" type="checkbox" '.$disabled.'>
+																 <input id="TrProduto" value="P" name="TrProduto" class="form-check-input-styled" type="checkbox" ' . $disabled . '>
 																 <label for="TrProduto" class="ml-1" style="margin-bottom: 2px">Produto</label>
 															 </div>
 															 <div class="p-1 m-0 d-flex flex-row">
-																 <input id="TrServico" value="S" name="TrServico" class="form-check-input-styled" type="checkbox" checked '.$disabled.'>
+																 <input id="TrServico" value="S" name="TrServico" class="form-check-input-styled" type="checkbox" checked ' . $disabled . '>
 																 <label for="TrServico" class="ml-1" style="margin-bottom: 2px">Serviço</label>
 															 </div>
 														 ');
@@ -464,26 +497,26 @@ if (isset($_POST['inputTRData'])) {
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
 												<?php
-													if (count($rowTrOr) >= 1) {
-														print('<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" value="' . $row['TrRefCategoria'] . '" disabled>');
-													} else {
-														print('<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>');
-													}
+												if (count($rowTrOr) >= 1) {
+													print('<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" value="' . $row['TrRefCategoria'] . '" disabled>');
+												} else {
+													print('<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>');
+												}
 												?>
 												<option value="">Selecione</option>
 												<?php
-													$sql = "SELECT CategId, CategNome
+												$sql = "SELECT CategId, CategNome
 															FROM Categoria
 															JOIN Situacao on SituaId = CategStatus
 															WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 														    ORDER BY CategNome ASC";
-													$result = $conn->query($sql);
-													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+												$result = $conn->query($sql);
+												$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowCategoria as $item) {
-														$seleciona = $item['CategId'] == $row['TrRefCategoria'] ? "selected" : "";
-														print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
-													}
+												foreach ($rowCategoria as $item) {
+													$seleciona = $item['CategId'] == $row['TrRefCategoria'] ? "selected" : "";
+													print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
+												}
 												?>
 												</select>
 											</div>

@@ -202,6 +202,7 @@ if (isset($_POST['inputData'])) {
 				}
 
 				let tipoTr = '';
+				let tipoMensagem = '';
 
 				if ($('#TrProduto').parent().hasClass('checked')) {
 					tipoTr = 'P';
@@ -223,18 +224,16 @@ if (isset($_POST['inputData'])) {
 						cmbSubCategoriaArray: cmbSubCategoriaArray
 					},
 					function(resposta) {
-						//console.log(resposta)
+
+						tipoTr == 'P' ? tipoMensagem = 'produtos' : tipoTr == 'S' ? tipoMensagem = 'serviços' : tipoMensagem = 'produtos ou serviços'
+
 						if (resposta == 'existem produtos') {
-							//console.log(resposta)
+
 							$("#formTR").submit();
+
 						} else {
-							console.log(resposta)
-							alerta('Atenção', 'A categoria selecionada não possui produtos ou serviços ativos!', 'error');
-							//$('#TrProduto').focus();
-							//$('#TrServico').focus();
-							//$(`#${select}-error`).html('');
-							//$(`#${select}`).html('');
-							//$(`#${select}`).children().first().attr('selected')
+							alerta('Atenção', `A categoria selecionada não possui ${tipoMensagem} ativos!`, 'error');
+						
 						}
 					}
 				);

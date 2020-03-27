@@ -1,7 +1,9 @@
 <?php
 
 	if ($possuiSubCategoria){
-		
+
+		$insertId = $_POST['inputTRId'];
+
 		foreach ($_POST['cmbSubCategoria'] as $value) {					
 			
 			if ($rowParametro['ParamProdutoOrcamento']) {
@@ -43,6 +45,8 @@
 		}
 		
 	} else {
+
+		$insertId = $_POST['inputTRId'];
 		
 		$value = $_POST['cmbCategoria'];
 			
