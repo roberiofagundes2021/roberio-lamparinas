@@ -217,26 +217,31 @@ if (isset($_POST['inputData'])) {
 				let cmbCategoriaId = $('#cmbCategoria').val();
 				let cmbSubCategoriaArray = $('#cmbSubCategoria').val()
 
-				$.post(
-					"trVerificaProdutoServico.php", {
-						tipoTr: tipoTr,
-						cmbCategoriaId: cmbCategoriaId,
-						cmbSubCategoriaArray: cmbSubCategoriaArray
-					},
-					function(resposta) {
+				if (cmbCategoriaId){
 
-						tipoTr == 'P' ? tipoMensagem = 'produtos' : tipoTr == 'S' ? tipoMensagem = 'serviços' : tipoMensagem = 'produtos ou serviços'
+					$.post(
+						"trVerificaProdutoServico.php", {
+							tipoTr: tipoTr,
+							cmbCategoriaId: cmbCategoriaId,
+							cmbSubCategoriaArray: cmbSubCategoriaArray
+						},
+						function(resposta) {
 
-						if (resposta == 'existem produtos') {
+							tipoTr == 'P' ? tipoMensagem = 'produtos' : tipoTr == 'S' ? tipoMensagem = 'serviços' : tipoMensagem = 'produtos ou serviços'
 
-							$("#formTR").submit();
+							if (resposta == 'existem produtos') {
 
-						} else {
-							alerta('Atenção', `A categoria selecionada não possui ${tipoMensagem} ativos!`, 'error');
-						
+								$("#formTR").submit();
+
+							} else {
+								alerta('Atenção', 'A categoria selecionada não possui ' + tipoMensagem + ' ativos!', 'error');
+							
+							}
 						}
-					}
-				);
+					);
+				} else {
+					$("#formTR").submit();
+				}
 			});
 		}); //document.ready
 

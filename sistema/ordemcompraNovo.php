@@ -156,7 +156,7 @@ if(isset($_POST['inputData'])){
 				
 				$.getJSON('filtraSubCategoria.php?idFornecedor='+Forne[0], function (dados){
 					
-					var option = '<option value="#">Selecione a SubCategoria</option>';
+					var option = '<option value="">Selecione a SubCategoria</option>';
 					
 					if (dados.length){						
 						
@@ -181,7 +181,7 @@ if(isset($_POST['inputData'])){
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
 					
-					var option = '<option value="#">Selecione a SubCategoria</option>';
+					var option = '<option value="">Selecione a SubCategoria</option>';
 					
 					if (dados.length){						
 						
@@ -503,7 +503,7 @@ if(isset($_POST['inputData'])){
 											<div class="form-group">
 												<label for="cmbLocalEstoque">Local / Almoxarifado</label>
 												<select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+													<option value="">Selecione</option>
 												</select>
 											</div>
 										</div>

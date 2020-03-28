@@ -88,7 +88,7 @@ try{
 	$enviar = 0;
 
 	//Verifica se o número de produtos é igual ao número de produtos com a quantidade e valor unitário preenchido para habilitar o botào "Enviar"
-	if ($countProdutoUtilizado == $rowCompleto['Quant']){
+	if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado != 0 && $rowCompleto['Quant'] != 0)){
 		$enviar = 1;
 	}
 

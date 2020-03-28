@@ -139,6 +139,34 @@ if (isset($_POST['inputTipo'])) {
 
 			selecionaTipo(tipo);
 
+			Filtrando();
+
+			var cmbCategoria = $('#cmbCategoria').val();
+			var cmbSubCategoria = $('#cmbSubCategoria').val();
+
+			//Ao carregar a página tive que executar o que o onChange() executa para que a combo da SubCategoria já venha filtrada, além de selecionada, é claro.
+
+			$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
+
+				var option = '<option value="">Selecione a SubCategoria</option>';
+
+				if (dados.length) {
+
+					$.each(dados, function(i, obj) {
+
+						if (obj.SbCatId == cmbSubCategoria) {
+							option += '<option value="' + obj.SbCatId + '" selected>' + obj.SbCatNome + '</option>';
+						} else {
+							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
+						}
+					});
+
+					$('#cmbSubCategoria').html(option).show();
+				} else {
+					ResetSubCategoria();
+				}
+			});			
+
 		}
 
 		$(document).ready(function() {
@@ -178,7 +206,7 @@ if (isset($_POST['inputTipo'])) {
 				
 				$.getJSON('filtraSubCategoria.php?idFornecedor='+Forne[0], function (dados){
 					
-					var option = '<option value="#">Selecione a SubCategoria</option>';
+					var option = '<option value="">Selecione a SubCategoria</option>';
 					
 					if (dados.length){						
 						
@@ -203,7 +231,7 @@ if (isset($_POST['inputTipo'])) {
 
 				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
 
-					var option = '<option value="#">Selecione a SubCategoria</option>';
+					var option = '<option value="">Selecione a SubCategoria</option>';
 
 					if (dados.length) {
 
@@ -226,7 +254,7 @@ if (isset($_POST['inputTipo'])) {
 
 				var cmbUnidade = $('#cmbUnidade').val();
 
-				if (cmbUnidade == '#') {
+				if (cmbUnidade == '') {
 					ResetLocalEstoque();
 				} else {
 
@@ -447,7 +475,7 @@ if (isset($_POST['inputTipo'])) {
 															<?php
 															$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																	FROM Fornecedor
-																	JOIN Situacao on SituaId = ForneStatus														     
+																	JOIN Situacao on SituaId = ForneStatus													     
 																	WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY ForneNome ASC";
 															$result = $conn->query($sql);
@@ -617,7 +645,8 @@ if (isset($_POST['inputTipo'])) {
 														$sql = "SELECT LcEstId, LcEstNome
 														        FROM LocalEstoque
 														        JOIN Situacao on SituaId = LcEstStatus 												     
-														        WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and LcEstUnidade = " . $row['OrComUnidade'] . " and SituaChave = 'ATIVO'
+														        WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and 
+														        LcEstUnidade = " . $row['OrComUnidade'] . " and SituaChave = 'ATIVO'
 														        ORDER BY LcEstNome ASC";
 														$result = $conn->query($sql);
 														$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -685,40 +714,6 @@ if (isset($_POST['inputTipo'])) {
 
 	</div>
 	<!-- /page content -->
-
-	<!-- Adicionando Javascript -->
-	<script type="text/javascript">
-		//Ao carregar a página tive que executar o que o onChange() executa para que a combo da SubCategoria já venha filtrada, além de selecionada, é claro.
-		window.onload = function() {
-
-			var cmbSubCategoria = $('#cmbSubCategoria').val();
-
-			Filtrando();
-
-			var cmbCategoria = $('#cmbCategoria').val();
-
-			$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
-
-				var option = '<option value="#">Selecione a SubCategoria</option>';
-
-				if (dados.length) {
-
-					$.each(dados, function(i, obj) {
-
-						if (obj.SbCatId == cmbSubCategoria) {
-							option += '<option value="' + obj.SbCatId + '" selected>' + obj.SbCatNome + '</option>';
-						} else {
-							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
-						}
-					});
-
-					$('#cmbSubCategoria').html(option).show();
-				} else {
-					ResetSubCategoria();
-				}
-			});
-		}
-	</script>
 
 </body>
 

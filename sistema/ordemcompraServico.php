@@ -77,9 +77,23 @@ try{
 	foreach ($rowServicoUtilizado as $itemServicoUtilizado){
 		$aServicos[] = $itemServicoUtilizado['OCXSrServico'];
 	}
+
+	$sql = "SELECT COUNT(OCXSrServico) as Quant
+			FROM OrdemCompraXServico
+			WHERE OCXSrEmpresa = ". $_SESSION['EmpreId'] ." and OCXSrOrdemCompra = ".$iOrdemCompra." and 
+			OCXSrQuantidade <> '' and OCXSrQuantidade <> 0 and OCXSrValorUnitario <> 0.00 ";
+	$result = $conn->query($sql);
+	$rowCompleto = $result->fetch(PDO::FETCH_ASSOC);
+
+	$enviar = 0;
+
+	//Verifica se o número de serviços é igual ao número de serviços com a quantidade e valor unitário preenchido para habilitar o botào "Enviar"
+	if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado != 0 && $rowCompleto['Quant'] != 0)){
+		$enviar = 1;
+	}	
 	
 } catch(PDOException $e) {
-	echo 'Error: ' . $e->getMessage();
+	echo 'Error: ' . $e->getMessage();die;
 }
 
 ?>
@@ -159,6 +173,14 @@ try{
 					}	
 				});
 			});
+
+			//Enviar para aprovação do Centro Administrativo (via Bandeja)
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();		
+				
+				confirmaExclusao(document.formOrdemCompraServico, "Essa ação enviará toda a Ordem de Compra (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "ordemcompraEnviar.php");
+			});			
 						
 		}); //document.ready
 		
@@ -460,6 +482,11 @@ try{
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<?php
+											if ($enviar){
+												print('<button class="btn btn-lg btn-default" id="enviar">Enviar para Aprovação</button>');
+											}
+										?>										
 										<a href="ordemcompra.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
