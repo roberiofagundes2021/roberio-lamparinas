@@ -28,7 +28,7 @@ try{
 
 		$sql = "SELECT PerfiId
 				FROM Perfil
-				Where PerfiChave IN ('ADMINISTRADOR','CONTROLADORIA') ";
+				Where PerfiChave IN ('ADMINISTRADOR','CENTROADMINISTRATIVO') ";
 		$result = $conn->query($sql);
 		$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -96,21 +96,19 @@ try{
 
 		} else{
 
-			if ($rowBandeja['SituaChave'] == 'ATIVO'){
-				$sql = "UPDATE Bandeja SET BandeData = :dData, BandeSolicitante = :iSolicitante, BandeStatus = :iStatus, 
-						BandeUsuarioAtualizador = :iUsuarioAtualizador
-						WHERE BandeEmpresa = :iEmpresa and BandeId = :iIdBandeja";
-				$result = $conn->prepare($sql);
-						
-				$result->execute(array(
-								':dData' => date("Y-m-d"),
-								':iSolicitante' => $_SESSION['UsuarId'],
-								':iStatus' => $rowSituacao['SituaId'],
-								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iEmpresa' => $_SESSION['EmpreId'],
-								':iIdBandeja' => $rowBandeja['BandeId']														
-								));
-			}		
+			$sql = "UPDATE Bandeja SET BandeData = :dData, BandeSolicitante = :iSolicitante, BandeStatus = :iStatus, 
+					BandeUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE BandeEmpresa = :iEmpresa and BandeId = :iIdBandeja";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':dData' => date("Y-m-d"),
+							':iSolicitante' => $_SESSION['UsuarId'],
+							':iStatus' => $rowSituacao['SituaId'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId'],
+							':iIdBandeja' => $rowBandeja['BandeId']														
+							));
 		}
 	}
 

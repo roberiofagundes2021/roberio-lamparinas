@@ -13,10 +13,8 @@ $sNumero = $_POST['inputOrcamentoNumero'];
 
 $sql = "SELECT *
 		FROM Orcamento
-		LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
+		JOIN Fornecedor on ForneId = OrcamFornecedor
 		JOIN Categoria on CategId = OrcamCategoria
-		LEFT JOIN OrcamentoXSubCategoria on OrXSCOrcamento = OrcamId
-		LEFT JOIN SubCategoria on SbCatId = OrXSCSubcategoria 
 		WHERE OrcamEmpresa = " . $_SESSION['EmpreId'] . " and OrcamId = " . $iOrcamento;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -46,6 +44,7 @@ try {
 		'default_font' => 'dejavusans',
 		'orientation' => 'P' //P->Portrait (retrato)    L->Landscape (paisagem)
 	]);*/
+
 
 	$html = "
 
@@ -90,17 +89,19 @@ try {
 			            Fornecedor: <span style="font-weight:normal;">' . $row['ForneNome'] . '</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">' . $row['ForneCelular'] . '</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">' . $item['ForneEmail'] . '</span>
 		            </div>
 		            <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
-			            Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> &nbsp;&nbsp;<span style="color:#ccc;">|</span> &nbsp;&nbsp; SubCategoria: <span style="font-weight:normal;">' . $row['SbCatNome'] . '</span> 
+			            Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span>
 		            </div>
 		            <br>
-		            <div>' . $row['OrcamConteudo'] . '</div>
-		            <br>
+		            <div>' . $row['OrcamConteudo'] . '</div>';
+		            
+
+		$html .= '  <br>
 		            <table style="width:100%; border-collapse: collapse;">
 			            <tr>
 			            	<th style="text-align: center; width:8%">Item</th>
 				            <th style="text-align: left; width:46%">' . $tipo . '</th>
-				            <th style="text-align: center; width:12%">Quant.</th>
 				            <th style="text-align: center; width:11%">Unidade</th>
+				            <th style="text-align: center; width:12%">Quant.</th>				            
 				            <th style="text-align: center; width:11%">V. Unit.</th>
 				            <th style="text-align: center; width:12%">V. Total</th>
 			            </tr>
@@ -136,8 +137,8 @@ try {
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
 					<td style='text-align: left;'>" . $itemProduto['ProduNome'] . ": " . $itemProduto['ProduDetalhamento'] . "</td>
+					<td style='text-align: center;'>" . $itemProduto['UnMedSigla'] . "</td>					
 					<td style='text-align: center;'>" . $itemProduto['OrXPrQuantidade'] . "</td>
-					<td style='text-align: center;'>" . $itemProduto['UnMedSigla'] . "</td>
 					<td style='text-align: right;'>" . $valorUnitario . "</td>
 					<td style='text-align: right; '>" . $valorTotal . "</td>
 				</tr>
@@ -152,7 +153,7 @@ try {
 	            	<td colspan='5' height='40' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
-				    <td style='border-top: 1px solid #bbb; text-align: right;'>
+				    <td style='text-align: right;'>
 				        " . mostraValor($totalGeral) . "
 				    </td>
 				</tr>";
@@ -162,21 +163,19 @@ try {
 	            	<td colspan='5' height='40' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
-				    <td style='border-top: 1px solid #bbb; text-align: right'>
+				    <td style='text-align: right'>
 					    
 				    </td>
 				</tr>";
 		}
 
-
-		$html .= "</table>";
 	} else {
 		$html .= '
 		            <div style="font-weight: bold; position:relative; margin-top: 10px; background-color:#ccc; padding: 5px;">
 		            	Fornecedor: <span style="font-weight:normal;">' . $row['ForneNome'] . '</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">' . $row['ForneCelular'] . '</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">' . $row['ForneEmail'] . '</span>
 		            </div>
 		            <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
-		            	Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> &nbsp;&nbsp;<span style="color:#ccc;">|</span> &nbsp;&nbsp; SubCategoria: <span style="font-weight:normal;">' . $row['SbCatNome'] . '</span> 
+		            	Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span>
 		            </div>
 		            <br>
 		            <div>' . $row['OrcamConteudo'] . '</div>
@@ -191,10 +190,10 @@ try {
 		            	</tr>
 		            ';
 
-		$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OrXSvQuantidade, OrXSvValorUnitario
+		$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OrXSrQuantidade, OrXSrValorUnitario
 				FROM Servico
-				JOIN OrcamentoXServico on OrXSvServico = ServiId
-				WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OrXSvOrcamento = " . $iOrcamento;
+				JOIN OrcamentoXServico on OrXSrServico = ServiId
+				WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OrXSrOrcamento = " . $iOrcamento;
 
 		$result = $conn->query($sql);
 		$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -205,10 +204,10 @@ try {
 
 		foreach ($rowServicos as $itemServico) {
 
-			if (($itemServico['OrXSvValorUnitario'] != '' and $itemServico['OrXSvValorUnitario'] != null and $itemServico['OrXSvValorUnitario'] != 0) && ($itemServico['OrXSvQuantidade'] != '' and $itemServico['OrXSvQuantidade'] != null and $itemServico['OrXSvQuantidade'] != 0)) {
-				$valorUnitario = mostraValor($itemServico['OrXSvValorUnitario']);
-				$valorTotal = mostraValor($itemServico['OrXSvQuantidade'] * $itemServico['OrXSvValorUnitario']);
-				$totalGeral = ($itemServico['OrXSvQuantidade'] * $itemServico['OrXSvValorUnitario']) + $totalGeral;
+			if (($itemServico['OrXSrValorUnitario'] != '' and $itemServico['OrXSrValorUnitario'] != null and $itemServico['OrXSrValorUnitario'] != 0) && ($itemServico['OrXSrQuantidade'] != '' and $itemServico['OrXSrQuantidade'] != null and $itemServico['OrXSrQuantidade'] != 0)) {
+				$valorUnitario = mostraValor($itemServico['OrXSrValorUnitario']);
+				$valorTotal = mostraValor($itemServico['OrXSrQuantidade'] * $itemServico['OrXSrValorUnitario']);
+				$totalGeral = ($itemServico['OrXSrQuantidade'] * $itemServico['OrXSrValorUnitario']) + $totalGeral;
 
 				$cont2++;
 			} else {
@@ -220,7 +219,7 @@ try {
 				<tr>
 					<td style='text-align: center'>" . $cont . "</td>
 					<td style='text-align: left'>" . $itemServico['ServiNome'] . ": " . $itemServico['ServiDetalhamento'] . "</td>
-					<td style='text-align: center'>" . $itemServico['OrXSvQuantidade'] . "</td>
+					<td style='text-align: center'>" . $itemServico['OrXSrQuantidade'] . "</td>
 					<td style='text-align: right'>" . $valorUnitario . "</td>
 					<td style='text-align: right'>" . $valorTotal . "</td>
 				</tr>
@@ -232,10 +231,10 @@ try {
 		if ($cont2 == count($rowServicos)) {
 			$html .= "  
 			    <tr>
-	            	<td colspan='5' height='40' valign='middle'>
+	            	<td colspan='4' height='40' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
-				    <td text-align: left'>
+				    <td style='text-align: right;'>
 				        " . mostraValor($totalGeral) . "
 				    </td>
 				</tr>";
@@ -245,14 +244,14 @@ try {
 	            	<td colspan='4' height='40' valign='middle'>
 		                <strong>Total Geral</strong>
 	                </td>
-				    <td style='border-top: 1px solid #333; text-align: left'>
+				    <td style='text-align: right;'>
 					    
 				    </td>
 				</tr>";
 		}
-
-		$html .= "</table>";
 	}
+
+	$html .= "</table>";
 
 
 	$sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone

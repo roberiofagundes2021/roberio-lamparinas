@@ -9,7 +9,6 @@ use Mpdf\Mpdf;
 require_once 'global_assets/php/vendor/autoload.php';
 require_once 'global_assets/php/funcoesgerais.php';
 
-
 if (isset($_POST['inputMovimentacaoId'])) {
     $sql = "SELECT *, MvXPrProduto, MvXPrQuantidade, MvXPrLote, MvXPrValidade, ClassNome, ProduNome, ProduMarca, ProduModelo, ProduCodigo, ProduUnidadeMedida, ProduModelo, ProduNumSerie, CategNome, UnMedNome, ModelNome, MarcaNome
 	    FROM Movimentacao
@@ -203,12 +202,13 @@ try {
                                  ";
                 } else {
                     $html .= "
-                            <div style='margin-top: -28px ;'>
-                                <div style='margin-right: 12px ;float: left ;width: 22%; border: 1px solid #c9d0d4; background-color: #e9e9e9'>
+
+                            <div style='margin-top: 28px;'>
+                                <div style='margin-right: 12px; float: left; width: 22%; border: 1px solid #c9d0d4; background-color: #e9e9e9'>
                                     <p style='font-size: 0.8rem; margin: 0px; padding: 8px'>Código: " . $value['ProduCodigo'] . "</p>
                                 </div>
-                                <div style='margin: 0px 2px 0px 2px ;float: left; width: 76.8%; border: 1px solid #c9d0d4; background-color: #e9e9e9'>
-                                    <p style='font-size: 0.8rem ;margin: 0px; padding: 8px'>Produto: " . $value['ProduNome'] . "</p>
+                                <div style='float: left; width: 76.8%; border: 1px solid #c9d0d4; background-color: #e9e9e9'>
+                                    <p style='font-size: 0.8rem; margin: 0px; padding: 8px'>Produto: " . $value['ProduNome'] . "</p>
                                 </div>
                             </div>
                             <div style='margin-bottom: 8px ;margin-top: 2px; margin-bottom 4px; '>
@@ -288,7 +288,10 @@ try {
                      ";
 
             //$mpdf->SetHTMLHeader($topo);
-            $mpdf->WriteHTML($html);
+            //$stylesheet = file_get_contents('global_assets/css/lamparinas/bootstrap-3.3.7/dist/css/bootstrap.min.css');
+            $stylesheet = file_get_contents('global_assets/css/lamparinas/impressao.css');         
+            $mpdf->WriteHTML($stylesheet, 1); // CSS Script goes here.
+            $mpdf->WriteHTML($html, 2);
             //$mpdf->SetHTMLFooter($rodape);
             // $mpdf->SetHTMLHeader($topo,'O',true);	
 

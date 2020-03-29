@@ -370,15 +370,51 @@ if($totalAcoes){
 				if (Tipo == 'imprimir'){
 					document.formBandeja.action = "ordemcompraImprime.php";
 					document.formBandeja.setAttribute("target", "_blank");
+					document.formBandeja.submit();
 				} else {
 					if (Tipo == 'liberar'){	
-						document.getElementById('inputOrdemCompraStatus').value = 'ATIVO'; //Liberado
-						document.formBandeja.action = "ordemcompraMudaSituacao.php";		
+						document.getElementById('inputOrdemCompraStatus').value = 'LIBERADO'; //Liberado
+						document.formBandeja.action = "ordemcompraBandejaMudaSituacao.php";	
+						document.formBandeja.setAttribute("target", "_self");
+						document.formBandeja.submit();	
 					} else if (Tipo == 'naoliberar'){
-						document.getElementById('inputOrdemCompraStatus').value = 'NAOLIBERADO';
-						document.formBandeja.action = "ordemcompraMudaSituacao.php";
+			            bootbox.prompt({
+			                title: 'Informe o motivo da não liberação',
+			                inputType: 'textarea',
+			                buttons: {
+			                    confirm: {
+			                        label: 'Enviar',
+			                        className: 'btn-success'
+			                    },
+			                    cancel: {
+			                        label: 'Cancelar',
+			                        className: 'btn-link'
+			                    }
+			                },
+			                callback: function (result) {
+
+			                    if (result === null) {                                             
+			                        bootbox.alert({
+			                            title: 'Não Liberar',
+			                            message: 'A não liberação foi cancelada!'
+			                        });                              
+			                    } else {
+			                       
+			                        document.getElementById('inputMotivo').value = result;
+									document.getElementById('inputOrdemCompraStatus').value = 'NAOLIBERADO';
+									document.formBandeja.action = "ordemcompraBandejaMudaSituacao.php";
+									document.formBandeja.setAttribute("target", "_self");
+									document.formBandeja.submit();
+									
+									/*
+			                        bootbox.alert({
+			                            title: 'Hi <strong>' + result + '</strong>',
+			                            message: 'How are you doing today?'
+			                        });*/                               
+			                    }
+			                }
+			            });
 					}
-					document.formBandeja.setAttribute("target", "_self");
 				}
 			}
 
@@ -434,14 +470,9 @@ if($totalAcoes){
 			                    }
 			                }
 			            });
-
-
 					}
 				}
 			}
-
-			
-
 		}		
 		
 	</script>

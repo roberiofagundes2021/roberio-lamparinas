@@ -21,7 +21,7 @@ if (isset($_POST['inputOrcamentoId'])) {
 if (isset($_POST['inputIdOrcamento'])) {
 
 	$sql = "DELETE FROM OrcamentoXServico
-			WHERE OrXSvOrcamento = :iOrcamento AND OrXSvEmpresa = :iEmpresa";
+			WHERE OrXSrOrcamento = :iOrcamento AND OrXSrEmpresa = :iEmpresa";
 	$result = $conn->prepare($sql);
 
 	$result->execute(array(
@@ -31,7 +31,7 @@ if (isset($_POST['inputIdOrcamento'])) {
 
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
-		$sql = "INSERT INTO OrcamentoXServico (OrXSvOrcamento, OrXSvServico, OrXSvQuantidade, OrXSvValorUnitario, OrXSvUsuarioAtualizador, OrXSvEmpresa)
+		$sql = "INSERT INTO OrcamentoXServico (OrXSrOrcamento, OrXSrServico, OrXSrQuantidade, OrXSrValorUnitario, OrXSrUsuarioAtualizador, OrXSrEmpresa)
 				VALUES (:iOrcamento, :iServico, :iQuantidade, :iValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
@@ -61,16 +61,16 @@ try {
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 
-	$sql = "SELECT OrXSvServico, OrXSvValorUnitario, OrXSvQuantidade
+	$sql = "SELECT OrXSrServico, OrXSrValorUnitario, OrXSrQuantidade
 			FROM OrcamentoXServico
-			JOIN Servico on ServiId = OrXSvServico
-			WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OrXSvOrcamento = " . $iOrcamento;
+			JOIN Servico on ServiId = OrXSrServico
+			WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OrXSrOrcamento = " . $iOrcamento;
 	$result = $conn->query($sql);
 	$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countServicoUtilizado = count($rowServicoUtilizado);
 
 	foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
-		$aServicos[] = $itemServicoUtilizado['OrXSvServico'];
+		$aServicos[] = $itemServicoUtilizado['OrXSrServico'];
 	}
 
 	$sql = "SELECT SbCatId, SbCatNome
@@ -333,10 +333,10 @@ try {
 
 									<?php
 
-									$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OrXSvValorUnitario, OrXSvQuantidade
+									$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OrXSrValorUnitario, OrXSrQuantidade
 												FROM Servico
-												JOIN OrcamentoXServico on OrXSvServico = ServiId
-												WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OrXSvOrcamento = " . $iOrcamento;
+												JOIN OrcamentoXServico on OrXSrServico = ServiId
+												WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OrXSrOrcamento = " . $iOrcamento;
 									$result = $conn->query($sql);
 									$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 									$count = count($rowServicos);
@@ -395,11 +395,11 @@ try {
 
 										$cont++;
 
-										$iQuantidade = isset($item['OrXSvQuantidade']) ? $item['OrXSvQuantidade'] : '';
-										$fValorUnitario = isset($item['OrXSvValorUnitario']) ? mostraValor($item['OrXSvValorUnitario']) : '';
-										$fValorTotal = (isset($item['OrXSvQuantidade']) and isset($item['OrXSvValorUnitario'])) ? mostraValor($item['OrXSvQuantidade'] * $item['OrXSvValorUnitario']) : '';
+										$iQuantidade = isset($item['OrXSrQuantidade']) ? $item['OrXSrQuantidade'] : '';
+										$fValorUnitario = isset($item['OrXSrValorUnitario']) ? mostraValor($item['OrXSrValorUnitario']) : '';
+										$fValorTotal = (isset($item['OrXSrQuantidade']) and isset($item['OrXSrValorUnitario'])) ? mostraValor($item['OrXSrQuantidade'] * $item['OrXSrValorUnitario']) : '';
 
-										$fTotalGeral += (isset($item['OrXSvQuantidade']) and isset($item['OrXSvValorUnitario'])) ? $item['OrXSvQuantidade'] * $item['OrXSvValorUnitario'] : 0;
+										$fTotalGeral += (isset($item['OrXSrQuantidade']) and isset($item['OrXSrValorUnitario'])) ? $item['OrXSrQuantidade'] * $item['OrXSrValorUnitario'] : 0;
 
 										print('
 											<div class="row" style="margin-top: 8px;">
