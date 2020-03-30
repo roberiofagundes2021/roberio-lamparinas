@@ -205,7 +205,11 @@ if (isset($_POST['inputData'])) {
 					ordemCompra: numOrdemCompra,
 				},
 				success: function(resposta) {
-					console.log(resposta);
+					$("#tabelaProdutos").html(resposta);
+					let total = $('#total').html()
+
+					$("#inputTotal").val(total)
+					
 				}
 
 			});
