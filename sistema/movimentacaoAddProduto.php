@@ -4,7 +4,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla
+$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla, ProduDetalhamento
 		FROM Produto
 		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 		WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduId = ". $_POST['idProduto'];
@@ -29,7 +29,7 @@ $count = count($row);
 
 		$output = 	'<tr id="row'.$_POST['numItens'].'">
 						 <td>'.$_POST['numItens'].'</td>
-						 <td>'.$row['ProduNome'].'</td>
+						 <td title="'.$row['ProduDetalhamento'].'">'.$row['ProduNome'].'</td>
 						 <td>'.$row['UnMedSigla'].'</td>
 						 <td>'.$_POST['quantidade'].'</td>
 						 <td>'.$valorCusto.'</td>
