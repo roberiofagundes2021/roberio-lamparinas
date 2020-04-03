@@ -129,15 +129,21 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 				$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
 
 				/* Verifica se a Bandeja já tem um registro com BandeTabela: FluxoOperacional e BandeTabelaId: IdFluxoAtual, evitando duplicação */
+				$sql = "SELECT COUNT(BandeId) as Count
+						FROM Bandeja
+						Where BandeTabela = 'FluxoOperacional' and BandeTabelaId =  ".$iFluxoOperacional;
+				$result = $conn->query($sql);
+				$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
+				$count = $rowBandeja['Count'];
+
 				$sql = "SELECT BandeId, SituaChave
 						FROM Bandeja
 						JOIN Situacao on SituaId = BandeStatus
 						Where BandeTabela = 'FluxoOperacional' and BandeTabelaId =  ".$iFluxoOperacional;
-				$result = $conn->query("$sql");
+				$result = $conn->query($sql);
 				$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
-				$count = count($rowBandeja);
 
-				if (!$count){
+				if ($count == 0){
 				
 					/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
 					$sIdentificacao = 'Fluxo Operacional (Nº Contrato: '.$rowFluxo['FlOpeNumContrato'].' | Nº Processo: '.$rowFluxo['FlOpeNumProcesso'].')';
@@ -178,20 +184,19 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 					/* Fim Insere Bandeja */
 				
 				} else{
-					if ($rowBandeja['SituaChave'] == 'ATIVO'){
-						$sql = "UPDATE Bandeja SET BandeData = :dData, BandeSolicitante = :iSolicitante, BandeStatus = :iStatus, BandeUsuarioAtualizador = :iUsuarioAtualizador
-								WHERE BandeEmpresa = :iEmpresa and BandeId = :iIdBandeja";
-						$result = $conn->prepare($sql);
-								
-						$result->execute(array(
-										':dData' => date("Y-m-d"),
-										':iSolicitante' => $_SESSION['UsuarId'],
-										':iStatus' => $rowSituacao['SituaId'],
-										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-										':iEmpresa' => $_SESSION['EmpreId'],
-										':iIdBandeja' => $rowBandeja['BandeId']														
-										));
-					}
+
+					$sql = "UPDATE Bandeja SET BandeData = :dData, BandeSolicitante = :iSolicitante, BandeStatus = :iStatus, BandeUsuarioAtualizador = :iUsuarioAtualizador
+							WHERE BandeEmpresa = :iEmpresa and BandeId = :iIdBandeja";
+					$result = $conn->prepare($sql);
+							
+					$result->execute(array(
+									':dData' => date("Y-m-d"),
+									':iSolicitante' => $_SESSION['UsuarId'],
+									':iStatus' => $rowSituacao['SituaId'],
+									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+									':iEmpresa' => $_SESSION['EmpreId'],
+									':iIdBandeja' => $rowBandeja['BandeId']														
+									));
 				}
 			}
 

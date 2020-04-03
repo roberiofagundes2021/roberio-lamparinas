@@ -51,7 +51,8 @@ $rowTotalPendente = $result->fetch(PDO::FETCH_ASSOC);
 $totalPendente = $rowTotalPendente['TotalPendente'];
 
 /* LIBERADAS */
-$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabela, BandeTabelaId, SituaNome
+$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabela, BandeTabelaId, 
+		SituaNome, OrComNumero, OrComTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
@@ -358,7 +359,7 @@ if($totalAcoes){
 		});
 		
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaBandeja(BandeId, BandeTabela, BandeTabelaId, OrComNumero, OrComSituacao, OrComTipo, Tipo){
+		function atualizaBandeja(BandeId, BandeTabela, BandeTabelaId, OrComNumero, OrComTipo, Tipo){
 
 			document.getElementById('inputBandejaId').value = BandeId;
 

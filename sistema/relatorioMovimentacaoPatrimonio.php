@@ -9,7 +9,7 @@ include('global_assets/php/conexao.php');
 $sql = ("SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave, LcEstNome, SetorNome
 		 FROM Movimentacao
 		 LEFT JOIN Fornecedor on ForneId = MovimFornecedor
-		 LEFT JOIN LocalEstoque on LcEstId = MovimOrigem or LcEstId = MovimDestinoLocal
+		 LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal or LcEstId = MovimDestinoLocal
 		 LEFT JOIN Setor on SetorId = MovimDestinoSetor
 		 JOIN Situacao on SituaId = MovimSituacao
 	     WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . "

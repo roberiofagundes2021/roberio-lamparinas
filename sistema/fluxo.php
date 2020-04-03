@@ -200,7 +200,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												FROM Bandeja
 												JOIN Situacao on SituaId = BandeStatus
 												WHERE BandeTabela = 'FluxoOperacional' and BandeTabelaId = ".$item['FlOpeId']." and 
-												BandeEmpresa = ".$_SESSION['EmpreId']." and nd SituaChave = 'NAOLIBERADO'";
+												BandeEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'NAOLIBERADO'";
 										$result = $conn->query($sql);
 										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);										
 										

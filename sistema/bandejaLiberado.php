@@ -10,6 +10,9 @@
 	
 	foreach ($rowLiberado as $item){ 
 
+		$ordemCompraNumero = isset($item['OrComNumero']) ? $item['OrComNumero'] : '';
+		$ordemCompraTipo = isset($item['OrComTipo']) ? $item['OrComTipo'] : '';		
+
 		print('
 		<tr>
 			<td class="text-center">
@@ -35,16 +38,9 @@
 				</a>
 			</td>
 			<td class="text-center">
-				<div class="list-icons" style="display:none;">
-					<div class="list-icons-item dropdown">
-						<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
-						<div class="dropdown-menu dropdown-menu-right">
-							<a href="#" class="dropdown-item"><i class="icon-undo"></i> Quick reply</a>
-							<a href="#" class="dropdown-item"><i class="icon-history"></i> Full history</a>
-							<div class="dropdown-divider"></div>
-							<a href="#" class="dropdown-item"><i class="icon-plus3 text-blue"></i> Unresolve issue</a>
-							<a href="#" class="dropdown-item"><i class="icon-cross2 text-danger"></i> Close issue</a>
-						</div>
+				<div class="list-icons">
+					<div class="list-icons list-icons-extendedt">
+						<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$ordemCompraNumero.'\', \''.$ordemCompraTipo.'\', \'imprimir\');" class="list-icons-item"><i class="icon-printer2"></i> Visualizar</a>
 					</div>
 				</div>
 			</td>

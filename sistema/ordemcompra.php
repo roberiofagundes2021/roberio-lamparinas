@@ -148,7 +148,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					alerta('Atenção','Enquanto o status estiver AGUARDANDO LIBERAÇÃO a impressão não poderá ser realizada!','error');
 					return false;
 				} else if (OrComSituacaoChave == 'PENDENTE'){			
-					alerta('Atenção','Enquanto o status estiver PENDENTE de liberação a impressão não poderá ser realizada!','error');
+					alerta('Atenção','Enquanto o status estiver PENDENTE de preenchimento a impressão não poderá ser realizada!','error');
 					return false;
 				} else if (OrComSituacaoChave == 'NAOLIBERADO'){			
 					alerta('Atenção','A ordem de compra/contrato não foi liberada, portanto, a impressão não poderá ser realizada!','error');
