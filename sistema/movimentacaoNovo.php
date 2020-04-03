@@ -256,9 +256,9 @@ if (isset($_POST['inputData'])) {
 
 							linhaTabela = `<tr id='trModal'>
 						                        <td>${valores[0]}</td>
-												<td><input id='nome' type="text" class="form-control" value="${valores[1]}" disabled></td>
-												<td><input id='quantidade' type="text" class="form-control" value="${valores[3]}"></td>
-												<td><input id='saldo' type="text" class="form-control" value=""></td>
+												<td>${valores[1]}</td>
+												<td><input id='quantidade' type="text" class="form-control" value="0"></td>
+												<td><input id='saldo' type="text" class="form-control" value="" disabled></td>
 											</tr>
 						                  `;
 						} else {
@@ -275,11 +275,11 @@ if (isset($_POST['inputData'])) {
 
 							linhaTabela = `<tr id='trModal'>
 						                                    <td>${valores[0]}</td>
-												            <td><input id='nome' type="text" class="form-control" value="${valores[1]}" disabled></td>
-												            <td><input id='quantidade' type="text" class="form-control" value="${valores[3]}" style="text-align: center"></td>
+												            <td>${valores[1]}</td>
+												            <td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="0" style="text-align: center"></td>
 												            <td><input id='saldo' type="text" class="form-control" value="${valores[4]}" style="text-align: center"  disabled></td>
 								                            <td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
-															<td><input id='validade' type="text" class="form-control" value="" style="text-align: center"></td>
+															<td><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
 														</tr>
 								                        `;
 						}
@@ -287,6 +287,18 @@ if (isset($_POST['inputData'])) {
 						$('#thead-modal').html(cabecalho);
 
 						$('#tbody-modal').html(linhaTabela);
+
+						function validaQuantInputModal(quantMax) {
+							$('#quantidade').on('keyup', function() {
+                                 if(parseInt($('#quantidade').val()) > parseInt(quantMax)){
+									$('#quantidade').val(quantMax)
+									console.log('teste')
+								 }
+								 //console.log($('#quantidade').val() , quantMax)
+							})
+						}
+
+						validaQuantInputModal($('#quantidade').attr('quantMax'))
 					}
 				})
 			})
@@ -303,44 +315,90 @@ if (isset($_POST['inputData'])) {
 				let grid = $('.trGrid')
 				let tdsModal = $('#trModal').children()
 
-				grid.each((i1, elem1) => {
-					let trs = $(elem1).children()
+				grid.each((i1, elem1) => { // each sobre a grid
+					let tr = $(elem1).children() // colocando todas as linhas em um 
 
-					let tr = trs.first()
 					let td = tr.first()
 					let indiceLinha = td.html()
 
 					tdsModal.each((i, elem2) => {
 						let indiceProdutoModal = $(elem2).html()
-						let tipo = $(`#campo${indiceLinha}`).attr('tipo')
+						let inputHiddenProdutoServico = $(`#campo${indiceLinha}`)
+						let tipo = inputHiddenProdutoServico.attr('tipo')
 
 						if (i == 0 && indiceProdutoModal == indiceLinha) {
 
-							let novaQuantidade = $(tdsModal[2]).children().val()
-							$(trs[3]).html(novaQuantidade);
+							let novaQuantidade = $(tdsModal[2]).children().val() // pegando a quantidade digitada pelo usuário
+							let saldo = $(tdsModal[3]).children().val() // pegando o saldo do produto
+							let lote = $(tdsModal[4]).children().val() // pegando o lote digitado pelo usuário
+							let validade = $(tdsModal[5]).children().val() // pegando a validade digitada pelo usuário
 
-							let inputProdutoGridValores = $(`#campo${indiceLinha}`).val()
+							let inputProdutoGridValores = inputHiddenProdutoServico.val()
 							let arrayValInput = inputProdutoGridValores.split('#')
 
-							let novoTotal = recalcValorTotal(novaQuantidade, arrayValInput[1])
-							$(trs[6]).html("R$ " + novoTotal)
+							// adicionando  novos dados no array
+							arrayValInput[3] = novaQuantidade
+							arrayValInput[4] = saldo
+							arrayValInput[5] = lote
+							arrayValInput[6] = validade
 
+							var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
+
+							var stringVallnput = arrayValInput.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
+
+							inputHiddenProdutoServico.val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
+
+
+
+							let quantInicial = inputHiddenProdutoServico.attr('quantInicial')
+							let saldoInicial = inputHiddenProdutoServico.attr('saldoInicial')
+
+							let novosValores = recalcValores(quantInicial, novaQuantidade, saldoInicial, arrayValInput[2])
+							console.log(novosValores.quantAtualizada)
+							$(tr[3]).html(novosValores.quantAtualizada)
+							$(tr[4]).html(novosValores.novoSaldo)
+							$(tr[6]).html("R$ " + novosValores.valorTotal)
+
+
+							$('#inputNumItens').val()
+							stringVallnput = ''
+							console.log(inputHiddenProdutoServico.val())
+
+
+							// O input itemEditadoquantidade recebe como valor a ultima quantidade editata, para garantir que pelo menos uma quantidade de produtos ou serviços foi editada 
+							$('#itemEditadoquantidade').val(novaQuantidade)
 						}
 					})
 
 				})
+				$('#page-modal').fadeOut(200);
+				$('body').css('overflow', 'scroll');
 			})
-			$('#page-modal').fadeOut(200);
-			$('body').css('overflow', 'scroll');
 		}
 
 
 
-		function recalcValorTotal(quant, valorUni) {
-			let valorTotal = quant * valorUni;
+		function recalcValores(quantInicial, novaQuantidade, saldoInicial, valorUni) {
+			console.log(valorUni)
 
-			return float2moeda(valorTotal);
+			let valorTotal = 0
+			let novoSaldo = 0
+			let quantAtualizada = 0
+			quantInicial == novaQuantidade ? novoSaldo = saldoInicial : novoSaldo = saldoInicial - novaQuantidade;
+
+			//let valorTotal = novaQuantidade * valorUni;
+			//let novoSaldo = saldoInicial - novaQuantidade;
+			quantAtualizada = parseInt(novaQuantidade) + parseInt(quantInicial)
+			console.log(novaQuantidade)
+
+			return {
+				quantAtualizada: quantAtualizada,
+				valorTotal: float2moeda(quantAtualizada * valorUni),
+				novoSaldo: novoSaldo
+			};
 		}
+
+
 
 		function inputsModal() {
 			$('#tbody-modal')
@@ -841,6 +899,12 @@ if (isset($_POST['inputData'])) {
 					if (cmbOrdemCompra == '#') {
 						alerta('Atenção', 'Informe a Ordem Compra / Carta Contrato!', 'error');
 						$('#cmbDestinoLocal').focus();
+						return false;
+					}
+
+					// Verifica se pelomento um produto ou serviço foi editado, na entrada.
+					if ($('#itemEditadoquantidade').val() == 0) {
+						alerta('Atenção', 'Informe a quantidade de itens que deseja dar entrada no sistema!', 'error');
 						return false;
 					}
 				} else if (inputTipo == 'S') {
@@ -1457,6 +1521,7 @@ if (isset($_POST['inputData'])) {
 
 							<div id="inputProdutos">
 								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
+								<input type="hidden" id="itemEditadoquantidade" name="itemEditadoquantidade" value="0">
 								<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">
 								<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
 								<input type="hidden" id="inputTotal" name="inputTotal" value="0">
@@ -1470,7 +1535,7 @@ if (isset($_POST['inputData'])) {
 												<th>Item</th>
 												<th>Produto/Serviço</th>
 												<th>Unidade Medida</th>
-												<th>Quantidade</th>
+												<th>Quant. Rec.</th>
 												<th>Valor Unitário</th>
 												<th>Valor Total</th>
 												<th class="text-center">Ações</th>

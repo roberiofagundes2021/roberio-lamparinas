@@ -36,7 +36,7 @@ if ($count) {
                         <th>Item</th>
                         <th>Produto/Serviço</th>
                         <th>Unidade Medida</th>
-                        <th>Quantidade</th>
+                        <th>Quant. Rec.</th>
                         <th>Saldo</th>
                         <th>Valor Unitário</th>
                         <th>Valor Total</th>
@@ -49,23 +49,17 @@ if ($count) {
     foreach ($row as $item) {
 
         if ($item['tipo'] == 'P') {
-            $sql = "SELECT distinct OCXPrQuantidade as QuantOrdemCompra, MvXPrQuantidade as QuantEntradas, (OCXPrQuantidade - MvXPrQuantidade) as Saldo
-                        FROM MovimentacaoXProduto
-                        JOIN Movimentacao on MovimOrdemCompra = MvXPrId
-                        JOIN OrdemCompra on OrComId = MovimOrdemCompra
-                        JOIN OrdemCompraXProduto on OCXPrOrdemCompra = OrComId
-                        WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimTipo = 'E' and MvXPrProduto = " . $item['id'] . " and MovimOrdemCompra = '" . $_POST['ordemCompra'] . "'
-                 ";
+            $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComEmpresa, OrComId, ".$item['id'].", 'P') as Quantidade, dbo.fnSaldoEntrada(OrComEmpresa, OrComId, ".$item['id'].", 'P') as Saldo
+                        FROM OrdemCompra
+                        Where OrComEmpresa = " . $_SESSION['EmpreId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
+                   ";
             $result = $conn->query($sql);
             $saldo = $result->fetch(PDO::FETCH_ASSOC);
         } else {
 
-            $sql = "SELECT distinct OCXSrQuantidade as QuantOrdemCompra, MvXSrQuantidade as QuantEntradas, (OCXSrQuantidade - MvXSrQuantidade) as Saldo
-                         FROM MovimentacaoXServico
-                         JOIN Movimentacao on MovimOrdemCompra = MvXSrId
-                         JOIN OrdemCompra on OrComId = MovimOrdemCompra
-                         JOIN OrdemCompraXServico on OCXSrOrdemCompra = OrComId
-                         WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimTipo = 'E' and MvXSrServico = " . $item['id'] . " and MovimOrdemCompra = '" . $_POST['ordemCompra'] . "'
+            $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComEmpresa, OrComId, ".$item['id'].", 'S') as Quantidade, dbo.fnSaldoEntrada(OrComEmpresa, OrComId, ".$item['id'].", 'S') as Saldo
+                        FROM OrdemCompra
+                        Where OrComEmpresa = " . $_SESSION['EmpreId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
                  ";
             $result = $conn->query($sql);
             $saldo = $result->fetch(PDO::FETCH_ASSOC);
@@ -82,12 +76,12 @@ if ($count) {
 						 <td>' . $numItens . '</td>
 						 <td data-popup="tooltip" data-placement="bottom" title="'.$item['detalhamento'].'">' . $item['nome'] . '</td>
 						 <td>' . $item['UnMedSigla'] . '</td>
-                         <td>' . $item['quantidade'] . '</td>
+                         <td>' . $saldo['Quantidade'] . '</td>
                          <td>' . $saldo['Saldo'] . '</td>
 						 <td>' . $valorCusto . '</td>
                          <td>' . $valorTotal . '</td>
                          <td><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
-                         <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" name="campo' . $numItens . '" value="' . $item['id'] . '#' . $item['valorCusto'] . '">
+                         <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" quantInicial="'.$saldo['Quantidade'].'" saldoInicial="'.$saldo['Saldo'].'"  name="campo' . $numItens . '" value="'.$item['tipo'].'#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>
                     ';
         // $output .= "<input type='hidden' tipo='".$item['tipo']."' id='campo".$numItens."' name='campo".$numItens."' value='".$item['id']."#".$item['valorCusto']."'>";
