@@ -24,7 +24,6 @@ if(isset($_POST['inputProdutoId'])){
 		$outrasDespesas = mostraValor($row['ProduOutrasDespesas']);
 		$custoFinal = mostraValor($row['ProduCustoFinal']);
 		$margemLucro = mostraValor($row['ProduMargemLucro']);
-		$numSerie = $row['ProduNumSerie'];
 		
 		//Primeiro verifica se no banco está nulo
 		if ($row['ProduFoto'] != null){
@@ -74,7 +73,7 @@ if(isset($_POST['inputNome'])){
 								   ProduFoto = :sFoto, ProduCategoria = :iCategoria, ProduSubCategoria = :iSubCategoria, ProduValorCusto = :fValorCusto, 
 								   ProduOutrasDespesas = :fOutrasDespesas, ProduCustoFinal = :fCustoFinal, ProduMargemLucro = :fMargemLucro, 
 								   ProduValorVenda = :fValorVenda, ProduEstoqueMinimo = :iEstoqueMinimo, ProduMarca = :iMarca, ProduModelo = :iModelo, 
-								   ProduNumSerie = :sNumSerie, ProduFabricante = :iFabricante, ProduUnidadeMedida = :iUnidadeMedida, 
+								   ProduFabricante = :iFabricante, ProduUnidadeMedida = :iUnidadeMedida, 
 								   ProduTipoFiscal = :iTipoFiscal, ProduNcmFiscal = :iNcmFiscal, ProduOrigemFiscal = :iOrigemFiscal, 
 								   ProduCest = :iCest, ProduUsuarioAtualizador = :iUsuarioAtualizador ";
 
@@ -101,7 +100,6 @@ if(isset($_POST['inputNome'])){
 						':iEstoqueMinimo' => $_POST['inputEstoqueMinimo'] == '' ? null : $_POST['inputEstoqueMinimo'],
 						':iMarca' => $_POST['cmbMarca'] == '#' ? null : $_POST['cmbMarca'],
 						':iModelo' => $_POST['cmbModelo'] == '#' ? null : $_POST['cmbModelo'],
-						':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
 						':iFabricante' => $_POST['cmbFabricante'] == '#' ? null : $_POST['cmbFabricante'],
 						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
 						':iTipoFiscal' => $_POST['cmbTipoFiscal'] == '#' ? null : $_POST['cmbTipoFiscal'],
@@ -607,7 +605,7 @@ if(isset($_POST['inputNome'])){
 									<h5 class="mb-0 font-weight-semibold">Dados do Fabricante</h5>
 									<br>
 									<div class="row">
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbMarca">Marca</label>
 												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
@@ -631,7 +629,7 @@ if(isset($_POST['inputNome'])){
 											</div>
 										</div>
 							
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbModelo">Modelo</label>
 												<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
@@ -655,7 +653,7 @@ if(isset($_POST['inputNome'])){
 											</div>
 										</div>
 
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbFabricante">Fabricante</label>
 												<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
@@ -678,13 +676,6 @@ if(isset($_POST['inputNome'])){
 												</select>
 											</div>
 										</div>
-								
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputNumSerie">Número de Série</label>
-												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série" value="<?php echo $numSerie; ?>">
-											</div>
-										</div>								
 									</div>
 								</div>
 							</div>

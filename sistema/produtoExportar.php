@@ -8,7 +8,7 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT ProduCodigo, ProduCodigoBarras, ProduNome, CategNome, SbCatNome, ProduDetalhamento,
 		ProduValorCusto, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda,
-		ProduEstoqueMinimo, MarcaNome, ModelNome, ProduNumSerie, FabriNome, UnMedNome, TpFisNome,
+		ProduEstoqueMinimo, MarcaNome, ModelNome, FabriNome, UnMedNome, TpFisNome,
 		NcmNome, OrFisNome, ProduCest, SituaNome
 		FROM Produto
 		LEFT JOIN Categoria on CategId = ProduCategoria
@@ -46,7 +46,6 @@ $dadosXls .= "        <th bgcolor='#cccccc'>ValorVenda</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>EstoqueMinimo</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>Marca</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>Modelo</th>";
-$dadosXls .= "        <th bgcolor='#cccccc'>NumSerie</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>Fabricante</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>UnidadeMedida</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>TipoFiscal</th>";
@@ -73,7 +72,6 @@ foreach($row as $item){
 	$dadosXls .= "      <td>".$item['ProduEstoqueMinimo']."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['MarcaNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['ModelNome'])."</td>";
-	$dadosXls .= "      <td>".$item['ProduNumSerie']."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['FabriNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['UnMedNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['TpFisNome'])."</td>";

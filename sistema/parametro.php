@@ -165,7 +165,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 								<div class="col-lg-6">
 									<!-- Switch group -->
 									<div class="form-group row" id="inputParamValorProduto">
-										<label class="col-form-label col-lg-3">Valor do Produto será atualizado <span class="text-danger">*</span></label>
+										<label class="col-form-label col-lg-3">Valor do Produto/Serviço será atualizado <span class="text-danger">*</span></label>
 										<div class="d-flex flex-column p-2">
 											<div class="form-check form-check-inline">
 												<label class="form-check-label">

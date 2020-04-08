@@ -26,11 +26,11 @@ if(isset($_POST['inputNome'])){
 		
 		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduDetalhamento, ProduFoto, ProduCategoria, ProduSubCategoria, ProduValorCusto, 
 									 ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
-									 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduNumSerie, ProduFabricante, ProduUnidadeMedida, 
+									 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduFabricante, ProduUnidadeMedida, 
 									 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
 									 ProduUsuarioAtualizador, ProduEmpresa) 
 				VALUES (:sCodigo, :sCodigoBarras, :sNome, :sDetalhamento, :sFoto, :iCategoria, :iSubCategoria, :fValorCusto, 
-						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, :sNumSerie, 
+						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, 
 						:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
 						:iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
@@ -51,7 +51,6 @@ if(isset($_POST['inputNome'])){
 						':iEstoqueMinimo' => $_POST['inputEstoqueMinimo'] == '' ? null : $_POST['inputEstoqueMinimo'],
 						':iMarca' => $_POST['cmbMarca'] == '#' ? null : $_POST['cmbMarca'],
 						':iModelo' => $_POST['cmbModelo'] == '#' ? null : $_POST['cmbModelo'],
-						':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
 						':iFabricante' => $_POST['cmbFabricante'] == '#' ? null : $_POST['cmbFabricante'],
 						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
 						':iTipoFiscal' => $_POST['cmbTipoFiscal'] == '#' ? null : $_POST['cmbTipoFiscal'],
@@ -534,7 +533,7 @@ if(isset($_POST['inputNome'])){
 									<h5 class="mb-0 font-weight-semibold">Dados do Fabricante</h5>
 									<br>
 									<div class="row">
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbMarca">Marca</label>
 												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
@@ -557,7 +556,7 @@ if(isset($_POST['inputNome'])){
 											</div>
 										</div>
 										
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbModelo">Modelo</label>
 												<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
@@ -580,7 +579,7 @@ if(isset($_POST['inputNome'])){
 											</div>
 										</div>	
 										
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbFabricante">Fabricante</label>
 												<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
@@ -602,13 +601,6 @@ if(isset($_POST['inputNome'])){
 												</select>
 											</div>
 										</div>
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputNumSerie">Número de Série</label>
-												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série">
-											</div>
-										</div>	
 									</div>
 								</div>
 							</div>

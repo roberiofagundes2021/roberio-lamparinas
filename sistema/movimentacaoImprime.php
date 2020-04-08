@@ -10,17 +10,18 @@ require_once 'global_assets/php/vendor/autoload.php';
 require_once 'global_assets/php/funcoesgerais.php';
 
 if (isset($_POST['inputMovimentacaoId'])) {
-    $sql = "SELECT *, MvXPrProduto, MvXPrQuantidade, MvXPrLote, MvXPrValidade, ClassNome, ProduNome, ProduMarca, ProduModelo, ProduCodigo, ProduUnidadeMedida, ProduModelo, ProduNumSerie, CategNome, UnMedNome, ModelNome, MarcaNome
-	    FROM Movimentacao
-	    JOIN MovimentacaoXProduto on MvXPrMovimentacao = " . $_POST['inputMovimentacaoId'] . "
-	    LEFT JOIN Produto on ProduId = MvXPrProduto
-	    LEFT JOIN Categoria on CategId = ProduCategoria
-	    LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
-	    LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-	    LEFT JOIN Modelo on ModelId = ProduModelo
-	    LEFT JOIN Marca on MarcaId = ProduMarca
-	    WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $_POST['inputMovimentacaoId'] . "
-	    ";
+    $sql = "SELECT *, MvXPrProduto, MvXPrQuantidade, MvXPrLote, MvXPrValidade, ClassNome, ProduNome, ProduMarca, ProduModelo, 
+            ProduCodigo, ProduUnidadeMedida, ProduModelo, CategNome, UnMedNome, ModelNome, MarcaNome
+	        FROM Movimentacao
+	        JOIN MovimentacaoXProduto on MvXPrMovimentacao = " . $_POST['inputMovimentacaoId'] . " 
+	        LEFT JOIN Produto on ProduId = MvXPrProduto
+	        LEFT JOIN Categoria on CategId = ProduCategoria
+	        LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
+	        LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+	        LEFT JOIN Modelo on ModelId = ProduModelo
+	        LEFT JOIN Marca on MarcaId = ProduMarca
+	        WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $_POST['inputMovimentacaoId'] . "
+	       ";
     $result = $conn->query($sql);
     $rowMvPr = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -439,7 +440,7 @@ try {
                                         <p style='font-size: 0.8rem ;margin: 0px; padding: 8px'>Modelo: " . $value['ModelNome'] . "</p>
                                     </div>
                                     <div style='margin: 0px 2px 0px 2px ;float: left; width: 20%; border: 1px solid #c9d0d4'>
-                                        <p style='font-size: 0.8rem ;margin: 0px; padding: 8px'>Série: " . $value['ProduNumSerie'] . "</p>
+                                        <p style='font-size: 0.8rem ;margin: 0px; padding: 8px'>Série: ESSE CAMPO NAO EXISTE MAIS</p>
                                     </div>
                                 </div>
                                 <div style='margin-bottom: 8px ;margin-top: 2px; margin-bottom 4px; max-height: 200px !important'>
@@ -484,7 +485,7 @@ try {
                                         <p style='font-size: 0.8rem ;margin: 0px; padding: 8px'>Modelo: " . $value['ModelNome'] . "</p>
                                     </div>
                                     <div style='margin: 0px 2px 0px 2px ;float: left; width: 20%; border: 1px solid #c9d0d4'>
-                                        <p style='font-size: 0.8rem ;margin: 0px; padding: 8px'>Série: " . $value['ProduNumSerie'] . "</p>
+                                        <p style='font-size: 0.8rem ;margin: 0px; padding: 8px'>Série: ESSE CAMPO NAO EXISTE MAIS</p>
                                     </div>
                                 </div>
                                 <div style='margin-bottom: 8px ;margin-top: 2px; margin-bottom 4px; background-color: #e9e9e9!important'>

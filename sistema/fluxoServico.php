@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Fluxo Operacional Produto';
+$_SESSION['PaginaAtual'] = 'Fluxo Operacional Serviço';
 
 include('global_assets/php/conexao.php');
 
@@ -20,30 +20,30 @@ if(isset($_POST['inputFluxoOperacionalId'])){
 }
 
 $bFechado = 0;
-$countProduto = 0;
+$countServico = 0;
 
-function calculaValorProduto($valorProduto, $outrasDespesas = 0, $margemLucro){
+function calculaValorServico($valorServico, $outrasDespesas = 0, $margemLucro){
    
    $porcentMargemLucro = ($margemLucro / 100);
-   $valorProdutoA = floatval(str_replace(',', '.', str_replace('.', '', $valorProduto)));
+   $valorServicoA = floatval(str_replace(',', '.', str_replace('.', '', $valorServico)));
    
     if($margemLucro != 0.00){
    	    if($outrasDespesas != 0.00){
-            $valorProdutoTotal = $valorProdutoA + $outrasDespesas;
-            $novoValorVenda = $valorProdutoTotal + ($valorProdutoTotal * $porcentMargemLucro);
+            $valorServicoTotal = $valorServicoA + $outrasDespesas;
+            $novoValorVenda = $valorServicoTotal + ($valorServicoTotal * $porcentMargemLucro);
  
             $valores['valorVenda'] = round($novoValorVenda, 2);
-            $valores['valorTotal'] = $valorProdutoTotal;
+            $valores['valorTotal'] = $valorServicoTotal;
         } else {
-   	        //$novoValorVenda = floatval($valorProduto) + (floatval($valorProduto) * $porcentMargemLucro);
-   	        $valorProdutoTotal = $valorProdutoA + $outrasDespesas;
-   	        $novoValorVenda = $valorProdutoTotal + ($valorProdutoTotal * $porcentMargemLucro);
+   	        //$novoValorVenda = floatval($valorServico) + (floatval($valorServico) * $porcentMargemLucro);
+   	        $valorServicoTotal = $valorServicoA + $outrasDespesas;
+   	        $novoValorVenda = $valorServicoTotal + ($valorServicoTotal * $porcentMargemLucro);
    	        $valores['valorVenda'] = round($novoValorVenda, 2);
-   	        $valores['valorTotal'] = $valorProdutoTotal;
+   	        $valores['valorTotal'] = $valorServicoTotal;
         }
    } else {
-   	    $valorProdutoTotal = $valorProdutoA + $outrasDespesas;
-   	    $valores['valorTotal'] = $valorProdutoTotal;
+   	    $valorServicoTotal = $valorServicoA + $outrasDespesas;
+   	    $valores['valorTotal'] = $valorServicoTotal;
    }
    return  $valores;
 }
@@ -63,8 +63,8 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 		$result = $conn->query($sql);
 		$Parametro = $result->fetch(PDO::FETCH_ASSOC);
 
-		$sql = "DELETE FROM FluxoOperacionalXProduto
-				WHERE FOXPrFluxoOperacional = :iFluxoOperacional AND FOXPrEmpresa = :iEmpresa";
+		$sql = "DELETE FROM FluxoOperacionalXServico
+				WHERE FOXSrFluxoOperacional = :iFluxoOperacional AND FOXSrEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
 		
 		$result->execute(array(
@@ -74,14 +74,14 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 		
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 		
-			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario, 
-					FOXPrUsuarioAtualizador, FOXPrEmpresa)
-					VALUES (:iFluxoOperacional, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+			$sql = "INSERT INTO FluxoOperacionalXServico (FOXSrFluxoOperacional, FOXSrServico, FOXSrQuantidade, 
+					FOXSrValorUnitario, FOXSrUsuarioAtualizador, FOXSrEmpresa)
+					VALUES (:iFluxoOperacional, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 			
 			$result->execute(array(
 							':iFluxoOperacional' => $iFluxoOperacional,
-							':iProduto' => $_POST['inputIdProduto'.$i],
+							':iServico' => $_POST['inputIdServico'.$i],
 							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
 							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -95,16 +95,10 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 					FROM Situacao
 					Where SituaChave = 'PENDENTE' ";
 			$result = $conn->query("$sql");
-			$rowPendente = $result->fetch(PDO::FETCH_ASSOC);
+			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
-			$sql = "SELECT SituaId
-					FROM Situacao
-					Where SituaChave = 'NAOLIBERADO' ";
-			$result = $conn->query("$sql");
-			$rowNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);			
-
-			//Atualiza a Situação do Fluxo se estiver fechado o valor total dos produtos com o valor total do Fluxo e a situação estiver PENDENTE ou NAOLIBERADO. Daí deve passar para AGUARDANDOLIBERACAO.
-			if ($valorTotal === $TotalGeral && ($_POST['inputStatus'] == $rowPendente['SituaId'] || $_POST['inputStatus'] == $rowNaoLiberado['SituaId'])){
+			//Atualiza a Situação do Fluxo se estiver fechado o valor total dos serviços com o valor total do Fluxo e a situação estiver PENDENTE. Daí deve passar para ATIVO.
+			if ($valorTotal === $TotalGeral && $_POST['inputStatus'] == $rowSituacao['SituaId']){		
 					
 				/* Atualiza o Status do Fluxo para "Aguardando Liberação" */
 				$sql = "SELECT SituaId
@@ -157,7 +151,8 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 				
 					$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, BandeSolicitante, 
 							BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
-							VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+							VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, 
+							:iStatus, :iUsuarioAtualizador, :iEmpresa)";
 					$result = $conn->prepare($sql);
 							
 					$result->execute(array(
@@ -192,7 +187,8 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 				
 				} else{
 
-					$sql = "UPDATE Bandeja SET BandeData = :dData, BandeSolicitante = :iSolicitante, BandeStatus = :iStatus, BandeUsuarioAtualizador = :iUsuarioAtualizador
+					$sql = "UPDATE Bandeja SET BandeData = :dData, BandeSolicitante = :iSolicitante, BandeStatus = :iStatus, 
+							BandeUsuarioAtualizador = :iUsuarioAtualizador
 							WHERE BandeEmpresa = :iEmpresa and BandeId = :iIdBandeja";
 					$result = $conn->prepare($sql);
 							
@@ -207,25 +203,24 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 				}
 			}
 
-	        //Se o parâmetro de atualizar estiver ativo e o fluxo estiver fechado  	RETIRAR ISSO DAQUIIIIIII. NA BANDEJA QUE ISSO ACONTECE (AO LIBERAR)
+	        //Se o parâmetro de atualizar estiver ativo e o fluxo estiver fechado
 			if($Parametro['ParamValorAtualizadoFluxo'] == 1 && $valorTotal === $TotalGeral){
 
-				// Selecionando dados de produto
+				// Selecionando dados de servico
 				$sql = "SELECT *
-	                    FROM Produto
-	                    WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduId = ".$_POST['inputIdProduto'.$i]."
+	                    FROM Servico
+	                    WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiId = ".$_POST['inputIdServico'.$i]."
 	                   ";
 	            $result = $conn->query($sql);
-		        $Produto = $result->fetch(PDO::FETCH_ASSOC);
+		        $Servico = $result->fetch(PDO::FETCH_ASSOC);
 
-				if($Produto['ProduMargemLucro'] != 0.00 || $Produto['ProduValorVenda'] != 0.00){
+				if($Servico['ServiMargemLucro'] != 0.00 || $Servico['ServiValorVenda'] != 0.00){
 				   	
-				   $valores = calculaValorProduto($_POST['inputValorUnitario'.$i], $Produto['ProduOutrasDespesas'], $Produto['ProduMargemLucro'] );
-	               //var_dump($Produto['ProduNome'], $custoFinal);
+				   $valores = calculaValorServico($_POST['inputValorUnitario'.$i], $Servico['ServiOutrasDespesas'], $Servico['ServiMargemLucro'] );
+	               //var_dump($Servico['ServiNome'], $custoFinal);
 	               
-               	    $sql = "UPDATE Produto SET ProduValorCusto = :pValorUnitario, ProduCustoFinal = :pCustoFinal, ProduValorVenda = :pValorVenda
-                        WHERE ProduId = ".$Produto['ProduId']."
-		               ";
+               	    $sql = "UPDATE Servico SET ServiValorCusto = :pValorUnitario, ServiCustoFinal = :pCustoFinal, ServiValorVenda = :pValorVenda
+                        	WHERE ServiId = ".$Servico['ServiId'];
 		            $result = $conn->prepare($sql);
 				
 		            $result->execute(array(
@@ -236,11 +231,10 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 
 				} else {
 					
-					$valores = calculaValorProduto($_POST['inputValorUnitario'.$i], $Produto['ProduOutrasDespesas'], $Produto['ProduMargemLucro'] );
+					$valores = calculaValorServico($_POST['inputValorUnitario'.$i], $Servico['ServiOutrasDespesas'], $Servico['ServiMargemLucro'] );
 					
-               	    $sql = "UPDATE Produto SET ProduValorCusto = :pValorUnitario, ProduCustoFinal = :pCustoFinal
-                        WHERE ProduId = ".$Produto['ProduId']."
-		               ";
+               	    $sql = "UPDATE Servico SET ServiValorCusto = :pValorUnitario, ServiCustoFinal = :pCustoFinal
+                        	WHERE ServiId = ".$Servico['ServiId'];
 		            $result = $conn->prepare($sql);
 
 		            $result->execute(array(
@@ -280,16 +274,16 @@ try{
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
-	$sql = "SELECT FOXPrProduto
-			FROM FluxoOperacionalXProduto
-			JOIN Produto on ProduId = FOXPrProduto
-			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+	$sql = "SELECT FOXSrServico
+			FROM FluxoOperacionalXServico
+			JOIN Servico on ServiId = FOXSrServico
+			WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
-	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countProdutoUtilizado = count($rowProdutoUtilizado);
+	$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+	$countServicoUtilizado = count($rowServicoUtilizado);
 	
-	foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
-		$aProdutos[] = $itemProdutoUtilizado['FOXPrProduto'];
+	foreach ($rowServicoUtilizado as $itemServicoUtilizado){
+		$aServicos[] = $itemServicoUtilizado['FOXSrServico'];
 	}
 	
 } catch(PDOException $e) {
@@ -304,7 +298,7 @@ try{
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Listando produtos do Fluxo Operacional</title>
+	<title>Lamparinas | Listando serviços do Fluxo Operacional</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -324,48 +318,48 @@ try{
 
         $(document).ready(function() {	
 
-			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
-			$('#cmbProduto').on('change', function(e){
+			//Ao mudar a SubCategoria, filtra o servico via ajax (retorno via JSON)
+			$('#cmbServico').on('change', function(e){
 				
 				var inputCategoria = $('#inputIdCategoria').val();
-				var produtos = $(this).val();
-				//console.log(produtos);
+				var servicos = $(this).val();
+				//console.log(servicos);
 				
 				var cont = 1;
-				var produtoId = [];
-				var produtoQuant = [];
-				var produtoValor = [];
+				var servicoId = [];
+				var servicoQuant = [];
+				var servicoValor = [];
 				
 				// Aqui é para cada "class" faça
-				$.each( $(".idProduto"), function() {			
-					produtoId[cont] = $(this).val();
+				$.each( $(".idServico"), function() {			
+					servicoId[cont] = $(this).val();
 					cont++;
 				});
 				
 				cont = 1;
 				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
 				$.each( $(".Quantidade"), function() {
-					$id = produtoId[cont];
+					$id = servicoId[cont];
 					
-					produtoQuant[$id] = $(this).val();
+					servicoQuant[$id] = $(this).val();
 					cont++;
 				});				
 				
 				cont = 1;
 				$.each( $(".ValorUnitario"), function() {
-					$id = produtoId[cont];
+					$id = servicoId[cont];
 					
-					produtoValor[$id] = $(this).val();
+					servicoValor[$id] = $(this).val();
 					cont++;
 				});
 				
 				$.ajax({
 					type: "POST",
-					url: "fluxoFiltraProduto.php",
-					data: {idCategoria: inputCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
+					url: "fluxoFiltraServico.php",
+					data: {idCategoria: inputCategoria, servicos: servicos, servicoId: servicoId, servicoQuant: servicoQuant, servicoValor: servicoValor},
 					success: function(resposta){
 						//alert(resposta);
-						$("#tabelaProdutos").html(resposta).show();
+						$("#tabelaServicos").html(resposta).show();
 						
 						return false;
 						
@@ -387,19 +381,19 @@ try{
 					return false;
 				}
 				
-				$( "#formFluxoOperacionalProduto" ).submit();
+				$( "#formFluxoOperacionalServico" ).submit();
 				
 			}); // enviar			
 						
 		}); //document.ready
 		
-		//Mostra o "Filtrando..." na combo Produto
-		function FiltraProduto(){
-			$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+		//Mostra o "Filtrando..." na combo Servico
+		function FiltraServico(){
+			$('#cmbServico').empty().append('<option>Filtrando...</option>');
 		}
 		
-		function ResetProduto(){
-			$('#cmbProduto').empty().append('<option>Sem produto</option>');
+		function ResetServico(){
+			$('#cmbServico').empty().append('<option>Sem servico</option>');
 		}	
 		
 		function calculaValorTotal(id){
@@ -444,9 +438,9 @@ try{
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formFluxoOperacionalProduto" id="formFluxoOperacionalProduto" method="post" class="form-validate">
+					<form name="formFluxoOperacionalServico" id="formFluxoOperacionalServico" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Listar Produtos - Fluxo Operacional Nº Contrato "<?php echo $row['FlOpeNumContrato']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Listar Servicos - Fluxo Operacional Nº Contrato "<?php echo $row['FlOpeNumContrato']; ?>"</h5>
 						</div>					
 						
 						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional" class="form-control" value="<?php echo $row['FlOpeId']; ?>">
@@ -515,28 +509,28 @@ try{
 									<div class="row">	
 										<div class="col-lg-12">
 											<div class="form-group">
-												<label for="cmbProduto">Produto</label>
-												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc <?php if ($countProdutoUtilizado and $_SESSION['PerfiChave'] != 'SUPER' and $_SESSION['PerfiChave'] != 'ADMINISTRADOR' and $_SESSION['PerfiChave'] != 'CONTROLADORIA' and $_SESSION['PerfiChave'] != 'CENTROADMINISTRATIVO') { echo "disabled";} ?> >
+												<label for="cmbServico">Servico</label>
+												<select id="cmbServico" name="cmbServico" class="form-control multiselect-filtering" multiple="multiple" data-fouc <?php if ($countServicoUtilizado and $_SESSION['PerfiChave'] != 'SUPER' and $_SESSION['PerfiChave'] != 'ADMINISTRADOR' and $_SESSION['PerfiChave'] != 'CONTROLADORIA' and $_SESSION['PerfiChave'] != 'CENTROADMINISTRATIVO') { echo "disabled";} ?> >
 													<?php 
-														$sql = "SELECT ProduId, ProduNome
-																FROM Produto										     
-																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria;
+														$sql = "SELECT ServiId, ServiNome
+																FROM Servico										     
+																WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and ServiStatus = 1 and ServiCategoria = ".$iCategoria;
 														if ($iSubCategoria){
-															$sql .= " and ProduSubCategoria = ".$iSubCategoria;
+															$sql .= " and ServiSubCategoria = ".$iSubCategoria;
 														}
-														$sql .=	" ORDER BY ProduNome ASC";
+														$sql .=	" ORDER BY ServiNome ASC";
 														$result = $conn->query($sql);
-														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
+														$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);														
 														
-														foreach ($rowProduto as $item){	
+														foreach ($rowServico as $item){	
 															
-															if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
+															if (in_array($item['ServiId'], $aServicos) or $countServicoUtilizado == 0) {
 																$seleciona = "selected";
 															} else {
 																$seleciona = "";
 															}													
 															
-															print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
+															print('<option value="'.$item['ServiId'].'" '.$seleciona.'>'.$item['ServiNome'].'</option>');
 														}
 													
 													?>
@@ -550,7 +544,7 @@ try{
 							<!-- Custom header text -->
 							<div class="card">
 								<div class="card-header header-elements-inline">
-									<h5 class="card-title">Relação de Produtos</h5>
+									<h5 class="card-title">Relação de Servicos</h5>
 									<div class="header-elements">
 										<div class="list-icons">
 											<a class="list-icons-item" data-action="collapse"></a>
@@ -561,7 +555,7 @@ try{
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os produtos selecionados acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
+									<p class="mb-3">Abaixo estão listados todos os servicos selecionados acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<!--<div class="hot-container">
 										<div id="example"></div>
@@ -569,48 +563,41 @@ try{
 									
 									<?php									
 
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
-												FROM Produto
-												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												LEFT JOIN Marca on MarcaId = ProduMarca
-												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
+												FROM Servico
+												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+												LEFT JOIN Marca on MarcaId = ServiMarca
+												WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
 										$result = $conn->query($sql);
-										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-										$count = count($rowProdutos);
+										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+										$count = count($rowServicos);
 										
 										if (!$count){
-											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
-													FROM Produto
-													LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and ProduSubCategoria = ".$iSubCategoria." and ProduStatus = 1 ";
+											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
+													FROM Servico
+													WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiCategoria = ".$iCategoria." and ServiSubCategoria = ".$iSubCategoria." and ServiStatus = 1 ";
 											$result = $conn->query($sql);
-											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-											$countProduto = count($rowProdutos);
+											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+											$countServico = count($rowServicos);
 										} 
 										
 										$cont = 0;
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-8">
+											<div class="col-lg-9">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
 														</div>
 														<div class="col-lg-8">
-															<label for="inputProduto"><strong>Produto</strong></label>
+															<label for="inputServico"><strong>Servico</strong></label>
 														</div>
 														<div class="col-lg-3">
 															<label for="inputMarca"><strong>Marca</strong></label>
 														</div>
 													</div>
 												</div>												
-											<div class="col-lg-1">
-												<div class="form-group">
-													<label for="inputUnidade"><strong>Unidade</strong></label>
-												</div>
-											</div>
 											<div class="col-lg-1">
 												<div class="form-group">
 													<label for="inputQuantidade"><strong>Quantidade</strong></label>
@@ -628,19 +615,19 @@ try{
 											</div>											
 										</div>');
 										
-										print('<div id="tabelaProdutos">');
+										print('<div id="tabelaServicos">');
 										
 										$fTotalGeral = 0;
 										
-										foreach ($rowProdutos as $item){
+										foreach ($rowServicos as $item){
 											
 											$cont++;
 											
-											$iQuantidade = isset($item['FOXPrQuantidade']) ? $item['FOXPrQuantidade'] : '';
-											$fValorUnitario = isset($item['FOXPrValorUnitario']) ? mostraValor($item['FOXPrValorUnitario']) : '';											
-											$fValorTotal = (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? mostraValor($item['FOXPrQuantidade'] * $item['FOXPrValorUnitario']) : '';
+											$iQuantidade = isset($item['FOXSrQuantidade']) ? $item['FOXSrQuantidade'] : '';
+											$fValorUnitario = isset($item['FOXSrValorUnitario']) ? mostraValor($item['FOXSrValorUnitario']) : '';											
+											$fValorTotal = (isset($item['FOXSrQuantidade']) and isset($item['FOXSrValorUnitario'])) ? mostraValor($item['FOXSrQuantidade'] * $item['FOXSrValorUnitario']) : '';
 											
-											$fTotalGeral += (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? $item['FOXPrQuantidade'] * $item['FOXPrValorUnitario'] : 0;
+											$fTotalGeral += (isset($item['FOXSrQuantidade']) and isset($item['FOXSrValorUnitario'])) ? $item['FOXSrQuantidade'] * $item['FOXSrValorUnitario'] : 0;
 
 											if ($fTotalGeral == $row['FlOpeValor']){
 												$bFechado = 1;
@@ -650,22 +637,19 @@ try{
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
+												<div class="col-lg-9">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
+															<input type="hidden" id="inputIdServico'.$cont.'" name="inputIdServico'.$cont.'" value="'.$item['ServiId'].'" class="idServico">
 														</div>
 														<div class="col-lg-8">
-															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+															<input type="text" id="inputServico'.$cont.'" name="inputServico'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ServiDetalhamento'].'" value="'.$item['ServiNome'].'" readOnly>
 														</div>
 														<div class="col-lg-3">
 															<input type="text" id="inputMarca'.$cont.'" name="inputMarca'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['MarcaNome'].'" value="'.$item['MarcaNome'].'" readOnly>
 														</div>
 													</div>
-												</div>								
-												<div class="col-lg-1">
-													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
 													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
@@ -682,7 +666,7 @@ try{
 										
 										print('
 										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
+												<div class="col-lg-9">
 													<div class="row">
 														<div class="col-lg-1">
 															
@@ -694,9 +678,6 @@ try{
 															
 														</div>
 													</div>
-												</div>								
-												<div class="col-lg-1">
-													
 												</div>
 												<div class="col-lg-1">
 													
@@ -729,7 +710,7 @@ try{
 											if ($bFechado){												
 												print('<button class="btn btn-lg btn-success" id="enviar" disabled>Alterar</button>');
 											} else{ 
-												if (!$countProduto){
+												if (!$countServico){
 													print('<button class="btn btn-lg btn-success" id="enviar" disabled>Alterar</button>');
 												} else {
 													print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
@@ -745,8 +726,8 @@ try{
 								<?php	
 									if ($bFechado){
 										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído ('.$row['SituaNome'].')');
-									} else if (!$countProduto){
-										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Não há produtos cadastrados para a Categoria e SubCategoria informada');
+									} else if (!$countServico){
+										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Não há servicos cadastrados para a Categoria e SubCategoria informada');
 									}
 								?>
 								</div>	
