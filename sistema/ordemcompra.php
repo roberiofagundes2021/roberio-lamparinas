@@ -48,6 +48,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 		$(document).ready(function() {
 			
+			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
+			
 			/* Início: Tabela Personalizada */
 			$('#tblOrdemCompra').DataTable( {
 				"order": [[ 0, "desc" ]],

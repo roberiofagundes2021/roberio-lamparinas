@@ -26,6 +26,10 @@ $output = '';
 $totalGeral = 0;
 
 
+$sql = " SELECT dbo.fnValorTotalOrdemCompra(" . $_SESSION['EmpreId'] . ",  " . $_POST['ordemCompra'] . ") as valorTotalOrdemCompra";
+$result = $conn->query($sql);
+$totalOrdemCompra = $result->fetch(PDO::FETCH_ASSOC);
+
 if ($count) {
     $numItens = 0;
 
@@ -33,23 +37,23 @@ if ($count) {
 
     $output .= '<thead>
                     <tr class="bg-slate">
-                        <th>Item</th>
+                        <th  style="text-align: center">Item</th>
                         <th>Produto/Serviço</th>
-                        <th>Unidade Medida</th>
-                        <th>Quant. Rec.</th>
-                        <th>Saldo</th>
-                        <th>Valor Unitário</th>
-                        <th>Valor Total</th>
-                        <th>Ações</th>
+                        <th  style="text-align: center">Unidade Medida</th>
+                        <th  style="text-align: center">Quant. Recebida</th>
+                        <th  style="text-align: center">Saldo</th>
+                        <th  style="text-align: center">Valor Unitário</th>
+                        <th  style="text-align: center">Valor Total</th>
+                        <th  style="text-align: center">Ações</th>
                     </tr>
                 </thead>
         ';
     $output .= '<tbody>';
 
-    foreach ($row as $item) {
+    foreach (array_reverse($row) as $item) {
 
         if ($item['tipo'] == 'P') {
-            $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComEmpresa, OrComId, ".$item['id'].", 'P') as Quantidade, dbo.fnSaldoEntrada(OrComEmpresa, OrComId, ".$item['id'].", 'P') as Saldo
+            $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'P') as Quantidade, dbo.fnSaldoEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'P') as Saldo
                         FROM OrdemCompra
                         Where OrComEmpresa = " . $_SESSION['EmpreId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
                    ";
@@ -57,7 +61,7 @@ if ($count) {
             $saldo = $result->fetch(PDO::FETCH_ASSOC);
         } else {
 
-            $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComEmpresa, OrComId, ".$item['id'].", 'S') as Quantidade, dbo.fnSaldoEntrada(OrComEmpresa, OrComId, ".$item['id'].", 'S') as Saldo
+            $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'S') as Quantidade, dbo.fnSaldoEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'S') as Saldo
                         FROM OrdemCompra
                         Where OrComEmpresa = " . $_SESSION['EmpreId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
                  ";
@@ -71,17 +75,17 @@ if ($count) {
         $valorTotal = formataMoeda($item['quantidade'] * $item['valorCusto']);
 
         $totalGeral += $item['quantidade'] * $item['valorCusto'];
-       // var_dump($saldo);
+        // var_dump($saldo);
         $output .=  '<tr class="trGrid" id="row' . $numItens . '">
-						 <td>' . $numItens . '</td>
-						 <td data-popup="tooltip" data-placement="bottom" title="'.$item['detalhamento'].'">' . $item['nome'] . '</td>
-						 <td>' . $item['UnMedSigla'] . '</td>
-                         <td>' . $saldo['Quantidade'] . '</td>
-                         <td>' . $saldo['Saldo'] . '</td>
-						 <td>' . $valorCusto . '</td>
-                         <td>' . $valorTotal . '</td>
-                         <td><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
-                         <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" quantInicial="'.$saldo['Quantidade'].'" saldoInicial="'.$saldo['Saldo'].'"  name="campo' . $numItens . '" value="'.$item['tipo'].'#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
+						 <td style="text-align: center">' . $numItens . '</td>
+						 <td data-popup="tooltip" data-placement="bottom" title="' . $item['detalhamento'] . '">' . $item['nome'] . '</td>
+						 <td style="text-align: center">' . $item['UnMedSigla'] . '</td>
+                         <td style="text-align: center"></td>
+                         <td style="text-align: center">' . $saldo['Saldo'] . '</td>
+						 <td style="text-align: right">' . $valorCusto . '</td>
+                         <td class="valorTotal" style="text-align: right">R$ 0, 00</td>
+                         <td  style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
+                         <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" idLinha="row' . $numItens . '" quantInicial="' . $saldo['Quantidade'] . '" saldoInicial="' . $saldo['Saldo'] . '"  name="campo' . $numItens . '" value="' . $item['tipo'] . '#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>
                     ';
         // $output .= "<input type='hidden' tipo='".$item['tipo']."' id='campo".$numItens."' name='campo".$numItens."' value='".$item['id']."#".$item['valorCusto']."'>";
@@ -94,9 +98,17 @@ if ($count) {
     $output .= '
             <tfoot>
                 <tr>
-                    <th colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total:</th>
+                    <th colspan="6" style="text-align:right; font-size: 16px; font-weight:bold;">
+                         <div>Total (R$) Nota Fiscal:</div>
+                         <div>Saldo (R$) Ordem de Compra/Carta Contrato:</div>
+                    </th>
                     <th colspan="2">
-                        <div id="total" style="text-align:left; font-size: 15px; font-weight:bold;">' . $totalGeral . '</div>
+                        <div>
+                            <div id="total" valorTotalGeral="" style="text-align:left; font-size: 15px; font-weight:bold;">R$ 0, 00</div>
+                        </div>
+                        <div>
+                            <div id="totalSaldo" style="text-align:left; font-size: 15px; font-weight:bold;">' . formataMoeda($totalOrdemCompra['valorTotalOrdemCompra']) . '</div>
+                         </div>
                     </th>
                 </tr>
             </tfoot>

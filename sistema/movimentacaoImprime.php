@@ -10,6 +10,7 @@ require_once 'global_assets/php/vendor/autoload.php';
 require_once 'global_assets/php/funcoesgerais.php';
 
 if (isset($_POST['inputMovimentacaoId'])) {
+
     $sql = "SELECT *, MvXPrProduto, MvXPrQuantidade, MvXPrLote, MvXPrValidade, ClassNome, ProduNome, ProduMarca, ProduModelo, 
             ProduCodigo, ProduUnidadeMedida, ProduModelo, CategNome, UnMedNome, ModelNome, MarcaNome
 	        FROM Movimentacao
@@ -22,30 +23,34 @@ if (isset($_POST['inputMovimentacaoId'])) {
 	        LEFT JOIN Marca on MarcaId = ProduMarca
 	        WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $_POST['inputMovimentacaoId'] . "
 	       ";
+
     $result = $conn->query($sql);
     $rowMvPr = $result->fetchAll(PDO::FETCH_ASSOC);
 
-    $sql = "SELECT MovimData, MovimTipo, MovimFinalidade, MovimOrigemLocal, MovimObservacao, FinalNome, MovimDestinoLocal, MovimDestinoSetor,     MovimDestinoManual, MovimMotivo, LcEstNome, ParamValorObsImpreRetirada
-	    FROM Movimentacao
-	    JOIN Finalidade on FinalId = MovimFinalidade
-	    JOIN LocalEstoque on LcEstId = MovimOrigemLocal
-	    JOIN Parametro on ParamEmpresa = MovimEmpresa
-	    WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $_POST['inputMovimentacaoId'] . "
-	    ";
+    $sql = "SELECT MovimData, MovimTipo, MovimFinalidade, MovimOrigemLocal, MovimObservacao, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, MovimMotivo, MotivChave, LcEstNome, ParamValorObsImpreRetirada
+			FROM Movimentacao
+			JOIN LocalEstoque on LcEstId = MovimOrigemLocal
+			JOIN Parametro on ParamEmpresa = MovimEmpresa
+			JOIN Motivo on MotivId = MovimMotivo
+			WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $_POST['inputMovimentacaoId'] . "
+	       ";
     $result = $conn->query($sql);
     $rowMv = $result->fetch(PDO::FETCH_ASSOC);
 }
 
 try {
-    $mpdf = new Mpdf([
-        'mode' => 'utf-8',
-        //'format' => [190, 236], 
-        //'format' => 'A4-L',
-        'default_font_size' => 10,
-        'default_font' => 'dejavusans',
-        //'orientation' => 'P', //P =>Portrait, L=> Landscape
-        'margin_top' => 8 // se quiser dar margin no header, aí seria 'margin_header'
-    ]);
+	$mpdf = new mPDF([
+	             'mode' => 'utf-8',    // mode - default ''
+	             'format' => 'A4-P',    // format - A4, for example, default ''
+	             'default_font_size' => 9,     // font size - default 0
+	             'default_font' => '',    // default font family
+	             'margin-left' => 15,    // margin_left
+	             'margin-right' => 15,    // margin right
+	             'margin-top' => 158,     // margin top    -- aumentei aqui para que não ficasse em cima do header
+	             'margin-bottom' => 60,    // margin bottom
+	             'margin-header' => 6,     // margin header
+	             'margin-bottom' => 0,     // margin footer
+	             'orientation' => 'P']);  // L - landscape, P - portrait	
 
     // Evita erro ao recarregar pagina do relatório
     if (!isset($rowMv)) {
@@ -64,9 +69,9 @@ try {
 
             $html = "";
 
-            $html .= "<div style='height: 940px ;position: relative ;border: 1px solid rgb(149, 150, 148); box-sizing: border-box; padding: 20px'>";
+            $html .= "<div style='height: 940px ;position: relative; border: 1px solid rgb(149, 150, 148); box-sizing: border-box; padding: 20px'>";
 
-            $topo = "
+            $html .= "
                     <div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
                        <div style='float:left; width: 400px; display: inline-block; margin-bottom: 10px;'>
                            <img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
@@ -79,90 +84,44 @@ try {
                     </div>
             ";
 
-            $html .= $topo;
+			$sql = "SELECT MovimDestinoLocal, MovimDestinoManual, LcEstNome
+					FROM Movimentacao
+					JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+					WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $_POST['inputMovimentacaoId'];
+			$result = $conn->query($sql);
+			$row = $result->fetch(PDO::FETCH_ASSOC);
+			
+			if ($rowMv['MotivChave'] == 'CONSIGNACAO' || $rowMv['MotivChave'] == 'DESCARTE' || $rowMv['MotivChave'] == 'DOACAO' || $rowMv['MotivChave'] == 'DEVOLUCAO') {
+				$Origem = $row['MovimDestinoManual'];
+			} else{
+				$Origem = $row['LcEstNome'];
+			}
 
-            if (
-                $rowMv['MovimMotivo'] != 'consignação' ||
-                $rowMv['MovimMotivo'] != 'descarte' ||
-                $rowMv['MovimMotivo'] != 'doação' ||
-                $rowMv['MovimMotivo'] != 'devolução'
-            ) {
-
-                $sql = "SELECT MovimDestinoLocal, LcEstNome
-                        FROM Movimentacao
-                        JOIN LocalEstoque on LcEstId = MovimDestinoLocal
-                        WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $_POST['inputMovimentacaoId'] . "
-                ";
-                $result = $conn->query($sql);
-                $row = $result->fetch(PDO::FETCH_ASSOC);
-
-                $html .= '<br>
-                    <div style="display: flex; flex-direction: column ;width: 100%; height 20px">
-                       <div style="">
-                            <div style="margin-right: 12px ;float: left ;width: 18.1%; border: 1px solid #c9d0d4">
-                                <p style="font-size: 0.8rem; margin: 0px; padding: 8px">Data: ' . mostraData($rowMv['MovimData']) . '</p>
-                            </div>
-                            <div style="margin: 0px 2px 0px 2px ;float: left; width: 13.5%; border: 1px solid #c9d0d4; background-color: #d8d8d8">
-                                <p style="font-size: 0.8rem; text-align: center ;margin: 0px; padding: 8px">Nº 0001/19</p>
-                            </div>
-                            <div style="float: right; width: 66.8%; border: 1px solid #c9d0d4">
-                                <p style="font-size: 0.8rem; margin: 0px; padding: 8px">Finalidade: ' . $rowMv['FinalNome'] . '</p>
-                            </div>
-                       </div>
-                       <div style="margin-top: 3px ;">
-                            <div style="margin-right: 12px ;float: left ;width: 49.5%; border: 1px solid #c9d0d4">
-                                <p style="font-size: 0.8rem; margin: 0px; padding: 8px">Estoque de Origem: ' . $rowMv['LcEstNome'] . '</p>
-                            </div>
-                            <div style="margin: 0px 2px 0px 2px ;float: left; width: 49.5%; border: 1px solid #c9d0d4">
-                                <p style="font-size: 0.8rem ;margin: 0px; padding: 8px">Estoque de Destino(setor): ' . $row['LcEstNome'] . '</p>
-                            </div>
-                       </div>
-                       <div style="margin-top: 7px ;">
-                            <div style="margin-right: 12px ;float: left ;width: 100%; border: 1px solid #c9d0d4; background-color: #d8d8d8">
-                                <p style="font-size: 0.8rem; margin: 0px; padding: 8px; text-align: center">Identificação dos Bens</p>
-                            </div>
-                       </div>
-                    </div>
-                  <br>';
-            } else {
-
-                $sql = "SELECT MovimDestinoManual, LcEstNome
-                        FROM Movimentacao
-                        JOIN LocalEstoque on LcEstId = MovimDestinoManual
-                        WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $_POST['inputMovimentacaoId'] . "
-                ";
-                $result = $conn->query($sql);
-                $row2 = $result->fetch(PDO::FETCH_ASSOC);
-
-                $html .= '<br>
-                    <div style="display: flex; flex-direction: column ;width: 100%; height 20px">
-                       <div style="">
-                            <div style="margin-right: 12px ;float: left ;width: 18.1%; border: 1px solid #c9d0d4">
-                                <p style="font-size: 0.8rem; margin: 0px; padding: 8px">Data: ' . mostraData($rowMv['MovimData']) . '</p>
-                            </div>
-                            <div style="margin: 0px 2px 0px 2px ;float: left; width: 13.5%; border: 1px solid #c9d0d4; background-color: #d8d8d8">
-                                <p style="font-size: 0.8rem; text-align: center ;margin: 0px; padding: 8px">Nº 0001/19</p>
-                            </div>
-                            <div style="float: right; width: 66.8%; border: 1px solid #333">
-                                <p style="font-size: 0.8rem; margin: 0px; padding: 8px">Motivo: ' . $rowMv['FinalNome'] . '</p>
-                            </div>
-                       </div>
-                       <div style="margin-top: 3px ;">
-                            <div style="margin-right: 12px ;float: left ;width: 49.5%; border: 1px solid #c9d0d4">
-                                <p style="font-size: 0.8rem; margin: 0px; padding: 8px">Estoque de Origem: ' . $rowMv['LcEstNome'] . '</p>
-                            </div>
-                            <div style="margin: 0px 2px 0px 2px ;float: left; width: 49.5%; border: 1px solid #c9d0d4">
-                                <p style="font-size: 0.8rem ;margin: 0px; padding: 8px">Estoque de Destino(setor): ' . $row['LcEstNome'] . '</p>
-                            </div>
-                       </div>
-                       <div style="margin-top: 7px ;">
-                            <div style="margin-right: 12px ;float: left ;width: 100%; border: 1px solid #c9d0d4; background-color: #d8d8d8">
-                                <p style="font-size: 0.8rem; margin: 0px; padding: 8px; text-align: center">Identificação dos Bens</p>
-                            </div>
-                       </div>
-                    </div>
-                  <br>';
-            }
+			$html .= '<br>
+					<div style="display: flex; flex-direction: column ;width: 100%; height 20px">
+					   <div style="">
+							<div style="margin-right: 12px ;float: left ;width: 18.1%; border: 1px solid #c9d0d4">
+								<p style="font-size: 0.8rem; margin: 0px; padding: 8px">Data: ' . mostraData($rowMv['MovimData']) . '</p>
+							</div>
+							<div style="margin: 0px 2px 0px 2px ;float: left; width: 13.5%; border: 1px solid #c9d0d4; background-color: #d8d8d8">
+								<p style="font-size: 0.8rem; text-align: center ;margin: 0px; padding: 8px">Nº 0001/19</p>
+							</div>
+					   </div>
+					   <div style="margin-top: 3px ;">
+							<div style="margin-right: 12px ;float: left ;width: 49.5%; border: 1px solid #c9d0d4">
+								<p style="font-size: 0.8rem; margin: 0px; padding: 8px">Estoque de Origem: ' . $Origem . '</p>
+							</div>
+							<div style="margin: 0px 2px 0px 2px ;float: left; width: 49.5%; border: 1px solid #c9d0d4">
+								<p style="font-size: 0.8rem ;margin: 0px; padding: 8px">Estoque de Destino(setor): ' . $row['LcEstNome'] . '</p>
+							</div>
+					   </div>
+					   <div style="margin-top: 7px ;">
+							<div style="margin-right: 12px ;float: left ;width: 100%; border: 1px solid #c9d0d4; background-color: #d8d8d8">
+								<p style="font-size: 0.8rem; margin: 0px; padding: 8px; text-align: center">Identificação dos Bens</p>
+							</div>
+					   </div>
+					</div>
+				  <br>';
 
             $html .= '
     
@@ -277,7 +236,13 @@ try {
 
             $html .= "</div>";
 
-
+			$rodape = "
+			<div style='width:100%'>
+				<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
+				<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
+			</div>";			
+			
+/*
             $html .= "
                     <div style='width:100%;'>
                         <hr/>
@@ -286,14 +251,14 @@ try {
                            <div style='width:105px; float:right; display: inline;'>Página " . $cont . " / " . ceil($numPaginas) . "</div> 
                         </div>
                     </div>
-                     ";
+                     "; */
 
             //$mpdf->SetHTMLHeader($topo);
             //$stylesheet = file_get_contents('global_assets/css/lamparinas/bootstrap-3.3.7/dist/css/bootstrap.min.css');
             $stylesheet = file_get_contents('global_assets/css/lamparinas/impressao.css');         
             $mpdf->WriteHTML($stylesheet, 1); // CSS Script goes here.
-            $mpdf->WriteHTML($html, 2);
-            //$mpdf->SetHTMLFooter($rodape);
+			$mpdf->SetHTMLFooter($rodape);
+            $mpdf->WriteHTML($html, 2);            
             // $mpdf->SetHTMLHeader($topo,'O',true);	
 
             // Other code
@@ -316,7 +281,7 @@ try {
 
             $html .= "<div style='height: 950px; border: 1px solid rgb(149, 150, 148); box-sizing: border-box; padding: 20px'>";
 
-            $topo = "
+            $html .= "
 	            <div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
 		           <div style='float:left; width: 400px; display: inline-block; margin-bottom: 10px;'>
 			           <img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
@@ -327,9 +292,7 @@ try {
 			            <div style='margin-top:8px; font-weight:bold;'>Recibo de Retirada - Requisição de Material</div>
 		            </div> 
 	            </div>
-	    ";
-
-            $html .= $topo;
+			";
 
             if (
                 $rowMv['MovimMotivo'] != 'consignação' ||
@@ -354,9 +317,6 @@ try {
                         </div>
                         <div style="margin: 0px 2px 0px 2px ;float: left; width: 13.5%; border: 1px solid #c9d0d4; background-color: #d8d8d8">
                             <p style="font-size: 0.8rem; text-align: center ;margin: 0px; padding: 8px">Nº 0001/19</p>
-                        </div>
-                        <div style="float: right; width: 66.8%; border: 1px solid #c9d0d4">
-                            <p style="font-size: 0.8rem; margin: 0px; padding: 8px">Tipo de Transferência: ' . $rowMv['FinalNome'] . '</p>
                         </div>
 	               </div>
 	               <div style="margin-top: 3px ;">
@@ -392,9 +352,6 @@ try {
                         </div>
                         <div style="margin: 0px 2px 0px 2px ;float: left; width: 13.5%; border: 1px solid #c9d0d4; background-color: #e9e9e9">
                             <p style="font-size: 0.8rem; text-align: center ;margin: 0px; padding: 8px">Nº 0001/19</p>
-                        </div>
-                        <div style="float: right; width: 66.8%; border: 1px solid #c9d0d4">
-                            <p style="font-size: 0.8rem; margin: 0px; padding: 8px">Tipo de Transferência: ' . $rowMv['FinalNome'] . '</p>
                         </div>
 	               </div>
 	               <div style="margin-top: 3px ;">
@@ -557,6 +514,12 @@ try {
             $html .= "</div>";
 
 
+			$rodape = "<hr/>
+			<div style='width:100%'>
+				<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
+				<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
+			</div>";			
+			/*
             $html .= "
                     <div style='width:100%;'>
                         <hr/>
@@ -565,11 +528,12 @@ try {
                            <div style='width:105px; float:right; display: inline;'>Página " . $cont . " / " . ceil($numPaginas) . "</div> 
                         </div>
                     </div>
-                     ";
+                     "; */
 
             //$mpdf->SetHTMLHeader($topo);
+			$mpdf->SetHTMLFooter($rodape);
             $mpdf->WriteHTML($html);
-            //$mpdf->SetHTMLFooter($rodape);
+            
             // $mpdf->SetHTMLHeader($topo,'O',true);	
 
             // Other code
@@ -581,5 +545,10 @@ try {
 } catch (\Mpdf\MpdfException $e) { // Note: safer fully qualified exception name used for catch
 
     // Process the exception, log, print etc.
-    echo $e->getMessage();
+    $html = $e->getMessage();
+	
+    $mpdf->WriteHTML($html);
+    
+    // Other code
+    $mpdf->Output();	
 }

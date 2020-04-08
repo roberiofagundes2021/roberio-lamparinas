@@ -71,6 +71,7 @@ try {
 	<div style='text-align:center; margin-top: 20px;'><h1>ORDEM DE COMPRA</h1></div>	 
 	";
 	
+	
 	foreach ($row as $item){	
 		
 		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario
@@ -91,7 +92,7 @@ try {
 		$result = $conn->query($sql);
 		$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 		$totalServicos = count($rowServicos);
-
+		
 		$html .= '
 		<div style="font-weight: bold; position:relative; margin-top: 10px; background-color:#ccc; padding: 5px;">
 			Fornecedor: <span style="font-weight:normal;">'.$item['ForneNome'].'</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">'.$item['ForneCelular'].'</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">'.$item['ForneEmail'].'</span>
@@ -102,6 +103,8 @@ try {
 		<br>
 		<div>'.$item['OrComConteudo'].'</div>
 		<br>';
+		
+		$totalGeralProdutos = 0;
 		
 		if($totalProdutos > 0){
 	
@@ -118,7 +121,6 @@ try {
 			';
 			
 			$cont = 1;
-			$totalGeralProdutos = 0;
 			
 			foreach ($rowProdutos as $itemProduto){
 				
@@ -171,6 +173,8 @@ try {
 			$html .= "</table>";
 		}
 
+		$totalGeralServicos = 0;
+		
 		if($totalServicos > 0){
 	
 			$html .= '
@@ -185,7 +189,6 @@ try {
 			';
 			
 			$cont = 1;
-			$totalGeralServicos = 0;
 			
 			foreach ($rowServicos as $itemServico){
 				
@@ -249,6 +252,7 @@ try {
 				    </tr>
 				  </table>
 		";
+		
 	}
 	
 	$sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
@@ -287,5 +291,10 @@ try {
 } catch (\Mpdf\MpdfException $e) { // Note: safer fully qualified exception name used for catch
     
     // Process the exception, log, print etc.
-    echo $e->getMessage();
+    $html = $e->getMessage();
+	
+    $mpdf->WriteHTML($html);
+    
+    // Other code
+    $mpdf->Output();	
 }

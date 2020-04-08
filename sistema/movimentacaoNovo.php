@@ -221,10 +221,13 @@ if (isset($_POST['inputData'])) {
 					$('#page-modal').fadeIn(200);
 
 					let linha = $(elem).parent().parent()
+					let saldoinicialModal = $(elem).parent().next().attr('saldoInicial') // selecionando o valor do input hidden
 
 					if ($(elem).attr('idRow') == linha.attr('id')) {
 						let tds = linha.children();
 						let tipoProdutoServico = $(tds[8]).attr('tipo');
+
+
 
 						let valores = [];
 
@@ -257,7 +260,7 @@ if (isset($_POST['inputData'])) {
 							linhaTabela = `<tr id='trModal'>
 						                        <td>${valores[0]}</td>
 												<td>${valores[1]}</td>
-												<td><input id='quantidade' type="text" class="form-control" value="0"></td>
+												<td><input id='quantidade' type="text" class="form-control" value="" style="text-align: center"></td>
 												<td><input id='saldo' type="text" class="form-control" value="" disabled></td>
 											</tr>
 						                  `;
@@ -276,8 +279,8 @@ if (isset($_POST['inputData'])) {
 							linhaTabela = `<tr id='trModal'>
 						                                    <td>${valores[0]}</td>
 												            <td>${valores[1]}</td>
-												            <td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="0" style="text-align: center"></td>
-												            <td><input id='saldo' type="text" class="form-control" value="${valores[4]}" style="text-align: center"  disabled></td>
+												            <td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" style="text-align: center"></td>
+												            <td><input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center"  disabled></td>
 								                            <td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
 															<td><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
 														</tr>
@@ -288,17 +291,16 @@ if (isset($_POST['inputData'])) {
 
 						$('#tbody-modal').html(linhaTabela);
 
+						// Esta função não permite que o valor digitado pelo usuário seja maior que o valor de saldo.
 						function validaQuantInputModal(quantMax) {
 							$('#quantidade').on('keyup', function() {
-                                 if(parseInt($('#quantidade').val()) > parseInt(quantMax)){
+								if (parseInt($('#quantidade').val()) > parseInt(quantMax)) {
 									$('#quantidade').val(quantMax)
-									console.log('teste')
-								 }
-								 //console.log($('#quantidade').val() , quantMax)
+								}
 							})
 						}
 
-						validaQuantInputModal($('#quantidade').attr('quantMax'))
+						validaQuantInputModal($('#saldo').val())
 					}
 				})
 			})
@@ -350,14 +352,15 @@ if (isset($_POST['inputData'])) {
 
 
 
-							let quantInicial = inputHiddenProdutoServico.attr('quantInicial')
+							//let quantInicial = inputHiddenProdutoServico.attr('quantInicial')
 							let saldoInicial = inputHiddenProdutoServico.attr('saldoInicial')
 
-							let novosValores = recalcValores(quantInicial, novaQuantidade, saldoInicial, arrayValInput[2])
+							let novosValores = recalcValores( /*quantInicial,*/ novaQuantidade, saldoInicial, arrayValInput[2])
 							console.log(novosValores.quantAtualizada)
 							$(tr[3]).html(novosValores.quantAtualizada)
 							$(tr[4]).html(novosValores.novoSaldo)
 							$(tr[6]).html("R$ " + novosValores.valorTotal)
+							$(tr[6]).attr('valorTotalSomaGeral', novosValores.somaTotalValorGeral)
 
 
 							$('#inputNumItens').val()
@@ -369,36 +372,57 @@ if (isset($_POST['inputData'])) {
 							$('#itemEditadoquantidade').val(novaQuantidade)
 						}
 					})
-
 				})
 				$('#page-modal').fadeOut(200);
 				$('body').css('overflow', 'scroll');
+
+				recalcValorTotal()
 			})
 		}
 
 
 
-		function recalcValores(quantInicial, novaQuantidade, saldoInicial, valorUni) {
-			console.log(valorUni)
+		function recalcValores( /*quantInicial,*/ novaQuantidade, saldoInicial, valorUni) {
+
 
 			let valorTotal = 0
 			let novoSaldo = 0
 			let quantAtualizada = 0
-			quantInicial == novaQuantidade ? novoSaldo = saldoInicial : novoSaldo = saldoInicial - novaQuantidade;
+			/*quantInicial == novaQuantidade ? novoSaldo = saldoInicial : */
+			novoSaldo = saldoInicial - novaQuantidade;
 
 			//let valorTotal = novaQuantidade * valorUni;
 			//let novoSaldo = saldoInicial - novaQuantidade;
-			quantAtualizada = parseInt(novaQuantidade) + parseInt(quantInicial)
-			console.log(novaQuantidade)
+			quantAtualizada = parseInt(novaQuantidade)
 
 			return {
 				quantAtualizada: quantAtualizada,
 				valorTotal: float2moeda(quantAtualizada * valorUni),
+				somaTotalValorGeral: quantAtualizada * valorUni,
 				novoSaldo: novoSaldo
 			};
 		}
 
+		function recalcValorTotal() {
+			let novoTotalGeral = 0
+			let velhoTotalGeral = $('#total').attr('valorTotalGeral')
+			$('.trGrid').each((i, elem) => {
+				$(elem).children().each((i, elem) => {
+					if ($(elem).hasClass('valorTotal')) {
 
+						if ($(elem).attr('valorTotalSomaGeral')) {
+							novoTotalGeral += parseFloat($(elem).attr('valorTotalSomaGeral'))
+							
+							//$('#total').attr('valorTotalGeral', `${novoTotalGeral}`)
+	
+							//console.log(novoTotalGeral)
+						}
+					}
+				})
+			})
+
+			$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`)
+		}
 
 		function inputsModal() {
 			$('#tbody-modal')
@@ -491,6 +515,7 @@ if (isset($_POST['inputData'])) {
 
 				FiltraCategoria();
 				Filtrando();
+				FiltraOrdensCompra()
 
 				$.getJSON('filtraCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
 
@@ -1000,6 +1025,10 @@ if (isset($_POST['inputData'])) {
 			//Mostra o "Filtrando..." na combo Produto
 			function FiltraProduto() {
 				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+			}
+
+			function FiltraOrdensCompra() {
+				$('#cmbOrdemCompra').empty().append('<option>Filtrando...</option>');
 			}
 
 			function ResetCategoria() {
@@ -1554,7 +1583,7 @@ if (isset($_POST['inputData'])) {
 										</tbody>
 										<tfoot>
 											<tr>
-												<th colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total:</th>
+												<th colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$) Nota Fiscal:</th>
 												<th colspan="2">
 													<div id="total" style="text-align:left; font-size: 15px; font-weight:bold;">R$ 0,00</div>
 												</th>
