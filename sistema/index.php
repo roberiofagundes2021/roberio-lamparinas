@@ -664,6 +664,8 @@ if($totalAcoes){
 
 	</div>
 	<!-- /page content -->
+	
+	<?php include_once("alerta.php"); ?>
 
 </body>
 </html>

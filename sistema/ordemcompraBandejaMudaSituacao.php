@@ -8,6 +8,8 @@ $_SESSION['msg'] = array();
 
 if(isset($_POST['inputOrdemCompraId'])){
 	
+	$iOrdemCompra = $_POST['inputOrdemCompraId'];
+	
 	try{
 
 		$conn->beginTransaction();
@@ -29,7 +31,7 @@ if(isset($_POST['inputOrdemCompraId'])){
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $row['SituaId']);
 		$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
-		$result->bindParam(':iOrdemCompra', $_POST['inputOrdemCompraId']);
+		$result->bindParam(':iOrdemCompra', $iOrdemCompra);
 		$result->execute();
 		
 		$sql = "UPDATE Bandeja SET BandeStatus = :bStatus, BandeMotivo = :sMotivo, BandeUsuarioAtualizador = :iUsuario
@@ -47,21 +49,36 @@ if(isset($_POST['inputOrdemCompraId'])){
 		$result = $conn->query($sql);
 		$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
+		$fCustoFinal = 0;
+		$fPrecoVenda = 0;
+
 		//Se o parâmetro diz que o Valor do Produto/Serviço será atualizado a partir da Ordem de Compra, tais valores devem ser atualizados		
-		if ($rowParametro['ParamValorAtualizadoOrdemCompra']){
+		if ($rowParametro['ParamValorAtualizadoOrdemCompra'] && $_POST['inputOrdemCompraStatus'] == 'LIBERADO'){
 			
 			$sql = "SELECT OCXPrProduto, OCXPrValorUnitario 
 					FROM OrdemCompraXProduto
-					WHERE OCXPrOrdemCompra = '".$_POST['inputOrdemCompraId']."'";
+					WHERE OCXPrOrdemCompra = ".$iOrdemCompra;
 			$result = $conn->query($sql);
-			$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);  
+			$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC); 
 
 			foreach ($rowProduto as $item){
+				
+				$sql = "SELECT ProduOutrasDespesas, ProduMargemLucro 
+						FROM Produto
+						WHERE ProduId = ".$item['OCXPrProduto'];
+				$result = $conn->query($sql);
+				$rowAtualizaProduto = $result->fetch(PDO::FETCH_ASSOC);
+				
+				$fCustoFinal = $item['OCXPrValorUnitario'] + $rowAtualizaProduto['ProduOutrasDespesas'];
+				$fPrecoVenda = $fCustoFinal + ($rowAtualizaProduto['ProduMargemLucro'] * $fCustoFinal) / 100; 
 
-				$sql = "UPDATE Produto SET ProduValorCusto = :fValor, ProduUsuarioAtualizador = :iUsuario
+				$sql = "UPDATE Produto SET ProduValorCusto = :fCusto, ProduCustoFinal = :fCustoFinal, 
+						ProduValorVenda = :fVenda, ProduUsuarioAtualizador = :iUsuario
 						WHERE ProduId = :iProduto";
 				$result = $conn->prepare($sql);
-				$result->bindParam(':fValor', $item['OCXPrValorUnitario']);
+				$result->bindParam(':fCusto', $item['OCXPrValorUnitario']);
+				$result->bindParam(':fCustoFinal', $fCustoFinal);
+				$result->bindParam(':fVenda', $fPrecoVenda);
 				$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
 				$result->bindParam(':iProduto', $item['OCXPrProduto']);
 				$result->execute();
@@ -69,16 +86,31 @@ if(isset($_POST['inputOrdemCompraId'])){
 
 			$sql = "SELECT OCXSrServico, OCXSrValorUnitario 
 					FROM OrdemCompraXServico
-					WHERE OCXSrOrdemCompra = '".$_POST['inputOrdemCompraId']."'";
+					WHERE OCXSrOrdemCompra = ".$iOrdemCompra;
 			$result = $conn->query($sql);
-			$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);  
+			$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);			
+
+			$fCustoFinal = 0;
+			$fPrecoVenda = 0;			
 
 			foreach ($rowServico as $item){
+				
+				$sql = "SELECT ServiOutrasDespesas, ServiMargemLucro 
+						FROM Servico
+						WHERE ServiId = ".$item['OCXSrServico'];
+				$result = $conn->query($sql);
+				$rowAtualizaServico = $result->fetch(PDO::FETCH_ASSOC);
+				
+				$fCustoFinal = $item['OCXSrValorUnitario'] + $rowAtualizaServico['ServiOutrasDespesas'];
+				$fPrecoVenda = $fCustoFinal + ($rowAtualizaServico['ServiMargemLucro'] * $fCustoFinal) / 100; 				
 
-				$sql = "UPDATE Servico SET ServiValorCusto = :fValor, ServiUsuarioAtualizador = :iUsuario
+				$sql = "UPDATE Servico SET ServiValorCusto = :fCusto, ServiCustoFinal = :fCustoFinal, 
+						ServiValorVenda = :fVenda, ServiUsuarioAtualizador = :iUsuario
 						WHERE ServiId = :iServico";
 				$result = $conn->prepare($sql);
-				$result->bindParam(':fValor', $item['OCXSrValorUnitario']);
+				$result->bindParam(':fCusto', $item['OCXSrValorUnitario']);
+				$result->bindParam(':fCustoFinal', $fCustoFinal);
+				$result->bindParam(':fVenda', $fPrecoVenda);				
 				$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
 				$result->bindParam(':iServico', $item['OCXSrServico']);
 				$result->execute();
@@ -88,7 +120,7 @@ if(isset($_POST['inputOrdemCompraId'])){
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação da ordem de ompra alterada!!!";
+		$_SESSION['msg']['mensagem'] = "Situação da ordem de compra alterada!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
