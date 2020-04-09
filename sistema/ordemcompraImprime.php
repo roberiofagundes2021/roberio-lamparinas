@@ -68,7 +68,7 @@ try {
 		</div> 
 	</div>
 
-	<div style='text-align:center; margin-top: 20px;'><h1>ORDEM DE COMPRA</h1></div>	 
+	<div style='text-align:center; margin-top: 20px;'><h1>ORDEM DE COMPRA</h1></div>
 	";
 	
 	
