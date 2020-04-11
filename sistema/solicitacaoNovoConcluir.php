@@ -45,8 +45,9 @@ if (isset($_SESSION['Carrinho'])) {
 		$conn->beginTransaction();
 
 		// Selecionando dados do setor do usuário
-		$sql = "SELECT EXUXPSetor
+		$sql = "SELECT EXUXPSetor, SetorNome
                 FROM EmpresaXUsuarioXPerfil 
+                JOIN Setor on SetorId = EXUXPSetor
 		        WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . "
 		       ";
 		$result = $conn->query($sql);
@@ -54,7 +55,7 @@ if (isset($_SESSION['Carrinho'])) {
 
 		$sql = "SELECT SituaId
 		        FROM Situacao
-		        WHERE SituaChave =  'AGUARDANDOLIBERACAO'
+		        WHERE SituaChave = 'AGUARDANDOLIBERACAO'
 		       ";
 		$result = $conn->query($sql);
 		$Situacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -70,7 +71,8 @@ if (isset($_SESSION['Carrinho'])) {
 			$soliObservacao = $_POST['txtObservacao'];
 		}
 
-		$sql = "INSERT INTO Solicitacao (SolicNumero, SolicData, SolicObservacao, SolicSetor, SolicSolicitante, SolicSituacao, SolicUsuarioAtualizador, SolicEmpresa)
+		$sql = "INSERT INTO Solicitacao (SolicNumero, SolicData, SolicObservacao, SolicSetor, SolicSolicitante, 
+				SolicSituacao, SolicUsuarioAtualizador, SolicEmpresa)
 				VALUES (:iNumero, :iData, :iObservacao, :iSetor, :iSolicitante, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		// var_dump($Perfil['PerfiId']);
@@ -90,34 +92,28 @@ if (isset($_SESSION['Carrinho'])) {
 
 		$SolicitacaoId = $conn->lastInsertId();
 
-		try {
-			$sql = "INSERT INTO SolicitacaoXProduto
-						(SlXPrSolicitacao, SlXPrProduto, SlXPrQuantidade, SlXPrUsuarioAtualizador, SlXPrEmpresa)
-					VALUES 
-						(:iSolicitacao, :iProduto, :iQuantidade, :iUsuarioAtualizador, :iEmpresa)";
-			$result = $conn->prepare($sql);
+		$sql = "INSERT INTO SolicitacaoXProduto
+					(SlXPrSolicitacao, SlXPrProduto, SlXPrQuantidade, SlXPrUsuarioAtualizador, SlXPrEmpresa)
+				VALUES 
+					(:iSolicitacao, :iProduto, :iQuantidade, :iUsuarioAtualizador, :iEmpresa)";
+		$result = $conn->prepare($sql);
 
-			foreach ($_SESSION['Carrinho'] as $key => $value) {
+		foreach ($_SESSION['Carrinho'] as $key => $value) {
 
-				$result->execute(array(
-					':iSolicitacao' => $SolicitacaoId,
-					':iProduto' => $value['id'],
-					':iQuantidade' => $value['quantidade'],
-					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-					':iEmpresa' => $_SESSION['EmpreId']
-				));
-			}
-		} catch (PDOException $e) {
-			$conn->rollback();
-			echo 'Error: ' . $e->getMessage();
-			exit;
+			$result->execute(array(
+				':iSolicitacao' => $SolicitacaoId,
+				':iProduto' => $value['id'],
+				':iQuantidade' => $value['quantidade'],
+				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+				':iEmpresa' => $_SESSION['EmpreId']
+			));
 		}
 
-		$sIdentificacao = 'Solicitação de materiais (' . $Setor['EXUXPSetor'] . ')';
+		$sIdentificacao = 'Solicitação de materiais (' . $Setor['SetorNome'] . ')';
 
-		$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, BandeSolicitante, BandeTabela, BandeTabelaId,
-												 BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
-							VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, BandeTabela, BandeTabelaId,
+				BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
+				VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -125,7 +121,6 @@ if (isset($_SESSION['Carrinho'])) {
 			':dData' => date("Y-m-d"),
 			':sDescricao' => 'Liberar Solicitação',
 			':sURL' => '',
-			':iPerfilDestino' => $rowPerfil['PerfiId'],  //Tem que tirar esse campo do banco, já que agora tem uma tabela BandejaXPerfil
 			':iSolicitante' => $_SESSION['UsuarId'],
 			':sTabela' => 'Solicitacao',
 			':iTabelaId' => $SolicitacaoId,
@@ -146,8 +141,6 @@ if (isset($_SESSION['Carrinho'])) {
 			':iPerfil' => $rowPerfil['PerfiId'],
 			':iEmpresa' => $_SESSION['EmpreId']
 		));
-
-
 
 		$conn->commit();
 

@@ -113,7 +113,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				document.formFluxoOperacional.action = "fluxoRealizado.php";
 			} else if (Tipo == 'aditivo'){
 				document.formFluxoOperacional.action = "fluxoAditivo.php";
-			} else if (Tipo == 'imprime'){
+			} else if (Tipo == 'imprimir'){
 				document.formFluxoOperacional.action = "fluxoImprime.php";
 				document.formFluxoOperacional.setAttribute("target", "_blank");
 			} else if (Tipo == 'motivo'){
@@ -172,8 +172,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table class="table" id="tblFluxo">
 								<thead>
 									<tr class="bg-slate">
-										<th width="10%">Data Início</th>
-										<th width="10%">Data Fim</th>
+										<th width="10%">Início</th>
+										<th width="10%">Fim</th>
 										<th width="12%">Nº Contrato</th>
 										<th width="12%">Nº Processo</th>										
 										<th width="18%">Fornecedor</th>
@@ -233,6 +233,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>																
 																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
 																<div class="dropdown-divider"></div>
+
+																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>
+																
 																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\','.$item['FlOpeStatus'].', \'realizado\', \'\');" class="dropdown-item"><i class="icon-statistics" data-popup="tooltip" data-placement="bottom" title="Fluxo Realizado"></i> Fluxo Realizado</a>');
 										
 										if (isset($rowMotivo['BandeMotivo'])){

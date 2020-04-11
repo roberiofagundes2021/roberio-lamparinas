@@ -6,12 +6,13 @@ $_SESSION['PaginaAtual'] = 'Solicitação';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT SolicId, SolicNumero, SolicData, SolicObservacao, SolicSetor, SolicSolicitante, SolicSituacao, UsuarNome, SetorNome, SituaNome, SituaChave
+$sql = "SELECT SolicId, SolicNumero, SolicData, SolicObservacao, SolicSetor, SolicSolicitante, SolicSituacao, UsuarNome, 
+		SetorNome, SituaChave, SituaNome, SituaCor
 		FROM Solicitacao
 		JOIN Usuario on UsuarId = SolicSolicitante
 		JOIN Setor on SetorId = SolicSetor
 		JOIN Situacao on SituaId = SolicSituacao
-	    WHERE SolicEmpresa = " . $_SESSION['EmpreId'] . "
+	    WHERE SolicEmpresa = " . $_SESSION['EmpreId'] . " and UsuarId = ".$_SESSION['UsuarId']."
 		ORDER BY SolicData DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -38,14 +39,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<!-- /theme JS files -->	
 
-	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script>
-	<!-- /theme JS files -->
+	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
+
+	<!-- Modal -->
+	<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>	
 
 	<script type="text/javascript">
+		
 		$(document).ready(function() {
 
 			// Modal
@@ -94,41 +98,41 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			}
 			produtosMostrar()
 
+			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
+
 			/* Início: Tabela Personalizada */
 			$('#tblSolicitacao').DataTable({
-				"order": [
-					[0, "desc"]
-				],
+				"order": [[0, "desc"]],
 				autoWidth: false,
 				responsive: true,
 				columnDefs: [{
 						orderable: true, //Data
-						width: "5%",
+						width: "10%",
 						targets: [0]
 					},
 					{
 						orderable: true, //Numero
-						width: "5%",
+						width: "10%",
 						targets: [1]
 					},
 					{
 						orderable: true, //Setor
-						width: "15%",
+						width: "30%",
 						targets: [2]
 					},
 					{
 						orderable: true, //Solicitante
-						width: "20%",
+						width: "30%",
 						targets: [3]
 					},
 					{
 						orderable: true, //Situação
-						width: "5%",
+						width: "10%",
 						targets: [4]
 					},
 					{
 						orderable: false, //Ações
-						width: "5%",
+						width: "10%",
 						targets: [5]
 					}
 				],
@@ -137,12 +141,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					search: '<span>Filtro:</span> _INPUT_',
 					searchPlaceholder: 'filtra qualquer coluna...',
 					lengthMenu: '<span>Mostrar:</span> _MENU_',
-					paginate: {
-						'first': 'Primeira',
-						'last': 'Última',
-						'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-						'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
-					}
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
 				}
 			});
 
@@ -168,35 +167,21 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaSolicitacao(SolicId, SolicNumero, SolicSituacao, SolicSituacaoChave, Tipo) {
+		function atualizaSolicitacao(SolicId, Tipo, Motivo) {
 
 			document.getElementById('inputSolicitacaoId').value = SolicId;
-			document.getElementById('inputSolicitacaoNumero').value = SolicNumero;
-			document.getElementById('inputSolicitacaoStatus').value = SolicSituacao;
 
-			if (Tipo == 'imprimir') {
-				if (SolicSituacaoChave == 'PENDENTE') {
-					alerta('Atenção', 'Enquanto o status estiver PENDENTE de liberação a impressão não poderá ser realizada!', 'error');
-					return false;
-				} else if (SolicSituacaoChave == 'NAOLIBERADO') {
-					alerta('Atenção', 'A ordem de compra/contrato não foi liberada, portanto, a impressão não poderá ser realizada!', 'error');
-					return false;
-				} else {
-					document.formSolicitacao.action = "solicitacaoImprime.php";
-					document.formSolicitacao.setAttribute("target", "_blank");
-				}
-			} else {
-				if (Tipo == 'edita') {
-					document.formSolicitacao.action = "solicitacaoEdita.php";
-				} else if (Tipo == 'exclui') {
-					confirmaExclusao(document.formSolicitacao, "Tem certeza que deseja excluir essa ordem de compra?", "solicitacaoExclui.php");
-				} else if (Tipo == 'mudaStatus') {
-					document.formSolicitacao.action = "solicitacaoMudaSituacao.php";
-				} else if (Tipo == 'produto') {
-					document.formSolicitacao.action = "solicitacaoProduto.php";
-				} else if (Tipo == 'duplica') {
-					document.formSolicitacao.action = "solicitacaoDuplica.php";
-				}
+			if (Tipo == 'motivo'){
+	            bootbox.alert({
+                    title: '<strong>Motivo da Não Liberação</strong>',
+                    message: Motivo
+                });
+                return false;
+			} else if (Tipo == 'imprimir') {
+				document.formSolicitacao.action = "solicitacaoImprime.php";
+				document.formSolicitacao.setAttribute("target", "_blank");
+			} else if (Tipo == 'exclui') {
+				confirmaExclusao(document.formSolicitacao, "Tem certeza que deseja excluir essa solicitação?", "solicitacaoExclui.php");
 				document.formSolicitacao.setAttribute("target", "_self");
 			}
 
@@ -260,28 +245,51 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									foreach ($row as $item) {
 
 										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 
-										if ($item['SituaChave'] == 'PENDENTE') {
-											$situacaoClasse = 'badge badge-flat border-primary text-danger-600';
-										} else if ($item['SituaChave'] == 'NAOLIBERADO') {
-											$situacaoClasse = 'badge badge-flat border-danger text-danger-600';
-										} else {
-											$situacaoClasse = 'badge badge-flat border-success text-success-600';
-										}
+										$sql = "SELECT BandeMotivo
+												FROM Bandeja
+												JOIN Situacao on SituaId = BandeStatus
+												WHERE BandeTabela = 'Solicitacao' and BandeTabelaId = ".$item['SolicId']." and 
+												BandeEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'NAOLIBERADO'";
+										$result = $conn->query($sql);
+										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);
 
 										print('
 										<tr>
 											<td>' . mostraData($item['SolicData']) . '</td>
 											<td>' . $item['SolicNumero'] . '</td>
 											<td>' . $item['SetorNome'] . '</td>
-											<td>' . $item['UsuarNome'] . '</td>
+											<td>' . nomeSobrenome($item['UsuarNome'], 2) . '</td>
 											');
 
 										print('<td><div"><span class="' . $situacaoClasse . '">' . $situacao . '</span></div></td>');
 
-										print('<td class="text-center">		
-												<a id="' . $item['SolicId'] . '" class="btn-modal dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-											</td>
+										print('<td class="text-center">
+													<div class="list-icons">
+														<div class="list-icons list-icons-extended">
+															<div class="dropdown">													
+																<a href="#" class="list-icons-item" data-toggle="dropdown">
+																	<i class="icon-menu9"></i>
+																</a>
+
+																<div class="dropdown-menu dropdown-menu-right">
+																	<a id="' . $item['SolicId'] . '" class="btn-modal dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																	<div class="dropdown-divider"></div>
+																	<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'imprimir\', \''.$rowMotivo['BandeMotivo'].'\')" class="dropdown-item" title="Imprimir Solicitação"><i class="icon-printer2"></i> Imprimir</a>
+																');
+
+																	if (isset($rowMotivo['BandeMotivo'])){
+
+																		print('																		
+																		<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'motivo\', \''.$rowMotivo['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
+																	}
+										print('		
+																</div>
+															</div>
+														</div>
+													</div>														
+												</td>
 										</tr>');
 									}
 									?>
@@ -298,8 +306,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				<form name="formSolicitacao" method="post">
 					<input type="hidden" id="inputSolicitacaoId" name="inputSolicitacaoId">
-					<input type="hidden" id="inputSolicitacaoNumero" name="inputSolicitacaoNumero">
-					<input type="hidden" id="inputSolicitacaoStatus" name="inputSolicitacaoStatus">
 					<input type="hidden" id="inputSolicitacaoTipo" name="inputSolicitacaoTipo">
 				</form>
 

@@ -24,8 +24,8 @@ if (isset($_POST['cmbPerfil'])){
 //echo $idPerfilLogado;die;
 
 /* AGUARDANDOLIBERACAO */
-$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabela,
-			   BandeTabelaId, SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, OrComNumero, OrComSituacao, OrComTipo
+$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, 
+		SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, OrComNumero, OrComSituacao, OrComTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
@@ -51,7 +51,7 @@ $rowTotalPendente = $result->fetch(PDO::FETCH_ASSOC);
 $totalPendente = $rowTotalPendente['TotalPendente'];
 
 /* LIBERADAS */
-$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabela, BandeTabelaId, 
+$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, 
 		SituaNome, OrComNumero, OrComTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
@@ -77,7 +77,7 @@ $rowTotalLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalLiberado = $rowTotalLiberado['TotalLiberado'];
 
 /* NÃO LIBERADAS */
-$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, UsuarNome, BandeTabela, BandeTabelaId, SituaNome
+$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, SituaNome
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
@@ -424,7 +424,7 @@ if($totalAcoes){
 				document.getElementById('inputFluxoId').value = BandeTabelaId;
 				
 				if (Tipo == 'imprimir'){
-					document.formBandeja.action = "fluxoBandejaImprime.php";
+					document.formBandeja.action = "fluxoImprime.php";
 					document.formBandeja.setAttribute("target", "_blank");
 					document.formBandeja.submit();
 				} else {
@@ -474,8 +474,64 @@ if($totalAcoes){
 					}
 				}
 			}
-		}		
-		
+
+			if (BandeTabela == 'Solicitacao'){
+				
+				document.getElementById('inputSolicitacaoId').value = BandeTabelaId;
+
+				if (Tipo == 'imprimir'){
+					document.formBandeja.action = "solicitacaoImprime.php";
+					document.formBandeja.setAttribute("target", "_blank");
+					document.formBandeja.submit();
+				} else {
+					if (Tipo == 'liberar'){	
+						document.getElementById('inputSolicitacaoStatus').value = 'LIBERADO'; //Liberado
+						document.formBandeja.action = "movimentacaoNovo.php";	
+						document.formBandeja.setAttribute("target", "_self");
+						document.formBandeja.submit();	
+					} else if (Tipo == 'naoliberar'){
+
+			            bootbox.prompt({
+			                title: 'Informe o motivo da não liberação',
+			                inputType: 'textarea',
+			                buttons: {
+			                    confirm: {
+			                        label: 'Enviar',
+			                        className: 'btn-success'
+			                    },
+			                    cancel: {
+			                        label: 'Cancelar',
+			                        className: 'btn-link'
+			                    }
+			                },
+			                callback: function (result) {
+
+			                    if (result === null) {                                             
+			                        bootbox.alert({
+			                            title: 'Não Liberar',
+			                            message: 'A não liberação foi cancelada!'
+			                        });                              
+			                    } else {
+			                       
+			                        document.getElementById('inputMotivo').value = result;
+									document.getElementById('inputSolicitacaoStatus').value = 'NAOLIBERADO';
+									document.formBandeja.action = "solicitacaoBandejaMudaSituacao.php";
+									document.formBandeja.setAttribute("target", "_self");
+									document.formBandeja.submit();
+									
+									/*
+			                        bootbox.alert({
+			                            title: 'Hi <strong>' + result + '</strong>',
+			                            message: 'How are you doing today?'
+			                        });*/                               
+			                    }
+			                }
+			            });
+					}
+				}
+			}
+		}
+
 	</script>
 
 </head>
@@ -651,6 +707,8 @@ if($totalAcoes){
 					<input type="hidden" id="inputOrdemCompraNumero" name="inputOrdemCompraNumero" >
 					<input type="hidden" id="inputOrdemCompraStatus" name="inputOrdemCompraStatus" >
 					<input type="hidden" id="inputOrdemCompraTipo" name="inputOrdemCompraTipo" >
+					<input type="hidden" id="inputSolicitacaoId" name="inputSolicitacaoId" >					
+					<input type="hidden" id="inputSolicitacaoStatus" name="inputSolicitacaoStatus" >					
 					<input type="hidden" id="inputMotivo" name="inputMotivo" >
 				</form>				
 				

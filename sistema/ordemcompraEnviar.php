@@ -58,9 +58,9 @@ try{
 			/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
 			$sIdentificacao = 'Ordem de Compra (Nº Ordem Compra: '.$rowOrdemCompra['OrComNumero'].' | Nº Processo: '.$rowOrdemCompra['OrComNumProcesso'].')';
 		
-			$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, BandeSolicitante, 
+			$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
 								BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
-					VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, 
+					VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, 
 							:iStatus, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 					
@@ -69,7 +69,6 @@ try{
 							':dData' => date("Y-m-d"),
 							':sDescricao' => 'Liberar Ordem de Compra',
 							':sURL' => '',
-							':iPerfilDestino' => $rowPerfil['PerfiId'],  //Tem que tirar esse campo do banco, já que agora tem uma tabela BandejaXPerfil
 							':iSolicitante' => $_SESSION['UsuarId'],
 							':sTabela' => 'OrdemCompra',
 							':iTabelaId' => $iOrdemCompra,

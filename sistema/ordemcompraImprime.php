@@ -24,7 +24,7 @@ $sql = "SELECT *
 		WHERE OrComEmpresa = ". $_SESSION['EmpreId'] ." and OrComId = ".$iOrdemCompra;
 
 $result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
+$row = $result->fetch(PDO::FETCH_ASSOC);
 
 try {
 	$mpdf = new mPDF([

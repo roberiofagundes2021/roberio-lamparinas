@@ -812,7 +812,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					?>
 				</div>
 				<div class="card-footer mt-2 d-flex flex-column">
-					<form id="solicitacao" method="POST" action="solicitacaoNovoComcluir.php">
+					<form id="solicitacao" method="POST" action="solicitacaoNovoConcluir.php">
 						<!--<input id="inputObservacao" type="hidden" name="inputObservacao">-->
 						<div class="row">
 							<div class="col-lg-12">

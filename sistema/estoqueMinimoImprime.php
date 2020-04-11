@@ -9,13 +9,14 @@ use Mpdf\Mpdf;
 require_once 'global_assets/php/vendor/autoload.php';
 
 
-$sql = "SELECT DISTINCT ProduCategoria, CategNome, ProduCodigo, ProduNome, ProduEstoqueMinimo, dbo.fnSaldoEstoque(MovimEmpresa, ProduId, MovimDestinoLocal) as saldo
+$sql = "SELECT DISTINCT ProduCategoria, CategNome, ProduCodigo, ProduNome, ProduEstoqueMinimo, 
+		dbo.fnSaldoEstoque(MovimEmpresa, ProduId, NULL) as saldo
 	    FROM Produto
 	    JOIN Categoria on CategId = ProduCategoria
 	    JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 	    JOIN Movimentacao on MovimId = MvXPrMovimentacao
-	    WHERE MovimEmpresa = ".$_SESSION['EmpreId']." and dbo.fnSaldoEstoque(MovimEmpresa, ProduId, MovimDestinoLocal) < ProduEstoqueMinimo
-	    Group By ProduCategoria, CategNome, ProduCodigo, ProduNome, ProduEstoqueMinimo, dbo.fnSaldoEstoque(MovimEmpresa, ProduId, MovimDestinoLocal)
+	    WHERE MovimEmpresa = ".$_SESSION['EmpreId']." and dbo.fnSaldoEstoque(MovimEmpresa, ProduId, NULL) < ProduEstoqueMinimo
+	    Group By ProduCategoria, CategNome, ProduId, ProduCodigo, ProduNome, ProduEstoqueMinimo, MovimEmpresa
 	    ";
 $result = $conn->query($sql);
 $rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
