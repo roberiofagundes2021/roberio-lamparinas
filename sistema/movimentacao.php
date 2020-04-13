@@ -6,15 +6,15 @@ $_SESSION['PaginaAtual'] = 'Movimentação';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave, LcEstNome, SetorNome
-		 FROM Movimentacao
-		 LEFT JOIN Fornecedor on ForneId = MovimFornecedor
-		 LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal or LcEstId = MovimDestinoLocal
-		 LEFT JOIN Setor on SetorId = MovimOrigemSetor or LcEstId = MovimDestinoSetor
-		 JOIN Situacao on SituaId = MovimSituacao
-	     WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . "
-		 ORDER BY MovimData DESC");
-$result = $conn->query("$sql");
+$sql = "SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave, LcEstNome, SetorNome
+		FROM Movimentacao
+		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
+		LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal or LcEstId = MovimDestinoLocal
+		LEFT JOIN Setor on SetorId = MovimOrigemSetor or LcEstId = MovimDestinoSetor
+		JOIN Situacao on SituaId = MovimSituacao
+	    WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . "
+		ORDER BY MovimData DESC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -38,11 +38,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-
 	<!-- /theme JS files -->
 
+	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
+
 	<script type="text/javascript">
+	
 		$(document).ready(function() {
+
+			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
 
 			/* Início: Tabela Personalizada */
 			$('#tblMovimentacao').DataTable({
