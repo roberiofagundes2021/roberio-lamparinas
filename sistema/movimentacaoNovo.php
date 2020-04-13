@@ -75,7 +75,7 @@ if (isset($_POST['inputData'])) {
 			':sTipo' => $_POST['inputTipo'],
 			':iMotivo' => $iMotivo,
 			':dData' => gravaData($_POST['inputData']),
-			':iFinalidade' => $_POST['cmbFinalidade'] == '#' ? null : $_POST['cmbFinalidade'],
+			':iFinalidade' => isset($_POST['cmbFinalidade']) && $_POST['cmbFinalidade'] == '#' ? null : isset($_POST['cmbFinalidade']) ? $_POST['cmbFinalidade'] : null,
 
 			':iOrigemLocal' => $tipoOrigem == 'Local' ? $idOrigem : $tipoOrigem == 'OrigemLocalTransferencia' ? $idOrigem : null,
 			':iOrigemSetor' => $tipoOrigem == 'Setor' ? $idOrigem : null,
@@ -101,11 +101,6 @@ if (isset($_POST['inputData'])) {
 		$insertId = $conn->lastInsertId();
 
 		try {
-			$sql = "INSERT INTO MovimentacaoXProduto
-						(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa)
-					VALUES 
-						(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa)";
-			$result = $conn->prepare($sql);
 
 			for ($i = 1; $i <= $_POST['inputNumItens']; $i++) {
 
@@ -114,18 +109,43 @@ if (isset($_POST['inputData'])) {
 				//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
 				if (isset($_POST[$campo])) {
 					$registro = explode('#', $_POST[$campo]);
+					//var_dump($registro);
 
-					$result->execute(array(
-						':iMovimentacao' => $insertId,
-						':iProduto' => $registro[0],
-						':iQuantidade' => $registro[1],
-						':fValorUnitario' => gravaValor($registro[2]),
-						':sLote' => $registro[3],
-						':dValidade' => gravaData($registro[4]),
-						':iClassificacao' => $registro[5],
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
-					));
+					if ($registro[0] == 'P') {
+						$sql = "INSERT INTO MovimentacaoXProduto
+						        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa)
+					            VALUES 
+						        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa)";
+						$result = $conn->prepare($sql);
+
+						$result->execute(array(
+							':iMovimentacao' => $insertId,
+							':iProduto' => $registro[1],
+							':iQuantidade' => $registro[3],
+							':fValorUnitario' => isset($registro[2]) ? $registro[2] : null,
+							':sLote' => $registro[5],
+							':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+							':iClassificacao' => isset($registro[5]) ? $registro[5] : null,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId']
+						));
+					} else {
+						$sql = "INSERT INTO MovimentacaoXServico
+						        (MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrLote, MvXSrUsuarioAtualizador, MvXSrEmpresa)
+					            VALUES 
+						        (:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :sLote, :iUsuarioAtualizador, :iEmpresa)";
+						$result = $conn->prepare($sql);
+
+						$result->execute(array(
+							':iMovimentacao' => $insertId,
+							':iServico' => $registro[1],
+							':iQuantidade' => $registro[3],
+							':fValorUnitario' => $registro[2] != '' ? $registro[2] : null,
+							':sLote' => $registro[5],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId']
+						));
+					}
 				}
 			}
 		} catch (PDOException $e) {
@@ -151,7 +171,7 @@ if (isset($_POST['inputData'])) {
 		exit;
 	}
 
-	//irpara("movimentacao.php");
+	irpara("movimentacao.php");
 }
 
 ?>
@@ -209,9 +229,25 @@ if (isset($_POST['inputData'])) {
 					modalAcoes()
 					mudarValores()
 
+					let todasLinhas = $('.trGrid')
+					$('#inputNumItens').val(todasLinhas.length)
+					//console.log(todasLinhas)
+
 				}
 
 			});
+
+
+			$.ajax({
+				type: "POST",
+				url: "movimentacaoSaldoOrdemCompra.php",
+				data: {
+					ordemCompra: numOrdemCompra,
+				},
+				success: function(resposta) {
+					$("#inputTotalOrdemCompraCartaContrato").val(float2moeda(resposta)).attr('disabled', '').attr('valor', resposta);
+				}
+			})
 		}
 
 		function modalAcoes() {
@@ -221,6 +257,7 @@ if (isset($_POST['inputData'])) {
 					$('#page-modal').fadeIn(200);
 
 					let linha = $(elem).parent().parent()
+					let todasLinhas = $(elem).parent().parent().parent()
 					let saldoinicialModal = $(elem).parent().next().attr('saldoInicial') // selecionando o valor do input hidden
 
 					if ($(elem).attr('idRow') == linha.attr('id')) {
@@ -248,12 +285,12 @@ if (isset($_POST['inputData'])) {
 						if (tipoProdutoServico != 'P') {
 
 							cabecalho = `
-							               <tr>
-							                     <tr class="bg-slate">
+							               
+							                <tr class="bg-slate">
 											     <th width="5%">Item</th>
 											     <th width="75%">Serviço</th>
 											     <th width="10%">Quantidade</th>
-											     <th width="10%">Saldo</th>
+											     <th width="10%"></th>
 									     	</tr>
 							                    `;
 
@@ -261,7 +298,7 @@ if (isset($_POST['inputData'])) {
 						                        <td>${valores[0]}</td>
 												<td>${valores[1]}</td>
 												<td><input id='quantidade' type="text" class="form-control" value="" style="text-align: center"></td>
-												<td><input id='saldo' type="text" class="form-control" value="" disabled></td>
+												<td><input id='saldo' type="hidden" class="form-control" value="${saldoinicialModal}" disabled></td>
 											</tr>
 						                  `;
 						} else {
@@ -377,6 +414,7 @@ if (isset($_POST['inputData'])) {
 				$('body').css('overflow', 'scroll');
 
 				recalcValorTotal()
+				calcSaldoOrdemCompra()
 			})
 		}
 
@@ -412,16 +450,35 @@ if (isset($_POST['inputData'])) {
 
 						if ($(elem).attr('valorTotalSomaGeral')) {
 							novoTotalGeral += parseFloat($(elem).attr('valorTotalSomaGeral'))
-							
+
 							//$('#total').attr('valorTotalGeral', `${novoTotalGeral}`)
-	
+
 							//console.log(novoTotalGeral)
 						}
 					}
 				})
 			})
 
-			$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`)
+			$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`).attr('valor', novoTotalGeral)
+		}
+
+		function calcSaldoOrdemCompra() {
+			let valorTotal = $('#total').attr('valor')
+			let valorSaldoOrdemCompra = $("#inputTotalOrdemCompraCartaContrato").attr('valor')
+			console.log(valorTotal)
+			console.log(valorSaldoOrdemCompra)
+
+			let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
+
+			if (calcSaldoAtual < 0) {
+				alerta('Atenção', 'O valor total da Ordem de Compra foi ultrapaçado.', 'error');
+				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
+				return
+			} else {
+				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
+			}
+
+
 		}
 
 		function inputsModal() {
@@ -444,17 +501,17 @@ if (isset($_POST['inputData'])) {
 					},
 					{
 						orderable: true, //Produto/Servico
-						width: "30%",
+						width: "20%",
 						targets: [1]
 					},
 					{
 						orderable: true, //Unidade Medida
-						width: "10%",
+						width: "12%",
 						targets: [2]
 					},
 					{
 						orderable: true, //Quantidade
-						width: "10%",
+						width: "12%",
 						targets: [3]
 					},
 					{
@@ -464,12 +521,12 @@ if (isset($_POST['inputData'])) {
 					},
 					{
 						orderable: true, //Valor Unitário
-						width: "10%",
+						width: "12%",
 						targets: [5]
 					},
 					{
 						orderable: false, //Valor Total
-						width: "5%",
+						width: "10%",
 						targets: [6]
 					},
 					{
@@ -597,6 +654,7 @@ if (isset($_POST['inputData'])) {
 
 					produtosOrdemConpra(ordemCompra)
 				}
+
 			})
 
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
@@ -606,6 +664,7 @@ if (isset($_POST['inputData'])) {
 
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var cmbCategoria = $('#cmbCategoria').val();
+				//console.log(inputTipo)
 
 				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
 
@@ -813,11 +872,12 @@ if (isset($_POST['inputData'])) {
 						quantidade: inputQuantidade
 					},
 					success: function(resposta) {
+						console.log(resposta)
 
 						//var newRow = $("<tr>");
 
 						//newRow.append(resposta);	    
-						$("#tabelaProdutos").append(resposta);
+						$("#tabelaProdutoServico").append(resposta);
 
 						//Adiciona mais um item nessa contagem
 						$('#inputNumItens').val(resNumItens);
@@ -1162,19 +1222,19 @@ if (isset($_POST['inputData'])) {
 									<div class="form-group">
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" value="E" class="form-input-styled" onclick="selecionaTipo('E')" checked data-fouc>
+												<input type="radio" name="inputTipo" value="E" class="form-input-styled" onclick="selecionaTipo('E')" checked data-fouc>
 												Entrada
 											</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" value="S" class="form-input-styled" onclick="selecionaTipo('S')" data-fouc>
+												<input type="radio" name="inputTipo" value="S" class="form-input-styled" onclick="selecionaTipo('S')" data-fouc>
 												Saída
 											</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo('T')" data-fouc>
+												<input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo('T')" data-fouc>
 												Transferência
 											</label>
 										</div>
@@ -1385,39 +1445,45 @@ if (isset($_POST['inputData'])) {
 
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputNotaFiscal">Nº Nota Fiscal</label>
-												<input type="text" id="inputNotaFiscal" name="inputNotaFiscal" class="form-control">
+												<label for="inputTotalOrdemCompraCartaContrato">Total (R$) Ordem de Compra/Carta Contrato</label>
+												<input type="text" id="inputTotalOrdemCompraCartaContrato" name="inputTotalOrdemCompraCartaContrato" class="form-control" onKeyUp="moeda(this)" maxLength="11">
 											</div>
 										</div>
 									</div> <!-- row -->
 
 									<div class="row">
-
 										<div class="col-lg-3">
 											<div class="form-group">
+												<label for="inputNotaFiscal">Nº Nota Fiscal</label>
+												<input type="text" id="inputNotaFiscal" name="inputNotaFiscal" class="form-control" placeholder="Nº NF">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
 												<label for="inputDataEmissao">Data Emissão</label>
-												<input type="text" id="inputDataEmissao" name="inputDataEmissao" class="form-control">
+												<input type="text" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data NF">
 											</div>
 										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputNumSerie">Nº Série Nota Fiscal</label>
-												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" maxLength="30">
+												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" maxLength="30" placeholder="Nº Série">
 											</div>
 										</div>
 
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputValorTotal">Valor Total</label>
+												<label for="inputValorTotal">Total (R$) Nota Fiscal</label>
 												<input type="text" id="inputValorTotal" name="inputValorTotal" class="form-control" onKeyUp="moeda(this)" maxLength="11">
 											</div>
 										</div>
 
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputChaveAcesso">Chave de Acesso</label>
-												<input type="text" id="inputChaveAcesso" name="inputChaveAcesso" class="form-control">
+												<input type="text" id="inputChaveAcesso" name="inputChaveAcesso" class="form-control" placeholder="Chave de Acesso NF">
 											</div>
 										</div>
 
@@ -1564,7 +1630,7 @@ if (isset($_POST['inputData'])) {
 												<th>Item</th>
 												<th>Produto/Serviço</th>
 												<th>Unidade Medida</th>
-												<th>Quant. Rec.</th>
+												<th>Quant. Recebida</th>
 												<th>Valor Unitário</th>
 												<th>Valor Total</th>
 												<th class="text-center">Ações</th>
@@ -1604,18 +1670,34 @@ if (isset($_POST['inputData'])) {
 												<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>
 													<!--<option value="#">Selecione</option>-->
 													<?php
-													$sql = ("SELECT SituaId, SituaNome, SituaChave
-																 FROM Situacao
-																 WHERE SituaChave = 'ATIVO'
-															     ORDER BY SituaNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($row as $item) {
-														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-															print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-														} else {
+													if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
+														$sql = "SELECT SituaId, SituaNome, SituaChave
+																 FROM Situacao
+																 WHERE SituaStatus = '1'
+															     ORDER BY SituaNome ASC";
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														print('<option value="#">Selecione</option>');
+
+														foreach ($row as $item) {
+
 															print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+														}
+													} else {
+
+														$sql = "SELECT SituaId, SituaNome, SituaChave
+													            FROM Situacao
+													            WHERE SituaStatus = '1'
+													            ORDER BY SituaNome ASC";
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($row as $item) {
+															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
+																print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
+															}
 														}
 													}
 													?>

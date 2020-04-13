@@ -42,8 +42,8 @@ if ($count) {
                         <th  style="text-align: center">Unidade Medida</th>
                         <th  style="text-align: center">Quant. Recebida</th>
                         <th  style="text-align: center">Saldo</th>
-                        <th  style="text-align: center">Valor Unitário</th>
-                        <th  style="text-align: center">Valor Total</th>
+                        <th  style="text-align: left; width: 10%">Valor Unitário</th>
+                        <th  style="text-align: left; width: 13%">Valor Total</th>
                         <th  style="text-align: center">Ações</th>
                     </tr>
                 </thead>
@@ -82,8 +82,8 @@ if ($count) {
 						 <td style="text-align: center">' . $item['UnMedSigla'] . '</td>
                          <td style="text-align: center"></td>
                          <td style="text-align: center">' . $saldo['Saldo'] . '</td>
-						 <td style="text-align: right">' . $valorCusto . '</td>
-                         <td class="valorTotal" style="text-align: right">R$ 0, 00</td>
+						 <td style="text-align: left">' . $valorCusto . '</td>
+                         <td class="valorTotal" style="text-align: left">R$ 0, 00</td>
                          <td  style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
                          <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" idLinha="row' . $numItens . '" quantInicial="' . $saldo['Quantidade'] . '" saldoInicial="' . $saldo['Saldo'] . '"  name="campo' . $numItens . '" value="' . $item['tipo'] . '#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>
@@ -107,7 +107,7 @@ if ($count) {
                             <div id="total" valorTotalGeral="" style="text-align:left; font-size: 15px; font-weight:bold;">R$ 0, 00</div>
                         </div>
                         <div>
-                            <div id="totalSaldo" style="text-align:left; font-size: 15px; font-weight:bold;">' . formataMoeda($totalOrdemCompra['valorTotalOrdemCompra']) . '</div>
+                            <div id="totalSaldo" style="text-align:left; font-size: 15px; font-weight:bold;" valor="'.$totalOrdemCompra['valorTotalOrdemCompra'].'">' . formataMoeda($totalOrdemCompra['valorTotalOrdemCompra']) . '</div>
                          </div>
                     </th>
                 </tr>
