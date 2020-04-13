@@ -16,9 +16,6 @@
 			$dias = 'dia';
 		}
 
-		$ordemCompraNumero = isset($item['OrComNumero']) ? $item['OrComNumero'] : '';
-		$ordemCompraTipo = isset($item['OrComTipo']) ? $item['OrComTipo'] : '';
-
 		print('
 		<tr>
 			<td class="text-center">
@@ -49,11 +46,11 @@
 					<div class="list-icons-item dropdown">
 						<a href="#" class="list-icons-item dropdown-toggle caret-0" data-toggle="dropdown"><i class="icon-menu7"></i></a>
 						<div class="dropdown-menu dropdown-menu-right">
-							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$ordemCompraNumero.'\', \''.$ordemCompraTipo.'\', \'imprimir\');" class="dropdown-item"><i class="icon-printer2"></i> Visualizar</a>
+							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \'imprimir\');" class="dropdown-item"><i class="icon-printer2"></i> Visualizar</a>
 							
 							<div class="dropdown-divider"></div>							
-							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$ordemCompraNumero.'\', \''.$ordemCompraTipo.'\', \'liberar\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
-							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$ordemCompraNumero.'\', \''.$ordemCompraTipo.'\', \'naoliberar\');" class="dropdown-item" id="motivo"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
+							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \'liberar\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
+							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \'naoliberar\');" class="dropdown-item" id="motivo"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
 						</div>
 					</div>
 				</div>

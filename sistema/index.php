@@ -359,14 +359,12 @@ if($totalAcoes){
 		});
 		
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaBandeja(BandeId, BandeTabela, BandeTabelaId, OrComNumero, OrComTipo, Tipo){
+		function atualizaBandeja(BandeId, BandeTabela, BandeTabelaId, Tipo){
 
 			document.getElementById('inputBandejaId').value = BandeId;
 
 			if(BandeTabela == 'OrdemCompra'){
 				document.getElementById('inputOrdemCompraId').value = BandeTabelaId;
-				document.getElementById('inputOrdemCompraNumero').value = OrComNumero;			
-				document.getElementById('inputOrdemCompraTipo').value = OrComTipo;
 				
 				if (Tipo == 'imprimir'){
 					document.formBandeja.action = "ordemcompraImprime.php";
@@ -704,9 +702,7 @@ if($totalAcoes){
 					<input type="hidden" id="inputFluxoId" name="inputFluxoId" >
 					<input type="hidden" id="inputFluxoStatus" name="inputFluxoStatus" >
 					<input type="hidden" id="inputOrdemCompraId" name="inputOrdemCompraId" >
-					<input type="hidden" id="inputOrdemCompraNumero" name="inputOrdemCompraNumero" >
 					<input type="hidden" id="inputOrdemCompraStatus" name="inputOrdemCompraStatus" >
-					<input type="hidden" id="inputOrdemCompraTipo" name="inputOrdemCompraTipo" >
 					<input type="hidden" id="inputSolicitacaoId" name="inputSolicitacaoId" >					
 					<input type="hidden" id="inputSolicitacaoStatus" name="inputSolicitacaoStatus" >					
 					<input type="hidden" id="inputMotivo" name="inputMotivo" >

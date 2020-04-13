@@ -137,7 +137,7 @@ try {
 
 			$html .= '<br>
                         <table style="width:100%;">
-                            <tr>
+                            <tr>                                
                                 <td style="width:25%">Data: ' . mostraData($row['MovimData']) . '</td>
                                 <td style="width:25%; text-align: center; background-color: #d8d8d8;">Nº: 0001/19</td>
                                 <td colspan="2" style="width:50%; border: none;"></td>
@@ -162,8 +162,8 @@ try {
                     $html .= '
                             <table style="width:100%;">
                                 <tr>
-                                    <td colspan="1">Código: '.$value['ProduCodigo'].'</td>
-                                    <td colspan="3">Produto: '.$value['ProduNome'].'</td>
+                                    <td rowspan="3" style="text-align: center; background-color: #eee;">Código: '.$value['ProduCodigo'].'</td>
+                                    <td colspan="4">Produto: '.$value['ProduNome'].'</td>
                                     <td colspan="2">Categoria: '.$value['CategNome'].'</td>
                                 </tr>
                                 <tr>

@@ -6,12 +6,12 @@ $_SESSION['PaginaAtual'] = 'Relatório de Movimentação';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
-		 FROM Fornecedor
-		 LEFT JOIN Categoria on CategId = ForneCategoria
-	     WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY ForneNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
+		FROM Fornecedor
+		JOIN Categoria on CategId = ForneCategoria
+	    WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ."
+		ORDER BY ForneNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -21,7 +21,6 @@ $Y = date("Y");
 
 $dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d-30, $Y)); //30 dias atrás
 $dataFim = date ("Y-m-d");
-
 
 ?>
 

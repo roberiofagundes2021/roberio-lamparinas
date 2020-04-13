@@ -6,15 +6,15 @@ $_SESSION['PaginaAtual'] = 'Movimentação do Patrimônio';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave, LcEstNome, SetorNome
-		 FROM Movimentacao
-		 LEFT JOIN Fornecedor on ForneId = MovimFornecedor
-		 LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal or LcEstId = MovimDestinoLocal
-		 LEFT JOIN Setor on SetorId = MovimDestinoSetor
-		 JOIN Situacao on SituaId = MovimSituacao
-	     WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . "
-		 ORDER BY MovimData DESC");
-$result = $conn->query("$sql");
+$sql = "SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave, LcEstNome, SetorNome
+		FROM Movimentacao
+		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
+		LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal or LcEstId = MovimDestinoLocal
+		LEFT JOIN Setor on SetorId = MovimDestinoSetor
+		JOIN Situacao on SituaId = MovimSituacao
+	    WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . "
+		ORDER BY MovimData DESC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -38,7 +38,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
     <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
     <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
     <script src="global_assets/js/demo_pages/form_layouts.js"></script>
-
 
     <script type="text/javascript">
         $(document).ready(function() {
@@ -126,8 +125,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                 $('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
             }
 
-
-
             let resultadosConsulta = '';
             let inputsValues = {};
 
@@ -138,7 +135,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                     e.preventDefault()
 
                     const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>')
-
 
                     let dataDe = $('#inputDataDe').val()
                     let dataAte = $('#inputDataAte').val()

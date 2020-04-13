@@ -9,22 +9,20 @@ use Mpdf\Mpdf;
 require_once 'global_assets/php/vendor/autoload.php';
 
 $iOrdemCompra = $_POST['inputOrdemCompraId'];
-$sNumero = $_POST['inputOrdemCompraNumero'];
 
-if ($_POST['inputOrdemCompraTipo'] == 'O'){
-	$sTipo = "Ordem de Compra";
-} else{
-	$sTipo = "Carta Contrato";
-}
-
-$sql = "SELECT *
+$sql = "SELECT ForneNome, ForneCelular, ForneEmail, CategNome, OrComTipo, OrComNumero, OrComConteudo
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
 		JOIN Categoria on CategId = OrComCategoria
 		WHERE OrComEmpresa = ". $_SESSION['EmpreId'] ." and OrComId = ".$iOrdemCompra;
-echo $sql;die;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
+
+if ($row['OrComTipo'] == 'O'){
+	$sTipo = "Ordem de Compra";
+} else{
+	$sTipo = "Carta Contrato";
+}
 
 try {
 	$mpdf = new mPDF([
@@ -64,15 +62,14 @@ try {
 		</div>
 		<div style='width:250px; float:right; display: inline; text-align:right;'>
 			<div>".date('d/m/Y')."</div>
-			<div style='margin-top:8px;'>".$sTipo.": ".formatarNumero($sNumero)."</div>
+			<div style='margin-top:8px;'>".$sTipo.": ".formatarNumero($row['OrComNumero'])."</div>
 		</div> 
 	</div>
 
 	<div style='text-align:center; margin-top: 20px;'><h1>ORDEM DE COMPRA</h1></div>
 	";
 	
-	
-	foreach ($row as $item){	
+
 		
 		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario
 				FROM Produto
@@ -95,10 +92,10 @@ try {
 		
 		$html .= '
 		<div style="font-weight: bold; position:relative; margin-top: 10px; background-color:#ccc; padding: 5px;">
-			Fornecedor: <span style="font-weight:normal;">'.$item['ForneNome'].'</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">'.$item['ForneCelular'].'</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">'.$item['ForneEmail'].'</span>
+			Fornecedor: <span style="font-weight:normal;">'.$row['ForneNome'].'</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">'.$row['ForneCelular'].'</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">'.$row['ForneEmail'].'</span>
 		</div>
 		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
-			Categoria: <span style="font-weight:normal;">'.$item['CategNome'].'</span>
+			Categoria: <span style="font-weight:normal;">'.$row['CategNome'].'</span>
 		</div>
 		<br>
 		<div>'.$item['OrComConteudo'].'</div>
@@ -253,7 +250,7 @@ try {
 				  </table>
 		";
 		
-	}
+
 	
 	$sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
 			FROM Usuario

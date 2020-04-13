@@ -15,7 +15,7 @@ if (isset($_POST['inputOrdemCompraId'])) {
 
 		$sql = "SELECT OrComId, OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, 
 					   OrComSubCategoria, OrComConteudo, OrComFornecedor, ForneContato, ForneEmail, ForneTelefone, ForneCelular, 
-					   OrComValorFrete, OrComTotalPedido, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
+					   OrComValorFrete, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
 					   OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, UsuarNome, UsuarEmail, UsuarTelefone
 				FROM OrdemCompra
 				JOIN Usuario on UsuarId = OrComSolicitante
