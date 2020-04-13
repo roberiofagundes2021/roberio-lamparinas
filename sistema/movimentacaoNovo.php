@@ -800,6 +800,10 @@ if (isset($_POST['inputData'])) {
 				});
 			});
 
+			$("input[type=radio][name=inputProdutoServico]").click(function() {
+				console.log('teste')
+			})
+
 			$('#btnAdicionar').click(function() {
 
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
@@ -1150,6 +1154,22 @@ if (isset($_POST['inputData'])) {
 			}
 		}
 
+		function selecionaProdutoServico(tipo) {
+			if(tipo == 'P'){
+				document.getElementById('formLote').style.display = "block";
+				document.getElementById('formValidade').style.display = "block";
+				document.getElementById('classificacao').style.display = "block";
+				$('#tituloProdutoServico').html('Dados dos Produtos')
+				$('[for=cmbProduto]').html('Produto')
+			} else {
+				document.getElementById('formLote').style.display = "none";
+				document.getElementById('formValidade').style.display = "none";
+				document.getElementById('classificacao').style.display = "none";
+				$('#tituloProdutoServico').html('Dados dos Serviços')
+				$('[for=cmbProduto]').html('Serviço')
+			}
+		}
+
 		function selecionaMotivo(motivo) {
 			var Motivo = motivo.split("#");
 			var chave = Motivo[1];
@@ -1494,7 +1514,23 @@ if (isset($_POST['inputData'])) {
 
 							<div class="row" id="dadosProduto" style="display: none">
 								<div class="col-lg-12">
-									<h5 class="mb-0 font-weight-semibold">Dados dos Produtos</h5>
+									<div class="col-lg-4 px-0">
+										<div class="form-group">
+											<div class="form-check form-check-inline">
+												<label class="form-check-label">
+													<input type="radio" name="inputProdutoServico" value="P" class="form-input-styled" onclick="selecionaProdutoServico('P')"  checked data-fouc>
+													Produto
+												</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<label class="form-check-label">
+													<input type="radio" name="inputProdutoServico" value="S" class="form-input-styled" onclick="selecionaProdutoServico('S')"   data-fouc>
+													Serviço
+												</label>
+											</div>
+										</div>
+									</div>
+									<h5 class="mb-0 font-weight-semibold" id="tituloProdutoServico">Dados dos Produtos</h5>
 									<br>
 
 									<div class="row">
@@ -1568,14 +1604,14 @@ if (isset($_POST['inputData'])) {
 											</div>
 										</div>
 
-										<div class="col-lg-2">
+										<div class="col-lg-2" id="formLote">
 											<div class="form-group">
 												<label for="inputLote">Lote</label>
 												<input type="text" id="inputLote" name="inputLote" class="form-control">
 											</div>
 										</div>
 
-										<div class="col-lg-2">
+										<div class="col-lg-2" id="formValidade">
 											<div class="form-group">
 												<label for="inputValidade">Validade</label>
 												<input type="text" id="inputValidade" name="inputValidade" class="form-control">
