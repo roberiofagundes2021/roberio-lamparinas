@@ -80,8 +80,15 @@ try {
             <td colspan="1" style="width:20%; font-size:12px;">Telefone: '.$row['UsuarTelefone'].'</td>
             <td colspan="1" style="width:20%; font-size:12px;">Celular: '.$row['UsuarCelular'].'</td>
             <td colspan="1" style="width:20%; font-size:12px;">E-mail: '.$row['UsuarEmail'].'</td>
-        </tr>
-    </table>
+		</tr>';
+	
+	if ($row['SolicObservacao'] != null && $row['SolicObservacao'] != ''){
+		$html .= '<tr>
+					<td colspan="4">Observação: '.$row['SolicObservacao'].'</td>
+				  </tr>';
+	}
+
+    $html.= '</table>
 	<br>';
 	
 	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, SlXPrQuantidade
