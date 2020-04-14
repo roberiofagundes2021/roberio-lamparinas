@@ -11,23 +11,19 @@ if (isset($_POST['inputOrdemCompraId'])) {
 
 	$iOrdemCompra = $_POST['inputOrdemCompraId'];
 
-	try {
-
-		$sql = "SELECT OrComId, OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, 
-					   OrComSubCategoria, OrComConteudo, OrComFornecedor, ForneContato, ForneEmail, ForneTelefone, ForneCelular, 
-					   OrComValorFrete, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
-					   OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, UsuarNome, UsuarEmail, UsuarTelefone
-				FROM OrdemCompra
-				JOIN Usuario on UsuarId = OrComSolicitante
-				JOIN Fornecedor on ForneId = OrComFornecedor
-				WHERE OrComId = $iOrdemCompra ";
-		$result = $conn->query($sql);
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-	} catch (PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
-	}
+	$sql = "SELECT OrComId, OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, 
+				   OrComSubCategoria, OrComConteudo, OrComFornecedor, ForneContato, ForneEmail, ForneTelefone, ForneCelular, 
+				   OrComValorFrete, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
+				   OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, UsuarNome, UsuarEmail, UsuarTelefone
+			FROM OrdemCompra
+			JOIN Usuario on UsuarId = OrComSolicitante
+			JOIN Fornecedor on ForneId = OrComFornecedor
+			WHERE OrComId = $iOrdemCompra ";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 	$_SESSION['msg'] = array();
+
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
 	irpara("ordemcompra.php");
@@ -136,13 +132,12 @@ if (isset($_POST['inputTipo'])) {
 
 			//Ao carregar a página é verificado se é PF ou PJ para aparecer os campos relacionados e esconder o que não estiver
 			var tipo = $('input[name="inputTipo"]:checked').val();
+			var cmbCategoria = $('#cmbCategoria').val();
+			var cmbSubCategoria = $('#cmbSubCategoria').val();
 
 			selecionaTipo(tipo);
 
 			Filtrando();
-
-			var cmbCategoria = $('#cmbCategoria').val();
-			var cmbSubCategoria = $('#cmbSubCategoria').val();
 
 			//Ao carregar a página tive que executar o que o onChange() executa para que a combo da SubCategoria já venha filtrada, além de selecionada, é claro.
 
@@ -186,7 +181,7 @@ if (isset($_POST['inputTipo'])) {
 				} else {
 					$('#inputTelefoneFornecedor').val(Forne[4]);
 				}
-				
+
 				$.getJSON('filtraCategoria.php?idFornecedor='+Forne[0], function (dados){
 					
 					//var option = '<option value="#">Selecione a Categoria</option>';
@@ -556,7 +551,7 @@ if (isset($_POST['inputTipo'])) {
 													$result = $conn->query($sql);
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowSubCategoria as $item) {
+													foreach ($rowSubCategoria as $item) {														
 														$seleciona = $item['SbCatId'] == $row['OrComSubCategoria'] ? "selected" : "";
 														print('<option value="' . $item['SbCatId'] . '" ' . $seleciona . '>' . $item['SbCatNome'] . '</option>');
 													}

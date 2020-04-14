@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Movimentação';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave, LcEstNome, SetorNome
+$sql = "SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave, SituaCor, LcEstNome, SetorNome
 		FROM Movimentacao
 		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
 		LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal or LcEstId = MovimDestinoLocal
@@ -58,13 +58,39 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				autoWidth: false,
 				responsive: true,
 				columnDefs: [{
-						visible: false,
+						orderable: true,  //Data
+						width: "10%",
 						targets: [0]
 					},
 					{
-						orderable: false,
-						width: 50,
-						targets: [7]
+						orderable: true, //Tipo
+						width: "10%",
+						targets: [1]
+					},
+					{
+						orderable: true, //Nota Fiscal
+						width: "10%",
+						targets: [2]
+					},
+					{
+						orderable: true, //Fornecedor
+						width: "30%",
+						targets: [3]
+					},
+					{
+						orderable: true, //Destino
+						width: "20%",
+						targets: [4]
+					},
+					{
+						orderable: true, //Situação
+						width: "10%",
+						targets: [5]
+					},
+					{
+						orderable: false, //Ações
+						width: "10%",
+						targets: [6]
 					}
 				],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -165,7 +191,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table class="table" id="tblMovimentacao">
 								<thead>
 									<tr class="bg-slate">
-										<th>Id</th>
 										<th>Data</th>
 										<th>Tipo</th>
 										<th>Nota Fiscal</th>
@@ -189,11 +214,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											$local = isset($item['LcEstNome']) ? $item['LcEstNome'] : $item['SetorNome'];
 										}
 										$situacao = $item['SituaNome'];
-										$situacaoClasse = $item['SituaChave'] == 'PENDENTE' ? 'badge-success' : 'badge-secondary';
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 
 										print('
 										<tr>
-											<td>' . $item['MovimId'] . '</td>
 											<td>' . mostraData($item['MovimData']) . '</td>
 											<td>' . $tipo . '</td>
 											<td>' . $item['MovimNotaFiscal'] . '</td>
@@ -201,7 +225,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>' . $local . '</td>
 											');
 
-										print('<td><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></td>');
+										print('<td><span class="'.$situacaoClasse.'">'.$situacao.'</span></td>');
 
 										if ($item['MovimTipo'] == 'T' || $item['MovimTipo'] == 'S') {
 											print('<td class="text-center">

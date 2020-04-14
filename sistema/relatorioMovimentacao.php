@@ -283,7 +283,7 @@ $dataFim = date ("Y-m-d");
 								<p class="font-size-lg">Utilize os filtros abaixo para gerar o relatório.</p>
 								<br>
 								
-								<form name="formMovimentacao" method="post" action="relatorioMovimentacaoImprime.php" target="_blank">
+								<form name="formMovimentacao" method="post" action="relatorioMovimentacaoImprime.php" class="p-3">
 									<div class="row">
 										<div class="col-lg-2">
 											<div class="form-group">
@@ -428,13 +428,32 @@ $dataFim = date ("Y-m-d");
 									</div>								
 											
 									<div class="text-right">
-										<div>										
-											<button type="submit" class="btn btn-success btn-icon">
-												<i class="icon-printer2"> Imprimir</i>
-											</button>
+										<div>
+											<button id="submitFiltro" class="btn btn-success"><i class="icon-search">Consultar</i></button>										
+											<button  class="btn btn-secondary btn-icon" >
+                                            	<i class="icon-printer2"> Imprimir</i>
+                                        	</button>
 										</div>
 									</div>
 								</form>
+
+								<table class="table" id="tblMovimentacao">
+									<thead>
+										<tr class="bg-slate">
+											<th>Data</th>
+											<th>Tipo</th>
+											<th>Produto</th> <!-- O Hint deve aparecer Código, Patrimônio e Detalhamento -->
+											<th>Categoria</th>
+											<th>Fornecedor</th>
+											<th>Quantidade</th>
+											<th>Origem</th>
+											<th>Destino</th>
+										</tr>
+									</thead>
+									<tbody>
+
+									</tbody>
+								</table>								
 								
 							</div>
 							

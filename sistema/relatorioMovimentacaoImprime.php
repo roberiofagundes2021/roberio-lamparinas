@@ -19,15 +19,13 @@ $iProduto = isset($_POST['cmProduto']) ? $_POST['cmbProduto'] : 0;
 
 
 $sql = "SELECT MovimData, MovimTipo, ForneNome, LcEstNome as Origem, MovimDestinoLocal, MovimDestinoManual, 
-	    ProduNome, MvXPrQuantidade, MvXPrLote, MvXPrValidade, MovimNotaFiscal, FinalNome, ClassNome,
-		MvXPrValorUnitario
+	    ProduNome, MvXPrQuantidade, MvXPrLote, MvXPrValidade, MovimNotaFiscal, ClassNome, MvXPrValorUnitario
 		FROM Movimentacao
 		JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
 		JOIN Produto on ProduId = MvXPrProduto
-		LEFT JOIN Finalidade on FinalId = MovimFinalidade
 		LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
 		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
-		LEFT JOIN LocalEstoque on LcEstId = MovimOrigem
+		LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal
 		Where MovimEmpresa = ".$_SESSION['EmpreId']." and MovimData between '".$dDataInicio."' and '".$dDataFim."' ";
 
 if ($iCategoria != '#' and $iCategoria != 0){
@@ -96,7 +94,6 @@ try {
 			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Lote</th>
 			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:6%">Validade</th>
 			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">NF</th>
-			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Finalidade</th>
 			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Classificação</th>
 			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Valor</th>
 		</tr>
@@ -114,7 +111,6 @@ try {
 					<td style='padding-top: 8px; border-top: 1px solid #333;'>".$item['MvXPrLote']."</td>
 					<td style='padding-top: 8px; border-top: 1px solid #333;'>".mostraData($item['MvXPrValidade'])."</td>
 					<td style='padding-top: 8px; border-top: 1px solid #333;'>".$item['MovimNotaFiscal']."</td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>".$item['FinalNome']."</td>
 					<td style='padding-top: 8px; border-top: 1px solid #333;'>".$item['ClassNome']."</td>
 					<td style='padding-top: 8px; border-top: 1px solid #333;'>".mostraValor($item['MvXPrValorUnitario'])."</td>
 				</tr>

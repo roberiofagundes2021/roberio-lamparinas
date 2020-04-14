@@ -40,6 +40,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
     <script src="global_assets/js/demo_pages/form_layouts.js"></script>
 
     <script type="text/javascript">
+    
         $(document).ready(function() {
 
             /* Início: Tabela Personalizada */

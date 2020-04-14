@@ -66,7 +66,7 @@ function queryPesquisa(){
                 $string .= ' and ';
             }
 
-            $sql = "SELECT MvXPrId, MovimId ,MovimData, MovimNotaFiscal, MovimOrigem, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, SetorNome
+            $sql = "SELECT MvXPrId, MovimId ,MovimData, MovimNotaFiscal, MovimOrigemLocal, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, SetorNome
                     FROM Movimentacao
                     JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
                     JOIN Produto on ProduId = MvXPrProduto

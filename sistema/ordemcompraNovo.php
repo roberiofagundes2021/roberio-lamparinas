@@ -24,10 +24,10 @@ if(isset($_POST['inputData'])){
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 		
 		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, 
-							OrComConteudo, OrComFornecedor, OrComValorFrete, OrComTotalPedido, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
+							OrComConteudo, OrComFornecedor, OrComValorFrete, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
 							OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, OrComSituacao, OrComUsuarioAtualizador, OrComEmpresa)
 				VALUES (:sTipo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, 
-						:fTotalPedido, :iSolicitante, :iUnidade, :iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, 
+						:iSolicitante, :iUnidade, :iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, 
 						:iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
@@ -48,7 +48,6 @@ if(isset($_POST['inputData'])){
 						':sConteudo' => $_POST['txtareaConteudo'],
 						':iFornecedor' => $iFornecedor,
 						':fValorFrete' => null,
-						':fTotalPedido' => null,
 						':iSolicitante' => $_SESSION['UsuarId'],
 						':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
 						':iLocalEntrega' => $_POST['cmbLocalEstoque'] == '' ? null : $_POST['cmbLocalEstoque'],
