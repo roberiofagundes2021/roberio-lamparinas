@@ -290,6 +290,7 @@ if (isset($_POST['inputData'])) {
 											     <th width="5%">Item</th>
 											     <th width="75%">Serviço</th>
 											     <th width="10%">Quantidade</th>
+												 <th width="10%">Saldo</th>
 											     <th width="10%"></th>
 									     	</tr>
 							                    `;
@@ -298,7 +299,7 @@ if (isset($_POST['inputData'])) {
 						                        <td>${valores[0]}</td>
 												<td>${valores[1]}</td>
 												<td><input id='quantidade' type="text" class="form-control" value="" style="text-align: center"></td>
-												<td><input id='saldo' type="hidden" class="form-control" value="${saldoinicialModal}" disabled></td>
+												<td><input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled></td>
 											</tr>
 						                  `;
 						} else {
@@ -548,6 +549,33 @@ if (isset($_POST['inputData'])) {
 					}
 				}
 			});
+
+			function limiteTxtarea() {
+				console.log($('#txtareaObservacao'))
+				$('#txtareaObservacao').on('keyup', () => {
+					let texto = $('#txtareaObservacao').val()
+					let tam = $('#txtareaObservacao').val().length
+
+					if (tam > 4000) {
+						if (document.getElementById('txtareaObservacao').readOnly == true) {
+							alerta('Atenção', 'É permitido um máximo de 4000 caracteres.', 'error');
+							$('#txtareaObservacao').val(texto.substring(0,(texto.length - 1)))
+						} else {
+							document.getElementById('txtareaObservacao').readOnly = true;
+						}
+
+						//$('#txtareaObservacao').val(texto.substr(1,40))
+
+						
+						return
+					}
+				})
+
+				$('#txtareaObservacao').on('click', () => {
+					document.getElementById('txtareaObservacao').readOnly = false;
+				})
+			}
+			//limiteTxtarea()
 
 			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
@@ -1155,7 +1183,7 @@ if (isset($_POST['inputData'])) {
 		}
 
 		function selecionaProdutoServico(tipo) {
-			if(tipo == 'P'){
+			if (tipo == 'P') {
 				document.getElementById('formLote').style.display = "block";
 				document.getElementById('formValidade').style.display = "block";
 				document.getElementById('classificacao').style.display = "block";
@@ -1290,7 +1318,7 @@ if (isset($_POST['inputData'])) {
 									<div class="row">
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputData">Data</label>
+												<label for="inputData">Data<span style="color: red">*</span></label>
 												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" readOnly>
 											</div>
 										</div>
@@ -1342,7 +1370,7 @@ if (isset($_POST['inputData'])) {
 
 										<div class="col-lg-4" id="DestinoLocal">
 											<div class="form-group">
-												<label for="cmbDestinoLocal">Destino</label>
+												<label for="cmbDestinoLocal">Destino<span style="color: red">*</span></label>
 												<select id="cmbDestinoLocal" name="cmbDestinoLocal" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
@@ -1363,7 +1391,7 @@ if (isset($_POST['inputData'])) {
 
 										<div class="col-lg-4" id="DestinoSetor" style="display:none">
 											<div class="form-group">
-												<label for="cmbDestinoSetor">Destino</label>
+												<label for="cmbDestinoSetor">Destino<span style="color: red">*</span></label>
 												<select id="cmbDestinoSetor" name="cmbDestinoSetor" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
@@ -1384,7 +1412,7 @@ if (isset($_POST['inputData'])) {
 
 										<div class="col-lg-4" id="DestinoLocalEstoqueSetor" style="display:none;">
 											<div class="form-group">
-												<label for="cmbDestinoLocalEstoqueSetor">Destino</label>
+												<label for="cmbDestinoLocalEstoqueSetor">Destino<span style="color: red">*</span></label>
 												<select id="cmbDestinoLocalEstoqueSetor" name="cmbDestinoLocalEstoqueSetor" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
@@ -1407,7 +1435,7 @@ if (isset($_POST['inputData'])) {
 
 										<div class="col-lg-4" id="DestinoManual" style="display:none">
 											<div class="form-group">
-												<label for="inputDestinoManual">Destino</label>
+												<label for="inputDestinoManual">Destino<span style="color: red">*</span></label>
 												<input type="text" id="inputDestinoManual" name="inputDestinoManual" class="form-control">
 											</div>
 										</div>
@@ -1419,7 +1447,7 @@ if (isset($_POST['inputData'])) {
 								<div class="col-lg-12">
 									<div class="form-group">
 										<label for="txtareaObservacao">Observação</label>
-										<textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" placeholder="Observação"></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" placeholder="Observação" maxlength="4000"></textarea>
 									</div>
 								</div>
 							</div>
@@ -1432,7 +1460,7 @@ if (isset($_POST['inputData'])) {
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbFornecedor">Fornecedor</label>
+												<label for="cmbFornecedor">Fornecedor<span style="color: red">*</span></label>
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
 													<option value="-1">Selecione</option>
 													<?php
@@ -1475,7 +1503,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputNotaFiscal">Nº Nota Fiscal</label>
-												<input type="text" id="inputNotaFiscal" name="inputNotaFiscal" class="form-control" placeholder="Nº NF">
+												<input type="text" id="inputNotaFiscal" name="inputNotaFiscal" class="form-control" placeholder="Nº NF" maxlength="50">
 											</div>
 										</div>
 
@@ -1503,7 +1531,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputChaveAcesso">Chave de Acesso</label>
-												<input type="text" id="inputChaveAcesso" name="inputChaveAcesso" class="form-control" placeholder="Chave de Acesso NF">
+												<input type="text" id="inputChaveAcesso" name="inputChaveAcesso" class="form-control" placeholder="Chave de Acesso NF" maxlength="100">
 											</div>
 										</div>
 
@@ -1518,13 +1546,13 @@ if (isset($_POST['inputData'])) {
 										<div class="form-group">
 											<div class="form-check form-check-inline">
 												<label class="form-check-label">
-													<input type="radio" name="inputProdutoServico" value="P" class="form-input-styled" onclick="selecionaProdutoServico('P')"  checked data-fouc>
+													<input type="radio" name="inputProdutoServico" value="P" class="form-input-styled" onclick="selecionaProdutoServico('P')" checked data-fouc>
 													Produto
 												</label>
 											</div>
 											<div class="form-check form-check-inline">
 												<label class="form-check-label">
-													<input type="radio" name="inputProdutoServico" value="S" class="form-input-styled" onclick="selecionaProdutoServico('S')"   data-fouc>
+													<input type="radio" name="inputProdutoServico" value="S" class="form-input-styled" onclick="selecionaProdutoServico('S')" data-fouc>
 													Serviço
 												</label>
 											</div>
@@ -1667,6 +1695,7 @@ if (isset($_POST['inputData'])) {
 												<th>Produto/Serviço</th>
 												<th>Unidade Medida</th>
 												<th>Quant. Recebida</th>
+												<th>Saldo</th>
 												<th>Valor Unitário</th>
 												<th>Valor Total</th>
 												<th class="text-center">Ações</th>
@@ -1674,6 +1703,7 @@ if (isset($_POST['inputData'])) {
 										</thead>
 										<tbody>
 											<tr style="display:none;">
+												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
