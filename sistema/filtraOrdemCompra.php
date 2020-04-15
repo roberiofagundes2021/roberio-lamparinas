@@ -70,7 +70,7 @@ if ($count) {
         print($totalProdutos);
 
         if ($saldosPositivos == $totalProdutos) {
-            print('<option idOrdemCompra="' . $value['OrComId'] . '" value="' . $value['OrComNumero'] . '">' . $value['OrComNumero'] . '</option>');
+            print('<option idOrdemCompra="' . $value['OrComId'] . '" value="' . $value['OrComId'] . '">' . $value['OrComNumero'] . '</option>');
         }
     }
 }
