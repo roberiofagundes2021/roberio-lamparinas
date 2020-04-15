@@ -847,7 +847,7 @@ if (isset($_POST['inputData'])) {
 					$("select#cmbFornecedor").trigger("change"); //Simula o change do select
 				}
 
-				$.getJSON('movimentacaoSituacao.php', function(dados) {
+				/*$.getJSON('movimentacaoSituacao.php', function(dados) {
 
 					var option = '<option value="#">Selecione</option>';
 
@@ -871,7 +871,7 @@ if (isset($_POST['inputData'])) {
 
 						$('#cmbSituacao').html(option).show();
 					}
-				});
+				});*/
 			});
 
 			$("input[type=radio][name=inputProdutoServico]").click(function() {
