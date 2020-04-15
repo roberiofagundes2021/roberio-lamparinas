@@ -154,6 +154,74 @@ if (isset($_POST['inputData'])) {
 			exit;
 		}
 
+
+
+		if (isset($_POST['cmbSituacao'])) {
+
+			$sql = "SELECT SituaId, SituaNome, SituaChave
+					FROM Situacao
+					WHERE SituaId = " . $_POST['cmbSituacao'] . "
+					";
+			$result = $conn->query($sql);
+			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+			$destinoChave = '';
+
+			if($rowSituacao['SituaChave'] == 'AGUARDANDOLIBERACAO') $destinoChave = 'CENTROADMINISTRATIVO';
+			if($rowSituacao['SituaChave'] == 'PENDENTE') $destinoChave = 'ALMOXARIFADO';
+			
+			if ($rowSituacao['SituaChave'] != 'FINALIZADO') {
+				$sql = "SELECT PerfiId
+				        FROM Perfil
+				        WHERE PerfiChave = '".$destinoChave ."' 
+				        ";
+				$result = $conn->query($sql);
+				$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
+				
+
+				/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
+				$sIdentificacao = 'Movimentação';
+
+				$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
+								BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
+					VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, 
+							:iStatus, :iUsuarioAtualizador, :iEmpresa)";
+				$result = $conn->prepare($sql);
+
+				$result->execute(array(
+					':sIdentificacao' => $sIdentificacao,
+					':dData' => date("Y-m-d"),
+					':sDescricao' => 'Liberar Movimentacao',
+					':sURL' => '',
+					':iSolicitante' => $_SESSION['UsuarId'],
+					':sTabela' => 'Movimentacao',
+					':iTabelaId' => $insertId,
+					':iStatus' => $rowSituacao['SituaId'],
+					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+					':iEmpresa' => $_SESSION['EmpreId']
+				));
+
+				$insertIdBande = $conn->lastInsertId();
+
+				$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeEmpresa)
+						VALUES (:iBandeja, :iPerfil, :iEmpresa)";
+				$result = $conn->prepare($sql);
+
+				$result->execute(array(
+					':iBandeja' => $insertIdBande,
+					':iPerfil' => $rowPerfil['PerfiId'],
+					':iEmpresa' => $_SESSION['EmpreId']
+				));
+
+				/* Fim Insere Bandeja */
+			}
+		}
+
+
+
+
+
+
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -549,33 +617,6 @@ if (isset($_POST['inputData'])) {
 					}
 				}
 			});
-
-			function limiteTxtarea() {
-				console.log($('#txtareaObservacao'))
-				$('#txtareaObservacao').on('keyup', () => {
-					let texto = $('#txtareaObservacao').val()
-					let tam = $('#txtareaObservacao').val().length
-
-					if (tam > 4000) {
-						if (document.getElementById('txtareaObservacao').readOnly == true) {
-							alerta('Atenção', 'É permitido um máximo de 4000 caracteres.', 'error');
-							$('#txtareaObservacao').val(texto.substring(0,(texto.length - 1)))
-						} else {
-							document.getElementById('txtareaObservacao').readOnly = true;
-						}
-
-						//$('#txtareaObservacao').val(texto.substr(1,40))
-
-						
-						return
-					}
-				})
-
-				$('#txtareaObservacao').on('click', () => {
-					document.getElementById('txtareaObservacao').readOnly = false;
-				})
-			}
-			//limiteTxtarea()
 
 			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
@@ -1695,7 +1736,6 @@ if (isset($_POST['inputData'])) {
 												<th>Produto/Serviço</th>
 												<th>Unidade Medida</th>
 												<th>Quant. Recebida</th>
-												<th>Saldo</th>
 												<th>Valor Unitário</th>
 												<th>Valor Total</th>
 												<th class="text-center">Ações</th>
@@ -1703,7 +1743,6 @@ if (isset($_POST['inputData'])) {
 										</thead>
 										<tbody>
 											<tr style="display:none;">
-												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
@@ -1733,40 +1772,43 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputSituacao">Situação</label>
-												<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>
-													<!--<option value="#">Selecione</option>-->
-													<?php
+												<!--<option value="#">Selecione</option>-->
+												<?php
 
-													if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
-														$sql = "SELECT SituaId, SituaNome, SituaChave
+												if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
+													$sql = "SELECT SituaId, SituaNome, SituaChave
 																 FROM Situacao
 																 WHERE SituaStatus = '1'
 															     ORDER BY SituaNome ASC";
-														$result = $conn->query($sql);
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-														print('<option value="#">Selecione</option>');
+													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2">');
+													print('<option value="#">Selecione</option>');
 
-														foreach ($row as $item) {
-
+													foreach ($row as $item) {
+														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'FINALIZADO') {
 															print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
 														}
-													} else {
+													}
+												} else {
 
-														$sql = "SELECT SituaId, SituaNome, SituaChave
+													$sql = "SELECT SituaId, SituaNome, SituaChave
 													            FROM Situacao
 													            WHERE SituaStatus = '1'
 													            ORDER BY SituaNome ASC";
-														$result = $conn->query($sql);
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-														foreach ($row as $item) {
-															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-																print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-															}
+													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
+
+													foreach ($row as $item) {
+														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
+															print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
 														}
 													}
-													?>
+												}
+												?>
 												</select>
 
 											</div>
