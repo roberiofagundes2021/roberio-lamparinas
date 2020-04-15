@@ -278,14 +278,16 @@ if (isset($_POST['inputData'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		function produtosOrdemConpra(numOrdemCompra) {
+		function produtosOrdemConpra(ordemCompra) {
 			let inputLote = $('#inputLote').val();
-
+			let numOrdemCompra = $('#cmbOrdemCompra').val()
+            
 			$.ajax({
 				type: "POST",
 				url: "movimentacaoAddProdutoOrdemCompra.php",
 				data: {
-					ordemCompra: numOrdemCompra,
+					ordemCompra: ordemCompra,
+					numOrdemCompra: numOrdemCompra,
 					lote: inputLote
 				},
 				success: function(resposta) {
@@ -310,7 +312,7 @@ if (isset($_POST['inputData'])) {
 				type: "POST",
 				url: "movimentacaoSaldoOrdemCompra.php",
 				data: {
-					ordemCompra: numOrdemCompra,
+					ordemCompra: ordemCompra,
 				},
 				success: function(resposta) {
 					$("#inputTotalOrdemCompraCartaContrato").val(float2moeda(resposta)).attr('disabled', '').attr('valor', resposta);
@@ -700,6 +702,7 @@ if (isset($_POST['inputData'])) {
 
 					var option = '<option value="#">Selecione</option>';
 					if (dados) {
+						console.log(dados)
 						$('#cmbOrdemCompra').html(option).show();
 						$('#cmbOrdemCompra').append(dados).show();
 					} else {
