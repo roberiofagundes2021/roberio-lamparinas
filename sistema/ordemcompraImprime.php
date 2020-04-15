@@ -8,7 +8,13 @@ use Mpdf\Mpdf;
 
 require_once 'global_assets/php/vendor/autoload.php';
 
-$iOrdemCompra = $_POST['inputOrdemCompraId'];
+if (isset($_POST['inputOrdemCompraId'])){
+	$iOrdemCompra = $_POST['inputOrdemCompraId'];
+} else{
+	print('<script>
+				window.close();
+		   </script> ');
+}
 
 $sql = "SELECT ForneNome, ForneCelular, ForneEmail, CategNome, OrComTipo, OrComNumero, OrComConteudo
 		FROM OrdemCompra

@@ -8,10 +8,12 @@ use Mpdf\Mpdf;
 
 require_once 'global_assets/php/vendor/autoload.php';
 
-if(isset($_POST['inputSolicitacaoId'])){
+if (isset($_POST['inputSolicitacaoId'])){
 	$iSolicitacao = $_POST['inputSolicitacaoId'];
-} else {
-	$iSolicitacao = $_POST['inputSolicitacaoId'];
+} else{
+	print('<script>
+				window.close();
+		   </script> ');
 }
 
 $sql = "SELECT SolicNumero, SolicData, SolicObservacao, UsuarNome, UsuarTelefone, UsuarCelular, UsuarEmail, SetorNome
