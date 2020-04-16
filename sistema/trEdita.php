@@ -565,7 +565,7 @@ if (isset($_POST['inputTRData'])) {
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaConteudo">Conteúdo personalizado</label>
+										<label for="txtareaConteudo">Conteúdo personalizado - Introdução</label>
 										<textarea rows="5" cols="5" class="form-control" id="summernote" name="txtareaConteudo" placeholder="Corpo do TR (informe aqui o texto que você queira que apareça no TR)"><?php echo $row['TrRefConteudo']; ?></textarea>
 									</div>
 								</div>

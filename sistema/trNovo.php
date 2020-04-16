@@ -351,7 +351,7 @@ if (isset($_POST['inputData'])) {
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaConteudo">Conteúdo personalizado</label>
+										<label for="txtareaConteudo">Conteúdo personalizado - Introdução</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
 										<textarea rows="5" cols="5" class="form-control" id="summernote" name="txtareaConteudo" placeholder="Corpo da TR (informe aqui o texto que você queira que apareça na TR)"></textarea>
 									</div>

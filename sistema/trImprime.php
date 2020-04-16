@@ -62,6 +62,8 @@ try {
 	$result = $conn->query($sql);
 	$rowServicoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
 
+	$totalProdutos = 0;
+	$totalServicos = 0;
 	$totalGeralProdutos = 0;
 	$totalGeralServicos = 0;
 	$totalGeral = 0;
@@ -118,7 +120,7 @@ try {
 		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>PRODUTOS</h2></div>";
 
 		$html .= '
-		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
+		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd; padding: 8px; border: 1px solid #ccc;">
 			Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
 		</div>
 		<br>
@@ -130,7 +132,7 @@ try {
 
 			//Se foi utilizado ProdutoOrcamento
 			if($countProdutoUtilizado1){
-				$sql = "SELECT PrOrcId as Id, PrOrcNome as Nome, PrOrcCategoria as Categoria, PrOrcSubCategoria as SubCategoria
+				$sql = "SELECT PrOrcId as Id, PrOrcNome as Nome, PrOrcCategoria as Categoria, PrOrcSubCategoria as SubCategoria,
 						PrOrcDetalhamento as Detalhamento, UnMedSigla, TRXPrQuantidade, TRXPrValorUnitario
 						FROM ProdutoOrcamento
 						JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
@@ -150,7 +152,7 @@ try {
 			if (isset($rowProdutos)){
 
 				$html .= '
-				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 5px;">
+				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
 					SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
 				</div>
 				<br> ';					
@@ -159,11 +161,9 @@ try {
 				<table style="width:100%; border-collapse: collapse;">
 					<tr>
 						<th style="text-align: center; width:8%">Item</th>
-						<th style="text-align: left; width:46%">Produto</th>
-						<th style="text-align: center; width:10%">Unidade</th>        	
-						<th style="text-align: center; width:12%">Quant.</th>
-						<th style="text-align: center; width:12%">V. Unit.</th>
-						<th style="text-align: center; width:12%">V. Total</th>
+						<th style="text-align: left; width:65%">Produto</th>
+						<th style="text-align: center; width:12%">Unidade</th>        	
+						<th style="text-align: center; width:15%">Quantidade</th>
 					</tr>
 				';			
 
@@ -171,6 +171,7 @@ try {
 
 					if ($sbcat['TRXSCSubcategoria'] == $itemProduto['SubCategoria']) {
 
+						/*
 						if ($itemProduto['TRXPrValorUnitario'] != '' and $itemProduto['TRXPrValorUnitario'] != null) {
 							$valorUnitario = $itemProduto['TRXPrValorUnitario'];
 							$valorTotal = $itemProduto['TRXPrQuantidade'] * $itemProduto['TRXPrValorUnitario'];
@@ -178,6 +179,7 @@ try {
 							$valorUnitario = 0;
 							$valorTotal = 0;
 						}
+						*/
 
 						$html .= "
 							<tr>
@@ -185,24 +187,24 @@ try {
 								<td style='text-align: left;'>" . $itemProduto['Nome'] . ": " . $itemProduto['Detalhamento'] . "</td>
 								<td style='text-align: center;'>" . $itemProduto['UnMedSigla'] . "</td>							
 								<td style='text-align: center;'>" . $itemProduto['TRXPrQuantidade'] . "</td>
-								<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
-								<td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>
 							</tr>
 						";
 
 						$cont++;
-						$totalGeralProdutos += $valorTotal;
+						$totalProdutos += $itemProduto['TRXPrQuantidade'];						
 					}
 				}
+
+				$totalGeralProdutos += $totalProdutos;
 			
 				$html .= "<br>";
 				
 				$html .= "  <tr>
-								<td colspan='5' height='50' valign='middle'>
+								<td colspan='3' height='50' valign='middle'>
 									<strong>Total Produtos</strong>
 								</td>
-								<td style='text-align: right' colspan='2'>
-									".mostraValor($totalGeralProdutos)."
+								<td style='text-align: center' colspan='1'>
+									".$totalProdutos."
 								</td>
 							</tr>";
 				$html .= "</table>";
@@ -215,7 +217,7 @@ try {
 		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
 
 		$html .= '
-		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
+		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd;  padding: 8px;  border: 1px solid #ccc;">
 			Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
 		</div>
 		<br>
@@ -246,7 +248,7 @@ try {
 			if (isset($rowServicos) and $count){
 
 				$html .= '
-				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 5px;">
+				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
 					SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
 				</div>
 				<br> ';				
@@ -255,10 +257,8 @@ try {
 				<table style="width:100%; border-collapse: collapse;">
 					<tr>
 						<th style="text-align: center; width:8%">Item</th>
-						<th style="text-align: left; width:56%">Serviço</th>
-						<th style="text-align: center; width:12%">Quant.</th>
-						<th style="text-align: center; width:12%">V. Unit.</th>
-						<th style="text-align: center; width:12%">V. Total</th>
+						<th style="text-align: left; width:77%">Serviço</th>
+						<th style="text-align: center; width:15%">Quantidade</th>
 					</tr>
 				';			
 
@@ -266,38 +266,38 @@ try {
 
 					if ($sbcat['TRXSCSubcategoria'] == $itemServico['SubCategoria']) {
 
+						/*
 						if ($itemServico['TRXSrValorUnitario'] != '' and $itemServico['TRXSrValorUnitario'] != null) {
 							$valorUnitario = $itemServico['TRXSrValorUnitario'];
 							$valorTotal = $itemServico['TRXSrQuantidade'] * $itemServico['TRXSrValorUnitario'];
 						} else {
 							$valorUnitario = 0;
 							$valorTotal = 0;
-						}
+						} */
 
 						$html .= "
 							<tr>
 								<td style='text-align: center;'>" . $cont . "</td>
 								<td style='text-align: left;'>" . $itemServico['Nome'] . ": " . $itemServico['Detalhamento'] . "</td>
 								<td style='text-align: center;'>" . $itemServico['TRXSrQuantidade'] . "</td>
-								<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
-								<td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>
 							</tr>
 						";
 
 						$cont++;
-						$totalGeralServicos += $valorTotal;
+						$totalServicos += $itemServico['TRXSrQuantidade'];
 					}
 				}
 			
+				$totalGeralServicos += $totalServicos;
 
 				$html .= "<br>";
 				
 				$html .= "  <tr>
-								<td colspan='4' height='50' valign='middle'>
+								<td colspan='2' height='50' valign='middle'>
 									<strong>Total Serviços</strong>
 								</td>
-								<td style='text-align: right' colspan='2'>
-									".mostraValor($totalGeralServicos)."
+								<td style='text-align: center' colspan='1'>
+									".$totalServicos."
 								</td>
 							</tr>";
 				$html .= "</table>";
@@ -306,15 +306,16 @@ try {
 	}
 
 	$totalGeral = $totalGeralProdutos + $totalGeralServicos;
+	//echo $totalGeral;die;
 
 	if($totalGeral){
 		$html .= "<table style='width:100%; border-collapse: collapse; margin-top: 20px;'>
 					<tr>
-						<td colspan='5' height='50' valign='middle' style='width:85%'>
-							<strong>TOTAL GERAL</strong>
+						<td colspan='3' height='50' valign='middle' style='width:85%'>
+							<strong>TOTAL DE ITENS GERAL</strong>
 						</td>
-						<td style='text-align: right; width:15%'>
-							".mostraValor($totalGeral)."
+						<td style='text-align: center; width:15%'>
+							".$totalGeral."
 						</td>
 					</tr>
 				</table>
