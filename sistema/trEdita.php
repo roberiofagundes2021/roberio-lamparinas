@@ -21,7 +21,7 @@ if (isset($_POST['inputTRId'])) {
 
 	$iTR = $_POST['inputTRId'];
 
-	$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudo, TrRefTipo
+	$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio, TrRefConteudoFim, TrRefTipo
 			FROM TermoReferencia
 			WHERE TrRefId = $iTR ";
 	$result = $conn->query($sql);
@@ -66,14 +66,15 @@ if (isset($_POST['inputTRData'])) {
 
 		$conn->beginTransaction();
 
-		$sql = "UPDATE TermoReferencia SET TrRefCategoria = :iCategoria, TrRefConteudo = :sConteudo, TrRefTipo = :sTipo,
-										   TrRefUsuarioAtualizador = :iUsuarioAtualizador
+		$sql = "UPDATE TermoReferencia SET TrRefCategoria = :iCategoria, TrRefConteudoInicio = :sConteudoInicio, 
+				TrRefConteudoFim = :sConteudoFim, TrRefTipo = :sTipo, TrRefUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE TrRefId = :iTR";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 			':iCategoria' => $_POST['cmbCategoria'],
-			':sConteudo' => $_POST['txtareaConteudo'],
+			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+			':sConteudoFim' => $_POST['txtareaConteudoFim'],
 			':sTipo' => $tipoTr,
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iTR' => $iTR
@@ -210,7 +211,8 @@ if (isset($_POST['inputTRData'])) {
 				confirmaExclusao(document.formTR, "Existem produtos com quantidades ou valores lançados em orçamentos dessa TR, portanto, a Categoria e Subcategoria não podem ser alteradas. Apenas alterações no Conteúdo Personalizado são permitidas. Confirmar alteração?", "trEdita.php");
 			}
 
-			$('#summernote').summernote();
+			$('#summernoteInicio').summernote();
+			$('#summernoteFim').summernote();
 
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e) {
@@ -565,8 +567,18 @@ if (isset($_POST['inputTRData'])) {
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaConteudo">Conteúdo personalizado - Introdução</label>
-										<textarea rows="5" cols="5" class="form-control" id="summernote" name="txtareaConteudo" placeholder="Corpo do TR (informe aqui o texto que você queira que apareça no TR)"><?php echo $row['TrRefConteudo']; ?></textarea>
+										<label for="txtareaConteudoInicio">Conteúdo personalizado - Introdução</label>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do TR (informe aqui o texto que você queira que apareça no TR)"><?php echo $row['TrRefConteudoInicio']; ?></textarea>
+									</div>
+								</div>
+							</div>
+							<br>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudoFim">Conteúdo personalizado - Finalização</label>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais da TR (informe aqui o texto que você queira que apareça no término da TR)"><?php echo $row['TrRefConteudoFim']; ?></textarea>
 									</div>
 								</div>
 							</div>

@@ -42,9 +42,9 @@ if (isset($_POST['inputData'])) {
 		$sNumero = (int) $rowNumero['Numero'] + 1;
 		$sNumero = str_pad($sNumero, 6, "0", STR_PAD_LEFT);
 
-		$sql = "INSERT INTO TermoReferencia (TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudo, TrRefTipo,
+		$sql = "INSERT INTO TermoReferencia (TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio, TrRefConteudoFim, TrRefTipo,
 											 TrRefStatus, TrRefUsuarioAtualizador, TrRefEmpresa)
-				VALUES (:sNumero, :dData, :iCategoria, :sConteudo, :sTipo, 
+				VALUES (:sNumero, :dData, :iCategoria, :sConteudoInicio, :sConteudoFim, :sTipo, 
 						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
@@ -52,7 +52,8 @@ if (isset($_POST['inputData'])) {
 			':sNumero' => $sNumero,
 			':dData' => gravaData($_POST['inputData']),
 			':iCategoria' => $_POST['cmbCategoria'],
-			':sConteudo' => $_POST['txtareaConteudo'],
+			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+			':sConteudoFim' => $_POST['txtareaConteudoFim'],
 			':sTipo' => $tipoTr,
 			':bStatus' => 1,
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -157,8 +158,9 @@ if (isset($_POST['inputData'])) {
 	
 		$(document).ready(function() {
 
-			//Inicializa o editor de texto que será usado pelo campo "Conteúdo Personalizado"
-			$('#summernote').summernote();
+			//Inicializa o editor de texto que será usado pelos campos "Conteúdo Personalizado - Inicialização" e "Conteúdo Personalizado - Finalização"
+			$('#summernoteInicializacao').summernote();
+			$('#summernoteFinalizacao').summernote();
 
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e) {
@@ -351,9 +353,20 @@ if (isset($_POST['inputData'])) {
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaConteudo">Conteúdo personalizado - Introdução</label>
+										<label for="txtareaConteudo">Conteúdo Personalizado - Introdução</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
-										<textarea rows="5" cols="5" class="form-control" id="summernote" name="txtareaConteudo" placeholder="Corpo da TR (informe aqui o texto que você queira que apareça na TR)"></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo da TR (informe aqui o texto que você queira que apareça na TR)"></textarea>
+									</div>
+								</div>
+							</div>
+							<br>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudoFinalizacao">Conteúdo Personalizado - Finalização</label>
+										<!--<div id="summernote" name="txtareaConteudo"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais da TR (informe aqui o texto que você queira que apareça no término da TR)"></textarea>
 									</div>
 								</div>
 							</div>

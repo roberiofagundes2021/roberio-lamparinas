@@ -18,7 +18,7 @@ if (isset($_POST['inputTRId'])){
 
 try {
 
-	$sql = "SELECT TrRefNumero, TrRefConteudo, CategNome
+	$sql = "SELECT TrRefNumero, TrRefConteudoInicio, TrRefConteudoFim, CategNome
 			FROM TermoReferencia
 			JOIN Categoria on CategId = TrRefCategoria
 			WHERE TrRefEmpresa = " . $_SESSION['EmpreId'] . " and TrRefId = " . $iTR;
@@ -112,7 +112,7 @@ try {
 	";
 
 	$html .= '
-	<div>' . $row['TrRefConteudo'] . '</div>
+	<div>' . $row['TrRefConteudoInicio'] . '</div>
 	<br>';
 
 	if ($rowProdutoUtilizado1['CONT'] > 0 || $rowProdutoUtilizado2['CONT'] > 0){
@@ -131,7 +131,7 @@ try {
 		foreach ($rowSubCategoria as $sbcat) {			
 
 			//Se foi utilizado ProdutoOrcamento
-			if($countProdutoUtilizado1){
+			if($rowProdutoUtilizado1['CONT'] > 0){
 				$sql = "SELECT PrOrcId as Id, PrOrcNome as Nome, PrOrcCategoria as Categoria, PrOrcSubCategoria as SubCategoria,
 						PrOrcDetalhamento as Detalhamento, UnMedSigla, TRXPrQuantidade, TRXPrValorUnitario
 						FROM ProdutoOrcamento
@@ -171,16 +171,6 @@ try {
 
 					if ($sbcat['TRXSCSubcategoria'] == $itemProduto['SubCategoria']) {
 
-						/*
-						if ($itemProduto['TRXPrValorUnitario'] != '' and $itemProduto['TRXPrValorUnitario'] != null) {
-							$valorUnitario = $itemProduto['TRXPrValorUnitario'];
-							$valorTotal = $itemProduto['TRXPrQuantidade'] * $itemProduto['TRXPrValorUnitario'];
-						} else {
-							$valorUnitario = 0;
-							$valorTotal = 0;
-						}
-						*/
-
 						$html .= "
 							<tr>
 								<td style='text-align: center;'>" . $cont . "</td>
@@ -207,9 +197,9 @@ try {
 									".$totalProdutos."
 								</td>
 							</tr>";
-				$html .= "</table>";
+				$html .= "</table>"; 
 			}
-		}
+		} 
 	}
 
 	if ($rowServicoUtilizado1['CONT'] > 0 || $rowServicoUtilizado2['CONT'] > 0){
@@ -228,19 +218,20 @@ try {
 		foreach ($rowSubCategoria as $sbcat) {
 
 			//Se foi utilizado ServicoOrcamento
-			if($countServicoUtilizado1){
+			if($rowServicoUtilizado1['CONT'] > 0){
 				$sql = "SELECT SrOrcId as Id, SrOrcNome as Nome, SrOrcCategoria as Categoria, SrOrcSubCategoria as SubCategoria
-						SrOrcDetalhamento as Detalhamento, TRXSrQuantidade, TRXSrValorUnitario
+						SrOrcDetalhamento as Detalhamento, TRXSrQuantidade
 						FROM ServicoOrcamento
 						JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 						WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and SrOrcSubCategoria = ".$sbcat['TRXSCSubcategoria'];
 			} else {
 				$sql = "SELECT ServiId as Id, ServiNome as Nome, ServiCategoria as Categoria, ServiSubCategoria as SubCategoria, 
-						ServiDetalhamento as Detalhamento, TRXSrQuantidade, TRXSrValorUnitario
+						ServiDetalhamento as Detalhamento, TRXSrQuantidade
 						FROM Servico
 						JOIN TermoReferenciaXServico on TRXSrServico = ServiId
 						WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and ServiSubCategoria = ".$sbcat['TRXSCSubcategoria'];
 			}
+
 			$result = $conn->query($sql);
 			$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 			$count = count($rowServicos);			
@@ -265,15 +256,6 @@ try {
 				foreach ($rowServicos as $itemServico) {
 
 					if ($sbcat['TRXSCSubcategoria'] == $itemServico['SubCategoria']) {
-
-						/*
-						if ($itemServico['TRXSrValorUnitario'] != '' and $itemServico['TRXSrValorUnitario'] != null) {
-							$valorUnitario = $itemServico['TRXSrValorUnitario'];
-							$valorTotal = $itemServico['TRXSrQuantidade'] * $itemServico['TRXSrValorUnitario'];
-						} else {
-							$valorUnitario = 0;
-							$valorTotal = 0;
-						} */
 
 						$html .= "
 							<tr>
@@ -301,8 +283,8 @@ try {
 								</td>
 							</tr>";
 				$html .= "</table>";
-			}
-		}
+			} 
+		} 
 	}
 
 	$totalGeral = $totalGeralProdutos + $totalGeralServicos;
@@ -321,6 +303,10 @@ try {
 				</table>
 		";	
 	}
+
+	$html .= '
+	<div>' . $row['TrRefConteudoFim'] . '</div>
+	<br>';
 
 	$rodape = "<hr/>
     <div style='width:100%'>
