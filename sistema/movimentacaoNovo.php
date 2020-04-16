@@ -167,17 +167,17 @@ if (isset($_POST['inputData'])) {
 
 			$destinoChave = '';
 
-			if($rowSituacao['SituaChave'] == 'AGUARDANDOLIBERACAO') $destinoChave = 'CENTROADMINISTRATIVO';
-			if($rowSituacao['SituaChave'] == 'PENDENTE') $destinoChave = 'ALMOXARIFADO';
-			
+			if ($rowSituacao['SituaChave'] == 'AGUARDANDOLIBERACAO') $destinoChave = 'CENTROADMINISTRATIVO';
+			if ($rowSituacao['SituaChave'] == 'PENDENTE') $destinoChave = 'ALMOXARIFADO';
+
 			if ($rowSituacao['SituaChave'] != 'LIBERADO') {
 				$sql = "SELECT PerfiId
 				        FROM Perfil
-				        WHERE PerfiChave = '".$destinoChave ."' 
+				        WHERE PerfiChave = '" . $destinoChave . "' 
 				        ";
 				$result = $conn->query($sql);
 				$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
-				
+
 
 				/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
 				$sIdentificacao = 'Movimentação';
@@ -281,7 +281,7 @@ if (isset($_POST['inputData'])) {
 		function produtosOrdemConpra(ordemCompra) {
 			let inputLote = $('#inputLote').val();
 			let numOrdemCompra = $('#cmbOrdemCompra').val()
-            
+
 			$.ajax({
 				type: "POST",
 				url: "movimentacaoAddProdutoOrdemCompra.php",
@@ -465,7 +465,7 @@ if (isset($_POST['inputData'])) {
 							let quantInicial = inputHiddenProdutoServico.attr('quantInicial')
 							let saldoInicial = inputHiddenProdutoServico.attr('saldoInicial')
 
-							let novosValores = recalcValores( quantInicial, novaQuantidade, saldoInicial, arrayValInput[2])
+							let novosValores = recalcValores(quantInicial, novaQuantidade, saldoInicial, arrayValInput[2])
 							console.log(novosValores.quantAtualizada)
 							$(tr[3]).html(novosValores.quantAtualizada)
 							$(tr[4]).html(novosValores.novoSaldo)
@@ -1226,6 +1226,35 @@ if (isset($_POST['inputData'])) {
 				document.getElementById('dadosNF').style.display = "none";
 				document.getElementById('dadosProduto').style.display = "flex";
 			}
+
+
+
+			if (tipo == 'S') {
+				$('#cmbSituacao').children().each((i, elem) => {
+					if (i == 2) {
+						$(elem).attr('selected', '')
+						let text = $(elem).html()
+						$('#select2-cmbSituacao-container').attr('title', text)
+						$('#select2-cmbSituacao-container').html(text)
+						console.log($('#cmbSituacao').val())
+					} else {
+						$(elem).removeAttr('selected')
+					}
+				})
+			} else {
+				$('#cmbSituacao').children().each((i, elem) => {
+					if (i == 1) {
+						$(elem).attr('selected', '')
+						let text = $(elem).html()
+						$('#select2-cmbSituacao-container').attr('title', text)
+						$('#select2-cmbSituacao-container').html(text)
+						console.log($('#cmbSituacao').val())
+					} else {
+						$(elem).removeAttr('selected')
+					}
+				})
+			}
+
 		}
 
 		function selecionaProdutoServico(tipo) {
@@ -1793,7 +1822,7 @@ if (isset($_POST['inputData'])) {
 
 													foreach ($row as $item) {
 														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
-															if($item['SituaChave'] == 'AGUARDANDOLIBERACAO'){
+															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
 																print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
 															} else {
 																print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
