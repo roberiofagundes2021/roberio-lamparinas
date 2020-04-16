@@ -368,7 +368,7 @@ if (isset($_POST['inputData'])) {
 							linhaTabela = `<tr id='trModal'>
 						                        <td>${valores[0]}</td>
 												<td>${valores[1]}</td>
-												<td><input id='quantidade' type="text" class="form-control" value="" style="text-align: center"></td>
+												<td><input id='quantidade' type="text" class="form-control" value="" style="text-align: center" autofocus></td>
 												<td><input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled></td>
 											</tr>
 						                  `;
@@ -387,7 +387,7 @@ if (isset($_POST['inputData'])) {
 							linhaTabela = `<tr id='trModal'>
 						                                    <td>${valores[0]}</td>
 												            <td>${valores[1]}</td>
-												            <td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" style="text-align: center"></td>
+												            <td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" style="text-align: center" autofocus></td>
 												            <td><input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center"  disabled></td>
 								                            <td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
 															<td><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
@@ -409,6 +409,8 @@ if (isset($_POST['inputData'])) {
 						}
 
 						validaQuantInputModal($('#saldo').val())
+
+						$('#quantidade').attr('autofocus', '')
 					}
 				})
 			})
@@ -460,10 +462,10 @@ if (isset($_POST['inputData'])) {
 
 
 
-							//let quantInicial = inputHiddenProdutoServico.attr('quantInicial')
+							let quantInicial = inputHiddenProdutoServico.attr('quantInicial')
 							let saldoInicial = inputHiddenProdutoServico.attr('saldoInicial')
 
-							let novosValores = recalcValores( /*quantInicial,*/ novaQuantidade, saldoInicial, arrayValInput[2])
+							let novosValores = recalcValores( quantInicial, novaQuantidade, saldoInicial, arrayValInput[2])
 							console.log(novosValores.quantAtualizada)
 							$(tr[3]).html(novosValores.quantAtualizada)
 							$(tr[4]).html(novosValores.novoSaldo)
@@ -491,7 +493,7 @@ if (isset($_POST['inputData'])) {
 
 
 
-		function recalcValores( /*quantInicial,*/ novaQuantidade, saldoInicial, valorUni) {
+		function recalcValores(quantInicial, novaQuantidade, saldoInicial, valorUni) {
 
 
 			let valorTotal = 0
@@ -502,7 +504,7 @@ if (isset($_POST['inputData'])) {
 
 			//let valorTotal = novaQuantidade * valorUni;
 			//let novoSaldo = saldoInicial - novaQuantidade;
-			quantAtualizada = parseInt(novaQuantidade)
+			quantAtualizada = parseInt(novaQuantidade) + parseInt(quantInicial)
 
 			return {
 				quantAtualizada: quantAtualizada,
@@ -628,11 +630,11 @@ if (isset($_POST['inputData'])) {
 				var inputFornecedor = $('#inputFornecedor').val();
 				var cmbFornecedor = $('#cmbFornecedor').val();
 
-				if (inputNumItens > 0) {
+				/*if (inputNumItens > 0) {
 					alerta('Atenção', 'O fornecedor não pode ser alterado quando se tem produto(s) na lista! Exclua-o(s) primeiro ou cancele e recomece o cadastro da movimentação.', 'error');
 					$('#cmbFornecedor').val(inputFornecedor);
 					return false;
-				}
+				}*/
 				/*				
 								var element = document.getElementById("cmbFornecedor");
 								element.className = element.classList.remove("form-control-select2");
@@ -845,7 +847,7 @@ if (isset($_POST['inputData'])) {
 					$("select#cmbFornecedor").trigger("change"); //Simula o change do select
 				}
 
-				$.getJSON('movimentacaoSituacao.php', function(dados) {
+				/*$.getJSON('movimentacaoSituacao.php', function(dados) {
 
 					var option = '<option value="#">Selecione</option>';
 
@@ -869,7 +871,7 @@ if (isset($_POST['inputData'])) {
 
 						$('#cmbSituacao').html(option).show();
 					}
-				});
+				});*/
 			});
 
 			$("input[type=radio][name=inputProdutoServico]").click(function() {
@@ -1791,7 +1793,11 @@ if (isset($_POST['inputData'])) {
 
 													foreach ($row as $item) {
 														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'FINALIZADO') {
-															print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+															if($item['SituaChave'] == 'AGUARDANDOLIBERACAO'){
+																print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
+															} else {
+																print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+															}
 														}
 													}
 												} else {

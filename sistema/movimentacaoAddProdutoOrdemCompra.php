@@ -40,7 +40,6 @@ $sql = " SELECT dbo.fnValorTotalOrdemCompra(" . $_SESSION['EmpreId'] . ",  " . $
 $result = $conn->query($sql);
 $totalOrdemCompra = $result->fetch(PDO::FETCH_ASSOC);
 
-var_dump($countMovimentAprovads);
 
 if ($countMovimentAprovads) {
  
