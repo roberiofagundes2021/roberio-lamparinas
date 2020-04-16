@@ -29,7 +29,7 @@ $totalGeral = 0;
 $sql = "SELECT MovimId
 		FROM Movimentacao
 		JOIN Situacao on SituaId = MovimSituacao
-	    WHERE MovimOrdemCompra = " . $_POST['numOrdemCompra'] . " and MovimTipo = 'E' and MovimEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'FINALIZADO'
+	    WHERE MovimOrdemCompra = " . $_POST['numOrdemCompra'] . " and MovimTipo = 'E' and MovimEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'LIBERADO'
 		";
 $result = $conn->query($sql);
 $movimentAprovads = $result->fetchAll(PDO::FETCH_ASSOC);

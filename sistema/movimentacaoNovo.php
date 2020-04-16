@@ -170,7 +170,7 @@ if (isset($_POST['inputData'])) {
 			if($rowSituacao['SituaChave'] == 'AGUARDANDOLIBERACAO') $destinoChave = 'CENTROADMINISTRATIVO';
 			if($rowSituacao['SituaChave'] == 'PENDENTE') $destinoChave = 'ALMOXARIFADO';
 			
-			if ($rowSituacao['SituaChave'] != 'FINALIZADO') {
+			if ($rowSituacao['SituaChave'] != 'LIBERADO') {
 				$sql = "SELECT PerfiId
 				        FROM Perfil
 				        WHERE PerfiChave = '".$destinoChave ."' 
@@ -410,7 +410,7 @@ if (isset($_POST['inputData'])) {
 
 						validaQuantInputModal($('#saldo').val())
 
-						$('#quantidade').attr('autofocus', '')
+						$('#quantidade').focus()
 					}
 				})
 			})
@@ -509,7 +509,7 @@ if (isset($_POST['inputData'])) {
 			return {
 				quantAtualizada: quantAtualizada,
 				valorTotal: float2moeda(quantAtualizada * valorUni),
-				somaTotalValorGeral: quantAtualizada * valorUni,
+				somaTotalValorGeral: novaQuantidade * valorUni,
 				novoSaldo: novoSaldo
 			};
 		}
@@ -1792,7 +1792,7 @@ if (isset($_POST['inputData'])) {
 													print('<option value="#">Selecione</option>');
 
 													foreach ($row as $item) {
-														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'FINALIZADO') {
+														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
 															if($item['SituaChave'] == 'AGUARDANDOLIBERACAO'){
 																print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
 															} else {
