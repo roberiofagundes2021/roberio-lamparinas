@@ -1839,10 +1839,13 @@ if (isset($_POST['inputData'])) {
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
+													print('<option value="#">Selecione</option>');
 
 													foreach ($row as $item) {
 														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
 															print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
+														} else if($item['SituaChave'] == 'LIBERADO'){
+															print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
 														}
 													}
 												}
