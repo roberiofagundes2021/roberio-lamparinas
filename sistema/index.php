@@ -528,6 +528,62 @@ if($totalAcoes){
 					}
 				}
 			}
+
+			if(BandeTabela == 'Movimentacao'){
+				//alert(BandeTabelaId); return false;
+				document.getElementById('inputMovimentacaoId').value = BandeTabelaId;
+				
+				if (Tipo == 'imprimir'){
+					document.formBandeja.action = "movimentacaoImprime.php";
+					document.formBandeja.setAttribute("target", "_blank");
+					document.formBandeja.submit();
+				} else {
+					if (Tipo == 'liberar'){	
+						document.getElementById('inputMovimentacaoStatus').value = 'LIBERADO';
+						document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";	
+						document.formBandeja.setAttribute("target", "_self");
+						document.formBandeja.submit();	
+					} else if (Tipo == 'naoliberar'){
+			            bootbox.prompt({
+			                title: 'Informe o motivo da não liberação',
+			                inputType: 'textarea',
+			                buttons: {
+			                    confirm: {
+			                        label: 'Enviar',
+			                        className: 'btn-success'
+			                    },
+			                    cancel: {
+			                        label: 'Cancelar',
+			                        className: 'btn-link'
+			                    }
+			                },
+			                callback: function (result) {
+
+			                    if (result === null) {                                             
+			                        bootbox.alert({
+			                            title: 'Não Liberar',
+			                            message: 'A não liberação foi cancelada!'
+			                        });                              
+			                    } else {
+			                       
+			                        document.getElementById('inputMotivo').value = result;
+									document.getElementById('inputMovimentacaoStatus').value = 'NAOLIBERADO';
+									document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
+									document.formBandeja.setAttribute("target", "_self");
+									document.formBandeja.submit();
+									
+									/*
+			                        bootbox.alert({
+			                            title: 'Hi <strong>' + result + '</strong>',
+			                            message: 'How are you doing today?'
+			                        });*/                               
+			                    }
+			                }
+			            });
+					}
+				}
+			}
+
 		}
 
 	</script>
@@ -705,6 +761,8 @@ if($totalAcoes){
 					<input type="hidden" id="inputOrdemCompraStatus" name="inputOrdemCompraStatus" >
 					<input type="hidden" id="inputSolicitacaoId" name="inputSolicitacaoId" >					
 					<input type="hidden" id="inputSolicitacaoStatus" name="inputSolicitacaoStatus" >					
+					<input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId" >					
+					<input type="hidden" id="inputMovimentacaoStatus" name="inputMovimentacaoStatus" >
 					<input type="hidden" id="inputMotivo" name="inputMotivo" >
 				</form>				
 				
