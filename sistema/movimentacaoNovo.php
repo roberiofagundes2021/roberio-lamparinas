@@ -537,10 +537,10 @@ if (isset($_POST['inputData'])) {
 
 		function calcSaldoOrdemCompra() {
 			let valorTotal = $('#total').attr('valor')
-			let valorSaldoOrdemCompra = $("#inputTotalOrdemCompraCartaContrato").attr('valor')
-			console.log(valorTotal)
-			console.log(valorSaldoOrdemCompra)
+			let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial')
 
+            console.log(valorTotal)
+			console.log(valorSaldoOrdemCompra)
 			let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
 
 			if (calcSaldoAtual < 0) {
@@ -1044,6 +1044,7 @@ if (isset($_POST['inputData'])) {
 				var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val();
 				var cmbDestinoSetor = $('#cmbDestinoSetor').val();
 				var inputDestinoManual = $('#inputDestinoManual').val();
+				var inputValorTotal = $('#inputValorTotal').val().trim()
 				var Motivo = cmbMotivo.split("#");
 				var chave = Motivo[1];
 
@@ -1068,6 +1069,11 @@ if (isset($_POST['inputData'])) {
 					// Verifica se pelomento um produto ou serviço foi editado, na entrada.
 					if ($('#itemEditadoquantidade').val() == 0) {
 						alerta('Atenção', 'Informe a quantidade de itens que deseja dar entrada no sistema!', 'error');
+						return false;
+					}
+
+					if(inputValorTotal  == ''){
+                        alerta('Atenção', 'Informe o valor Total da nota fiscal!', 'error');
 						return false;
 					}
 				} else if (inputTipo == 'S') {
@@ -1598,7 +1604,7 @@ if (isset($_POST['inputData'])) {
 
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputValorTotal">Total (R$) Nota Fiscal</label>
+												<label for="inputValorTotal">Total (R$) Nota Fiscal<span style="color: red">*</span></label>
 												<input type="text" id="inputValorTotal" name="inputValorTotal" class="form-control" onKeyUp="moeda(this)" maxLength="11">
 											</div>
 										</div>

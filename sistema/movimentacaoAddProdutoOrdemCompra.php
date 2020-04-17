@@ -40,6 +40,10 @@ $sql = " SELECT dbo.fnValorTotalOrdemCompra(" . $_SESSION['EmpreId'] . ",  " . $
 $result = $conn->query($sql);
 $totalOrdemCompra = $result->fetch(PDO::FETCH_ASSOC);
 
+$sql = " SELECT dbo.fnSaldoEntradaOrdemCompra(" . $_SESSION['EmpreId'] . ",  " . $_POST['ordemCompra'] . ") as saldoOrdemCompra";
+$result = $conn->query($sql);
+$saldoOrdemCompra = $result->fetch(PDO::FETCH_ASSOC);
+
 
 if ($countMovimentAprovads) {
  
@@ -120,7 +124,7 @@ if ($countMovimentAprovads) {
                             <div id="total" valorTotalGeral="" style="text-align:left; font-size: 15px; font-weight:bold;">R$ 0, 00</div>
                         </div>
                         <div>
-                            <div id="totalSaldo" style="text-align:left; font-size: 15px; font-weight:bold;" valor="' . $totalOrdemCompra['valorTotalOrdemCompra'] . '">' . formataMoeda($totalOrdemCompra['valorTotalOrdemCompra']) . '</div>
+                            <div id="totalSaldo" style="text-align:left; font-size: 15px; font-weight:bold;" valorTotalInicial="'.$saldoOrdemCompra['saldoOrdemCompra'].'" valor="' . $saldoOrdemCompra['saldoOrdemCompra'] . '">' . formataMoeda($saldoOrdemCompra['saldoOrdemCompra']) . '</div>
                          </div>
                     </th>
                 </tr>
