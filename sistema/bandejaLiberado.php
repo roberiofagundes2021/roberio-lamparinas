@@ -37,7 +37,7 @@
 			<td class="text-center">
 				<div class="list-icons">
 					<div class="list-icons list-icons-extendedt">
-						<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \'imprimir\');" class="list-icons-item"><i class="icon-printer2"></i> Visualizar</a>
+						<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'imprimir\');" class="list-icons-item"><i class="icon-printer2"></i> Visualizar</a>
 					</div>
 				</div>
 			</td>

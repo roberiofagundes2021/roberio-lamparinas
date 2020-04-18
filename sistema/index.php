@@ -25,12 +25,13 @@ if (isset($_POST['cmbPerfil'])){
 
 /* AGUARDANDOLIBERACAO */
 $sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, 
-		SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, OrComNumero, OrComSituacao, OrComTipo
+		SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, OrComNumero, OrComSituacao, OrComTipo, MovimTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
+		LEFT JOIN Movimentacao on MovimId = BandeTabelaId		
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
 	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'AGUARDANDOLIBERACAO' and BnXPePerfil in (".$idPerfilLogado.")
@@ -52,12 +53,13 @@ $totalPendente = $rowTotalPendente['TotalPendente'];
 
 /* LIBERADAS */
 $sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, 
-		SituaNome, OrComNumero, OrComTipo
+		SituaNome, OrComNumero, OrComTipo, MovimTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
+		LEFT JOIN Movimentacao on MovimId = BandeTabelaId		
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
 	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'LIBERADO' and BnXPePerfil in (".$idPerfilLogado.")
@@ -77,12 +79,13 @@ $rowTotalLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalLiberado = $rowTotalLiberado['TotalLiberado'];
 
 /* NÃO LIBERADAS */
-$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, SituaNome
+$sql = "SELECT Distinct BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, SituaNome, MovimTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
+		LEFT JOIN Movimentacao on MovimId = BandeTabelaId		
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
 	    WHERE BandeEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'NAOLIBERADO' and BnXPePerfil in (".$idPerfilLogado.")
@@ -359,7 +362,7 @@ if($totalAcoes){
 		});
 		
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaBandeja(BandeId, BandeTabela, BandeTabelaId, Tipo){
+		function atualizaBandeja(BandeId, BandeTabela, BandeTabelaId, MovimTipo, Tipo){
 
 			document.getElementById('inputBandejaId').value = BandeId;
 
@@ -530,11 +533,17 @@ if($totalAcoes){
 			}
 
 			if(BandeTabela == 'Movimentacao'){
-				//alert(BandeTabelaId); return false;
-				document.getElementById('inputMovimentacaoId').value = BandeTabelaId;
 				
+				document.getElementById('inputMovimentacaoId').value = BandeTabelaId;
+
 				if (Tipo == 'imprimir'){
-					document.formBandeja.action = "movimentacaoImprime.php";
+					
+					if (MovimTipo == 'E'){
+						document.formBandeja.action = "movimentacaoImprimeEntrada.php";
+					} else {
+						document.formBandeja.action = "movimentacaoImprimeRetirada.php";
+					}
+					
 					document.formBandeja.setAttribute("target", "_blank");
 					document.formBandeja.submit();
 				} else {

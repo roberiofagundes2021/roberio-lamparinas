@@ -40,6 +40,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<!-- /theme JS files -->
 
+	<!-- Modal -->
+	<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>	
+
 	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
 	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
@@ -128,17 +131,29 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaMovimentacao(MovimId, MovimNotaFiscal, Tipo) {
+		function atualizaMovimentacao(MovimId, MovimNotaFiscal, MovimTipo, Tipo, Motivo) {
 
 			document.getElementById('inputMovimentacaoId').value = MovimId;
 			document.getElementById('inputMovimentacaoNotaFiscal').value = MovimNotaFiscal;
 
-			if (Tipo == 'edita') {
+			if (Tipo == 'motivo'){
+	            bootbox.alert({
+                    title: '<strong>Motivo da Não Liberação</strong>',
+                    message: Motivo
+                });
+                return false;
+			} else if (Tipo == 'edita') {
 				document.formMovimentacao.action = "movimentacaoEdita.php";
 			} else if (Tipo == 'exclui') {
 				confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir essa movimentação?", "movimentacaoExclui.php");
 			} else if (Tipo == 'imprimir') {
-				document.formMovimentacao.action = "movimentacaoImprime.php";
+
+				if (MovimTipo == 'E'){
+					document.formMovimentacao.action = "movimentacaoImprimeEntrada.php";
+				} else {
+					document.formMovimentacao.action = "movimentacaoImprimeRetirada.php";
+				}
+				
 				document.formMovimentacao.setAttribute("target", "_blank");
 			}
 
@@ -213,8 +228,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 											$local = isset($item['LcEstNome']) ? $item['LcEstNome'] : $item['SetorNome'];
 										}
+										
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
+
+										$sql = "SELECT BandeMotivo
+												FROM Bandeja
+												JOIN Situacao on SituaId = BandeStatus
+												WHERE BandeTabela = 'Movimentacao' and BandeTabelaId = ".$item['MovimId']." and 
+												BandeEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'NAOLIBERADO'";
+										$result = $conn->query($sql);
+										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);										
 
 										print('
 										<tr>
@@ -227,28 +251,29 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 										print('<td><span class="'.$situacaoClasse.'">'.$situacao.'</span></td>');
 
-										if ($item['MovimTipo'] == 'T' || $item['MovimTipo'] == 'S') {
-											print('<td class="text-center">
-											    	    <div class="list-icons">
-												    	    <div class="list-icons list-icons-extended">
-													    	    <a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														        <a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
-														        <a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'imprimir\');" class="list-icons-item"><i class="icon-printer2"></i></a>
-													        </div>
-												        </div>
-											        </td>
-										        </tr>');
-										} else {
-											print('<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons list-icons-extended" style="margin-right: 28px">
-														<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+										print('<td class="text-center">
+													<div class="list-icons">
+														<div class="list-icons list-icons-extended">
+															<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'edita\', \'\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+															<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin"></i></a>
+															<div class="dropdown">													
+															<a href="#" class="list-icons-item" data-toggle="dropdown">
+																<i class="icon-menu9"></i>
+															</a>
+
+															<div class="dropdown-menu dropdown-menu-right">
+																<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'imprimir\', \'\');" class="dropdown-item"><i class="icon-printer2"></i> Imprimir</a>');
+															
+																if (isset($rowMotivo['BandeMotivo'])){
+																	print('
+																	<div class="dropdown-divider"></div>
+																	<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'motivo\', \''.$rowMotivo['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
+																}															
+										print('				</div>
+														</div>
 													</div>
-												</div>
-											</td>
-										</tr>');
-										}
+												</td>
+											</tr>');
 									}
 									?>
 
