@@ -539,7 +539,7 @@ if (isset($_POST['inputData'])) {
 			let valorTotal = $('#total').attr('valor')
 			let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial')
 
-            console.log(valorTotal)
+			console.log(valorTotal)
 			console.log(valorSaldoOrdemCompra)
 			let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
 
@@ -557,6 +557,29 @@ if (isset($_POST['inputData'])) {
 		function inputsModal() {
 			$('#tbody-modal')
 		}
+
+
+		function verificaTotalNotaFiscal() {
+			let valorTotalNotaFiscal = $('#inputValorTotal').val()
+			let valorTotalNotaFiscalGrid = $('#total').attr('valor')
+			console.log(valorTotalNotaFiscal)
+			console.log(valorTotalNotaFiscalGrid)
+
+			if (parseFloat(valorTotalNotaFiscalGrid) != parseFloat(valorTotalNotaFiscal)) {
+				alerta('Atenção', 'O valor total da Nota Fiscal informado não corresponde ao total da entrada.', 'error');
+				$('#inputValorTotal').focus();
+				$("#formMovimentacao").submit((e) => {
+					e.preventDefault()
+				})
+				return false
+			}
+
+		}
+
+		$('#inputValorTotal').on('keyup', function() {
+			//verificaTotalNotaFiscal()
+		})
+
 
 		$(document).ready(function() {
 
@@ -788,26 +811,72 @@ if (isset($_POST['inputData'])) {
 				var cmbCategoria = $('#cmbCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 
-				$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
+				console.log(inputTipo)
+				console.log(cmbFornecedor)
+				console.log(cmbCategoria)
+				console.log(cmbSubCategoria)
 
-					var option = '<option value="#" "selected">Selecione o Produto</option>';
 
-					if (dados.length) {
 
-						$.each(dados, function(i, obj) {
-							if (inputTipo == 'E') {
-								option += '<option value="' + obj.ProduId + '#' + obj.ProduValorCusto + '">' + obj.ProduNome + '</option>';
+
+
+				$('[name=inputProdutoServico]').each((i, elem) => {
+					
+
+					if ($('[for=cmbProduto]').html() == 'Serviço') {
+
+						console.log('teste')
+						$.getJSON('filtraServico.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
+
+							var option = '<option value="#" "selected">Selecione o Serviço</option>';
+							console.log(dados)
+						    console.log('teste')
+
+							if (dados.length) {
+
+								$.each(dados, function(i, obj) {
+									if (inputTipo == 'E') {
+										option += '<option value="' + obj.ServiId + '#' + obj.ServiValorCusto + '">' + obj.ServiNome + '</option>';
+									} else {
+										option += '<option value="' + obj.ServiId + '#' + obj.ServiCustoFinal + '">' + obj.ServiNome + '</option>';
+									}
+
+								});
+
+								$('#cmbProduto').html(option).show();
 							} else {
-								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
+								ResetProduto();
 							}
-
 						});
 
-						$('#cmbProduto').html(option).show();
+						console.log('teste')
+
 					} else {
-						ResetProduto();
+						$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
+
+							var option = '<option value="#" "selected">Selecione o Produto</option>';
+
+							if (dados.length) {
+
+								$.each(dados, function(i, obj) {
+									if (inputTipo == 'E') {
+										option += '<option value="' + obj.ProduId + '#' + obj.ProduValorCusto + '">' + obj.ProduNome + '</option>';
+									} else {
+										option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
+									}
+
+								});
+
+								$('#cmbProduto').html(option).show();
+							} else {
+								ResetProduto();
+							}
+						});
 					}
-				});
+				})
+
+
+
 
 			});
 
@@ -875,7 +944,7 @@ if (isset($_POST['inputData'])) {
 			});
 
 			$("input[type=radio][name=inputProdutoServico]").click(function() {
-				console.log('teste')
+				
 			})
 
 			$('#btnAdicionar').click(function() {
@@ -1072,10 +1141,13 @@ if (isset($_POST['inputData'])) {
 						return false;
 					}
 
-					if(inputValorTotal  == ''){
-                        alerta('Atenção', 'Informe o valor Total da nota fiscal!', 'error');
+					if (inputValorTotal == '') {
+						alerta('Atenção', 'Informe o valor Total da nota fiscal!', 'error');
 						return false;
 					}
+
+					verificaTotalNotaFiscal()
+
 				} else if (inputTipo == 'S') {
 
 					//Verifica se a combo Finalidade foi informada
@@ -1850,7 +1922,7 @@ if (isset($_POST['inputData'])) {
 													foreach ($row as $item) {
 														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
 															print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-														} else if($item['SituaChave'] == 'LIBERADO'){
+														} else if ($item['SituaChave'] == 'LIBERADO') {
 															print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
 														}
 													}
