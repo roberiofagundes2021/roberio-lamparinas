@@ -7,6 +7,8 @@ include('global_assets/php/conexao.php');
 try{
 	if(isset($_POST['inputIdOrdemCompra'])){
 	
+        $conn->beginTransaction();		
+		
 		$iOrdemCompra = $_POST['inputIdOrdemCompra'];
 
 		/* Atualiza o Status da Ordem de Compra para "Aguardando Liberação" */
@@ -109,11 +111,23 @@ try{
 							':iIdBandeja' => $rowBandeja['BandeId']														
 							));
 		}
+
+        $conn->commit();
+        
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Ordem de Compra enviada para aprovação!!!";
+		$_SESSION['msg']['tipo'] = "success";      		
 	}
 
 } catch(PDOException $e){
 
-    echo 'Error1: ' . $e->getMessage();exit;
+    $conn->rollback();
+		
+    $_SESSION['msg']['titulo'] = "Erro";
+    $_SESSION['msg']['mensagem'] = "Erro ao enviar Ordem de Compra para aprovação!!!";
+    $_SESSION['msg']['tipo'] = "error";	
+
+    echo 'Error1: ' . $e->getMessage();
 }
 
 irpara("ordemcompra.php");

@@ -29,29 +29,24 @@ $result = $conn->query($sql);
 $rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
 $TotalFluxo = $rowFluxo['FlOpeValor'];
 
-$sql = "SELECT SUM(FOXPrQuantidade * FOXPrValorUnitario) as TotalProduto
+$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
 		FROM FluxoOperacionalXProduto
-		Where FOXPrFluxoOperacional = ".$iFluxoOperacional;
+		Where FOXPrEmpresa = ".$_SESSION['EmpreId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 $result = $conn->query($sql);
 $rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
 $TotalProdutos = $rowProdutos['TotalProduto'];
 
-$sql = "SELECT SUM(FOXSrQuantidade * FOXSrValorUnitario) as TotalServico
+$sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
 		FROM FluxoOperacionalXServico
-		Where FOXSrFluxoOperacional = ".$iFluxoOperacional;
+		Where FOXSrEmpresa = ".$_SESSION['EmpreId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
 $result = $conn->query($sql);
 $rowServicos = $result->fetch(PDO::FETCH_ASSOC);
 $TotalServicos = $rowServicos['TotalServico'];
 
-//$ValorTotalFluxo = floatval(str_replace(',', '.', str_replace('.', '', $_POST['inputValor'])));
-//$TotalServicos = floatval(str_replace(',', '.', str_replace('.', '', $_POST['inputTotalGeral'])));
-
 $TotalGeral = $TotalProdutos + $TotalServicos;
 
-$enviar = 0;
-
 if($TotalGeral == $TotalFluxo){
-	$enviar = 1;
+	$bFechado = 1;
 }
 
 //Se está alterando
@@ -72,8 +67,8 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 		
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 		
-			$sql = "INSERT INTO FluxoOperacionalXServico (FOXSrFluxoOperacional, FOXSrServico, FOXSrQuantidade, 
-					FOXSrValorUnitario, FOXSrUsuarioAtualizador, FOXSrEmpresa)
+			$sql = "INSERT INTO FluxoOperacionalXServico (FOXSrFluxoOperacional, FOXSrServico, FOXSrQuantidade, FOXSrValorUnitario, 
+					FOXSrUsuarioAtualizador, FOXSrEmpresa)
 					VALUES (:iFluxoOperacional, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 			
@@ -87,125 +82,6 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 							));
 		}
 
-		$sql = "SELECT SituaId
-				FROM Situacao
-				Where SituaChave = 'PENDENTE' ";
-		$result = $conn->query($sql);
-		$rowSituacaoPendente = $result->fetch(PDO::FETCH_ASSOC);
-
-		$sql = "SELECT SituaId
-				FROM Situacao
-				Where SituaChave = 'NAOLIBERADO' ";
-		$result = $conn->query($sql);
-		$rowSituacaoNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);		
-
-		//Atualiza a Situação do Fluxo se estiver fechado o valor total dos produtos + serviços com o valor total do Fluxo e a situação estiver PENDENTE. Daí deve passar para ATIVO.
-		if ($TotalFluxo === $TotalGeral && ($_POST['inputStatus'] == $rowSituacaoPendente['SituaId'] || $_POST['inputStatus'] == $rowSituacaoNaoLiberado['SituaId'])){		
-				
-			/* Atualiza o Status do Fluxo para "Aguardando Liberação" */
-			$sql = "SELECT SituaId
-					FROM Situacao
-					Where SituaChave = 'AGUARDANDOLIBERACAO' ";
-			$result = $conn->query($sql);
-			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
-
-			$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :iStatus
-                    WHERE FlOpeId = :iFluxo";
-            $result = $conn->prepare($sql);
-		
-            $result->execute(array(
-				':iStatus' => $rowSituacao['SituaId'],
-				':iFluxo' => $iFluxoOperacional					
-				));
-            /* Fim Atualiza */
-
-			$sql = "SELECT PerfiId
-					FROM Perfil
-					Where PerfiChave IN ('ADMINISTRADOR','CONTROLADORIA') ";
-			$result = $conn->query($sql);
-			$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
-
-			$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso
-					FROM FluxoOperacional
-					Where FlOpeId = ".$iFluxoOperacional;
-			$result = $conn->query($sql);
-			$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
-
-			/* Verifica se a Bandeja já tem um registro com BandeTabela: FluxoOperacional e BandeTabelaId: IdFluxoAtual, evitando duplicação */
-			$sql = "SELECT COUNT(BandeId) as Count
-					FROM Bandeja
-					Where BandeTabela = 'FluxoOperacional' and BandeTabelaId =  ".$iFluxoOperacional;
-			$result = $conn->query($sql);
-			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
-			$count = $rowBandeja['Count'];
-
-			$sql = "SELECT BandeId, SituaChave
-					FROM Bandeja
-					JOIN Situacao on SituaId = BandeStatus
-					Where BandeTabela = 'FluxoOperacional' and BandeTabelaId =  ".$iFluxoOperacional;
-			$result = $conn->query($sql);
-			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
-
-			if ($count == 0){
-			
-				/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
-				$sIdentificacao = 'Fluxo Operacional (Nº Contrato: '.$rowFluxo['FlOpeNumContrato'].' | Nº Processo: '.$rowFluxo['FlOpeNumProcesso'].')';
-			
-				$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandePerfilDestino, BandeSolicitante, 
-						BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
-						VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iPerfilDestino, :iSolicitante, :sTabela, :iTabelaId, 
-						:iStatus, :iUsuarioAtualizador, :iEmpresa)";
-				$result = $conn->prepare($sql);
-						
-				$result->execute(array(
-								':sIdentificacao' => $sIdentificacao,
-								':dData' => date("Y-m-d"),
-								':sDescricao' => 'Liberar Fluxo',
-								':sURL' => '',
-								':iPerfilDestino' => $rowPerfil['PerfiId'],  //Tem que tirar esse campo do banco, já que agora tem uma tabela BandejaXPerfil
-								':iSolicitante' => $_SESSION['UsuarId'],
-								':sTabela' => 'FluxoOperacional',
-								':iTabelaId' => $iFluxoOperacional,
-								':iStatus' => $rowSituacao['SituaId'],
-								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iEmpresa' => $_SESSION['EmpreId']						
-								));
-
-				$insertId = $conn->lastInsertId();
-
-				foreach ($rowPerfil as $item){
-				
-					$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeEmpresa)
-							VALUES (:iBandeja, :iPerfil, :iEmpresa)";
-					$result = $conn->prepare($sql);
-							
-					$result->execute(array(
-									':iBandeja' => $insertId,
-									':iPerfil' => $item['PerfiId'],
-									':iEmpresa' => $_SESSION['EmpreId']						
-									));					
-				}
-				/* Fim Insere Bandeja */
-			
-			} else{
-
-				$sql = "UPDATE Bandeja SET BandeData = :dData, BandeSolicitante = :iSolicitante, BandeStatus = :iStatus, 
-						BandeUsuarioAtualizador = :iUsuarioAtualizador
-						WHERE BandeEmpresa = :iEmpresa and BandeId = :iIdBandeja";
-				$result = $conn->prepare($sql);
-						
-				$result->execute(array(
-								':dData' => date("Y-m-d"),
-								':iSolicitante' => $_SESSION['UsuarId'],
-								':iStatus' => $rowSituacao['SituaId'],
-								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iEmpresa' => $_SESSION['EmpreId'],
-								':iIdBandeja' => $rowBandeja['BandeId']														
-								));
-			}
-		}
-		
-
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -213,10 +89,14 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 		$_SESSION['msg']['tipo'] = "success";
 
     } catch(PDOException $e){
-   	    $conn->rollback();
-   	    echo "Eita! ";
+		
+		echo 'Error: ' . $e->getMessage();
 
-   	    echo 'Error: ' . $e->getMessage();exit;
+		$conn->rollback();
+		
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar Fluxo Operacional!!!";
+		$_SESSION['msg']['tipo'] = "error";
     }
 }	
 
@@ -349,7 +229,7 @@ try{
 				
 				e.preventDefault();		
 				
-				confirmaExclusao(document.formFluxoOperacionalServico, "Essa ação enviará toda o Fluxo Operacional (com seus produtos e serviços) para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
+				confirmaExclusao(document.formFluxoOperacionalServico, "Essa ação enviará todo o Fluxo Operacional (com seus produtos e serviços) para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
 			});		
 						
 		}); //document.ready
@@ -528,7 +408,7 @@ try{
 										<div id="example"></div>
 									</div>-->
 									
-									<?php									
+									<?php
 
 										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
 												FROM Servico
@@ -537,16 +417,18 @@ try{
 												WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-										$count = count($rowServicos);		
+										$countServico = count($rowServicos);		
 
-										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
-												FROM Servico
-												JOIN Situacao on SituaId = ServiStatus
-												WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiCategoria = ".$iCategoria." and 
-												ServiSubCategoria = ".$iSubCategoria." and SituaChave = 'ATIVO' ";
-										$result = $conn->query($sql);
-										$rowServicosCateg = $result->fetchAll(PDO::FETCH_ASSOC);
-										$countServicoCateg = count($rowServicosCateg);
+										if (!$countServico){
+											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
+													FROM Servico
+													JOIN Situacao on SituaId = ServiStatus
+													WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiCategoria = ".$iCategoria." and 
+													ServiSubCategoria = ".$iSubCategoria." and SituaChave = 'ATIVO' ";
+											$result = $conn->query($sql);
+											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+											$countServico = count($rowServicos);
+										}
 										
 										$cont = 0;
 										
@@ -595,12 +477,6 @@ try{
 											$fValorTotal = (isset($item['FOXSrQuantidade']) and isset($item['FOXSrValorUnitario'])) ? mostraValor($item['FOXSrQuantidade'] * $item['FOXSrValorUnitario']) : '';
 											
 											$fTotalGeral += (isset($item['FOXSrQuantidade']) and isset($item['FOXSrValorUnitario'])) ? $item['FOXSrQuantidade'] * $item['FOXSrValorUnitario'] : 0;
-
-											if ($fTotalGeral == $row['FlOpeValor']){
-												$bFechado = 1;
-											} else {
-												$bFechado = 0;
-											}
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
@@ -674,19 +550,14 @@ try{
 										<?php 
 										
 											if ($bFechado){												
-												print('<button class="btn btn-lg btn-success" id="enviar" disabled>Alterar</button>');
+												print('
+												<button class="btn btn-lg btn-success" id="enviar" style="margin-right:5px;">Alterar</button>
+												<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
 											} else{ 
-												if ($countServicoCateg){
-													print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
-										
-													if ($enviar){
-														print('<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
-													}										
+												if ($countServico){
+													print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');										
 												} else {
 													print('<button class="btn btn-lg btn-success" id="enviar" disabled>Alterar</button>');
-													if ($enviar){
-														print('<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
-													}
 												}
 											} 
 										
@@ -698,9 +569,13 @@ try{
 								<div class="col-lg-6" style="text-align: right; padding-right: 35px; color: red;">
 								<?php	
 									if ($bFechado){
-										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído ('.$row['SituaNome'].')');
-									} else if (!$countServicoCateg){
-										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Não há servicos cadastrados para a Categoria e SubCategoria informada');
+										if($row['SituaNome'] == 'PENDENTE'){
+											print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído (ENVIE PARA APROVAÇÃO)');
+										} else {
+											print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído ('.$row['SituaNome'].')');
+										}
+									} else if (!$countServico){
+										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Não há serviços cadastrados para a Categoria e SubCategoria informada');
 									} else if ($TotalFluxo < $TotalGeral){
 										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Os valores dos Produtos + Serviços ultrapassaram o valor total do Fluxo');
 									}
