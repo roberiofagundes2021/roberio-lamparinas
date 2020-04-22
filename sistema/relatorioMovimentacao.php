@@ -44,13 +44,98 @@ $dataFim = date ("Y-m-d");
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	
 	<!-- /theme JS files -->	
+
+	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>		
 	
 	<script type="text/javascript">
 		
         $(document).ready(function() {	
-			
+
+			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data			
+
+			/* Início: Tabela Personalizada */
+			$('#tblMovimentacao').DataTable({
+				"order": [
+					[0, "desc"], [1, "desc"], [2, "asc"]
+				],
+				autoWidth: false,
+				responsive: true,
+				columnDefs: [{
+						orderable: true, //Data
+						width: "10%",
+						targets: [0]
+					},
+					{
+						orderable: true, //Tipo
+						width: "10%",
+						targets: [1]
+					},
+					{
+						orderable: true, //Produto
+						width: "20%",
+						targets: [2]
+					},
+					{
+						orderable: true, //Categoria
+						width: "15%",
+						targets: [3]
+					},
+					{
+						orderable: true, //Fornecedor
+						width: "15%",
+						targets: [4]
+					},
+					{
+						orderable: true, //Quantidade
+						width: "10%",
+						targets: [5]
+					},
+					{
+						orderable: true, //Origem
+						width: "10%",
+						targets: [6]
+					},
+					{
+						orderable: true, //Destino
+						width: "10%",
+						targets: [7]
+					}
+				],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: {
+						'first': 'Primeira',
+						'last': 'Última',
+						'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+						'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+					}
+				}
+			});
+
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};
+
+			_componentSelect2();
+			/* Fim: Tabela Personalizada */
+
 			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e){
 				
@@ -324,11 +409,12 @@ $dataFim = date ("Y-m-d");
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
 													<option value="-1">Todos</option>
 													<?php 
-														$sql = ("SELECT ForneId, ForneNome
-																 FROM Fornecedor														     
-																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
-																 ORDER BY ForneNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT ForneId, ForneNome
+																FROM Fornecedor
+																JOIN Situacao on SituaId = ForneStatus
+																WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY ForneNome ASC";
+														$result = $conn->query($sql);
 														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowFornecedor as $item){															
@@ -347,11 +433,12 @@ $dataFim = date ("Y-m-d");
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 													<option value="#">Todas</option>
 													<?php 
-														$sql = ("SELECT CategId, CategNome
-																 FROM Categoria															     
-																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
-																 ORDER BY CategNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT CategId, CategNome
+																FROM Categoria
+																JOIN Situacao on SituaId = CategStatus
+																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY CategNome ASC";
+														$result = $conn->query($sql);
 														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowCategoria as $item){															
@@ -366,13 +453,14 @@ $dataFim = date ("Y-m-d");
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
 													<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-														<option value="#">Todas</option>
+														<option value="">Todas</option>
 														<?php 
-															$sql = ("SELECT SbCatId, SbCatNome
-																	 FROM SubCategoria															     
-																	 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-																	 ORDER BY SbCatNome ASC");
-															$result = $conn->query("$sql");
+															$sql = "SELECT SbCatId, SbCatNome
+																	FROM SubCategoria
+																	JOIN Situacao on SituaId = SbCatStatus
+																	WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																	ORDER BY SbCatNome ASC";
+															$result = $conn->query($sql);
 															$row = $result->fetchAll(PDO::FETCH_ASSOC);
 															
 															foreach ($row as $item){
@@ -388,13 +476,14 @@ $dataFim = date ("Y-m-d");
 											<div class="form-group">
 												<label for="cmbCodigo">Código</label>
 												<select id="cmbCodigo" name="cmbCodigo" class="form-control form-control-select2">
-													<option value="#">Todas</option>
+													<option value="">Todas</option>
 													<?php 
-														$sql = ("SELECT ProduCodigo
-																 FROM Produto															     
-																 WHERE ProduStatus = 1 and ProduEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY ProduNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT ProduCodigo
+																FROM Produto
+																JOIN Situacao on SituaId = ProduStatus
+																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																ORDER BY ProduNome ASC";
+														$result = $conn->query($sql);
 														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowCategoria as $item){															
@@ -409,13 +498,14 @@ $dataFim = date ("Y-m-d");
 											<div class="form-group">
 												<label for="cmbProduto">Produto</label>
 													<select id="cmbProduto" name="cmbProduto" class="form-control form-control-select2">
-														<option value="#">Todas</option>
+														<option value="">Todas</option>
 														<?php 
-															$sql = ("SELECT ProduId, ProduNome
-																	 FROM Produto															     
-																	 WHERE ProduStatus = 1 and ProduEmpresa = ". $_SESSION['EmpreId'] ."
-																	 ORDER BY ProduNome ASC");
-															$result = $conn->query("$sql");
+															$sql = "SELECT ProduId, ProduNome
+																	FROM Produto
+																	JOIN Situacao on SituaId = ProduStatus
+																	WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																	ORDER BY ProduNome ASC";
+															$result = $conn->query($sql);
 															$row = $result->fetchAll(PDO::FETCH_ASSOC);
 															
 															foreach ($row as $item){

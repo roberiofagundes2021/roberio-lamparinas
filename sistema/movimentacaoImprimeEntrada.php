@@ -85,139 +85,141 @@ try {
     $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
     $totalServicos = count($rowServicos);
 		
+	$html .= '
+	<table style="width:100%; border-collapse: collapse;">
+		<tr style="background-color:#F1F1F1;">
+			<td colspan="2" style="width:40%; font-size:12px;">Fornecedor: '. $row['ForneNome'].'</td>
+			<td colspan="1" style="width:30%; font-size:12px;">Telefone: '. $row['ForneCelular'].'</td>
+			<td colspan="1" style="width:30%; font-size:12px;">E-mail: '. $row['ForneEmail'].'</td>
+		</tr>
+		<tr>
+			<td colspan="4" style="width:100%; font-size:12px;">Observação: '.$row['MovimObservacao'].'</td>
+		</tr>
+	</table>';
+
+	$totalGeralProdutos = 0;
+		
+	if ($totalProdutos > 0){
+
+		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>PRODUTOS</h2></div>";
+
 		$html .= '
 		<table style="width:100%; border-collapse: collapse;">
-			<tr style="background-color:#F1F1F1;">
-				<td colspan="2" style="width:40%; font-size:12px;">Fornecedor: '. $row['ForneNome'].'</td>
-				<td colspan="1" style="width:30%; font-size:12px;">Telefone: '. $row['ForneCelular'].'</td>
-				<td colspan="1" style="width:30%; font-size:12px;">E-mail: '. $row['ForneEmail'].'</td>
-			</tr>
 			<tr>
-				<td colspan="4" style="width:100%; font-size:12px;">Observação: '.$row['MovimObservação'].'</td>
+				<th style="text-align: center; width:8%">Item</th>
+				<th style="text-align: left; width:43%">Produto</th>
+				<th style="text-align: center; width:10%">Unidade</th>				
+				<th style="text-align: center; width:12%">Quant.</th>
+				<th style="text-align: center; width:12%">V. Unit.</th>
+				<th style="text-align: center; width:15%">V. Total</th>
 			</tr>
-		</table>';
-
-		$totalGeralProdutos = 0;
+		';
 		
-		if($totalProdutos > 0){
+		$cont = 1;
+		//var_dump($rowProdutos);exit;
+		foreach ($rowProdutos as $itemProduto){
 
-			$html .= "<div style='text-align:center; margin-top: 20px;'><h2>PRODUTOS</h2></div>";
-	
-			$html .= '
-			<table style="width:100%; border-collapse: collapse;">
-				<tr>
-					<th style="text-align: center; width:8%">Item</th>
-					<th style="text-align: left; width:43%">Produto</th>
-					<th style="text-align: center; width:10%">Unidade</th>				
-					<th style="text-align: center; width:12%">Quant.</th>
-					<th style="text-align: center; width:12%">V. Unit.</th>
-					<th style="text-align: center; width:15%">V. Total</th>
-				</tr>
-			';
-			
-			$cont = 1;
-			//var_dump($rowProdutos);exit;
-			foreach ($rowProdutos as $itemProduto){
-
-				if ($itemProduto['MvXPrQuantidade'] != '' and $itemProduto['MvXPrQuantidade'] != null and $itemProduto['MvXPrQuantidade'] != 0){
-                    
-                    $valorUnitario = $itemProduto['MvXPrValorUnitario'];                    
-					$valorTotal = $itemProduto['MvXPrQuantidade'] * $itemProduto['MvXPrValorUnitario'];
-				 
-                    $html .= "
-                        <tr>
-                            <td style='text-align: center;'>".$cont."</td>
-                            <td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
-                            <td style='text-align: center;'>".$itemProduto['UnMedSigla']."</td>					
-                            <td style='text-align: center;'>".$itemProduto['MvXPrQuantidade']."</td>
-                            <td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
-                            <td style='text-align: right;'>".mostraValor($valorTotal)."</td>
-                        </tr>
-                    ";
-                    
-                    $cont++;
-                    $totalGeralProdutos += $valorTotal;
-                }
-			}
-
-			$html .= "<br>";
-			
-			$html .= "  <tr>
-		                	<td colspan='5' height='50' valign='middle'>
-			                    <strong>Total Produtos</strong>
-		                    </td>
-						    <td style='text-align: right' colspan='2'>
-						        ".mostraValor($totalGeralProdutos)."
-						    </td>
-					    </tr>";
-			$html .= "</table>";
-		}
-
-		$totalGeralServicos = 0;
-
-		if($totalServicos > 0){
-	
-			$html .= '
-			<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
-				<tr>
-					<th style="text-align: center; width:8%">Item</th>
-					<th style="text-align: left; width:53%">Serviço</th>
-					<th style="text-align: center; width:12%">Quant.</th>
-					<th style="text-align: center; width:12%">V. Unit.</th>
-					<th style="text-align: center; width:15%">V. Total</th>
-				</tr>
-			';
-			
-			$cont = 1;
-			
-			foreach ($rowServicos as $itemServico){
+			if ($itemProduto['MvXPrQuantidade'] != '' and $itemProduto['MvXPrQuantidade'] != null and $itemProduto['MvXPrQuantidade'] != 0){
 				
-				if ($itemServico['MvXSrQuantidade'] != '' and $itemServico['MvXSrQuantidade'] != null and $itemServico['MvXSrQuantidade'] != 0){
-                    
-                    $valorUnitario = $itemServico['MvXSrValorUnitario'];
-					$valorTotal = $itemServico['MvXSrQuantidade'] * $itemServico['MvXSrValorUnitario'];
-
-                    $html .= "
-                        <tr>
-                            <td style='text-align: center;'>".$cont."</td>
-                            <td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']."</td>	
-                            <td style='text-align: center;'>".$itemServico['MvXSrQuantidade']."</td>
-                            <td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
-                            <td style='text-align: right;'>".mostraValor($valorTotal)."</td>
-                        </tr>
-                    ";
-                    
-                    $cont++;
-                    $totalGeralServicos += $valorTotal;
-                }
+				$valorUnitario = $itemProduto['MvXPrValorUnitario'];                    
+				$valorTotal = $itemProduto['MvXPrQuantidade'] * $itemProduto['MvXPrValorUnitario'];
+				
+				$html .= "
+					<tr>
+						<td style='text-align: center;'>".$cont."</td>
+						<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
+						<td style='text-align: center;'>".$itemProduto['UnMedSigla']."</td>					
+						<td style='text-align: center;'>".$itemProduto['MvXPrQuantidade']."</td>
+						<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
+						<td style='text-align: right;'>".mostraValor($valorTotal)."</td>
+					</tr>
+				";
+				
+				$cont++;
+				$totalGeralProdutos += $valorTotal;
 			}
-
-			$html .= "<br>";
-			
-			$html .= "  <tr>
-		                	<td colspan='4' height='50' valign='middle'>
-			                    <strong>Total Serviços</strong>
-		                    </td>
-						    <td style='text-align: right' colspan='2'>
-						        ".mostraValor($totalGeralServicos)."
-						    </td>
-					    </tr>";
-			$html .= "</table>";
 		}
 
-		$totalGeral = $totalGeralProdutos + $totalGeralServicos;
+		$html .= "<br>";
+		
+		$html .= "  <tr>
+						<td colspan='5' height='50' valign='middle'>
+							<strong>Total Produtos</strong>
+						</td>
+						<td style='text-align: right' colspan='2'>
+							".mostraValor($totalGeralProdutos)."
+						</td>
+					</tr>";
+		$html .= "</table>";
+	}
 
-		$html .= "<table style='width:100%; border-collapse: collapse; margin-top: 20px;'>
-		 			<tr>
-	                	<td colspan='5' height='50' valign='middle' style='width:85%'>
-		                    <strong>TOTAL GERAL</strong>
-	                    </td>
-					    <td style='text-align: right; width:15%'>
-					        ".mostraValor($totalGeral)."
-					    </td>
-				    </tr>
-				  </table>
-		";
+	$totalGeralServicos = 0;
+
+	if($totalServicos > 0){
+
+		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
+
+		$html .= '
+		<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
+			<tr>
+				<th style="text-align: center; width:8%">Item</th>
+				<th style="text-align: left; width:53%">Serviço</th>
+				<th style="text-align: center; width:12%">Quant.</th>
+				<th style="text-align: center; width:12%">V. Unit.</th>
+				<th style="text-align: center; width:15%">V. Total</th>
+			</tr>
+		';
+		
+		$cont = 1;
+		
+		foreach ($rowServicos as $itemServico){
+			
+			if ($itemServico['MvXSrQuantidade'] != '' and $itemServico['MvXSrQuantidade'] != null and $itemServico['MvXSrQuantidade'] != 0){
+				
+				$valorUnitario = $itemServico['MvXSrValorUnitario'];
+				$valorTotal = $itemServico['MvXSrQuantidade'] * $itemServico['MvXSrValorUnitario'];
+
+				$html .= "
+					<tr>
+						<td style='text-align: center;'>".$cont."</td>
+						<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']."</td>	
+						<td style='text-align: center;'>".$itemServico['MvXSrQuantidade']."</td>
+						<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
+						<td style='text-align: right;'>".mostraValor($valorTotal)."</td>
+					</tr>
+				";
+				
+				$cont++;
+				$totalGeralServicos += $valorTotal;
+			}
+		}
+
+		$html .= "<br>";
+		
+		$html .= "  <tr>
+						<td colspan='4' height='50' valign='middle'>
+							<strong>Total Serviços</strong>
+						</td>
+						<td style='text-align: right' colspan='2'>
+							".mostraValor($totalGeralServicos)."
+						</td>
+					</tr>";
+		$html .= "</table>";
+	}
+
+	$totalGeral = $totalGeralProdutos + $totalGeralServicos;
+
+	$html .= "<table style='width:100%; border-collapse: collapse; margin-top: 20px;'>
+				<tr>
+					<td colspan='5' height='50' valign='middle' style='width:85%'>
+						<strong>TOTAL GERAL</strong>
+					</td>
+					<td style='text-align: right; width:15%'>
+						".mostraValor($totalGeral)."
+					</td>
+				</tr>
+				</table>
+	";
 	
     $rodape = "<hr/>
     <div style='width:100%'>

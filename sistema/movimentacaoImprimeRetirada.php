@@ -89,35 +89,35 @@ try {
     }
 
     $html = "
-            <style>
-                th{
-                    text-align: center; 
-                    border: #bbb solid 1px; 
-                    background-color: #f8f8f8; 
-                    padding: 8px;
-                }
+    <style>
+        th{
+            text-align: center; 
+            border: #bbb solid 1px; 
+            background-color: #f8f8f8; 
+            padding: 8px;
+        }
 
-                td{
-                    padding: 8px;               
-                    border: #bbb solid 1px;
-                }
-            </style>
+        td{
+            padding: 8px;               
+            border: #bbb solid 1px;
+        }
+    </style>
 
 
-            <div style='position: relative; width:100%; border-bottom: 1px solid #666;'>
-               <div style='float:left; width: 400px; display: inline-block;'>
-                   <img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />     
-                   <span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
-                   <div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: Secretaria de Saúde / Hospital Padre Manoel</div>
-                   </div>
-                <div style='width:250px; float:right; display: inline; text-align:right;'>
-                    <div>".date('d/m/Y')."</div>
-                    <div style='margin-top:8px; font-weight:bold;'>Recibo de Retirada</div>
-                </div> 
+    <div style='position: relative; width:100%; border-bottom: 1px solid #666;'>
+        <div style='float:left; width: 400px; display: inline-block;'>
+            <img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />     
+            <span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
+            <div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: Secretaria de Saúde / Hospital Padre Manoel</div>
             </div>
+        <div style='width:250px; float:right; display: inline; text-align:right;'>
+            <div>".date('d/m/Y')."</div>
+            <div style='margin-top:8px; font-weight:bold;'>Recibo de Retirada</div>
+        </div> 
+    </div>
 
-            <div style='text-align:center; margin-top: 20px;'><h1>RECIBO DE RETIRADA</h1></div>
-            ";
+    <div style='text-align:center; margin-top: 20px;'><h1>RECIBO DE RETIRADA</h1></div>
+    ";
 
     // Caso seja uma movimentação de saída
     if ($row['MovimTipo'] == 'S') {
