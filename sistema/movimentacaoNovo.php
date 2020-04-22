@@ -121,11 +121,11 @@ if (isset($_POST['inputData'])) {
 						$result->execute(array(
 							':iMovimentacao' => $insertId,
 							':iProduto' => $registro[1],
-							':iQuantidade' => $registro[3],
-							':fValorUnitario' => isset($registro[2]) ? $registro[2] : null,
+							':iQuantidade' => (int)$registro[3],
+							':fValorUnitario' => isset($registro[2]) ? (float)$registro[2] : null,
 							':sLote' => $registro[5],
 							':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-							':iClassificacao' => isset($registro[5]) ? $registro[5] : null,
+							':iClassificacao' => isset($registro[7]) ? (int)$registro[7] : null,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iEmpresa' => $_SESSION['EmpreId']
 						));
@@ -139,8 +139,8 @@ if (isset($_POST['inputData'])) {
 						$result->execute(array(
 							':iMovimentacao' => $insertId,
 							':iServico' => $registro[1],
-							':iQuantidade' => $registro[3],
-							':fValorUnitario' => $registro[2] != '' ? $registro[2] : null,
+							':iQuantidade' => (int)$registro[3],
+							':fValorUnitario' => $registro[2] != '' ? (float)$registro[2] : null,
 							':sLote' => $registro[5],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iEmpresa' => $_SESSION['EmpreId']
@@ -727,7 +727,7 @@ if (isset($_POST['inputData'])) {
 
 					var option = '<option value="#">Selecione</option>';
 					if (dados) {
-						console.log(dados)
+						//console.log(dados)
 						$('#cmbOrdemCompra').html(option).show();
 						$('#cmbOrdemCompra').append(dados).show();
 					} else {
@@ -811,33 +811,23 @@ if (isset($_POST['inputData'])) {
 				var cmbCategoria = $('#cmbCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 
-				console.log(inputTipo)
-				console.log(cmbFornecedor)
-				console.log(cmbCategoria)
-				console.log(cmbSubCategoria)
-
-
-
-
 
 				$('[name=inputProdutoServico]').each((i, elem) => {
-					
 
 					if ($('[for=cmbProduto]').html() == 'Serviço') {
 
-						console.log('teste')
 						$.getJSON('filtraServico.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
 
 							var option = '<option value="#" "selected">Selecione o Serviço</option>';
-							console.log(dados)
-						    console.log('teste')
 
 							if (dados.length) {
 
 								$.each(dados, function(i, obj) {
 									if (inputTipo == 'E') {
 										option += '<option value="' + obj.ServiId + '#' + obj.ServiValorCusto + '">' + obj.ServiNome + '</option>';
+										console.log(obj)
 									} else {
+										console.log(obj)
 										option += '<option value="' + obj.ServiId + '#' + obj.ServiCustoFinal + '">' + obj.ServiNome + '</option>';
 									}
 
@@ -847,9 +837,9 @@ if (isset($_POST['inputData'])) {
 							} else {
 								ResetProduto();
 							}
+						}) .fail(function(m) {
+							console.log(m);
 						});
-
-						console.log('teste')
 
 					} else {
 						$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
@@ -890,7 +880,11 @@ if (isset($_POST['inputData'])) {
 				var Produto = cmbProduto.split("#");
 				var valor = Produto[1].replace(".", ",");
 
-				$('#inputValorUnitario').val(valor);
+				if(valor != 'null' && valor){
+					$('#inputValorUnitario').val(valor);
+				} else {
+					$('#inputValorUnitario').val('0,00');
+				}
 				$('#inputQuantidade').focus();
 			});
 
@@ -944,7 +938,7 @@ if (isset($_POST['inputData'])) {
 			});
 
 			$("input[type=radio][name=inputProdutoServico]").click(function() {
-				
+
 			})
 
 			$('#btnAdicionar').click(function() {
@@ -990,9 +984,12 @@ if (isset($_POST['inputData'])) {
 
 				//Verifica se a combo Classificação foi informada
 				if (inputTipo == 'S' && cmbClassificacao == '#') {
-					alerta('Atenção', 'Informe a Classificação/Bens!', 'error');
-					$('#cmbClassificacao').focus();
-					return false;
+
+					if ($('[for=cmbProduto]').html() == 'Produto') {
+						alerta('Atenção', 'Informe a Classificação/Bens!', 'error');
+						$('#cmbClassificacao').focus();
+						return false;
+					}
 				}
 
 				//Verifica se o campo já está no array
@@ -1008,46 +1005,91 @@ if (isset($_POST['inputData'])) {
 				total = total + parseFloat(inputTotal);
 				var totalFormatado = "R$ " + float2moeda(total).toString();
 
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "movimentacaoAddProduto.php",
-					data: {
-						tipo: inputTipo,
-						numItens: resNumItens,
-						idProduto: Produto[0],
-						quantidade: inputQuantidade
-					},
-					success: function(resposta) {
-						console.log(resposta)
 
-						//var newRow = $("<tr>");
+				if ($('[for=cmbProduto]').html() == 'Produto') {
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "movimentacaoAddProduto.php",
+						data: {
+							tipo: inputTipo,
+							numItens: resNumItens,
+							idProduto: Produto[0],
+							quantidade: inputQuantidade
+						},
+						success: function(resposta) {
+							console.log(resposta)
 
-						//newRow.append(resposta);	    
-						$("#tabelaProdutoServico").append(resposta);
+							//var newRow = $("<tr>");
 
-						//Adiciona mais um item nessa contagem
-						$('#inputNumItens').val(resNumItens);
-						$('#cmbProduto').val("#").change();
-						$('#inputQuantidade').val('');
-						$('#inputValorUnitario').val('');
-						$('#inputTotal').val(total);
-						$('#total').text(totalFormatado);
-						$('#inputLote').val('');
-						$('#inputValidade').val('');
+							//newRow.append(resposta);	    
+							$("#tabelaProdutoServico").append(resposta);
 
-						$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + Produto[0] + '#' + inputQuantidade + '#' + inputValorUnitario + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+							//Adiciona mais um item nessa contagem
+							$('#inputNumItens').val(resNumItens);
+							$('#cmbProduto').val("#").change();
+							$('#inputQuantidade').val('');
+							$('#inputValorUnitario').val('');
+							$('#inputTotal').val(total);
+							$('#total').text(totalFormatado);
+							$('#inputLote').val('');
+							$('#inputValidade').val('');
 
-						inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
+							$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="'+'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull'+'#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 
-						$('#inputIdProdutos').val(inputIdProdutos);
+							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
 
-						$('#cmbFornecedor').prop('disabled', true);
+							$('#inputIdProdutos').val(inputIdProdutos);
 
-						return false;
+							$('#cmbFornecedor').prop('disabled', true);
 
-					}
-				})
+							return false;
+
+						}
+					})
+
+				} else {
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "movimentacaoAddServico.php",
+						data: {
+							tipo: inputTipo,
+							numItens: resNumItens,
+							idServico: Produto[0],
+							quantidade: inputQuantidade
+						},
+						success: function(resposta) {
+							console.log(resposta)
+
+							//var newRow = $("<tr>");
+
+							//newRow.append(resposta);	    
+							$("#tabelaProdutoServico").append(resposta);
+
+							//Adiciona mais um item nessa contagem
+							$('#inputNumItens').val(resNumItens);
+							$('#cmbProduto').val("#").change();
+							$('#inputQuantidade').val('');
+							$('#inputValorUnitario').val('');
+							$('#inputTotal').val(total);
+							$('#total').text(totalFormatado);
+							$('#inputLote').val('');
+							$('#inputValidade').val('');
+
+							$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="'+'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull'+'#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+
+							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
+
+							$('#inputIdProdutos').val(inputIdProdutos);
+
+							$('#cmbFornecedor').prop('disabled', true);
+
+							return false;
+
+						}
+					})
+				}
 			}); //click
 
 			$(document).on('click', '.btn_remove', function() {
@@ -1795,7 +1837,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-2" id="formValidade">
 											<div class="form-group">
 												<label for="inputValidade">Validade</label>
-												<input type="text" id="inputValidade" name="inputValidade" class="form-control">
+												<input type="date" id="inputValidade" name="inputValidade" class="form-control">
 											</div>
 										</div>
 

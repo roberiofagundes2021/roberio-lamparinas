@@ -14,7 +14,7 @@ if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#' && $_GET['idFor
 				 WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_GET['idFornecedor']."' and ServiSubCategoria = '". $_GET['idSubCategoria']."'");
 	} else {
 		$sql = ("SELECT ServiId, ServiNome, ServiValorCusto, ServiCustoFinal
-				 FROM Servito
+				 FROM Servico
 				 JOIN Categoria on CategId = ServiCategoria
 				 JOIN Fornecedor on ForneCategoria = CategId
 				 WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_GET['idFornecedor']."'");		
@@ -27,11 +27,11 @@ if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#' && $_GET['idFor
 
 	if (isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] != "#"){
 		$sql = ("SELECT ServiId, ServiNome, ServiValorCusto, ServiCustoFinal
-				 FROM Servito
+				 FROM Servico
 				 WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiSubCategoria = '". $_GET['idSubCategoria']."'");
 	} else {
 		$sql = ("SELECT ServiId, ServiNome, ServiValorCusto, ServiCustoFinal
-				 FROM Servito
+				 FROM Servico
 				 WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiCategoria = '". $_GET['idCategoria']."'");
 	}
 }
@@ -39,17 +39,13 @@ if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#' && $_GET['idFor
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
-echo json_encode($sql);
+//echo json_encode($sql);
 
 //Verifica se já existe esse registro (se existir, retorna true)
-var_dump($row);
-print('teste php');
+//var_dump($row);
+//print('teste php');
 if($count){
     echo json_encode($row);
-    foreach ($row as $value) {
-        var_dump($value);
-    }
-    ;
 } else{
 	echo 0;
 }
