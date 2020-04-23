@@ -121,14 +121,86 @@ if (isset($_POST['inputData'])) {
 						$result->execute(array(
 							':iMovimentacao' => $insertId,
 							':iProduto' => $registro[1],
-							':iQuantidade' => (int)$registro[3],
-							':fValorUnitario' => isset($registro[2]) ? (float)$registro[2] : null,
+							':iQuantidade' => (int) $registro[3],
+							':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 							':sLote' => $registro[5],
 							':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-							':iClassificacao' => isset($registro[7]) ? (int)$registro[7] : null,
+							':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iEmpresa' => $_SESSION['EmpreId']
 						));
+
+						$insertIdMvXPr = $conn->lastInsertId();
+
+						// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
+						if ($registro[7] == '2') {
+							$sql = "SELECT PatriNumero
+							              FROM Patrimonio
+										  JOIN Situacao on SituaId = PatriStatus
+										  WHERE PatriEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' 
+										  ORDER BY PatriNumero
+										  ";
+							$result = $conn->query($sql);
+							$patrimonios = $result->fetchAll(PDO::FETCH_ASSOC);
+							$count = count($patrimonios);
+
+							//Caso não seja o primeiro registro na tabela para esta empresa
+							if ($count >= 1) {
+								$ultimoPatri = $patrimonios[$count - 1];
+								$numeroPatri = floatval($ultimoPatri) + 1;
+
+
+								// Selecionando o id da situacao 'ATIVO'
+								$sql = "SELECT SituaId
+							    			 FROM Situacao
+							    			 WHERE SituaChave = 'ATIVO' 
+							    		     ";
+								$result = $conn->query($sql);
+								$situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+
+								$sql = "INSERT INTO Patrimonio
+						                    (PatriNumero, PatriMovimentacaoProduto, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
+					                        VALUES 
+						                    (:sNumero, :iMovimentacaoProduto, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+								$result = $conn->prepare($sql);
+
+								$result->execute(array(
+									':sNumero' => $numeroPatri,
+									':iMovimentacaoProduto' => $insertIdMvXPr,
+									':iStatus' => $situacao['SituaId'],
+									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+									':iEmpresa' => $_SESSION['EmpreId']
+								));
+							} else {
+
+								//Caso seja o primeiro registro na tabela para esta empresa
+								$numeroPatri = '1';
+
+								// Selecionando o id da situacao 'ATIVO'
+								$sql = "SELECT SituaId
+							    			 FROM Situacao
+							    			 WHERE SituaChave = 'ATIVO' 
+							    		     ";
+								$result = $conn->query($sql);
+								$situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+
+								$sql = "INSERT INTO Patrimonio
+						                    (PatriNumero, PatriMovimentacaoProduto, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
+					                        VALUES 
+						                    (:sNumero, :iMovimentacaoProduto, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+								$result = $conn->prepare($sql);
+
+								$result->execute(array(
+									':sNumero' => $numeroPatri,
+									':iMovimentacaoProduto' => $insertIdMvXPr,
+									':iStatus' => $situacao['SituaId'],
+									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+									':iEmpresa' => $_SESSION['EmpreId']
+								));
+							}
+						}
 					} else {
 						$sql = "INSERT INTO MovimentacaoXServico
 						        (MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrLote, MvXSrUsuarioAtualizador, MvXSrEmpresa)
@@ -139,8 +211,8 @@ if (isset($_POST['inputData'])) {
 						$result->execute(array(
 							':iMovimentacao' => $insertId,
 							':iServico' => $registro[1],
-							':iQuantidade' => (int)$registro[3],
-							':fValorUnitario' => $registro[2] != '' ? (float)$registro[2] : null,
+							':iQuantidade' => (int) $registro[3],
+							':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
 							':sLote' => $registro[5],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iEmpresa' => $_SESSION['EmpreId']
@@ -837,7 +909,7 @@ if (isset($_POST['inputData'])) {
 							} else {
 								ResetProduto();
 							}
-						}) .fail(function(m) {
+						}).fail(function(m) {
 							console.log(m);
 						});
 
@@ -880,7 +952,7 @@ if (isset($_POST['inputData'])) {
 				var Produto = cmbProduto.split("#");
 				var valor = Produto[1].replace(".", ",");
 
-				if(valor != 'null' && valor){
+				if (valor != 'null' && valor) {
 					$('#inputValorUnitario').val(valor);
 				} else {
 					$('#inputValorUnitario').val('0,00');
@@ -1035,7 +1107,7 @@ if (isset($_POST['inputData'])) {
 							$('#inputLote').val('');
 							$('#inputValidade').val('');
 
-							$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="'+'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull'+'#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+							$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 
 							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
 
@@ -1077,7 +1149,7 @@ if (isset($_POST['inputData'])) {
 							$('#inputLote').val('');
 							$('#inputValidade').val('');
 
-							$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="'+'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull'+'#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+							$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 
 							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
 
@@ -1303,6 +1375,18 @@ if (isset($_POST['inputData'])) {
 
 		}); //document.ready	
 
+		function mudaTotalTitulo(tipoTela){
+
+			if(tipoTela == 'E'){
+				$('#totalTitulo').html('Total (R$) Nota Fiscal:')
+				$('#quantEditaEntradaSaida').html('Quant. Recebida')
+			} else if(tipoTela == 'S'){
+				$('#totalTitulo').html('Total (R$):')
+				$('#quantEditaEntradaSaida').html('Quantidade')
+			}
+			
+		}
+
 		Array.prototype.remove = function(start, end) {
 			this.splice(start, end);
 			return this;
@@ -1325,6 +1409,8 @@ if (isset($_POST['inputData'])) {
 				document.getElementById('motivo').style.display = "none";
 				document.getElementById('dadosNF').style.display = "block";
 				document.getElementById('dadosProduto').style.display = "none";
+
+				mudaTotalTitulo('E')
 			} else if (tipo == 'S') {
 				document.getElementById('EstoqueOrigem').style.display = "block";
 				document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
@@ -1335,6 +1421,8 @@ if (isset($_POST['inputData'])) {
 				document.getElementById('motivo').style.display = "none";
 				document.getElementById('dadosNF').style.display = "none";
 				document.getElementById('dadosProduto').style.display = "flex";
+
+				mudaTotalTitulo('S')
 			} else {
 				document.getElementById('EstoqueOrigem').style.display = "none";
 				document.getElementById('EstoqueOrigemLocalSetor').style.display = "block";
@@ -1889,7 +1977,7 @@ if (isset($_POST['inputData'])) {
 												<th>Item</th>
 												<th>Produto/Serviço</th>
 												<th>Unidade Medida</th>
-												<th>Quant. Recebida</th>
+												<th id="quantEditaEntradaSaida">Quant. Recebida</th>
 												<th>Valor Unitário</th>
 												<th>Valor Total</th>
 												<th class="text-center">Ações</th>
@@ -1908,7 +1996,7 @@ if (isset($_POST['inputData'])) {
 										</tbody>
 										<tfoot>
 											<tr>
-												<th colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$) Nota Fiscal:</th>
+												<th id="totalTitulo" colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$) Nota Fiscal:</th>
 												<th colspan="2">
 													<div id="total" style="text-align:left; font-size: 15px; font-weight:bold;">R$ 0,00</div>
 												</th>
