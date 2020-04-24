@@ -50,7 +50,7 @@
 							
 							<div class="dropdown-divider"></div>							
 							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberar\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
-							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MOvimTipo'].'\', \'naoliberar\');" class="dropdown-item" id="motivo"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
+							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'naoliberar\');" class="dropdown-item" id="motivo"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
 						</div>
 					</div>
 				</div>

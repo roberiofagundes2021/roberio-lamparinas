@@ -6,6 +6,42 @@ $_SESSION['PaginaAtual'] = 'Nova Movimentação';
 
 include('global_assets/php/conexao.php');
 
+
+//Caso a chamada à página venha da liberação de uma solicitação na bandeja.
+//var_dump($_POST);
+
+if (isset($_POST['inputSolicitacaoId'])) {
+
+	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
+	            FROM SolicitacaoXProduto
+                JOIN Solicitacao on SolicId = SlXPrSolicitacao
+                JOIN Produto on ProduId = SlXPrProduto
+				LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+                WHERE SlXPrEmpresa = " . $_SESSION['EmpreId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
+    ";
+	$result = $conn->query($sql);
+	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
+	$numProdutos = count($produtosSolicitacao);
+	//var_dump($produtosSolicitacao);
+
+	$idsProdutos = '';
+
+	if ($numProdutos) {
+		foreach ($produtosSolicitacao as $chave => $produto) {
+
+			if ($chave == 0) {
+				$idsProdutos .= '0, ' . $produto['ProduId'] . '';
+			} else {
+				$idsProdutos .= ', ' . $produto['ProduId'] . '';
+			}
+		}
+		print($idsProdutos);
+	}
+}
+
+
+
+
 if (isset($_POST['inputData'])) {
 
 	try {
@@ -1164,6 +1200,10 @@ if (isset($_POST['inputData'])) {
 				}
 			}); //click
 
+			function produtosSolicitacaoSaida() {
+
+			}
+
 			$(document).on('click', '.btn_remove', function() {
 
 				var inputTotal = $('#inputTotal').val();
@@ -1375,16 +1415,16 @@ if (isset($_POST['inputData'])) {
 
 		}); //document.ready	
 
-		function mudaTotalTitulo(tipoTela){
+		function mudaTotalTitulo(tipoTela) {
 
-			if(tipoTela == 'E'){
+			if (tipoTela == 'E') {
 				$('#totalTitulo').html('Total (R$) Nota Fiscal:')
 				$('#quantEditaEntradaSaida').html('Quant. Recebida')
-			} else if(tipoTela == 'S'){
+			} else if (tipoTela == 'S') {
 				$('#totalTitulo').html('Total (R$):')
 				$('#quantEditaEntradaSaida').html('Quantidade')
 			}
-			
+
 		}
 
 		Array.prototype.remove = function(start, end) {
@@ -1964,8 +2004,27 @@ if (isset($_POST['inputData'])) {
 							<div id="inputProdutos">
 								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
 								<input type="hidden" id="itemEditadoquantidade" name="itemEditadoquantidade" value="0">
-								<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">
+								<?php
+								if (isset($_POST['inputSolicitacaoId'])) {
+									print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="' . $idsProdutos . '">');
+								} else {
+									print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">');
+								}
+								?>
 								<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
+								<?php
+								if (isset($_POST['inputSolicitacaoId'])) {
+									$totalGeral = 0;
+
+									foreach ($produtosSolicitacao  as $produto) {
+										$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+									}
+
+									print('<input type="hidden" id="inputTotal" name="inputTotal" value="' . $totalGeral . '">');
+								} else {
+									print('<input type="hidden" id="inputTotal" name="inputTotal" value="0">');
+								}
+								?>
 								<input type="hidden" id="inputTotal" name="inputTotal" value="0">
 							</div>
 
@@ -1993,13 +2052,52 @@ if (isset($_POST['inputData'])) {
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 											</tr>
+
+											<?php
+											if (isset($_POST['inputSolicitacaoId'])) {
+												$idProdutoSolicitacao = 0;
+												$totalGeral = 0;
+												foreach ($produtosSolicitacao  as $produto) {
+													$idProdutoSolicitacao++;
+
+													$valorCusto = formataMoeda($produto['ProduValorVenda']);
+													$valorTotal = formataMoeda($produto['SlXPrQuantidade'] * $produto['ProduValorVenda']);
+													$valorTotalSemFormatacao = $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+
+													$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+													print("
+															   <tr class='produtoSolicitacao'>
+															        <td>" . $idProdutoSolicitacao . "</td>
+															        <td>" . $produto['ProduNome'] . "</td>
+															        <td>" . $produto['UnMedNome'] . "</td>
+															        <td>" . $produto['SlXPrQuantidade'] . "</td>
+																	<td>" . $valorCusto . "</td>
+																	<td>" . $valorTotal . "</td>
+															        <td><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
+															   </tr>
+														");
+												}
+											}
+											?>
 										</tbody>
 										<tfoot>
 											<tr>
-												<th id="totalTitulo" colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$) Nota Fiscal:</th>
-												<th colspan="2">
-													<div id="total" style="text-align:left; font-size: 15px; font-weight:bold;">R$ 0,00</div>
-												</th>
+												<th id="totalTitulo" colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$) Nota Fiscal: </th>
+												<?php
+												if (isset($_POST['inputSolicitacaoId'])) {
+													print('
+														    <th colspan="2">
+														        <div id="total" style="text-align:left; font-size: 15px; font-weight:bold;">' . formataMoeda($totalGeral) . '</div>
+													        </th>
+														    ');
+												} else {
+													print('
+														    <th colspan="2">
+														        <div id="total" style="text-align:left; font-size: 15px; font-weight:bold;">R$ 0,00</div>
+													        </th>
+														');
+												}
+												?>
 											</tr>
 										</tfoot>
 									</table>
