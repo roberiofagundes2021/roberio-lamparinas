@@ -1126,7 +1126,7 @@ if (isset($_POST['inputData'])) {
 							quantidade: inputQuantidade
 						},
 						success: function(resposta) {
-							console.log(resposta)
+							//console.log(resposta)
 
 							//var newRow = $("<tr>");
 
@@ -1168,7 +1168,7 @@ if (isset($_POST['inputData'])) {
 							quantidade: inputQuantidade
 						},
 						success: function(resposta) {
-							console.log(resposta)
+							//console.log(resposta)
 
 							//var newRow = $("<tr>");
 
@@ -1201,8 +1201,19 @@ if (isset($_POST['inputData'])) {
 			}); //click
 
 			function produtosSolicitacaoSaida() {
+				$('.produtoSolicitacao').each((i, elem) => {
+					var tds = $(elem).children()
+					var idProdutoGrid = $(elem).attr('idProduSolicitacao')
+					var idGridProdu = $(tds[0]).html()
+					var quantProduGrid = $(tds[3]).html()
+					var valUnitProduGrid = $(tds[4]).attr('valorUntPrSolici')
 
+					console.log($(elem).children())
+					$('#inputProdutos').append('<input type="hidden" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + 'P#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '">');
+				})
+				//$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 			}
+			produtosSolicitacaoSaida()
 
 			$(document).on('click', '.btn_remove', function() {
 
@@ -1215,6 +1226,7 @@ if (isset($_POST['inputData'])) {
 				//alert("Antes: " + inputIdProdutos);
 
 				var item = inputIdProdutos.split(",");
+				console.log(item)
 
 				var i;
 				var arr = [];
@@ -1300,16 +1312,22 @@ if (isset($_POST['inputData'])) {
 						return false;
 					}
 
+					if (inputTotal == '' || inputTotal == 0) {
+						alerta('Atenção', 'Informe algum produto!', 'error');
+						$('#cmbCategoria').focus();
+						return false;
+					}
+
 					verificaTotalNotaFiscal()
 
 				} else if (inputTipo == 'S') {
 
 					//Verifica se a combo Finalidade foi informada
-					if (cmbFinalidade == '#') {
+					/*if (cmbFinalidade == '#') {
 						alerta('Atenção', 'Informe a Finalidade!', 'error');
 						$('#cmbFinalidade').focus();
 						return false;
-					}
+					}*/
 
 					//Verifica se a combo Estoque de Origem foi informada
 					if (cmbEstoqueOrigem == '#') {
@@ -1368,15 +1386,15 @@ if (isset($_POST['inputData'])) {
 				}
 
 				//Verifica se tem algum produto na Grid
-				if (inputTotal == '' || inputTotal == 0) {
+				/*if (inputTotal == '' || inputTotal == 0) {
 					alerta('Atenção', 'Informe algum produto!', 'error');
 					$('#cmbCategoria').focus();
 					return false;
-				}
+				}*/
 
 				//desabilita as combos "Fornecedor" e "Situacao" na hora de gravar, senão o POST não o encontra
 				$('#cmbFornecedor').prop('disabled', false);
-				$('#cmbSituacao').prop('disabled', false);
+				//$('#cmbSituacao').prop('disabled', false);
 
 				$("#formMovimentacao").submit();
 			});
@@ -1505,6 +1523,24 @@ if (isset($_POST['inputData'])) {
 
 		}
 
+		$(document).ready(() => {
+			$('[name=inputTipo]').each((i, elem) => {
+				if ($(elem).attr('checked')) {
+					document.getElementById('EstoqueOrigem').style.display = "block";
+					document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
+					document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
+					document.getElementById('DestinoLocal').style.display = "none";
+					document.getElementById('DestinoSetor').style.display = "block";
+					document.getElementById('classificacao').style.display = "block";
+					document.getElementById('motivo').style.display = "none";
+					document.getElementById('dadosNF').style.display = "none";
+					document.getElementById('dadosProduto').style.display = "flex";
+
+					mudaTotalTitulo('S')
+				}
+			})
+		})
+
 		function selecionaProdutoServico(tipo) {
 			if (tipo == 'P') {
 				document.getElementById('formLote').style.display = "block";
@@ -1593,19 +1629,19 @@ if (isset($_POST['inputData'])) {
 									<div class="form-group">
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" name="inputTipo" value="E" class="form-input-styled" onclick="selecionaTipo('E')" checked data-fouc>
+												<input type="radio" name="inputTipo" value="E" class="form-input-styled" onclick="selecionaTipo('E')" <?php if (!isset($_POST['inputSolicitacaoId'])) echo 'checked' ?> <?php if (isset($_POST['inputSolicitacaoId'])) echo 'disabled' ?> data-fouc>
 												Entrada
 											</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" name="inputTipo" value="S" class="form-input-styled" onclick="selecionaTipo('S')" data-fouc>
+												<input type="radio" name="inputTipo" value="S" class="form-input-styled" onclick="selecionaTipo('S')" <?php if (isset($_POST['inputSolicitacaoId'])) echo 'checked' ?> data-fouc>
 												Saída
 											</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo('T')" data-fouc>
+												<input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo('T')" <?php if (isset($_POST['inputSolicitacaoId'])) echo 'disabled' ?> data-fouc>
 												Transferência
 											</label>
 										</div>
@@ -2002,7 +2038,13 @@ if (isset($_POST['inputData'])) {
 							</div>
 
 							<div id="inputProdutos">
-								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
+								<?php
+								if (isset($_POST['inputSolicitacaoId'])) {
+									print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="' . $numProdutos . '">');
+								} else {
+									print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">');
+								}
+								?>
 								<input type="hidden" id="itemEditadoquantidade" name="itemEditadoquantidade" value="0">
 								<?php
 								if (isset($_POST['inputSolicitacaoId'])) {
@@ -2025,7 +2067,6 @@ if (isset($_POST['inputData'])) {
 									print('<input type="hidden" id="inputTotal" name="inputTotal" value="0">');
 								}
 								?>
-								<input type="hidden" id="inputTotal" name="inputTotal" value="0">
 							</div>
 
 							<div class="row">
@@ -2066,12 +2107,12 @@ if (isset($_POST['inputData'])) {
 
 													$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
 													print("
-															   <tr class='produtoSolicitacao'>
+															   <tr class='produtoSolicitacao' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
 															        <td>" . $idProdutoSolicitacao . "</td>
 															        <td>" . $produto['ProduNome'] . "</td>
 															        <td>" . $produto['UnMedNome'] . "</td>
 															        <td>" . $produto['SlXPrQuantidade'] . "</td>
-																	<td>" . $valorCusto . "</td>
+																	<td valorUntPrSolici='" . $produto['ProduValorVenda'] . "'>" . $valorCusto . "</td>
 																	<td>" . $valorTotal . "</td>
 															        <td><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
 															   </tr>
