@@ -35,7 +35,6 @@ if (isset($_POST['inputSolicitacaoId'])) {
 				$idsProdutos .= ', ' . $produto['ProduId'] . '';
 			}
 		}
-		print($idsProdutos);
 	}
 }
 
@@ -1143,7 +1142,7 @@ if (isset($_POST['inputData'])) {
 							$('#inputLote').val('');
 							$('#inputValidade').val('');
 
-							$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+							$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 
 							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
 
@@ -1185,7 +1184,7 @@ if (isset($_POST['inputData'])) {
 							$('#inputLote').val('');
 							$('#inputValidade').val('');
 
-							$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+							$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 
 							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
 
@@ -1208,8 +1207,7 @@ if (isset($_POST['inputData'])) {
 					var quantProduGrid = $(tds[3]).html()
 					var valUnitProduGrid = $(tds[4]).attr('valorUntPrSolici')
 
-					console.log($(elem).children())
-					$('#inputProdutos').append('<input type="hidden" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + 'P#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '">');
+					$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + 'P#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '#' + 0 + '#' + 0 + '#' + 0 + '#' + 0 + '">');
 				})
 				//$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 			}
@@ -1226,7 +1224,6 @@ if (isset($_POST['inputData'])) {
 				//alert("Antes: " + inputIdProdutos);
 
 				var item = inputIdProdutos.split(",");
-				console.log(item)
 
 				var i;
 				var arr = [];
@@ -1266,7 +1263,7 @@ if (isset($_POST['inputData'])) {
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e) {
 
-				e.preventDefault();
+
 
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputTotal = $('#inputTotal').val();
@@ -1309,12 +1306,6 @@ if (isset($_POST['inputData'])) {
 
 					if (inputValorTotal == '') {
 						alerta('Atenção', 'Informe o valor Total da nota fiscal!', 'error');
-						return false;
-					}
-
-					if (inputTotal == '' || inputTotal == 0) {
-						alerta('Atenção', 'Informe algum produto!', 'error');
-						$('#cmbCategoria').focus();
 						return false;
 					}
 
@@ -1386,17 +1377,72 @@ if (isset($_POST['inputData'])) {
 				}
 
 				//Verifica se tem algum produto na Grid
-				/*if (inputTotal == '' || inputTotal == 0) {
+				if (inputTotal == '' || inputTotal == 0) {
 					alerta('Atenção', 'Informe algum produto!', 'error');
 					$('#cmbCategoria').focus();
 					return false;
-				}*/
+				}
 
 				//desabilita as combos "Fornecedor" e "Situacao" na hora de gravar, senão o POST não o encontra
 				$('#cmbFornecedor').prop('disabled', false);
-				//$('#cmbSituacao').prop('disabled', false);
+				$('#cmbSituacao').prop('disabled', false);
 
-				$("#formMovimentacao").submit();
+				if (inputTipo == 'S') {
+					const submitProduto = {}
+					$('.inputProdutoServicoClasse').each((i, elem) => {
+						let nomeInput = $(elem).attr('name')
+						let valorInput = $(elem).val()
+						submitProduto[`${nomeInput}`] = valorInput
+					})
+
+
+					document.getElementById('EstoqueOrigem').style.display = "block";
+					document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
+					document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
+					document.getElementById('DestinoLocal').style.display = "none";
+					document.getElementById('DestinoSetor').style.display = "block";
+					document.getElementById('classificacao').style.display = "block";
+					document.getElementById('motivo').style.display = "none";
+					document.getElementById('dadosNF').style.display = "none";
+					document.getElementById('dadosProduto').style.display = "flex";
+
+
+					submitProduto.inputData = $('#inputData').val()
+					submitProduto.cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val()
+					submitProduto.cmbDestinoSetor = $('#cmbDestinoSetor').val()
+					submitProduto.txtareaObservacao = $('#txtareaObservacao').val()
+					submitProduto.cmbSituacao = $('#cmbSituacao').val()
+					submitProduto.cmbMotivo = $('#cmbMotivo').val()
+					submitProduto.cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val()
+					submitProduto.cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val()
+					submitProduto.inputTipo = $('[name=inputTipo]').val()
+					submitProduto.inputDestinoManual = $('#inputDestinoManual').val()
+					submitProduto.cmbDestinoLocal = $('#cmbDestinoLocal').val()
+					submitProduto.cmbFornecedor = $('#cmbFornecedor').val()
+					submitProduto.cmbOrdemCompra = $('#cmbOrdemCompra').val()
+					submitProduto.inputNotaFiscal = $('#inputNotaFiscal').val()
+					submitProduto.inputDataEmissao = $('#inputDataEmissao').val()
+					submitProduto.inputNumSerie = $('#inputNumSerie').val()
+					submitProduto.inputValorTotal = $('#inputValorTotal').val()
+					submitProduto.inputChaveAcesso = $('#inputChaveAcesso').val()
+					submitProduto.inputNumItens = $('#inputNumItens').val()
+
+					$.ajax({
+						type: "POST",
+						url: "movimentacaoNovo.php",
+						data: submitProduto,
+						success: function(resposta) {
+							window.location.href = "index.php";
+						}
+					})
+
+
+				} else {
+					$("#formMovimentacao").submit();
+				}
+
+				//$("#formMovimentacao").submit();
+				console.log('teste 2')
 			});
 
 			//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
@@ -1502,7 +1548,7 @@ if (isset($_POST['inputData'])) {
 						let text = $(elem).html()
 						$('#select2-cmbSituacao-container').attr('title', text)
 						$('#select2-cmbSituacao-container').html(text)
-						console.log($('#cmbSituacao').val())
+
 					} else {
 						$(elem).removeAttr('selected')
 					}
@@ -1514,7 +1560,7 @@ if (isset($_POST['inputData'])) {
 						let text = $(elem).html()
 						$('#select2-cmbSituacao-container').attr('title', text)
 						$('#select2-cmbSituacao-container').html(text)
-						console.log($('#cmbSituacao').val())
+
 					} else {
 						$(elem).removeAttr('selected')
 					}
@@ -1525,7 +1571,7 @@ if (isset($_POST['inputData'])) {
 
 		$(document).ready(() => {
 			$('[name=inputTipo]').each((i, elem) => {
-				if ($(elem).attr('checked')) {
+				if ($(elem).attr('checked') && $(elem).val() == 'S') {
 					document.getElementById('EstoqueOrigem').style.display = "block";
 					document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
 					document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
@@ -1539,6 +1585,7 @@ if (isset($_POST['inputData'])) {
 					mudaTotalTitulo('S')
 				}
 			})
+
 		})
 
 		function selecionaProdutoServico(tipo) {
@@ -2156,43 +2203,60 @@ if (isset($_POST['inputData'])) {
 												<!--<option value="#">Selecione</option>-->
 												<?php
 
-												if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
+												if (isset($_POST['inputSolicitacaoId'])) {
 													$sql = "SELECT SituaId, SituaNome, SituaChave
-																 FROM Situacao
-																 WHERE SituaStatus = '1'
-															     ORDER BY SituaNome ASC";
-													$result = $conn->query($sql);
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2">');
-													print('<option value="#">Selecione</option>');
-
-													foreach ($row as $item) {
-														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
-															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-																print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-															} else {
-																print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-															}
-														}
-													}
-												} else {
-
-													$sql = "SELECT SituaId, SituaNome, SituaChave
-													            FROM Situacao
-													            WHERE SituaStatus = '1'
-													            ORDER BY SituaNome ASC";
+																	FROM Situacao
+																	WHERE SituaStatus = '1'
+																	ORDER BY SituaNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
-													print('<option value="#">Selecione</option>');
-
+	
 													foreach ($row as $item) {
-														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-															print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-														} else if ($item['SituaChave'] == 'LIBERADO') {
+														if ($item['SituaChave'] == 'LIBERADO') {
 															print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+														}
+													}
+												} else {
+													if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
+														$sql = "SELECT SituaId, SituaNome, SituaChave
+																	 FROM Situacao
+																	 WHERE SituaStatus = '1'
+																	 ORDER BY SituaNome ASC";
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2">');
+														print('<option value="#">Selecione</option>');
+
+														foreach ($row as $item) {
+															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
+																if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
+																	print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
+																} else {
+																	print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+																}
+															}
+														}
+													} else {
+
+														$sql = "SELECT SituaId, SituaNome, SituaChave
+																	FROM Situacao
+																	WHERE SituaStatus = '1'
+																	ORDER BY SituaNome ASC";
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
+														print('<option value="#">Selecione</option>');
+
+														foreach ($row as $item) {
+															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
+																print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
+															} else if ($item['SituaChave'] == 'LIBERADO') {
+																print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+															}
 														}
 													}
 												}
