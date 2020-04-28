@@ -186,6 +186,8 @@ try {
 	
 	if($totalServicos > 0){
 
+		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
+
 		$html .= '
 		<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
 			<tr>

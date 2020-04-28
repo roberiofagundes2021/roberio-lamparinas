@@ -22,13 +22,12 @@ if ($count) {
         $sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, ProduDetalhamento as detalhamento, ProduValorCusto as valorCusto, ProduCustoFinal as custoFinal, UnMedSigla, tipo = 'P'
 		FROM OrdemCompraXProduto
         JOIN Produto on ProduId = OCXPrProduto
- 		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+ 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
         WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and OCXPrOrdemCompra = '" . $value['OrComId'] . "'
         UNION
         SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, ServiValorCusto as valorCusto, ServiCustoFinal as custoFinal, UnMedSigla, tipo = 'S'
 		FROM OrdemCompraXServico
         JOIN Servico on ServiId = OCXSrServico
- 		LEFT JOIN UnidadeMedida on UnMedId = 0
         WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OCXSrOrdemCompra = '" . $value['OrComId'] . "'
         ";
         $result = $conn->query($sql);
