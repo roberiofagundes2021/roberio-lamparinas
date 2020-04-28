@@ -27,7 +27,38 @@ if(isset($_POST['inputServicoId'])){
 		$custoFinal = mostraValor($row['ServiCustoFinal']);
 		$margemLucro = mostraValor($row['ServiMargemLucro']);
 		$numSerie = $row['ServiNumSerie'];
-		
+
+		/* Verifica se tem Ordem de Compra ou Fluxo para esse produto (de acordo com o parâmetro) */
+		$sql = "SELECT ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra
+				FROM Parametro				
+				WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+		$result = $conn->query($sql);
+		$rowParamentro = $result->fetch(PDO::FETCH_ASSOC);
+
+		if ($rowParamentro['ParamValorAtualizadoFluxo']){
+			$sql = "SELECT COUNT(FOXSrServico) as CONT
+					FROM FluxoOperacionalXServico
+					JOIN FluxoOperacional on FlOpeId = FOXSrFluxoOperacional
+					JOIN Situacao on SituaId = FlOpeStatus
+					WHERE FOXSrServico = ".$iServico." and SituaChave = 'ATIVO' ";
+			$result = $conn->query($sql);
+			$rowExiste = $result->fetch(PDO::FETCH_ASSOC);
+		} else if ($rowParamentro['ParamValorAtualizadoOrdemCompra']){
+			$sql = "SELECT COUNT(OCXSrServico) as CONT
+					FROM OrdemCompraXServico
+					JOIN OrdemCompra on OrComId = OCXSrOrdemCompra
+					JOIN Situacao on SituaId = OrComSituacao
+					WHERE OCXSrServico = ".$iServico." and SituaChave = 'LIBERADO' ";
+			$result = $conn->query($sql);
+			$rowExiste = $result->fetch(PDO::FETCH_ASSOC);
+		}
+
+		$travado = "";
+
+		if ($rowExiste['CONT']){
+			$travado = "readOnly";
+		}		
+
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
 	}
@@ -72,7 +103,7 @@ if(isset($_POST['inputNome'])){
 						':sCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
-						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
@@ -145,7 +176,7 @@ if(isset($_POST['inputNome'])){
 
 			$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
 				
-				var option = '<option value="">Selecione a SubCategoria</option>';
+				var option = '<option value="#">Selecione a SubCategoria</option>';
 				
 				if (dados.length){						
 					
@@ -225,7 +256,7 @@ if(isset($_POST['inputNome'])){
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
 				
-				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
 					atualizaValorVenda();
 				}
 			});
@@ -251,7 +282,7 @@ if(isset($_POST['inputNome'])){
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
 				
-				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
 					atualizaValorVenda();
 				}				
 			});			
@@ -259,7 +290,9 @@ if(isset($_POST['inputNome'])){
 			//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
 			$('#inputMargemLucro').on('blur', function(e){
 								
-				atualizaValorVenda();
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
+					atualizaValorVenda();
+				}
 			});	
 			
 			//Ao mudar o Valor de Venda, atualiza a Margem de Lucro
@@ -281,7 +314,7 @@ if(isset($_POST['inputNome'])){
 				
 				inputMargemLucro = 0;
 				
-				if (inputCustoFinal != 0.00){
+				if (inputCustoFinal != 0.00 && inputValorVenda != 0.00){
 					inputMargemLucro = lucro / parseFloat(inputCustoFinal) * 100;
 				}
 				
@@ -303,7 +336,7 @@ if(isset($_POST['inputNome'])){
 					inputMargemLucro = 0.00;
 				}
 								
-				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
+				var inputValorVenda = inputMargemLucro == 0.00 ? 0.00 : parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
 				
 				inputValorVenda = float2moeda(inputValorVenda).toString();
 				
@@ -311,11 +344,11 @@ if(isset($_POST['inputNome'])){
 			}
 
 			function Filtrando(){
-				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+				$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
 			}
 			
 			function Reset(){
-				$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
+				$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
 			}
 		
 		});
@@ -418,7 +451,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="">Selecione</option>
+													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT SbCatId, SbCatNome
 																FROM SubCategoria
@@ -458,14 +491,14 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorCusto">Valor de Custo</label>
-												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="<?php echo $valorCusto; ?>" onKeyUp="moeda(this)" maxLength="12">
+												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="<?php echo $valorCusto; ?>" <?php echo $travado; ?> onKeyUp="moeda(this)" maxLength="12">
 											</div>
 										</div>
 										
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputOutrasDespesas">Outras Despesas</label>
-												<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" value="<?php echo $outrasDespesas; ?>" onKeyUp="moeda(this)" maxLength="12">
+												<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" value="<?php echo $outrasDespesas; ?>" <?php echo $travado; ?> onKeyUp="moeda(this)" maxLength="12">
 											</div>
 										</div>			
 										
@@ -478,13 +511,13 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputMargemLucro">Margem de Lucro (%)</label>
-												<input type="text" id="inputMargemLucro" name="inputMargemLucro" class="form-control" placeholder="Margem Lucro" value="<?php echo $margemLucro; ?>" onKeyUp="moeda(this)" maxLength="6">
+												<input type="text" id="inputMargemLucro" name="inputMargemLucro" class="form-control" placeholder="Margem Lucro" value="<?php echo $margemLucro; ?>" <?php echo $travado; ?> onKeyUp="moeda(this)" maxLength="6">
 											</div>
 										</div>										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputValorVenda">Valor de Venda</label>
-												<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" value="<?php echo $valorVenda; ?>" onKeyUp="moeda(this)" maxLength="12">
+												<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" value="<?php echo $valorVenda; ?>" <?php echo $travado; ?> onKeyUp="moeda(this)" maxLength="12">
 											</div>
 										</div>
 									</div>
@@ -500,7 +533,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbMarca">Marca</label>
 												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
-													<option value="">Selecione</option>
+													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT MarcaId, MarcaNome
 																FROM Marca
@@ -524,7 +557,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbModelo">Modelo</label>
 												<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
-													<option value="">Selecione</option>
+													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT ModelId, ModelNome
 																FROM Modelo
@@ -548,7 +581,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbFabricante">Fabricante</label>
 												<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
-													<option value="">Selecione</option>
+													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT FabriId, FabriNome
 																FROM Fabricante

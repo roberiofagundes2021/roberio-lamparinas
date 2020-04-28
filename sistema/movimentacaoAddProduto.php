@@ -29,7 +29,7 @@ $count = count($row);
 
 		$output = 	'<tr id="row'.$_POST['numItens'].'">
 						 <td>'.$_POST['numItens'].'</td>
-						 <td title="'.$row['ProduDetalhamento'].'">'.$row['ProduNome'].'</td>
+						 <td data-popup="tooltip" title="'.$row['ProduDetalhamento'].'">'.$row['ProduNome'].'</td>
 						 <td>'.$row['UnMedSigla'].'</td>
 						 <td>'.$_POST['quantidade'].'</td>
 						 <td>'.$valorCusto.'</td>

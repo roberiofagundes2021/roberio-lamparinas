@@ -16,7 +16,7 @@ if(isset($_POST['inputProdutoId'])){
 				FROM Produto
 				JOIN Situacao on SituaId = ProduStatus
 				WHERE ProduId = $iProduto ";
-		$result = $conn->query("$sql");
+		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);		
 		
 		$valorCusto = mostraValor($row['ProduValorCusto']);
@@ -38,6 +38,37 @@ if(isset($_POST['inputProdutoId'])){
 		} else {
 			$sFoto = "global_assets/images/lamparinas/sem_foto.gif";
 			$sButtonFoto = "Adicionar Foto...";
+		}
+
+		/* Verifica se tem Ordem de Compra ou Fluxo para esse produto (de acordo com o parâmetro) */
+		$sql = "SELECT ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra
+				FROM Parametro				
+				WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+		$result = $conn->query($sql);
+		$rowParamentro = $result->fetch(PDO::FETCH_ASSOC);
+
+		if ($rowParamentro['ParamValorAtualizadoFluxo']){
+			$sql = "SELECT COUNT(FOXPrProduto) as CONT
+					FROM FluxoOperacionalXProduto
+					JOIN FluxoOperacional on FlOpeId = FOXPrFluxoOperacional
+					JOIN Situacao on SituaId = FlOpeStatus
+					WHERE FOXPrProduto = ".$iProduto." and SituaChave = 'ATIVO' ";
+			$result = $conn->query($sql);
+			$rowExiste = $result->fetch(PDO::FETCH_ASSOC);
+		} else if ($rowParamentro['ParamValorAtualizadoOrdemCompra']){
+			$sql = "SELECT COUNT(OCXPrProduto) as CONT
+					FROM OrdemCompraXProduto
+					JOIN OrdemCompra on OrComId = OCXPrOrdemCompra
+					JOIN Situacao on SituaId = OrComSituacao
+					WHERE OCXPrProduto = ".$iProduto." and SituaChave = 'LIBERADO' ";
+			$result = $conn->query($sql);
+			$rowExiste = $result->fetch(PDO::FETCH_ASSOC);
+		}
+
+		$travado = "";
+
+		if ($rowExiste['CONT']){
+			$travado = "readOnly";
 		}
 		
 	} catch(PDOException $e) {
@@ -255,7 +286,7 @@ if(isset($_POST['inputNome'])){
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
 				
-				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
 					atualizaValorVenda();
 				}
 			});
@@ -280,16 +311,18 @@ if(isset($_POST['inputNome'])){
 				inputCustoFinal = float2moeda(inputCustoFinal).toString();
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
-				
-				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
 					atualizaValorVenda();
 				}				
 			});			
 			
 			//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
 			$('#inputMargemLucro').on('blur', function(e){
-								
-				atualizaValorVenda();
+				
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
+					atualizaValorVenda();
+				}
 			});	
 			
 			//Ao mudar o Valor de Venda, atualiza a Margem de Lucro
@@ -311,7 +344,7 @@ if(isset($_POST['inputNome'])){
 				
 				inputMargemLucro = 0;
 				
-				if (inputCustoFinal != 0.00){
+				if (inputCustoFinal != 0.00 && inputValorVenda != 0.00){
 					inputMargemLucro = lucro / parseFloat(inputCustoFinal) * 100;
 				}
 				
@@ -332,8 +365,8 @@ if(isset($_POST['inputNome'])){
 				if (inputMargemLucro == null || inputMargemLucro.trim() == '') {
 					inputMargemLucro = 0.00;
 				}
-								
-				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
+				
+				var inputValorVenda = inputMargemLucro == 0.00 ? 0.00 : parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
 				
 				inputValorVenda = float2moeda(inputValorVenda).toString();
 				
@@ -567,14 +600,14 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorCusto">Valor de Custo</label>
-												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="<?php echo $valorCusto; ?>" onKeyUp="moeda(this)" maxLength="12">
+												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="<?php echo $valorCusto; ?>"  <?php echo $travado; ?> onKeyUp="moeda(this)" maxLength="12" >
 											</div>
 										</div>
 										
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputOutrasDespesas">Outras Despesas</label>
-												<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" value="<?php echo $outrasDespesas; ?>" onKeyUp="moeda(this)" maxLength="12">
+												<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" value="<?php echo $outrasDespesas; ?>" <?php echo $travado; ?> onKeyUp="moeda(this)" maxLength="12">
 											</div>
 										</div>			
 										
@@ -587,13 +620,13 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputMargemLucro">Margem de Lucro (%)</label>
-												<input type="text" id="inputMargemLucro" name="inputMargemLucro" class="form-control" placeholder="Margem Lucro" value="<?php echo $margemLucro; ?>" onKeyUp="moeda(this)" maxLength="6">
+												<input type="text" id="inputMargemLucro" name="inputMargemLucro" class="form-control" placeholder="Margem Lucro" value="<?php echo $margemLucro; ?>" <?php echo $travado; ?> onKeyUp="moeda(this)" maxLength="6">
 											</div>
 										</div>										
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputValorVenda">Valor de Venda</label>
-												<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" value="<?php echo $valorVenda; ?>" onKeyUp="moeda(this)" maxLength="12">
+												<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" value="<?php echo $valorVenda; ?>" <?php echo $travado; ?> onKeyUp="moeda(this)" maxLength="12">
 											</div>
 										</div>
 									</div>

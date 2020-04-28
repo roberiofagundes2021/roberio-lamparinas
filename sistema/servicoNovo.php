@@ -37,7 +37,7 @@ if(isset($_POST['inputNome'])){
 						':sCodigo' => $sCodigo,
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
-						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
@@ -123,7 +123,7 @@ if(isset($_POST['inputNome'])){
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
 					
-					var option = '<option value="">Selecione a SubCategoria</option>';
+					var option = '<option value="#">Selecione a SubCategoria</option>';
 					
 					if (dados.length){
 						
@@ -159,7 +159,7 @@ if(isset($_POST['inputNome'])){
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
 				
-				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
 					atualizaValorVenda();
 				}
 			});
@@ -185,7 +185,7 @@ if(isset($_POST['inputNome'])){
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
 				
-				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
 					atualizaValorVenda();
 				}				
 			});			
@@ -193,7 +193,9 @@ if(isset($_POST['inputNome'])){
 			//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
 			$('#inputMargemLucro').on('blur', function(e){
 								
-				atualizaValorVenda();
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
+					atualizaValorVenda();
+				}
 			});	
 			
 			//Ao mudar o Valor de Venda, atualiza a Margem de Lucro
@@ -215,7 +217,7 @@ if(isset($_POST['inputNome'])){
 				
 				inputMargemLucro = 0;
 				
-				if (inputCustoFinal != 0.00){
+				if (inputCustoFinal != 0.00 && inputValorVenda != 0.00){
 					inputMargemLucro = lucro / parseFloat(inputCustoFinal) * 100;
 				}
 				
@@ -237,7 +239,7 @@ if(isset($_POST['inputNome'])){
 					inputMargemLucro = 0.00;
 				}
 								
-				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
+				var inputValorVenda = inputMargemLucro == 0.00 ? 0.00 : parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
 				
 				inputValorVenda = float2moeda(inputValorVenda).toString();
 				
@@ -245,11 +247,11 @@ if(isset($_POST['inputNome'])){
 			}
 			
 			function Filtrando(){
-				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+				$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
 			}
 			
 			function Reset(){
-				$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
+				$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
 			}
 			
 			//Valida Registro Duplicado
@@ -350,7 +352,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="">Selecione</option>
+													<option value="#">Selecione</option>
 												</select>
 											</div>
 										</div>
@@ -416,7 +418,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbMarca">Marca</label>
 												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
-													<option value="">Selecione</option>
+													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT MarcaId, MarcaNome
 																FROM Marca
@@ -439,7 +441,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbModelo">Modelo</label>
 												<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
-													<option value="">Selecione</option>
+													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT ModelId, ModelNome
 																FROM Modelo
@@ -462,7 +464,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbFabricante">Fabricante</label>
 												<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
-													<option value="">Selecione</option>
+													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT FabriId, FabriNome
 																FROM Fabricante

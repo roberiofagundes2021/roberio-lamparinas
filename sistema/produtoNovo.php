@@ -132,7 +132,7 @@ if(isset($_POST['inputNome'])){
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
 					
-					var option = '<option>Selecione a SubCategoria</option>';
+					var option = '<option value="#">Selecione a SubCategoria</option>';
 					
 					if (dados.length){
 						
@@ -168,7 +168,7 @@ if(isset($_POST['inputNome'])){
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
 				
-				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
 					atualizaValorVenda();
 				}
 			});
@@ -194,7 +194,7 @@ if(isset($_POST['inputNome'])){
 				
 				$('#inputCustoFinal').val(inputCustoFinal);
 				
-				if (inputMargemLucro != null && inputMargemLucro.trim() != '') {
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
 					atualizaValorVenda();
 				}				
 			});			
@@ -202,7 +202,9 @@ if(isset($_POST['inputNome'])){
 			//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
 			$('#inputMargemLucro').on('blur', function(e){
 								
-				atualizaValorVenda();
+				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
+					atualizaValorVenda();
+				}
 			});	
 			
 			//Ao mudar o Valor de Venda, atualiza a Margem de Lucro
@@ -224,7 +226,7 @@ if(isset($_POST['inputNome'])){
 				
 				inputMargemLucro = 0;
 				
-				if (inputCustoFinal != 0.00){
+				if (inputCustoFinal != 0.00 && inputValorVenda != 0.00){
 					inputMargemLucro = lucro / parseFloat(inputCustoFinal) * 100;
 				}
 				
@@ -246,7 +248,7 @@ if(isset($_POST['inputNome'])){
 					inputMargemLucro = 0.00;
 				}
 								
-				var inputValorVenda = parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
+				var inputValorVenda = inputMargemLucro == 0.00 ? 0.00 : parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal))/100;
 				
 				inputValorVenda = float2moeda(inputValorVenda).toString();
 				
