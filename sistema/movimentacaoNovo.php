@@ -8,7 +8,7 @@ include('global_assets/php/conexao.php');
 
 
 //Caso a chamada à página venha da liberação de uma solicitação na bandeja.
-//var_dump($_POST);
+
 
 if (isset($_POST['inputSolicitacaoId'])) {
 
@@ -36,6 +36,17 @@ if (isset($_POST['inputSolicitacaoId'])) {
 			}
 		}
 	}
+
+	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
+	            FROM SolicitacaoXProduto
+                JOIN Solicitacao on SolicId = SlXPrSolicitacao
+                JOIN Produto on ProduId = SlXPrProduto
+				LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+                WHERE SlXPrEmpresa = " . $_SESSION['EmpreId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
+    ";
+	$result = $conn->query($sql);
+	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
+	$numProdutos = count($produtosSolicitacao);
 }
 
 
@@ -137,14 +148,31 @@ if (isset($_POST['inputData'])) {
 
 		try {
 
-			for ($i = 1; $i <= $_POST['inputNumItens']; $i++) {
+			$numItems = intval($_POST['inputNumItens']);
+
+			for ($i = 1; $i <=  $numItems; $i++) {
+
+				$campoSoma = $i;
 
 				$campo = 'campo' . $i;
+				//echo intval($_POST['inputNumItens']);
 
 				//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
+				//var_dump($_POST['campo1']);
+				//var_dump($_POST['campo2']);
+				//var_dump($_POST['campo3']);
+				//var_dump($campo);
+				//var_dump($numItems);
 				if (isset($_POST[$campo])) {
+
 					$registro = explode('#', $_POST[$campo]);
+					//var_dump($_POST[$campo]);
 					//var_dump($registro);
+
+					//Svar_dump($_POST);
+					//var_dump($_POST);
+					//var_dump($_POST['campo2']);
+					//var_dump($_POST['campo3']);
 
 					if ($registro[0] == 'P') {
 						$sql = "INSERT INTO MovimentacaoXProduto
@@ -166,74 +194,103 @@ if (isset($_POST['inputData'])) {
 						));
 
 						$insertIdMvXPr = $conn->lastInsertId();
+						//var_dump($_POST['campo1']);
+						//var_dump($_POST['campo2']);
+						//var_dump($_POST['campo3']);
+						//var_dump($_POST['campo4']);
+						//var_dump($_POST['campo5']);
+						//var_dump($registro);
+						//var_dump($campo);
+						//var_dump($_POST['inputNumItens']);
 
 						// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
-						if ($registro[7] == '2') {
-							$sql = "SELECT PatriNumero
+
+						if ($registro[7] == 2) {
+							var_dump($registro[7]);
+
+							$quantItens = intval($registro[3]);
+							//var_dump($quantItens);
+							for ($i = 1; $i <= $quantItens; $i++) {
+
+
+								$sql = "SELECT PatriNumero
 							              FROM Patrimonio
 										  JOIN Situacao on SituaId = PatriStatus
 										  WHERE PatriEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' 
 										  ORDER BY PatriNumero
 										  ";
-							$result = $conn->query($sql);
-							$patrimonios = $result->fetchAll(PDO::FETCH_ASSOC);
-							$count = count($patrimonios);
-
-							//Caso não seja o primeiro registro na tabela para esta empresa
-							if ($count >= 1) {
-								$ultimoPatri = $patrimonios[$count - 1];
-								$numeroPatri = floatval($ultimoPatri) + 1;
-
-
-								// Selecionando o id da situacao 'ATIVO'
-								$sql = "SELECT SituaId
-							    			 FROM Situacao
-							    			 WHERE SituaChave = 'ATIVO' 
-							    		     ";
 								$result = $conn->query($sql);
-								$situacao = $result->fetch(PDO::FETCH_ASSOC);
+								$patrimonios = $result->fetchAll(PDO::FETCH_ASSOC);
+								$count = count($patrimonios);
+								//var_dump($count);
+
+								//Caso não seja o primeiro registro na tabela para esta empresa
+								//DELETE FROM Patrimonio WHERE PatriId > 0;
+								if ($count >= 1) {
+									$ultimoPatri = $count;
+									$numeroPatri = intval($ultimoPatri) + 1;
+									$numeroPatriFinal = '';
+									//var_dump($i);
+
+									if ($numeroPatri < 10) $numeroPatriFinal = "000000" . $numeroPatri . "";
+									if ($numeroPatri < 100 && $numeroPatri > 9) $numeroPatriFinal = "00000" . $numeroPatri . "";
+									if ($numeroPatri < 1000 && $numeroPatri > 99) $numeroPatriFinal = "0000" . $numeroPatri . "";
+									if ($numeroPatri < 10000 && $numeroPatri > 999) $numeroPatriFinal = "000" . $numeroPatri . "";
+									if ($numeroPatri < 100000 && $numeroPatri > 9999) $numeroPatriFinal = "00" . $numeroPatri . "";
+									if ($numeroPatri < 1000000 && $numeroPatri > 99999) $numeroPatriFinal = "0" . $numeroPatri . "";
+									if ($numeroPatri < 10000000 && $numeroPatri > 999999) $numeroPatriFinal = $numeroPatri;
 
 
-								$sql = "INSERT INTO Patrimonio
-						                    (PatriNumero, PatriMovimentacaoProduto, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
-					                        VALUES 
-						                    (:sNumero, :iMovimentacaoProduto, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
-								$result = $conn->prepare($sql);
-
-								$result->execute(array(
-									':sNumero' => $numeroPatri,
-									':iMovimentacaoProduto' => $insertIdMvXPr,
-									':iStatus' => $situacao['SituaId'],
-									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-									':iEmpresa' => $_SESSION['EmpreId']
-								));
-							} else {
-
-								//Caso seja o primeiro registro na tabela para esta empresa
-								$numeroPatri = '1';
-
-								// Selecionando o id da situacao 'ATIVO'
-								$sql = "SELECT SituaId
-							    			 FROM Situacao
-							    			 WHERE SituaChave = 'ATIVO' 
-							    		     ";
-								$result = $conn->query($sql);
-								$situacao = $result->fetch(PDO::FETCH_ASSOC);
+									// Selecionando o id da situacao 'ATIVO'
+									$sql = "SELECT SituaId
+												 FROM Situacao
+												 WHERE SituaChave = 'ATIVO' 
+												 ";
+									$result = $conn->query($sql);
+									$situacao = $result->fetch(PDO::FETCH_ASSOC);
 
 
-								$sql = "INSERT INTO Patrimonio
-						                    (PatriNumero, PatriMovimentacaoProduto, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
-					                        VALUES 
-						                    (:sNumero, :iMovimentacaoProduto, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
-								$result = $conn->prepare($sql);
+									$sql = "INSERT INTO Patrimonio
+												(PatriNumero, PatriMovimentacaoProduto, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
+												VALUES 
+												(:sNumero, :iMovimentacaoProduto, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+									$result = $conn->prepare($sql);
 
-								$result->execute(array(
-									':sNumero' => $numeroPatri,
-									':iMovimentacaoProduto' => $insertIdMvXPr,
-									':iStatus' => $situacao['SituaId'],
-									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-									':iEmpresa' => $_SESSION['EmpreId']
-								));
+									$result->execute(array(
+										':sNumero' => $numeroPatriFinal,
+										':iMovimentacaoProduto' => $insertIdMvXPr,
+										':iStatus' => $situacao['SituaId'],
+										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+										':iEmpresa' => $_SESSION['EmpreId']
+									));
+								} else {
+
+									//Caso seja o primeiro registro na tabela para esta empresa
+									$numeroPatri = '0000001';
+
+									// Selecionando o id da situacao 'ATIVO'
+									$sql = "SELECT SituaId
+												 FROM Situacao
+												 WHERE SituaChave = 'ATIVO' 
+												 ";
+									$result = $conn->query($sql);
+									$situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+
+									$sql = "INSERT INTO Patrimonio
+												(PatriNumero, PatriMovimentacaoProduto, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
+												VALUES 
+												(:sNumero, :iMovimentacaoProduto, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+									$result = $conn->prepare($sql);
+
+									$result->execute(array(
+										':sNumero' => $numeroPatri,
+										':iMovimentacaoProduto' => $insertIdMvXPr,
+										':iStatus' => $situacao['SituaId'],
+										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+										':iEmpresa' => $_SESSION['EmpreId']
+									));
+								}
 							}
 						}
 					} else {
@@ -834,9 +891,10 @@ if (isset($_POST['inputData'])) {
 
 					var option = '<option value="#">Selecione</option>';
 					if (dados) {
-						//console.log(dados)
+						console.log(dados)
 						$('#cmbOrdemCompra').html(option).show();
 						$('#cmbOrdemCompra').append(dados).show();
+						
 					} else {
 						$('#cmbOrdemCompra').html(option).show();
 					}
@@ -1393,8 +1451,9 @@ if (isset($_POST['inputData'])) {
 						let nomeInput = $(elem).attr('name')
 						let valorInput = $(elem).val()
 						submitProduto[`${nomeInput}`] = valorInput
-					})
 
+					})
+					console.log(submitProduto)
 
 					document.getElementById('EstoqueOrigem').style.display = "block";
 					document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
@@ -1415,7 +1474,7 @@ if (isset($_POST['inputData'])) {
 					submitProduto.cmbMotivo = $('#cmbMotivo').val()
 					submitProduto.cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val()
 					submitProduto.cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val()
-					submitProduto.inputTipo = $('[name=inputTipo]').val()
+					submitProduto.inputTipo = 'S'
 					submitProduto.inputDestinoManual = $('#inputDestinoManual').val()
 					submitProduto.cmbDestinoLocal = $('#cmbDestinoLocal').val()
 					submitProduto.cmbFornecedor = $('#cmbFornecedor').val()
@@ -1426,13 +1485,15 @@ if (isset($_POST['inputData'])) {
 					submitProduto.inputValorTotal = $('#inputValorTotal').val()
 					submitProduto.inputChaveAcesso = $('#inputChaveAcesso').val()
 					submitProduto.inputNumItens = $('#inputNumItens').val()
+					console.log($('#cmbClassificacao').val())
 
 					$.ajax({
 						type: "POST",
 						url: "movimentacaoNovo.php",
 						data: submitProduto,
 						success: function(resposta) {
-							window.location.href = "index.php";
+							//window.location.href = "index.php";
+							console.log(resposta)
 						}
 					})
 
@@ -1742,8 +1803,26 @@ if (isset($_POST['inputData'])) {
 													$result = $conn->query("$sql");
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($row as $item) {
-														print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+													if (isset($_POST['inputSolicitacaoId'])) {
+														$sql = ("SELECT EXUXPSetor
+																      FROM EmpresaXUsuarioXPerfil
+																      WHERE EXUXPUsuario = ".$_SESSION['UsuarId']." and EXUXPEmpresa = " . $_SESSION['EmpreId'] . "
+															          ");
+														$result = $conn->query("$sql");
+														$usuarioPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
+														foreach ($row as $item) {
+															if ($item['LcEstId'] == $usuarioPerfil['EXUXPSetor']) {
+																print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
+															} else {
+																print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+															}
+														}
+													} else {
+														foreach ($row as $item) {
+															
+																print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+															
+														}
 													}
 
 													?>
@@ -2212,7 +2291,7 @@ if (isset($_POST['inputData'])) {
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
-	
+
 													foreach ($row as $item) {
 														if ($item['SituaChave'] == 'LIBERADO') {
 															print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
