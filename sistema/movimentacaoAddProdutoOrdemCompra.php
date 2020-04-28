@@ -91,7 +91,7 @@ if ($countMovimentAprovads) {
             $valorCusto = formataMoeda($item['valorCusto']);
             $valorTotal = formataMoeda($item['quantidade'] * $item['valorCusto']);
 
-            $totalGeral += $item['quantidade'] * $item['valorCusto'];
+             
             // var_dump($saldo);
             $output .=  '<tr class="trGrid" id="row' . $numItens . '">
 						 <td style="text-align: center">' . $numItens . '</td>

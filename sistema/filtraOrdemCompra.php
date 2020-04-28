@@ -19,13 +19,12 @@ if ($count) {
     foreach ($row as $value) {
 
 
-        $sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, ProduDetalhamento as detalhamento, ProduValorCusto as valorCusto, ProduCustoFinal as custoFinal, UnMedSigla, tipo = 'P'
+        $sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, ProduDetalhamento as detalhamento, ProduValorCusto as valorCusto, ProduCustoFinal as custoFinal, tipo = 'P'
 		FROM OrdemCompraXProduto
         JOIN Produto on ProduId = OCXPrProduto
- 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
         WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and OCXPrOrdemCompra = '" . $value['OrComId'] . "'
         UNION
-        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, ServiValorCusto as valorCusto, ServiCustoFinal as custoFinal, UnMedSigla, tipo = 'S'
+        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, ServiValorCusto as valorCusto, ServiCustoFinal as custoFinal, tipo = 'S'
 		FROM OrdemCompraXServico
         JOIN Servico on ServiId = OCXSrServico
         WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OCXSrOrdemCompra = '" . $value['OrComId'] . "'
@@ -63,13 +62,17 @@ if ($count) {
                     $saldosPositivos++;
                 }
             }
+
+           // var_dump($saldo);
         }
 
-        print($saldosPositivos);
-        print($totalProdutos);
+        //print($saldosPositivos);
+       // print($totalProdutos);
+        //var_dump($rowProdutoServico);
 
         if ($saldosPositivos == $totalProdutos) {
             print('<option idOrdemCompra="' . $value['OrComId'] . '" value="' . $value['OrComId'] . '">' . $value['OrComNumero'] . '</option>');
         }
+        var_dump($row);
     }
 }

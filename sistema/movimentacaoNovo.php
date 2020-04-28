@@ -150,23 +150,23 @@ if (isset($_POST['inputData'])) {
 
 			$numItems = intval($_POST['inputNumItens']);
 
-			for ($i = 0; $i <=  4; $i++) {
+			for ($i = 1; $i <=  $numItems; $i++) {
 
-				$campoSoma = $i + 1;
+				$campoSoma = $i;
 
-				$campo = 'campo' . $campoSoma;
+				$campo = 'campo' . $i;
 				//echo intval($_POST['inputNumItens']);
 
 				//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
 				//var_dump($_POST['campo1']);
 				//var_dump($_POST['campo2']);
 				//var_dump($_POST['campo3']);
-				var_dump($campo);
-				var_dump($numItems);
+				//var_dump($campo);
+				//var_dump($numItems);
 				if (isset($_POST[$campo])) {
 
 					$registro = explode('#', $_POST[$campo]);
-					//var_dump($registro);
+					//var_dump($_POST[$campo]);
 					//var_dump($registro);
 
 					//Svar_dump($_POST);
@@ -195,22 +195,22 @@ if (isset($_POST['inputData'])) {
 
 						$insertIdMvXPr = $conn->lastInsertId();
 						//var_dump($_POST['campo1']);
-					//var_dump($_POST['campo2']);
-					//var_dump($_POST['campo3']);
-					//var_dump($_POST['campo4']);
-					//var_dump($_POST['campo5']);
+						//var_dump($_POST['campo2']);
+						//var_dump($_POST['campo3']);
+						//var_dump($_POST['campo4']);
+						//var_dump($_POST['campo5']);
 						//var_dump($registro);
 						//var_dump($campo);
 						//var_dump($_POST['inputNumItens']);
 
 						// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
-						
+
 						if ($registro[7] == 2) {
-							//var_dump($registro[7]);
+							var_dump($registro[7]);
 
 							$quantItens = intval($registro[3]);
 							//var_dump($quantItens);
-							for ($i = 0; $i < $quantItens; $i++) {
+							for ($i = 1; $i <= $quantItens; $i++) {
 
 
 								$sql = "SELECT PatriNumero
@@ -891,9 +891,10 @@ if (isset($_POST['inputData'])) {
 
 					var option = '<option value="#">Selecione</option>';
 					if (dados) {
-						//console.log(dados)
+						console.log(dados)
 						$('#cmbOrdemCompra').html(option).show();
 						$('#cmbOrdemCompra').append(dados).show();
+						
 					} else {
 						$('#cmbOrdemCompra').html(option).show();
 					}
@@ -1803,8 +1804,14 @@ if (isset($_POST['inputData'])) {
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													if (isset($_POST['inputSolicitacaoId'])) {
+														$sql = ("SELECT EXUXPSetor
+																      FROM EmpresaXUsuarioXPerfil
+																      WHERE EXUXPUsuario = ".$_SESSION['UsuarId']." and EXUXPEmpresa = " . $_SESSION['EmpreId'] . "
+															          ");
+														$result = $conn->query("$sql");
+														$usuarioPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 														foreach ($row as $item) {
-															if ($item['LcEstNome'] == 'ALMOXARIFADO') {
+															if ($item['LcEstId'] == $usuarioPerfil['EXUXPSetor']) {
 																print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
 															} else {
 																print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
@@ -1812,9 +1819,9 @@ if (isset($_POST['inputData'])) {
 														}
 													} else {
 														foreach ($row as $item) {
-															if ($item['LcEstNome'] == 'ALMOXARIFADO') {
+															
 																print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
-															}
+															
 														}
 													}
 
