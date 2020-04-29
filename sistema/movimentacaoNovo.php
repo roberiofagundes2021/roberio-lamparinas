@@ -443,7 +443,8 @@ if (isset($_POST['inputData'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		function produtosOrdemConpra(ordemCompra) {
+		
+		function produtosOrdemCompra(ordemCompra) {
 			let inputLote = $('#inputLote').val();
 			let numOrdemCompra = $('#cmbOrdemCompra').val()
 
@@ -471,7 +472,6 @@ if (isset($_POST['inputData'])) {
 				}
 
 			});
-
 
 			$.ajax({
 				type: "POST",
@@ -656,8 +656,6 @@ if (isset($_POST['inputData'])) {
 			})
 		}
 
-
-
 		function recalcValores(quantInicial, novaQuantidade, saldoInicial, valorUni) {
 
 
@@ -722,7 +720,6 @@ if (isset($_POST['inputData'])) {
 		function inputsModal() {
 			$('#tbody-modal')
 		}
-
 
 		function verificaTotalNotaFiscal() {
 			let valorTotalNotaFiscal = $('#inputValorTotal').val()
@@ -915,7 +912,7 @@ if (isset($_POST['inputData'])) {
 				if (ordemCompra) {
 					//console.log($('#cmbOrdemCompra').val())
 
-					produtosOrdemConpra(ordemCompra)
+					produtosOrdemCompra(ordemCompra)
 				}
 
 			})
@@ -1770,11 +1767,12 @@ if (isset($_POST['inputData'])) {
 										<select id="cmbMotivo" name="cmbMotivo" class="form-control form-control-select2" onChange="selecionaMotivo(this.value)">
 											<option value="#">Selecione</option>
 											<?php
-											$sql = ("SELECT MotivId, MotivNome, MotivChave
-														 FROM Motivo
-														 WHERE MotivStatus = 1 and MotivEmpresa = " . $_SESSION['EmpreId'] . "
-														 ORDER BY MotivNome ASC");
-											$result = $conn->query("$sql");
+											$sql = "SELECT MotivId, MotivNome, MotivChave
+													FROM Motivo
+													JOIN Situacao on SituaId = MotivStatus
+													WHERE MotivEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+													ORDER BY MotivNome ASC";
+											$result = $conn->query($sql);
 											$rowMotivo = $result->fetchAll(PDO::FETCH_ASSOC);
 
 											foreach ($rowMotivo as $item) {
@@ -1804,11 +1802,12 @@ if (isset($_POST['inputData'])) {
 												<select id="cmbEstoqueOrigem" name="cmbEstoqueOrigem" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
-													$sql = ("SELECT LcEstId, LcEstNome
-																 FROM LocalEstoque
-																 WHERE LcEstStatus = 1 and LcEstEmpresa = " . $_SESSION['EmpreId'] . "
-															     ORDER BY LcEstNome ASC");
-													$result = $conn->query("$sql");
+													$sql = "SELECT LcEstId, LcEstNome
+															FROM LocalEstoque
+															JOIN Situacao on SituaId = LcEstStatus
+															WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															ORDER BY LcEstNome ASC";
+													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($row as $item) {
@@ -1825,12 +1824,16 @@ if (isset($_POST['inputData'])) {
 												<select id="cmbEstoqueOrigemLocalSetor" name="cmbEstoqueOrigemLocalSetor" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
-													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia FROM LocalEstoque
-														     WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . "
-														     UNION
-														     SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia FROM Setor
-														     WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . "
-														     Order By Nome";
+													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
+															FROM LocalEstoque
+															JOIN Situacao on SituaId = LcEstStatus
+														    WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+														    UNION
+															SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
+															FROM Setor
+															JOIN Situacao on SituaId = SetorStatus
+														    WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+														    Order By Nome";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1848,11 +1851,12 @@ if (isset($_POST['inputData'])) {
 												<select id="cmbDestinoLocal" name="cmbDestinoLocal" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
-													$sql = ("SELECT LcEstId, LcEstNome
-																 FROM LocalEstoque
-																 WHERE LcEstStatus = 1 and LcEstEmpresa = " . $_SESSION['EmpreId'] . "
-															     ORDER BY LcEstNome ASC");
-													$result = $conn->query("$sql");
+													$sql = "SELECT LcEstId, LcEstNome
+															FROM LocalEstoque
+															JOIN Situacao on SituaId = LcEstStatus
+															WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															ORDER BY LcEstNome ASC";
+													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($row as $item) {
@@ -1871,22 +1875,23 @@ if (isset($_POST['inputData'])) {
 													<?php
 
 													if (isset($_POST['inputSolicitacaoId'])) {
-														$sql = ("SELECT EXUXPSetor, SetorNome
+														$sql = "SELECT EXUXPSetor, SetorNome
 																 FROM EmpresaXUsuarioXPerfil
 																 JOIN Setor on SetorId = EXUXPSetor
 																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPEmpresa = " . $_SESSION['EmpreId'] . "
-															    ");
-														$result = $conn->query("$sql");
+															    ";
+														$result = $conn->query($sql);
 														$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
 														print('<option value="' . $usuarioPerfil['EXUXPSetor'] . '" selected>' . $usuarioPerfil['SetorNome'] . '</option>');
 													} else {
 
-														$sql = ("SELECT SetorId, SetorNome
-														         FROM Setor
-														         WHERE SetorStatus = 1 and SetorEmpresa = " . $_SESSION['EmpreId'] . "
-														         ORDER BY SetorNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT SetorId, SetorNome
+														        FROM Setor
+																JOIN Situacao on SituaId = SetorStatus
+														        WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+														        ORDER BY SetorNome ASC";
+														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 														foreach ($row as $item) {
@@ -1906,12 +1911,16 @@ if (isset($_POST['inputData'])) {
 												<select id="cmbDestinoLocalEstoqueSetor" name="cmbDestinoLocalEstoqueSetor" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
-													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia FROM LocalEstoque
-														     WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . "
-														     UNION
-														     SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia FROM Setor
-														     WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . "
-														     Order By Nome";
+													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
+															FROM LocalEstoque
+															JOIN Situacao on SituaId = LcEstStatus
+															WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															UNION
+															SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
+															FROM Setor
+															JOIN Situacao on SituaId = SetorStatus
+															WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															Order By Nome";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1954,11 +1963,12 @@ if (isset($_POST['inputData'])) {
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
 													<option value="-1">Selecione</option>
 													<?php
-													$sql = ("SELECT ForneId, ForneNome
-																 FROM Fornecedor														     
-																 WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and ForneStatus = 1
-															     ORDER BY ForneNome ASC");
-													$result = $conn->query("$sql");
+													$sql = "SELECT ForneId, ForneNome
+															FROM Fornecedor
+															JOIN Situacao on SituaId = ForneStatus
+															WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															ORDER BY ForneNome ASC";
+													$result = $conn->query($sql);
 													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($rowFornecedor as $item) {
@@ -2058,16 +2068,17 @@ if (isset($_POST['inputData'])) {
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
-													$sql = ("SELECT CategId, CategNome
-																 FROM Categoria															     
-																 WHERE CategStatus = 1 and CategEmpresa = " . $_SESSION['EmpreId'] . "
-																 ORDER BY CategNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														$sql = "SELECT CategId, CategNome
+																FROM Categoria
+																JOIN Situacao on SituaId = CategStatus
+																WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																ORDER BY CategNome ASC";
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($row as $item) {
-														print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
-													}
+														foreach ($row as $item) {
+															print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
+														}
 
 													?>
 												</select>
@@ -2079,19 +2090,6 @@ if (isset($_POST['inputData'])) {
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
-													<?php
-													/*$sql = ("SELECT SbCatId, SbCatNome
-																 FROM SubCategoria															     
-																 WHERE SbCatStatus = 1 and SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-																 ORDER BY SbCatNome ASC");
-														$result = $conn->query("$sql");
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($row as $item){
-															print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');
-														}
-													  */
-													?>
 												</select>
 											</div>
 										</div>
@@ -2142,11 +2140,12 @@ if (isset($_POST['inputData'])) {
 												<select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
-													$sql = ("SELECT ClassId, ClassNome
-																 FROM Classificacao
-																 WHERE ClassStatus = 1
-																 ORDER BY ClassNome ASC");
-													$result = $conn->query("$sql");
+													$sql = "SELECT ClassId, ClassNome
+															FROM Classificacao
+															JOIN Situacao on SituaId = ClassStatus
+															WHERE SituaChave = 'ATIVO'
+															ORDER BY ClassNome ASC";
+													$result = $conn->query($sql);
 													$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($rowClassificacao as $item) {
@@ -2210,7 +2209,7 @@ if (isset($_POST['inputData'])) {
 												<th>Unidade Medida</th>
 												<th id="quantEditaEntradaSaida">Quant. Recebida</th>
 												<th>Valor Unitário</th>
-												<th>Valor Total</th>
+												<th style="text-align:center">Valor Total</th>
 												<th class="text-center">Ações</th>
 											</tr>
 										</thead>
@@ -2289,9 +2288,9 @@ if (isset($_POST['inputData'])) {
 
 												if (isset($_POST['inputSolicitacaoId'])) {
 													$sql = "SELECT SituaId, SituaNome, SituaChave
-																	FROM Situacao
-																	WHERE SituaStatus = '1'
-																	ORDER BY SituaNome ASC";
+															FROM Situacao
+															WHERE SituaStatus = '1'
+															ORDER BY SituaNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2305,9 +2304,9 @@ if (isset($_POST['inputData'])) {
 												} else {
 													if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
 														$sql = "SELECT SituaId, SituaNome, SituaChave
-																	 FROM Situacao
-																	 WHERE SituaStatus = '1'
-																	 ORDER BY SituaNome ASC";
+																FROM Situacao
+																WHERE SituaStatus = '1'
+																ORDER BY SituaNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 

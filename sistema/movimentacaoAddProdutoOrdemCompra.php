@@ -10,10 +10,9 @@ $sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, 
  		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
         WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and OCXPrOrdemCompra = '" . $_POST['ordemCompra'] . "'
         UNION
-        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, ServiValorCusto as valorCusto, ServiCustoFinal as custoFinal, UnMedSigla, tipo = 'S'
+        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, ServiValorCusto as valorCusto, ServiCustoFinal as custoFinal, '', tipo = 'S'
 		FROM OrdemCompraXServico
         JOIN Servico on ServiId = OCXSrServico
- 		LEFT JOIN UnidadeMedida on UnMedId = 0
         WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OCXSrOrdemCompra = '" . $_POST['ordemCompra'] . "'
         ";
 $result = $conn->query($sql);
@@ -59,8 +58,8 @@ if ($countMovimentAprovads) {
                         <th  style="text-align: center">Unidade Medida</th>
                         <th  style="text-align: center">Quant. Recebida</th>
                         <th  style="text-align: center">Saldo</th>
-                        <th  style="text-align: left; width: 10%">Valor Unitário</th>
-                        <th  style="text-align: left; width: 13%">Valor Total</th>
+                        <th  style="text-align: right; width: 10%">Valor Unitário</th>
+                        <th  style="text-align: right; width: 13%">Valor Total</th>
                         <th  style="text-align: center">Ações</th>
                     </tr>
                 </thead>
@@ -99,8 +98,8 @@ if ($countMovimentAprovads) {
 						 <td style="text-align: center">' . $item['UnMedSigla'] . '</td>
                          <td style="text-align: center">'.$saldo['Quantidade'].'</td>
                          <td style="text-align: center">' . $saldo['Saldo'] . '</td>
-						 <td style="text-align: left">' . $valorCusto . '</td>
-                         <td class="valorTotal" style="text-align: left">R$ 0, 00</td>
+						 <td style="text-align: right">' . $valorCusto . '</td>
+                         <td class="valorTotal" style="text-align: right">R$ 0, 00</td>
                          <td  style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
                          <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" idLinha="row' . $numItens . '" quantInicial="' . $saldo['Quantidade'] . '" saldoInicial="' . $saldo['Saldo'] . '"  name="campo' . $numItens . '" value="' . $item['tipo'] . '#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>
@@ -119,13 +118,15 @@ if ($countMovimentAprovads) {
                          <div>Total (R$) Nota Fiscal:</div>
                          <div>Saldo (R$) Ordem de Compra/Carta Contrato:</div>
                     </th>
-                    <th colspan="2">
+                    <th colspan="1">
                         <div>
-                            <div id="total" valorTotalGeral="" style="text-align:left; font-size: 15px; font-weight:bold;">R$ 0, 00</div>
+                            <div id="total" valorTotalGeral="" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0, 00</div>
                         </div>
                         <div>
-                            <div id="totalSaldo" style="text-align:left; font-size: 15px; font-weight:bold;" valorTotalInicial="'.$saldoOrdemCompra['saldoOrdemCompra'].'" valor="' . $saldoOrdemCompra['saldoOrdemCompra'] . '">' . formataMoeda($saldoOrdemCompra['saldoOrdemCompra']) . '</div>
+                            <div id="totalSaldo" style="text-align:right; font-size: 15px; font-weight:bold;" valorTotalInicial="'.$saldoOrdemCompra['saldoOrdemCompra'].'" valor="' . $saldoOrdemCompra['saldoOrdemCompra'] . '">' . formataMoeda($saldoOrdemCompra['saldoOrdemCompra']) . '</div>
                          </div>
+                    </th>
+                    <th colspan="1">
                     </th>
                 </tr>
             </tfoot>
@@ -153,8 +154,8 @@ if ($countMovimentAprovads) {
                         <th  style="text-align: center">Unidade Medida</th>
                         <th  style="text-align: center">Quant. Recebida</th>
                         <th  style="text-align: center">Saldo</th>
-                        <th  style="text-align: left; width: 10%">Valor Unitário</th>
-                        <th  style="text-align: left; width: 13%">Valor Total</th>
+                        <th  style="text-align: right; width: 10%">Valor Unitário</th>
+                        <th  style="text-align: right; width: 13%">Valor Total</th>
                         <th  style="text-align: center">Ações</th>
                     </tr>
                 </thead>
@@ -193,8 +194,8 @@ if ($countMovimentAprovads) {
 						 <td style="text-align: center">' . $item['UnMedSigla'] . '</td>
                          <td style="text-align: center"></td>
                          <td style="text-align: center">' . $saldo['Saldo'] . '</td>
-						 <td style="text-align: left">' . $valorCusto . '</td>
-                         <td class="valorTotal" style="text-align: left">R$ 0, 00</td>
+						 <td style="text-align: right">' . $valorCusto . '</td>
+                         <td class="valorTotal" style="text-align: right">R$ 0, 00</td>
                          <td  style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
                          <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" idLinha="row' . $numItens . '" quantInicial="' . $saldo['Quantidade'] . '" saldoInicial="' . $saldo['Saldo'] . '"  name="campo' . $numItens . '" value="' . $item['tipo'] . '#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>
@@ -213,13 +214,15 @@ if ($countMovimentAprovads) {
                          <div>Total (R$) Nota Fiscal:</div>
                          <div>Saldo (R$) Ordem de Compra/Carta Contrato:</div>
                     </th>
-                    <th colspan="2">
+                    <th colspan="1">
                         <div>
-                            <div id="total" valorTotalGeral="" style="text-align:left; font-size: 15px; font-weight:bold;">R$ 0, 00</div>
+                            <div id="total" valorTotalGeral="" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0, 00</div>
                         </div>
                         <div>
-                            <div id="totalSaldo" style="text-align:left; font-size: 15px; font-weight:bold;" valor="' . $totalOrdemCompra['valorTotalOrdemCompra'] . '">' . formataMoeda($totalOrdemCompra['valorTotalOrdemCompra']) . '</div>
+                            <div id="totalSaldo" style="text-align:right; font-size: 15px; font-weight:bold;" valor="' . $totalOrdemCompra['valorTotalOrdemCompra'] . '">' . formataMoeda($totalOrdemCompra['valorTotalOrdemCompra']) . '</div>
                          </div>
+                    </th>
+                    <th colspan="1">
                     </th>
                 </tr>
             </tfoot>
