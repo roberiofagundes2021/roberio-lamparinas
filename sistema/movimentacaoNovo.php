@@ -894,7 +894,7 @@ if (isset($_POST['inputData'])) {
 						console.log(dados)
 						$('#cmbOrdemCompra').html(option).show();
 						$('#cmbOrdemCompra').append(dados).show();
-						
+
 					} else {
 						$('#cmbOrdemCompra').html(option).show();
 					}
@@ -1803,28 +1803,9 @@ if (isset($_POST['inputData'])) {
 													$result = $conn->query("$sql");
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													if (isset($_POST['inputSolicitacaoId'])) {
-														$sql = ("SELECT EXUXPSetor
-																      FROM EmpresaXUsuarioXPerfil
-																      WHERE EXUXPUsuario = ".$_SESSION['UsuarId']." and EXUXPEmpresa = " . $_SESSION['EmpreId'] . "
-															          ");
-														$result = $conn->query("$sql");
-														$usuarioPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
-														foreach ($row as $item) {
-															if ($item['LcEstId'] == $usuarioPerfil['EXUXPSetor']) {
-																print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
-															} else {
-																print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
-															}
-														}
-													} else {
-														foreach ($row as $item) {
-															
-																print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
-															
-														}
+													foreach ($row as $item) {
+														print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
 													}
-
 													?>
 												</select>
 											</div>
@@ -1877,19 +1858,35 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-4" id="DestinoSetor" style="display:none">
 											<div class="form-group">
 												<label for="cmbDestinoSetor">Destino<span style="color: red">*</span></label>
-												<select id="cmbDestinoSetor" name="cmbDestinoSetor" class="form-control form-control-select2">
+												<select id="cmbDestinoSetor" name="cmbDestinoSetor" class="form-control form-control-select2" <?php if (isset($_POST['inputSolicitacaoId'])) echo 'disabled' ?>>
 													<option value="#">Selecione</option>
 													<?php
-													$sql = ("SELECT SetorId, SetorNome
-																 FROM Setor
-																 WHERE SetorStatus = 1 and SetorEmpresa = " . $_SESSION['EmpreId'] . "
-															     ORDER BY SetorNome ASC");
-													$result = $conn->query("$sql");
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($row as $item) {
-														print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
+													if (isset($_POST['inputSolicitacaoId'])) {
+														$sql = ("SELECT EXUXPSetor, SetorNome
+																 FROM EmpresaXUsuarioXPerfil
+																 JOIN Setor on SetorId = EXUXPSetor
+																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPEmpresa = " . $_SESSION['EmpreId'] . "
+															    ");
+														$result = $conn->query("$sql");
+														$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
+
+														print('<option value="' . $usuarioPerfil['EXUXPSetor'] . '" selected>' . $usuarioPerfil['SetorNome'] . '</option>');
+													} else {
+
+														$sql = ("SELECT SetorId, SetorNome
+														         FROM Setor
+														         WHERE SetorStatus = 1 and SetorEmpresa = " . $_SESSION['EmpreId'] . "
+														         ORDER BY SetorNome ASC");
+														$result = $conn->query("$sql");
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($row as $item) {
+
+															print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
+														}
 													}
+
 													?>
 												</select>
 											</div>
@@ -2106,7 +2103,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputQuantidade">Quantidade</label>
-												<input type="text" id="inputQuantidade" name="inputQuantidade" class="form-control">
+												<input type="number" maxlength="10" id="inputQuantidade" name="inputQuantidade" class="form-control">
 											</div>
 										</div>
 
@@ -2120,7 +2117,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-2" id="formLote">
 											<div class="form-group">
 												<label for="inputLote">Lote</label>
-												<input type="text" id="inputLote" name="inputLote" class="form-control">
+												<input type="text" maxlength="50" id="inputLote" name="inputLote" class="form-control">
 											</div>
 										</div>
 
