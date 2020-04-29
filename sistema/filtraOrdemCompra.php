@@ -70,7 +70,7 @@ if ($count) {
        // print($totalProdutos);
         //var_dump($rowProdutoServico);
 
-        if ($saldosPositivos == $totalProdutos) {
+        if ($saldosPositivos >= 1) {
             print('<option idOrdemCompra="' . $value['OrComId'] . '" value="' . $value['OrComId'] . '">' . $value['OrComNumero'] . '</option>');
         }
         var_dump($row);

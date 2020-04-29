@@ -204,92 +204,93 @@ if (isset($_POST['inputData'])) {
 						//var_dump($_POST['inputNumItens']);
 
 						// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
+						if (isset($registro[7])) {
+							if ($registro[7] == 2) {
+								var_dump($registro[7]);
 
-						if ($registro[7] == 2) {
-							var_dump($registro[7]);
-
-							$quantItens = intval($registro[3]);
-							//var_dump($quantItens);
-							for ($i = 1; $i <= $quantItens; $i++) {
+								$quantItens = intval($registro[3]);
+								//var_dump($quantItens);
+								for ($i = 1; $i <= $quantItens; $i++) {
 
 
-								$sql = "SELECT PatriNumero
+									$sql = "SELECT PatriNumero
 							              FROM Patrimonio
 										  JOIN Situacao on SituaId = PatriStatus
 										  WHERE PatriEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' 
 										  ORDER BY PatriNumero
 										  ";
-								$result = $conn->query($sql);
-								$patrimonios = $result->fetchAll(PDO::FETCH_ASSOC);
-								$count = count($patrimonios);
-								//var_dump($count);
+									$result = $conn->query($sql);
+									$patrimonios = $result->fetchAll(PDO::FETCH_ASSOC);
+									$count = count($patrimonios);
+									//var_dump($count);
 
-								//Caso não seja o primeiro registro na tabela para esta empresa
-								//DELETE FROM Patrimonio WHERE PatriId > 0;
-								if ($count >= 1) {
-									$ultimoPatri = $count;
-									$numeroPatri = intval($ultimoPatri) + 1;
-									$numeroPatriFinal = '';
-									//var_dump($i);
+									//Caso não seja o primeiro registro na tabela para esta empresa
+									//DELETE FROM Patrimonio WHERE PatriId > 0;
+									if ($count >= 1) {
+										$ultimoPatri = $count;
+										$numeroPatri = intval($ultimoPatri) + 1;
+										$numeroPatriFinal = '';
+										//var_dump($i);
 
-									if ($numeroPatri < 10) $numeroPatriFinal = "000000" . $numeroPatri . "";
-									if ($numeroPatri < 100 && $numeroPatri > 9) $numeroPatriFinal = "00000" . $numeroPatri . "";
-									if ($numeroPatri < 1000 && $numeroPatri > 99) $numeroPatriFinal = "0000" . $numeroPatri . "";
-									if ($numeroPatri < 10000 && $numeroPatri > 999) $numeroPatriFinal = "000" . $numeroPatri . "";
-									if ($numeroPatri < 100000 && $numeroPatri > 9999) $numeroPatriFinal = "00" . $numeroPatri . "";
-									if ($numeroPatri < 1000000 && $numeroPatri > 99999) $numeroPatriFinal = "0" . $numeroPatri . "";
-									if ($numeroPatri < 10000000 && $numeroPatri > 999999) $numeroPatriFinal = $numeroPatri;
+										if ($numeroPatri < 10) $numeroPatriFinal = "000000" . $numeroPatri . "";
+										if ($numeroPatri < 100 && $numeroPatri > 9) $numeroPatriFinal = "00000" . $numeroPatri . "";
+										if ($numeroPatri < 1000 && $numeroPatri > 99) $numeroPatriFinal = "0000" . $numeroPatri . "";
+										if ($numeroPatri < 10000 && $numeroPatri > 999) $numeroPatriFinal = "000" . $numeroPatri . "";
+										if ($numeroPatri < 100000 && $numeroPatri > 9999) $numeroPatriFinal = "00" . $numeroPatri . "";
+										if ($numeroPatri < 1000000 && $numeroPatri > 99999) $numeroPatriFinal = "0" . $numeroPatri . "";
+										if ($numeroPatri < 10000000 && $numeroPatri > 999999) $numeroPatriFinal = $numeroPatri;
 
 
-									// Selecionando o id da situacao 'ATIVO'
-									$sql = "SELECT SituaId
+										// Selecionando o id da situacao 'ATIVO'
+										$sql = "SELECT SituaId
 												 FROM Situacao
 												 WHERE SituaChave = 'ATIVO' 
 												 ";
-									$result = $conn->query($sql);
-									$situacao = $result->fetch(PDO::FETCH_ASSOC);
+										$result = $conn->query($sql);
+										$situacao = $result->fetch(PDO::FETCH_ASSOC);
 
 
-									$sql = "INSERT INTO Patrimonio
+										$sql = "INSERT INTO Patrimonio
 												(PatriNumero, PatriMovimentacaoProduto, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
 												VALUES 
 												(:sNumero, :iMovimentacaoProduto, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
-									$result = $conn->prepare($sql);
+										$result = $conn->prepare($sql);
 
-									$result->execute(array(
-										':sNumero' => $numeroPatriFinal,
-										':iMovimentacaoProduto' => $insertIdMvXPr,
-										':iStatus' => $situacao['SituaId'],
-										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-										':iEmpresa' => $_SESSION['EmpreId']
-									));
-								} else {
+										$result->execute(array(
+											':sNumero' => $numeroPatriFinal,
+											':iMovimentacaoProduto' => $insertIdMvXPr,
+											':iStatus' => $situacao['SituaId'],
+											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+											':iEmpresa' => $_SESSION['EmpreId']
+										));
+									} else {
 
-									//Caso seja o primeiro registro na tabela para esta empresa
-									$numeroPatri = '0000001';
+										//Caso seja o primeiro registro na tabela para esta empresa
+										$numeroPatri = '0000001';
 
-									// Selecionando o id da situacao 'ATIVO'
-									$sql = "SELECT SituaId
+										// Selecionando o id da situacao 'ATIVO'
+										$sql = "SELECT SituaId
 												 FROM Situacao
 												 WHERE SituaChave = 'ATIVO' 
 												 ";
-									$result = $conn->query($sql);
-									$situacao = $result->fetch(PDO::FETCH_ASSOC);
+										$result = $conn->query($sql);
+										$situacao = $result->fetch(PDO::FETCH_ASSOC);
 
 
-									$sql = "INSERT INTO Patrimonio
+										$sql = "INSERT INTO Patrimonio
 												(PatriNumero, PatriMovimentacaoProduto, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
 												VALUES 
 												(:sNumero, :iMovimentacaoProduto, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
-									$result = $conn->prepare($sql);
+										$result = $conn->prepare($sql);
 
-									$result->execute(array(
-										':sNumero' => $numeroPatri,
-										':iMovimentacaoProduto' => $insertIdMvXPr,
-										':iStatus' => $situacao['SituaId'],
-										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-										':iEmpresa' => $_SESSION['EmpreId']
-									));
+										$result->execute(array(
+											':sNumero' => $numeroPatri,
+											':iMovimentacaoProduto' => $insertIdMvXPr,
+											':iStatus' => $situacao['SituaId'],
+											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+											':iEmpresa' => $_SESSION['EmpreId']
+										));
+									}
 								}
 							}
 						}
@@ -1679,6 +1680,13 @@ if (isset($_POST['inputData'])) {
 			}
 		}
 
+		function verifcMumero(elem) {
+			if (typeof $(elem).val() == 'string') {
+				console.log('string')
+				return false
+			}
+		}
+
 		function float2moeda(num) {
 
 			x = 0;
@@ -2103,7 +2111,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputQuantidade">Quantidade</label>
-												<input type="number" maxlength="10" id="inputQuantidade" name="inputQuantidade" class="form-control">
+												<input type="text" maxlength="10" id="inputQuantidade" name="inputQuantidade" class="form-control" onKeyUp="onlynumber(this)">
 											</div>
 										</div>
 
