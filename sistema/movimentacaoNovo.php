@@ -722,10 +722,8 @@ if (isset($_POST['inputData'])) {
 		}
 
 		function verificaTotalNotaFiscal() {
-			let valorTotalNotaFiscal = $('#inputValorTotal').val()
+			let valorTotalNotaFiscal = $('#inputValorTotal').val().replace('.', '').replace(',', '.')
 			let valorTotalNotaFiscalGrid = $('#total').attr('valor')
-			console.log(valorTotalNotaFiscal)
-			console.log(valorTotalNotaFiscalGrid)
 
 			if (parseFloat(valorTotalNotaFiscalGrid) != parseFloat(valorTotalNotaFiscal)) {
 				alerta('Atenção', 'O valor total da Nota Fiscal informado não corresponde ao total da entrada.', 'error');
@@ -759,12 +757,12 @@ if (isset($_POST['inputData'])) {
 					},
 					{
 						orderable: true, //Produto/Servico
-						width: "20%",
+						width: "5%",
 						targets: [1]
 					},
 					{
 						orderable: true, //Unidade Medida
-						width: "12%",
+						width: "10%",
 						targets: [2]
 					},
 					{
@@ -779,7 +777,7 @@ if (isset($_POST['inputData'])) {
 					},
 					{
 						orderable: true, //Valor Unitário
-						width: "12%",
+						width: "10%",
 						targets: [5]
 					},
 					{
@@ -788,9 +786,14 @@ if (isset($_POST['inputData'])) {
 						targets: [6]
 					},
 					{
-						orderable: false, //Ações
+						orderable: false, //Classificacao
 						width: "10%",
-						targets: [6]
+						targets: [7]
+					},
+					{
+						orderable: false, //Ações
+						width: "5%",
+						targets: [8]
 					}
 				],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -1490,7 +1493,7 @@ if (isset($_POST['inputData'])) {
 						url: "movimentacaoNovo.php",
 						data: submitProduto,
 						success: function(resposta) {
-							//window.location.href = "index.php";
+							window.location.href = "index.php";
 							console.log(resposta)
 						}
 					})
@@ -2210,11 +2213,13 @@ if (isset($_POST['inputData'])) {
 												<th id="quantEditaEntradaSaida">Quant. Recebida</th>
 												<th>Valor Unitário</th>
 												<th style="text-align:center">Valor Total</th>
+												<?php if (isset($_POST['inputSolicitacaoId'])) print('<th style="text-align:center">Classificação</th>') ?>
 												<th class="text-center">Ações</th>
 											</tr>
 										</thead>
 										<tbody>
 											<tr style="display:none;">
+												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
@@ -2236,7 +2241,10 @@ if (isset($_POST['inputData'])) {
 													$valorTotalSemFormatacao = $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
 
 													$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
-													print("
+
+													$linha = '';
+
+													$linha .= "
 															   <tr class='produtoSolicitacao' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
 															        <td>" . $idProdutoSolicitacao . "</td>
 															        <td>" . $produto['ProduNome'] . "</td>
@@ -2244,9 +2252,36 @@ if (isset($_POST['inputData'])) {
 															        <td>" . $produto['SlXPrQuantidade'] . "</td>
 																	<td valorUntPrSolici='" . $produto['ProduValorVenda'] . "'>" . $valorCusto . "</td>
 																	<td>" . $valorTotal . "</td>
-															        <td><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
-															   </tr>
-														");
+																	<td>" . $valorTotal . "</td>
+															   
+														";
+
+													$linha .= '
+																<td>
+																    <select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
+																       <option value="#">Selecione</option>
+													    ';
+
+													$sql = "SELECT ClassId, ClassNome
+														FROM Classificacao
+														JOIN Situacao on SituaId = ClassStatus
+														WHERE SituaChave = 'ATIVO'
+														ORDER BY ClassNome ASC";
+												    $result = $conn->query($sql);
+												    $rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+
+												    foreach ($rowClassificacao as $item) {
+												    	$linha .= '<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>';
+													}
+													
+													$linha .= "
+														            </select>
+																</td>
+																<td><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
+															</tr>
+														";
+														
+													print($linha);
 												}
 											}
 											?>
