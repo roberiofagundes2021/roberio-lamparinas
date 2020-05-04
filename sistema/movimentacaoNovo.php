@@ -1541,6 +1541,36 @@ if (isset($_POST['inputData'])) {
 				$('#cmbProduto').empty().append('<option>Sem produto</option>');
 			}
 
+			function classBemSaidaSolicit(valor) {
+				let grid = $('.trGrid')
+				//console.log(grid)
+				grid.each((i1, elem1) => { // each sobre a grid
+					let tr = $(elem1).children() // colocando todas as linhas em um 
+
+					let td = tr.first()
+					let indiceLinha = td.html()
+			
+
+
+
+
+					let inputProdutoGridValores = inputHiddenProdutoServico.val()
+					let arrayValInput = inputProdutoGridValores.split('#')
+					let inputHiddenProdutoServico = $(`#campo${indiceLinha}`)
+					// adicionando  novos dados no array
+					arrayValInput[7] = valor
+					console.log(valor)
+				})
+			}
+			$('.selectClassific').each((i, elem) => {
+				//console.log('teste')
+				$(elem).on('change', function(e) {
+					let valor = $(elem).val()
+					classBemSaidaSolicit(valor)
+					//console.log('teste')
+				})
+			})
+
 		}); //document.ready	
 
 		function mudaTotalTitulo(tipoTela) {
@@ -1651,6 +1681,8 @@ if (isset($_POST['inputData'])) {
 			})
 
 		})
+
+
 
 		function selecionaProdutoServico(tipo) {
 			if (tipo == 'P') {
@@ -2276,7 +2308,7 @@ if (isset($_POST['inputData'])) {
 													$linha = '';
 
 													$linha .= "
-															   <tr class='produtoSolicitacao' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
+															   <tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
 															        <td>" . $idProdutoSolicitacao . "</td>
 															        <td>" . $produto['ProduNome'] . "</td>
 															        <td>" . $produto['UnMedNome'] . "</td>
@@ -2289,7 +2321,7 @@ if (isset($_POST['inputData'])) {
 													$linha .= '
 																<td>
 																    <div class="d-flex flex-row ">
-																        <select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
+																        <select id="cmbClassificacao' . $idProdutoSolicitacao . '" name="cmbClassificacao" class="form-control form-control-select2 selectClassific">
 																            <option value="#">Selecione</option>
 													    ';
 
