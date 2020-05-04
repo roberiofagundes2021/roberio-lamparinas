@@ -1,26 +1,15 @@
 <?php
+
 include_once("sessao.php");
+
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputNome'])){
-	
-	try{		
-		$sql = "SELECT COUNT(isnull(ServiCodigo,0)) as Codigo
-				FROM Servico
-				Where ServiEmpresa = ".$_SESSION['EmpreId']."";
-		//echo $sql;die;
-		$result = $conn->query("$sql");
-		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
-		
-		$sCodigo = (int)$rowCodigo['Codigo'] + 1;
-		$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
-	} catch(PDOException $e) {	
-		echo 'Error1: ' . $e->getMessage();die;
-	}
-	
+
 	try{
 		
-		$sql = "UPDATE ServicoOrcamento SET SrOrcNome = :sNome,  SrOrcDetalhamento = :sDetalhamento, SrOrcCategoria = :iCategoria, SrOrcSubcategoria = :iSubCategoria, SrOrcUsuarioAtualizador = :iUsuarioAtualizador, SrOrcEmpresa = :iEmpresa 
+		$sql = "UPDATE ServicoOrcamento SET SrOrcNome = :sNome,  SrOrcDetalhamento = :sDetalhamento, SrOrcCategoria = :iCategoria, 
+				SrOrcSubcategoria = :iSubCategoria, SrOrcUsuarioAtualizador = :iUsuarioAtualizador, SrOrcUnidade = :iUnidade
 				WHERE SrOrcId = :sId ";
 		$result = $conn->prepare($sql);
 
@@ -31,7 +20,7 @@ if(isset($_POST['inputNome'])){
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

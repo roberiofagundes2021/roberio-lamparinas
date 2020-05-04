@@ -15,40 +15,39 @@ $piEmpresa = 0;
 
 // Se a pessoa preencheu o login
 if(isset($_POST['usuario'])){
+
 	$psUsuario = $_POST['usuario'];
 	$psSenha = md5($_POST['senha']);
-	if(isset($_POST['empresa'])){
+
+	if (isset($_POST['empresa'])){
 		$piEmpresa = $_POST['empresa'];
 		$_SESSION['EmpreId'] = $piEmpresa;
 	}
-	
+
 	$_SESSION['UsuarLogin'] = $_POST['usuario'];
 	$_SESSION['UsuarSenha'] = $_POST['senha'];
 
 	$usuario_escape = addslashes($psUsuario);
 	$senha_escape = addslashes($psSenha);
 
-	$sql = ("SELECT Top 1 UsuarId, UsuarLogin, UsuarNome, UsuarSenha, EXUXPStatus, PerfiChave
-			 FROM Usuario
-			 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId	
-			 JOIN Perfil on PerfiId = EXUXPPerfil			 
-			 WHERE UsuarLogin = '$usuario_escape'");
-	$result = $conn->query("$sql");
+	$sql = "SELECT Top 1 UsuarId, UsuarLogin, UsuarNome, UsuarSenha, EXUXPStatus, PerfiChave, SituaChave
+			FROM Usuario
+			JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+			JOIN Situacao on SituaId = EXUXPStatus	
+			JOIN Perfil on PerfiId = EXUXPPerfil			 
+			WHERE UsuarLogin = '$usuario_escape' ";
+	$result = $conn->query($sql);
 	$row = $result->fetch();
-	//$count = count($row);
-	//$count = $result->rowCount();
-	//$row = $result->fetch();
-	//var_dump($row);die;
 	
-	$_SESSION['UsuarLogado'] = 0;
+//	$_SESSION['UsuarLogado'] = 0;
 	
 	$sPerfilChave = $row['PerfiChave'];
 	
 	if ($row == 0){	
 		$erro[] = "O usuário não está cadastrado.";
-	} else if ($row['EXUXPStatus'] == 0){
+	} else if ($row['EXUXPStatus'] == 0 || $row['SituaChave'] == 'INATIVO'){
 		$erro[] = "Esse usuário está desativado.";
-	} else if (strcmp($row['UsuarSenha'], ($psSenha)) != 0){  //"strcmp": cpmpara 2 strings (se for 0 significa que são iguais)
+	} else if (strcmp($row['UsuarSenha'], ($psSenha)) != 0){  //"strcmp": compara 2 strings (se for 0 significa que são iguais)
 		$erro[] = "<strong>Senha</strong> incorreta.";
 	} else {	
 		
@@ -93,16 +92,18 @@ if(isset($_POST['usuario'])){
 			}
 		} else { */
 		
-			$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
-					 FROM Usuario
-					 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-					 JOIN Perfil on PerfiId = EXUXPPerfil
-					 JOIN Empresa on EmpreId = EXUXPEmpresa
-					 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and 
-						   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
-					 ");
+			$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EXUXPUnidade, UnidaNome
+					FROM Usuario
+					JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+					JOIN Situacao on SituaId = EXUXPStatus
+					JOIN Perfil on PerfiId = EXUXPPerfil
+					JOIN Empresa on EmpreId = EXUXPEmpresa
+					JOIN Unidade on UnidaId = EXUXPUnidade
+					WHERE UsuarLogin = '$usuario_escape' and SituaChave = 'ATIVO' and 
+					      EmpreId in (Select LicenEmpresa from Licenca JOIN Situacao on SituaId = LicenStatus where LicenDtFim is null or LicenDtFim > GETDATE() and SituaChave = 'ATIVO')
+					";
 
-			$result = $conn->query("$sql");
+			$result = $conn->query($sql);
 			$row = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
 			$count = count($row);
 			
@@ -113,21 +114,23 @@ if(isset($_POST['usuario'])){
 				
 				$_SESSION['EmpreId'] = 99999999;  // Se preferirem deixar pre-selecionado já uma empresa basta trocar o 9999999 por $row[0]['EmpreId']
 				
-				$result = $conn->query("$sql");
+				$result = $conn->query($sql);
 				while ($linhas = $result->fetch()){
 					$_SESSION['Empresa'][$linhas['EmpreId']] = $linhas['EmpreNomeFantasia'];
 				}
 			} else if ($piEmpresa) {
 							
-				$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
-						 FROM Usuario
-						 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-						 JOIN Perfil on PerfiId = EXUXPPerfil
-						 JOIN Empresa on EmpreId = EXUXPEmpresa
-						 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa and 
-							   EmpreId in (Select LicenEmpresa from Licenca where LicenDtFim is null or LicenDtFim > GETDATE() and LicenStatus = 1)
-						 ");
-				$result = $conn->query("$sql");
+				$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EXUXPUnidade, UnidaNome
+						FROM Usuario
+						JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+						JOIN Situacao on SituaId = EXUXPStatus
+						JOIN Perfil on PerfiId = EXUXPPerfil
+						JOIN Empresa on EmpreId = EXUXPEmpresa
+						JOIN Unidade on UnidaId = EXUXPUnidade
+						WHERE UsuarLogin = '$usuario_escape' and SituaChave = 'ATIVO' and EmpreId = $piEmpresa and 
+						   EmpreId in (Select LicenEmpresa from Licenca JOIN Situacao on SituaId = LicenStatus where LicenDtFim is null or LicenDtFim > GETDATE() and SituaChave = 'ATIVO')
+						";
+				$result = $conn->query($sql);
 				$row = $result->fetch();
 				
 				if ($row > 0){
@@ -136,9 +139,13 @@ if(isset($_POST['usuario'])){
 					$_SESSION['UsuarNome'] = $row['UsuarNome'];
 					$_SESSION['EmpreId'] = $row['EmpreId'];
 					$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
+					$_SESSION['UnidadeId'] = $row['EXUXPUnidade'];
+					$_SESSION['UnidadeNome'] = $row['UnidaNome'];
 					$_SESSION['PerfiChave'] = $row['PerfiChave'];
-					$_SESSION['UsuarLogado'] = 1;
+					//$_SESSION['UsuarLogado'] = 1;
 					
+					unset($_SESSION['UsuarSenha']);
+
 					irpara("index.php");
 				} else {
 					$erro[] = "Login inválido. Verifique se o usuário informado faz parte dessa empresa.";
@@ -152,8 +159,12 @@ if(isset($_POST['usuario'])){
 				$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
 				$_SESSION['EmpreId'] = $row[0]['EmpreId'];
 				$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
+				$_SESSION['UnidadeId'] = $row[0]['EXUXPUnidade'];
+				$_SESSION['UnidadeNome'] = $row[0]['UnidaNome'];
 				$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
-				$_SESSION['UsuarLogado'] = 1;
+				//$_SESSION['UsuarLogado'] = 1;
+
+				unset($_SESSION['UsuarSenha']);
 				
 				irpara("index.php");
 			}
@@ -171,45 +182,10 @@ if(isset($_POST['usuario'])){
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Lamparinas | Login</title>
 
-	<!-- Global stylesheets -->
-	<link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
-	<link href="global_assets/css/icons/icomoon/styles.css" rel="stylesheet" type="text/css">
-	<link href="layout_1/LTR/default/full/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-	<link href="layout_1/LTR/default/full/assets/css/bootstrap_limitless.min.css" rel="stylesheet" type="text/css">
-	<link href="layout_1/LTR/default/full/assets/css/layout.min.css" rel="stylesheet" type="text/css">
-	<link href="layout_1/LTR/default/full/assets/css/components.min.css" rel="stylesheet" type="text/css">
-	<link href="layout_1/LTR/default/full/assets/css/colors.min.css" rel="stylesheet" type="text/css">
-	<!-- /global stylesheets -->
-
-	<!-- Core JS files -->
-	<script src="global_assets/js/main/jquery.min.js"></script>
-	<script src="global_assets/js/main/bootstrap.bundle.min.js"></script>
-	<script src="global_assets/js/plugins/loaders/blockui.min.js"></script>
-	<!-- /core JS files -->
+	<?php include_once("head.php"); ?>
 
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
-	
-	<!-- Theme JS files -->
-	<!--<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-		<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script> -->
-	
-	<!-- Theme JS files -->
-	<script src="layout_1/LTR/default/full/assets/js/app.js"></script>
-	<!--<script src="global_assets/js/demo_pages/login_validation.js"></script> -->
-	<!-- /theme JS files -->
-	
-	<!--<script src="global_assets/js/lamparinas/traducao.js"></script> -->
-	<!--<script type="text/javascript">
-		function foco(){
-			//alert('Entrou');
-			//document.getElementById("senha").focus();
-			//$("#senha").focus();
-			//document.forms[0].senha.focus();
-			$(this).next().focus();
-		}
-	</script> -->
-
 </head>
 
 <body>

@@ -225,7 +225,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								A relação abaixo faz referência às solicitações da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b>
+								A relação abaixo faz referência às solicitações da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
 								<div class="text-right"><a href="solicitacaoNovo.php" class="btn btn-success" role="button">Nova Solicitação</a></div>
 							</div>
 

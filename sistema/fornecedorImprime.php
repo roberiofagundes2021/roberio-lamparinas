@@ -15,7 +15,7 @@ if ($iCategoria == '#'){
 			FROM Fornecedor
 			JOIN Categoria on CategId = ForneCategoria
 			JOIN Situacao on SituaId = ForneStatus
-			WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
+			WHERE ForneUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
 			Group By ForneCategoria, CategNome, ForneTipo, ForneRazaoSocial, ForneNome, ForneCpf, ForneCnpj, ForneContato, ForneTelefone, ForneEmail";
 } else {
 	
@@ -30,7 +30,7 @@ if ($iCategoria == '#'){
 	$sql = "SELECT *
 			FROM Fornecedor
 			JOIN Situacao on SituaId = ForneStatus
-			WHERE ForneCategoria = ".$iCategoria." and ForneEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'";
+			WHERE ForneCategoria = ".$iCategoria." and ForneUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
 }
 
 $result = $conn->query($sql);
@@ -52,7 +52,7 @@ try {
 		<div style='width:300px; float:left; display: inline;'>
 			<img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
 			<span style='font-weight:bold;line-height:200px;'>".$_SESSION['EmpreNomeFantasia']."</span><br>
-			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: Hospital Padre Manoel</div>
+			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: ".$_SESSION['UnidadeNome']."</div>
 		</div>
 		<div style='width:300px; float:right; display: inline; text-align:right;'>
 			<div>{DATE j/m/Y}</div>

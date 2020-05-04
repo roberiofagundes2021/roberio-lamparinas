@@ -6,12 +6,12 @@ $_SESSION['PaginaAtual'] = 'Unidade de Medida';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus, SituaNome, SituaCor, SituaChave
-		 FROM UnidadeMedida
-		 JOIN Situacao on SituaId = UnMedStatus
-	     WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY UnMedNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus, SituaNome, SituaCor, SituaChave
+		FROM UnidadeMedida
+		JOIN Situacao on SituaId = UnMedStatus
+	    WHERE UnMedUnidade = ". $_SESSION['UnidadeId'] ."
+		ORDER BY UnMedNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -153,7 +153,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência às unidades de medida da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência às unidades de medida da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="unidademedidaNovo.php" class="btn btn-success" role="button">Nova Unidade de Medida</a></div>
 							</div>
 							

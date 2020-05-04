@@ -15,11 +15,11 @@ if(isset($_POST['inputTipo'])){
 										ForneAniversario, ForneCep, ForneEndereco, ForneNumero, ForneComplemento, ForneBairro, ForneCidade, 
 										ForneEstado, ForneContato, ForneTelefone, ForneCelular, ForneEmail, ForneSite, ForneObservacao,
 									    ForneBanco, ForneAgencia, ForneConta, ForneInformacaoAdicional, ForneIpi, ForneFrete, ForneIcms, 
-									    ForneOutros, ForneStatus, ForneUsuarioAtualizador, ForneEmpresa)
+									    ForneOutros, ForneStatus, ForneUsuarioAtualizador, ForneUnidade)
 				VALUES (:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual, :iCategoria,  
 						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dAniversario, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
 						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, :iBanco, :sAgencia, 
-						:sConta, :sInformacaoAdicional, :iIpi, :iFrete, :iIcms, :iOutros, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+						:sConta, :sInformacaoAdicional, :iIpi, :iFrete, :iIcms, :iOutros, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$conn->beginTransaction();
@@ -62,7 +62,7 @@ if(isset($_POST['inputTipo'])){
 						':iOutros' => $_POST['inputOutros'] == null ? 0.00 : gravaValor($_POST['inputOutros']),
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 
 		$insertId = $conn->lastInsertId(); 
@@ -71,9 +71,9 @@ if(isset($_POST['inputTipo'])){
 			
 			try{
 				$sql = "INSERT INTO FornecedorXSubCategoria 
-							(FrXSCFornecedor, FrXSCSubCategoria, FrXSCEmpresa)
+							(FrXSCFornecedor, FrXSCSubCategoria, FrXSCUnidade)
 						VALUES 
-							(:iFornecedor, :iSubCategoria, :iEmpresa)";
+							(:iFornecedor, :iSubCategoria, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				foreach ($_POST['cmbSubCategoria'] as $key => $value){
@@ -81,7 +81,7 @@ if(isset($_POST['inputTipo'])){
 					$result->execute(array(
 									':iFornecedor' => $insertId,
 									':iSubCategoria' => $value,
-									':iEmpresa' => $_SESSION['EmpreId']
+									':iUnidade' => $_SESSION['UnidadeId']
 									));
 				}
 				

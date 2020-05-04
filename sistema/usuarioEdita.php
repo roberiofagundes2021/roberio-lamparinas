@@ -16,6 +16,7 @@ if (isset($_POST['inputUsuarioId'])) {
 
 	$iUsuario = $_POST['inputUsuarioId'];
 
+<<<<<<< HEAD
 	try {
 
 		$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, EXUXPPerfil, EXUXPUnidade, EXUXPSetor, EXUXPLocalEstoque
@@ -35,6 +36,22 @@ if (isset($_POST['inputUsuarioId'])) {
 	} catch (PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
 	}
+=======
+	$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, EXUXPPerfil, EXUXPUnidade, EXUXPSetor, EXUXPLocalEstoque
+			FROM Usuario
+			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+			WHERE UsuarId = $iUsuario and EXUXPEmpresa = $EmpresaId ";
+	$result = $conn->query("$sql");
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+
+	$sql = "SELECT PerfiChave
+				FROM Perfil
+				JOIN Situacao on SituaId = PerfiStatus															     
+				WHERE SituaChave = 'ATIVO' and PerfiId = " . $row['EXUXPPerfil'] . "
+				ORDER BY PerfiNome ASC";
+	$result = $conn->query($sql);
+	$rowPerf = $result->fetch(PDO::FETCH_ASSOC);
+>>>>>>> 6b15fd5a90a528a7b90a9efb58073dc83ebb792d
 
 	$_SESSION['msg'] = array();
 }
@@ -49,7 +66,7 @@ if (isset($_POST['inputCpf'])) {
 				FROM Usuario
 				JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 				WHERE UsuarId = $iUsuario and EXUXPEmpresa = $EmpresaId ";
-		$result = $conn->query("$sql");
+		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 
 		$senha = '';
@@ -129,6 +146,7 @@ if (isset($_POST['inputCpf'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+		
 		$(document).ready(function() {
 
 			//Garantindo que ninguém mude a empresa na tela de edição
@@ -191,7 +209,8 @@ if (isset($_POST['inputCpf'])) {
 				var cmbUnidade = $('#cmbUnidade').val();
 
 				if (cmbUnidade == '#') {
-					Reset();
+					ResetSetor();
+					ResetLocalEstoque();
 				} else {
 
 					$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
@@ -206,7 +225,7 @@ if (isset($_POST['inputCpf'])) {
 
 							$('#cmbSetor').html(option).show();
 						} else {
-							Reset();
+							ResetSetor();
 						}
 					});
 
@@ -222,7 +241,7 @@ if (isset($_POST['inputCpf'])) {
 
 							$('#cmbLocalEstoque').html(option).show();
 						} else {
-							Reset();
+							ResetLocalEstoque();
 						}
 					});
 				}
@@ -301,12 +320,17 @@ if (isset($_POST['inputCpf'])) {
 			});
 
 			function Filtrando() {
-				$('#cmbSetor').empty().append('<option>Filtrando...</option>');
+				$('#cmbSetor').empty().append('<option value="#">Filtrando...</option>');
+				$('#cmbLocalEstoque').empty().append('<option value="#">Filtrando...</option>');
 			}
 
-			function Reset() {
+			function ResetSetor() {
 				$('#cmbSetor').empty().append('<option value="#">Sem setor</option>');
 			}
+
+			function ResetLocalEstoque() {
+				$('#cmbLocalEstoque').empty().append('<option value="#">Sem Local de Estoque</option>');
+			}			
 		});
 	</script>
 
@@ -375,12 +399,12 @@ include_once("topo.php");
 											<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2" required>
 												<option value="#">Informe um perfil</option>
 												<?php
-												$sql = ("SELECT PerfiId, PerfiNome, PerfiChave
-																 FROM Perfil
-																 JOIN Situacao on SituaId = PerfiStatus															     
-																 WHERE SituaChave = 'ATIVO'
-																 ORDER BY PerfiNome ASC");
-												$result = $conn->query("$sql");
+												$sql = "SELECT PerfiId, PerfiNome, PerfiChave
+														FROM Perfil
+														JOIN Situacao on SituaId = PerfiStatus															     
+														WHERE SituaChave = 'ATIVO'
+														ORDER BY PerfiNome ASC";
+												$result = $conn->query($sql);
 												$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 
 												foreach ($rowPerfil as $item) {
@@ -465,12 +489,12 @@ include_once("topo.php");
 											<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
 												<option value="#">Informe uma unidade</option>
 												<?php
-												$sql = ("SELECT UnidaId, UnidaNome
-																 FROM Unidade															     
-																 JOIN Situacao on SituaId = UnidaStatus															     
-																 WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
-																 ORDER BY UnidaNome ASC");
-												$result = $conn->query("$sql");
+												$sql = "SELECT UnidaId, UnidaNome
+														FROM Unidade															     
+														JOIN Situacao on SituaId = UnidaStatus															     
+														WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
+														ORDER BY UnidaNome ASC";
+												$result = $conn->query($sql);
 												$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
 
 												foreach ($rowUnidade as $item) {
@@ -492,11 +516,11 @@ include_once("topo.php");
 											<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
 												<option value="#">Informe um setor</option>
 												<?php
-												$sql = ("SELECT SetorId, SetorNome
-																 FROM Setor
-																 JOIN Situacao on SituaId = SetorStatus															     															     
-																 WHERE SetorEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
-																 ORDER BY SetorNome ASC");
+												$sql = "SELECT SetorId, SetorNome
+														FROM Setor
+														JOIN Situacao on SituaId = SetorStatus															     															     
+														WHERE SetorEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
+														ORDER BY SetorNome ASC";
 												$result = $conn->query("$sql");
 												$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -517,13 +541,17 @@ include_once("topo.php");
 										<div class="form-group">
 											<label for="cmbLocalEstoque">Local de Estoque</label>
 											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
+<<<<<<< HEAD
 												<option value="#">Sem Local de Estoque</option>
+=======
+												<option value="#">Informe um Local de Estoque</option>
+>>>>>>> 6b15fd5a90a528a7b90a9efb58073dc83ebb792d
 												<?php
 												$sql = "SELECT LcEstId, LcEstNome
-																 FROM LocalEstoque
-																 JOIN Situacao on SituaId = LcEstStatus															     															     
-																 WHERE LcEstEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
-																 ORDER BY LcEstNome ASC";
+														FROM LocalEstoque
+														JOIN Situacao on SituaId = LcEstStatus															     															     
+														WHERE LcEstEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
+														ORDER BY LcEstNome ASC";
 												$result = $conn->query($sql);
 												$rowLcEst = $result->fetchAll(PDO::FETCH_ASSOC);
 

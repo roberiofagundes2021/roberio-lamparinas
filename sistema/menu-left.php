@@ -28,7 +28,7 @@
 								<img src="global_assets/images/lamparinas/logo-lamparinas_200x200.jpg" class="img-fluid shadow-5 mb-3" width="100" height="100" alt="" style="padding-top:8px;">
 							</a>
 							<h6 class="mb-0 text-white text-shadow-dark"><?php echo nomeSobrenome($_SESSION['UsuarNome'],2); ?></h6>
-							<span class="font-size-sm text-white text-shadow-dark"><?php echo $_SESSION['EmpreNomeFantasia']; ?></span>
+							<span class="font-size-sm text-white text-shadow-dark"><?php echo $_SESSION['UnidadeNome']; ?></span>
 						</div>
 													
 						<div class="sidebar-user-material-footer">

@@ -9,19 +9,13 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputModeloId'])){
 	
 	$iModelo = $_POST['inputModeloId'];
-        	
-	try{
 		
-		$sql = "SELECT ModelId, ModelNome
-				FROM Modelo
-				WHERE ModelId = $iModelo ";
-		$result = $conn->query("$sql");
-		$row = $result->fetch(PDO::FETCH_ASSOC);
+	$sql = "SELECT ModelId, ModelNome
+			FROM Modelo
+			WHERE ModelId = $iModelo ";
+	$result = $conn->query("$sql");
+	$row = $result->fetch(PDO::FETCH_ASSOC);
 		
-	} catch(PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
-	}
-	
 	$_SESSION['msg'] = array();
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
@@ -69,7 +63,12 @@ if(isset($_POST['inputNome'])){
 	<title>Lamparinas | Modelo</title>
 
 	<?php include_once("head.php"); ?>
-	
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 	<script type="text/javascript" >
 
         $(document).ready(function() {
@@ -92,13 +91,6 @@ if(isset($_POST['inputNome'])){
 					return false;
 				}
 				
-				//Verifica se o campo só possui espaços em branco
-				/*if (inputNomeNovo == ''){
-					alerta('Atenção','Informe o modelo!','error');
-					$('#inputNome').focus();
-					return false;
-				}*/
-				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
@@ -119,10 +111,7 @@ if(isset($_POST['inputNome'])){
 		})
 	
 	</script>
-    <script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 </head>
 
 <body class="navbar-top">
@@ -157,7 +146,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="inputNome">Nome do Modelo</label>
+										<label for="inputNome">Nome do Modelo <span class="text-danger">*</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Modelo" value="<?php echo $row['ModelNome']; ?>" required autofocus>
 									</div>
 								</div>

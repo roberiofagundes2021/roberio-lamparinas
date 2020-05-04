@@ -12,7 +12,7 @@ $sql = "SELECT SrOrcNome, CategNome, SbCatNome, SrOrcSituacao, SrOrcId, SituaNom
 		JOIN Categoria on CategId = SrOrcCategoria
 		LEFT JOIN SubCategoria on SbCatId = SrOrcSubcategoria
 		JOIN Situacao on SituaId = SrOrcSituacao
-	    WHERE SrOrcEmpresa = ". $_SESSION['EmpreId'] ."
+	    WHERE SrOrcUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY SrOrcNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -158,7 +158,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos serviços para orçamento da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência aos serviços para orçamento da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="servicoOrcamentoNovo.php" class="btn btn-success" role="button">Novo Serviço</a></div>
 							</div>
 							

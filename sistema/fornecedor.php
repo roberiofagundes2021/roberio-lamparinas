@@ -6,12 +6,12 @@ $_SESSION['PaginaAtual'] = 'Fornecedor';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
-		 FROM Fornecedor
-		 LEFT JOIN Categoria on CategId = ForneCategoria
-	     WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY ForneNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
+		FROM Fornecedor
+		JOIN Categoria on CategId = ForneCategoria
+	    WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." 
+		ORDER BY ForneNome ASC";	
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -174,7 +174,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos fornecedores da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência aos fornecedores da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right">
 									<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
 										<a href="#collapse-imprimir-relacao" class="dropdown-toggle btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
@@ -194,17 +194,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 													<option value="#">Filtrar por: Categoria (todas)</option>
 													<?php 
-														$sql = ("SELECT CategId, CategNome
-																 FROM Categoria		  
-																 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
-																 ORDER BY CategNome ASC");
-														$result = $conn->query("$sql");
+														$sql = "SELECT CategId, CategNome
+																FROM Categoria
+																JOIN Situacao on SituaId = CategStatus		  
+																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+																ORDER BY CategNome ASC";
+														$result = $conn->query($sql);
 														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowCategoria as $item){															
 															print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-														}
-													
+														}													
 													?>
 												</select>
 											</div>

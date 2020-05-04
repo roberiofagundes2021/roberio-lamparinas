@@ -244,7 +244,7 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos produtos da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência aos produtos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right">
 									<a href="produtoNovo.php" class="btn btn-success" role="button">Novo Produto</a>
 									<a href="#" style="float:right; margin-left: 5px;" onclick="atualizaProduto(0, '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>

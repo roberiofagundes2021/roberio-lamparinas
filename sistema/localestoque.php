@@ -154,7 +154,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos locais de estoque da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência aos locais de estoque da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="localestoqueNovo.php" class="btn btn-success" role="button">Novo Local do Estoque</a></div>
 							</div>
 							

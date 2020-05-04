@@ -8,13 +8,12 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubcategoria, PrOrcUnidadeMedida 
 		FROM ProdutoOrcamento
-		WHERE PrOrcId = ". $_POST['inputPrOrcId'] ." and PrOrcEmpresa = ". $_SESSION['EmpreId'];
+		WHERE PrOrcId = ". $_POST['inputPrOrcId'] ." and PrOrcUnidade = ". $_SESSION['UnidadeId'];
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 //$count = count($row);
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -24,8 +23,17 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Lamparinas | Produto para Orçamento</title>
 
-	<!-----------------------------------------Validação do formulário e Seleção altomatica de Subcategorias---------------------------------------->
 	<?php include_once("head.php"); ?>
+
+	<!---------------------------------Scripts Universais------------------------------------>
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 
 	<script type="text/javascript">
 		
@@ -40,7 +48,6 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				const selectedId = $('#cmbSubCategoria').attr('valId');
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
-					//let option = '<option>Selecione a SubCategoria</option>';
 				
 					if (dados.length){
 					
@@ -109,17 +116,6 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 			});
 		});
 	</script>
-	<!---------------------------------Scripts Universais------------------------------------>
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
-	
-	<!------------------------------------Fim de validação do formulário e Seleção altomatica de Subcategorias------------------------------------>
 
 </head>
 
@@ -165,7 +161,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 													$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
 															FROM UnidadeMedida
 															JOIN Situacao on SituaId = UnMedStatus
-															WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+															WHERE UnMedUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 															ORDER BY UnMedNome ASC";
 													$result = $conn->query($sql);
 													$rowUnMed = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -203,7 +199,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 													$sql = "SELECT CategId, CategNome
 															FROM Categoria
 															JOIN Situacao on SituaId = CategStatus
-															WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+															WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 															ORDER BY CategNome ASC";
 													$result = $conn->query($sql);
 													$rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);

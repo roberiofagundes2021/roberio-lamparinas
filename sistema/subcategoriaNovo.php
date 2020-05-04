@@ -10,8 +10,8 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO SubCategoria (SbCatNome, SbCatCategoria, SbCatStatus, SbCatUsuarioAtualizador, SbCatEmpresa)
-				VALUES (:sNome, :sCategoria, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO SubCategoria (SbCatNome, SbCatCategoria, SbCatStatus, SbCatUsuarioAtualizador, SbCatUnidade)
+				VALUES (:sNome, :sCategoria, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -19,7 +19,7 @@ if(isset($_POST['inputNome'])){
 						':sCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iUnidade' => $_SESSION['UnidadeId'],
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -84,23 +84,6 @@ if(isset($_POST['inputNome'])){
 					return false;
 				}
 				
-				//remove os espaços desnecessários antes e depois
-				//inputNome = inputNome.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				/*if (inputNome == ''){
-					alerta('Atenção','Informe a sub categoria!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-
-				//Verifica se o campo só possui espaços em branco
-				if (cmbCategoria == '#'){
-					alerta('Atenção','Informe a categoria!','error');
-					$('#cmbCategoria').focus();
-					return false;
-				}*/
-				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
@@ -160,11 +143,12 @@ if(isset($_POST['inputNome'])){
 									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 
-											$sql = ("SELECT CategId, CategNome
-													 FROM Categoria
-													 WHERE CategStatus = 1 and CategEmpresa = ".$_SESSION['EmpreId']."
-													 ORDER BY CategNome ASC");
-											$result = $conn->query("$sql");
+											$sql = "SELECT CategId, CategNome
+													FROM Categoria
+													JOIN Situacao on SituaId = CategStatus
+													WHERE SituaChave = 'ATIVO' and CategUnidade = ".$_SESSION['UnidadeId']."
+													ORDER BY CategNome ASC";
+											$result = $conn->query($sql);
 											$row = $result->fetchAll(PDO::FETCH_ASSOC);
 											
 											foreach ($row as $item){

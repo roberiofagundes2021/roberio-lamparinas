@@ -9,7 +9,7 @@ include('global_assets/php/conexao.php');
 $sql = ("SELECT FabriId, FabriNome, FabriStatus, SituaNome, SituaCor, SituaChave
 		 FROM Fabricante
 		 JOIN Situacao on SituaId = FabriStatus
-	     WHERE FabriEmpresa = ". $_SESSION['EmpreId'] ."
+	     WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ."
 		 ORDER BY FabriNome ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -148,7 +148,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos fabricantes da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência aos fabricantes da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="fabricanteNovo.php" class="btn btn-success" role="button">Novo Fabricante</a></div>
 							</div>
 							
@@ -169,7 +169,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										print('
 										<tr>
-											<td>'.$item['SituaNome'].'</td>
+											<td>'.$item['FabriNome'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaFabricante('.$item['FabriId'].', \''.$item['FabriNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

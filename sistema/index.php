@@ -6,10 +6,6 @@ $_SESSION['PaginaAtual'] = 'Painel de Controle';
 
 include('global_assets/php/conexao.php');
 
-$_SESSION['Pendente'] = 50;
-$_SESSION['Liberado'] = 50;
-$_SESSION['NaoLiberado'] = 50;
-
 if (isset($_POST['cmbPerfil'])){
 	$idPerfilLogado = $_POST['cmbPerfil'];
 } else {

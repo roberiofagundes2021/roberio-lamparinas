@@ -8,7 +8,7 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus
 		FROM UnidadeMedida
-		WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ."
+		WHERE UnMedUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY UnMedNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -17,18 +17,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 if(isset($_POST['inputNome'])){
 
 	try{
-		$sql = "SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
-				FROM Produto
-				Where ProduEmpresa = ".$_SESSION['EmpreId']."";
-		//echo $sql;die;
-		$result = $conn->query("$sql");
-		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);
-		
-		$sCodigo = (int)$rowCodigo['Codigo'] + 1;
-		$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
 
-		$sql = "INSERT INTO ProdutoOrcamento (PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubcategoria, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcUsuarioAtualizador, PrOrcEmpresa) 
-				VALUES (:sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :iUnidadeMedida, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO ProdutoOrcamento (PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubcategoria, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcUsuarioAtualizador, PrOrcUnidade) 
+				VALUES (:sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :iUnidadeMedida, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -40,7 +31,7 @@ if(isset($_POST['inputNome'])){
 						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '' ? null : $_POST['cmbUnidadeMedida'],
 						':iSituacao' => $_POST['inputSituacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -70,9 +61,17 @@ if(isset($_POST['inputNome'])){
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Lamparinas | Novo Produto para Orçamento</title>
 
-	
-<!-----------------------------------------Validação do formulário e Seleção altomatica de Subcategorias---------------------------------------->
 	<?php include_once("head.php"); ?>
+
+	<!---------------------------------Scripts Universais------------------------------------>
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
+	<!-- Validação -->
+    <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 
 	<script type="text/javascript">
 	    
@@ -112,20 +111,12 @@ if(isset($_POST['inputNome'])){
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
 
-				
 				e.preventDefault();
 				
 				let inputNome = $('#inputNome').val();
 
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
-				
-				/*/Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe o nome do produto!','error');
-					$('#inputNome').focus();
-					return false;
-				}*/
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -154,15 +145,6 @@ if(isset($_POST['inputNome'])){
 		});
 	</script>
 
-	<!---------------------------------Scripts Universais------------------------------------>
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	
-	<!-- Validação -->
-    <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 </head>
 
 <body class="navbar-top">
@@ -208,7 +190,7 @@ if(isset($_POST['inputNome'])){
 													$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
 															FROM UnidadeMedida
 															JOIN Situacao on SituaId = UnMedStatus
-															WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+															WHERE UnMedUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 															ORDER BY UnMedNome ASC";
 													$result = $conn->query($sql);
 													$rowUnidadeMedida = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -245,7 +227,7 @@ if(isset($_POST['inputNome'])){
 													$sql = "SELECT CategId, CategNome
 															FROM Categoria
 															JOIN Situacao on SituaId = CategStatus
-															WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+															WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 															ORDER BY CategNome ASC";
 													$result = $conn->query($sql);
 													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

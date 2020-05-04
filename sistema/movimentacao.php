@@ -197,7 +197,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência às movimentações do estoque da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência às movimentações do estoque da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right">
 									<a href="movimentacaoNovo.php" class="btn btn-success" role="button">Nova Movimentação</a>
 									<a href="index.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Listar Requisições">Requisições</a></div>

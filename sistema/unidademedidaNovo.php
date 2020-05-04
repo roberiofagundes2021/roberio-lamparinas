@@ -10,8 +10,8 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO UnidadeMedida (UnMedNome, UnMedSigla, UnMedStatus, UnMedUsuarioAtualizador, UnMedEmpresa)
-				VALUES (:sNome, :sSigla, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO UnidadeMedida (UnMedNome, UnMedSigla, UnMedStatus, UnMedUsuarioAtualizador, UnMedUnidade)
+				VALUES (:sNome, :sSigla, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -19,7 +19,7 @@ if(isset($_POST['inputNome'])){
 						':sSigla' => $_POST['inputSigla'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iUnidade' => $_SESSION['UnidadeId'],
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -50,6 +50,11 @@ if(isset($_POST['inputNome'])){
 
 	<?php include_once("head.php"); ?>
 	
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 	<script type="text/javascript" >
 
         $(document).ready(function() {
@@ -66,28 +71,12 @@ if(isset($_POST['inputNome'])){
 				inputNome = inputNome.trim();
 				inputSigla = inputSigla.trim();
 
-
-				
 				//Verifica se o campo só possui espaços em branco
 				if (inputNome == ''){
 					alerta('Atenção','Informe a Unidade de Medida!','error');
 					$('#inputNome').focus();
 					return false;
 				}
-				
-				//Verifica se o campo só possui espaços em branco
-				/*if (inputNome == ''){
-					alerta('Atenção','Informe a unidade de medida!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputSigla == ''){
-					alerta('Atenção','Informe a sigla!','error');
-					$('#inputSigla').focus();
-					return false;
-				}*/
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -107,10 +96,7 @@ if(isset($_POST['inputNome'])){
 			})
 		})
 	</script>
-	<script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 </head>
 
 <body class="navbar-top">

@@ -6,10 +6,11 @@ $_SESSION['PaginaAtual'] = 'Categoria';
 
 include('global_assets/php/conexao.php');
 
+//O ALTERAR é usado na importação de Produtos (eles não devem aparecer aqui)
 $sql = "SELECT CategId, CategNome, CategStatus, SituaNome, SituaChave, SituaCor
 		FROM Categoria
 		JOIN Situacao on SituaId = CategStatus
-	    WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave != 'ALTERAR'
+	    WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave != 'ALTERAR'
 		ORDER BY CategNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -147,7 +148,7 @@ $count = count($row);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência às categorias da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência às categorias da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="categoriaNovo.php" class="btn btn-success" role="button">Nova Categoria</a></div>
 							</div>					
 							

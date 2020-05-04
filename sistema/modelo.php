@@ -6,12 +6,12 @@ $_SESSION['PaginaAtual'] = 'Modelo';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT ModelId, ModelNome, ModelStatus, SituaNome, SituaCor, SituaChave
-		 FROM Modelo
-		 JOIN Situacao on SituaId = ModelStatus
-	     WHERE ModelEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY ModelNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT ModelId, ModelNome, ModelStatus, SituaNome, SituaCor, SituaChave
+		FROM Modelo
+		JOIN Situacao on SituaId = ModelStatus
+	    WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ."
+		ORDER BY ModelNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -148,7 +148,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos modelos da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência aos modelos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="modeloNovo.php" class="btn btn-success" role="button">Novo Modelo</a></div>
 							</div>
 							

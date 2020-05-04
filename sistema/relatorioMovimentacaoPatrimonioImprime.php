@@ -140,7 +140,7 @@ if (isset($_POST['resultados'])) {
 		            <div style='float:left; width: 400px; display: inline-block; margin-bottom: 10px;'>
 			            <img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
 			            <span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
-			            <div style='position: absolute; font-size:9px; margin-top: 8px; margin-left:4px;'>Unidade: Secretaria de Saúde / Hospital Padre Manoel</div>
+			            <div style='position: absolute; font-size:9px; margin-top: 8px; margin-left:4px;'>Unidade: ".$_SESSION['UnidadeNome']."</div>
 					</div>
 					<div style='width:250px; float:right; display: inline; text-align:right;'>
 			            <div style='font-size: 0.8rem'>Data {DATE j/m/Y}</div>

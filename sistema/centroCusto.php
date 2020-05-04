@@ -145,7 +145,7 @@ $count = count($row);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos Centros de Custo da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência aos Centros de Custo da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="centroCustoNovo.php" class="btn btn-success" role="button">Novo Centro de Custo</a></div>
 							</div>					
 							

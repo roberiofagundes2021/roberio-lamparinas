@@ -10,31 +10,26 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputFornecedorId'])){
 	
 	$iFornecedor = $_POST['inputFornecedorId'];
+		
+	$sql = "SELECT *
+			FROM Fornecedor
+			WHERE ForneId = $iFornecedor ";
+	$result = $conn->query("$sql");
+	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
-	try{
-		
-		$sql = "SELECT *
-				FROM Fornecedor
-				WHERE ForneId = $iFornecedor ";
-		$result = $conn->query("$sql");
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-		
-		//SubCategorias para esse fornecedor
-		$sql = ("SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
-				 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and FrXSCFornecedor = $iFornecedor
-				 ORDER BY SbCatNome ASC");
-		$result = $conn->query("$sql");
-		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($rowBD as $item){
-			$aSubCategorias[] = $item['SbCatId'];
-		}
-						
-	} catch(PDOException $e) {
-		echo 'Error: ' . $e->getMessage();die;
+	//SubCategorias para esse fornecedor
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria
+			JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
+			WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and FrXSCFornecedor = $iFornecedor
+			ORDER BY SbCatNome ASC";
+	$result = $conn->query($sql);
+	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+
+	foreach ($rowBD as $item){
+		$aSubCategorias[] = $item['SbCatId'];
 	}
-	
+						
 	$_SESSION['msg'] = array();
 
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
@@ -103,20 +98,20 @@ if(isset($_POST['inputTipo'])){
 						));
 
 		$sql = "DELETE FROM FornecedorXSubCategoria
-				WHERE FrXSCFornecedor = :iFornecedor and FrXSCEmpresa = :iEmpresa";
+				WHERE FrXSCFornecedor = :iFornecedor and FrXSCUnidade = :iUnidade";
 		$result = $conn->prepare($sql);	
 		
 		$result->execute(array(
 							':iFornecedor' => $_POST['inputFornecedorId'],
-							':iEmpresa' => $_SESSION['EmpreId']));
+							':iUnidade' => $_SESSION['UnidadeId']));
 						
 		if (isset($_POST['cmbSubCategoria'])){
 			
 			try{
 				$sql = "INSERT INTO FornecedorXSubCategoria 
-							(FrXSCFornecedor, FrXSCSubCategoria, FrXSCEmpresa)
+							(FrXSCFornecedor, FrXSCSubCategoria, FrXSCUnidade)
 						VALUES 
-							(:iFornecedor, :iSubCategoria, :iEmpresa)";
+							(:iFornecedor, :iSubCategoria, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				foreach ($_POST['cmbSubCategoria'] as $key => $value){
@@ -124,7 +119,7 @@ if(isset($_POST['inputTipo'])){
 					$result->execute(array(
 									':iFornecedor' => $_POST['inputFornecedorId'],
 									':iSubCategoria' => $value,
-									':iEmpresa' => $_SESSION['EmpreId']
+									':iUnidade' => $_SESSION['UnidadeId']
 									));
 				}
 							
@@ -179,49 +174,6 @@ if(isset($_POST['inputTipo'])){
     <script type="text/javascript" >
 
 		window.onload = function(){
-			/*
-			//Ao carregar a página executa o que o onChange() executa para que a combo da SubCategoria já venha filtrada, além de selecionada, é claro.
-			var cmbSubCategoria = $('#cmbSubCategoria').val();
-			
-			//alert(cmbSubCategoria);
-
-			var arr = [cmbSubCategoria];
-			//alert(array.indexOf(2));
-
-			//alert(arr);
-			
-			//O InArray do JQuery trás a posição que foi encontrado, 0 para o primeiro item do array, 1 para o segundo etc. Caso não encontre trás -1
-			if (arr.indexOf(2)) != -1){
-				alert("Sucesso!!");
-			} else{
-				alert("No success");
-			}			
-						
-			Filtrando();
-			
-			var cmbCategoria = $('#cmbCategoria').val();			
-
-			$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
-				
-				var option = '<option>Selecione a SubCategoria</option>';
-				
-				if (dados.length){						
-					
-					$.each(dados, function(i, obj){
-
-						if(obj.SbCatId == cmbSubCategoria){							
-							option += '<option value="'+obj.SbCatId+'" selected>'+obj.SbCatNome+'</option>';
-						} else {							
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						}
-					});
-					
-					$('#cmbSubCategoria').html(option).show();
-				} else {
-					Reset();
-				}					
-			});
-			*/
 			//Ao carregar a página é verificado se é PF ou PJ para aparecer os campos relacionados e esconder o que não estiver
 			var tipo = $('input[name="inputTipo"]:checked').val();
 			
@@ -415,18 +367,18 @@ if(isset($_POST['inputTipo'])){
 			var Soma;
 			var Resto;
 			Soma = 0;
-		  if (strCPF == "00000000000") return false;
-			 
-		  for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
-		  Resto = (Soma * 10) % 11;
-		   
+			if (strCPF == "00000000000") return false;
+				
+			for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+			Resto = (Soma * 10) % 11;
+
 			if ((Resto == 10) || (Resto == 11))  Resto = 0;
 			if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
-		   
-		  Soma = 0;
+
+			Soma = 0;
 			for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
 			Resto = (Soma * 10) % 11;
-		   
+
 			if ((Resto == 10) || (Resto == 11))  Resto = 0;
 			if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
 			return true;
@@ -618,11 +570,12 @@ if(isset($_POST['inputTipo'])){
 										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 											<option value="#">Selecione uma categoria</option>
 											<?php 
-												$sql = ("SELECT CategId, CategNome
-														 FROM Categoria															     
-														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ."
-														 ORDER BY CategNome ASC");
-												$result = $conn->query("$sql");
+												$sql = "SELECT CategId, CategNome
+														FROM Categoria
+														JOIN Situacao on SituaId = CategStatus
+														WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+														ORDER BY CategNome ASC";
+												$result = $conn->query($sql);
 												$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 												
 												foreach ($rowCategoria as $item){			
@@ -643,10 +596,12 @@ if(isset($_POST['inputTipo'])){
 											<?php
 												
 												if (isset($row['ForneCategoria'])){
-													$sql = ("SELECT SbCatId, SbCatNome
-															 FROM SubCategoria														 
-															 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['ForneCategoria']." and SbCatStatus = 1
-															 ORDER BY SbCatNome ASC");
+													
+													$sql = "SELECT SbCatId, SbCatNome
+															FROM SubCategoria
+															JOIN Situacao on SituaId = SbCatStatus
+															WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['ForneCategoria']." and SituaChave = 'ATIVO'
+															ORDER BY SbCatNome ASC";
 													$result = $conn->query("$sql");
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 													$count = count($rowSubCategoria);
@@ -818,11 +773,12 @@ if(isset($_POST['inputTipo'])){
 											<select id="cmbBanco" name="cmbBanco" class="form-control form-control-select2">
 												<option value="#">Selecione um banco</option>
 												<?php 
-													$sql = ("SELECT BancoId, BancoCodigo, BancoNome
-															 FROM Banco
-															 WHERE BancoStatus = 1
-															 ORDER BY BancoCodigo ASC");
-													$result = $conn->query("$sql");
+													$sql = "SELECT BancoId, BancoCodigo, BancoNome
+															FROM Banco
+															JOIN Situacao on SituaId = BancoStatus
+															WHERE SituaChave = 'ATIVO'
+															ORDER BY BancoCodigo ASC";
+													$result = $conn->query($sql);
 													$rowBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 													
 													foreach ($rowBanco as $item){
