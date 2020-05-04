@@ -145,7 +145,7 @@ $count = count($row);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência as Formas de Pagamento da <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência as Formas de Pagamento da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="formaPagamentoNovo.php" class="btn btn-success" role="button">Nova Forma de Pagamento</a></div>
 							</div>					
 							

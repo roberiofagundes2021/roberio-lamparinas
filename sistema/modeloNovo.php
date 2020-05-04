@@ -10,15 +10,15 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO Modelo (ModelNome, ModelStatus, ModelUsuarioAtualizador, ModelEmpresa)
-				VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO Modelo (ModelNome, ModelStatus, ModelUsuarioAtualizador, ModelUnidade)
+				VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iUnidade' => $_SESSION['UnidadeId'],
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -48,6 +48,11 @@ if(isset($_POST['inputNome'])){
 	<title>Lamparinas | Modelo</title>
 
 	<?php include_once("head.php"); ?>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	
 	<script type="text/javascript" >
 
@@ -70,13 +75,6 @@ if(isset($_POST['inputNome'])){
 					return false;
 				}
 				
-				//Verifica se o campo só possui espaços em branco
-				/*if (inputNome == ''){
-					alerta('Atenção','Informe o modelo!','error');
-					$('#inputNome').focus();
-					return false;
-				}*/
-				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
@@ -95,10 +93,7 @@ if(isset($_POST['inputNome'])){
 			})
 		})
 	</script>	
-	<script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 </head>
 
 <body class="navbar-top">
@@ -130,7 +125,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="inputNome">Nome do Modelo</label>
+										<label for="inputNome">Nome do Modelo <span class="text-danger">*</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Modelo" required autofocus>
 									</div>
 								</div>

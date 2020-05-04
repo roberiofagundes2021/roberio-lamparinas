@@ -9,19 +9,13 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputSubCategoriaId'])){
 	
 	$iSubCategoria = $_POST['inputSubCategoriaId'];
-        	
-	try{
 		
-		$sql = "SELECT SbCatId, SbCatNome, SbCatCategoria
-				FROM SubCategoria
-				WHERE SbCatId = $iSubCategoria ";
-		$result = $conn->query("$sql");
-		$row = $result->fetch(PDO::FETCH_ASSOC);
+	$sql = "SELECT SbCatId, SbCatNome, SbCatCategoria
+			FROM SubCategoria
+			WHERE SbCatId = $iSubCategoria ";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
 		
-	} catch(PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
-	}
-	
 	$_SESSION['msg'] = array();
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
@@ -76,7 +70,12 @@ if(isset($_POST['inputNome'])){
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
-	<!-- /theme JS files -->	
+	<!-- /theme JS files -->
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 	
 	<script type="text/javascript" >
 
@@ -92,7 +91,6 @@ if(isset($_POST['inputNome'])){
 				var cmbCategoria   = $('#cmbCategoria').val();
 				var subCategoriaId = $('#inputSubCategoriaId').val();
 				
-
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNomeNovo.trim();
 				
@@ -102,20 +100,6 @@ if(isset($_POST['inputNome'])){
 					$('#inputNome').focus();
 					return false;
 				}
-				
-				//Verifica se o campo só possui espaços em branco
-				/*if (inputNomeNovo == ''){
-					alerta('Atenção','Informe a sub categoria!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-
-				//Verifica se o campo só possui espaços em branco
-				if (cmbCategoria == '#'){
-					alerta('Atenção','Informe a categoria!','error');
-					$('#cmbCategoria').focus();
-					return false;
-				}*/
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -135,10 +119,7 @@ if(isset($_POST['inputNome'])){
 			})
 		})
 	</script>
-	<script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 </head>
 
 <body class="navbar-top">
@@ -182,11 +163,12 @@ if(isset($_POST['inputNome'])){
 									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 
-											$sql = ("SELECT CategId, CategNome
-													 FROM Categoria
-													 WHERE CategStatus = 1 and CategEmpresa = ".$_SESSION['EmpreId']."
-													 ORDER BY CategNome ASC");
-											$result = $conn->query("$sql");
+											$sql = "SELECT CategId, CategNome
+													FROM Categoria
+													JOIN Situacao on SituaId = CategStatus
+													WHERE SituaChave = 'ATIVO' and CategUnidade = ".$_SESSION['UnidadeId']."
+													ORDER BY CategNome ASC";
+											$result = $conn->query($sql);
 											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 											
 											foreach ($rowCategoria as $item){

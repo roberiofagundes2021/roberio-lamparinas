@@ -6,13 +6,13 @@ $_SESSION['PaginaAtual'] = 'Sub Categoria';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT SbCatId, SbCatNome, SbCatStatus, CategNome, SituaNome, SituaCor, SituaChave
-		 FROM SubCategoria
-		 JOIN Categoria on CategId = SbCatCategoria
-		 JOIN Situacao on SituaId = SbCatStatus
-	     WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY SbCatNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT SbCatId, SbCatNome, SbCatStatus, CategNome, SituaNome, SituaCor, SituaChave
+		FROM SubCategoria
+		JOIN Categoria on CategId = SbCatCategoria
+		JOIN Situacao on SituaId = SbCatStatus
+	    WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ."
+		ORDER BY SbCatNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -154,7 +154,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência às sub categorias da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência às sub categorias da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="subcategoriaNovo.php" class="btn btn-success" role="button">Nova Sub Categoria</a></div>
 							</div>
 							

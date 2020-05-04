@@ -7,28 +7,28 @@ include('global_assets/php/conexao.php');
 if ($_POST['tipo'] == 'F'){
 
 	if(isset($_POST['nomeVelho'])){
-		$sql = ("SELECT ForneId
-				 FROM Fornecedor
-				 WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nomeNovo']."' and ForneNome <> '". $_POST['nomeVelho']."' and ForneCpf = '". limpaCPF_CNPJ($_POST['cpf'])."'");
+		$sql = "SELECT ForneId
+				FROM Fornecedor
+				WHERE ForneUnidade = ".$_SESSION['UnidadeId']." and ForneNome = '". $_POST['nomeNovo']."' and ForneNome <> '". $_POST['nomeVelho']."' and ForneCpf = '". limpaCPF_CNPJ($_POST['cpf'])."'";
 	} else{
-		$sql = ("SELECT ForneId
-				 FROM Fornecedor
-				 WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nome']."' and ForneCpf = '". limpaCPF_CNPJ($_POST['cpf'])."'");
+		$sql = "SELECT ForneId
+				FROM Fornecedor
+				WHERE ForneUnidade = ".$_SESSION['UnidadeId']." and ForneNome = '". $_POST['nome']."' and ForneCpf = '". limpaCPF_CNPJ($_POST['cpf'])."'";
 	}
 } else{
 
 	if(isset($_POST['nomeVelho'])){
-		$sql = ("SELECT ForneId
-				 FROM Fornecedor
-				 WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nomeNovo']."' and ForneNome <> '". $_POST['nomeVelho']."' and ForneCnpj = '". limpaCPF_CNPJ($_POST['cnpj'])."'");
+		$sql = "SELECT ForneId
+				FROM Fornecedor
+				WHERE ForneUnidade = ".$_SESSION['UnidadeId']." and ForneNome = '". $_POST['nomeNovo']."' and ForneNome <> '". $_POST['nomeVelho']."' and ForneCnpj = '". limpaCPF_CNPJ($_POST['cnpj'])."'";
 	} else{
-		$sql = ("SELECT ForneId
-				 FROM Fornecedor
-				 WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nome']."' and ForneCnpj = '". limpaCPF_CNPJ($_POST['cnpj'])."'");
+		$sql = "SELECT ForneId
+				FROM Fornecedor
+				WHERE ForneUnidade = ".$_SESSION['UnidadeId']." and ForneNome = '". $_POST['nome']."' and ForneCnpj = '". limpaCPF_CNPJ($_POST['cnpj'])."'";
 	}
 }
 
-$result = $conn->query("$sql");
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 

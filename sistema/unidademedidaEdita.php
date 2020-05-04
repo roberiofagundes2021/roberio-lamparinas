@@ -9,19 +9,13 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputUnidadeMedidaId'])){
 	
 	$iUnidadeMedida = $_POST['inputUnidadeMedidaId'];
-        	
-	try{
 		
-		$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
-				FROM UnidadeMedida
-				WHERE UnMedId = $iUnidadeMedida ";
-		$result = $conn->query("$sql");
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-		
-	} catch(PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
-	}
-	
+	$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
+			FROM UnidadeMedida
+			WHERE UnMedId = $iUnidadeMedida ";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+			
 	$_SESSION['msg'] = array();
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
@@ -70,6 +64,11 @@ if(isset($_POST['inputNome'])){
 	<title>Lamparinas | Unidade de Medida</title>
 
 	<?php include_once("head.php"); ?>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	
 	<script type="text/javascript" >
 
@@ -93,21 +92,7 @@ if(isset($_POST['inputNome'])){
 					alerta('Atenção','Informe a Unidade de Medida!','error');
 					$('#inputNome').focus();
 					return false;
-				}
-				
-				//Verifica se o campo só possui espaços em branco
-				/*if (inputNomeNovo == ''){
-					alerta('Atenção','Informe a unidade de medida!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputSigla == ''){
-					alerta('Atenção','Informe a sigla!','error');
-					$('#inputSigla').focus();
-					return false;
-				}*/				
+				}		
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -129,10 +114,7 @@ if(isset($_POST['inputNome'])){
 		})
 	
 	</script>
-    <script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 </head>
 
 <body class="navbar-top">

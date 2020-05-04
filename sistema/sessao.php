@@ -22,25 +22,7 @@ if(array_key_exists('FluxoId', $_SESSION) and !in_array(basename($_SERVER['PHP_S
 	unset($_SESSION['FluxoId']);
 }
 
-/*
-$tr = array('trOrcamento.php', 'trOrcamentoNovo.php', 'trOrcamentoEdita.php', 'trOrcamentoExclui.php', 'trOrcamentoImprime.php',
-			'trOrcamentoProduto.php', 'trOrcamentoDuplica.php');
-
-//Se existe a sessão $_SESSION['TRId'] e a página que está sendo acessada não é nenhuma das sitadas acima, limpa essa sessão.	  
-if(array_key_exists('TRId', $_SESSION) and !in_array(basename($_SERVER['PHP_SELF']), $tr)){
-	unset($_SESSION['TRId']);
-	unset($_SESSION['TRNumero']);
-}
-
-echo "<br>";
-echo "Existe o array? ".array_key_exists('TRId', $_SESSION);
-echo "<br>";
-echo basename($_SERVER['PHP_SELF']);
-echo "<br>";
-echo in_array(basename($_SERVER['PHP_SELF']), $tr);
-*/
-
-if(!array_key_exists('UsuarId', $_SESSION) or !$_SESSION['UsuarLogado']){
+if (!array_key_exists('UsuarId', $_SESSION)){  // or !$_SESSION['UsuarLogado']
   header('Expires: 0');
   header('Pragma: no-cache');  
   header("Location: login.php");

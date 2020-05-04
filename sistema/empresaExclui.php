@@ -9,10 +9,16 @@ if(isset($_POST['inputEmpresaId'])){
 	$iEmpresa = $_POST['inputEmpresaId'];
         	
 	try{
-		
+
+		$sql = "DELETE FROM Parametro
+				WHERE ParamEmpresa = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iEmpresa); 
+		$result->execute();		
+
 		$sql = "DELETE FROM Empresa
 				WHERE EmpreId = :id";
-		$result = $conn->prepare("$sql");
+		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iEmpresa); 
 		$result->execute();
 		
@@ -26,7 +32,7 @@ if(isset($_POST['inputEmpresaId'])){
 		$_SESSION['msg']['mensagem'] = "Erro ao excluir empresa!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 }
 

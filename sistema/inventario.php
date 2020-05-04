@@ -155,7 +155,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								A relação abaixo faz referência aos inventários da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b>.
+								A relação abaixo faz referência aos inventários da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>.
 								<div class="text-right"><a href="inventarioNovo.php" class="btn btn-success" role="button">Novo Inventário</a></div>
 							</div>							
 

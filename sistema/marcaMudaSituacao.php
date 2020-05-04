@@ -12,6 +12,7 @@ if(isset($_POST['inputMarcaId'])){
 	$sStatus = $_POST['inputMarcaStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
         	
 	try{
+		
 		$sql = "SELECT SituaId
 				FROM Situacao
 			    WHERE SituaChave = '". $sStatus."'";

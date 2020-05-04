@@ -240,7 +240,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>					
 
 							<div class="card-body">
-								A relação abaixo faz referência às ordens de compra da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b>
+								A relação abaixo faz referência às ordens de compra da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
 								<div class="text-right"><a href="ordemcompraNovo.php" class="btn btn-success" role="button">Nova Ordem de Compra</a></div>
 							</div>
 							

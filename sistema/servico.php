@@ -224,7 +224,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos serviços da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência aos serviços da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right">
 									<a href="servicoNovo.php" class="btn btn-success" role="button">Novo Serviço</a>
 									<a href="#" style="float:right; margin-left: 5px;" onclick="atualizaServico(0, '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Serviços"><i class="icon-drawer-out"></i></a>

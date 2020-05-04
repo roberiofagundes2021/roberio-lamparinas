@@ -6,12 +6,12 @@ $_SESSION['PaginaAtual'] = 'Marca';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT MarcaId, MarcaNome, MarcaStatus, SituaNome, SituaCor, SituaChave
-		 FROM Marca
-		 JOIN Situacao on SituaId = MarcaStatus
-	     WHERE MarcaEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY MarcaNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT MarcaId, MarcaNome, MarcaStatus, SituaNome, SituaCor, SituaChave
+		FROM Marca
+		JOIN Situacao on SituaId = MarcaStatus
+	    WHERE MarcaUnidade = ". $_SESSION['UnidadeId'] ."
+		ORDER BY MarcaNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -148,7 +148,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência às marcas da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência às marcas da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="marcaNovo.php" class="btn btn-success" role="button">Nova Marca</a></div>
 							</div>
 							

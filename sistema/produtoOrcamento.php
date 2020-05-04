@@ -12,7 +12,7 @@ $sql = "SELECT PrOrcNome, CategNome, SbCatNome, PrOrcUnidadeMedida, PrOrcSituaca
 		JOIN Categoria on CategId = PrOrcCategoria
 		LEFT JOIN SubCategoria on SbCatId = PrOrcSubcategoria
 		JOIN Situacao on SituaId = PrOrcSituacao
-	    WHERE PrOrcEmpresa = ". $_SESSION['EmpreId'] ."
+	    WHERE PrOrcUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY PrOrcNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -37,9 +37,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>	
-			
-	</script>
+	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 
 	<script type="text/javascript">
 
@@ -158,7 +156,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos produtos para orçamento da empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b></p>
+								<p class="font-size-lg">A relação abaixo faz referência aos produtos para orçamento da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="produtoOrcamentoNovo.php" class="btn btn-success" role="button">Novo Produto</a></div>
 							</div>
 							
