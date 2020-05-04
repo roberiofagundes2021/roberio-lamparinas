@@ -25,8 +25,6 @@ if (isset($_POST['inputUsuarioId'])) {
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 
-		$perfilAlmo = '';;
-
 		$sql = "SELECT PerfiChave
 				 FROM Perfil
 				 JOIN Situacao on SituaId = PerfiStatus															     
@@ -519,7 +517,7 @@ include_once("topo.php");
 										<div class="form-group">
 											<label for="cmbLocalEstoque">Local de Estoque</label>
 											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
-												<option value="#">Sem setor</option>
+												<option value="#">Sem Local de Estoque</option>
 												<?php
 												$sql = "SELECT LcEstId, LcEstNome
 																 FROM LocalEstoque

@@ -53,16 +53,7 @@ if ($count) {
 			$total = $_POST['quantidade'] * $row['ProduCustoFinal'];
 		}
 
-		$output = 	'<tr id="row' . $_POST['numItens'] . '">
-								 <td>' . $_POST['numItens'] . '</td>
-								 <td title="' . $row['ProduDetalhamento'] . '">' . $row['ProduNome'] . '</td>
-								 <td>' . $row['UnMedSigla'] . '</td>
-								 <td>Estoque Indisponível '.$row['Estoque'] .'</td>
-								 <td>' . $valorCusto . '</td>
-								 <td>' . $valorTotal . '</td>
-								 <td><span name="remove" id="' . $_POST['numItens'] . '#' . $total . '" class="btn btn_remove">X</span></td>
-							 <tr>
-							 ';
+		$output = 	'SEMESTOQUE';
 		echo $output;
 	}
 } else {

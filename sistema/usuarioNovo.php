@@ -570,7 +570,7 @@ include_once("topo.php");
 											<div class="form-group">
 												<label for="cmbLocalEstoque">Local de Estoque</label>
 												<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
-													<option value="#">Sem setor</option>
+													<option value="#">Local de Estoque</option>
 												</select>
 											</div>
 										</div>

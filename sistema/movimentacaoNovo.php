@@ -443,7 +443,6 @@ if (isset($_POST['inputData'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		
 		function produtosOrdemCompra(ordemCompra) {
 			let inputLote = $('#inputLote').val();
 			let numOrdemCompra = $('#cmbOrdemCompra').val()
@@ -786,14 +785,9 @@ if (isset($_POST['inputData'])) {
 						targets: [6]
 					},
 					{
-						orderable: false, //Classificacao
-						width: "10%",
-						targets: [7]
-					},
-					{
 						orderable: false, //Ações
 						width: "5%",
-						targets: [8]
+						targets: [6]
 					}
 				],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -1188,29 +1182,33 @@ if (isset($_POST['inputData'])) {
 
 							//var newRow = $("<tr>");
 
-							//newRow.append(resposta);	    
-							$("#tabelaProdutoServico").append(resposta);
+							//newRow.append(resposta);
+							if (resposta != 'SEMESTOQUE') {
+								$("#tabelaProdutoServico").append(resposta);
 
-							//Adiciona mais um item nessa contagem
-							$('#inputNumItens').val(resNumItens);
-							$('#cmbProduto').val("#").change();
-							$('#inputQuantidade').val('');
-							$('#inputValorUnitario').val('');
-							$('#inputTotal').val(total);
-							$('#total').text(totalFormatado);
-							$('#inputLote').val('');
-							$('#inputValidade').val('');
+								//Adiciona mais um item nessa contagem
+								$('#inputNumItens').val(resNumItens);
+								$('#cmbProduto').val("#").change();
+								$('#inputQuantidade').val('');
+								$('#inputValorUnitario').val('');
+								$('#inputTotal').val(total);
+								$('#total').text(totalFormatado);
+								$('#inputLote').val('');
+								$('#inputValidade').val('');
 
-							$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+								$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 
-							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
+								inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
 
-							$('#inputIdProdutos').val(inputIdProdutos);
+								$('#inputIdProdutos').val(inputIdProdutos);
 
-							$('#cmbFornecedor').prop('disabled', true);
+								$('#cmbFornecedor').prop('disabled', true);
 
-							return false;
-
+								return false;
+							} else {
+								alerta('Atenção', 'Estoque indisponível!', 'error');
+								return false;
+							}
 						}
 					})
 
@@ -1229,29 +1227,33 @@ if (isset($_POST['inputData'])) {
 							//console.log(resposta)
 
 							//var newRow = $("<tr>");
+							if (resposta != 'SEMESTOQUE') {
+								//newRow.append(resposta);	    
+								$("#tabelaProdutoServico").append(resposta);
 
-							//newRow.append(resposta);	    
-							$("#tabelaProdutoServico").append(resposta);
+								//Adiciona mais um item nessa contagem
+								$('#inputNumItens').val(resNumItens);
+								$('#cmbProduto').val("#").change();
+								$('#inputQuantidade').val('');
+								$('#inputValorUnitario').val('');
+								$('#inputTotal').val(total);
+								$('#total').text(totalFormatado);
+								$('#inputLote').val('');
+								$('#inputValidade').val('');
 
-							//Adiciona mais um item nessa contagem
-							$('#inputNumItens').val(resNumItens);
-							$('#cmbProduto').val("#").change();
-							$('#inputQuantidade').val('');
-							$('#inputValorUnitario').val('');
-							$('#inputTotal').val(total);
-							$('#total').text(totalFormatado);
-							$('#inputLote').val('');
-							$('#inputValidade').val('');
+								$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 
-							$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+								inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
 
-							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
+								$('#inputIdProdutos').val(inputIdProdutos);
 
-							$('#inputIdProdutos').val(inputIdProdutos);
+								$('#cmbFornecedor').prop('disabled', true);
 
-							$('#cmbFornecedor').prop('disabled', true);
-
-							return false;
+								return false;
+							} else {
+								alerta('Atenção', 'Estoque indisponível!', 'error');
+								return false;
+							}
 
 						}
 					})
@@ -1446,7 +1448,7 @@ if (isset($_POST['inputData'])) {
 				$('#cmbFornecedor').prop('disabled', false);
 				$('#cmbSituacao').prop('disabled', false);
 
-				if (inputTipo == 'S') {
+				if (inputTipo == 'S' && $('input[name="inputTipo"]:checked').attr('saidaSolicitacao')) {
 					const submitProduto = {}
 					$('.inputProdutoServicoClasse').each((i, elem) => {
 						let nomeInput = $(elem).attr('name')
@@ -1504,7 +1506,7 @@ if (isset($_POST['inputData'])) {
 				}
 
 				//$("#formMovimentacao").submit();
-				console.log('teste 2')
+				console.log(inputTipo)
 			});
 
 			//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
@@ -1751,7 +1753,7 @@ if (isset($_POST['inputData'])) {
 										</div>
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" name="inputTipo" value="S" class="form-input-styled" onclick="selecionaTipo('S')" <?php if (isset($_POST['inputSolicitacaoId'])) echo 'checked' ?> data-fouc>
+												<input type="radio" name="inputTipo" value="S" class="form-input-styled" onclick="selecionaTipo('S')" <?php if (isset($_POST['inputSolicitacaoId'])) echo 'checked' ?> <?php if (isset($_POST['inputSolicitacaoId'])) echo 'saidaSolicitacao="true"' ?> data-fouc>
 												Saída
 											</label>
 										</div>
@@ -1805,16 +1807,46 @@ if (isset($_POST['inputData'])) {
 												<select id="cmbEstoqueOrigem" name="cmbEstoqueOrigem" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
-													$sql = "SELECT LcEstId, LcEstNome
+
+													if (isset($_POST['inputSolicitacaoId'])) {
+														$sql = "SELECT EXUXPLocalEstoque, SetorNome
+																 FROM EmpresaXUsuarioXPerfil
+																 JOIN Setor on SetorId = EXUXPSetor
+																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPEmpresa = " . $_SESSION['EmpreId'] . "
+															    ";
+														$result = $conn->query($sql);
+														$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
+
+														$sql = "SELECT LcEstId, LcEstNome
 															FROM LocalEstoque
 															JOIN Situacao on SituaId = LcEstStatus
 															WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 															ORDER BY LcEstNome ASC";
-													$result = $conn->query($sql);
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($row as $item) {
-														print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+
+
+														foreach ($row as $item) {
+															if ($item['LcEstId'] == $usuarioPerfil['EXUXPLocalEstoque']) {
+																print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
+															} else {
+																print('<option value="' . $item['LcEstId'] . '" "' . $usuarioPerfil['EXUXPLocalEstoque'] . '">' . $item['LcEstNome'] . '</option>');
+															}
+														}
+													} else {
+
+														$sql = "SELECT LcEstId, LcEstNome
+															FROM LocalEstoque
+															JOIN Situacao on SituaId = LcEstStatus
+															WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															ORDER BY LcEstNome ASC";
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($row as $item) {
+															print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+														}
 													}
 													?>
 												</select>
@@ -1843,6 +1875,7 @@ if (isset($_POST['inputData'])) {
 													foreach ($row as $item) {
 														print('<option value="' . $item['Id'] . '#' . $item['Nome'] . '#' . $item['Referencia'] . '">' . $item['Nome'] . '</option>');
 													}
+
 													?>
 												</select>
 											</div>
@@ -2071,17 +2104,17 @@ if (isset($_POST['inputData'])) {
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
-														$sql = "SELECT CategId, CategNome
+													$sql = "SELECT CategId, CategNome
 																FROM Categoria
 																JOIN Situacao on SituaId = CategStatus
 																WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 																ORDER BY CategNome ASC";
-														$result = $conn->query($sql);
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-														foreach ($row as $item) {
-															print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
-														}
+													foreach ($row as $item) {
+														print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
+													}
 
 													?>
 												</select>
@@ -2213,13 +2246,11 @@ if (isset($_POST['inputData'])) {
 												<th id="quantEditaEntradaSaida">Quant. Recebida</th>
 												<th>Valor Unitário</th>
 												<th style="text-align:center">Valor Total</th>
-												<?php if (isset($_POST['inputSolicitacaoId'])) print('<th style="text-align:center">Classificação</th>') ?>
 												<th class="text-center">Ações</th>
 											</tr>
 										</thead>
 										<tbody>
 											<tr style="display:none;">
-												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
@@ -2252,14 +2283,14 @@ if (isset($_POST['inputData'])) {
 															        <td>" . $produto['SlXPrQuantidade'] . "</td>
 																	<td valorUntPrSolici='" . $produto['ProduValorVenda'] . "'>" . $valorCusto . "</td>
 																	<td>" . $valorTotal . "</td>
-																	<td>" . $valorTotal . "</td>
 															   
 														";
 
 													$linha .= '
 																<td>
-																    <select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
-																       <option value="#">Selecione</option>
+																    <div class="d-flex flex-row ">
+																        <select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
+																            <option value="#">Selecione</option>
 													    ';
 
 													$sql = "SELECT ClassId, ClassNome
@@ -2267,20 +2298,21 @@ if (isset($_POST['inputData'])) {
 														JOIN Situacao on SituaId = ClassStatus
 														WHERE SituaChave = 'ATIVO'
 														ORDER BY ClassNome ASC";
-												    $result = $conn->query($sql);
-												    $rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+													$result = $conn->query($sql);
+													$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
-												    foreach ($rowClassificacao as $item) {
-												    	$linha .= '<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>';
+													foreach ($rowClassificacao as $item) {
+														$linha .= '<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>';
 													}
-													
+
 													$linha .= "
-														            </select>
+																	    </select>
+																	    <span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span>
+																	</div>
 																</td>
-																<td><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
 															</tr>
 														";
-														
+
 													print($linha);
 												}
 											}
