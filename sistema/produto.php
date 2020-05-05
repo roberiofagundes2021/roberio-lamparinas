@@ -15,7 +15,7 @@ $sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, ProduValor
 		JOIN Categoria on CategId = ProduCategoria
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 		JOIN Situacao on SituaId = ProduStatus
-	    WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . "
+	    WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . "
 		ORDER BY ProduCodigo ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

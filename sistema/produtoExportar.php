@@ -21,7 +21,7 @@ $sql = "SELECT ProduCodigo, ProduCodigoBarras, ProduNome, CategNome, SbCatNome, 
 		LEFT JOIN Ncm on NcmId = ProduNcmFiscal
 		LEFT JOIN OrigemFiscal on OrFisId = ProduOrigemFiscal
 		LEFT JOIN Situacao on SituaId = ProduStatus
-		WHERE ProduEmpresa = ".$_SESSION['EmpreId']."
+		WHERE ProduUnidade = ".$_SESSION['UnidadeId']."
 		ORDER BY ProduNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

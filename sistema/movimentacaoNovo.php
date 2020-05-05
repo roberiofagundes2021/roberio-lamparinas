@@ -727,17 +727,17 @@ if (isset($_POST['inputData'])) {
 					},
 					{
 						orderable: true, //Produto/Servico
-						width: "20%",
+						width: "25%",
 						targets: [1]
 					},
 					{
 						orderable: true, //Unidade Medida
-						width: "10%",
+						width: "12%",
 						targets: [2]
 					},
 					{
 						orderable: true, //Quantidade
-						width: "15%",
+						width: "10%",
 						targets: [3]
 					},
 					{
@@ -751,18 +751,18 @@ if (isset($_POST['inputData'])) {
 						targets: [5]
 					},
 					{
-						orderable: false, //Valor Total
-						width: "5%",
+						orderable: true, //Valor Total
+						width: "10%",
 						targets: [6]
 					},
 					{
 						orderable: false, //Classificação
-						width: "15%",
+						width: "13%",
 						targets: [7]
 					},
 					{
 						orderable: false, //Ações
-						width: "10%",
+						width: "5%",
 						targets: [8]
 					}
 				],
@@ -779,6 +779,23 @@ if (isset($_POST['inputData'])) {
 					}
 				}
 			});
+
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
 
 			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
@@ -2216,16 +2233,18 @@ if (isset($_POST['inputData'])) {
 											<tr class="bg-slate">
 												<th>Item</th>
 												<th>Produto/Serviço</th>
-												<th>Unidade Medida</th>
-												<th id="quantEditaEntradaSaida">Quant. Recebida</th>
-												<th>Valor Unitário</th>
-												<th style="text-align:center">Valor Total</th>
+												<th style="text-align:center">Unidade Medida</th>
+												<th id="quantEditaEntradaSaida" style="text-align:center">Quant. Recebida</th>
+												<th style="text-align:center">Saldo</th>
+												<th style="text-align:right">Valor Unitário</th>
+												<th style="text-align:right">Valor Total</th>
 												<th style="text-align:center">Classificação</th>
 												<th class="text-center">Ações</th>
 											</tr>
 										</thead>
 										<tbody>
 											<tr style="display:none;">
+												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
@@ -2255,15 +2274,16 @@ if (isset($_POST['inputData'])) {
 															   <tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
 															        <td>" . $idProdutoSolicitacao . "</td>
 															        <td>" . $produto['ProduNome'] . "</td>
-															        <td>" . $produto['UnMedNome'] . "</td>
-															        <td>" . $produto['SlXPrQuantidade'] . "</td>
-																	<td valorUntPrSolici='" . $produto['ProduValorVenda'] . "'>" . $valorCusto . "</td>
-																	<td>" . $valorTotal . "</td>
+															        <td style='text-align:center'>" . $produto['UnMedNome'] . "</td>
+																	<td style='text-align:center'>" . $produto['SlXPrQuantidade'] . "</td>
+																	<td style='text-align:center'>0</td>
+																	<td valorUntPrSolici='" . $produto['ProduValorVenda'] . "' style='text-align:right'>" . $valorCusto . "</td>
+																	<td style='text-align:right'>" . $valorTotal . "</td>
 															   
 														";
 
 													$linha .= '
-																<td>
+																<td style="text-align:center">
 																    <div class="d-flex flex-row ">
 																        <select id="' . $idProdutoSolicitacao . '" name="cmbClassificacao" class="form-control form-control-select2 selectClassific">
 																            <option value="#">Selecione</option>
@@ -2285,7 +2305,7 @@ if (isset($_POST['inputData'])) {
 																	    </select>
 																	</div>
 																</td>
-																<td><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
+																<td style='text-align:center;'><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
 															</tr>
 														";
 
@@ -2296,22 +2316,25 @@ if (isset($_POST['inputData'])) {
 										</tbody>
 										<tfoot>
 											<tr>
-												<th id="totalTitulo" colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$) Nota Fiscal: </th>
+												<th id="totalTitulo" colspan="6" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$) Nota Fiscal: </th>
 												<?php
 												if (isset($_POST['inputSolicitacaoId'])) {
 													print('
-														    <th colspan="2">
-														        <div id="total" style="text-align:left; font-size: 15px; font-weight:bold;">' . formataMoeda($totalGeral) . '</div>
+														    <th colspan="1">
+														        <div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">' . formataMoeda($totalGeral) . '</div>
 													        </th>
 														    ');
 												} else {
 													print('
-														    <th colspan="2">
-														        <div id="total" style="text-align:left; font-size: 15px; font-weight:bold;">R$ 0,00</div>
+														    <th colspan="1">
+														        <div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0,00</div>
 													        </th>
 														');
-												}
+												}												
 												?>
+												<th colspan="2">
+												    
+												</th>
 											</tr>
 										</tfoot>
 									</table>

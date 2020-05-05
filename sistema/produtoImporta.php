@@ -111,7 +111,7 @@ else {
 			
 			$sql = "SELECT ProduId
 					FROM Produto
-					WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCodigoBarras = '".$codigo."'";
+					WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and ProduCodigoBarras = '".$codigo."'";
 			$result = $conn->query($sql);
 			$row = $result->fetch(PDO::FETCH_ASSOC);
 			//$count = count($row);
@@ -119,7 +119,7 @@ else {
 			if ($row){
 
 				$sql = "UPDATE Produto SET ProduNome = :sNome, ProduDetalhamento = :sDetalhamento, ProduUsuarioAtualizador = :iUsuarioAtualizador
-						WHERE ProduCodigoBarras = :sCodigoBarras and ProduEmpresa = :iEmpresa";
+						WHERE ProduCodigoBarras = :sCodigoBarras and ProduUnidade = :iUnidade";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
@@ -127,7 +127,7 @@ else {
 								':sDetalhamento' => $detalhamento,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 								':sCodigoBarras' => $codigo,
-								':iEmpresa' => $_SESSION['EmpreId']
+								':iUnidade' => $_SESSION['UnidadeId']
 								));
 
 				$produtosimportados .= $nome.', ';
@@ -144,7 +144,7 @@ else {
 				
 				$sql = "SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
 						FROM Produto
-						Where ProduEmpresa = ".$_SESSION['EmpreId']."";
+						Where ProduUnidade = ".$_SESSION['UnidadeId']."";
 				//echo $sql;die;
 				$result = $conn->query("$sql");
 				$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
@@ -156,11 +156,11 @@ else {
 											 ProduValorCusto, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
 											 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduFabricante, ProduUnidadeMedida, 
 											 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
-											 ProduUsuarioAtualizador, ProduEmpresa) 
+											 ProduUsuarioAtualizador, ProduUnidade) 
 						VALUES (:sCodigo, :sCodigoBarras, :sNome, :iCategoria, :iSubCategoria, :sDetalhamento, :sFoto, :fValorCusto, 
 								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo,
 								:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
-								:iUsuarioAtualizador, :iEmpresa);";
+								:iUsuarioAtualizador, :iUnidade);";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
@@ -187,7 +187,7 @@ else {
 								':iCest' => null,
 								':bStatus' => 1,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iEmpresa' => $_SESSION['EmpreId']
+								':iUnidade' => $_SESSION['UnidadeId']
 								));
 				 	    
 				$produtosimportados.= $nome.', ';

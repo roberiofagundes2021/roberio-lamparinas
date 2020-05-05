@@ -11,7 +11,7 @@ if(isset($_POST['inputNome'])){
 	try{		
 		$sql = "SELECT COUNT(isnull(ServiCodigo,0)) as Codigo
 				FROM Servico
-				Where ServiEmpresa = ".$_SESSION['EmpreId']."";
+				Where ServiUnidade = ".$_SESSION['UnidadeId']."";
 		//echo $sql;die;
 		$result = $conn->query("$sql");
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
@@ -27,10 +27,10 @@ if(isset($_POST['inputNome'])){
 		$sql = "INSERT INTO Servico (ServiCodigo, ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, ServiValorCusto, 
 									 ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda, 
 									 ServiMarca, ServiModelo, ServiNumSerie, ServiFabricante, ServiStatus, 
-									 ServiUsuarioAtualizador, ServiEmpresa) 
+									 ServiUsuarioAtualizador, ServiUnidade) 
 				VALUES (:sCodigo, :sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :fValorCusto, 
 						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iMarca, :iModelo, :sNumSerie, 
-						:iFabricante, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+						:iFabricante, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -50,7 +50,7 @@ if(isset($_POST['inputNome'])){
 						':iFabricante' => $_POST['cmbFabricante'] == '#' ? null : $_POST['cmbFabricante'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -334,7 +334,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT CategId, CategNome
 																FROM Categoria
 																JOIN Situacao on SituaId = CategStatus
-																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY CategNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -423,7 +423,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT MarcaId, MarcaNome
 																FROM Marca
 																JOIN Situacao on SituaId = MarcaStatus
-																WHERE MarcaEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE MarcaUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY MarcaNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -446,7 +446,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT ModelId, ModelNome
 																FROM Modelo
 																JOIN Situacao on SituaId = ModelStatus
-																WHERE ModelEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY ModelNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -469,7 +469,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT FabriId, FabriNome
 																FROM Fabricante
 																JOIN Situacao on SituaId = FabriStatus
-																WHERE FabriEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY FabriNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);

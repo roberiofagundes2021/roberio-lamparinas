@@ -541,7 +541,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT CategId, CategNome
 																FROM Categoria
 																JOIN Situacao on SituaId = CategStatus
-																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY CategNome ASC";
 														$result = $conn->query($sql);
 														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -565,7 +565,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT SbCatId, SbCatNome
 																FROM SubCategoria
 																JOIN Situacao on SituaId = SbCatStatus
-																WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY SbCatNome ASC";
 														$result = $conn->query($sql);
 														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -647,7 +647,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT MarcaId, MarcaNome
 																FROM Marca
 																JOIN Situacao on SituaId = MarcaStatus
-																WHERE MarcaEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE MarcaUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY MarcaNome ASC";
 														$result = $conn->query($sql);
 														$rowMarca = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -671,7 +671,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT ModelId, ModelNome
 																FROM Modelo
 																JOIN Situacao on SituaId = ModelStatus
-																WHERE ModelEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY ModelNome ASC";
 														$result = $conn->query($sql);
 														$rowModelo = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -695,7 +695,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT FabriId, FabriNome
 																FROM Fabricante
 																JOIN Situacao on SituaId = FabriStatus
-																WHERE FabriEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY FabriNome ASC";
 														$result = $conn->query($sql);
 														$rowFabricante = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -728,7 +728,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
 																FROM UnidadeMedida
 																JOIN Situacao on SituaId = UnMedStatus
-																WHERE UnMedEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
+																WHERE UnMedUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
 																ORDER BY UnMedNome ASC";
 														$result = $conn->query($sql);
 														$rowUnidadeMedida = $result->fetchAll(PDO::FETCH_ASSOC);

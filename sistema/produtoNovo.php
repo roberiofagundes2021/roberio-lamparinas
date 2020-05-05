@@ -11,7 +11,7 @@ if(isset($_POST['inputNome'])){
 	try{		
 		$sql = "SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
 				FROM Produto
-				Where ProduEmpresa = ".$_SESSION['EmpreId']."";
+				Where ProduUnidade = ".$_SESSION['UnidadeId']."";
 		//echo $sql;die;
 		$result = $conn->query("$sql");
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
@@ -28,11 +28,11 @@ if(isset($_POST['inputNome'])){
 									 ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
 									 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduFabricante, ProduUnidadeMedida, 
 									 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
-									 ProduUsuarioAtualizador, ProduEmpresa) 
+									 ProduUsuarioAtualizador, ProduUnidade) 
 				VALUES (:sCodigo, :sCodigoBarras, :sNome, :sDetalhamento, :sFoto, :iCategoria, :iSubCategoria, :fValorCusto, 
 						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo, 
 						:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
-						:iUsuarioAtualizador, :iEmpresa)";
+						:iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -59,7 +59,7 @@ if(isset($_POST['inputNome'])){
 						':iCest' => $_POST['inputCest'] == '' ? null : $_POST['inputCest'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -320,19 +320,6 @@ if(isset($_POST['inputNome'])){
 				
 				e.preventDefault();
 				
-				/*
-				var inputNome = $('#inputNome').val();
-				
-				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe o nome do produto!','error');
-					$('#inputNome').focus();
-					return false;
-				}*/
-				
 				$( "#formProduto" ).submit();
 				
 			}); // enviar
@@ -454,7 +441,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT CategId, CategNome
 																FROM Categoria
 																JOIN Situacao on SituaId = CategStatus
-																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY CategNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -544,7 +531,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT MarcaId, MarcaNome
 																FROM Marca															
 																JOIN Situacao on SituaId = MarcaStatus
-																WHERE MarcaEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE MarcaUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY MarcaNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -567,7 +554,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT ModelId, ModelNome
 																FROM Modelo
 																JOIN Situacao on SituaId = ModelStatus
-																WHERE ModelEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY ModelNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -590,7 +577,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT FabriId, FabriNome
 																FROM Fabricante
 																JOIN Situacao on SituaId = FabriStatus
-																WHERE FabriEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY FabriNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -622,7 +609,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
 																FROM UnidadeMedida
 																JOIN Situacao on SituaId = UnMedStatus
-																WHERE UnMedEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
+																WHERE UnMedUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
 																ORDER BY UnMedNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);

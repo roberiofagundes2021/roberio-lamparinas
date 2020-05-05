@@ -8,11 +8,11 @@ use Mpdf\Mpdf;
 
 require_once 'global_assets/php/vendor/autoload.php';
 
-$sql = ("SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreStatus, dbo.fnLicencaVencimento(EmpreId) as Licenca
-		 FROM Empresa
-		 LEFT JOIN Licenca on LicenEmpresa = EmpreId
-		 ORDER BY EmpreNomeFantasia ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreStatus, dbo.fnLicencaVencimento(EmpreId) as Licenca
+		FROM Empresa
+		LEFT JOIN Licenca on LicenEmpresa = EmpreId
+		ORDER BY EmpreNomeFantasia ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 try {

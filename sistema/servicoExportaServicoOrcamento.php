@@ -9,7 +9,7 @@ $_SESSION['msg'] = array();
 if (isset($_POST['inputServicoId'])) {
     $sql = "SELECT ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, ServiStatus
             FROM Servico
-            WHERE ServiId = " . $_POST['inputServicoId'] . " and ServiEmpresa = " . $_SESSION['EmpreId'] . "
+            WHERE ServiId = " . $_POST['inputServicoId'] . " and ServiUnidade = " . $_SESSION['UnidadeId'] . "
            ";
     $result = $conn->query($sql);
     $servico = $result->fetch(PDO::FETCH_ASSOC);

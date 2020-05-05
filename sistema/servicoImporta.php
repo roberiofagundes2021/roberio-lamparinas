@@ -117,14 +117,14 @@ else {
 			if ($row){
 
 				$sql = "UPDATE Servico SET ServiDetalhamento = :sDetalhamento, ServiUsuarioAtualizador = :iUsuarioAtualizador
-						WHERE ServiNome = :sNome and ServiEmpresa = :iEmpresa";
+						WHERE ServiNome = :sNome and ServiUnidade = :iUnidade";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
 								':sNome' => $nome,
 								':sDetalhamento' => $detalhamento,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iEmpresa' => $_SESSION['EmpreId']
+								':iUnidade' => $_SESSION['UnidadeId']
 								));
 
 				$servicosimportados .= $nome.', ';
@@ -151,11 +151,11 @@ else {
 				
 				$sql = "INSERT INTO Servico (ServiCodigo, ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, 
 											 ServiValorCusto, ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda, 
-											 ServiFabricante, ServiMarca, ServiModelo, ServiNumSerie, ServiStatus, ServiEmpresa,
+											 ServiFabricante, ServiMarca, ServiModelo, ServiNumSerie, ServiStatus, ServiUnidade,
 											 ServiUsuarioAtualizador) 
 						VALUES (:sCodigo, :sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :fValorCusto, 
 								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iFabricante, :iMarca, 
-								:iModelo, :sNumSerie, :bStatus, :iEmpresa, :iUsuarioAtualizador);";
+								:iModelo, :sNumSerie, :bStatus, :iUnidade, :iUsuarioAtualizador);";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
@@ -174,7 +174,7 @@ else {
 								':iModelo' => null,
 								':sNumSerie' => null,
 								':bStatus' => 1,
-								':iEmpresa' => $_SESSION['EmpreId'],								
+								':iUnidade' => $_SESSION['UnidadeId'],								
 								':iUsuarioAtualizador' => $_SESSION['UsuarId']
 								));
 				 	    

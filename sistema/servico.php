@@ -10,7 +10,7 @@ $sql = "SELECT ServiId, ServiCodigo, ServiNome, CategNome, SbCatNome, ServiValor
 		JOIN Categoria on CategId = ServiCategoria
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 		JOIN Situacao on SituaId = ServiStatus
-	    WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ."
+	    WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY ServiNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
