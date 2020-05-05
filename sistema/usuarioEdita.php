@@ -16,27 +16,6 @@ if (isset($_POST['inputUsuarioId'])) {
 
 	$iUsuario = $_POST['inputUsuarioId'];
 
-<<<<<<< HEAD
-	try {
-
-		$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, EXUXPPerfil, EXUXPUnidade, EXUXPSetor, EXUXPLocalEstoque
-				FROM Usuario
-				JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
-				WHERE UsuarId = $iUsuario and EXUXPEmpresa = $EmpresaId ";
-		$result = $conn->query("$sql");
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-
-		$sql = "SELECT PerfiChave
-				 FROM Perfil
-				 JOIN Situacao on SituaId = PerfiStatus															     
-				 WHERE SituaChave = 'ATIVO' and PerfiId = " . $row['EXUXPPerfil'] . "
-				 ORDER BY PerfiNome ASC";
-		$result = $conn->query($sql);
-		$rowPerf = $result->fetch(PDO::FETCH_ASSOC);
-	} catch (PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
-	}
-=======
 	$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, EXUXPPerfil, EXUXPUnidade, EXUXPSetor, EXUXPLocalEstoque
 			FROM Usuario
 			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
@@ -51,7 +30,6 @@ if (isset($_POST['inputUsuarioId'])) {
 				ORDER BY PerfiNome ASC";
 	$result = $conn->query($sql);
 	$rowPerf = $result->fetch(PDO::FETCH_ASSOC);
->>>>>>> 6b15fd5a90a528a7b90a9efb58073dc83ebb792d
 
 	$_SESSION['msg'] = array();
 }

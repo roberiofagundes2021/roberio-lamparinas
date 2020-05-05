@@ -10,16 +10,15 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstUnidade, LcEstStatus, LcEstUsuarioAtualizador, LcEstEmpresa)
-				VALUES (:sNome, :sUnidade, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstUnidade, LcEstStatus, LcEstUsuarioAtualizador)
+				VALUES (:sNome, :iUnidade, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
-						':sUnidade' => $_POST['cmbUnidade'],
+						':iUnidade' => $_SESSION['UnidadeId'],
 						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -55,7 +54,12 @@ if(isset($_POST['inputNome'])){
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<!-- /theme JS files -->	
+	<!-- /theme JS files -->
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 
 	<script type="text/javascript" >
 
@@ -67,7 +71,6 @@ if(isset($_POST['inputNome'])){
 				e.preventDefault();
 				
 				var inputNome  = $('#inputNome').val();
-				var cmbUnidade = $('#cmbUnidade').val();
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
@@ -78,20 +81,6 @@ if(isset($_POST['inputNome'])){
 					$('#inputNome').focus();
 					return false;
 				}
-				
-				//Verifica se o campo só possui espaços em branco
-				/*if (inputNome == ''){
-					alerta('Atenção','Informe o local do estoque!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-
-				//Verifica se o campo só possui espaços em branco
-				if (cmbUnidade == '#'){
-					alerta('Atenção','Informe a unidade!','error');
-					$('#cmbUnidade').focus();
-					return false;
-				}*/
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -111,10 +100,7 @@ if(isset($_POST['inputNome'])){
 			})
 		})
 	</script>
-	<script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 </head>
 
 <body class="navbar-top">
@@ -144,32 +130,12 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-6">
+								<div class="col-lg-12">
 									<div class="form-group">
 										<label for="inputNome">Local do Estoque</label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local do Estoque" required autofocus>
 									</div>
-								</div>
-
-								<div class="col-lg-6">
-									<label for="cmbUnidade">Unidade</label>
-									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
-										<option value="">Selecione</option>
-										<?php 
-											$sql = ("SELECT UnidaId, UnidaNome
-													 FROM Unidade
-													 WHERE UnidaStatus = 1 and UnidaEmpresa = ".$_SESSION['EmpreId']."
-													 ORDER BY UnidaNome ASC");
-											$result = $conn->query("$sql");
-											$row = $result->fetchAll(PDO::FETCH_ASSOC);
-											
-											foreach ($row as $item){
-												print('<option value="'.$item['UnidaId'].'">'.$item['UnidaNome'].'</option>');
-											}
-										
-										?>
-									</select>
-								</div>						
+								</div>			
 							</div>
 															
 							<div class="row" style="margin-top: 10px;">

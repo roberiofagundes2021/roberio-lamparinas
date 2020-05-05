@@ -9,19 +9,13 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputLocalEstoqueId'])){
 	
 	$iLocalEstoque = $_POST['inputLocalEstoqueId'];
-        	
-	try{
-		
-		$sql = "SELECT LcEstId, LcEstNome, LcEstUnidade
-				FROM LocalEstoque
-				WHERE LcEstId = $iLocalEstoque ";
-		$result = $conn->query("$sql");
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-		
-	} catch(PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
-	}
-	
+        			
+	$sql = "SELECT LcEstId, LcEstNome, LcEstUnidade
+			FROM LocalEstoque
+			WHERE LcEstId = $iLocalEstoque ";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+			
 	$_SESSION['msg'] = array();
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
@@ -32,13 +26,12 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstUnidade = :iUnidade, LcEstUsuarioAtualizador = :iUsuarioAtualizador
+		$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE LcEstId = :iLocalEstoque";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
-						':iUnidade' => $_POST['cmbUnidade'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iLocalEstoque' => $_POST['inputLocalEstoqueId']
 						));
@@ -76,7 +69,12 @@ if(isset($_POST['inputNome'])){
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
-	<!-- /theme JS files -->	
+	<!-- /theme JS files -->
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	
 	<script type="text/javascript" >
 
@@ -101,20 +99,6 @@ if(isset($_POST['inputNome'])){
 					return false;
 				}
 				
-				//Verifica se o campo só possui espaços em branco
-				/*if (inputNomeNovo == ''){
-					alerta('Atenção','Informe o local do estoque!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-
-				//Verifica se o campo só possui espaços em branco
-				if (cmbUnidade == '#'){
-					alerta('Atenção','Informe a unidade!','error');
-					$('#cmbUnidade').focus();
-					return false;
-				}*/
-				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
@@ -133,10 +117,7 @@ if(isset($_POST['inputNome'])){
 			})
 		})
 	</script>	
-    <script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 </head>
 
 <body class="navbar-top">
@@ -169,32 +150,12 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-6">
+								<div class="col-lg-12">
 									<div class="form-group">
 										<label for="inputNome">Local do Estoque</label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local do Estoque" value="<?php echo $row['LcEstNome']; ?>" required autofocus>
 									</div>
 								</div>
-								<div class="col-lg-6">
-									<label for="cmbUnidade">Unidade</label>
-									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
-										<option value="">Selecione</option>
-										<?php 
-											$sql = ("SELECT UnidaId, UnidaNome
-													 FROM Unidade
-													 WHERE UnidaStatus = 1 and UnidaEmpresa = ".$_SESSION['EmpreId']."
-													 ORDER BY UnidaNome ASC");
-											$result = $conn->query("$sql");
-											$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
-											
-											foreach ($rowUnidade as $item){
-												$seleciona = $item['UnidaId'] == $row['LcEstUnidade'] ? "selected" : "";
-												print('<option value="'.$item['UnidaId'].'" '. $seleciona .'>'.$item['UnidaNome'].'</option>');
-											}
-										
-										?>
-									</select>
-								</div>								
 							</div>
 								
 							<div class="row" style="margin-top: 10px;">

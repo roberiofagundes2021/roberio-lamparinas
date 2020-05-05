@@ -6,13 +6,12 @@ $_SESSION['PaginaAtual'] = 'Local do Estoque';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT LcEstId, LcEstNome, LcEstStatus, UnidaNome, SituaNome, SituaCor, SituaChave
-		 FROM LocalEstoque
-		 JOIN Unidade on UnidaId = LcEstUnidade
-		 JOIN Situacao on SituaId = LcEstStatus
-	     WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY LcEstNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, SituaNome, SituaCor, SituaChave
+		FROM LocalEstoque
+		JOIN Situacao on SituaId = LcEstStatus
+	    WHERE LcEstUnidade = ". $_SESSION['UnidadeId'] ."
+		ORDER BY LcEstNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -48,13 +47,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [
 				{
 					orderable: true,   //Local de Estoque
-					width: "40%",
+					width: "80%",
 					targets: [0]
-				},
-				{ 
-					orderable: true,   //Unidade
-					width: "40%",
-					targets: [1]
 				},
 				{ 
 					orderable: true,   //Situação
@@ -162,7 +156,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<thead>
 									<tr class="bg-slate">
 										<th>Local do Estoque</th>
-										<th>Unidade</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -177,7 +170,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('
 										<tr>
 											<td>'.$item['LcEstNome'].'</td>
-											<td>'.$item['UnidaNome'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaLocalEstoque('.$item['LcEstId'].', \''.$item['LcEstNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
