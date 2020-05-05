@@ -155,24 +155,12 @@ if (isset($_POST['inputData'])) {
 				$campoSoma = $i;
 
 				$campo = 'campo' . $i;
-				//echo intval($_POST['inputNumItens']);
 
 				//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
-				//var_dump($_POST['campo1']);
-				//var_dump($_POST['campo2']);
-				//var_dump($_POST['campo3']);
-				//var_dump($campo);
-				//var_dump($numItems);
+
 				if (isset($_POST[$campo])) {
 
 					$registro = explode('#', $_POST[$campo]);
-					//var_dump($_POST[$campo]);
-					//var_dump($registro);
-
-					//Svar_dump($_POST);
-					//var_dump($_POST);
-					//var_dump($_POST['campo2']);
-					//var_dump($_POST['campo3']);
 
 					if ($registro[0] == 'P') {
 						$sql = "INSERT INTO MovimentacaoXProduto
@@ -194,14 +182,6 @@ if (isset($_POST['inputData'])) {
 						));
 
 						$insertIdMvXPr = $conn->lastInsertId();
-						//var_dump($_POST['campo1']);
-						//var_dump($_POST['campo2']);
-						//var_dump($_POST['campo3']);
-						//var_dump($_POST['campo4']);
-						//var_dump($_POST['campo5']);
-						//var_dump($registro);
-						//var_dump($campo);
-						//var_dump($_POST['inputNumItens']);
 
 						// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
 						if (isset($registro[7])) {
@@ -209,7 +189,7 @@ if (isset($_POST['inputData'])) {
 								var_dump($registro[7]);
 
 								$quantItens = intval($registro[3]);
-								//var_dump($quantItens);
+
 								for ($i = 1; $i <= $quantItens; $i++) {
 
 
@@ -222,10 +202,9 @@ if (isset($_POST['inputData'])) {
 									$result = $conn->query($sql);
 									$patrimonios = $result->fetchAll(PDO::FETCH_ASSOC);
 									$count = count($patrimonios);
-									//var_dump($count);
+
 
 									//Caso não seja o primeiro registro na tabela para esta empresa
-									//DELETE FROM Patrimonio WHERE PatriId > 0;
 									if ($count >= 1) {
 										$ultimoPatri = $count;
 										$numeroPatri = intval($ultimoPatri) + 1;
@@ -466,7 +445,6 @@ if (isset($_POST['inputData'])) {
 
 					let todasLinhas = $('.trGrid')
 					$('#inputNumItens').val(todasLinhas.length)
-					//console.log(todasLinhas)
 
 				}
 
@@ -630,17 +608,14 @@ if (isset($_POST['inputData'])) {
 							let saldoInicial = inputHiddenProdutoServico.attr('saldoInicial')
 
 							let novosValores = recalcValores(quantInicial, novaQuantidade, saldoInicial, arrayValInput[2])
-							console.log(novosValores.quantAtualizada)
+
 							$(tr[3]).html(novosValores.quantAtualizada)
 							$(tr[4]).html(novosValores.novoSaldo)
 							$(tr[6]).html("R$ " + novosValores.valorTotal)
 							$(tr[6]).attr('valorTotalSomaGeral', novosValores.somaTotalValorGeral)
 
-
 							$('#inputNumItens').val()
 							stringVallnput = ''
-							console.log(inputHiddenProdutoServico.val())
-
 
 							// O input itemEditadoquantidade recebe como valor a ultima quantidade editata, para garantir que pelo menos uma quantidade de produtos ou serviços foi editada 
 							$('#itemEditadoquantidade').val(novaQuantidade)
@@ -687,8 +662,6 @@ if (isset($_POST['inputData'])) {
 							novoTotalGeral += parseFloat($(elem).attr('valorTotalSomaGeral'))
 
 							//$('#total').attr('valorTotalGeral', `${novoTotalGeral}`)
-
-							//console.log(novoTotalGeral)
 						}
 					}
 				})
@@ -701,8 +674,6 @@ if (isset($_POST['inputData'])) {
 			let valorTotal = $('#total').attr('valor')
 			let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial')
 
-			console.log(valorTotal)
-			console.log(valorSaldoOrdemCompra)
 			let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
 
 			if (calcSaldoAtual < 0) {
@@ -756,7 +727,7 @@ if (isset($_POST['inputData'])) {
 					},
 					{
 						orderable: true, //Produto/Servico
-						width: "5%",
+						width: "20%",
 						targets: [1]
 					},
 					{
@@ -766,7 +737,7 @@ if (isset($_POST['inputData'])) {
 					},
 					{
 						orderable: true, //Quantidade
-						width: "12%",
+						width: "15%",
 						targets: [3]
 					},
 					{
@@ -781,13 +752,18 @@ if (isset($_POST['inputData'])) {
 					},
 					{
 						orderable: false, //Valor Total
-						width: "10%",
+						width: "5%",
 						targets: [6]
 					},
 					{
+						orderable: false, //Classificação
+						width: "15%",
+						targets: [7]
+					},
+					{
 						orderable: false, //Ações
-						width: "5%",
-						targets: [6]
+						width: "10%",
+						targets: [8]
 					}
 				],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -811,17 +787,6 @@ if (isset($_POST['inputData'])) {
 				var inputNumItens = $('#inputNumItens').val();
 				var inputFornecedor = $('#inputFornecedor').val();
 				var cmbFornecedor = $('#cmbFornecedor').val();
-
-				/*if (inputNumItens > 0) {
-					alerta('Atenção', 'O fornecedor não pode ser alterado quando se tem produto(s) na lista! Exclua-o(s) primeiro ou cancele e recomece o cadastro da movimentação.', 'error');
-					$('#cmbFornecedor').val(inputFornecedor);
-					return false;
-				}*/
-				/*				
-								var element = document.getElementById("cmbFornecedor");
-								element.className = element.classList.remove("form-control-select2");
-								
-								$("#cmbFornecedor").removeClass("form-control-select2"); */
 
 				$('#inputFornecedor').val(cmbFornecedor);
 
@@ -886,7 +851,6 @@ if (isset($_POST['inputData'])) {
 
 					var option = '<option value="#">Selecione</option>';
 					if (dados) {
-						console.log(dados)
 						$('#cmbOrdemCompra').html(option).show();
 						$('#cmbOrdemCompra').append(dados).show();
 
@@ -902,12 +866,10 @@ if (isset($_POST['inputData'])) {
 				$('#cmbOrdemCompra').children().each((i, elem) => {
 					if ($(elem).val() == $('#cmbOrdemCompra').val()) {
 						ordemCompra = $(elem).attr('idOrdemCompra');
-						//console.log($('#cmbOrdemCompra').val())
 					}
 				});
 
 				if (ordemCompra) {
-					//console.log($('#cmbOrdemCompra').val())
 
 					produtosOrdemCompra(ordemCompra)
 				}
@@ -921,7 +883,6 @@ if (isset($_POST['inputData'])) {
 
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var cmbCategoria = $('#cmbCategoria').val();
-				//console.log(inputTipo)
 
 				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
 
@@ -937,7 +898,7 @@ if (isset($_POST['inputData'])) {
 					} else {
 						ResetSubCategoria();
 					}
-				});
+				})
 
 				$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria, function(dados) {
 
@@ -960,6 +921,30 @@ if (isset($_POST['inputData'])) {
 				});
 
 			});
+
+			$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
+				let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val()
+				Filtrando()
+				$.getJSON('filtraPatrimonio.php?idCategoria=' + cmbOrigem, function(dados) {
+
+					var option = '<option value="#" "selected">Selecione o Produto</option>';
+
+					if (dados.length) {
+
+						$.each(dados, function(i, obj) {
+							if (inputTipo == 'E') {
+								option += '<option value="' + obj.ProduId + '#' + obj.ProduValorCusto + '">' + obj.ProduNome + '</option>';
+							} else {
+								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
+							}
+						});
+
+						$('#cmbProduto').html(option).show();
+					} else {
+						ResetProduto();
+					}
+				});
+			})
 
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			$('#cmbSubCategoria').on('change', function(e) {
@@ -985,9 +970,7 @@ if (isset($_POST['inputData'])) {
 								$.each(dados, function(i, obj) {
 									if (inputTipo == 'E') {
 										option += '<option value="' + obj.ServiId + '#' + obj.ServiValorCusto + '">' + obj.ServiNome + '</option>';
-										console.log(obj)
 									} else {
-										console.log(obj)
 										option += '<option value="' + obj.ServiId + '#' + obj.ServiCustoFinal + '">' + obj.ServiNome + '</option>';
 									}
 
@@ -998,7 +981,7 @@ if (isset($_POST['inputData'])) {
 								ResetProduto();
 							}
 						}).fail(function(m) {
-							console.log(m);
+							//console.log(m);
 						});
 
 					} else {
@@ -1069,32 +1052,6 @@ if (isset($_POST['inputData'])) {
 					$('#cmbFornecedor').val(-1); //Selecione
 					$("select#cmbFornecedor").trigger("change"); //Simula o change do select
 				}
-
-				/*$.getJSON('movimentacaoSituacao.php', function(dados) {
-
-					var option = '<option value="#">Selecione</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							if (inputTipo == 'E') {
-								if (obj.SituaChave == 'BLOQUEADO') {
-									option += '<option value="' + obj.SituaId + '" selected>' + obj.SituaNome + '</option>';
-								} else {
-									option += '<option value="' + obj.SituaId + '">' + obj.SituaNome + '</option>';
-								}
-							} else {
-								if (obj.SituaChave == 'FINALIZADO') {
-									option += '<option value="' + obj.SituaId + '" selected>' + obj.SituaNome + '</option>';
-								} else {
-									option += '<option value="' + obj.SituaId + '">' + obj.SituaNome + '</option>';
-								}
-							}
-						});
-
-						$('#cmbSituacao').html(option).show();
-					}
-				});*/
 			});
 
 			$("input[type=radio][name=inputProdutoServico]").click(function() {
@@ -1178,7 +1135,6 @@ if (isset($_POST['inputData'])) {
 							quantidade: inputQuantidade
 						},
 						success: function(resposta) {
-							//console.log(resposta)
 
 							//var newRow = $("<tr>");
 
@@ -1224,7 +1180,6 @@ if (isset($_POST['inputData'])) {
 							quantidade: inputQuantidade
 						},
 						success: function(resposta) {
-							//console.log(resposta)
 
 							//var newRow = $("<tr>");
 							if (resposta != 'SEMESTOQUE') {
@@ -1282,8 +1237,6 @@ if (isset($_POST['inputData'])) {
 				var inputIdProdutos = $('#inputIdProdutos').val(); //array com o Id dos produtos adicionados
 				var inputNumItens = $('#inputNumItens').val();
 
-				//alert("Antes: " + inputIdProdutos);
-
 				var item = inputIdProdutos.split(",");
 
 				var i;
@@ -1298,9 +1251,6 @@ if (isset($_POST['inputData'])) {
 				arr.splice(index, 1);
 
 				$('#inputIdProdutos').val(arr);
-
-				//var teste = $('#inputIdProdutos').val();
-				//alert(teste);
 
 				$("#row" + Produto[0] + "").remove(); //remove a linha da tabela
 				$("#campo" + Produto[0] + "").remove(); //remove o campo hidden
@@ -1373,13 +1323,6 @@ if (isset($_POST['inputData'])) {
 					verificaTotalNotaFiscal()
 
 				} else if (inputTipo == 'S') {
-
-					//Verifica se a combo Finalidade foi informada
-					/*if (cmbFinalidade == '#') {
-						alerta('Atenção', 'Informe a Finalidade!', 'error');
-						$('#cmbFinalidade').focus();
-						return false;
-					}*/
 
 					//Verifica se a combo Estoque de Origem foi informada
 					if (cmbEstoqueOrigem == '#') {
@@ -1456,7 +1399,6 @@ if (isset($_POST['inputData'])) {
 						submitProduto[`${nomeInput}`] = valorInput
 
 					})
-					console.log(submitProduto)
 
 					document.getElementById('EstoqueOrigem').style.display = "block";
 					document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
@@ -1488,7 +1430,6 @@ if (isset($_POST['inputData'])) {
 					submitProduto.inputValorTotal = $('#inputValorTotal').val()
 					submitProduto.inputChaveAcesso = $('#inputChaveAcesso').val()
 					submitProduto.inputNumItens = $('#inputNumItens').val()
-					console.log($('#cmbClassificacao').val())
 
 					$.ajax({
 						type: "POST",
@@ -1496,7 +1437,6 @@ if (isset($_POST['inputData'])) {
 						data: submitProduto,
 						success: function(resposta) {
 							window.location.href = "index.php";
-							console.log(resposta)
 						}
 					})
 
@@ -1504,9 +1444,6 @@ if (isset($_POST['inputData'])) {
 				} else {
 					$("#formMovimentacao").submit();
 				}
-
-				//$("#formMovimentacao").submit();
-				console.log(inputTipo)
 			});
 
 			//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
@@ -1541,33 +1478,39 @@ if (isset($_POST['inputData'])) {
 				$('#cmbProduto').empty().append('<option>Sem produto</option>');
 			}
 
-			function classBemSaidaSolicit(valor) {
+			function classBemSaidaSolicit(valor, idSelect) {
 				let grid = $('.trGrid')
-				//console.log(grid)
+
 				grid.each((i1, elem1) => { // each sobre a grid
 					let tr = $(elem1).children() // colocando todas as linhas em um 
 
 					let td = tr.first()
 					let indiceLinha = td.html()
-			
+
+					//let inputProdutoGridValores = inputHiddenProdutoServico.val()
+					if (idSelect == indiceLinha) {
+						//let arrayValInput = inputProdutoGridValores.split('#')
+						let valueProdutoServicoArray = $(`#campo${indiceLinha}`).val().split('#')
+						// adicionando  novos dados no array
+						valueProdutoServicoArray[7] = valor
 
 
+						var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
 
+						var stringVallnput = valueProdutoServicoArray.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
 
-					let inputProdutoGridValores = inputHiddenProdutoServico.val()
-					let arrayValInput = inputProdutoGridValores.split('#')
-					let inputHiddenProdutoServico = $(`#campo${indiceLinha}`)
-					// adicionando  novos dados no array
-					arrayValInput[7] = valor
-					console.log(valor)
+						$(`#campo${indiceLinha}`).val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
+
+						console.log($(`#campo${indiceLinha}`).val())
+					}
 				})
 			}
 			$('.selectClassific').each((i, elem) => {
-				//console.log('teste')
+
 				$(elem).on('change', function(e) {
 					let valor = $(elem).val()
-					classBemSaidaSolicit(valor)
-					//console.log('teste')
+					let idSelect = $(elem).attr('id')
+					classBemSaidaSolicit(valor, idSelect)
 				})
 			})
 
@@ -1716,7 +1659,6 @@ if (isset($_POST['inputData'])) {
 
 		function verifcMumero(elem) {
 			if (typeof $(elem).val() == 'string') {
-				console.log('string')
 				return false
 			}
 		}
@@ -2278,11 +2220,13 @@ if (isset($_POST['inputData'])) {
 												<th id="quantEditaEntradaSaida">Quant. Recebida</th>
 												<th>Valor Unitário</th>
 												<th style="text-align:center">Valor Total</th>
+												<th style="text-align:center">Classificação</th>
 												<th class="text-center">Ações</th>
 											</tr>
 										</thead>
 										<tbody>
 											<tr style="display:none;">
+												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
 												<td>&nbsp;</td>
@@ -2321,7 +2265,7 @@ if (isset($_POST['inputData'])) {
 													$linha .= '
 																<td>
 																    <div class="d-flex flex-row ">
-																        <select id="cmbClassificacao' . $idProdutoSolicitacao . '" name="cmbClassificacao" class="form-control form-control-select2 selectClassific">
+																        <select id="' . $idProdutoSolicitacao . '" name="cmbClassificacao" class="form-control form-control-select2 selectClassific">
 																            <option value="#">Selecione</option>
 													    ';
 
@@ -2339,9 +2283,9 @@ if (isset($_POST['inputData'])) {
 
 													$linha .= "
 																	    </select>
-																	    <span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span>
 																	</div>
 																</td>
+																<td><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
 															</tr>
 														";
 
