@@ -186,7 +186,6 @@ if (isset($_POST['inputData'])) {
 						// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
 						if (isset($registro[7])) {
 							if ($registro[7] == 2) {
-								var_dump($registro[7]);
 
 								$quantItens = intval($registro[3]);
 
@@ -793,7 +792,7 @@ if (isset($_POST['inputData'])) {
 					dropdownAutoWidth: true,
 					width: 'auto'
 				});
-			};	
+			};
 
 			_componentSelect2();
 
@@ -915,7 +914,9 @@ if (isset($_POST['inputData'])) {
 					} else {
 						ResetSubCategoria();
 					}
-				})
+				}).fail(function(m) {
+					
+				});
 
 				$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria, function(dados) {
 
@@ -961,6 +962,22 @@ if (isset($_POST['inputData'])) {
 						ResetProduto();
 					}
 				});
+			})
+
+			//Impede que o input quantidade receba letras
+			$('#inputQuantidade').on('keydown', ()=>{
+				let valor = $('#inputQuantidade').val()
+
+				if(valor == '´' || valor == '~' || valor == '`' || valor == ';'){
+					$('#inputQuantidade').val('')
+				}
+				if( event.keyCode != '8' && event.keyCode != '48' && event.keyCode != '49' && event.keyCode != '50' && event.keyCode != '51' && event.keyCode != '52' && event.keyCode != '53' && event.keyCode != '54' && event.keyCode != '55' && event.keyCode != '56' && event.keyCode != '57'  && event.keyCode != '96'  && event.keyCode != '97'  && event.keyCode != '98'  && event.keyCode != '99'  && event.keyCode != '100'  && event.keyCode != '101'  && event.keyCode != '102'  && event.keyCode != '103'  && event.keyCode != '104'  && event.keyCode != '105'  && event.keyCode != '106'  && event.keyCode != '107'){
+					return false
+				}
+
+				if(event.keyCode == '222' && event.keyCode != '219' && event.keyCode != '191'){
+					return false
+				}
 			})
 
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
@@ -1021,6 +1038,8 @@ if (isset($_POST['inputData'])) {
 							} else {
 								ResetProduto();
 							}
+						}).fail(function(m) {
+							
 						});
 					}
 				})
@@ -1149,7 +1168,8 @@ if (isset($_POST['inputData'])) {
 							tipo: inputTipo,
 							numItens: resNumItens,
 							idProduto: Produto[0],
-							quantidade: inputQuantidade
+							quantidade: inputQuantidade,
+							classific: cmbClassificacao
 						},
 						success: function(resposta) {
 
@@ -1176,6 +1196,51 @@ if (isset($_POST['inputData'])) {
 								$('#inputIdProdutos').val(inputIdProdutos);
 
 								$('#cmbFornecedor').prop('disabled', true);
+
+
+
+								function classBemSaidaSolicit(valor, idSelect) {
+									let grid = $('.trGrid')
+
+									grid.each((i1, elem1) => { // each sobre a grid
+										let tr = $(elem1).children() // colocando todas as linhas em um 
+
+										let td = tr.first()
+										let indiceLinha = td.html()
+
+										//let inputProdutoGridValores = inputHiddenProdutoServico.val()
+										if (idSelect == indiceLinha) {
+											
+											let valueProdutoServicoArray = $(`#campo${indiceLinha}`).val().split('#')
+											// adicionando  novos dados no array
+											valueProdutoServicoArray[valueProdutoServicoArray.length - 1] = valor
+
+											var ponto = eval('/' + '.' + '/g')
+											
+											valueProdutoServicoArray[2] = valueProdutoServicoArray[2].replace(',', '.')
+
+
+
+											var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
+
+											var stringVallnput = valueProdutoServicoArray.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
+
+											$(`#campo${indiceLinha}`).val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
+										}
+									})
+								}
+
+
+
+								$('.selectClassific2').each((i, elem) => {
+
+									$(elem).on('change', function(e) {
+
+										let valor = $(elem).val()
+										let idSelect = $(elem).attr('id')
+										classBemSaidaSolicit(valor, idSelect)
+									})
+								})
 
 								return false;
 							} else {
@@ -1238,7 +1303,7 @@ if (isset($_POST['inputData'])) {
 					var idProdutoGrid = $(elem).attr('idProduSolicitacao')
 					var idGridProdu = $(tds[0]).html()
 					var quantProduGrid = $(tds[3]).html()
-					var valUnitProduGrid = $(tds[4]).attr('valorUntPrSolici')
+					var valUnitProduGrid = $(tds[5]).attr('valorUntPrSolici')
 
 					$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + 'P#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '#' + 0 + '#' + 0 + '#' + 0 + '#' + 0 + '">');
 				})
@@ -1448,14 +1513,30 @@ if (isset($_POST['inputData'])) {
 					submitProduto.inputChaveAcesso = $('#inputChaveAcesso').val()
 					submitProduto.inputNumItens = $('#inputNumItens').val()
 
-					$.ajax({
-						type: "POST",
-						url: "movimentacaoNovo.php",
-						data: submitProduto,
-						success: function(resposta) {
-							window.location.href = "index.php";
-						}
+					let contSelectClass = $('.selectClassific').length
+					let contSelectClassVal = 0
+
+					$('.selectClassific').each((i, elem) => {
+							let valor = $(elem).val()
+							
+							if (valor != '#') {
+								contSelectClassVal++
+							}				
 					})
+
+					if (contSelectClass == contSelectClassVal) {
+						$.ajax({
+							type: "POST",
+							url: "movimentacaoNovo.php",
+							data: submitProduto,
+							success: function(resposta) {
+								window.location.href = "index.php";
+							}
+						})
+					} else {
+						alerta('Atenção', 'Informe a classificação dos produtos incluidos!', 'error');
+						return false;
+					}
 
 
 				} else {
@@ -1495,6 +1576,7 @@ if (isset($_POST['inputData'])) {
 				$('#cmbProduto').empty().append('<option>Sem produto</option>');
 			}
 
+
 			function classBemSaidaSolicit(valor, idSelect) {
 				let grid = $('.trGrid')
 
@@ -1517,19 +1599,20 @@ if (isset($_POST['inputData'])) {
 						var stringVallnput = valueProdutoServicoArray.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
 
 						$(`#campo${indiceLinha}`).val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
-
-						console.log($(`#campo${indiceLinha}`).val())
 					}
 				})
 			}
 			$('.selectClassific').each((i, elem) => {
 
 				$(elem).on('change', function(e) {
+
 					let valor = $(elem).val()
 					let idSelect = $(elem).attr('id')
 					classBemSaidaSolicit(valor, idSelect)
 				})
 			})
+
+
 
 		}); //document.ready	
 
@@ -1567,6 +1650,8 @@ if (isset($_POST['inputData'])) {
 				document.getElementById('motivo').style.display = "none";
 				document.getElementById('dadosNF').style.display = "block";
 				document.getElementById('dadosProduto').style.display = "none";
+				document.getElementById('trEntrada').style.display = "table-row";
+				document.getElementById('trSaida').style.display = "none";
 
 				mudaTotalTitulo('E')
 			} else if (tipo == 'S') {
@@ -1579,6 +1664,10 @@ if (isset($_POST['inputData'])) {
 				document.getElementById('motivo').style.display = "none";
 				document.getElementById('dadosNF').style.display = "none";
 				document.getElementById('dadosProduto').style.display = "flex";
+				document.getElementById('trEntrada').style.display = "none";
+				document.getElementById('trSaida').style.display = "table-row";
+
+				
 
 				mudaTotalTitulo('S')
 			} else {
@@ -2230,17 +2319,60 @@ if (isset($_POST['inputData'])) {
 								<div class="col-lg-12">
 									<table class="table" id="tabelaProdutoServico">
 										<thead>
-											<tr class="bg-slate">
-												<th>Item</th>
-												<th>Produto/Serviço</th>
-												<th style="text-align:center">Unidade Medida</th>
-												<th id="quantEditaEntradaSaida" style="text-align:center">Quant. Recebida</th>
-												<th style="text-align:center">Saldo</th>
-												<th style="text-align:right">Valor Unitário</th>
-												<th style="text-align:right">Valor Total</th>
-												<th style="text-align:center">Classificação</th>
-												<th class="text-center">Ações</th>
-											</tr>
+										<?php
+											if (isset($_POST['inputSolicitacaoId'])) {
+												print('
+												    <tr class="bg-slate" id="trEntrada" style="display: none; width: 100%">
+												        <th>Item</th>
+												        <th>Produto/Serviço</th>
+												        <th style="text-align:center">Unidade Medida</th>
+												        <th id="quantEditaEntradaSaida" style="text-align:center">Quant. Recebida</th>
+												        <th style="text-align:center">Saldo</th>
+												        <th style="text-align:right">Valor Unitário</th>
+												        <th style="text-align:right">Valor Total</th>
+												        <th class="text-center">Ações</th>
+											        </tr>
+												    <tr class="bg-slate" id="trSaida" >
+												        <th>Item</th>
+												        <th>Produto/Serviço</th>
+												        <th style="text-align:center">Unidade Medida</th>
+												        <th id="quantEditaEntradaSaida" style="text-align:center">Quant. Recebida</th>
+												        <th style="text-align:center">Saldo</th>
+												        <th style="text-align:right">Valor Unitário</th>
+												        <th style="text-align:right">Valor Total</th>
+												        <th id="classificacaoSaida">Classificação</th>
+												        <th class="text-center">Ações</th>
+											        </tr>
+												');
+											} else {
+												print('
+                                             
+											        <tr class="bg-slate" id="trEntrada">
+											            <th>Item</th>
+											            <th>Produto/Serviço</th>
+											            <th style="text-align:center">Unidade Medida</th>
+											            <th id="quantEditaEntradaSaida" style="text-align:center">Quant. Recebida</th>
+											            <th style="text-align:center">Saldo</th>
+											            <th style="text-align:right">Valor Unitário</th>
+											            <th style="text-align:right">Valor Total</th>
+											            <th class="text-center">Ações</th>
+													</tr>
+													<tr class="bg-slate" id="trSaida" style="display: none; width: 100%">
+													    <th>Item</th>
+													    <th>Produto/Serviço</th>
+													    <th style="text-align:center">Unidade Medida</th>
+													    <th id="quantEditaEntradaSaida" style="text-align:center">Quant. Recebida</th>
+													    <th style="text-align:center">Saldo</th>
+													    <th style="text-align:right">Valor Unitário</th>
+													    <th style="text-align:right">Valor Total</th>
+													    <th id="classificacaoSaida">Classificação</th>
+													    <th class="text-center">Ações</th>
+												    </tr>
+											');
+											}
+											
+
+                                        ?>
 										</thead>
 										<tbody>
 											<tr style="display:none;">
@@ -2330,10 +2462,10 @@ if (isset($_POST['inputData'])) {
 														        <div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0,00</div>
 													        </th>
 														');
-												}												
+												}
 												?>
 												<th colspan="2">
-												    
+
 												</th>
 											</tr>
 										</tfoot>

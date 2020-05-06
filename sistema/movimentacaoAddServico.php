@@ -33,6 +33,7 @@ $count = count($row);
 							 <td>'.$_POST['quantidade'].'</td>
 							 <td>'.$valorCusto.'</td>
 							 <td>'.$valorTotal.'</td>
+							 <td></td>
 							 <td><span name="remove" id="'.$_POST['numItens'].'#'.$total.'" class="btn btn_remove">X</span></td>
 						 <tr>
 						 ';
