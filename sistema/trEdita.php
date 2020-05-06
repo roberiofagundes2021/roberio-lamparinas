@@ -30,7 +30,7 @@ if (isset($_POST['inputTRId'])) {
 	$sql = "SELECT SbCatId, SbCatNome
 			 FROM SubCategoria
 			 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-			 WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and TRXSCTermoReferencia = $iTR
+			 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = $iTR
 			 ORDER BY SbCatNome ASC";
 	$result = $conn->query($sql);
 	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -85,12 +85,12 @@ if (isset($_POST['inputTRData'])) {
 			if (count($aSubCategorias) != count($_POST['cmbSubCategoria']) || array_diff($aSubCategorias, $_POST['cmbSubCategoria'])) {
 
 				$sql = "DELETE FROM TRXSubcategoria
-						WHERE TRXSCTermoReferencia = :iTermoReferencia and TRXSCEmpresa = :iEmpresa";
+						WHERE TRXSCTermoReferencia = :iTermoReferencia and TRXSCUnidade = :iUnidade";
 				$result = $conn->prepare($sql);
 
 				$result->execute(array(
 					':iTermoReferencia' => $_POST['inputTRId'],
-					':iEmpresa' => $_SESSION['EmpreId']
+					':iUnidade' => $_SESSION['UnidadeId']
 				));
 
 				$possuiSubCategoria = 0;
@@ -100,9 +100,9 @@ if (isset($_POST['inputTRData'])) {
 					$possuiSubCategoria = 1;
 
 					$sql = "INSERT INTO TRXSubcategoria
-								(TRXSCTermoReferencia, TRXSCSubcategoria, TRXSCEmpresa)
+								(TRXSCTermoReferencia, TRXSCSubcategoria, TRXSCUnidade)
 							VALUES 
-								(:iTermoReferencia, :iTrSubCategoria, :iTrEmpresa)";
+								(:iTermoReferencia, :iTrSubCategoria, :iTrUnidade)";
 					$result = $conn->prepare($sql);
 
 					foreach ($_POST['cmbSubCategoria'] as $key => $value) {
@@ -110,29 +110,29 @@ if (isset($_POST['inputTRData'])) {
 						$result->execute(array(
 							':iTermoReferencia' => $_POST['inputTRId'],
 							':iTrSubCategoria' => $value,
-							':iTrEmpresa' => $_SESSION['EmpreId']
+							':iTrUnidade' => $_SESSION['UnidadeId']
 						));
 					}
 				}
 
 				// Excluindo os produtos de TermoReferenciaXProduto atrelados a esta TR.
 				$sql = "DELETE FROM TermoReferenciaXProduto
-						WHERE TRXPrTermoReferencia = :iTr and TRXPrEmpresa = :iEmpresa";
+						WHERE TRXPrTermoReferencia = :iTr and TRXPrUnidade = :iUnidade";
 				$result = $conn->prepare($sql);
 
 				$result->execute(array(
 					':iTr' => $iTR,
-					':iEmpresa' => $_SESSION['EmpreId']
+					':iUnidade' => $_SESSION['UnidadeId']
 				));
 
 				// Excluindo os serviços de TermoReferenciaXServico atrelados a esta TR.
 				$sql = "DELETE FROM TermoReferenciaXServico
-						WHERE TRXSrTermoReferencia = :iTr and TRXSrEmpresa = :iEmpresa";
+						WHERE TRXSrTermoReferencia = :iTr and TRXSrUnidade = :iUnidade";
 				$result = $conn->prepare($sql);
 
 				$result->execute(array(
 					':iTr' => $iTR,
-					':iEmpresa' => $_SESSION['EmpreId']
+					':iUnidade' => $_SESSION['UnidadeId']
 				));
 
 				//Se for Produto e Serviço
@@ -281,23 +281,6 @@ if (isset($_POST['inputTRData'])) {
 				//Exclui os produtos desse TR?
 				var inputExclui = $('#inputTRProdutoExclui').val();
 
-				//Aqui verifica primeiro se tem produtos preenchidos, porque do contrário deixa mudar
-				/*if (inputProduto > 0){
-
-					//Verifica se o a categoria ou subcategoria foi alterada
-					if (inputSubCategoria != cmbSubCategoria){
-
-						inputExclui = 1;
-						$('#inputTRProdutoExclui').val(inputExclui);
-						
-						confirmaExclusao(document.formTR, "Tem certeza que deseja alterar o TR? Existem produtos com quantidades ou valores lançados!", "trEdita.php");
-						
-					} else{
-						inputExclui = 0;
-						$('#inputTRProdutoExclui').val(inputExclui);
-					}
-				}*/
-
 				if ($('#inputValidar').val() >= 1) {
 					validarSubcategoria($('#inputValidar').val())
 
@@ -427,7 +410,7 @@ if (isset($_POST['inputTRData'])) {
 
 						$sql = "SELECT TRXPrTermoReferencia
 								FROM TermoReferenciaXProduto
-								WHERE TRXPrTermoReferencia = " . $iTR . " and TRXPrEmpresa = " . $_SESSION['EmpreId'];
+								WHERE TRXPrTermoReferencia = " . $iTR . " and TRXPrUnidade = " . $_SESSION['UnidadeId'];
 						$result = $conn->query($sql);
 						$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 						$countProduto = count($rowProduto);
@@ -513,7 +496,7 @@ if (isset($_POST['inputTRData'])) {
 												$sql = "SELECT CategId, CategNome
 															FROM Categoria
 															JOIN Situacao on SituaId = CategStatus
-															WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														    ORDER BY CategNome ASC";
 												$result = $conn->query($sql);
 												$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -542,7 +525,7 @@ if (isset($_POST['inputTRData'])) {
 													$sql = "SELECT SbCatId, SbCatNome
 													        FROM SubCategoria
 													        JOIN Situacao on SituaId = SbCatStatus
-													        WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and SbCatCategoria = " . $row['TrRefCategoria'] . " and SituaChave = 'ATIVO'
+													        WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SbCatCategoria = " . $row['TrRefCategoria'] . " and SituaChave = 'ATIVO'
 													        ORDER BY SbCatNome ASC";
 													$result = $conn->query($sql);
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

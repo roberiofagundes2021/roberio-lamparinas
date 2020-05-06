@@ -9,7 +9,7 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefStatus
 		FROM TermoReferencia
 		JOIN Categoria on CategId = TrRefCategoria
-	    WHERE TrRefEmpresa = " . $_SESSION['EmpreId'] . "
+	    WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . "
 		ORDER BY TrRefData DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -229,7 +229,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$sql = "SELECT SbCatId, SbCatNome
 												FROM SubCategoria
 												JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-												WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and TRXSCTermoReferencia = " . $item['TrRefId'] . "
+												WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $item['TrRefId'] . "
 													ORDER BY SbCatNome ASC";
 										$result = $conn->query($sql);
 										$rowSC = $result->fetchAll(PDO::FETCH_ASSOC);

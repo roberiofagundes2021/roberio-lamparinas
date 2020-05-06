@@ -42,12 +42,12 @@ if (isset($_POST['tipoTr'])) {
         $sql = "SELECT " . $prefixo1 . "Nome as nome
             FROM " . $tabela1 . "
             JOIN Situacao on SituaId = " . $prefixo1 . "".$situacaoOuStatus1."
-            WHERE " . $prefixo1 . "Empresa = " . $_SESSION['EmpreId'] . " and " . $prefixo1 . "Categoria = " . $categoriaId . "" . $subcategoriaString1 . " and SituaChave = 'ATIVO'
+            WHERE " . $prefixo1 . "Unidade = " . $_SESSION['UnidadeId'] . " and " . $prefixo1 . "Categoria = " . $categoriaId . "" . $subcategoriaString1 . " and SituaChave = 'ATIVO'
             UNION
             SELECT " . $prefixo2 . "Nome as nome
             FROM " . $tabela2 . "
             JOIN Situacao on SituaId = " . $prefixo2 . "".$situacaoOuStatus2."
-            WHERE " . $prefixo2 . "Empresa = " . $_SESSION['EmpreId'] . " and " . $prefixo2 . "Categoria = " . $categoriaId . "" . $subcategoriaString2 . "  and SituaChave = 'ATIVO'
+            WHERE " . $prefixo2 . "Unidade = " . $_SESSION['UnidadeId'] . " and " . $prefixo2 . "Categoria = " . $categoriaId . "" . $subcategoriaString2 . "  and SituaChave = 'ATIVO'
            ";
         $result = $conn->query($sql);
         $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -85,7 +85,7 @@ if (isset($_POST['tipoTr'])) {
         $sql = "SELECT *
             FROM " . $tabela . "
             JOIN Situacao on SituaId = " . $prefixo . "".$situacaoOuStatus."
-            WHERE " . $prefixo . "Empresa = " . $_SESSION['EmpreId'] . " and " . $prefixo . "Categoria = " . $categoriaId . "" . $subcategoriaString . "  and SituaChave = 'ATIVO'
+            WHERE " . $prefixo . "Unidade = " . $_SESSION['UnidadeId'] . " and " . $prefixo . "Categoria = " . $categoriaId . "" . $subcategoriaString . "  and SituaChave = 'ATIVO'
            ";
         $result = $conn->query($sql);
         $row = $result->fetchAll(PDO::FETCH_ASSOC);

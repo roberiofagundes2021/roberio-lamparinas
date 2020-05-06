@@ -109,7 +109,7 @@ else {
 			
 			$sql = "SELECT ServiId
 					FROM Servico
-					WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and ServiNome = '".$nome."'";
+					WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ." and ServiNome = '".$nome."'";
 			$result = $conn->query($sql);
 			$row = $result->fetch(PDO::FETCH_ASSOC);
 			//$count = count($row);
@@ -141,7 +141,7 @@ else {
 				
 				$sql = "SELECT COUNT(isnull(ServiCodigo,0)) as Codigo
 						FROM Servico
-						Where ServiEmpresa = ".$_SESSION['EmpreId']."";
+						Where ServiUnidade = ".$_SESSION['UnidadeId']."";
 				//echo $sql;die;
 				$result = $conn->query("$sql");
 				$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
