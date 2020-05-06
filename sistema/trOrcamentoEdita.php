@@ -6,63 +6,51 @@ $_SESSION['PaginaAtual'] = 'Editar Orçamento';
 
 include('global_assets/php/conexao.php');
 
+$sql = "SELECT TrRefCategoria
+		FROM TermoReferencia
+		JOIN Categoria on CategId = TrRefCategoria
+		WHERE TrRefUnidade = ". $_SESSION['UnidadeId'] ." and TrRefId = ".$_SESSION['TRId']."";
+$result = $conn->query($sql);
+$categoriaId = $result->fetch(PDO::FETCH_ASSOC);
 
+$sql = "SELECT CategId, CategNome
+		FROM Categoria
+		JOIN Situacao on SituaId = CategStatus
+		WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and CategId = ".$categoriaId['TrRefCategoria']." and SituaChave = 'ATIVO' ";
+$result = $conn->query($sql);
+$rowCategoria = $result->fetch(PDO::FETCH_ASSOC);
 
-//////////////////////////////////////////////////////////////
-
-       $sql = "SELECT TrRefCategoria
-		       FROM TermoReferencia
-		       JOIN Categoria on CategId = TrRefCategoria
-	           WHERE TrRefEmpresa = ". $_SESSION['EmpreId'] ." and TrRefId = ".$_SESSION['TRId']."";
-        $result = $conn->query($sql);
-        $categoriaId = $result->fetch(PDO::FETCH_ASSOC);
-
-        $sql = "SELECT CategId, CategNome
-				FROM Categoria															     
-				WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategId = ".$categoriaId['TrRefCategoria']." and CategStatus = 1";
-		$result = $conn->query($sql);
-		$rowCategoria = $result->fetch(PDO::FETCH_ASSOC);
-
-
-		$sql = "SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-				 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and TRXSCTermoReferencia = ".$_SESSION['TRId']."
-				 ORDER BY SbCatNome ASC";
-		$result = $conn->query($sql);
-		$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-
-//////////////////////////////////////////////////////////////
+$sql = "SELECT SbCatId, SbCatNome
+		FROM SubCategoria
+		JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
+		WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and TRXSCTermoReferencia = ".$_SESSION['TRId']."
+		ORDER BY SbCatNome ASC";
+$result = $conn->query($sql);
+$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
 //Se veio do orcamento.php
 if(isset($_POST['inputOrcamentoId'])){
 	
 	$iOrcamento = $_POST['inputOrcamentoId'];
-	
-	try{
-		
-		$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrConteudo, TrXOrFornecedor, 
-					   ForneId, ForneContato, ForneEmail, ForneTelefone, ForneCelular, TrXOrSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
-				FROM TRXOrcamento
-				JOIN Usuario on UsuarId = TrXOrSolicitante
-				LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
-				WHERE TrXOrId = $iOrcamento ";
-		$result = $conn->query($sql);
-		$row = $result->fetch(PDO::FETCH_ASSOC);
+			
+	$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrConteudo, TrXOrFornecedor, 
+					ForneId, ForneContato, ForneEmail, ForneTelefone, ForneCelular, TrXOrSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
+			FROM TRXOrcamento
+			JOIN Usuario on UsuarId = TrXOrSolicitante
+			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
+			WHERE TrXOrId = $iOrcamento ";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
 
-		$sql = "SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN TRXOrcamentoXSubcategoria on TXOXSCSubcategoria = SbCatId
-				 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and TXOXSCOrcamento = $iOrcamento
-				 ORDER BY SbCatNome ASC";
-		$result = $conn->query($sql);
-		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($rowBD as $item){
-			$aSubCategorias[] = $item['SbCatId'];
-		}
-		
-	} catch(PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria
+			JOIN TRXOrcamentoXSubcategoria on TXOXSCSubcategoria = SbCatId
+			WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and TXOXSCOrcamento = $iOrcamento
+			ORDER BY SbCatNome ASC";
+	$result = $conn->query($sql);
+	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+	foreach ($rowBD as $item){
+		$aSubCategorias[] = $item['SbCatId'];
 	}
 	
 	$_SESSION['msg'] = array();
@@ -100,39 +88,36 @@ if(isset($_POST['inputData'])){
 						));
         //$conn->beginTransaction();
 
-
         ////////////////////// Alterando a subcategoria\\\\\\\\\\\\\\\\\\
         $sql = "DELETE FROM TRXOrcamentoXSubcategoria
-				WHERE TXOXSCOrcamento = :iOrcamento and TXOXSCEmpresa = :iEmpresa";
+				WHERE TXOXSCOrcamento = :iOrcamento and TXOXSCUnidade = :iUnidade";
 		$resultSubCatDel = $conn->prepare($sql);
         $resultSubCatDel->execute(array(
 			            ':iOrcamento' => $iOrcamento,
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 
         foreach ($rowSubCategoria as $subcategoria) {
 
-            $sql = "INSERT INTO TRXOrcamentoXSubcategoria (TXOXSCOrcamento, TXOXSCSubcategoria, TXOXSCEmpresa) 
-		            VALUES(:iOrcamento, :iSubCategoria, :iEmpresa)";
+            $sql = "INSERT INTO TRXOrcamentoXSubcategoria (TXOXSCOrcamento, TXOXSCSubcategoria, TXOXSCUnidade) 
+		            VALUES(:iOrcamento, :iSubCategoria, :iUnidade)";
 		    $resultSubCatCadast = $conn->prepare($sql);
 		    $resultSubCatCadast->execute(array(
 			            ':iOrcamento' => $iOrcamento,
 						':iSubCategoria' => $subcategoria['SbCatId'] == '#' ? null : $subcategoria['SbCatId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
         }
-		
-
 		
 		if (isset($_POST['inputOrcamentoProdutoExclui']) and $_POST['inputOrcamentoProdutoExclui']){
 			
 			$sql = "DELETE FROM TRXOrcamentoXProduto
-					WHERE TXOXPOrcamento = :iOrcamento and TXOXPEmpresa = :iEmpresa";
+					WHERE TXOXPOrcamento = :iOrcamento and TXOXPUnidade = :iUnidade";
 			$result = $conn->prepare($sql);	
 			
 			$result->execute(array(
 								':iOrcamento' => $iOrcamento,
-								':iEmpresa' => $_SESSION['EmpreId']));
+								':iUnidade' => $_SESSION['UnidadeId']));
 		}
 		
 		$conn->commit();						
@@ -168,10 +153,6 @@ if(isset($_POST['inputData'])){
 
 	<?php include_once("head.php"); ?>
 
-    <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-    <script src="global_assets/js/demo_pages/form_select2.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 
@@ -181,7 +162,6 @@ if(isset($_POST['inputData'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
-	<link rel="stylesheet" type="text/css" href="global_assets/css/lamparinas/custon.css">	
 
     <script type="text/javascript" >
 
@@ -205,31 +185,6 @@ if(isset($_POST['inputData'])){
 				}
 			});
 			
-			/*//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
-			$('#cmbCategoria').on('change', function(e){
-				
-				Filtrando();
-				
-				var cmbCategoria = $('#cmbCategoria').val();
-
-				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
-					
-					var option = '<option value="#">Selecione a SubCategoria</option>';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						});						
-						
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}					
-				});
-				
-			}); */
-
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
 				
