@@ -27,8 +27,8 @@
 		
 			foreach ($produtos as $produto) {
 
-				$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrEmpresa)
-						VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
+				$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrUnidade)
+						VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				if ($produto) {
@@ -40,7 +40,7 @@
 						':fValorUnitario' => null,
 						':sTabela' => $parametroProduto,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iUnidade' => $_SESSION['UnidadeId'],
 					));
 				}
 			}
@@ -69,8 +69,8 @@
 	
 		foreach ($produtos as $produto) {
 
-			$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrEmpresa)
-					VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
+			$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrUnidade)
+					VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 
 			if ($produto) {
@@ -82,7 +82,7 @@
 					':fValorUnitario' => null,
 					':sTabela' => $parametroProduto,
 					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-					':iEmpresa' => $_SESSION['EmpreId'],
+					':iUnidade' => $_SESSION['UnidadeId'],
 				));
 			}
 		}

@@ -21,19 +21,19 @@ if (isset($_POST['inputTRId'])) {
 if (isset($_POST['inputIdTR'])) {
 
 	$sql = "DELETE FROM TermoReferenciaXServico
-			WHERE TRXSrTermoReferencia = :iTR AND TRXSrEmpresa = :iEmpresa";
+			WHERE TRXSrTermoReferencia = :iTR AND TRXSrUnidade = :iUnidade";
 	$result = $conn->prepare($sql);
 
 	$result->execute(array(
 		':iTR' => $iTR,
-		':iEmpresa' => $_SESSION['EmpreId']
+		':iUnidade' => $_SESSION['UnidadeId']
 	));
 
 
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
-		$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
-				VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrUnidade)
+				VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -43,7 +43,7 @@ if (isset($_POST['inputIdTR'])) {
 			':fValorUnitario' => null,
 			':sTabela' => $_POST['inputTabelaServico' . $i],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iEmpresa' => $_SESSION['EmpreId']
+			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -56,7 +56,7 @@ try {
 
 	$sql = "SELECT TrXOrId
 			FROM TRXOrcamento
-			WHERE TrXOrEmpresa = " . $_SESSION['EmpreId'] . " and TrXOrTermoReferencia = ".$iTR."
+			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrTermoReferencia = ".$iTR."
 			";
 	$result = $conn->query($sql);
 	$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -75,14 +75,14 @@ try {
 			FROM TermoReferencia
 			JOIN Categoria on CategId = TrRefCategoria
 			JOIN Situacao on SituaId = TrRefStatus
-			WHERE TrRefEmpresa = " . $_SESSION['EmpreId'] . " and TrRefId = " . $iTR ." and SituaChave = 'ATIVO'";
+			WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = " . $iTR ." and SituaChave = 'ATIVO'";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 
 	$sql = "SELECT TRXSCSubcategoria
 		    FROM TRXSubcategoria
-		    WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCEmpresa = " . $_SESSION['EmpreId'] . "";
+		    WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCUnidade = " . $_SESSION['UnidadeId'] . "";
 	$result = $conn->query($sql);
 	$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
 	
@@ -91,7 +91,7 @@ try {
 	$sql = "SELECT TRXSrServico
 			FROM TermoReferenciaXServico
 			JOIN ServicoOrcamento on SrOrcId = TRXSrServico
-			WHERE TRXSrEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'";
+			WHERE TRXSrUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'";
 	$result = $conn->query($sql);
 	$rowServicoUtilizado1 = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countServicoUtilizado1 = count($rowServicoUtilizado1);
@@ -107,7 +107,7 @@ try {
 	$sql = "SELECT TRXSrServico
 			FROM TermoReferenciaXServico
 			JOIN Servico on ServiId = TRXSrServico
-			WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
+			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
 	$result = $conn->query($sql);
 	$rowServicoUtilizado2 = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countServicoUtilizado2 = count($rowServicoUtilizado2);
@@ -270,7 +270,7 @@ try {
 													$sql = "SELECT SbCatId, SbCatNome
                                                             FROM SubCategoria
                                                             JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-                                                            WHERE SBCatEmpresa = " . $_SESSION['EmpreId'] . " and TRXSCTermoReferencia = " . $iTR;
+                                                            WHERE SBCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $iTR;
 													$result = $conn->query($sql);
 													$rowSbCat = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -295,7 +295,7 @@ try {
 																$sql = "SELECT SrOrcId, SrOrcNome
 														                FROM ServicoOrcamento
 																		JOIN Situacao on SituaId = SrOrcSituacao				     
-																		WHERE SrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " and SituaChave = 'ATIVO' and SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and SrOrcCategoria = " . $iCategoria;
+																		WHERE SrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " and SituaChave = 'ATIVO' and SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and SrOrcCategoria = " . $iCategoria;
 																if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null) {
 																	$sql .= " and SrOrcSubCategoria = " . $row['TrRefSubCategoria'];
 																}
@@ -319,7 +319,7 @@ try {
 																$sql = "SELECT ServiId, ServiNome
 																         FROM Servico
 																		 JOIN Situacao on SituaId = ServiStatus		
-																         WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria . "";
+																         WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria . "";
 																if ($subcategoria['TRXSCSubcategoria'] != '' and $subcategoria['TRXSCSubcategoria'] != null) {
 																	$sql .= " and ServiSubCategoria = " . $subcategoria['TRXSCSubcategoria'];
 																}
@@ -340,7 +340,7 @@ try {
 															$sql = "SELECT ServiId, ServiNome
 															         FROM Servico
 																	 JOIN Situacao on SituaId = ServiStatus		
-															         WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria . "";
+															         WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria . "";
 															$sql .= " ORDER BY ServiNome ASC";
 															$result = $conn->query($sql);
 															$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -392,7 +392,7 @@ try {
 									            FROM ServicoOrcamento
 									            JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 									            LEFT JOIN UnidadeMedida on UnMedId = SrOrcUnidadeMedida
-									            WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR  . " and TRXSrTabela = 'ServicoOrcamento'";
+									            WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR  . " and TRXSrTabela = 'ServicoOrcamento'";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -462,7 +462,7 @@ try {
 										$sql = "SELECT TRXSrQuantidade, TRXSrTabela, ServiId, ServiNome, ServiDetalhamento
 									            FROM TermoReferenciaXServico
 									            JOIN Servico on ServiId = TRXSrServico
-									            WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
+									            WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowServicos);

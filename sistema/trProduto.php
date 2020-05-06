@@ -21,19 +21,19 @@ if (isset($_POST['inputTRId'])) {
 if (isset($_POST['inputIdTR'])) {
 
 	$sql = "DELETE FROM TermoReferenciaXProduto
-			WHERE TRXPrTermoReferencia = :iTR AND TRXPrEmpresa = :iEmpresa";
+			WHERE TRXPrTermoReferencia = :iTR AND TRXPrUnidade = :iUnidade";
 	$result = $conn->prepare($sql);
 
 	$result->execute(array(
 		':iTR' => $iTR,
-		':iEmpresa' => $_SESSION['EmpreId']
+		':iUnidade' => $_SESSION['UnidadeId']
 	));
 
 
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
-		$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrEmpresa)
-				VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrUnidade)
+				VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -43,7 +43,7 @@ if (isset($_POST['inputIdTR'])) {
 			':fValorUnitario' => null,
 			':sTabela' => $_POST['inputTabelaProduto' . $i],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iEmpresa' => $_SESSION['EmpreId']
+			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -56,7 +56,7 @@ try {
 
 	$sql = "SELECT TrXOrId
 			FROM TRXOrcamento
-			WHERE TrXOrEmpresa = " . $_SESSION['EmpreId'] . " and TrXOrTermoReferencia = ".$iTR."
+			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrTermoReferencia = ".$iTR."
 			";
 	$result = $conn->query($sql);
 	$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -75,14 +75,14 @@ try {
 			FROM TermoReferencia
 			JOIN Categoria on CategId = TrRefCategoria
 			JOIN Situacao on SituaId = TrRefStatus
-			WHERE TrRefEmpresa = " . $_SESSION['EmpreId'] . " and TrRefId = " . $iTR ." and SituaChave = 'ATIVO'";
+			WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = " . $iTR ." and SituaChave = 'ATIVO'";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 
 	$sql = " SELECT TRXSCSubcategoria
 		     FROM TRXSubcategoria
-		     WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCEmpresa = " . $_SESSION['EmpreId'] . "
+		     WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCUnidade = " . $_SESSION['UnidadeId'] . "
 		";
 	$result = $conn->query($sql);
 	$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -92,7 +92,7 @@ try {
 	$sql = "SELECT TRXPrProduto
 			FROM TermoReferenciaXProduto
 			JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
-			WHERE TRXPrEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
+			WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado1 = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado1 = count($rowProdutoUtilizado1);
@@ -109,7 +109,7 @@ try {
 	$sql = "SELECT TRXPrProduto
 			FROM TermoReferenciaXProduto
 			JOIN Produto on ProduId = TRXPrProduto
-			WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado2 = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado2 = count($rowProdutoUtilizado2);
@@ -272,7 +272,7 @@ try {
 													$sql = "SELECT SbCatId, SbCatNome
                                                             FROM SubCategoria
                                                             JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-                                                            WHERE SBCatEmpresa = " . $_SESSION['EmpreId'] . " and TRXSCTermoReferencia = " . $iTR;
+                                                            WHERE SBCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $iTR;
 													$result = $conn->query($sql);
 													$rowSbCat = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -297,7 +297,7 @@ try {
 																$sql = "SELECT PrOrcId, PrOrcNome
 														                FROM ProdutoOrcamento
 																		JOIN Situacao on SituaId = PrOrcSituacao				     
-																		WHERE PrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " and SituaChave = 'ATIVO' and PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and PrOrcCategoria = " . $iCategoria;
+																		WHERE PrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " and SituaChave = 'ATIVO' and PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and PrOrcCategoria = " . $iCategoria;
 																if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null) {
 																	$sql .= " and PrOrcSubCategoria = " . $row['TrRefSubCategoria'];
 																}
@@ -321,7 +321,7 @@ try {
 																$sql = "SELECT ProduId, ProduNome
 																         FROM Produto
 																		 JOIN Situacao on SituaId = ProduStatus		
-																         WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' and ProduCategoria = " . $iCategoria . "";
+																         WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ProduCategoria = " . $iCategoria . "";
 																if ($subcategoria['TRXSCSubcategoria'] != '' and $subcategoria['TRXSCSubcategoria'] != null) {
 																	$sql .= " and ProduSubCategoria = " . $subcategoria['TRXSCSubcategoria'];
 																}
@@ -342,7 +342,7 @@ try {
 															$sql = "SELECT ProduId, ProduNome
 															        FROM Produto
 																	JOIN Situacao on SituaId = ProduStatus		
-															        WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' and 
+															        WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and 
 															        ProduCategoria = " . $iCategoria . "";
 															$sql .= " ORDER BY ProduNome ASC";
 															$result = $conn->query($sql);
@@ -395,7 +395,7 @@ try {
 									            FROM ProdutoOrcamento
 									            JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 									            JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-									            WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR  . " and TRXPrTabela = 'ProdutoOrcamento'";
+									            WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR  . " and TRXPrTabela = 'ProdutoOrcamento'";
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -466,7 +466,7 @@ try {
 									            FROM TermoReferenciaXProduto
 									            JOIN Produto on ProduId = TRXPrProduto
 												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-									            WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+									            WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);

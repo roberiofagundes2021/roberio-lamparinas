@@ -21,14 +21,14 @@ try {
 	$sql = "SELECT TrRefNumero, TrRefConteudoInicio, TrRefConteudoFim, CategNome
 			FROM TermoReferencia
 			JOIN Categoria on CategId = TrRefCategoria
-			WHERE TrRefEmpresa = " . $_SESSION['EmpreId'] . " and TrRefId = " . $iTR;
+			WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = " . $iTR;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 	$sql = "SELECT *
 			FROM TRXSubcategoria
 			JOIN SubCategoria on SbCatId = TRXSCSubcategoria
-			WHERE TRXSCEmpresa = " . $_SESSION['EmpreId'] . " and TRXSCTermoReferencia = " . $iTR;
+			WHERE TRXSCUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $iTR;
 	$result = $conn->query($sql);
 	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -36,14 +36,14 @@ try {
 	$sql = "SELECT COUNT(TRXPrProduto) as CONT
 			FROM TermoReferenciaXProduto
 			JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
-			WHERE TRXPrEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
+			WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
 
 	$sql = "SELECT COUNT(TRXPrProduto) as CONT
 			FROM TermoReferenciaXProduto
 			JOIN Produto on ProduId = TRXPrProduto
-			WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -51,14 +51,14 @@ try {
 	$sql = "SELECT COUNT(TRXSrServico) as CONT
 			FROM TermoReferenciaXServico
 			JOIN ServicoOrcamento on SrOrcId = TRXSrServico
-			WHERE TRXSrEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'";
+			WHERE TRXSrUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'";
 	$result = $conn->query($sql);
 	$rowServicoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
 
 	$sql = "SELECT COUNT(TRXSrServico) as CONT
 			FROM TermoReferenciaXServico
 			JOIN Servico on ServiId = TRXSrServico
-			WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
+			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
 	$result = $conn->query($sql);
 	$rowServicoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -137,14 +137,14 @@ try {
 						FROM ProdutoOrcamento
 						JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 						JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-						WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR;
+						WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR;
 			} else {
 				$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduCategoria as Categoria, ProduSubCategoria as SubCategoria, 
 						ProduDetalhamento as Detalhamento, UnMedSigla, TRXPrQuantidade, TRXPrValorUnitario
 						FROM Produto
 						JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 						JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-						WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR;
+						WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR;
 			}
 			$result = $conn->query($sql);
 			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -223,13 +223,13 @@ try {
 						SrOrcDetalhamento as Detalhamento, TRXSrQuantidade
 						FROM ServicoOrcamento
 						JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
-						WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and SrOrcSubCategoria = ".$sbcat['TRXSCSubcategoria'];
+						WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and SrOrcSubCategoria = ".$sbcat['TRXSCSubcategoria'];
 			} else {
 				$sql = "SELECT ServiId as Id, ServiNome as Nome, ServiCategoria as Categoria, ServiSubCategoria as SubCategoria, 
 						ServiDetalhamento as Detalhamento, TRXSrQuantidade
 						FROM Servico
 						JOIN TermoReferenciaXServico on TRXSrServico = ServiId
-						WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and ServiSubCategoria = ".$sbcat['TRXSCSubcategoria'];
+						WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and ServiSubCategoria = ".$sbcat['TRXSCSubcategoria'];
 			}
 
 			$result = $conn->query($sql);

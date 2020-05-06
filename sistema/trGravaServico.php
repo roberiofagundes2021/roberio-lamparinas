@@ -27,8 +27,8 @@
 
 			foreach ($servicos as $servico) {
 
-				$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
-						VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
+				$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrUnidade)
+						VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				if ($servico) {
@@ -40,7 +40,7 @@
 						':fValorUnitario' => null,
 						':sTabela' => $parametroServico,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iUnidade' => $_SESSION['UnidadeId'],
 					));
 				}
 			}
@@ -69,8 +69,8 @@
 
 		foreach ($servicos as $servico) {
 
-			$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrEmpresa)
-					VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iEmpresa)";
+			$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrUnidade)
+					VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 
 			if ($servico) {
@@ -82,7 +82,7 @@
 					':fValorUnitario' => null,
 					':sTabela' => $parametroServico,
 					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-					':iEmpresa' => $_SESSION['EmpreId'],
+					':iUnidade' => $_SESSION['UnidadeId'],
 				));
 			}
 		}	

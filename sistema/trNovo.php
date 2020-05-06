@@ -35,7 +35,7 @@ if (isset($_POST['inputData'])) {
 		//Gera o novo Número (incremental)
 		$sql = "SELECT COUNT(isnull(TrRefNumero,0)) as Numero
 				FROM TermoReferencia
-				Where TrRefEmpresa = " . $_SESSION['EmpreId'] . "";
+				Where TrRefUnidade = " . $_SESSION['UnidadeId'] . "";
 		$result = $conn->query($sql);
 		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -43,9 +43,9 @@ if (isset($_POST['inputData'])) {
 		$sNumero = str_pad($sNumero, 6, "0", STR_PAD_LEFT);
 
 		$sql = "INSERT INTO TermoReferencia (TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio, TrRefConteudoFim, TrRefTipo,
-											 TrRefStatus, TrRefUsuarioAtualizador, TrRefEmpresa)
+											 TrRefStatus, TrRefUsuarioAtualizador, TrRefUnidade)
 				VALUES (:sNumero, :dData, :iCategoria, :sConteudoInicio, :sConteudoFim, :sTipo, 
-						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
+						:bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -57,7 +57,7 @@ if (isset($_POST['inputData'])) {
 			':sTipo' => $tipoTr,
 			':bStatus' => 1,
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iEmpresa' => $_SESSION['EmpreId']
+			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		// Começo do cadastro de subcategorias da TR
@@ -70,9 +70,9 @@ if (isset($_POST['inputData'])) {
 			$possuiSubCategoria = 1;
 
 			$sql = "INSERT INTO TRXSubcategoria
-						(TRXSCTermoReferencia, TRXSCSubCategoria, TRXSCEmpresa)
+						(TRXSCTermoReferencia, TRXSCSubCategoria, TRXSCUnidade)
 					VALUES 
-						(:iTermoReferencia, :iSubCategoria, :iEmpresa)";
+						(:iTermoReferencia, :iSubCategoria, :iUnidade)";
 			$result = $conn->prepare($sql);
 
 			foreach ($_POST['cmbSubCategoria'] as $key => $value) {
@@ -80,7 +80,7 @@ if (isset($_POST['inputData'])) {
 				$result->execute(array(
 					':iTermoReferencia' => $insertId,
 					':iSubCategoria' => $value,
-					':iEmpresa' => $_SESSION['EmpreId']
+					':iUnidade' => $_SESSION['UnidadeId']
 				));
 			}
 		}
@@ -324,7 +324,7 @@ if (isset($_POST['inputData'])) {
 													$sql = "SELECT CategId, CategNome
 															FROM Categoria
 															JOIN Situacao on SituaId = CategStatus
-															WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 															ORDER BY CategNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
