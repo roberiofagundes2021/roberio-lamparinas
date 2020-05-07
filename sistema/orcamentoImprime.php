@@ -15,7 +15,7 @@ $sql = "SELECT *
 		FROM Orcamento
 		JOIN Fornecedor on ForneId = OrcamFornecedor
 		JOIN Categoria on CategId = OrcamCategoria
-		WHERE OrcamEmpresa = " . $_SESSION['EmpreId'] . " and OrcamId = " . $iOrcamento;
+		WHERE OrcamUnidade = " . $_SESSION['UnidadeId'] . " and OrcamId = " . $iOrcamento;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -193,7 +193,7 @@ try {
 		$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OrXSrQuantidade, OrXSrValorUnitario
 				FROM Servico
 				JOIN OrcamentoXServico on OrXSrServico = ServiId
-				WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OrXSrOrcamento = " . $iOrcamento;
+				WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and OrXSrOrcamento = " . $iOrcamento;
 
 		$result = $conn->query($sql);
 		$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);

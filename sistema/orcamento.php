@@ -10,7 +10,7 @@ $sql = "SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, Forne
 		FROM Orcamento
 		LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
 		JOIN Categoria on CategId = OrcamCategoria
-	    WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ."
+	    WHERE OrcamUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY OrcamData DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -222,7 +222,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										 $sql = "SELECT SbCatId, SbCatNome
 				                                        FROM SubCategoria
 				                                        JOIN OrcamentoXSubcategoria on OrXSCSubcategoria = SbCatId
-				                                        WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = ".$item['OrcamId']."
+				                                        WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and OrXSCOrcamento = ".$item['OrcamId']."
 				                                            ORDER BY SbCatNome ASC";
 		                                        $result = $conn->query($sql);
 		                                        $rowSC = $result->fetchAll(PDO::FETCH_ASSOC);

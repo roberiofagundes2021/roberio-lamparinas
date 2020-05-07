@@ -12,7 +12,7 @@ if(isset($_POST['inputOrcamentoId'])){
 		$conn->beginTransaction();	
 		
 		$sql = "DELETE FROM OrcamentoXProduto
-				WHERE OrXPrOrcamento = :iOrcamento and OrXPrEmpresa = :iEmpresa";
+				WHERE OrXPrOrcamento = :iOrcamento and OrXPrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iOrcamento', $iOrcamento);
 		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 

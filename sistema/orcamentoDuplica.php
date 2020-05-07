@@ -10,25 +10,25 @@ if (isset($_POST['inputOrcamentoId'])){
 
 	$sql = "SELECT OrcamId, OrcamTipo, OrcamCategoria, OrcamConteudo, OrcamFornecedor, OrcamStatus
 			FROM Orcamento
-			WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = ".$_POST['inputOrcamentoId']."";
+			WHERE OrcamUnidade = ". $_SESSION['UnidadeId'] ." and OrcamId = ".$_POST['inputOrcamentoId']."";
 	$result = $conn->query($sql);
 	$rowOrcamento = $result->fetch(PDO::FETCH_ASSOC);
 	//$count = count($rowOrcamento);
 
 	
-	$sql = ("SELECT COUNT(isnull(OrcamNumero,0)) as Numero
-			 FROM Orcamento
-			 Where OrcamEmpresa = ".$_SESSION['EmpreId']."");
-	$result = $conn->query("$sql");
+	$sql = "SELECT COUNT(isnull(OrcamNumero,0)) as Numero
+			FROM Orcamento
+			Where OrcamUnidade = ".$_SESSION['UnidadeId'];
+	$result = $conn->query($sql);
 	$rowNumero = $result->fetch(PDO::FETCH_ASSOC);		
 	
 	$sNumero = (int)$rowNumero['Numero'] + 1;
 	$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 		
 	$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor,
-								   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamEmpresa)
+								   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamUnidade)
 			VALUES (:sNumero, :sTipo, :dData, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
-					:bStatus, :iUsuarioAtualizador, :iEmpresa)";
+					:bStatus, :iUsuarioAtualizador, :iUnidade)";
 	$result = $conn->prepare($sql);
 	
 	$result->execute(array(
@@ -41,21 +41,21 @@ if (isset($_POST['inputOrcamentoId'])){
 					':iSolicitante' => $_SESSION['UsuarId'],
 					':bStatus' => $rowOrcamento['OrcamStatus'],
 					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-					':iEmpresa' => $_SESSION['EmpreId']
+					':iUnidade' => $_SESSION['UnidadeId']
 					));						
 
 	$insertId = $conn->lastInsertId();
 
 	$sql = "SELECT *
 			FROM OrcamentoXProduto
-			WHERE OrXPrEmpresa = ". $_SESSION['EmpreId'] ." and OrXPrOrcamento = ".$_POST['inputOrcamentoId']."";
+			WHERE OrXPrUnidade = ". $_SESSION['UnidadeId'] ." and OrXPrOrcamento = ".$_POST['inputOrcamentoId']."";
 	$result = $conn->query($sql);
 	$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	foreach ($rowProduto as $item){
 		try {
-		$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrEmpresa)
-				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrUnidade)
+				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 		
 		$result->execute(array(
@@ -64,7 +64,7 @@ if (isset($_POST['inputOrcamentoId'])){
 						':iQuantidade' => $item['OrXPrQuantidade'],
 						':fValorUnitario' => null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 		} catch(PDOException $e) {
 			echo 'Error2: ' . $e->getMessage();die;
@@ -75,14 +75,14 @@ if (isset($_POST['inputOrcamentoId'])){
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria
 			JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
-			WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = ".$rowOrcamento['OrcamId']."";
+			WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and OrXSCOrcamento = ".$rowOrcamento['OrcamId']."";
 	$result = $conn->query($sql);
 	$rowSBC = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	$sql = "INSERT INTO OrcamentoXSubCategoria 
-							(OrXSCOrcamento, OrXSCSubCategoria, OrXSCEmpresa)
+							(OrXSCOrcamento, OrXSCSubCategoria, OrXSCUnidade)
 						VALUES 
-							(:iOrcamento, :iSubCategoria, :iEmpresa)";
+							(:iOrcamento, :iSubCategoria, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				foreach ($rowSBC as $subcategoria){
@@ -90,7 +90,7 @@ if (isset($_POST['inputOrcamentoId'])){
 					$result->execute(array(
 									':iOrcamento' => $insertId,
 									':iSubCategoria' => $subcategoria['SbCatId'],
-									':iEmpresa' => $_SESSION['EmpreId']
+									':iUnidade' => $_SESSION['UnidadeId']
 									));
 				}
 
