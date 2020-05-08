@@ -4,7 +4,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla, ProduDetalhamento, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
+$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla, ProduDetalhamento, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, '".$_POST['origem']."') as Estoque
 		FROM Produto
 		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 		WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduId = " . $_POST['idProduto'];
@@ -15,7 +15,7 @@ $count = count($row);
 //Verifica se já existe esse registro (se existir, retorna true )
 if ($count) {
 
-	if ($row['Estoque'] >= 1) {
+	//if ($row['Estoque'] >= 1) {
 		if ($_POST['tipo'] == 'E') {
 			$valorCusto = formataMoeda($row['ProduValorCusto']);
 			$valorTotal = formataMoeda($_POST['quantidade'] * $row['ProduValorCusto']);
@@ -33,7 +33,6 @@ if ($count) {
 						 <td data-popup="tooltip" title="' . $row['ProduDetalhamento'] . '">' . $row['ProduNome'] . '</td>
 						 <td style="text-align: center">' . $row['UnMedSigla'] . '</td>
 						 <td style="text-align: center">' . $_POST['quantidade'] . '</td>
-						 <td style="text-align: center"></td>
 						 <td style="text-align: right">' . $valorCusto . '</td>
 						 <td style="text-align: right">' . $valorTotal . '</td>
 						 
@@ -71,7 +70,7 @@ if ($count) {
 					</tr>
 			";
 		echo $output;
-	} else {
+	/*} else {
 
 		if ($_POST['tipo'] == 'E') {
 			$valorCusto = formataMoeda($row['ProduValorCusto']);
@@ -87,7 +86,7 @@ if ($count) {
 
 		$output = 	'SEMESTOQUE';
 		echo $output;
-	}
+	}*/
 } else {
 	echo 0;
 }

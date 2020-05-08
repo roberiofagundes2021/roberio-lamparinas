@@ -159,38 +159,17 @@ if (isset($_POST['inputData'])) {
 				//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
 
 				if (isset($_POST[$campo])) {
-
+var_dump($campo);
 					$registro = explode('#', $_POST[$campo]);
 
 					if ($registro[0] == 'P') {
-						$sql = "INSERT INTO MovimentacaoXProduto
-						        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa)
-					            VALUES 
-						        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa)";
-						$result = $conn->prepare($sql);
 
-						$result->execute(array(
-							':iMovimentacao' => $insertId,
-							':iProduto' => $registro[1],
-							':iQuantidade' => (int) $registro[3],
-							':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-							':sLote' => $registro[5],
-							':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-							':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iEmpresa' => $_SESSION['EmpreId']
-						));
+						$quantItens = intval($registro[3]);
 
-						$insertIdMvXPr = $conn->lastInsertId();
-
-						// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
-						if (isset($registro[7])) {
-							if ($registro[7] == 2) {
-
-								$quantItens = intval($registro[3]);
-
-								for ($i = 1; $i <= $quantItens; $i++) {
-
+						for ($i = 1; $i <= $quantItens; $i++) {
+							// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
+							if (isset($registro[7])) {
+								if ($registro[7] == 2) {
 
 									$sql = "SELECT PatriNumero
 							              FROM Patrimonio
@@ -229,17 +208,38 @@ if (isset($_POST['inputData'])) {
 
 
 										$sql = "INSERT INTO Patrimonio
-												(PatriNumero, PatriMovimentacaoProduto, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
+												(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
 												VALUES 
-												(:sNumero, :iMovimentacaoProduto, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+												(:sNumero, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
 										$result = $conn->prepare($sql);
 
 										$result->execute(array(
 											':sNumero' => $numeroPatriFinal,
-											':iMovimentacaoProduto' => $insertIdMvXPr,
 											':iStatus' => $situacao['SituaId'],
 											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 											':iEmpresa' => $_SESSION['EmpreId']
+										));
+
+										$insertIdPatrimonio = $conn->lastInsertId();
+
+
+										$sql = "INSERT INTO MovimentacaoXProduto
+						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa, MvXPrPatrimonio)
+					                            VALUES 
+						                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa, :iPatrimonio)";
+										$result = $conn->prepare($sql);
+
+										$result->execute(array(
+											':iMovimentacao' => $insertId,
+											':iProduto' => $registro[1],
+											':iQuantidade' => (int) $registro[3],
+											':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
+											':sLote' => $registro[5],
+											':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+											':iEmpresa' => $_SESSION['EmpreId'],
+											':iPatrimonio' => $insertIdPatrimonio
 										));
 									} else {
 
@@ -256,17 +256,61 @@ if (isset($_POST['inputData'])) {
 
 
 										$sql = "INSERT INTO Patrimonio
-												(PatriNumero, PatriMovimentacaoProduto, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
+												(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
 												VALUES 
 												(:sNumero, :iMovimentacaoProduto, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
 										$result = $conn->prepare($sql);
 
 										$result->execute(array(
 											':sNumero' => $numeroPatri,
-											':iMovimentacaoProduto' => $insertIdMvXPr,
 											':iStatus' => $situacao['SituaId'],
 											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 											':iEmpresa' => $_SESSION['EmpreId']
+										));
+
+										$insertIdPatrimonio = $conn->lastInsertId();
+
+
+										$sql = "INSERT INTO MovimentacaoXProduto
+						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa, MvXPrPatrimonio)
+					                            VALUES 
+						                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa, :iPatrimonio)";
+										$result = $conn->prepare($sql);
+
+										$result->execute(array(
+											':iMovimentacao' => $insertId,
+											':iProduto' => $registro[1],
+											':iQuantidade' => (int) $registro[3],
+											':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
+											':sLote' => $registro[5],
+											':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+											':iEmpresa' => $_SESSION['EmpreId'],
+											':iPatrimonio' => $insertIdPatrimonio
+										));
+									}
+								} else {
+									$quantItens = intval($registro[3]);
+
+									for ($i = 1; $i <= $quantItens; $i++) {
+										$sql = "INSERT INTO MovimentacaoXProduto
+								            (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa, MvXPrPatrimonio)
+								            VALUES 
+								            (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa, :iPatrimonio)";
+										$result = $conn->prepare($sql);
+
+										$result->execute(array(
+											':iMovimentacao' => $insertId,
+											':iProduto' => $registro[1],
+											':iQuantidade' => (int) $registro[3],
+											':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
+											':sLote' => $registro[5],
+											':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+											':iEmpresa' => $_SESSION['EmpreId'],
+											':iPatrimonio' => null
 										));
 									}
 								}
@@ -712,72 +756,139 @@ if (isset($_POST['inputData'])) {
 
 		$(document).ready(function() {
 
-			/* Início: Tabela Personalizada */
-			$('#tabelaProdutoServico').DataTable({
-				"order": [
-					[0, "asc"]
-				],
-				autoWidth: false,
-				responsive: true,
-				columnDefs: [{
-						orderable: true, //Item
-						width: "5%",
-						targets: [0]
-					},
-					{
-						orderable: true, //Produto/Servico
-						width: "25%",
-						targets: [1]
-					},
-					{
-						orderable: true, //Unidade Medida
-						width: "12%",
-						targets: [2]
-					},
-					{
-						orderable: true, //Quantidade
-						width: "10%",
-						targets: [3]
-					},
-					{
-						orderable: true, //Saldo
-						width: "10%",
-						targets: [4]
-					},
-					{
-						orderable: true, //Valor Unitário
-						width: "10%",
-						targets: [5]
-					},
-					{
-						orderable: true, //Valor Total
-						width: "10%",
-						targets: [6]
-					},
-					{
-						orderable: false, //Classificação
-						width: "13%",
-						targets: [7]
-					},
-					{
-						orderable: false, //Ações
-						width: "5%",
-						targets: [8]
+			var inputTipo = $('input[name="inputTipo"]:checked').val();
+
+			if (inputTipo == 'E') {
+				/* Início: Tabela Personalizada */
+				$('#tabelaProdutoServico').DataTable({
+					"order": [
+						[0, "asc"]
+					],
+					autoWidth: false,
+					responsive: true,
+					columnDefs: [{
+							orderable: true, //Item
+							width: "5%",
+							targets: [0]
+						},
+						{
+							orderable: true, //Produto/Servico
+							width: "25%",
+							targets: [1]
+						},
+						{
+							orderable: true, //Unidade Medida
+							width: "12%",
+							targets: [2]
+						},
+						{
+							orderable: true, //Quantidade
+							width: "10%",
+							targets: [3]
+						},
+						{
+							orderable: true, //Saldo
+							width: "10%",
+							targets: [4]
+						},
+						{
+							orderable: true, //Valor Unitário
+							width: "10%",
+							targets: [5]
+						},
+						{
+							orderable: true, //Valor Total
+							width: "10%",
+							targets: [6]
+						},
+						{
+							orderable: false, //Classificação
+							width: "13%",
+							targets: [7]
+						},
+						{
+							orderable: false, //Ações
+							width: "5%",
+							targets: [8]
+						}
+					],
+					dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+					language: {
+						search: '<span>Filtro:</span> _INPUT_',
+						searchPlaceholder: 'filtra qualquer coluna...',
+						lengthMenu: '<span>Mostrar:</span> _MENU_',
+						paginate: {
+							'first': 'Primeira',
+							'last': 'Última',
+							'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+							'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+						}
 					}
-				],
-				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
-				language: {
-					search: '<span>Filtro:</span> _INPUT_',
-					searchPlaceholder: 'filtra qualquer coluna...',
-					lengthMenu: '<span>Mostrar:</span> _MENU_',
-					paginate: {
-						'first': 'Primeira',
-						'last': 'Última',
-						'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-						'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+				});
+			} else {
+				/* Início: Tabela Personalizada */
+				$('#tabelaProdutoServicoSaida').DataTable({
+					"order": [
+						[0, "asc"]
+					],
+					autoWidth: false,
+					responsive: true,
+					columnDefs: [{
+							orderable: true, //Item
+							width: "5%",
+							targets: [0]
+						},
+						{
+							orderable: true, //Produto/Servico
+							width: "30%",
+							targets: [1]
+						},
+						{
+							orderable: true, //Unidade Medida
+							width: "15%",
+							targets: [2]
+						},
+						{
+							orderable: true, //Quantidade
+							width: "10%",
+							targets: [3]
+						},
+						{
+							orderable: true, //Valor Unitário
+							width: "10%",
+							targets: [4]
+						},
+						{
+							orderable: true, //Valor Total
+							width: "10%",
+							targets: [5]
+						},
+						{
+							orderable: false, //Classificação
+							width: "15%",
+							targets: [6]
+						},
+						{
+							orderable: false, //Ações
+							width: "5%",
+							targets: [7]
+						}
+					],
+					dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+					language: {
+						search: '<span>Filtro:</span> _INPUT_',
+						searchPlaceholder: 'filtra qualquer coluna...',
+						lengthMenu: '<span>Mostrar:</span> _MENU_',
+						paginate: {
+							'first': 'Primeira',
+							'last': 'Última',
+							'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+							'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+						}
 					}
-				}
-			});
+				});
+			}
+
 
 			// Select2 for length menu styling
 			var _componentSelect2 = function() {
@@ -915,7 +1026,7 @@ if (isset($_POST['inputData'])) {
 						ResetSubCategoria();
 					}
 				}).fail(function(m) {
-					
+
 				});
 
 				$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria, function(dados) {
@@ -965,17 +1076,17 @@ if (isset($_POST['inputData'])) {
 			})
 
 			//Impede que o input quantidade receba letras
-			$('#inputQuantidade').on('keydown', ()=>{
+			$('#inputQuantidade').on('keydown', () => {
 				let valor = $('#inputQuantidade').val()
 
-				if(valor == '´' || valor == '~' || valor == '`' || valor == ';'){
+				if (valor == '´' || valor == '~' || valor == '`' || valor == ';') {
 					$('#inputQuantidade').val('')
 				}
-				if( event.keyCode != '8' && event.keyCode != '48' && event.keyCode != '49' && event.keyCode != '50' && event.keyCode != '51' && event.keyCode != '52' && event.keyCode != '53' && event.keyCode != '54' && event.keyCode != '55' && event.keyCode != '56' && event.keyCode != '57'  && event.keyCode != '96'  && event.keyCode != '97'  && event.keyCode != '98'  && event.keyCode != '99'  && event.keyCode != '100'  && event.keyCode != '101'  && event.keyCode != '102'  && event.keyCode != '103'  && event.keyCode != '104'  && event.keyCode != '105'  && event.keyCode != '106'  && event.keyCode != '107'){
+				if (event.keyCode != '8' && event.keyCode != '48' && event.keyCode != '49' && event.keyCode != '50' && event.keyCode != '51' && event.keyCode != '52' && event.keyCode != '53' && event.keyCode != '54' && event.keyCode != '55' && event.keyCode != '56' && event.keyCode != '57' && event.keyCode != '96' && event.keyCode != '97' && event.keyCode != '98' && event.keyCode != '99' && event.keyCode != '100' && event.keyCode != '101' && event.keyCode != '102' && event.keyCode != '103' && event.keyCode != '104' && event.keyCode != '105' && event.keyCode != '106' && event.keyCode != '107') {
 					return false
 				}
 
-				if(event.keyCode == '222' && event.keyCode != '219' && event.keyCode != '191'){
+				if (event.keyCode == '222' && event.keyCode != '219' && event.keyCode != '191') {
 					return false
 				}
 			})
@@ -1039,7 +1150,7 @@ if (isset($_POST['inputData'])) {
 								ResetProduto();
 							}
 						}).fail(function(m) {
-							
+
 						});
 					}
 				})
@@ -1161,6 +1272,7 @@ if (isset($_POST['inputData'])) {
 
 				if ($('[for=cmbProduto]').html() == 'Produto') {
 					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					let origem = $('#cmbEstoqueOrigem').val()
 					$.ajax({
 						type: "POST",
 						url: "movimentacaoAddProduto.php",
@@ -1168,6 +1280,7 @@ if (isset($_POST['inputData'])) {
 							tipo: inputTipo,
 							numItens: resNumItens,
 							idProduto: Produto[0],
+							origem: origem,
 							quantidade: inputQuantidade,
 							classific: cmbClassificacao
 						},
@@ -1177,7 +1290,14 @@ if (isset($_POST['inputData'])) {
 
 							//newRow.append(resposta);
 							if (resposta != 'SEMESTOQUE') {
-								$("#tabelaProdutoServico").append(resposta);
+
+								var inputTipo = $('input[name="inputTipo"]:checked').val();
+
+								if (inputTipo == 'E') {
+									$("#tabelaProdutoServico").append(resposta);
+								} else {
+									$("#tabelaProdutoServicoSaida").append(resposta);
+								}
 
 								//Adiciona mais um item nessa contagem
 								$('#inputNumItens').val(resNumItens);
@@ -1210,13 +1330,13 @@ if (isset($_POST['inputData'])) {
 
 										//let inputProdutoGridValores = inputHiddenProdutoServico.val()
 										if (idSelect == indiceLinha) {
-											
+
 											let valueProdutoServicoArray = $(`#campo${indiceLinha}`).val().split('#')
 											// adicionando  novos dados no array
 											valueProdutoServicoArray[valueProdutoServicoArray.length - 1] = valor
 
 											var ponto = eval('/' + '.' + '/g')
-											
+
 											valueProdutoServicoArray[2] = valueProdutoServicoArray[2].replace(',', '.')
 
 
@@ -1244,6 +1364,7 @@ if (isset($_POST['inputData'])) {
 
 								return false;
 							} else {
+								console.log(resposta)
 								alerta('Atenção', 'Estoque indisponível!', 'error');
 								return false;
 							}
@@ -1517,11 +1638,11 @@ if (isset($_POST['inputData'])) {
 					let contSelectClassVal = 0
 
 					$('.selectClassific').each((i, elem) => {
-							let valor = $(elem).val()
-							
-							if (valor != '#') {
-								contSelectClassVal++
-							}				
+						let valor = $(elem).val()
+
+						if (valor != '#') {
+							contSelectClassVal++
+						}
 					})
 
 					if (contSelectClass == contSelectClassVal) {
@@ -1530,7 +1651,8 @@ if (isset($_POST['inputData'])) {
 							url: "movimentacaoNovo.php",
 							data: submitProduto,
 							success: function(resposta) {
-								window.location.href = "index.php";
+								//window.location.href = "index.php";
+								console.log(resposta);
 							}
 						})
 					} else {
@@ -1667,7 +1789,7 @@ if (isset($_POST['inputData'])) {
 				document.getElementById('trEntrada').style.display = "none";
 				document.getElementById('trSaida').style.display = "table-row";
 
-				
+
 
 				mudaTotalTitulo('S')
 			} else {
@@ -2317,35 +2439,30 @@ if (isset($_POST['inputData'])) {
 
 							<div class="row">
 								<div class="col-lg-12">
-									<table class="table" id="tabelaProdutoServico">
-										<thead>
+									<?php
+									if (isset($_POST['inputSolicitacaoId'])) {
+										print('<table class="table" id="tabelaProdutoServicoSaida">');
+									} else {
+										print('<table class="table" id="tabelaProdutoServico">');
+									}
+									?>
+									<thead>
 										<?php
-											if (isset($_POST['inputSolicitacaoId'])) {
-												print('
-												    <tr class="bg-slate" id="trEntrada" style="display: none; width: 100%">
-												        <th>Item</th>
-												        <th>Produto/Serviço</th>
-												        <th style="text-align:center">Unidade Medida</th>
-												        <th id="quantEditaEntradaSaida" style="text-align:center">Quant. Recebida</th>
-												        <th style="text-align:center">Saldo</th>
-												        <th style="text-align:right">Valor Unitário</th>
-												        <th style="text-align:right">Valor Total</th>
-												        <th class="text-center">Ações</th>
-											        </tr>
+										if (isset($_POST['inputSolicitacaoId'])) {
+											print('
 												    <tr class="bg-slate" id="trSaida" >
 												        <th>Item</th>
 												        <th>Produto/Serviço</th>
 												        <th style="text-align:center">Unidade Medida</th>
-												        <th id="quantEditaEntradaSaida" style="text-align:center">Quant. Recebida</th>
-												        <th style="text-align:center">Saldo</th>
+												        <th id="quantEditaEntradaSaida" style="text-align:center">Quantidade</th>
 												        <th style="text-align:right">Valor Unitário</th>
 												        <th style="text-align:right">Valor Total</th>
 												        <th id="classificacaoSaida">Classificação</th>
 												        <th class="text-center">Ações</th>
 											        </tr>
 												');
-											} else {
-												print('
+										} else {
+											print('
                                              
 											        <tr class="bg-slate" id="trEntrada">
 											            <th>Item</th>
@@ -2361,79 +2478,97 @@ if (isset($_POST['inputData'])) {
 													    <th>Item</th>
 													    <th>Produto/Serviço</th>
 													    <th style="text-align:center">Unidade Medida</th>
-													    <th id="quantEditaEntradaSaida" style="text-align:center">Quant. Recebida</th>
-													    <th style="text-align:center">Saldo</th>
+													    <th id="quantEditaEntradaSaida" style="text-align:center">Quantidade</th>
 													    <th style="text-align:right">Valor Unitário</th>
 													    <th style="text-align:right">Valor Total</th>
 													    <th id="classificacaoSaida">Classificação</th>
 													    <th class="text-center">Ações</th>
 												    </tr>
 											');
-											}
-											
+										}
 
-                                        ?>
-										</thead>
-										<tbody>
-											<tr style="display:none;">
-												<td>&nbsp;</td>
-												<td>&nbsp;</td>
-												<td>&nbsp;</td>
-												<td>&nbsp;</td>
-												<td>&nbsp;</td>
-												<td>&nbsp;</td>
-												<td>&nbsp;</td>
-												<td>&nbsp;</td>
-												<td>&nbsp;</td>
-											</tr>
 
-											<?php
-											if (isset($_POST['inputSolicitacaoId'])) {
-												$idProdutoSolicitacao = 0;
-												$totalGeral = 0;
-												foreach ($produtosSolicitacao  as $produto) {
-													$idProdutoSolicitacao++;
+										?>
+									</thead>
+									<tbody>
+										<?php
+										if (isset($_POST['inputSolicitacaoId'])) {
+											$idProdutoSolicitacao = 0;
+											$totalGeral = 0;
 
-													$valorCusto = formataMoeda($produto['ProduValorVenda']);
-													$valorTotal = formataMoeda($produto['SlXPrQuantidade'] * $produto['ProduValorVenda']);
-													$valorTotalSemFormatacao = $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+											print('<tr style="display:none;">
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+										            </tr>
+											');
+										} else {
+											print('<tr style="display:none;">
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+											            <td>&nbsp;</td>
+														<td>&nbsp;</td>
+														<td>&nbsp;</td>
+										            </tr>
+								            ');
+										}
+										?>
 
-													$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+										<?php
+										if (isset($_POST['inputSolicitacaoId'])) {
+											$idProdutoSolicitacao = 0;
+											$totalGeral = 0;
+											foreach ($produtosSolicitacao  as $produto) {
+												$idProdutoSolicitacao++;
 
-													$linha = '';
+												$valorCusto = formataMoeda($produto['ProduValorVenda']);
+												$valorTotal = formataMoeda($produto['SlXPrQuantidade'] * $produto['ProduValorVenda']);
+												$valorTotalSemFormatacao = $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
 
-													$linha .= "
+												$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+
+												$linha = '';
+
+												$linha .= "
 															   <tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
 															        <td>" . $idProdutoSolicitacao . "</td>
 															        <td>" . $produto['ProduNome'] . "</td>
 															        <td style='text-align:center'>" . $produto['UnMedNome'] . "</td>
 																	<td style='text-align:center'>" . $produto['SlXPrQuantidade'] . "</td>
-																	<td style='text-align:center'>0</td>
 																	<td valorUntPrSolici='" . $produto['ProduValorVenda'] . "' style='text-align:right'>" . $valorCusto . "</td>
 																	<td style='text-align:right'>" . $valorTotal . "</td>
 															   
 														";
 
-													$linha .= '
+												$linha .= '
 																<td style="text-align:center">
 																    <div class="d-flex flex-row ">
 																        <select id="' . $idProdutoSolicitacao . '" name="cmbClassificacao" class="form-control form-control-select2 selectClassific">
 																            <option value="#">Selecione</option>
 													    ';
 
-													$sql = "SELECT ClassId, ClassNome
+												$sql = "SELECT ClassId, ClassNome
 														FROM Classificacao
 														JOIN Situacao on SituaId = ClassStatus
 														WHERE SituaChave = 'ATIVO'
 														ORDER BY ClassNome ASC";
-													$result = $conn->query($sql);
-													$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+												$result = $conn->query($sql);
+												$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowClassificacao as $item) {
-														$linha .= '<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>';
-													}
+												foreach ($rowClassificacao as $item) {
+													$linha .= '<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>';
+												}
 
-													$linha .= "
+												$linha .= "
 																	    </select>
 																	</div>
 																</td>
@@ -2441,34 +2576,41 @@ if (isset($_POST['inputData'])) {
 															</tr>
 														";
 
-													print($linha);
-												}
+												print($linha);
 											}
-											?>
-										</tbody>
-										<tfoot>
-											<tr>
-												<th id="totalTitulo" colspan="6" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$) Nota Fiscal: </th>
-												<?php
-												if (isset($_POST['inputSolicitacaoId'])) {
-													print('
+										}
+										?>
+									</tbody>
+									<tfoot>
+										<tr>
+											<th id="totalTitulo" colspan="6" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$) Nota Fiscal: </th>
+											<?php
+											if (isset($_POST['inputSolicitacaoId'])) {
+												print('
 														    <th colspan="1">
 														        <div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">' . formataMoeda($totalGeral) . '</div>
 													        </th>
-														    ');
-												} else {
-													print('
+															');
+
+												print('<th colspan="1">
+
+												       </th>
+												');
+											} else {
+												print('
 														    <th colspan="1">
 														        <div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0,00</div>
 													        </th>
-														');
-												}
-												?>
-												<th colspan="2">
+												');
+												print('<th colspan="2">
 
-												</th>
-											</tr>
-										</tfoot>
+														</th>
+												');
+											}
+											?>
+
+										</tr>
+									</tfoot>
 									</table>
 								</div>
 							</div>
