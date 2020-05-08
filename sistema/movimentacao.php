@@ -6,12 +6,13 @@ $_SESSION['PaginaAtual'] = 'Movimentação';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave, SituaCor, LcEstNome, SetorNome
+$sql = "SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave, SituaCor, LcEstNome, SetorNome, BandeMotivo
 		FROM Movimentacao
 		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
-		LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal or LcEstId = MovimDestinoLocal
-		LEFT JOIN Setor on SetorId = MovimOrigemSetor or LcEstId = MovimDestinoSetor
+		LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+		LEFT JOIN Setor on SetorId = MovimDestinoSetor
 		JOIN Situacao on SituaId = MovimSituacao
+		LEFT JOIN Bandeja on BandeTabelaId = MovimId and BandeTabela = 'Movimentacao' and BandeEmpresa = " . $_SESSION['EmpreId'] . "
 	    WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . "
 		ORDER BY MovimData DESC";
 $result = $conn->query($sql);
@@ -230,15 +231,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										}
 										
 										$situacao = $item['SituaNome'];
-										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
-
-										$sql = "SELECT BandeMotivo
-												FROM Bandeja
-												JOIN Situacao on SituaId = BandeStatus
-												WHERE BandeTabela = 'Movimentacao' and BandeTabelaId = ".$item['MovimId']." and 
-												BandeEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'NAOLIBERADO'";
-										$result = $conn->query($sql);
-										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);										
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];									
 
 										print('
 										<tr>
@@ -264,10 +257,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'imprimir\', \'\');" class="dropdown-item"><i class="icon-printer2"></i> Imprimir</a>');
 															
-																if (isset($rowMotivo['BandeMotivo'])){
+																if (isset($item['BandeMotivo'])){
 																	print('
 																	<div class="dropdown-divider"></div>
-																	<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'motivo\', \''.$rowMotivo['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
+																	<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
 																}															
 										print('				</div>
 														</div>

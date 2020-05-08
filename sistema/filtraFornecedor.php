@@ -8,14 +8,14 @@ if ($_GET['idCategoria'] == '-1'){
 	$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 			FROM Fornecedor
 			JOIN Situacao on SituaId = ForneStatus
-			WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
+			WHERE ForneUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
 			ORDER BY ForneNome ASC";
 } else{
 	$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 			FROM Fornecedor
 			JOIN Categoria on CategId = ForneCategoria
 			JOIN Situacao on SituaId = ForneStatus
-			WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and CategId = '". $_GET['idCategoria']."' and SituaChave = 'ATIVO'
+			WHERE ForneUnidade = ".$_SESSION['UnidadeId']." and CategId = '". $_GET['idCategoria']."' and SituaChave = 'ATIVO'
 			ORDER BY ForneNome ASC";
 }
 

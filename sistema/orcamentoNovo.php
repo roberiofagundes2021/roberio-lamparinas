@@ -19,7 +19,7 @@ if(isset($_POST['inputData'])){
 		
 		$sql = "SELECT COUNT(isnull(OrcamNumero,0)) as Numero
 				FROM Orcamento
-				Where OrcamEmpresa = ".$_SESSION['EmpreId']."";
+				Where OrcamUnidade = ".$_SESSION['UnidadeId']."";
 		$result = $conn->query($sql);
 		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);		
 		
@@ -27,9 +27,9 @@ if(isset($_POST['inputData'])){
 		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 			
 		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor,
-									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamEmpresa)
+									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamUnidade)
 				VALUES (:sNumero, :sTipo, :dData, :iCategoria,:sConteudo, :iFornecedor, :iSolicitante, 
-						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
+						:bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 		
 		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
@@ -46,7 +46,7 @@ if(isset($_POST['inputData'])){
 						':iSolicitante' => $_SESSION['UsuarId'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 		$insertId = $conn->lastInsertId(); 
 
@@ -55,9 +55,9 @@ if(isset($_POST['inputData'])){
 			
 			try{
 				$sql = "INSERT INTO OrcamentoXSubCategoria 
-							(OrXSCOrcamento, OrXSCSubCategoria, OrXSCEmpresa)
+							(OrXSCOrcamento, OrXSCSubCategoria, OrXSCUnidade)
 						VALUES 
-							(:iOrcamento, :iSubCategoria, :iEmpresa)";
+							(:iOrcamento, :iSubCategoria, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				foreach ($_POST['cmbSubCategoria'] as $key => $value){
@@ -65,7 +65,7 @@ if(isset($_POST['inputData'])){
 					$result->execute(array(
 									':iOrcamento' => $insertId,
 									':iSubCategoria' => $value,
-									':iEmpresa' => $_SESSION['EmpreId']
+									':iUnidade' => $_SESSION['UnidadeId']
 									));
 				}
 				
@@ -314,7 +314,7 @@ if(isset($_POST['inputData'])){
 														$sql = "SELECT CategId, CategNome
 																FROM Categoria
 																JOIN Situacao on SituaId = CategStatus						     
-																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 															    ORDER BY CategNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -364,7 +364,7 @@ if(isset($_POST['inputData'])){
 														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																FROM Fornecedor
 																JOIN Situacao on SituaId = ForneStatus
-																WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 															    ORDER BY ForneNome ASC";
 														$result = $conn->query($sql);
 														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);

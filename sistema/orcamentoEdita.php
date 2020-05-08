@@ -25,7 +25,7 @@ if(isset($_POST['inputOrcamentoId'])){
 		$sql = "SELECT SbCatId, SbCatNome
 				FROM SubCategoria
 				JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
-				WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = $iOrcamento
+				WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and OrXSCOrcamento = $iOrcamento
 				ORDER BY SbCatNome ASC";
 		$result = $conn->query($sql);
 		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -72,21 +72,21 @@ if(isset($_POST['inputTipo'])){
 
 
         $sql = "DELETE FROM OrcamentoXSubCategoria
-				WHERE OrXSCOrcamento = :iOrcamento and OrXSCEmpresa = :iEmpresa";
+				WHERE OrXSCOrcamento = :iOrcamento and OrXSCUnidade = :iUnidade";
 		$result = $conn->prepare($sql);	
 		
 		$result->execute(array(
 							':iOrcamento' => $_POST['inputOrcamentoId'],
-							':iEmpresa' => $_SESSION['EmpreId']));
+							':iUnidade' => $_SESSION['UnidadeId']));
 
 
 		if (isset($_POST['cmbSubCategoria'])){
 			
 			try{
 				$sql = "INSERT INTO OrcamentoXSubCategoria 
-							(OrXSCOrcamento, OrXSCSubCategoria, OrXSCEmpresa)
+							(OrXSCOrcamento, OrXSCSubCategoria, OrXSCUnidade)
 						VALUES 
-							(:iOrcamento, :iSubCategoria, :iEmpresa)";
+							(:iOrcamento, :iSubCategoria, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				foreach ($_POST['cmbSubCategoria'] as $key => $value){
@@ -94,7 +94,7 @@ if(isset($_POST['inputTipo'])){
 					$result->execute(array(
 									':iOrcamento' => $_POST['inputOrcamentoId'],
 									':iSubCategoria' => $value,
-									':iEmpresa' => $_SESSION['EmpreId']
+									':iUnidade' => $_SESSION['UnidadeId']
 									));
 				}
 	
@@ -107,12 +107,12 @@ if(isset($_POST['inputTipo'])){
 		if (isset($_POST['inputOrcamentoProdutoExclui']) and $_POST['inputOrcamentoProdutoExclui']){
 			
 			$sql = "DELETE FROM OrcamentoXProduto
-					WHERE OrXPrOrcamento = :iOrcamento and OrXPrEmpresa = :iEmpresa";
+					WHERE OrXPrOrcamento = :iOrcamento and OrXPrUnidade = :iUnidade";
 			$result = $conn->prepare($sql);	
 			
 			$result->execute(array(
 								':iOrcamento' => $iOrcamento,
-								':iEmpresa' => $_SESSION['EmpreId']));
+								':iUnidade' => $_SESSION['UnidadeId']));
 		}
 		
 		$conn->commit();						
@@ -404,7 +404,7 @@ if(isset($_POST['inputTipo'])){
 														$sql = "SELECT CategId, CategNome
 																FROM Categoria
 																JOIN Situacao on SituaId = CategStatus											     
-																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 															    ORDER BY CategNome ASC";
 														$result = $conn->query($sql);
 														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -429,7 +429,7 @@ if(isset($_POST['inputTipo'])){
 													        $sql = "SELECT SbCatId, SbCatNome
 																	FROM SubCategoria
 																	JOIN Situacao on SituaId = SbCatStatus
-																	WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SituaChave = 'ATIVO'
+																	WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SituaChave = 'ATIVO'
 																	ORDER BY SbCatNome ASC";
 													        $result = $conn->query($sql);
 													        $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -474,7 +474,7 @@ if(isset($_POST['inputTipo'])){
 														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																FROM Fornecedor
 																JOIN Situacao on SituaId = ForneStatus													     
-																WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO' and ForneCategoria = ".$row['OrcamCategoria']."
+																WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ForneCategoria = ".$row['OrcamCategoria']."
 															    ORDER BY ForneNome ASC";
 														$result = $conn->query($sql);
 														$fornecedores = $result->fetchAll(PDO::FETCH_ASSOC);

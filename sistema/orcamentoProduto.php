@@ -21,18 +21,18 @@ if(isset($_POST['inputOrcamentoId'])){
 if(isset($_POST['inputIdOrcamento'])){
 	
 	$sql = "DELETE FROM OrcamentoXProduto
-			WHERE OrXPrOrcamento = :iOrcamento AND OrXPrEmpresa = :iEmpresa";
+			WHERE OrXPrOrcamento = :iOrcamento AND OrXPrUnidade = :iUnidade";
 	$result = $conn->prepare($sql);
 	
 	$result->execute(array(
 					':iOrcamento' => $iOrcamento,
-					':iEmpresa' => $_SESSION['EmpreId']
+					':iUnidade' => $_SESSION['UnidadeId']
 					));		
 	
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 	
-		$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrEmpresa)
-				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO OrcamentoXProduto (OrXPrOrcamento, OrXPrProduto, OrXPrQuantidade, OrXPrValorUnitario, OrXPrUsuarioAtualizador, OrXPrUnidade)
+				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 		
 		$result->execute(array(
@@ -41,7 +41,7 @@ if(isset($_POST['inputIdOrcamento'])){
 						':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
 						':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -54,9 +54,9 @@ try{
 	
 	$sql = "SELECT *
 			FROM Orcamento
-			LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
+			JOIN Fornecedor on ForneId = OrcamFornecedor
 			JOIN Categoria on CategId = OrcamCategoria
-			WHERE OrcamEmpresa = ". $_SESSION['EmpreId'] ." and OrcamId = $iOrcamento ";
+			WHERE OrcamUnidade = ". $_SESSION['UnidadeId'] ." and OrcamId = $iOrcamento ";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
@@ -64,7 +64,7 @@ try{
 	$sql = "SELECT OrXPrProduto
 			FROM OrcamentoXProduto
 			JOIN Produto on ProduId = OrXPrProduto
-			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and OrXPrOrcamento = ".$iOrcamento;	
+			WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and OrXPrOrcamento = ".$iOrcamento;	
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
@@ -73,12 +73,12 @@ try{
 		$aProdutos[] = $itemProdutoUtilizado['OrXPrProduto'];
 	}
 
-	$sql = ("SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
-				 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = $iOrcamento
-				 ORDER BY SbCatNome ASC");
-		$result = $conn->query("$sql");
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria
+			JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
+			WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and OrXSCOrcamento = $iOrcamento
+			ORDER BY SbCatNome ASC";
+		$result = $conn->query($sql);
 		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($rowBD as $item){
 			$aSubCategorias[] = $item['SbCatId'];
@@ -267,11 +267,12 @@ try{
 													<!--<option value="#">Selecione uma subcategoria</option>-->
 													<?php
 												        if (isset($row['OrcamCategoria'])){
-													        $sql = ("SELECT SbCatId, SbCatNome
-															    FROM SubCategoria														 
-															     WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SbCatStatus = 1
-															     ORDER BY SbCatNome ASC");
-													        $result = $conn->query("$sql");
+													        $sql = "SELECT SbCatId, SbCatNome
+															    	FROM SubCategoria
+																	JOIN Situacao on SituaId = SbCatStatus	
+															     	WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SituaChave = 'ATIVO'
+															     	ORDER BY SbCatNome ASC";
+													        $result = $conn->query($sql);
 													        $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 													        $count = count($rowSubCategoria);
 
@@ -294,8 +295,9 @@ try{
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 													<?php 
 														$sql = "SELECT ProduId, ProduNome
-																FROM Produto										     
-																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria;
+																FROM Produto
+																JOIN Situacao on SituaId = ProduStatus
+																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
 														
 														if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
 															$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
@@ -351,8 +353,8 @@ try{
 										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OrXPrQuantidade, OrXPrValorUnitario
 												FROM Produto
 												JOIN OrcamentoXProduto on OrXPrProduto = ProduId
-												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OrXPrOrcamento = ".$iOrcamento;
+												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OrXPrOrcamento = ".$iOrcamento;
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
@@ -360,8 +362,9 @@ try{
 										if (!$count){
 											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
 													FROM Produto
-													LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and ProduStatus = 1 ";
+													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+													JOIN Situacao on SituaId = ProduStatus
+													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and SituaChave = 'ATIVO' ";
 													
 											if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
 												$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
