@@ -159,16 +159,16 @@ if (isset($_POST['inputData'])) {
 				//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
 
 				if (isset($_POST[$campo])) {
-var_dump($campo);
+					var_dump($campo);
 					$registro = explode('#', $_POST[$campo]);
 
 					if ($registro[0] == 'P') {
 
 						$quantItens = intval($registro[3]);
+						if (isset($registro[7])) {
+							for ($i = 1; $i <= $quantItens; $i++) {
+								// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
 
-						for ($i = 1; $i <= $quantItens; $i++) {
-							// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
-							if (isset($registro[7])) {
 								if ($registro[7] == 2) {
 
 									$sql = "SELECT PatriNumero
@@ -290,6 +290,7 @@ var_dump($campo);
 											':iPatrimonio' => $insertIdPatrimonio
 										));
 									}
+								
 								} else {
 									$quantItens = intval($registro[3]);
 
@@ -314,6 +315,28 @@ var_dump($campo);
 										));
 									}
 								}
+								break 1;
+							}
+						} else {
+							if ((int) $registro[3] > 0) {
+								$sql = "INSERT INTO MovimentacaoXProduto
+							            (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa, MvXPrPatrimonio)
+							            VALUES 
+							            (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa, :iPatrimonio)";
+								$result = $conn->prepare($sql);
+
+								$result->execute(array(
+									':iMovimentacao' => $insertId,
+									':iProduto' => $registro[1],
+									':iQuantidade' => (int) $registro[3],
+									':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
+									':sLote' => $registro[5],
+									':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+									':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+									':iEmpresa' => $_SESSION['EmpreId'],
+									':iPatrimonio' => null
+								));
 							}
 						}
 					} else {
@@ -1075,6 +1098,76 @@ var_dump($campo);
 				});
 			})
 
+			function filtraCategoriaOrigem() {
+				let cmbOrigem = $('#cmbEstoqueOrigem').val()
+				let tipoDeFiltro = 'Categoria'
+
+				$('#cmbCategoria').html('<option value="#" "selected">Filtrando...</option>');
+
+				$.ajax({
+					type: "POST",
+					url: "filtraPorOrigem.php",
+					data: {
+						origem: cmbOrigem,
+						tipoDeFiltro: tipoDeFiltro
+					},
+					success: function(resposta) {
+						var option = '<option value="#" "selected">Selecione a Categoria</option>';
+
+						if (resposta) {
+							$('#cmbCategoria').html('');
+							$('#cmbCategoria').append(option)
+							$('#cmbCategoria').append(resposta)
+
+						} else {
+							$('#cmbCategoria').html('<option value="#" "selected">Sem categorias</option>');
+						}
+					} //.fail(function(m) {
+					//console.log(m);
+					//});
+				})
+			}
+
+			$('#cmbEstoqueOrigem').on('change', function(e) {
+				filtraCategoriaOrigem()
+			})
+			filtraCategoriaOrigem()
+
+
+			function filtraPatrimonioProdutoOrigem() {
+				let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val().split('#')
+				let tipoDeFiltro = 'Patrimonio'
+
+				$('#cmbPatrimonio').html('<option value="#" "selected">Filtrando...</option>');
+
+				$.ajax({
+					type: "POST",
+					url: "filtraPorOrigem.php",
+					data: {
+						origem: cmbOrigem[0],
+						tipoDeFiltro: tipoDeFiltro
+					},
+					success: function(resposta) {
+						var option = '<option value="#" "selected">Selecione o Patrimônio</option>';
+console.log(resposta);
+						if (resposta) {
+							$('#cmbPatrimonio').html('');
+							$('#cmbPatrimonio').append(option)
+							$('#cmbPatrimonio').append(resposta)
+						} else {
+							$('#cmbPatrimonio').html('<option value="#" "selected">Sem Patrimônios</option>');
+						}
+					} //.fail(function(m) {
+					//console.log(m);
+					//});
+				})
+			}
+
+			$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
+				filtraPatrimonioProdutoOrigem() 
+			})
+			//filtraPatrimonioProdutoOrigem() 
+
 			//Impede que o input quantidade receba letras
 			$('#inputQuantidade').on('keydown', () => {
 				let valor = $('#inputQuantidade').val()
@@ -1774,6 +1867,7 @@ var_dump($campo);
 				document.getElementById('dadosProduto').style.display = "none";
 				document.getElementById('trEntrada').style.display = "table-row";
 				document.getElementById('trSaida').style.display = "none";
+				document.getElementById('Patrimonio').style.display = "none";
 
 				mudaTotalTitulo('E')
 			} else if (tipo == 'S') {
@@ -1788,7 +1882,8 @@ var_dump($campo);
 				document.getElementById('dadosProduto').style.display = "flex";
 				document.getElementById('trEntrada').style.display = "none";
 				document.getElementById('trSaida').style.display = "table-row";
-
+				document.getElementById('radiosProdutoServico').style.display = "flex";
+				document.getElementById('Patrimonio').style.display = "none";
 
 
 				mudaTotalTitulo('S')
@@ -1802,6 +1897,14 @@ var_dump($campo);
 				document.getElementById('motivo').style.display = "block";
 				document.getElementById('dadosNF').style.display = "none";
 				document.getElementById('dadosProduto').style.display = "flex";
+				document.getElementById('radiosProdutoServico').style.display = "none";
+				document.getElementById('Patrimonio').style.display = "flex";
+
+				document.getElementById('formLote').style.display = "block";
+				document.getElementById('formValidade').style.display = "block";
+				document.getElementById('classificacao').style.display = "block";
+				$('#tituloProdutoServico').html('Dados dos Produtos')
+				$('[for=cmbProduto]').html('Produto')
 			}
 
 
@@ -2280,7 +2383,7 @@ var_dump($campo);
 
 							<div class="row" id="dadosProduto" style="display: none">
 								<div class="col-lg-12">
-									<div class="col-lg-4 px-0">
+									<div id="radiosProdutoServico" class="col-lg-4 px-0">
 										<div class="form-group">
 											<div class="form-check form-check-inline">
 												<label class="form-check-label">
@@ -2298,7 +2401,16 @@ var_dump($campo);
 									</div>
 									<h5 class="mb-0 font-weight-semibold" id="tituloProdutoServico">Dados dos Produtos</h5>
 									<br>
-
+									<div class="row" id="Patrimonio" style="display: none">
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbPatrimonio">Patrimônio</label>
+												<select id="cmbPatrimonio" name="cmbPatrimonio" class="form-control form-control-select2">
+													<option value="#">Informe a origem</option>
+												</select>
+											</div>
+										</div>
+									</div>
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
