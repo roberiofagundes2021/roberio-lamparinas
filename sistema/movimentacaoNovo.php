@@ -16,8 +16,8 @@ if (isset($_POST['inputSolicitacaoId'])) {
 	            FROM SolicitacaoXProduto
                 JOIN Solicitacao on SolicId = SlXPrSolicitacao
                 JOIN Produto on ProduId = SlXPrProduto
-				LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-                WHERE SlXPrEmpresa = " . $_SESSION['EmpreId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
+				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+                WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
     ";
 	$result = $conn->query($sql);
 	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -38,18 +38,16 @@ if (isset($_POST['inputSolicitacaoId'])) {
 	}
 
 	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
-	            FROM SolicitacaoXProduto
-                JOIN Solicitacao on SolicId = SlXPrSolicitacao
-                JOIN Produto on ProduId = SlXPrProduto
-				LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-                WHERE SlXPrEmpresa = " . $_SESSION['EmpreId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
+			FROM SolicitacaoXProduto
+			JOIN Solicitacao on SolicId = SlXPrSolicitacao
+			JOIN Produto on ProduId = SlXPrProduto
+			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
     ";
 	$result = $conn->query($sql);
 	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
 	$numProdutos = count($produtosSolicitacao);
 }
-
-
 
 
 if (isset($_POST['inputData'])) {
@@ -102,10 +100,10 @@ if (isset($_POST['inputData'])) {
 
 		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
-										  MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimEmpresa)
+										  MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimUnidade)
 				VALUES (:sTipo, :iMotivo, :dData, :iFinalidade, :iOrigemLocal, :iOrigemSetor, :iDestinoLocal, :iDestinoSetor, :sDestinoManual, 
 						:sObservacao, :iFornecedor, :iOrdemCompra, :sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, 
-						:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
+						:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		/*echo $sql;
@@ -141,7 +139,7 @@ if (isset($_POST['inputData'])) {
 			':sChaveAcesso' => $_POST['inputChaveAcesso'] == '' ? null : $_POST['inputChaveAcesso'],
 			':iSituacao' => $_POST['cmbSituacao'] == '#' ? null : $_POST['cmbSituacao'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iEmpresa' => $_SESSION['EmpreId']
+			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		$insertId = $conn->lastInsertId();
@@ -172,10 +170,10 @@ if (isset($_POST['inputData'])) {
 								if ($registro[7] == 2) {
 
 									$sql = "SELECT PatriNumero
-							              FROM Patrimonio
-										  JOIN Situacao on SituaId = PatriStatus
-										  WHERE PatriEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' 
-										  ORDER BY PatriNumero
+							              	FROM Patrimonio
+										  	JOIN Situacao on SituaId = PatriStatus
+										  	WHERE PatriEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' 
+										  	ORDER BY PatriNumero
 										  ";
 									$result = $conn->query($sql);
 									$patrimonios = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -224,9 +222,9 @@ if (isset($_POST['inputData'])) {
 
 
 										$sql = "INSERT INTO MovimentacaoXProduto
-						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa, MvXPrPatrimonio)
+						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
 					                            VALUES 
-						                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa, :iPatrimonio)";
+						                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
 										$result = $conn->prepare($sql);
 
 										$result->execute(array(
@@ -238,7 +236,7 @@ if (isset($_POST['inputData'])) {
 											':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
 											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
 											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId'],
+											':iUnidade' => $_SESSION['UnidadeId'],
 											':iPatrimonio' => $insertIdPatrimonio
 										));
 									} else {
@@ -272,9 +270,9 @@ if (isset($_POST['inputData'])) {
 
 
 										$sql = "INSERT INTO MovimentacaoXProduto
-						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa, MvXPrPatrimonio)
+						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
 					                            VALUES 
-						                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa, :iPatrimonio)";
+						                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
 										$result = $conn->prepare($sql);
 
 										$result->execute(array(
@@ -286,7 +284,7 @@ if (isset($_POST['inputData'])) {
 											':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
 											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
 											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId'],
+											':iUnidade' => $_SESSION['UnidadeId'],
 											':iPatrimonio' => $insertIdPatrimonio
 										));
 									}
@@ -296,9 +294,9 @@ if (isset($_POST['inputData'])) {
 
 									for ($i = 1; $i <= $quantItens; $i++) {
 										$sql = "INSERT INTO MovimentacaoXProduto
-								            (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa, MvXPrPatrimonio)
+								            (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
 								            VALUES 
-								            (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa, :iPatrimonio)";
+								            (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
 										$result = $conn->prepare($sql);
 
 										$result->execute(array(
@@ -310,7 +308,7 @@ if (isset($_POST['inputData'])) {
 											':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
 											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
 											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId'],
+											':iUnidade' => $_SESSION['UnidadeId'],
 											':iPatrimonio' => null
 										));
 									}
@@ -320,9 +318,9 @@ if (isset($_POST['inputData'])) {
 						} else {
 							if ((int) $registro[3] > 0) {
 								$sql = "INSERT INTO MovimentacaoXProduto
-							            (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrEmpresa, MvXPrPatrimonio)
+							            (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
 							            VALUES 
-							            (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iEmpresa, :iPatrimonio)";
+							            (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
 								$result = $conn->prepare($sql);
 
 								$result->execute(array(
@@ -334,16 +332,16 @@ if (isset($_POST['inputData'])) {
 									':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
 									':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
 									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-									':iEmpresa' => $_SESSION['EmpreId'],
+									':iUnidade' => $_SESSION['UnidadeId'],
 									':iPatrimonio' => null
 								));
 							}
 						}
 					} else {
 						$sql = "INSERT INTO MovimentacaoXServico
-						        (MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrLote, MvXSrUsuarioAtualizador, MvXSrEmpresa)
+						        (MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrLote, MvXSrUsuarioAtualizador, MvXSrUnidade)
 					            VALUES 
-						        (:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :sLote, :iUsuarioAtualizador, :iEmpresa)";
+						        (:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :sLote, :iUsuarioAtualizador, :iUnidade)";
 						$result = $conn->prepare($sql);
 
 						$result->execute(array(
@@ -353,7 +351,7 @@ if (isset($_POST['inputData'])) {
 							':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
 							':sLote' => $registro[5],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iEmpresa' => $_SESSION['EmpreId']
+							':iUnidade' => $_SESSION['UnidadeId']
 						));
 					}
 				}
@@ -393,9 +391,9 @@ if (isset($_POST['inputData'])) {
 				$sIdentificacao = 'Movimentação';
 
 				$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
-								BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
+								BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
 					VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, 
-							:iStatus, :iUsuarioAtualizador, :iEmpresa)";
+							:iStatus, :iUsuarioAtualizador, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				$result->execute(array(
@@ -408,29 +406,24 @@ if (isset($_POST['inputData'])) {
 					':iTabelaId' => $insertId,
 					':iStatus' => $rowSituacao['SituaId'],
 					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-					':iEmpresa' => $_SESSION['EmpreId']
+					':iUnidade' => $_SESSION['UnidadeId']
 				));
 
 				$insertIdBande = $conn->lastInsertId();
 
-				$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeEmpresa)
-						VALUES (:iBandeja, :iPerfil, :iEmpresa)";
+				$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeUnidade)
+						VALUES (:iBandeja, :iPerfil, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				$result->execute(array(
 					':iBandeja' => $insertIdBande,
 					':iPerfil' => $rowPerfil['PerfiId'],
-					':iEmpresa' => $_SESSION['EmpreId']
+					':iUnidade' => $_SESSION['UnidadeId']
 				));
 
 				/* Fim Insere Bandeja */
 			}
 		}
-
-
-
-
-
 
 		$conn->commit();
 
@@ -2117,20 +2110,18 @@ console.log(resposta);
 														$sql = "SELECT EXUXPLocalEstoque, SetorNome
 																 FROM EmpresaXUsuarioXPerfil
 																 JOIN Setor on SetorId = EXUXPSetor
-																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPEmpresa = " . $_SESSION['EmpreId'] . "
+																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
 															    ";
 														$result = $conn->query($sql);
 														$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
 														$sql = "SELECT LcEstId, LcEstNome
-															FROM LocalEstoque
-															JOIN Situacao on SituaId = LcEstStatus
-															WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-															ORDER BY LcEstNome ASC";
+																FROM LocalEstoque
+																JOIN Situacao on SituaId = LcEstStatus
+																WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY LcEstNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
 
 														foreach ($row as $item) {
 															if ($item['LcEstId'] == $usuarioPerfil['EXUXPLocalEstoque']) {
@@ -2142,10 +2133,10 @@ console.log(resposta);
 													} else {
 
 														$sql = "SELECT LcEstId, LcEstNome
-															FROM LocalEstoque
-															JOIN Situacao on SituaId = LcEstStatus
-															WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-															ORDER BY LcEstNome ASC";
+																FROM LocalEstoque
+																JOIN Situacao on SituaId = LcEstStatus
+																WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY LcEstNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2167,12 +2158,12 @@ console.log(resposta);
 													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
 															FROM LocalEstoque
 															JOIN Situacao on SituaId = LcEstStatus
-														    WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+														    WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														    UNION
 															SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
 															FROM Setor
 															JOIN Situacao on SituaId = SetorStatus
-														    WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+														    WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														    Order By Nome";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -2195,7 +2186,7 @@ console.log(resposta);
 													$sql = "SELECT LcEstId, LcEstNome
 															FROM LocalEstoque
 															JOIN Situacao on SituaId = LcEstStatus
-															WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 															ORDER BY LcEstNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -2219,7 +2210,7 @@ console.log(resposta);
 														$sql = "SELECT EXUXPSetor, SetorNome
 																 FROM EmpresaXUsuarioXPerfil
 																 JOIN Setor on SetorId = EXUXPSetor
-																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPEmpresa = " . $_SESSION['EmpreId'] . "
+																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
 															    ";
 														$result = $conn->query($sql);
 														$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
@@ -2230,7 +2221,7 @@ console.log(resposta);
 														$sql = "SELECT SetorId, SetorNome
 														        FROM Setor
 																JOIN Situacao on SituaId = SetorStatus
-														        WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+														        WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														        ORDER BY SetorNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -2255,12 +2246,12 @@ console.log(resposta);
 													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
 															FROM LocalEstoque
 															JOIN Situacao on SituaId = LcEstStatus
-															WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 															UNION
 															SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
 															FROM Setor
 															JOIN Situacao on SituaId = SetorStatus
-															WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 															Order By Nome";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -2307,7 +2298,7 @@ console.log(resposta);
 													$sql = "SELECT ForneId, ForneNome
 															FROM Fornecedor
 															JOIN Situacao on SituaId = ForneStatus
-															WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 															ORDER BY ForneNome ASC";
 													$result = $conn->query($sql);
 													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -2419,10 +2410,10 @@ console.log(resposta);
 													<option value="#">Selecione</option>
 													<?php
 													$sql = "SELECT CategId, CategNome
-																FROM Categoria
-																JOIN Situacao on SituaId = CategStatus
-																WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-																ORDER BY CategNome ASC";
+															FROM Categoria
+															JOIN Situacao on SituaId = CategStatus
+															WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															ORDER BY CategNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 

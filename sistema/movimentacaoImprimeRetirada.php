@@ -16,7 +16,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
     $sql = "SELECT MovimTipo, MovimData, MovimObservacao, ParamValorObsImpreRetirada
             FROM Movimentacao
             JOIN Parametro on ParamEmpresa = MovimEmpresa
-            WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = ". $iMovimentacao;
+            WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = ". $iMovimentacao;
     $result = $conn->query($sql);
     $row = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -30,7 +30,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
 	        LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 	        LEFT JOIN Modelo on ModelId = ProduModelo
 	        LEFT JOIN Marca on MarcaId = ProduMarca
-	        WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $iMovimentacao;
+	        WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao;
     $result = $conn->query($sql);
     $rowMvPr = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -40,7 +40,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
                 FROM Movimentacao
                 JOIN LocalEstoque on LcEstId = MovimOrigemLocal
                 JOIN Setor on SetorId = MovimDestinoSetor
-                WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $iMovimentacao;
+                WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao;
 
     } else if ($row['MovimTipo'] == 'T'){
         
@@ -59,7 +59,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
                 LEFT JOIN Setor StO on StO.SetorId = MovimOrigemSetor
                 LEFT JOIN Setor StD on StD.SetorId = MovimDestinoSetor
                 JOIN Motivo on MotivId = MovimMotivo
-                WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . " and MovimId = " . $iMovimentacao;
+                WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao;
     }
     $result = $conn->query($sql);
     $rowMv = $result->fetch(PDO::FETCH_ASSOC);

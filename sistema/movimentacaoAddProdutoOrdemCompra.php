@@ -8,12 +8,12 @@ $sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, 
 		FROM OrdemCompraXProduto
         JOIN Produto on ProduId = OCXPrProduto
  		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-        WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and OCXPrOrdemCompra = '" . $_POST['ordemCompra'] . "'
+        WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and OCXPrOrdemCompra = '" . $_POST['ordemCompra'] . "'
         UNION
         SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, ServiValorCusto as valorCusto, ServiCustoFinal as custoFinal, '', tipo = 'S'
 		FROM OrdemCompraXServico
         JOIN Servico on ServiId = OCXSrServico
-        WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OCXSrOrdemCompra = '" . $_POST['ordemCompra'] . "'
+        WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and OCXSrOrdemCompra = '" . $_POST['ordemCompra'] . "'
         ";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -28,18 +28,18 @@ $totalGeral = 0;
 $sql = "SELECT MovimId
 		FROM Movimentacao
 		JOIN Situacao on SituaId = MovimSituacao
-	    WHERE MovimOrdemCompra = " . $_POST['numOrdemCompra'] . " and MovimTipo = 'E' and MovimEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'LIBERADO'
+	    WHERE MovimOrdemCompra = " . $_POST['numOrdemCompra'] . " and MovimTipo = 'E' and MovimUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADO'
 		";
 $result = $conn->query($sql);
 $movimentAprovads = $result->fetchAll(PDO::FETCH_ASSOC);
 $countMovimentAprovads = count($movimentAprovads);
 
 
-$sql = " SELECT dbo.fnValorTotalOrdemCompra(" . $_SESSION['EmpreId'] . ",  " . $_POST['ordemCompra'] . ") as valorTotalOrdemCompra";
+$sql = " SELECT dbo.fnValorTotalOrdemCompra(" . $_SESSION['UnidadeId'] . ",  " . $_POST['ordemCompra'] . ") as valorTotalOrdemCompra";
 $result = $conn->query($sql);
 $totalOrdemCompra = $result->fetch(PDO::FETCH_ASSOC);
 
-$sql = " SELECT dbo.fnSaldoEntradaOrdemCompra(" . $_SESSION['EmpreId'] . ",  " . $_POST['ordemCompra'] . ") as saldoOrdemCompra";
+$sql = " SELECT dbo.fnSaldoEntradaOrdemCompra(" . $_SESSION['UnidadeId'] . ",  " . $_POST['ordemCompra'] . ") as saldoOrdemCompra";
 $result = $conn->query($sql);
 $saldoOrdemCompra = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -69,17 +69,17 @@ if ($countMovimentAprovads) {
         foreach (array_reverse($row) as $item) {
 
             if ($item['tipo'] == 'P') {
-                $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'P') as Quantidade, dbo.fnSaldoEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'P') as Saldo
+                $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Quantidade, dbo.fnSaldoEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Saldo
                         FROM OrdemCompra
-                        Where OrComEmpresa = " . $_SESSION['EmpreId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
+                        Where OrComUnidade = " . $_SESSION['UnidadeId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
                    ";
                 $result = $conn->query($sql);
                 $saldo = $result->fetch(PDO::FETCH_ASSOC);
             } else {
 
-                $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'S') as Quantidade, dbo.fnSaldoEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'S') as Saldo
+                $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'S') as Quantidade, dbo.fnSaldoEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'S') as Saldo
                         FROM OrdemCompra
-                        Where OrComEmpresa = " . $_SESSION['EmpreId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
+                        Where OrComUnidade = " . $_SESSION['UnidadeId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
                  ";
                 $result = $conn->query($sql);
                 $saldo = $result->fetch(PDO::FETCH_ASSOC);
@@ -165,17 +165,17 @@ if ($countMovimentAprovads) {
         foreach (array_reverse($row) as $item) {
 
             if ($item['tipo'] == 'P') {
-                $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'P') as Quantidade, dbo.fnSaldoEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'P') as Saldo
+                $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Quantidade, dbo.fnSaldoEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Saldo
                         FROM OrdemCompra
-                        Where OrComEmpresa = " . $_SESSION['EmpreId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
+                        Where OrComUnidade = " . $_SESSION['UnidadeId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
                    ";
                 $result = $conn->query($sql);
                 $saldo = $result->fetch(PDO::FETCH_ASSOC);
             } else {
 
-                $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'S') as Quantidade, dbo.fnSaldoEntrada(OrComEmpresa, OrComId, " . $item['id'] . ", 'S') as Saldo
+                $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'S') as Quantidade, dbo.fnSaldoEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'S') as Saldo
                         FROM OrdemCompra
-                        Where OrComEmpresa = " . $_SESSION['EmpreId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
+                        Where OrComUnidade = " . $_SESSION['UnidadeId'] . " and OrComId = '" . $_POST['ordemCompra'] . "'
                  ";
                 $result = $conn->query($sql);
                 $saldo = $result->fetch(PDO::FETCH_ASSOC);

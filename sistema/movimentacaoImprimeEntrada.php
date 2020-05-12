@@ -19,7 +19,7 @@ if (isset($_POST['inputMovimentacaoId'])){
 $sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimNotaFiscal, MovimObservacao		
         FROM Movimentacao
 		JOIN Fornecedor on ForneId = MovimFornecedor
-		WHERE MovimEmpresa = ". $_SESSION['EmpreId'] ." and MovimId = ".$iMovimentacao." and MovimTipo = 'E'";
+		WHERE MovimUnidade = ". $_SESSION['UnidadeId'] ." and MovimId = ".$iMovimentacao." and MovimTipo = 'E'";
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -72,7 +72,7 @@ try {
             FROM Produto
             JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
             JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-            WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and MvXPrMovimentacao = ".$iMovimentacao." and MvXPrQuantidade <> 0";
+            WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and MvXPrMovimentacao = ".$iMovimentacao." and MvXPrQuantidade <> 0";
     $result = $conn->query($sql);
     $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
     $totalProdutos = count($rowProdutos);
@@ -80,7 +80,7 @@ try {
     $sql = "SELECT ServiId, ServiNome, ServiDetalhamento, MvXSrQuantidade, MvXSrValorUnitario
             FROM Servico
             JOIN MovimentacaoXServico on MvXSrServico = ServiId
-            WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and MvXSrMovimentacao = ".$iMovimentacao." and MvXSrQuantidade <> 0";
+            WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and MvXSrMovimentacao = ".$iMovimentacao." and MvXSrQuantidade <> 0";
     $result = $conn->query($sql);
     $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
     $totalServicos = count($rowServicos);
