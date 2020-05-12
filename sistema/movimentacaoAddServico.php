@@ -4,9 +4,9 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ServiId, ServiNome, ServiValorCusto, ServiCustoFinal, ServiDetalhamento, dbo.fnSaldoEstoque(ServiEmpresa, ServiId, NULL) as Estoque
+$sql = "SELECT ServiId, ServiNome, ServiValorCusto, ServiCustoFinal, ServiDetalhamento, dbo.fnSaldoEstoque(ServiUnidade, ServiId, NULL) as Estoque
 		FROM Servico
-		WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiId = ". $_POST['idServico'];
+		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiId = ". $_POST['idServico'];
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 $count = count($row);

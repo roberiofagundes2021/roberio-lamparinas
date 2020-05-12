@@ -9,7 +9,7 @@ function gerarNumeracao()
 
 	$sql = "SELECT MAX(SolicId)
 	        FROM Solicitacao
-			WHERE SolicEmpresa = " . $_SESSION['EmpreId'] . "
+			WHERE SolicUnidade = " . $_SESSION['UnidadeId'] . "
 		   ";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -17,7 +17,7 @@ function gerarNumeracao()
 	if ($row[""]) {
 		$sql = "SELECT SolicNumero
 	            FROM Solicitacao
-			    WHERE SolicId = " . $row[""] . " and SolicEmpresa = " . $_SESSION['EmpreId'] . "
+			    WHERE SolicId = " . $row[""] . " and SolicUnidade = " . $_SESSION['UnidadeId'] . "
 		   ";
 		$result = $conn->query($sql);
 		$rowSolic = $result->fetch(PDO::FETCH_ASSOC);
@@ -72,8 +72,8 @@ if (isset($_SESSION['Carrinho'])) {
 		}
 
 		$sql = "INSERT INTO Solicitacao (SolicNumero, SolicData, SolicObservacao, SolicSetor, SolicSolicitante, 
-				SolicSituacao, SolicUsuarioAtualizador, SolicEmpresa)
-				VALUES (:iNumero, :iData, :iObservacao, :iSetor, :iSolicitante, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
+				SolicSituacao, SolicUsuarioAtualizador, SolicUnidade)
+				VALUES (:iNumero, :iData, :iObservacao, :iSetor, :iSolicitante, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 		// var_dump($Perfil['PerfiId']);
 		// var_dump($_SESSION['UsuarId']);
@@ -87,15 +87,15 @@ if (isset($_SESSION['Carrinho'])) {
 			':iSolicitante' => $_SESSION['UsuarId'],
 			':iSituacao' => $Situacao['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iEmpresa' => $_SESSION['EmpreId']
+			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		$SolicitacaoId = $conn->lastInsertId();
 
 		$sql = "INSERT INTO SolicitacaoXProduto
-					(SlXPrSolicitacao, SlXPrProduto, SlXPrQuantidade, SlXPrUsuarioAtualizador, SlXPrEmpresa)
+					(SlXPrSolicitacao, SlXPrProduto, SlXPrQuantidade, SlXPrUsuarioAtualizador, SlXPrUnidade)
 				VALUES 
-					(:iSolicitacao, :iProduto, :iQuantidade, :iUsuarioAtualizador, :iEmpresa)";
+					(:iSolicitacao, :iProduto, :iQuantidade, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		foreach ($_SESSION['Carrinho'] as $key => $value) {
@@ -105,15 +105,15 @@ if (isset($_SESSION['Carrinho'])) {
 				':iProduto' => $value['id'],
 				':iQuantidade' => $value['quantidade'],
 				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-				':iEmpresa' => $_SESSION['EmpreId']
+				':iUnidade' => $_SESSION['UnidadeId']
 			));
 		}
 
 		$sIdentificacao = 'Solicitação de materiais (' . $Setor['SetorNome'] . ')';
 
 		$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, BandeTabela, BandeTabelaId,
-				BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
-				VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+				BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
+				VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -126,20 +126,20 @@ if (isset($_SESSION['Carrinho'])) {
 			':iTabelaId' => $SolicitacaoId,
 			':iStatus' => $Situacao['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iEmpresa' => $_SESSION['EmpreId']
+			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		$BandejaId = $conn->lastInsertId();
 
 
-		$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeEmpresa)
-							VALUES (:iBandeja, :iPerfil, :iEmpresa)";
+		$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeUnidade)
+							VALUES (:iBandeja, :iPerfil, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 			':iBandeja' => $BandejaId,
 			':iPerfil' => $rowPerfil['PerfiId'],
-			':iEmpresa' => $_SESSION['EmpreId']
+			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		$conn->commit();

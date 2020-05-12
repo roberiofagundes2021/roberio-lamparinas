@@ -12,8 +12,8 @@ $sql = "SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaN
 		LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
 		LEFT JOIN Setor on SetorId = MovimDestinoSetor
 		JOIN Situacao on SituaId = MovimSituacao
-		LEFT JOIN Bandeja on BandeTabelaId = MovimId and BandeTabela = 'Movimentacao' and BandeEmpresa = " . $_SESSION['EmpreId'] . "
-	    WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . "
+		LEFT JOIN Bandeja on BandeTabelaId = MovimId and BandeTabela = 'Movimentacao' and BandeUnidade = " . $_SESSION['UnidadeId'] . "
+	    WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . "
 		ORDER BY MovimData DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

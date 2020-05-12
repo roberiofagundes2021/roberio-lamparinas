@@ -9,15 +9,6 @@ include('global_assets/php/conexao.php');
 if (!empty($_POST['inputProdutoId'])) {
     if (session_status() !== 'PHP_SESSION_ACTIVE') {
 
-        //$produtos = [];
-
-        //if(isset($_SESSION['carrinho'])) {
-        //  if(!in_array($_SESSION['carrinho'], $produtos)){
-        //     array_push($produtos, $_SESSION['carrinho']);
-        // } else {
-        //     print('ja existe');
-        // }
-        // }
         $verifcExist = false;
         $verifcZero = false;
         $chaveProdutoZero = 0;
@@ -46,11 +37,11 @@ if (!empty($_POST['inputProdutoId'])) {
                 array_push($produtos, ['quantidade' => 1, 'id' => $_POST['inputProdutoId']]);
 
                 //Carregar o no item na tela de modal do carrinho da pagina de solicitação
-                $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
+                $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
                         FROM Produto
                         JOIN Categoria on CategId = ProduCategoria
                         JOIN Situacao on SituaId = ProduStatus
-	                    WHERE ProduId = " . $_POST['inputProdutoId'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+	                    WHERE ProduId = " . $_POST['inputProdutoId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
                         ";
                 $result = $conn->query($sql);
                 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -92,11 +83,11 @@ if (!empty($_POST['inputProdutoId'])) {
                 $_SESSION['Carrinho'][$chaveProdutoZero]['quantidade'] = 1;
 
                 //Carregar o no item na tela de modal do carrinho da pagina de solicitação
-                $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
+                $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
                         FROM Produto
                         JOIN Categoria on CategId = ProduCategoria
                         JOIN Situacao on SituaId = ProduStatus
-	                    WHERE ProduId = " . $_POST['inputProdutoId'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+	                    WHERE ProduId = " . $_POST['inputProdutoId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
                         ";
                 $result = $conn->query($sql);
                 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -142,11 +133,11 @@ if (!empty($_POST['inputProdutoId'])) {
 
 
             //Carregar o no item na tela de modal do carrinho da pagina de solicitação
-            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
+            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
                     FROM Produto
                     JOIN Categoria on CategId = ProduCategoria
                     JOIN Situacao on SituaId = ProduStatus
-	                WHERE ProduId = " . $_POST['inputProdutoId'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+	                WHERE ProduId = " . $_POST['inputProdutoId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
                     ";
             $result = $conn->query($sql);
             $row = $result->fetch(PDO::FETCH_ASSOC);

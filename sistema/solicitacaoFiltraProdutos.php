@@ -46,11 +46,11 @@ function queryPesquisa()
                 $string .= ' and ';
             }
 
-            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduDetalhamento, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
+            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduDetalhamento, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
                     FROM Produto
                     JOIN Categoria on CategId = ProduCategoria
                     JOIN Situacao on SituaId = ProduStatus
-                    WHERE " . $string . " ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' 
+                    WHERE " . $string . " ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' 
                     ";
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -62,11 +62,11 @@ function queryPesquisa()
     } else {
         try {
 
-            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduDetalhamento, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
+            $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduDetalhamento, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
                     FROM Produto
                     JOIN Categoria on CategId = ProduCategoria
                     JOIN Situacao on SituaId = ProduStatus
-                    WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' 
+                    WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' 
                     ORDER BY ProduNome ASC ";
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);

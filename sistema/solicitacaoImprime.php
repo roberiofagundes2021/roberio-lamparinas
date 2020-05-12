@@ -20,7 +20,7 @@ $sql = "SELECT SolicNumero, SolicData, SolicObservacao, UsuarNome, UsuarTelefone
 		FROM Solicitacao
         JOIN Usuario on UsuarId = SolicSolicitante
         JOIN Setor on SetorId = SolicSetor
-		WHERE SolicEmpresa = ". $_SESSION['EmpreId'] ." and SolicId = ".$iSolicitacao;
+		WHERE SolicUnidade = ". $_SESSION['UnidadeId'] ." and SolicId = ".$iSolicitacao;
 
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -97,22 +97,11 @@ try {
 			FROM Produto
 			JOIN SolicitacaoXProduto on SlXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and SlXPrSolicitacao = ".$iSolicitacao;
+			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SlXPrSolicitacao = ".$iSolicitacao;
 
 	$result = $conn->query($sql);
 	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 	$totalProdutos = count($rowProdutos);
-/*
-	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario
-			FROM Servico
-			JOIN SolicitacaoXServico on FOXSrServico = ServiId
-			WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and FOXSrSolicitacao = ".$iSolicitacao;
-
-	$result = $conn->query($sql);
-	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-	$totalServicos = count($rowServicos); 
-
-    $totalGeralProdutos = 0; */
     
     $totalItens = 0;
 	
@@ -149,85 +138,8 @@ try {
 
 		$html .= "<br>";
 		
-/*		$html .= "  <tr>
-	                	<td colspan='5' height='50' valign='middle'>
-		                    <strong>Total Produtos</strong>
-	                    </td>
-					    <td style='text-align: right' colspan='2'>
-					        ".mostraValor($totalGeralProdutos)."
-					    </td>
-				    </tr>";*/
 		$html .= "</table>";
 	}
-
-/*	$totalGeralServicos = 0;
-	
-	if($totalServicos > 0){
-
-		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
-
-		$html .= '
-		<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
-			<tr>
-				<th style="text-align: center; width:8%">Item</th>
-				<th style="text-align: left; width:53%">Serviço</th>
-				<th style="text-align: center; width:12%">Quant.</th>
-				<th style="text-align: center; width:12%">V. Unit.</th>
-				<th style="text-align: center; width:15%">V. Total</th>
-			</tr>
-		';
-		
-		$cont = 1;
-		
-		foreach ($rowServicos as $rowServico){
-			
-			if ($rowServico['FOXSrValorUnitario'] != '' and $rowServico['FOXSrValorUnitario'] != null){
-				$valorUnitario = $rowServico['FOXSrValorUnitario'];
-				$valorTotal = $rowServico['FOXSrQuantidade'] * $rowServico['FOXSrValorUnitario'];
-			} else {
-				$valorUnitario = "";
-				$valorTotal = "";
-			}
-
-			if($totalServicos == ($cont)){
-				$html .= "
-				<tr>
-					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$rowServico['ServiNome'].": ".$rowServico['ServiDetalhamento']."</td>	
-					<td style='text-align: center;'>".$rowServico['FOXSrQuantidade']."</td>
-					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
-					<td style='text-align: right;'>".mostraValor($valorTotal)."</td>
-				</tr>
-			";
-			} else {
-				$html .= "
-				<tr>
-					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$rowServico['ServiNome'].": ".$rowServico['ServiDetalhamento']."</td>
-					<td style='text-align: center;'>".$rowServico['FOXSrQuantidade']."</td>
-					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
-					<td style='text-align: right'>".mostraValor($valorTotal)."</td>
-				</tr>
-			";
-			}
-			
-			$cont++;
-			$totalGeralServicos += $valorTotal;
-		}
-
-		$html .= "<br>";
-		
-		$html .= "  <tr>
-	                	<td colspan='4' height='50' valign='middle'>
-		                    <strong>Total Serviços</strong>
-	                    </td>
-					    <td style='text-align: right' colspan='2'>
-					        ".mostraValor($totalGeralServicos)."
-					    </td>
-				    </tr>";
-		$html .= "</table>";
-	}
-*/
 
 	$html .= "<table style='width:100%; border-collapse: collapse; margin-top: 20px;'>
 	 			<tr>
@@ -241,27 +153,6 @@ try {
 			  </table>
 	";
 		
-/*	
-	$sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
-			FROM Usuario
-			Where UsuarId = ".$_SESSION['UsuarId']."
-			ORDER BY UsuarNome ASC";
-	$result = $conn->query($sql);
-	$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);	
-	
-	$html .= '			
-		<br><br>
-		<div style="width: 100%; margin-top: 200px;">
-			<div style="position: relative; float: left; text-align: center;">
-				Solicitante: '.$rowUsuario['UsuarNome'].'<br>
-				<div style="margin-top:3px;">
-					Telefone: '.$rowUsuario['UsuarTelefone'].' <br>
-					E-mail: '.$rowUsuario['UsuarEmail'].'
-				</div>
-			</div>
-		</div>
-	';	
-*/	
     $rodape = "<hr/>
     <div style='width:100%'>
 		<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>

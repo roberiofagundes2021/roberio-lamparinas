@@ -10,13 +10,13 @@ require_once 'global_assets/php/vendor/autoload.php';
 
 
 $sql = "SELECT DISTINCT ProduCategoria, CategNome, ProduCodigo, ProduNome, ProduEstoqueMinimo, 
-		dbo.fnSaldoEstoque(MovimEmpresa, ProduId, NULL) as saldo
+		dbo.fnSaldoEstoque(MovimUnidade, ProduId, NULL) as saldo
 	    FROM Produto
 	    JOIN Categoria on CategId = ProduCategoria
 	    JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 	    JOIN Movimentacao on MovimId = MvXPrMovimentacao
-	    WHERE MovimEmpresa = ".$_SESSION['EmpreId']." and dbo.fnSaldoEstoque(MovimEmpresa, ProduId, NULL) < ProduEstoqueMinimo
-	    Group By ProduCategoria, CategNome, ProduId, ProduCodigo, ProduNome, ProduEstoqueMinimo, MovimEmpresa
+	    WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and dbo.fnSaldoEstoque(MovimUnidade, ProduId, NULL) < ProduEstoqueMinimo
+	    Group By ProduCategoria, CategNome, ProduId, ProduCodigo, ProduNome, ProduEstoqueMinimo, MovimUnidade
 	    ";
 $result = $conn->query($sql);
 $rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);

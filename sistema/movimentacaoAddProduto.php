@@ -4,10 +4,10 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla, ProduDetalhamento, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, '".$_POST['origem']."') as Estoque
+$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla, ProduDetalhamento, dbo.fnSaldoEstoque(ProduUnidade, ProduId, '".$_POST['origem']."') as Estoque
 		FROM Produto
-		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduId = " . $_POST['idProduto'];
+		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId = " . $_POST['idProduto'];
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 $count = count($row);

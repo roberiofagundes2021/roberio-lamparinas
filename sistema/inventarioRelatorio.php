@@ -69,8 +69,8 @@ try {
 		$iLocal = $item['InXLELocal'];
 		
 		$sql = ("SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, 
-						dbo.fnSaldoEstoque(".$_SESSION['EmpreId'].", ProduId, MovimDestinoLocal) as Saldo, 
-						dbo.fnCalculaValorTotalInventario(dbo.fnSaldoEstoque(".$_SESSION['EmpreId'].", ProduId, MovimDestinoLocal), ProduCustoFinal) as ValorTotal
+						dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, MovimDestinoLocal) as Saldo, 
+						dbo.fnCalculaValorTotalInventario(dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, MovimDestinoLocal), ProduCustoFinal) as ValorTotal
 				 FROM Produto
 				 JOIN Categoria on CategId = ProduCategoria
 				 JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida

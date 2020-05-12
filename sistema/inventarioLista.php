@@ -66,18 +66,19 @@ try {
 		$iCategoria = $item['InvenCategoria'];
 		$iLocal = $item['InXLELocal'];
 		
-		$sql = ("SELECT Distinct ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, dbo.fnSaldoEstoque(".$_SESSION['EmpreId'].", ProduId, MovimDestinoLocal) as Saldo, LcEstNome
-				 FROM Produto
-				 JOIN Categoria on CategId = ProduCategoria
-				 JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-				 JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
-				 JOIN Movimentacao on MovimId = MvXPrMovimentacao
-				 JOIN LocalEstoque on LcEstId = MovimDestinoLocal
-				 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduStatus = 1 and
-					   ProduCategoria = ".$iCategoria." and
-					   MovimDestinoLocal = (".$iLocal.") and MovimSituacao = 2
-				 ");
-		$result = $conn->query("$sql");
+		$sql = "SELECT Distinct ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, MovimDestinoLocal) as Saldo, LcEstNome
+				FROM Produto
+				JOIN Categoria on CategId = ProduCategoria
+				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
+				JOIN Movimentacao on MovimId = MvXPrMovimentacao
+				JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+				JOIN Situacao on SituaId = MovimSituacao
+				WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduStatus = 1 and
+					  ProduCategoria = ".$iCategoria." and
+					  MovimDestinoLocal = (".$iLocal.") and SituaChave = 'FINALIZADO'
+				 ";
+		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);		
 		
 		foreach ($rowProdutos as $itemProduto){

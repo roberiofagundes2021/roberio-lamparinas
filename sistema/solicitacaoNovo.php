@@ -6,12 +6,11 @@ $_SESSION['PaginaAtual'] = 'Nova Solicitação';
 
 include('global_assets/php/conexao.php');
 
-
-$sql = "SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
+$sql = "SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN Situacao on SituaId = ProduStatus
-	    WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+	    WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 		ORDER BY ProduNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -507,7 +506,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															$sql = "SELECT CategId, CategNome
 																	FROM Categoria		
 																	JOIN Situacao on SituaId = CategStatus											     
-																	WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY CategNome ASC";
 															$result = $conn->query($sql);
 															$rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -538,7 +537,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															$sql = "SELECT MarcaId, MarcaNome
 																	FROM Marca
 																	JOIN Situacao on SituaId = MarcaStatus											     
-																	WHERE MarcaEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	WHERE MarcaUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY MarcaNome ASC";
 															$result = $conn->query($sql);
 															$rowMarca = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -559,7 +558,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															$sql = "SELECT FabriId, FabriNome
 																	FROM Fabricante														     
 																	JOIN Situacao on SituaId = FabriStatus											     
-																	WHERE FabriEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	WHERE FabriUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY FabriNome ASC";
 															$result = $conn->query($sql);
 															$rowFabri = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -581,7 +580,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															$sql = "SELECT ModelId, ModelNome
 																	FROM Modelo														     
 																	JOIN Situacao on SituaId = ModelStatus											     
-																	WHERE ModelEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	WHERE ModelUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY ModelNome ASC";
 															$result = $conn->query($sql);
 															$rowModel = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -767,11 +766,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 						foreach ($_SESSION['Carrinho'] as $item) {
 							if ($item['quantidade'] > 0) {
-								$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduEmpresa, ProduId, NULL) as Estoque
+								$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
 		                            FROM Produto
 		                            JOIN Categoria on CategId = ProduCategoria
 									JOIN Situacao on SituaId = ProduStatus
-	                                WHERE ProduId = " . $item['id'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+	                                WHERE ProduId = " . $item['id'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 		                            ";
 								$result = $conn->query($sql);
 								$row = $result->fetch(PDO::FETCH_ASSOC);

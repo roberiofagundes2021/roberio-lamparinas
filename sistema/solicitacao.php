@@ -7,12 +7,13 @@ $_SESSION['PaginaAtual'] = 'Solicitação';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT SolicId, SolicNumero, SolicData, SolicObservacao, SolicSetor, SolicSolicitante, SolicSituacao, UsuarNome, 
-		SetorNome, SituaChave, SituaNome, SituaCor
+		SetorNome, SituaChave, SituaNome, SituaCor, BandeMotivo
 		FROM Solicitacao
 		JOIN Usuario on UsuarId = SolicSolicitante
 		JOIN Setor on SetorId = SolicSetor
 		JOIN Situacao on SituaId = SolicSituacao
-	    WHERE SolicEmpresa = " . $_SESSION['EmpreId'] . " and UsuarId = ".$_SESSION['UsuarId']."
+		LEFT JOIN Bandeja on BandeTabelaId = SolicId and BandeTabela = 'Solicitacao' and BandeUnidade = " . $_SESSION['UnidadeId'] . "
+	    WHERE SolicUnidade = " . $_SESSION['UnidadeId'] . " and UsuarId = ".$_SESSION['UsuarId']."
 		ORDER BY SolicData DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -247,14 +248,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 
-										$sql = "SELECT BandeMotivo
-												FROM Bandeja
-												JOIN Situacao on SituaId = BandeStatus
-												WHERE BandeTabela = 'Solicitacao' and BandeTabelaId = ".$item['SolicId']." and 
-												BandeEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'NAOLIBERADO'";
-										$result = $conn->query($sql);
-										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);
-
 										print('
 										<tr>
 											<td>' . mostraData($item['SolicData']) . '</td>
@@ -276,13 +269,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																<div class="dropdown-menu dropdown-menu-right">
 																	<a id="' . $item['SolicId'] . '" class="btn-modal dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 																	<div class="dropdown-divider"></div>
-																	<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'imprimir\', \''.$rowMotivo['BandeMotivo'].'\')" class="dropdown-item" title="Imprimir Solicitação"><i class="icon-printer2"></i> Imprimir</a>
+																	<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir Solicitação"><i class="icon-printer2"></i> Imprimir</a>
 																');
 
-																	if (isset($rowMotivo['BandeMotivo'])){
+																	if (isset($item['BandeMotivo'])){
 
 																		print('																		
-																		<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'motivo\', \''.$rowMotivo['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
+																		<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
 																	}
 										print('		
 																</div>
