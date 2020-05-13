@@ -12,17 +12,17 @@ if(isset($_POST['inputOrdemCompraId'])){
 		$conn->beginTransaction();	
 		
 		$sql = "DELETE FROM OrdemCompraXProduto
-				WHERE OCXPrOrdemCompra = :iOrdemCompra and OCXPrEmpresa = :iEmpresa";
+				WHERE OCXPrOrdemCompra = :iOrdemCompra and OCXPrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iOrdemCompra', $iOrdemCompra);
-		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+		$result->bindParam(':iUnidade', $_SESSION['UnidadeId']); 
 		$result->execute();
 		
 		$sql = "DELETE FROM OrdemCompraXServico
-				WHERE OCXSrOrdemCompra = :iOrdemCompra and OCXSrEmpresa = :iEmpresa";
+				WHERE OCXSrOrdemCompra = :iOrdemCompra and OCXSrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iOrdemCompra', $iOrdemCompra);
-		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+		$result->bindParam(':iUnidade', $_SESSION['UnidadeId']); 
 		$result->execute();
 		
 		$sql = "DELETE FROM OrdemCompra

@@ -69,12 +69,12 @@ if (isset($_POST['inputTipo'])) {
 		if (isset($_POST['inputOrdemCompraProdutoExclui']) and $_POST['inputOrdemCompraProdutoExclui']) {
 
 			$sql = "DELETE FROM OrdemCompraXProduto
-					WHERE OCXPrOrdemCompra = :iOrdemCompra and OCXPrEmpresa = :iEmpresa";
+					WHERE OCXPrOrdemCompra = :iOrdemCompra and OCXPrUnidade = :iUnidade";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
 				':iOrdemCompra' => $iOrdemCompra,
-				':iEmpresa' => $_SESSION['EmpreId']
+				':iUnidade' => $_SESSION['UnidadeId']
 			));
 		}
 
@@ -389,7 +389,7 @@ if (isset($_POST['inputTipo'])) {
 
 						$sql = "SELECT OCXSrOrdemCompra
 								FROM OrdemCompraXServico
-								WHERE OCXSrOrdemCompra = " . $iOrdemCompra . " and OCXSrEmpresa = " . $_SESSION['EmpreId'];
+								WHERE OCXSrOrdemCompra = " . $iOrdemCompra . " and OCXSrUnidade = " . $_SESSION['UnidadeId'];
 						$result = $conn->query($sql);
 						$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
 						$countServico = count($rowServico);
@@ -471,7 +471,7 @@ if (isset($_POST['inputTipo'])) {
 															$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																	FROM Fornecedor
 																	JOIN Situacao on SituaId = ForneStatus													     
-																	WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY ForneNome ASC";
 															$result = $conn->query($sql);
 															$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -522,7 +522,7 @@ if (isset($_POST['inputTipo'])) {
 													$sql = "SELECT CategId, CategNome
 															FROM Categoria
 															JOIN Situacao on SituaId = CategStatus
-															WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 															ORDER BY CategNome ASC";
 													$result = $conn->query($sql);
 													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -546,7 +546,7 @@ if (isset($_POST['inputTipo'])) {
 													$sql = "SELECT SbCatId, SbCatNome
 															FROM SubCategoria
 															JOIN Situacao on SituaId = SbCatStatus															     
-															WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 															ORDER BY SbCatNome ASC";
 													$result = $conn->query($sql);
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

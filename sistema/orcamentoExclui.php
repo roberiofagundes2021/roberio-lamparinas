@@ -15,7 +15,7 @@ if(isset($_POST['inputOrcamentoId'])){
 				WHERE OrXPrOrcamento = :iOrcamento and OrXPrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iOrcamento', $iOrcamento);
-		$result->bindParam(':iEmpresa', $_SESSION['EmpreId']); 
+		$result->bindParam(':iUnidade', $_SESSION['UnidadeId']); 
 		$result->execute();
 		
 		

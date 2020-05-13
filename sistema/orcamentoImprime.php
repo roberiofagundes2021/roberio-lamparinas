@@ -110,8 +110,8 @@ try {
 		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OrXPrQuantidade, OrXPrValorUnitario
 				FROM Produto
 				JOIN OrcamentoXProduto on OrXPrProduto = ProduId
-				LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-				WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and OrXPrOrcamento = " . $iOrcamento;
+				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+				WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and OrXPrOrcamento = " . $iOrcamento;
 
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -7,13 +7,14 @@ $_SESSION['PaginaAtual'] = 'Ordem de Compra';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT OrComId, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
-		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor
+		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor, BandeMotivo
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
 		JOIN Categoria on CategId = OrComCategoria
 		LEFT JOIN SubCategoria on SbCatId = OrComSubCategoria
 		JOIN Situacao on SituaId = OrComSituacao
-	    WHERE OrComEmpresa = ". $_SESSION['EmpreId'] ."
+		LEFT JOIN Bandeja on BandeTabelaId = OrComId and BandeTabela = 'OrdemCompra' and BandeUnidade = " . $_SESSION['UnidadeId'] . "
+	    WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY OrComDtEmissao DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -266,14 +267,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										$tipo = $item['OrComTipo'] == 'C' ? 'Carta Contrato' : 'Ordem de Compra';
-
-										$sql = "SELECT BandeMotivo
-												FROM Bandeja
-												JOIN Situacao on SituaId = BandeStatus
-												WHERE BandeTabela = 'OrdemCompra' and BandeTabelaId = ".$item['OrComId']." and 
-												BandeEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'NAOLIBERADO'";
-										$result = $conn->query($sql);
-										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);
 										
 										print('
 										<tr>
@@ -304,11 +297,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																<div class="dropdown-divider"></div>
 																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>');
 
-										if (isset($rowMotivo['BandeMotivo'])){
+										if (isset($item['BandeMotivo'])){
 
 											print('
 																<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'motivo\', \''.$rowMotivo['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
+																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
 										}
 
 										print('				</div>

@@ -20,7 +20,7 @@ $sql = "SELECT ForneNome, ForneCelular, ForneEmail, CategNome, OrComTipo, OrComN
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
 		JOIN Categoria on CategId = OrComCategoria
-		WHERE OrComEmpresa = ". $_SESSION['EmpreId'] ." and OrComId = ".$iOrdemCompra;
+		WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$iOrdemCompra;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -79,7 +79,7 @@ try {
 			FROM Produto
 			JOIN OrdemCompraXProduto on OCXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OCXPrOrdemCompra = ".$iOrdemCompra;
+			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OCXPrOrdemCompra = ".$iOrdemCompra;
 
 	$result = $conn->query($sql);
 	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -88,7 +88,7 @@ try {
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OCXSrQuantidade, OCXSrValorUnitario
 			FROM Servico
 			JOIN OrdemCompraXServico on OCXSrServico = ServiId
-			WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and OCXSrOrdemCompra = ".$iOrdemCompra;
+			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and OCXSrOrdemCompra = ".$iOrdemCompra;
 
 	$result = $conn->query($sql);
 	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);

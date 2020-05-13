@@ -25,10 +25,10 @@ if(isset($_POST['inputData'])){
 		
 		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, 
 							OrComConteudo, OrComFornecedor, OrComValorFrete, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
-							OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, OrComSituacao, OrComUsuarioAtualizador, OrComEmpresa)
+							OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, OrComSituacao, OrComUsuarioAtualizador, OrComUnidade)
 				VALUES (:sTipo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, 
 						:iSolicitante, :iUnidade, :iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, 
-						:iUsuarioAtualizador, :iEmpresa)";
+						:iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 		
 		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
@@ -56,7 +56,7 @@ if(isset($_POST['inputData'])){
 						':sObservacao' => $_POST['txtareaObservacao'],
 						':bStatus' => $rowSituacao['SituaId'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 
 		$insertId = $conn->lastInsertId();	
@@ -369,7 +369,7 @@ if(isset($_POST['inputData'])){
 																$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																		FROM Fornecedor
 																		JOIN Situacao on SituaId = ForneStatus												     
-																		WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																		WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																		ORDER BY ForneNome ASC";
 																$result = $conn->query($sql);
 																$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -357,7 +357,7 @@ if(isset($_POST['inputTipo'])){
 						
 							$sql = "SELECT OrXPrOrcamento
 									FROM OrcamentoXProduto
-									WHERE OrXPrOrcamento = ".$iOrcamento." and OrXPrEmpresa = ".$_SESSION['EmpreId'];
+									WHERE OrXPrOrcamento = ".$iOrcamento." and OrXPrUnidade = ".$_SESSION['UnidadeId'];
 							$result = $conn->query($sql);
 							$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 							$countProduto = count($rowProduto);

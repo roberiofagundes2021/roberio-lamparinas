@@ -21,18 +21,18 @@ if(isset($_POST['inputOrdemCompraId'])){
 if(isset($_POST['inputIdOrdemCompra'])){
 	
 	$sql = "DELETE FROM OrdemCompraXServico
-			WHERE OCXSrOrdemCompra = :iOrdemCompra AND OCXSrEmpresa = :iEmpresa";
+			WHERE OCXSrOrdemCompra = :iOrdemCompra AND OCXSrUnidade = :iUnidade";
 	$result = $conn->prepare($sql);
 	
 	$result->execute(array(
 					':iOrdemCompra' => $iOrdemCompra,
-					':iEmpresa' => $_SESSION['EmpreId']
+					':iUnidade' => $_SESSION['UnidadeId']
 					));		
 	
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 	
-		$sql = "INSERT INTO OrdemCompraXServico (OCXSrOrdemCompra, OCXSrServico, OCXSrQuantidade, OCXSrValorUnitario, OCXSrUsuarioAtualizador, OCXSrEmpresa)
-				VALUES (:iOrdemCompra, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO OrdemCompraXServico (OCXSrOrdemCompra, OCXSrServico, OCXSrQuantidade, OCXSrValorUnitario, OCXSrUsuarioAtualizador, OCXSrUnidade)
+				VALUES (:iOrdemCompra, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 		
 		$result->execute(array(
@@ -41,7 +41,7 @@ if(isset($_POST['inputIdOrdemCompra'])){
 						':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
 						':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -57,7 +57,7 @@ try{
 			JOIN Fornecedor on ForneId = OrComFornecedor
 			JOIN Categoria on CategId = OrComCategoria
 			LEFT JOIN SubCategoria on SbCatId = OrComSubCategoria
-			WHERE OrComEmpresa = ". $_SESSION['EmpreId'] ." and OrComId = ".$iOrdemCompra;
+			WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$iOrdemCompra;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
@@ -65,7 +65,7 @@ try{
 	$sql = "SELECT OCXSrServico
 			FROM OrdemCompraXServico
 			JOIN Servico on ServiId = OCXSrServico
-			WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and ServiCategoria = ".$iCategoria." and OCXSrOrdemCompra = ".$row['OrComId']."";
+			WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ." and ServiCategoria = ".$iCategoria." and OCXSrOrdemCompra = ".$row['OrComId']."";
 	
 	if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 		$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
@@ -80,7 +80,7 @@ try{
 
 	$sql = "SELECT COUNT(OCXSrServico) as Quant
 			FROM OrdemCompraXServico
-			WHERE OCXSrEmpresa = ". $_SESSION['EmpreId'] ." and OCXSrOrdemCompra = ".$iOrdemCompra." and 
+			WHERE OCXSrUnidade = ". $_SESSION['UnidadeId'] ." and OCXSrOrdemCompra = ".$iOrdemCompra." and 
 			OCXSrQuantidade <> '' and OCXSrQuantidade <> 0 and OCXSrValorUnitario <> 0.00 ";
 	$result = $conn->query($sql);
 	$rowCompleto = $result->fetch(PDO::FETCH_ASSOC);
@@ -294,7 +294,7 @@ try{
 														$sql = "SELECT ServiId, ServiNome
 																FROM Servico
 																JOIN Situacao on SituaId = ServiStatus										     
-																WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO' and 
+																WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and 
 																ServiCategoria = ".$iCategoria;
 														
 														if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
@@ -349,7 +349,7 @@ try{
 										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OCXSrQuantidade, OCXSrValorUnitario
 												FROM Servico
 												JOIN OrdemCompraXServico on OCXSrServico = ServiId
-												WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and OCXSrOrdemCompra = ".$iOrdemCompra;
+												WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and OCXSrOrdemCompra = ".$iOrdemCompra;
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowServicos);
@@ -358,7 +358,7 @@ try{
 											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
 													FROM Servico
 													JOIN Situacao on SituaId = ServiStatus
-													WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiCategoria = ".$iCategoria." and 
+													WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria." and 
 													SituaChave = 'ATIVO' ";
 													
 											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
