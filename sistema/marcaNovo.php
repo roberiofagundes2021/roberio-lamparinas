@@ -7,6 +7,7 @@ $_SESSION['PaginaAtual'] = 'Nova Marca';
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputNome'])){
+	
 
 	try{
 		
@@ -67,13 +68,6 @@ if(isset($_POST['inputNome'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNomeNovo = inputNome.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNomeNovo == ''){
-					alerta('Atenção','Informe a marca!','error');
-					$('#inputNome').focus();
-					return false;
-				}
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({

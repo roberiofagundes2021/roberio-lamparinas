@@ -6,7 +6,6 @@ $_SESSION['PaginaAtual'] = 'Nova Movimentação';
 
 include('global_assets/php/conexao.php');
 
-
 //Caso a chamada à página venha da liberação de uma solicitação na bandeja.
 
 
@@ -288,7 +287,6 @@ if (isset($_POST['inputData'])) {
 											':iPatrimonio' => $insertIdPatrimonio
 										));
 									}
-								
 								} else {
 									$quantItens = intval($registro[3]);
 
@@ -1142,7 +1140,7 @@ if (isset($_POST['inputData'])) {
 					},
 					success: function(resposta) {
 						var option = '<option value="#" "selected">Selecione o Patrimônio</option>';
-console.log(resposta);
+						console.log(resposta);
 						if (resposta) {
 							$('#cmbPatrimonio').html('');
 							$('#cmbPatrimonio').append(option)
@@ -1157,7 +1155,7 @@ console.log(resposta);
 			}
 
 			$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
-				filtraPatrimonioProdutoOrigem() 
+				filtraPatrimonioProdutoOrigem()
 			})
 			//filtraPatrimonioProdutoOrigem() 
 
@@ -1382,7 +1380,7 @@ console.log(resposta);
 								if (inputTipo == 'E') {
 									$("#tabelaProdutoServico").append(resposta);
 								} else {
-									$("#tabelaProdutoServicoSaida").append(resposta);
+									$("#tabelaProdutoServico").append(resposta);
 								}
 
 								//Adiciona mais um item nessa contagem
@@ -2106,44 +2104,30 @@ console.log(resposta);
 													<option value="#">Selecione</option>
 													<?php
 
-													if (isset($_POST['inputSolicitacaoId'])) {
-														$sql = "SELECT EXUXPLocalEstoque, SetorNome
+													$sql = "SELECT EXUXPLocalEstoque, SetorNome
 																 FROM EmpresaXUsuarioXPerfil
 																 JOIN Setor on SetorId = EXUXPSetor
 																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
 															    ";
-														$result = $conn->query($sql);
-														$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
+													$result = $conn->query($sql);
+													$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
-														$sql = "SELECT LcEstId, LcEstNome
+													$sql = "SELECT LcEstId, LcEstNome
 																FROM LocalEstoque
 																JOIN Situacao on SituaId = LcEstStatus
 																WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																ORDER BY LcEstNome ASC";
-														$result = $conn->query($sql);
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-														foreach ($row as $item) {
-															if ($item['LcEstId'] == $usuarioPerfil['EXUXPLocalEstoque']) {
-																print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
-															} else {
-																print('<option value="' . $item['LcEstId'] . '" "' . $usuarioPerfil['EXUXPLocalEstoque'] . '">' . $item['LcEstNome'] . '</option>');
-															}
-														}
-													} else {
-
-														$sql = "SELECT LcEstId, LcEstNome
-																FROM LocalEstoque
-																JOIN Situacao on SituaId = LcEstStatus
-																WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY LcEstNome ASC";
-														$result = $conn->query($sql);
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-														foreach ($row as $item) {
-															print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+													foreach ($row as $item) {
+														if ($item['LcEstId'] == $usuarioPerfil['EXUXPLocalEstoque']) {
+															print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
+														} else {
+															print('<option value="' . $item['LcEstId'] . '" "' . $usuarioPerfil['EXUXPLocalEstoque'] . '">' . $item['LcEstNome'] . '</option>');
 														}
 													}
+
 													?>
 												</select>
 											</div>

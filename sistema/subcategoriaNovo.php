@@ -53,9 +53,6 @@ if(isset($_POST['inputNome'])){
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	
 	<!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
@@ -76,13 +73,6 @@ if(isset($_POST['inputNome'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNomeNovo = inputNome.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNomeNovo == ''){
-					alerta('Atenção','Informe a subcategoria!','error');
-					$('#inputNome').focus();
-					return false;
-				}
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -134,12 +124,12 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-6">
 									<div class="form-group">
-										<label for="inputNome">Sub Categoria</label>
+										<label for="inputNome">Sub Categoria<span class="text-danger">*</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Sub Categoria" required autofocus>
 									</div>
 								</div>
 								<div class="col-lg-6">
-									<label for="cmbCategoria">Categoria</label>
+									<label for="cmbCategoria">Categoria<span class="text-danger">*</span></label>
 									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 

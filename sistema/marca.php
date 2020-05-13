@@ -163,8 +163,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<tbody>
 								<?php
 									foreach ($row as $item){
+										var_dump( $item['MarcaStatus']);
 										
-										$situacao = $item['MarcaStatus'] ? 'Ativo' : 'Inativo';
+										$situacao = $item['MarcaStatus'] == 1 ? 'Ativo' : 'Inativo';
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
 										

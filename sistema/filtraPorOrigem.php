@@ -8,12 +8,12 @@ if ($_POST['tipoDeFiltro'] == 'Categoria') {
 	$sql = "SELECT MvXPrProduto as id
 		FROM MovimentacaoXProduto
 		LEFT JOIN Movimentacao on MovimId = MvXPrMovimentacao
-		WHERE MvXPrEmpresa = " . $_SESSION['EmpreId'] . " and MovimDestinoLocal = " . $_POST['origem'] . " and MovimTipo = 'E'
+		WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " and MovimDestinoLocal = " . $_POST['origem'] . " and MovimTipo = 'E'
 		UNION
 		SELECT MvXSrServico as id
 		FROM MovimentacaoXServico
 		LEFT JOIN Movimentacao on MovimId = MvXSrMovimentacao
-		WHERE MvXSrEmpresa = " . $_SESSION['EmpreId'] . " and MovimDestinoLocal = " . $_POST['origem'] . " and MovimTipo = 'E'
+		WHERE MvXSrUnidade = " . $_SESSION['UnidadeId'] . " and MovimDestinoLocal = " . $_POST['origem'] . " and MovimTipo = 'E'
 		";
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -26,7 +26,7 @@ if ($_POST['tipoDeFiltro'] == 'Categoria') {
 
 			$sql = "SELECT ProduCategoria
 		        FROM Produto
-		        WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduId = " . $value['id'] . "
+		        WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId = " . $value['id'] . "
 		";
 			$result = $conn->query($sql);
 			$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -38,7 +38,7 @@ if ($_POST['tipoDeFiltro'] == 'Categoria') {
 		$sql = "SELECT CategId, CategNome
 		        FROM Categoria
 				JOIN Situacao on SituaStatus = CategStatus
-		        WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+		        WHERE CategEmpresa = " . $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
 		";
 		$result = $conn->query($sql);
 		$categorias = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -56,7 +56,7 @@ if ($_POST['tipoDeFiltro'] == 'Categoria') {
 	        FROM Patrimonio
 	        LEFT JOIN MovimentacaoXProduto on MvXPrPatrimonio = PatriId
 	        LEFT JOIN Movimentacao on MovimId = MvXPrMovimentacao
-	        WHERE MvXPrEmpresa = " . $_SESSION['EmpreId'] . " and MovimDestinoSetor = " . $_POST['origem'] . " and MovimTipo = 'S'
+	        WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " and MovimDestinoSetor = " . $_POST['origem'] . " and MovimTipo = 'S'
 	";
 	$result = $conn->query($sql);
 	$rowPatrimonios = $result->fetchAll(PDO::FETCH_ASSOC);

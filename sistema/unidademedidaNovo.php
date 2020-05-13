@@ -70,13 +70,6 @@ if(isset($_POST['inputNome'])){
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
 				inputSigla = inputSigla.trim();
-
-				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe a Unidade de Medida!','error');
-					$('#inputNome').focus();
-					return false;
-				}
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -128,13 +121,13 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-8">
 									<div class="form-group">
-										<label for="inputNome">Nome</label>
+										<label for="inputNome">Nome<span class="text-danger">*</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Unidade de Medida" required autofocus>
 									</div>
 								</div>
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputSigla">Sigla</label>
+										<label for="inputSigla">Sigla<span class="text-danger">*</span></label>
 										<input type="text" id="inputSigla" name="inputSigla" class="form-control" placeholder="Sigla" required>
 									</div>
 								</div>								

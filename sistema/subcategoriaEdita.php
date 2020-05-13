@@ -95,11 +95,6 @@ if(isset($_POST['inputNome'])){
 				inputNome = inputNomeNovo.trim();
 				
 				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe a subcategoria!','error');
-					$('#inputNome').focus();
-					return false;
-				}
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -154,12 +149,12 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-6">
 									<div class="form-group">
-										<label for="inputNome">Sub Categoria</label>
+										<label for="inputNome">Sub Categoria<span class="text-danger">*</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Sub Categoria" value="<?php echo $row['SbCatNome']; ?>" required autofocus>
 									</div>
 								</div>
 								<div class="col-lg-6">
-									<label for="cmbCategoria">Categoria</label>
+									<label for="cmbCategoria">Categoria<span class="text-danger">*</span></label>
 									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 
