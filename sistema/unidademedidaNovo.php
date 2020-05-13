@@ -121,13 +121,13 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-8">
 									<div class="form-group">
-										<label for="inputNome">Nome<span class="text-danger">*</span></label>
+										<label for="inputNome">Nome<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Unidade de Medida" required autofocus>
 									</div>
 								</div>
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputSigla">Sigla<span class="text-danger">*</span></label>
+										<label for="inputSigla">Sigla<span class="text-danger"> *</span></label>
 										<input type="text" id="inputSigla" name="inputSigla" class="form-control" placeholder="Sigla" required>
 									</div>
 								</div>								

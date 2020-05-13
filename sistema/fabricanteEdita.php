@@ -139,7 +139,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="inputNome">Nome do Fabricante<span class="text-danger">*</span></label>
+										<label for="inputNome">Nome do Fabricante<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Fabricante" value="<?php echo $row['FabriNome']; ?>" required autofocus>
 									</div>
 								</div>

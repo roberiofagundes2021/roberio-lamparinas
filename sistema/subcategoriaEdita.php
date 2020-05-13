@@ -149,12 +149,12 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-6">
 									<div class="form-group">
-										<label for="inputNome">Sub Categoria<span class="text-danger">*</span></label>
+										<label for="inputNome">Sub Categoria<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Sub Categoria" value="<?php echo $row['SbCatNome']; ?>" required autofocus>
 									</div>
 								</div>
 								<div class="col-lg-6">
-									<label for="cmbCategoria">Categoria<span class="text-danger">*</span></label>
+									<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
 									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 
