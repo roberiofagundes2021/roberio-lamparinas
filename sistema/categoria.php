@@ -54,12 +54,12 @@ $count = count($row);
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Situação
+					orderable: false,   //Situação
 					width: "10%",
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //Ações
+					orderable: false,   //Ações
 					width: "10%",
 					targets: [2]
 				}],

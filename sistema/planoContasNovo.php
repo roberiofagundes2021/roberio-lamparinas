@@ -71,14 +71,6 @@ if(isset($_POST['inputNome'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
-
-
-				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe o Plano de Contas!','error');
-					$('#inputNome').focus();
-					return false;
-				}
 				
 				//Verifica se o campo só possui espaços em branco
 				/*if (inputNome == ''){
@@ -148,12 +140,12 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-6">
 									<div class="form-group">
-										<label for="inputNome">Plano de Contas</label>
+										<label for="inputNome">Plano de Contas<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Plano de Contas" required autofocus>
 									</div>
 								</div>
 								<div class="col-lg-6">
-									<label for="cmbCentroCusto">Centro de Custo</label>
+									<label for="cmbCentroCusto">Centro de Custo<span class="text-danger"> *</span></label>
 									<select id="cmbCentroCusto" name="cmbCentroCusto" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 

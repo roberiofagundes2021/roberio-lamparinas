@@ -6,8 +6,9 @@ $_SESSION['PaginaAtual'] = 'Forma de Pagamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT FrPagId, FrPagNome, FrPagStatus
+$sql = "SELECT FrPagId, FrPagNome, FrPagStatus, SituaNome, SituaCor, SituaChave
 		FROM FormaPagamento
+		JOIN Situacao on SituaId = FrPagStatus
 	    WHERE FrPagEmpresa = ". $_SESSION['EmpreId'] ."
 		ORDER BY FrPagNome ASC";
 $result = $conn->query($sql);
@@ -41,7 +42,7 @@ $count = count($row);
 
 		$(document).ready(function (){	
 			$('#tblFormaPagamento').DataTable( {
-				"order": [[ 1, "asc" ]],
+				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [
@@ -52,7 +53,7 @@ $count = count($row);
 				},
 				{ 
 					orderable: true,   //Situação
-					width: "15%",
+					width: "10%",
 					targets: [1]
 				},
 				{ 
@@ -162,15 +163,16 @@ $count = count($row);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['FrPagStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['FrPagStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
+										$situacaoChave ='\''.$item['SituaChave'].'\'';
 										
 										print('
 										<tr>
 											<td>'.$item['FrPagNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\','.$item['FrPagStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">

@@ -6,15 +6,15 @@ $_SESSION['PaginaAtual'] = 'Fornecedor';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
+$sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome, SituaNome, SituaCor, SituaChave
 		FROM Fornecedor
 		JOIN Categoria on CategId = ForneCategoria
+		JOIN Situacao on SituaId = ForneStatus
 	    WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." 
-		ORDER BY ForneNome ASC";	
+		ORDER BY ForneNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
-
 ?>
 
 <!DOCTYPE html>
@@ -123,6 +123,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				document.getElementById('inputFornecedorId').value = ForneId;
 				document.getElementById('inputFornecedorNome').value = ForneNome;
 				document.getElementById('inputFornecedorStatus').value = ForneStatus;
+				console.log(ForneId, ForneNome, ForneStatus, Tipo)
 						
 				if (Tipo == 'edita'){	
 					document.formFornecedor.action = "fornecedorEdita.php";		
@@ -230,10 +231,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								</thead>
 								<tbody>
 								<?php
+
 									foreach ($row as $item){
 										
-										$situacao = $item['ForneStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['ForneStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaChave'] == 'ATIVO' ? 'Ativo' : 'Inativo';
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
+										$situacaoChave ='\''.$item['SituaChave'].'\'';
 										$documento = $item['ForneCnpj'] == NULL ? $item['ForneCpf'] : $item['ForneCnpj'];
 										$telefone = $item['ForneCelular'] == NULL ? $item['ForneTelefone'] : $item['ForneCelular'];
 										
@@ -245,14 +248,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['CategNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
 														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
-														<!--<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'imprime\');" class="list-icons-item"><i class="icon-printer2" data-popup="tooltip" data-placement="bottom" title="Gerar PDF"></i></a>-->
+														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
 											</td>

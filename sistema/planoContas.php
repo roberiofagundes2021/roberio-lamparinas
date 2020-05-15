@@ -6,9 +6,10 @@ $_SESSION['PaginaAtual'] = 'Plano de Contas';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT PlConId, PlConNome, PlConStatus, CeCusNome
+$sql = "SELECT PlConId, PlConNome, PlConStatus, CeCusNome, SituaNome, SituaCor, SituaChave
 		 FROM PlanoContas
 		 JOIN CentroCusto on CeCusId = PlConCentroCusto
+		 JOIN Situacao on SituaId = PlConStatus
 	     WHERE PlConEmpresa = ". $_SESSION['EmpreId'] ."
 		 ORDER BY PlConNome ASC";
 $result = $conn->query($sql);
@@ -43,7 +44,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 			/* Início: Tabela Personalizada */
 			$('#tblPlanoContas').DataTable( {
-				"order": [[ 1, "asc" ]],
+				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [
@@ -59,7 +60,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Situação
-					width: "15%",
+					width: "10%",
 					targets: [2]
 				},
 				{ 
@@ -169,8 +170,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['PlConStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['PlConStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
+										$situacaoChave ='\''.$item['SituaChave'].'\'';
 										
 										print('
 										<tr>
@@ -178,7 +180,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['CeCusNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaPlanoContas('.$item['PlConId'].', \''.$item['PlConNome'].'\','.$item['PlConStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaPlanoContas('.$item['PlConId'].', \''.$item['PlConNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">

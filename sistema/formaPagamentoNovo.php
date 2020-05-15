@@ -62,13 +62,6 @@ if(isset($_POST['inputNome'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe a Forma de Pagamento!','error');
-					$('#inputNome').focus();
-					return false;
-				}
 
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -123,7 +116,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="inputNome">Forma de Pagamento</label>
+										<label for="inputNome">Forma de Pagamento<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Forma de Pagamento" required autofocus>
 									</div>
 								</div>

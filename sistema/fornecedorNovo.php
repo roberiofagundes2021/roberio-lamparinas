@@ -134,6 +134,11 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>		
 	<!-- /theme JS files -->	
 
+	<!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 	
@@ -231,6 +236,22 @@ if(isset($_POST['inputTipo'])){
 				});
 			});
 
+			/*jQuery.validator.setDefaults({
+				debug: true,
+				success: "valid"
+			})*/
+			$("#formFornecedor").validate({
+				rules: {
+				
+					inputCpf: {
+						required: true
+					},
+					inputCnpj: {
+						required: true
+					}
+				}
+			})
+
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
 				
@@ -245,21 +266,8 @@ if(isset($_POST['inputTipo'])){
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
 				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNome == ''){
-					alerta('Atenção','Informe o nome do fornecedor!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-				
 				// Se Pessoa Física
 				if (inputTipo  == "F"){
-					//Verifica se o campo só possui espaços em branco
-					if (inputCpf == ''){
-						alerta('Atenção','Informe o CPF!','error');
-						$('#inputCPF').focus();
-						return false;
-					}
 					
 					if (!validaCPF(inputCpf)){
 						alerta('Atenção','CPF inválido!','error');
@@ -267,12 +275,7 @@ if(isset($_POST['inputTipo'])){
 						return false;					
 					}					
 				} else {
-					//Verifica se o campo só possui espaços em branco
-					if (inputCnpj == '' || inputCnpj == '__.___.___/____-__'){
-						alerta('Atenção','Informe o CNPJ!','error');
-						$('#inputCNPJ').focus();
-						return false;
-					}
+					
 				}
 				
 				if (cmbSubCategoria[0] == 'Filtrando'){
@@ -369,7 +372,7 @@ if(isset($_POST['inputTipo'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formFornecedor" id="formFornecedor" method="post" class="form-validate">
+					<form name="formFornecedor" id="formFornecedor" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Fornecedor</h5>
 						</div>
@@ -399,21 +402,21 @@ if(isset($_POST['inputTipo'])){
 							<div class="row">
 								<div class="col-lg-9">
 									<div class="form-group">
-										<label for="inputNome">Nome</label>
+										<label for="inputNome">Nome<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Fantasia" required autofocus>
 									</div>
 								</div>	
 								
 								<div class="col-lg-3" id="CPF" style="display:none;">
 									<div class="form-group">
-										<label for="inputCpf">CPF</label>
+										<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
 										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99">
 									</div>	
 								</div>
 								
 								<div class="col-lg-3" id="CNPJ">
 									<div class="form-group">				
-										<label for="inputCnpj">CNPJ</label>
+										<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
 										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99">
 									</div>	
 								</div>							
@@ -524,9 +527,9 @@ if(isset($_POST['inputTipo'])){
 							<div class="row">
 								<div class="col-lg-6">
 									<div class="form-group">
-										<label for="cmbCategoria">Categoria</label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-											<option value="#">Selecione uma categoria</option>
+										<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
+										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+											<option value="">Selecione uma categoria</option>
 											<?php 
 												$sql = ("SELECT CategId, CategNome
 														 FROM Categoria															     

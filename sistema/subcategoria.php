@@ -42,7 +42,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$(document).ready(function (){	
 			$('#tblSubCategoria').DataTable( {
-				"order": [[ 1, "asc" ]],
+				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [
@@ -57,14 +57,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //Situação
-					width: "10%",
-					targets: [1]
-				},
-				{ 
-					orderable: true,   //Ações
+					orderable: false,   //Situação
 					width: "10%",
 					targets: [2]
+				},
+				{ 
+					orderable: false,   //Ações
+					width: "10%",
+					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
