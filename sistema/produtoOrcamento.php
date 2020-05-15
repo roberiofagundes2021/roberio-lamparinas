@@ -43,7 +43,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$(document).ready(function (){	
 			$('#tblProdutoOrcamento').DataTable( {
-				"order": [[ 1, "asc" ]],
+				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [
