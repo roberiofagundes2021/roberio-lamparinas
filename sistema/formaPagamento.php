@@ -9,7 +9,7 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT FrPagId, FrPagNome, FrPagStatus, SituaNome, SituaCor, SituaChave
 		FROM FormaPagamento
 		JOIN Situacao on SituaId = FrPagStatus
-	    WHERE FrPagEmpresa = ". $_SESSION['EmpreId'] ."
+	    WHERE FrPagUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY FrPagNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -48,7 +48,7 @@ $count = count($row);
 			    columnDefs: [
 				{
 					orderable: true,   //Forma Pagamento
-					width: "70%",
+					width: "80%",
 					targets: [0]
 				},
 				{ 
@@ -58,7 +58,7 @@ $count = count($row);
 				},
 				{ 
 					orderable: false,   //Ações
-					width: "15%",
+					width: "10%",
 					targets: [2]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',

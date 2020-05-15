@@ -9,18 +9,12 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputPlanoContasId'])){
 	
 	$iPlanoContas = $_POST['inputPlanoContasId'];
-        	
-	try{
 		
-		$sql = "SELECT PlConId, PlConNome, PlConCentroCusto
-				FROM PlanoContas
-				WHERE PlConId = $iPlanoContas ";
-		$result = $conn->query($sql);
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-		
-	} catch(PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
-	}
+	$sql = "SELECT PlConId, PlConNome, PlConCentroCusto
+			FROM PlanoContas
+			WHERE PlConId = $iPlanoContas ";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
 	$_SESSION['msg'] = array();
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
@@ -78,6 +72,11 @@ if(isset($_POST['inputNome'])){
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 	<!-- /theme JS files -->	
 	
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 	<script type="text/javascript" >
 
         $(document).ready(function() {
@@ -94,20 +93,6 @@ if(isset($_POST['inputNome'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNomeNovo = inputNomeNovo.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				/*if (inputNomeNovo == ''){
-					alerta('Atenção','Informe a sub categoria!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-
-				//Verifica se o campo só possui espaços em branco
-				if (cmbCategoria == '#'){
-					alerta('Atenção','Informe a categoria!','error');
-					$('#cmbCategoria').focus();
-					return false;
-				}*/
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -127,10 +112,6 @@ if(isset($_POST['inputNome'])){
 			})
 		})
 	</script>
-	<script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 </head>
 
 <body class="navbar-top">
@@ -174,16 +155,17 @@ if(isset($_POST['inputNome'])){
 									<select id="cmbCentroCusto" name="cmbCentroCusto" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 
-											$sql = "SELECT CeCusId, CeCusNome
-													 FROM CentroCusto
-													 WHERE CeCusStatus = 1 and CeCusEmpresa = ".$_SESSION['EmpreId']."
-													 ORDER BY CeCusNome ASC";
+											$sql = "SELECT CnCusId, CnCusNome
+													FROM CentroCusto
+													JOIN Situacao on SituaId = CnCusStatus
+													WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+													ORDER BY CnCusNome ASC";
 											$result = $conn->query($sql);
 											$rowCentroCusto = $result->fetchAll(PDO::FETCH_ASSOC);
 											
 											foreach ($rowCentroCusto as $item){
-												$seleciona = $item['CeCusId'] == $row['PlConCentroCusto'] ? "selected" : "";
-												print('<option value="'.$item['CeCusId'].'" '. $seleciona .'>'.$item['CeCusNome'].'</option>');
+												$seleciona = $item['CnCusId'] == $row['PlConCentroCusto'] ? "selected" : "";
+												print('<option value="'.$item['CnCusId'].'" '. $seleciona .'>'.$item['CnCusNome'].'</option>');
 											}
 										
 										?>

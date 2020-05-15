@@ -4,14 +4,14 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['nomeVelho'])){
+if (isset($_POST['nomeVelho'])){
 	$sql = "SELECT FrPagId
 			 FROM FormaPagamento
-			 WHERE FrPagEmpresa = ".$_SESSION['EmpreId']." and FrPagNome = '". $_POST['nomeNovo']."' and FrPagNome <> '". $_POST['nomeVelho']."'";
+			 WHERE FrPagUnidade = ".$_SESSION['UnidadeId']." and FrPagNome = '". $_POST['nomeNovo']."' and FrPagNome <> '". $_POST['nomeVelho']."'";
 } else{
 	$sql = "SELECT FrPagId
 			 FROM FormaPagamento
-			 WHERE FrPagEmpresa = ".$_SESSION['EmpreId']." and FrPagNome = '". $_POST['nome']."'";
+			 WHERE FrPagUnidade = ".$_SESSION['UnidadeId']." and FrPagNome = '". $_POST['nome']."'";
 }
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

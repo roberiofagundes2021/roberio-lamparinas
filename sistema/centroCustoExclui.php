@@ -11,7 +11,7 @@ if(isset($_POST['inputCentroCustoId'])){
 	try{
 		
 		$sql = "DELETE FROM CentroCusto
-				WHERE CeCusId = :id";
+				WHERE CnCusId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iCentroCusto); 
 		$result->execute();

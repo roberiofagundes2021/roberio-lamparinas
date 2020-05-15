@@ -21,8 +21,8 @@ if(isset($_POST['inputCentroCustoId'])){
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iStatus = $row['SituaId'];
 		
-		$sql = "UPDATE CentroCusto SET CeCusStatus = :bStatus
-				WHERE CeCusId = :id";
+		$sql = "UPDATE CentroCusto SET CnCusStatus = :bStatus
+				WHERE CnCusId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $iStatus); 
 		$result->bindParam(':id', $iCentroCusto); 

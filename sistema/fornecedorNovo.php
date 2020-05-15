@@ -134,7 +134,7 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>		
 	<!-- /theme JS files -->	
 
-	<!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
+	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
@@ -235,22 +235,6 @@ if(isset($_POST['inputTipo'])){
 					}					
 				});
 			});
-
-			/*jQuery.validator.setDefaults({
-				debug: true,
-				success: "valid"
-			})*/
-			$("#formFornecedor").validate({
-				rules: {
-				
-					inputCpf: {
-						required: true
-					},
-					inputCnpj: {
-						required: true
-					}
-				}
-			})
 
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){

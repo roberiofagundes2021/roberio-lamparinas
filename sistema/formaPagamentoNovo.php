@@ -10,15 +10,15 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO FormaPagamento (FrPagNome, FrPagStatus, FrPagUsuarioAtualizador, FrPagEmpresa)
-				VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO FormaPagamento (FrPagNome, FrPagStatus, FrPagUsuarioAtualizador, FrPagUnidade)
+				VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iUnidade' => $_SESSION['UnidadeId'],
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -48,11 +48,16 @@ if(isset($_POST['inputNome'])){
 	<title>Lamparinas | Forma de Pagamento</title>
 
 	<?php include_once("head.php"); ?>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	
-	<script type="text/javascript" >
+	<script type="text/javascript">
 
         $(document).ready(function() {
-			
+							
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
 				
@@ -74,17 +79,13 @@ if(isset($_POST['inputNome'])){
 							alerta('Atenção','Esse registro já existe!','error');
 							return false;
 						}
-						
+
 						$( "#formFormaPagamento" ).submit();
 					}
-				})
-			})
+				})			
+			})			
 		})
 	</script>
-	<script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 </head>
 
 <body class="navbar-top">
