@@ -12,7 +12,7 @@ $sql = "SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaN
 		LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal or LcEstId = MovimDestinoLocal
 		LEFT JOIN Setor on SetorId = MovimDestinoSetor
 		JOIN Situacao on SituaId = MovimSituacao
-	    WHERE MovimEmpresa = " . $_SESSION['EmpreId'] . "
+	    WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . "
 		ORDER BY MovimData DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -276,10 +276,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                             <select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
-                                                $sql = ("SELECT LcEstId, LcEstNome
-																          FROM LocalEstoque															     
-																          WHERE LcEstStatus = 1 and LcEstEmpresa = " . $_SESSION['EmpreId'] . "
-																          ORDER BY LcEstNome ASC");
+                                                $sql = "SELECT LcEstId, LcEstNome
+                                                        FROM LocalEstoque
+                                                        JOIN Situacao on SituaId = LcEstStatus
+                                                        WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                        ORDER BY LcEstNome ASC";
                                                 $result = $conn->query($sql);
                                                 $rowLcEst = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -296,11 +297,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                             <select id="cmbSetor" name="cmbSetor" class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
-                                                $sql = ("SELECT SetorId, SetorNome
-																             FROM Setor													     
-																             WHERE SetorStatus = 1 and SetorEmpresa = " . $_SESSION['EmpreId'] . "
-																             ORDER BY SetorNome ASC");
-                                                $result = $conn->query("$sql");
+                                                $sql = "SELECT SetorId, SetorNome
+                                                        FROM Setor
+                                                        JOIN Situacao on SituaId = SetorStatus
+                                                        WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                        ORDER BY SetorNome ASC";
+                                                $result = $conn->query($sql);
                                                 $rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                 foreach ($rowSetor as $item) {
@@ -318,11 +320,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                             <select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
-                                                $sql = ("SELECT CategId, CategNome
-																             FROM Categoria														     
-																             WHERE CategStatus = 1 and CategEmpresa = " . $_SESSION['EmpreId'] . "
-																             ORDER BY CategNome ASC");
-                                                $result = $conn->query("$sql");
+                                                $sql = "SELECT CategId, CategNome
+                                                        FROM Categoria
+                                                        JOIN Situacao on SituaId = CategStatus
+                                                        WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                        ORDER BY CategNome ASC";
+                                                $result = $conn->query($sql);
                                                 $rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                 foreach ($rowCateg as $item) {

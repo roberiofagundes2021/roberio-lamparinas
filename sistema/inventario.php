@@ -6,13 +6,13 @@ $_SESSION['PaginaAtual'] = 'Inventário';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT InvenId, InvenData, InvenNumero, SituaNome, SituaChave, UnidaNome, CategNome
-		 FROM Inventario
-		 JOIN Situacao on SituaId = InvenSituacao
-		 LEFT JOIN Unidade on UnidaId = InvenUnidade
-		 LEFT JOIN Categoria on CategId = InvenCategoria
-		 WHERE InvenEmpresa = ".$_SESSION['EmpreId']."
-		 ORDER BY InvenNumero DESC"); 
+$sql = "SELECT InvenId, InvenData, InvenNumero, SituaNome, SituaChave, UnidaNome, CategNome
+		FROM Inventario
+		JOIN Situacao on SituaId = InvenSituacao
+		LEFT JOIN Unidade on UnidaId = InvenUnidade
+		LEFT JOIN Categoria on CategId = InvenCategoria
+		WHERE InvenEmpresa = ".$_SESSION['EmpreId']."
+		ORDER BY InvenNumero DESC"; 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);

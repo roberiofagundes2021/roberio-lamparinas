@@ -56,9 +56,9 @@ $args = [];
                     JOIN Produto on ProduId = MvXPrProduto
                     JOIN LocalEstoque on LcEstId = MovimDestinoLocal
                     LEFT JOIN Setor on SetorId = MovimDestinoSetor
-                    WHERE ".$string." ProduEmpresa = ".$_SESSION['EmpreId']."
+                    WHERE ".$string." ProduUnidade = ".$_SESSION['UnidadeId']."
                     ";
-            $result = $conn->query("$sql");
+            $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
@@ -75,7 +75,7 @@ if (isset($_POST['inputLocalEstoque_imp'])) {
 	try {
 		$sql = "SELECT LcEstNome
 		        FROM LocalEstoque
-		        WHERE LcEstId = " . $_POST['inputLocalEstoque_imp'] . " and LcEstEmpresa = " . $_SESSION['EmpreId'] . "
+		        WHERE LcEstId = " . $_POST['inputLocalEstoque_imp'] . " and LcEstUnidade = " . $_SESSION['UnidadeId'] . "
 	            ";
 		$result = $conn->query($sql);
 		$LocalEstoque = $result->fetch(PDO::FETCH_ASSOC);
@@ -88,7 +88,7 @@ if (isset($_POST['inputSetor_imp'])) {
 	try {
 		$sql = "SELECT SetorNome
 		        FROM Setor
-		        WHERE SetorId = " . $_POST['inputSetor_imp'] . " and SetorEmpresa = " . $_SESSION['EmpreId'] . "
+		        WHERE SetorId = " . $_POST['inputSetor_imp'] . " and SetorUnidade = " . $_SESSION['UnidadeId'] . "
 	            ";
 		$result = $conn->query($sql);
 		$Setor = $result->fetch(PDO::FETCH_ASSOC);
@@ -101,7 +101,7 @@ if (isset($_POST['inputCategoria_imp'])) {
 	try {
 		$sql = "SELECT CategNome
 		        FROM Categoria
-		        WHERE CategId = " . $_POST['inputCategoria_imp'] . " and CategEmpresa = " . $_SESSION['EmpreId'] . "
+		        WHERE CategId = " . $_POST['inputCategoria_imp'] . " and CategUnidade = " . $_SESSION['UnidadeId'] . "
 	            ";
 		$result = $conn->query($sql);
 		$Categoria = $result->fetch(PDO::FETCH_ASSOC);
@@ -115,7 +115,7 @@ if (isset($_POST['inputSubCategoria_imp'])) {
 	try {
 		$sql = "SELECT SbCatNome
 		        FROM SubCategoria
-		        WHERE SbCatId = " . $_POST['inputSubCategoria_imp'] . " and SbCatEmpresa = " . $_SESSION['EmpreId'] . "
+		        WHERE SbCatId = " . $_POST['inputSubCategoria_imp'] . " and SbCatUnidade = " . $_SESSION['UnidadeId'] . "
 	            ";
 		$result = $conn->query($sql);
 		$SubCategoria = $result->fetch(PDO::FETCH_ASSOC);
