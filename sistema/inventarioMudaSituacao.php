@@ -9,14 +9,21 @@ $_SESSION['msg'] = array();
 if(isset($_POST['inputInventarioId'])){
 	
 	$iInventario = $_POST['inputInventarioId'];
-	$bStatus = $_POST['inputInventarioStatus'] ? 1 : 2;  // aqui passa de PENDENTE para FINALIZADO
+	$sStatus = $_POST['inputInventarioStatus'] == 'PENDENTE' ? 'FINALIZADO' : 'PENDENTE';
         	
 	try{
+
+		$sql = "SELECT SituaId
+				FROM Situacao
+			    WHERE SituaChave = '". $sStatus."'";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+		$iStatus = $row['SituaId'];
 		
 		$sql = "UPDATE Inventario SET InvenSituacao = :bStatus
 				WHERE InvenId = :id";
 		$result = $conn->prepare("$sql");
-		$result->bindParam(':bStatus', $bStatus); 
+		$result->bindParam(':bStatus', $iStatus); 
 		$result->bindParam(':id', $iInventario); 
 		$result->execute();
 		

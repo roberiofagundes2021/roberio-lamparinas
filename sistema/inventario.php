@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Inventário';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT InvenId, InvenData, InvenNumero, SituaNome, SituaChave, UnidaNome, CategNome
+$sql = "SELECT InvenId, InvenData, InvenNumero, SituaNome, SituaChave, SituaCor, UnidaNome, CategNome
 		FROM Inventario
 		JOIN Situacao on SituaId = InvenSituacao
 		LEFT JOIN Unidade on UnidaId = InvenUnidade
@@ -87,6 +87,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			document.getElementById('inputInventarioId').value = InvenId;
 			document.getElementById('inputInventarioNumero').value = InvenNumero;
+			document.getElementById('inputInventarioStatus').value = Situacao;
 							
 			if (Tipo == 'edita'){	
 				document.formInventario.action = "inventarioEdita.php";		
@@ -175,7 +176,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									foreach ($row as $item){
 										
 										$situacao = $item['SituaNome'];
-										$situacaoClasse = $item['SituaChave'] == 'FINALIZADO' ? 'badge-success' : 'bg-grey';
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>

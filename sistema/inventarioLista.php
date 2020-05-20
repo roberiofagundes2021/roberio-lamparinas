@@ -54,10 +54,10 @@ try {
 		<br>
 		<table style="width:100%; border-collapse: collapse;">
 			<tr>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Código</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Patrimônio</th>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:30%">Produto</th>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:30%">Categoria</th>
+				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:28%">Categoria</th>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">1ª Contagem</th>
 				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">2ª Contagem</th>
 			</tr>
@@ -66,11 +66,12 @@ try {
 		$iCategoria = $item['InvenCategoria'];
 		$iLocal = $item['InXLELocal'];
 		
-		$sql = "SELECT Distinct ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, MovimDestinoLocal) as Saldo, LcEstNome
+		$sql = "SELECT Distinct ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, MovimDestinoLocal) as Saldo, LcEstNome
 				FROM Produto
 				JOIN Categoria on CategId = ProduCategoria
 				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
+				JOIN Patrimonio on PatriId = MvXPrPatrimonio
 				JOIN Movimentacao on MovimId = MvXPrMovimentacao
 				JOIN LocalEstoque on LcEstId = MovimDestinoLocal
 				JOIN Situacao on SituaId = MovimSituacao
@@ -85,7 +86,7 @@ try {
 			
 			$html .= "
 				<tr>
-					<td style='padding-top: 8px;'>".formatarNumero($itemProduto['ProduCodigo'])."</td>
+					<td style='padding-top: 8px;'>".formatarNumero($itemProduto['PatriNumero'])."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome']."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['UnMedSigla']."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['CategNome']."</td>

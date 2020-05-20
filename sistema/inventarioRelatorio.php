@@ -56,8 +56,8 @@ try {
 		<br>
 		<table style="width:100%;">
 			<tr>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Código</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:42%">Produto</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Patrimônio</th>
+				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:40%">Produto</th>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Unitário</th>
@@ -68,13 +68,14 @@ try {
 		$iCategoria = $item['InvenCategoria'];
 		$iLocal = $item['InXLELocal'];
 		
-		$sql = ("SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, 
+		$sql = ("SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, 
 						dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, MovimDestinoLocal) as Saldo, 
 						dbo.fnCalculaValorTotalInventario(dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, MovimDestinoLocal), ProduCustoFinal) as ValorTotal
 				 FROM Produto
 				 JOIN Categoria on CategId = ProduCategoria
 				 JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 				 JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
+				 JOIN Patrimonio on PatriId = MvXPrPatrimonio
 				 JOIN Movimentacao on MovimId = MvXPrMovimentacao
 				 JOIN LocalEstoque on LcEstId = MovimDestinoLocal
 				 JOIN Situacao on SituaId = MovimSituacao
@@ -91,7 +92,7 @@ try {
 			
 			$html .= "
 				<tr>
-					<td style='padding-top: 8px;'>".formatarNumero($itemProduto['ProduCodigo'])."</td>
+					<td style='padding-top: 8px;'>".formatarNumero($itemProduto['PatriNumero'])."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome']."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['UnMedSigla']."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['Saldo']."</td>

@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-include_once("sessao.php"); 
+include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Novo Inventário';
 
@@ -8,31 +8,31 @@ include('global_assets/php/conexao.php');
 
 $sql = ("SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
 		 FROM Usuario
-		 Where UsuarId = ".$_SESSION['UsuarId']."
+		 Where UsuarId = " . $_SESSION['UsuarId'] . "
 		 ORDER BY UsuarNome ASC");
 $result = $conn->query("$sql");
 $rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
 
-if(isset($_POST['inputData'])){
-				
-	try{
-		
+if (isset($_POST['inputData'])) {
+
+	try {
+
 		$sql = ("Select SituaId from Situacao 
 				Where SituaChave = 'PENDENTE'");
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);
-		
+
 		$iSituacao = $row['SituaId'];
 
 		$sql = "Select Max(InvenNumero) as MaiorNumero
 				From Inventario
-				Where InvenEmpresa = ".$_SESSION['EmpreId'];
+				Where InvenEmpresa = " . $_SESSION['EmpreId'];
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);
-		
+
 		$iUltimoNumero = $row['MaiorNumero'];
 		$iproximoNumero = $iUltimoNumero + 1;
-		
+
 		$sql = "INSERT INTO Inventario (InvenData, InvenNumero, InvenDataLimite, InvenClassificacao, InvenUnidade, InvenCategoria, InvenSolicitante, 
 										InvenObservacao, InvenSituacao, InvenUsuarioAtualizador, InvenEmpresa)
 				VALUES (:dData, :iNumero, :dDataLimite, :iClassificacao, :iUnidade, :iCategoria, :iSolicitante, 
@@ -40,76 +40,75 @@ if(isset($_POST['inputData'])){
 		$result = $conn->prepare($sql);
 
 		$conn->beginTransaction();
-		
+
 		$result->execute(array(
-						':dData' => gravaData($_POST['inputData']),
-						':iNumero' => $iproximoNumero,
-						':dDataLimite' => gravaData($_POST['inputDataLimite']),
-						':iClassificacao' => $_POST['cmbClassificacao'] == '#' ? null : $_POST['cmbClassificacao'],
-						':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
-						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':iSolicitante' => $_SESSION['UsuarId'],
-						':sObservacao' => $_POST['txtObservacao'],
-						':iSituacao' => $iSituacao,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
-						));
+			':dData' => gravaData($_POST['inputData']),
+			':iNumero' => $iproximoNumero,
+			':dDataLimite' => gravaData($_POST['inputDataLimite']),
+			':iClassificacao' => $_POST['cmbClassificacao'] == '#' ? null : $_POST['cmbClassificacao'],
+			':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
+			':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+			':iSolicitante' => $_SESSION['UsuarId'],
+			':sObservacao' => $_POST['txtObservacao'],
+			':iSituacao' => $iSituacao,
+			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+			':iEmpresa' => $_SESSION['EmpreId']
+		));
 
-		$insertId = $conn->lastInsertId(); 
+		$insertId = $conn->lastInsertId();
 
-		if ($_POST['cmbLocalEstoque']){
-			
+		if ($_POST['cmbLocalEstoque']) {
+
 			$sql = "INSERT INTO InventarioXLocalEstoque 
 						(InXLEInventario, InXLELocal)
 					VALUES 
 						(:iInventario, :iLocal)";
 			$result = $conn->prepare($sql);
 
-			foreach ($_POST['cmbLocalEstoque'] as $key => $value){
+			foreach ($_POST['cmbLocalEstoque'] as $key => $value) {
 
 				$result->execute(array(
-								':iInventario' => $insertId,
-								':iLocal' => $value									
-								));
+					':iInventario' => $insertId,
+					':iLocal' => $value
+				));
 			}
 		}
 
-		if ($_POST['cmbEquipe']){
-			
+		if ($_POST['cmbEquipe']) {
+
 			$sql = "INSERT INTO InventarioXEquipe 
 						(InXEqInventario, InXEqUsuario, InXEqPresidente)
 					VALUES 
 						(:iInventario, :iUsuario, :bPresidente)";
 			$result = $conn->prepare($sql);
 
-			foreach ($_POST['cmbEquipe'] as $key => $value){
+			foreach ($_POST['cmbEquipe'] as $key => $value) {
 
 				$result->execute(array(
-								':iInventario' => $insertId,
-								':iUsuario' => $value,
-								':bPresidente' => $value == $_POST['cmbPresidente'] ? 1 : 0
-								));
+					':iInventario' => $insertId,
+					':iUsuario' => $value,
+					':bPresidente' => $value == $_POST['cmbPresidente'] ? 1 : 0
+				));
 			}
 		}
-		
-		$conn->commit();		
-		
+
+		$conn->commit();
+
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Inventário incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
-		
-	} catch(PDOException $e) {		
-		
+	} catch (PDOException $e) {
+
 		$conn->rollback();
-		
+
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir inventário!!!";
-		$_SESSION['msg']['tipo'] = "error";	
-		
+		$_SESSION['msg']['tipo'] = "error";
+
 		echo 'Error: ' . $e->getMessage();
 		exit;
 	}
-	
+
 	irpara("inventario.php");
 }
 
@@ -117,6 +116,7 @@ if(isset($_POST['inputData'])){
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -124,157 +124,141 @@ if(isset($_POST['inputData'])){
 	<title>Lamparinas | Inventário</title>
 
 	<?php include_once("head.php"); ?>
-	
+
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<!-- /theme JS files -->	
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+	<!-- /theme JS files -->
 
 	<!-- Adicionando Javascript -->
-    <script type="text/javascript" >
+	<script type="text/javascript">
+		$(document).ready(function() {
 
-        $(document).ready(function() {
-			            
 			//Valida Registro Duplicado
-			$('#enviar').on('click', function(e){
-				
+			$('#enviar').on('click', function(e) {
+
 				e.preventDefault();
-						
+
 				var cmbUnidade = $('#cmbUnidade').val();
 				var cmbLocalEstoque = $('#cmbLocalEstoque').val();
 				var cmbEquipe = $('#cmbEquipe').val();
-								
-				//Verifica se o campo só possui espaços em branco
-				if (cmbUnidade == '#'){
-					alerta('Atenção','Informe a Unidade!','error');
-					$('#cmbUnidade').focus();
-					return false;
-				}
-				
-				if (cmbLocalEstoque == ''){
-					alerta('Atenção','Informe o Local(is) de Estoque!','error');
-					$('#cmbLocalEstoque').focus();
-					return false;
-				}
 
-				if (cmbEquipe == ''){
-					alerta('Atenção','Informe a equipe responsável!','error');
-					$('#cmbEquipe').focus();
-					return false;
-				}	
-				
-				$( "#formInventario" ).submit();
-				
+				$("#formInventario").submit();
+
 			}); // enviar
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
-			$('#cmbUnidade').on('change', function(e){
+			$('#cmbUnidade').on('change', function(e) {
 
 				FiltraLocalEstoque();
-				
+
 				var cmbUnidade = $('#cmbUnidade').val();
 
-				if (cmbUnidade == '#'){
+				if (cmbUnidade == '#') {
 					ResetLocalEstoque();
 				} else {
-				
-					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados){
-						
+
+					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function(dados) {
+
 						var option = '';
 
-						if (dados.length){						
-							
-							$.each(dados, function(i, obj){
-								option += '<option value="'+obj.LcEstId+'">' + obj.LcEstNome + '</option>';
-							});						
-							
+						if (dados.length) {
+
+							$.each(dados, function(i, obj) {
+								option += '<option value="' + obj.LcEstId + '">' + obj.LcEstNome + '</option>';
+							});
+
 							$('#cmbLocalEstoque').html(option).show();
 						} else {
 							ResetLocalEstoque();
-						}					
+						}
 					});
 				}
 			});
-            
+
 			//Ao mudar a Equipe, filtra o possível presidente via ajax (retorno via JSON)
-			$('#cmbEquipe').on('change', function(e){
-						
+			$('#cmbEquipe').on('change', function(e) {
+
 				var cmbEquipe = $('#cmbEquipe').val();
-				
+
 				//Esse IF é para quando se exclui todos que estavam selecionados entrar no ELSE e limpar a combo do Presidente
-				if (cmbEquipe != ''){
-					
-					$.getJSON('filtraPresidente.php?aEquipe='+cmbEquipe, function (dados){
+				if (cmbEquipe != '') {
+
+					$.getJSON('filtraPresidente.php?aEquipe=' + cmbEquipe, function(dados) {
 
 						var option = '';
 
-						if (dados.length){
-							
-							$.each(dados, function(i, obj){
-								option += '<option value="'+obj.UsuarId+'">'+obj.UsuarLogin+'</option>';
-							});						
-							
+						if (dados.length) {
+
+							$.each(dados, function(i, obj) {
+								option += '<option value="' + obj.UsuarId + '">' + obj.UsuarLogin + '</option>';
+							});
+
 							$('#cmbPresidente').html(option).show();
 						} else {
 							ResetPresidente();
-						}					
+						}
 					});
 				} else {
-					ResetPresidente();						
-				}				
-			});	
-			
-        }); // document.ready
+					ResetPresidente();
+				}
+			});
 
-		function FiltraLocalEstoque(){
+		}); // document.ready
+
+		function FiltraLocalEstoque() {
 			$('#cmbLocalEstoque').empty().append('<option>Filtrando...</option>');
 		}
-		
-		function ResetLocalEstoque(){
-			$('#cmbLocalEstoque').empty().append('<option>Sem Local do Estoque</option>');
-		}			
-		
-		//Mostra o "Filtrando..." na combo Presidente da Comissão
-		function FiltraPresidente(){
-			$('#cmbPresidente').empty().append('<option>Filtrando...</option>');
-		}			
-		
-		function ResetPresidente(){
-			$('#cmbPresidente').empty().append('<option value="#">Nenhum</option>');
-		}			
 
-    </script>	
-	
+		function ResetLocalEstoque() {
+			$('#cmbLocalEstoque').empty().append('<option>Sem Local do Estoque</option>');
+		}
+
+		//Mostra o "Filtrando..." na combo Presidente da Comissão
+		function FiltraPresidente() {
+			$('#cmbPresidente').empty().append('<option>Filtrando...</option>');
+		}
+
+		function ResetPresidente() {
+			$('#cmbPresidente').empty().append('<option value="#">Nenhum</option>');
+		}
+	</script>
+
 </head>
 
 <body class="navbar-top">
 
-	<?php include_once("topo.php"); ?>	
+	<?php include_once("topo.php"); ?>
 
 	<!-- Page content -->
 	<div class="page-content">
-		
+
 		<?php include_once("menu-left.php"); ?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
 
-			<?php include_once("cabecalho.php"); ?>	
+			<?php include_once("cabecalho.php"); ?>
 
 			<!-- Content area -->
 			<div class="content">
-				
+
 				<!-- Info blocks -->
 				<div class="card">
-					
-					<form name="formInventario" id="formInventario" method="post" class="form-validate">
+
+					<form name="formInventario" id="formInventario" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Inventário</h5>
 						</div>
-						
+
 						<div class="card-body">
 
 							<div class="row">
@@ -290,90 +274,90 @@ if(isset($_POST['inputData'])){
 										<label for="inputDataLimite">Data Limite</label>
 										<input type="text" id="inputDataLimite" name="inputDataLimite" class="form-control" placeholder="Data Limite">
 									</div>
-								</div>	
-								
+								</div>
+
 								<div class="col-lg-2" id="classificacao">
 									<div class="form-group">
 										<label for="cmbClassificacao">Classificação/Bens</label>
 										<select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
 											<option value="#">Selecione</option>
-											<?php 
-												$sql = ("SELECT ClassId, ClassNome
+											<?php
+											$sql = ("SELECT ClassId, ClassNome
 														 FROM Classificacao
 														 WHERE ClassStatus = 1
 														 ORDER BY ClassNome ASC");
-												$result = $conn->query("$sql");
-												$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($rowClassificacao as $item){
-													print('<option value="'.$item['ClassId'].'">'.$item['ClassNome'].'</option>');
-												}
-											
-											?>
-										</select>
-									</div>
-								</div>								
-								
-								<div class="col-lg-6">
-									<label for="cmbUnidade">Unidade</label>
-									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
-										<option value="#">Selecione</option>
-										<?php 
-											$sql = ("SELECT UnidaId, UnidaNome
-													 FROM Unidade
-													 WHERE UnidaStatus = 1 and UnidaEmpresa = ".$_SESSION['EmpreId']."
-													 ORDER BY UnidaNome ASC");
 											$result = $conn->query("$sql");
-											$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
-											
-											foreach ($rowUnidade as $item){
-												print('<option value="'.$item['UnidaId'].'">'.$item['UnidaNome'].'</option>');
+											$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+
+											foreach ($rowClassificacao as $item) {
+												print('<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>');
 											}
-										
-										?>
-									</select>
-								</div>									
-							</div>	
-							
-							<div class="row">		
-								
-								<div class="col-lg-8">
-									<div class="form-group" style="border-bottom:1px solid #ddd;">
-										<label for="cmbLocalEstoque">Locais do Estoque</label>
-										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" data-fouc>
-											<?php 
-												$sql = ("SELECT LcEstId, LcEstNome
-														 FROM LocalEstoque															     
-														 WHERE LcEstEmpresa = ". $_SESSION['EmpreId'] ." and LcEstStatus = 1
-														 ORDER BY LcEstNome ASC");
-												$result = $conn->query("$sql");
-												$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($rowLocal as $item){															
-													print('<option value="'.$item['LcEstId'].'">'.$item['LcEstNome'].'</option>');
-												}
-											
+
 											?>
 										</select>
 									</div>
 								</div>
-								
+
+								<div class="col-lg-6">
+									<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
+									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
+										<option value="">Selecione</option>
+										<?php
+										$sql = ("SELECT UnidaId, UnidaNome
+													 FROM Unidade
+													 WHERE UnidaStatus = 1 and UnidaEmpresa = " . $_SESSION['EmpreId'] . "
+													 ORDER BY UnidaNome ASC");
+										$result = $conn->query("$sql");
+										$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+
+										foreach ($rowUnidade as $item) {
+											print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
+										}
+
+										?>
+									</select>
+								</div>
+							</div>
+
+							<div class="row">
+
+								<div class="col-lg-8">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
+										<label for="cmbLocalEstoque">Locais do Estoque<span class="text-danger"> *</span></label>
+										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" required data-fouc>
+											<?php
+											$sql = ("SELECT LcEstId, LcEstNome
+														 FROM LocalEstoque															     
+														 WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and LcEstStatus = 1
+														 ORDER BY LcEstNome ASC");
+											$result = $conn->query("$sql");
+											$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
+
+											foreach ($rowLocal as $item) {
+												print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+											}
+
+											?>
+										</select>
+									</div>
+								</div>
+
 								<div class="col-lg-4">
 									<label for="cmbCategoria">Categoria</label>
 									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 										<option value="#">Selecione</option>
-										<?php 
-											$sql = ("SELECT CategId, CategNome
+										<?php
+										$sql = ("SELECT CategId, CategNome
 													 FROM Categoria
-													 WHERE CategStatus = 1 and CategEmpresa = ".$_SESSION['EmpreId']."
+													 WHERE CategStatus = 1 and CategEmpresa = " . $_SESSION['EmpreId'] . "
 													 ORDER BY CategNome ASC");
-											$result = $conn->query("$sql");
-											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-											
-											foreach ($rowCategoria as $item){
-												print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-											}
-										
+										$result = $conn->query("$sql");
+										$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+
+										foreach ($rowCategoria as $item) {
+											print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
+										}
+
 										?>
 									</select>
 								</div>
@@ -381,30 +365,30 @@ if(isset($_POST['inputData'])){
 							<br>
 
 							<h5 class="mb-0 font-weight-semibold">Comissão de Inventário</h5>
-							<br>							
+							<br>
 							<div class="row">
 								<div class="col-lg-9">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
-										<label for="cmbEquipe">Equipe Responsável</label>
-										<select id="cmbEquipe" name="cmbEquipe[]" class="form-control select" multiple="multiple" data-fouc>
-											<?php 
-												$sql = ("SELECT UsuarId, UsuarLogin
+										<label for="cmbEquipe">Equipe Responsável<span class="text-danger"> *</span></label>
+										<select id="cmbEquipe" name="cmbEquipe[]" class="form-control select" multiple="multiple" data-fouc required>
+											<?php
+											$sql = ("SELECT UsuarId, UsuarLogin
 														 FROM Usuario
 														 JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
-														 WHERE EXUXPEmpresa = ". $_SESSION['EmpreId'] ." and EXUXPStatus = 1
+														 WHERE EXUXPEmpresa = " . $_SESSION['EmpreId'] . " and EXUXPStatus = 1
 														 ORDER BY UsuarLogin ASC");
-												$result = $conn->query("$sql");
-												$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($rowEquipe as $item){															
-													print('<option value="'.$item['UsuarId'].'">'.$item['UsuarLogin'].'</option>');
-												}
-											
+											$result = $conn->query("$sql");
+											$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
+
+											foreach ($rowEquipe as $item) {
+												print('<option value="' . $item['UsuarId'] . '">' . $item['UsuarLogin'] . '</option>');
+											}
+
 											?>
 										</select>
 									</div>
 								</div>
-								
+
 								<div class="col-lg-3">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbPresidente">Presidente da Comissão</label>
@@ -412,12 +396,12 @@ if(isset($_POST['inputData'])){
 											<option value="#">Nenhum</option>
 										</select>
 									</div>
-								</div>								
+								</div>
 							</div>
 							<br>
-							
+
 							<div class="row">
-								<div class="col-lg-12">									
+								<div class="col-lg-12">
 									<h5 class="mb-0 font-weight-semibold">Dados do Solicitante</h5>
 									<br>
 									<div class="row">
@@ -427,22 +411,22 @@ if(isset($_POST['inputData'])){
 												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly>
 											</div>
 										</div>
-										
+
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputEmailSolicitante">E-mail</label>
 												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarEmail']; ?>" readOnly>
 											</div>
-										</div>									
+										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputTelefoneSolicitante">Telefone</label>
 												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarTelefone']; ?>" readOnly>
 											</div>
-										</div>									
+										</div>
 									</div>
-									
+
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group">
@@ -452,28 +436,28 @@ if(isset($_POST['inputData'])){
 										</div>
 									</div>
 								</div>
-							</div>									
-							
+							</div>
+
 							<div class="row" style="margin-top: 40px;">
-								<div class="col-lg-12">								
+								<div class="col-lg-12">
 									<div class="form-group">
 										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
 										<a href="inventario.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>
-				
+
 						</div>
 						<!-- /card-body -->
-					
+
 					</form>
-					
+
 				</div>
 				<!-- /info blocks -->
 
 			</div>
-			<!-- /content area -->			
-			
+			<!-- /content area -->
+
 			<?php include_once("footer.php"); ?>
 
 		</div>
@@ -483,4 +467,5 @@ if(isset($_POST['inputData'])){
 	<!-- /page content -->
 
 </body>
+
 </html>
