@@ -11,13 +11,13 @@ require_once 'global_assets/php/vendor/autoload.php';
 $iInventario = $_POST['inputInventarioId'];
 $sNumero = $_POST['inputInventarioNumero'];
 
-$sql = ("SELECT InvenNumero, InvenCategoria, InXLELocal, LcEstNome
-		 FROM Inventario
-		 JOIN InventarioXLocalEstoque on InXLEInventario = InvenId
-		 JOIN LocalEstoque on LcEstId = InXLELocal
-		 Where InvenId = ".$iInventario."
-		");
-$result = $conn->query("$sql");
+$sql = "SELECT InvenNumero, InvenCategoria, InXLELocal, LcEstNome
+		FROM Inventario
+		JOIN InventarioXLocalEstoque on InXLEInventario = InvenId
+		JOIN LocalEstoque on LcEstId = InXLELocal
+		Where InvenId = ".$iInventario."
+		";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 try {
@@ -73,11 +73,11 @@ try {
 				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 				JOIN Patrimonio on PatriId = MvXPrPatrimonio
 				JOIN Movimentacao on MovimId = MvXPrMovimentacao
-				JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+				LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+				LEFT JOIN Setor on SetorId = MovimDestinoSetor
 				JOIN Situacao on SituaId = MovimSituacao
 				WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduStatus = 1 and
-					  ProduCategoria = ".$iCategoria." and
-					  MovimDestinoLocal = (".$iLocal.") and SituaChave = 'FINALIZADO'
+					  ProduCategoria = ".$iCategoria." and MovimDestinoLocal = (".$iLocal.") and SituaChave = 'FINALIZADO'
 				 ";
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);		

@@ -15,7 +15,8 @@ if (isset($_POST['inputMovimentacaoId'])) {
 
     $sql = "SELECT MovimTipo, MovimData, MovimObservacao, ParamValorObsImpreRetirada
             FROM Movimentacao
-            JOIN Parametro on ParamEmpresa = MovimEmpresa
+            JOIN Unidade on UnidaId = MovimUnidade
+            JOIN Parametro on ParamEmpresa = UnidaEmpresa
             WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = ". $iMovimentacao;
     $result = $conn->query($sql);
     $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -66,7 +67,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
 
     $Origem = $rowMv['Origem'];
     $Destino = $rowMv['Destino'];
-    $Motivo = $rowMv['MotivChave']; 
+    //$Motivo = $rowMv['MotivChave']; 
 }
 
 try {
