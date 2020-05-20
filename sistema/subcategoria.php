@@ -57,7 +57,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					targets: [1]
 				},
 				{ 
-					orderable: false,   //Situação
+					orderable: true,   //Situação
 					width: "10%",
 					targets: [2]
 				},

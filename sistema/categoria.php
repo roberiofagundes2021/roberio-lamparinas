@@ -54,7 +54,7 @@ $count = count($row);
 					targets: [0]
 				},
 				{ 
-					orderable: false,   //Situação
+					orderable: true,   //Situação
 					width: "10%",
 					targets: [1]
 				},

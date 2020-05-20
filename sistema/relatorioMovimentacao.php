@@ -9,7 +9,7 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
 		FROM Fornecedor
 		JOIN Categoria on CategId = ForneCategoria
-	    WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . "
+	    WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY ForneNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -274,7 +274,7 @@ $dataFim = date("Y-m-d");
 
 				$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
 
-					var option = '<option value="" "selected">Selecione o Produto</option>';
+					var option = '<option value="" selected>Selecione o Produto</option>';
 
 					if (dados.length) {
 
@@ -544,7 +544,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT ForneId, ForneNome
 																FROM Fornecedor
 																JOIN Situacao on SituaId = ForneStatus
-																WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY ForneNome ASC";
 													$result = $conn->query($sql);
 													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -568,7 +568,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT CategId, CategNome
 																FROM Categoria
 																JOIN Situacao on SituaId = CategStatus
-																WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY CategNome ASC";
 													$result = $conn->query($sql);
 													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -590,7 +590,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT SbCatId, SbCatNome
 																	FROM SubCategoria
 																	JOIN Situacao on SituaId = SbCatStatus
-																	WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																	ORDER BY SbCatNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -613,7 +613,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT ProduCodigo
 																FROM Produto
 																JOIN Situacao on SituaId = ProduStatus
-																WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY ProduNome ASC";
 													$result = $conn->query($sql);
 													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -635,7 +635,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT ProduId, ProduNome
 																	FROM Produto
 																	JOIN Situacao on SituaId = ProduStatus
-																	WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																	ORDER BY ProduNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -682,7 +682,7 @@ $dataFim = date("Y-m-d");
 									<thead>
 										<tr class="bg-slate">
 											<th>Data</th>
-											<th>Tipo</th>
+											<th style='text-align: center'>Tipo</th>
 											<th>Produto</th> <!-- O Hint deve aparecer Código, Patrimônio e Detalhamento -->
 											<th>Categoria</th>
 											<th>Fornecedor</th>

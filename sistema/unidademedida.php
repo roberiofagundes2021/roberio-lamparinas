@@ -51,12 +51,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					targets: [0]
 				},
 				{ 
-					orderable: false,   //Sigla
+					orderable: true,   //Sigla
 					width: "20%",
 					targets: [1]
 				},
 				{ 
-					orderable: false,   //Situação
+					orderable: true,   //Situação
 					width: "10%",
 					targets: [2]
 				},

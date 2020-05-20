@@ -9,18 +9,12 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputCentroCustoId'])){
 	
 	$iCentroCusto = $_POST['inputCentroCustoId'];
-        	
-	try{
 		
-		$sql = "SELECT CeCusId, CeCusNome
-				FROM CentroCusto
-				WHERE CeCusId = $iCentroCusto ";
-		$result = $conn->query($sql);
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-		
-	} catch(PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
-	}
+	$sql = "SELECT CnCusId, CnCusNome
+			FROM CentroCusto
+			WHERE CnCusId = $iCentroCusto ";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
 	$_SESSION['msg'] = array();
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
@@ -32,8 +26,8 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE CentroCusto SET CeCusNome = :sNome, CeCusUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE CeCusId = :iCentroCusto";
+		$sql = "UPDATE CentroCusto SET CnCusNome = :sNome, CnCusUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE CnCusId = :iCentroCusto";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -69,6 +63,11 @@ if(isset($_POST['inputNome'])){
 	<title>Lamparinas | Centro de Custo</title>
 
 	<?php include_once("head.php"); ?>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	
 	<script type="text/javascript" >
 
@@ -86,7 +85,6 @@ if(isset($_POST['inputNome'])){
 				inputNomeNovo = inputNomeNovo.trim();
 
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				
 				
 				$.ajax({
 					type: "POST",
@@ -107,10 +105,6 @@ if(isset($_POST['inputNome'])){
 		})
 	
 	</script>
-    <script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 </head>
 
 <body class="navbar-top">
@@ -135,16 +129,16 @@ if(isset($_POST['inputNome'])){
 					
 					<form name="formCentroCusto" id="formCentroCusto" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Centro de Custo "<?php echo $row['CeCusNome']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Centro de Custo "<?php echo $row['CnCusNome']; ?>"</h5>
 						</div>
-						<input type="hidden" id="inputCentroCustoId" name="inputCentroCustoId" value="<?php echo $row['CeCusId']; ?>" >
-						<input type="hidden" id="inputCentroCustoNome" name="inputCentroCustoNome" value="<?php echo $row['CeCusNome']; ?>" >
+						<input type="hidden" id="inputCentroCustoId" name="inputCentroCustoId" value="<?php echo $row['CnCusId']; ?>" >
+						<input type="hidden" id="inputCentroCustoNome" name="inputCentroCustoNome" value="<?php echo $row['CnCusNome']; ?>" >
 						<div class="card-body">								
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
 										<label for="inputNome">Centro de Custo<span class="text-danger"> *</span></label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Centro de Custo" value="<?php echo $row['CeCusNome']; ?>" required autofocus>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Centro de Custo" value="<?php echo $row['CnCusNome']; ?>" required autofocus>
 									</div>
 								</div>
 							</div>

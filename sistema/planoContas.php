@@ -6,12 +6,12 @@ $_SESSION['PaginaAtual'] = 'Plano de Contas';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT PlConId, PlConNome, PlConStatus, CeCusNome, SituaNome, SituaCor, SituaChave
-		 FROM PlanoContas
-		 JOIN CentroCusto on CeCusId = PlConCentroCusto
-		 JOIN Situacao on SituaId = PlConStatus
-	     WHERE PlConEmpresa = ". $_SESSION['EmpreId'] ."
-		 ORDER BY PlConNome ASC";
+$sql = "SELECT PlConId, PlConNome, PlConStatus, CnCusNome, SituaNome, SituaCor, SituaChave
+		FROM PlanoContas
+		JOIN CentroCusto on CnCusId = PlConCentroCusto
+		JOIN Situacao on SituaId = PlConStatus
+	    WHERE PlConUnidade = ". $_SESSION['UnidadeId'] ."
+		ORDER BY PlConNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -50,12 +50,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [
 				{
 					orderable: true,   //Plano de Contas
-					width: "35%",
+					width: "40%",
 					targets: [0]
 				},	
 				{
 					orderable: true,   //Centro de Custo
-					width: "35%",
+					width: "40%",
 					targets: [1]
 				},
 				{ 
@@ -65,7 +65,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: false,   //Ações
-					width: "15%",
+					width: "10%",
 					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -177,7 +177,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('
 										<tr>
 											<td>'.$item['PlConNome'].'</td>
-											<td>'.$item['CeCusNome'].'</td>
+											<td>'.$item['CnCusNome'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaPlanoContas('.$item['PlConId'].', \''.$item['PlConNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

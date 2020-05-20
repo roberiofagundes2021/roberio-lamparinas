@@ -10,8 +10,8 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO PlanoContas (PlConNome, PlConCentroCusto, PlConStatus, PlConUsuarioAtualizador, PlConEmpresa)
-				VALUES (:sNome, :sCentroCusto, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO PlanoContas (PlConNome, PlConCentroCusto, PlConStatus, PlConUsuarioAtualizador, PlConUnidade)
+				VALUES (:sNome, :sCentroCusto, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -19,7 +19,7 @@ if(isset($_POST['inputNome'])){
 						':sCentroCusto' => $_POST['cmbCentroCusto'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId'],
+						':iUnidade' => $_SESSION['UnidadeId'],
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -55,7 +55,12 @@ if(isset($_POST['inputNome'])){
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<!-- /theme JS files -->	
+	<!-- /theme JS files -->
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 	<script type="text/javascript" >
 
@@ -71,20 +76,6 @@ if(isset($_POST['inputNome'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				/*if (inputNome == ''){
-					alerta('Atenção','Informe a sub categoria!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-
-				//Verifica se o campo só possui espaços em branco
-				if (cmbCategoria == '#'){
-					alerta('Atenção','Informe a categoria!','error');
-					$('#cmbCategoria').focus();
-					return false;
-				}*/
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -105,10 +96,6 @@ if(isset($_POST['inputNome'])){
 			})
 		})
 	</script>
-	<script src="http://malsup.github.com/jquery.form.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 </head>
 
 <body class="navbar-top">
@@ -149,15 +136,16 @@ if(isset($_POST['inputNome'])){
 									<select id="cmbCentroCusto" name="cmbCentroCusto" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 
-											$sql = "SELECT CeCusId, CeCusNome
-													 FROM CentroCusto
-													 WHERE CeCusStatus = 1 and CeCusEmpresa = ".$_SESSION['EmpreId']."
-													 ORDER BY CeCusNome ASC";
+											$sql = "SELECT CnCusId, CnCusNome
+													FROM CentroCusto
+													JOIN Situacao on SituaId = CnCusStatus
+													WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+													ORDER BY CnCusNome ASC";
 											$result = $conn->query($sql);
 											$row = $result->fetchAll(PDO::FETCH_ASSOC);
 											
 											foreach ($row as $item){
-												print('<option value="'.$item['CeCusId'].'">'.$item['CeCusNome'].'</option>');
+												print('<option value="'.$item['CnCusId'].'">'.$item['CnCusNome'].'</option>');
 											}
 										
 										?>

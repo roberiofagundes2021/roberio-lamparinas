@@ -26,7 +26,7 @@ $sql = "SELECT MovimData, MovimTipo, ForneNome, LcEstNome as Origem, MovimDestin
 		LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
 		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
 		LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal
-		Where MovimEmpresa = ".$_SESSION['EmpreId']." and MovimData between '".$dDataInicio."' and '".$dDataFim."' ";
+		Where MovimUnidade = ".$_SESSION['UnidadeId']." and MovimData between '".$dDataInicio."' and '".$dDataFim."' ";
 
 if ($iCategoria != '#' and $iCategoria != 0){
 	$sql .= " and ProduCategoria = $iCategoria ";

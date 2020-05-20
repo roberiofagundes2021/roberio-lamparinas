@@ -8,15 +8,14 @@ include('global_assets/php/conexao.php');
 
 //Caso a chamada à página venha da liberação de uma solicitação na bandeja.
 
-
 if (isset($_POST['inputSolicitacaoId'])) {
 
 	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
-	            FROM SolicitacaoXProduto
-                JOIN Solicitacao on SolicId = SlXPrSolicitacao
-                JOIN Produto on ProduId = SlXPrProduto
-				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-                WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
+			FROM SolicitacaoXProduto
+			JOIN Solicitacao on SolicId = SlXPrSolicitacao
+			JOIN Produto on ProduId = SlXPrProduto
+			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
     ";
 	$result = $conn->query($sql);
 	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -47,7 +46,6 @@ if (isset($_POST['inputSolicitacaoId'])) {
 	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
 	$numProdutos = count($produtosSolicitacao);
 }
-
 
 if (isset($_POST['inputData'])) {
 
@@ -156,7 +154,7 @@ if (isset($_POST['inputData'])) {
 				//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
 
 				if (isset($_POST[$campo])) {
-					var_dump($campo);
+					//var_dump($campo);
 					$registro = explode('#', $_POST[$campo]);
 
 					if ($registro[0] == 'P') {
@@ -165,22 +163,21 @@ if (isset($_POST['inputData'])) {
 						if (isset($registro[7])) {
 							for ($i = 1; $i <= $quantItens; $i++) {
 								// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
-
+								
 								if ($registro[7] == 2) {
 
-									$sql = "SELECT PatriNumero
+									$sql = "SELECT COUNT(PatriNumero) as CONT
 							              	FROM Patrimonio
 										  	JOIN Situacao on SituaId = PatriStatus
-										  	WHERE PatriEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' 
-										  	ORDER BY PatriNumero
+										  	WHERE PatriUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 										  ";
 									$result = $conn->query($sql);
-									$patrimonios = $result->fetchAll(PDO::FETCH_ASSOC);
-									$count = count($patrimonios);
-
-
+									$patrimonios = $result->fetch(PDO::FETCH_ASSOC);
+									$count = $patrimonios['CONT'];
+									
 									//Caso não seja o primeiro registro na tabela para esta empresa
 									if ($count >= 1) {
+
 										$ultimoPatri = $count;
 										$numeroPatri = intval($ultimoPatri) + 1;
 										$numeroPatriFinal = '';
@@ -205,16 +202,16 @@ if (isset($_POST['inputData'])) {
 
 
 										$sql = "INSERT INTO Patrimonio
-												(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
+												(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
 												VALUES 
-												(:sNumero, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+												(:sNumero, :iStatus, :iUsuarioAtualizador, :iUnidade)";
 										$result = $conn->prepare($sql);
 
 										$result->execute(array(
 											':sNumero' => $numeroPatriFinal,
 											':iStatus' => $situacao['SituaId'],
 											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId']
+											':iUnidade' => $_SESSION['UnidadeId']
 										));
 
 										$insertIdPatrimonio = $conn->lastInsertId();
@@ -239,7 +236,7 @@ if (isset($_POST['inputData'])) {
 											':iPatrimonio' => $insertIdPatrimonio
 										));
 									} else {
-
+										
 										//Caso seja o primeiro registro na tabela para esta empresa
 										$numeroPatri = '0000001';
 
@@ -251,23 +248,22 @@ if (isset($_POST['inputData'])) {
 										$result = $conn->query($sql);
 										$situacao = $result->fetch(PDO::FETCH_ASSOC);
 
-
 										$sql = "INSERT INTO Patrimonio
-												(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriEmpresa)
+												(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
 												VALUES 
-												(:sNumero, :iMovimentacaoProduto, :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+												(:sNumero, :iStatus, :iUsuarioAtualizador, :iUnidade)";
 										$result = $conn->prepare($sql);
 
 										$result->execute(array(
 											':sNumero' => $numeroPatri,
 											':iStatus' => $situacao['SituaId'],
 											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iEmpresa' => $_SESSION['EmpreId']
+											':iUnidade' => $_SESSION['UnidadeId']
 										));
 
 										$insertIdPatrimonio = $conn->lastInsertId();
 
-
+										
 										$sql = "INSERT INTO MovimentacaoXProduto
 						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
 					                            VALUES 
@@ -287,6 +283,7 @@ if (isset($_POST['inputData'])) {
 											':iPatrimonio' => $insertIdPatrimonio
 										));
 									}
+
 								} else {
 									$quantItens = intval($registro[3]);
 
@@ -356,11 +353,9 @@ if (isset($_POST['inputData'])) {
 			}
 		} catch (PDOException $e) {
 			$conn->rollback();
-			echo 'Error: ' . $e->getMessage();
+			echo 'Error1: ' . $e->getMessage();
 			exit;
 		}
-
-
 
 		if (isset($_POST['cmbSituacao'])) {
 
@@ -439,7 +434,7 @@ if (isset($_POST['inputData'])) {
 		echo 'Error: ' . $e->getMessage();
 		exit;
 	}
-
+	
 	irpara("movimentacao.php");
 }
 

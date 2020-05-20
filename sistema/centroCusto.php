@@ -6,11 +6,11 @@ $_SESSION['PaginaAtual'] = 'Centro de Custo';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT CeCusId, CeCusNome, CeCusStatus, SituaNome, SituaCor, SituaChave
+$sql = "SELECT CnCusId, CnCusNome, CnCusStatus, SituaNome, SituaCor, SituaChave
 		FROM CentroCusto
-		JOIN Situacao on SituaId = CeCusStatus
-	    WHERE CeCusEmpresa = ". $_SESSION['EmpreId'] ."
-		ORDER BY CeCusNome ASC";
+		JOIN Situacao on SituaId = CnCusStatus
+	    WHERE CnCusUnidade = ". $_SESSION['UnidadeId'] ."
+		ORDER BY CnCusNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
@@ -48,7 +48,7 @@ $count = count($row);
 			    columnDefs: [
 				{
 					orderable: true,   //Centro de Custo
-					width: "70%",
+					width: "80%",
 					targets: [0]
 				},
 				{ 
@@ -58,7 +58,7 @@ $count = count($row);
 				},
 				{ 
 					orderable: false,   //Ações
-					width: "15%",
+					width: "10%",
 					targets: [2]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -91,11 +91,11 @@ $count = count($row);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaCentroCusto(CeCusId, CeCusNome, CeCusStatus, Tipo){
+		function atualizaCentroCusto(CnCusId, CnCusNome, CnCusStatus, Tipo){
 		
-			document.getElementById('inputCentroCustoId').value = CeCusId;
-			document.getElementById('inputCentroCustoNome').value = CeCusNome;
-			document.getElementById('inputCentroCustoStatus').value = CeCusStatus;
+			document.getElementById('inputCentroCustoId').value = CnCusId;
+			document.getElementById('inputCentroCustoNome').value = CnCusNome;
+			document.getElementById('inputCentroCustoStatus').value = CnCusStatus;
 					
 			if (Tipo == 'edita'){	
 				document.formCentroCusto.action = "centroCustoEdita.php";		
@@ -169,16 +169,16 @@ $count = count($row);
 										
 										print('
 										<tr>
-											<td>'.$item['CeCusNome'].'</td>
+											<td>'.$item['CnCusNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaCentroCusto('.$item['CeCusId'].', \''.$item['CeCusNome'].'\','.$situacaoChave .', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaCentroCusto('.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$situacaoChave .', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCentroCusto('.$item['CeCusId'].', \''.$item['CeCusNome'].'\','.$item['CeCusStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCentroCusto('.$item['CeCusId'].', \''.$item['CeCusNome'].'\','.$item['CeCusStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaCentroCusto('.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$item['CnCusStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaCentroCusto('.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$item['CnCusStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>

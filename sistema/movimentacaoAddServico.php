@@ -30,7 +30,7 @@ $count = count($row);
 							 <td>'.$_POST['numItens'].'</td>
 							 <td data-popup="tooltip" title="'.$row['ServiDetalhamento'].'">'.$row['ServiNome'].'</td>
 							 <td></td>
-							 <td>'.$_POST['quantidade'].'</td>
+							 <td style="text-align: center">'.$_POST['quantidade'].'</td>
 							 <td>'.$valorCusto.'</td>
 							 <td>'.$valorTotal.'</td>
 							 <td></td>

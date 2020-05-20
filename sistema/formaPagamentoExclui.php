@@ -30,6 +30,6 @@ if(isset($_POST['inputFormaPagamentoId'])){
 	}
 }
 
-irpara("FormaPagamento.php");
+irpara("formaPagamento.php");
 
 ?>

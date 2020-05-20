@@ -3,21 +3,6 @@
 include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
-//$inputDataDe = $_POST['inputDataDe'];
-//$inputDataAte = $_POST['inputDataAte'];
-//$inputSetor = $_POST['inputSetor'];
-
-//$_POST['inputDataDe'] ? $inputDataDe = $_POST['inputDataDe'] : $inputDataDe = '1900-01-01';
-//$_POST['inputDataAte'] ? $inputDataAte = $_POST['inputDataAte'] : $inputDataDe = '2100-01-01';
-//$inputLocalEstoque = $_POST['inputEstoqueLocal'];
-//$inputCategoria = $_POST['inputCategoria'];
-//$inputSubCategoria = $_POST['inputSubCategoria'];
-//$inputProduto = $_POST['inputProduto'];
-
-
-
-
-
 function queryPesquisa(){
 
     $cont = 0;
@@ -29,9 +14,6 @@ function queryPesquisa(){
     if (!empty($_POST['inputDataDe']) || !empty($_POST['inputDataAte'])) {
         empty($_POST['inputDataDe']) ? $inputDataDe = '1900-01-01' : $inputDataDe = $_POST['inputDataDe'];
         empty($_POST['inputDataAte']) ? $inputDataAte = '2100-01-01' : $inputDataAte = $_POST['inputDataAte'];
-
-        //$args[]  = "MovimData = ".$inputDataDe." ";MovimData BETWEEN '".$inputDataDe."' and '".$inputDataAte."'
-        //$args[] = "`dataAte` = ".$inputDataAte." ";
 
         $args[]  = "MovimData BETWEEN '".$inputDataDe."' and '".$inputDataAte."' ";
     }
@@ -56,7 +38,6 @@ function queryPesquisa(){
         $args[]  = "ProduNome LIKE '%".$_POST['inputProduto']."%' ";
     }
 
-
     if (count($args) >= 1) {
         try {
 
@@ -72,9 +53,9 @@ function queryPesquisa(){
                     JOIN Produto on ProduId = MvXPrProduto
                     JOIN LocalEstoque on LcEstId = MovimDestinoLocal
                     LEFT JOIN Setor on SetorId = MovimDestinoSetor
-                    WHERE ".$string." ProduEmpresa = ".$_SESSION['EmpreId']."
+                    WHERE ".$string." ProduUnidade = ".$_SESSION['UnidadeId']."
                     ";
-            $result = $conn->query("$sql");
+            $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;

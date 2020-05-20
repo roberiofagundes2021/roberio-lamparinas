@@ -7,17 +7,17 @@ include('global_assets/php/conexao.php');
 if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#' && $_GET['idFornecedor'] != '-1'){
 
 	if (isset($_GET['idSubCategoria']) && $_GET['idSubCategoria'] != '#'){
-		$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
-				 FROM Produto
-				 JOIN Categoria on CategId = ProduCategoria
-				 JOIN Fornecedor on ForneCategoria = CategId
-				 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_GET['idFornecedor']."' and ProduSubCategoria = '". $_GET['idSubCategoria']."'");
+		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
+				FROM Produto
+				JOIN Categoria on CategId = ProduCategoria
+				JOIN Fornecedor on ForneCategoria = CategId
+				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ForneId = '". $_GET['idFornecedor']."' and ProduSubCategoria = '". $_GET['idSubCategoria']."'";
 	} else {
-		$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
-				 FROM Produto
-				 JOIN Categoria on CategId = ProduCategoria
-				 JOIN Fornecedor on ForneCategoria = CategId
-				 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_GET['idFornecedor']."'");		
+		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
+				FROM Produto
+				JOIN Categoria on CategId = ProduCategoria
+				JOIN Fornecedor on ForneCategoria = CategId
+				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ForneId = '". $_GET['idFornecedor']."'";
 	}
 	
 } else {
@@ -26,17 +26,17 @@ if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#' && $_GET['idFor
 	if(isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] == null) $_GET['idSubCategoria'] = "#";
 
 	if (isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] != "#"){
-		$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
-				 FROM Produto
-				 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduSubCategoria = '". $_GET['idSubCategoria']."'");
+		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
+				FROM Produto
+				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduSubCategoria = '". $_GET['idSubCategoria']."'";
 	} else {
-		$sql = ("SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
-				 FROM Produto
-				 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = '". $_GET['idCategoria']."'");
+		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
+				FROM Produto
+				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = '". $_GET['idCategoria']."'";
 	}
 }
 
-$result = $conn->query("$sql");
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 //echo json_encode($sql);
