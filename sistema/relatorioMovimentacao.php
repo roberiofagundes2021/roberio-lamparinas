@@ -9,7 +9,7 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
 		FROM Fornecedor
 		JOIN Categoria on CategId = ForneCategoria
-	    WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ."
+	    WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . "
 		ORDER BY ForneNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -326,6 +326,9 @@ $dataFim = date("Y-m-d");
 				$('#cmbServico').empty().append('<option>Sem serviço</option>');
 			}
 
+			let resultadosConsulta = '';
+			let inputsValues = {};
+
 			function Filtrar() {
 				let cont = false;
 
@@ -333,6 +336,8 @@ $dataFim = date("Y-m-d");
 					e.preventDefault()
 
 					const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>')
+
+                    if($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() == 'Filtrando...') $('#cmbProduto').val("")
 
 					let dataDe = $('#inputDataDe').val()
 					let dataAte = $('#inputDataAte').val()
@@ -350,13 +355,13 @@ $dataFim = date("Y-m-d");
 					inputsValues = {
 						inputDataDe: dataDe,
 						inputDataAte: dataAte,
-						inputTipo: tipo,
-						inputFornecedor: fornecedor,
-						inputCategoria: categoria,
-						inputSubCategoria: subCategoria,
-						inputProduto: inputProduto,
-						inputServico: inputServico,
-						inputCodigo: codigo,
+						cmbTipo: tipo,
+						cmbFornecedor: fornecedor,
+						cmbCategoria: categoria,
+						cmbSubCategoria: subCategoria,
+						cmbProduto: inputProduto,
+						cmbServico: inputServico,
+						cmbCodigo: codigo,
 					};
 
 					$.post(
@@ -378,6 +383,36 @@ $dataFim = date("Y-m-d");
 			}
 			Filtrar()
 
+
+			function imprime() {
+				url = 'relatorioMovimentacaoImprime.php';
+
+				$('#imprimir').on('click', (e) => {
+					e.preventDefault()
+					console.log('teste')
+					if (resultadosConsulta) {
+                        let tipo = $('input[name="inputTipo"]:checked').val()
+
+                        $('#TipoProdutoServico').val(tipo)
+						$('#inputResultado').val(resultadosConsulta)
+						$('#inputDataDe_imp').val(inputsValues.inputDataDe)
+						$('#inputDataAte_imp').val(inputsValues.inputDataAte)
+						$('#cmbTipo_imp').val(inputsValues.cmbTipo)
+						$('#cmbFornecedor_imp').val(inputsValues.cmbFornecedor)
+						$('#cmbCategoria_imp').val(inputsValues.cmbCategoria)
+						$('#cmbSubCategoria_imp').val(inputsValues.cmbSubCategoria)
+						$('#cmbProduto_imp').val(inputsValues.cmbProduto)
+						$('#cmbServico_imp').val(inputsValues.cmbServico)
+						$('#cmbCodigo_imp').val(inputsValues.cmbCodigo)
+
+						$('#formImprime').attr('action', url)
+
+						$('#formImprime').submit()
+					}
+				})
+
+			}
+			imprime()
 
 		});
 
@@ -408,29 +443,7 @@ $dataFim = date("Y-m-d");
 		}
 
 
-		/*function imprime() {
-			url = 'relatorioMovimentacaoPatrimonioImprime.php';
 
-			$('#imprimir').on('click', (e) => {
-				e.preventDefault()
-				if (resultadosConsulta) {
-
-					$('#inputResultado').val(resultadosConsulta)
-					$('#inputDataDe_imp').val(inputsValues.inputDataDe)
-					$('#inputDataAte_imp').val(inputsValues.inputDataAte)
-					$('#inputLocalEstoque_imp').val(inputsValues.inputlocalEstoque)
-					$('#inputSetor_imp').val(inputsValues.inputSetor)
-					$('#inputCategoria_imp').val(inputsValues.inputCategoria)
-					$('#inputSubCategoria_imp').val(inputsValues.inputSubCategoria)
-					$('#inputProduto_imp').val(inputsValues.inputProduto)
-
-					$('#formImprime').attr('action', url)
-
-					$('#formImprime').submit()
-				}
-			})
-		}
-		imprime()*/
 
 		function selecionaTipo(tipo) {
 			if (tipo == 'P') {
@@ -481,6 +494,20 @@ $dataFim = date("Y-m-d");
 							<div class="card-body">
 								<p class="font-size-lg">Utilize os filtros abaixo para gerar o relatório.</p>
 								<br>
+
+								<form id="formImprime" method="POST" target="_blank">
+								    <input id="TipoProdutoServico" type="hidden" name="TipoProdutoServico"></input>
+									<input id="inputResultado" type="hidden" name="resultados"></input>
+									<input id="inputDataDe_imp" type="hidden" name="inputDataDe_imp"></input>
+									<input id="inputDataAte_imp" type="hidden" name="inputDataAte_imp"></input>
+									<input id="cmbTipo_imp" type="hidden" name="cmbTipo_imp"></input>
+									<input id="cmbFornecedor_imp" type="hidden" name="cmbFornecedor_imp"></input>
+									<input id="cmbCategoria_imp" type="hidden" name="cmbCategoria_imp"></input>
+									<input id="cmbSubCategoria_imp" type="hidden" name="cmbSubCategoria_imp"></input>
+									<input id="cmbProduto_imp" type="hidden" name="cmbProduto_imp"></input>
+									<input id="cmbServico_imp" type="hidden" name="cmbServico_imp"></input>
+									<input id="cmbCodigo_imp" type="hidden" name="cmbCodigo_imp"></input>
+								</form>
 
 								<form name="formMovimentacao" method="post" class="p-3">
 									<div class="row">
@@ -544,7 +571,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT ForneId, ForneNome
 																FROM Fornecedor
 																JOIN Situacao on SituaId = ForneStatus
-																WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+																WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																ORDER BY ForneNome ASC";
 													$result = $conn->query($sql);
 													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -568,7 +595,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT CategId, CategNome
 																FROM Categoria
 																JOIN Situacao on SituaId = CategStatus
-																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+																WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																ORDER BY CategNome ASC";
 													$result = $conn->query($sql);
 													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -590,7 +617,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT SbCatId, SbCatNome
 																	FROM SubCategoria
 																	JOIN Situacao on SituaId = SbCatStatus
-																	WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+																	WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY SbCatNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -613,7 +640,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT ProduCodigo
 																FROM Produto
 																JOIN Situacao on SituaId = ProduStatus
-																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+																WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																ORDER BY ProduNome ASC";
 													$result = $conn->query($sql);
 													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -635,7 +662,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT ProduId, ProduNome
 																	FROM Produto
 																	JOIN Situacao on SituaId = ProduStatus
-																	WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+																	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY ProduNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -649,7 +676,7 @@ $dataFim = date("Y-m-d");
 										</div>
 										<div class="col-lg-10" id="Servico" style="display: none">
 											<div class="form-group">
-												<label for="x">Servico</label>
+												<label for="x">Serviço</label>
 												<select id="cmbServico" name="cmbServico" class="form-control form-control-select2">
 													<option value="">Todos</option>
 													<?php
@@ -673,7 +700,7 @@ $dataFim = date("Y-m-d");
 									<div class="text-right">
 										<div>
 											<button id="submitFiltro" class="btn btn-success"><i class="icon-search">Consultar</i></button>
-											<button class="btn btn-secondary btn-icon" disabled><i class="icon-printer2"> Imprimir</i></button>
+											<button id="imprimir" class="btn btn-secondary btn-icon" disabled><i class="icon-printer2"> Imprimir</i></button>
 										</div>
 									</div>
 								</form>

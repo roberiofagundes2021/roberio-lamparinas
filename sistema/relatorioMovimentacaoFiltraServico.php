@@ -37,31 +37,31 @@ function queryPesquisa()
         $args[]  = "MovimData BETWEEN '" . $inputDataDe . "' and '" . $inputDataAte . "' ";
     }
 
-    if (!empty($_POST['inputTipo'])) {
-        $args[]  = "MovimTipo = '" . $_POST['inputTipo'] . "' ";
+    if (!empty($_POST['cmbTipo'])) {
+        $args[]  = "MovimTipo = '" . $_POST['cmbTipo'] . "' ";
     }
 
-    if (!empty($_POST['inputFornecedor'])) {
-        $args[]  = "MovimFornecedor = " . $_POST['inputFornecedor'] . " ";
+    if (!empty($_POST['cmbFornecedor'])) {
+        $args[]  = "MovimFornecedor = " . $_POST['cmbFornecedor'] . " ";
     }
 
-    if (!empty($_POST['inputCategoria'])) {
-        $args[]  = "ServiCategoria = " . $_POST['inputCategoria'] . " ";
+    if (!empty($_POST['cmbCategoria'] && $_POST['cmbCategoria'] != 'Sem Categoria' && $_POST['cmbCategoria'] != "Filtrando...")) {
+        $args[]  = "ServiCategoria = " . $_POST['cmbCategoria'] . " ";
     }
 
-    if (!empty($_POST['inputSubCategoria'])) {
-        $args[]  = "ServiSubCategoria = " . $_POST['inputSubCategoria'] . " ";
+    if (!empty($_POST['cmbSubCategoria']) && $_POST['cmbSubCategoria'] != "Sem Subcategoria" && $_POST['cmbSubCategoria'] != "Filtrando...") {
+        $args[]  = "ServiSubCategoria = " . $_POST['cmbSubCategoria'] . " ";
     }
 
-    if (!empty($_POST['inputCodigo'])) {
-        $args[]  = "ServiCodigo = " . $_POST['inputCodigo'] . " ";
+    if (!empty($_POST['cmbCodigo'])) {
+        $args[]  = "ServiCodigo = " . $_POST['cmbCodigo'] . " ";
     }
 
-    if (!empty($_POST['inputServico'])) {
-        $args[]  = "ServiId = '" . $_POST['inputServico'] . "'";
+    if (!empty($_POST['cmbServico']) && $_POST['cmbServico'] != "Sem serviço" && $_POST['cmbServico'] != "Filtrando...") {
+        $args[]  = "ServiId = '" . $_POST['cmbServico'] . "'";
     }
 
-    if ($_POST['inputTipo'] == 'E') {
+    if ($_POST['cmbTipo'] == 'E') {
 
 
         if (count($args) >= 1) {
@@ -87,7 +87,7 @@ function queryPesquisa()
                 $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
                 count($rowData) >= 1 ? $cont = 1 : $cont = 0;
-                print($sql);
+
             } catch (PDOException $e) {
                 echo 'Error: ' . $e->getMessage();
             }
@@ -112,7 +112,7 @@ function queryPesquisa()
              ");
             }
         }
-    } else if ($_POST['inputTipo'] == 'S') {
+    } else if ($_POST['cmbTipo'] == 'S') {
         if (count($args) >= 1) {
             try {
 
@@ -185,7 +185,6 @@ function queryPesquisa()
                 $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
                 count($rowData) >= 1 ? $cont = 1 : $cont = 0;
-                print($sql);
             } catch (PDOException $e) {
                 echo 'Error: ' . $e->getMessage();
             }

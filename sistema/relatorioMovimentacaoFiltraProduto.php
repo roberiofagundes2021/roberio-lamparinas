@@ -37,35 +37,35 @@ function queryPesquisa()
         $args[]  = "MovimData BETWEEN '" . $inputDataDe . "' and '" . $inputDataAte . "' ";
     }
 
-    if (!empty($_POST['inputTipo'])) {
-        $args[]  = "MovimTipo = '" . $_POST['inputTipo'] . "' ";
+    if (!empty($_POST['cmbTipo'])) {
+        $args[]  = "MovimTipo = '" . $_POST['cmbTipo'] . "' ";
     }
 
-    if (!empty($_POST['inputFornecedor'])) {
-        $args[]  = "MovimFornecedor = " . $_POST['inputFornecedor'] . " ";
+    if (!empty($_POST['cmbFornecedor'])) {
+        $args[]  = "MovimFornecedor = " . $_POST['cmbFornecedor'] . " ";
     }
 
-    if (!empty($_POST['inputCategoria'])) {
-        $args[]  = "ProduCategoria = " . $_POST['inputCategoria'] . " ";
+    if (!empty($_POST['cmbCategoria']) && $_POST['cmbCategoria'] != 'Sem Categoria' && $_POST['cmbCategoria'] != "Filtrando...") {
+        $args[]  = "ProduCategoria = " . $_POST['cmbCategoria'] . " ";
     }
 
-    if (!empty($_POST['inputSubCategoria'])) {
-        $args[]  = "ProduSubCategoria = " . $_POST['inputSubCategoria'] . " ";
+    if (!empty($_POST['cmbSubCategoria']) && $_POST['cmbSubCategoria'] != "Sem Subcategoria" && $_POST['cmbSubCategoria'] != "Filtrando...") {
+        $args[]  = "ProduSubCategoria = " . $_POST['cmbSubCategoria'] . " ";
     }
 
-    if (!empty($_POST['inputCodigo'])) {
-        $args[]  = "ProduCodigo = " . $_POST['inputCodigo'] . " ";
+    if (!empty($_POST['cmbCodigo'])) {
+        $args[]  = "ProduCodigo = " . $_POST['cmbCodigo'] . " ";
     }
 
-    if (!empty($_POST['inputProduto']) && $_POST['inputProduto'] != "Sem produto") {
-        $args[]  = "ProduId = " . $_POST['inputProduto'] . " ";
+    if (!empty($_POST['cmbProduto']) && $_POST['cmbProduto'] != "Sem produto" && $_POST['cmbProduto'] != "Filtrando...") {
+        $args[]  = "ProduId = " . $_POST['cmbProduto'] . " ";
     }
 
     /*if(!empty($_POST['inputProduto'])){
         $args[]  = "ProduNome LIKE '%".$_POST['inputProduto']."%' ";
     }*/
 
-    if ($_POST['inputTipo'] == 'E') {
+    if ($_POST['cmbTipo'] == 'E') {
 
         if (count($args) >= 1) {
             try {
@@ -114,7 +114,7 @@ function queryPesquisa()
              ");
             }
         }
-    } else if ($_POST['inputTipo'] == 'S') {
+    } else if ($_POST['cmbTipo'] == 'S') {
         if (count($args) >= 1) {
             try {
 
