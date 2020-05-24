@@ -442,9 +442,6 @@ $dataFim = date("Y-m-d");
 			document.formFornecedor.submit();
 		}
 
-
-
-
 		function selecionaTipo(tipo) {
 			if (tipo == 'P') {
 				document.getElementById('Produto').style.display = "block";

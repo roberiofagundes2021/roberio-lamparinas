@@ -3,21 +3,6 @@
 include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
-//$inputDataDe = $_POST['inputDataDe'];
-//$inputDataAte = $_POST['inputDataAte'];
-//$inputSetor = $_POST['inputSetor'];
-
-//$_POST['inputDataDe'] ? $inputDataDe = $_POST['inputDataDe'] : $inputDataDe = '1900-01-01';
-//$_POST['inputDataAte'] ? $inputDataAte = $_POST['inputDataAte'] : $inputDataDe = '2100-01-01';
-//$inputLocalEstoque = $_POST['inputEstoqueLocal'];
-//$inputCategoria = $_POST['inputCategoria'];
-//$inputSubCategoria = $_POST['inputSubCategoria'];
-//$inputProduto = $_POST['inputProduto'];
-
-
-
-
-
 function queryPesquisa()
 {
 
@@ -30,9 +15,6 @@ function queryPesquisa()
     if (!empty($_POST['inputDataDe']) || !empty($_POST['inputDataAte'])) {
         empty($_POST['inputDataDe']) ? $inputDataDe = '1900-01-01' : $inputDataDe = $_POST['inputDataDe'];
         empty($_POST['inputDataAte']) ? $inputDataAte = '2100-01-01' : $inputDataAte = $_POST['inputDataAte'];
-
-        //$args[]  = "MovimData = ".$inputDataDe." ";MovimData BETWEEN '".$inputDataDe."' and '".$inputDataAte."'
-        //$args[] = "`dataAte` = ".$inputDataAte." ";
 
         $args[]  = "MovimData BETWEEN '" . $inputDataDe . "' and '" . $inputDataAte . "' ";
     }
@@ -61,154 +43,60 @@ function queryPesquisa()
         $args[]  = "ProduId = " . $_POST['cmbProduto'] . " ";
     }
 
-    /*if(!empty($_POST['inputProduto'])){
-        $args[]  = "ProduNome LIKE '%".$_POST['inputProduto']."%' ";
-    }*/
+    if (count($args) >= 1) {
 
-    if ($_POST['cmbTipo'] == 'E') {
+        $string = implode(" and ", $args);
 
-        if (count($args) >= 1) {
-            try {
-
-                $string = implode(" and ", $args);
-
-                if ($string != '') {
-                    $string .= ' and ';
-                }
-
-                $sql = "SELECT MvXPrId, MovimId ,MovimData, MovimTipo, MovimNotaFiscal, MovimOrigemLocal, MovimDestinoSetor, MovimFornecedor, LcEstNome, MvXPrValidade, MvXPrQuantidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, SetorNome, CategNome, ForneNome
-                    FROM Movimentacao
-                    JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-                    JOIN Produto on ProduId = MvXPrProduto
-                    JOIN Categoria on CategId = ProduCategoria
-                    JOIN LocalEstoque on LcEstId = MovimDestinoLocal
-                    LEFT JOIN Setor on SetorId = MovimDestinoSetor
-                    JOIN Fornecedor on ForneId = MovimFornecedor
-                    WHERE " . $string . " ProduEmpresa = " . $_SESSION['EmpreId'] . "
-                    ";
-                $result = $conn->query("$sql");
-                $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                count($rowData) >= 1 ? $cont = 1 : $cont = 0;
-            } catch (PDOException $e) {
-                echo 'Error: ' . $e->getMessage();
-            }
+        if ($string != '') {
+            $string .= ' and ';
         }
 
-        if ($cont == 1) {
-            $cont = 0;
-            foreach ($rowData as $item) {
-                $cont++;
-                print("
-                
-                <tr>
-                   <td class='even'>" . mostraData($item['MovimData']) . "</td>
-                   <td class='even' style='text-align: center'>" . $item['MovimTipo'] . "</td>
-                   <td class='odd'>" . $item['ProduNome'] . "</td>
-                   <td class='even'>" . $item['CategNome'] . "</td>
-                   <td class='odd'>" . $item['ForneNome'] . "</td>
-                   <td class='odd'>" . $item['MvXPrQuantidade'] . "</td>
-                   <td class='odd'></td>
-                   <td class='even'>" . $item['LcEstNome'] . "</td>
-                </tr>
-             ");
-            }
-        }
-    } else if ($_POST['cmbTipo'] == 'S') {
-        if (count($args) >= 1) {
-            try {
+        $sql = "SELECT MovimData, MovimTipo, 
+                CASE 
+                    WHEN MovimOrigemLocal IS NULL THEN SetorO.SetorNome
+                ELSE LocalO.LcEstNome 
+                END as Origem,
+                CASE 
+                    WHEN MovimDestinoLocal IS NULL THEN ISNULL(SetorD.SetorNome, MovimDestinoManual)
+                ELSE LocalD.LcEstNome
+                END as Destino, 
+                MvXPrQuantidade, ProduNome, CategNome, ForneNome
+            FROM Movimentacao   
+            JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
+            JOIN Produto on ProduId = MvXPrProduto
+            JOIN Categoria on CategId = ProduCategoria
+            JOIN Situacao on SituaId = MovimSituacao
+            LEFT JOIN LocalEstoque LocalO on LocalO.LcEstId = MovimOrigemLocal 
+            LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
+            LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
+            LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
+            LEFT JOIN Fornecedor on ForneId = MovimFornecedor
+            WHERE " . $string . " MovimUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADO'
+            ";
+        $result = $conn->query($sql);
+        $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                $string = implode(" and ", $args);
+        count($rowData) >= 1 ? $cont = 1 : $cont = 0;
+    }
 
-                if ($string != '') {
-                    $string .= ' and ';
-                }
+    if ($cont == 1) {
+        $cont = 0;
+        foreach ($rowData as $item) {
+            $cont++;     
 
-                $sql = "SELECT MvXPrId, MovimId ,MovimData, MovimTipo, MovimNotaFiscal, MovimOrigemLocal, MovimDestinoSetor, MovimFornecedor, LcEstNome, MvXPrValidade, MvXPrQuantidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, SetorNome, CategNome, ForneNome
-                    FROM Movimentacao
-                    JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-                    JOIN Produto on ProduId = MvXPrProduto
-                    JOIN Categoria on CategId = ProduCategoria
-                    JOIN LocalEstoque on LcEstId = MovimDestinoLocal
-                    LEFT JOIN Setor on SetorId = MovimDestinoSetor
-                    JOIN Fornecedor on ForneId = MovimFornecedor
-                    WHERE " . $string . " ProduEmpresa = " . $_SESSION['EmpreId'] . "
-                    ";
-                $result = $conn->query("$sql");
-                $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                count($rowData) >= 1 ? $cont = 1 : $cont = 0;
-            } catch (PDOException $e) {
-                echo 'Error: ' . $e->getMessage();
-            }
-        }
-
-        if ($cont == 1) {
-            $cont = 0;
-            foreach ($rowData as $item) {
-                $cont++;
-                print("
-                
-                <tr>
-                   <td class='even'>" . mostraData($item['MovimData']) . "</td>
-                   <td class='even' style='text-align: center'>" . $item['MovimTipo'] . "</td>
-                   <td class='odd'>" . $item['ProduNome'] . "</td>
-                   <td class='even'>" . $item['CategNome'] . "</td>
-                   <td class='odd'>" . $item['ForneNome'] . "</td>
-                   <td class='odd' style='text-align: center'>" . $item['MvXPrQuantidade'] . "</td>
-                   <td class='odd'>" . $item['LcEstNome'] . "</td>
-                   <td class='even'>" . $item['SetorNome'] . "</td>
-                </tr>
-             ");
-            }
-        }
-    } else {
-        if (count($args) >= 1) {
-            try {
-
-                $string = implode(" and ", $args);
-
-                if ($string != '') {
-                    $string .= ' and ';
-                }
-
-                $sql = "SELECT MvXPrId, MovimId ,MovimData, MovimTipo, MovimNotaFiscal, MovimOrigemLocal, MovimDestinoSetor, MovimFornecedor, LcEstNome, MvXPrValidade, MvXPrQuantidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, SetorNome, CategNome, ForneNome
-                    FROM Movimentacao
-                    JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-                    JOIN Produto on ProduId = MvXPrProduto
-                    JOIN Categoria on CategId = ProduCategoria
-                    JOIN LocalEstoque on LcEstId = MovimDestinoLocal
-                    LEFT JOIN Setor on SetorId = MovimDestinoSetor
-                    JOIN Fornecedor on ForneId = MovimFornecedor
-                    WHERE " . $string . " ProduEmpresa = " . $_SESSION['EmpreId'] . "
-                    ";
-                $result = $conn->query("$sql");
-                $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                count($rowData) >= 1 ? $cont = 1 : $cont = 0;
-            } catch (PDOException $e) {
-                echo 'Error: ' . $e->getMessage();
-            }
-        }
-
-        if ($cont == 1) {
-            $cont = 0;
-            foreach ($rowData as $item) {
-                $cont++;
-                print("
-                
-                <tr>
-                   <td class='even'>" . mostraData($item['MovimData']) . "</td>
-                   <td class='even' style='text-align: center'>" . $item['MovimTipo'] . "</td>
-                   <td class='odd'>" . $item['ProduNome'] . "</td>
-                   <td class='even'>" . $item['CategNome'] . "</td>
-                   <td class='odd'>" . $item['ForneNome'] . "</td>
-                   <td class='odd' style='text-align: center'>" . $item['MvXPrQuantidade'] . "</td>
-                   <td class='odd'>" . $item['LcEstNome'] . "</td>
-                   <td class='even'>" . $item['SetorNome'] . "</td>
-                </tr>
-             ");
-            }
+            print("
+            
+            <tr>
+                <td class='even'>" . mostraData($item['MovimData']) . "</td>
+                <td class='even' style='text-align: center'>" . $item['MovimTipo'] . "</td>
+                <td class='odd'>" . $item['ProduNome'] . "</td>
+                <td class='even'>" . $item['CategNome'] . "</td>
+                <td class='odd'>" . $item['ForneNome'] . "</td>
+                <td class='odd' style='text-align: center'>" . $item['MvXPrQuantidade'] . "</td>
+                <td class='odd'>" . $item['Origem']  . "</td>
+                <td class='even'>" . $item['Destino'] . "</td>
+            </tr>
+            ");
         }
     }
 }
