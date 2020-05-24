@@ -1396,6 +1396,11 @@ if (isset($_POST['inputData'])) {
 
 								$('#cmbFornecedor').prop('disabled', true);
 
+								$('input[name="inputTipo"]').each((i, elem)=>{
+									if($(elem) != $('input[name="inputTipo"]:checked')){
+										$(elem).attr('disabled','')
+									}
+								})
 
 
 								function classBemSaidaSolicit(valor, idSelect) {
@@ -1829,6 +1834,23 @@ if (isset($_POST['inputData'])) {
 
 		}
 
+		function limpaValorFormulario(tipo){
+            if(tipo == 'E'){
+				$("#cmbEstoqueOrigem").val("#")
+				$("#cmbEstoqueOrigemLocalSetor").val("#")
+				$("#cmbDestinoLocalEstoqueSetor").val("#")
+				$("#cmbDestinoSetor").val("#")
+			} else if(tipo == 'S'){
+				$("#cmbEstoqueOrigemLocalSetor").val("#")
+				$("#cmbDestinoLocalEstoqueSetor").val("#")
+				$("#cmbDestinoLocal").val("#")
+			} else {
+				$("#cmbDestinoLocal").val("#")
+				$("#cmbDestinoSetor").val("#")
+				$("#cmbEstoqueOrigem").val("#")
+			}
+		}
+
 		Array.prototype.remove = function(start, end) {
 			this.splice(start, end);
 			return this;
@@ -1856,6 +1878,7 @@ if (isset($_POST['inputData'])) {
 				document.getElementById('Patrimonio').style.display = "none";
 
 				mudaTotalTitulo('E')
+				limpaValorFormulario('E')
 			} else if (tipo == 'S') {
 				document.getElementById('EstoqueOrigem').style.display = "block";
 				document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
@@ -1873,6 +1896,7 @@ if (isset($_POST['inputData'])) {
 
 
 				mudaTotalTitulo('S')
+				limpaValorFormulario('S')
 			} else {
 				document.getElementById('EstoqueOrigem').style.display = "none";
 				document.getElementById('EstoqueOrigemLocalSetor').style.display = "block";
@@ -1891,6 +1915,8 @@ if (isset($_POST['inputData'])) {
 				document.getElementById('classificacao').style.display = "block";
 				$('#tituloProdutoServico').html('Dados dos Produtos')
 				$('[for=cmbProduto]').html('Produto')
+
+				limpaValorFormulario('T')
 			}
 
 

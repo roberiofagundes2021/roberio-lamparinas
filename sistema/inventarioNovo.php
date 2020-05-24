@@ -74,6 +74,22 @@ if (isset($_POST['inputData'])) {
 			}
 		}
 
+		if (isset($_POST["cmbSetor"])) {
+			$sql = "INSERT INTO InventarioXSetor 
+						(InXSeInventario, InXSeSetor)
+					VALUES 
+						(:iInventario, :iSetor)";
+			$result = $conn->prepare($sql);
+
+			foreach ($_POST['cmbSetor'] as $key => $value) {
+
+				$result->execute(array(
+					':iInventario' => $insertId,
+					':iSetor' => $value
+				));
+			}
+		}
+
 		if ($_POST['cmbEquipe']) {
 
 			$sql = "INSERT INTO InventarioXEquipe 
@@ -299,29 +315,47 @@ if (isset($_POST['inputData'])) {
 								</div>
 
 								<div class="col-lg-6">
-									<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
-									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
-										<option value="">Selecione</option>
+									<label for="cmbCategoria">Categoria</label>
+									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
 										<?php
-										$sql = ("SELECT UnidaId, UnidaNome
-													 FROM Unidade
-													 WHERE UnidaStatus = 1 and UnidaEmpresa = " . $_SESSION['EmpreId'] . "
-													 ORDER BY UnidaNome ASC");
+										$sql = ("SELECT CategId, CategNome
+													 FROM Categoria
+													 WHERE CategStatus = 1 and CategEmpresa = " . $_SESSION['EmpreId'] . "
+													 ORDER BY CategNome ASC");
 										$result = $conn->query("$sql");
-										$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+										$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
-										foreach ($rowUnidade as $item) {
-											print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
+										foreach ($rowCategoria as $item) {
+											print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
 										}
 
 										?>
 									</select>
 								</div>
+
 							</div>
 
 							<div class="row">
+								<div class="col-lg-4">
+									<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
+									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
+										<?php
+										$sql = "SELECT EXUXPUnidade, UnidaNome
+												FROM EmpresaXUsuarioXPerfil
+												JOIN Unidade on UnidaId = EXUXPUnidade
+												WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+											    ";
+										$result = $conn->query($sql);
+										$usuarioUnidade = $result->fetch(PDO::FETCH_ASSOC);
 
-								<div class="col-lg-8">
+										print('<option value="' . $usuarioUnidade['EXUXPUnidade'] . '" selected>' . $usuarioUnidade['UnidaNome'] . '</option>');
+
+										?>
+									</select>
+								</div>
+
+								<div class="col-lg-4">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbLocalEstoque">Locais do Estoque<span class="text-danger"> *</span></label>
 										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" required data-fouc>
@@ -343,23 +377,25 @@ if (isset($_POST['inputData'])) {
 								</div>
 
 								<div class="col-lg-4">
-									<label for="cmbCategoria">Categoria</label>
-									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-										<option value="#">Selecione</option>
-										<?php
-										$sql = ("SELECT CategId, CategNome
-													 FROM Categoria
-													 WHERE CategStatus = 1 and CategEmpresa = " . $_SESSION['EmpreId'] . "
-													 ORDER BY CategNome ASC");
-										$result = $conn->query("$sql");
-										$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
+										<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
+										<select id="cmbSetor" name="cmbSetor[]" class="form-control select" multiple="multiple" required>
+											<option value="">Todos</option>
+											<?php
+											$sql = "SELECT SetorId, SetorNome
+													 FROM Setor
+													 WHERE SetorStatus = 1 and SetorEmpresa = " . $_SESSION['EmpreId'] . "
+													 ORDER BY SetorNome ASC";
+											$result = $conn->query($sql);
+											$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
 
-										foreach ($rowCategoria as $item) {
-											print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
-										}
+											foreach ($rowSetor as $item) {
+												print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
+											}
 
-										?>
-									</select>
+											?>
+										</select>
+									</div>
 								</div>
 							</div>
 							<br>
