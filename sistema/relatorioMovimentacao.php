@@ -272,21 +272,56 @@ $dataFim = date("Y-m-d");
 					cmbFornecedor = '#';
 				}
 
-				$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
+				if (cmbFornecedor = !'#' && cmbFornecedor != '') {
+					$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
 
-					var option = '<option value="" selected>Selecione o Produto</option>';
+						var option = '<option value="#" "selected">Selecione o Produto</option>';
 
-					if (dados.length) {
+						if (dados.length) {
 
-						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.ProduId + '">' + obj.ProduNome + '</option>';
-						});
+							$.each(dados, function(i, obj) {
+								option += '<option value="' + obj.ProduId + '">' + obj.ProduNome + '</option>';
+							});
 
-						$('#cmbProduto').html(option).show();
-					} else {
-						ResetProduto();
-					}
-				});
+							$('#cmbProduto').html(option).show();
+						} else {
+							ResetProduto();
+						}
+					});
+				} else if (cmCategoria = !'#' && cmbCategoria != '') {
+					$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
+
+						var option = '<option value="#" "selected">Selecione o Produto</option>';
+
+						if (dados.length) {
+
+							$.each(dados, function(i, obj) {
+								option += '<option value="' + obj.ProduId + '">' + obj.ProduNome + '</option>';
+							});
+
+							$('#cmbProduto').html(option).show();
+						} else {
+							ResetProduto();
+						}
+					});
+				} else {
+					$.getJSON('filtraProduto.php?idSubCategoria=' + cmbSubCategoria, function(dados) {
+
+						var option = '<option value="#" "selected">Selecione o Produto</option>';
+
+						if (dados.length) {
+
+							$.each(dados, function(i, obj) {
+								option += '<option value="' + obj.ProduId + '">' + obj.ProduNome + '</option>';
+							});
+
+							$('#cmbProduto').html(option).show();
+						} else {
+							ResetProduto();
+						}
+					});
+				}
+
 
 			});
 
@@ -337,7 +372,7 @@ $dataFim = date("Y-m-d");
 
 					const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>')
 
-                    if($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() == 'Filtrando...') $('#cmbProduto').val("")
+					if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() == 'Filtrando...') $('#cmbProduto').val("")
 
 					let dataDe = $('#inputDataDe').val()
 					let dataAte = $('#inputDataAte').val()
@@ -391,9 +426,9 @@ $dataFim = date("Y-m-d");
 					e.preventDefault()
 					console.log('teste')
 					if (resultadosConsulta) {
-                        let tipo = $('input[name="inputTipo"]:checked').val()
+						let tipo = $('input[name="inputTipo"]:checked').val()
 
-                        $('#TipoProdutoServico').val(tipo)
+						$('#TipoProdutoServico').val(tipo)
 						$('#inputResultado').val(resultadosConsulta)
 						$('#inputDataDe_imp').val(inputsValues.inputDataDe)
 						$('#inputDataAte_imp').val(inputsValues.inputDataAte)
@@ -493,7 +528,7 @@ $dataFim = date("Y-m-d");
 								<br>
 
 								<form id="formImprime" method="POST" target="_blank">
-								    <input id="TipoProdutoServico" type="hidden" name="TipoProdutoServico"></input>
+									<input id="TipoProdutoServico" type="hidden" name="TipoProdutoServico"></input>
 									<input id="inputResultado" type="hidden" name="resultados"></input>
 									<input id="inputDataDe_imp" type="hidden" name="inputDataDe_imp"></input>
 									<input id="inputDataAte_imp" type="hidden" name="inputDataAte_imp"></input>

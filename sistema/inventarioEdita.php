@@ -33,6 +33,17 @@ if (isset($_POST['inputInventarioId'])) {
 			$aLocaisEstoque[] = $item['LcEstId'];
 		}
 
+		$sql = "SELECT SetorId, SetorNome
+				 FROM Setor
+				 JOIN InventarioXSetor on InXSeSetor = SetorId
+				 WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . " and InXSeInventario = " . $iInventario . " and SetorStatus = 1
+				 ORDER BY SetorNome ASC";
+		$result = $conn->query($sql);
+		$rowBDSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($rowBDSetor as $item) {
+			$aSetores[] = $item['SetorId'];
+		}
+
 		//Equipe do inventário
 		$sql = ("SELECT UsuarId, UsuarLogin
 				 FROM Usuario
@@ -104,6 +115,29 @@ if (isset($_POST['inputData'])) {
 				$result->execute(array(
 					':iInventario' => $_POST['inputInventarioId'],
 					':iLocal' => $value
+				));
+			}
+		}
+
+		$sql = "DELETE FROM InventarioXSetor
+				WHERE InXSeInventario = :iInventario";
+		$result = $conn->prepare($sql);
+
+		$result->execute(array(':iInventario' => $_POST['inputInventarioId']));
+
+		
+		if (isset($_POST["cmbSetor"])) {
+			$sql = "INSERT INTO InventarioXSetor 
+						(InXSeInventario, InXSeSetor)
+					VALUES 
+						(:iInventario, :iSetor)";
+			$result = $conn->prepare($sql);
+
+			foreach ($_POST['cmbSetor'] as $key => $value) {
+
+				$result->execute(array(
+					':iInventario' => $_POST['inputInventarioId'],
+					':iSetor' => $value
 				));
 			}
 		}
@@ -352,31 +386,45 @@ if (isset($_POST['inputData'])) {
 								</div>
 
 								<div class="col-lg-4">
+									<label for="cmbCategoria">Categoria</label>
+									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+										<option value="#">Selecione</option>
+										<?php
+										$sql = ("SELECT CategId, CategNome
+													 FROM Categoria
+													 WHERE CategStatus = 1 and CategEmpresa = " . $_SESSION['EmpreId'] . "
+													 ORDER BY CategNome ASC");
+										$result = $conn->query("$sql");
+										$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+
+										foreach ($rowCategoria as $item) {
+											$seleciona = $item['CategId'] == $row['InvenCategoria'] ? "selected" : "";
+											print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
+										}
+										?>
+									</select>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-4">
 									<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
 									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
-										<option value="">Selecione</option>
 										<?php
-										$sql = ("SELECT UnidaId, UnidaNome
-													 FROM Unidade
-													 WHERE UnidaStatus = 1 and UnidaEmpresa = " . $_SESSION['EmpreId'] . "
-													 ORDER BY UnidaNome ASC");
-										$result = $conn->query("$sql");
-										$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+										$sql = "SELECT EXUXPUnidade, UnidaNome
+												FROM EmpresaXUsuarioXPerfil
+												JOIN Unidade on UnidaId = EXUXPUnidade
+												WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+											    ";
+										$result = $conn->query($sql);
+										$usuarioUnidade = $result->fetch(PDO::FETCH_ASSOC);
 
-										foreach ($rowUnidade as $item) {
-											$seleciona = $item['UnidaId'] == $row['InvenUnidade'] ? "selected" : "";
-											print('<option value="' . $item['UnidaId'] . '" ' . $seleciona . '>' . $item['UnidaNome'] . '</option>');
-										}
+										print('<option value="' . $usuarioUnidade['EXUXPUnidade'] . '" selected>' . $usuarioUnidade['UnidaNome'] . '</option>');
 
 										?>
 									</select>
 								</div>
-
-							</div>
-
-
-							<div class="row">
-								<div class="col-lg-8">
+								<div class="col-lg-4">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbLocalEstoque">Locais do Estoque<span class="text-danger"> *</span></label>
 										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" data-fouc required>
@@ -400,28 +448,41 @@ if (isset($_POST['inputData'])) {
 									</div>
 								</div>
 								<div class="col-lg-4">
-									<label for="cmbCategoria">Categoria</label>
-									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-										<option value="#">Selecione</option>
-										<?php
-										$sql = ("SELECT CategId, CategNome
-													 FROM Categoria
-													 WHERE CategStatus = 1 and CategEmpresa = " . $_SESSION['EmpreId'] . "
-													 ORDER BY CategNome ASC");
-										$result = $conn->query("$sql");
-										$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
+										<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
+										<select id="cmbSetor" name="cmbSetor[]" class="form-control select" multiple="multiple" required>
+											<option value="">Todos</option>
+											<?php
+											$sql = "SELECT SetorId, SetorNome
+													 FROM Setor
+													 WHERE SetorStatus = 1 and SetorEmpresa = " . $_SESSION['EmpreId'] . "
+													 ORDER BY SetorNome ASC";
+											$result = $conn->query($sql);
+											$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+											$count = count($rowSetor);
 
-										foreach ($rowCategoria as $item) {
-											$seleciona = $item['CategId'] == $row['InvenCategoria'] ? "selected" : "";
-											print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
-										}
+											if ($count) {
+												foreach ($rowSetor as $item) {
+													$seleciona = in_array($item['SetorId'], $aSetores) ? "selected" : "";
+													print('<option value="' . $item['SetorId'] . '" '.$seleciona.'>' . $item['SetorNome'] . '</option>');
+												}
+											}
 
-										?>
-									</select>
+											?>
+										</select>
+									</div>
 								</div>
 							</div>
 							<br>
-
+<?php 
+foreach ($rowSetor as $key => $item) {
+	//$seleciona = array_key_exists($item['SetorId'], $aSetores) ? "selected" : "";
+	//$seleciona = array_key_exists($item['SetorId'], $aSetores) ? "selected" : "";
+	if(in_array                                                ($item['SetorId'], $aSetores)){
+		printf('existe');
+	}
+} ?>
+<?php ///var_dump($aSetores); ?>
 							<h5 class="mb-0 font-weight-semibold">Comissão de Inventário</h5>
 							<br>
 							<div class="row">
