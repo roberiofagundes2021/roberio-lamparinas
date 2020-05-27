@@ -47,15 +47,10 @@ if(isset($_POST['inputDataInicio'])){
 		$conn->beginTransaction();
 
 		$sql = "INSERT INTO Aditivo (AditiFluxoOperacional, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, 
-									 AditiValor, AditiUsuarioAtualizador, AditiEmpresa)
+									 AditiValor, AditiUsuarioAtualizador, AditiUnidade)
 				VALUES (:iFluxo, :iNumero, :dDataCelebracao, :dDataInicio, :dDataFim, 
-						:fValor, :iUsuarioAtualizador, :iEmpresa)";
+						:fValor, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
-		
-		//echo $iProxAditivo;die;
-		
-		//var_dump($iFluxoOperacional, $iProxAditivo, $_POST['inputDataCelebracao'], $_POST['inputDataInicio'],
-		//		 $_POST['inputDataFim'], gravaValor($_POST['inputValor']), $_SESSION['UsuarId'], $_SESSION['EmpreId']);		
 
 		$result->execute(array(
 						':iFluxo' => $iFluxoOperacional,
@@ -65,7 +60,7 @@ if(isset($_POST['inputDataInicio'])){
 						':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 						':fValor' => $_POST['inputValor'] == '' ? null : gravaValor($_POST['inputValor']),
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 	    				
 		$conn->commit();

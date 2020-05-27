@@ -23,13 +23,13 @@ try{
 			JOIN Categoria on CategId = FlOpeCategoria
 			JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 			JOIN Situacao on SituaId = FlOpeStatus
-			WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ." and FlOpeId = ".$iFluxoOperacional;
+			WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
 	$sql = "SELECT AditiNumero, AditiDtInicio, AditiDtFim, AditiValor, AditiDtCelebracao
 			FROM Aditivo			
-			WHERE AditiEmpresa = ". $_SESSION['EmpreId'] ." and AditiFluxoOperacional = ".$iFluxoOperacional;
+			WHERE AditiUnidade = ". $_SESSION['UnidadeId'] ." and AditiFluxoOperacional = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$rowAditivo = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countAditivos = count($rowAditivo);

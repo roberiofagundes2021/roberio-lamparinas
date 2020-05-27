@@ -61,9 +61,9 @@ try{
             $sIdentificacao = 'Fluxo Operacional (Nº Contrato: '.$rowFluxo['FlOpeNumContrato'].' | Nº Processo: '.$rowFluxo['FlOpeNumProcesso'].')';
         
             $sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
-                    BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeEmpresa)
+                    BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
                     VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, 
-                    :iStatus, :iUsuarioAtualizador, :iEmpresa)";
+                    :iStatus, :iUsuarioAtualizador, :iUnidade)";
             $result = $conn->prepare($sql);
                     
             $result->execute(array(
@@ -76,21 +76,21 @@ try{
                             ':iTabelaId' => $iFluxoOperacional,
                             ':iStatus' => $rowSituacao['SituaId'],
                             ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-                            ':iEmpresa' => $_SESSION['EmpreId']						
+                            ':iUnidade' => $_SESSION['UnidadeId']
                             ));                            
 
 			$insertId = $conn->lastInsertId();
 
 			foreach ($rowPerfil as $item){
 			
-				$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeEmpresa)
-						VALUES (:iBandeja, :iPerfil, :iEmpresa)";
+				$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeUnidade)
+						VALUES (:iBandeja, :iPerfil, :iUnidade)";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
 								':iBandeja' => $insertId,
 								':iPerfil' => $item['PerfiId'],
-								':iEmpresa' => $_SESSION['EmpreId']						
+								':iUnidade' => $_SESSION['UnidadeId']
 								));					
 			}
 			/* Fim Insere Bandeja */
@@ -99,7 +99,7 @@ try{
 
 			$sql = "UPDATE Bandeja SET BandeData = :dData, BandeSolicitante = :iSolicitante, BandeStatus = :iStatus, 
 					BandeUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE BandeEmpresa = :iEmpresa and BandeId = :iIdBandeja";
+					WHERE BandeUnidade = :iUnidade and BandeId = :iIdBandeja";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -107,7 +107,7 @@ try{
 							':iSolicitante' => $_SESSION['UsuarId'],
 							':iStatus' => $rowSituacao['SituaId'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iEmpresa' => $_SESSION['EmpreId'],
+							':iUnidade' => $_SESSION['UnidadeId'],
 							':iIdBandeja' => $rowBandeja['BandeId']														
 							));
         }

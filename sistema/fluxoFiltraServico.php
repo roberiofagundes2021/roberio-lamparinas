@@ -28,14 +28,14 @@ if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POS
 			FROM Servico
 			JOIN Categoria on CategId = ServiCategoria
 			LEFT JOIN Marca on MarcaId = ServiMarca
-			WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiSubCategoria = '". $_POST['idSubCategoria']."' and ServiId in (".$lista.")
+			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiSubCategoria = '". $_POST['idSubCategoria']."' and ServiId in (".$lista.")
 			";
 } else {
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, MarcaNome
 			FROM Servico
 			JOIN Categoria on CategId = ServiCategoria
 			LEFT JOIN Marca on MarcaId = ServiMarca
-			WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiCategoria = '". $_POST['idCategoria']."' and ServiId in (".$lista.")
+			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = '". $_POST['idCategoria']."' and ServiId in (".$lista.")
 			";
 }
 

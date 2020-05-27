@@ -12,7 +12,7 @@ $sql = "SELECT FlOpeId, ForneNome, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataI
 		JOIN Categoria on CategId = FlOpeCategoria
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
 		JOIN Situacao on SituaId = FlOpeStatus
-	    WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ."
+	    WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY FlOpeDataInicio DESC, FlOpeCategoria ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -202,7 +202,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												FROM Bandeja
 												JOIN Situacao on SituaId = BandeStatus
 												WHERE BandeTabela = 'FluxoOperacional' and BandeTabelaId = ".$item['FlOpeId']." and 
-												BandeEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'NAOLIBERADO'";
+												BandeUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'NAOLIBERADO'";
 										$result = $conn->query($sql);
 										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);										
 										

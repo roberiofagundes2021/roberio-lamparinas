@@ -20,7 +20,7 @@ $sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, 
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
 		JOIN Categoria on CategId = FlOpeCategoria
 		JOIN SubCategoria on SbCatId = FlOpeSubCategoria
-		WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ." and FlOpeId = ".$iFluxoOperacional;
+		WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ".$iFluxoOperacional;
 
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -95,7 +95,7 @@ try {
 			FROM Produto
 			JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 
 	$result = $conn->query($sql);
 	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -104,7 +104,7 @@ try {
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario
 			FROM Servico
 			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-			WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
+			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
 
 	$result = $conn->query($sql);
 	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -262,28 +262,7 @@ try {
 			    </tr>
 			  </table>
 	";
-		
-/*	
-	$sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
-			FROM Usuario
-			Where UsuarId = ".$_SESSION['UsuarId']."
-			ORDER BY UsuarNome ASC";
-	$result = $conn->query($sql);
-	$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);	
-	
-	$html .= '			
-		<br><br>
-		<div style="width: 100%; margin-top: 200px;">
-			<div style="position: relative; float: left; text-align: center;">
-				Solicitante: '.$rowUsuario['UsuarNome'].'<br>
-				<div style="margin-top:3px;">
-					Telefone: '.$rowUsuario['UsuarTelefone'].' <br>
-					E-mail: '.$rowUsuario['UsuarEmail'].'
-				</div>
-			</div>
-		</div>
-	';	
-*/	
+			
     $rodape = "<hr/>
     <div style='width:100%'>
 		<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
