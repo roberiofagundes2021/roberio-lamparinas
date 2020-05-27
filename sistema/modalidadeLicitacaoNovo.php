@@ -117,7 +117,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="inputNome">Nome da Modalidade de Licitação <span class="text-danger"> *</span></label>
+										<label for="inputNome">Modalidade de Licitação <span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Modalidade de licitação" required autofocus>
 									</div>
 								</div>

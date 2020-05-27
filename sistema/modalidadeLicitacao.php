@@ -145,13 +145,13 @@ $count = count($row);
 
 							<div class="card-body">
 								<p class="font-size-lg">Segue abaixo a relação de Modalidades de Licitação disponíveis para os usuários do sistema.</p>
-								<div class="text-right"><a href="modalidadeLicitacaoNovo.php" class="btn btn-success" role="button">Nova Modalidade de LIcitação</a></div>
+								<div class="text-right"><a href="modalidadeLicitacaoNovo.php" class="btn btn-success" role="button">Nova Modalidade de Licitação</a></div>
 							</div>							
 
 							<table id="tblMdLic" class="table">
 								<thead>
 									<tr class="bg-slate">
-										<th>Nome da Modalidade de Licitação</th>
+										<th>Modalidade de Licitação</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
