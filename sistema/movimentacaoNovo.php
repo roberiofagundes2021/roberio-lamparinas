@@ -93,7 +93,7 @@ if (isset($_POST['inputData'])) {
 			$tipoDestino = 'DestinoSetor';
 			$idDestino = $_POST['cmbDestinoSetor'];
 		}
-
+var_dump($_POST);
 
 		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
@@ -1561,8 +1561,6 @@ if (isset($_POST['inputData'])) {
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e) {
 
-
-
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputTotal = $('#inputTotal').val();
 				var cmbFinalidade = $('#cmbFinalidade').val();
@@ -1748,6 +1746,7 @@ if (isset($_POST['inputData'])) {
 				} else {
 					$("#formMovimentacao").submit();
 				}
+				//console.log(inputTipo)
 			});
 
 			//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo

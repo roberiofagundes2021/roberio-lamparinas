@@ -41,10 +41,10 @@
 								<i class="icon-comment-discussion mr-2"></i>
 								Suporte
 							</a>
-							
-							<?php 
-								if ($_SESSION['PerfiChave'] == "SUPER" or $_SESSION['PerfiChave'] == "ADMINISTRADOR") {
-									print('
+
+							<?php
+							if ($_SESSION['PerfiChave'] == "SUPER" or $_SESSION['PerfiChave'] == "ADMINISTRADOR") {
+								print('
 										<div class="breadcrumb-elements-item dropdown p-0">
 											<a href="#" class="breadcrumb-elements-item dropdown-toggle" data-toggle="dropdown">
 												<i class="icon-gear mr-2"></i>
@@ -52,21 +52,24 @@
 											</a>
 
 											<div class="dropdown-menu dropdown-menu-right">');
-												
-												if ($_SESSION['PerfiChave'] == "SUPER") {
-													print('<a href="empresa.php" class="dropdown-item"><i class="icon-office"></i> Empresas</a>'); 
-												}
-												
-												print('<a href="usuario.php" class="dropdown-item"><i class="icon-users"></i> Usuários</a>										  
-												<a href="perfil.php" class="dropdown-item"><i class="icon-user-check"></i> Perfis</a>											
-												
-												<div class="dropdown-divider"></div>
-												<a href="banco.php" class="dropdown-item"><i class="icon-piggy-bank"></i> Bancos</a>
-												<a href="ncm.php" class="dropdown-item"><i class="icon-price-tag"></i> NCM</a>
-											</div>
-										</div>
-									');
+
+								if ($_SESSION['PerfiChave'] == "SUPER") {
+									print('<a href="empresa.php" class="dropdown-item"><i class="icon-office"></i> Empresas</a>');
 								}
+
+								print('<a href="usuario.php" class="dropdown-item"><i class="icon-users"></i> Usuários</a>										  
+												<a href="perfil.php" class="dropdown-item"><i class="icon-user-check"></i> Perfis</a>	');
+								if ($_SESSION['PerfiChave'] == "SUPER") {
+									print('<div class="dropdown-divider"></div>
+												<a href="banco.php" class="dropdown-item"><i class="icon-piggy-bank"></i> Bancos</a>
+												<a href="modalidadeLicitacao.php" class="dropdown-item"><i class="icon-table"></i> Modalidade Licitação</a>
+												<a href="ncm.php" class="dropdown-item"><i class="icon-price-tag"></i> NCM</a>
+											</div>');
+								}
+
+
+								print('</div>');
+							}
 							?>
 						</div>
 					</div>

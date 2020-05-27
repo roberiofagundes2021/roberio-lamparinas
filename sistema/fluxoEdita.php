@@ -30,7 +30,7 @@ if(isset($_POST['inputFluxoOperacionalId'])){
 				WHERE FlOpeId = $iFluxoOperacional ";
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);
-						
+	
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();die;
 	}
@@ -48,7 +48,7 @@ if(isset($_POST['inputDataInicio'])){
 		
 		$sql = "UPDATE FluxoOperacional SET FlOpeFornecedor = :iFornecedor, FlOpeCategoria = :iCategoria, FlOpeSubCategoria = :iSubCategoria, 
 										    FlOpeDataInicio = :dDataInicio, FlOpeDataFim = :dDataFim, FlOpeNumContrato = :iNumContrato, 
-										    FlOpeNumProcesso = :iNumProcesso, FlOpeValor = :fValor, FlOpeUsuarioAtualizador = :iUsuarioAtualizador
+										    FlOpeNumProcesso = :iNumProcesso, FlOpeModalidadeLicitacao = :iModalidadeLicitacao, FlOpeValor = :fValor, FlOpeUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE FlOpeId = ".$_POST['inputFluxoOperacionalId']."
 				";
 		$result = $conn->prepare($sql);
@@ -61,6 +61,7 @@ if(isset($_POST['inputDataInicio'])){
 						':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 						':iNumContrato' => $_POST['inputNumContrato'],
 						':iNumProcesso' => $_POST['inputNumProcesso'],
+						':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'],
 						':fValor' => gravaValor($_POST['inputValor']),	
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']						
 						));
@@ -363,14 +364,40 @@ if(isset($_POST['inputDataInicio'])){
 									</div>
 								</div>								
 								
-								<div class="col-lg-3">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputNumContrato">Número do Contrato <?php if($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
 										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>"  <?php echo $bObrigatorio; ?>>
 									</div>
 								</div>
+
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="cmbModalidadeLicitacao">Modalidade de Licitação</label>
+										<select id="cmbModalidadeLicitacao" name="cmbModalidadeLicitacao" class="form-control form-control-select2">
+											<option value="#">Selecione</option>
+											<?php
+											$sql = "SELECT MdLicId, MdLicNome
+															FROM ModalidadeLicitacao
+															JOIN Situacao on SituaId = MdLicStatus
+															WHERE SituaChave = 'ATIVO'
+															ORDER BY MdLicNome ASC";
+											$result = $conn->query($sql);
+											$rowMdLic = $result->fetchAll(PDO::FETCH_ASSOC);
+
+											foreach ($rowMdLic as $item) {
+												if($item['MdLicId'] == $row['FlOpeModalidadeLicitacao']){
+													print('<option value="' . $item['MdLicId'] . '" selected>' . $item['MdLicNome'] . '</option>');
+												} else {
+													print('<option value="' . $item['MdLicId'] . '">' . $item['MdLicNome'] . '</option>');
+												}
+											}
+											?>
+										</select>
+									</div>
+								</div>
 										
-								<div class="col-lg-3">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputNumProcesso">Número do Processo <?php if($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
 										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>"  <?php echo $bObrigatorio; ?>>
