@@ -10,63 +10,63 @@ require_once 'global_assets/php/vendor/autoload.php';
 
 // Aplicado filtro aos resultados
 /***************************************************************/
-$args = []; 
-
-    if (!empty($_POST['inputDataDe_imp']) || !empty($_POST['inputDataAte_imp'])) {
-        empty($_POST['inputDataDe_imp']) ? $inputDataDe = '1900-01-01' : $inputDataDe = $_POST['inputDataDe_imp'];
-        empty($_POST['inputDataAte_imp']) ? $inputDataAte = '2100-01-01' : $inputDataAte = $_POST['inputDataAte_imp'];
-
-        //$args[]  = "MovimData = ".$inputDataDe." ";MovimData BETWEEN '".$inputDataDe."' and '".$inputDataAte."'
-        //$args[] = "`dataAte` = ".$inputDataAte." ";
-
-        $args[]  = "MovimData BETWEEN '".$inputDataDe."' and '".$inputDataAte."' ";
-    }
-
-    if(!empty($_POST['inputLocalEstoque_imp'])){
-        $args[]  = "MovimDestinoLocal = ".$_POST['inputLocalEstoque_imp']." ";
-    }
-
-    if(!empty($_POST['inputSetor_imp'])){
-        $args[]  = "MovimDestinoSetor = ".$_POST['inputSetor']." ";
-    }
-
-    if(!empty($_POST['inputCategoria_imp'])){
-        $args[]  = "ProduCategoria = ".$_POST['inputCategoria_imp']." ";
-    }
-
-    if(!empty($_POST['inputSubCategoria_imp'])){
-        $args[]  = "ProduSubCategoria = ".$_POST['inputSubCategoria_imp']." ";
-    }
-
-    if(!empty($_POST['inputProduto_imp'])){
-        $args[]  = "ProduNome LIKE '%".$_POST['inputProduto_imp']."%' ";
-    }
+$args = [];
 
 
-    if (count($args) >= 1) {
-        try {
+/////////////////////////////////////////////
 
-			$string = implode( " and ",$args );
-			
-			$string != '' ? $string .= ' and ' : $string;
+if (!empty($_POST['inputDataDe_imp']) || !empty($_POST['inputDataAte_imp'])) {
+	empty($_POST['inputDataDe_imp']) ? $inputDataDe = '1900-01-01' : $inputDataDe = $_POST['inputDataDe_imp'];
+	empty($_POST['inputDataAte_imp']) ? $inputDataAte = '2100-01-01' : $inputDataAte = $_POST['inputDataAte_imp'];
 
-            $sql = "SELECT MvXPrId, MovimId ,MovimData, MovimNotaFiscal, MovimOrigem, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, ProduNome, SetorNome
-                    FROM Movimentacao
-                    JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
+	$args[]  = "MovimData BETWEEN '".$inputDataDe."' and '".$inputDataAte."' ";
+}
+
+if(!empty($_POST['inputLocalEstoque_imp'])){
+	$args[]  = "MovimDestinoLocal = ".$_POST['inputLocalEstoque_imp']." ";
+}
+
+if(!empty($_POST['inputSetor_imp'])){
+	$args[]  = "MovimDestinoSetor = ".$_POST['inputSetor_imp']." ";
+}
+
+if(!empty($_POST['inputCategoria_imp'])){
+	$args[]  = "ProduCategoria = ".$_POST['inputCategoria_imp']." ";
+}
+
+if(!empty($_POST['inputSubCategoria_imp'])){
+	$args[]  = "ProduSubCategoria = ".$_POST['inputSubCategoria_imp']." ";
+}
+
+if(!empty($_POST['inputProduto_imp'])){
+	$args[]  = "ProduNome LIKE '%".$_POST['inputProduto_imp']."%' ";
+}
+
+
+if (count($args) >= 1) {
+	try {
+
+		$string = implode(" and ", $args);
+
+		$string != '' ? $string .= ' and ' : $string;
+
+		$sql = "SELECT PatriNumero ,MvXPrId, MovimId ,MovimData, MovimNotaFiscal, MovimOrigemLocal, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, SetorNome
+                    FROM Patrimonio
+                    JOIN MovimentacaoXProduto on MvXPrPatrimonio = PatriId
+                    JOIN Movimentacao on MovimId = MvXPrMovimentacao
                     JOIN Produto on ProduId = MvXPrProduto
-                    JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+                    LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
                     LEFT JOIN Setor on SetorId = MovimDestinoSetor
-                    WHERE ".$string." ProduUnidade = ".$_SESSION['UnidadeId']."
+                    WHERE " . $string . " ProduUnidade = " . $_SESSION['UnidadeId'] . "
                     ";
-            $result = $conn->query($sql);
-            $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
+		$result = $conn->query($sql);
+		$rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
-            count($rowData) >= 1 ? $cont = 1 : $cont = 0;
-
-        } catch (PDOException $e) {
-            echo 'Error: ' . $e->getMessage();
-        }
-    }
+		count($rowData) >= 1 ? $cont = 1 : $cont = 0;
+	} catch (PDOException $e) {
+		echo 'Error: ' . $e->getMessage();
+	}
+}
 /***************************************************************/
 
 
@@ -140,7 +140,7 @@ if (isset($_POST['resultados'])) {
 		            <div style='float:left; width: 400px; display: inline-block; margin-bottom: 10px;'>
 			            <img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
 			            <span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
-			            <div style='position: absolute; font-size:9px; margin-top: 8px; margin-left:4px;'>Unidade: ".$_SESSION['UnidadeNome']."</div>
+			            <div style='position: absolute; font-size:9px; margin-top: 8px; margin-left:4px;'>Unidade: " . $_SESSION['UnidadeNome'] . "</div>
 					</div>
 					<div style='width:250px; float:right; display: inline; text-align:right;'>
 			            <div style='font-size: 0.8rem'>Data {DATE j/m/Y}</div>
@@ -157,39 +157,39 @@ if (isset($_POST['resultados'])) {
 		$html .= '<br>';
 		$html .= '<br>';
 
-		if(!empty($_POST['inputDataDe_imp']) || !empty($_POST['inputDataAte_imp'])){
-			if(!empty($_POST['inputDataDe_imp']) && !empty($_POST['inputDataAte_imp'])){
+		if (!empty($_POST['inputDataDe_imp']) || !empty($_POST['inputDataAte_imp'])) {
+			if (!empty($_POST['inputDataDe_imp']) && !empty($_POST['inputDataAte_imp'])) {
 				$html .= '
             		<div style="font-weight: bold; font-size: 0.8rem; position:relative; margin-top: 10px; padding: 5px;">
-			            Período: '.mostraData($_POST['inputDataDe_imp']).' à '.mostraData($_POST['inputDataAte_imp']).' 
+			            Período: ' . mostraData($_POST['inputDataDe_imp']) . ' à ' . mostraData($_POST['inputDataAte_imp']) . ' 
 		            </div>
 		        ';
-			} else if(!empty($_POST['inputDataDe_imp'])){
+			} else if (!empty($_POST['inputDataDe_imp'])) {
 				$html .= '
             		<div style="font-weight: bold; font-size: 0.8rem; position:relative; margin-top: 20px; padding: 5px;">
-			            Período: '.mostraData($_POST['inputDataDe_imp']).' à '.date('d/m/Y').' 
+			            Período: ' . mostraData($_POST['inputDataDe_imp']) . ' à ' . date('d/m/Y') . ' 
 		            </div>
 		        ';
 			} else {
 				$html .= '
             		<div style="font-weight: bold; font-size: 0.8rem; position:relative; margin-top: 20px; padding: 5px;">
-			            Período: Até '.date('d/m/Y').' 
+			            Período: Até ' . date('d/m/Y') . ' 
 		            </div>
 		        ';
 			}
 		}
 
-		if(!empty($_POST['inputCategoria_imp'])){
+		if (!empty($_POST['inputCategoria_imp'])) {
 			$html .= '
 					<div style="font-weight: bold; font-size: 0.8rem; padding: 5px;">
-			            Categoria: '.$Categoria['CategNome'].'
+			            Categoria: ' . $Categoria['CategNome'] . '
 		            </div>
 		        ';
 		}
-		if(!empty($_POST['inputSubCategoria_imp'])){
+		if (!empty($_POST['inputSubCategoria_imp'])) {
 			$html .= '
             		<div style="font-weight: bold; font-size: 0.8rem; position:relative; padding: 5px;">
-			            SubCategoria: '.$SubCategoria['SbCatNome'].' 
+			            SubCategoria: ' . $SubCategoria['SbCatNome'] . ' 
 		            </div>
 		        ';
 		}
@@ -214,19 +214,19 @@ if (isset($_POST['resultados'])) {
 		';
 
 		$html .= "<tbody>";
-		
+
 		$cont = 0;
-		foreach($rowData as $produto){
+		foreach ($rowData as $produto) {
 			$cont += 1;
 			$html .= "
 			<tr>
 				<td style='font-size: 0.6rem; padding-top: 7px'>" . $cont . "</td>
 				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['ProduNome'] . "</td>
-				<td style='font-size: 0.6rem; padding-top: 7px'></td>
+				<td style='font-size: 0.6rem; padding-top: 7px'>".$produto['PatriNumero']."</td>
 				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['MovimNotaFiscal'] . "</td>
-				<td style='font-size: 0.6rem; padding-top: 7px'>".mostraValor($produto['MvXPrValorUnitario'])."</td>
+				<td style='font-size: 0.6rem; padding-top: 7px'>" . mostraValor($produto['MvXPrValorUnitario']) . "</td>
 				<td style='font-size: 0.6rem; padding-top: 7px'></td>
-				<td style='font-size: 0.6rem; padding-top: 7px'>".mostraData($produto['MvXPrValidade'])."</td>
+				<td style='font-size: 0.6rem; padding-top: 7px'>" . mostraData($produto['MvXPrValidade']) . "</td>
 				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['LcEstNome'] . "</td>
 				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['SetorNome'] . "</td>
 			</tr>

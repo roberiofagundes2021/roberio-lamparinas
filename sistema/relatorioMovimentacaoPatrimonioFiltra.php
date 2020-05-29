@@ -47,11 +47,12 @@ function queryPesquisa(){
                 $string .= ' and ';
             }
 
-            $sql = "SELECT MvXPrId, MovimId ,MovimData, MovimNotaFiscal, MovimOrigemLocal, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, SetorNome
-                    FROM Movimentacao
-                    JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
+            $sql = "SELECT PatriNumero, MvXPrId, MovimId ,MovimData, MovimNotaFiscal, MovimOrigemLocal, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, SetorNome
+                    FROM Patrimonio
+                    JOIN MovimentacaoXProduto on MvXPrPatrimonio = PatriId
+                    JOIN Movimentacao on MovimId = MvXPrMovimentacao
                     JOIN Produto on ProduId = MvXPrProduto
-                    JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+                    LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
                     LEFT JOIN Setor on SetorId = MovimDestinoSetor
                     WHERE ".$string." ProduUnidade = ".$_SESSION['UnidadeId']."
                     ";
@@ -74,13 +75,16 @@ function queryPesquisa(){
                 <tr>
                    <td class='even'>" . $cont . "</td>
                    <td class='odd'>" . $item['ProduNome'] . "</td>
-                   <td class='even'></td>
+                   <td  class='even'>".$item['PatriNumero']."</td>
                    <td class='odd'>" . $item['MovimNotaFiscal'] . "</td>
                    <td class='even'></td>
                    <td class='odd'>" . $item['MovimNotaFiscal'] . "</td>
                    <td class='even'>".mostraData($item['MvXPrValidade'])."</td>
                    <td class='odd'>" . $item['LcEstNome'] . "</td>
                    <td class='even'>" . $item['SetorNome'] . "</td>
+                   <td style='text-align: center'>
+                         <i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>
+                   </td>
                 </tr>
              ");
         }

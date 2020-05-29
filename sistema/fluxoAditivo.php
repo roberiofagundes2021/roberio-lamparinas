@@ -27,7 +27,7 @@ try{
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
-	$sql = "SELECT AditiNumero, AditiDtInicio, AditiDtFim, AditiValor, AditiDtCelebracao
+	$sql = "SELECT AditiId, AditiNumero, AditiDtInicio, AditiDtFim, AditiValor, AditiDtCelebracao
 			FROM Aditivo			
 			WHERE AditiEmpresa = ". $_SESSION['EmpreId'] ." and AditiFluxoOperacional = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
@@ -284,7 +284,7 @@ try{
 																		<div class="list-icons list-icons-extended">
 																		
 																			<!--<a href="#" onclick="atualizaAditivo('.$row['FlOpeId'].', '.$item['AditiId'].', \''.$row['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>-->
-																				<a href="#" onclick="atualizaAditivo('.$row['FlOpeId'].', '.$item['FlOpeId'].', \''.$row['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
+																				<a href="#" onclick="atualizaAditivo('.$row['FlOpeId'].', '.$item['AditiId'].', \''.$row['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
 																		</div>
 																	</div>');
 														}

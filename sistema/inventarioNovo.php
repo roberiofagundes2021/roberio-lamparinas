@@ -75,18 +75,45 @@ if (isset($_POST['inputData'])) {
 		}
 
 		if (isset($_POST["cmbSetor"])) {
-			$sql = "INSERT INTO InventarioXSetor 
-						(InXSeInventario, InXSeSetor)
-					VALUES 
-						(:iInventario, :iSetor)";
-			$result = $conn->prepare($sql);
+			if ($_POST["cmbSetor"][0] == "Todos") {
+				$sql = "SELECT SetorId
+				             FROM Setor
+							 JOIN Situacao on SituaId = SetorStatus
+							 WHERE SetorEmpresa =  " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+				";
+				$result = $conn->query($sql);
+				$rowSetores = $result->fetchAll(PDO::FETCH_ASSOC);
+				//
+				$sql = "INSERT INTO InventarioXSetor 
+					     	(InXSeInventario, InXSeSetor)
+					        VALUES 
+						    (:iInventario, :iSetor)";
+				$result = $conn->prepare($sql);
 
-			foreach ($_POST['cmbSetor'] as $key => $value) {
+				foreach ($rowSetores as $key => $value) {
 
-				$result->execute(array(
-					':iInventario' => $insertId,
-					':iSetor' => $value
-				));
+					$result->execute(array(
+						':iInventario' => $insertId,
+						':iSetor' => current($value) // current retorna a primeira posição do array, nesse caso o Id do setor
+					));
+				}
+
+				
+			} else {
+
+				$sql = "INSERT INTO InventarioXSetor 
+				            (InXSeInventario, InXSeSetor)
+			                VALUES 
+				            (:iInventario, :iSetor)";
+				$result = $conn->prepare($sql);
+
+				foreach ($_POST['cmbSetor'] as $key => $value) {
+
+					$result->execute(array(
+						':iInventario' => $insertId,
+						':iSetor' => $value
+					));
+				}
 			}
 		}
 
@@ -380,7 +407,7 @@ if (isset($_POST['inputData'])) {
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
 										<select id="cmbSetor" name="cmbSetor[]" class="form-control select" multiple="multiple" required>
-											<option value="">Todos</option>
+											<option value="Todos">Todos</option>
 											<?php
 											$sql = "SELECT SetorId, SetorNome
 													 FROM Setor

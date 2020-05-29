@@ -18,6 +18,13 @@ $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
+$d = date("d");
+$m = date("m");
+$Y = date("Y");
+
+$dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
+$dataFim = date("Y-m-d");
+
 ?>
 
 <!DOCTYPE html>
@@ -40,7 +47,107 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
     <script src="global_assets/js/demo_pages/form_layouts.js"></script>
 
     <script type="text/javascript">
-    
+        function modalAcoes() {
+
+            $('.btn-acoes').each((i, elem) => {
+                $(elem).on('click', function() {
+                    $('#page-modal').fadeIn(200);
+
+                    /*let linha = $(elem).parent().parent()
+                    let todasLinhas = $(elem).parent().parent().parent()
+                    let saldoinicialModal = $(elem).parent().next().attr('saldoInicial') // selecionando o valor do input hidden
+
+                    if ($(elem).attr('idRow') == linha.attr('id')) {
+                        let tds = linha.children();
+                        let tipoProdutoServico = $(tds[8]).attr('tipo');
+
+
+
+                        let valores = [];
+
+                        let inputItem = $('<td></td>');
+                        let inputProdutoServico = $('<input type="text">');
+                        let inputQuantidade = $('<input type="text">');
+                        let inputSaldo = $('<input type="text">');
+                        let inputValidade = $('<input type="text">');
+
+                        let linhaTabela = '';
+
+                        tds.each((i, elem) => {
+                            valores[i] = $(elem).html();
+                        })
+
+                        inputItem.val(valores[0]);
+
+                        if (tipoProdutoServico != 'P') {
+
+                            cabecalho = `
+                               
+                                <tr class="bg-slate">
+                                     <th width="5%">Item</th>
+                                     <th width="75%">Serviço</th>
+                                     <th width="10%">Quantidade</th>
+                                     <th width="10%">Saldo</th>
+                                     <th width="10%"></th>
+                                 </tr>
+                                    `;
+
+                            linhaTabela = `<tr id='trModal'>
+                                    <td>${valores[0]}</td>
+                                    <td>${valores[1]}</td>
+                                    <td><input id='quantidade' type="text" class="form-control" value="" style="text-align: center" autofocus></td>
+                                    <td><input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled></td>
+                                </tr>
+                              `;
+                        } else {
+                            cabecalho = `
+                                 <tr class="bg-slate">
+                                        <th width="5%">Item</th>
+                                        <th width="45%">Produto</th>
+                                        <th width="8%">Quantidade</th>
+                                        <th width="10%">Saldo</th>
+                                        <th width="10%">Lote</th>
+                                        <th width="12%">Validade</th>
+                                </tr>
+                                    `;
+
+                            linhaTabela = `<tr id='trModal'>
+                                                <td>${valores[0]}</td>
+                                                <td>${valores[1]}</td>
+                                                <td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" style="text-align: center" autofocus></td>
+                                                <td><input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center"  disabled></td>
+                                                <td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
+                                                <td><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
+                                            </tr>
+                                            `;
+                        }
+
+                        $('#thead-modal').html(cabecalho);
+
+                        $('#tbody-modal').html(linhaTabela);
+
+                        // Esta função não permite que o valor digitado pelo usuário seja maior que o valor de saldo.
+                        function validaQuantInputModal(quantMax) {
+                            $('#quantidade').on('keyup', function() {
+                                if (parseInt($('#quantidade').val()) > parseInt(quantMax)) {
+                                    $('#quantidade').val(quantMax)
+                                }
+                            })
+                        }
+
+                        validaQuantInputModal($('#saldo').val())
+
+                        $('#quantidade').focus()
+                    }*/
+                })
+            })
+
+            $('#modal-close').on('click', function() {
+                $('#page-modal').fadeOut(200);
+                $('body').css('overflow', 'scroll');
+            })
+        }
+
         $(document).ready(function() {
 
             /* Início: Tabela Personalizada */
@@ -55,9 +162,54 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                         targets: [0]
                     },
                     {
+                        orderable: true,
+                        width: 15,
+                        targets: [1]
+                    },
+                    {
                         orderable: false,
-                        width: 50,
+                        width: 5,
+                        targets: [2]
+                    },
+                    {
+                        orderable: false,
+                        width: 5,
+                        targets: [3]
+                    },
+                    {
+                        orderable: false,
+                        width: 5,
+                        targets: [4]
+                    },
+                    {
+                        orderable: false,
+                        width: 5,
+                        targets: [5]
+                    },
+                    {
+                        orderable: false,
+                        width: 5,
+                        targets: [6]
+                    },
+                    {
+                        orderable: false,
+                        width: 5,
                         targets: [7]
+                    },
+                    {
+                        orderable: false,
+                        width: 15,
+                        targets: [8]
+                    },
+                    {
+                        orderable: false,
+                        width: 15,
+                        targets: [9]
+                    },
+                    {
+                        orderable: false,
+                        width: 5,
+                        targets: [10]
                     }
                 ],
                 dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -165,6 +317,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                 $('tbody').html(data)
                                 $('#imprimir').removeAttr('disabled')
                                 resultadosConsulta = data
+                                modalAcoes()
                             } else {
                                 $('tbody').html(msg)
                                 $('#imprimir').attr('disabled', '')
@@ -189,9 +342,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                         $('#inputCategoria_imp').val(inputsValues.inputCategoria)
                         $('#inputSubCategoria_imp').val(inputsValues.inputSubCategoria)
                         $('#inputProduto_imp').val(inputsValues.inputProduto)
-                        
+
                         $('#formImprime').attr('action', url)
-                        
+
                         $('#formImprime').submit()
                     }
                 })
@@ -255,7 +408,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                                 <span class="input-group-prepend">
                                                     <span class="input-group-text"><i class="icon-calendar22"></i></span>
                                                 </span>
-                                                <input type="date" id="inputDataDe" name="inputDataDe" class="form-control">
+                                                <input type="date" id="inputDataDe" name="inputDataDe" class="form-control" value="<?php echo $dataInicio ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -266,7 +419,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                                 <span class="input-group-prepend">
                                                     <span class="input-group-text"><i class="icon-calendar22"></i></span>
                                                 </span>
-                                                <input type="date" id="inputDataAte" name="inputDataAte" class="form-control">
+                                                <input type="date" id="inputDataAte" name="inputDataAte" class="form-control" value="<?php echo $dataFim ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -378,6 +531,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                         <th>Validade</th>
                                         <th>Origem</th>
                                         <th>Destino</th>
+                                        <th>Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -390,6 +544,37 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
                 <!-- /info blocks -->
+
+                <!--Modal ditar-->
+                <div id="page-modal" class="custon-modal">
+                    <div class="custon-modal-container">
+                        <div class="card custon-modal-content">
+                            <div class="custon-modal-title">
+                                <i class=""></i>
+                                <p class="h3">Itens Recebidos</p>
+                                <i class=""></i>
+                            </div>
+                            <div class="card-footer mt-2 d-flex flex-column">
+                                <table class="table table-modal">
+                                    <thead id="thead-modal">
+
+                                    </thead>
+                                    <tbody id="tbody-modal">
+
+                                    </tbody>
+                                </table>
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <button class="btn btn-lg btn-success" id="salvar">Salvar</button>
+                                            <a id="modal-close" class="btn btn-basic" role="button">Cancelar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
             <!-- /content area -->

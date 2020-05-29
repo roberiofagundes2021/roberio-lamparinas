@@ -164,7 +164,7 @@ try {
 				 JOIN Situacao on SituaId = MovimSituacao
 				 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduStatus = 1 and
 					   ProduCategoria = ".$iCategoria." and
-					   MovimDestinoLocal = (".$iSetor.") and SituaChave = 'FINALIZADO'
+					   MovimDestinoLocal = ".$iSetor."
 				 ");
 		$result = $conn->query("$sql");
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);		
