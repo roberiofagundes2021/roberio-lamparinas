@@ -31,14 +31,14 @@ $TotalFluxo = $rowFluxo['FlOpeValor'];
 
 $sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
 		FROM FluxoOperacionalXProduto
-		Where FOXPrEmpresa = ".$_SESSION['EmpreId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+		Where FOXPrUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 $result = $conn->query($sql);
 $rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
 $TotalProdutos = $rowProdutos['TotalProduto'];
 
 $sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
 		FROM FluxoOperacionalXServico
-		Where FOXSrEmpresa = ".$_SESSION['EmpreId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
+		Where FOXSrUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
 $result = $conn->query($sql);
 $rowServicos = $result->fetch(PDO::FETCH_ASSOC);
 $TotalServicos = $rowServicos['TotalServico'];
@@ -57,19 +57,19 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 		$conn->beginTransaction();
 
 		$sql = "DELETE FROM FluxoOperacionalXProduto
-				WHERE FOXPrFluxoOperacional = :iFluxoOperacional AND FOXPrEmpresa = :iEmpresa";
+				WHERE FOXPrFluxoOperacional = :iFluxoOperacional AND FOXPrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
 		
 		$result->execute(array(
 						':iFluxoOperacional' => $iFluxoOperacional,
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 		
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 		
 			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario, 
-					FOXPrUsuarioAtualizador, FOXPrEmpresa)
-					VALUES (:iFluxoOperacional, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+					FOXPrUsuarioAtualizador, FOXPrUnidade)
+					VALUES (:iFluxoOperacional, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 			
 			$result->execute(array(
@@ -78,7 +78,7 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
 							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iEmpresa' => $_SESSION['EmpreId']
+							':iUnidade' => $_SESSION['UnidadeId']
 							));
 		}
 
@@ -109,14 +109,14 @@ try{
 			JOIN Categoria on CategId = FlOpeCategoria
 			JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 			JOIN Situacao on SituaId = FlOpeStatus
-			WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ." and FlOpeId = ".$iFluxoOperacional;
+			WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
 	$sql = "SELECT FOXPrProduto
 			FROM FluxoOperacionalXProduto
 			JOIN Produto on ProduId = FOXPrProduto
-			WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+			WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
@@ -360,8 +360,9 @@ try{
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc <?php if ($countProdutoUtilizado and $_SESSION['PerfiChave'] != 'SUPER' and $_SESSION['PerfiChave'] != 'ADMINISTRADOR' and $_SESSION['PerfiChave'] != 'CONTROLADORIA' and $_SESSION['PerfiChave'] != 'CENTROADMINISTRATIVO') { echo "disabled";} ?> >
 													<?php 
 														$sql = "SELECT ProduId, ProduNome
-																FROM Produto										     
-																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria;
+																FROM Produto
+																JOIN Situacao on SituaId = ProduStatus  
+																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
 														if ($iSubCategoria){
 															$sql .= " and ProduSubCategoria = ".$iSubCategoria;
 														}
@@ -415,7 +416,7 @@ try{
 												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 												LEFT JOIN Marca on MarcaId = ProduMarca
-												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countProduto = count($rowProdutos);
@@ -425,7 +426,7 @@ try{
 													FROM Produto
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													JOIN Situacao on SituaId = ProduStatus
-													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and 
+													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and 
 													ProduSubCategoria = ".$iSubCategoria." and SituaChave = 'ATIVO' ";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);

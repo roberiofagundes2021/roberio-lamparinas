@@ -474,7 +474,15 @@ if (isset($_POST['inputData'])) {
 								</div>
 							</div>
 							<br>
-							
+<?php 
+foreach ($rowSetor as $key => $item) {
+	//$seleciona = array_key_exists($item['SetorId'], $aSetores) ? "selected" : "";
+	//$seleciona = array_key_exists($item['SetorId'], $aSetores) ? "selected" : "";
+	if(in_array                                                ($item['SetorId'], $aSetores)){
+		printf('existe');
+	}
+} ?>
+<?php ///var_dump($aSetores); ?>
 							<h5 class="mb-0 font-weight-semibold">Comissão de Inventário</h5>
 							<br>
 							<div class="row">

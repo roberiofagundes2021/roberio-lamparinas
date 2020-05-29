@@ -12,7 +12,7 @@ $iSubCategoria = $_POST['inputFluxoOperacionalSubCategoria'];
 $sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
 			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus
 		FROM FluxoOperacional
-	    WHERE FlOpeEmpresa = ". $_SESSION['EmpreId'] ." and FlOpeId = ". $iFluxoOperacional . "";
+	    WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ". $iFluxoOperacional . "";
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -26,7 +26,7 @@ if ($row['FlOpeDataFim'] > date("Y-m-d")){
 $sql = "SELECT FOXPrProduto
 		FROM FluxoOperacionalXProduto
 		JOIN Produto on ProduId = FOXPrProduto
-		WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 $result = $conn->query($sql);
 $rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 $countProdutoUtilizado = count($rowProdutoUtilizado);
@@ -240,8 +240,9 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-																FROM Fornecedor														     
-																WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1
+																FROM Fornecedor
+																JOIN Situacao on SituaId = ForneStatus
+																WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY ForneNome ASC";
 														$result = $conn->query($sql);
 														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -265,7 +266,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 														$sql = "SELECT CategId, CategNome
 																FROM Categoria
 																JOIN Fornecedor on ForneCategoria = CategId
-																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and ForneId = ".$row['FlOpeFornecedor']."
+																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and ForneId = ".$row['FlOpeFornecedor']."
 																ORDER BY CategNome ASC";
 														$result = $conn->query($sql);
 														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -289,7 +290,8 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 													$sql = "SELECT SbCatId, SbCatNome
 															FROM SubCategoria
 															LEFT JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
-															WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and FrXSCFornecedor = '". $row['FlOpeFornecedor']."' and SbCatStatus = 1
+															JOIN Situacao on SituaId = SbCatStatus
+															WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and FrXSCFornecedor = '". $row['FlOpeFornecedor']."' and SituaChave = 'ATIVO'
 															Order By SbCatNome ASC";
 													$result = $conn->query($sql);
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -312,8 +314,9 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc >
 													<?php 
 														$sql = "SELECT ProduId, ProduNome
-																FROM Produto										     
-																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduSubCategoria = ".$iSubCategoria."
+																FROM Produto
+																JOIN Situacao on SituaId = ProduStatus
+																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduSubCategoria = ".$iSubCategoria."
 																ORDER BY ProduNome ASC";
 														$result = $conn->query($sql);
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
@@ -408,7 +411,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 											LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 											LEFT JOIN Marca on MarcaId = ProduMarca
-											WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+											WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 									$result = $conn->query($sql);
 									$rowPrevisto = $result->fetchAll(PDO::FETCH_ASSOC);
 									
@@ -445,7 +448,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 												$sql = "SELECT ISNULL(SUM(MvXPrQuantidade), 0) as Controle, MvXPrValorUnitario
 														FROM Movimentacao														
 														JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-														WHERE MovimEmpresa = ".$_SESSION['EmpreId']." and MvXPrProduto = ".$item['ProduId']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$dataFim."' and MovimTipo = 'E' 
+														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['ProduId']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$dataFim."' and MovimTipo = 'E' 
 														GROUP By MvXPrQuantidade, MvXPrValorUnitario";
 												$result = $conn->query($sql);
 												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -506,9 +509,9 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 									$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 											FROM Produto
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-											LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+											JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 											LEFT JOIN Marca on MarcaId = ProduMarca
-											WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+											WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 									$result = $conn->query($sql);
 									$rowRealizado = $result->fetchAll(PDO::FETCH_ASSOC);
 									
@@ -544,7 +547,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 												$sql = "SELECT ISNULL(SUM(MvXPrQuantidade), 0) as Controle, MvXPrValorUnitario
 														FROM Movimentacao														
 														JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-														WHERE MovimEmpresa = ".$_SESSION['EmpreId']." and MvXPrProduto = ".$item['ProduId']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$dataFim."' and MovimTipo = 'E' 
+														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['ProduId']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$dataFim."' and MovimTipo = 'E' 
 														GROUP By MvXPrQuantidade, MvXPrValorUnitario";
 												$result = $conn->query($sql);
 												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);

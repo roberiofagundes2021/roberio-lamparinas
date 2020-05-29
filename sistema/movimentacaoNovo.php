@@ -93,7 +93,7 @@ if (isset($_POST['inputData'])) {
 			$tipoDestino = 'DestinoSetor';
 			$idDestino = $_POST['cmbDestinoSetor'];
 		}
-var_dump($_POST);
+var_dump($_POST);die;
 
 		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
