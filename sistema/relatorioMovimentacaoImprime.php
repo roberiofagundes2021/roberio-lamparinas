@@ -19,18 +19,73 @@ $sCodigo = isset($_POST['cmbCodigo_imp']) ? $_POST['cmbCodigo_imp'] : 0;
 $iProduto = isset($_POST['cmbProduto_imp']) ? $_POST['cmbProduto_imp'] : 0;
 $iServico = isset($_POST['cmbServico_imp']) ? $_POST['cmbServico_imp'] : 0;
 
+if ($iCategoria != '#' and $iCategoria != 0) {
+
+	$sqlNome = "SELECT CategNome
+				FROM Categoria
+				WHERE CategId = ".$iCategoria;
+	$result = $conn->query($sqlNome);
+	$rowNome = $result->fetch(PDO::FETCH_ASSOC);		
+	$sCategoria = $rowNome['CategNome']; 
+}	
+
+if ($iSubCategoria != '#' and $iSubCategoria != 0) {
+	$sqlNome = "SELECT SbCatNome
+				FROM SubCategoria
+				WHERE SbCatId = ".$iSubCategoria;
+	$result = $conn->query($sqlNome);
+	$rowNome = $result->fetch(PDO::FETCH_ASSOC);		
+	$sSubCategoria = $rowNome['SbCatNome']; 
+}
+
+if ($iProduto != '#' and $iProduto != 0) {
+	$sqlNome = "SELECT ProduNome
+				FROM Produto
+				WHERE ProduId = ".$iProduto;
+	$result = $conn->query($sqlNome);
+	$rowNome = $result->fetch(PDO::FETCH_ASSOC);		
+	$sProduto = $rowNome['ProduNome']; 
+}	
+
+if ($iFornecedor != '#' and $iFornecedor != 0) {
+	$sqlNome = "SELECT ForneNome
+				FROM Fornecedor
+  				WHERE ForneId = ".$iFornecedor;
+	$result = $conn->query($sqlNome);
+	$rowNome = $result->fetch(PDO::FETCH_ASSOC);		
+	$sFornecedor = $rowNome['ForneNome']; 
+}	
 
 if ($sTipoProdutoServico == 'P') {
-	$sql = "SELECT MovimData, MovimTipo, MovimDestinoLocal, MovimDestinoManual, MovimNotaFiscal, MvXPrQuantidade, MvXPrLote,
-	        MvXPrValidade, MvXPrValorUnitario, ProduNome, ForneNome, LcEstNome as Origem, ClassNome
-		FROM Movimentacao
-		JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-		JOIN Produto on ProduId = MvXPrProduto
-		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
-		LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal
-		LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
-		Where MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimData between '" . $dDataInicio . "' and '" . $dDataFim . "' ";
 
+	$sql = "SELECT MovimData, MovimTipo, 
+			CASE 
+				WHEN MovimOrigemLocal IS NULL THEN SetorO.SetorNome
+			ELSE LocalO.LcEstNome 
+			END as Origem,
+			CASE 
+				WHEN MovimDestinoLocal IS NULL THEN ISNULL(SetorD.SetorNome, MovimDestinoManual)
+			ELSE LocalD.LcEstNome
+			END as Destino, 
+			MovimNotaFiscal, MvXPrQuantidade, MvXPrLote,
+	        MvXPrValidade, MvXPrValorUnitario, ProduNome, ForneNome, ClassNome
+			FROM Movimentacao
+			JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
+			JOIN Produto on ProduId = MvXPrProduto
+			LEFT JOIN Fornecedor on ForneId = MovimFornecedor
+			LEFT JOIN LocalEstoque LocalO on LocalO.LcEstId = MovimOrigemLocal 
+			LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
+			LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
+			LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
+			LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
+			JOIN Situacao on SituaId = MovimSituacao
+			Where MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimData between '" . $dDataInicio . "' and '" . $dDataFim . "' 
+			and SituaChave = 'LIBERADO' ";
+
+	if ($iTipo != 0) {
+		$sql .= " and MovimTipo = $iTipo ";
+	}
+	
 	if ($iCategoria != '#' and $iCategoria != 0) {
 		$sql .= " and ProduCategoria = $iCategoria ";
 	}
@@ -47,14 +102,27 @@ if ($sTipoProdutoServico == 'P') {
 		$sql .= " and MovimFornecedor = $iFornecedor ";
 	}
 } else {
-	$sql = "SELECT MovimData, MovimTipo, MovimDestinoLocal, MovimDestinoManual, MovimNotaFiscal, 
-	       MvXSrQuantidade, MvXSrLote, MvXSrValorUnitario, ServiNome, ForneNome, LcEstNome as Origem
-		   FROM Movimentacao
-		   JOIN MovimentacaoXServico on MvXSrMovimentacao = MovimId
-		   JOIN Servico on ServiId = MvXSrServico
-		   LEFT JOIN Fornecedor on ForneId = MovimFornecedor
-		   LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal
-		   Where MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimData between '" . $dDataInicio . "' and '" . $dDataFim . "' ";
+	$sql = "SELECT MovimData, MovimTipo, 
+			CASE 
+				WHEN MovimOrigemLocal IS NULL THEN SetorO.SetorNome
+			ELSE LocalO.LcEstNome 
+			END as Origem,
+			CASE 
+				WHEN MovimDestinoLocal IS NULL THEN ISNULL(SetorD.SetorNome, MovimDestinoManual)
+			ELSE LocalD.LcEstNome
+			END as Destino, 
+			MovimNotaFiscal, MvXSrQuantidade, MvXSrValorUnitario, ServiNome, ForneNome
+		    FROM Movimentacao
+		    JOIN MovimentacaoXServico on MvXSrMovimentacao = MovimId
+		    JOIN Servico on ServiId = MvXSrServico
+		    LEFT JOIN Fornecedor on ForneId = MovimFornecedor
+			LEFT JOIN LocalEstoque LocalO on LocalO.LcEstId = MovimOrigemLocal 
+			LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
+			LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
+			LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor
+			JOIN Situacao on SituaId = MovimSituacao
+		    Where MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimData between '" . $dDataInicio . "' and '" . $dDataFim . "' 
+		    and SituaChave = 'LIBERADO' ";
 
 	if ($iCategoria != '#' and $iCategoria != 0) {
 		$sql .= " and ServiCategoria = $iCategoria ";
@@ -73,96 +141,364 @@ if ($sTipoProdutoServico == 'P') {
 	}
 }
 
-$result = $conn->query("$sql");
+$sql .= " Order By MovimData DESC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 try {
-	$mpdf = new Mpdf([
-		'mode' => 'utf-8',
-		//'format' => [190, 236], 
-		'format' => 'A4-L',
-		'default_font_size' => 10,
-		'default_font' => 'dejavusans',
-		'orientation' => 'L'
-	]);
+	$mpdf = new mPDF([
+		'mode' => 'utf-8',    // mode - default ''
+		'format' => 'A4-P',    // format - A4, for example, default ''
+		'default_font_size' => 9,     // font size - default 0
+		'default_font' => '',    // default font family
+		'margin-left' => 15,    // margin_left
+		'margin-right' => 15,    // margin right
+		'margin-top' => 158,     // margin top    -- aumentei aqui para que não ficasse em cima do header
+		'margin-bottom' => 60,    // margin bottom
+		'margin-header' => 6,     // margin header
+		'margin-bottom' => 0,     // margin footer
+		'orientation' => 'P']);  // L - landscape, P - portrait	
 
 
-	$topo = "
+	$html = "
+
+	<style>
+		th{
+			text-align: center; 
+			border: #bbb solid 1px; 
+			background-color: #f8f8f8; 
+			padding: 8px;
+		}
+
+		td{
+			padding: 8px;				
+			border: #bbb solid 1px;
+		}
+	</style>
+
 	<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
 		<div style='width:300px; float:left; display: inline;'>
 			<img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
-			<span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
-			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: " . $_SESSION['UnidadeNome'] . "</div>
+			<span style='font-weight:bold;line-height:200px;'>".$_SESSION['EmpreNomeFantasia']."</span><br>
+			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: ".$_SESSION['UnidadeNome']."</div>
 		</div>
-		<div style='width:200px; float:right; display: inline; text-align:right;'>
-			<div>{DATE j/m/Y}</div>
-			<div style='margin-top:8px;'>Relatório de Movimentação</div>
+		<div style='width:250px; float:right; display: inline; text-align:right;'>
+			<div>&nbsp;</div>
+			<div style='margin-top:8px;'>Intervalo: ".mostraData($dDataInicio)." a ".mostraData($dDataFim)."</div>
 		</div> 
-	 </div>
+	</div>
+
+	<div style='text-align:center; margin-top: 20px;'><h1>RELATÓRIO DE MOVIMENTAÇÃO</h1></div>
 	";
 
-	$html = '';
+	$sTipo = $iTipo == 'E' ? 'Entrada' : ($iTipo == 'S' ? 'Saída' : ($iTipo == 'T' ? 'Transferência' : 'Todos'));
+	$sFornecedor = $iFornecedor ? $sFornecedor : 'Todos';
+	$sCategoria = $iCategoria ? $sCategoria : 'Todos';
+	$sSubCategoria = $iSubCategoria ? $sSubCategoria : 'Todos';
+	$sCodigo = $sCodigo ? $sCodigo : 'Todos';
+	$sProduto = $iProduto ? $sProduto : 'Todos';
 
-	$html .= '
-	<br><br>
-	<table style="width:100%; border-collapse: collapse; font-size:10px;">
-		<tr>
-			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:6%">Data</th>
-	';
+	$htmlEntrada = '';
+	$htmlSaida = '';
+	$htmlTransferencia = '';
+	$contEntrada = 0;
+	$contSaida = 0;
+	$contTransferencia = 0;
 
-	// Se for todos os tipos
-	/*	if ($iTipo == '#'){
-		$html .= '<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Tipo</th>';
-	}*/
+	$html .= '<br>
+			  <br>
+			  ';
 
-	$html .= '
-			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; padding-rigth: 10px; width:15%">Fornecedor</th>
-			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Estoque Destino</th>
-			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:18%">Produto</th>
-			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Quant.</th>
-			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Lote</th>
-			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:6%">Validade</th>
-			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">NF</th>
-			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Classificação</th>
-			<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">Valor</th>
-		</tr>
-	';
+	if ($iTipo == 'E'){
+		$html .= '		
+		<table style="width:100%; border-collapse: collapse; font-size:10px;">
+		<tr><td colspan="5" style="text-align:center;"><h2>RELAÇÃO DAS ENTRADAS</h2></td></tr>
+		<tr><td style="border:none;"></td></tr>
+		';
+	} else if ($iTipo == 'S'){
+		$html .= '
+		<table style="width:100%; border-collapse: collapse; font-size:10px;">
+		<tr><td colspan="5" style="text-align:center;"><h2>RELAÇÃO DAS SAÍDAS</h2></td></tr>
+		<tr><td style="border:none;"></td></tr>
+		';
+	} else if ($iTipo == 'T'){
+		$html .= '
+		<table style="width:100%; border-collapse: collapse; font-size:10px;">
+		<tr><td colspan="5" style="text-align:center;"><h2>RELAÇÃO DAS TRANSFERÊNCIAS</h2></td></tr>
+		<tr><td style="border:none;"></td></tr>
+		';	
+	} else {
 
-	foreach ($row as $item) {
-		if ($sTipoProdutoServico == 'P') {
-			$html .= "
-			<tr>
-				<td style='padding-top: 15px; border-top: 1px solid #333;'>" . mostraData($item['MovimData']) . "</td>
-				<td style='padding-top: 15px; border-top: 1px solid #333;'>" . $item['ForneNome'] . "</td>
-				<td style='padding-top: 15px; border-top: 1px solid #333;'>" . $item['Origem'] . "</td>
-				<td style='padding-top: 15px; border-top: 1px solid #333;'>" . $item['ProduNome'] . "</td>
-				<td style='padding-top: 15px; border-top: 1px solid #333;'>" . $item['MvXPrQuantidade'] . "</td>
-				<td style='padding-top: 15px; border-top: 1px solid #333;'>" . $item['MvXPrLote'] . "</td>
-				<td style='padding-top: 15px; border-top: 1px solid #333;'>" . mostraData($item['MvXPrValidade']) . "</td>
-				<td style='padding-top: 15px; border-top: 1px solid #333;'>" . $item['MovimNotaFiscal'] . "</td>
-				<td style='padding-top: 15px; border-top: 1px solid #333;'>" . $item['ClassNome'] . "</td>
-				<td style='padding-top: 15px; border-top: 1px solid #333;'>" . mostraValor($item['MvXPrValorUnitario']) . "</td>
-			</tr>
-		";
-		} else {
-			$html .= "
-				<tr>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>" . mostraData($item['MovimData']) . "</td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>" . $item['ForneNome'] . "</td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>" . $item['Origem'] . "</td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>" . $item['ServiNome'] . "</td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>" . $item['MvXSrQuantidade'] . "</td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>" . $item['MvXSrLote'] . "</td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>" . mostraData($item['MvXPrValidade']) . "</td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>" . $item['MovimNotaFiscal'] . "</td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>" . mostraValor($item['MvXSrValorUnitario']) . "</td>
-				</tr>
-			";
-		}
+		$htmlEntrada .= '		
+		<table style="width:100%; border-collapse: collapse; font-size:10px;">
+		<tr><td colspan="5" style="text-align:center;"><h2>RELAÇÃO DAS ENTRADAS</h2></td></tr>
+		<tr><td style="border:none;"></td></tr>
+		';
+		$htmlSaida .= '
+		<table style="width:100%; border-collapse: collapse; font-size:10px;">
+		<tr><td colspan="5" style="text-align:center;"><h2>RELAÇÃO DAS SAÍDAS</h2></td></tr>
+		<tr><td style="border:none;"></td></tr>
+		';
+		$htmlTransferencia .= '
+		<table style="width:100%; border-collapse: collapse; font-size:10px;">
+		<tr><td colspan="5" style="text-align:center;"><h2>RELAÇÃO DAS TRANSFERÊNCIAS</h2></td></tr>
+		<tr><td style="border:none;"></td></tr>
+		';	
 	}
 
-	$html .= "</table>";
+	foreach ($row as $item) {
+		
+		if ($sTipoProdutoServico == 'P') {
+			
+			$dValidade = $item['MvXPrValidade'] != '1900-01-01' ? mostraData($item['MvXPrValidade']) : '';
+
+			if ($iTipo == 'E'){
+
+				$html .= "
+				<tr>
+					<td colspan='1' style='background-color:#EEEEEE;'>Data: " . mostraData($item['MovimData']) . "</td>
+					<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
+				</tr>
+				<tr>
+					<td style='border:none' colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
+					<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+				</tr>
+				<tr>	
+					<td style='width:25%; border:none'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
+					<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+					<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
+					<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
+					<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+				</tr>
+				<tr><td style='border:none;'></td></tr>
+				";
+
+			} else if ($iTipo == 'S'){ 
+
+				$html .= "
+				<tr>
+					<td colspan='1' style='background-color:#EEEEEE;'>Data: " . mostraData($item['MovimData']) . "</td>
+					<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
+				</tr>
+				<tr>
+					<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
+					<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+				</tr>
+				<tr>	
+					<td style='width:25%; border:none'>Classificação: " . $item['ClassNome'] . "</td>
+					<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+					<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
+					<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
+					<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+				</tr>
+				<tr><td style='border:none;'></td></tr>
+				";
+			} else if ($iTipo == 'T'){
+
+				$html .= "
+				<tr>
+					<td colspan='1' style='background-color:#EEEEEE;'>Data: " . mostraData($item['MovimData']) . "</td>
+					<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
+				</tr>
+				<tr>
+					<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
+					<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+				</tr>
+				<tr>	
+					<td style='width:25%; border:none'>Classificação: " . $item['ClassNome'] . "</td>
+					<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+					<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
+					<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
+					<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+				</tr>
+				<tr><td style='border:none;'></td></tr>
+				";
+			} else{
+
+				if ($item['MovimTipo'] == 'E'){
+
+					$htmlEntrada .= "
+					<tr>
+						<td colspan='1' style='background-color:#EEEEEE;'>Data: " . mostraData($item['MovimData']) . "</td>
+						<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
+					</tr>
+					<tr>
+						<td style='border:none' colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
+						<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+					</tr>
+					<tr>	
+						<td style='width:25%; border:none'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
+						<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+						<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
+						<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
+						<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+					</tr>
+					<tr><td style='border:none;'></td></tr>
+					";
+
+					$contEntrada++;
+	
+				} else if ($item['MovimTipo'] == 'S'){ 
+	
+					$htmlSaida .= "
+					<tr>
+						<td colspan='1' style='background-color:#EEEEEE;'>Data: " . mostraData($item['MovimData']) . "</td>
+						<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
+					</tr>
+					<tr>
+						<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
+						<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+					</tr>
+					<tr>	
+						<td style='width:25%; border:none'>Classificação: " . $item['ClassNome'] . "</td>
+						<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+						<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
+						<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
+						<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+					</tr>
+					<tr><td style='border:none;'></td></tr>
+					";
+
+					$contSaida++;
+
+				} else if ($item['MovimTipo'] == 'T'){
+	
+					$htmlTransferencia .= "
+					<tr>
+						<td colspan='1' style='background-color:#EEEEEE;'>Data: " . mostraData($item['MovimData']) . "</td>
+						<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
+					</tr>
+					<tr>
+						<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
+						<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+					</tr>
+					<tr>	
+						<td style='width:25%; border:none'>Classificação: " . $item['ClassNome'] . "</td>
+						<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+						<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
+						<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
+						<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+					</tr>
+					<tr><td style='border:none;'></td></tr>
+					";
+
+					$contTransferencia++;
+				} 	
+
+			}
+
+		} else { //Serviço
+
+			if ($iTipo == 'E'){
+
+				$html .= "
+				<tr>
+					<td colspan='1' style='background-color:#EEEEEE;'>Data: " . mostraData($item['MovimData']) . "</td>
+					<td colspan='4' style='background-color:#EEEEEE;'>Serviço: " . $item['ServiNome'] . "</td>
+				</tr>
+				<tr>
+					<td style='border:none' colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
+					<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+				</tr>
+				<tr>	
+					<td style='border:none' colspan='2'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
+					<td style='border:none' colspan='1'>Quantidade: " . $item['MvXSrQuantidade'] . "</td>
+					<td style='border:none' colspan='2'>Valor: " . mostraValor($item['MvXSrValorUnitario']) . "</td>
+				</tr>
+				<tr><td style='border:none;'></td></tr>
+				";
+
+			} else if ($iTipo == 'S'){ 
+
+				$html .= "
+				<tr>
+					<td colspan='1' style='background-color:#EEEEEE;'>Data: " . mostraData($item['MovimData']) . "</td>
+					<td colspan='4' style='background-color:#EEEEEE;'>Serviço: " . $item['ServiNome'] . "</td>
+				</tr>
+				<tr>
+					<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
+					<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+				</tr>
+				<tr>	
+					<td style='border:none' colspan='3'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+					<td style='border:none' colspan='2'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+				</tr>
+				<tr><td style='border:none;'></td></tr>
+				";
+
+			}  else{
+
+				if ($item['MovimTipo'] == 'E'){
+
+					$htmlEntrada .= "
+					<tr>
+						<td colspan='1' style='background-color:#EEEEEE;'>Data: " . mostraData($item['MovimData']) . "</td>
+						<td colspan='4' style='background-color:#EEEEEE;'>Serviço: " . $item['ServiNome'] . "</td>
+					</tr>
+					<tr>
+						<td style='border:none' colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
+						<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+					</tr>
+					<tr>	
+						<td style='border:none' colspan='2'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
+						<td style='border:none' colspan='1'>Quantidade: " . $item['MvXSrQuantidade'] . "</td>
+						<td style='border:none' colspan='2'>Valor: " . mostraValor($item['MvXSrValorUnitario']) . "</td>
+					</tr>
+					<tr><td style='border:none;'></td></tr>
+					";
+
+					$contEntrada++;
+	
+				} else if ($item['MovimTipo'] == 'S'){ 
+	
+					$htmlSaida .= "
+					<tr>
+						<td colspan='1' style='background-color:#EEEEEE;'>Data: " . mostraData($item['MovimData']) . "</td>
+						<td colspan='4' style='background-color:#EEEEEE;'>Serviço: " . $item['ServiNome'] . "</td>
+					</tr>
+					<tr>
+						<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
+						<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+					</tr>
+					<tr>	
+						<td style='border:none' colspan='3'>Quantidade: " . $item['MvXSrQuantidade'] . "</td>
+						<td style='border:none' colspan='2'>Valor: " . mostraValor($item['MvXSrValorUnitario']) . "</td>
+					</tr>
+					<tr><td style='border:none;'></td></tr>
+					";
+
+					$contSaida++;
+
+				}
+			}
+
+		} 
+	}
+
+	if ($htmlEntrada != ''){
+		
+		if ($contEntrada){
+			$htmlEntrada .= "</table><br>";
+			$html .= $htmlEntrada;
+		}
+		if ($contSaida){
+			$htmlSaida .= "</table><br>";
+			$html .= $htmlSaida;
+		}
+		if ($contTransferencia){
+			$htmlTransferencia .= "</table><br>";
+			$html .= $htmlTransferencia;
+		}		
+
+	} else{
+		$html .= "</table>";
+	}
+
+	$html .= '<hr/>
+			  <br>
+			  Observação: Esse relatório foi gerado a partir dos seguintes critérios: Tipo ('.$sTipo.'), Fornecedor ('.$sFornecedor.'), Categoria ('.$sCategoria.'), SubCategoria ('.$sSubCategoria.'), Código ('.$sCodigo.'), Produto ('.$sProduto.')
+			  <br><br>
+			  ';
 
 	$rodape = "<hr/>
     <div style='width:100%'>

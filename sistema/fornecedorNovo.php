@@ -249,19 +249,7 @@ if(isset($_POST['inputTipo'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
-				
-				// Se Pessoa Física
-				if (inputTipo  == "F"){
-					
-					if (!validaCPF(inputCpf)){
-						alerta('Atenção','CPF inválido!','error');
-						$('#inputCpf').focus();
-						return false;					
-					}					
-				} else {
-					
-				}
-				
+
 				if (cmbSubCategoria[0] == 'Filtrando'){
 					alerta('Atenção','Por algum problema na sua conexão o campo SubCategoria parece não conseguindo ser filtrado! Favor cancelar a edição e tentar novamente.','error');
 					return false;
@@ -302,12 +290,16 @@ if(isset($_POST['inputTipo'])){
 				document.getElementById('dadosPF').style.display = "block";
 				document.getElementById('dadosPJ').style.display = "none";
 				document.getElementById('inputNome').placeholder = "Nome Completo";
+				document.getElementById('inputCpf').setAttribute('required', 'required');
+				document.getElementById('inputCnpj').removeAttribute('required', 'required');
 			} else {
 				document.getElementById('CPF').style.display = "none";
 				document.getElementById('CNPJ').style.display = "block";				
 				document.getElementById('dadosPF').style.display = "none";
 				document.getElementById('dadosPJ').style.display = "block";
 				document.getElementById('inputNome').placeholder = "Nome Fantasia";
+				document.getElementById('inputCpf').removeAttribute('required', 'required');
+				document.getElementById('inputCnpj').setAttribute('required', 'required');
 			}
 		}	
 
@@ -401,7 +393,7 @@ if(isset($_POST['inputTipo'])){
 								<div class="col-lg-3" id="CNPJ">
 									<div class="form-group">				
 										<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
-										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99">
+										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" required>
 									</div>	
 								</div>							
 							</div>

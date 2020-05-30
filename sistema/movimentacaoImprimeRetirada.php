@@ -25,10 +25,10 @@ if (isset($_POST['inputMovimentacaoId'])) {
             ProduModelo, ProduCodigo, ProduUnidadeMedida, ProduModelo, CategNome, UnMedSigla, ModelNome, MarcaNome
 	        FROM Movimentacao
 	        JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-	        LEFT JOIN Produto on ProduId = MvXPrProduto
-	        LEFT JOIN Categoria on CategId = ProduCategoria
+	        JOIN Produto on ProduId = MvXPrProduto
+	        JOIN Categoria on CategId = ProduCategoria
 	        LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
-	        LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+	        JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 	        LEFT JOIN Modelo on ModelId = ProduModelo
             LEFT JOIN Marca on MarcaId = ProduMarca
 	        WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao. " and ClassChave <> 'PERMANENTE' ";
@@ -39,10 +39,10 @@ if (isset($_POST['inputMovimentacaoId'])) {
             ProduModelo, ProduCodigo, ProduUnidadeMedida, ProduModelo, CategNome, UnMedSigla, ModelNome, MarcaNome, PatriNumero
 	        FROM Movimentacao
 	        JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-	        LEFT JOIN Produto on ProduId = MvXPrProduto
-	        LEFT JOIN Categoria on CategId = ProduCategoria
+	        JOIN Produto on ProduId = MvXPrProduto
+	        JOIN Categoria on CategId = ProduCategoria
 	        LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
-	        LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+	        JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 	        LEFT JOIN Modelo on ModelId = ProduModelo
             LEFT JOIN Marca on MarcaId = ProduMarca
             JOIN Patrimonio on PatriId = MvXPrPatrimonio
