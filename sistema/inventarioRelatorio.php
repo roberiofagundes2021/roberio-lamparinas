@@ -151,21 +151,19 @@ try {
 		$iCategoria = $item['InvenCategoria'];
 		$iSetor = $item['InXSeSetor'];
 		
-		$sql = ("SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, 
-						dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, MovimDestinoLocal) as Saldo, 
-						dbo.fnCalculaValorTotalInventario(dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, MovimDestinoLocal), ProduCustoFinal) as ValorTotal
-				 FROM Produto
-				 JOIN Categoria on CategId = ProduCategoria
-				 JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-				 JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
-				 JOIN Patrimonio on PatriId = MvXPrPatrimonio
-				 JOIN Movimentacao on MovimId = MvXPrMovimentacao
-				 JOIN Setor on SetorId = MovimDestinoSetor
-				 JOIN Situacao on SituaId = MovimSituacao
-				 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduStatus = 1 and
-					   ProduCategoria = ".$iCategoria." and
-					   MovimDestinoLocal = ".$iSetor."
-				 ");
+		$sql ="SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, MovimDestinoLocal) as Saldo, LcEstNome
+		FROM Produto
+		JOIN Categoria on CategId = ProduCategoria
+		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+		JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
+		JOIN Patrimonio on PatriId = MvXPrPatrimonio
+		JOIN Movimentacao on MovimId = MvXPrMovimentacao
+		LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+		LEFT JOIN Setor on SetorId = MovimDestinoSetor
+		JOIN Situacao on SituaId = MovimSituacao
+		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduStatus = 1 and
+			  ProduCategoria = ".$iCategoria." and MovimDestinoSetor = $iSetor and SituaChave = 'LIBERADO'
+		 ";
 		$result = $conn->query("$sql");
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);		
 		
