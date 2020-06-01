@@ -151,7 +151,7 @@ try {
 		$iCategoria = $item['InvenCategoria'];
 		$iSetor = $item['InXSeSetor'];
 		
-		$sql ="SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, MovimDestinoLocal) as Saldo, LcEstNome
+		$sql ="SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, MovimDestinoLocal) as Saldo, LcEstNome, MvXPrValorUnitario
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -178,7 +178,7 @@ try {
 					<td style='padding-top: 8px;'>".$itemProduto['UnMedSigla']."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['Saldo']."</td>
 					<td style='padding-top: 8px;'>".mostraValor($itemProduto['ProduCustoFinal'])."</td>
-					<td style='padding-top: 8px;'>".formataMoeda($itemProduto['ValorTotal'])."</td>
+					<td style='padding-top: 8px;'>".formataMoeda($itemProduto['MvXPrValorUnitario'])."</td>
 				</tr>
 			";
 			
