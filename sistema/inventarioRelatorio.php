@@ -171,18 +171,20 @@ try {
 		
 		foreach ($rowProdutos as $itemProduto){
 			
+			$total = floatval($itemProduto['MvXPrValorUnitario']) * intval($itemProduto['Saldo']);
+
 			$html .= "
 				<tr>
 					<td style='padding-top: 8px;'>".formatarNumero($itemProduto['PatriNumero'])."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome']."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['UnMedSigla']."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['Saldo']."</td>
-					<td style='padding-top: 8px;'>".mostraValor($itemProduto['ProduCustoFinal'])."</td>
-					<td style='padding-top: 8px;'>".formataMoeda($itemProduto['MvXPrValorUnitario'])."</td>
+					<td style='padding-top: 8px;'>".mostraValor($itemProduto['MvXPrValorUnitario'])."</td>
+					<td style='padding-top: 8px;'>".formataMoeda($total)."</td>
 				</tr>
 			";
 			
-			$totalGeral += $itemProduto['ValorTotal'];
+			$totalGeral += $total;
 		}
 		
 		$html .= "
