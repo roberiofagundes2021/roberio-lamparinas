@@ -33,24 +33,24 @@
         $html .= '</table>
         <br>';
 
-        $html .= '                      
-        <table style="width:100%;">
-        <tr>
-            <td colspan="7" style="border: none;"></td>
-        </tr> 
-        <tr>
-            <td colspan="7" style="background-color: #d8d8d8; text-align: center; font-weight: bold;">BENS PATRIMONIADOS</td>
-        </tr>
-        ';
-
-        foreach ($produtos as $produtos3) {
+        foreach ($produtos as $produtos3) {            
             
             $cont += 1;
             
-            //Isso aqui tenho que testar uma retirada de mais de 4 bens permanentes de uma só vez (isso é para quebrar a página)
+            //Isso aqui para os casos de uma retirada de mais de 4 bens permanentes de uma só vez (isso é para quebrar a página)
             if ($cont > 1){
                 $html .= '<br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
             }
+
+            $html .= '                      
+            <table style="width:100%;">
+            <tr>
+                <td colspan="7" style="border: none;"></td>
+            </tr> 
+            <tr>
+                <td colspan="7" style="background-color: #d8d8d8; text-align: center; font-weight: bold;">BENS PATRIMONIADOS</td>
+            </tr>
+            ';
 
             foreach ($produtos3 as $value) {
 
