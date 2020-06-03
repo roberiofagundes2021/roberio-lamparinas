@@ -47,7 +47,7 @@ function queryPesquisa(){
                 $string .= ' and ';
             }
 
-            $sql = "SELECT PatriNumero, MvXPrId, MovimId ,MovimData, MovimNotaFiscal, MovimOrigemLocal, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, MarcaNome, FabriNome, SetorNome
+            $sql = "SELECT PatriId ,PatriNumero, PatriNumSerie, PatriEstadoConservacao, MvXPrId, MovimId, MvXPrValorUnitario, MovimData, MovimNotaFiscal, MovimOrigemLocal, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, MarcaNome, FabriNome, SetorNome
                     FROM Patrimonio
                     JOIN MovimentacaoXProduto on MvXPrPatrimonio = PatriId
                     JOIN Movimentacao on MovimId = MvXPrMovimentacao
@@ -74,13 +74,13 @@ function queryPesquisa(){
             $cont++;
             print("
                 
-                <tr>
+                <tr idPatrimonio=".$item['PatriId']." editado='0'>
                    <td class='even'>" . $cont . "</td>
                    <td class='odd'>" . $item['ProduNome'] . "</td>
                    <td  class='even'>".$item['PatriNumero']."</td>
                    <td class='odd'>" . $item['MovimNotaFiscal'] . "</td>
-                   <td class='even'></td>
-                   <td class='odd'>" . $item['MovimNotaFiscal'] . "</td>
+                   <td class='even'>".$item['MvXPrValorUnitario']."</td>
+                   <td class='odd'></td>
                    <td class='even'>".mostraData($item['MvXPrValidade'])."</td>
                    <td class='odd'>" . $item['LcEstNome'] . "</td>
                    <td class='even'>" . $item['SetorNome'] . "</td>
@@ -88,6 +88,12 @@ function queryPesquisa(){
                    <td class='even' style='display: none'>" . $item['FabriNome'] . "</td>
                    <td style='text-align: center'>
                          <i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>
+                   </td>
+                   <td style='display: none' id='inputNumeroSerie'>
+                        <input type='text' value='" . $item['PatriNumSerie'] . "'>
+                   </td>
+                   <td style='display: none' id='inputEstadoConservacao'>
+                        <input type='text' value='" . $item['PatriEstadoConservacao'] . "'>
                    </td>
                 </tr>
              ");

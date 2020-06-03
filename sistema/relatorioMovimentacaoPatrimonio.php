@@ -47,6 +47,8 @@ $dataFim = date("Y-m-d");
     <script src="global_assets/js/demo_pages/form_layouts.js"></script>
 
     <script type="text/javascript">
+        const selectEstCo = $('#selectSetadoConservacao').html()
+
         function modalAcoes() {
 
             $('.btn-acoes').each((i, elem) => {
@@ -55,219 +57,140 @@ $dataFim = date("Y-m-d");
 
                     let linha = $(elem).parent().parent()
 
+                    let id = linha.attr('idPatrimonio')
+                    let editado = linha.attr('editado')
+
                     let tds = linha.children();
                     let produto = $(tds[1]).html();
                     let patrimonio = $(tds[2]).html();
                     let notaFisc = $(tds[3]).html();
-                    let aquisicao= $(tds[4]).html();
+                    let aquisicao = $(tds[4]).html();
                     let depreciacao = $(tds[5]).html();
                     let origem = $(tds[7]).html();
                     let destino = $(tds[8]).html();
                     let marca = $(tds[9]).html();
                     let fabricante = $(tds[10]).html();
+                    let numeroSerie = $(tds[12]).children().first().val()
+                    console.log(numeroSerie)
+
+                    /*if(parseInt(editado) == 1){
+                        numeroSerie =  $(tds[12]).html()
+                        console.log('editado')
+                    } else {
+                        linha.attr('editado', 1)
+                    }*/
+                    
+                    
 
                     const fonte1 = 'style="font-size: 1.1rem"'
                     const fonte2 = 'style="font-size: 0.9rem"'
                     const textCenter = 'style="text-align: center"'
-                    const styleLabel1 =  'style="min-width: 250px; font-size: 0.9rem"'
-                    const styleLabel2 =  'style="min-width: 150px; font-size: 0.9rem"'
-                    const styleLabel3 =  'style="min-width: 100px; font-size: 0.9rem"'
+                    const styleLabel1 = 'style="min-width: 250px; font-size: 0.9rem"'
+                    const styleLabel2 = 'style="min-width: 150px; font-size: 0.9rem"'
+                    const styleLabel3 = 'style="min-width: 100px; font-size: 0.9rem"'
+                    const marginP = 'style="font-size: 0.9rem; margin-top: 4px"'
 
-                    formModal = `<form>
-                                                   <div class='row'>
-                                                        <div class='col-lg-6 col-12'>
-                                                            <div class="form-group d-flex flex-row">
-                                                                <label for="produto" ${fonte1} class="pr-2">Produto:</label>
-                                                                <div class="input-group">
-                                                                    <p id='produto' ${fonte1}>${produto}</p>
-                                                                </div>
-                                                           </div>
-                                                        </div>
-                                                        <div class='col-lg-6 col-12'>
-                                                            <div class="form-group d-flex flex-row">
-                                                                <label for="produto" ${fonte1} class="pr-2">Patrimônio:</label>
-                                                                <div class="input-group">
-                                                                    <p id='produto' ${fonte1}>${patrimonio}</p>
-                                                                </div>
-                                                           </div>
-                                                        </div>
-                                                   </div>
-                                                   <div class='row'>
-                                                        <div class='col-lg-6 col-12'>
-                                                             <div class="form-group d-flex flex-row">
-                                                                 <label for="produto" ${fonte1} class="pr-2">Origem:</label>
-                                                                 <div class="input-group">
-                                                                     <p id='produto' ${fonte1}>${origem}</p>
-                                                                 </div>
-                                                            </div>
-                                                         </div>
-                                                         <div class='col-lg-6 col-12'>
-                                                             <div class="form-group d-flex flex-row">
-                                                                 <label for="produto" ${fonte1} class="pr-2">Destino:</label>
-                                                                 <div class="input-group">
-                                                                     <p id='produto' ${fonte2}>${destino}</p>
-                                                                 </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                   <div class='row'>
-                                                        <div class='col-lg-3 col-sm-6 col-12'>
-                                                            <div class="form-group d-flex flex-row">
-                                                                <label for="produto" ${styleLabel3}>Nota Fiscal: </label>
-                                                                <div class="input-group">
-                                                                    <p id='produto' ${fonte2}>${notaFisc}</p>
-                                                                </div>
-                                                           </div>
-                                                        </div>
-                                                        <div class='col-lg-3 col-sm-6 col-12'>
-                                                            <div class="form-group d-flex flex-row">
-                                                                <label for="produto" ${styleLabel2} >Data da Compra:</label>
-                                                                <div class="input-group">
-                                                                    <p id='produto' ${fonte2}></p>
-                                                                </div>
-                                                           </div>
-                                                        </div>
-                                                        <div class='col-lg-3 col-sm-6 col-12'>
-                                                            <div class="form-group d-flex flex-row">
-                                                                <label for="produto" ${styleLabel3}>(R$) Aquisição:</label>
-                                                                <div class="input-group">
-                                                                    <p id='produto' ${fonte2}>${ aquisicao}</p>
-                                                                </div>
-                                                           </div>
-                                                        </div>
-                                                        <div class='col-lg-3 col-sm-6 col-12'>
-                                                            <div class="form-group d-flex flex-row">
-                                                                <label for="produto" ${styleLabel2}>(R$) Depreciação:</label>
-                                                                <div class="input-group">
-                                                                    <p id='produto' ${fonte2}>${depreciacao}</p>
-                                                                </div>
-                                                           </div>
-                                                        </div>
-                                                    </div>
-                                                   <div class='row'>
-                                                        <div class='col-lg-3 col-sm-6 col-12'>
-                                                            <div class="form-group d-flex flex-row">
-                                                                <label for="produto" ${fonte2} class="pr-1">Marca:</label>
-                                                                <div class="input-group">
-                                                                    <p id='produto' ${fonte2}>${marca}</p>
-                                                                </div>
-                                                           </div>
-                                                        </div>
-                                                        <div class='col-lg-3 col-sm-6 col-12'>
-                                                            <div class="form-group d-flex flex-row">
-                                                                <label for="produto" ${fonte2} class="pr-1">Fabricante:</label>
-                                                                <div class="input-group">
-                                                                    <p id='produto' ${fonte2}>${fabricante}</p>
-                                                                </div>
-                                                           </div>
-                                                        </div>
-                                                        <div class='col-lg-6 col-sm-6 col-12'>
-                                                            <div class="form-group d-flex flex-row">
-                                                                <label for="numeroSerie" ${styleLabel3} class="pr-1">N Série:</label>
-                                                                <div class="input-group">
-                                                                   <input type="text" id="numeroSerie" name="numeroSerie" class="form-control p-0">
-                                                                </div>
-                                                           </div>
-                                                        </div>
-                                                   </div>
-                                                   <div class='row'>
-                                                        <div class='col-lg-6 col-12'>
-                                                            <div class="form-group d-flex flex-row">
-                                                                <label for="estadoConserv" ${styleLabel1} class="pr-1">Estado de Conservação (Status):</label>
-                                                                <div class="input-group">
-                                                                   <input type="text" id="estadoConserv" name="estadoConserv" class="form-control p-0">
-                                                                </div>
-                                                           </div>
-                                                        </div>
-                                                   </div>
-                                                   <div class='row'>
-                                                        
-                                                   </div>
-                                           </form>
+                    formModal = `
+                                    <div class='row'>
+                                         <div class='col-lg-6 col-12'>
+                                             <div class="form-group d-flex flex-row">
+                                                 <label for="produto" ${fonte1} class="pr-2">Produto:</label>
+                                                 <div class="input-group">
+                                                     <p id='produto' ${marginP}>${produto}</p>
+                                                 </div>
+                                            </div>
+                                         </div>
+                                         <div class='col-lg-6 col-12'>
+                                             <div class="form-group d-flex flex-row">
+                                                 <label for="produto" ${fonte1} class="pr-2">Patrimônio:</label>
+                                                 <div class="input-group">
+                                                     <p id='produto' ${marginP}>${patrimonio}</p>
+                                                 </div>
+                                            </div>
+                                         </div>
+                                    </div>
+                                    <div class='row'>
+                                         <div class='col-lg-6 col-12'>
+                                              <div class="form-group d-flex flex-row">
+                                                  <label for="produto" ${fonte1} class="pr-2">Origem:</label>
+                                                  <div class="input-group">
+                                                      <p id='produto' ${marginP}>${origem}</p>
+                                                  </div>
+                                             </div>
+                                          </div>
+                                          <div class='col-lg-6 col-12'>
+                                              <div class="form-group d-flex flex-row">
+                                                  <label for="produto" ${fonte1} class="pr-2">Destino:</label>
+                                                  <div class="input-group d-flex flex-row align-items-center">
+                                                      <p id='produto' ${marginP}>${destino}</p>
+                                                  </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                     <hr class="m-1">
+                                    <div class='row'>
+                                         <div class='col-lg-3 col-sm-6 col-12'>
+                                             <div class="form-group d-flex flex-row">
+                                                 <label for="produto" ${styleLabel3}>Nota Fiscal: </label>
+                                                 <div class="input-group">
+                                                     <p id='produto' ${fonte2}>${notaFisc}</p>
+                                                 </div>
+                                            </div>
+                                         </div>
+                                         <div class='col-lg-3 col-sm-6 col-12'>
+                                             <div class="form-group d-flex flex-row">
+                                                 <label for="produto" ${styleLabel2} >Data da Compra:</label>
+                                                 <div class="input-group">
+                                                     <p id='produto' ${fonte2}></p>
+                                                 </div>
+                                            </div>
+                                         </div>
+                                         <div class='col-lg-3 col-sm-6 col-12'>
+                                             <div class="form-group d-flex flex-row">
+                                                 <label for="produto" ${styleLabel3}>(R$) Aquisição: </label>
+                                                 <div class="input-group">
+                                                     <p id='produto' ${fonte2} class="ml-2">${ aquisicao}</p>
+                                                 </div>
+                                            </div>
+                                         </div>
+                                         <div class='col-lg-3 col-sm-6 col-12'>
+                                             <div class="form-group d-flex flex-row">
+                                                 <label for="produto" ${styleLabel2}>(R$) Depreciação:</label>
+                                                 <div class="input-group">
+                                                     <p id='produto' ${fonte2}>${depreciacao}</p>
+                                                 </div>
+                                            </div>
+                                         </div>
+                                     </div>
+                                    <div class='row'>
+                                         <div class='col-lg-3 col-sm-6 col-12'>
+                                             <div class="form-group d-flex flex-row">
+                                                 <label for="produto" ${fonte2} class="pr-1">Marca:</label>
+                                                 <div class="input-group">
+                                                     <p id='produto' ${fonte2}>${marca}</p>
+                                                 </div>
+                                            </div>
+                                         </div>
+                                         <div class='col-lg-3 col-sm-6 col-12'>
+                                             <div class="form-group d-flex flex-row">
+                                                 <label for="produto" ${fonte2} class="pr-1">Fabricante:</label>
+                                                 <div class="input-group">
+                                                     <p id='produto' ${fonte2}>${fabricante}</p>
+                                                 </div>
+                                            </div>
+                                         </div>
+                                         <div class='col-lg-6 col-sm-6 col-12'>
+                                             <div class="form-group d-flex flex-row">
+                                                 <label for="numeroSerie" ${styleLabel3} class="pr-1">N Série:</label>
+                                                 <div class="input-group">
+                                                    <input type="text" id="numeroSerie" name="numeroSerie" class="form-control p-0" value="${numeroSerie ? numeroSerie : ''}">
+                                                 </div>
+                                            </div>
+                                         </div>
+                                    </div>
+                                    <input type="text" id="inputProdutoEdita" name="inputProdutoEdita" value="${id}" style="display: none">
                     `;
-                    $('.form-modal').html(formModal)
-                   /* if ($(elem).attr('idRow') == linha.attr('id')) {
-                        let tds = linha.children();
-                        let tipoProdutoServico = $(tds[8]).attr('tipo');
-
-
-
-                        let valores = [];
-
-                        let inputItem = $('<td></td>');
-                        let inputProdutoServico = $('<input type="text">');
-                        let inputQuantidade = $('<input type="text">');
-                        let inputSaldo = $('<input type="text">');
-                        let inputValidade = $('<input type="text">');
-
-                        let linhaTabela = '';
-
-                        tds.each((i, elem) => {
-                            valores[i] = $(elem).html();
-                        })
-
-                        inputItem.val(valores[0]);
-
-                        if (tipoProdutoServico != 'P') {
-
-                            cabecalho = `
-                               
-                                <tr class="bg-slate">
-                                     <th width="5%">Item</th>
-                                     <th width="75%">Serviço</th>
-                                     <th width="10%">Quantidade</th>
-                                     <th width="10%">Saldo</th>
-                                     <th width="10%"></th>
-                                 </tr>
-                                    `;
-
-                            linhaTabela = `<tr id='trModal'>
-                                    <td>${valores[0]}</td>
-                                    <td>${valores[1]}</td>
-                                    <td><input id='quantidade' type="text" class="form-control" value="" style="text-align: center" autofocus></td>
-                                    <td><input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled></td>
-                                </tr>
-                              `;
-                        } else {
-                            cabecalho = `
-                                 <tr class="bg-slate">
-                                        <th width="5%">Item</th>
-                                        <th width="45%">Produto</th>
-                                        <th width="8%">Quantidade</th>
-                                        <th width="10%">Saldo</th>
-                                        <th width="10%">Lote</th>
-                                        <th width="12%">Validade</th>
-                                </tr>
-                                    `;
-
-                            linhaTabela = `<tr id='trModal'>
-                                                <td>${valores[0]}</td>
-                                                <td>${valores[1]}</td>
-                                                <td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" style="text-align: center" autofocus></td>
-                                                <td><input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center"  disabled></td>
-                                                <td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
-                                                <td><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
-                                            </tr>
-                                            `;
-                        }
-
-                        $('#thead-modal').html(cabecalho);
-
-                        $('#tbody-modal').html(linhaTabela);
-
-                        // Esta função não permite que o valor digitado pelo usuário seja maior que o valor de saldo.
-                        function validaQuantInputModal(quantMax) {
-                            $('#quantidade').on('keyup', function() {
-                                if (parseInt($('#quantidade').val()) > parseInt(quantMax)) {
-                                    $('#quantidade').val(quantMax)
-                                }
-                            })
-                        }
-
-                        validaQuantInputModal($('#saldo').val())
-
-                        $('#quantidade').focus()
-                    }*/
+                    $('.dados-produto').html(formModal)
                 })
             })
 
@@ -455,6 +378,46 @@ $dataFim = date("Y-m-d");
                     );
                 })
             })()
+
+            $('#salvar').on('click', function(e){
+                let numeroSerie = $('#numeroSerie').val()
+                let estadoConservacao = $('#cmbSetadoConservacao').val()
+                let id = $('#inputProdutoEdita').val()
+                let url = 'relatorioMovimentacaoPatrimonioEdita.php'
+                let data = {
+                        inputNumeroSerie: numeroSerie,
+                        cmbEstadoConservacao: estadoConservacao,
+                        inputId: id
+                    }
+                    console.log(data)
+
+                $.post(
+                    url,
+                    data,
+                    function(data){
+                        if(data){
+                            console.log(data)
+                            alerta('Atenção', 'Registro editado', 'success');
+
+                            //let inputNumeroSerie = $(`<td style="display: none" id="inputNumeroSerie">${numeroSerie}</td>`)
+                            //let inputEstadoConservacao = $(`<td style="display: none" id="inputEstadoConservacao">${estadoConservacao}</td>`)
+
+                            $('[idpatrimonio]').each((i, elem)=>{
+                                let tds = $(elem).children()
+                                console.log()
+                                if($(elem).attr('idpatrimonio') == id){
+                                    $(tds[12]).children().first().val(numeroSerie)
+                                    console.log($(tds[12]).children().first())
+                                   // $(elem).append(inputNumeroSerie).append(inputEstadoConservacao)
+                                }
+                            })
+                        }
+                    } 
+                )
+
+                $('#page-modal').fadeOut(200);
+                $('body').css('overflow', 'scroll');
+            })
 
             function imprime() {
                 url = 'relatorioMovimentacaoPatrimonioImprime.php';
@@ -683,9 +646,36 @@ $dataFim = date("Y-m-d");
                                 <p class="h3">Dados Produto</p>
                                 <i class=""></i>
                             </div>
-                            <div class="form-modal p-3">
-                            
-                            </div>
+                            <form id="editarProduto" method="POST">
+                                <div class="dados-produto p-3">
+
+                                </div>
+                                <div class="d-flex flex-row p-2">
+                                    <div class="col-lg-3 col-4 pr-0 d-flex flex-row align-items-center">
+                                        <p style="font-size: 0.9rem;">Estado de Conservação:</p>
+                                    </div>
+                                    <div class="col-lg-5 col-8 pl-0">
+                                        <div class="form-group">
+                                            <select id="cmbSetadoConservacao" name="cmbSetadoConservacao" class="form-control form-control-select2">
+                                                <option value="">Selecionar</option>
+                                                <?php
+                                                $sql = "SELECT EstCoId, EstCoNome
+                                            FROM EstadoConservacao
+                                            JOIN Situacao on SituaId = EstCoStatus
+                                            WHERE SituaChave = 'ATIVO'
+                                            ORDER BY EstCoNome ASC";
+                                                $result = $conn->query($sql);
+                                                $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                foreach ($rowEstCo as $item) {
+                                                    print('<option value="' . $item['EstCoId'] . '">' . $item['EstCoNome'] . '</option>');
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                             <div class="card-footer mt-2 d-flex flex-column">
                                 <div class="row" style="margin-top: 10px;">
                                     <div class="col-lg-12">
