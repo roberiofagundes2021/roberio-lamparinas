@@ -45,7 +45,8 @@ if (isset($_POST['inputMovimentacaoId'])) {
 	        JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 	        LEFT JOIN Modelo on ModelId = ProduModelo
             LEFT JOIN Marca on MarcaId = ProduMarca
-            JOIN Patrimonio on PatriId = MvXPrPatrimonio
+            JOIN MovimentacaoXProdutoXPatrimonio on MXPXPMovimentacaoXProduto = MvXPrId
+            JOIN Patrimonio on PatriId = MXPXPPatrimonio
 	        WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao. " and ClassChave = 'PERMANENTE' ";
     $result = $conn->query($sql);
     $rowMvPrPatrimoniado = $result->fetchAll(PDO::FETCH_ASSOC);    

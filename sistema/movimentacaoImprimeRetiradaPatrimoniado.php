@@ -3,66 +3,72 @@
     // Caso seja uma movimentação de saída
     if ($row['MovimTipo'] == 'S') {
 
-        $numPaginas = count($rowMvPrPatrimoniado) / 3;
+        $numPaginas = count($rowMvPrPatrimoniado) / 4;
         $cont = 0;
-        $produtos = array_chunk($rowMvPrPatrimoniado, 3);
+        $produtos = array_chunk($rowMvPrPatrimoniado, 4);
+
+        //"Bens não patrimoniados" tem quantidade e não tem patrimônio, já os "Bens patrimoniados" não tem quantidade e tem patrimônio
+        $html .= '<br>
+        <table style="width:100%;">
+            <tr>                                
+                <td style="width:25%">Data: ' . mostraData($row['MovimData']) . '</td>
+                <td style="width:25%; text-align: center; background-color: #d8d8d8;">Nº: 0001/19</td>
+                <td colspan="2" style="width:50%; border: none;"></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="width:50%">Origem: '. $Origem .'</td>
+                <td colspan="2" style="width:50%">Destino: '.$Destino.'</td>
+            </tr>
+        ';
+
+        if ($row['ParamValorObsImpreRetirada'] == 1) {
+
+            $html .= ' 
+                <tr>
+                    <td colspan="4">Observação: '.$row['MovimObservacao'].'</td>
+                    </tr>
+                ';
+        }
+
+        $html .= '</table>
+        <br>';
+
+        $html .= '                      
+        <table style="width:100%;">
+        <tr>
+            <td colspan="7" style="border: none;"></td>
+        </tr> 
+        <tr>
+            <td colspan="7" style="background-color: #d8d8d8; text-align: center; font-weight: bold;">BENS PATRIMONIADOS</td>
+        </tr>
+        ';
 
         foreach ($produtos as $produtos3) {
             
             $cont += 1;
             
-            //"Bens não patrimoniados" tem quantidade e não tem patrimônio, já os "Bens patrimoniados" não tem quantidade e tem patrimônio
-			$html .= '<br>
-                        <table style="width:100%;">
-                            <tr>                                
-                                <td style="width:25%">Data: ' . mostraData($row['MovimData']) . '</td>
-                                <td style="width:25%; text-align: center; background-color: #d8d8d8;">Nº: 0001/19</td>
-                                <td colspan="2" style="width:50%; border: none;"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" style="width:50%">Origem: '. $Origem .'</td>
-                                <td colspan="2" style="width:50%">Destino: '.$Destino.'</td>
-                            </tr>
-                      ';
-
-            if ($row['ParamValorObsImpreRetirada'] == 1) {
-    
-                $html .= ' 
-                            <tr>
-                                <td colspan="4">Observação: '.$row['MovimObservacao'].'</td>
-                             </tr>
-                         ';
+            //Isso aqui tenho que testar uma retirada de mais de 4 bens permanentes de uma só vez (isso é para quebrar a página)
+            if ($cont > 1){
+                $html .= '<br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
             }
-
-            $html .= '
-                        </table>
-				      <br>
-                     ';
 
             foreach ($produtos3 as $value) {
 
-                    $html .= '
-                            <table style="width:100%;">
-                                <tr>
-                                    <td colspan="7" style="border: none;"></td>
-                                </tr>            
-                                <tr>
-                                    <td colspan="7" style="background-color: #d8d8d8; text-align: center; font-weight: bold;">BENS PATRIMONIADOS</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="7" style="border: none;"></td>
-                                </tr>
-                                <tr>
-                                    <td rowspan="3" style="text-align: center; background-color: #eee;">Patrimônio: '.$value['PatriNumero'].'</td>
-                                    <td colspan="5">Produto: '.$value['ProduNome'].'</td>
-                                    <td colspan="1">Código: '.$value['ProduCodigo'].'</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3">Marca: '. $Origem .'</td>
-                                    <td colspan="2">Modelo: '.$Destino.'</td>
-                                    <td colspan="1">Unidade: '.$value['UnMedSigla'].'</td>                                    
-                                </tr>
-                                <tr>
+                    $html .= '        
+                            <tr>
+                                <td colspan="7" style="border: none;"></td>
+                            </tr>
+                            <tr>
+                                <td rowspan="3" style="text-align: center; background-color: #eee;">Patrimônio: '.$value['PatriNumero'].'</td>
+                                <td colspan="5">Produto: '.$value['ProduNome'].'</td>
+                                <td colspan="1">Código: '.$value['ProduCodigo'].'</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">Marca: '. $Origem .'</td>
+                                <td colspan="2">Modelo: '.$Destino.'</td>
+                                <td colspan="1">Unidade: '.$value['UnMedSigla'].'</td>                                    
+                            </tr>
+                            <tr>
                             ';
 
                         
@@ -71,11 +77,12 @@
                     $html .= '
                                     <td colspan="1">Lote: '.$value['CategNome'].'</td>
                                     <td colspan="1">Validade: '.mostraData($value['Validade']).'</td>
-                                    <td colspan="1">Quantidade: '.$value['MvXPrQuantidade'].'</td>                                
+                                    <td colspan="1">Quantidade: 1</td>                                
                                 </tr>
-                            </table>
                             ';
             }
+
+            $html .= '</table>';            
 
             // Other code
         }
