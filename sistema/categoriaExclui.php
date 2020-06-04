@@ -12,7 +12,7 @@ if(isset($_POST['inputCategoriaId'])){
 		
 		$sql = "DELETE FROM Categoria
 				WHERE CategId = :id";
-		$result = $conn->prepare("$sql");
+		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iCategoria); 
 		$result->execute();
 		
@@ -23,7 +23,7 @@ if(isset($_POST['inputCategoriaId'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir categoria!!! Geralmente isso ocorre quando o registro a ser excluido esta sendo usado em outro local.";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir categoria!!! O registro a ser excluído está sendo usado em outro local.";
 		$_SESSION['msg']['tipo'] = "error";			
 		
 		//echo 'Error: ' . $e->getMessage();die;
