@@ -422,10 +422,11 @@ try{
 										$countProduto = count($rowProdutos);
 										
 										if (!$countProduto){
-											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
+											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
 													FROM Produto
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													JOIN Situacao on SituaId = ProduStatus
+													LEFT JOIN Marca on MarcaId = ProduMarca
 													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and 
 													ProduSubCategoria = ".$iSubCategoria." and SituaChave = 'ATIVO' ";
 											$result = $conn->query($sql);
