@@ -233,7 +233,7 @@ try {
 												<div class="col-lg-6 font-size-lg">A relação abaixo faz referência aos aditivos do fluxo acima</div>
 												<div class="col-lg-6 text-right">
 													<a href="fluxo.php" class="btn btn-classic" role="button">Voltar</a>
-													<a href="#" onclick="atualizaAditivo(<?php echo $row['FlOpeId']; ?>, 0, '<?php echo $row['SituaChave']; ?>', 'novo');" class="btn btn-success" role="button">Novo Aditivo</a>
+													<a href="#" onclick="atualizaAditivo('<?php echo $row['FlOpeId']; ?>', '0', '<?php echo $row['FlOpeCategoria'] ?>', '<?php echo $row['FlOpeSubCategoria'] ?>','<?php echo $row['SituaChave']; ?>', 'novo');" class="btn btn-success" role="button">Novo Aditivo</a>
 												</div>
 											</div>
 										</div>
