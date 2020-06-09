@@ -79,7 +79,7 @@ function queryPesquisa(){
                    <td class='odd'>" . $item['ProduNome'] . "</td>
                    <td  class='even'>".$item['PatriNumero']."</td>
                    <td class='odd'>" . $item['MovimNotaFiscal'] . "</td>
-                   <td class='even'>".$item['MvXPrValorUnitario']."</td>
+                   <td class='even'>".mostraValor($item['MvXPrValorUnitario'])."</td>
                    <td class='odd'></td>
                    <td class='even'>".mostraData($item['MvXPrValidade'])."</td>
                    <td class='odd'>" . $item['LcEstNome'] . "</td>

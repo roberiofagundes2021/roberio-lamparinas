@@ -71,16 +71,7 @@ $dataFim = date("Y-m-d");
                     let marca = $(tds[9]).html();
                     let fabricante = $(tds[10]).html();
                     let numeroSerie = $(tds[12]).children().first().val()
-                    console.log(numeroSerie)
-
-                    /*if(parseInt(editado) == 1){
-                        numeroSerie =  $(tds[12]).html()
-                        console.log('editado')
-                    } else {
-                        linha.attr('editado', 1)
-                    }*/
-                    
-                    
+                    //console.log(numeroSerie)
 
                     const fonte1 = 'style="font-size: 1.1rem"'
                     const fonte2 = 'style="font-size: 0.9rem"'
@@ -90,105 +81,101 @@ $dataFim = date("Y-m-d");
                     const styleLabel3 = 'style="min-width: 100px; font-size: 0.9rem"'
                     const marginP = 'style="font-size: 0.9rem; margin-top: 4px"'
 
+                    var NumSerie = numeroSerie ? numeroSerie : ''
+
+                    $('numeroSerie').val(NumSerie)
+
                     formModal = `
                                     <div class='row'>
-                                         <div class='col-lg-6 col-12'>
-                                             <div class="form-group d-flex flex-row">
-                                                 <label for="produto" ${fonte1} class="pr-2">Produto:</label>
+                                         <div class='col-lg-2'>
+                                             <div class="form-group">
+                                                 <label for="produto">Patrimônio</label>
                                                  <div class="input-group">
-                                                     <p id='produto' ${marginP}>${produto}</p>
+                                                    <input id='produto' class='form-control' value='${patrimonio}' readOnly />
                                                  </div>
                                             </div>
-                                         </div>
-                                         <div class='col-lg-6 col-12'>
-                                             <div class="form-group d-flex flex-row">
-                                                 <label for="produto" ${fonte1} class="pr-2">Patrimônio:</label>
+                                         </div>                                    
+                                         <div class='col-lg-10'>
+                                             <div class="form-group">
+                                                 <label for="produto">Produto</label>
                                                  <div class="input-group">
-                                                     <p id='produto' ${marginP}>${patrimonio}</p>
+                                                     <input id='produto' class='form-control' value='${produto}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
                                     </div>
                                     <div class='row'>
-                                         <div class='col-lg-6 col-12'>
-                                              <div class="form-group d-flex flex-row">
-                                                  <label for="produto" ${fonte1} class="pr-2">Origem:</label>
+                                         <div class='col-lg-6'>
+                                              <div class="form-group">
+                                                  <label for="produto">Origem</label>
                                                   <div class="input-group">
-                                                      <p id='produto' ${marginP}>${origem}</p>
+                                                    <input id='produto' class='form-control' value='${origem}' readOnly />
                                                   </div>
                                              </div>
                                           </div>
-                                          <div class='col-lg-6 col-12'>
-                                              <div class="form-group d-flex flex-row">
-                                                  <label for="produto" ${fonte1} class="pr-2">Destino:</label>
-                                                  <div class="input-group d-flex flex-row align-items-center">
-                                                      <p id='produto' ${marginP}>${destino}</p>
+                                          <div class='col-lg-6'>
+                                              <div class="form-group">
+                                                  <label for="produto">Destino</label>
+                                                  <div class="input-group">
+                                                    <input id='produto' class='form-control' value='${destino}' readOnly />
                                                   </div>
                                              </div>
                                          </div>
                                      </div>
-                                     <hr class="m-1">
+                                     
                                     <div class='row'>
-                                         <div class='col-lg-3 col-sm-6 col-12'>
-                                             <div class="form-group d-flex flex-row">
-                                                 <label for="produto" ${styleLabel3}>Nota Fiscal: </label>
+                                         <div class='col-lg-3'>
+                                             <div class="form-group">
+                                                 <label for="produto">Nota Fiscal</label>
                                                  <div class="input-group">
-                                                     <p id='produto' ${fonte2}>${notaFisc}</p>
+                                                     <input id='produto' class='form-control' value='${notaFisc}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
-                                         <div class='col-lg-3 col-sm-6 col-12'>
-                                             <div class="form-group d-flex flex-row">
-                                                 <label for="produto" ${styleLabel2} >Data da Compra:</label>
+                                         <div class='col-lg-3'>
+                                             <div class="form-group">
+                                                 <label for="produto">Data da Compra</label>
                                                  <div class="input-group">
-                                                     <p id='produto' ${fonte2}></p>
+                                                     <input id='produto' class='form-control' value='' readOnly />
                                                  </div>
                                             </div>
                                          </div>
-                                         <div class='col-lg-3 col-sm-6 col-12'>
-                                             <div class="form-group d-flex flex-row">
-                                                 <label for="produto" ${styleLabel3}>(R$) Aquisição: </label>
+                                         <div class='col-lg-3'>
+                                             <div class="form-group">
+                                                 <label for="produto">(R$) Aquisição</label>
                                                  <div class="input-group">
-                                                     <p id='produto' ${fonte2} class="ml-2">${ aquisicao}</p>
+                                                     <input id='produto' class='form-control' value='${ aquisicao}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
-                                         <div class='col-lg-3 col-sm-6 col-12'>
-                                             <div class="form-group d-flex flex-row">
-                                                 <label for="produto" ${styleLabel2}>(R$) Depreciação:</label>
+                                         <div class='col-lg-3'>
+                                             <div class="form-group">
+                                                 <label for="produto">(R$) Depreciação</label>
                                                  <div class="input-group">
-                                                     <p id='produto' ${fonte2}>${depreciacao}</p>
+                                                     <input id='produto' class='form-control' value='${depreciacao}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
                                      </div>
-                                    <div class='row'>
-                                         <div class='col-lg-3 col-sm-6 col-12'>
-                                             <div class="form-group d-flex flex-row">
-                                                 <label for="produto" ${fonte2} class="pr-1">Marca:</label>
+                                     <div class='row'>
+                                         <div class='col-lg-6'>
+                                             <div class="form-group">
+                                                 <label for="produto">Marca</label>
                                                  <div class="input-group">
-                                                     <p id='produto' ${fonte2}>${marca}</p>
+                                                     <input id='produto' class='form-control' value='${marca}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
-                                         <div class='col-lg-3 col-sm-6 col-12'>
-                                             <div class="form-group d-flex flex-row">
-                                                 <label for="produto" ${fonte2} class="pr-1">Fabricante:</label>
+                                         <div class='col-lg-6'>
+                                             <div class="form-group">
+                                                 <label for="produto">Fabricante</label>
                                                  <div class="input-group">
-                                                     <p id='produto' ${fonte2}>${fabricante}</p>
+                                                     <input id='produto' class='form-control' value='${fabricante}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
-                                         <div class='col-lg-6 col-sm-6 col-12'>
-                                             <div class="form-group d-flex flex-row">
-                                                 <label for="numeroSerie" ${styleLabel3} class="pr-1">N Série:</label>
-                                                 <div class="input-group">
-                                                    <input type="text" id="numeroSerie" name="numeroSerie" class="form-control p-0" value="${numeroSerie ? numeroSerie : ''}">
-                                                 </div>
-                                            </div>
-                                         </div>
-                                    </div>
-                                    <input type="text" id="inputProdutoEdita" name="inputProdutoEdita" value="${id}" style="display: none">
+                                     </div>
+                                     <input type="text" id="inputProdutoEdita" name="inputProdutoEdita" value="${id}" style="display: none">
                     `;
                     $('.dados-produto').html(formModal)
                 })
@@ -651,19 +638,25 @@ $dataFim = date("Y-m-d");
 
                                 </div>
                                 <div class="d-flex flex-row p-2">
-                                    <div class="col-lg-3 col-4 pr-0 d-flex flex-row align-items-center">
-                                        <p style="font-size: 0.9rem;">Estado de Conservação:</p>
+                                    <div class='col-lg-6'>
+                                        <div class="form-group">
+                                            <label for="numeroSerie">Nº Série <span class="text-danger">(Editável)</span></label>
+                                            <div class="input-group">
+                                                <input type="text" id="numeroSerie" name="numeroSerie" class="form-control" >
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-lg-5 col-8 pl-0">
+                                    <div class="col-lg-6">
+                                        <label for="numeroSerie">Estado de Conservação <span class="text-danger">(Editável)</span></label>
                                         <div class="form-group">
                                             <select id="cmbSetadoConservacao" name="cmbSetadoConservacao" class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
                                                 $sql = "SELECT EstCoId, EstCoNome
-                                            FROM EstadoConservacao
-                                            JOIN Situacao on SituaId = EstCoStatus
-                                            WHERE SituaChave = 'ATIVO'
-                                            ORDER BY EstCoNome ASC";
+                                                        FROM EstadoConservacao
+                                                        JOIN Situacao on SituaId = EstCoStatus
+                                                        WHERE SituaChave = 'ATIVO'
+                                                        ORDER BY EstCoNome ASC";
                                                 $result = $conn->query($sql);
                                                 $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
 
