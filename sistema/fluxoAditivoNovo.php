@@ -112,113 +112,157 @@ if (isset($_POST['inputDataInicio'])) {
 		$_SESSION['AditivoNovo'] = $conn->lastInsertId();
 
 		$conn->commit();
-
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Aditivo incluído!!!";
-		$_SESSION['msg']['tipo'] = "success";
 	} catch (PDOException $e) {
 
 		$conn->rollback();
-
-		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir Aditivo!!!";
-		$_SESSION['msg']['tipo'] = "error";
 
 		echo 'Error: ' . $e->getMessage();
 		die;
 	}
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//Se está aincluindo Produtos
-if (isset($_POST['inputIdProduto1'])) {
-
+///////////////////////////////////////////////////////
+if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 	try {
-
 		$conn->beginTransaction();
 
-		$sql = "DELETE FROM AditivoXProduto
-				WHERE AdXPrAditivo = :iAditivo AND AdXPrUnidade = :iUnidade";
+
+
+		$sql = "SELECT SituaId, SituaNome, SituaChave
+		            FROM Situacao
+		            WHERE SituaStatus = 1 and SituaChave = 'AGUARDANDOLIBERACAO'
+		";
+		$result = $conn->query($sql);
+		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+		$sql = "SELECT PerfiId
+				        FROM Perfil
+				        WHERE PerfiChave = 'CONTROLADORIA' 
+				        ";
+		$result = $conn->query($sql);
+		$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
+
+		/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
+		$sIdentificacao = 'Fluxo Aditivo';
+
+		$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
+					    BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
+		                VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, 
+				        :iStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
-			':iAditivo' => $_SESSION['AditivoNovo'],
+			':sIdentificacao' => $sIdentificacao,
+			':dData' => date("Y-m-d"),
+			':sDescricao' => 'Liberar Fluxo Aditivo',
+			':sURL' => '',
+			':iSolicitante' => $_SESSION['UsuarId'],
+			':sTabela' => 'Aditivo',
+			':iTabelaId' => $_SESSION['AditivoNovo'],
+			':iStatus' => $rowSituacao['SituaId'],
+			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
-		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+		$insertIdBande = $conn->lastInsertId();
 
-			$sql = "INSERT INTO AditivoXProduto (AdXPrAditivo, AdXPrProduto, AdXPrQuantidade, AdXPrValorUnitario, 
+		$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeUnidade)
+			VALUES (:iBandeja, :iPerfil, :iUnidade)";
+		$result = $conn->prepare($sql);
+
+		$result->execute(array(
+			':iBandeja' => $insertIdBande,
+			':iPerfil' => $rowPerfil['PerfiId'],
+			':iUnidade' => $_SESSION['UnidadeId']
+		));
+
+		/* Fim Insere Bandeja */
+
+
+		//Se está aincluindo Produtos
+		if (isset($_POST['inputIdProduto1'])) {
+
+			$sql = "DELETE FROM AditivoXProduto
+				WHERE AdXPrAditivo = :iAditivo AND AdXPrUnidade = :iUnidade";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+				':iAditivo' => $_SESSION['AditivoNovo'],
+				':iUnidade' => $_SESSION['UnidadeId']
+			));
+
+			for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+
+				$sql = "INSERT INTO AditivoXProduto (AdXPrAditivo, AdXPrProduto, AdXPrQuantidade, AdXPrValorUnitario, 
 					AdXPrUsuarioAtualizador, AdXPrUnidade)
 					VALUES (:iAditivo, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+				$result = $conn->prepare($sql);
+
+				$result->execute(array(
+					':iAditivo' => $_SESSION['AditivoNovo'],
+					':iProduto' => $_POST['inputIdProduto' . $i],
+					':iQuantidade' => $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
+					':fValorUnitario' => $_POST['inputValorUnitario' . $i] == '' ? null : gravaValor($_POST['inputValorUnitario' . $i]),
+					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+					':iUnidade' => $_SESSION['UnidadeId']
+				));
+			}
+		}
+
+		//Se está aincluindo Serviços
+		if (isset($_POST['inputIdServico1'])) {
+
+			$sql = "DELETE FROM AditivoXServico
+				WHERE AdXSrAditivo = :iAditivo AND AdXSrUnidade = :iUnidade";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
 				':iAditivo' => $_SESSION['AditivoNovo'],
-				':iProduto' => $_POST['inputIdProduto' . $i],
-				':iQuantidade' => $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
-				':fValorUnitario' => $_POST['inputValorUnitario' . $i] == '' ? null : gravaValor($_POST['inputValorUnitario' . $i]),
-				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 				':iUnidade' => $_SESSION['UnidadeId']
 			));
-		}
 
-		$conn->commit();
-	} catch (PDOException $e) {
+			for ($i = 1; $i <= $_POST['totalRegistrosServicos']; $i++) {
 
-		echo 'Error: ' . $e->getMessage();
-
-		$conn->rollback();
-	}
-}
-////////////////////////////////////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//Se está aincluindo Serviços
-if (isset($_POST['inputIdServico1'])) {
-
-	try {
-
-		$conn->beginTransaction();
-
-		$sql = "DELETE FROM AditivoXServico
-				WHERE AdXSrAditivo = :iAditivo AND AdXSrUnidade = :iUnidade";
-		$result = $conn->prepare($sql);
-
-		$result->execute(array(
-			':iAditivo' => $_SESSION['AditivoNovo'],
-			':iUnidade' => $_SESSION['UnidadeId']
-		));
-
-		for ($i = 1; $i <= $_POST['totalRegistrosServicos']; $i++) {
-
-			$sql = "INSERT INTO AditivoXServico (AdXSrAditivo, AdXSrServico, AdXSrQuantidade, AdXSrValorUnitario, 
+				$sql = "INSERT INTO AditivoXServico (AdXSrAditivo, AdXSrServico, AdXSrQuantidade, AdXSrValorUnitario, 
 					AdXSrUsuarioAtualizador, AdXSrUnidade)
 					VALUES (:iAditivo, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
-			$result = $conn->prepare($sql);
+				$result = $conn->prepare($sql);
 
-			$result->execute(array(
-				':iAditivo' => $_SESSION['AditivoNovo'],
-				':iServico' => $_POST['inputIdServico' . $i],
-				':iQuantidade' => $_POST['inputQuantidadeServico' . $i] == '' ? null : $_POST['inputQuantidadeServico' . $i],
-				':fValorUnitario' => $_POST['inputValorUnitarioServico' . $i] == '' ? null : gravaValor($_POST['inputValorUnitarioServico' . $i]),
-				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-				':iUnidade' => $_SESSION['UnidadeId']
-			));
+				$result->execute(array(
+					':iAditivo' => $_SESSION['AditivoNovo'],
+					':iServico' => $_POST['inputIdServico' . $i],
+					':iQuantidade' => $_POST['inputQuantidadeServico' . $i] == '' ? null : $_POST['inputQuantidadeServico' . $i],
+					':fValorUnitario' => $_POST['inputValorUnitarioServico' . $i] == '' ? null : gravaValor($_POST['inputValorUnitarioServico' . $i]),
+					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+					':iUnidade' => $_SESSION['UnidadeId']
+				));
+			}
 		}
 
 		$conn->commit();
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Aditivo realizado com sucesso!!!";
+		$_SESSION['msg']['tipo'] = "success";
+
+		unset($_SESSION['AditivoNovo']);
 
 		irpara("fluxoAditivo.php");
 	} catch (PDOException $e) {
 
 		echo 'Error: ' . $e->getMessage();
 
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao realizar aditivo!!!";
+		$_SESSION['msg']['tipo'] = "error";
+
 		$conn->rollback();
+
 		irpara("fluxoAditivo.php");
 	}
 }
+
+// Após realizar todas os registros, redireciona para fluxoAditivo
+//if (isset($_POST['inputIdProduto1']) || isset($_POST['inputIdServico1'])) irpara("fluxoAditivo.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -511,13 +555,8 @@ try {
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os produtos selecionados acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
-									<!--<div class="hot-container">
-										<div id="example"></div>
-									</div>-->
 
 									<?php
-
 
 									$cont = 0;
 									if (isset($_POST['inputDataInicio'])) {
@@ -670,7 +709,6 @@ try {
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os servicos selecionados acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<?php
 

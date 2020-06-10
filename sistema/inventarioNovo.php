@@ -34,9 +34,9 @@ if (isset($_POST['inputData'])) {
 		$iproximoNumero = $iUltimoNumero + 1;
 
 		$sql = "INSERT INTO Inventario (InvenData, InvenNumero, InvenDataLimite, InvenClassificacao, InvenUnidade, InvenCategoria, InvenSolicitante, 
-										InvenObservacao, InvenSituacao, InvenUsuarioAtualizador)
+										InvenObservacao, InvenSituacao, InvenUsuarioAtualizador, InvenEmpresa)
 				VALUES (:dData, :iNumero, :dDataLimite, :iClassificacao, :iUnidade, :iCategoria, :iSolicitante, 
-						:sObservacao, :iSituacao, :iUsuarioAtualizador)";
+						:sObservacao, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$conn->beginTransaction();
@@ -51,7 +51,8 @@ if (isset($_POST['inputData'])) {
 			':iSolicitante' => $_SESSION['UsuarId'],
 			':sObservacao' => $_POST['txtObservacao'],
 			':iSituacao' => $iSituacao,
-			':iUsuarioAtualizador' => $_SESSION['UsuarId']
+			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+			':iEmpresa' => $_SESSION['EmpreId']
 		));
 
 		$insertId = $conn->lastInsertId();
