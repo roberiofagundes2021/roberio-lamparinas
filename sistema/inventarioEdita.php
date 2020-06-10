@@ -205,6 +205,8 @@ if (isset($_POST['inputData'])) {
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
+	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
 
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
@@ -427,7 +429,7 @@ if (isset($_POST['inputData'])) {
 								<div class="col-lg-4">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbLocalEstoque">Locais do Estoque<span class="text-danger"> *</span></label>
-										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" data-fouc required>
+										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control multiselect" multiple="multiple" data-fouc required>
 											<?php
 											$sql = ("SELECT LcEstId, LcEstNome
 														 FROM LocalEstoque														 
@@ -450,7 +452,7 @@ if (isset($_POST['inputData'])) {
 								<div class="col-lg-4">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
-										<select id="cmbSetor" name="cmbSetor[]" class="form-control select" multiple="multiple" required>
+										<select id="cmbSetor" name="cmbSetor[]" class="form-control multiselect" multiple="multiple" required>
 											<option value="">Todos</option>
 											<?php
 											$sql = "SELECT SetorId, SetorNome

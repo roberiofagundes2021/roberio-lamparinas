@@ -25,7 +25,7 @@ if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#' && $_GET['idFor
 	//Isso aqui é pra corrigir um bug. Já que o correto era vir #
 	if(isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] == null) $_GET['idSubCategoria'] = "#";
 
-	if (isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] != "#"){
+	if (isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] != "#" and $_GET['idSubCategoria'] != ""){
 		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
 				FROM Produto
 				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduSubCategoria = '". $_GET['idSubCategoria']."'";

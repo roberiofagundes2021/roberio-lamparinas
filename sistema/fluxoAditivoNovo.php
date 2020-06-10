@@ -112,6 +112,17 @@ if (isset($_POST['inputDataInicio'])) {
 		$_SESSION['AditivoNovo'] = $conn->lastInsertId();
 
 		$conn->commit();
+
+		if ($_POST['inputValor'] == '') {
+
+			$_SESSION['msg']['titulo'] = "Sucesso";
+			$_SESSION['msg']['mensagem'] = "Aditivo realizado com sucesso!!!";
+			$_SESSION['msg']['tipo'] = "success";
+
+			unset($_SESSION['AditivoNovo']);
+
+			irpara("fluxoAditivo.php");
+		}
 	} catch (PDOException $e) {
 
 		$conn->rollback();
@@ -545,13 +556,6 @@ try {
 							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && $countProduto >= 1 ? print('block') : print('none')  ?>">
 								<div class="card-header header-elements-inline">
 									<h5 class="card-title">Relação de Produtos</h5>
-									<div class="header-elements">
-										<div class="list-icons">
-											<a class="list-icons-item" data-action="collapse"></a>
-											<a class="list-icons-item" data-action="reload"></a>
-											<a class="list-icons-item" data-action="remove"></a>
-										</div>
-									</div>
 								</div>
 
 								<div class="card-body">
@@ -699,13 +703,6 @@ try {
 
 								<div class="card-header header-elements-inline">
 									<h5 class="card-title">Relação de Servicos</h5>
-									<div class="header-elements">
-										<div class="list-icons">
-											<a class="list-icons-item" data-action="collapse"></a>
-											<a class="list-icons-item" data-action="reload"></a>
-											<a class="list-icons-item" data-action="remove"></a>
-										</div>
-									</div>
 								</div>
 
 								<div class="card-body">
@@ -890,10 +887,10 @@ try {
 				<!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 
 			</div>
-			<?php include_once("footer.php"); ?>
+			<?php !isset($_POST['inputDataInicio']) ?  include_once("footer.php") : '' ?>
 		</div>
 		<!-- /info blocks -->
-
+		<?php isset($_POST['inputDataInicio']) ?  include_once("footer.php") : '' ?>
 	</div>
 	<!-- /content area -->
 

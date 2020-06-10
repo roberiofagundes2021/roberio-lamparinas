@@ -227,6 +227,21 @@ if (isset($_POST['inputData'])) {
 				}
 			});
 
+			$("#formInventario").validate({
+				rules: {
+					cmbLocalEstoque: {
+						required: true,
+						min: "a"
+					},
+					cmbSetor: {
+						required: function(element) {
+							return $("#cmbLocalEstoque").val()  == "";
+						}
+					}
+				}
+			});
+
+
 			//Ao mudar a Equipe, filtra o possível presidente via ajax (retorno via JSON)
 			$('#cmbEquipe').on('change', function(e) {
 
@@ -385,7 +400,7 @@ if (isset($_POST['inputData'])) {
 								<div class="col-lg-4">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbLocalEstoque">Locais do Estoque<span class="text-danger"> *</span></label>
-										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" required data-fouc>
+										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control multiselect" multiple="multiple" data-fouc>
 											<?php
 											$sql = "SELECT LcEstId, LcEstNome
 														FROM LocalEstoque
@@ -406,23 +421,23 @@ if (isset($_POST['inputData'])) {
 								<div class="col-lg-4">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
-										
-											<select id="cmbSetor" name="cmbSetor[]" class="form-control multiselect" multiple="multiple" data-fouc="">
-												<?php
-												$sql = "SELECT SetorId, SetorNome
+
+										<select id="cmbSetor" name="cmbSetor[]" class="form-control multiselect" multiple="multiple" data-fouc="">
+											<?php
+											$sql = "SELECT SetorId, SetorNome
 														FROM Setor
 														JOIN Situacao on SituaId = SetorStatus
 														WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														ORDER BY SetorNome ASC";
-												$result = $conn->query($sql);
-												$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+											$result = $conn->query($sql);
+											$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
 
-												foreach ($rowSetor as $item) {
-													print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
-												}
-												?>
-											</select>
-										
+											foreach ($rowSetor as $item) {
+												print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
+											}
+											?>
+										</select>
+
 									</div>
 								</div>
 							</div>

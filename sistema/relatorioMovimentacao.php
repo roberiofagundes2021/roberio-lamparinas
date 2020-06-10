@@ -272,7 +272,7 @@ $dataFim = date("Y-m-d");
 					cmbFornecedor = '#';
 				}
 
-				if (cmbFornecedor = !'#' && cmbFornecedor != '') {
+				if (cmbFornecedor !='#' && cmbFornecedor != '') {
 					$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
 
 						var option = '<option value="#" "selected">Selecione o Produto</option>';
@@ -288,7 +288,7 @@ $dataFim = date("Y-m-d");
 							ResetProduto();
 						}
 					});
-				} else if (cmCategoria = !'#' && cmbCategoria != '') {
+				} else if (cmCategoria != '#' && cmbCategoria != '') {
 					$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
 
 						var option = '<option value="#" "selected">Selecione o Produto</option>';
