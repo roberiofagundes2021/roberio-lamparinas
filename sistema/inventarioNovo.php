@@ -96,8 +96,6 @@ if (isset($_POST['inputData'])) {
 						':iSetor' => current($value) // current retorna a primeira posição do array, nesse caso o Id do setor
 					));
 				}
-
-				
 			} else {
 
 				$sql = "INSERT INTO InventarioXSetor 
@@ -173,6 +171,8 @@ if (isset($_POST['inputData'])) {
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
+	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
 
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
@@ -324,17 +324,17 @@ if (isset($_POST['inputData'])) {
 										<select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
 											<option value="#">Selecione</option>
 											<?php
-												$sql = "SELECT ClassId, ClassNome
+											$sql = "SELECT ClassId, ClassNome
 														FROM Classificacao
 														JOIN Situacao on SituaId = ClassStatus
 														WHERE SituaChave = 'ATIVO'
 														ORDER BY ClassNome ASC";
-												$result = $conn->query($sql);
-												$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+											$result = $conn->query($sql);
+											$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
-												foreach ($rowClassificacao as $item) {
-													print('<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>');
-												}
+											foreach ($rowClassificacao as $item) {
+												print('<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>');
+											}
 											?>
 										</select>
 									</div>
@@ -368,15 +368,15 @@ if (isset($_POST['inputData'])) {
 									<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
 									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
 										<?php
-											$sql = "SELECT EXUXPUnidade, UnidaNome
+										$sql = "SELECT EXUXPUnidade, UnidaNome
 													FROM EmpresaXUsuarioXPerfil
 													JOIN Unidade on UnidaId = EXUXPUnidade
 													WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
 													";
-											$result = $conn->query($sql);
-											$usuarioUnidade = $result->fetch(PDO::FETCH_ASSOC);
+										$result = $conn->query($sql);
+										$usuarioUnidade = $result->fetch(PDO::FETCH_ASSOC);
 
-											print('<option value="' . $usuarioUnidade['EXUXPUnidade'] . '" selected>' . $usuarioUnidade['UnidaNome'] . '</option>');
+										print('<option value="' . $usuarioUnidade['EXUXPUnidade'] . '" selected>' . $usuarioUnidade['UnidaNome'] . '</option>');
 										?>
 									</select>
 								</div>
@@ -386,17 +386,17 @@ if (isset($_POST['inputData'])) {
 										<label for="cmbLocalEstoque">Locais do Estoque<span class="text-danger"> *</span></label>
 										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control select" multiple="multiple" required data-fouc>
 											<?php
-												$sql = "SELECT LcEstId, LcEstNome
+											$sql = "SELECT LcEstId, LcEstNome
 														FROM LocalEstoque
 														JOIN Situacao on SituaId = LcEstStatus														     
 														WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														ORDER BY LcEstNome ASC";
-												$result = $conn->query($sql);
-												$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
+											$result = $conn->query($sql);
+											$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
 
-												foreach ($rowLocal as $item) {
-													print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
-												}
+											foreach ($rowLocal as $item) {
+												print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+											}
 											?>
 										</select>
 									</div>
@@ -405,9 +405,9 @@ if (isset($_POST['inputData'])) {
 								<div class="col-lg-4">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
-										<select id="cmbSetor" name="cmbSetor[]" class="form-control select" multiple="multiple" required>
-											<option value="Todos">Todos</option>
-											<?php
+										
+											<select id="cmbSetor" name="cmbSetor[]" class="form-control multiselect" multiple="multiple" data-fouc="">
+												<?php
 												$sql = "SELECT SetorId, SetorNome
 														FROM Setor
 														JOIN Situacao on SituaId = SetorStatus
@@ -419,8 +419,9 @@ if (isset($_POST['inputData'])) {
 												foreach ($rowSetor as $item) {
 													print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
 												}
-											?>
-										</select>
+												?>
+											</select>
+										
 									</div>
 								</div>
 							</div>
@@ -434,18 +435,18 @@ if (isset($_POST['inputData'])) {
 										<label for="cmbEquipe">Equipe Responsável<span class="text-danger"> *</span></label>
 										<select id="cmbEquipe" name="cmbEquipe[]" class="form-control select" multiple="multiple" data-fouc required>
 											<?php
-												$sql = "SELECT UsuarId, UsuarLogin
+											$sql = "SELECT UsuarId, UsuarLogin
 														FROM Usuario
 														JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
 														JOIN Situacao on SituaId = EXUXPStatus
 														WHERE EXUXPUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														ORDER BY UsuarLogin ASC";
-												$result = $conn->query($sql);
-												$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
+											$result = $conn->query($sql);
+											$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
 
-												foreach ($rowEquipe as $item) {
-													print('<option value="' . $item['UsuarId'] . '">' . $item['UsuarLogin'] . '</option>');
-												}
+											foreach ($rowEquipe as $item) {
+												print('<option value="' . $item['UsuarId'] . '">' . $item['UsuarLogin'] . '</option>');
+											}
 											?>
 										</select>
 									</div>

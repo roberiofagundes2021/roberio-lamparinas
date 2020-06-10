@@ -39,7 +39,7 @@ function queryPesquisa()
         $args[]  = "ProduCodigo = " . $_POST['cmbCodigo'] . " ";
     }
 
-    if (!empty($_POST['cmbProduto']) && $_POST['cmbProduto'] != "Sem produto" && $_POST['cmbProduto'] != "Filtrando...") {
+    if (!empty($_POST['cmbProduto']) && $_POST['cmbProduto'] != "Sem produto" && $_POST['cmbProduto'] != "Filtrando..."  && $_POST['cmbProduto'] != "#") {
         $args[]  = "ProduId = " . $_POST['cmbProduto'] . " ";
     }
 

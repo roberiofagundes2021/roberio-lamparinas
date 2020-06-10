@@ -209,11 +209,14 @@ if (isset($_POST['inputIdServico1'])) {
 		}
 
 		$conn->commit();
+
+		irpara("fluxoAditivo.php");
 	} catch (PDOException $e) {
 
 		echo 'Error: ' . $e->getMessage();
 
 		$conn->rollback();
+		irpara("fluxoAditivo.php");
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -283,7 +286,7 @@ try {
 	<script type="text/javascript">
 		$(document).ready(function() {
 
-			$('#enviar').on('click', function(e) {
+			$('#enviar1').on('click', function(e) {
 
 				e.preventDefault();
 
@@ -307,27 +310,35 @@ try {
 
 			});
 
+			$('#enviar2').on('click', function(e) {
+
+				e.preventDefault();
+
+				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
+				var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+				var inputTotalGeralServico = $('#inputTotalGeralServico').val().replace('.', '').replace(',', '.');
+				var somaTotais = parseFloat(inputTotalGeral) + parseFloat(inputTotalGeralServico);
+
+				//Verifica se o valor ultrapassou o total do fluxo
+				if (somaTotais > parseFloat(inputValor)) {
+					alerta('Atenção', 'A soma dos totais ultrapassou o valor do contrato!', 'error');
+					return false;
+				}
+
+				//Verifica se o valor é menor que o total do fluxo
+				if (somaTotais < parseFloat(inputValor)) {
+					alerta('Atenção', 'A soma dos totais é menor que o valor do contrato!', 'error');
+					return false;
+				}
+
+
+				$("#formAditivo").submit();
+
+			});
+
 		});
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////
-
-		//Valida Registro
-		$('#enviar').on('click', function(e) {
-
-			e.preventDefault();
-
-			var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
-			var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
-
-			//Verifica se o valor ultrapassou o total
-			if (parseFloat(inputTotalGeral) > parseFloat(inputValor)) {
-				alerta('Atenção', 'A soma dos totais ultrapassou o valor do contrato!', 'error');
-				return false;
-			}
-
-			$("#formFluxoOperacionalProduto").submit();
-
-		}); // enviar	
 
 		//Enviar para aprovação da Controladoria (via Bandeja)
 		$('#enviarAprovacao').on('click', function(e) {
@@ -336,7 +347,6 @@ try {
 
 			confirmaExclusao(document.formFluxoOperacionalProduto, "Essa ação enviará todo o Fluxo Operacional (com seus produtos e serviços) para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
 		});
-
 
 		function calculaValorTotal(id) {
 
@@ -467,7 +477,7 @@ try {
 							<div class="row" style="margin-top: 10px; display: <?php isset($_POST['inputDataInicio']) ? print('none') : print('block')   ?>">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
+										<button class="btn btn-lg btn-success" id="enviar1">Incluir</button>
 										<a href="fluxoAditivo.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 									</div>
 								</div>
@@ -475,8 +485,20 @@ try {
 
 							<!-- /card-body -->
 							<!---------------------------------------------------------------------------------------------Produtos---------------------------------------------------------------------------------------------------------->
+							<?php
+							$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+                                				FROM Produto
+                                				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+                                				LEFT JOIN Marca on MarcaId = ProduMarca
+                                				JOIN Situacao on SituaId = ProduStatus
+                                				WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = " . $iCategoria . " and 
+                                				ProduSubCategoria = " . $iSubCategoria . " and SituaChave = 'ATIVO' ";
+							$result = $conn->query($sql);
+							$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+							$countProduto = count($rowProdutos);
 
-							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) ? print('block') : print('none')  ?>">
+							?>
+							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && $countProduto >= 1 ? print('block') : print('none')  ?>">
 								<div class="card-header header-elements-inline">
 									<h5 class="card-title">Relação de Produtos</h5>
 									<div class="header-elements">
@@ -490,60 +512,30 @@ try {
 
 								<div class="card-body">
 									<p class="mb-3">Abaixo estão listados todos os produtos selecionados acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
-									<div class="row">
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputValor">Valor Total</label>
-												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
-											</div>
-										</div>
-									</div>
 									<!--<div class="hot-container">
 										<div id="example"></div>
 									</div>-->
 
 									<?php
 
-									/*$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome
-												FROM Produto
-												JOIN AditivoXProduto on AdXPrProduto = ProduId
-												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												LEFT JOIN Marca on MarcaId = ProduMarca
-												WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and AdXPrAditivo = " . $iAditivo;
-						$result = $conn->query($sql);
-						$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-						$countProduto = count($rowProdutos);*/
-
-									if (!$countProduto) {
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
-													FROM Produto
-													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-                                                    LEFT JOIN Marca on MarcaId = ProduMarca
-													JOIN Situacao on SituaId = ProduStatus
-													WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = " . $iCategoria . " and 
-													ProduSubCategoria = " . $iSubCategoria . " and SituaChave = 'ATIVO' ";
-										$result = $conn->query($sql);
-										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-										$countProduto = count($rowProdutos);
-									}
 
 									$cont = 0;
 									if (isset($_POST['inputDataInicio'])) {
 										print('
 										<div class="row" style="margin-bottom: -20px;">
 											<div class="col-lg-8">
-													<div class="row">
-														<div class="col-lg-1">
-															<label for="inputCodigo"><strong>Item</strong></label>
-														</div>
-														<div class="col-lg-8">
-															<label for="inputProduto"><strong>Produto</strong></label>
-														</div>
-														<div class="col-lg-3">
-															<label for="inputMarca"><strong>Marca</strong></label>
-														</div>
+												<div class="row">
+													<div class="col-lg-1">
+														<label for="inputCodigo"><strong>Item</strong></label>
 													</div>
-												</div>												
+													<div class="col-lg-8">
+														<label for="inputProduto"><strong>Produto</strong></label>
+													</div>
+													<div class="col-lg-3">
+														<label for="inputMarca"><strong>Marca</strong></label>
+													</div>
+												</div>
+											</div>												
 											<div class="col-lg-1">
 												<div class="form-group">
 													<label for="inputUnidade"><strong>Unidade</strong></label>
@@ -616,32 +608,32 @@ try {
 									if (isset($_POST['inputDataInicio'])) {
 										print('
 										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
-													<div class="row">
-														<div class="col-lg-1">
-															
-														</div>
-														<div class="col-lg-8">
-															
-														</div>
-														<div class="col-lg-3">
-															
-														</div>
+											<div class="col-lg-8">
+												<div class="row">
+													<div class="col-lg-1">
+														
 													</div>
-												</div>								
-												<div class="col-lg-1">
-													
+													<div class="col-lg-8">
+														
+													</div>
+													<div class="col-lg-3">
+														
+													</div>
 												</div>
-												<div class="col-lg-1">
-													
-												</div>	
-												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
-													<h5><b>Total:</b></h5>
-												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="' . mostraValor($fTotalGeral) . '" readOnly>
-												</div>											
-											</div>');
+											</div>								
+											<div class="col-lg-1">
+												
+											</div>
+											<div class="col-lg-1">
+												
+											</div>	
+											<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+												<h5><b>Total:</b></h5>
+											</div>	
+											<div class="col-lg-1">
+												<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="' . mostraValor($fTotalGeral) . '" readOnly>
+											</div>											
+										</div>');
 
 										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >');
 									}
@@ -651,8 +643,19 @@ try {
 
 								</div>
 							</div>
-							<div class="lista-servicos" style="display: <?php isset($_POST['inputDataInicio']) ? print('block') : print('none')  ?>">
-								<!---------------------------------------------------------------------------------------------Serviços---------------------------------------------------------------------------------------------------------->
+							<!---------------------------------------------------------------------------------------------Serviços---------------------------------------------------------------------------------------------------------->
+							<?php
+							$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
+							        			  FROM Servico
+							        			  JOIN Situacao on SituaId = ServiStatus
+							        			  WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
+							        			  ServiSubCategoria = " . $iSubCategoria . " and SituaChave = 'ATIVO' ";
+							$result = $conn->query($sql);
+							$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+							$countServico = count($rowServicos);
+							?>
+							<!------------------------------Se não existirem serviços ou se a requisição não estiver vindo do lugar certo-------------------------------------->
+							<div class="lista-servicos" style="display: <?php isset($_POST['inputDataInicio']) && $countServico >= 1 ? print('block') : print('none')  ?>">
 								<!-- Custom header text -->
 
 								<div class="card-header header-elements-inline">
@@ -803,67 +806,62 @@ try {
 									}
 
 									?>
-									<div class="row" style="margin-top: 10px;">
-										<div class="col-lg-6">
-											<div class="form-group">
-												<?php
-												if ($bFechado) {
-													print('
-												<button class="btn btn-lg btn-success" id="enviar" style="margin-right:5px;">Alterar</button>
-												<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
-												} else {
-													if (!$countProduto) {
-														print('<button class="btn btn-lg btn-success" id="enviar" disabled>Alterar</button>');
-													} else {
-														print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
-													}
-												}
-
-												?>
-												<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>
-											</div>
-										</div>
-
-										<div class="col-lg-6" style="text-align: right; padding-right: 35px; color: red;">
-											<?php
-											if ($bFechado) {
-												if ($row['SituaNome'] == 'PENDENTE') {
-													print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído (ENVIE PARA APROVAÇÃO)');
-												} else {
-													print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído (' . $row['SituaNome'] . ')');
-												}
-											} else if (!$countProduto) {
-												print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Não há produtos cadastrados para a Categoria e SubCategoria informada');
-											} else if ($TotalFluxo < $TotalGeral) {
-												print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Os valores dos Produtos + Serviços ultrapassaram o valor total do Fluxo');
-											}
-											?>
-										</div>
-									</div>
-
 								</div>
-
 								<!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 							</div>
-					</form>
+							<div class="row" style="margin-top: 10px; display:<?php ($countProduto >= 1 || $countServico >= 1) &&  isset($_POST['inputDataInicio']) ? print('block') : print('none')  ?>">
+								<div class="col-lg-6">
+									<div class="form-group">
+										<?php
+										if ($bFechado) {
+											print('
+												<button class="btn btn-lg btn-success" id="enviar2" style="margin-right:5px;">Alterar</button>
+												<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
+										} else {
+											if (!$countProduto) {
+												print('<button class="btn btn-lg btn-success" id="enviar2" disabled>Alterar</button>');
+											} else {
+												print('<button class="btn btn-lg btn-success" id="enviar2">Alterar</button>');
+											}
+										}
 
+										?>
+										<a href="fluxoAditivo.php" class="btn btn-basic" role="button">Cancelar</a>
+									</div>
+								</div>
+
+								<div class="col-lg-6" style="text-align: right; padding-right: 35px; color: red;">
+									<?php
+									if ($bFechado) {
+										if ($row['SituaNome'] == 'PENDENTE') {
+											print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído (ENVIE PARA APROVAÇÃO)');
+										} else {
+											print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído (' . $row['SituaNome'] . ')');
+										}
+									} else if (!$countProduto) {
+										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Não há produtos cadastrados para a Categoria e SubCategoria informada');
+									} else if ($TotalFluxo < $TotalGeral) {
+										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Os valores dos Produtos + Serviços ultrapassaram o valor total do Fluxo');
+									}
+									?>
+								</div>
+							</div>
+						</div>
+					</form>
 				</div>
 				<!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 
-
-
 			</div>
-			<!-- /info blocks -->
-
+			<?php include_once("footer.php"); ?>
 		</div>
-		<!-- /content area -->
+		<!-- /info blocks -->
 
-		<?php include_once("footer.php"); ?>
+	</div>
+	<!-- /content area -->
 
 	</div>
 	<!-- /main content -->
 
-	</div>
 	<!-- /page content -->
 
 </body>
