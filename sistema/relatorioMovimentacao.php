@@ -288,7 +288,7 @@ $dataFim = date("Y-m-d");
 							ResetProduto();
 						}
 					});
-				} else if (cmCategoria != '#' && cmbCategoria != '') {
+				} else if (cmbCategoria != '#' && cmbCategoria != '') {
 					$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
 
 						var option = '<option value="#" "selected">Selecione o Produto</option>';
@@ -328,7 +328,7 @@ $dataFim = date("Y-m-d");
 			//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
 			function Filtrando() {
 				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-				FiltraProduto();
+		
 			}
 
 			//Mostra o "Filtrando..." na combo Produto

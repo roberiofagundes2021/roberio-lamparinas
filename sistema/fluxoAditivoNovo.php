@@ -115,6 +115,54 @@ if (isset($_POST['inputDataInicio'])) {
 
 		if ($_POST['inputValor'] == '') {
 
+			$sql = "SELECT SituaId, SituaNome, SituaChave
+			FROM Situacao
+			WHERE SituaStatus = 1 and SituaChave = 'AGUARDANDOLIBERACAO'
+";
+			$result = $conn->query($sql);
+			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+			$sql = "SELECT PerfiId
+				FROM Perfil
+				WHERE PerfiChave = 'CONTROLADORIA' 
+				";
+			$result = $conn->query($sql);
+			$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
+
+			/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
+			$sIdentificacao = 'Fluxo Aditivo';
+
+			$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
+				BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
+				VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, 
+				:iStatus, :iUsuarioAtualizador, :iUnidade)";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+				':sIdentificacao' => $sIdentificacao,
+				':dData' => date("Y-m-d"),
+				':sDescricao' => 'Liberar Fluxo Aditivo',
+				':sURL' => '',
+				':iSolicitante' => $_SESSION['UsuarId'],
+				':sTabela' => 'Aditivo',
+				':iTabelaId' => $_SESSION['AditivoNovo'],
+				':iStatus' => $rowSituacao['SituaId'],
+				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+				':iUnidade' => $_SESSION['UnidadeId']
+			));
+
+			$insertIdBande = $conn->lastInsertId();
+
+			$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeUnidade)
+	        VALUES (:iBandeja, :iPerfil, :iUnidade)";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+				':iBandeja' => $insertIdBande,
+				':iPerfil' => $rowPerfil['PerfiId'],
+				':iUnidade' => $_SESSION['UnidadeId']
+			));
+
 			$_SESSION['msg']['titulo'] = "Sucesso";
 			$_SESSION['msg']['mensagem'] = "Aditivo realizado com sucesso!!!";
 			$_SESSION['msg']['tipo'] = "success";
