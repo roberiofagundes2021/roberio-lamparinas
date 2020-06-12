@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Novo Aditivo';
 include('global_assets/php/conexao.php');
 
 $iFluxoOperacional = $_POST['inputFluxoId'];
-//////////////////////////////////////////////////////////////
+
 if (isset($_POST['inputFluxoOperacionalId'])) {
 	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
 	$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
@@ -53,7 +53,7 @@ $TotalGeral = $TotalProdutos + $TotalServicos;
 if ($TotalGeral == $TotalFluxo) {
 	$bFechado = 1;
 }
-///////////////////////////////////////////////////
+
 $sql = "SELECT Top 1 isnull(AditiNumero, 0) as Aditivo
         FROM Aditivo
         WHERE AditiFluxoOperacional = " . $iFluxoOperacional . "
@@ -179,7 +179,7 @@ if (isset($_POST['inputDataInicio'])) {
 		die;
 	}
 }
-///////////////////////////////////////////////////////
+
 if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 	try {
 		$conn->beginTransaction();
@@ -320,12 +320,6 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 }
 
 // Após realizar todas os registros, redireciona para fluxoAditivo
-//if (isset($_POST['inputIdProduto1']) || isset($_POST['inputIdServico1'])) irpara("fluxoAditivo.php");
-
-////////////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////////////
 
 try {
 
@@ -346,22 +340,9 @@ try {
 	$result = $conn->query($sql);
 	$rowAditivo = $result->fetch(PDO::FETCH_ASSOC);
 
-	/* $sql = "SELECT AdXPrProduto
-			FROM AditivoXProduto
-			JOIN Produto on ProduId = AdXPrProduto
-			WHERE AdXPrUnidade = " . $_SESSION['UnidadeId'] . " and AdXPrAditivo = " . $iAditivo;
-    $result = $conn->query($sql);
-    $rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
-    $countProdutoUtilizado = count($rowProdutoUtilizado);
-
-    foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
-        $aProdutos[] = $itemProdutoUtilizado['AdXPrProduto'];
-    }*/
 } catch (PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
 
 ?>
 
@@ -424,13 +405,13 @@ try {
 
 				//Verifica se o valor ultrapassou o total do fluxo
 				if (somaTotais > parseFloat(inputValor)) {
-					alerta('Atenção', 'A soma dos totais ultrapassou o valor do contrato!', 'error');
+					alerta('Atenção', 'A soma dos totais ultrapassou o valor do aditivo!', 'error');
 					return false;
 				}
 
 				//Verifica se o valor é menor que o total do fluxo
 				if (somaTotais < parseFloat(inputValor)) {
-					alerta('Atenção', 'A soma dos totais é menor que o valor do contrato!', 'error');
+					alerta('Atenção', 'A soma dos totais é menor que o valor do aditivo!', 'error');
 					return false;
 				}
 
@@ -440,8 +421,6 @@ try {
 			});
 
 		});
-
-		///////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//Enviar para aprovação da Controladoria (via Bandeja)
 		$('#enviarAprovacao').on('click', function(e) {

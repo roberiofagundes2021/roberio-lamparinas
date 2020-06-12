@@ -288,7 +288,7 @@ try {
 																		<div class="list-icons list-icons-extended">
 																		
 																			<!--<a href="#"  class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>-->
-																				<a href="#"  class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
+																				<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
 																		</div>
 																	</div>');
 
@@ -311,7 +311,7 @@ try {
 																		<div class="list-icons list-icons-extended">
 																		
 																			<!--<a href="#"  class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>-->
-																				<a href="#"  class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
+																				<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'exclui\', \'\');"  class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
 																		</div>
 																	</div>');
 														}

@@ -71,6 +71,7 @@ $dataFim = date("Y-m-d");
                     let marca = $(tds[9]).html();
                     let fabricante = $(tds[10]).html();
                     let numeroSerie = $(tds[12]).children().first().val()
+                    let estadoConservacao = $(tds[13]).children().first().val()
                     //console.log(numeroSerie)
 
                     const fonte1 = 'style="font-size: 1.1rem"'
@@ -83,7 +84,29 @@ $dataFim = date("Y-m-d");
 
                     var NumSerie = numeroSerie ? numeroSerie : ''
 
-                    $('numeroSerie').val(NumSerie)
+                    $('#numeroSerie').val(NumSerie)
+                    
+                    $('#cmbEstadoConservacao').val(estadoConservacao)
+
+                    if (estadoConservacao) {
+                        url = 'filtraEstadoConservacao.php'
+                            inputsValues = {
+                                inputEstadoConservacao: estadoConservacao
+                            }
+                            
+                            $.post(
+                                url,
+                                inputsValues,
+                                (data) => {
+                                    console.log(data)
+                                    if (data) {
+                                        $('#cmbEstadoConservacao').html(data)
+                                        
+                                        console.log(data)
+                                    } else {}
+                                }
+                            );
+                    }
 
                     formModal = `
                                     <div class='row'>
@@ -144,7 +167,7 @@ $dataFim = date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">(R$) Aquisição</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${ aquisicao}' readOnly />
+                                                     <input id='produto' class='form-control' value='${aquisicao}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -366,40 +389,41 @@ $dataFim = date("Y-m-d");
                 })
             })()
 
-            $('#salvar').on('click', function(e){
+            $('#salvar').on('click', function(e) {
                 let numeroSerie = $('#numeroSerie').val()
-                let estadoConservacao = $('#cmbSetadoConservacao').val()
+                let estadoConservacao = $('#cmbEstadoConservacao').val()
                 let id = $('#inputProdutoEdita').val()
                 let url = 'relatorioMovimentacaoPatrimonioEdita.php'
                 let data = {
-                        inputNumeroSerie: numeroSerie,
-                        cmbEstadoConservacao: estadoConservacao,
-                        inputId: id
-                    }
-                    console.log(data)
+                    inputNumeroSerie: numeroSerie,
+                    cmbEstadoConservacao: estadoConservacao,
+                    inputId: id
+                }
+                console.log(data)
 
                 $.post(
                     url,
                     data,
-                    function(data){
-                        if(data){
+                    function(data) {
+                        if (data) {
                             console.log(data)
                             alerta('Atenção', 'Registro editado', 'success');
 
                             //let inputNumeroSerie = $(`<td style="display: none" id="inputNumeroSerie">${numeroSerie}</td>`)
                             //let inputEstadoConservacao = $(`<td style="display: none" id="inputEstadoConservacao">${estadoConservacao}</td>`)
 
-                            $('[idpatrimonio]').each((i, elem)=>{
+                            $('[idpatrimonio]').each((i, elem) => {
                                 let tds = $(elem).children()
                                 console.log()
-                                if($(elem).attr('idpatrimonio') == id){
+                                if ($(elem).attr('idpatrimonio') == id) {
                                     $(tds[12]).children().first().val(numeroSerie)
+                                    $(tds[13]).children().first().val(estadoConservacao)
                                     console.log($(tds[12]).children().first())
-                                   // $(elem).append(inputNumeroSerie).append(inputEstadoConservacao)
+                                    // $(elem).append(inputNumeroSerie).append(inputEstadoConservacao)
                                 }
                             })
                         }
-                    } 
+                    }
                 )
 
                 $('#page-modal').fadeOut(200);
@@ -642,14 +666,14 @@ $dataFim = date("Y-m-d");
                                         <div class="form-group">
                                             <label for="numeroSerie">Nº Série <span class="text-danger">(Editável)</span></label>
                                             <div class="input-group">
-                                                <input type="text" id="numeroSerie" name="numeroSerie" class="form-control" >
+                                                <input type="text" id="numeroSerie" name="numeroSerie" class="form-control">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <label for="numeroSerie">Estado de Conservação <span class="text-danger">(Editável)</span></label>
                                         <div class="form-group">
-                                            <select id="cmbSetadoConservacao" name="cmbSetadoConservacao" class="form-control form-control-select2">
+                                            <select id="cmbEstadoConservacao" name="cmbEstadoConservacao" class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
                                                 $sql = "SELECT EstCoId, EstCoNome
