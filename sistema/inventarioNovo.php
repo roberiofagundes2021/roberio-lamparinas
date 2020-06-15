@@ -183,23 +183,36 @@ if (isset($_POST['inputData'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		$(document).ready(function() {
+		$(document).ready(function () {
 
 			//Valida Registro Duplicado
-			$('#enviar').on('click', function(e) {
+			$('#enviar').on('click', function (e) {
 
 				e.preventDefault();
 
 				var cmbUnidade = $('#cmbUnidade').val();
 				var cmbLocalEstoque = $('#cmbLocalEstoque').val();
 				var cmbEquipe = $('#cmbEquipe').val();
+				let cmbSetor = $("#cmbSetor").val()
 
-				$("#formInventario").submit();
+
+				if (cmbLocalEstoque == '') {
+					alerta('Atenção', 'Informe o local de estoque!', 'error');
+					$('#cmbLocalEstoque').focus();
+					return false;
+
+				} else if (cmbSetor == '') {
+					alerta('Atenção', 'Informe o setor!', 'error');
+					$('#cmbSetor').focus();
+					return false;
+				} else {
+					$("#formInventario").submit();	
+				}
 
 			}); // enviar
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
-			$('#cmbUnidade').on('change', function(e) {
+			$('#cmbUnidade').on('change', function (e) {
 
 				FiltraLocalEstoque();
 
@@ -209,14 +222,15 @@ if (isset($_POST['inputData'])) {
 					ResetLocalEstoque();
 				} else {
 
-					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function(dados) {
+					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados) {
 
 						var option = '';
 
 						if (dados.length) {
 
-							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.LcEstId + '">' + obj.LcEstNome + '</option>';
+							$.each(dados, function (i, obj) {
+								option += '<option value="' + obj.LcEstId + '">' + obj
+									.LcEstNome + '</option>';
 							});
 
 							$('#cmbLocalEstoque').html(option).show();
@@ -227,37 +241,38 @@ if (isset($_POST['inputData'])) {
 				}
 			});
 
-			$("#formInventario").validate({
+			/*$("#formInventario").validate({
 				rules: {
 					cmbLocalEstoque: {
 						required: true,
 						min: "a"
 					},
 					cmbSetor: {
-						required: function(element) {
-							return $("#cmbLocalEstoque").val()  == "";
+						required: function (element) {
+							return $("#cmbLocalEstoque").val() == "";
 						}
 					}
 				}
-			});
+			});*/
 
 
 			//Ao mudar a Equipe, filtra o possível presidente via ajax (retorno via JSON)
-			$('#cmbEquipe').on('change', function(e) {
+			$('#cmbEquipe').on('change', function (e) {
 
 				var cmbEquipe = $('#cmbEquipe').val();
 
 				//Esse IF é para quando se exclui todos que estavam selecionados entrar no ELSE e limpar a combo do Presidente
 				if (cmbEquipe != '') {
 
-					$.getJSON('filtraPresidente.php?aEquipe=' + cmbEquipe, function(dados) {
+					$.getJSON('filtraPresidente.php?aEquipe=' + cmbEquipe, function (dados) {
 
 						var option = '';
 
 						if (dados.length) {
 
-							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.UsuarId + '">' + obj.UsuarLogin + '</option>';
+							$.each(dados, function (i, obj) {
+								option += '<option value="' + obj.UsuarId + '">' + obj
+									.UsuarLogin + '</option>';
 							});
 
 							$('#cmbPresidente').html(option).show();
@@ -323,21 +338,24 @@ if (isset($_POST['inputData'])) {
 								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputData">Data de Emissão</label>
-										<input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data de Emissão" value="<?php echo date('d/m/Y'); ?>" readOnly>
+										<input type="text" id="inputData" name="inputData" class="form-control"
+											placeholder="Data de Emissão" value="<?php echo date('d/m/Y'); ?>" readOnly>
 									</div>
 								</div>
 
 								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputDataLimite">Data Limite</label>
-										<input type="text" id="inputDataLimite" name="inputDataLimite" class="form-control" placeholder="Data Limite">
+										<input type="text" id="inputDataLimite" name="inputDataLimite"
+											class="form-control" placeholder="Data Limite">
 									</div>
 								</div>
 
 								<div class="col-lg-2" id="classificacao">
 									<div class="form-group">
 										<label for="cmbClassificacao">Classificação/Bens</label>
-										<select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
+										<select id="cmbClassificacao" name="cmbClassificacao"
+											class="form-control form-control-select2">
 											<option value="#">Selecione</option>
 											<?php
 											$sql = "SELECT ClassId, ClassNome
@@ -358,7 +376,8 @@ if (isset($_POST['inputData'])) {
 
 								<div class="col-lg-6">
 									<label for="cmbCategoria">Categoria</label>
-									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+									<select id="cmbCategoria" name="cmbCategoria"
+										class="form-control form-control-select2">
 										<option value="#">Selecione</option>
 										<?php
 										$sql = "SELECT CategId, CategNome
@@ -382,7 +401,8 @@ if (isset($_POST['inputData'])) {
 							<div class="row">
 								<div class="col-lg-4">
 									<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
-									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
+									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2"
+										required>
 										<?php
 										$sql = "SELECT EXUXPUnidade, UnidaNome
 													FROM EmpresaXUsuarioXPerfil
@@ -399,8 +419,10 @@ if (isset($_POST['inputData'])) {
 
 								<div class="col-lg-4">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
-										<label for="cmbLocalEstoque">Locais do Estoque<span class="text-danger"> *</span></label>
-										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control multiselect" multiple="multiple" data-fouc>
+										<label for="cmbLocalEstoque">Locais do Estoque<span class="text-danger">
+												*</span></label>
+										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]"
+											class="form-control multiselect" multiple="multiple" data-fouc>
 											<?php
 											$sql = "SELECT LcEstId, LcEstNome
 														FROM LocalEstoque
@@ -422,7 +444,8 @@ if (isset($_POST['inputData'])) {
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
 
-										<select id="cmbSetor" name="cmbSetor[]" class="form-control multiselect" multiple="multiple" data-fouc="">
+										<select id="cmbSetor" name="cmbSetor[]" class="form-control multiselect"
+											multiple="multiple" data-fouc="">
 											<?php
 											$sql = "SELECT SetorId, SetorNome
 														FROM Setor
@@ -448,8 +471,10 @@ if (isset($_POST['inputData'])) {
 							<div class="row">
 								<div class="col-lg-9">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
-										<label for="cmbEquipe">Equipe Responsável<span class="text-danger"> *</span></label>
-										<select id="cmbEquipe" name="cmbEquipe[]" class="form-control select" multiple="multiple" data-fouc required>
+										<label for="cmbEquipe">Equipe Responsável<span class="text-danger">
+												*</span></label>
+										<select id="cmbEquipe" name="cmbEquipe[]" class="form-control select"
+											multiple="multiple" data-fouc required>
 											<?php
 											$sql = "SELECT UsuarId, UsuarLogin
 														FROM Usuario
@@ -471,7 +496,8 @@ if (isset($_POST['inputData'])) {
 								<div class="col-lg-3">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbPresidente">Presidente da Comissão</label>
-										<select id="cmbPresidente" name="cmbPresidente" class="form-control form-control-select2">
+										<select id="cmbPresidente" name="cmbPresidente"
+											class="form-control form-control-select2">
 											<option value="#">Nenhum</option>
 										</select>
 									</div>
@@ -487,21 +513,27 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputNomeSolicitante">Solicitante</label>
-												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly>
+												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante"
+													class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>"
+													readOnly>
 											</div>
 										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputEmailSolicitante">E-mail</label>
-												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarEmail']; ?>" readOnly>
+												<input type="text" id="inputEmailSolicitante"
+													name="inputEmailSolicitante" class="form-control"
+													value="<?php echo $rowUsuario['UsuarEmail']; ?>" readOnly>
 											</div>
 										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputTelefoneSolicitante">Telefone</label>
-												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarTelefone']; ?>" readOnly>
+												<input type="text" id="inputTelefoneSolicitante"
+													name="inputTelefoneSolicitante" class="form-control"
+													value="<?php echo $rowUsuario['UsuarTelefone']; ?>" readOnly>
 											</div>
 										</div>
 									</div>
@@ -510,7 +542,8 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtObservacao">Observação</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtObservacao" name="txtObservacao" placeholder="Observação"></textarea>
+												<textarea rows="5" cols="5" class="form-control" id="txtObservacao"
+													name="txtObservacao" placeholder="Observação"></textarea>
 											</div>
 										</div>
 									</div>
