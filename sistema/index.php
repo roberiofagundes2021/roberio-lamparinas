@@ -592,22 +592,17 @@ if ($totalAcoes) {
 
 			if (BandeTabela == 'Aditivo') {
 
-				document.getElementById('inputMovimentacaoId').value = BandeTabelaId;
+				document.getElementById('inputAditivoId').value = BandeTabelaId;
 
 				if (Tipo == 'imprimir') {
-
-					if (MovimTipo == 'E') {
-						document.formBandeja.action = "movimentacaoImprimeEntrada.php";
-					} else {
-						document.formBandeja.action = "movimentacaoImprimeRetirada.php";
-					}
+						document.formBandeja.action = "fluxoAditivoImprime.php";
 
 					document.formBandeja.setAttribute("target", "_blank");
 					document.formBandeja.submit();
 				} else {
 					if (Tipo == 'liberar') {
-						document.getElementById('inputMovimentacaoStatus').value = 'LIBERADO';
-						document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
+						document.getElementById('inputAditivoStatus').value = 'LIBERADO';
+						document.formBandeja.action = "fluxoAditivoBandejaMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
 					} else if (Tipo == 'naoliberar') {
@@ -634,8 +629,8 @@ if ($totalAcoes) {
 								} else {
 
 									document.getElementById('inputMotivo').value = result;
-									document.getElementById('inputMovimentacaoStatus').value = 'NAOLIBERADO';
-									document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
+									document.getElementById('inputAditivoStatus').value = 'NAOLIBERADO';
+									document.formBandeja.action = "fluxoAditivoBandejaMudaSituacao.php";
 									document.formBandeja.setAttribute("target", "_self");
 									document.formBandeja.submit();
 
