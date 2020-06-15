@@ -75,11 +75,11 @@ try {
 		</div>
 		<div style='width:250px; float:right; display: inline; text-align:right;'>
 			<div>".date('d/m/Y')."</div>
-			<div style='margin-top:8px;'>Fluxo Operacional Aditivo: ".$row['FlOpeNumContrato']."</div>
+			<div style='margin-top:8px;'>Fluxo Operacional: ".$row['FlOpeNumContrato']."</div>
 		</div> 
 	</div>
 
-	<div style='text-align:center; margin-top: 20px;'><h1>FLUXO OPERACIONAL ADITIVO</h1></div>
+	<div style='text-align:center; margin-top: 20px;'><h1>FLUXO OPERACIONAL/ADITIVO</h1></div>
 	";
 
 	$html .= '
@@ -119,15 +119,6 @@ try {
             <td style="width:20%; font-size:12px;">Valor: '. mostraValor($row['AditiValor']).'</td>
             <td style="width:15%; font-size:12px;">Início: '. mostraData($row['AditiDtInicio']).'</td>
             <td style="width:15%; font-size:12px;">Fim: '. mostraData($row['AditiDtFim']).'</td>
-        </tr>
-        <tr>
-            <td colspan="3" style="font-size:12px;">Categoria: '.$row['CategNome'].'</td>
-            <td colspan="2" style="font-size:12px;">Sub Categoria: '.$row['SbCatNome'].'</td>
-        </tr>
-        <tr>
-            <td colspan="3" style="width:40%; font-size:12px;">Fornecedor: '.$row['ForneNome'].'</td>
-            <td colspan="1" style="width:30%; font-size:12px;">Telefone: '.$row['ForneCelular'].'</td>
-            <td colspan="1" style="width:30%; font-size:12px;">E-mail: '.$row['ForneEmail'].'</td>
         </tr>
     </table>
 	<br>';
@@ -178,8 +169,8 @@ try {
 				$valorUnitario = $rowProduto['AdXPrValorUnitario'];
 				$valorTotal = $rowProduto['AdXPrQuantidade'] * $rowProduto['AdXPrValorUnitario'];
 			} else {
-				$valorUnitario = "";
-				$valorTotal = "";
+				$valorUnitario = 0;
+				$valorTotal = 0;
 			}
 
 			if($totalProdutos == ($cont)){

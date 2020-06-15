@@ -111,10 +111,9 @@ try {
 				document.formAditivo.action = "fluxoAditivoEdita.php";
 			} else if (Tipo == 'exclui') {
 				confirmaExclusao(document.formAditivo, "Tem certeza que deseja excluir esse aditivo?", "fluxoAditivoExclui.php");
-			} else if (Tipo == 'produto') {
-				document.formAditivo.action = "fluxoAditivoProduto.php";
-			} else if (Tipo == 'servico') {
-				document.formAditivo.action = "fluxoAditivoServico.php";
+			} else if (Tipo == 'imprimir'){
+				document.formAditivo.setAttribute("target", "_blank");
+				document.formAditivo.action = "fluxoAditivoImprime.php";
 			}
 
 			document.formAditivo.submit();
@@ -289,23 +288,10 @@ try {
 																		
 																			<!--<a href="#"  class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>-->
 																				<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
+																				<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'imprimir\', \'\');" class="list-icons-item"><i class="icon-printer2" title="Listar Serviços"></i></a>
 																		</div>
 																	</div>');
-
-															print('
-																<div class="list-icons m-2">
-																	<div class="list-icons list-icons-extended">
-																		
-																		<div class="dropdown">													
-																			<a href="#" class="list-icons-item" data-toggle="dropdown">
-																				<i class="icon-menu9"></i>
-																			</a>
-																			
-																			<div class="dropdown-menu dropdown-menu-right">
-																				<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																				<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>															
-																				<div class="dropdown-divider">
-																			</div>');
+																
 														} else {
 															print('<div class="list-icons">
 																		<div class="list-icons list-icons-extended">
@@ -319,18 +305,8 @@ try {
 														if (mostraValor($item['AditiValor']) != '0,00') {
 															print('
 														<div class="list-icons m-2">
-															<div class="list-icons list-icons-extended">
-																
-																<div class="dropdown">													
-																	<a href="#" class="list-icons-item" data-toggle="dropdown">
-																		<i class="icon-menu9"></i>
-																	</a>
-																	
-																	<div class="dropdown-menu dropdown-menu-right">
-																		<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																		<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>															
-																		<div class="dropdown-divider">
-																	</div>');
+														    <a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'imprimir\', \'\');" class="list-icons-item"><i class="icon-printer2" title="Listar Serviços"></i></a>												
+															');
 														}
 													}
 
