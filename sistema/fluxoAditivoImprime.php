@@ -83,7 +83,7 @@ try {
 	";
 
 	$html .= '
-	    <h3>Fluxo Operacional</h3>
+	    <h3>FLUXO OPERACIONAL</h3>
 	';
 	
 	$html .= '
@@ -108,14 +108,14 @@ try {
 	<br>';
 
 	$html .= '
-	    <h3>Aditivo</h3>
+	    <h3>ADITIVO</h3>
 	';
 	
 	$html .= '
     <table style="width:100%; border-collapse: collapse;">
         <tr style="background-color:#F1F1F1;">
             <td style="width:20%; font-size:10px;">Nº Aditivo: '. $row['AditiNumero'].'</td>
-            <td style="width:30%; font-size:10px;">Data de Celebração: '. $row['AditiDtCelebracao'].'</td>
+            <td style="width:30%; font-size:10px;">Data de Celebração: '. mostraData($row['AditiDtCelebracao']).'</td>
             <td style="width:20%; font-size:10px;">Valor: '. mostraValor($row['AditiValor']).'</td>
             <td style="width:15%; font-size:10px;">Início: '. mostraData($row['AditiDtInicio']).'</td>
             <td style="width:15%; font-size:10px;">Fim: '. mostraData($row['AditiDtFim']).'</td>
@@ -127,8 +127,7 @@ try {
 			FROM Produto
 			JOIN AditivoXProduto on AdXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and AdXPrAditivo = ".$row['AditiId'];
-
+			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and AdXPrAditivo = ".$_POST['inputAditivoId'];
 
 	$result = $conn->query($sql);
 	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -137,7 +136,7 @@ try {
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, AdXSrQuantidade, AdXSrValorUnitario
 			FROM Servico
 			JOIN AditivoXServico on AdXSrServico = ServiId
-			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$row['AditiId'];
+			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$_POST['inputAditivoId'];
 
 	$result = $conn->query($sql);
 	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -147,7 +146,7 @@ try {
 	
 	if($totalProdutos > 0){
 
-		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>PRODUTOS</h2></div>";
+		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>PRODUTOS ADITIVADOS</h2></div>";
 
 		$html .= '
 		<table style="width:100%; border-collapse: collapse;">
@@ -218,7 +217,7 @@ try {
 	
 	if($totalServicos > 0){
 
-		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
+		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS ADITIVADOS</h2></div>";
 
 		$html .= '
 		<table style="width:100%; border-collapse: collapse; margin-top: 20px;">

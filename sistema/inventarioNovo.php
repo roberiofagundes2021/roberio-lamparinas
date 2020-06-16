@@ -149,7 +149,6 @@ if (isset($_POST['inputData'])) {
 		echo 'Error: ' . $e->getMessage();
 		exit;
 	}
-
 	irpara("inventario.php");
 }
 
@@ -196,14 +195,9 @@ if (isset($_POST['inputData'])) {
 				let cmbSetor = $("#cmbSetor").val()
 
 
-				if (cmbLocalEstoque == '') {
-					alerta('Atenção', 'Informe o local de estoque!', 'error');
+				if (cmbLocalEstoque == '' && cmbSetor == '') {
+					alerta('Atenção', 'Informe um local de estoque ou setor!', 'error');
 					$('#cmbLocalEstoque').focus();
-					return false;
-
-				} else if (cmbSetor == '') {
-					alerta('Atenção', 'Informe o setor!', 'error');
-					$('#cmbSetor').focus();
 					return false;
 				} else {
 					$("#formInventario").submit();	
