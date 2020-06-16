@@ -114,11 +114,11 @@ try {
 	$html .= '
     <table style="width:100%; border-collapse: collapse;">
         <tr style="background-color:#F1F1F1;">
-            <td style="width:25%; font-size:12px;">Nº Aditivo: '. $row['AditiNumero'].'</td>
-            <td style="width:25%; font-size:12px;">Data de Celebração: '. $row['AditiDtCelebracao'].'</td>
-            <td style="width:20%; font-size:12px;">Valor: '. mostraValor($row['AditiValor']).'</td>
-            <td style="width:15%; font-size:12px;">Início: '. mostraData($row['AditiDtInicio']).'</td>
-            <td style="width:15%; font-size:12px;">Fim: '. mostraData($row['AditiDtFim']).'</td>
+            <td style="width:20%; font-size:10px;">Nº Aditivo: '. $row['AditiNumero'].'</td>
+            <td style="width:30%; font-size:10px;">Data de Celebração: '. $row['AditiDtCelebracao'].'</td>
+            <td style="width:20%; font-size:10px;">Valor: '. mostraValor($row['AditiValor']).'</td>
+            <td style="width:15%; font-size:10px;">Início: '. mostraData($row['AditiDtInicio']).'</td>
+            <td style="width:15%; font-size:10px;">Fim: '. mostraData($row['AditiDtFim']).'</td>
         </tr>
     </table>
 	<br>';
