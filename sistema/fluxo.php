@@ -112,6 +112,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			} else if (Tipo == 'realizado'){
 				document.formFluxoOperacional.action = "fluxoRealizado.php";
 			} else if (Tipo == 'aditivo'){
+				if($('#link-aditivo').attr('disabled') == 'disabled'){
+					    alerta('Atenção', 'Preencha todas as quantidades e valores dos produtos selecionados ou retire da lista', 'error');
+						return false;
+				}
 				document.formFluxoOperacional.action = "fluxoAditivo.php";
 			} else if (Tipo == 'imprimir'){
 				document.formFluxoOperacional.action = "fluxoImprime.php";
@@ -216,6 +220,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['CategNome'].'</td>
 											<td><span class="'.$situacaoClasse.'">'.$situacao.'</span>
 											');
+											$disabled = $item['SituaChave'] == 'PENDENTE' ? 'disabled="true"' : '';
 										
 										print('<td class="text-center">
 												<div class="list-icons">
@@ -231,7 +236,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>																
-																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
+																<a href="#" id="link-aditivo" '.$disabled.' onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
 																<div class="dropdown-divider"></div>
 
 																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>

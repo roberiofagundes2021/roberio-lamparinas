@@ -91,6 +91,21 @@ if (isset($_POST['inputDataInicio'])) {
 	try {
 
 		$conn->beginTransaction();
+		
+		$sql = "SELECT SituaId
+		FROM Situacao
+		WHERE SituaChave = 'AGUARDANDOLIBERACAO'
+		";
+		$result = $conn->query($sql);
+		$rowStatus = $result->fetch(PDO::FETCH_ASSOC);
+		$bStatus = $rowStatus['SituaId'];
+
+		$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
+	WHERE FlOpeId = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':bStatus', $bStatus);
+		$result->bindParam(':id', $iFluxoOperacional);
+		$result->execute();
 
 		$sql = "INSERT INTO Aditivo (AditiFluxoOperacional, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, 
 									 AditiValor, AditiUsuarioAtualizador, AditiUnidade)
@@ -162,6 +177,7 @@ if (isset($_POST['inputDataInicio'])) {
 				':iPerfil' => $rowPerfil['PerfiId'],
 				':iUnidade' => $_SESSION['UnidadeId']
 			));
+
 
 			$_SESSION['msg']['titulo'] = "Sucesso";
 			$_SESSION['msg']['mensagem'] = "Aditivo realizado com sucesso!!!";
@@ -339,7 +355,6 @@ try {
 		Where AditiUnidade = " . $_SESSION['UnidadeId'] . " and AditiFluxoOperacional = " . $iFluxoOperacional;
 	$result = $conn->query($sql);
 	$rowAditivo = $result->fetch(PDO::FETCH_ASSOC);
-
 } catch (PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
 }

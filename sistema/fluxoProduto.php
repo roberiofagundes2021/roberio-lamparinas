@@ -213,6 +213,23 @@ try{
 				
 				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
 				var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+				var totalProdutos = $('#totalRegistros').val();
+
+                var cont = 1;
+
+				for(i = 0; i <= totalProdutos; i++){
+                       var valorTotal = $(`#inputValorTotal${i}`).val()
+                       cont = valorTotal == '' ? 0 : 1;
+					   if ($(`#inputValorTotal${i}`).val() == '0,00') {
+						alerta('Atenção', 'Preencha todas as quantidades e valores dos produtos selecionados ou retire da lista', 'error');
+						return false;
+					}
+				}
+
+				if(cont == 0){
+					alerta('Atenção','Preencha todas as quantidades e valores dos produtos selecionados, ou retire da lista','error');
+					return false;
+				}
 				
 				//Verifica se o valor ultrapassou o total
 				if (parseFloat(inputTotalGeral) > parseFloat(inputValor)){
