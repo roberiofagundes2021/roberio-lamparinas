@@ -6,7 +6,7 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT TrRefTipo
 		FROM TermoReferencia
-		WHERE TrRefId = ".$_POST['iTr']." and TrRefEmpresa = ".$_SESSION['EmpreId'];
+		WHERE TrRefId = ".$_POST['iTr']." and TrRefUnidade = ".$_SESSION['UnidadeId'];
 $result = $conn->query($sql);
 $rowTipo = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -16,7 +16,7 @@ if ($rowTipo['TrRefTipo'] == 'P'){
 
 	$sql = "SELECT COUNT(TRXPrProduto) as Qtde
 			FROM TermoReferenciaXProduto
-			WHERE TRXPrTermoReferencia = ".$_POST['iTr']." and TRXPrEmpresa = ".$_SESSION['EmpreId'];
+			WHERE TRXPrTermoReferencia = ".$_POST['iTr']." and TRXPrUnidade = ".$_SESSION['UnidadeId'];
 	$result = $conn->query($sql);
 	$rowVerifica = $result->fetch(PDO::FETCH_ASSOC);
 			
@@ -31,7 +31,7 @@ if ($rowTipo['TrRefTipo'] == 'P'){
 	
 	$sql = "SELECT COUNT(TRXSrServico) as Qtde
 			FROM TermoReferenciaXServico
-			WHERE TRXSrTermoReferencia = ".$_POST['iTr']." and TRXSrEmpresa = ".$_SESSION['EmpreId'];
+			WHERE TRXSrTermoReferencia = ".$_POST['iTr']." and TRXSrUnidade = ".$_SESSION['UnidadeId'];
 	$result = $conn->query($sql);
 	$rowVerifica = $result->fetch(PDO::FETCH_ASSOC);
 	
@@ -49,11 +49,11 @@ if ($rowTipo['TrRefTipo'] == 'P'){
 			(
 			(SELECT COUNT(TRXPrTermoReferencia) Qtde
 			 FROM TermoReferenciaXProduto
-			 WHERE TRXPrTermoReferencia = ".$_POST['iTr']." and TRXPrEmpresa = ".$_SESSION['EmpreId'].")
+			 WHERE TRXPrTermoReferencia = ".$_POST['iTr']." and TRXPrUnidade = ".$_SESSION['UnidadeId'].")
 			UNION
 			(SELECT COUNT(TRXSrTermoReferencia) qtde
 			 FROM TermoReferenciaXServico
-			 WHERE TRXSrTermoReferencia = ".$_POST['iTr']." and TRXSrEmpresa = ".$_SESSION['EmpreId'].")
+			 WHERE TRXSrTermoReferencia = ".$_POST['iTr']." and TRXSrUnidade = ".$_SESSION['UnidadeId'].")
 			) as Soma";
 	$result = $conn->query($sql);
 	$rowVerifica = $result->fetch(PDO::FETCH_ASSOC);
@@ -65,11 +65,11 @@ if ($rowTipo['TrRefTipo'] == 'P'){
 				(
 				(SELECT COUNT(TRXPrTermoReferencia) Qtde
 				 FROM TermoReferenciaXProduto
-				 WHERE (TRXPrQuantidade is null or TRXPrQuantidade = 0) and TRXPrTermoReferencia = ".$_POST['iTr']." and TRXPrEmpresa = ".$_SESSION['EmpreId'].")
+				 WHERE (TRXPrQuantidade is null or TRXPrQuantidade = 0) and TRXPrTermoReferencia = ".$_POST['iTr']." and TRXPrUnidade = ".$_SESSION['UnidadeId'].")
 				UNION
 				(SELECT COUNT(TRXSrTermoReferencia) qtde
 				 FROM TermoReferenciaXServico
-				 WHERE (TRXSrQuantidade is null or TRXSrQuantidade = 0) and TRXSrTermoReferencia = ".$_POST['iTr']." and TRXSrEmpresa = ".$_SESSION['EmpreId'].")
+				 WHERE (TRXSrQuantidade is null or TRXSrQuantidade = 0) and TRXSrTermoReferencia = ".$_POST['iTr']." and TRXSrUnidade = ".$_SESSION['UnidadeId'].")
 				) as Soma";
 	} else {
 		$semRegistro = 1;

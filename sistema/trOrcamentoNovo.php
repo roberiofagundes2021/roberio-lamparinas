@@ -18,13 +18,13 @@ $rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
        $sql = "SELECT TrRefCategoria
 		       FROM TermoReferencia
 		       JOIN Categoria on CategId = TrRefCategoria
-	           WHERE TrRefEmpresa = ". $_SESSION['EmpreId'] ." and TrRefId = ".$_SESSION['TRId']."";
+	           WHERE TrRefUnidade = ". $_SESSION['UnidadeId'] ." and TrRefId = ".$_SESSION['TRId']."";
         $result = $conn->query($sql);
         $categoriaId = $result->fetch(PDO::FETCH_ASSOC);
 
         $sql = "SELECT CategId, CategNome
 				FROM Categoria															     
-				WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategId = ".$categoriaId['TrRefCategoria']." and CategStatus = 1";
+				WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and CategId = ".$categoriaId['TrRefCategoria']." and CategStatus = 1";
 		$result = $conn->query($sql);
 		$rowCategoria = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -32,7 +32,7 @@ $rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
 		$sql = "SELECT SbCatId, SbCatNome
 				 FROM SubCategoria
 				 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-				 WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and TRXSCTermoReferencia = ".$_SESSION['TRId']."
+				 WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and TRXSCTermoReferencia = ".$_SESSION['TRId']."
 				 ORDER BY SbCatNome ASC";
 		$result = $conn->query($sql);
 		$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -45,7 +45,7 @@ if(isset($_POST['inputData'])){
 		
 		$sql = "SELECT COUNT(isnull(TrXOrNumero,0)) as Numero
 				 FROM TRXOrcamento
-				 Where TrXOrEmpresa = ".$_SESSION['EmpreId']."";
+				 Where TrXOrUnidade = ".$_SESSION['UnidadeId']."";
 		$result = $conn->query($sql);
 		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);		
 		
@@ -53,9 +53,9 @@ if(isset($_POST['inputData'])){
 		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 			
 		$sql = "INSERT INTO TRXOrcamento (TrXOrTermoReferencia, TrXOrNumero, TrXOrData, TrXOrCategoria, TrXOrConteudo, TrXOrFornecedor,
-									   TrXOrSolicitante, TrXOrStatus, TrXOrUsuarioAtualizador, TrXOrEmpresa)
+									   TrXOrSolicitante, TrXOrStatus, TrXOrUsuarioAtualizador, TrXOrUnidade)
 				VALUES (:iTR, :sNumero, :dData, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
-						:bStatus, :iUsuarioAtualizador, :iEmpresa)";
+						:bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 		
 		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
@@ -71,15 +71,15 @@ if(isset($_POST['inputData'])){
 						':iSolicitante' => $_SESSION['UsuarId'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
+						':iUnidade' => $_SESSION['UnidadeId']
 						));
 		$insertId = $conn->lastInsertId(); 
 			
 			try{
 				$sql = "INSERT INTO TRXOrcamentoXSubcategoria
-							(TXOXSCOrcamento, TXOXSCSubcategoria, TXOXSCEmpresa)
+							(TXOXSCOrcamento, TXOXSCSubcategoria, TXOXSCUnidade)
 						VALUES 
-							(:iTrOrcamento, :iTrSubCategoria, :iTrEmpresa)";
+							(:iTrOrcamento, :iTrSubCategoria, :iTrUnidade)";
 				$result = $conn->prepare($sql);
 
 				foreach ($rowSubCategoria as $subcategoria){
@@ -87,7 +87,7 @@ if(isset($_POST['inputData'])){
 					$result->execute(array(
 									':iTrOrcamento' => $insertId,
 									':iTrSubCategoria' => $subcategoria['SbCatId'],
-									':iTrEmpresa' => $_SESSION['EmpreId']
+									':iTrUnidade' => $_SESSION['UnidadeId']
 									));
 				}
 				

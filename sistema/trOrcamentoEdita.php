@@ -335,7 +335,7 @@ if(isset($_POST['inputData'])){
 						
 							$sql = "SELECT TXOXPOrcamento
 									FROM TRXOrcamentoXProduto
-									WHERE TXOXPOrcamento = ".$iOrcamento." and TXOXPEmpresa = ".$_SESSION['EmpreId'];
+									WHERE TXOXPOrcamento = ".$iOrcamento." and TXOXPUnidade = ".$_SESSION['UnidadeId'];
 							$result = $conn->query($sql);
 							$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 							$countProduto = count($rowProduto);
@@ -404,7 +404,7 @@ if(isset($_POST['inputData'])){
 													<?php
 														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																 FROM Fornecedor														     
-																 WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneStatus = 1 and ForneCategoria = ".$rowCategoria['CategId']."
+																 WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and ForneStatus = 1 and ForneCategoria = ".$rowCategoria['CategId']."
 															     ORDER BY ForneNome ASC";
 														$result = $conn->query("$sql");
 														$fornecedores = $result->fetchAll(PDO::FETCH_ASSOC);

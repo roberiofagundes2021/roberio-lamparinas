@@ -21,18 +21,18 @@ if (isset($_POST['inputOrcamentoId'])) {
 if (isset($_POST['inputIdOrcamento'])) {
 
 	$sql = "DELETE FROM TRXOrcamentoXProduto
-			WHERE TXOXPOrcamento = :iOrcamento AND TXOXPEmpresa = :iEmpresa";
+			WHERE TXOXPOrcamento = :iOrcamento AND TXOXPUnidade = :iUnidade";
 	$result = $conn->prepare($sql);
 
 	$result->execute(array(
 		':iOrcamento' => $iOrcamento,
-		':iEmpresa' => $_SESSION['EmpreId']
+		':iUnidade' => $_SESSION['UnidadeId']
 	));
 
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
-		$sql = "INSERT INTO TRXOrcamentoXProduto (TXOXPOrcamento, TXOXPProduto, TXOXPQuantidade, TXOXPValorUnitario, TXOXPUsuarioAtualizador, TXOXPEmpresa)
-				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO TRXOrcamentoXProduto (TXOXPOrcamento, TXOXPProduto, TXOXPQuantidade, TXOXPValorUnitario, TXOXPUsuarioAtualizador, TXOXPUnidade)
+				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -41,7 +41,7 @@ if (isset($_POST['inputIdOrcamento'])) {
 			':iQuantidade' => $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
 			':fValorUnitario' => $_POST['inputValorUnitario' . $i] == '' ? null : gravaValor($_POST['inputValorUnitario' . $i]),
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iEmpresa' => $_SESSION['EmpreId']
+			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -57,21 +57,21 @@ try {
 			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
 			JOIN Categoria on CategId = TrXOrCategoria
 			LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
-			WHERE TrXOrEmpresa = " . $_SESSION['EmpreId'] . " and TrXOrId = " . $iOrcamento;
+			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	$sql = "SELECT SbCatId, SbCatNome
         	FROM SubCategoria
 		    JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-			WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and TRXSCTermoReferencia = " . $row['TrXOrTermoReferencia'] . "";
+			WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $row['TrXOrTermoReferencia'] . "";
 	$result = $conn->query($sql);
 	$rowSC = $result->fetch(PDO::FETCH_ASSOC);
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	$sql = "SELECT TXOXPProduto
 			FROM TRXOrcamentoXProduto
 			JOIN Produto on ProduId = TXOXPProduto
-			WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TXOXPOrcamento = " . $iOrcamento;
+			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
@@ -332,7 +332,7 @@ try {
 			                                    LEFT JOIN Fornecedor on ForneId = TRXOrFornecedor
 			                                    JOIN Categoria on CategId = TRXOrCategoria
 			                                    LEFT JOIN SubCategoria on SbCatId = TRXOrSubCategoria
-			                                    WHERE TRXOrEmpresa = " . $_SESSION['EmpreId'] . " and TRXOrId = " . $iOrcamento;
+			                                    WHERE TRXOrUnidade = " . $_SESSION['UnidadeId'] . " and TRXOrId = " . $iOrcamento;
 									$result = $conn->query($sql);
 									$row = $result->fetch(PDO::FETCH_ASSOC);
 									$iTR = $row['TrXOrTermoReferencia'];
@@ -342,7 +342,7 @@ try {
 											FROM ProdutoOrcamento
 											JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 											LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-											WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
+											WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
 									$result = $conn->query($sql);
 									$rowProdutosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -350,7 +350,7 @@ try {
 											FROM Produto
 											JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 											LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-											WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+											WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
 									$result = $conn->query($sql);
 									$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -415,7 +415,7 @@ try {
 											    FROM TRXOrcamentoXProduto 
 												JOIN ProdutoOrcamento on PrOrcId = TXOXPProduto
 												LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-											    WHERE TXOXPEmpresa = " . $_SESSION['EmpreId'] . " and TXOXPOrcamento = " . $iOrcamento;
+											    WHERE TXOXPUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
 										$result = $conn->query($sql);
 										$rowProdutosOrc = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countProdutoOrc = count($rowProdutos);
@@ -505,7 +505,7 @@ try {
 											    FROM TRXOrcamentoXProduto 
 												JOIN Produto on ProduId = TXOXPProduto
 												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-											    WHERE TXOXPEmpresa = " . $_SESSION['EmpreId'] . " and TXOXPOrcamento = " . $iOrcamento;
+											    WHERE TXOXPUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
 										$result = $conn->query($sql);
 										$rowProdutosOrc = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countProdutoOrc = count($rowProdutos);

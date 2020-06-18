@@ -129,10 +129,10 @@ if (isset($_POST['resultados'])) {
 		$mpdf = new Mpdf([
 			'mode' => 'utf-8',
 			//'format' => [190, 236], 
-			'format' => 'A4-P', //A4-L
+			'format' => 'A4-L', //A4-L
 			'default_font_size' => 9,
 			'default_font' => 'dejavusans',
-			'orientation' => 'P' //P->Portrait (retrato)    L->Landscape (paisagem)
+			'orientation' => 'L' //P->Portrait (retrato)    L->Landscape (paisagem)
 		]);
 
 		$topo = "

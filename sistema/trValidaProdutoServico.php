@@ -18,7 +18,7 @@ if ($bProduto){
 		$sql = "SELECT PrOrcId
 				FROM ProdutoOrcamento
 				JOIN Situacao on SituaId = PrOrcStatus
-				WHERE PrOrcCategoria = ". $iCategoria " and SituaChave = 'ATIVO' ";				
+				WHERE PrOrcCategoria = ". $iCategoria ." and SituaChave = 'ATIVO' ";
 		if($iSubCatgoria){
 			$sql .= " and PrOrcSubCategoria in (".$iSubCategoria.")";
 		}

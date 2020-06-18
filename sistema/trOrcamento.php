@@ -19,7 +19,7 @@ $sql = ("SELECT TrRefNumero, TrXOrId, TrXOrNumero, TrXOrData, TrXOrCategoria, Fo
 		 LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
 		 JOIN Categoria on CategId = TrXOrCategoria
 		 LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
-	     WHERE TrXOrEmpresa = ". $_SESSION['EmpreId'] ." and TrXOrTermoReferencia = ".$_SESSION['TRId']."
+	     WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." and TrXOrTermoReferencia = ".$_SESSION['TRId']."
 		 ORDER BY TrXOrData DESC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
