@@ -102,7 +102,7 @@ try {
 			document.getElementById('inputCategoria').value = Categoria;
 			document.getElementById('inputSubCategoria').value = SubCategoria;
 
-			if (Situacao != 'ATIVO') {
+			if (Situacao != 'ATIVO' && Situacao != 'FINALIZADO') {
 				alerta('Atenção', 'Aditivos só podem ser criados com o Fluxo Operacional com a situação ATIVO.', 'error');
 				return false;
 			} else if (Tipo == 'novo') {

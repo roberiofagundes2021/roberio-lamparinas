@@ -22,6 +22,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -29,8 +30,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<title>Lamparinas | Fluxo Operacional</title>
 
 	<?php include_once("head.php"); ?>
-	
-	<!-- Theme JS files --> 
+
+	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
@@ -40,39 +41,47 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- /theme JS files -->
 
 	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
-	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>	
+	<script type="text/javascript" language="javascript"
+		src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+	<script type="text/javascript" language="javascript"
+		src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
 
 	<!-- Modal -->
-	<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>	
-	
+	<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>
+
 	<script type="text/javascript">
-		
-		$(document).ready(function() {
+		$(document).ready(function () {
 
 			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
-			
+
 			/* Início: Tabela Personalizada */
-			$('#tblFluxo').DataTable( {
-				"order": [[ 0, "desc" ]],
-			    autoWidth: false,
+			$('#tblFluxo').DataTable({
+				"order": [
+					[0, "desc"]
+				],
+				autoWidth: false,
 				responsive: true,
-			    columnDefs: [{ 
+				columnDefs: [{
 					orderable: false,
 					width: 50,
-					targets: [ 7 ]
-				}], 
+					targets: [7]
+				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
 					search: '<span>Filtro:</span> _INPUT_',
 					searchPlaceholder: 'filtra qualquer coluna...',
 					lengthMenu: '<span>Mostrar:</span> _MENU_',
-					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+					paginate: {
+						'first': 'Primeira',
+						'last': 'Última',
+						'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+						'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+					}
 				}
 			});
-			
+
 			// Select2 for length menu styling
-			var _componentSelect2 = function() {
+			var _componentSelect2 = function () {
 				if (!$().select2) {
 					console.warn('Warning - select2.min.js is not loaded.');
 					return;
@@ -84,75 +93,78 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					dropdownAutoWidth: true,
 					width: 'auto'
 				});
-			};	
+			};
 
 			_componentSelect2();
-			
+
 			/* Fim: Tabela Personalizada */
 		});
-			
+
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaFluxoOperacional(FlOpeId, FlOpeCategoria, FlOpeSubCategoria, FlOpeStatus, Tipo, Motivo){
+		function atualizaFluxoOperacional(linkAditivo, FlOpeId, FlOpeCategoria, FlOpeSubCategoria, FlOpeStatus, Tipo,
+		Motivo) {
 
 			document.getElementById('inputFluxoOperacionalId').value = FlOpeId;
 			document.getElementById('inputFluxoOperacionalCategoria').value = FlOpeCategoria;
 			document.getElementById('inputFluxoOperacionalSubCategoria').value = FlOpeSubCategoria;
 			document.getElementById('inputFluxoOperacionalStatus').value = FlOpeStatus;
-					
-			if (Tipo == 'edita'){	
-				document.formFluxoOperacional.action = "fluxoEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formFluxoOperacional, "Tem certeza que deseja excluir esse fluxo?", "fluxoExclui.php");
-			} else if (Tipo == 'mudaStatus'){
+
+			if (Tipo == 'edita') {
+				document.formFluxoOperacional.action = "fluxoEdita.php";
+			} else if (Tipo == 'exclui') {
+				confirmaExclusao(document.formFluxoOperacional, "Tem certeza que deseja excluir esse fluxo?",
+					"fluxoExclui.php");
+			} else if (Tipo == 'mudaStatus') {
 				document.formFluxoOperacional.action = "fluxoMudaSituacao.php";
-			} else if (Tipo == 'produto'){
+			} else if (Tipo == 'produto') {
 				document.formFluxoOperacional.action = "fluxoProduto.php";
-			} else if (Tipo == 'servico'){
+			} else if (Tipo == 'servico') {
 				document.formFluxoOperacional.action = "fluxoServico.php";
-			} else if (Tipo == 'realizado'){
+			} else if (Tipo == 'realizado') {
 				document.formFluxoOperacional.action = "fluxoRealizado.php";
-			} else if (Tipo == 'aditivo'){
-				if($('#link-aditivo').attr('disabled') == 'disabled'){
-					    alerta('Atenção', 'Preencha todas as quantidades e valores dos produtos selecionados ou retire da lista', 'error');
-						return false;
+			} else if (Tipo == 'aditivo') {
+				if (linkAditivo != '') {
+
+					alerta('Atenção', 'Este fluxo operacional ainda está pendente. Não é possível fazer aditivos',
+						'error');
+					return false;
 				}
 				document.formFluxoOperacional.action = "fluxoAditivo.php";
-			} else if (Tipo == 'imprimir'){
+			} else if (Tipo == 'imprimir') {
 				document.formFluxoOperacional.action = "fluxoImprime.php";
 				document.formFluxoOperacional.setAttribute("target", "_blank");
-			} else if (Tipo == 'motivo'){
-	            bootbox.alert({
-                    title: '<strong>Motivo da Não Liberação</strong>',
-                    message: Motivo
-                });
-                return false;
-			}	
-			
+			} else if (Tipo == 'motivo') {
+				bootbox.alert({
+					title: '<strong>Motivo da Não Liberação</strong>',
+					message: Motivo
+				});
+				return false;
+			}
+
 			document.formFluxoOperacional.submit();
-		}		
-			
+		}
 	</script>
 
 </head>
 
 <body class="navbar-top">
 
-	<?php include_once("topo.php"); ?>	
+	<?php include_once("topo.php"); ?>
 
 	<!-- Page content -->
 	<div class="page-content">
-		
+
 		<?php include_once("menu-left.php"); ?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
 
-			<?php include_once("cabecalho.php"); ?>	
+			<?php include_once("cabecalho.php"); ?>
 
 			<!-- Content area -->
 			<div class="content">
 
-				<!-- Info blocks -->		
+				<!-- Info blocks -->
 				<div class="row">
 					<div class="col-lg-12">
 						<!-- Basic responsive configuration -->
@@ -169,17 +181,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos fluxos operacionais da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right"><a href="fluxoNovo.php" class="btn btn-success" role="button">Novo Fluxo Operacional</a></div>
+								<p class="font-size-lg">A relação abaixo faz referência aos fluxos operacionais da
+									unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+								<div class="text-right"><a href="fluxoNovo.php" class="btn btn-success"
+										role="button">Novo Fluxo Operacional</a></div>
 							</div>
-							
+
 							<table class="table" id="tblFluxo">
 								<thead>
 									<tr class="bg-slate">
 										<th width="10%">Início</th>
 										<th width="10%">Fim</th>
 										<th width="12%">Nº Contrato</th>
-										<th width="12%">Nº Processo</th>										
+										<th width="12%">Nº Processo</th>
 										<th width="18%">Fornecedor</th>
 										<th width="18%">Categoria</th>
 										<th width="10%">Situação</th>
@@ -187,7 +201,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									</tr>
 								</thead>
 								<tbody>
-								<?php
+									<?php
+									$cont = 1; 
 									foreach ($row as $item){
 
 										$sql = "SELECT Top 1 isnull(AditiDtFim, FlOpeDataFim) as DataFim
@@ -208,7 +223,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												WHERE BandeTabela = 'FluxoOperacional' and BandeTabelaId = ".$item['FlOpeId']." and 
 												BandeUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'NAOLIBERADO'";
 										$result = $conn->query($sql);
-										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);										
+										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);
+
 										
 										print('
 										<tr>
@@ -220,7 +236,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['CategNome'].'</td>
 											<td><span class="'.$situacaoClasse.'">'.$situacao.'</span>
 											');
-											$disabled = $item['SituaChave'] == 'PENDENTE' ? 'disabled="true"' : '';
+											$disabled = $item['SituaChave'] == 'PENDENTE' ? "disabled" : '';
 										
 										print('<td class="text-center">
 												<div class="list-icons">
@@ -236,7 +252,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>																
-																<a href="#" id="link-aditivo" '.$disabled.' onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
+																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
 																<div class="dropdown-divider"></div>
 
 																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>
@@ -256,6 +272,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												</div>
 											</td>
 										</tr>');
+
+										$cont++;
 									}
 								?>
 
@@ -265,20 +283,21 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- /basic responsive configuration -->
 
 					</div>
-				</div>				
-				
+				</div>
+
 				<!-- /info blocks -->
-				
+
 				<form name="formFluxoOperacional" method="post">
-					<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" >
-					<input type="hidden" id="inputFluxoOperacionalCategoria" name="inputFluxoOperacionalCategoria" >
-					<input type="hidden" id="inputFluxoOperacionalSubCategoria" name="inputFluxoOperacionalSubCategoria" >
-					<input type="hidden" id="inputFluxoOperacionalStatus" name="inputFluxoOperacionalStatus" >
+					<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId">
+					<input type="hidden" id="inputFluxoOperacionalCategoria" name="inputFluxoOperacionalCategoria">
+					<input type="hidden" id="inputFluxoOperacionalSubCategoria"
+						name="inputFluxoOperacionalSubCategoria">
+					<input type="hidden" id="inputFluxoOperacionalStatus" name="inputFluxoOperacionalStatus">
 				</form>
 
 			</div>
 			<!-- /content area -->
-			
+
 			<?php include_once("footer.php"); ?>
 
 		</div>
