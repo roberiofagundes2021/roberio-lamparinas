@@ -103,7 +103,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaFluxoOperacional(linkAditivo, FlOpeId, FlOpeCategoria, FlOpeSubCategoria, FlOpeStatus, Tipo,
 		Motivo) {
-
+			
 			document.getElementById('inputFluxoOperacionalId').value = FlOpeId;
 			document.getElementById('inputFluxoOperacionalCategoria').value = FlOpeCategoria;
 			document.getElementById('inputFluxoOperacionalSubCategoria').value = FlOpeSubCategoria;
@@ -131,6 +131,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				}
 				document.formFluxoOperacional.action = "fluxoAditivo.php";
 			} else if (Tipo == 'imprimir') {
+				console.log('teste')
 				document.formFluxoOperacional.action = "fluxoImprime.php";
 				document.formFluxoOperacional.setAttribute("target", "_blank");
 			} else if (Tipo == 'motivo') {
@@ -250,14 +251,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															</a>
 															
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>																
+																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>																
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
 																<div class="dropdown-divider"></div>
 
-																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>
+																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\', '.$item['FlOpeStatus'].', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>
 																
-																<a href="#" onclick="atualizaFluxoOperacional('.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\','.$item['FlOpeStatus'].', \'realizado\', \'\');" class="dropdown-item"><i class="icon-statistics" data-popup="tooltip" data-placement="bottom" title="Fluxo Realizado"></i> Fluxo Realizado</a>');
+																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FlOpeSubCategoria'].'\','.$item['FlOpeStatus'].', \'realizado\', \'\');" class="dropdown-item"><i class="icon-statistics" data-popup="tooltip" data-placement="bottom" title="Fluxo Realizado"></i> Fluxo Realizado</a>');
 										
 										if (isset($rowMotivo['BandeMotivo'])){
 
