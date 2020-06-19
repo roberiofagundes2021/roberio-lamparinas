@@ -72,10 +72,10 @@ try {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		$(document).ready(function() {
+		$(document).ready(function () {
 
 			//Valida Registro
-			$('#enviar').on('click', function(e) {
+			$('#enviar').on('click', function (e) {
 
 				e.preventDefault();
 
@@ -102,16 +102,21 @@ try {
 			document.getElementById('inputCategoria').value = Categoria;
 			document.getElementById('inputSubCategoria').value = SubCategoria;
 
-			if (Situacao != 'ATIVO' && Situacao != 'FINALIZADO') {
-				alerta('Atenção', 'Aditivos só podem ser criados com o Fluxo Operacional com a situação ATIVO ou FINALIZADO.', 'error');
-				return false;
-			} else if (Tipo == 'novo') {
+
+			if (Tipo == 'novo') {
+				if (Situacao != 'ATIVO' && Situacao != 'FINALIZADO') {
+					alerta('Atenção',
+						'Aditivos só podem ser criados com o Fluxo Operacional com a situação ATIVO ou FINALIZADO.',
+						'error');
+					return false;
+				}
 				document.formAditivo.action = "fluxoAditivoNovo.php";
 			} else if (Tipo == 'edita') {
 				document.formAditivo.action = "fluxoAditivoEdita.php";
 			} else if (Tipo == 'exclui') {
-				confirmaExclusao(document.formAditivo, "Tem certeza que deseja excluir esse aditivo?", "fluxoAditivoExclui.php");
-			} else if (Tipo == 'imprimir'){
+				confirmaExclusao(document.formAditivo, "Tem certeza que deseja excluir esse aditivo?",
+					"fluxoAditivoExclui.php");
+			} else if (Tipo == 'imprimir') {
 				document.formAditivo.setAttribute("target", "_blank");
 				document.formAditivo.action = "fluxoAditivoImprime.php";
 			}
@@ -144,10 +149,12 @@ try {
 
 					<form name="formAditivo" id="formAditivo" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Aditivos - Fluxo Operacional Nº Contrato "<?php echo $row['FlOpeNumContrato']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Aditivos - Fluxo Operacional Nº Contrato
+								"<?php echo $row['FlOpeNumContrato']; ?>"</h5>
 						</div>
 
-						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional" class="form-control" value="<?php echo $row['FlOpeId']; ?>">
+						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional"
+							class="form-control" value="<?php echo $row['FlOpeId']; ?>">
 
 						<div class="card-body">
 
@@ -157,20 +164,27 @@ try {
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputFornecedor">Fornecedor</label>
-												<input type="text" id="inputFornecedor" name="inputFornecedor" class="form-control" value="<?php echo $row['ForneNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdFornecedor" name="inputIdFornecedor" class="form-control" value="<?php echo $row['ForneId']; ?>">
+												<input type="text" id="inputFornecedor" name="inputFornecedor"
+													class="form-control" value="<?php echo $row['ForneNome']; ?>"
+													readOnly>
+												<input type="hidden" id="inputIdFornecedor" name="inputIdFornecedor"
+													class="form-control" value="<?php echo $row['ForneId']; ?>">
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputTelefone">Telefone</label>
-												<input type="text" id="inputTelefone" name="inputTelefone" class="form-control" value="<?php echo $row['ForneTelefone']; ?>" readOnly>
+												<input type="text" id="inputTelefone" name="inputTelefone"
+													class="form-control" value="<?php echo $row['ForneTelefone']; ?>"
+													readOnly>
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputCelular">Celular</label>
-												<input type="text" id="inputCelular" name="inputCelular" class="form-control" value="<?php echo $row['ForneCelular']; ?>" readOnly>
+												<input type="text" id="inputCelular" name="inputCelular"
+													class="form-control" value="<?php echo $row['ForneCelular']; ?>"
+													readOnly>
 											</div>
 										</div>
 									</div>
@@ -178,27 +192,38 @@ try {
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputCategoriaNome">Categoria</label>
-												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" value="<?php echo $row['CategNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['FlOpeCategoria']; ?>">
+												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome"
+													class="form-control" value="<?php echo $row['CategNome']; ?>"
+													readOnly>
+												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria"
+													class="form-control" value="<?php echo $row['FlOpeCategoria']; ?>">
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputCategoriaNome">SubCategoria</label>
-												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo $row['SbCatNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['FlOpeSubCategoria']; ?>">
+												<input type="text" id="inputSubCategoriaNome"
+													name="inputSubCategoriaNome" class="form-control"
+													value="<?php echo $row['SbCatNome']; ?>" readOnly>
+												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria"
+													class="form-control"
+													value="<?php echo $row['FlOpeSubCategoria']; ?>">
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputContrato">Contrato</label>
-												<input type="text" id="inputContrato" name="inputContrato" class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly>
+												<input type="text" id="inputContrato" name="inputContrato"
+													class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>"
+													readOnly>
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputProcesso">Processo</label>
-												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
+												<input type="text" id="inputProcesso" name="inputProcesso"
+													class="form-control" value="<?php echo $row['FlOpeNumProcesso']; ?>"
+													readOnly>
 											</div>
 										</div>
 										<!--<div class="col-lg-2">
@@ -221,7 +246,8 @@ try {
 											<div class="header-elements">
 												<div class="list-icons">
 													<a class="list-icons-item" data-action="collapse"></a>
-													<a href="fluxo.php" class="list-icons-item" data-action="reload"></a>
+													<a href="fluxo.php" class="list-icons-item"
+														data-action="reload"></a>
 													<!--<a class="list-icons-item" data-action="remove"></a>-->
 												</div>
 											</div>
@@ -229,10 +255,13 @@ try {
 
 										<div class="card-body">
 											<div class="row">
-												<div class="col-lg-6 font-size-lg">A relação abaixo faz referência aos aditivos do fluxo acima</div>
+												<div class="col-lg-6 font-size-lg">A relação abaixo faz referência aos
+													aditivos do fluxo acima</div>
 												<div class="col-lg-6 text-right">
 													<a href="fluxo.php" class="btn btn-classic" role="button">Voltar</a>
-													<a href="#" onclick="atualizaAditivo('<?php echo $row['FlOpeId']; ?>', '0', '<?php echo $row['FlOpeCategoria'] ?>', '<?php echo $row['FlOpeSubCategoria'] ?>','<?php echo $row['SituaChave']; ?>', 'novo');" class="btn btn-success" role="button">Novo Aditivo </a>
+													<a href="#"
+														onclick="atualizaAditivo('<?php echo $row['FlOpeId']; ?>', '0', '<?php echo $row['FlOpeCategoria'] ?>', '<?php echo $row['FlOpeSubCategoria'] ?>','<?php echo $row['SituaChave']; ?>', 'novo');"
+														class="btn btn-success" role="button">Novo Aditivo </a>
 												</div>
 											</div>
 										</div>
@@ -281,32 +310,20 @@ try {
 													print('<td class="text-center">');
 
 													if ($cont == $countAditivos) {
-														if (mostraValor($item['AditiValor']) != '0,00') {
-															print('<div class="list-icons m-2">
-																		<div class="list-icons list-icons-extended">
-																		
-																			<!--<a href="#"  class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>-->
-																				<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
-																				<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'imprimir\', \'\');" class="list-icons-item"><i class="icon-printer2" title="Listar Serviços"></i></a>
-																		</div>
-																	</div>');
-																
-														} else {
-															print('<div class="list-icons">
-																		<div class="list-icons list-icons-extended">
-																		
-																			<!--<a href="#"  class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>-->
-																				<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'exclui\', \'\');"  class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
-																		</div>
-																	</div>');
-														}
+
+														print('<div class="list-icons m-2">
+																	<div class="list-icons list-icons-extended">
+																	
+																		<!--<a href="#"  class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>-->
+																			<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>		
+																			<a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'imprimir\', \'\');" class="list-icons-item"><i class="icon-printer2" title="Imprimir Aditivo"></i></a>
+																	</div>
+																</div>');
 													} else {
-														if (mostraValor($item['AditiValor']) != '0,00') {
 															print('
-														<div class="list-icons m-2">
-														    <a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'imprimir\', \'\');" class="list-icons-item"><i class="icon-printer2" title="Listar Serviços"></i></a>												
+														            <div class="list-icons m-2">
+														                 <a href="#" onclick="atualizaAditivo(' . $row['FlOpeId'] . ', \'' . $item['AditiId'] . '\', \'' . $row['FlOpeCategoria'] . '\', \'' . $row['FlOpeSubCategoria'] . '\', \'' . $row['SituaChave'] . '\', \'imprimir\', \'\');" class="list-icons-item"><i class="icon-printer2" title="Imprimir Aditivo"></i></a>												
 															');
-														}
 													}
 
 													print('</td>');
