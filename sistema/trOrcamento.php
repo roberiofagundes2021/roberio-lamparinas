@@ -13,12 +13,13 @@ if (isset($_POST['inputTRId'])){
 	$_SESSION['TRNumero'] = $_POST['inputTRNumero'];
 }
 
-$sql = ("SELECT TrRefNumero, TrXOrId, TrXOrNumero, TrXOrData, TrXOrCategoria, ForneNome, CategNome, SbCatNome, TrXOrStatus
+$sql = ("SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrCategoria, TrXOrStatus, TrRefNumero, TrRefTipo, ForneNome, CategNome, SbCatNome, SituaId, SituaCor, SituaChave
 		 FROM TRXOrcamento
 		 JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
 		 LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
 		 JOIN Categoria on CategId = TrXOrCategoria
 		 LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
+		 JOIN Situacao on SituaId = TrXOrStatus
 	     WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." and TrXOrTermoReferencia = ".$_SESSION['TRId']."
 		 ORDER BY TrXOrData DESC");
 $result = $conn->query("$sql");
@@ -49,7 +50,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
 	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script
+	<script src="global_assets/js/demo_pages/components_popups.js"></script>
 	<!-- /theme JS files -->	
 	
 	<script type="text/javascript" >
@@ -145,9 +146,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					confirmaExclusao(document.formOrcamento, "Tem certeza que deseja excluir esse orcamento?", "trOrcamentoExclui.php");
 				} else if (Tipo == 'mudaStatus'){
 					document.formOrcamento.action = "trOrcamentoMudaSituacao.php";
-				} else if (Tipo == 'produto'){
+				} else if (Tipo == 'P'){
 					document.formOrcamento.action = "trOrcamentoProduto.php";
-				} else if (Tipo == 'duplica'){
+				} else if (Tipo == 'S'){
+					document.formOrcamento.action = "trOrcamentoServico.php";
+				}  else if (Tipo == 'duplica'){
 					document.formOrcamento.action = "trOrcamentoDuplica.php";
 				}
 			}
@@ -214,8 +217,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['TrXOrStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['TrXOrStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['TrXOrStatus'] == 1 ? 'Ativo' : 'Inativo';
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
+										$situacaoChave ='\''.$item['SituaChave'].'\'';
 										
 										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
 
@@ -253,29 +257,79 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											print('</td>');
 										}
 										
-										print('<td><a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										// print('<td><a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>');
 										
-										print('<td class="text-center">
+										//////////////////////////////////////////////////////////
+										if ($item['TrRefTipo'] == 'P') {
+											print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
+
 														<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
 														<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
+
 														<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'produto\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
-																<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'P\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
 															</div>
 														</div>
 													</div>
 												</div>
 											</td>
 										</tr>');
+										} else if ($item['TrRefTipo'] == 'S') {
+											print('<td class="text-center">
+												<div class="list-icons">
+													<div class="list-icons list-icons-extended">
+													<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
+													<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
+														<div class="dropdown">													
+															<a href="#" class="list-icons-item" data-toggle="dropdown">
+																<i class="icon-menu9"></i>
+															</a>
+
+															<div class="dropdown-menu dropdown-menu-right">
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'S\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Serviços</a>
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
+															</div>
+														</div>
+													</div>
+												</div>
+											</td>
+										</tr>');
+										} else {
+											print('<td class="text-center">
+												<div class="list-icons">
+													<div class="list-icons list-icons-extended">
+													<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
+													<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
+														<div class="dropdown">													
+															<a href="#" class="list-icons-item" data-toggle="dropdown">
+																<i class="icon-menu9"></i>
+															</a>
+
+															<div class="dropdown-menu dropdown-menu-right">
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'P\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'S\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Serviços</a>
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
+															</div>
+														</div>
+													</div>
+												</div>
+											</td>
+										</tr>');
+										}
 									}
+									
 								?>
 
 								</tbody>

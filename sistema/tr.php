@@ -6,10 +6,11 @@ $_SESSION['PaginaAtual'] = 'Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefStatus
+$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefStatus, SituaId, SituaCor, SituaChave
 		FROM TermoReferencia
 		JOIN Categoria on CategId = TrRefCategoria
-	    WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . "
+		JOIN Situacao on SituaId = TrRefStatus
+	    WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 		ORDER BY TrRefData DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -234,9 +235,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$result = $conn->query($sql);
 										$rowSC = $result->fetchAll(PDO::FETCH_ASSOC);
 
-
-										$situacao = $item['TrRefStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['TrRefStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['TrRefStatus'] == 1 ? 'Ativo' : 'Inativo';
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
+										$situacaoChave ='\''.$item['SituaChave'].'\'';
 
 										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
 
@@ -285,7 +286,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 
 
-										print('<td><a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
+										// print('<td><a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
+										print('<td><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></td>');
 
 										if ($item['TrRefTipo'] == 'P') {
 											print('<td class="text-center">

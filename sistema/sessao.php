@@ -28,19 +28,12 @@ if (array_key_exists('FluxoId', $_SESSION) and !in_array(basename($_SERVER['PHP_
 $arquivoAditivoNovo = array('fluxoAditivoNovo.php');
 
 if (array_key_exists('AditivoNovo', $_SESSION) and !in_array(basename($_SERVER['PHP_SELF']), $arquivoAditivoNovo)) {
-	/*$sql = "SELECT AditiValor
-	             FROM Aditivo
-				WHERE AditiId = ".$_SESSION['AditivoNovo']."";
-	$result = $conn->prepare($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);*/
 
-//	if($row['AditiValor'] != NULL){
-		$sql = "DELETE FROM Aditivo WHERE AditiId =  :id
+	$sql = "DELETE FROM Aditivo WHERE AditiId =  :id
 		";
-		$result = $conn->prepare($sql);
-		$result->bindParam(':id', $_SESSION['AditivoNovo']);
-		$result->execute();	 
-//	}
+	$result = $conn->prepare($sql);
+	$result->bindParam(':id', $_SESSION['AditivoNovo']);
+	$result->execute();
 
 	unset($_SESSION['AditivoNovo']);
 }

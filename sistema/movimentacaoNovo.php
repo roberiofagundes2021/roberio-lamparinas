@@ -229,7 +229,7 @@ var_dump($_POST);die;
 											':iQuantidade' => (int) $registro[3],
 											':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 											':sLote' => $registro[5],
-											':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+											':dValidade' => $registro[6] != '0' ? $registro[6] : null,
 											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
 											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 											':iUnidade' => $_SESSION['UnidadeId'],

@@ -91,21 +91,6 @@ if (isset($_POST['inputDataInicio'])) {
 	try {
 
 		$conn->beginTransaction();
-		
-		$sql = "SELECT SituaId
-		FROM Situacao
-		WHERE SituaChave = 'AGUARDANDOLIBERACAO'
-		";
-		$result = $conn->query($sql);
-		$rowStatus = $result->fetch(PDO::FETCH_ASSOC);
-		$bStatus = $rowStatus['SituaId'];
-
-		$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
-	WHERE FlOpeId = :id";
-		$result = $conn->prepare($sql);
-		$result->bindParam(':bStatus', $bStatus);
-		$result->bindParam(':id', $iFluxoOperacional);
-		$result->execute();
 
 		$sql = "INSERT INTO Aditivo (AditiFluxoOperacional, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, 
 									 AditiValor, AditiUsuarioAtualizador, AditiUnidade)
@@ -130,10 +115,26 @@ if (isset($_POST['inputDataInicio'])) {
 
 		if ($_POST['inputValor'] == '') {
 
+			$sql = "SELECT SituaId
+		            FROM Situacao
+		            WHERE SituaChave = 'AGUARDANDOLIBERACAO'";
+			$result = $conn->query($sql);
+			$rowStatus = $result->fetch(PDO::FETCH_ASSOC);
+			$bStatus = $rowStatus['SituaId'];
+
+			$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
+	                 WHERE FlOpeId = :id";
+			$result = $conn->prepare($sql);
+			$result->bindParam(':bStatus', $bStatus);
+			$result->bindParam(':id', $iFluxoOperacional);
+			$result->execute();
+
+
+
+
 			$sql = "SELECT SituaId, SituaNome, SituaChave
 			FROM Situacao
-			WHERE SituaStatus = 1 and SituaChave = 'AGUARDANDOLIBERACAO'
-";
+			WHERE SituaStatus = 1 and SituaChave = 'AGUARDANDOLIBERACAO'";
 			$result = $conn->query($sql);
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -312,6 +313,21 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 				));
 			}
 		}
+		//// Mudando status do fluxo, após gravar produtos e serviços
+		$sql = "SELECT SituaId
+		            FROM Situacao
+		            WHERE SituaChave = 'AGUARDANDOLIBERACAO'
+		";
+		$result = $conn->query($sql);
+		$rowStatus = $result->fetch(PDO::FETCH_ASSOC);
+		$bStatus = $rowStatus['SituaId'];
+
+		$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
+	                 WHERE FlOpeId = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':bStatus', $bStatus);
+		$result->bindParam(':id', $iFluxoOperacional);
+		$result->execute();
 
 		$conn->commit();
 		$_SESSION['msg']['titulo'] = "Sucesso";

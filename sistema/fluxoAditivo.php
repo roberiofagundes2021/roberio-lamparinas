@@ -19,10 +19,10 @@ try {
 	$sql = "SELECT FlOpeId, FlOpeNumContrato, FlOpeCategoria, FlOpeSubCategoria, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
 				   SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, FlOpeStatus, SituaChave
 			FROM FluxoOperacional
-			JOIN Fornecedor on ForneId = FlOpeFornecedor
-			JOIN Categoria on CategId = FlOpeCategoria
-			JOIN SubCategoria on SbCatId = FlOpeSubCategoria
-			JOIN Situacao on SituaId = FlOpeStatus
+			LEFT JOIN Fornecedor on ForneId = FlOpeFornecedor
+			LEFT JOIN Categoria on CategId = FlOpeCategoria
+			LEFT JOIN SubCategoria on SbCatId = FlOpeSubCategoria
+			LEFT JOIN Situacao on SituaId = FlOpeStatus
 			WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -103,7 +103,7 @@ try {
 			document.getElementById('inputSubCategoria').value = SubCategoria;
 
 			if (Situacao != 'ATIVO' && Situacao != 'FINALIZADO') {
-				alerta('Atenção', 'Aditivos só podem ser criados com o Fluxo Operacional com a situação ATIVO.', 'error');
+				alerta('Atenção', 'Aditivos só podem ser criados com o Fluxo Operacional com a situação ATIVO ou FINALIZADO.', 'error');
 				return false;
 			} else if (Tipo == 'novo') {
 				document.formAditivo.action = "fluxoAditivoNovo.php";
@@ -232,11 +232,10 @@ try {
 												<div class="col-lg-6 font-size-lg">A relação abaixo faz referência aos aditivos do fluxo acima</div>
 												<div class="col-lg-6 text-right">
 													<a href="fluxo.php" class="btn btn-classic" role="button">Voltar</a>
-													<a href="#" onclick="atualizaAditivo('<?php echo $row['FlOpeId']; ?>', '0', '<?php echo $row['FlOpeCategoria'] ?>', '<?php echo $row['FlOpeSubCategoria'] ?>','<?php echo $row['SituaChave']; ?>', 'novo');" class="btn btn-success" role="button">Novo Aditivo</a>
+													<a href="#" onclick="atualizaAditivo('<?php echo $row['FlOpeId']; ?>', '0', '<?php echo $row['FlOpeCategoria'] ?>', '<?php echo $row['FlOpeSubCategoria'] ?>','<?php echo $row['SituaChave']; ?>', 'novo');" class="btn btn-success" role="button">Novo Aditivo </a>
 												</div>
 											</div>
 										</div>
-
 										<table class="table" id="tblFluxo">
 											<thead>
 												<tr class="bg-slate">
