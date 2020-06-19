@@ -7,32 +7,6 @@
         $cont = 0;
         $produtos = array_chunk($rowMvPrPatrimoniado, 4);
 
-        //"Bens não patrimoniados" tem quantidade e não tem patrimônio, já os "Bens patrimoniados" não tem quantidade e tem patrimônio
-      /*  $html .= '<br>
-        <table style="width:100%;">
-            <tr>                                
-                <td style="width:25%">Data: ' . mostraData($row['MovimData']) . '</td>
-                <td style="width:25%; text-align: center; background-color: #d8d8d8;">Nº: 0001/19</td>
-                <td colspan="2" style="width:50%; border: none;"></td>
-            </tr>
-            <tr>
-                <td colspan="2" style="width:50%">Origem: '. $Origem .'</td>
-                <td colspan="2" style="width:50%">Destino: '.$Destino.'</td>
-            </tr>
-        ';
-
-        if ($row['ParamValorObsImpreRetirada'] == 1) {
-
-            $html .= ' 
-                <tr>
-                    <td colspan="4">Observação: '.$row['MovimObservacao'].'</td>
-                    </tr>
-                ';
-        }
-
-        $html .= '</table>
-        <br>'; */
-
         foreach ($produtos as $produtos3) {            
             
             $cont += 1;
@@ -64,8 +38,8 @@
                             <td colspan="1">Código: '.$value['ProduCodigo'].'</td>
                         </tr>
                         <tr>
-                            <td colspan="3">Marca: '. $Origem .'</td>
-                            <td colspan="2">Modelo: '.$Destino.'</td>
+                            <td colspan="3">Marca: '. $value['MarcaNome'] .'</td>
+                            <td colspan="2">Modelo: '.$value['ModelNome'].'</td>
                             <td colspan="1">Unidade: '.$value['UnMedSigla'].'</td>                                    
                         </tr>
                         <tr>
@@ -73,11 +47,15 @@
 
                 $html .= '  <td colspan="3">Categoria: '.$value['CategNome'].'</td>';
 
-                $html .= '
-                                <td colspan="1">Lote: '.$value['CategNome'].'</td>
-                                <td colspan="1">Validade: '.mostraData($value['Validade']).'</td>
-                                <td colspan="1">Quantidade: 1</td>                                
-                            </tr>
+                if($value['Validade'] == ''){
+                    $html .= '  <td colspan="2">Lote: '.$value['MvXPrLote'].'</td>';                    
+                } else{
+                    $html .= '  <td colspan="1">Lote: '.$value['MvXPrLote'].'</td>';
+                    $html .= '  <td colspan="1">Validade: '.mostraData($value['Validade']).'</td>';    
+                }
+
+                $html .= '  <td colspan="1">Quantidade: 1</td>
+                         </tr>
                         ';
             }
 

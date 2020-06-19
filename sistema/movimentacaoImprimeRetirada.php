@@ -22,7 +22,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
     $row = $result->fetch(PDO::FETCH_ASSOC);
 
     //Após concluido a tela de Movimentação tem que avaliar se precisa desse Distinct, porque não deve ser criado vários registros na tabela MovimentacaoXProduto pra esse caso de produtos não patrimoniados.
-    $sql = "SELECT Distinct MvXPrProduto, MvXPrQuantidade, MvXPrLote, isnull(MvXPrValidade, '') as Validade, ClassNome, ClassChave, ProduNome, ProduMarca, 
+    $sql = "SELECT Distinct MvXPrProduto, MvXPrQuantidade, MvXPrLote, isnull(cast(cast(MvXPrValidade as date)as varchar),'') as Validade, ClassNome, ClassChave, ProduNome, ProduMarca, 
             ProduModelo, ProduCodigo, ProduUnidadeMedida, ProduModelo, CategNome, UnMedSigla, ModelNome, MarcaNome
 	        FROM Movimentacao
 	        JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
@@ -36,7 +36,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
     $result = $conn->query($sql);
     $rowMvPrNaoPatrimoniado = $result->fetchAll(PDO::FETCH_ASSOC);
 
-    $sql = "SELECT MvXPrProduto, MvXPrQuantidade, MvXPrLote, isnull(MvXPrValidade, '') as Validade, ClassNome, ClassChave, ProduNome, ProduMarca, 
+    $sql = "SELECT MvXPrProduto, MvXPrQuantidade, MvXPrLote, isnull(cast(cast(MvXPrValidade as date)as varchar),'') as Validade, ClassNome, ClassChave, ProduNome, ProduMarca, 
             ProduModelo, ProduCodigo, ProduUnidadeMedida, ProduModelo, CategNome, UnMedSigla, ModelNome, MarcaNome, PatriNumero
 	        FROM Movimentacao
 	        JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
@@ -136,6 +136,32 @@ try {
 
     <div style='text-align:center; margin-top: 20px;'><h1>RECIBO DE RETIRADA</h1></div>
     ";
+
+    //"Bens não patrimoniados" tem quantidade e não tem patrimônio, já os "Bens patrimoniados" não tem quantidade e tem patrimônio
+    $html .= '<br>
+    <table style="width:100%;">
+        <tr>                                
+            <td style="width:25%">Data: ' . mostraData($row['MovimData']) . '</td>
+            <td style="width:25%; text-align: center; background-color: #d8d8d8;">Nº: 0001/19</td>
+            <td colspan="2" style="width:50%; border: none;"></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="width:50%">Origem: '. $Origem .'</td>
+            <td colspan="2" style="width:50%">Destino: '.$Destino.'</td>
+        </tr>
+    ';
+
+    if ($row['ParamValorObsImpreRetirada'] == 1) {
+
+        $html .= ' 
+            <tr>
+                <td colspan="4">Observação: '.$row['MovimObservacao'].'</td>
+                </tr>
+            ';
+    }
+
+    $html .= '</table>
+    <br>';    
 
     //Listando os Bens Não Patrimoniados
     include("movimentacaoImprimeRetiradaNaoPatrimoniado.php");

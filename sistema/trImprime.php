@@ -305,6 +305,7 @@ try {
 	}
 
 	$html .= '
+	<br><br>
 	<div>' . $row['TrRefConteudoFim'] . '</div>
 	<br>';
 
