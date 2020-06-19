@@ -3,87 +3,85 @@
     // Caso seja uma movimentação de saída
     if ($row['MovimTipo'] == 'S') {
 
-        $numPaginas = count($rowMvPrNaoPatrimoniado) / 3;
+        $numPaginas = count($rowMvPrNaoPatrimoniado) / 4;
         $cont = 0;
-        $produtos = array_chunk($rowMvPrNaoPatrimoniado, 3);
+        $produtos = array_chunk($rowMvPrNaoPatrimoniado, 4);
+
+        //"Bens não patrimoniados" tem quantidade e não tem patrimônio, já os "Bens patrimoniados" não tem quantidade e tem patrimônio
+        $html .= '<br>
+        <table style="width:100%;">
+            <tr>                                
+                <td style="width:25%">Data: ' . mostraData($row['MovimData']) . '</td>
+                <td style="width:25%; text-align: center; background-color: #d8d8d8;">Nº: 0001/19</td>
+                <td colspan="2" style="width:50%; border: none;"></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="width:50%">Origem: '. $Origem .'</td>
+                <td colspan="2" style="width:50%">Destino: '.$Destino.'</td>
+            </tr>
+        ';
+
+        if ($row['ParamValorObsImpreRetirada'] == 1) {
+
+            $html .= ' 
+                <tr>
+                    <td colspan="4">Observação: '.$row['MovimObservacao'].'</td>
+                    </tr>
+                ';
+        }
+
+        $html .= '</table>
+        <br>';
 
         foreach ($produtos as $produtos3) {
             
             $cont += 1;
 
-          //  $html .= "<div style='height: 800px ;position: relative; border: 1px solid #ccc; box-sizing: border-box; padding: 20px'>";
-
-
-            //"Bens não patrimoniados" tem quantidade e não tem patrimônio, já os "Bens patrimoniados" não tem quantidade e tem patrimônio
-
-			$html .= '<br>
-                        <table style="width:100%;">
-                            <tr>                                
-                                <td style="width:25%">Data: ' . mostraData($row['MovimData']) . '</td>
-                                <td style="width:25%; text-align: center; background-color: #d8d8d8;">Nº: 0001/19</td>
-                                <td colspan="2" style="width:50%; border: none;"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" style="width:50%">Origem: '. $Origem .'</td>
-                                <td colspan="2" style="width:50%">Destino: '.$Destino.'</td>
-                            </tr>
-                      ';
-
-            if ($row['ParamValorObsImpreRetirada'] == 1) {
-    
-                $html .= ' 
-                            <tr>
-                                <td colspan="4">Observação: '.$row['MovimObservacao'].'</td>
-                             </tr>
-                         ';
+            //Isso aqui para os casos de uma retirada de mais de 4 bens permanentes de uma só vez (isso é para quebrar a página)
+            if ($cont > 1){
+                $html .= '<br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
             }
 
-            $html .= '
-                        </table>
-				      <br>
-                     ';
+            $html .= '                      
+            <table style="width:100%;">
+            <tr>
+                <td colspan="7" style="border: none;"></td>
+            </tr> 
+            <tr>
+                <td colspan="7" style="background-color: #d8d8d8; text-align: center; font-weight: bold;">BENS NÃO PATRIMONIADOS</td>
+            </tr>
+            ';            
 
             foreach ($produtos3 as $value) {
 
-                    $html .= '
-                            <table style="width:100%;">
-                                <tr>
-                                    <td colspan="7" style="border: none;"></td>
-                                </tr>            
-                                <tr>
-                                    <td colspan="7" style="background-color: #d8d8d8; text-align: center; font-weight: bold;">BENS NÃO PATRIMONIADOS</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="7" style="border: none;"></td>
-                                </tr>
-                                <tr>
-                                    <td rowspan="3" style="text-align: center; background-color: #eee;">Código: '.$value['ProduCodigo'].'</td>
-                                    <td colspan="4">Produto: '.$value['ProduNome'].'</td>
-                                    <td colspan="2">Categoria: '.$value['CategNome'].'</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3">Marca: '. $Origem .'</td>
-                                    <td colspan="2">Modelo: '.$Destino.'</td>
-                                    <td colspan="1">Unidade: '.$value['UnMedSigla'].'</td>                                    
-                                </tr>
-                                <tr>
-                            ';
+                $html .= '  
+                        <tr>
+                            <td colspan="7" style="border: none;"></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3" style="text-align: center; background-color: #eee;">Código: '.$value['ProduCodigo'].'</td>
+                            <td colspan="4">Produto: '.$value['ProduNome'].'</td>
+                            <td colspan="2">Categoria: '.$value['CategNome'].'</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">Marca: '. $Origem .'</td>
+                            <td colspan="2">Modelo: '.$Destino.'</td>
+                            <td colspan="1">Unidade: '.$value['UnMedSigla'].'</td>                                    
+                        </tr>
+                        <tr>
+                        ';
 
-                    if ($value['ClassChave'] == 'PERMANENTE') {                            
-                        $html .= '  <td colspan="2">Classificação: '.$value['ClassNome'].'</td>
-                                    <td colspan="1">Patrimônio: '.$value['PatriNumero'].'</td>';
-                    } else {
-                        $html .= '  <td colspan="3">Classificação: '.$value['ClassNome'].'</td>';
-                    }
+                $html .= '  <td colspan="3">Classificação: '.$value['ClassNome'].'</td>';
 
-                    $html .= '
-                                    <td colspan="1">Lote: '.$value['CategNome'].'</td>
-                                    <td colspan="1">Validade: '.mostraData($value['Validade']).'</td>
-                                    <td colspan="1">Quantidade: '.$value['MvXPrQuantidade'].'</td>                                
-                                </tr>
-                            </table>
-                            ';
+                $html .= '
+                                <td colspan="1">Lote: '.$value['CategNome'].'</td>
+                                <td colspan="1">Validade: '.mostraData($value['Validade']).'</td>
+                                <td colspan="1">Quantidade: '.$value['MvXPrQuantidade'].'</td>                                
+                            </tr>
+                        ';
             }
+
+            $html .= '</table>';   
         }
 
         //*************************************** Caso seja uma movimentação de Transferência ***********************************\\

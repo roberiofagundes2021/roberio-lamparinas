@@ -8,7 +8,7 @@
         $produtos = array_chunk($rowMvPrPatrimoniado, 4);
 
         //"Bens não patrimoniados" tem quantidade e não tem patrimônio, já os "Bens patrimoniados" não tem quantidade e tem patrimônio
-        $html .= '<br>
+      /*  $html .= '<br>
         <table style="width:100%;">
             <tr>                                
                 <td style="width:25%">Data: ' . mostraData($row['MovimData']) . '</td>
@@ -31,7 +31,7 @@
         }
 
         $html .= '</table>
-        <br>';
+        <br>'; */
 
         foreach ($produtos as $produtos3) {            
             
@@ -54,37 +54,34 @@
 
             foreach ($produtos3 as $value) {
 
-                    $html .= '        
-                            <tr>
-                                <td colspan="7" style="border: none;"></td>
-                            </tr>
-                            <tr>
-                                <td rowspan="3" style="text-align: center; background-color: #eee;">Patrimônio: '.$value['PatriNumero'].'</td>
-                                <td colspan="5">Produto: '.$value['ProduNome'].'</td>
-                                <td colspan="1">Código: '.$value['ProduCodigo'].'</td>
-                            </tr>
-                            <tr>
-                                <td colspan="3">Marca: '. $Origem .'</td>
-                                <td colspan="2">Modelo: '.$Destino.'</td>
-                                <td colspan="1">Unidade: '.$value['UnMedSigla'].'</td>                                    
-                            </tr>
-                            <tr>
-                            ';
+                $html .= '        
+                        <tr>
+                            <td colspan="7" style="border: none;"></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3" style="text-align: center; background-color: #eee;">Patrimônio: '.$value['PatriNumero'].'</td>
+                            <td colspan="5">Produto: '.$value['ProduNome'].'</td>
+                            <td colspan="1">Código: '.$value['ProduCodigo'].'</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">Marca: '. $Origem .'</td>
+                            <td colspan="2">Modelo: '.$Destino.'</td>
+                            <td colspan="1">Unidade: '.$value['UnMedSigla'].'</td>                                    
+                        </tr>
+                        <tr>
+                        ';
 
-                        
-                    $html .= '  <td colspan="3">Categoria: '.$value['CategNome'].'</td>';
+                $html .= '  <td colspan="3">Categoria: '.$value['CategNome'].'</td>';
 
-                    $html .= '
-                                    <td colspan="1">Lote: '.$value['CategNome'].'</td>
-                                    <td colspan="1">Validade: '.mostraData($value['Validade']).'</td>
-                                    <td colspan="1">Quantidade: 1</td>                                
-                                </tr>
-                            ';
+                $html .= '
+                                <td colspan="1">Lote: '.$value['CategNome'].'</td>
+                                <td colspan="1">Validade: '.mostraData($value['Validade']).'</td>
+                                <td colspan="1">Quantidade: 1</td>                                
+                            </tr>
+                        ';
             }
 
-            $html .= '</table>';            
-
-            // Other code
+            $html .= '</table>';
         }
 
         //*************************************** Caso seja uma movimentação de Transferência ***********************************\\
