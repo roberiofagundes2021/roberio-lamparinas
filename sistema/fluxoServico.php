@@ -460,9 +460,6 @@ try {
 														<div class="col-lg-8">
 															<label for="inputServico"><strong>Servico</strong></label>
 														</div>
-														<div class="col-lg-3">
-															<label for="inputMarca"><strong>Marca</strong></label>
-														</div>
 													</div>
 												</div>												
 											<div class="col-lg-1">
@@ -504,11 +501,8 @@ try {
 															<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
 															<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
 														</div>
-														<div class="col-lg-8">
+														<div class="col-lg-11">
 															<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
-														</div>
-														<div class="col-lg-3">
-															<input type="text" id="inputMarca' . $cont . '" name="inputMarca' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['MarcaNome'] . '" value="' . $item['MarcaNome'] . '" readOnly>
 														</div>
 													</div>
 												</div>
