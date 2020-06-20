@@ -16,7 +16,6 @@ try {
     print('sucesso');
 
 } catch (PDOException $e) {
-    print($sql);
     $_SESSION['msg']['titulo'] = "Erro";
     $_SESSION['msg']['mensagem'] = "Erro ao alterar serviço!!!";
     $_SESSION['msg']['tipo'] = "error";

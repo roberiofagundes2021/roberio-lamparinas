@@ -52,7 +52,7 @@ $dataFim = date("Y-m-d");
         function modalAcoes() {
 
             $('.btn-acoes').each((i, elem) => {
-                $(elem).on('click', function() {
+                $(elem).on('click', function () {
                     $('#page-modal').fadeIn(200);
 
                     let linha = $(elem).parent().parent()
@@ -85,27 +85,25 @@ $dataFim = date("Y-m-d");
                     var NumSerie = numeroSerie ? numeroSerie : ''
 
                     $('#numeroSerie').val(NumSerie)
-                    
+
                     $('#cmbEstadoConservacao').val(estadoConservacao)
 
                     if (estadoConservacao) {
-                        url = 'filtraEstadoConservacao.php'
-                            inputsValues = {
-                                inputEstadoConservacao: estadoConservacao
+                        let url = 'filtraEstadoConservacao.php'
+                        let inputsValues = {
+                            inputEstadoConservacao: estadoConservacao
+                        }
+
+                        $.post(
+                            url,
+                            inputsValues,
+                            (data) => {
+                                if (data) {
+                                    $('#cmbEstadoConservacao').html(data)
+
+                                } else {}
                             }
-                            
-                            $.post(
-                                url,
-                                inputsValues,
-                                (data) => {
-                                    console.log(data)
-                                    if (data) {
-                                        $('#cmbEstadoConservacao').html(data)
-                                        
-                                        console.log(data)
-                                    } else {}
-                                }
-                            );
+                        );
                     }
 
                     formModal = `
@@ -114,7 +112,7 @@ $dataFim = date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Patrimônio</label>
                                                  <div class="input-group">
-                                                    <input id='produto' class='form-control' value='${patrimonio}' readOnly />
+                                                    <input class='form-control' value='${patrimonio}' readOnly />
                                                  </div>
                                             </div>
                                          </div>                                    
@@ -122,7 +120,7 @@ $dataFim = date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Produto</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${produto}' readOnly />
+                                                     <input class='form-control' value='${produto}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -132,7 +130,7 @@ $dataFim = date("Y-m-d");
                                               <div class="form-group">
                                                   <label for="produto">Origem</label>
                                                   <div class="input-group">
-                                                    <input id='produto' class='form-control' value='${origem}' readOnly />
+                                                    <input class='form-control' value='${origem}' readOnly />
                                                   </div>
                                              </div>
                                           </div>
@@ -140,7 +138,7 @@ $dataFim = date("Y-m-d");
                                               <div class="form-group">
                                                   <label for="produto">Destino</label>
                                                   <div class="input-group">
-                                                    <input id='produto' class='form-control' value='${destino}' readOnly />
+                                                    <input class='form-control' value='${destino}' readOnly />
                                                   </div>
                                              </div>
                                          </div>
@@ -151,7 +149,7 @@ $dataFim = date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Nota Fiscal</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${notaFisc}' readOnly />
+                                                     <input class='form-control' value='${notaFisc}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -159,7 +157,7 @@ $dataFim = date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Data da Compra</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='' readOnly />
+                                                     <input class='form-control' value='' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -167,7 +165,7 @@ $dataFim = date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">(R$) Aquisição</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${aquisicao}' readOnly />
+                                                     <input class='form-control' value='${aquisicao}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -175,7 +173,7 @@ $dataFim = date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">(R$) Depreciação</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${depreciacao}' readOnly />
+                                                     <input class='form-control' value='${depreciacao}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -185,7 +183,7 @@ $dataFim = date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Marca</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${marca}' readOnly />
+                                                     <input class='form-control' value='${marca}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -193,7 +191,7 @@ $dataFim = date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Fabricante</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${fabricante}' readOnly />
+                                                     <input class='form-control' value='${fabricante}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -204,13 +202,13 @@ $dataFim = date("Y-m-d");
                 })
             })
 
-            $('#modal-close').on('click', function() {
+            $('#modal-close').on('click', function () {
                 $('#page-modal').fadeOut(200);
                 $('body').css('overflow', 'scroll');
             })
         }
 
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
@@ -289,7 +287,7 @@ $dataFim = date("Y-m-d");
             });
 
             // Select2 for length menu styling
-            var _componentSelect2 = function() {
+            var _componentSelect2 = function () {
                 if (!$().select2) {
                     console.warn('Warning - select2.min.js is not loaded.');
                     return;
@@ -314,14 +312,16 @@ $dataFim = date("Y-m-d");
                     Filtrando()
                     const valCategoria = $('#cmbCategoria').val()
 
-                    $.getJSON('filtraSubCategoria.php?idCategoria=' + valCategoria, function(dados) {
+                    $.getJSON('filtraSubCategoria.php?idCategoria=' + valCategoria, function (
+                    dados) {
 
                         var option = '<option value="">Selecione a SubCategoria</option>';
 
                         if (dados.length) {
 
-                            $.each(dados, function(i, obj) {
-                                option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
+                            $.each(dados, function (i, obj) {
+                                option += '<option value="' + obj.SbCatId + '">' +
+                                    obj.SbCatNome + '</option>';
                             });
 
                             $('#cmbSubCategoria').html(option).show();
@@ -349,7 +349,9 @@ $dataFim = date("Y-m-d");
                 $('#submitFiltro').on('click', (e) => {
                     e.preventDefault()
 
-                    const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>')
+                    const msg = $(
+                        '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+                        )
 
                     let dataDe = $('#inputDataDe').val()
                     let dataAte = $('#inputDataAte').val()
@@ -389,7 +391,7 @@ $dataFim = date("Y-m-d");
                 })
             })()
 
-            $('#salvar').on('click', function(e) {
+            $('#salvar').on('click', function (e) {
                 let numeroSerie = $('#numeroSerie').val()
                 let estadoConservacao = $('#cmbEstadoConservacao').val()
                 let id = $('#inputProdutoEdita').val()
@@ -399,14 +401,12 @@ $dataFim = date("Y-m-d");
                     cmbEstadoConservacao: estadoConservacao,
                     inputId: id
                 }
-                console.log(data)
 
                 $.post(
                     url,
                     data,
-                    function(data) {
+                    function (data) {
                         if (data) {
-                            console.log(data)
                             alerta('Atenção', 'Registro editado', 'success');
 
                             //let inputNumeroSerie = $(`<td style="display: none" id="inputNumeroSerie">${numeroSerie}</td>`)
@@ -414,11 +414,9 @@ $dataFim = date("Y-m-d");
 
                             $('[idpatrimonio]').each((i, elem) => {
                                 let tds = $(elem).children()
-                                console.log()
                                 if ($(elem).attr('idpatrimonio') == id) {
                                     $(tds[12]).children().first().val(numeroSerie)
                                     $(tds[13]).children().first().val(estadoConservacao)
-                                    console.log($(tds[12]).children().first())
                                     // $(elem).append(inputNumeroSerie).append(inputEstadoConservacao)
                                 }
                             })
@@ -509,9 +507,11 @@ $dataFim = date("Y-m-d");
                                             <label for="inputDataDe">Período de</label>
                                             <div class="input-group">
                                                 <span class="input-group-prepend">
-                                                    <span class="input-group-text"><i class="icon-calendar22"></i></span>
+                                                    <span class="input-group-text"><i
+                                                            class="icon-calendar22"></i></span>
                                                 </span>
-                                                <input type="date" id="inputDataDe" name="inputDataDe" class="form-control" value="<?php echo $dataInicio ?>">
+                                                <input type="date" id="inputDataDe" name="inputDataDe"
+                                                    class="form-control" value="<?php echo $dataInicio ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -520,16 +520,19 @@ $dataFim = date("Y-m-d");
                                             <label for="inputDataAte">Até</label>
                                             <div class="input-group">
                                                 <span class="input-group-prepend">
-                                                    <span class="input-group-text"><i class="icon-calendar22"></i></span>
+                                                    <span class="input-group-text"><i
+                                                            class="icon-calendar22"></i></span>
                                                 </span>
-                                                <input type="date" id="inputDataAte" name="inputDataAte" class="form-control" value="<?php echo $dataFim ?>">
+                                                <input type="date" id="inputDataAte" name="inputDataAte"
+                                                    class="form-control" value="<?php echo $dataFim ?>">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-3">
                                         <div class="form-group">
                                             <label for="cmbLocalEstoque">Local Estoque</label>
-                                            <select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2">
+                                            <select id="cmbLocalEstoque" name="cmbLocalEstoque"
+                                                class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
                                                 $sql = "SELECT LcEstId, LcEstNome
@@ -550,7 +553,8 @@ $dataFim = date("Y-m-d");
                                     <div class="col-lg-3">
                                         <div class="form-group">
                                             <label for="cmbSetor">Setor</label>
-                                            <select id="cmbSetor" name="cmbSetor" class="form-control form-control-select2">
+                                            <select id="cmbSetor" name="cmbSetor"
+                                                class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
                                                 $sql = "SELECT SetorId, SetorNome
@@ -573,7 +577,8 @@ $dataFim = date("Y-m-d");
                                     <div class="col-lg-3">
                                         <div class="form-group">
                                             <label for="cmbCategoria">Categoria</label>
-                                            <select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+                                            <select id="cmbCategoria" name="cmbCategoria"
+                                                class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
                                                 $sql = "SELECT CategId, CategNome
@@ -594,7 +599,8 @@ $dataFim = date("Y-m-d");
                                     <div class="col-lg-3">
                                         <div class="form-group">
                                             <label for="cmbSubCategoria">SubCategoria</label>
-                                            <select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+                                            <select id="cmbSubCategoria" name="cmbSubCategoria"
+                                                class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                             </select>
                                         </div>
@@ -604,16 +610,19 @@ $dataFim = date("Y-m-d");
                                             <label for="inputPoduto">Produto</label>
                                             <div class="input-group">
                                                 <span class="input-group-prepend">
-                                                    <span class="input-group-text"><i class="icon-calendar22"></i></span>
+                                                    <span class="input-group-text"><i
+                                                            class="icon-calendar22"></i></span>
                                                 </span>
-                                                <input type="text" id="inputProduto" name="inputProduto" class="form-control">
+                                                <input type="text" id="inputProduto" name="inputProduto"
+                                                    class="form-control">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="text-right">
                                     <div>
-                                        <button id="submitFiltro" class="btn btn-success"><i class="icon-search">Consultar</i></button>
+                                        <button id="submitFiltro" class="btn btn-success"><i
+                                                class="icon-search">Consultar</i></button>
                                         <button id="imprimir" class="btn btn-secondary btn-icon" disabled>
                                             <i class="icon-printer2"> Imprimir</i>
                                         </button>
@@ -664,16 +673,20 @@ $dataFim = date("Y-m-d");
                                 <div class="d-flex flex-row p-2">
                                     <div class='col-lg-6'>
                                         <div class="form-group">
-                                            <label for="numeroSerie">Nº Série <span class="text-danger">(Editável)</span></label>
+                                            <label for="numeroSerie">Nº Série <span
+                                                    class="text-danger">(Editável)</span></label>
                                             <div class="input-group">
-                                                <input type="text" id="numeroSerie" name="numeroSerie" class="form-control">
+                                                <input type="text" id="numeroSerie" name="numeroSerie"
+                                                    class="form-control">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <label for="numeroSerie">Estado de Conservação <span class="text-danger">(Editável)</span></label>
+                                        <label for="numeroSerie">Estado de Conservação <span
+                                                class="text-danger">(Editável)</span></label>
                                         <div class="form-group">
-                                            <select id="cmbEstadoConservacao" name="cmbEstadoConservacao" class="form-control form-control-select2">
+                                            <select id="cmbEstadoConservacao" name="cmbEstadoConservacao"
+                                                class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
                                                 $sql = "SELECT EstCoId, EstCoNome
