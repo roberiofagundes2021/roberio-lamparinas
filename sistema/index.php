@@ -595,13 +595,12 @@ if ($totalAcoes) {
 				document.getElementById('inputAditivoId').value = BandeTabelaId;
 
 				if (Tipo == 'imprimir') {
-						document.formBandeja.action = "fluxoAditivoImprime.php";
-
+					document.formBandeja.action = "fluxoAditivoImprime.php";
 					document.formBandeja.setAttribute("target", "_blank");
 					document.formBandeja.submit();
 				} else {
 					if (Tipo == 'liberar') {
-						document.getElementById('inputAditivoStatus').value = 'LIBERADO';
+						document.getElementById('inputAditivoStatus').value = 'ATIVO';
 						document.formBandeja.action = "fluxoAditivoBandejaMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();

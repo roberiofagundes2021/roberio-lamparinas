@@ -21,10 +21,8 @@ $sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, 
 		JOIN Categoria on CategId = FlOpeCategoria
 		JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 		WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
-
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
-
 
 $sql = "SELECT AditiId, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, AditiValor, FlOpeId, FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, CategNome, SbCatNome,
 		ForneNome, ForneCelular, ForneEmail
@@ -34,7 +32,6 @@ $sql = "SELECT AditiId, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFi
 		JOIN Categoria on CategId = FlOpeCategoria
 		JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 		WHERE AditiUnidade = " . $_SESSION['UnidadeId'] . " and AditiFluxoOperacional = " . $iFluxoOperacional;
-
 $result = $conn->query($sql);
 $rowAditivos = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -85,25 +82,103 @@ try {
 	";
 
 	$html .= '
+	<h2 style="margin-top: 20px; text-align: center;">RESUMO</h2>
+'	;	
+
+	//Dados do Fluxo
+	$html .= '
     <table style="width:100%; border-collapse: collapse;">
         <tr style="background-color:#F1F1F1;">
-            <td style="width:25%; font-size:12px;">Nº Ata Registro: ' . $row['FlOpeNumContrato'] . '</td>
-            <td style="width:25%; font-size:12px;">Nº Processo: ' . $row['FlOpeNumProcesso'] . '</td>
-            <td style="width:20%; font-size:12px;">Valor: ' . mostraValor($row['FlOpeValor']) . '</td>
-            <td style="width:15%; font-size:12px;">Início: ' . mostraData($row['FlOpeDataInicio']) . '</td>
-            <td style="width:15%; font-size:12px;">Fim: ' . mostraData($row['FlOpeDataFim']) . '</td>
+            <td style="width:28%; font-size:14px;">Início: ' . mostraData($row['FlOpeDataInicio']) . '</td>
+            <td style="width:22%; font-size:14px;">Fim: ' . mostraData($row['FlOpeDataFim']) . '</td>
+            <td style="width:30%; font-size:14px;">Nº Ata Registro: ' . $row['FlOpeNumContrato'] . '</td>
+			<td style="width:5%; font-size:14px;">Nº Processo: ' . $row['FlOpeNumProcesso'] . '</td>
+			<td style="width:5%; font-size:14px; border-right: none;">Valor:</td>			
+			<td style="width:10%; font-size:14px; border-left: none; text-align:right;">' . mostraValor($row['FlOpeValor']) . '</td>
         </tr>
         <tr>
-            <td colspan="3" style="font-size:12px;">Categoria: ' . $row['CategNome'] . '</td>
-            <td colspan="2" style="font-size:12px;">Sub Categoria: ' . $row['SbCatNome'] . '</td>
+            <td colspan="2" style="font-size:14px;">Categoria: ' . $row['CategNome'] . '</td>
+            <td colspan="4" style="font-size:14px;">Sub Categoria: ' . $row['SbCatNome'] . '</td>
         </tr>
         <tr>
-            <td colspan="3" style="width:40%; font-size:12px;">Fornecedor: ' . $row['ForneNome'] . '</td>
-            <td colspan="1" style="width:30%; font-size:12px;">Telefone: ' . $row['ForneCelular'] . '</td>
-            <td colspan="1" style="width:30%; font-size:12px;">E-mail: ' . $row['ForneEmail'] . '</td>
+            <td colspan="3" style="width:36%; font-size:14px;">Fornecedor: ' . $row['ForneNome'] . '</td>
+            <td colspan="1" style="width:29%; font-size:14px;">E-mail: ' . $row['ForneEmail'] . '</td>
+            <td colspan="2" style="width:35%; font-size:14px;"> Telefone: ' . $row['ForneCelular'] . '</td>
         </tr>
     </table>
 	<br>';
+
+	$totalGeralFluxo = $row['FlOpeValor'];
+	$totalGeralProdutos = 0;
+
+	if ($rowProdutos){
+		foreach ($rowProdutos as $rowProduto) {
+
+			if ($rowProduto['FOXPrValorUnitario'] != '' and $rowProduto['FOXPrValorUnitario'] != null) {
+				$valorUnitario = $rowProduto['FOXPrValorUnitario'];
+				$valorTotal = $rowProduto['FOXPrQuantidade'] * $rowProduto['FOXPrValorUnitario'];
+			} else {
+				$valorUnitario = 0;
+				$valorTotal = 0;
+			}
+	
+			$totalGeralProdutos += $valorTotal;
+		}	
+	}
+
+	$totalGeralServicos = 0;
+
+	if ($rowServicos){
+		foreach ($rowServicos as $rowServico) {
+
+			if ($rowServico['FOXSrValorUnitario'] != '' and $rowServico['FOXSrValorUnitario'] != null) {
+				$valorUnitario = $rowServico['FOXSrValorUnitario'];
+				$valorTotal = $rowServico['FOXSrQuantidade'] * $rowServico['FOXSrValorUnitario'];
+			} else {
+				$valorUnitario = 0;
+				$valorTotal = 0;
+			}
+	
+			$totalGeralServicos += $valorTotal;
+		}	
+	}
+
+	$totalGeralAditivos = 0;
+
+	//Dados dos Aditivos
+	if ($rowAditivos){
+
+		foreach ($rowAditivos as $aditivo){
+			$html .= '
+			<table style="width:100%; border-collapse: collapse;">
+				<tr>
+					<td style="width:17%; font-size:10px;">Nº Aditivo: ' . $aditivo['AditiNumero'] . '</td>
+					<td style="width:23%; font-size:10px;">Celebração: ' . mostraData($aditivo['AditiDtCelebracao']) . '</td>
+					<td style="width:18%; font-size:10px;">Início: ' . mostraData($aditivo['AditiDtInicio']) . '</td>
+					<td style="width:22%; font-size:10px;">Fim: ' . mostraData($aditivo['AditiDtFim']) . '</td>
+					<td style="width:7%; font-size:10px; border-right: none;">Valor:</td>
+					<td style="width:13%; font-size:10px; border-left: none; text-align:right;">'. mostraValor($aditivo['AditiValor']) . '</td>	
+				</tr>
+			</table>
+			<br>';
+
+			$totalGeralAditivos += $aditivo['AditiValor'];
+		}
+	}
+
+	$totalGeral = $totalGeralFluxo + $totalGeralProdutos + $totalGeralServicos + $totalGeralAditivos;
+
+	$html .= "<table style='width:100%; border-collapse: collapse; margin-top: 20px;'>
+	 			<tr>
+                	<td colspan='5' height='50' valign='middle' style='width:80%'>
+	                    <strong>TOTAL GERAL (Fluxo + Aditivos)</strong>
+                    </td>
+				    <td style='text-align: right; width:20%'>
+				        " . mostraValor($totalGeral) . "
+				    </td>
+			    </tr>
+			  </table>
+	";		
 
 	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
 			FROM Produto
@@ -126,7 +201,11 @@ try {
 
 	$totalGeralProdutos = 0;
 
-	if ($totalProdutos > 0) {
+	$html .= '
+	<h2 style="margin-top: 50px; text-align: center;">DETALHAMENTO DO FLUXO</h2>
+'	;
+
+	if ($totalProdutos > 0) {		
 
 		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>PRODUTOS</h2></div>";
 
@@ -150,8 +229,8 @@ try {
 				$valorUnitario = $rowProduto['FOXPrValorUnitario'];
 				$valorTotal = $rowProduto['FOXPrQuantidade'] * $rowProduto['FOXPrValorUnitario'];
 			} else {
-				$valorUnitario = "";
-				$valorTotal = "";
+				$valorUnitario = 0;
+				$valorTotal = 0;
 			}
 
 			if ($totalProdutos == ($cont)) {
@@ -268,7 +347,7 @@ try {
 	$html .= "<table style='width:100%; border-collapse: collapse; margin-top: 20px;'>
 	 			<tr>
                 	<td colspan='5' height='50' valign='middle' style='width:85%'>
-	                    <strong>TOTAL GERAL</strong>
+	                    <strong>TOTAL DO FLUXO</strong>
                     </td>
 				    <td style='text-align: right; width:15%'>
 				        " . mostraValor($totalGeral) . "
@@ -281,7 +360,7 @@ try {
 	foreach ($rowAditivos as $aditivo) {
 		//////////////////////////////////
 		$html .= '
-	        <h3 style="margin-top: 50px">ADITIVO</h3>
+	        <h2 style="margin-top: 50px; text-align: center;">DETALHAMENTO DO ADITIVO</h2>
 	    ';
 
 		$html .= '
@@ -289,14 +368,13 @@ try {
                     <tr style="background-color:#F1F1F1;">
                         <td style="width:20%; font-size:10px;">Nº Aditivo: ' . $aditivo['AditiNumero'] . '</td>
                         <td style="width:30%; font-size:10px;">Data de Celebração: ' . mostraData($aditivo['AditiDtCelebracao']) . '</td>
-                        <td style="width:20%; font-size:10px;">Valor: ' . mostraValor($aditivo['AditiValor']) . '</td>
-                        <td style="width:15%; font-size:10px;">Início: ' . mostraData($aditivo['AditiDtInicio']) . '</td>
-                        <td style="width:15%; font-size:10px;">Fim: ' . mostraData($aditivo['AditiDtFim']) . '</td>
+                        <td style="width:18%; font-size:10px;">Início: ' . mostraData($aditivo['AditiDtInicio']) . '</td>
+						<td style="width:17%; font-size:10px;">Fim: ' . mostraData($aditivo['AditiDtFim']) . '</td>
+						<td style="width:7%; font-size:10px;border-right:none;">Valor:</td>
+						<td style="width:8%; font-size:10px;border-left: none; text-align:right;">' . mostraValor($aditivo['AditiValor']) . '</td>						
                     </tr>
                 </table>
 	            <br>';
-
-
 
 		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario
 			FROM Produto
@@ -321,19 +399,19 @@ try {
 
 		if ($totalProdutos > 0) {
 
-			$html .= "<div style='margin-top: -20px;'><h4>Produtos Aditivo N°".$aditivo['AditiNumero']."</h4></div>";
+			$html .= "<div style='margin-top: -10px; text-align:center;'><h3>Produtos do Aditivo N° ".$aditivo['AditiNumero']."</h3></div>";
 
 			$html .= '
-		<table style="width:100%; border-collapse: collapse;">
-			<tr>
-				<th style="text-align: center; width:8%">Item</th>
-				<th style="text-align: left; width:43%">Produto</th>
-				<th style="text-align: center; width:10%">Unidade</th>				
-				<th style="text-align: center; width:12%">Quant.</th>
-				<th style="text-align: center; width:12%">V. Unit.</th>
-				<th style="text-align: center; width:15%">V. Total</th>
-			</tr>
-		';
+			<table style="width:100%; border-collapse: collapse;">
+				<tr>
+					<th style="text-align: center; width:8%">Item</th>
+					<th style="text-align: left; width:43%">Produto</th>
+					<th style="text-align: center; width:10%">Unidade</th>				
+					<th style="text-align: center; width:12%">Quant.</th>
+					<th style="text-align: center; width:12%">V. Unit.</th>
+					<th style="text-align: center; width:15%">V. Total</th>
+				</tr>
+			';
 
 			$cont = 1;
 
@@ -392,18 +470,18 @@ try {
 
 		if ($totalServicos > 0) {
 
-			$html .= "<div style='margin-bottom: -20px;'><h4>Serviços Aditivo N°".$aditivo['AditiNumero']."</h4></div>";
+			$html .= "<div style='margin-top: 10px; margin-bottom: -20px; text-align: center;'><h4>Serviços Aditivo N°".$aditivo['AditiNumero']."</h4></div>";
 
 			$html .= '
-		<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
-			<tr>
-				<th style="text-align: center; width:8%">Item</th>
-				<th style="text-align: left; width:53%">Serviço</th>
-				<th style="text-align: center; width:12%">Quant.</th>
-				<th style="text-align: center; width:12%">V. Unit.</th>
-				<th style="text-align: center; width:15%">V. Total</th>
-			</tr>
-		';
+			<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
+				<tr>
+					<th style="text-align: center; width:8%">Item</th>
+					<th style="text-align: left; width:53%">Serviço</th>
+					<th style="text-align: center; width:12%">Quant.</th>
+					<th style="text-align: center; width:12%">V. Unit.</th>
+					<th style="text-align: center; width:15%">V. Total</th>
+				</tr>
+			';
 
 			$cont = 1;
 
@@ -461,7 +539,7 @@ try {
 		$html .= "<table style='width:100%; border-collapse: collapse; margin-top: 20px;'>
 	 			<tr>
                 	<td colspan='5' height='50' valign='middle' style='width:85%'>
-	                    <strong>TOTAL GERAL</strong>
+	                    <strong>TOTAL DO ADITIVO</strong>
                     </td>
 				    <td style='text-align: right; width:15%'>
 				        " . mostraValor($totalGeral) . "
