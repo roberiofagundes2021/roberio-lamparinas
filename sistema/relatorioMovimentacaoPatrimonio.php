@@ -438,7 +438,7 @@ $dataFim = date("Y-m-d");
                         $('#inputResultado').val(resultadosConsulta)
                         $('#inputDataDe_imp').val(inputsValues.inputDataDe)
                         $('#inputDataAte_imp').val(inputsValues.inputDataAte)
-                        $('#inputLocalEstoque_imp').val(inputsValues.inputlocalEstoque)
+                        $('#inputLocalEstoque_imp').val(inputsValues.inputLocalEstoque)
                         $('#inputSetor_imp').val(inputsValues.inputSetor)
                         $('#inputCategoria_imp').val(inputsValues.inputCategoria)
                         $('#inputSubCategoria_imp').val(inputsValues.inputSubCategoria)

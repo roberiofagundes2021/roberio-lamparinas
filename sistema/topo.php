@@ -63,13 +63,13 @@
 			
 			<ul class="navbar-nav ml-md-auto">
 
-				<li class="nav-item dropdown show">
-					<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown" aria-expanded="true">
+				<li class="nav-item dropdown">
+					<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">
 						<i class="icon-people"></i>
 						<span class="d-md-none ml-2">Usuários</span>
 					</a>
 					
-					<div class="dropdown-menu dropdown-menu-right dropdown-content wmin-md-300 show">
+					<div class="dropdown-menu dropdown-menu-right dropdown-content wmin-md-300">
 						<div class="dropdown-content-header">
 							<span class="font-weight-semibold">Usuários online</span>
 							<a href="#" class="text-default"><i class="icon-search4 font-size-base"></i></a>

@@ -12,7 +12,6 @@ require_once 'global_assets/php/vendor/autoload.php';
 /***************************************************************/
 $args = [];
 
-
 /////////////////////////////////////////////
 
 if (!empty($_POST['inputDataDe_imp']) || !empty($_POST['inputDataAte_imp'])) {
@@ -42,7 +41,6 @@ if(!empty($_POST['inputProduto_imp'])){
 	$args[]  = "ProduNome LIKE '%".$_POST['inputProduto_imp']."%' ";
 }
 
-
 if (count($args) >= 1) {
 	try {
 
@@ -69,22 +67,21 @@ if (count($args) >= 1) {
 }
 /***************************************************************/
 
-
-
-if (isset($_POST['inputLocalEstoque_imp'])) {
+if (isset($_POST['inputLocalEstoque_imp']) && $_POST['inputLocalEstoque_imp'] != '') {
 	try {
 		$sql = "SELECT LcEstNome
 		        FROM LocalEstoque
 		        WHERE LcEstId = " . $_POST['inputLocalEstoque_imp'] . " and LcEstUnidade = " . $_SESSION['UnidadeId'] . "
-	            ";
+				";
+		echo $sql;		
 		$result = $conn->query($sql);
 		$LocalEstoque = $result->fetch(PDO::FETCH_ASSOC);
 	} catch (PDOException $e) {
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error1: ' . $e->getMessage();die;
 	}
 }
 
-if (isset($_POST['inputSetor_imp'])) {
+if (isset($_POST['inputSetor_imp']) && $_POST['inputSetor_imp'] != '') {
 	try {
 		$sql = "SELECT SetorNome
 		        FROM Setor
@@ -97,7 +94,7 @@ if (isset($_POST['inputSetor_imp'])) {
 	}
 }
 
-if (isset($_POST['inputCategoria_imp'])) {
+if (isset($_POST['inputCategoria_imp']) && $_POST['inputCategoria_imp'] != '') {
 	try {
 		$sql = "SELECT CategNome
 		        FROM Categoria
@@ -111,7 +108,7 @@ if (isset($_POST['inputCategoria_imp'])) {
 }
 
 
-if (isset($_POST['inputSubCategoria_imp'])) {
+if (isset($_POST['inputSubCategoria_imp']) && $_POST['inputSubCategoria_imp'] != '') {
 	try {
 		$sql = "SELECT SbCatNome
 		        FROM SubCategoria
@@ -136,23 +133,37 @@ if (isset($_POST['resultados'])) {
 		]);
 
 		$topo = "
-		        <div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
-		            <div style='float:left; width: 400px; display: inline-block; margin-bottom: 10px;'>
-			            <img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
-			            <span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
-			            <div style='position: absolute; font-size:9px; margin-top: 8px; margin-left:4px;'>Unidade: " . $_SESSION['UnidadeNome'] . "</div>
-					</div>
-					<div style='width:250px; float:right; display: inline; text-align:right;'>
-			            <div style='font-size: 0.8rem'>Data {DATE j/m/Y}</div>
-			            <div style='margin-top:8px;'></div>
-		            </div>
-		            <div style='margin-top: -44px;width:300px; float:right; display: inline-block; text-align:right; font-size: 0.8rem; margin-bottom: 10px;'>
-			            <div style='margin-top:8px; font-weight:bold;'>Relatório Movimentação do Patrimônio</div>
-		            </div> 
-	            </div>
+			<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
+				<div style='float:left; width: 400px; display: inline-block; margin-bottom: 10px;'>
+					<img src='global_assets/images/lamparinas/logo-lamparinas_200x200.jpg' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
+					<span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
+					<div style='position: absolute; font-size:9px; margin-top: 8px; margin-left:4px;'>Unidade: " . $_SESSION['UnidadeNome'] . "</div>
+				</div>
+				<div style='width:350px; float:right; display: inline; text-align:right;'>
+					<div style='font-size: 0.8rem'>Data {DATE j/m/Y}</div>
+					<div style='margin-top:8px;'></div>
+					<div style='margin-top:8px; font-weight:bold;'>Relatório Movimentação do Patrimônio</div>
+				</div>
+			</div>
 	    ";
 
-		$html = '';
+		$html = '
+			<style>
+				th{
+					text-align: center; 
+					border: #bbb solid 1px; 
+					background-color: #f8f8f8; 
+					padding: 8px;
+					font-size: 0.6rem;
+				}
+
+				td{
+					padding: 8px;				
+					border: #bbb solid 1px;
+					font-size: 0.6rem;
+				}
+			</style>
+		';
 
 		$html .= '<br>';
 		$html .= '<br>';
@@ -196,20 +207,19 @@ if (isset($_POST['resultados'])) {
 
 
 		$html .= '
-		<hr>
-		<div></div>
+		<br>
 		<br>
 		<table style="width:100%; border-collapse: collapse; margin-top: -24px">
 			<tr>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:4%; font-size: 0.6rem">Item</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:17%; font-size: 0.6rem">Descrição</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%; font-size: 0.6rem">Patrimônio</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%; font-size: 0.6rem">Nota Fiscal</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:11%; font-size: 0.6rem">Aquisição (R$)</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%; font-size: 0.6rem">Depreciação (R$)</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%; font-size: 0.6rem">Validade</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%; font-size: 0.6rem">Origem</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%; font-size: 0.6rem">Destino</th>
+				<th style="text-align: left; width:4%;">Item</th>
+				<th style="text-align: left; width:17%;">Descrição</th>
+				<th style="text-align: center; width:10%;">Patrimônio</th>
+				<th style="text-align: center; width:12%;">Nota Fiscal</th>
+				<th style="text-align: center; width:11%;">Aquisição (R$)</th>
+				<th style="text-align: center; width:12%;">Depreciação (R$)</th>
+				<th style="text-align: center; width:10%;">Validade</th>
+				<th style="text-align: left; width:12%;">Origem</th>
+				<th style="text-align: left; width:12%;">Destino</th>
 			</tr>
 		';
 
@@ -220,15 +230,15 @@ if (isset($_POST['resultados'])) {
 			$cont += 1;
 			$html .= "
 			<tr>
-				<td style='font-size: 0.6rem; padding-top: 7px'>" . $cont . "</td>
-				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['ProduNome'] . "</td>
-				<td style='font-size: 0.6rem; padding-top: 7px'>".$produto['PatriNumero']."</td>
-				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['MovimNotaFiscal'] . "</td>
-				<td style='font-size: 0.6rem; padding-top: 7px'>" . mostraValor($produto['MvXPrValorUnitario']) . "</td>
-				<td style='font-size: 0.6rem; padding-top: 7px'></td>
-				<td style='font-size: 0.6rem; padding-top: 7px'>" . mostraData($produto['MvXPrValidade']) . "</td>
-				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['LcEstNome'] . "</td>
-				<td style='font-size: 0.6rem; padding-top: 7px'>" . $produto['SetorNome'] . "</td>
+				<td style='text-align: center'>" . $cont . "</td>
+				<td style='text-align: left'>" . $produto['ProduNome'] . "</td>
+				<td style='text-align: center'>".$produto['PatriNumero']."</td>
+				<td style='text-align: center'>" . $produto['MovimNotaFiscal'] . "</td>
+				<td style='text-align: right'>" . mostraValor($produto['MvXPrValorUnitario']) . "</td>
+				<td style='text-align: right'></td>
+				<td style='text-align: center'>" . mostraData($produto['MvXPrValidade']) . "</td>
+				<td style='text-align: left'>" . $produto['LcEstNome'] . "</td>
+				<td style='text-align: left'>" . $produto['SetorNome'] . "</td>
 			</tr>
 		 ";
 		}
@@ -236,12 +246,11 @@ if (isset($_POST['resultados'])) {
 
 		$html .= "</table>";
 
-
 		$rodape = "<hr/>
-    <div style='width:100%'>
-		<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
-		<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
-	</div>";
+		<div style='width:100%'>
+			<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
+			<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
+		</div>";
 
 		$mpdf->SetHTMLHeader($topo, 'O', true);
 		$mpdf->WriteHTML($html);
