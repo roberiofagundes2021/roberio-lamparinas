@@ -70,7 +70,7 @@ function queryPesquisa(){
 
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
 
-            print($sql);
+            // print($sql);
 
         } catch (PDOException $e) {
             echo 'Error: ' . $e->getMessage();
