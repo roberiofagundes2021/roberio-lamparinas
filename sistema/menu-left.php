@@ -144,6 +144,7 @@
 							<ul class="nav nav-group-sub" data-submenu-title="Form layouts">
 								<li class="nav-item"><a href="relatorioMovimentacao.php" class="nav-link">Movimentação</a></li>
 								<li class="nav-item"><a href="relatorioMovimentacaoPatrimonio.php" class="nav-link">Movimentação do Patrimônio</a></li>
+								<li class="nav-item"><a href="relatorioLicitacao.php" class="nav-link">Licitação</a></li>
 								<li class="nav-item"><a href="relatorioCurvaABC.php" class="nav-link">Curva ABC</a></li>
 							</ul>
 						</li>
