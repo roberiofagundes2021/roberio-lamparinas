@@ -547,11 +547,11 @@ $dataFim = date("Y-m-d");
                                                 $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                 foreach ($rowSituacao as $item) {
-                                                   /* if ($item['SituaChave'] == 'ATIVO') {
+                                                    if ($item['SituaChave'] == 'ATIVO') {
                                                         print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
                                                     } else if($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "NAOLIBERADO"){
                                                         print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-                                                    }*/
+                                                    }
                                                 }
                                                 ?>
                                             </select>
