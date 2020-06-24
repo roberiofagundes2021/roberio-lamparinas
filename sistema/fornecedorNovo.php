@@ -507,11 +507,11 @@ if(isset($_POST['inputTipo'])){
 										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 											<option value="">Selecione uma categoria</option>
 											<?php 
-												$sql = ("SELECT CategId, CategNome
-														 FROM Categoria															     
-														 WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and CategStatus = 1
-														 ORDER BY CategNome ASC");
-												$result = $conn->query("$sql");
+												$sql = "SELECT CategId, CategNome
+														FROM Categoria															     
+														WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and CategStatus = 1
+														ORDER BY CategNome ASC";
+												$result = $conn->query($sql);
 												$row = $result->fetchAll(PDO::FETCH_ASSOC);
 												
 												foreach ($row as $item){															
@@ -687,11 +687,12 @@ if(isset($_POST['inputTipo'])){
 											<select id="cmbBanco" name="cmbBanco" class="form-control form-control-select2">
 												<option value="#">Selecione um banco</option>
 												<?php 
-													$sql = ("SELECT BancoId, BancoCodigo, BancoNome
-															 FROM Banco
-															 WHERE BancoStatus = 1
-															 ORDER BY BancoCodigo ASC");
-													$result = $conn->query("$sql");
+													$sql = "SELECT BancoId, BancoCodigo, BancoNome
+															FROM Banco
+															JOIN Situacao on SituaId = BancoStatus
+															WHERE SituaChave = 'ATIVO'
+															ORDER BY BancoCodigo ASC";
+													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 													
 													foreach ($row as $item){
