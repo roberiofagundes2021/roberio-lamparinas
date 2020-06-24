@@ -202,9 +202,7 @@ if(isset($_POST['inputNome'])){
 			//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
 			$('#inputMargemLucro').on('blur', function(e){
 								
-				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
-					atualizaValorVenda();
-				}
+				atualizaValorVenda();
 			});	
 			
 			//Ao mudar o Valor de Venda, atualiza a Margem de Lucro

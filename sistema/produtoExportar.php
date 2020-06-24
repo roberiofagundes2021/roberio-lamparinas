@@ -89,14 +89,15 @@ $dadosXls .= "  </table>";
     
      
     // Configurações header para forçar o download  
-    header('Content-Type: application/vnd.ms-excel');
+	header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+	//header('Content-Type: application/vnd.ms-excel');
     header('Content-Disposition: attachment;filename="'.$arquivo.'"');
     header('Cache-Control: max-age=0');
     // Se for o IE9, isso talvez seja necessário
     header('Cache-Control: max-age=1');
     
     header("Content-type: text/html; charset=utf-8");
-       
+	
     // Envia o conteúdo do arquivo  
     echo $dadosXls;  
     exit;

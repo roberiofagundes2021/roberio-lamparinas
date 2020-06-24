@@ -75,7 +75,7 @@ else {
 		// Mantém o nome original do arquivo
 		$nome_final = $_FILES['arquivo']['name'];
 	}
-	
+	//var_dump(($_FILES['arquivo']));die;
 	$arquivo = new DomDocument();
 	$arquivo->load($_FILES['arquivo']['tmp_name']);
 	//var_dump($arquivo);die;	
@@ -141,6 +141,13 @@ else {
 						Where SituaChave = 'ALTERAR' ";
 				$result = $conn->query($sql);
 				$rowCategoria = $result->fetch(PDO::FETCH_ASSOC);
+
+				$sql = "SELECT UnMedId
+						FROM UnidadeMedida
+						JOIN Situacao on SituaId = UnMedStatus
+						Where SituaChave = 'ALTERAR' ";
+				$result = $conn->query($sql);
+				$rowUnidadeMedida = $result->fetch(PDO::FETCH_ASSOC);				
 				
 				$sql = "SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
 						FROM Produto
@@ -153,10 +160,10 @@ else {
 				$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
 				
 				$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduCategoria, ProduSubCategoria, ProduDetalhamento, ProduFoto, 
-											 ProduValorCusto, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
-											 ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduFabricante, ProduUnidadeMedida, 
-											 ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
-											 ProduUsuarioAtualizador, ProduUnidade) 
+											ProduValorCusto, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
+											ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduFabricante, ProduUnidadeMedida, 
+											ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
+											ProduUsuarioAtualizador, ProduUnidade) 
 						VALUES (:sCodigo, :sCodigoBarras, :sNome, :iCategoria, :iSubCategoria, :sDetalhamento, :sFoto, :fValorCusto, 
 								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo,
 								:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
@@ -180,7 +187,7 @@ else {
 								':iMarca' => null,
 								':iModelo' => null,
 								':iFabricante' => null,
-								':iUnidadeMedida' => null,
+								':iUnidadeMedida' => $rowUnidadeMedida['UnMedId'],
 								':iTipoFiscal' => null,
 								':iNcmFiscal' => null,
 								':iOrigemFiscal' => null,
@@ -189,7 +196,7 @@ else {
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 								':iUnidade' => $_SESSION['UnidadeId']
 								));
-				 	    
+						
 				$produtosimportados.= $nome.', ';
 				$importados++;
 			}		
