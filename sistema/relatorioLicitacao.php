@@ -49,7 +49,7 @@ $dataFim = date("Y-m-d");
     <script type="text/javascript">
         const selectEstCo = $('#selectSetadoConservacao').html()
 
-        /*function modalAcoes() {
+        function modalAcoes() {
 
             $('.btn-acoes').each((i, elem) => {
                 $(elem).on('click', function() {
@@ -57,21 +57,36 @@ $dataFim = date("Y-m-d");
 
                     let linha = $(elem).parent().parent()
 
-                    let id = linha.attr('idPatrimonio')
+                    let id = linha.attr('idFluxoOperacional')
                     let editado = linha.attr('editado')
 
                     let tds = linha.children();
-                    let produto = $(tds[1]).html();
-                    let patrimonio = $(tds[2]).html();
-                    let notaFisc = $(tds[3]).html();
-                    let aquisicao = $(tds[4]).html();
-                    let depreciacao = $(tds[5]).html();
-                    let origem = $(tds[7]).html();
-                    let destino = $(tds[8]).html();
-                    let marca = $(tds[9]).html();
-                    let fabricante = $(tds[10]).html();
-                    let numeroSerie = $(tds[12]).children().first().val()
-                    let estadoConservacao = $(tds[13]).children().first().val()
+
+                    let item = $(tds[0]).html();
+                    let categoria = $(tds[1]).html();
+                    let empresaContrat = $(tds[2]).html();
+                    let local = $(tds[3]).html();
+                    let status = $(tds[4]).html();
+                    let modalidade = $(tds[5]).html();
+                    let inicio = $(tds[6]).html();
+                    let termino = $(tds[7]).html();
+                    let prioridade = $(tds[8]).html();
+                    let observacao = $(tds[9]).html();
+                    let prioridadeVal = $(tds[10]).children().first().val()
+                    let observacaoVal = $(tds[11]).children().first().val()
+                    console.log(observacaoVal)
+
+                    // let produto = $(tds[1]).html();
+                    // let patrimonio = $(tds[2]).html();
+                    // let notaFisc = $(tds[3]).html();
+                    // let aquisicao = $(tds[4]).html();
+                    // let depreciacao = $(tds[5]).html();
+                    // let origem = $(tds[7]).html();
+                    // let destino = $(tds[8]).html();
+                    // let marca = $(tds[9]).html();
+                    // let fabricante = $(tds[10]).html();
+                    // let numeroSerie = $(tds[12]).children().first().val()
+                    // let estadoConservacao = $(tds[13]).children().first().val()
                     //console.log(numeroSerie)
 
                     const fonte1 = 'style="font-size: 1.1rem"'
@@ -82,123 +97,103 @@ $dataFim = date("Y-m-d");
                     const styleLabel3 = 'style="min-width: 100px; font-size: 0.9rem"'
                     const marginP = 'style="font-size: 0.9rem; margin-top: 4px"'
 
-                    var NumSerie = numeroSerie ? numeroSerie : ''
+                    var Observacao = observacaoVal ? observacaoVal : ''
 
-                    $('#numeroSerie').val(NumSerie)
-                    
-                    $('#cmbEstadoConservacao').val(estadoConservacao)
+                    $('#cmbPrioridadeEdit').val(prioridadeVal)
 
-                    if (estadoConservacao) {
-                        url = 'filtraEstadoConservacao.php'
-                            inputsValues = {
-                                inputEstadoConservacao: estadoConservacao
+                    $('#txtareaObservacao').val(Observacao)
+
+                    if (prioridadeVal) {
+                        url = 'filtraPrioridade.php'
+                        inputsValues = {
+                            inputPrioridade: prioridadeVal
+                        }
+
+                        $.post(
+                            url,
+                            inputsValues,
+                            (data) => {
+
+                                if (data) {
+                                    $('#cmbPrioridadeEdit').html(data)
+                                } else {}
                             }
-                            
-                            $.post(
-                                url,
-                                inputsValues,
-                                (data) => {
-                                    console.log(data)
-                                    if (data) {
-                                        $('#cmbEstadoConservacao').html(data)
-                                        
-                                        console.log(data)
-                                    } else {}
-                                }
-                            );
+                        );
                     }
 
                     formModal = `
                                     <div class='row'>
-                                         <div class='col-lg-2'>
+                                         <div class='col-lg-1'>
                                              <div class="form-group">
-                                                 <label for="produto">Patrimônio</label>
+                                                 <label for="produto">Item</label>
                                                  <div class="input-group">
-                                                    <input id='produto' class='form-control' value='${patrimonio}' readOnly />
+                                                    <input id='produto' class='form-control' value='${item}' readOnly />
                                                  </div>
                                             </div>
                                          </div>                                    
-                                         <div class='col-lg-10'>
+                                         <div class='col-lg-5'>
                                              <div class="form-group">
-                                                 <label for="produto">Produto</label>
+                                                 <label for="produto">Categoria</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${produto}' readOnly />
+                                                     <input id='produto' class='form-control' value='${categoria}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
-                                    </div>
-                                    <div class='row'>
                                          <div class='col-lg-6'>
                                               <div class="form-group">
                                                   <label for="produto">Origem</label>
                                                   <div class="input-group">
-                                                    <input id='produto' class='form-control' value='${origem}' readOnly />
+                                                    <input id='produto' class='form-control' value='${empresaContrat}' readOnly />
                                                   </div>
                                              </div>
                                           </div>
-                                          <div class='col-lg-6'>
+                                    </div>
+                                    <div class='row'>
+                                          <div class='col-lg-4'>
                                               <div class="form-group">
-                                                  <label for="produto">Destino</label>
+                                                  <label for="produto">Local</label>
                                                   <div class="input-group">
-                                                    <input id='produto' class='form-control' value='${destino}' readOnly />
+                                                    <input id='produto' class='form-control' value='${local}' readOnly />
                                                   </div>
                                              </div>
+                                         </div>
+                                         <div class='col-lg-4'>
+                                             <div class="form-group">
+                                                 <label for="produto">Status</label>
+                                                 <div class="input-group">
+                                                     <input id='produto' class='form-control' value='${status}' readOnly />
+                                                 </div>
+                                            </div>
+                                         </div>
+                                         <div class='col-lg-4'>
+                                             <div class="form-group">
+                                                 <label for="produto">Modalidade</label>
+                                                 <div class="input-group">
+                                                     <input id='produto' class='form-control' value='${modalidade}' readOnly />
+                                                 </div>
+                                            </div>
                                          </div>
                                      </div>
                                      
                                     <div class='row'>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="produto">Nota Fiscal</label>
-                                                 <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${notaFisc}' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="produto">Data da Compra</label>
-                                                 <div class="input-group">
-                                                     <input id='produto' class='form-control' value='' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="produto">(R$) Aquisição</label>
-                                                 <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${aquisicao}' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="produto">(R$) Depreciação</label>
-                                                 <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${depreciacao}' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>
-                                     </div>
-                                     <div class='row'>
                                          <div class='col-lg-6'>
                                              <div class="form-group">
-                                                 <label for="produto">Marca</label>
+                                                 <label for="produto">Inicio</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${marca}' readOnly />
+                                                     <input id='produto' class='form-control' value='${inicio}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
                                          <div class='col-lg-6'>
                                              <div class="form-group">
-                                                 <label for="produto">Fabricante</label>
+                                                 <label for="produto">Termino</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${fabricante}' readOnly />
+                                                     <input id='produto' class='form-control' value='${termino}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
                                      </div>
-                                     <input type="text" id="inputProdutoEdita" name="inputProdutoEdita" value="${id}" style="display: none">
+                                     <input type="text" id="inputFluxoOperacionalEdita" name="inputFluxoOperacionalEdita" value="${id}" style="display: none">
                     `;
                     $('.dados-produto').html(formModal)
                 })
@@ -208,7 +203,7 @@ $dataFim = date("Y-m-d");
                 $('#page-modal').fadeOut(200);
                 $('body').css('overflow', 'scroll');
             })
-        }*/
+        }
 
         $(document).ready(function() {
 
@@ -273,11 +268,6 @@ $dataFim = date("Y-m-d");
                         orderable: false,
                         width: 5,
                         targets: [10]
-                    },
-                    {
-                        orderable: false,
-                        width: 5,
-                        targets: [11]
                     }
                 ],
                 dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -380,19 +370,16 @@ $dataFim = date("Y-m-d");
                         cmbStatus: status
                     };
 
-                    console.log( inputsValues )
-
                     $.post(
                         url,
                         inputsValues,
                         (data) => {
 
                             if (data) {
-                                console.log(data)
                                 $('tbody').html(data)
                                 $('#imprimir').removeAttr('disabled')
                                 resultadosConsulta = data
-                                //modalAcoes()
+                                modalAcoes()
                             } else {
                                 $('tbody').html(msg)
                                 $('#imprimir').attr('disabled', '')
@@ -403,35 +390,40 @@ $dataFim = date("Y-m-d");
             })()
 
             $('#salvar').on('click', function(e) {
-                let numeroSerie = $('#numeroSerie').val()
-                let estadoConservacao = $('#cmbEstadoConservacao').val()
-                let id = $('#inputProdutoEdita').val()
-                let url = 'relatorioMovimentacaoPatrimonioEdita.php'
+                let prioridade = $('#cmbPrioridadeEdit').val()
+                let  observacao = $('#txtareaObservacao').val()
+                let id = $('#inputFluxoOperacionalEdita').val()
+                let url = 'relatorioLicitacaoEdita.php'
                 let data = {
-                    inputNumeroSerie: numeroSerie,
-                    cmbEstadoConservacao: estadoConservacao,
+                    cmbPrioridade: prioridade,
+                    observacao: observacao,
                     inputId: id
                 }
-                console.log(data)
 
                 $.post(
                     url,
                     data,
                     function(data) {
                         if (data) {
-                            console.log(data)
+
                             alerta('Atenção', 'Registro editado', 'success');
 
                             //let inputNumeroSerie = $(`<td style="display: none" id="inputNumeroSerie">${numeroSerie}</td>`)
                             //let inputEstadoConservacao = $(`<td style="display: none" id="inputEstadoConservacao">${estadoConservacao}</td>`)
+                            let prioridade = ''
+                            $('#cmbPrioridadeEdit').children().each((i, elem)=>{
+                                if($(elem).val() == $('#cmbPrioridadeEdit').val()){
+                                    prioridade = $(elem).html()
+                                }
+                            })
+                            $('[idFluxoOperacional]').each((i, elem) => {
 
-                            $('[idpatrimonio]').each((i, elem) => {
                                 let tds = $(elem).children()
-                                console.log()
-                                if ($(elem).attr('idpatrimonio') == id) {
-                                    $(tds[12]).children().first().val(numeroSerie)
-                                    $(tds[13]).children().first().val(estadoConservacao)
-                                    console.log($(tds[12]).children().first())
+                              
+                                if ($(elem).attr('idFluxoOperacional') == id) {
+                                    $(tds[8]).html(prioridade)
+                                    $(tds[11]).children().first().val(observacao) // colocando o valor dentro do input que armazena o valor da observação, pra que seja recuperado quando o modal for aberto em cada linha da tabela
+                                    // console.log($(tds[12]).children().first())
                                     // $(elem).append(inputNumeroSerie).append(inputEstadoConservacao)
                                 }
                             })
@@ -494,7 +486,7 @@ $dataFim = date("Y-m-d");
                         <!-- Basic responsive configuration -->
                         <div class="card">
                             <div class="card-header header-elements-inline">
-                                <h3 class="card-title">Movimentação do Patrimônio</h3>
+                                <h3 class="card-title">Licitação</h3>
                                 <div class="header-elements">
                                     <div class="list-icons">
                                         <a class="list-icons-item" data-action="collapse"></a>
@@ -526,7 +518,7 @@ $dataFim = date("Y-m-d");
                                                 <span class="input-group-prepend">
                                                     <span class="input-group-text"><i class="icon-calendar22"></i></span>
                                                 </span>
-                                                <input type="date" id="inputDataDe" name="inputDataDe" class="form-control" value="<?php echo $dataInicio ?>">
+                                                <input type="date" id="inputDataDe" name="inputDataDe" class="form-control" value="2012-06-20">
                                             </div>
                                         </div>
                                     </div>
@@ -545,18 +537,22 @@ $dataFim = date("Y-m-d");
                                         <div class="form-group">
                                             <label for="cmbStatus">Status</label>
                                             <select id="cmbStatus" name="cmbStatus" class="form-control form-control-select2">
-                                               <option value="">Selecionar</option>
+                                                <option value="">Selecionar</option>
                                                 <?php
-                                                    $sql = "SELECT SituaId, SituaNome
+                                                $sql = "SELECT SituaId, SituaNome, SituaChave
                                                             FROM Situacao
                                                             WHERE SituaStatus = 1
                                                             ORDER BY SituaNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
-    
-                                                    foreach ($rowSituacao as $item) {
+                                                $result = $conn->query($sql);
+                                                $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                foreach ($rowSituacao as $item) {
+                                                   /* if ($item['SituaChave'] == 'ATIVO') {
+                                                        print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
+                                                    } else if($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "NAOLIBERADO"){
                                                         print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-                                                    }
+                                                    }*/
+                                                }
                                                 ?>
                                             </select>
                                         </div>
@@ -605,7 +601,7 @@ $dataFim = date("Y-m-d");
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
+                                    <!-- <div class="col-lg-3">
                                         <div class="form-group">
                                             <label for="cmbClassificacao">Classificação</label>
                                             <select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
@@ -615,24 +611,24 @@ $dataFim = date("Y-m-d");
                                                 <option value="S">Serviço</option>
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="col-lg-3">
                                         <div class="form-group">
                                             <label for="cmbModalidade">Modalidade</label>
                                             <select id="cmbModalidade" name="cmbModalidade" class="form-control form-control-select2">
-                                               <option value="">Selecionar</option>
+                                                <option value="">Selecionar</option>
                                                 <?php
-                                                    $sql = "SELECT MdLicId, MdLicNome
+                                                $sql = "SELECT MdLicId, MdLicNome
                                                             FROM ModalidadeLicitacao
                                                             JOIN Situacao on SituaId = MdLicStatus
                                                             WHERE SituaChave = 'ATIVO'
                                                             ORDER BY MdLicNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowMdLic = $result->fetchAll(PDO::FETCH_ASSOC);
-    
-                                                    foreach ($rowMdLic as $item) {
-                                                        print('<option value="' . $item['MdLicId'] . '">' . $item['MdLicNome'] . '</option>');
-                                                    }
+                                                $result = $conn->query($sql);
+                                                $rowMdLic = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                foreach ($rowMdLic as $item) {
+                                                    print('<option value="' . $item['MdLicId'] . '">' . $item['MdLicNome'] . '</option>');
+                                                }
                                                 ?>
                                             </select>
                                         </div>
@@ -641,19 +637,19 @@ $dataFim = date("Y-m-d");
                                         <div class="form-group">
                                             <label for="cmbPrioridade">Prioridade</label>
                                             <select id="cmbPrioridade" name="cmbPrioridade" class="form-control form-control-select2">
-                                               <option value="">Selecionar</option>
+                                                <option value="">Selecionar</option>
                                                 <?php
-                                                    $sql = "SELECT PriorId, PriorNome
+                                                $sql = "SELECT PriorId, PriorNome
                                                             FROM Prioridade
                                                             JOIN Situacao on SituaId = PriorStatus
                                                             WHERE SituaChave = 'ATIVO'
                                                             ORDER BY PriorNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowPrioridade = $result->fetchAll(PDO::FETCH_ASSOC);
-    
-                                                    foreach ($rowPrioridade as $item) {
-                                                        print('<option value="' . $item['PriorId'] . '">' . $item['PriorNome'] . '</option>');
-                                                    }
+                                                $result = $conn->query($sql);
+                                                $rowPrioridade = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                foreach ($rowPrioridade as $item) {
+                                                    print('<option value="' . $item['PriorId'] . '">' . $item['PriorNome'] . '</option>');
+                                                }
                                                 ?>
                                             </select>
                                         </div>
@@ -695,7 +691,6 @@ $dataFim = date("Y-m-d");
                                     <tr class="bg-slate">
                                         <th>Item</th>
                                         <th>Categoria</th>
-                                        <th>Classificação</th>
                                         <th>Empresa Contratada</th>
                                         <th>Local</th>
                                         <th>Status</th>
@@ -703,7 +698,6 @@ $dataFim = date("Y-m-d");
                                         <th>Inicio</th>
                                         <th>Término</th>
                                         <th>Prioridade</th>
-                                        <th>Observação</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
@@ -732,33 +726,34 @@ $dataFim = date("Y-m-d");
 
                                 </div>
                                 <div class="d-flex flex-row p-2">
-                                    <div class='col-lg-6'>
-                                        <div class="form-group">
-                                            <label for="numeroSerie">Nº Série <span class="text-danger">(Editável)</span></label>
-                                            <div class="input-group">
-                                                <input type="text" id="numeroSerie" name="numeroSerie" class="form-control">
-                                            </div>
-                                        </div>
-                                    </div>
                                     <div class="col-lg-6">
-                                        <label for="numeroSerie">Estado de Conservação <span class="text-danger">(Editável)</span></label>
+                                        <label for="cmbPrioridadeEdit">Prioridade <span class="text-danger">(Editável)</span></label>
                                         <div class="form-group">
-                                            <select id="cmbEstadoConservacao" name="cmbEstadoConservacao" class="form-control form-control-select2">
+                                            <select id="cmbPrioridadeEdit" name="cmbPrioridadeEdit" class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
-                                                $sql = "SELECT EstCoId, EstCoNome
-                                                        FROM EstadoConservacao
-                                                        JOIN Situacao on SituaId = EstCoStatus
+                                                $sql = "SELECT PriorId, PriorNome
+                                                        FROM Prioridade
+                                                        JOIN Situacao on SituaId = PriorStatus
                                                         WHERE SituaChave = 'ATIVO'
-                                                        ORDER BY EstCoNome ASC";
+                                                        ORDER BY PriorNome ASC";
                                                 $result = $conn->query($sql);
-                                                $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                $rowPrioridade = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                foreach ($rowEstCo as $item) {
-                                                    print('<option value="' . $item['EstCoId'] . '">' . $item['EstCoNome'] . '</option>');
+                                                foreach ($rowPrioridade as $item) {
+                                                    print('<option value="' . $item['PriorId'] . '">' . $item['PriorNome'] . '</option>');
                                                 }
                                                 ?>
                                             </select>
+                                        </div>
+                                    </div>
+                                    <div class='col-lg-6'>
+                                        <div class="form-group">
+                                            <label for="txtareaObservacao">Observação <span class="text-danger">(Editável)</span></label>
+                                            <div class="input-group">
+                                                <!-- <input type="text" id="numeroSerie" name="numeroSerie" class="form-control"> -->
+                                                <textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" maxlength="4000"></textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

@@ -82,22 +82,25 @@ function queryPesquisa(){
             $cont++;
             print("
                 
-                <tr idPatrimonio=".$item['FlOpeId']." editado='0'>
+                <tr idFluxoOperacional=".$item['FlOpeId']." editado='0'>
                    <td class='even'>" . $cont . "</td>
                    <td class='odd'>" . $item['CategNome'] . "</td>
-                   <td  class='even'></td>
                    <td class='odd'>" . $item['ForneNome'] . "</td>
                    <td class='even'>".$item['UnidaNome']."</td>
                    <td class='odd'>".$item['SituaNome']."</td>
                    <td class='even'>".$item['MdLicNome']."</td>
-                   <td class='odd'>".$item['FlOpeDataInicio']."</td>
-                   <td class='even'>".$item['FlOpeDataFim']."</td>
-                   <td class='odd'>".$item['FlOpePrioridade']."</td>
-                   <td class='even'>".$item['FlOpeObservacao']."</td>
+                   <td class='odd'>".mostraData($item['FlOpeDataInicio'])."</td>
+                   <td class='even'>".mostraData($item['FlOpeDataFim'])."</td>
+                   <td class='odd'>".$item['PriorNome']."</td>
                    <td  class='odd' style='text-align: center'>
                          <i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>
                    </td>
-                   
+                   <td style='display: none'>
+                        <input type='text' value='".$item['FlOpePrioridade']."'>
+                   </td>
+                   <td style='display: none'>
+                        <input type='text' value='" . $item['FlOpeObservacao'] . "'>
+                   </td>
                 </tr>
              ");
         }
