@@ -3,75 +3,75 @@
 include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
-function queryPesquisa(){
+function queryPesquisa()
+{
 
     $cont = 0;
 
     include('global_assets/php/conexao.php');
 
-    $args = []; 
+    $args = [];
 
     if (!empty($_POST['inputDataDe']) || !empty($_POST['inputDataAte'])) {
         empty($_POST['inputDataDe']) ? $inputDataDe = '1900-01-01' : $inputDataDe = $_POST['inputDataDe'];
         empty($_POST['inputDataAte']) ? $inputDataAte = '2100-01-01' : $inputDataAte = $_POST['inputDataAte'];
 
-        $args[]  = "FlOpeDataInicio > '".$inputDataDe."' and FlOpeDataFim < '".$inputDataAte."' ";
+        $args[]  = "((FlOpeDataInicio BETWEEN  '" . $inputDataDe . "' and '2020-06-24') OR (FlOpeDataFim BETWEEN '" . $inputDataAte . "' and '2020-06-24'))";
     }
 
-    if(!empty($_POST['cmbUnidade']) && $_POST['cmbUnidade'] != ""){
-        $args[]  = "FlOpeUnidade = ".$_POST['cmbUnidade']." ";
+    if (!empty($_POST['cmbUnidade']) && $_POST['cmbUnidade'] != "") {
+        $args[]  = "FlOpeUnidade = " . $_POST['cmbUnidade'] . " ";
     }
 
-    if(!empty($_POST['cmbEmpresaContratada']) && $_POST['cmbEmpresaContratada'] != ""){
-        $args[]  = "FlOpeFornecedor = ".$_POST['cmbEmpresaContratada']." ";
+    if (!empty($_POST['cmbEmpresaContratada']) && $_POST['cmbEmpresaContratada'] != "") {
+        $args[]  = "FlOpeFornecedor = " . $_POST['cmbEmpresaContratada'] . " ";
     }
 
-    if(!empty($_POST['cmbCategoria']) && $_POST['cmbCategoria'] != ""){
-        $args[]  = "FlOpeCategoria = ".$_POST['cmbCategoria']." ";
+    if (!empty($_POST['cmbCategoria']) && $_POST['cmbCategoria'] != "") {
+        $args[]  = "FlOpeCategoria = " . $_POST['cmbCategoria'] . " ";
     }
 
     // if(!empty($_POST['cmbClassificacao'])){
     //     $args[]  = "FlOpe = ".$_POST['inputSubCategoria']." ";
     // }
 
-    if(!empty($_POST['cmbModalidade']) && $_POST['cmbModalidade'] != ""){
-        $args[]  = "FlOpeModalidadeLicitacao = ".$_POST['cmbModalidade']." ";
+    if (!empty($_POST['cmbModalidade']) && $_POST['cmbModalidade'] != "") {
+        $args[]  = "FlOpeModalidadeLicitacao = " . $_POST['cmbModalidade'] . " ";
     }
 
-    if(!empty($_POST['cmbPrioridade']) && $_POST['cmbPrioridade'] != ""){
-        $args[]  = "FlOpePrioridade = ".$_POST['cmbPrioridade']." ";
+    if (!empty($_POST['cmbPrioridade']) && $_POST['cmbPrioridade'] != "") {
+        $args[]  = "FlOpePrioridade = " . $_POST['cmbPrioridade'] . " ";
     }
 
-    if(!empty($_POST['cmbStatus']) && $_POST['cmbStatus'] != ""){
-        $args[]  = "FlOpeStatus = ".$_POST['cmbStatus']." ";
+    if (!empty($_POST['cmbStatus']) && $_POST['cmbStatus'] != "") {
+        $args[]  = "FlOpeStatus = " . $_POST['cmbStatus'] . " ";
     }
 
     if (count($args) >= 1) {
         try {
 
-            $string = implode( " and ",$args );
+            $string = implode(" and ", $args);
 
             // if ($string != ''){
             //     $string .= ' and ';
             // }
-      
+
             $sql = "SELECT FlOpeId,  FlOpeDataInicio,  FlOpeDataFim,  FlOpeObservacao, FlOpePrioridade, UnidaNome, ForneNome, CategNome, MdLicNome, PriorNome, SituaNome
                     FROM FluxoOperacional
-                    LEFT JOIN Unidade on UnidaId = FlOpeUnidade
-                    LEFT JOIN Fornecedor on ForneId = FlOpeId
+                    JOIN Unidade on UnidaId = FlOpeUnidade
+                    LEFT JOIN Fornecedor on ForneId = FlOpeFornecedor
                     LEFT JOIN Categoria  on CategId = FlOpeCategoria
                     LEFT JOIN ModalidadeLicitacao on MdLicId = FlOpeModalidadeLicitacao
                     LEFT JOIN Prioridade on PriorId = FlOpePrioridade 
                     JOIN Situacao on SituaId = FlOpeStatus
-                    WHERE ".$string."
+                    WHERE " . $string . "
                     ";
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
 
-            // print($sql);
-
+            print($sql);
         } catch (PDOException $e) {
             echo 'Error: ' . $e->getMessage();
         }
@@ -79,32 +79,76 @@ function queryPesquisa(){
     if ($cont == 1) {
         $cont = 0;
         foreach ($rowData as $item) {
+
             $cont++;
-            print("
-                
-                <tr idFluxoOperacional=".$item['FlOpeId']." editado='0'>
-                   <td class='even'>" . $cont . "</td>
-                   <td class='odd'>" . $item['CategNome'] . "</td>
-                   <td class='odd'>" . $item['ForneNome'] . "</td>
-                   <td class='even'>".$item['UnidaNome']."</td>
-                   <td class='odd'>".$item['SituaNome']."</td>
-                   <td class='even'>".$item['MdLicNome']."</td>
-                   <td class='odd'>".mostraData($item['FlOpeDataInicio'])."</td>
-                   <td class='even'>".mostraData($item['FlOpeDataFim'])."</td>
-                   <td class='odd'>".$item['PriorNome']."</td>
-                   <td  class='odd' style='text-align: center'>
-                         <i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>
-                   </td>
-                   <td style='display: none'>
-                        <input type='text' value='".$item['FlOpePrioridade']."'>
-                   </td>
-                   <td style='display: none'>
-                        <input type='text' value='" . $item['FlOpeObservacao'] . "'>
-                   </td>
-                </tr>
-             ");
+
+            $sql = "SELECT MAX(AditiId) AditiId
+                        FROM FluxoOperacional
+                        JOIN Aditivo on AditiFluxoOperacional = FlOpeId
+                        WHERE FlOpeId = " . $item['FlOpeId'] . "
+            ";
+            $result = $conn->query($sql);
+            $rowUltimoAditivo = $result->fetch(PDO::FETCH_ASSOC);
+            var_dump($rowUltimoAditivo);
+            if ($rowUltimoAditivo['AditiId']) {
+
+                $sql = "SELECT AditiDtInicio, AditiDtFim
+                            FROM Aditivo
+                            WHERE AditiId = " . $rowUltimoAditivo['AditiId'] . "
+                ";
+                $result = $conn->query($sql);
+                $rowDataUltimoAditivo = $result->fetch(PDO::FETCH_ASSOC);
+
+                print("
+                    
+                    <tr idFluxoOperacional=" . $item['FlOpeId'] . " editado='0'>
+                       <td class='even'>" . $cont . "</td>
+                       <td class='odd'>" . $item['CategNome'] . "</td>
+                       <td class='odd'>" . $item['ForneNome'] . "</td>
+                       <td class='even'>" . $item['UnidaNome'] . "</td>
+                       <td class='odd'>" . $item['SituaNome'] . "</td>
+                       <td class='even'>" . $item['MdLicNome'] . "</td>
+                       <td class='odd'>" . mostraData($rowDataUltimoAditivo['AditiDtInicio']) . "</td>
+                       <td class='even'>" . mostraData($rowDataUltimoAditivo['AditiDtFim']) . "</td>
+                       <td class='odd'>" . $item['PriorNome'] . "</td>
+                       <td  class='odd' style='text-align: center'>
+                             <i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>
+                       </td>
+                       <td style='display: none'>
+                            <input type='text' value='" . $item['FlOpePrioridade'] . "'>
+                       </td>
+                       <td style='display: none'>
+                            <input type='text' value='" . $item['FlOpeObservacao'] . "'>
+                       </td>
+                    </tr>
+                 ");
+            } else {
+
+                print("
+                    
+                    <tr idFluxoOperacional=" . $item['FlOpeId'] . " editado='0'>
+                       <td class='even'>" . $cont . "</td>
+                       <td class='odd'>" . $item['CategNome'] . "</td>
+                       <td class='odd'>" . $item['ForneNome'] . "</td>
+                       <td class='even'>" . $item['UnidaNome'] . "</td>
+                       <td class='odd'>" . $item['SituaNome'] . "</td>
+                       <td class='even'>" . $item['MdLicNome'] . "</td>
+                       <td class='odd'>" . mostraData($item['FlOpeDataInicio']) . "</td>
+                       <td class='even'>" . mostraData($item['FlOpeDataFim']) . "</td>
+                       <td class='odd'>" . $item['PriorNome'] . "</td>
+                       <td  class='odd' style='text-align: center'>
+                             <i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>
+                       </td>
+                       <td style='display: none'>
+                            <input type='text' value='" . $item['FlOpePrioridade'] . "'>
+                       </td>
+                       <td style='display: none'>
+                            <input type='text' value='" . $item['FlOpeObservacao'] . "'>
+                       </td>
+                    </tr>
+                 ");
+            }
         }
-        
     }
 }
 

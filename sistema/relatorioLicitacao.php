@@ -141,7 +141,7 @@ $dataFim = date("Y-m-d");
                                          </div>
                                          <div class='col-lg-6'>
                                               <div class="form-group">
-                                                  <label for="produto">Origem</label>
+                                                  <label for="produto">Empresa Contratada</label>
                                                   <div class="input-group">
                                                     <input id='produto' class='form-control' value='${empresaContrat}' readOnly />
                                                   </div>
@@ -195,7 +195,7 @@ $dataFim = date("Y-m-d");
                                      </div>
                                      <input type="text" id="inputFluxoOperacionalEdita" name="inputFluxoOperacionalEdita" value="${id}" style="display: none">
                     `;
-                    $('.dados-produto').html(formModal)
+                    $('.dados-licitacao').html(formModal)
                 })
             })
 
@@ -376,6 +376,7 @@ $dataFim = date("Y-m-d");
                         (data) => {
 
                             if (data) {
+                                console.log(data)
                                 $('tbody').html(data)
                                 $('#imprimir').removeAttr('disabled')
                                 resultadosConsulta = data
@@ -391,7 +392,7 @@ $dataFim = date("Y-m-d");
 
             $('#salvar').on('click', function(e) {
                 let prioridade = $('#cmbPrioridadeEdit').val()
-                let  observacao = $('#txtareaObservacao').val()
+                let observacao = $('#txtareaObservacao').val()
                 let id = $('#inputFluxoOperacionalEdita').val()
                 let url = 'relatorioLicitacaoEdita.php'
                 let data = {
@@ -411,15 +412,15 @@ $dataFim = date("Y-m-d");
                             //let inputNumeroSerie = $(`<td style="display: none" id="inputNumeroSerie">${numeroSerie}</td>`)
                             //let inputEstadoConservacao = $(`<td style="display: none" id="inputEstadoConservacao">${estadoConservacao}</td>`)
                             let prioridade = ''
-                            $('#cmbPrioridadeEdit').children().each((i, elem)=>{
-                                if($(elem).val() == $('#cmbPrioridadeEdit').val()){
+                            $('#cmbPrioridadeEdit').children().each((i, elem) => {
+                                if ($(elem).val() == $('#cmbPrioridadeEdit').val()) {
                                     prioridade = $(elem).html()
                                 }
                             })
                             $('[idFluxoOperacional]').each((i, elem) => {
 
                                 let tds = $(elem).children()
-                              
+
                                 if ($(elem).attr('idFluxoOperacional') == id) {
                                     $(tds[8]).html(prioridade)
                                     $(tds[11]).children().first().val(observacao) // colocando o valor dentro do input que armazena o valor da observação, pra que seja recuperado quando o modal for aberto em cada linha da tabela
@@ -436,20 +437,21 @@ $dataFim = date("Y-m-d");
             })
 
             function imprime() {
-                url = 'relatorioMovimentacaoPatrimonioImprime.php';
+                url = 'relatorioLicitacaoImprime.php';
 
                 $('#imprimir').on('click', (e) => {
                     e.preventDefault()
                     if (resultadosConsulta) {
-
                         $('#inputResultado').val(resultadosConsulta)
                         $('#inputDataDe_imp').val(inputsValues.inputDataDe)
                         $('#inputDataAte_imp').val(inputsValues.inputDataAte)
-                        $('#inputLocalEstoque_imp').val(inputsValues.inputlocalEstoque)
-                        $('#inputSetor_imp').val(inputsValues.inputSetor)
-                        $('#inputCategoria_imp').val(inputsValues.inputCategoria)
-                        $('#inputSubCategoria_imp').val(inputsValues.inputSubCategoria)
-                        $('#inputProduto_imp').val(inputsValues.inputProduto)
+                        $('#inputLocal_imp').val(inputsValues.cmbUnidade)
+                        $('#inputEmpresaContratada_imp').val(inputsValues.cmbEmpresaContratada)
+                        $('#inputCategoria_imp').val(inputsValues.cmbCategoria)
+                        $('#inputClassificacao_imp').val(inputsValues.cmbClassificacao)
+                        $('#inputModalidade_imp').val(inputsValues.cmbModalidade)
+                        $('#inputPrioridade_imp').val(inputsValues.cmbPrioridade)
+                        $('#inputStatus_imp').val(inputsValues.cmbStatus)
 
                         $('#formImprime').attr('action', url)
 
@@ -500,13 +502,13 @@ $dataFim = date("Y-m-d");
                                 <input id="inputResultado" type="hidden" name="resultados"></input>
                                 <input id="inputDataDe_imp" type="hidden" name="inputDataDe_imp"></input>
                                 <input id="inputDataAte_imp" type="hidden" name="inputDataAte_imp"></input>
-                                <input id="cmbLocal_imp" type="hidden" name="cmbLocal_imp"></input>
-                                <input id="cmbEmpresaContratada_imp" type="hidden" name="cmbEmpresaContratada_imp"></input>
-                                <input id="cmbCategoria_imp" type="hidden" name="cmbCategoria_imp"></input>
-                                <input id="cmbClassificacao_imp" type="hidden" name="cmbClassificacao_imp"></input>
-                                <input id="cmbModalidade_imp" type="hidden" name="cmbModalidade_imp"></input>
-                                <input id="cmbPrioridade_imp" type="hidden" name="cmbPrioridade_imp"></input>
-                                <input id="cmbStatus_imp" type="hidden" name="cmbStatus_imp"></input>
+                                <input id="inputLocal_imp" type="hidden" name="inputLocal_imp"></input>
+                                <input id="inputEmpresaContratada_imp" type="hidden" name="inputEmpresaContratada_imp"></input>
+                                <input id="inputCategoria_imp" type="hidden" name="inputCategoria_imp"></input>
+                                <input id="inputClassificacao_imp" type="hidden" name="inputClassificacao_imp"></input>
+                                <input id="inputModalidade_imp" type="hidden" name="inputModalidade_imp"></input>
+                                <input id="inputPrioridade_imp" type="hidden" name="inputPrioridade_imp"></input>
+                                <input id="inputStatus_imp" type="hidden" name="inputStatus_imp"></input>
                             </form>
 
                             <form name="formFiltro" id="formFiltro" method="POST" class="form-validate-jquery p-3">
@@ -549,7 +551,7 @@ $dataFim = date("Y-m-d");
                                                 foreach ($rowSituacao as $item) {
                                                     if ($item['SituaChave'] == 'ATIVO') {
                                                         print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-                                                    } else if($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "NAOLIBERADO"){
+                                                    } else if ($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "NAOLIBERADO") {
                                                         print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
                                                     }
                                                 }
@@ -718,15 +720,26 @@ $dataFim = date("Y-m-d");
                         <div class="card custon-modal-content">
                             <div class="custon-modal-title">
                                 <i class=""></i>
-                                <p class="h3">Dados Produto</p>
-                                <i class=""></i>
+                                <p class="h3">Dados Licitação</p>
+                                <i id="modal-close" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
                             </div>
-                            <form id="editarProduto" method="POST">
-                                <div class="dados-produto p-3">
+                            <form id="editarLicitacao" method="POST">
+                                <div class="dados-licitacao p-3">
 
                                 </div>
                                 <div class="d-flex flex-row p-2">
-                                    <div class="col-lg-6">
+                                    <div class='col-lg-12'>
+                                        <div class="form-group">
+                                            <label for="txtareaObservacao">Observação <span class="text-danger">(Editável)</span></label>
+                                            <div class="input-group">
+                                                <!-- <input type="text" id="numeroSerie" name="numeroSerie" class="form-control"> -->
+                                                <textarea rows="3" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" maxlength="4000"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row p-2">
+                                    <div class="col-lg-4">
                                         <label for="cmbPrioridadeEdit">Prioridade <span class="text-danger">(Editável)</span></label>
                                         <div class="form-group">
                                             <select id="cmbPrioridadeEdit" name="cmbPrioridadeEdit" class="form-control form-control-select2">
@@ -745,15 +758,6 @@ $dataFim = date("Y-m-d");
                                                 }
                                                 ?>
                                             </select>
-                                        </div>
-                                    </div>
-                                    <div class='col-lg-6'>
-                                        <div class="form-group">
-                                            <label for="txtareaObservacao">Observação <span class="text-danger">(Editável)</span></label>
-                                            <div class="input-group">
-                                                <!-- <input type="text" id="numeroSerie" name="numeroSerie" class="form-control"> -->
-                                                <textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" maxlength="4000"></textarea>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
