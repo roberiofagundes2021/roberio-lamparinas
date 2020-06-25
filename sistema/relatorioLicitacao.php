@@ -74,20 +74,8 @@ $dataFim = date("Y-m-d");
                     let observacao = $(tds[9]).html();
                     let prioridadeVal = $(tds[10]).children().first().val()
                     let observacaoVal = $(tds[11]).children().first().val()
-                    console.log(observacaoVal)
 
-                    // let produto = $(tds[1]).html();
-                    // let patrimonio = $(tds[2]).html();
-                    // let notaFisc = $(tds[3]).html();
-                    // let aquisicao = $(tds[4]).html();
-                    // let depreciacao = $(tds[5]).html();
-                    // let origem = $(tds[7]).html();
-                    // let destino = $(tds[8]).html();
-                    // let marca = $(tds[9]).html();
-                    // let fabricante = $(tds[10]).html();
-                    // let numeroSerie = $(tds[12]).children().first().val()
-                    // let estadoConservacao = $(tds[13]).children().first().val()
-                    //console.log(numeroSerie)
+                    console.log($(tds[10]).children().first().val())
 
                     const fonte1 = 'style="font-size: 1.1rem"'
                     const fonte2 = 'style="font-size: 0.9rem"'
@@ -178,7 +166,7 @@ $dataFim = date("Y-m-d");
                                     <div class='row'>
                                          <div class='col-lg-6'>
                                              <div class="form-group">
-                                                 <label for="produto">Inicio</label>
+                                                 <label for="produto">Início</label>
                                                  <div class="input-group">
                                                      <input id='produto' class='form-control' value='${inicio}' readOnly />
                                                  </div>
@@ -186,7 +174,7 @@ $dataFim = date("Y-m-d");
                                          </div>
                                          <div class='col-lg-6'>
                                              <div class="form-group">
-                                                 <label for="produto">Termino</label>
+                                                 <label for="produto">Término</label>
                                                  <div class="input-group">
                                                      <input id='produto' class='form-control' value='${termino}' readOnly />
                                                  </div>
@@ -200,6 +188,11 @@ $dataFim = date("Y-m-d");
             })
 
             $('#modal-close').on('click', function() {
+                $('#page-modal').fadeOut(200);
+                $('body').css('overflow', 'scroll');
+            })
+
+            $('.modal-close').on('click', function() {
                 $('#page-modal').fadeOut(200);
                 $('body').css('overflow', 'scroll');
             })
@@ -376,7 +369,6 @@ $dataFim = date("Y-m-d");
                         (data) => {
 
                             if (data) {
-                                console.log(data)
                                 $('tbody').html(data)
                                 $('#imprimir').removeAttr('disabled')
                                 resultadosConsulta = data
@@ -411,10 +403,10 @@ $dataFim = date("Y-m-d");
 
                             //let inputNumeroSerie = $(`<td style="display: none" id="inputNumeroSerie">${numeroSerie}</td>`)
                             //let inputEstadoConservacao = $(`<td style="display: none" id="inputEstadoConservacao">${estadoConservacao}</td>`)
-                            let prioridade = ''
+                            let prioridadeText = ''
                             $('#cmbPrioridadeEdit').children().each((i, elem) => {
                                 if ($(elem).val() == $('#cmbPrioridadeEdit').val()) {
-                                    prioridade = $(elem).html()
+                                    prioridadeText  = $(elem).html()
                                 }
                             })
                             $('[idFluxoOperacional]').each((i, elem) => {
@@ -422,7 +414,9 @@ $dataFim = date("Y-m-d");
                                 let tds = $(elem).children()
 
                                 if ($(elem).attr('idFluxoOperacional') == id) {
-                                    $(tds[8]).html(prioridade)
+                                    let prioridadeVal = $('#cmbPrioridadeEdit').val()
+                                    $(tds[8]).html(prioridadeText )
+                                    $(tds[10]).children().first().val(prioridadeVal )
                                     $(tds[11]).children().first().val(observacao) // colocando o valor dentro do input que armazena o valor da observação, pra que seja recuperado quando o modal for aberto em cada linha da tabela
                                     // console.log($(tds[12]).children().first())
                                     // $(elem).append(inputNumeroSerie).append(inputEstadoConservacao)
@@ -767,7 +761,7 @@ $dataFim = date("Y-m-d");
                                     <div class="col-lg-12">
                                         <div class="form-group">
                                             <button class="btn btn-lg btn-success" id="salvar">Salvar</button>
-                                            <a id="modal-close" class="btn btn-basic" role="button">Cancelar</a>
+                                            <a class="btn btn-basic modal-close" role="button">Cancelar</a>
                                         </div>
                                     </div>
                                 </div>
