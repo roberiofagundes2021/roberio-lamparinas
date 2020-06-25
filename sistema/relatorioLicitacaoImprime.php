@@ -14,12 +14,15 @@ $args = [];
 
 /////////////////////////////////////////////
 
-if (!empty($_POST['inputDataDe_imp']) || !empty($_POST['inputDataAte_imp'])) {
-    empty($_POST['inputDataDe_imp']) ? $inputDataDe = '1900-01-01' : $inputDataDe = $_POST['inputDataDe_imp'];
-    empty($_POST['inputDataAte_imp']) ? $inputDataAte = '2100-01-01' : $inputDataAte = $_POST['inputDataAte_imp'];
 
-    $args[]  = "((FlOpeDataInicio BETWEEN  '" . $inputDataDe . "' and '2020-06-24') OR (FlOpeDataFim BETWEEN '" . $inputDataAte . "' and '2020-06-24'))";
-}
+empty($_POST['inputDataDe_imp']) ? $inputDataDe = '' : $inputDataDe = " FlOpeDataInicio > '".$_POST['inputDataDe_imp']."'";
+
+$args[]  = $inputDataDe;
+
+empty($_POST['inputDataAte_imp']) ? $inputDataAte = '' : $inputDataAte = " dbo.fnFimContrato(FlOpeId) < '". $_POST['inputDataAte_imp']."'";
+
+$args[]  = $inputDataAte;
+
 
 if (!empty($_POST['inputUnidade_imp']) && $_POST['inputUnidade_imp'] != "") {
     $args[]  = "FlOpeUnidade = " . $_POST['inputUnidade_imp'] . " ";
@@ -54,7 +57,7 @@ if (count($args) >= 1) {
         //     $string .= ' and ';
         // }
 
-        $sql = "SELECT FlOpeId,  FlOpeDataInicio,  FlOpeDataFim,  FlOpeObservacao, FlOpePrioridade, UnidaNome, ForneNome, CategNome, MdLicNome, PriorNome, SituaNome
+        $sql = "SELECT FlOpeId,  FlOpeDataInicio,  dbo.fnFimContrato(FlOpeId) as DataFim,  FlOpeObservacao, FlOpePrioridade, UnidaNome, ForneNome, CategNome, MdLicNome, PriorNome, SituaNome
                 FROM FluxoOperacional
                 JOIN Unidade on UnidaId = FlOpeUnidade
                 LEFT JOIN Fornecedor on ForneId = FlOpeFornecedor
@@ -175,6 +178,7 @@ if (isset($_POST['resultados'])) {
         $html .= "<tbody>";
 
         $cont = 0;
+        
         foreach ($rowData as $item) {
             $cont += 1;
             $sql = "SELECT MAX(AditiId) AditiId
@@ -184,7 +188,7 @@ if (isset($_POST['resultados'])) {
             ";
             $result = $conn->query($sql);
             $rowUltimoAditivo = $result->fetch(PDO::FETCH_ASSOC);
-            var_dump($rowUltimoAditivo);
+            //var_dump($rowUltimoAditivo);
             if ($rowUltimoAditivo['AditiId']) {
 
                 $sql = "SELECT AditiDtInicio, AditiDtFim
@@ -207,7 +211,7 @@ if (isset($_POST['resultados'])) {
                                 <td style='text-align: center'>" . $item['PriorNome'] . "</td>
                                 <td style='text-align: justify'>" . $item['FlOpeObservacao'] . "</td>
                             </tr>
-                ";
+                "; 
             } else {
 
                 $html .= "
@@ -219,7 +223,7 @@ if (isset($_POST['resultados'])) {
                                 <td style='text-align: center'>" . $item['SituaNome'] . "</td>
                                 <td style='text-align: center'>" . $item['MdLicNome'] . "</td>
                                 <td style='text-align: center'>" . mostraData($item['FlOpeDataInicio']) . "</td>
-                                <td style='text-align: center'>" . mostraData($item['FlOpeDataFim']) . "</td>
+                                <td style='text-align: center'>" . mostraData($item['DataFim']) . "</td>
                                 <td style='text-align: center'>" . $item['PriorNome'] . "</td>
                                 <td style='text-align: justify'>" . $item['FlOpeObservacao'] . "</td>
                             </tr>
