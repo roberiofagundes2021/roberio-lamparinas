@@ -520,7 +520,7 @@ $dataFim = date("Y-m-d");
                                                 <span class="input-group-prepend">
                                                     <span class="input-group-text"><i class="icon-calendar22"></i></span>
                                                 </span>
-                                                <input type="date" id="inputDataDe" name="inputDataDe" class="form-control" value="2012-06-20">
+                                                <input type="date" id="inputDataDe" name="inputDataDe" class="form-control" value="<?php echo $dataInicio ?>">
                                             </div>
                                         </div>
                                     </div>

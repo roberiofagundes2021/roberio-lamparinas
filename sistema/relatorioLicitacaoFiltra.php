@@ -71,7 +71,6 @@ function queryPesquisa()
 
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
 
-            print($sql);
         } catch (PDOException $e) {
             echo 'Error: ' . $e->getMessage();
         }
@@ -89,7 +88,8 @@ function queryPesquisa()
             ";
             $result = $conn->query($sql);
             $rowUltimoAditivo = $result->fetch(PDO::FETCH_ASSOC);
-            var_dump($rowUltimoAditivo);
+
+            
             if ($rowUltimoAditivo['AditiId']) {
 
                 $sql = "SELECT AditiDtInicio, AditiDtFim
