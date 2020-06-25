@@ -35,6 +35,23 @@ $sql = "SELECT AditiId, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFi
 $result = $conn->query($sql);
 $rowAditivos = $result->fetchAll(PDO::FETCH_ASSOC);
 
+$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
+		FROM Produto
+		JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
+$result = $conn->query($sql);
+$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+$totalProdutos = count($rowProdutos);
+
+$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario
+		FROM Servico
+		JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
+$result = $conn->query($sql);
+$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+$totalServicos = count($rowServicos);
+
 try {
 	$mpdf = new mPDF([
 		'mode' => 'utf-8',    // mode - default ''
@@ -166,7 +183,7 @@ try {
 		}
 	}
 
-	$totalGeral = $totalGeralFluxo + $totalGeralProdutos + $totalGeralServicos + $totalGeralAditivos;
+	$totalGeral = $totalGeralFluxo + $totalGeralAditivos;
 
 	$html .= "<table style='width:100%; border-collapse: collapse; margin-top: 20px;'>
 	 			<tr>
@@ -178,32 +195,13 @@ try {
 				    </td>
 			    </tr>
 			  </table>
-	";		
-
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
-			FROM Produto
-			JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
-
-	$result = $conn->query($sql);
-	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-	$totalProdutos = count($rowProdutos);
-
-	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario
-			FROM Servico
-			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
-
-	$result = $conn->query($sql);
-	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-	$totalServicos = count($rowServicos);
+	";
 
 	$totalGeralProdutos = 0;
 
 	$html .= '
 	<h2 style="margin-top: 50px; text-align: center;">DETALHAMENTO DO FLUXO</h2>
-'	;
+	';
 
 	if ($totalProdutos > 0) {		
 
