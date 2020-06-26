@@ -22,8 +22,8 @@ $d = date("d");
 $m = date("m");
 $Y = date("Y");
 
-$dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
-$dataFim = date("Y-m-d");
+$dataInicio = date('Y')."-01-01";  //date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
+$dataFim = date('Y')."-12-31"; //date("Y-m-d");
 
 ?>
 
@@ -53,7 +53,12 @@ $dataFim = date("Y-m-d");
 
             $('.btn-acoes').each((i, elem) => {
 
-                let conteudoOriginalSelectPrioridadeEdit =  $('#cmbPrioridadeEdit').html(); 
+                let conteudoOriginalSelectPrioridadeEdit =  `
+                                                <option value="">Selecionar</option>
+                                                <option value="1">Prioridade Baixa</option>
+                                                <option value="3">Prioridade Máxima</option>
+                                                <option value="2">Prioridade Média</option> 
+                `
                 $(elem).on('click', function() {
                     $('#page-modal').fadeIn(200);
 
@@ -343,7 +348,7 @@ $dataFim = date("Y-m-d");
                 $('#submitFiltro').on('click', (e) => {
                     e.preventDefault()
 
-                    const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>')
+                    const msg = $('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%">Nenhum registro encontrado...</td></tr>')
 
                     let dataDe = $('#inputDataDe').val()
                     let dataAte = $('#inputDataAte').val()
