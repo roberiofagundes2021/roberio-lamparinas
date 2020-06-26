@@ -31,9 +31,9 @@ if (isset($_POST['inputDataInicio'])) {
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao,
-											  FlOpeValor, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa, FlOpeUnidade)
+											  FlOpeValor, FlOpeObservacao, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa, FlOpeUnidade)
 				VALUES (:iFornecedor, :iCategoria, :iSubCategoria, :dDataInicio, :dDataFim, :iNumContrato, :iNumProcesso, :iModalidadeLicitacao,
-						:fValor, :bStatus, :iUsuarioAtualizador, :iEmpresa, :iUnidade)";
+						:fValor, :sObservacao, :bStatus, :iUsuarioAtualizador, :iEmpresa, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -46,6 +46,7 @@ if (isset($_POST['inputDataInicio'])) {
 			':iNumProcesso' => $_POST['inputNumProcesso'],
 			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'],
 			':fValor' => gravaValor($_POST['inputValor']),
+			':sObservacao' => $_POST['txtareaObservacao'] == '' ? null : $_POST['txtareaObservacao'],
 			':bStatus' => $rowSituacao['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iEmpresa' => $_SESSION['EmpreId'],
@@ -398,7 +399,14 @@ if (isset($_POST['inputDataInicio'])) {
 									</div>
 								</div>
 							</div>
-
+							<div class="row" style="margin-top: 10px;">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaObservacao">Observação</label>
+										<textarea rows="3" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" maxlength="4000"></textarea>
+									</div>
+								</div>
+							</div>
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">

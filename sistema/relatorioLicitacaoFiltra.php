@@ -12,12 +12,15 @@ function queryPesquisa()
 
     $args = [];
 
-    if (!empty($_POST['inputDataDe']) || !empty($_POST['inputDataAte'])) {
-        empty($_POST['inputDataDe']) ? $inputDataDe = '1900-01-01' : $inputDataDe = $_POST['inputDataDe'];
-        empty($_POST['inputDataAte']) ? $inputDataAte = '2100-01-01' : $inputDataAte = $_POST['inputDataAte'];
+    empty($_POST['inputDataDe']) ? $inputDataDe = '' : $inputDataDe = " FlOpeDataInicio > '".$_POST['inputDataDe']."'";
 
-        $args[]  = "((FlOpeDataInicio BETWEEN  '" . $inputDataDe . "' and '2020-06-24') OR (FlOpeDataFim BETWEEN '" . $inputDataAte . "' and '2020-06-24'))";
-    }
+    $args[]  = $inputDataDe;
+    
+    empty($_POST['inputDataAte']) ? $inputDataAte = '' : $inputDataAte = " dbo.fnFimContrato(FlOpeId) < '". $_POST['inputDataAte']."'";
+    
+    $args[]  = $inputDataAte;
+
+
 
     if (!empty($_POST['cmbUnidade']) && $_POST['cmbUnidade'] != "") {
         $args[]  = "FlOpeUnidade = " . $_POST['cmbUnidade'] . " ";
@@ -89,7 +92,7 @@ function queryPesquisa()
             $result = $conn->query($sql);
             $rowUltimoAditivo = $result->fetch(PDO::FETCH_ASSOC);
 
-            
+
             if ($rowUltimoAditivo['AditiId']) {
 
                 $sql = "SELECT AditiDtInicio, AditiDtFim

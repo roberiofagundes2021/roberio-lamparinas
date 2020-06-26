@@ -52,6 +52,8 @@ $dataFim = date("Y-m-d");
         function modalAcoes() {
 
             $('.btn-acoes').each((i, elem) => {
+
+                let conteudoOriginalSelectPrioridadeEdit =  $('#cmbPrioridadeEdit').html(); 
                 $(elem).on('click', function() {
                     $('#page-modal').fadeIn(200);
 
@@ -75,8 +77,6 @@ $dataFim = date("Y-m-d");
                     let prioridadeVal = $(tds[10]).children().first().val()
                     let observacaoVal = $(tds[11]).children().first().val()
 
-                    console.log($(tds[10]).children().first().val())
-
                     const fonte1 = 'style="font-size: 1.1rem"'
                     const fonte2 = 'style="font-size: 0.9rem"'
                     const textCenter = 'style="text-align: center"'
@@ -87,11 +87,14 @@ $dataFim = date("Y-m-d");
 
                     var Observacao = observacaoVal ? observacaoVal : ''
 
-                    $('#cmbPrioridadeEdit').val(prioridadeVal)
+                    if (prioridadeVal != '' || prioridadeVal != 0) {
+                        $('#cmbPrioridadeEdit').val(prioridadeVal)
+                    }
 
                     $('#txtareaObservacao').val(Observacao)
 
-                    if (prioridadeVal) {
+                    console.log(conteudoOriginalSelectPrioridadeEdit)
+                    if (prioridadeVal != '' || prioridadeVal != 0) {
                         url = 'filtraPrioridade.php'
                         inputsValues = {
                             inputPrioridade: prioridadeVal
@@ -104,9 +107,11 @@ $dataFim = date("Y-m-d");
 
                                 if (data) {
                                     $('#cmbPrioridadeEdit').html(data)
-                                } else {}
+                                } 
                             }
                         );
+                    } else {
+                        $('#cmbPrioridadeEdit').html(conteudoOriginalSelectPrioridadeEdit)
                     }
 
                     formModal = `
@@ -406,7 +411,7 @@ $dataFim = date("Y-m-d");
                             let prioridadeText = ''
                             $('#cmbPrioridadeEdit').children().each((i, elem) => {
                                 if ($(elem).val() == $('#cmbPrioridadeEdit').val()) {
-                                    prioridadeText  = $(elem).html()
+                                    prioridadeText = $(elem).html()
                                 }
                             })
                             $('[idFluxoOperacional]').each((i, elem) => {
@@ -415,8 +420,8 @@ $dataFim = date("Y-m-d");
 
                                 if ($(elem).attr('idFluxoOperacional') == id) {
                                     let prioridadeVal = $('#cmbPrioridadeEdit').val()
-                                    $(tds[8]).html(prioridadeText )
-                                    $(tds[10]).children().first().val(prioridadeVal )
+                                    $(tds[8]).html(prioridadeText)
+                                    $(tds[10]).children().first().val(prioridadeVal)
                                     $(tds[11]).children().first().val(observacao) // colocando o valor dentro do input que armazena o valor da observação, pra que seja recuperado quando o modal for aberto em cada linha da tabela
                                     // console.log($(tds[12]).children().first())
                                     // $(elem).append(inputNumeroSerie).append(inputEstadoConservacao)
