@@ -160,7 +160,7 @@ $dataFim = date("Y-m-d");
                                          </div>
                                          <div class='col-lg-4'>
                                              <div class="form-group">
-                                                 <label for="produto">Modalidade</label>
+                                                 <label for="produto">Modalidade da Licitação</label>
                                                  <div class="input-group">
                                                      <input id='produto' class='form-control' value='${modalidade}' readOnly />
                                                  </div>
