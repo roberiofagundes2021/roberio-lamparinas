@@ -98,7 +98,6 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
 
                     $('#txtareaObservacao').val(Observacao)
 
-                    console.log(conteudoOriginalSelectPrioridadeEdit)
                     if (prioridadeVal != '' || prioridadeVal != 0) {
                         url = 'filtraPrioridade.php'
                         inputsValues = {
@@ -125,7 +124,7 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Item</label>
                                                  <div class="input-group">
-                                                    <input id='produto' class='form-control' value='${item}' readOnly />
+                                                    <input class='form-control' value='${item}' readOnly />
                                                  </div>
                                             </div>
                                          </div>                                    
@@ -133,7 +132,7 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Categoria</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${categoria}' readOnly />
+                                                     <input class='form-control' value='${categoria}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -141,7 +140,7 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
                                               <div class="form-group">
                                                   <label for="produto">Empresa Contratada</label>
                                                   <div class="input-group">
-                                                    <input id='produto' class='form-control' value='${empresaContrat}' readOnly />
+                                                    <input class='form-control' value='${empresaContrat}' readOnly />
                                                   </div>
                                              </div>
                                           </div>
@@ -151,7 +150,7 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
                                               <div class="form-group">
                                                   <label for="produto">Local</label>
                                                   <div class="input-group">
-                                                    <input id='produto' class='form-control' value='${local}' readOnly />
+                                                    <input class='form-control' value='${local}' readOnly />
                                                   </div>
                                              </div>
                                          </div>
@@ -159,7 +158,7 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Status</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${status}' readOnly />
+                                                     <input class='form-control' value='${status}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -167,7 +166,7 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Modalidade da Licitação</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${modalidade}' readOnly />
+                                                     <input class='form-control' value='${modalidade}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -178,7 +177,7 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Início</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${inicio}' readOnly />
+                                                     <input class='form-control' value='${inicio}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -186,7 +185,7 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
                                              <div class="form-group">
                                                  <label for="produto">Término</label>
                                                  <div class="input-group">
-                                                     <input id='produto' class='form-control' value='${termino}' readOnly />
+                                                     <input class='form-control' value='${termino}' readOnly />
                                                  </div>
                                             </div>
                                          </div>
@@ -441,7 +440,7 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
             })
 
             function imprime() {
-                url = 'relatorioLicitacaoImprime.php';
+                let url = 'relatorioLicitacaoImprime.php';
 
                 $('#imprimir').on('click', (e) => {
                     e.preventDefault()
