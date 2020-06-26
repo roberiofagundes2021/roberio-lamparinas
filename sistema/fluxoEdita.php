@@ -62,7 +62,7 @@ if (isset($_POST['inputDataInicio'])) {
 			':iNumProcesso' => $_POST['inputNumProcesso'],
 			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'],
 			':fValor' => gravaValor($_POST['inputValor']),
-			' :sObservacao' => $_POST['txtareaObservacao'],
+			':sObservacao' => $_POST['txtareaObservacao'] == '' ? null : $_POST['txtareaObservacao'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId']
 		));
 
