@@ -209,7 +209,7 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
 
         $(document).ready(function() {
 
-            /* Início: Tabela Personalizada */
+            /* Início: Tabela Personalizada 
             $('#tblLicitacao').DataTable({
                 "order": [
                     [0, "desc"]

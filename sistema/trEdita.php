@@ -211,6 +211,7 @@ if (isset($_POST['inputTRData'])) {
 				confirmaExclusao(document.formTR, "Existem produtos com quantidades ou valores lançados em orçamentos dessa TR, portanto, a Categoria e Subcategoria não podem ser alteradas. Apenas alterações no Conteúdo Personalizado são permitidas. Confirmar alteração?", "trEdita.php");
 			}
 
+			//Inicializa o editor de texto que será usado pelos campos "Conteúdo Personalizado - Inicialização" e "Conteúdo Personalizado - Finalização"
 			$('#summernoteInicio').summernote();
 			$('#summernoteFim').summernote();
 

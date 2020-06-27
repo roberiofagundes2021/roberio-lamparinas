@@ -1,6 +1,6 @@
 <?php 
 
-include_once("sessao.php"); 
+include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Editar Servico';
 
@@ -66,8 +66,9 @@ if(isset($_POST['inputServicoId'])){
 	$_SESSION['msg'] = array();
 
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
-
-	irpara("servico.php");
+	
+	header("Location: servico.php");
+	//irpara("servico.php");
 }
 
 if(isset($_POST['inputNome'])){
@@ -290,9 +291,7 @@ if(isset($_POST['inputNome'])){
 			//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
 			$('#inputMargemLucro').on('blur', function(e){
 								
-				if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
-					atualizaValorVenda();
-				}
+				atualizaValorVenda();
 			});	
 			
 			//Ao mudar o Valor de Venda, atualiza a Margem de Lucro
