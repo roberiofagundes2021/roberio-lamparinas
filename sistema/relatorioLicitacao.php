@@ -25,6 +25,17 @@ $Y = date("Y");
 $dataInicio = date('Y')."-01-01";  //date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
 $dataFim = date('Y')."-12-31"; //date("Y-m-d");
 
+
+$sql = "SELECT PerfiNome
+        FROM Usuario
+        JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+        JOIN Perfil on PerfiId = EXUXPPerfil
+        WHERE UsuarId = ".$_SESSION['UsuarId']."
+";
+$result = $conn->query($sql);
+$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -349,6 +360,8 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
 
                     const msg = $('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%">Nenhum registro encontrado...</td></tr>')
 
+                    $('tbody').html('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%"><i class="icon-spinner2 spinner"></i></td></tr>')
+
                     let dataDe = $('#inputDataDe').val()
                     let dataAte = $('#inputDataAte').val()
                     let unidade = $('#cmbUnidade').val()
@@ -659,7 +672,7 @@ $dataFim = date('Y')."-12-31"; //date("Y-m-d");
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-3" style="display:<?php if($rowPerfil['PerfiNome'] != 'CONTROLADORIA') echo 'none' ?>">
                                         <div class="form-group">
                                             <label for="cmbUnidade">Local</label>
                                             <select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
