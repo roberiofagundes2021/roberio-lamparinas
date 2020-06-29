@@ -20,22 +20,6 @@ if (isset($_POST['servicos']) and $_POST['servicos'] != '') {
 	$lista = 0;
 }
 
-if (isset($_POST['idSubCategoria']) and $_POST['idSubCategoria'] != '') {
-	$subCategorias = $_POST['idSubCategoria'];
-	$numSubCategorias = count($subCategorias);
-
-	$listaSubCategorias = "";
-
-	for ($i = 0; $i < $numSubCategorias; $i++) {
-		$listaSubCategorias .= $subCategorias[$i] . ",";
-	}
-
-	//retira a última vírgula
-	$listaSubCategorias = substr($listaSubCategorias, 0, -1);
-} else {
-	$listaSubCategorias = 0;
-}
-
 $iTR = $_POST['idTr'];
 
 $sql = "SELECT TRXSrServico
@@ -58,22 +42,12 @@ $countServicosTr2 = count($rowServicos);
 
 if (count($rowServicosOrcamento) >= 1) {
 
-	if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != '') {
-
-		$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, TRXSrTabela
-				FROM ServicoOrcamento
-				JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
-				JOIN Categoria on CategId = SrOrcCategoria
-				WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and SrOrcSubCategoria in (" . $listaSubCategorias . ") and SrOrcId in (" . $lista . ")
-				";
-	} else {
-		$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, TRXSrTabela
-				FROM ServicoOrcamento
-				JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
-				JOIN Categoria on CategId = SrOrcCategoria
-				WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and SrOrcCategoria = '" . $_POST['idCategoria'] . "' and SrOrcId in (" . $lista . ")
-				";
-	}
+	$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, TRXSrTabela
+			FROM ServicoOrcamento
+			JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
+			JOIN Categoria on CategId = SrOrcCategoria
+			WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and SrOrcId in (" . $lista . ")
+			";
 	//echo $sql;
 
 	$result = $conn->query($sql);
@@ -125,24 +99,13 @@ if (count($rowServicosOrcamento) >= 1) {
 
 	echo $output;
 } else {
-	if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != '') {
+	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, TRXSrTabela
+			FROM Servico
+			JOIN TermoReferenciaXServico on TRXSrServico = ServiId
+			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and ServiId in (" . $lista . ")
+			";
 
-		$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, TRXSrTabela
-				FROM Servico
-				JOIN TermoReferenciaXServico on TRXSrServico = ServiId
-				JOIN Categoria on CategId = ServiCategoria
-				WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and ServiSubCategoria in (" . $_POST['idSubCategoria'] . ") and ServiId in (" . $lista . ")
-				";
-	} else {
-		$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, TRXSrTabela
-				FROM Servico
-				JOIN TermoReferenciaXServico on TRXSrServico = ServiId
-				JOIN Categoria on CategId = ServiCategoria
-				WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and ServiCategoria = '" . $_POST['idCategoria'] . "' and ServiId in (" . $lista . ")
-				";
-	}
-
-	//echo $sql;
+	//echo $sql;die;
 
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -220,7 +220,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
         $(document).ready(function() {
 
-            /* Início: Tabela Personalizada */
+            /* Início: Tabela Personalizada 
             $('#tblLicitacao').DataTable({
                 "order": [
                     [0, "desc"]

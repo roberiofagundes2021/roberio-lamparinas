@@ -159,8 +159,8 @@ if (isset($_POST['inputData'])) {
 		$(document).ready(function() {
 
 			//Inicializa o editor de texto que será usado pelos campos "Conteúdo Personalizado - Inicialização" e "Conteúdo Personalizado - Finalização"
-			$('#summernoteInicializacao').summernote();
-			$('#summernoteFinalizacao').summernote();
+			$('#summernoteInicio').summernote();
+			$('#summernoteFim').summernote();
 
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e) {

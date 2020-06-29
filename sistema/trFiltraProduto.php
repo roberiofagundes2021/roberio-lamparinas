@@ -20,22 +20,6 @@ if (isset($_POST['produtos']) and $_POST['produtos'] != '') {
 	$lista = 0;
 }
 
-if (isset($_POST['idSubCategoria']) and $_POST['idSubCategoria'] != '') {
-	$subCategorias = $_POST['idSubCategoria'];
-	$numSubCategorias = count($subCategorias);
-
-	$listaSubCategorias = "";
-
-	for ($i = 0; $i < $numSubCategorias; $i++) {
-		$listaSubCategorias .= $subCategorias[$i] . ",";
-	}
-
-	//retira a última vírgula
-	$listaSubCategorias = substr($listaSubCategorias, 0, -1);
-} else {
-	$listaSubCategorias = 0;
-}
-
 $iTR = $_POST['idTr'];
 
 $sql = "SELECT TRXPrProduto
@@ -57,24 +41,14 @@ $countProdutosTr2 = count($rowProdutos);
 //echo $produto;
 
 if (count($rowProdutosOrcamento) >= 1) {
-	if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != '') {
 
-		$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrTabela, UnMedNome
-				FROM ProdutoOrcamento
-				JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
-				JOIN Categoria on CategId = PrOrcCategoria
-				JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-				WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and PrOrcSubCategoria in (" . $listaSubCategorias . ") and PrOrcId in (" . $lista . ")
-				";
-	} else {
-		$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrTabela, UnMedNome
-				FROM ProdutoOrcamento
-				JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
-				JOIN Categoria on CategId = PrOrcCategoria
-				JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-				WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and PrOrcCategoria = '" . $_POST['idCategoria'] . "' and PrOrcId in (" . $lista . ")
-				";
-	}
+	$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrTabela, UnMedNome
+			FROM ProdutoOrcamento
+			JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
+			JOIN Categoria on CategId = PrOrcCategoria
+			JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+			WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and PrOrcId in (" . $lista . ")
+			";
 	//echo $sql;
 
 	$result = $conn->query($sql);
@@ -126,25 +100,14 @@ if (count($rowProdutosOrcamento) >= 1) {
 
 	echo $output;
 } else {
-	if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != '') {
 
-		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrTabela, UnMedNome
-				FROM Produto
-				JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
-				JOIN Categoria on CategId = ProduCategoria
-				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-				WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and ProduSubCategoria in (" . $listaSubCategorias . ") and ProduId in (" . $lista . ")
-				";
-	} else {
-		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrTabela, UnMedNome
-				FROM Produto
-				JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
-				JOIN Categoria on CategId = ProduCategoria
-				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-				WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and ProduCategoria = '" . $_POST['idCategoria'] . "' and ProduId in (" . $lista . ")
-				";
-	}
-
+	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrTabela, UnMedNome
+			FROM Produto
+			JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
+			JOIN Categoria on CategId = ProduCategoria
+			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and ProduId in (" . $lista . ")
+			";
 	//echo $sql;
 
 	$result = $conn->query($sql);
