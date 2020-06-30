@@ -29,7 +29,8 @@ try {
 
 	$sql = "SELECT AditiId, AditiNumero, AditiDtInicio, AditiDtFim, AditiValor, AditiDtCelebracao
 			FROM Aditivo
-			WHERE AditiUnidade = " . $_SESSION['UnidadeId'] . " and AditiFluxoOperacional = " . $iFluxoOperacional;
+			JOIN Situacao on SituaId = AditiStatus
+			WHERE AditiUnidade = " . $_SESSION['UnidadeId'] . " and AditiFluxoOperacional = " . $iFluxoOperacional ." and SituaChave = 'ATIVO' ";
 	$result = $conn->query($sql);
 	$rowAditivo = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countAditivos = count($rowAditivo);

@@ -27,7 +27,7 @@ if (isset($_POST['inputFluxoOperacionalId'])) {
 $bFechado = 0;
 $countProduto = 0;
 
-$sql = "SELECT FlOpeValor, FLOpeStatus
+$sql = "SELECT FlOpeValor, FlOpeStatus
 		FROM FluxoOperacional
 		Where FlOpeId = " . $iFluxoOperacional;
 $result = $conn->query($sql);
@@ -56,7 +56,8 @@ if ($TotalGeral == $TotalFluxo) {
 
 $sql = "SELECT Top 1 isnull(AditiNumero, 0) as Aditivo
         FROM Aditivo
-        WHERE AditiFluxoOperacional = " . $iFluxoOperacional . "
+		JOIN Situacao on SituaId = AditiStatus
+        WHERE AditiFluxoOperacional = " . $iFluxoOperacional . " and SituaChave = 'ATIVO' 
         ORDER BY AditiNumero DESC
        ";
 $result = $conn->query($sql);
@@ -75,7 +76,8 @@ if ($rowNumero['Aditivo'] > 0) {
 
 	$sql = "SELECT Top 1 isnull(AditiDtFim, '1900-01-01') as ProxData
 	        FROM Aditivo
-	        WHERE AditiFluxoOperacional = " . $iFluxoOperacional . "
+			JOIN Situacao on SituaId = AditiStatus
+	        WHERE AditiFluxoOperacional = " . $iFluxoOperacional . " and SituaChave = 'ATIVO' 
 	        ORDER BY AditiDtFim DESC
 	       ";
 	$result = $conn->query($sql);
@@ -88,14 +90,26 @@ if ($rowNumero['Aditivo'] > 0) {
 
 if (isset($_POST['inputDataInicio'])) {
 
+	$sql = "SELECT SituaId
+		         FROM Situacao
+		         Where SituaChave = 'ATIVO' ";
+	$result = $conn->query($sql);
+	$rowAditSitua = $result->fetch(PDO::FETCH_ASSOC);
+
+	$sql = "SELECT FlOpeStatus
+		         FROM FluxoOperacional
+		         Where FlOpeId = " . $iFluxoOperacional;
+	$result = $conn->query($sql);
+	$rowFluxoStatus = $result->fetch(PDO::FETCH_ASSOC);
+
 	try {
 
 		$conn->beginTransaction();
 
 		$sql = "INSERT INTO Aditivo (AditiFluxoOperacional, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, 
-									 AditiValor, AditiUsuarioAtualizador, AditiUnidade)
+									 AditiValor, AditiStatusFluxo, AditiStatus, AditiUsuarioAtualizador, AditiUnidade)
 				VALUES (:iFluxo, :iNumero, :dDataCelebracao, :dDataInicio, :dDataFim, 
-						:fValor, :iUsuarioAtualizador, :iUnidade)";
+						:fValor, :iStatusFluxo, :iStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -105,7 +119,8 @@ if (isset($_POST['inputDataInicio'])) {
 			':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':fValor' => $_POST['inputValor'] == '' ? null : gravaValor($_POST['inputValor']),
-			':StatusFluxo' => $rowFluxo['FLOpeStatus'],
+			':iStatusFluxo' => $rowFluxoStatus['FlOpeStatus'],
+			':iStatus' => $rowAditSitua['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));

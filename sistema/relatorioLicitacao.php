@@ -358,9 +358,9 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                 $('#submitFiltro').on('click', (e) => {
                     e.preventDefault()
 
-                    const msg = $('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%">Nenhum registro encontrado...</td></tr>')
+                    const msg = $('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%; text-align: center">Nenhum registro encontrado...</td></tr>')
 
-                    $('tbody').html('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%"><i class="icon-spinner2 spinner"></i></td></tr>')
+                    $('tbody').html('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%; text-align: center"><i class="icon-spinner2 spinner"></i></td></tr>')
 
                     let dataDe = $('#inputDataDe').val()
                     let dataAte = $('#inputDataAte').val()
