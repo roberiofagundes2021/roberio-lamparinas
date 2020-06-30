@@ -672,7 +672,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3" style="display:<?php if($rowPerfil['PerfiNome'] != 'CONTROLADORIA') echo 'none' ?>">
+                                    <div class="col-lg-3" style="display:<?php if($rowPerfil['PerfiNome'] != 'Controladoria') echo 'none' ?>">
                                         <div class="form-group">
                                             <label for="cmbUnidade">Local</label>
                                             <select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">

@@ -27,7 +27,7 @@ if (isset($_POST['inputFluxoOperacionalId'])) {
 $bFechado = 0;
 $countProduto = 0;
 
-$sql = "SELECT FlOpeValor
+$sql = "SELECT FlOpeValor, FLOpeStatus
 		FROM FluxoOperacional
 		Where FlOpeId = " . $iFluxoOperacional;
 $result = $conn->query($sql);
@@ -105,6 +105,7 @@ if (isset($_POST['inputDataInicio'])) {
 			':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':fValor' => $_POST['inputValor'] == '' ? null : gravaValor($_POST['inputValor']),
+			':StatusFluxo' => $rowFluxo['FLOpeStatus'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
