@@ -921,38 +921,12 @@ try {
 							<div class="row" style="margin-top: 10px; display:<?php ($countProduto >= 1 || $countServico >= 1) &&  isset($_POST['inputDataInicio']) ? print('block') : print('none')  ?>">
 								<div class="col-lg-6">
 									<div class="form-group">
-										<?php
-										if ($bFechado) {
-											print('
-												<button class="btn btn-lg btn-success" id="enviar2" style="margin-right:5px;">Alterar</button>
-												<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
-										} else {
-											if (!$countProduto) {
-												print('<button class="btn btn-lg btn-success" id="enviar2" disabled>Alterar</button>');
-											} else {
-												print('<button class="btn btn-lg btn-success" id="enviar2">Alterar</button>');
-											}
-										}
 
-										?>
+										<button class="btn btn-lg btn-success" id="enviar2" style="margin-right:5px;">Alterar</button>
+
+
 										<a href="fluxoAditivo.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
-								</div>
-
-								<div class="col-lg-6" style="text-align: right; padding-right: 35px; color: red;">
-									<?php
-									if ($bFechado) {
-										if ($row['SituaNome'] == 'PENDENTE') {
-											print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído (ENVIE PARA APROVAÇÃO)');
-										} else {
-											print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído (' . $row['SituaNome'] . ')');
-										}
-									} else if (!$countProduto) {
-										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Não há produtos cadastrados para a Categoria e SubCategoria informada');
-									} else if ($TotalFluxo < $TotalGeral) {
-										print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Os valores dos Produtos + Serviços ultrapassaram o valor total do Fluxo');
-									}
-									?>
 								</div>
 							</div>
 						</div>
