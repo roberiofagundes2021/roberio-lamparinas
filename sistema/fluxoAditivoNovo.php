@@ -921,10 +921,7 @@ try {
 							<div class="row" style="margin-top: 10px; display:<?php ($countProduto >= 1 || $countServico >= 1) &&  isset($_POST['inputDataInicio']) ? print('block') : print('none')  ?>">
 								<div class="col-lg-6">
 									<div class="form-group">
-
 										<button class="btn btn-lg btn-success" id="enviar2" style="margin-right:5px;">Alterar</button>
-
-
 										<a href="fluxoAditivo.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
