@@ -17,24 +17,24 @@ if(isset($_POST['inputData'])){
 	
 	try{
 		
+		$conn->beginTransaction();
+
 		$sql = "SELECT SituaId
 				FROM Situacao
 				Where SituaChave = 'PENDENTE' ";
-		$result = $conn->query("$sql");
+		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 		
 		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, 
-							OrComConteudo, OrComFornecedor, OrComValorFrete, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
+							OrComConteudo, OrComFornecedor, OrComValorFrete, OrComSolicitante, OrComUnidadeEntrega, OrComLocalEntrega, 
 							OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, OrComSituacao, OrComUsuarioAtualizador, OrComUnidade)
 				VALUES (:sTipo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, 
-						:iSolicitante, :iUnidade, :iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, 
+						:iSolicitante, :iUnidadeEntrega, :iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, 
 						:iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 		
 		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
-		$iFornecedor = $aFornecedor[0];
-		
-		$conn->beginTransaction();		
+		$iFornecedor = $aFornecedor[0];		
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
@@ -49,7 +49,7 @@ if(isset($_POST['inputData'])){
 						':iFornecedor' => $iFornecedor,
 						':fValorFrete' => null,
 						':iSolicitante' => $_SESSION['UsuarId'],
-						':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
+						':iUnidadeEntrega' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
 						':iLocalEntrega' => $_POST['cmbLocalEstoque'] == '' ? null : $_POST['cmbLocalEstoque'],
 						':sEnderecoEntrega' => $_POST['inputEnderecoEntrega'],
 						':dDataEntrega' => gravaData($_POST['inputDataEntrega']),

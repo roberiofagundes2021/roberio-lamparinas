@@ -611,7 +611,7 @@ if (isset($_POST['inputTipo'])) {
 									<br>
 									<div class="row">
 										<div class="col-lg-6">
-											<label for="cmbUnidade">Unidade</label>
+											<label for="cmbUnidade">Unidade <span class="text-danger">*</span></label>
 											<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
 												<option value="">Selecione</option>
 												<?php
