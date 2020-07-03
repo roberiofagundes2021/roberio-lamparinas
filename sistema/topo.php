@@ -22,9 +22,10 @@
 			data,
 			success: (data) => {
 				$('#usuariosOnline').html(data)
+				console.log(data)
 			}
 		})
-	}, 60000)
+	}, 1000)
 </script>
 
 <!-- Main navbar -->
