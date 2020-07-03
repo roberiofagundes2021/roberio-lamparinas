@@ -17,6 +17,7 @@ class ComposerStaticInitea44d7da5e97d0691a812366eb42399e
         ),
         'M' => 
         array (
+            'MyApp\\' => 6,
             'Mpdf\\' => 5,
         ),
         'D' => 
@@ -29,6 +30,10 @@ class ComposerStaticInitea44d7da5e97d0691a812366eb42399e
         'Psr\\Log\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
+        'MyApp\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/app',
         ),
         'Mpdf\\' => 
         array (

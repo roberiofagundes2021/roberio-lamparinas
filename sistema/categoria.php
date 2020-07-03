@@ -1,6 +1,6 @@
-<?php
+<?php 
 
-include_once("sessao.php");
+include_once("sessao.php"); 
 
 $_SESSION['PaginaAtual'] = 'Categoria';
 
@@ -10,7 +10,7 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT CategId, CategNome, CategStatus, SituaNome, SituaChave, SituaCor
 		FROM Categoria
 		JOIN Situacao on SituaId = CategStatus
-	    WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave != 'ALTERAR'
+	    WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave != 'ALTERAR'
 		ORDER BY CategNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -21,7 +21,6 @@ $count = count($row);
 
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -29,66 +28,51 @@ $count = count($row);
 	<title>Lamparinas | Categoria</title>
 
 	<?php include_once("head.php"); ?>
-
+	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
+	
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>	
+	
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-
-	<!-- /theme JS files -->
-
+	<script src="global_assets/js/lamparinas/stop-back.js"></script>
+	
+	<!-- /theme JS files -->	
+	
 	<script type="text/javascript">
-		$(document).ready(function() {
 
-			history.pushState({
-				page: 1
-			}, "Categoria", "http://localhost/lamparinas/lamparinas/sistema/categoria.php");
-			window.addEventListener("popstate", function(event) {
-				history.pushState({
-					page: 1
-				}, "Categoria", "http://localhost/lamparinas/lamparinas/sistema/categoria.php");
-			});
-
-			$('#tblCategoria').DataTable({
-				"order": [
-					[0, "asc"]
-				],
-				autoWidth: false,
+		$(document).ready(function (){	
+			$('#tblCategoria').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
 				responsive: true,
-				columnDefs: [{
-						orderable: true, //Categoria
-						width: "80%",
-						targets: [0]
-					},
-					{
-						orderable: true, //Situação
-						width: "10%",
-						targets: [1]
-					},
-					{
-						orderable: false, //Ações
-						width: "10%",
-						targets: [2]
-					}
-				],
+			    columnDefs: [
+				{
+					orderable: true,   //Categoria
+					width: "80%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "10%",
+					targets: [1]
+				},
+				{ 
+					orderable: false,   //Ações
+					width: "10%",
+					targets: [2]
+				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
 					search: '<span>Filtro:</span> _INPUT_',
 					searchPlaceholder: 'filtra qualquer coluna...',
 					lengthMenu: '<span>Mostrar:</span> _MENU_',
-					paginate: {
-						'first': 'Primeira',
-						'last': 'Última',
-						'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-						'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
-					}
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
 				}
 			});
-
+			
 			// Select2 for length menu styling
 			var _componentSelect2 = function() {
 				if (!$().select2) {
@@ -102,52 +86,53 @@ $count = count($row);
 					dropdownAutoWidth: true,
 					width: 'auto'
 				});
-			};
+			};	
 
 			_componentSelect2();
-
-			/* Fim: Tabela Personalizada */
+			
+			/* Fim: Tabela Personalizada */					
 		})
-
+			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaCategoria(CategId, CategNome, CategStatus, Tipo) {
-
+		function atualizaCategoria(CategId, CategNome, CategStatus, Tipo){
+		
 			document.getElementById('inputCategoriaId').value = CategId;
 			document.getElementById('inputCategoriaNome').value = CategNome;
 			document.getElementById('inputCategoriaStatus').value = CategStatus;
-
-			if (Tipo == 'edita') {
-				document.formCategoria.action = "categoriaEdita.php";
-			} else if (Tipo == 'exclui') {
+					
+			if (Tipo == 'edita'){	
+				document.formCategoria.action = "categoriaEdita.php";		
+			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formCategoria, "Tem certeza que deseja excluir essa categoria?", "categoriaExclui.php");
-			} else if (Tipo == 'mudaStatus') {
+			} else if (Tipo == 'mudaStatus'){
 				document.formCategoria.action = "categoriaMudaSituacao.php";
-			}
-
+			} 
+			
 			document.formCategoria.submit();
-		}
+		}		
+			
 	</script>
 
 </head>
 
 <body class="navbar-top">
 
-	<?php include_once("topo.php"); ?>
+	<?php include_once("topo.php"); ?>	
 
 	<!-- Page content -->
 	<div class="page-content">
-
+		
 		<?php include_once("menu-left.php"); ?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
 
-			<?php include_once("cabecalho.php"); ?>
+			<?php include_once("cabecalho.php"); ?>	
 
 			<!-- Content area -->
 			<div class="content">
 
-				<!-- Info blocks -->
+				<!-- Info blocks -->		
 				<div class="row">
 					<div class="col-lg-12">
 						<!-- Basic responsive configuration -->
@@ -166,8 +151,8 @@ $count = count($row);
 							<div class="card-body">
 								<p class="font-size-lg">A relação abaixo faz referência às categorias da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 								<div class="text-right"><a href="categoriaNovo.php" class="btn btn-success" role="button">Nova Categoria</a></div>
-							</div>
-
+							</div>					
+							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->
 							<table id="tblCategoria" class="table">
 								<thead>
@@ -178,30 +163,30 @@ $count = count($row);
 									</tr>
 								</thead>
 								<tbody>
-									<?php
-									foreach ($row as $item) {
-
+								<?php
+									foreach ($row as $item){
+										
 										$situacao = $item['SituaNome'];
-										$situacaoClasse = 'badge badge-flat border-' . $item['SituaCor'] . ' text-' . $item['SituaCor'];
-
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
+										
 										print('
 										<tr>
-											<td>' . $item['CategNome'] . '</td>
+											<td>'.$item['CategNome'].'</td>
 											');
-
-										print('<td><a href="#" onclick="atualizaCategoria(' . $item['CategId'] . ', \'' . $item['CategNome'] . '\',\'' . $item['SituaChave'] . '\', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
-
+										
+										print('<td><a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCategoria(' . $item['CategId'] . ', \'' . $item['CategNome'] . '\',\'' . $item['SituaChave'] . '\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCategoria(' . $item['CategId'] . ', \'' . $item['CategNome'] . '\',\'' . $item['SituaChave'] . '\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>
 										</tr>');
 									}
-									?>
+								?>
 
 								</tbody>
 							</table>
@@ -209,19 +194,19 @@ $count = count($row);
 						<!-- /basic responsive configuration -->
 
 					</div>
-				</div>
-
+				</div>				
+				
 				<!-- /info blocks -->
-
+				
 				<form name="formCategoria" method="post" action="categoriaEdita.php">
-					<input type="hidden" id="inputCategoriaId" name="inputCategoriaId">
-					<input type="hidden" id="inputCategoriaNome" name="inputCategoriaNome">
-					<input type="hidden" id="inputCategoriaStatus" name="inputCategoriaStatus">
+					<input type="hidden" id="inputCategoriaId" name="inputCategoriaId" >
+					<input type="hidden" id="inputCategoriaNome" name="inputCategoriaNome" >
+					<input type="hidden" id="inputCategoriaStatus" name="inputCategoriaStatus" >
 				</form>
 
 			</div>
 			<!-- /content area -->
-
+			
 			<?php include_once("footer.php"); ?>
 
 		</div>

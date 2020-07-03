@@ -39,6 +39,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<script src="global_assets/js/lamparinas/stop-back.js"></script>
 	
 	<!-- /theme JS files -->	
 	
