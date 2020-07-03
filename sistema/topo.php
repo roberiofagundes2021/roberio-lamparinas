@@ -21,8 +21,7 @@
 			url,
 			data,
 			success: (data) => {
-				$('#usuariosOnline').html(data)
-				console.log(data)
+				$('#usuariosOnline').html(data)				
 			}
 		})
 	}, 1000)
