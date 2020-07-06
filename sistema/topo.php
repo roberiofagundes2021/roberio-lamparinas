@@ -21,10 +21,10 @@
 			url,
 			data,
 			success: (data) => {
-				$('#usuariosOnline').html(data)
+				$('#usuariosOnline').html(data)				
 			}
 		})
-	}, 60000)
+	}, 1000)
 </script>
 
 <!-- Main navbar -->

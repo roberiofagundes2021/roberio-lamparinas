@@ -14,7 +14,7 @@ if (isset($_POST['timesTampUsuarioOnline'])) {
     $result->bindParam(':id', $usuario);
     $result->execute();
 
-    $tempo = $ultimoAcesso - 60000;
+    $tempo = $ultimoAcesso - 1000;
 
     $sql = "SELECT UsuarId, UsuarNome, UsuarDataAcesso, SetorNome
                 FROM Usuario
