@@ -6,3 +6,5 @@ window.addEventListener("popstate", function(event) {
         page: 1
     }, "Categoria", "#");
 });
+
+var popped = ('state' in window.history && window.history.state !== null), initialURL = location.href;

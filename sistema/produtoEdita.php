@@ -7,6 +7,17 @@ $_SESSION['PaginaAtual'] = 'Editar Produto';
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputProdutoId'])){
+
+	$sql = "SELECT TRXPrTermoReferencia
+	            FROM TermoReferenciaXProduto
+				JOIN Produto on ProduId = TRXPrProduto
+	            JOIN TermoReferencia on TrRefId = TRXPrTermoReferencia
+				JOIN Situacao on Situaid = TrRefStatus
+	            WHERE TRXPrProduto = ".$_POST['inputProdutoId']." and (SituaChave = 'ATIVO' or SituaChave = 'AGUARDANDOLIBERACAO' or SituaChave = 'FINALIZADO')  and TRXPrUnidade = ".$_SESSION['UnidadeId']."
+	            ";
+	$result = $conn->query($sql);
+	$rowTrs = $result->fetchAll(PDO::FETCH_ASSOC);
+	$contTRs = count($rowTrs);
 	
 	$iProduto = $_POST['inputProdutoId'];
 	
@@ -157,7 +168,7 @@ if(isset($_POST['inputNome'])){
 		echo 'Error: ' . $e->getMessage();		
 		exit;
 	}
-	
+
 	irpara("produto.php");
 }
 
@@ -427,7 +438,16 @@ if(isset($_POST['inputNome'])){
 			
 			function Reset(){
 				$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
-			}			
+			}
+			
+			$('#alterar').on('click', (e)=>{
+				e.preventDefault()
+				
+				$('#cmbCategoria').removeAttr('disabled')
+				$('#cmbSubCategoria').removeAttr('disabled')
+
+				$('#formProduto').submit()
+			})
 		
 		});
 
@@ -455,7 +475,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formProduto" method="post" class="form-validate-jquery" action="produtoEdita.php">
+					<form id="formProduto" name="formProduto" method="post" class="form-validate-jquery" action="produtoEdita.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Produto "<?php echo $row['ProduNome']; ?>"</h5>
 						</div>
@@ -533,7 +553,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required <?php $contTRs >= 1 ? print('disabled') : ''?>>
 													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT CategId, CategNome
@@ -557,7 +577,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" <?php $contTRs >= 1 ? print('disabled') : ''?>>
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT SbCatId, SbCatNome
@@ -828,7 +848,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<button id="alterar" class="btn btn-lg btn-success" type="submit">Alterar</button>
 										<a href="produto.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

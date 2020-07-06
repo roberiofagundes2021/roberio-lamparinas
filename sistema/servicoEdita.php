@@ -7,6 +7,18 @@ $_SESSION['PaginaAtual'] = 'Editar Servico';
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputServicoId'])){
+
+	$sql = "SELECT TRXSrTermoReferencia
+	            FROM TermoReferenciaXServico
+				JOIN Servico on ServiId =TRXSrServico
+	            JOIN TermoReferencia on TrRefId =TRXSrTermoReferencia
+				JOIN Situacao on Situaid = TrRefStatus
+	            WHERE TRXSrServico = ".$_POST['inputServicoId']." and (SituaChave = 'ATIVO' or SituaChave = 'AGUARDANDOLIBERACAO' or SituaChave = 'FINALIZADO')  and TRXSrUnidade = ".$_SESSION['UnidadeId']."
+	            ";
+	$result = $conn->query($sql);
+	$rowTrs = $result->fetchAll(PDO::FETCH_ASSOC);
+	$contTRs = count($rowTrs);
+
 	
 	$iServico = $_POST['inputServicoId'];
 	
@@ -349,6 +361,15 @@ if(isset($_POST['inputNome'])){
 			function Reset(){
 				$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
 			}
+
+			$('#alterar').on('click', (e)=>{
+				e.preventDefault()
+				
+				$('#cmbCategoria').removeAttr('disabled')
+				$('#cmbSubCategoria').removeAttr('disabled')
+
+				$('#formServico').submit()
+			})
 		
 		});
 
@@ -375,7 +396,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formServico" method="post" class="form-validate-jquery" action="servicoEdita.php">
+					<form id="formServico" name="formServico" method="post" class="form-validate-jquery" action="servicoEdita.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Serviço "<?php echo $row['ServiNome']; ?>"</h5>
 						</div>
@@ -425,7 +446,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required <?php $contTRs >= 1 ? print('disabled') : ''?>>
 													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT CategId, CategNome
@@ -449,7 +470,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" <?php $contTRs >= 1 ? print('disabled') : ''?>>
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT SbCatId, SbCatNome
@@ -613,7 +634,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<button id="alterar" class="btn btn-lg btn-success" type="submit">Alterar</button>
 										<a href="servico.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

@@ -124,6 +124,11 @@ if (isset($_POST['inputCpf'])) {
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 	<!-- /theme JS files -->
 
 	<!-- Adicionando Javascript -->
@@ -319,30 +324,30 @@ if (isset($_POST['inputCpf'])) {
 					return false;
 				}
 
-				//Verifica se o campo só possui espaços em branco
-				if (inputNome == '') {
-					alerta('Atenção', 'Informe o nome do usuário!', 'error');
-					$('#inputNome').focus();
-					return false;
-				}
+				// //Verifica se o campo só possui espaços em branco
+				// if (inputNome == '') {
+				// 	alerta('Atenção', 'Informe o nome do usuário!', 'error');
+				// 	$('#inputNome').focus();
+				// 	return false;
+				// }
 
-				if (cmbPerfil == '#') {
-					alerta('Atenção', 'Informe o perfil!', 'error');
-					$('#cmPerfil').focus();
-					return false;
-				}
+				// if (cmbPerfil == '#') {
+				// 	alerta('Atenção', 'Informe o perfil!', 'error');
+				// 	$('#cmPerfil').focus();
+				// 	return false;
+				// }
 
-				if (inputLogin == '') {
-					alerta('Atenção', 'Informe o login!', 'error');
-					$('#inputLogin').focus();
-					return false;
-				}
+				// if (inputLogin == '') {
+				// 	alerta('Atenção', 'Informe o login!', 'error');
+				// 	$('#inputLogin').focus();
+				// 	return false;
+				// }
 
-				if (inputSenha == '') {
-					alerta('Atenção', 'Informe a senha!', 'error');
-					$('#inputSenha').focus();
-					return false;
-				}
+				// if (inputSenha == '') {
+				// 	alerta('Atenção', 'Informe a senha!', 'error');
+				// 	$('#inputSenha').focus();
+				// 	return false;
+				// }
 
 				if (inputSenha != inputConfirmaSenha) {
 					alerta('Atenção', 'A confirmação de senha não confere!', 'error');
@@ -350,17 +355,17 @@ if (isset($_POST['inputCpf'])) {
 					return false;
 				}
 
-				if (cmbUnidade == '#') {
-					alerta('Atenção', 'Informe a unidade!', 'error');
-					$('#cmUnidade').focus();
-					return false;
-				}
+				// if (cmbUnidade == '#') {
+				// 	alerta('Atenção', 'Informe a unidade!', 'error');
+				// 	$('#cmUnidade').focus();
+				// 	return false;
+				// }
 
-				if (cmbSetor == '#' || cmbSetor == 'Filtrando...') {
+				if (cmbSetor == '#' || cmbSetor == 'Filtrando...' ) {
 					alerta('Atenção', 'Informe o setor!', 'error');
 					$('#cmSetor').focus();
 					return false;
-				}
+				} 
 
 				$('#cmbEmpresa').prop("disabled", false);
 
@@ -425,7 +430,7 @@ include_once("topo.php");
 			<!-- Info blocks -->
 			<div class="card">
 
-				<form name="formUsuario" id="formUsuario" method="post" class="form-validate">
+				<form name="formUsuario" id="formUsuario" method="post" class="form-validate-jquery">
 					<div class="card-header header-elements-inline">
 						<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Usuário</h5>
 					</div>
@@ -458,7 +463,7 @@ include_once("topo.php");
 											<div class="form-group">
 												<label for="cmbPerfil">Perfil</label>
 												<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2" required>
-													<option value="#">Informe um perfil</option>
+													<option value="">Informe um perfil</option>
 													<?php
 													$sql = ("SELECT PerfiId, PerfiNome, PerfiChave
 																	 FROM Perfil
@@ -494,14 +499,14 @@ include_once("topo.php");
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputSenha">Senha</label>
-												<input type="password" id="inputSenha" name="inputSenha" class="form-control" placeholder="Senha">
+												<input type="password" id="inputSenha" name="inputSenha" class="form-control" placeholder="Senha" required>
 											</div>
 										</div>
 
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputConfirmaSenha">Confirma Senha</label>
-												<input type="password" id="inputConfirmaSenha" name="inputConfirmaSenha" class="form-control" placeholder="Confirma Senha">
+												<input type="password" id="inputConfirmaSenha" name="inputConfirmaSenha" class="form-control" placeholder="Confirma Senha" required>
 											</div>
 										</div>
 									</div>
@@ -544,7 +549,7 @@ include_once("topo.php");
 											<div class="form-group">
 												<label for="cmbUnidade">Unidade</label>
 												<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
-													<option value="#">Informe uma unidade</option>
+													<option value="">Informe uma unidade</option>
 													<?php
 													$sql = "SELECT UnidaId, UnidaNome
 															FROM Unidade
@@ -567,7 +572,7 @@ include_once("topo.php");
 											<div class="form-group">
 												<label for="cmbSetor">Setor</label>
 												<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
-													<option value="#">Sem setor</option>
+													<option value="">Sem setor</option>
 												</select>
 											</div>
 										</div>
@@ -576,7 +581,7 @@ include_once("topo.php");
 											<div class="form-group">
 												<label for="cmbLocalEstoque">Local de Estoque</label>
 												<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
-													<option value="#">Local de Estoque</option>
+													<option value="">Local de Estoque</option>
 												</select>
 											</div>
 										</div>
