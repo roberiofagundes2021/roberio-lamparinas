@@ -1,30 +1,31 @@
 <script>
-	setTimeout(() => {
-		let url = 'usuariosOnlineAtualiza.php'
-		let data = {
-			timesTampUsuarioOnline: Date.now
-		}
-		$.post({
-			url,
-			data,
-			success: (data) => {
-				$('#usuariosOnline').html(data)
-			}
-		})
-	}, 1000)
-	setInterval(() => {
-		let url = 'usuariosOnlineAtualiza.php'
-		let data = {
-			timesTampUsuarioOnline: Date.now
-		}
-		$.post({
-			url,
-			data,
-			success: (data) => {
-				$('#usuariosOnline').html(data)				
-			}
-		})
-	}, 1000)
+	// setTimeout(() => {
+	// 	let url = 'usuariosOnlineAtualiza.php'
+	// 	let data = {
+	// 		timesTampUsuarioOnline: Date.now()
+	// 	}
+	// 	console.log(new Date().toLocaleTimeString() )
+	// 	// $.post({
+	// 	// 	url,
+	// 	// 	data,
+	// 	// 	success: (data) => {
+	// 	// 		$('#usuariosOnline').html(data)
+	// 	// 	}
+	// 	// })
+	// }, 1000)
+	// setInterval(() => {
+	// 	let url = 'usuariosOnlineAtualiza.php'
+	// 	let data = {
+	// 		timesTampUsuarioOnline: Date.now
+	// 	}
+	// 	$.post({
+	// 		url,
+	// 		data,
+	// 		success: (data) => {
+	// 			$('#usuariosOnline').html(data)				
+	// 		}
+	// 	})
+	// }, 1000)
 </script>
 
 <!-- Main navbar -->
