@@ -5,7 +5,10 @@ include('global_assets/php/conexao.php');
 
 if (isset($_POST['timesTampUsuarioOnline'])) {
 
-    $ultimoAcesso = intval($_POST['timesTampUsuarioOnline']);
+    $ultimoAcesso = $_POST['timesTampUsuarioOnline'];
+    $hora = $_POST['hora'];
+    $minuto = $_POST['minuto'];
+    $segundos = intval($_POST['segundos']);
     $usuario = $_SESSION['UsuarId'];
 
     $sql = " UPDATE Usuario set UsuarDataAcesso = :sDataAcesso WHERE UsuarId = :id ";
@@ -14,13 +17,15 @@ if (isset($_POST['timesTampUsuarioOnline'])) {
     $result->bindParam(':id', $usuario);
     $result->execute();
 
-    $tempo = $ultimoAcesso - 1000;
+    $segundos = $segundos - 1;
+
+    $string = $hora.":".$minuto.":".$segundos;
 
     $sql = "SELECT UsuarId, UsuarNome, UsuarDataAcesso, SetorNome
                 FROM Usuario
                 JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario =  UsuarId
                 JOIN Setor on SetorId =  EXUXPSetor
-                WHERE UsuarDataAcesso >= $tempo and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+                WHERE UsuarDataAcesso >= '$string'  and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
                 ORDER BY UsuarDataAcesso";
     $result = $conn->query($sql);
     $row = $result->fetchAll(PDO::FETCH_ASSOC);
