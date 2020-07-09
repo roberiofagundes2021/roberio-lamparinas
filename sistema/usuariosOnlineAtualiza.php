@@ -17,7 +17,7 @@ if (isset($_POST['timesTampUsuarioOnline'])) {
     $result->bindParam(':id', $usuario);
     $result->execute();
 
-    $segundos = $segundos - 1;
+    $segundos = $segundos + 1;
 
     $string = $hora.":".$minuto.":".$segundos;
 
@@ -29,6 +29,38 @@ if (isset($_POST['timesTampUsuarioOnline'])) {
                 ORDER BY UsuarDataAcesso";
     $result = $conn->query($sql);
     $row = $result->fetchAll(PDO::FETCH_ASSOC);
+var_dump($row);
+
+
+/**$ultimoAcesso = $_POST['timesTampUsuarioOnline'];
+    $hora = intval($_POST['hora']);
+    $minuto = intVal($_POST['minuto']);
+    $segundos = intval($_POST['segundos']);
+    $usuario = $_SESSION['UsuarId'];
+
+    $time = $hora + $minuto + $segundos;
+
+    $sql = " UPDATE Usuario set UsuarDataAcesso = :sDataAcesso  WHERE UsuarId = :id ";
+    $result = $conn->prepare($sql);
+    $result->bindParam(':sDataAcesso', $time);
+    $result->bindParam(':id', $usuario);
+    $result->execute();
+
+    $segundos = $segundos - 1;
+
+    $string = $$hora + $minuto + $segundos;
+
+    $sql = "SELECT UsuarId, UsuarNome, UsuarDataAcesso, SetorNome
+                FROM Usuario
+                JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario =  UsuarId
+                JOIN Setor on SetorId =  EXUXPSetor
+                WHERE UsuarDataAcesso >= '$string'  and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+                ORDER BY UsuarDataAcesso";
+    $result = $conn->query($sql);
+    $row = $result->fetchAll(PDO::FETCH_ASSOC);
+    print($_POST['timesTampUsuarioOnline']); */
+
+
 
     foreach ($row as $usuario) {
         print('

@@ -1,33 +1,37 @@
 <script>
-	setTimeout(() => {
-		let url = 'usuariosOnlineAtualiza.php'
-		let data = {
-			timesTampUsuarioOnline: new Date().toLocaleTimeString() 
-		}
-		$.post({
-			url,
-			data,
-			success: (data) => {
-				$('#usuariosOnline').html(data)
-			}
-		})
-	}, 1000)
-	setInterval(() => {
-		let url = 'usuariosOnlineAtualiza.php'
-		let data = {
-			timesTampUsuarioOnline: new Date().toLocaleTimeString(),
-			hora:  new Date().getHours(),
-			minuto:  new Date().getMinutes(),
-			segundos: new Date().getSeconds()
-		}
-		$.post({
-			url,
-			data,
-			success: (data) => {
-				$('#usuariosOnline').html(data)				
-			}
-		})
-	}, 1000)
+	// setTimeout(() => {
+	// 	let url = 'usuariosOnlineAtualiza.php'
+	// 	let data = {
+	// 		timesTampUsuarioOnline: new Date().toLocaleTimeString(),
+	// 		hora:  new Date().getHours(),
+	// 		minuto:  new Date().getMinutes(),
+	// 		segundos: new Date().getSeconds()
+	// 	}
+	// 	$.post({
+	// 		url,
+	// 		data,
+	// 		success: (data) => {
+	// 			$('#usuariosOnline').html(data)
+	// 		}
+	// 	})
+	// }, 1000)
+	// setInterval(() => {
+	// 	let url = 'usuariosOnlineAtualiza.php'
+	// 	let data = {
+	// 		timesTampUsuarioOnline: new Date().toLocaleTimeString(),
+	// 		hora:  new Date().getHours(),
+	// 		minuto:  new Date().getMinutes(),
+	// 		segundos: new Date().getSeconds()
+	// 	}
+	// 	$.post({
+	// 		url,
+	// 		data,
+	// 		success: (data) => {
+	// 			console.log(data)
+	// 			$('#usuariosOnline').html(data)				
+	// 		}
+	// 	})
+	// }, 2000)
 </script>
 
 <!-- Main navbar -->

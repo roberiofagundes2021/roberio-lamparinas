@@ -261,9 +261,9 @@ try{
 										</div>
 									
 										<div class="col-lg-6">
-											<div class="form-group" style="border-bottom:1px solid #ddd;">
-												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control form-control-select2" multiple="multiple" data-fouc>
+										    <div class="form-group">
+												<label for="cmbSubCategoria">SubCategoria(as)</label>
+												<div class="d-flex flex-row" style="padding-top: 7px;">
 													<!--<option value="#">Selecione uma subcategoria</option>-->
 													<?php
 												        if (isset($row['OrcamCategoria'])){
@@ -278,13 +278,13 @@ try{
 
 													        
 														        foreach ($rowSubCategoria as $item){
-															        $seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
-															        print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
+																	print('<input type="text" class="form-control pb-0" value="' . $item['SbCatNome'] . '" readOnly>');
+																	print('<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="' . $item['SbCatId'] . '">');
 														        }
 													        
 												        }
 											        ?>
-												</select>
+												</div>
 											</div>
 										</div>
 									</div>
