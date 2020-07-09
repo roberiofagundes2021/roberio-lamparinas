@@ -177,7 +177,7 @@ try {
 					success: function(resposta) {
 						//alert(resposta); 
 						$("#tabelaServicos").html(resposta).show();
-
+console.log(resposta)
 						return false;
 
 					}

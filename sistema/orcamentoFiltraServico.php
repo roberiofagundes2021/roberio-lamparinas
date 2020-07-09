@@ -26,14 +26,12 @@ if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POS
 
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
 			FROM Servico
-			JOIN OrcamentoXServico on OrXSrServico = ServiId
 			JOIN Categoria on CategId = ServiCategoria
 			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiSubCategoria = '". $_POST['idSubCategoria']."' and ServiId in (".$lista.")
 			";
 } else {
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
 			FROM Servico
-			JOIN OrcamentoXServico on OrXSrServico = ServiId
 			JOIN Categoria on CategId = ServiCategoria
 			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = '". $_POST['idCategoria']."' and ServiId in (".$lista.")
 			";
@@ -59,8 +57,7 @@ foreach ($row as $item){
 	$quantidade = isset($_POST['servicoQuant'][$id]) ? $_POST['servicoQuant'][$id] : '';
 	$valorUnitario = isset($_POST['servicoValor'][$id]) ? $_POST['servicoValor'][$id] : '';
 	$valorTotal = (isset($_POST['servicoQuant'][$id]) && isset($_POST['servicoValor'][$id])) ? mostraValor((float)$quantidade * (float)$valorUnitario) : '';
-	print($_POST['servicoQuant'][$id]);
-	print(' ');
+	
 	$fTotalGeral += (isset($_POST['servicoQuant'][$id]) and isset($_POST['servicoValor'][$id])) ? (float)$quantidade * (float)$valorUnitario : 0;	
 	
 	$output .= ' <div class="row" style="margin-top: 8px;">

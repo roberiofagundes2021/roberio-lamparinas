@@ -240,9 +240,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											    <td>'.$item['ForneNome'].'</td>
 											    <td>'.$item['CategNome'].'</td>
 										');
-                                       
 										if (!$rowSC) {
-
 											print('
 												<td>
 											        <div class="d-flex flex-row">
