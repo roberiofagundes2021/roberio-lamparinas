@@ -241,20 +241,40 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											    <td>'.$item['CategNome'].'</td>
 										');
                                        
-                                        if(!$rowSC){
-											$seleciona = $item['SbCatNome'];
-                                      
+										if (!$rowSC) {
+
 											print('
-											    <td>'.$seleciona.'</td>
+												<td>
+											        <div class="d-flex flex-row">
+                                                        <div class="p-1">
+                                                            <div></div>
+                                                        </div>
+											        </div>
+											    </td>
 											');
 										} else {
-											print('<td>');
-                                            foreach ($rowSC as $a) {
-											    print('
-											        '.$a['SbCatNome']. ' |
-											    ');
+											print('<td>
+                                                      <div class="d-flex flex-row">
+												');
+											foreach ($rowSC as $key => $a) {
+												if (count($rowSC) == $key + 1) {
+													print('
+                                                        <div class="py-1 pl-1 pr-1 pl-0 ">
+                                                            <div>' . $a['SbCatNome'] . '</div>
+                                                        </div>
+											        ');
+												} else {
+													print('
+                                                        <div class="py-1 pl-1 pr-0 ">
+                                                            <div style="margin-right: 3px;">' . $a['SbCatNome'] . ',</div>
+                                                        </div>
+											        ');
+												}
 											}
-											print('</td>');
+											print('
+                                                   </div>
+												</td>
+											');
 										}
 										
 										// print('<td><a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

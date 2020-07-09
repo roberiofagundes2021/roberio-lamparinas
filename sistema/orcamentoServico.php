@@ -126,6 +126,8 @@ try {
 
 				var cont = 1;
 				var servicoId = [];
+				var servicoQuant = [];
+				var servicoValor = [];
 
 				// Aqui é para cada "class" faça
 				$.each($(".idServico"), function() {
@@ -134,6 +136,32 @@ try {
 				});
 
 				cont = 1;
+				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
+				$.each( $(".Quantidade"), function() {
+					$id = servicoId[cont];
+					
+					servicoQuant[$id] = $(this).val();
+					cont++;
+				});				
+				
+				cont = 1;
+				$.each( $(".ValorUnitario"), function() {
+					$id = servicoId[cont];
+					
+					servicoValor[$id] = $(this).val();
+					cont++;
+				});
+
+				const data = {
+						idCategoria: inputCategoria,
+						idSubCategoria: inputSubCategoria,
+						servico: servico,
+						servicoId: servicoId,
+						servicoQuant: servicoQuant,
+						servicoValor: servicoValor
+					}
+
+                    console.log(data)
 
 				$.ajax({
 					type: "POST",
@@ -142,10 +170,12 @@ try {
 						idCategoria: inputCategoria,
 						idSubCategoria: inputSubCategoria,
 						servico: servico,
-						servicoId: servicoId
+						servicoId: servicoId,
+						servicoQuant: servicoQuant,
+						servicoValor: servicoValor
 					},
 					success: function(resposta) {
-						//alert(resposta);
+						//alert(resposta); 
 						$("#tabelaServicos").html(resposta).show();
 
 						return false;
