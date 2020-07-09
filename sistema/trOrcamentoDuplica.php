@@ -8,7 +8,7 @@ include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputOrcamentoId'])){
 
-	$sql = "SELECT TrXOrId, TrXOrTermoReferencia, TrXOrTipo, TrXOrCategoria, TrXOrConteudo, TrXOrStatus
+	$sql = "SELECT TrXOrId, TrXOrTermoReferencia, TrXOrCategoria, TrXOrConteudo, TrXOrStatus
 			FROM TRXOrcamento
 			WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." and TrXOrId = ".$_POST['inputOrcamentoId']."";
 	$result = $conn->query($sql);
@@ -24,16 +24,15 @@ if (isset($_POST['inputOrcamentoId'])){
 	$sNumero = (int)$rowNumero['Numero'] + 1;
 	$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 		
-	$sql = "INSERT INTO TRXOrcamento (TrXOrTermoReferencia, TrXOrNumero, TrXOrTipo, TrXOrData, TrXOrCategoria, TrXOrConteudo, TrXOrFornecedor,
+	$sql = "INSERT INTO TRXOrcamento (TrXOrTermoReferencia, TrXOrNumero, TrXOrData, TrXOrCategoria, TrXOrConteudo, TrXOrFornecedor,
 								   TrXOrSolicitante, TrXOrStatus, TrXOrUsuarioAtualizador, TrXOrUnidade)
-			VALUES (:sTR, :sNumero, :sTipo, :dData, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
+			VALUES (:sTR, :sNumero, :dData, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
 					:bStatus, :iUsuarioAtualizador, :iUnidade)";
 	$result = $conn->prepare($sql);
 	
 	$result->execute(array(
 		            ':sTR' => $rowOrcamento['TrXOrTermoReferencia'],
 					':sNumero' => $sNumero,
-					':sTipo' => $rowOrcamento['TrXOrTipo'],
 					':dData' => gravaData(date('d/m/Y')),
 					':iCategoria' => $rowOrcamento['TrXOrCategoria'] == '' ? null : $rowOrcamento['TrXOrCategoria'],
 					':sConteudo' => $rowOrcamento['TrXOrConteudo'],
@@ -54,8 +53,8 @@ if (isset($_POST['inputOrcamentoId'])){
 
 	foreach ($rowProduto as $item){ 
 		try {
-		$sql = "INSERT INTO TRXOrcamentoXProduto (TXOXPOrcamento, TXOXPProduto, TXOXPQuantidade, TXOXPValorUnitario
-, TXOXPUsuarioAtualizador, TXOXPUnidade)
+		$sql = "INSERT INTO TRXOrcamentoXProduto (TXOXPOrcamento, TXOXPProduto, TXOXPQuantidade, TXOXPValorUnitario, 
+				TXOXPUsuarioAtualizador, TXOXPUnidade)
 				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 		
