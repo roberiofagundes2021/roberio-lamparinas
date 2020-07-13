@@ -144,6 +144,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					document.formOrcamento.action = "trOrcamentoEdita.php";
 				} else if (Tipo == 'exclui'){
 					confirmaExclusao(document.formOrcamento, "Tem certeza que deseja excluir esse orcamento?", "trOrcamentoExclui.php");
+				} else if (Tipo == 'imprimir'){
+					document.formOrcamento.action = "trOrcamentoImprime.php";
 				} else if (Tipo == 'mudaStatus'){
 					document.formOrcamento.action = "trOrcamentoMudaSituacao.php";
 				} else if (Tipo == 'P'){

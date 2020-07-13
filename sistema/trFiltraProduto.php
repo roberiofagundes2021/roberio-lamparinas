@@ -38,6 +38,7 @@ $result = $conn->query($sql);
 $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 $countProdutosTr2 = count($rowProdutos);
 
+
 //echo $produto;
 
 if (count($rowProdutosOrcamento) >= 1) {
@@ -89,11 +90,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 					</div>	
 				</div>';
 
-		if ($item['TRXPrTabela'] != null) {
-			$output .= '<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . $item['TRXPrTabela'] . '">';
-		} else {
 			$output .= '<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . 'ProdutoOrcamento ' . '">';
-		}
 	}
 
 	$output .= '<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >';
@@ -101,12 +98,11 @@ if (count($rowProdutosOrcamento) >= 1) {
 	echo $output;
 } else {
 
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrTabela, UnMedNome
+	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, UnMedNome
 			FROM Produto
-			JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 			JOIN Categoria on CategId = ProduCategoria
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and ProduId in (" . $lista . ")
+			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId in (" . $lista . ")
 			";
 	//echo $sql;
 
@@ -147,11 +143,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 					</div>	
 				</div>';
 
-		if ($item['TRXPrTabela'] != null) {
-			$output .= '<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . $item['TRXPrTabela'] . '">';
-		} else {
 			$output .= '<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . 'Produto ' . '">';
-		}
 	}
 
 	$output .= '<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >';
