@@ -276,7 +276,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												} else {
 													print('
                                                         <div class="py-1 pl-1 pr-0 ">
-                                                            <div style="margin-right: 3px;">' . $a['SbCatNome'] . ',</div>
+                                                            <div>' . $a['SbCatNome'] . ',</div>
                                                         </div>
 											        ');
 												}
