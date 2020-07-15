@@ -15,11 +15,12 @@ if (isset($_SESSION['EmpresaId'])){
 	$_SESSION['UC'] = 'Usuario';
 }
 
-$sql = ("SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPStatus, PerfiNome, EmpreNomeFantasia
+$sql = ("SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPStatus, PerfiNome, EmpreNomeFantasia, SituaNome, SituaChave, SituaCor
 		 FROM Usuario
 		 JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		 JOIN Empresa on EXUXPEmpresa = EmpreId
 		 JOIN Perfil on PerfiId = EXUXPPerfil
+		 JOIN Situacao on SituaId =  EXUXPStatus
 		 Where EmpreId = ".$EmpresaId."
 		 ORDER BY UsuarNome ASC");
 $result = $conn->query("$sql");
@@ -181,8 +182,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['EXUXPStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['EXUXPStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
@@ -192,7 +193,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['PerfiNome'].'</td>');
 											
 										if ($_SESSION['UsuarId'] != $item['UsuarId']) {
-											print('<td><a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', '.$item['EXUXPStatus'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+											print('<td><a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['SituaChave'].'\', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										} else {
 											print('<td><a href="#" data-popup="tooltip" data-trigger="focus" title="Seu usuário não pode ser desativado por você."><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										}

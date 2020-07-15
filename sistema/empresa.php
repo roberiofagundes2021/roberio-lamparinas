@@ -6,8 +6,9 @@ $_SESSION['PaginaAtual'] = 'Empresa';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreStatus, dbo.fnLicencaVencimento(EmpreId) as Licenca
+$sql = "SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, dbo.fnLicencaVencimento(EmpreId) as Licenca, SituaNome, SituaChave, SituaCor
 		FROM Empresa
+		JOIN Situacao on SituaId = EmpreStatus
 		ORDER BY EmpreNomeFantasia ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -196,8 +197,8 @@ $count = count($row);
 								<?php
 									foreach ($row as $item){
 
-										$situacao = $item['EmpreStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['EmpreStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
@@ -206,7 +207,7 @@ $count = count($row);
 											<td>'.formatarCPF_Cnpj($item['EmpreCnpj']).'</td>');
 										
 										if ($_SESSION['EmpreId'] != $item['EmpreId']) {
-											print('<td><a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+											print('<td><a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										} else {
 											print('<td><a href="#" data-popup="tooltip" data-trigger="focus" title="Essa empresa está sendo usada por você no momento"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										}
@@ -216,20 +217,20 @@ $count = count($row);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 														<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'licenca\');" class="dropdown-item"><i class="icon-certificate"></i> Licença</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'unidade\');" class="dropdown-item"><i class="icon-home7"></i> Unidade</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'setor\');" class="dropdown-item"><i class="icon-store"></i> Setor</a>																
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'usuario\');" class="dropdown-item"><i class="icon-user-plus"></i> Usuários</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'menu\');" class="dropdown-item"><i class="icon-menu2"></i> Menu</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\','.$item['EmpreStatus'].', \'parametro\');" class="dropdown-item"><i class="icon-equalizer"></i> Parâmetro</a>
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'licenca\');" class="dropdown-item"><i class="icon-certificate"></i> Licença</a>
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'unidade\');" class="dropdown-item"><i class="icon-home7"></i> Unidade</a>
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'setor\');" class="dropdown-item"><i class="icon-store"></i> Setor</a>																
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'usuario\');" class="dropdown-item"><i class="icon-user-plus"></i> Usuários</a>
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'menu\');" class="dropdown-item"><i class="icon-menu2"></i> Menu</a>
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'parametro\');" class="dropdown-item"><i class="icon-equalizer"></i> Parâmetro</a>
 															</div>
 														</div>
 													</div>

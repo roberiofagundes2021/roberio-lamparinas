@@ -6,8 +6,9 @@ $_SESSION['PaginaAtual'] = 'Perfil';
 
 include('global_assets/php/conexao.php');
 
-$sql = ("SELECT PerfiId, PerfiNome, PerfiChave, PerfiStatus
-		 FROM Perfil		 
+$sql = ("SELECT PerfiId, PerfiNome, PerfiChave, PerfiStatus, SituaNome, SituaChave, SituaCor
+		 FROM Perfil
+		 JOIN Situacao on SituaId = PerfiStatus
 		 ORDER BY PerfiNome ASC");
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -45,12 +46,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [
 				{
 					orderable: true,   //Perfil
-					width: "70%",
+					width: "80%",
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Situação
-					width: "15%",
+					orderable: false,   //Situação
+					width: "5%",
 					targets: [1]
 				},
 				{ 
@@ -159,14 +160,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['PerfiStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['PerfiStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
 											<td>'.$item['PerfiNome'].'</td>');
 										
-										print('<td><a href="#" onclick="atualizaPerfil('.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaPerfil('.$item['PerfiId'].', \''.$item['PerfiNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">

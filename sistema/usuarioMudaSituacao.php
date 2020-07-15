@@ -15,14 +15,21 @@ if (isset($_SESSION['EmpresaId'])){
 if(isset($_POST['inputUsuarioId'])){
 	
 	$iUsuario = $_POST['inputUsuarioId'];
-	$bStatus = $_POST['inputUsuarioStatus'] ? 0 : 1;
+	$sStatus = $_POST['inputUsuarioStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
         	
 	try{
+
+		$sql = "SELECT SituaId
+		            FROM Situacao
+		            WHERE SituaChave = '$sStatus'";
+		$result = $conn->query($sql);
+		$situacao = $result->fetch(PDO::FETCH_ASSOC);
+		$iStatus = $situacao['SituaId'];
 		
-		$sql = "UPDATE EmpresaXUsuarioXPerfil SET EXUXPStatus = :bStatus
+		$sql = "UPDATE EmpresaXUsuarioXPerfil SET EXUXPStatus = :iStatus
 				WHERE EXUXPUsuario = :idUsuario and EXUXPEmpresa = :idEmpresa";
-		$result = $conn->prepare("$sql");
-		$result->bindParam(':bStatus', $bStatus);
+		$result = $conn->prepare($sql);
+		$result->bindParam(':iStatus', $iStatus);
 		$result->bindParam(':idUsuario', $iUsuario);
 		$result->bindParam(':idEmpresa', $EmpresaId);
 		$result->execute();
