@@ -364,11 +364,13 @@ if (isset($_POST['inputData'])) {
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
-													$sql = ("SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular, ForneCategoria
-																 FROM Fornecedor														     
-																 WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and ForneCategoria = " . $rowCategoria['CategId'] . "  and ForneStatus = 1
-															     ORDER BY ForneNome ASC");
-													$result = $conn->query("$sql");
+													$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular, ForneCategoria
+															FROM Fornecedor
+															JOIN Situacao on SituaId = ForneStatus
+															WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and ForneCategoria = " . $rowCategoria['CategId'] . "  
+															and SituaChave = 'ATIVO'
+															ORDER BY ForneNome ASC";
+													$result = $conn->query($sql);
 													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($rowFornecedor as $item) {

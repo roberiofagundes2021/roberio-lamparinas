@@ -7,7 +7,7 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputTRId'])){
 	
 	$iTR = $_POST['inputTRId'];
-	$iEmpresa = $_SESSION['EmpreId'];
+	$iUnidade = $_SESSION['UnidadeId'];
         	
 	try{
 		$conn->beginTransaction();	
@@ -16,7 +16,7 @@ if(isset($_POST['inputTRId'])){
 
 		$sql = "SELECT TrXOrId
 				FROM TRXOrcamento
-				WHERE TrXOrTermoReferencia = $iTR and TrXOrEmpresa = $iEmpresa";
+				WHERE TrXOrTermoReferencia = $iTR and TrXOrUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
 		
@@ -25,46 +25,46 @@ if(isset($_POST['inputTRId'])){
 		    $iOrcamento = $item['TrXOrId'];
 		   
 			$sql = "DELETE FROM TRXOrcamentoXSubCategoria
-					WHERE TXOXSCOrcamento = :iOrcamento and TXOXSCEmpresa = :iEmpresa";
+					WHERE TXOXSCOrcamento = :iOrcamento and TXOXSCUnidade = :iUnidade";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
-			$result->bindParam(':iEmpresa', $iEmpresa); 
+			$result->bindParam(':iUnidade', $iUnidade); 
 			$result->execute();
 			
 			$sql = "DELETE FROM TRXOrcamentoXProduto
-					WHERE TXOXPOrcamento = :iOrcamento and TXOXPEmpresa = :iEmpresa";
+					WHERE TXOXPOrcamento = :iOrcamento and TXOXPUnidade = :iUnidade";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
-			$result->bindParam(':iEmpresa', $iEmpresa); 
+			$result->bindParam(':iUnidade', $iUnidade); 
 			$result->execute();	
 
 			$sql = "DELETE FROM TRXOrcamentoXServico
-					WHERE TXOXSOrcamento = :iOrcamento and TXOXSEmpresa = :iEmpresa";
+					WHERE TXOXSOrcamento = :iOrcamento and TXOXSUnidade = :iUnidade";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
-			$result->bindParam(':iEmpresa', $iEmpresa); 
+			$result->bindParam(':iUnidade', $iUnidade); 
 			$result->execute();				
 		}
 		   
 		$sql = "DELETE FROM TRXOrcamento
-				WHERE TrXOrTermoReferencia = :iTR and TrXOrEmpresa = :iEmpresa";
+				WHERE TrXOrTermoReferencia = :iTR and TrXOrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
-		$result->bindParam(':iEmpresa', $iEmpresa); 
+		$result->bindParam(':iUnidade', $iUnidade); 
 		$result->execute();
 		
 		$sql = "DELETE FROM TermoReferenciaXProduto
-				WHERE TRXPrTermoReferencia = :iTR and TRXPrEmpresa = :iEmpresa";
+				WHERE TRXPrTermoReferencia = :iTR and TRXPrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
-		$result->bindParam(':iEmpresa', $iEmpresa); 
+		$result->bindParam(':iUnidade', $iUnidade); 
 		$result->execute();
 		
 		$sql = "DELETE FROM TermoReferenciaXServico
-				WHERE TRXSrTermoReferencia = :iTR and TRXSrEmpresa = :iEmpresa";
+				WHERE TRXSrTermoReferencia = :iTR and TRXSrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
-		$result->bindParam(':iEmpresa', $iEmpresa); 
+		$result->bindParam(':iUnidade', $iUnidade); 
 		$result->execute();	
 		
 		$sql = "DELETE FROM TermoReferencia

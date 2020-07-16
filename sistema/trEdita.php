@@ -66,93 +66,111 @@ if (isset($_POST['inputTRData'])) {
 
 		$conn->beginTransaction();
 
-		$sql = "UPDATE TermoReferencia SET TrRefCategoria = :iCategoria, TrRefConteudoInicio = :sConteudoInicio, 
-				TrRefConteudoFim = :sConteudoFim, TrRefTipo = :sTipo, TrRefUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE TrRefId = :iTR";
-		$result = $conn->prepare($sql);
+		//Se tiver orçamento já cadastrado para essa TR grava apenas os Conteúdos Personalizados
+		if (count($rowTrOr) >= 1) {
+			
+			$sql = "UPDATE TermoReferencia SET TrRefConteudoInicio = :sConteudoInicio, TrRefConteudoFim = :sConteudoFim, 
+					TrRefUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE TrRefId = :iTR";
+			$result = $conn->prepare($sql);
 
-		$result->execute(array(
-			':iCategoria' => $_POST['cmbCategoria'],
-			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
-			':sConteudoFim' => $_POST['txtareaConteudoFim'],
-			':sTipo' => $tipoTr,
-			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iTR' => $iTR
-		));
+			$result->execute(array(
+				':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+				':sConteudoFim' => $_POST['txtareaConteudoFim'],
+				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+				':iTR' => $iTR
+			));
+		} else {
 
-		//Compara 2 arrays (se houve alteração na SubCategoria)
-		if (isset($_POST['cmbSubCategoria'])) {
-			if (count($aSubCategorias) != count($_POST['cmbSubCategoria']) || array_diff($aSubCategorias, $_POST['cmbSubCategoria'])) {
+			$sql = "UPDATE TermoReferencia SET TrRefCategoria = :iCategoria, TrRefConteudoInicio = :sConteudoInicio, 
+					TrRefConteudoFim = :sConteudoFim, TrRefTipo = :sTipo, TrRefUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE TrRefId = :iTR";
+			$result = $conn->prepare($sql);
 
-				$sql = "DELETE FROM TRXSubcategoria
-						WHERE TRXSCTermoReferencia = :iTermoReferencia and TRXSCUnidade = :iUnidade";
-				$result = $conn->prepare($sql);
+			$result->execute(array(
+				':iCategoria' => $_POST['cmbCategoria'],
+				':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+				':sConteudoFim' => $_POST['txtareaConteudoFim'],
+				':sTipo' => $tipoTr,
+				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+				':iTR' => $iTR
+			));
 
-				$result->execute(array(
-					':iTermoReferencia' => $_POST['inputTRId'],
-					':iUnidade' => $_SESSION['UnidadeId']
-				));
+			//Compara 2 arrays (se houve alteração na SubCategoria)
+			if (isset($_POST['cmbSubCategoria'])) {
+				if (count($aSubCategorias) != count($_POST['cmbSubCategoria']) || array_diff($aSubCategorias, $_POST['cmbSubCategoria'])) {
 
-				$possuiSubCategoria = 0;
-
-				if (isset($_POST['cmbSubCategoria']) and $_POST['cmbSubCategoria'][0] != "") {
-
-					$possuiSubCategoria = 1;
-
-					$sql = "INSERT INTO TRXSubcategoria
-								(TRXSCTermoReferencia, TRXSCSubcategoria, TRXSCUnidade)
-							VALUES 
-								(:iTermoReferencia, :iTrSubCategoria, :iTrUnidade)";
+					$sql = "DELETE FROM TRXSubcategoria
+							WHERE TRXSCTermoReferencia = :iTermoReferencia and TRXSCUnidade = :iUnidade";
 					$result = $conn->prepare($sql);
 
-					foreach ($_POST['cmbSubCategoria'] as $key => $value) {
+					$result->execute(array(
+						':iTermoReferencia' => $_POST['inputTRId'],
+						':iUnidade' => $_SESSION['UnidadeId']
+					));
 
-						$result->execute(array(
-							':iTermoReferencia' => $_POST['inputTRId'],
-							':iTrSubCategoria' => $value,
-							':iTrUnidade' => $_SESSION['UnidadeId']
-						));
+					$possuiSubCategoria = 0;
+
+					if (isset($_POST['cmbSubCategoria']) and $_POST['cmbSubCategoria'][0] != "") {
+
+						$possuiSubCategoria = 1;
+
+						$sql = "INSERT INTO TRXSubcategoria
+									(TRXSCTermoReferencia, TRXSCSubcategoria, TRXSCUnidade)
+								VALUES 
+									(:iTermoReferencia, :iTrSubCategoria, :iTrUnidade)";
+						$result = $conn->prepare($sql);
+
+						foreach ($_POST['cmbSubCategoria'] as $key => $value) {
+
+							$result->execute(array(
+								':iTermoReferencia' => $_POST['inputTRId'],
+								':iTrSubCategoria' => $value,
+								':iTrUnidade' => $_SESSION['UnidadeId']
+							));
+						}
+					}
+
+					// Excluindo os produtos de TermoReferenciaXProduto atrelados a esta TR.
+					$sql = "DELETE FROM TermoReferenciaXProduto
+							WHERE TRXPrTermoReferencia = :iTr and TRXPrUnidade = :iUnidade";
+					$result = $conn->prepare($sql);
+
+					$result->execute(array(
+						':iTr' => $iTR,
+						':iUnidade' => $_SESSION['UnidadeId']
+					));
+
+					// Excluindo os serviços de TermoReferenciaXServico atrelados a esta TR.
+					$sql = "DELETE FROM TermoReferenciaXServico
+							WHERE TRXSrTermoReferencia = :iTr and TRXSrUnidade = :iUnidade";
+					$result = $conn->prepare($sql);
+
+					$result->execute(array(
+						':iTr' => $iTR,
+						':iUnidade' => $_SESSION['UnidadeId']
+					));
+
+					//Se for Produto e Serviço
+					if ($tipoTr == 'PS') {
+
+						//Gravando os Produtos
+						include("trGravaProduto.php");
+
+						// Gravando os Serviços
+						include("trGravaServico.php");
+					} else if ($tipoTr == 'P') {
+
+						//Gravando os Produtos
+						include("trGravaProduto.php");
+					} else if ($tipoTr == 'S') {
+
+						// Gravando os Serviços
+						include("trGravaServico.php");
 					}
 				}
-
-				// Excluindo os produtos de TermoReferenciaXProduto atrelados a esta TR.
-				$sql = "DELETE FROM TermoReferenciaXProduto
-						WHERE TRXPrTermoReferencia = :iTr and TRXPrUnidade = :iUnidade";
-				$result = $conn->prepare($sql);
-
-				$result->execute(array(
-					':iTr' => $iTR,
-					':iUnidade' => $_SESSION['UnidadeId']
-				));
-
-				// Excluindo os serviços de TermoReferenciaXServico atrelados a esta TR.
-				$sql = "DELETE FROM TermoReferenciaXServico
-						WHERE TRXSrTermoReferencia = :iTr and TRXSrUnidade = :iUnidade";
-				$result = $conn->prepare($sql);
-
-				$result->execute(array(
-					':iTr' => $iTR,
-					':iUnidade' => $_SESSION['UnidadeId']
-				));
-
-				//Se for Produto e Serviço
-				if ($tipoTr == 'PS') {
-
-					//Gravando os Produtos
-					include("trGravaProduto.php");
-
-					// Gravando os Serviços
-					include("trGravaServico.php");
-				} else if ($tipoTr == 'P') {
-
-					//Gravando os Produtos
-					include("trGravaProduto.php");
-				} else if ($tipoTr == 'S') {
-
-					// Gravando os Serviços
-					include("trGravaServico.php");
-				}
 			}
+
 		}
 
 		$conn->commit();

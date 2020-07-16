@@ -50,7 +50,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 			/* Início: Tabela Personalizada */
 			$('#tblOrcamento').DataTable( {
-				"order": [[ 0, "desc" ]],
+				"order": [[ 0, "desc" ], [ 1, "desc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{ 

@@ -403,10 +403,12 @@ if(isset($_POST['inputData'])){
 													<option value="#">Selecione</option>
 													<?php
 														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-																 FROM Fornecedor														     
-																 WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and ForneStatus = 1 and ForneCategoria = ".$rowCategoria['CategId']."
-															     ORDER BY ForneNome ASC";
-														$result = $conn->query("$sql");
+																FROM Fornecedor
+																JOIN Situacao on SituaId = ForneStatus
+																WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and ForneCategoria = ".$rowCategoria['CategId']."
+																and SituaChave = 'ATIVO'
+															    ORDER BY ForneNome ASC";
+														$result = $conn->query($sql);
 														$fornecedores = $result->fetchAll(PDO::FETCH_ASSOC);
 														foreach($fornecedores as $fornecedor){
 															if($fornecedor['ForneId'] == $row['ForneId']){
