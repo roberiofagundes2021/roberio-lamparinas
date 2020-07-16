@@ -25,9 +25,9 @@ if (isset($_POST['inputOrcamentoId'])){
 	$sNumero = (int)$rowNumero['Numero'] + 1;
 	$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 		
-	$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor,
+	$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo,
 								   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamUnidade)
-			VALUES (:sNumero, :sTipo, :dData, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, 
+			VALUES (:sNumero, :sTipo, :dData, :iCategoria, :sConteudo, :iSolicitante, 
 					:bStatus, :iUsuarioAtualizador, :iUnidade)";
 	$result = $conn->prepare($sql);
 	
@@ -37,7 +37,6 @@ if (isset($_POST['inputOrcamentoId'])){
 					':dData' => gravaData(date('d/m/Y')),
 					':iCategoria' => $rowOrcamento['OrcamCategoria'] == '' ? null : $rowOrcamento['OrcamCategoria'],
 					':sConteudo' => $rowOrcamento['OrcamConteudo'],
-					':iFornecedor' => $rowOrcamento['OrcamFornecedor'],
 					':iSolicitante' => $_SESSION['UsuarId'],
 					':bStatus' => $rowOrcamento['OrcamStatus'],
 					':iUsuarioAtualizador' => $_SESSION['UsuarId'],

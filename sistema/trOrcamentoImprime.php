@@ -121,9 +121,7 @@ try {
 			<div style='text-align:center; margin-top: 20px;'><h1>ORÇAMENTO DO TERMO DE REFERÊNCIA</h1></div>
     ";
     
-    $html .= '
-	    <h3>TERMO DE REFERÊNCIA</h3>
-	';
+	$html .= "<div style='text-align:center;'><h2>TERMO DE REFERÊNCIA</h2></div>";
 	
 	$html .= '
     <table style="width:100%; border-collapse: collapse;">
@@ -134,10 +132,6 @@ try {
     </table>
 	<br>';
 
-
-    $html .= '
-	<div>' . $row['TrRefConteudoInicio'] . '</div>
-	<br>';
 
     if ($rowProdutoUtilizado1['CONT'] > 0 || $rowProdutoUtilizado2['CONT'] > 0) {
 
@@ -354,11 +348,6 @@ try {
 				</table>
 		";
     }
-
-    $html .= '
-	<br><br>
-	<div>' . $row['TrRefConteudoFim'] . '</div>
-	<br>';
 
     $rodape = "<hr/>
     <div style='width:100%'>
