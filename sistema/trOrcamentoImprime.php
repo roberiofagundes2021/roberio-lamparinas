@@ -18,55 +18,50 @@ if (isset($_POST['inputOrcamentoId'])) {
 
 try {
 
-    $sql = "SELECT *
+    $sql = "SELECT TrXOrNumero, TrRefData, TrXOrTabelaProduto, TrXOrTabelaServico, CategNome
 			FROM TRXOrcamento
             JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
-			LEFT JOIN Categoria on CategId = TrXOrCategoria
+			JOIN Categoria on CategId = TrXOrCategoria
             LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
 			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
     $result = $conn->query($sql);
     $row = $result->fetch(PDO::FETCH_ASSOC);
 
 
-    $sql = "SELECT *
-    FROM TRXOrcamentoXSubCategoria
-    JOIN SubCategoria on SbCatId = TXOXSCSubcategoria
-    WHERE TXOXSCUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSCOrcamento = " . $iOrcamento;
+    $sql = "SELECT SbCatNome, TXOXSCSubcategoria
+    		FROM TRXOrcamentoXSubCategoria
+    		JOIN SubCategoria on SbCatId = TXOXSCSubcategoria
+    		WHERE TXOXSCUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSCOrcamento = " . $iOrcamento;
     $result = $conn->query($sql);
     $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
-    // Selects para identificar a a tabela de origem dos produtos da TR.
+    // Selects para identificar a tabela de origem dos produtos da TR.
     $sql = "SELECT DISTINCT COUNT(TXOXPProduto) as CONT
-    FROM TRXOrcamentoXProduto
-    JOIN ProdutoOrcamento on PrOrcId = TXOXPProduto
-    WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento . "";
+    		FROM TRXOrcamentoXProduto
+    		JOIN ProdutoOrcamento on PrOrcId = TXOXPProduto
+    		WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento . "";
     $result = $conn->query($sql);
     $rowProdutoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
 
     $sql = "SELECT COUNT(TXOXPProduto) as CONT
-    FROM TRXOrcamentoXProduto
-    JOIN Produto on ProduId = TXOXPProduto
-    WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento . "";
+    		FROM TRXOrcamentoXProduto
+    		JOIN Produto on ProduId = TXOXPProduto
+    		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento . "";
     $result = $conn->query($sql);
     $rowProdutoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
 
-    // var_dump($rowProdutoUtilizado1);
-    // print('                      ');
-    // var_dump($rowProdutoUtilizado2);
-    // die;
-
     // Selects para identificar a a tabela de origem dos serviços da TR.
     $sql = "SELECT COUNT(TXOXSServico) as CONT
-    FROM TRXOrcamentoXServico
-    JOIN ServicoOrcamento on SrOrcId = TXOXSServico
-    WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " ";
+    		FROM TRXOrcamentoXServico
+    		JOIN ServicoOrcamento on SrOrcId = TXOXSServico
+    		WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " ";
     $result = $conn->query($sql);
     $rowServicoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
 
     $sql = "SELECT COUNT(TXOXSServico) as CONT
-    FROM TRXOrcamentoXServico
-    JOIN Servico on ServiId = TXOXSServico
-    WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . "";
+    		FROM TRXOrcamentoXServico
+    		JOIN Servico on ServiId = TXOXSServico
+    		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . "";
     $result = $conn->query($sql);
     $rowServicoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -341,7 +336,7 @@ try {
 						<td colspan='3' height='50' valign='middle' style='width:85%'>
 							<strong>TOTAL GERAL DE ITENS</strong>
 						</td>
-						<td style='text-align: center; width:15%'>
+						<td style='text-align: right; width:15%'>
 							" . mostraValor($totalGeral) . "
 						</td>
 					</tr>
