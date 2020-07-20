@@ -38,13 +38,12 @@ if (isset($_POST['inputOrcamentoId'])) {
 		foreach ($rowBD as $key => $item) {
 			$aSubCategorias[] = $item['SbCatId'];
 
-			if(($tamanhoArray - 1) == $key ){
-			    $aSubCategoriasString .= $item['SbCatId'];
-		    } else {
-				$aSubCategoriasString .= $item['SbCatId'].',';
+			if (($tamanhoArray - 1) == $key) {
+				$aSubCategoriasString .= $item['SbCatId'];
+			} else {
+				$aSubCategoriasString .= $item['SbCatId'] . ',';
 			}
 		}
-
 	} catch (PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
 	}
@@ -120,6 +119,18 @@ if (isset($_POST['inputTipo'])) {
 
 			$sql = "DELETE FROM OrcamentoXProduto
 					WHERE OrXPrOrcamento = :iOrcamento and OrXPrUnidade = :iUnidade";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+				':iOrcamento' => $iOrcamento,
+				':iUnidade' => $_SESSION['UnidadeId']
+			));
+		}
+
+		if (isset($_POST['inputOrcamentoServicoExclui']) and $_POST['inputOrcamentoServicoExclui']) {
+
+			$sql = "DELETE FROM OrcamentoXServico
+					WHERE OrXSrOrcamento = :iOrcamento and OrXSrUnidade = :iUnidade";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
@@ -279,17 +290,19 @@ if (isset($_POST['inputTipo'])) {
 
 				//Tem produto cadastrado para esse orçamento na tabela OrcamentoXProduto?
 				var inputProduto = $('#inputOrcamentoProduto').val();
+				var inputServico = $('#inputOrcamentoServico').val();
 
 				//Exclui os produtos desse Orçamento?
 				var inputExclui = $('#inputOrcamentoProdutoExclui').val();
+				var inputExclui = $('#inputOrcamentoServicoExclui').val();
 
 				//Aqui verifica primeiro se tem produtos preenchidos, porque do contrário deixa mudar
-				
-				if (inputProduto > 0) {
+
+				if ((inputProduto > 0 || inputServico > 0)) {
 
 					//Verifica se o a categoria ou subcategoria foi alterada
-					
-					if (inputSubCategoria != cmbSubCategoria) {
+
+					if ((inputSubCategoria != cmbSubCategoria) || ($('#tipoAnteriorProdutoServico').val() != $('input[name="inputTipo"]:checked').val())) {
 						console.log(inputSubCategoria)
 						console.log(cmbSubCategoria)
 
@@ -307,14 +320,25 @@ if (isset($_POST['inputTipo'])) {
 
 						inputExclui = 1;
 						$('#inputOrcamentoProdutoExclui').val(inputExclui);
+						$('#inputOrcamentoServicoExclui').val(inputExclui);
 
 						confirmaExclusao(document.formOrcamento, "Tem certeza que deseja alterar o orçamento? Existem produtos com quantidades ou valores lançados!", "orcamentoEdita.php");
 
 					} else {
 						inputExclui = 0;
 						$('#inputOrcamentoProdutoExclui').val(inputExclui);
+						$('#inputOrcamentoServicoExclui').val(inputExclui);
 					}
 				}
+
+				if ($('#tipoAnteriorProdutoServico').val() != $('input[name="inputTipo"]:checked').val()) {
+					
+					inputExclui = 1;
+					$('#inputOrcamentoProdutoExclui').val(inputExclui);
+					$('#inputOrcamentoServicoExclui').val(inputExclui);
+
+				} 
+				
 
 				$("#formOrcamento").submit();
 
@@ -365,8 +389,10 @@ if (isset($_POST['inputTipo'])) {
 						<input type="hidden" id="inputOrcamentoId" name="inputOrcamentoId" value="<?php echo $row['OrcamId']; ?>">
 						<input type="hidden" id="inputOrcamentoNumero" name="inputOrcamentoNumero" value="<?php echo $row['OrcamNumero']; ?>">
 						<input type="hidden" id="inputOrcamentoCategoria" name="inputOrcamentoCategoria" value="<?php echo $row['OrcamCategoria']; ?>">
-						<input type="hidden" id="inputOrcamentoSubCategoria" name="inputOrcamentoSubCategoria" value="<?php echo $aSubCategoriasString; ?>" >
+						<input type="hidden" id="inputOrcamentoSubCategoria" name="inputOrcamentoSubCategoria" value="<?php echo $aSubCategoriasString; ?>">
 						<input type="hidden" id="inputOrcamentoProdutoExclui" name="inputOrcamentoProdutoExclui" value="0">
+						<input type="hidden" id="inputOrcamentoServicoExclui" name="inputOrcamentoServicoExclui" value="0">
+						<input type="hidden" id="tipoAnteriorProdutoServico" name="tipoAnteriorProdutoServico" value="<?php echo $row['OrcamTipo'] ?>">
 
 						<?php
 
@@ -378,6 +404,18 @@ if (isset($_POST['inputTipo'])) {
 						$countProduto = count($rowProduto);
 
 						print('<input type="hidden" id="inputOrcamentoProduto" name="inputOrcamentoProduto" value="' . $countProduto . '" >');
+						?>
+
+						<?php
+
+						$sql = "SELECT OrXSrOrcamento
+			                        FROM OrcamentoXServico
+			                        WHERE OrXSrOrcamento = " . $iOrcamento . " and OrXSrUnidade = " . $_SESSION['UnidadeId'];
+						$result = $conn->query($sql);
+						$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
+						$countServico = count($rowServico);
+
+						print('<input type="hidden" id="inputOrcamentoServico" name="inputOrcamentoServico" value="' . $countServico . '" >');
 						?>
 
 						<div class="card-body">
@@ -485,7 +523,7 @@ if (isset($_POST['inputTipo'])) {
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
-												    <option value="">Selecione</option>
+													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																FROM Fornecedor
