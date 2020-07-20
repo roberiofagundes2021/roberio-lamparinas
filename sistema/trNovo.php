@@ -205,6 +205,7 @@ if (isset($_POST['inputData'])) {
 
 				let tipoTr = '';
 				let tipoMensagem = '';
+				let subCategMensagem = '';
 
 				if ($('#TrProduto').parent().hasClass('checked')) {
 					tipoTr = 'P';
@@ -231,12 +232,14 @@ if (isset($_POST['inputData'])) {
 
 							tipoTr == 'P' ? tipoMensagem = 'produtos' : tipoTr == 'S' ? tipoMensagem = 'serviços' : tipoMensagem = 'produtos ou serviços'
 
+							cmbSubCategoriaArray != '' ? subCategMensagem = 'e subactegoria selecionadas não possuem' : subCategMensagem = 'selecionada não possui'
+
 							if (resposta == 'existem produtos') {
 
 								$("#formTR").submit();
 
 							} else {
-								alerta('Atenção', 'A categoria selecionada não possui ' + tipoMensagem + ' ativos!', 'error');
+								alerta('Atenção', 'A categoria ' + subCategMensagem + ' ' + tipoMensagem + ' ativos!', 'error');
 							
 							}
 						}

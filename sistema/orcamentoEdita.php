@@ -14,7 +14,7 @@ if (isset($_POST['inputOrcamentoId'])) {
 	try {
 
 		$sql = "SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor, 
-					   ForneId, ForneContato, ForneEmail, ForneTelefone, ForneCelular, OrcamSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
+					   ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular, OrcamSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
 				FROM Orcamento
 				JOIN Usuario on UsuarId = OrcamSolicitante
 				LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
@@ -29,9 +29,22 @@ if (isset($_POST['inputOrcamentoId'])) {
 				ORDER BY SbCatNome ASC";
 		$result = $conn->query($sql);
 		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($rowBD as $item) {
+		// Esta variável armazena em uma string os valores de Ids de subcategorias usadas pelo orcamento
+		// para que seja transformadas em array no JS e comparada ao valor do select de subcategoria.
+		$aSubCategoriasString = '';
+
+		$tamanhoArray = count($rowBD);
+
+		foreach ($rowBD as $key => $item) {
 			$aSubCategorias[] = $item['SbCatId'];
+
+			if(($tamanhoArray - 1) == $key ){
+			    $aSubCategoriasString .= $item['SbCatId'];
+		    } else {
+				$aSubCategoriasString .= $item['SbCatId'].',';
+			}
 		}
+
 	} catch (PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
 	}
@@ -261,7 +274,7 @@ if (isset($_POST['inputTipo'])) {
 
 				//Depois
 				var cmbCategoria = $('#cmbCategoria').val();
-				var cmbSubCategoria = $('#cmbSubCategoria').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val().join(); // retorna uma string a partir do valor do select que é um array
 				var cmbFornecedor = $('#cmbFornecedor').val();
 
 				//Tem produto cadastrado para esse orçamento na tabela OrcamentoXProduto?
@@ -271,10 +284,14 @@ if (isset($_POST['inputTipo'])) {
 				var inputExclui = $('#inputOrcamentoProdutoExclui').val();
 
 				//Aqui verifica primeiro se tem produtos preenchidos, porque do contrário deixa mudar
+				
 				if (inputProduto > 0) {
 
 					//Verifica se o a categoria ou subcategoria foi alterada
+					
 					if (inputSubCategoria != cmbSubCategoria) {
+						console.log(inputSubCategoria)
+						console.log(cmbSubCategoria)
 
 						if (cmbCategoria == '' || cmbCategoria == '#') {
 							alerta('Atenção', 'Informe a categoria!', 'error');
@@ -348,8 +365,7 @@ if (isset($_POST['inputTipo'])) {
 						<input type="hidden" id="inputOrcamentoId" name="inputOrcamentoId" value="<?php echo $row['OrcamId']; ?>">
 						<input type="hidden" id="inputOrcamentoNumero" name="inputOrcamentoNumero" value="<?php echo $row['OrcamNumero']; ?>">
 						<input type="hidden" id="inputOrcamentoCategoria" name="inputOrcamentoCategoria" value="<?php echo $row['OrcamCategoria']; ?>">
-						<!--<input type="hidden" id="inputOrcamentoSubCategoria" name="inputOrcamentoSubCategoria" value="<?php //echo $row['OrcamSubCategoria']; 
-																															?>" >-->
+						<input type="hidden" id="inputOrcamentoSubCategoria" name="inputOrcamentoSubCategoria" value="<?php echo $aSubCategoriasString; ?>" >
 						<input type="hidden" id="inputOrcamentoProdutoExclui" name="inputOrcamentoProdutoExclui" value="0">
 
 						<?php
@@ -473,18 +489,18 @@ if (isset($_POST['inputTipo'])) {
 													<?php
 													$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																FROM Fornecedor
-																JOIN Situacao on SituaId = ForneStatus													     
+																JOIN Situacao on SituaId = ForneStatus							     
 																WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ForneCategoria = " . $row['OrcamCategoria'] . "
 															    ORDER BY ForneNome ASC";
 													$result = $conn->query($sql);
 													$fornecedores = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($fornecedores as $fornecedor) {
-														if (isset($row['ForneId'])) {
-															if ($fornecedor['ForneId'] == $row['ForneId']) {
-																print('<option selected value="' . $fornecedor['ForneId'] . '#' . $fornecedor['ForneContato'] . '#' . $fornecedor['ForneEmail'] . '#' . $fornecedor['ForneTelefone'] . '#' . $fornecedor['ForneCelular'] . '" ' . $seleciona . '>' . $fornecedor['ForneNome'] . '</option>');
+														if (isset($row['OrcamFornecedor'])) {
+															if ($fornecedor['ForneId'] == $row['OrcamFornecedor']) {
+																print('<option selected value="' . $fornecedor['ForneId'] . '#' . $fornecedor['ForneContato'] . '#' . $fornecedor['ForneEmail'] . '#' . $fornecedor['ForneTelefone'] . '#' . $fornecedor['ForneCelular'] . '" selected>' . $fornecedor['ForneNome'] . '</option>');
 															} else {
-																print('<option value="' . $fornecedor['ForneId'] . '#' . $fornecedor['ForneContato'] . '#' . $fornecedor['ForneEmail'] . '#' . $fornecedor['ForneTelefone'] . '#' . $fornecedor['ForneCelular'] . '" ' . $seleciona . '>' . $fornecedor['ForneNome'] . '</option>');
+																print('<option value="' . $fornecedor['ForneId'] . '#' . $fornecedor['ForneContato'] . '#' . $fornecedor['ForneEmail'] . '#' . $fornecedor['ForneTelefone'] . '#' . $fornecedor['ForneCelular'] . '">' . $fornecedor['ForneNome'] . '</option>');
 															}
 														} else {
 															print('<option value="' . $fornecedor['ForneId'] . '#' . $fornecedor['ForneContato'] . '#' . $fornecedor['ForneEmail'] . '#' . $fornecedor['ForneTelefone'] . '#' . $fornecedor['ForneCelular'] . '" >' . $fornecedor['ForneNome'] . '</option>');

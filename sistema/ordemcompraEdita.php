@@ -78,6 +78,18 @@ if (isset($_POST['inputTipo'])) {
 			));
 		}
 
+		if (isset($_POST['inputOrdemCompraServicoExclui']) and $_POST['inputOrdemCompraServicoExclui']) {
+
+			$sql = "DELETE FROM OrdemCompraXServico
+					WHERE OCXSrOrdemCompra = :iOrdemCompra and OCXSrUnidade = :iUnidade";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+				':iOrdemCompra' => $iOrdemCompra,
+				':iUnidade' => $_SESSION['UnidadeId']
+			));
+		}
+
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -290,7 +302,8 @@ if (isset($_POST['inputTipo'])) {
 				var inputServico = $('#inputOrdemCompraServico').val();
 
 				//Exclui os produtos dessa Ordem de Compra?
-				var inputExclui = $('#inputOrdemCompraProdutoExclui').val();
+				var inputProdutoExclui = $('#inputOrdemCompraProdutoExclui').val();
+				var inputServicoExclui = $('#inputOrdemCompraServicoExclui').val();
 
 				//Aqui verifica primeiro se tem produtos preenchidos, porque do contrário deixa mudar
 				if (inputProduto > 0 || inputServico > 0) {
@@ -298,14 +311,18 @@ if (isset($_POST['inputTipo'])) {
 					//Verifica se o a categoria ou subcategoria foi alterada
 					if (inputSubCategoria != cmbSubCategoria) {
 
-						inputExclui = 1;
-						$('#inputOrdemCompraProdutoExclui').val(inputExclui);
+						inputProdutoExclui = 1;
+						inputServicoExclui = 1;
+						$('#inputOrdemCompraProdutoExclui').val(inputProdutoExclui);
+						$('#inputOrdemCompraServicoExclui').val(inputServicoExclui);
 
 						confirmaExclusao(document.formOrdemCompra, "Tem certeza que deseja alterar a ordem de compra? Existem produtos ou serviços com quantidades ou valores lançados!", "ordemcompraEdita.php");
 
 					} else {
-						inputExclui = 0;
-						$('#inputOrdemCompraProdutoExclui').val(inputExclui);
+						inputProdutoExclui = 0;
+						inputServicoExclui = 0;
+						$('#inputOrdemCompraProdutoExclui').val(inputProdutoExclui);
+						$('#inputOrdemCompraServicoExclui').val(inputServicoExclui);
 					}
 				}
 
@@ -375,6 +392,7 @@ if (isset($_POST['inputTipo'])) {
 						<input type="hidden" id="inputOrdemCompraCategoria" name="inputOrdemCompraCategoria" value="<?php echo $row['OrComCategoria']; ?>">
 						<input type="hidden" id="inputOrdemCompraSubCategoria" name="inputOrdemCompraSubCategoria" value="<?php echo $row['OrComSubCategoria']; ?>">
 						<input type="hidden" id="inputOrdemCompraProdutoExclui" name="inputOrdemCompraProdutoExclui" value="0">
+						<input type="hidden" id="inputOrdemCompraServicoExclui" name="inputOrdemCompraServicoExclui" value="0">
 
 						<?php
 

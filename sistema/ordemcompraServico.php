@@ -130,7 +130,6 @@ try{
 				var inputCategoria = $('#inputIdCategoria').val();
 				var inputSubCategoria = $('#inputIdSubCategoria').val(); //alert(inputSubCategoria);
 				var servicos = $(this).val();
-				//console.log(servicos);
 				
 				var cont = 1;
 				var servicoId = [];
@@ -165,7 +164,7 @@ try{
 					url: "ordemcompraFiltraServico.php",
 					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, servicos: servicos, servicoId: servicoId, servicoQuant: servicoQuant, servicoValor: servicoValor},
 					success: function(resposta){
-						//alert(resposta);
+
 						$("#tabelaServicos").html(resposta).show();
 						
 						return false;
