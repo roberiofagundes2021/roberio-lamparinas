@@ -221,12 +221,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
 
 										 $sql = "SELECT SbCatId, SbCatNome
-				                                        FROM SubCategoria
-				                                        JOIN OrcamentoXSubcategoria on OrXSCSubcategoria = SbCatId
-				                                        WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and OrXSCOrcamento = ".$item['OrcamId']."
-				                                            ORDER BY SbCatNome ASC";
-		                                        $result = $conn->query($sql);
-		                                        $rowSC = $result->fetchAll(PDO::FETCH_ASSOC);
+												 FROM SubCategoria
+												 JOIN OrcamentoXSubcategoria on OrXSCSubcategoria = SbCatId
+												 WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and OrXSCOrcamento = ".$item['OrcamId']."
+												 ORDER BY SbCatNome ASC";
+		                            	 $result = $conn->query($sql);
+		                                 $rowSC = $result->fetchAll(PDO::FETCH_ASSOC);
 
 										print('
 										    <tr>
@@ -280,7 +280,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\'\''.$item['SituaChave'].'\'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
 														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
 														<div class="dropdown">	
 															<a href="#" class="list-icons-item" data-toggle="dropdown">

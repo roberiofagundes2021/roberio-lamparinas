@@ -412,7 +412,7 @@ if (isset($_POST['inputTipo'])) {
 
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
+												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php
@@ -483,7 +483,7 @@ if (isset($_POST['inputTipo'])) {
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="cmbFornecedor">Fornecedor</label>
+												<label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
 												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
 												    <option value="">Selecione</option>
 													<?php
@@ -543,7 +543,7 @@ if (isset($_POST['inputTipo'])) {
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNomeSolicitante">Solicitante</label>
+												<label for="inputNomeSolicitante">Solicitante <span class="text-danger">*</span></label>
 												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $row['UsuarNome']; ?>" readOnly required>
 											</div>
 										</div>
