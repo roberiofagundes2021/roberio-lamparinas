@@ -121,11 +121,10 @@ try {
     </table>
 	<br>';
 
-	$html .= "<div style='text-align:center;'><h2>FORNECEDOR</h2></div>";
-	$html .= '
-	         <div  style="text-align:center; margin-top: -20px"><h4>' . $row['ForneNome'] . '</h4></div> 
-		
-		';
+	if ($row['ForneNome'] <> ""){
+		$html .= "<div style='text-align:center;'><h2>FORNECEDOR</h2></div>";
+		$html .= '<div style="text-align:center; margin-top: -20px"><p style="font-size:18px;">' . $row['ForneNome'] . '</p></div>';	
+	}
 
 	if ($rowProdutoUtilizado['CONT'] > 0) {
 
