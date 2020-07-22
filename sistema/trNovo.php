@@ -43,9 +43,9 @@ if (isset($_POST['inputData'])) {
 		$sNumero = str_pad($sNumero, 6, "0", STR_PAD_LEFT);
 
 		$sql = "INSERT INTO TermoReferencia (TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio, TrRefConteudoFim, TrRefTipo,
-											 TrRefStatus, TrRefUsuarioAtualizador, TrRefUnidade)
+											 TrRefStatus, TrRefUsuarioAtualizador, TrRefUnidade, TrRefTabelaProduto, TrRefTabelaServico)
 				VALUES (:sNumero, :dData, :iCategoria, :sConteudoInicio, :sConteudoFim, :sTipo, 
-						:bStatus, :iUsuarioAtualizador, :iUnidade)";
+						:bStatus, :iUsuarioAtualizador, :iUnidade, :sTabelaProduto, :sTabelaServico)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -57,7 +57,9 @@ if (isset($_POST['inputData'])) {
 			':sTipo' => $tipoTr,
 			':bStatus' => 1,
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iUnidade' => $_SESSION['UnidadeId']
+			':iUnidade' => $_SESSION['UnidadeId'],
+			':sTabelaProduto' => $parametroProduto,
+			':sTabelaServico' => $parametroServico
 		));
 
 		// Começo do cadastro de subcategorias da TR
