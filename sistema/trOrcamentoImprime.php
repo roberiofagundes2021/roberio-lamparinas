@@ -35,8 +35,7 @@ try {
 	$result = $conn->query($sql);
 	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
-	// Selects para identificar a tabela de origem dos produtos da TR.
-
+	//Selects para identificar se o orçamento já possue produtos.
 	$tabelaOrigemProduto = $row['TrRefTabelaProduto'];
 	$campoPrefix =  $row['TrRefTabelaProduto'] == 'Produto' ? 'Produ' : 'PrOrc';
 
@@ -47,14 +46,8 @@ try {
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
 
-	// $sql = "SELECT COUNT(TXOXPProduto) as CONT
-	// 		FROM TRXOrcamentoXProduto
-	// 		JOIN Produto on ProduId = TXOXPProduto
-	// 		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento . "";
-	// $result = $conn->query($sql);
-	// $rowProdutoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
 
-	// Selects para identificar a a tabela de origem dos serviços da TR.
+	// Selects para identificar se o orçamento já possue serviços.
 	$tabelaOrigemServico = $row['TrRefTabelaServico'];
 	$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
 
@@ -64,13 +57,6 @@ try {
     		WHERE " . $campoPrefix . "Unidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " ";
 	$result = $conn->query($sql);
 	$rowServicoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
-
-	// $sql = "SELECT COUNT(TXOXSServico) as CONT
-	// 		FROM TRXOrcamentoXServico
-	// 		JOIN Servico on ServiId = TXOXSServico
-	// 		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . "";
-	// $result = $conn->query($sql);
-	// $rowServicoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
 
 
 	$totalProdutos = 0;
