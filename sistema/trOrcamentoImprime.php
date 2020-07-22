@@ -18,9 +18,10 @@ if (isset($_POST['inputOrcamentoId'])) {
 
 try {
 
-	$sql = "SELECT TrXOrNumero, TrRefData, TrXOrTabelaProduto, TrXOrTabelaServico, TrRefId, TrRefTabelaProduto, TrRefTabelaServico, CategNome
+	$sql = "SELECT TrXOrNumero, TrRefData, TrXOrTabelaProduto, TrXOrTabelaServico, TrRefId, TrRefTabelaProduto, TrRefTabelaServico, TrRefNumero, TrRefTipo, ForneNome, CategNome
 			FROM TRXOrcamento
             JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
 			JOIN Categoria on CategId = TrXOrCategoria
             LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
 			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
@@ -120,17 +121,25 @@ try {
     </table>
 	<br>';
 
+	$html .= "<div style='text-align:center;'><h2>FORNECEDOR</h2></div>";
+	$html .= '
+	         <div  style="text-align:center; margin-top: -20px"><h4>' . $row['ForneNome'] . '</h4></div> 
+		
+		';
 
 	if ($rowProdutoUtilizado['CONT'] > 0) {
 
-		$html .= "<div style='text-align:center;'><h2>PRODUTOS</h2></div>";
+		$tituloProduto = "<div style='text-align:center;'><h2>PRODUTOS</h2></div>";
 
-		$html .= '
-		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd; padding: 8px; border: 1px solid #ccc;">
-			Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
-		</div>
-		<br>
-		';
+		$cabecalhoProduto = '
+	                                	<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd; padding: 8px; border: 1px solid #ccc;">
+	                                	Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
+	                                </div>
+	                            <br>
+						';
+		
+		$html .= $row['TrRefTipo'] == 'P' || $row['TrRefTipo'] == 'PS' ? $tituloProduto.' '.$cabecalhoProduto : '';
+		$exibirProduto = $row['TrRefTipo'] == 'P' || $row['TrRefTipo'] == 'PS' ? true : false;
 
 		$cont = 1;
 
@@ -150,7 +159,7 @@ try {
 			$result = $conn->query($sql);
 			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
-			if (isset($rowProdutos)) {
+			if (isset($rowProdutos) && $exibirProduto) {
 
 				$html .= '
 				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
@@ -215,14 +224,18 @@ try {
 			}
 		}
 	} else {
-		$html .= "<div style='text-align:center;'><h2>PRODUTOS</h2></div>";
 
-		$html .= '
-		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd; padding: 8px; border: 1px solid #ccc;">
-			Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
-		</div>
-		<br>
-		';
+		$tituloProduto = "<div style='text-align:center;'><h2>PRODUTOS</h2></div>";
+
+		$cabecalhoProduto = '
+	                                	<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd; padding: 8px; border: 1px solid #ccc;">
+	                                	Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
+	                                </div>
+	                            <br>
+						';
+		
+		$html .= $row['TrRefTipo'] == 'P' || $row['TrRefTipo'] == 'PS' ? $tituloProduto.' '.$cabecalhoProduto : '';
+		$exibirProduto = $row['TrRefTipo'] == 'P' || $row['TrRefTipo'] == 'PS' ? true : false;
 
 		$cont = 1;
 
@@ -242,7 +255,7 @@ try {
 			$result = $conn->query($sql);
 			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
-			if (isset($rowProdutos)) {
+			if (isset($rowProdutos) && $exibirProduto) {
 
 				$html .= '
 				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
@@ -301,15 +314,16 @@ try {
 
 	if ($rowServicoUtilizado['CONT'] > 0) {
 
-		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
+		$tituloServico = "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
 
-		$html .= '
-    	<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd;  padding: 8px;  border: 1px solid #ccc;">
-    		Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
-    	</div>
-    	<br>
-    	';
-
+		$cabecalhoServico = '
+    	                        <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd;  padding: 8px;  border: 1px solid #ccc;">
+    	                        	Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
+    	                        </div>
+    	                    <br>
+						';
+		
+		$html .= $row['TrRefTipo'] == 'S' || $row['TrRefTipo'] == 'PS' ? $tituloServico.' '.$cabecalhoServico : '';
 		$cont = 1;
 
 		foreach ($rowSubCategoria as $sbcat) {
@@ -388,15 +402,17 @@ try {
 			}
 		}
 	} else {
-		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
 
-		$html .= '
-    	<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd;  padding: 8px;  border: 1px solid #ccc;">
-    		Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
-    	</div>
-    	<br>
-    	';
+		$tituloServico = "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
 
+		$cabecalhoServico = '
+    	                        <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd;  padding: 8px;  border: 1px solid #ccc;">
+    	                        	Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
+    	                        </div>
+    	                    <br>
+						';
+		
+		$html .= $row['TrRefTipo'] == 'S' || $row['TrRefTipo'] == 'PS' ? $tituloServico.' '.$cabecalhoServico : '';
 		$cont = 1;
 
 		foreach ($rowSubCategoria as $sbcat) {
@@ -434,14 +450,6 @@ try {
 				foreach ($rowServicos as $itemServico) {
 
 					if ($sbcat['TXOXSCSubcategoria'] == $itemServico['SubCategoria']) {
-
-						// if ($itemServico['TXOXSValorUnitario'] != '' and $itemServico['TXOXSValorUnitario'] != null) {
-						// 	$valorUnitario = $itemServico['TXOXSValorUnitario'];
-						// 	$valorTotal = $itemServico['TXOXSQuantidade'] * $itemServico['TXOXSValorUnitario'];
-						// } else {
-						// 	$valorUnitario = 0;
-						// 	$valorTotal = 0;
-						// }
 
 						$html .= "
 						<tr>
