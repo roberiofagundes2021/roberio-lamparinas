@@ -1,7 +1,7 @@
 <?php 
 
 include_once("sessao.php"); 
-
+$inicio1 = microtime(true);
 include('global_assets/php/conexao.php');
 
 $_SESSION['PaginaAtual'] = 'Termo de Referência / Orçamento';
@@ -13,15 +13,15 @@ if (isset($_POST['inputTRId'])){
 	$_SESSION['TRNumero'] = $_POST['inputTRNumero'];
 }
 
-$sql = ("SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrCategoria, TrXOrStatus, TrRefNumero, TrRefTipo, ForneNome, CategNome, SbCatNome, SituaId, SituaCor, SituaChave
-		 FROM TRXOrcamento
-		 JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
-		 LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
-		 JOIN Categoria on CategId = TrXOrCategoria
-		 LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
-		 JOIN Situacao on SituaId = TrXOrStatus
-	     WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." and TrXOrTermoReferencia = ".$_SESSION['TRId']."
-		 ORDER BY TrXOrData DESC");
+$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrCategoria, TrXOrStatus, TrRefNumero, TrRefTipo, ForneNome, CategNome, 
+		SituaId, SituaCor, SituaChave, dbo.fnSubCategoriasTRXOrcamento(TrXOrUnidade, TrXOrId) as SubCategorias
+		FROM TRXOrcamento
+		JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+		LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
+		JOIN Categoria on CategId = TrXOrCategoria
+		JOIN Situacao on SituaId = TrXOrStatus
+	    WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." and TrXOrTermoReferencia = ".$_SESSION['TRId']."
+		ORDER BY TrXOrData DESC";
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -222,60 +222,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacao = $item['TrXOrStatus'] == 1 ? 'Ativo' : 'Inativo';
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
-										
-										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
-
-
-                                        
-										 $sql = "SELECT SbCatId, SbCatNome
-				                                        FROM SubCategoria
-				                                        JOIN TRXOrcamentoXSubcategoria on TXOXSCSubcategoria = SbCatId
-				                                        WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and TXOXSCOrcamento = ".$item['TrXOrId']."
-				                                            ORDER BY SbCatNome ASC";
-		                                        $result = $conn->query($sql);
-		                                        $rowSC = $result->fetchAll(PDO::FETCH_ASSOC);
 
 										print('
 										    <tr>
 											    <td>'.mostraData($item['TrXOrData']).'</td>
 											    <td>'.$item['TrXOrNumero'].'</td>
 											    <td>'.$item['ForneNome'].'</td>
-											    <td>'.$item['CategNome'].'</td>
+												<td>'.$item['CategNome'].'</td>
+												<td>'.$item['SubCategorias'].'</td>
 										');
-										if (!$rowSC) {
-											print('
-												<td>
-											        <div class="d-flex flex-row">
-                                                        <div class="p-1">
-                                                            <div></div>
-                                                        </div>
-											        </div>
-											    </td>
-											');
-										} else {
-											print('<td>
-                                                      <div class="d-flex flex-row">
-												');
-											foreach ($rowSC as $key => $a) {
-												if (count($rowSC) == $key + 1) {
-													print('
-                                                        <div class="py-1 pl-1 pr-1 pl-0 ">
-                                                            <div>' . $a['SbCatNome'] . '</div>
-                                                        </div>
-											        ');
-												} else {
-													print('
-                                                        <div class="py-1 pl-1 pr-0 ">
-                                                            <div>' . $a['SbCatNome'] . ',</div>
-                                                        </div>
-											        ');
-												}
-											}
-											print('
-                                                   </div>
-												</td>
-											');
-										}
 										
 										// print('<td><a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										print('<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>');
@@ -382,6 +337,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- /page content -->
 
 	<?php include_once("alerta.php"); ?>
+	
+	<?php $total1 = microtime(true) - $inicio1;
+	echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; ?>	
 
 </body>
 

@@ -1,12 +1,13 @@
 <?php 
 
 include_once("sessao.php"); 
-
+$inicio1 = microtime(true);
 $_SESSION['PaginaAtual'] = 'Orçamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, ForneNome, CategNome, OrcamStatus, SituaNome, SituaChave, SituaCor
+$sql = "SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, ForneNome, CategNome, OrcamStatus, 
+		SituaNome, SituaChave, SituaCor, dbo.fnSubCategoriasOrcamento(OrcamUnidade, OrcamId) as SubCategorias
 		FROM Orcamento
 		LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
 		JOIN Categoria on CategId = OrcamCategoria
@@ -217,16 +218,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 
 										$tipo = $item['OrcamTipo'] == 'P' ? 'Produto' : 'Serviço';
-										
-										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
-
-										 $sql = "SELECT SbCatId, SbCatNome
-												 FROM SubCategoria
-												 JOIN OrcamentoXSubcategoria on OrXSCSubcategoria = SbCatId
-												 WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and OrXSCOrcamento = ".$item['OrcamId']."
-												 ORDER BY SbCatNome ASC";
-		                            	 $result = $conn->query($sql);
-		                                 $rowSC = $result->fetchAll(PDO::FETCH_ASSOC);
 
 										print('
 										    <tr>
@@ -234,23 +225,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											    <td>'.$item['OrcamNumero'].'</td>
 											    <td>'.$tipo.'</td>
 											    <td>'.$item['ForneNome'].'</td>
-											    <td>'.$item['CategNome'].'</td>
+												<td>'.$item['CategNome'].'</td>
+												<td>'.$item['SubCategorias'].'</td>
 										');
-
-										print('<td>');
-										
-										$subCategorias = '';
-										
-										foreach ($rowSC as $a) {
-											
-											$subCategorias .= $a['SbCatNome'].', ';
-										}
-										
-										$subCategorias = substr($subCategorias,0,-2);
-										
-										print($subCategorias);
-										
-										print('</td>');
 										
 										print('<td><a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
@@ -332,7 +309,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- /page content -->
 
 	<?php include_once("alerta.php"); ?>
-
+	
+	<?php $total1 = microtime(true) - $inicio1;
+		   echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; ?>
 </body>
 
 </html>
