@@ -1,12 +1,13 @@
 <?php
 
 include_once("sessao.php");
-
+$inicio1 = microtime(true);
 $_SESSION['PaginaAtual'] = 'Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefStatus, SituaId, SituaCor, SituaChave
+$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefStatus, 
+		SituaId, SituaCor, SituaChave, dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias
 		FROM TermoReferencia
 		JOIN Categoria on CategId = TrRefCategoria
 		JOIN Situacao on SituaId = TrRefStatus
@@ -230,14 +231,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<?php
 									foreach ($row as $item) {
 
-										$sql = "SELECT SbCatId, SbCatNome
-												FROM SubCategoria
-												JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-												WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $item['TrRefId'] . "
-													ORDER BY SbCatNome ASC";
-										$result = $conn->query($sql);
-										$rowSC = $result->fetchAll(PDO::FETCH_ASSOC);
-
 										$situacao = $item['TrRefStatus'] == 1 ? 'Ativo' : 'Inativo';
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
@@ -248,46 +241,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										    <tr>
 											    <td>' . mostraData($item['TrRefData']) . '</td>
 											    <td>' . $item['TrRefNumero'] . '</td>
-											    <td>' . $item['CategNome'] . '</td>
+												<td>' . $item['CategNome'] . '</td>
+												<td>' . $item['SubCategorias'] . '</td>
 										');
-
-										if (!$rowSC) {
-
-											print('
-												<td>
-											        <div class="d-flex flex-row">
-                                                        <div class="p-1">
-                                                            <div></div>
-                                                        </div>
-											        </div>
-											    </td>
-											');
-										} else {
-											print('<td>
-                                                      <div class="d-flex flex-row">
-												');
-											foreach ($rowSC as $key => $a) {
-												if (count($rowSC) == $key + 1) {
-													print('
-                                                        <div class="py-1 pl-1 pr-1 pl-0 ">
-                                                            <div>' . $a['SbCatNome'] . '</div>
-                                                        </div>
-											        ');
-												} else {
-													print('
-                                                        <div class="py-1 pl-1 pr-0 ">
-                                                            <div>' . $a['SbCatNome'] . ',</div>
-                                                        </div>
-											        ');
-												}
-											}
-											print('
-                                                   </div>
-												</td>
-											');
-										}
-
-
 
 										// print('<td><a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
 										print('<td><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></td>');
@@ -390,7 +346,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- /page content -->
 
 	<?php include_once("alerta.php"); ?>
-
+	
+	<?php $total1 = microtime(true) - $inicio1;
+	echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; ?>
 </body>
 
 </html>
