@@ -43,9 +43,9 @@ if (isset($_POST['inputData'])) {
 		$sNumero = str_pad($sNumero, 6, "0", STR_PAD_LEFT);
 
 		$sql = "INSERT INTO TermoReferencia (TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio, TrRefConteudoFim, TrRefTipo,
-											 TrRefStatus, TrRefUsuarioAtualizador, TrRefUnidade)
+											 TrRefStatus, TrRefUsuarioAtualizador, TrRefUnidade, TrRefTabelaProduto, TrRefTabelaServico)
 				VALUES (:sNumero, :dData, :iCategoria, :sConteudoInicio, :sConteudoFim, :sTipo, 
-						:bStatus, :iUsuarioAtualizador, :iUnidade)";
+						:bStatus, :iUsuarioAtualizador, :iUnidade, :sTabelaProduto, :sTabelaServico)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -57,7 +57,9 @@ if (isset($_POST['inputData'])) {
 			':sTipo' => $tipoTr,
 			':bStatus' => 1,
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iUnidade' => $_SESSION['UnidadeId']
+			':iUnidade' => $_SESSION['UnidadeId'],
+			':sTabelaProduto' => $parametroProduto,
+			':sTabelaServico' => $parametroServico
 		));
 
 		// Começo do cadastro de subcategorias da TR
@@ -205,6 +207,7 @@ if (isset($_POST['inputData'])) {
 
 				let tipoTr = '';
 				let tipoMensagem = '';
+				let subCategMensagem = '';
 
 				if ($('#TrProduto').parent().hasClass('checked')) {
 					tipoTr = 'P';
@@ -231,12 +234,14 @@ if (isset($_POST['inputData'])) {
 
 							tipoTr == 'P' ? tipoMensagem = 'produtos' : tipoTr == 'S' ? tipoMensagem = 'serviços' : tipoMensagem = 'produtos ou serviços'
 
+							cmbSubCategoriaArray != '' ? subCategMensagem = 'e subactegoria selecionadas não possuem' : subCategMensagem = 'selecionada não possui'
+
 							if (resposta == 'existem produtos') {
 
 								$("#formTR").submit();
 
 							} else {
-								alerta('Atenção', 'A categoria selecionada não possui ' + tipoMensagem + ' ativos!', 'error');
+								alerta('Atenção', 'A categoria ' + subCategMensagem + ' ' + tipoMensagem + ' ativos!', 'error');
 							
 							}
 						}

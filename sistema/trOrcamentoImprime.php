@@ -9,93 +9,78 @@ use Mpdf\Mpdf;
 require_once 'global_assets/php/vendor/autoload.php';
 
 if (isset($_POST['inputOrcamentoId'])) {
-    $iOrcamento = $_POST['inputOrcamentoId'];
+	$iOrcamento = $_POST['inputOrcamentoId'];
 } else {
-    print('<script>
+	print('<script>
 				window.close();
 		   </script> ');
 }
 
 try {
 
-    $sql = "SELECT TrXOrNumero, TrRefData, TrXOrTabelaProduto, TrXOrTabelaServico, CategNome
+	$sql = "SELECT TrXOrNumero, TrRefData, TrXOrTabelaProduto, TrXOrTabelaServico, TrRefId, TrRefTabelaProduto, TrRefTabelaServico, TrRefNumero, TrRefTipo, ForneNome, CategNome
 			FROM TRXOrcamento
             JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
 			JOIN Categoria on CategId = TrXOrCategoria
             LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
 			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
-    $result = $conn->query($sql);
-    $row = $result->fetch(PDO::FETCH_ASSOC);
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 
-    $sql = "SELECT SbCatNome, TXOXSCSubcategoria
+	$sql = "SELECT SbCatNome, TXOXSCSubcategoria
     		FROM TRXOrcamentoXSubCategoria
     		JOIN SubCategoria on SbCatId = TXOXSCSubcategoria
     		WHERE TXOXSCUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSCOrcamento = " . $iOrcamento;
-    $result = $conn->query($sql);
-    $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+	$result = $conn->query($sql);
+	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
-    // Selects para identificar a tabela de origem dos produtos da TR.
-    $sql = "SELECT DISTINCT COUNT(TXOXPProduto) as CONT
+	//Selects para identificar se o orçamento já possue produtos.
+	$tabelaOrigemProduto = $row['TrRefTabelaProduto'];
+	$campoPrefix =  $row['TrRefTabelaProduto'] == 'Produto' ? 'Produ' : 'PrOrc';
+
+	$sql = "SELECT DISTINCT COUNT(TXOXPProduto) as CONT
     		FROM TRXOrcamentoXProduto
-    		JOIN ProdutoOrcamento on PrOrcId = TXOXPProduto
-    		WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento . "";
-    $result = $conn->query($sql);
-    $rowProdutoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
+    		JOIN " . $tabelaOrigemProduto . " on " . $campoPrefix . "Id = TXOXPProduto
+			WHERE " . $campoPrefix . "Unidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento . "";
+	$result = $conn->query($sql);
+	$rowProdutoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
 
-    $sql = "SELECT COUNT(TXOXPProduto) as CONT
-    		FROM TRXOrcamentoXProduto
-    		JOIN Produto on ProduId = TXOXPProduto
-    		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento . "";
-    $result = $conn->query($sql);
-    $rowProdutoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
 
-    // Selects para identificar a a tabela de origem dos serviços da TR.
-    $sql = "SELECT COUNT(TXOXSServico) as CONT
-    		FROM TRXOrcamentoXServico
-    		JOIN ServicoOrcamento on SrOrcId = TXOXSServico
-    		WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " ";
-    $result = $conn->query($sql);
-    $rowServicoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
+	// Selects para identificar se o orçamento já possue serviços.
+	$tabelaOrigemServico = $row['TrRefTabelaServico'];
+	$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
 
-    $sql = "SELECT COUNT(TXOXSServico) as CONT
-    		FROM TRXOrcamentoXServico
-    		JOIN Servico on ServiId = TXOXSServico
-    		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . "";
-    $result = $conn->query($sql);
-	$rowServicoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
-	
-	////////////////////////////////////////////////////////
 	$sql = "SELECT COUNT(TXOXSServico) as CONT
     		FROM TRXOrcamentoXServico
-    		JOIN ServicoOrcamento on SrOrcId = TXOXSServico
-    		WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " ";
-    $result = $conn->query($sql);
-    $rowServicoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
-	////////////////////////////////////////////////////////
+    		JOIN " . $tabelaOrigemServico . " on " . $campoPrefix . "Id = TXOXSServico
+    		WHERE " . $campoPrefix . "Unidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " ";
+	$result = $conn->query($sql);
+	$rowServicoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
 
 
-    $totalProdutos = 0;
-    $totalServicos = 0;
-    $totalGeralProdutos = 0;
-    $totalGeralServicos = 0;
-    $totalGeral = 0;
+	$totalProdutos = 0;
+	$totalServicos = 0;
+	$totalGeralProdutos = 0;
+	$totalGeralServicos = 0;
+	$totalGeral = 0;
 
-    $mpdf = new mPDF([
-        'mode' => 'utf-8',    // mode - default ''
-        'format' => 'A4-P',    // format - A4, for example, default ''
-        'default_font_size' => 9,     // font size - default 0
-        'default_font' => '',    // default font family
-        'margin-left' => 15,    // margin_left
-        'margin-right' => 15,    // margin right
-        'margin-top' => 158,     // margin top    -- aumentei aqui para que não ficasse em cima do header
-        'margin-bottom' => 60,    // margin bottom
-        'margin-header' => 6,     // margin header
-        'margin-bottom' => 0,     // margin footer
-        'orientation' => 'P'
-    ]);  // L - landscape, P - portrait
+	$mpdf = new mPDF([
+		'mode' => 'utf-8',    // mode - default ''
+		'format' => 'A4-P',    // format - A4, for example, default ''
+		'default_font_size' => 9,     // font size - default 0
+		'default_font' => '',    // default font family
+		'margin-left' => 15,    // margin_left
+		'margin-right' => 15,    // margin right
+		'margin-top' => 158,     // margin top    -- aumentei aqui para que não ficasse em cima do header
+		'margin-bottom' => 60,    // margin bottom
+		'margin-header' => 6,     // margin header
+		'margin-bottom' => 0,     // margin footer
+		'orientation' => 'P'
+	]);  // L - landscape, P - portrait
 
-    $html = "
+	$html = "
 		<style>
 			th{
 				text-align: center; 
@@ -124,66 +109,64 @@ try {
 
 			<div style='text-align:center; margin-top: 20px;'><h1>ORÇAMENTO DO TERMO DE REFERÊNCIA</h1></div>
     ";
-    
+
 	$html .= "<div style='text-align:center;'><h2>TERMO DE REFERÊNCIA</h2></div>";
-	
+
 	$html .= '
     <table style="width:100%; border-collapse: collapse;">
         <tr style="background-color:#F1F1F1;">
-            <td style="width:25%; font-size:12px;">Nº TR: '. $row['TrRefNumero'].'</td>
-            <td style="width:15%; font-size:12px;">Data: '. mostraData($row['TrRefData']).'</td>
+            <td style="width:25%; font-size:12px;">Nº TR: ' . $row['TrRefNumero'] . '</td>
+            <td style="width:15%; font-size:12px;">Data: ' . mostraData($row['TrRefData']) . '</td>
         </tr>
     </table>
 	<br>';
 
+	if ($row['ForneNome'] <> ""){
+		$html .= "<div style='text-align:center;'><h2>FORNECEDOR</h2></div>";
+		$html .= '<div style="text-align:center; margin-top: -20px"><p style="font-size:18px;">' . $row['ForneNome'] . '</p></div>';	
+	}
 
-    if ($rowProdutoUtilizado1['CONT'] > 0 || $rowProdutoUtilizado2['CONT'] > 0) {
+	if ($rowProdutoUtilizado['CONT'] > 0) {
 
-        $html .= "<div style='text-align:center;'><h2>PRODUTOS</h2></div>";
+		$tituloProduto = "<div style='text-align:center;'><h2>PRODUTOS</h2></div>";
 
-        $html .= '
-		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd; padding: 8px; border: 1px solid #ccc;">
-			Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
-		</div>
-		<br>
-		';
+		$cabecalhoProduto = '
+	                                	<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd; padding: 8px; border: 1px solid #ccc;">
+	                                	Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
+	                                </div>
+	                            <br>
+						';
+		
+		$html .= $row['TrRefTipo'] == 'P' || $row['TrRefTipo'] == 'PS' ? $tituloProduto.' '.$cabecalhoProduto : '';
+		$exibirProduto = $row['TrRefTipo'] == 'P' || $row['TrRefTipo'] == 'PS' ? true : false;
 
-        $cont = 1;
+		$cont = 1;
 
-        foreach ($rowSubCategoria as $sbcat) {
+		foreach ($rowSubCategoria as $sbcat) {
 
-            //Se foi utilizado ProdutoOrcamento
-            if ($row['TrXOrTabelaProduto'] == 'ProdutoOrcamento') {
-                $sql = "SELECT PrOrcId as Id, PrOrcNome as Nome, PrOrcCategoria as Categoria, PrOrcSubCategoria as SubCategoria,
-						PrOrcDetalhamento as Detalhamento, UnMedSigla, TXOXPQuantidade, TXOXPValorUnitario
-						FROM ProdutoOrcamento
-						JOIN TRXOrcamentoXProduto on TXOXPProduto = PrOrcId
-                        JOIN TRXOrcamento on TrXOrId = TXOXPOrcamento
-                        JOIN TRXOrcamentoXSubcategoria on TXOXSCOrcamento = TXOXPOrcamento
-						JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-                        WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
-            } else {
-                $sql = "SELECT DISTINCT ProduId as Id, ProduNome as Nome, ProduCategoria as Categoria, ProduSubCategoria as SubCategoria, 
-						ProduDetalhamento as Detalhamento, UnMedSigla, TXOXPQuantidade, TXOXPValorUnitario
-						FROM Produto
-						JOIN TRXOrcamentoXProduto on TXOXPProduto = ProduId
-                        JOIN TRXOrcamento on TrXOrId = TXOXPOrcamento
-                        JOIN TRXOrcamentoXSubcategoria on TXOXSCOrcamento = TXOXPOrcamento
-						JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-						WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
-            }
-            $result = $conn->query($sql);
-            $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+            $tabelaOrigemProduto = $row['TrRefTabelaProduto'];
+			$campoPrefix =  $row['TrRefTabelaProduto'] == 'Produto' ? 'Produ' : 'PrOrc';
 
-            if (isset($rowProdutos)) {
+			$sql = "SELECT ".$campoPrefix."Id as Id, ".$campoPrefix."Nome as Nome, ".$campoPrefix."Categoria as Categoria, ".$campoPrefix."SubCategoria as SubCategoria,
+			        ".$campoPrefix."Detalhamento as Detalhamento, UnMedSigla, TXOXPQuantidade, TXOXPValorUnitario
+					FROM ".$tabelaOrigemProduto."
+					JOIN TRXOrcamentoXProduto on TXOXPProduto = ".$campoPrefix."Id
+                    JOIN TRXOrcamento on TrXOrId = TXOXPOrcamento
+                    JOIN TRXOrcamentoXSubcategoria on TXOXSCOrcamento = TXOXPOrcamento
+					JOIN UnidadeMedida on UnMedId = ".$campoPrefix."UnidadeMedida
+                    WHERE ".$campoPrefix."Unidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
+			$result = $conn->query($sql);
+			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                $html .= '
+			if (isset($rowProdutos) && $exibirProduto) {
+
+				$html .= '
 				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
 					SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
 				</div>
 				<br> ';
 
-                $html .= '	
+				$html .= '	
 				<table style="width:100%; border-collapse: collapse;">
 					<tr>
 						<th style="text-align: center; width:8%">Item</th>
@@ -195,19 +178,19 @@ try {
 					</tr>
 				';
 
-                foreach ($rowProdutos as $itemProduto) {
+				foreach ($rowProdutos as $itemProduto) {
 
-                    if ($sbcat['TXOXSCSubcategoria'] == $itemProduto['SubCategoria']) {
+					if ($sbcat['TXOXSCSubcategoria'] == $itemProduto['SubCategoria']) {
 
-                        if ($itemProduto['TXOXPValorUnitario'] != '' and $itemProduto['TXOXPValorUnitario'] != null){
-                            $valorUnitario = $itemProduto['TXOXPValorUnitario'];
-                            $valorTotal = $itemProduto['TXOXPQuantidade'] * $itemProduto['TXOXPValorUnitario'];
-                        } else {
-                            $valorUnitario = 0;
-                            $valorTotal = 0;
-                        }
+						if ($itemProduto['TXOXPValorUnitario'] != '' and $itemProduto['TXOXPValorUnitario'] != null) {
+							$valorUnitario = $itemProduto['TXOXPValorUnitario'];
+							$valorTotal = $itemProduto['TXOXPQuantidade'] * $itemProduto['TXOXPValorUnitario'];
+						} else {
+							$valorUnitario = 0;
+							$valorTotal = 0;
+						}
 
-                        $html .= "
+						$html .= "
                             
                             <tr>
 					            <td style='text-align: center;'>" . $cont . "</td>
@@ -219,16 +202,16 @@ try {
 				            </tr>
                 		";
 
-                        $cont++;
-                        $totalProdutos += $itemProduto['TXOXPQuantidade'] * $itemProduto['TXOXPValorUnitario'];
-                    }
-                }
+						$cont++;
+						$totalProdutos += $itemProduto['TXOXPQuantidade'] * $itemProduto['TXOXPValorUnitario'];
+					}
+				}
 
-                $totalGeralProdutos += $totalProdutos;
+				$totalGeralProdutos += $totalProdutos;
 
-                $html .= "<br>";
+				$html .= "<br>";
 
-                $html .= "  <tr>
+				$html .= "  <tr>
                 				<td colspan='5' height='50' valign='middle'>
                 					<strong>Total Produtos</strong>
                 				</td>
@@ -236,74 +219,135 @@ try {
                 					" . mostraValor($totalProdutos) . "
                 				</td>
                 			</tr>";
-                $html .= "</table>";
-            }
-        }
-    } else {
-		///////////////////////////////////////////////////////////////////////////
-		if ($row['TrXOrTabelaProduto'] == 'ProdutoOrcamento') {
-			$sql = "SELECT PrOrcId as Id, PrOrcNome as Nome, PrOrcCategoria as Categoria, PrOrcSubCategoria as SubCategoria,
-					PrOrcDetalhamento as Detalhamento, UnMedSigla, TXOXPQuantidade, TXOXPValorUnitario
-					FROM ProdutoOrcamento
-					JOIN TRXOrcamentoXProduto on TXOXPProduto = PrOrcId
-					JOIN TRXOrcamento on TrXOrId = TXOXPOrcamento
-					JOIN TRXOrcamentoXSubcategoria on TXOXSCOrcamento = TXOXPOrcamento
-					JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-					WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
-		} else {
-			$sql = "SELECT DISTINCT ProduId as Id, ProduNome as Nome, ProduCategoria as Categoria, ProduSubCategoria as SubCategoria, 
-					ProduDetalhamento as Detalhamento, UnMedSigla, TXOXPQuantidade, TXOXPValorUnitario
-					FROM Produto
-					JOIN TRXOrcamentoXProduto on TXOXPProduto = ProduId
-					JOIN TRXOrcamento on TrXOrId = TXOXPOrcamento
-					JOIN TRXOrcamentoXSubcategoria on TXOXSCOrcamento = TXOXPOrcamento
-					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
+				$html .= "</table>";
+			}
 		}
-		///////////////////////////////////////////////////////////////////////////
+	} else {
+
+		$tituloProduto = "<div style='text-align:center;'><h2>PRODUTOS</h2></div>";
+
+		$cabecalhoProduto = '
+	                                	<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd; padding: 8px; border: 1px solid #ccc;">
+	                                	Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
+	                                </div>
+	                            <br>
+						';
+		
+		$html .= $row['TrRefTipo'] == 'P' || $row['TrRefTipo'] == 'PS' ? $tituloProduto.' '.$cabecalhoProduto : '';
+		$exibirProduto = $row['TrRefTipo'] == 'P' || $row['TrRefTipo'] == 'PS' ? true : false;
+
+		$cont = 1;
+
+		foreach ($rowSubCategoria as $sbcat) {
+
+			$tabelaOrigemProduto = $row['TrRefTabelaProduto'];
+			$campoPrefix =  $row['TrRefTabelaProduto'] == 'Produto' ? 'Produ' : 'PrOrc';
+
+			$sql = "SELECT " . $campoPrefix . "Id as Id, " . $campoPrefix . "Nome as Nome, " . $campoPrefix . "Categoria as Categoria, " . $campoPrefix . "SubCategoria as SubCategoria,
+		            " . $campoPrefix . "Detalhamento as Detalhamento, UnMedSigla, TRXPrQuantidade
+		    		FROM " . $tabelaOrigemProduto . "
+		    		JOIN TermoReferenciaXProduto on TRXPrProduto = " . $campoPrefix . "Id
+                    JOIN TermoReferencia on TrRefId = TRXPrTermoReferencia
+                    JOIN TRXSubcategoria on TRXSCTermoReferencia = TRXPrTermoReferencia
+		    		JOIN UnidadeMedida on UnMedId = " . $campoPrefix . "UnidadeMedida
+                    WHERE " . $campoPrefix . "Unidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $row['TrRefId'];
+			$result = $conn->query($sql);
+			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+
+			if (isset($rowProdutos) && $exibirProduto) {
+
+				$html .= '
+				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
+					SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
+				</div>
+				<br> ';
+
+				$html .= '	
+				<table style="width:100%; border-collapse: collapse;">
+					<tr>
+						<th style="text-align: center; width:10%">Item</th>
+						<th style="text-align: left; width:65%">Produto</th>
+						<th style="text-align: center; width:10%">Unidade</th>        	
+						<th style="text-align: center; width:15%">Quantidade</th>
+						<th style="text-align: center; width:15%">V. Unitário</th>
+                        <th style="text-align: center; width:15%">V. Total</th>
+					</tr>
+				';
+
+				foreach ($rowProdutos as $itemProduto) {
+
+					if ($sbcat['TXOXSCSubcategoria'] == $itemProduto['SubCategoria']) {
+
+						$html .= "
+                            
+                            <tr>
+					            <td style='text-align: center;'>" . $cont . "</td>
+					            <td style='text-align: left;'>" . $itemProduto['Nome'] . "</td>
+					            <td style='text-align: center;'>" . $itemProduto['UnMedSigla'] . "</td>					
+					            <td style='text-align: center;'>" . $itemProduto['TRXPrQuantidade'] . "</td>
+								<td style='text-align: center;'></td>
+								<td style='text-align: center;'></td>
+					            
+				            </tr>
+                		";
+
+						$cont++;
+						// $totalProdutos += $itemProduto['TXOXPQuantidade'] * $itemProduto['TXOXPValorUnitario'];
+					}
+				}
+
+				$totalGeralProdutos += $totalProdutos;
+
+				$html .= "<br>";
+
+				$html .= "  <tr>
+								<td colspan='5' height='50' valign='middle'>
+									<strong>Total Produtos</strong>
+								</td>
+								<td style='text-align: right' colspan='1'></td>
+							</tr>";
+				$html .= "</table>";
+			}
+		}
 	}
 
-    if ($rowServicoUtilizado1['CONT'] > 0 || $rowServicoUtilizado2['CONT'] > 0){
+	if ($rowServicoUtilizado['CONT'] > 0) {
 
-    	$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
+		$tituloServico = "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
 
-    	$html .= '
-    	<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd;  padding: 8px;  border: 1px solid #ccc;">
-    		Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
-    	</div>
-    	<br>
-    	';
+		$cabecalhoServico = '
+    	                        <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd;  padding: 8px;  border: 1px solid #ccc;">
+    	                        	Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
+    	                        </div>
+    	                    <br>
+						';
+		
+		$html .= $row['TrRefTipo'] == 'S' || $row['TrRefTipo'] == 'PS' ? $tituloServico.' '.$cabecalhoServico : '';
+		$cont = 1;
 
-    	$cont = 1;
+		foreach ($rowSubCategoria as $sbcat) {
 
-    	foreach ($rowSubCategoria as $sbcat) {
+			$tabelaOrigemServico = $row['TrRefTabelaServico'];
+			$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
 
-    		//Se foi utilizado ServicoOrcamento
-    		if($row['TrXOrTabelaServico'] == 'ServicoOrcamento'){
-    			$sql = "SELECT SrOrcId as Id, SrOrcNome as Nome, SrOrcCategoria as Categoria, SrOrcSubCategoria as SubCategoria, TXOXSQuantidade, TXOXSValorUnitario
-    					FROM ServicoOrcamento
-    					JOIN TRXOrcamentoXServico on TXOXSServico = SrOrcId
-    					WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " and SrOrcSubCategoria = ".$sbcat['TXOXSCSubcategoria'];
-    		} else {
-    			$sql = "SELECT ServiId as Id, ServiNome as Nome, ServiCategoria as Categoria, ServiSubCategoria as SubCategoria, TXOXSQuantidade, TXOXSValorUnitario
-    					FROM Servico
-    					JOIN TRXOrcamentoXServico on TXOXSServico = ServiId
-    					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " and ServiSubCategoria = ".$sbcat['TXOXSCSubcategoria'];
-    		}
+			
+			$sql = "SELECT ".$campoPrefix."Id as Id, ".$campoPrefix."Nome as Nome, ".$campoPrefix."Categoria as Categoria, ".$campoPrefix."SubCategoria as SubCategoria, TXOXSQuantidade, TXOXSValorUnitario
+    				FROM ".$tabelaOrigemServico."
+    				JOIN TRXOrcamentoXServico on TXOXSServico = ".$campoPrefix."Id
+    				WHERE ".$campoPrefix."Unidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " and ".$campoPrefix."SubCategoria = " . $sbcat['TXOXSCSubcategoria'];
+			$result = $conn->query($sql);
+			$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+			$count = count($rowServicos);
 
-    		$result = $conn->query($sql);
-    		$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-            $count = count($rowServicos);		
+			if (isset($rowServicos) and $count) {
 
-    		if (isset($rowServicos) and $count){
-
-    			$html .= '
+				$html .= '
     			<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
     				SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
     			</div>
-    			<br> ';				
+    			<br> ';
 
-    			$html .= '	
+				$html .= '	
     			<table style="width:100%; border-collapse: collapse;">
     				<tr>
     					<th style="text-align: center; width:8%">Item</th>
@@ -312,21 +356,21 @@ try {
                         <th style="text-align: center; width:15%">V. Unitário</th>
                         <th style="text-align: center; width:15%">V. Total</th>
     				</tr>
-    			';			
+				';
 
-    			foreach ($rowServicos as $itemServico) {
+				foreach ($rowServicos as $itemServico) {
 
-    				if ($sbcat['TXOXSCSubcategoria'] == $itemServico['SubCategoria']) {
+					if ($sbcat['TXOXSCSubcategoria'] == $itemServico['SubCategoria']) {
 
-                        if ($itemServico['TXOXSValorUnitario'] != '' and $itemServico['TXOXSValorUnitario'] != null){
-                            $valorUnitario = $itemServico['TXOXSValorUnitario'];
-                            $valorTotal = $itemServico['TXOXSQuantidade'] * $itemServico['TXOXSValorUnitario'];
-                        } else {
-                            $valorUnitario = 0;
-                            $valorTotal = 0;
-                        }
+						if ($itemServico['TXOXSValorUnitario'] != '' and $itemServico['TXOXSValorUnitario'] != null) {
+							$valorUnitario = $itemServico['TXOXSValorUnitario'];
+							$valorTotal = $itemServico['TXOXSQuantidade'] * $itemServico['TXOXSValorUnitario'];
+						} else {
+							$valorUnitario = 0;
+							$valorTotal = 0;
+						}
 
-    					$html .= "
+						$html .= "
     						<tr>
     							<td style='text-align: center;'>" . $cont . "</td>
     							<td style='text-align: left;'>" . $itemServico['Nome'] . "</td>
@@ -336,33 +380,111 @@ try {
     						</tr>
     					";
 
-    					$cont++;
-    					$totalServicos += $itemServico['TXOXSQuantidade'] * $itemServico['TXOXSValorUnitario'];
-    				}
-    			}
+						$cont++;
+						$totalServicos += $itemServico['TXOXSQuantidade'] * $itemServico['TXOXSValorUnitario'];
+					}
+				}
 
-    			$totalGeralServicos += $totalServicos;
+				$totalGeralServicos += $totalServicos;
 
-    			$html .= "<br>";
+				$html .= "<br>";
 
-    			$html .= "  <tr>
+				$html .= "  <tr>
     							<td colspan='4' height='50' valign='middle'>
     								<strong>Total Serviços</strong>
     							</td>
     							<td style='text-align: center' colspan='1'>
-    								".mostraValor($totalServicos)."
+    								" . mostraValor($totalServicos) . "
     							</td>
     						</tr>";
-    			$html .= "</table>";
-    		} 
-    	} 
-    }
+				$html .= "</table>";
+			}
+		}
+	} else {
 
-    $totalGeral = $totalGeralProdutos + $totalGeralServicos;
-    //echo $totalGeral;die;
+		$tituloServico = "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
 
-    if ($totalGeral) {
-        $html .= "<table style='width:100%; border-collapse: collapse; margin-top: 20px;'>
+		$cabecalhoServico = '
+    	                        <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd;  padding: 8px;  border: 1px solid #ccc;">
+    	                        	Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
+    	                        </div>
+    	                    <br>
+						';
+		
+		$html .= $row['TrRefTipo'] == 'S' || $row['TrRefTipo'] == 'PS' ? $tituloServico.' '.$cabecalhoServico : '';
+		$cont = 1;
+
+		foreach ($rowSubCategoria as $sbcat) {
+
+			$tabelaOrigemServico = $row['TrRefTabelaServico'];
+			$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
+
+			$sql = "SELECT ".$campoPrefix ."Id as Id, ".$campoPrefix ."Nome as Nome, ".$campoPrefix ."Categoria as Categoria, ".$campoPrefix ."SubCategoria as SubCategoria, TRXSrQuantidade
+    				FROM ".$tabelaOrigemServico."
+    				JOIN TermoReferenciaXServico on TRXSrServico = ".$campoPrefix ."Id
+					WHERE ".$campoPrefix ."Unidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $row['TrRefId'] . "";
+			$result = $conn->query($sql);
+			$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+			$count = count($rowServicos);
+
+			if (isset($rowServicos) and $count) {
+
+				$html .= '
+    			<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
+    				SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
+    			</div>
+    			<br> ';
+
+				$html .= '	
+    			<table style="width:100%; border-collapse: collapse;">
+				<tr>
+				<th style="text-align: center; width:8%">Item</th>
+				<th style="text-align: left; width:65%">Serviço</th>     	
+				<th style="text-align: center; width:15%">Quantidade</th>
+				<th style="text-align: center; width:15%">V. Unitário</th>
+				<th style="text-align: center; width:15%">V. Total</th>
+				</tr>
+    			';
+
+				foreach ($rowServicos as $itemServico) {
+
+					if ($sbcat['TXOXSCSubcategoria'] == $itemServico['SubCategoria']) {
+
+						$html .= "
+						<tr>
+						    <td style='text-align: center;'>" . $cont . "</td>
+						    <td style='text-align: left;'>" . $itemServico['Nome'] . "</td>
+						    <td style='text-align: center;'>" . $itemServico['TRXSrQuantidade'] . "</td>
+						    <td style='text-align: right;'></td>
+						    <td style='text-align: right;'></td>
+					    </tr>
+    					";
+
+						$cont++;
+						$totalServicos += $itemServico['TXOXSQuantidade'] * $itemServico['TXOXSValorUnitario'];
+					}
+				}
+
+				$totalGeralServicos += $totalServicos;
+
+				$html .= "<br>";
+
+				$html .= "  <tr>
+    							<td colspan='4' height='50' valign='middle'>
+    								<strong>Total Serviços</strong>
+    							</td>
+    							<td style='text-align: center' colspan='1'></td>
+    						</tr>";
+				$html .= "</table>";
+			}
+		}
+	}
+
+	$totalGeral = $totalGeralProdutos + $totalGeralServicos;
+	//echo $totalGeral;die;
+
+	if ($totalGeral) {
+		$html .= "<table style='width:100%; border-collapse: collapse; margin-top: 20px;'>
 					<tr>
 						<td colspan='3' height='50' valign='middle' style='width:85%'>
 							<strong>TOTAL GERAL DE ITENS</strong>
@@ -373,22 +495,22 @@ try {
 					</tr>
 				</table>
 		";
-    }
+	}
 
-    $rodape = "<hr/>
+	$rodape = "<hr/>
     <div style='width:100%'>
 		<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
 		<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
 	</div>";
 
-    //$mpdf->SetHTMLHeader($topo, '0');
-    $mpdf->SetHTMLFooter($rodape);
-    $mpdf->WriteHTML($html);
+	//$mpdf->SetHTMLHeader($topo, '0');
+	$mpdf->SetHTMLFooter($rodape);
+	$mpdf->WriteHTML($html);
 
-    // Other code
-    $mpdf->Output();
+	// Other code
+	$mpdf->Output();
 } catch (\Mpdf\MpdfException $e) { // Note: safer fully qualified exception name used for catch
 
-    // Process the exception, log, print etc.
-    echo $e->getMessage();
+	// Process the exception, log, print etc.
+	echo $e->getMessage();
 }

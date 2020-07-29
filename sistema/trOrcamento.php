@@ -1,7 +1,7 @@
 <?php 
 
 include_once("sessao.php"); 
-
+$inicio1 = microtime(true);
 include('global_assets/php/conexao.php');
 
 $_SESSION['PaginaAtual'] = 'Termo de Referência / Orçamento';
@@ -13,15 +13,15 @@ if (isset($_POST['inputTRId'])){
 	$_SESSION['TRNumero'] = $_POST['inputTRNumero'];
 }
 
-$sql = ("SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrCategoria, TrXOrStatus, TrRefNumero, TrRefTipo, ForneNome, CategNome, SbCatNome, SituaId, SituaCor, SituaChave
-		 FROM TRXOrcamento
-		 JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
-		 LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
-		 JOIN Categoria on CategId = TrXOrCategoria
-		 LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
-		 JOIN Situacao on SituaId = TrXOrStatus
-	     WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." and TrXOrTermoReferencia = ".$_SESSION['TRId']."
-		 ORDER BY TrXOrData DESC");
+$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrCategoria, TrXOrStatus, TrRefNumero, TrRefTipo, ForneNome, CategNome, 
+		SituaId, SituaCor, SituaChave, dbo.fnSubCategoriasTRXOrcamento(TrXOrUnidade, TrXOrId) as SubCategorias
+		FROM TRXOrcamento
+		JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+		LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
+		JOIN Categoria on CategId = TrXOrCategoria
+		JOIN Situacao on SituaId = TrXOrStatus
+	    WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." and TrXOrTermoReferencia = ".$_SESSION['TRId']."
+		ORDER BY TrXOrData DESC";
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -222,60 +222,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacao = $item['TrXOrStatus'] == 1 ? 'Ativo' : 'Inativo';
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
-										
-										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
-
-
-                                        
-										 $sql = "SELECT SbCatId, SbCatNome
-				                                        FROM SubCategoria
-				                                        JOIN TRXOrcamentoXSubcategoria on TXOXSCSubcategoria = SbCatId
-				                                        WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and TXOXSCOrcamento = ".$item['TrXOrId']."
-				                                            ORDER BY SbCatNome ASC";
-		                                        $result = $conn->query($sql);
-		                                        $rowSC = $result->fetchAll(PDO::FETCH_ASSOC);
 
 										print('
 										    <tr>
 											    <td>'.mostraData($item['TrXOrData']).'</td>
 											    <td>'.$item['TrXOrNumero'].'</td>
 											    <td>'.$item['ForneNome'].'</td>
-											    <td>'.$item['CategNome'].'</td>
+												<td>'.$item['CategNome'].'</td>
+												<td>'.$item['SubCategorias'].'</td>
 										');
-										if (!$rowSC) {
-											print('
-												<td>
-											        <div class="d-flex flex-row">
-                                                        <div class="p-1">
-                                                            <div></div>
-                                                        </div>
-											        </div>
-											    </td>
-											');
-										} else {
-											print('<td>
-                                                      <div class="d-flex flex-row">
-												');
-											foreach ($rowSC as $key => $a) {
-												if (count($rowSC) == $key + 1) {
-													print('
-                                                        <div class="py-1 pl-1 pr-1 pl-0 ">
-                                                            <div>' . $a['SbCatNome'] . '</div>
-                                                        </div>
-											        ');
-												} else {
-													print('
-                                                        <div class="py-1 pl-1 pr-0 ">
-                                                            <div>' . $a['SbCatNome'] . ',</div>
-                                                        </div>
-											        ');
-												}
-											}
-											print('
-                                                   </div>
-												</td>
-											');
-										}
 										
 										// print('<td><a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										print('<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>');
@@ -294,7 +249,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																<i class="icon-menu9"></i>
 															</a>
 
-															<div class="dropdown-menu dropdown-menu-right">
+															<div class="dropdown-menu dropdown-menu-right" style="z-index: 10000">
 															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'P\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
 															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
@@ -315,7 +270,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																<i class="icon-menu9"></i>
 															</a>
 
-															<div class="dropdown-menu dropdown-menu-right">
+															<div class="dropdown-menu dropdown-menu-right"  style="z-index: 10000">
 															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'S\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Serviços</a>
 															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
 															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
@@ -336,7 +291,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																<i class="icon-menu9"></i>
 															</a>
 
-															<div class="dropdown-menu dropdown-menu-right">
+															<div class="dropdown-menu dropdown-menu-right"  style="z-index: 10000">
 															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'P\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'S\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Serviços</a>
 															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
@@ -351,7 +306,33 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									}
 									
 								?>
-
+                                    <tr role="row">
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr role="row">
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr role="row">
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									</tr>
 								</tbody>
 							</table>
 						</div>
@@ -382,6 +363,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- /page content -->
 
 	<?php include_once("alerta.php"); ?>
+	
+	<?php $total1 = microtime(true) - $inicio1;
+	echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; ?>	
 
 </body>
 
