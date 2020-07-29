@@ -22,6 +22,19 @@ if (isset($_POST['servicos']) and $_POST['servicos'] != '') {
 
 $iTR = $_POST['idTr'];
 
+// $sql = "SELECT SrOrcId
+// 		FROM ServicoOrcamento
+// 		WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . "";
+// $result = $conn->query($sql);
+// $rowServicosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
+
+
+// $sql = "SELECT ServiId
+// 		FROM Servico
+// 		WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . "";
+// $result = $conn->query($sql);
+// $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+// $countServicosTr2 = count($rowServicos);
 $sql = "SELECT TRXSrServico
 		FROM TermoReferenciaXServico
 		JOIN ServicoOrcamento on SrOrcId = TRXSrServico
@@ -42,11 +55,10 @@ $countServicosTr2 = count($rowServicos);
 
 if (count($rowServicosOrcamento) >= 1) {
 
-	$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, TRXSrTabela
+	$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento
 			FROM ServicoOrcamento
-			JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 			JOIN Categoria on CategId = SrOrcCategoria
-			WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and SrOrcId in (" . $lista . ")
+			WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and SrOrcId in (" . $lista . ")
 			";
 	//echo $sql;
 
@@ -80,29 +92,25 @@ if (count($rowServicosOrcamento) >= 1) {
 							</div>
 						</div>
 					</div>								
-					<div class="col-lg-1">
-						<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
-					</div>
 					<div class="col-lg-2">
 						<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $quantidade . '">
 					</div>	
 				</div>';
 
-		if ($item['TRXSrTabela'] != null) {
-			$output .= '<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . $item['TRXSrTabela'] . '">';
-		} else {
+		// if ($item['TRXSrTabela'] != null) {
+		// 	$output .= '<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . $item['TRXSrTabela'] . '">';
+		// } else {
 			$output .= '<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . 'ServicoOrcamento ' . '">';
-		}
+		// }
 	}
 
 	$output .= '<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >';
 
 	echo $output;
 } else {
-	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, TRXSrTabela
+	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
 			FROM Servico
-			JOIN TermoReferenciaXServico on TRXSrServico = ServiId
-			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and ServiId in (" . $lista . ")
+			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiId in (" . $lista . ")
 			";
 
 	//echo $sql;die;
@@ -141,11 +149,11 @@ if (count($rowServicosOrcamento) >= 1) {
 					</div>	
 				</div>';
 
-		if ($item['TRXSrTabela'] != null) {
-			$output .= '<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . $item['TRXSrTabela'] . '">';
-		} else {
+		// if ($item['TRXSrTabela'] != null) {
+		// 	$output .= '<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . $item['TRXSrTabela'] . '">';
+		// } else {
 			$output .= '<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . 'Servico ' . '">';
-		}
+		// }
 	}
 
 	$output .= '<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >';

@@ -22,6 +22,16 @@ if (isset($_POST['inputOrdemCompraId'])) {
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
+
+	$sql = "SELECT MovimId
+			FROM Movimentacao
+		    JOIN OrdemCompra on OrComId = MovimOrdemCompra
+	        WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$row['OrComId']." and MovimTipo = 'E'
+        ";
+    $result = $conn->query($sql);
+	$rowM = $result->fetchAll(PDO::FETCH_ASSOC);
+	$movimentacoes = count($rowM);
+
 	$_SESSION['msg'] = array();
 
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
@@ -31,6 +41,13 @@ if (isset($_POST['inputOrdemCompraId'])) {
 
 if (isset($_POST['inputTipo'])) {
 
+	$sql = "SELECT SituaId
+            FROM Situacao
+			WHERE SituaChave = 'AGUARDANDOLIBERACAO'	
+	";
+	$result = $conn->query($sql);
+	$Situacao = $result->fetch(PDO::FETCH_ASSOC);
+
 	try {
 
 		$iOrdemCompra = $_POST['inputOrdemCompraId'];
@@ -38,7 +55,7 @@ if (isset($_POST['inputTipo'])) {
 		$sql = "UPDATE OrdemCompra SET OrComTipo = :sTipo, OrComNumero = :sNumero, OrComLote = :sLote, OrComNumProcesso = :sProcesso, 
 									   OrComCategoria = :iCategoria, OrComSubCategoria = :iSubCategoria, OrComConteudo = :sConteudo,  
 									   OrComFornecedor = :iFornecedor, OrComUnidade = :iUnidade, OrComLocalEntrega = :iLocalEntrega, 
-									   OrComEnderecoEntrega = :sEnderecoEntrega, OrComDtEntrega = :dDataEntrega, 
+									   OrComEnderecoEntrega = :sEnderecoEntrega, OrComSituacao = :iSituacao, OrComDtEntrega = :dDataEntrega, 
 									   OrComObservacao = :sObservacao,  OrComUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE OrComId = :iOrdemCompra";
 		$result = $conn->prepare($sql);
@@ -61,6 +78,7 @@ if (isset($_POST['inputTipo'])) {
 			':iLocalEntrega' => $_POST['cmbLocalEstoque'] == '' ? null : $_POST['cmbLocalEstoque'],
 			':sEnderecoEntrega' => $_POST['inputEnderecoEntrega'],
 			':dDataEntrega' => gravaData($_POST['inputDataEntrega']),
+			':iSituacao' => $Situacao['SituaId'],
 			':sObservacao' => $_POST['txtareaObservacao'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iOrdemCompra' => $iOrdemCompra
@@ -95,7 +113,7 @@ if (isset($_POST['inputTipo'])) {
 		exit;
 	}
 
-	irpara("ordemcompra.php");
+	// irpara("ordemcompra.php");
 }
 
 ?>
@@ -127,8 +145,7 @@ if (isset($_POST['inputTipo'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		
-		window.onload = function() {
+		window.onload = function () {
 
 			//Ao carregar a página é verificado se é PF ou PJ para aparecer os campos relacionados e esconder o que não estiver
 			var tipo = $('input[name="inputTipo"]:checked').val();
@@ -141,18 +158,20 @@ if (isset($_POST['inputTipo'])) {
 
 			//Ao carregar a página tive que executar o que o onChange() executa para que a combo da SubCategoria já venha filtrada, além de selecionada, é claro.
 
-			$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
+			$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function (dados) {
 
 				var option = '<option value="">Selecione a SubCategoria</option>';
 
 				if (dados.length) {
 
-					$.each(dados, function(i, obj) {
+					$.each(dados, function (i, obj) {
 
 						if (obj.SbCatId == cmbSubCategoria) {
-							option += '<option value="' + obj.SbCatId + '" selected>' + obj.SbCatNome + '</option>';
+							option += '<option value="' + obj.SbCatId + '" selected>' + obj.SbCatNome +
+								'</option>';
 						} else {
-							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
+							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome +
+								'</option>';
 						}
 					});
 
@@ -160,78 +179,81 @@ if (isset($_POST['inputTipo'])) {
 				} else {
 					ResetSubCategoria();
 				}
-			});			
+			});
 
 		}
 
-		$(document).ready(function() {
+		$(document).ready(function () {
 
 			$('#summernote').summernote();
 
 			//Ao informar o fornecedor, trazer os demais dados dele (contato, e-mail, telefone)
-			$('#cmbFornecedor').on('change', function(e){				
-				
+			$('#cmbFornecedor').on('change', function (e) {
+
 				var Fornecedor = $('#cmbFornecedor').val();
 				var Forne = Fornecedor.split('#');
-				
+
 				$('#inputContato').val(Forne[1]);
 				$('#inputEmailFornecedor').val(Forne[2]);
-				if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
+				if (Forne[3] != "" && Forne[3] != "(__) ____-____") {
 					$('#inputTelefoneFornecedor').val(Forne[3]);
 				} else {
 					$('#inputTelefoneFornecedor').val(Forne[4]);
 				}
 
-				$.getJSON('filtraCategoria.php?idFornecedor='+Forne[0], function (dados){
-					
+				$.getJSON('filtraCategoria.php?idFornecedor=' + Forne[0], function (dados) {
+
 					//var option = '<option value="#">Selecione a Categoria</option>';
 					var option = '';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
-						});						
-						
+
+					if (dados.length) {
+
+						$.each(dados, function (i, obj) {
+							option += '<option value="' + obj.CategId + '">' + obj.CategNome +
+								'</option>';
+						});
+
 						$('#cmbCategoria').html(option).show();
 					} else {
 						ResetCategoria();
-					}					
+					}
 				});
-				
-				$.getJSON('filtraSubCategoria.php?idFornecedor='+Forne[0], function (dados){
-					
-					var option = '<option value="">Selecione a SubCategoria</option>';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						});						
-						
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}					
-				});				
-				
-			});
 
-			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
-			$('#cmbCategoria').on('change', function(e) {
-
-				Filtrando();
-
-				var cmbCategoria = $('#cmbCategoria').val();
-
-				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
+				$.getJSON('filtraSubCategoria.php?idFornecedor=' + Forne[0], function (dados) {
 
 					var option = '<option value="">Selecione a SubCategoria</option>';
 
 					if (dados.length) {
 
-						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
+						$.each(dados, function (i, obj) {
+							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome +
+								'</option>';
+						});
+
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						ResetSubCategoria();
+					}
+				});
+
+			});
+
+			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function (e) {
+
+				Filtrando();
+
+				var cmbCategoria = $('#cmbCategoria').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function (dados) {
+
+					var option = '<option value="">Selecione a SubCategoria</option>';
+
+					if (dados.length) {
+
+						$.each(dados, function (i, obj) {
+							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome +
+								'</option>';
 						});
 
 						$('#cmbSubCategoria').html(option).show();
@@ -243,7 +265,7 @@ if (isset($_POST['inputTipo'])) {
 			});
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
-			$('#cmbUnidade').on('change', function(e) {
+			$('#cmbUnidade').on('change', function (e) {
 
 				FiltraLocalEstoque();
 
@@ -253,14 +275,15 @@ if (isset($_POST['inputTipo'])) {
 					ResetLocalEstoque();
 				} else {
 
-					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function(dados) {
+					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados) {
 
 						var option = '';
 
 						if (dados.length) {
 
-							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.LcEstId + '">' + obj.LcEstNome + '</option>';
+							$.each(dados, function (i, obj) {
+								option += '<option value="' + obj.LcEstId + '">' + obj
+									.LcEstNome + '</option>';
 							});
 
 							$('#cmbLocalEstoque').html(option).show();
@@ -271,7 +294,7 @@ if (isset($_POST['inputTipo'])) {
 				}
 			});
 
-			$("#enviar").on('click', function(e) {
+			$("#enviar").on('click', function (e) {
 
 				e.preventDefault();
 
@@ -301,7 +324,9 @@ if (isset($_POST['inputTipo'])) {
 						inputExclui = 1;
 						$('#inputOrdemCompraProdutoExclui').val(inputExclui);
 
-						confirmaExclusao(document.formOrdemCompra, "Tem certeza que deseja alterar a ordem de compra? Existem produtos ou serviços com quantidades ou valores lançados!", "ordemcompraEdita.php");
+						confirmaExclusao(document.formOrdemCompra,
+							"Tem certeza que deseja alterar a ordem de compra? Existem produtos ou serviços com quantidades ou valores lançados!",
+							"ordemcompraEdita.php");
 
 					} else {
 						inputExclui = 0;
@@ -367,14 +392,20 @@ if (isset($_POST['inputTipo'])) {
 
 					<form name="formOrdemCompra" id="formOrdemCompra" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Ordem de Compra/Contrato Nº "<?php echo $_POST['inputOrdemCompraNumero']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Ordem de Compra/Contrato Nº
+								"<?php echo $_POST['inputOrdemCompraNumero']; ?>"</h5>
 						</div>
 
-						<input type="hidden" id="inputOrdemCompraId" name="inputOrdemCompraId" value="<?php echo $row['OrComId']; ?>">
-						<input type="hidden" id="inputOrdemCompraNumero" name="inputOrdemCompraNumero" value="<?php echo $row['OrComNumero']; ?>">
-						<input type="hidden" id="inputOrdemCompraCategoria" name="inputOrdemCompraCategoria" value="<?php echo $row['OrComCategoria']; ?>">
-						<input type="hidden" id="inputOrdemCompraSubCategoria" name="inputOrdemCompraSubCategoria" value="<?php echo $row['OrComSubCategoria']; ?>">
-						<input type="hidden" id="inputOrdemCompraProdutoExclui" name="inputOrdemCompraProdutoExclui" value="0">
+						<input type="hidden" id="inputOrdemCompraId" name="inputOrdemCompraId"
+							value="<?php echo $row['OrComId']; ?>">
+						<input type="hidden" id="inputOrdemCompraNumero" name="inputOrdemCompraNumero"
+							value="<?php echo $row['OrComNumero']; ?>">
+						<input type="hidden" id="inputOrdemCompraCategoria" name="inputOrdemCompraCategoria"
+							value="<?php echo $row['OrComCategoria']; ?>">
+						<input type="hidden" id="inputOrdemCompraSubCategoria" name="inputOrdemCompraSubCategoria"
+							value="<?php echo $row['OrComSubCategoria']; ?>">
+						<input type="hidden" id="inputOrdemCompraProdutoExclui" name="inputOrdemCompraProdutoExclui"
+							value="0">
 
 						<?php
 
@@ -408,13 +439,19 @@ if (isset($_POST['inputTipo'])) {
 											<div class="form-group">
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="C" name="inputTipo" class="form-input-styled" data-fouc onclick="selecionaTipo('C')" <?php if ($row['OrComTipo'] == 'C') echo "checked"; ?>>
+														<input type="radio" id="inputTipo" value="C" name="inputTipo"
+															class="form-input-styled" data-fouc
+															onclick="selecionaTipo('C')"
+															<?php if ($row['OrComTipo'] == 'C') echo "checked"; ?>>
 														Carta Contrato
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="O" name="inputTipo" class="form-input-styled" data-fouc onclick="selecionaTipo('O')" <?php if ($row['OrComTipo'] == 'O') echo "checked"; ?>>
+														<input type="radio" id="inputTipo" value="O" name="inputTipo"
+															class="form-input-styled" data-fouc
+															onclick="selecionaTipo('O')"
+															<?php if ($row['OrComTipo'] == 'O') echo "checked"; ?>>
 														Ordem de Compra
 													</label>
 												</div>
@@ -423,36 +460,50 @@ if (isset($_POST['inputTipo'])) {
 
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputData">Data da Emissão <span class="text-danger">*</span></label>
-												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo mostraData($row['OrComDtEmissao']); ?>" readOnly required>
+												<label for="inputData">Data da Emissão <span
+														class="text-danger">*</span></label>
+												<input type="text" id="inputData" name="inputData" class="form-control"
+													value="<?php echo mostraData($row['OrComDtEmissao']); ?>" readOnly
+													required>
 											</div>
 										</div>
 
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputNumero">Número <span class="text-danger">*</span></label>
-												<input type="text" id="inputNumero" name="inputNumero" class="form-control" value="<?php echo $row['OrComNumero']; ?>" required>
+												<label for="inputNumero">Número <span
+														class="text-danger">*</span></label>
+												<input type="text" id="inputNumero" name="inputNumero"
+													class="form-control" value="<?php echo $row['OrComNumero']; ?>"
+													<?php $movimentacoes >= 1 ? print('readonly') : '' ?> required>
 											</div>
 										</div>
 
-										<div class="col-lg-2" id="Ata" style="display: <?php if ($row['OrComTipo'] == 'O') echo 'none' ?>">
+										<div class="col-lg-2" id="Ata"
+											style="display: <?php if ($row['OrComTipo'] == 'O') echo 'none' ?>">
 											<div class="form-group">
 												<label for="inputNumAta">Nº Ata Registro</label>
-												<input type="text" id="inputNumAta" name="inputNumAta" class="form-control" value="<?php echo $row['OrComNumAta']; ?>">
+												<input type="text" id="inputNumAta" name="inputNumAta"
+													class="form-control" value="<?php echo $row['OrComNumAta']; ?>"
+													<?php $movimentacoes >= 1 ? print('readonly') : '' ?>>
 											</div>
 										</div>
 
-										<div class="col-lg-2" id="Lote" style="display: <?php if ($row['OrComTipo'] == 'C') echo 'none' ?>">
+										<div class="col-lg-2" id="Lote"
+											style="display: <?php if ($row['OrComTipo'] == 'C') echo 'none' ?>">
 											<div class="form-group">
 												<label for="inputLote">Lote</label>
-												<input type="text" id="inputLote" name="inputLote" class="form-control" value="<?php echo $row['OrComLote']; ?>">
+												<input type="text" id="inputLote" name="inputLote" class="form-control"
+													value="<?php echo $row['OrComLote']; ?>"
+													<?php $movimentacoes >= 1 ? print('readonly') : '' ?>>
 											</div>
 										</div>
 
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputProcesso">Processo</label>
-												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="<?php echo $row['OrComNumProcesso']; ?>">
+												<input type="text" id="inputProcesso" name="inputProcesso"
+													class="form-control" value="<?php echo $row['OrComNumProcesso']; ?>"
+													<?php $movimentacoes >= 1 ? print('readonly') : '' ?>>
 											</div>
 										</div>
 									</div>
@@ -464,8 +515,16 @@ if (isset($_POST['inputTipo'])) {
 											<div class="row">
 												<div class="col-lg-4">
 													<div class="form-group">
-														<label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
-														<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
+														<label for="cmbFornecedor">Fornecedor <span
+																class="text-danger">*</span></label>
+														<?php 
+														   if($movimentacoes >= 1){
+															   print('<input type="hidden" name="cmbFornecedor" value="'.$row['OrComFornecedor'].'" />');
+														   }
+														?>
+														<select id="cmbFornecedor" name="cmbFornecedor"
+															class="form-control form-control-select2" required
+															<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
 															<option value="">Selecione</option>
 															<?php
 															$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
@@ -489,21 +548,27 @@ if (isset($_POST['inputTipo'])) {
 												<div class="col-lg-3">
 													<div class="form-group">
 														<label for="inputContato">Contato</label>
-														<input type="text" id="inputContato" name="inputContato" class="form-control" value="<?php echo $row['ForneContato']; ?>" readOnly>
+														<input type="text" id="inputContato" name="inputContato"
+															class="form-control"
+															value="<?php echo $row['ForneContato']; ?>" readOnly>
 													</div>
 												</div>
 
 												<div class="col-lg-3">
 													<div class="form-group">
 														<label for="inputEmailFornecedor">E-mail</label>
-														<input type="text" id="inputEmailFornecedor" name="inputEmailFornecedor" class="form-control" value="<?php echo $row['ForneEmail']; ?>" readOnly>
+														<input type="text" id="inputEmailFornecedor"
+															name="inputEmailFornecedor" class="form-control"
+															value="<?php echo $row['ForneEmail']; ?>" readOnly>
 													</div>
 												</div>
 
 												<div class="col-lg-2">
 													<div class="form-group">
 														<label for="inputTelefoneFornecedor">Telefone</label>
-														<input type="text" id="inputTelefoneFornecedor" name="inputTelefoneFornecedor" class="form-control" value="<?php echo $row['ForneTelefone']; ?>" readOnly>
+														<input type="text" id="inputTelefoneFornecedor"
+															name="inputTelefoneFornecedor" class="form-control"
+															value="<?php echo $row['ForneTelefone']; ?>" readOnly>
 													</div>
 												</div>
 											</div>
@@ -515,8 +580,16 @@ if (isset($_POST['inputTipo'])) {
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+												<?php 
+												    if($movimentacoes >= 1){
+												       print('<input type="hidden" name="cmbCategoria" value="'.$row['OrComCategoria'].'" />');
+												    }
+												?>
+												<label for="cmbCategoria">Categoria <span
+														class="text-danger">*</span></label>
+												<select id="cmbCategoria" name="cmbCategoria"
+													class="form-control form-control-select2" required
+													<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
 													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT CategId, CategNome
@@ -539,8 +612,15 @@ if (isset($_POST['inputTipo'])) {
 
 										<div class="col-lg-6">
 											<div class="form-group">
+											    <?php 
+												    if($movimentacoes >= 1){
+												       print('<input type="hidden" name="cmbSubCategoria" value="'.$row['OrComSubCategoria'].'" />');
+												    }
+												?>
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+												<select id="cmbSubCategoria" name="cmbSubCategoria"
+													class="form-control form-control-select2"
+													<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
 													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT SbCatId, SbCatNome
@@ -569,7 +649,10 @@ if (isset($_POST['inputTipo'])) {
 								<div class="col-lg-12">
 									<div class="form-group">
 										<label for="txtareaConteudo">Conteúdo personalizado</label>
-										<textarea rows="5" cols="5" class="form-control" id="summernote" name="txtareaConteudo" placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"><?php echo $row['OrComConteudo']; ?></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="summernote"
+											name="txtareaConteudo"
+											placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"
+											<?php $movimentacoes >= 1 ? print('readOnly') : '' ?>><?php echo $row['OrComConteudo']; ?></textarea>
 									</div>
 								</div>
 							</div>
@@ -582,22 +665,29 @@ if (isset($_POST['inputTipo'])) {
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNomeSolicitante">Solicitante <span class="text-danger">*</span></label>
-												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $row['UsuarNome']; ?>" readOnly required>
+												<label for="inputNomeSolicitante">Solicitante <span
+														class="text-danger">*</span></label>
+												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante"
+													class="form-control" value="<?php echo $row['UsuarNome']; ?>"
+													readOnly required>
 											</div>
 										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputEmailSolicitante">E-mail</label>
-												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $row['UsuarEmail']; ?>" readOnly>
+												<input type="text" id="inputEmailSolicitante"
+													name="inputEmailSolicitante" class="form-control"
+													value="<?php echo $row['UsuarEmail']; ?>" readOnly>
 											</div>
 										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputTelefoneSolicitante">Telefone</label>
-												<input type="text" id="inputTelefoneSolicitante" name="inputTelefoneSolicitante" class="form-control" value="<?php echo $row['UsuarTelefone']; ?>" readOnly>
+												<input type="text" id="inputTelefoneSolicitante"
+													name="inputTelefoneSolicitante" class="form-control"
+													value="<?php echo $row['UsuarTelefone']; ?>" readOnly>
 											</div>
 										</div>
 									</div>
@@ -612,7 +702,14 @@ if (isset($_POST['inputTipo'])) {
 									<div class="row">
 										<div class="col-lg-6">
 											<label for="cmbUnidade">Unidade <span class="text-danger">*</span></label>
-											<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
+											<?php 
+											    if($movimentacoes >= 1){
+											       print('<input type="hidden" name="cmbUnidade" value="'.$row['OrComUnidade'].'" />');
+											    }
+											?>
+											<select id="cmbUnidade" name="cmbUnidade"
+												class="form-control form-control-select2"
+												<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
 												<option value="">Selecione</option>
 												<?php
 												$sql = "SELECT UnidaId, UnidaNome
@@ -632,8 +729,15 @@ if (isset($_POST['inputTipo'])) {
 										</div>
 										<div class="col-lg-6">
 											<div class="form-group">
+											    <?php 
+												    if($movimentacoes >= 1){
+												       print('<input type="hidden" name="cmbLocalEstoque" value="'.$row['OrComLocalEntrega'].'" />');
+												    }
+												?>
 												<label for="cmbLocalEstoque">Local / Almoxarifado</label>
-												<select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2">
+												<select id="cmbLocalEstoque" name="cmbLocalEstoque"
+													class="form-control form-control-select2"
+													<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
 													<option value="">Selecione</option>
 													<?php
 													if (isset($row['OrComUnidade'])) {
@@ -661,14 +765,20 @@ if (isset($_POST['inputTipo'])) {
 										<div class="col-lg-10">
 											<div class="form-group">
 												<label for="inputEnderecoEntrega">Endereço da Entrega</label>
-												<input type="text" id="inputEnderecoEntrega" name="inputEnderecoEntrega" class="form-control" value="<?php echo $row['OrComEnderecoEntrega']; ?>">
+												<input type="text" id="inputEnderecoEntrega" name="inputEnderecoEntrega"
+													class="form-control"
+													value="<?php echo $row['OrComEnderecoEntrega']; ?>"
+													<?php $movimentacoes >= 1 ? print('readOnly') : '' ?>>
 											</div>
 										</div>
 
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputDataEntrega">Previsão de Entrega</label>
-												<input type="text" id="inputDataEntrega" name="inputDataEntrega" class="form-control" value="<?php echo mostraData($row['OrComDtEntrega']); ?>">
+												<input type="text" id="inputDataEntrega" name="inputDataEntrega"
+													class="form-control"
+													value="<?php echo mostraData($row['OrComDtEntrega']); ?>"
+													<?php $movimentacoes >= 1 ? print('readOnly') : '' ?>>
 											</div>
 										</div>
 									</div>
@@ -677,7 +787,9 @@ if (isset($_POST['inputTipo'])) {
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtareaObservacao">Observação</label>
-												<textarea rows="3" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao"><?php echo $row['OrComObservacao']; ?></textarea>
+												<textarea rows="3" cols="5" class="form-control" id="txtareaObservacao"
+													name="txtareaObservacao"
+													<?php $movimentacoes >= 1 ? print('readOnly') : '' ?>><?php echo $row['OrComObservacao']; ?></textarea>
 											</div>
 										</div>
 									</div>

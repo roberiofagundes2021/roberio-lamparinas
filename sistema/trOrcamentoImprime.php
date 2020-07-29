@@ -63,7 +63,16 @@ try {
     		JOIN Servico on ServiId = TXOXSServico
     		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . "";
     $result = $conn->query($sql);
-    $rowServicoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
+	$rowServicoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
+	
+	////////////////////////////////////////////////////////
+	$sql = "SELECT COUNT(TXOXSServico) as CONT
+    		FROM TRXOrcamentoXServico
+    		JOIN ServicoOrcamento on SrOrcId = TXOXSServico
+    		WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " ";
+    $result = $conn->query($sql);
+    $rowServicoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
+	////////////////////////////////////////////////////////
 
 
     $totalProdutos = 0;
@@ -230,7 +239,29 @@ try {
                 $html .= "</table>";
             }
         }
-    }
+    } else {
+		///////////////////////////////////////////////////////////////////////////
+		if ($row['TrXOrTabelaProduto'] == 'ProdutoOrcamento') {
+			$sql = "SELECT PrOrcId as Id, PrOrcNome as Nome, PrOrcCategoria as Categoria, PrOrcSubCategoria as SubCategoria,
+					PrOrcDetalhamento as Detalhamento, UnMedSigla, TXOXPQuantidade, TXOXPValorUnitario
+					FROM ProdutoOrcamento
+					JOIN TRXOrcamentoXProduto on TXOXPProduto = PrOrcId
+					JOIN TRXOrcamento on TrXOrId = TXOXPOrcamento
+					JOIN TRXOrcamentoXSubcategoria on TXOXSCOrcamento = TXOXPOrcamento
+					JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+					WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
+		} else {
+			$sql = "SELECT DISTINCT ProduId as Id, ProduNome as Nome, ProduCategoria as Categoria, ProduSubCategoria as SubCategoria, 
+					ProduDetalhamento as Detalhamento, UnMedSigla, TXOXPQuantidade, TXOXPValorUnitario
+					FROM Produto
+					JOIN TRXOrcamentoXProduto on TXOXPProduto = ProduId
+					JOIN TRXOrcamento on TrXOrId = TXOXPOrcamento
+					JOIN TRXOrcamentoXSubcategoria on TXOXSCOrcamento = TXOXPOrcamento
+					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
+		}
+		///////////////////////////////////////////////////////////////////////////
+	}
 
     if ($rowServicoUtilizado1['CONT'] > 0 || $rowServicoUtilizado2['CONT'] > 0){
 
