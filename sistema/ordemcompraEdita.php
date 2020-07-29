@@ -424,7 +424,7 @@ if (isset($_POST['inputTipo'])) {
 
 						$sql = "SELECT OCXPrOrdemCompra
 								FROM OrdemCompraXProduto
-								WHERE OCXPrOrdemCompra = " . $iOrdemCompra . " and OCXPrEmpresa = " . $_SESSION['EmpreId'];
+								WHERE OCXPrOrdemCompra = " . $iOrdemCompra . " and OCXPrUnidade = " . $_SESSION['UnidadeId'];
 						$result = $conn->query($sql);
 						$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 						$countProduto = count($rowProduto);
