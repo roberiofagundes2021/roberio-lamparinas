@@ -125,7 +125,7 @@ if (isset($_POST['inputTipo'])) {
 		exit;
 	}
 
-	// irpara("ordemcompra.php");
+	irpara("ordemcompra.php");
 }
 
 ?>
@@ -197,7 +197,12 @@ if (isset($_POST['inputTipo'])) {
 
 		$(document).ready(function () {
 
-			$('#summernote').summernote();
+			if($('#disabledForm').hasClass('disabledForm')){
+				$('#summernote').summernote('disable');
+				console.log('teste')
+			} else {
+				$('#summernote').summernote();
+			}
 
 			//Ao informar o fornecedor, trazer os demais dados dele (contato, e-mail, telefone)
 			$('#cmbFornecedor').on('change', function (e) {
@@ -408,6 +413,7 @@ if (isset($_POST['inputTipo'])) {
 				<div class="card">
 
 					<form name="formOrdemCompra" id="formOrdemCompra" method="post" class="form-validate-jquery">
+					    <input id="disabledForm" type="hidden" class="<?php $movimentacoes >= 1 ? print('disabledForm') : print('') ?>">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Ordem de Compra/Contrato Nº
 								"<?php echo $_POST['inputOrdemCompraNumero']; ?>"</h5>
@@ -455,7 +461,8 @@ if (isset($_POST['inputTipo'])) {
 														<input type="radio" id="inputTipo" value="C" name="inputTipo"
 															class="form-input-styled" data-fouc
 															onclick="selecionaTipo('C')"
-															<?php if ($row['OrComTipo'] == 'C') echo "checked"; ?>>
+															<?php if ($row['OrComTipo'] == 'C') echo "checked"; ?>
+															<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
 														Carta Contrato
 													</label>
 												</div>
@@ -464,7 +471,8 @@ if (isset($_POST['inputTipo'])) {
 														<input type="radio" id="inputTipo" value="O" name="inputTipo"
 															class="form-input-styled" data-fouc
 															onclick="selecionaTipo('O')"
-															<?php if ($row['OrComTipo'] == 'O') echo "checked"; ?>>
+															<?php if ($row['OrComTipo'] == 'O') echo "checked"; ?>
+															<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
 														Ordem de Compra
 													</label>
 												</div>
@@ -665,7 +673,7 @@ if (isset($_POST['inputTipo'])) {
 										<textarea rows="5" cols="5" class="form-control" id="summernote"
 											name="txtareaConteudo"
 											placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"
-											<?php $movimentacoes >= 1 ? print('readOnly') : '' ?>><?php echo $row['OrComConteudo']; ?></textarea>
+											><?php echo $row['OrComConteudo']; ?></textarea>
 									</div>
 								</div>
 							</div>
