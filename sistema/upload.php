@@ -9,7 +9,7 @@
     $pasta = "global_assets/images/produtos/";
      
     // formatos de imagem permitidos
-    $permitidos = array(".jpg", ".jpeg", ".gif", ".png", ".bmp", ".webp");   
+    $permitidos = array(".jpg", ".jpeg", ".gif", ".png", ".bmp");   
          
     if(isset($_FILES)){
 		
@@ -63,7 +63,7 @@
                 echo "A imagem deve ser de no máximo 1MB";
             }
         }else{
-            echo "Somente são aceitos arquivos do tipo Imagem";
+            echo "Formatos aceitos: .jpg, .jpeg, .gif, .png, .bmp";
         }
     }else{
         echo "Selecione uma imagem";
