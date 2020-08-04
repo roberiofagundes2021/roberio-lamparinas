@@ -159,6 +159,7 @@
 								<li class="nav-item"><a href="centroCusto.php" class="nav-link">Centro de Custo</a></li>								
 								<li class="nav-item"><a href="planoContas.php" class="nav-link">Plano de Contas</a></li>
 								<li class="nav-item"><a href="formaPagamento.php" class="nav-link">Forma de Pagamento</a></li>
+								<li class="nav-item"><a href="contaBanco.php" class="nav-link">Conta/Banco</a></li>
 							</ul>
 						</li>
 						<!-- /Controle de Estoque -->
