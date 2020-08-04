@@ -61,6 +61,7 @@ if(isset($_POST['inputNome'])){
 
     <!-- Theme JS files -->
     <script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+    <script src="global_assets/js/demo_pages/form_select2.js"></script>
 
     <!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
     <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
@@ -98,21 +99,22 @@ if(isset($_POST['inputNome'])){
                         <div class="card-header header-elements-inline">
                             <h5 class="text-uppercase font-weight-bold">Cadastrar Nova Conta/Banco</h5>
                         </div>
-                        <div class="orw">
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    <label for="inputNome">Nome<span class="text-danger"> *</span></label>
-                                    <input type="text" id="inputNome" name="inputNome" class="form-control"
-                                        placeholder="Conta/Banco" required autofocus>
-                                </div>
-                            </div>
-                        </div>
                         <div class="card-body">
+                            
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="inputNome">Nome<span class="text-danger"> *</span></label>
+                                        <input type="text" id="inputNome" name="inputNome" class="form-control"
+                                            placeholder="Conta/Banco" required autofocus>
+                                    </div>
+                                </div>
+                            </div>                            
                             <div class="row">
                                 <div class="col-lg-4">
                                     <label for="cmbBanco">Banco<span class="text-danger"> *</span></label>
                                     <select id="cmbBanco" name="cmbBanco"
-                                        class="form-control form-control-select2" required>
+                                        class="form-control select-search" required>
                                         <option value="">Selecione</option>
                                         <?php 
 											$sql = "SELECT BancoId, BancoNome

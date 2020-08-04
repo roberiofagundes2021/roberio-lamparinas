@@ -65,45 +65,13 @@ if(isset($_POST['inputNome'])){
 
     <!-- Theme JS files -->
     <script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+    <script src="global_assets/js/demo_pages/form_select2.js"></script>
 
     <!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
     <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
     <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
     <script src="global_assets/js/demo_pages/form_validation.js"></script>
     <!-- /theme JS files -->
-
-    <script type="text/javascript">
-        // $(document).ready(function() {
-
-        // 	//Valida Registro Duplicado
-        // 	$('#enviar').on('click', function(e){
-
-        // 		e.preventDefault();
-
-        // 		var inputNome    = $('#inputNome').val();
-        // 		var cmbCategoria = $('#cmbCategoria').val();
-
-        // 		//remove os espaços desnecessários antes e depois
-        // 		inputNomeNovo = inputNome.trim();
-
-        // 		//Esse ajax está sendo usado para verificar no banco se o registro já existe
-        // 		$.ajax({
-        // 			type: "POST",
-        // 			url: "subcategoriaValida.php",
-        // 			data: {nome : inputNome, categoria: cmbCategoria},
-        // 			success: function(resposta){
-
-        // 				if(resposta == 1){
-        // 					alerta('Atenção','Uma subcategoria com esse nome já está ligada a categoria selecionada.','error');
-        // 					return false;
-        // 				}
-
-        // 				$( "#formSubCategoria" ).submit();
-        // 			}
-        // 		})
-        // 	})
-        // })
-    </script>
 
 </head>
 
@@ -132,21 +100,22 @@ if(isset($_POST['inputNome'])){
                         <div class="card-header header-elements-inline">
                             <h5 class="text-uppercase font-weight-bold">Cadastrar Nova Conta/Banco</h5>
                         </div>
-                        <div class="orw">
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    <label for="inputNome">Nome<span class="text-danger"> *</span></label>
-                                    <input type="text" id="inputNome" name="inputNome" value="<?php echo $row['CnBanNome']?>" class="form-control"
-                                        placeholder="Conta/Banco" required autofocus>
+                        <div class="card-body">
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="inputNome">Nome<span class="text-danger"> *</span></label>
+                                        <input type="text" id="inputNome" name="inputNome" value="<?php echo $row['CnBanNome']?>" class="form-control"
+                                            placeholder="Conta/Banco" required autofocus>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-body">
+
                             <div class="row">
                                 <div class="col-lg-4">
                                     <label for="cmbBanco">Banco<span class="text-danger"> *</span></label>
-                                    <select id="cmbBanco" name="cmbBanco" class="form-control form-control-select2"
-                                        required>
+                                    <select id="cmbBanco" name="cmbBanco" class="form-control select-search" required>
                                         <option value="">Selecione</option>
                                         <?php 
 											$sql = "SELECT BancoId, BancoNome
