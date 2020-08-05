@@ -162,6 +162,9 @@
 								<li class="nav-item"><a href="contaBanco.php" class="nav-link">Conta/Banco</a></li>
 							</ul>
 						</li>
+						<li class="nav-item">
+							<a href="contasAPagar.php" class="nav-link"><i class="icon-cash"></i> <span>Contas à Pagar</span></a>
+						</li>
 						<!-- /Controle de Estoque -->
 					</ul>
 				</div>
