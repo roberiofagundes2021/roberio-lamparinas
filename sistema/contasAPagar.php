@@ -19,8 +19,8 @@ $d = date("d");
 $m = date("m");
 $Y = date("Y");
 
-$dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
-$dataFim = date("Y-m-d");
+$dataInicio = date("Y-m-01"); //30 dias atrás
+$dataFim = date("Y-m-t");
 
 ?>
 
@@ -127,354 +127,354 @@ $dataFim = date("Y-m-d");
                 }
             });
 
-        //     // Select2 for length menu styling
-        //     var _componentSelect2 = function () {
-        //         if (!$().select2) {
-        //             console.warn('Warning - select2.min.js is not loaded.');
-        //             return;
-        //         }
+            //     // Select2 for length menu styling
+            //     var _componentSelect2 = function () {
+            //         if (!$().select2) {
+            //             console.warn('Warning - select2.min.js is not loaded.');
+            //             return;
+            //         }
 
-        //         // Initialize
-        //         $('.dataTables_length select').select2({
-        //             minimumResultsForSearch: Infinity,
-        //             dropdownAutoWidth: true,
-        //             width: 'auto'
-        //         });
-        //     };
+            //         // Initialize
+            //         $('.dataTables_length select').select2({
+            //             minimumResultsForSearch: Infinity,
+            //             dropdownAutoWidth: true,
+            //             width: 'auto'
+            //         });
+            //     };
 
-        //     _componentSelect2();
-        //     /* Fim: Tabela Personalizada */
+            //     _componentSelect2();
+            //     /* Fim: Tabela Personalizada */
 
-        //     //Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
-        //     $('#cmbFornecedor').on('change', function (e) {
+            //     //Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
+            //     $('#cmbFornecedor').on('change', function (e) {
 
-        //         var cmbTipo = $('#cmbTipo').val();
-        //         var inputFornecedor = $('#inputFornecedor').val();
-        //         var cmbFornecedor = $('#cmbFornecedor').val();
+            //         var cmbTipo = $('#cmbTipo').val();
+            //         var inputFornecedor = $('#inputFornecedor').val();
+            //         var cmbFornecedor = $('#cmbFornecedor').val();
 
-        //         $('#inputFornecedor').val(cmbFornecedor);
+            //         $('#inputFornecedor').val(cmbFornecedor);
 
-        //         FiltraCategoria();
-        //         Filtrando();
-        //         FiltraServico();
+            //         FiltraCategoria();
+            //         Filtrando();
+            //         FiltraServico();
 
-        //         $.getJSON('filtraCategoria.php?idFornecedor=' + cmbFornecedor, function (dados) {
+            //         $.getJSON('filtraCategoria.php?idFornecedor=' + cmbFornecedor, function (dados) {
 
-        //             var option = '<option value="">Selecione a Categoria</option>';
+            //             var option = '<option value="">Selecione a Categoria</option>';
 
-        //             if (dados.length) {
+            //             if (dados.length) {
 
-        //                 $.each(dados, function (i, obj) {
-        //                     option += '<option value="' + obj.CategId + '">' + obj
-        //                         .CategNome + '</option>';
-        //                 });
+            //                 $.each(dados, function (i, obj) {
+            //                     option += '<option value="' + obj.CategId + '">' + obj
+            //                         .CategNome + '</option>';
+            //                 });
 
-        //                 $('#cmbCategoria').html(option).show();
-        //             } else {
-        //                 ResetCategoria();
-        //             }
-        //         });
+            //                 $('#cmbCategoria').html(option).show();
+            //             } else {
+            //                 ResetCategoria();
+            //             }
+            //         });
 
-        //         $.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor, function (dados) {
+            //         $.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor, function (dados) {
 
-        //             var option = '<option value="">Selecione a SubCategoria</option>';
+            //             var option = '<option value="">Selecione a SubCategoria</option>';
 
-        //             if (dados.length) {
+            //             if (dados.length) {
 
-        //                 $.each(dados, function (i, obj) {
-        //                     option += '<option value="' + obj.SbCatId + '">' + obj
-        //                         .SbCatNome + '</option>';
-        //                 });
+            //                 $.each(dados, function (i, obj) {
+            //                     option += '<option value="' + obj.SbCatId + '">' + obj
+            //                         .SbCatNome + '</option>';
+            //                 });
 
-        //                 $('#cmbSubCategoria').html(option).show();
-        //             } else {
-        //                 ResetSubCategoria();
-        //             }
-        //         });
+            //                 $('#cmbSubCategoria').html(option).show();
+            //             } else {
+            //                 ResetSubCategoria();
+            //             }
+            //         });
 
-        //         $.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor, function (dados) {
+            //         $.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor, function (dados) {
 
-        //             var option = '<option value="" "selected">Selecione o Produto</option>';
+            //             var option = '<option value="" "selected">Selecione o Produto</option>';
 
-        //             if (dados.length) {
+            //             if (dados.length) {
 
-        //                 $.each(dados, function (i, obj) {
-        //                     option += '<option value="' + obj.ProduId + '">' + obj
-        //                         .ProduNome + '</option>';
-        //                 });
+            //                 $.each(dados, function (i, obj) {
+            //                     option += '<option value="' + obj.ProduId + '">' + obj
+            //                         .ProduNome + '</option>';
+            //                 });
 
-        //                 $('#cmbProduto').html(option).show();
-        //             } else {
-        //                 ResetProduto();
-        //             }
-        //         });
+            //                 $('#cmbProduto').html(option).show();
+            //             } else {
+            //                 ResetProduto();
+            //             }
+            //         });
 
-        //         $.getJSON('filtraServico.php?idFornecedor=' + cmbFornecedor, function (dados) {
+            //         $.getJSON('filtraServico.php?idFornecedor=' + cmbFornecedor, function (dados) {
 
-        //             var option = '<option value="" "selected">Selecione o Serviço</option>';
+            //             var option = '<option value="" "selected">Selecione o Serviço</option>';
 
-        //             if (dados.length) {
+            //             if (dados.length) {
 
-        //                 $.each(dados, function (i, obj) {
-        //                     option += '<option value="' + obj.ServiId + '">' + obj
-        //                         .ServiNome + '</option>';
-        //                 });
+            //                 $.each(dados, function (i, obj) {
+            //                     option += '<option value="' + obj.ServiId + '">' + obj
+            //                         .ServiNome + '</option>';
+            //                 });
 
-        //                 $('#cmbServico').html(option).show();
-        //             } else {
-        //                 ResetServico();
-        //             }
-        //         });
+            //                 $('#cmbServico').html(option).show();
+            //             } else {
+            //                 ResetServico();
+            //             }
+            //         });
 
-        //     });
+            //     });
 
-        //     //Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
-        //     $('#cmbCategoria').on('change', function (e) {
+            //     //Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
+            //     $('#cmbCategoria').on('change', function (e) {
 
-        //         Filtrando();
+            //         Filtrando();
 
-        //         var cmbCategoria = $('#cmbCategoria').val();
+            //         var cmbCategoria = $('#cmbCategoria').val();
 
-        //         $.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function (dados) {
+            //         $.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function (dados) {
 
-        //             var option = '<option value="">Selecione a SubCategoria</option>';
+            //             var option = '<option value="">Selecione a SubCategoria</option>';
 
-        //             if (dados.length) {
+            //             if (dados.length) {
 
-        //                 $.each(dados, function (i, obj) {
-        //                     option += '<option value="' + obj.SbCatId + '">' + obj
-        //                         .SbCatNome + '</option>';
-        //                 });
+            //                 $.each(dados, function (i, obj) {
+            //                     option += '<option value="' + obj.SbCatId + '">' + obj
+            //                         .SbCatNome + '</option>';
+            //                 });
 
-        //                 $('#cmbSubCategoria').html(option).show();
-        //             } else {
-        //                 ResetSubCategoria();
-        //             }
-        //         });
+            //                 $('#cmbSubCategoria').html(option).show();
+            //             } else {
+            //                 ResetSubCategoria();
+            //             }
+            //         });
 
-        //         $.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria, function (dados) {
+            //         $.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria, function (dados) {
 
-        //             var option = '<option value="" "selected">Selecione o Produto</option>';
+            //             var option = '<option value="" "selected">Selecione o Produto</option>';
 
-        //             if (dados.length) {
+            //             if (dados.length) {
 
-        //                 $.each(dados, function (i, obj) {
-        //                     option += '<option value="' + obj.ProduId + '">' + obj
-        //                         .ProduNome + '</option>';
-        //                 });
+            //                 $.each(dados, function (i, obj) {
+            //                     option += '<option value="' + obj.ProduId + '">' + obj
+            //                         .ProduNome + '</option>';
+            //                 });
 
-        //                 $('#cmbProduto').html(option).show();
-        //             } else {
-        //                 ResetProduto();
-        //             }
-        //         });
+            //                 $('#cmbProduto').html(option).show();
+            //             } else {
+            //                 ResetProduto();
+            //             }
+            //         });
 
-        //     });
+            //     });
 
-        //     //Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
-        //     $('#cmbSubCategoria').on('change', function (e) {
+            //     //Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
+            //     $('#cmbSubCategoria').on('change', function (e) {
 
-        //         FiltraProduto();
+            //         FiltraProduto();
 
-        //         var cmbTipo = $('#cmbTipo').val();
-        //         var cmbFornecedor = $('#cmbFornecedor').val();
-        //         var cmbCategoria = $('#cmbCategoria').val();
-        //         var cmbSubCategoria = $('#cmbSubCategoria').val();
+            //         var cmbTipo = $('#cmbTipo').val();
+            //         var cmbFornecedor = $('#cmbFornecedor').val();
+            //         var cmbCategoria = $('#cmbCategoria').val();
+            //         var cmbSubCategoria = $('#cmbSubCategoria').val();
 
-        //         if (cmbTipo == 'S' || cmbTipo == 'T') {
-        //             cmbFornecedor = '#';
-        //         }
+            //         if (cmbTipo == 'S' || cmbTipo == 'T') {
+            //             cmbFornecedor = '#';
+            //         }
 
-        //         if (cmbFornecedor != '#' && cmbFornecedor != '') {
-        //             $.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' +
-        //                 cmbCategoria + '&idSubCategoria=' + cmbSubCategoria,
-        //                 function (dados) {
+            //         if (cmbFornecedor != '#' && cmbFornecedor != '') {
+            //             $.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' +
+            //                 cmbCategoria + '&idSubCategoria=' + cmbSubCategoria,
+            //                 function (dados) {
 
-        //                     var option =
-        //                         '<option value="#" "selected">Selecione o Produto</option>';
+            //                     var option =
+            //                         '<option value="#" "selected">Selecione o Produto</option>';
 
-        //                     if (dados.length) {
+            //                     if (dados.length) {
 
-        //                         $.each(dados, function (i, obj) {
-        //                             option += '<option value="' + obj.ProduId + '">' + obj
-        //                                 .ProduNome + '</option>';
-        //                         });
+            //                         $.each(dados, function (i, obj) {
+            //                             option += '<option value="' + obj.ProduId + '">' + obj
+            //                                 .ProduNome + '</option>';
+            //                         });
 
-        //                         $('#cmbProduto').html(option).show();
-        //                     } else {
-        //                         ResetProduto();
-        //                     }
-        //                 });
-        //         } else if (cmbCategoria != '#' && cmbCategoria != '') {
-        //             $.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria + '&idSubCategoria=' +
-        //                 cmbSubCategoria,
-        //                 function (dados) {
+            //                         $('#cmbProduto').html(option).show();
+            //                     } else {
+            //                         ResetProduto();
+            //                     }
+            //                 });
+            //         } else if (cmbCategoria != '#' && cmbCategoria != '') {
+            //             $.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria + '&idSubCategoria=' +
+            //                 cmbSubCategoria,
+            //                 function (dados) {
 
-        //                     var option =
-        //                         '<option value="#" "selected">Selecione o Produto</option>';
+            //                     var option =
+            //                         '<option value="#" "selected">Selecione o Produto</option>';
 
-        //                     if (dados.length) {
+            //                     if (dados.length) {
 
-        //                         $.each(dados, function (i, obj) {
-        //                             option += '<option value="' + obj.ProduId + '">' + obj
-        //                                 .ProduNome + '</option>';
-        //                         });
+            //                         $.each(dados, function (i, obj) {
+            //                             option += '<option value="' + obj.ProduId + '">' + obj
+            //                                 .ProduNome + '</option>';
+            //                         });
 
-        //                         $('#cmbProduto').html(option).show();
-        //                     } else {
-        //                         ResetProduto();
-        //                     }
-        //                 });
-        //         } else {
-        //             $.getJSON('filtraProduto.php?idSubCategoria=' + cmbSubCategoria, function (dados) {
+            //                         $('#cmbProduto').html(option).show();
+            //                     } else {
+            //                         ResetProduto();
+            //                     }
+            //                 });
+            //         } else {
+            //             $.getJSON('filtraProduto.php?idSubCategoria=' + cmbSubCategoria, function (dados) {
 
-        //                 var option =
-        //                     '<option value="#" "selected">Selecione o Produto</option>';
-
-        //                 if (dados.length) {
-
-        //                     $.each(dados, function (i, obj) {
-        //                         option += '<option value="' + obj.ProduId + '">' + obj
-        //                             .ProduNome + '</option>';
-        //                     });
-
-        //                     $('#cmbProduto').html(option).show();
-        //                 } else {
-        //                     ResetProduto();
-        //                 }
-        //             });
-        //         }
-
-
-        //     });
-
-        //     //Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
-        //     function Filtrando() {
-        //         $('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-
-        //     }
-
-        //     //Mostra o "Filtrando..." na combo Produto
-        //     function FiltraCategoria() {
-        //         $('#cmbCategoria').empty().append('<option>Filtrando...</option>');
-        //     }
-
-        //     //Mostra o "Filtrando..." na combo Produto
-        //     function FiltraProduto() {
-        //         $('#cmbProduto').empty().append('<option>Filtrando...</option>');
-        //     }
-
-        //     function FiltraServico() {
-        //         $('#cmbServico').empty().append('<option>Filtrando...</option>');
-        //     }
-
-        //     function ResetCategoria() {
-        //         $('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
-        //     }
-
-        //     function ResetSubCategoria() {
-        //         $('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
-        //     }
-
-        //     function ResetProduto() {
-        //         $('#cmbProduto').empty().append('<option>Sem produto</option>');
-        //     }
-
-        //     function ResetServico() {
-        //         $('#cmbServico').empty().append('<option>Sem serviço</option>');
-        //     }
-
-        //     let resultadosConsulta = '';
-        //     let inputsValues = {};
-
-        //     function Filtrar() {
-        //         let cont = false;
-
-        //         $('#submitFiltro').on('click', (e) => {
-        //             e.preventDefault()
-
-        //             const msg = $(
-        //                 '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-        //             )
-
-        //             if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() ==
-        //                 'Filtrando...') $('#cmbProduto').val("")
-
-        //             let dataDe = $('#inputDataDe').val()
-        //             let dataAte = $('#inputDataAte').val()
-        //             let tipo = $('#cmbTipo').val()
-        //             let fornecedor = $('#cmbFornecedor').val()
-        //             let categoria = $('#cmbCategoria').val()
-        //             let subCategoria = $('#cmbSubCategoria').val()
-        //             let inputProduto = $('#cmbProduto').val()
-        //             let inputServico = $('#cmbServico').val()
-        //             let codigo = $('#cmbCodigo').val()
-        //             let tipoDeFiltro = $('input[name="inputTipo"]:checked').val();
-        //             let url = "";
-        //             tipoDeFiltro == 'P' ? url = "relatorioMovimentacaoFiltraProduto.php" : url =
-        //                 "relatorioMovimentacaoFiltraServico.php";
-
-        //             inputsValues = {
-        //                 inputDataDe: dataDe,
-        //                 inputDataAte: dataAte,
-        //                 cmbTipo: tipo,
-        //                 cmbFornecedor: fornecedor,
-        //                 cmbCategoria: categoria,
-        //                 cmbSubCategoria: subCategoria,
-        //                 cmbProduto: inputProduto,
-        //                 cmbServico: inputServico,
-        //                 cmbCodigo: codigo,
-        //             };
-
-        //             $.post(
-        //                 url,
-        //                 inputsValues,
-        //                 (data) => {
-
-        //                     if (data) {
-        //                         $('tbody').html(data)
-        //                         $('#imprimir').removeAttr('disabled')
-        //                         resultadosConsulta = data
-        //                     } else {
-        //                         $('tbody').html(msg)
-        //                         $('#imprimir').attr('disabled', '')
-        //                     }
-        //                 }
-        //             );
-        //         })
-        //     }
-        //     Filtrar()
-
-
-        //     function imprime() {
-        //         url = 'relatorioMovimentacaoImprime.php';
-
-        //         $('#imprimir').on('click', (e) => {
-        //             e.preventDefault()
-        //             console.log('teste')
-        //             if (resultadosConsulta) {
-        //                 let tipo = $('input[name="inputTipo"]:checked').val()
-
-        //                 $('#TipoProdutoServico').val(tipo)
-        //                 $('#inputResultado').val(resultadosConsulta)
-        //                 $('#inputDataDe_imp').val(inputsValues.inputDataDe)
-        //                 $('#inputDataAte_imp').val(inputsValues.inputDataAte)
-        //                 $('#cmbTipo_imp').val(inputsValues.cmbTipo)
-        //                 $('#cmbFornecedor_imp').val(inputsValues.cmbFornecedor)
-        //                 $('#cmbCategoria_imp').val(inputsValues.cmbCategoria)
-        //                 $('#cmbSubCategoria_imp').val(inputsValues.cmbSubCategoria)
-        //                 $('#cmbProduto_imp').val(inputsValues.cmbProduto)
-        //                 $('#cmbServico_imp').val(inputsValues.cmbServico)
-        //                 $('#cmbCodigo_imp').val(inputsValues.cmbCodigo)
-
-        //                 $('#formImprime').attr('action', url)
-
-        //                 $('#formImprime').submit()
-        //             }
-        //         })
-
-        //     }
-        //     imprime()
+            //                 var option =
+            //                     '<option value="#" "selected">Selecione o Produto</option>';
+
+            //                 if (dados.length) {
+
+            //                     $.each(dados, function (i, obj) {
+            //                         option += '<option value="' + obj.ProduId + '">' + obj
+            //                             .ProduNome + '</option>';
+            //                     });
+
+            //                     $('#cmbProduto').html(option).show();
+            //                 } else {
+            //                     ResetProduto();
+            //                 }
+            //             });
+            //         }
+
+
+            //     });
+
+            //     //Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
+            //     function Filtrando() {
+            //         $('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+
+            //     }
+
+            //     //Mostra o "Filtrando..." na combo Produto
+            //     function FiltraCategoria() {
+            //         $('#cmbCategoria').empty().append('<option>Filtrando...</option>');
+            //     }
+
+            //     //Mostra o "Filtrando..." na combo Produto
+            //     function FiltraProduto() {
+            //         $('#cmbProduto').empty().append('<option>Filtrando...</option>');
+            //     }
+
+            //     function FiltraServico() {
+            //         $('#cmbServico').empty().append('<option>Filtrando...</option>');
+            //     }
+
+            //     function ResetCategoria() {
+            //         $('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
+            //     }
+
+            //     function ResetSubCategoria() {
+            //         $('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+            //     }
+
+            //     function ResetProduto() {
+            //         $('#cmbProduto').empty().append('<option>Sem produto</option>');
+            //     }
+
+            //     function ResetServico() {
+            //         $('#cmbServico').empty().append('<option>Sem serviço</option>');
+            //     }
+
+            //     let resultadosConsulta = '';
+            //     let inputsValues = {};
+
+            //     function Filtrar() {
+            //         let cont = false;
+
+            //         $('#submitFiltro').on('click', (e) => {
+            //             e.preventDefault()
+
+            //             const msg = $(
+            //                 '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+            //             )
+
+            //             if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() ==
+            //                 'Filtrando...') $('#cmbProduto').val("")
+
+            //             let dataDe = $('#inputDataDe').val()
+            //             let dataAte = $('#inputDataAte').val()
+            //             let tipo = $('#cmbTipo').val()
+            //             let fornecedor = $('#cmbFornecedor').val()
+            //             let categoria = $('#cmbCategoria').val()
+            //             let subCategoria = $('#cmbSubCategoria').val()
+            //             let inputProduto = $('#cmbProduto').val()
+            //             let inputServico = $('#cmbServico').val()
+            //             let codigo = $('#cmbCodigo').val()
+            //             let tipoDeFiltro = $('input[name="inputTipo"]:checked').val();
+            //             let url = "";
+            //             tipoDeFiltro == 'P' ? url = "relatorioMovimentacaoFiltraProduto.php" : url =
+            //                 "relatorioMovimentacaoFiltraServico.php";
+
+            //             inputsValues = {
+            //                 inputDataDe: dataDe,
+            //                 inputDataAte: dataAte,
+            //                 cmbTipo: tipo,
+            //                 cmbFornecedor: fornecedor,
+            //                 cmbCategoria: categoria,
+            //                 cmbSubCategoria: subCategoria,
+            //                 cmbProduto: inputProduto,
+            //                 cmbServico: inputServico,
+            //                 cmbCodigo: codigo,
+            //             };
+
+            //             $.post(
+            //                 url,
+            //                 inputsValues,
+            //                 (data) => {
+
+            //                     if (data) {
+            //                         $('tbody').html(data)
+            //                         $('#imprimir').removeAttr('disabled')
+            //                         resultadosConsulta = data
+            //                     } else {
+            //                         $('tbody').html(msg)
+            //                         $('#imprimir').attr('disabled', '')
+            //                     }
+            //                 }
+            //             );
+            //         })
+            //     }
+            //     Filtrar()
+
+
+            //     function imprime() {
+            //         url = 'relatorioMovimentacaoImprime.php';
+
+            //         $('#imprimir').on('click', (e) => {
+            //             e.preventDefault()
+            //             console.log('teste')
+            //             if (resultadosConsulta) {
+            //                 let tipo = $('input[name="inputTipo"]:checked').val()
+
+            //                 $('#TipoProdutoServico').val(tipo)
+            //                 $('#inputResultado').val(resultadosConsulta)
+            //                 $('#inputDataDe_imp').val(inputsValues.inputDataDe)
+            //                 $('#inputDataAte_imp').val(inputsValues.inputDataAte)
+            //                 $('#cmbTipo_imp').val(inputsValues.cmbTipo)
+            //                 $('#cmbFornecedor_imp').val(inputsValues.cmbFornecedor)
+            //                 $('#cmbCategoria_imp').val(inputsValues.cmbCategoria)
+            //                 $('#cmbSubCategoria_imp').val(inputsValues.cmbSubCategoria)
+            //                 $('#cmbProduto_imp').val(inputsValues.cmbProduto)
+            //                 $('#cmbServico_imp').val(inputsValues.cmbServico)
+            //                 $('#cmbCodigo_imp').val(inputsValues.cmbCodigo)
+
+            //                 $('#formImprime').attr('action', url)
+
+            //                 $('#formImprime').submit()
+            //             }
+            //         })
+
+            //     }
+            //     imprime()
 
         });
 
@@ -660,20 +660,21 @@ $dataFim = date("Y-m-d");
                                                     <label for="cmbSubCategoria">Status</label>
                                                     <select id="cmbSubCategoria" name="cmbSubCategoria"
                                                         class="form-control form-control-select2">
-                                                        <option value="">Á Pagar/Pagas</option>
-                                                        <!-- <?php
-													// $sql = "SELECT SbCatId, SbCatNome
-													// 				FROM SubCategoria
-													// 				JOIN Situacao on SituaId = SbCatStatus
-													// 				WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-													// 				ORDER BY SbCatNome ASC";
-													// $result = $conn->query($sql);
-													// $row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													// foreach ($row as $item) {
-													// 	print('<option value="' . $item['SbCatId'] . '">' . $item['SbCatNome'] . '</option>');
-													// }
-													?> -->
+                                                        <option value="">Selecione</option>
+                                                        <?php
+													        $sql = "SELECT SituaId, SituaNome, SituaChave
+													        				FROM Situacao
+													        				WHERE SituaStatus = 1
+													        				ORDER BY SituaNome ASC";
+													        $result = $conn->query($sql);
+													        $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
+        
+													        foreach ($rowSituacao as $item) {
+													        	if($item['SituaChave'] == 'APAGAR' || $item['SituaChave'] == 'PAGA'){
+                                                                    print('<option value="' . $item['SituatId'] . '">' . $item['SituaNome'] . '</option>');
+                                                                }
+													        }
+													    ?>
                                                     </select>
                                                 </div>
                                             </div>
@@ -685,8 +686,12 @@ $dataFim = date("Y-m-d");
                                         </div>
                                         <div class="text-right pt-3">
                                             <div>
-                                                <button id="novoLacamento" class="btn btn-success"><a href="novoLancamento.php" style="text-decoration:none; color: #FFF">Novo Lançamento</a></button>
-                                                <button id="efetuarPagamento" class="btn btn-success">Efetuar Pagamento</button>
+                                                <button id="novoLacamento" class="btn btn-success"><a
+                                                        href="novoLancamento.php"
+                                                        style="text-decoration:none; color: #FFF">Novo
+                                                        Lançamento</a></button>
+                                                <button id="efetuarPagamento" class="btn btn-success">Efetuar
+                                                    Pagamento</button>
                                                 <button class="btn bg-secondary"><i class="icon-printer2"></i></button>
                                             </div>
                                         </div>
