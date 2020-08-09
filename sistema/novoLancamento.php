@@ -6,22 +6,61 @@ $_SESSION['PaginaAtual'] = 'Novo Lançamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
-		FROM Fornecedor
-		JOIN Categoria on CategId = ForneCategoria
-	    WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . "
-		ORDER BY ForneNome ASC";
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
+if(isset($_POST['cmbPlanoContas'])){
+
+    try{
+
+        $sql = "SELECT SituaId
+                FROM Situacao
+                WHERE SituaChave = 'ATIVO'
+           ";
+        $result = $conn->query($sql);
+        $situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                                      CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                      CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+				VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                        :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+		$result = $conn->prepare($sql);
+		
+		$result->execute(array(
+                    
+						':iPlanoContas' => $_POST['cmbPlanoContas'],
+						':iFornecedor' => $_POST['cmbFornecedor'],
+						':iContaBanco' => $_POST['cmbContaBanco'],
+						':iFormaPagamento' => $_POST['cmbFormaPagamento'],
+						':sNumDocumento' => $_POST['inputNumeroDocumento'],
+						':sNotaFiscal' => $_POST['inputNotaFiscal'],
+						':dateDtEmissao' => $_POST['inputDataEmissao'],
+						':iOrdemCompra' => $_POST['cmbOrdemCarta'],
+						':sDescricao' => $_POST['inputDescricao'],
+						':dateDtVencimento' => $_POST['inputDataVencimento'],
+						':fValorAPagar' => (float)$_POST['inputValor'],
+                        ':dateDtPagamento' => $_POST['inputDataPagamento'],
+                        ':fValorPago' => (float)$_POST['inputValorTotalPago'],
+						':sObservacao' => $_POST['inputObservacao'],
+						':iStatus' => $situacao['SituaId'],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iUnidade' => $_SESSION['UnidadeId']
+                        ));
+                        
+        $_SESSION['msg']['titulo'] = "Sucesso";
+        $_SESSION['msg']['mensagem'] = "Orçamento incluído!!!";
+        $_SESSION['msg']['tipo'] = "success";
+        
+    } catch(PDOException $e) {
+        
+        $_SESSION['msg']['titulo'] = "Erro";
+        $_SESSION['msg']['mensagem'] = "Erro ao incluir orçamento!!!";
+        $_SESSION['msg']['tipo'] = "error";	
+        
+        echo 'Error: ' . $e->getMessage();die;
+    }
+     
+    irpara("orcamento.php");
+}
 //$count = count($row);
-
-$d = date("d");
-$m = date("m");
-$Y = date("Y");
-
-$dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
-$dataFim = date("Y-m-d");
-
 ?>
 
 <!DOCTYPE html>
@@ -54,9 +93,9 @@ $dataFim = date("Y-m-d");
         src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
 
     <!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+    <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+    <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+    <script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 </head>
 
@@ -99,7 +138,8 @@ $dataFim = date("Y-m-d");
                                     <div class="row">
                                         <div class="col-lg-6">
                                             <div class="form-group">
-                                                <label for="cmbPlanoContas">Plano de Contas <span class="text-danger">*</span></label>
+                                                <label for="cmbPlanoContas">Plano de Contas <span
+                                                        class="text-danger">*</span></label>
                                                 <select id="cmbPlanoContas" name="cmbPlanoContas"
                                                     class="form-control form-control-select2" required>
                                                     <option value="">Selecionar</option>
@@ -122,7 +162,8 @@ $dataFim = date("Y-m-d");
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="form-group">
-                                                <label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
+                                                <label for="cmbFornecedor">Fornecedor <span
+                                                        class="text-danger">*</span></label>
                                                 <select id="cmbFornecedor" name="cmbFornecedor"
                                                     class="form-control form-control-select2" required>
                                                     <option value="">Selecionar</option>
@@ -217,15 +258,32 @@ $dataFim = date("Y-m-d");
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="inputOrdemCarta">Ordem Compra/Carta Contrato</label>
-                                                <input type="text" id="inputOrdemCarta" name="inputOrdemCarta"
-                                                    class="form-control" placeholder="Ordem Compra/Carta Contrato">
+                                                <select id="cmbOrdemCarta" name="cmbOrdemCarta"
+                                                    class="form-control form-control-select2">
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+													$sql = "SELECT OrComId, OrComNumero
+																FROM OrdemCompra
+																JOIN Situacao on SituaId = OrComSituacao
+																WHERE OrComUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADO'
+																";
+													$result = $conn->query($sql);
+													$rowOrdemCompra = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowOrdemCompra as $item) {
+														print('<option value="' . $item['OrComId'] . '">' . $item['OrComNumero'] . '</option>');
+													}
+
+													?>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="form-group">
-                                                <label for="inputDescricao">Descrição <span class="text-danger">*</span></label>
+                                                <label for="inputDescricao">Descrição <span
+                                                        class="text-danger">*</span></label>
                                                 <textarea id="inputDescricao" class="form-control" name="inputDescricao"
                                                     rows="3" required></textarea>
                                             </div>
@@ -241,12 +299,13 @@ $dataFim = date("Y-m-d");
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataVencimento">Data do
                                                                     Vencimento</label>
-                                                                <input type="text" id="inputDataVencimento"
+                                                                <input type="date" id="inputDataVencimento"
                                                                     name="inputDataVencimento" class="form-control">
                                                             </div>
                                                             <div class="form-group col-6">
                                                                 <label for="inputValor">Valor</label>
-                                                                <input type="text" id="inputValor" name="inputValor"
+                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12"
+                                                                    id="inputValor" name="inputValor"
                                                                     class="form-control">
                                                             </div>
                                                         </div>
@@ -263,14 +322,15 @@ $dataFim = date("Y-m-d");
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataPagamento">Data do
                                                                     Pagamento</label>
-                                                                <input type="text" id="inputDataPagamento"
+                                                                <input type="date" id="inputDataPagamento"
                                                                     name="inputDataPagamento" class="form-control">
                                                             </div>
                                                             <div class="form-group col-6">
                                                                 <label for="inputValorTotalPago">Valor Total
                                                                     Pago</label>
-                                                                <input type="text" id="inputValorTotalPago"
-                                                                    name="inputValorTotalPago" class="form-control">
+                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12"
+                                                                    id="inputValorTotalPago" name="inputValorTotalPago"
+                                                                    class="form-control">
                                                             </div>
                                                         </div>
                                                     </div>

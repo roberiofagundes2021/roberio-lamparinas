@@ -387,63 +387,54 @@ $dataFim = date("Y-m-t");
             //     let resultadosConsulta = '';
             //     let inputsValues = {};
 
-            //     function Filtrar() {
-            //         let cont = false;
+                function Filtrar() {
+                    let cont = false;
 
-            //         $('#submitFiltro').on('click', (e) => {
-            //             e.preventDefault()
+                    $('#submitFiltro').on('click', (e) => {
+                        e.preventDefault()
 
-            //             const msg = $(
-            //                 '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-            //             )
+                        const msg = $(
+                            '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+                        )
 
-            //             if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() ==
-            //                 'Filtrando...') $('#cmbProduto').val("")
+                        if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() ==
+                            'Filtrando...') $('#cmbProduto').val("")
 
-            //             let dataDe = $('#inputDataDe').val()
-            //             let dataAte = $('#inputDataAte').val()
-            //             let tipo = $('#cmbTipo').val()
-            //             let fornecedor = $('#cmbFornecedor').val()
-            //             let categoria = $('#cmbCategoria').val()
-            //             let subCategoria = $('#cmbSubCategoria').val()
-            //             let inputProduto = $('#cmbProduto').val()
-            //             let inputServico = $('#cmbServico').val()
-            //             let codigo = $('#cmbCodigo').val()
-            //             let tipoDeFiltro = $('input[name="inputTipo"]:checked').val();
-            //             let url = "";
-            //             tipoDeFiltro == 'P' ? url = "relatorioMovimentacaoFiltraProduto.php" : url =
-            //                 "relatorioMovimentacaoFiltraServico.php";
+                        let periodoDe = $('#inputPeriodoDe').val()
+                        let ate = $('#inputAte').val()
+                        let numeroDocumento = $('#inputNumeroDocumento').val()
+                        let fornecedor = $('#cmbFornecedor').val()
+                        let planoContas = $('#cmbPlanoContas').val()
+                        let status = $('#cmbStatus').val()
+                        let url = "contasAPagarFiltra.php";
 
-            //             inputsValues = {
-            //                 inputDataDe: dataDe,
-            //                 inputDataAte: dataAte,
-            //                 cmbTipo: tipo,
-            //                 cmbFornecedor: fornecedor,
-            //                 cmbCategoria: categoria,
-            //                 cmbSubCategoria: subCategoria,
-            //                 cmbProduto: inputProduto,
-            //                 cmbServico: inputServico,
-            //                 cmbCodigo: codigo,
-            //             };
+                        inputsValues = {
+                            inputPeriodoDe: periodoDe,
+                            inputAte: ate,
+                            inputNumeroDocumento: numeroDocumento,
+                            cmbFornecedor: fornecedor,
+                            cmbPlanoContas: planoContas,
+                            cmbStatus: status
+                        };
 
-            //             $.post(
-            //                 url,
-            //                 inputsValues,
-            //                 (data) => {
+                        $.post(
+                            url,
+                            inputsValues,
+                            (data) => {
 
-            //                     if (data) {
-            //                         $('tbody').html(data)
-            //                         $('#imprimir').removeAttr('disabled')
-            //                         resultadosConsulta = data
-            //                     } else {
-            //                         $('tbody').html(msg)
-            //                         $('#imprimir').attr('disabled', '')
-            //                     }
-            //                 }
-            //             );
-            //         })
-            //     }
-            //     Filtrar()
+                                if (data) {
+                                    $('tbody').html(data)
+                                    $('#imprimir').removeAttr('disabled')
+                                    resultadosConsulta = data
+                                } else {
+                                    $('tbody').html(msg)
+                                    $('#imprimir').attr('disabled', '')
+                                }
+                            }
+                        );
+                    })
+                }
+                Filtrar()
 
 
             //     function imprime() {
@@ -575,26 +566,26 @@ $dataFim = date("Y-m-t");
                                     <div class="row">
                                         <div class="col-lg-2">
                                             <div class="form-group">
-                                                <label for="inputDataInicio">Período de</label>
+                                                <label for="inputPeriodoDe">Período de</label>
                                                 <div class="input-group">
                                                     <span class="input-group-prepend">
                                                         <span class="input-group-text"><i
                                                                 class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputDataDe" name="inputDataInicio"
+                                                    <input type="date" id="inputPeriodoDe" name="inputPeriodoDe"
                                                         class="form-control" value="<?php echo $dataInicio; ?>">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-lg-2">
                                             <div class="form-group">
-                                                <label for="inputDataFim">Até</label>
+                                                <label for="inputAte">Até</label>
                                                 <div class="input-group">
                                                     <span class="input-group-prepend">
                                                         <span class="input-group-text"><i
                                                                 class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputDataAte" name="inputDataFim"
+                                                    <input type="date" id="inputAte" name="inputAte"
                                                         class="form-control" value="<?php echo $dataFim; ?>">
                                                 </div>
                                             </div>
@@ -636,16 +627,16 @@ $dataFim = date("Y-m-t");
                                                     class="form-control form-control-select2">
                                                     <option value="">Todos</option>
                                                     <?php
-													$sql = "SELECT CategId, CategNome
-																FROM Categoria
-																JOIN Situacao on SituaId = CategStatus
-																WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY CategNome ASC";
+													$sql = "SELECT PlConId, PlConNome
+																FROM PlanoContas
+																JOIN Situacao on SituaId = PlConStatus
+																WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY PlConNome ASC";
 													$result = $conn->query($sql);
-													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+													$rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowCategoria as $item) {
-														print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
+													foreach ($rowPlanoContas as $item) {
+														print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
 													}
 
 													?>
@@ -671,7 +662,7 @@ $dataFim = date("Y-m-t");
         
 													        foreach ($rowSituacao as $item) {
 													        	if($item['SituaChave'] == 'APAGAR' || $item['SituaChave'] == 'PAGA'){
-                                                                    print('<option value="' . $item['SituatId'] . '">' . $item['SituaNome'] . '</option>');
+                                                                    print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
                                                                 }
 													        }
 													    ?>
@@ -680,7 +671,7 @@ $dataFim = date("Y-m-t");
                                             </div>
                                             <div class="text-right col-2 pt-3">
                                                 <div>
-                                                    <button id="pesquisar" class="btn btn-success">Pesquisar</button>
+                                                    <button id="submitFiltro" class="btn btn-success">Pesquisar</button>
                                                 </div>
                                             </div>
                                         </div>
