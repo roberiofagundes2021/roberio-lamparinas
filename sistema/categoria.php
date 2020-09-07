@@ -152,7 +152,7 @@ $count = count($row);
 
 							<div class="card-body">
 								<p class="font-size-lg">A relação abaixo faz referência às categorias da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right"><a href="categoriaNovo.php" class="btn btn-success" role="button">Nova Categoria</a></div>
+								<div class="text-right"><a href="categoriaNovo.php" class="btn btn-principal" role="button">Nova Categoria</a></div>
 							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->

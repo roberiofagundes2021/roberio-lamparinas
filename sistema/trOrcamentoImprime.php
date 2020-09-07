@@ -107,7 +107,7 @@ try {
 			</div> 
 			</div>
 
-			<div style='text-align:center; margin-top: 20px;'><h1>ORÇAMENTO DO TERMO DE REFERÊNCIA</h1></div>
+			<div style='text-align:center; margin-top: 20px;'><h1>ORÇAMENTO</h1></div>
     ";
 
 	$html .= "<div style='text-align:center;'><h2>TERMO DE REFERÊNCIA</h2></div>";

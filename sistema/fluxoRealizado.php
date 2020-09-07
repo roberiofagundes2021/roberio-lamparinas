@@ -377,7 +377,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 
 									</div>
 
-									<div class="text-right"><a href="fluxoRealizado.php" class="btn btn-success" role="button">Filtrar</a></div>
+									<div class="text-right"><a href="fluxoRealizado.php" class="btn btn-principal" role="button">Filtrar</a></div>
 								</form>
 							</div>
 						</div>

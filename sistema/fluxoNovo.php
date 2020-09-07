@@ -410,7 +410,7 @@ if (isset($_POST['inputDataInicio'])) {
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
+										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
 										<a href="fluxo.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 									</div>
 								</div>

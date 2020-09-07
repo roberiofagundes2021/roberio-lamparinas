@@ -255,7 +255,7 @@ if(isset($_POST['inputNome'])){
 								<div class="row" style="margin-top: 40px;">
 									<div class="col-lg-12">								
 										<div class="form-group">
-											<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
+											<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
 											<a href="produtoOrcamento.php" class="btn btn-basic" id="cancelar">Cancelar</a>
 										</div>
 									</div>

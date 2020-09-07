@@ -444,10 +444,10 @@ if (isset($_POST['inputDataInicio'])) {
 
 										if ($bFechado) {
 											if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'ADMINISTRADOR' or $_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' or $_SESSION['PerfiChave'] == 'CONTROLADORIA') {
-												print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
+												print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
 											}
 										} else {
-											print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
+											print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
 										}
 
 										?>

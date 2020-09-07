@@ -269,7 +269,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" id="enviar">Atualizar</button>
+										<button class="btn btn-lg btn-principal" id="enviar">Atualizar</button>
 									</div>
 								</div>
 							</div>
@@ -406,7 +406,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 									<div class="row" style="margin-top: 10px;">
 										<div class="col-lg-12">
 											<div class="form-group">
-												<button class="btn btn-lg btn-success" id="enviar">Atualizar</button>
+												<button class="btn btn-lg btn-principal" id="enviar">Atualizar</button>
 											</div>
 										</div>
 									</div>

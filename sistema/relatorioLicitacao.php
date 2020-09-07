@@ -696,7 +696,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                 </div>
                                 <div class="text-right">
                                     <div>
-                                        <button id="submitFiltro" class="btn btn-success"><i class="icon-search">Consultar</i></button>
+                                        <button id="submitFiltro" class="btn btn-principal"><i class="icon-search">Consultar</i></button>
                                         <button id="imprimir" class="btn btn-secondary btn-icon" disabled>
                                             <i class="icon-printer2"> Imprimir</i>
                                         </button>
@@ -782,7 +782,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                 <div class="row" style="margin-top: 10px;">
                                     <div class="col-lg-12">
                                         <div class="form-group">
-                                            <button class="btn btn-lg btn-success" id="salvar">Salvar</button>
+                                            <button class="btn btn-lg btn-principal" id="salvar">Salvar</button>
                                             <a class="btn btn-basic modal-close" role="button">Cancelar</a>
                                         </div>
                                     </div>

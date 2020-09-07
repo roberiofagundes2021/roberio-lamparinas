@@ -731,7 +731,7 @@ $dataFim = date("Y-m-d");
 
 									<div class="text-right">
 										<div>
-											<button id="submitFiltro" class="btn btn-success"><i class="icon-search">Consultar</i></button>
+											<button id="submitFiltro" class="btn btn-principal"><i class="icon-search">Consultar</i></button>
 											<button id="imprimir" class="btn btn-secondary btn-icon" disabled><i class="icon-printer2"> Imprimir</i></button>
 										</div>
 									</div>

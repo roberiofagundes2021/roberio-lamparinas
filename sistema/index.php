@@ -383,7 +383,7 @@ if ($totalAcoes) {
 							buttons: {
 								confirm: {
 									label: 'Enviar',
-									className: 'btn-success'
+									className: 'btn-principal'
 								},
 								cancel: {
 									label: 'Cancelar',
@@ -439,7 +439,7 @@ if ($totalAcoes) {
 							buttons: {
 								confirm: {
 									label: 'Enviar',
-									className: 'btn-success'
+									className: 'btn-principal'
 								},
 								cancel: {
 									label: 'Cancelar',
@@ -495,7 +495,7 @@ if ($totalAcoes) {
 							buttons: {
 								confirm: {
 									label: 'Enviar',
-									className: 'btn-success'
+									className: 'btn-principal'
 								},
 								cancel: {
 									label: 'Cancelar',
@@ -556,7 +556,7 @@ if ($totalAcoes) {
 							buttons: {
 								confirm: {
 									label: 'Enviar',
-									className: 'btn-success'
+									className: 'btn-principal'
 								},
 								cancel: {
 									label: 'Cancelar',
@@ -611,7 +611,7 @@ if ($totalAcoes) {
 							buttons: {
 								confirm: {
 									label: 'Enviar',
-									className: 'btn-success'
+									className: 'btn-principal'
 								},
 								cancel: {
 									label: 'Cancelar',

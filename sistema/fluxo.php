@@ -184,7 +184,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<div class="card-body">
 								<p class="font-size-lg">A relação abaixo faz referência aos fluxos operacionais da
 									unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right"><a href="fluxoNovo.php" class="btn btn-success"
+								<div class="text-right"><a href="fluxoNovo.php" class="btn btn-principal"
 										role="button">Novo Fluxo Operacional</a></div>
 							</div>
 

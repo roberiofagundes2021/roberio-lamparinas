@@ -380,7 +380,7 @@ if (isset($_POST['inputData'])) {
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
+										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
 										<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

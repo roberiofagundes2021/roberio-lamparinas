@@ -150,7 +150,7 @@ $count = count($row);
 
 							<div class="card-body">
 								<p class="font-size-lg">Segue abaixo a relação de bancos disponíveis para os usuários do sistema.</p>
-								<div class="text-right"><a href="bancoNovo.php" class="btn btn-success" role="button">Novo Banco</a></div>
+								<div class="text-right"><a href="bancoNovo.php" class="btn btn-principal" role="button">Novo Banco</a></div>
 							</div>							
 
 							<table id="tblBanco" class="table">

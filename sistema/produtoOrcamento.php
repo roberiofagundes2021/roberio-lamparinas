@@ -160,7 +160,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 							<div class="card-body">
 								<p class="font-size-lg">A relação abaixo faz referência aos produtos para orçamento da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right"><a href="produtoOrcamentoNovo.php" class="btn btn-success" role="button">Novo Produto</a></div>
+								<div class="text-right"><a href="produtoOrcamentoNovo.php" class="btn btn-principal" role="button">Novo Produto</a></div>
 							</div>
 							
 							<table class="table" id="tblProdutoOrcamento">

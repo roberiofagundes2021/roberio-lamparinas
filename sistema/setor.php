@@ -113,7 +113,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 							<div class="card-body">
 								<p class="font-size-lg">A relação abaixo faz referência aos setores da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>
-								<div class="text-right"><a href="setorNovo.php" class="btn btn-success" role="button">Novo Setor</a></div>
+								<div class="text-right"><a href="setorNovo.php" class="btn btn-principal" role="button">Novo Setor</a></div>
 							</div>
 							
 							<table class="table datatable-responsive">

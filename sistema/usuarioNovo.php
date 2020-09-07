@@ -594,7 +594,7 @@ include_once("topo.php");
 						<div class="row" style="margin-top: 20px;">
 							<div class="col-lg-12">
 								<div class="form-group">
-									<button class="btn btn-lg btn-success" disabled id="enviar">Incluir</button>
+									<button class="btn btn-lg btn-principal" disabled id="enviar">Incluir</button>
 									<a href="usuario.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 								</div>
 							</div>

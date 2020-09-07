@@ -595,7 +595,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											</div>
 											<div class="text-right">
 												<div>
-													<button id="submitFiltro" class="btn btn-success">Consultar</button>
+													<button id="submitFiltro" class="btn btn-principal">Consultar</button>
 												</div>
 											</div>
 										</form>
@@ -822,7 +822,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 						</div>
 					</form>
-					<button id="confirmar-solicitacao" class="btn btn-success" disabled>Confirmar</button>
+					<button id="confirmar-solicitacao" class="btn btn-principal" disabled>Confirmar</button>
 				</div>
 			</div>
 		</div>

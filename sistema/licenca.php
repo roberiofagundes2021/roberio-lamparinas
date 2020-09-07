@@ -104,7 +104,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 							<div class="card-body">
 								As licenças abaixo são da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b>.
-								<div class="text-right"><a href="licencaNovo.php" class="btn btn-success" role="button">Nova Licença</a></div>
+								<div class="text-right"><a href="licencaNovo.php" class="btn btn-principal" role="button">Nova Licença</a></div>
 							</div>							
 
 							<table class="table datatable-responsive">
