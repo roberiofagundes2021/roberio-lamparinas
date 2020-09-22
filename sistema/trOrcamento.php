@@ -200,7 +200,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<div class="card-body">
 								A relação abaixo faz referência aos orçamentos da <span style="color: #FF0000; font-weight: bold;">TR nº <?php echo $_SESSION['TRNumero']; ?></span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
 								<div class="text-right"><a href="tr.php" role="button"><< Termo de Referência</a>&nbsp;&nbsp;&nbsp;
-								<a href="trOrcamentoNovo.php" class="btn btn-success" role="button">Novo Orçamento</a></div>
+								<a href="trOrcamentoNovo.php" class="btn btn-principal" role="button">Novo Orçamento</a></div>
 							</div>
 							
 							<table class="table" id="tblOrcamento">

@@ -168,7 +168,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 							<div class="card-body">
 								<p class="font-size-lg">A relação abaixo faz referência às Contas/Bancos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right"><a href="contaBancoNovo.php" class="btn btn-success" role="button">Nova Conta/Banco</a></div>
+								<div class="text-right"><a href="contaBancoNovo.php" class="btn btn-principal" role="button">Nova Conta/Banco</a></div>
 							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->

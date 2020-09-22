@@ -492,7 +492,7 @@ try{
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<button class="btn btn-lg btn-principal" type="submit">Alterar</button>
 										<?php
 											if ($enviar){
 												print('<button class="btn btn-lg btn-default" id="enviar">Enviar para Aprovação</button>');

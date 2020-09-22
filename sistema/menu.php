@@ -10,12 +10,12 @@ if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
 
-$sql = ("SELECT MenuId, MenuNome, ModulNome, MenuPai, MenuLevel, MenuHome, MenuIco, MenuStatus
-		 FROM Menu
-		 JOIN Modulo on ModulId = MenuModulo
-	     WHERE MenuEmpresa = ". $_SESSION['EmpresaId'] ."
-		 ORDER BY MenuNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT MenuId, MenuNome, ModulNome, MenuPai, MenuLevel, MenuHome, MenuIco, MenuStatus
+		FROM Menu
+		JOIN Modulo on ModulId = MenuModulo
+	    WHERE MenuEmpresa = ". $_SESSION['EmpresaId'] ."
+		ORDER BY MenuNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 //var_dump($count);die;
@@ -109,7 +109,7 @@ $count = count($row);
 
 							<div class="card-body">
 								<p class="font-size-lg">A relação abaixo faz referência às menus da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>
-								<div class="text-right"><a href="menuNovo.php" class="btn btn-success" role="button">Novo Item de Menu</a></div>
+								<div class="text-right"><a href="menuNovo.php" class="btn btn-principal" role="button">Novo Item de Menu</a></div>
 							</div>				
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->

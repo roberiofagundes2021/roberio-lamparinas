@@ -540,7 +540,7 @@ if(isset($_POST['inputNome'])){
 										<input type="hidden" id="inputFoto" name="inputFoto" value="<?php echo $row['ProduFoto']; ?>" >
 									</div>
 									<br>
-									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%"><?php echo $sButtonFoto; ?></button>									
+									<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%"><?php echo $sButtonFoto; ?></button>									
 								</div>									
 									
 							</div> <!-- media -->
@@ -848,7 +848,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button id="alterar" class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<button id="alterar" class="btn btn-lg btn-principal" type="submit">Alterar</button>
 										<a href="produto.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

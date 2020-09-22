@@ -176,46 +176,53 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos fornecedores da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right">
-									<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
-										<a href="#collapse-imprimir-relacao" class="dropdown-toggle btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
-											<i class="icon-printer2"></i>																						
-										</a>
+								<div class="row">
+									<div class="col-lg-9">
+										<p class="font-size-lg">A relação abaixo faz referência aos fornecedores da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 									</div>
-									<div>
-										<a href="fornecedorNovo.php" class="btn btn-success" role="button">Novo Fornecedor</a>
-									</div>
-								</div>
-								<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 5px;">
-									<div class="row">
-										<div class="col-lg-9">
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">												
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-													<option value="#">Filtrar por: Categoria (todas)</option>
-													<?php 
-														$sql = "SELECT CategId, CategNome
-																FROM Categoria
-																JOIN Situacao on SituaId = CategStatus		  
-																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																ORDER BY CategNome ASC";
-														$result = $conn->query($sql);
-														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowCategoria as $item){															
-															print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-														}													
-													?>
-												</select>
+									<div class="col-lg-3">
+										<div class="text-right">
+											<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
+												<a href="#collapse-imprimir-relacao" class="dropdown-toggle btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
+													<i class="icon-printer2"></i>																						
+												</a>
 											</div>
-										
-											<a href="#" onclick="atualizaFornecedor(0, '','', 'imprime');" class="form-control btn bg-slate-700 btn-icon" role="button" data-placement="bottom" data-container="body">
-												<i class="icon-printer2"> Gerar PDF ou Imprimir</i>
-											</a>
+											<div>
+												<a href="fornecedorNovo.php" class="btn btn-principal" role="button">Novo Fornecedor</a>
+											</div>
 										</div>
-									</div>
+
+										<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 5px;">
+											<div class="row">
+												<div class="col-lg-9">
+												</div>
+												<div class="col-lg-3">
+													<div class="form-group">												
+														<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+															<option value="#">Filtrar por: Categoria (todas)</option>
+															<?php 
+																$sql = "SELECT CategId, CategNome
+																		FROM Categoria
+																		JOIN Situacao on SituaId = CategStatus		  
+																		WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+																		ORDER BY CategNome ASC";
+																$result = $conn->query($sql);
+																$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+																
+																foreach ($rowCategoria as $item){															
+																	print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+																}													
+															?>
+														</select>
+													</div>
+												
+													<a href="#" onclick="atualizaFornecedor(0, '','', 'imprime');" class="form-control btn bg-slate-700 btn-icon" role="button" data-placement="bottom" data-container="body">
+														<i class="icon-printer2"> Gerar PDF ou Imprimir</i>
+													</a>
+												</div>
+											</div>
+										</div>
+									</div>	
 								</div>
 							</div>
 							

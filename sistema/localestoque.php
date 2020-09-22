@@ -152,7 +152,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 							<div class="card-body">
 								<p class="font-size-lg">A relação abaixo faz referência aos locais de estoque da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right"><a href="localestoqueNovo.php" class="btn btn-success" role="button">Novo Local do Estoque</a></div>
+								<div class="text-right"><a href="localestoqueNovo.php" class="btn btn-principal" role="button">Novo Local do Estoque</a></div>
 							</div>
 							
 							<table id="tblLocalEstoque" class="table">

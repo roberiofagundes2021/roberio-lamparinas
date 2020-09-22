@@ -592,7 +592,7 @@ if (isset($_POST['inputTRData'])) {
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<button type="submit" class="btn btn-lg btn-success" id="enviar">Alterar</button>
+										<button type="submit" class="btn btn-lg btn-principal" id="enviar">Alterar</button>
 										<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

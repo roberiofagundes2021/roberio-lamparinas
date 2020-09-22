@@ -61,6 +61,31 @@ Copyright (c) 2018 Carlos Victor
     width: 100%;
 }
 
+/* Todos os botões em destaque do caso de uso (botão principal) */
+.btn-principal{
+    background-color: #F8D11F;
+    color: #333;
+}
+
+.btn-principal:hover,
+.btn-principal:focus,
+.btn-principal.focus,
+.btn-principal:active,
+.btn-principal.active,
+.open .dropdown-toggle.btn-principal {
+    color: #333;
+    background-color: #f8c91f;
+    border-color: #F8D11F;
+}
+
+.bg-slate{
+    background-color: #466d96;
+}
+
+/* Barra de Topo do Sistema */
+.navbar-dark{
+    background-color: #375b82;
+}
 
 /* CSS Modal */
 .custon-modal{

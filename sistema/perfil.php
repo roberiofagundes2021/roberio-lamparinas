@@ -145,7 +145,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 							<div class="card-body">
 								Segue abaixo a relação de perfis disponíveis para os usuários do sistema.
-								<div class="text-right"><a href="perfilNovo.php" class="btn btn-success" role="button">Novo Perfil</a></div>
+								<div class="text-right"><a href="perfilNovo.php" class="btn btn-principal" role="button">Novo Perfil</a></div>
 							</div>
 							
 							<table id="tblPerfil" class="table">

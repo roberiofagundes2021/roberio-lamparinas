@@ -1,4 +1,24 @@
 
+		<?php
+
+			$arquivosFornecedor = array(
+				'fornecedor.php', 'fornecedorNovo.php', 'fornecedorEdita.php', 'fornecedorExclui.php', 'fornecedorMudaSituacao.php'
+			);
+
+			$arquivosProduto = array(
+				'produto.php', 'produtoNovo.php', 'produtoEdita.php', 'produtoExclui.php', 'produtoMudaSituacao.php'
+			);			
+
+			$arquivosServico = array(
+				'servico.php', 'servicoNovo.php', 'servicoEdita.php', 'servicoExclui.php', 'servicoMudaSituacao.php'
+			);			
+
+			$arquivosInventario = array(
+				'inventario.php', 'inventarioNovo.php', 'inventarioEdita.php', 'inventarioExclui.php', 'inventarioMudaSituacao.php'
+			);			
+		
+		?>
+
 		<!-- Main sidebar -->
 		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-md">
 
@@ -25,13 +45,13 @@
 						<div class="card-body text-center">
 							<a href="index.php">
 								<!-- src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle shadow-1 -->
-								<img src="global_assets/images/lamparinas/logo-lamparinas_200x200.jpg" class="img-fluid shadow-5 mb-3" width="100" height="100" alt="" style="padding-top:8px;">
+								<img src="global_assets/images/lamparinas/logo-lamparinas_200x200.jpg" class="img-fluid shadow-5 mb-3" width="100" height="100" alt="" style="padding-top:8px;visibility:hidden">
 							</a>
-							<h6 class="mb-0 text-white text-shadow-dark"><?php echo nomeSobrenome($_SESSION['UsuarNome'],2); ?></h6>
-							<span class="font-size-sm text-white text-shadow-dark"><?php echo $_SESSION['UnidadeNome']; ?></span>
+							<h6 class="mb-0 text-white text-shadow-dark"><?php //echo nomeSobrenome($_SESSION['UsuarNome'],2); ?></h6>
+							<span class="font-size-sm text-white text-shadow-dark"><?php //echo $_SESSION['UnidadeNome']; ?></span>
 						</div>
 													
-						<div class="sidebar-user-material-footer">
+						<div class="sidebar-user-material-footer" style="margin-top:40px;">
 							<a href="#user-nav" class="d-flex justify-content-between align-items-center text-shadow-dark dropdown-toggle" data-toggle="collapse"><span>Minha Conta</span></a>
 						</div>
 					</div>
@@ -82,7 +102,7 @@
 						<!-- Main -->
 						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Principal</div> <i class="icon-menu" title="Main"></i></li>
 						<li class="nav-item">
-							<a href="index.php" class="nav-link active">
+							<a href="index.php" <?php if (basename($_SERVER['PHP_SELF']) == 'index.php') { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
 								<i class="icon-home4"></i>
 								<span>
 									Página Inicial
@@ -110,13 +130,19 @@
 						</li>
 						
 						<li class="nav-item">
-							<a href="fornecedor.php" class="nav-link"><i class="icon-users2"></i> <span>Fornecedor</span></a>
+							<a href="fornecedor.php" <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosFornecedor)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
+								<i class="icon-users2"></i> <span>Fornecedor</span
+							></a>
 						</li>
 						<li class="nav-item">
-							<a href="produto.php" class="nav-link"><i class="icon-gift"></i> <span>Produto</span></a>
+							<a href="produto.php"  <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosProduto)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
+								<i class="icon-gift"></i> <span>Produto</span>
+							</a>
 						</li>
 						<li class="nav-item">
-							<a href="servico.php" class="nav-link"><i class="icon-cogs"></i><span>Serviços</span></a>
+							<a href="servico.php"  <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosServico)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
+								<i class="icon-cogs"></i><span>Serviços</span>
+							</a>
 						</li>						
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-bag"></i> <span>Compras</span></a>
@@ -137,7 +163,9 @@
 						</li>						
 						
 						<li class="nav-item">
-							<a href="inventario.php" class="nav-link"><i class="icon-paste2"></i> <span>Inventário</span></a>
+							<a href="inventario.php"  <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosInventario)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
+								<i class="icon-paste2"></i> <span>Inventário</span>
+							</a>
 						</li>						
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link"><i class="icon-stack-text"></i> <span>Relatórios</span></a>

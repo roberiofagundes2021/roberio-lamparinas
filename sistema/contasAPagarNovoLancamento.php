@@ -496,7 +496,7 @@ if(isset($_GET['lancamentoId'])){
                                         </div>
                                     </div>
 
-                                    <button id="salvar" class="btn btn-success">Salvar</button>
+                                    <button id="salvar" class="btn btn-principal">Salvar</button>
                                     <a href="contasAPagar.php" class="btn">Cancelar</a>
                                 </form>
 

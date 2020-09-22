@@ -2081,20 +2081,7 @@ var_dump($_POST);die;
 										</div>
 									</div>
 								</div>
-							</div>
-						</div>
-						<!-- /card-body -->
-					</form>
 
-				</div>
-				<!-- /info blocks -->
-
-				<!-- Info blocks -->
-				<div class="card">
-					
-					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovo.php">
-						<div class="card-body">
-							<div class="row">
 								<div class="col-lg-4" id="motivo" style="display:none;">
 									<div class="form-group">
 										<label for="cmbMotivo">Motivo</label>
@@ -2824,9 +2811,8 @@ var_dump($_POST);die;
 						<!-- /card-body -->
 					</form>
 
-
 				</div>
-				<!-- /info blocks -->				
+				<!-- /info blocks -->
 
 				<div id="page-modal" class="custon-modal">
 					<div class="custon-modal-container">

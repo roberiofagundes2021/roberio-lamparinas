@@ -420,7 +420,7 @@ if(isset($_POST['inputNome'])){
 										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:250px; border:2px solid #ccc;">
 									</div>
 									<br>
-									<button id="addFoto" class="ml-3 btn btn-lg btn-success" style="width:90%">Adicionar Foto...</button>	
+									<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>	
 								</div>
 								
 							</div> <!-- media -->
@@ -707,7 +707,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" id="enviar">Incluir</button>
+										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
 										<a href="produto.php" class="btn btn-lg" id="cancelar">Cancelar</a>
 									</div>
 								</div>

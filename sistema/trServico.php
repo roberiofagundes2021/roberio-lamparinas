@@ -535,7 +535,7 @@ try {
 									<div class="row" style="margin-top: 10px;">
 								        <div class="row justify-content-center col-lg-12">
 									        <div class="form-group col-12 col-lg-6">
-										        <button id="btnsubmit" class="btn btn-lg btn-success" disabled type="submit">Alterar</button>
+										        <button id="btnsubmit" class="btn btn-lg btn-principal" disabled type="submit">Alterar</button>
 										        <a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
 											</div>
 											<div class="row justify-content-end align-content-center col-12 col-lg-6">
@@ -549,7 +549,7 @@ try {
 									<div class="row" style="margin-top: 10px;">
 								        <div class="col-lg-12">
 									        <div class="form-group">
-										        <button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										        <button class="btn btn-lg btn-principal" type="submit">Alterar</button>
 										        <a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
 									        </div>
 								        </div>

@@ -561,13 +561,13 @@ try {
 
 										if ($bFechado) {
 											print('
-												<button class="btn btn-lg btn-success" id="enviar" style="margin-right:5px;">Alterar</button>
+												<button class="btn btn-lg btn-principal" id="enviar" style="margin-right:5px;">Alterar</button>
 												<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
 										} else {
 											if ($countServico) {
-												print('<button class="btn btn-lg btn-success" id="enviar">Alterar</button>');
+												print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
 											} else {
-												print('<button class="btn btn-lg btn-success" id="enviar" disabled>Alterar</button>');
+												print('<button class="btn btn-lg btn-principal" id="enviar" disabled>Alterar</button>');
 											}
 										}
 

@@ -256,7 +256,7 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 30px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-success" type="submit">Alterar</button>
+										<button class="btn btn-lg btn-principal" type="submit">Alterar</button>
 										<a href="menu.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

@@ -219,7 +219,7 @@ $count = count($row);
 
 							<div class="card-body">
 								<p class="font-size-lg">As empresas cadastradas abaixo estarão aptas a utilizar o sistema, desde que ativas e com licença vigente.</p>
-								<div class="text-right"><a href="empresaNovo.php" class="btn btn-success" role="button">Nova Empresa</a></div>
+								<div class="text-right"><a href="empresaNovo.php" class="btn btn-principal" role="button">Nova Empresa</a></div>
 							</div>							
 
 							<table class="table datatable-responsive">

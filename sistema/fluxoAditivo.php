@@ -262,7 +262,7 @@ try {
 													<a href="fluxo.php" class="btn btn-classic" role="button">Voltar</a>
 													<a href="#"
 														onclick="atualizaAditivo('<?php echo $row['FlOpeId']; ?>', '0', '<?php echo $row['FlOpeCategoria'] ?>', '<?php echo $row['FlOpeSubCategoria'] ?>','<?php echo $row['SituaChave']; ?>', 'novo');"
-														class="btn btn-success" role="button">Novo Aditivo </a>
+														class="btn btn-principal" role="button">Novo Aditivo </a>
 												</div>
 											</div>
 										</div>

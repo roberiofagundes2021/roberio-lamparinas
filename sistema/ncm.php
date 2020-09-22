@@ -150,7 +150,7 @@ $count = count($row);
 
 							<div class="card-body">
 								<p class="font-size-lg">Segue abaixo a relação de NCMs (Nomeclatura Comum Mercosul) disponíveis para os usuários do sistema.</p>
-								<div class="text-right"><a href="ncmNovo.php" class="btn btn-success" role="button">Novo NCM</a></div>
+								<div class="text-right"><a href="ncmNovo.php" class="btn btn-principal" role="button">Novo NCM</a></div>
 							</div>							
 
 							<table id="tblNCM" class="table">

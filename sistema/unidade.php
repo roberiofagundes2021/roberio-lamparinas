@@ -114,7 +114,7 @@ $count = count($row);
 
 							<div class="card-body">
 								<p class="font-size-lg">A relação abaixo faz referência às unidades da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>
-								<div class="text-right"><a href="unidadeNovo.php" class="btn btn-success" role="button">Nova Unidade</a></div>
+								<div class="text-right"><a href="unidadeNovo.php" class="btn btn-principal" role="button">Nova Unidade</a></div>
 							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->

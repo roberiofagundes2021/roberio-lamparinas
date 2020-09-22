@@ -907,7 +907,7 @@ $dataFim = date("Y-m-t");
                                             </div>
                                             <div class="text-right col-2 pt-3">
                                                 <div>
-                                                    <button id="submitFiltro" class="btn btn-success">Pesquisar</button>
+                                                    <button id="submitFiltro" class="btn btn-principal">Pesquisar</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -917,7 +917,7 @@ $dataFim = date("Y-m-t");
                                                         href="contasAPagarNovoLancamento.php"
                                                         style="text-decoration:none; color: #FFF">Novo
                                                         Lançamento</a></button>
-                                                <button id="efetuarPagamento" class="btn btn-success">Efetuar
+                                                <button id="efetuarPagamento" class="btn btn-principal">Efetuar
                                                     Pagamento</button>
                                                 <button class="btn bg-secondary"><i class="icon-printer2"></i></button>
                                             </div>
