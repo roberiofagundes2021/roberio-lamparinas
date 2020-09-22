@@ -224,7 +224,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>Categoria</th>
 										<th>SubCategoria</th>
 										<th>Situação</th>
-										<th class="text-center">Ações</th>
+										<th class="text-center" style="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -333,7 +333,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					<input type="hidden" id="inputTRNomeCategoria" name="inputTRNomeCategoria">
 					<input type="hidden" id="inputTRStatus" name="inputTRStatus">
 				</form>
-
+				
 			</div>
 			<!-- /content area -->
 

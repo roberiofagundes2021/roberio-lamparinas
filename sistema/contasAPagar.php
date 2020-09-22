@@ -79,7 +79,7 @@ $dataFim = date("Y-m-t");
                     },
                     {
                         orderable: true, //Fornecedor
-                        width: "20%",
+                        width: "15%",
                         targets: [2]
                     },
                     {
@@ -94,12 +94,12 @@ $dataFim = date("Y-m-t");
                     },
                     {
                         orderable: true, //Valor Total
-                        width: "10%",
+                        width: "5%",
                         targets: [5]
                     },
                     {
                         orderable: true, //Saldo
-                        width: "10%",
+                        width: "5%",
                         targets: [6]
                     },
                     {
@@ -109,8 +109,51 @@ $dataFim = date("Y-m-t");
                     },
                     {
                         orderable: true, //Ações
-                        width: "5%",
+                        width: "20%",
                         targets: [8]
+                    }
+                ],
+                dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+                language: {
+                    search: '<span>Filtro:</span> _INPUT_',
+                    searchPlaceholder: 'filtra qualquer coluna...',
+                    lengthMenu: '<span>Mostrar:</span> _MENU_',
+                    paginate: {
+                        'first': 'Primeira',
+                        'last': 'Última',
+                        'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+                        'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+                    }
+                }
+            });
+
+            $('#tblParcelamento').DataTable({
+                "order": [
+                    [0, "desc"],
+                    [1, "desc"],
+                    [2, "asc"]
+                ],
+                autoWidth: false,
+                responsive: true,
+                columnDefs: [{
+                        orderable: true, //Item
+                        width: "10%",
+                        targets: [0]
+                    },
+                    {
+                        orderable: true, //Descrição
+                        width: "40%",
+                        targets: [1]
+                    },
+                    {
+                        orderable: true, //Vencimento
+                        width: "25%",
+                        targets: [2]
+                    },
+                    {
+                        orderable: true, //Valor
+                        width: "25%",
+                        targets: [3]
                     }
                 ],
                 dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -387,54 +430,247 @@ $dataFim = date("Y-m-t");
             //     let resultadosConsulta = '';
             //     let inputsValues = {};
 
-                function Filtrar() {
-                    let cont = false;
+            function modalAcoes() {
+                console.log('teste')
+                $('.btnParcelar').each((i, elem) => {
+                    $(elem).on('click', function () {
+                        $('#page-modal').fadeIn(200);
+                        
+                        
+                        let linha = $(elem).parent().parent()
 
-                    $('#submitFiltro').on('click', (e) => {
-                        e.preventDefault()
+                        // let id = linha.attr('idPatrimonio')
+                        // let editado = linha.attr('editado')
 
-                        const msg = $(
-                            '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-                        )
+                        let tds = linha.children();
+                        console.log(tds)
+                        let validade = $(tds[5]).html();
+                        //Conteúdo novo
 
-                        if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() ==
-                            'Filtrando...') $('#cmbProduto').val("")
+                        $('#valorTotal').val(validade)
 
-                        let periodoDe = $('#inputPeriodoDe').val()
-                        let ate = $('#inputAte').val()
-                        let numeroDocumento = $('#inputNumeroDocumento').val()
-                        let fornecedor = $('#cmbFornecedor').val()
-                        let planoContas = $('#cmbPlanoContas').val()
-                        let status = $('#cmbStatus').val()
-                        let url = "contasAPagarFiltra.php";
+                        //////////////////////////////
+                        // let descricao = $(tds[2]).html();
+                        // let  = $(tds[3]).html();
+                        // let aquisicao = $(tds[4]).html();
+                        // let depreciacao = $(tds[5]).html();
+                        // let origem = $(tds[7]).html();
+                        // let destino = $(tds[8]).html();
+                        // let marca = $(tds[9]).html();
+                        // let fabricante = $(tds[10]).html();
+                        // let numeroSerie = $(tds[12]).children().first().val()
+                        // let estadoConservacao = $(tds[13]).children().first().val()
+                        //console.log(numeroSerie)
 
-                        inputsValues = {
-                            inputPeriodoDe: periodoDe,
-                            inputAte: ate,
-                            inputNumeroDocumento: numeroDocumento,
-                            cmbFornecedor: fornecedor,
-                            cmbPlanoContas: planoContas,
-                            cmbStatus: status
-                        };
+                        const fonte1 = 'style="font-size: 1.1rem"'
+                        const fonte2 = 'style="font-size: 0.9rem"'
+                        const textCenter = 'style="text-align: center"'
+                        const styleLabel1 = 'style="min-width: 250px; font-size: 0.9rem"'
+                        const styleLabel2 = 'style="min-width: 150px; font-size: 0.9rem"'
+                        const styleLabel3 = 'style="min-width: 100px; font-size: 0.9rem"'
+                        const marginP = 'style="font-size: 0.9rem; margin-top: 4px"'
 
-                        $.post(
-                            url,
-                            inputsValues,
-                            (data) => {
+                        var NumSerie = numeroSerie ? numeroSerie : ''
 
-                                if (data) {
-                                    $('tbody').html(data)
-                                    $('#imprimir').removeAttr('disabled')
-                                    resultadosConsulta = data
-                                } else {
-                                    $('tbody').html(msg)
-                                    $('#imprimir').attr('disabled', '')
-                                }
+                        $('#numeroSerie').val(NumSerie)
+
+                        $('#cmbEstadoConservacao').val(estadoConservacao)
+
+                        if (estadoConservacao) {
+                            let url = 'filtraEstadoConservacao.php'
+                            let inputsValues = {
+                                inputEstadoConservacao: estadoConservacao
                             }
-                        );
+
+                            $.post(
+                                url,
+                                inputsValues,
+                                (data) => {
+                                    if (data) {
+                                        $('#cmbEstadoConservacao').html(data)
+
+                                    } else {}
+                                }
+                            );
+                        }
+
+                        formModal = `
+                        <div class='row'>
+                             <div class='col-lg-2'>
+                                 <div class="form-group">
+                                     <label for="produto">Patrimônio</label>
+                                     <div class="input-group">
+                                        <input class='form-control' value='${patrimonio}' readOnly />
+                                     </div>
+                                </div>
+                             </div>                                    
+                             <div class='col-lg-10'>
+                                 <div class="form-group">
+                                     <label for="produto">Produto</label>
+                                     <div class="input-group">
+                                         <input class='form-control' value='${produto}' readOnly />
+                                     </div>
+                                </div>
+                             </div>
+                        </div>
+                        <div class='row'>
+                             <div class='col-lg-6'>
+                                  <div class="form-group">
+                                      <label for="produto">Origem</label>
+                                      <div class="input-group">
+                                        <input class='form-control' value='${origem}' readOnly />
+                                      </div>
+                                 </div>
+                              </div>
+                              <div class='col-lg-6'>
+                                  <div class="form-group">
+                                      <label for="produto">Destino</label>
+                                      <div class="input-group">
+                                        <input class='form-control' value='${destino}' readOnly />
+                                      </div>
+                                 </div>
+                             </div>
+                         </div>
+                         
+                        <div class='row'>
+                             <div class='col-lg-3'>
+                                 <div class="form-group">
+                                     <label for="produto">Nota Fiscal</label>
+                                     <div class="input-group">
+                                         <input class='form-control' value='${notaFisc}' readOnly />
+                                     </div>
+                                </div>
+                             </div>
+                             <div class='col-lg-3'>
+                                 <div class="form-group">
+                                     <label for="produto">Data da Compra</label>
+                                     <div class="input-group">
+                                         <input class='form-control' value='' readOnly />
+                                     </div>
+                                </div>
+                             </div>
+                             <div class='col-lg-3'>
+                                 <div class="form-group">
+                                     <label for="produto">(R$) Aquisição</label>
+                                     <div class="input-group">
+                                         <input class='form-control' value='${aquisicao}' readOnly />
+                                     </div>
+                                </div>
+                             </div>
+                             <div class='col-lg-3'>
+                                 <div class="form-group">
+                                     <label for="produto">(R$) Depreciação</label>
+                                     <div class="input-group">
+                                         <input class='form-control' value='${depreciacao}' readOnly />
+                                     </div>
+                                </div>
+                             </div>
+                         </div>
+                         <div class='row'>
+                             <div class='col-lg-6'>
+                                 <div class="form-group">
+                                     <label for="produto">Marca</label>
+                                     <div class="input-group">
+                                         <input class='form-control' value='${marca}' readOnly />
+                                     </div>
+                                </div>
+                             </div>
+                             <div class='col-lg-6'>
+                                 <div class="form-group">
+                                     <label for="produto">Fabricante</label>
+                                     <div class="input-group">
+                                         <input class='form-control' value='${fabricante}' readOnly />
+                                     </div>
+                                </div>
+                             </div>
+                         </div>
+                         <input type="text" id="inputProdutoEdita" name="inputProdutoEdita" value="${id}" style="display: none">
+                         `;
+                        $('.dados-produto').html(formModal)
                     })
-                }
-                Filtrar()
+                })
+
+                $('#modal-close').on('click', function () {
+                    $('#page-modal').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                })
+            }
+
+
+            function editarLancamento(){
+                $('.editarLancamento').each((i, elem) => {
+                    $(elem).on('click', ( ) => {
+                        let linha = $(elem).parent().parent()
+                        let tds = linha.children();
+    
+                        let filhosPrimeiroTd = $(tds[0]).children();
+                        let idLancamento = $(filhosPrimeiroTd[1]).val()
+    
+                        window.location.href = `contasAPagarNovoLancamento.php?lancamentoId=${idLancamento}`
+                    })
+                })
+            }
+
+
+
+            function Filtrar() {
+                let cont = false;
+
+                $('#submitFiltro').on('click', (e) => {
+                    e.preventDefault()
+
+                    const msg = $(
+                        '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+                    )
+
+                    if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() ==
+                        'Filtrando...') $('#cmbProduto').val("")
+
+                    let periodoDe = $('#inputPeriodoDe').val()
+                    let ate = $('#inputAte').val()
+                    let numeroDocumento = $('#inputNumeroDocumento').val()
+                    let fornecedor = $('#cmbFornecedor').val()
+                    let planoContas = $('#cmbPlanoContas').val()
+                    let status = $('#cmbStatus').val()
+                    let url = "contasAPagarFiltra.php";
+
+                    inputsValues = {
+                        inputPeriodoDe: periodoDe,
+                        inputAte: ate,
+                        inputNumeroDocumento: numeroDocumento,
+                        cmbFornecedor: fornecedor,
+                        cmbPlanoContas: planoContas,
+                        cmbStatus: status
+                    };
+
+                    $.post(
+                        url,
+                        inputsValues,
+                        (data) => {
+                            // console.log(data)
+                            if (data) {
+                                $('tbody').html(data)
+                                $('#imprimir').removeAttr('disabled')
+                                resultadosConsulta = data
+                                modalAcoes()
+                                editarLancamento()
+
+                            } else {
+                                $('tbody').html(msg)
+                                $('#imprimir').attr('disabled', '')
+                            }
+                        }
+                    );
+                })
+            }
+            Filtrar()
+
+
+            // $('.btnParcelar').each((i, elem) => {
+            //     $(elem).on('click', ( ) => {
+                    
+            //     })
+            // })
 
 
             //     function imprime() {
@@ -678,7 +914,7 @@ $dataFim = date("Y-m-t");
                                         <div class="text-right pt-3">
                                             <div>
                                                 <button id="novoLacamento" class="btn btn-success"><a
-                                                        href="novoLancamento.php"
+                                                        href="contasAPagarNovoLancamento.php"
                                                         style="text-decoration:none; color: #FFF">Novo
                                                         Lançamento</a></button>
                                                 <button id="efetuarPagamento" class="btn btn-success">Efetuar
@@ -717,6 +953,99 @@ $dataFim = date("Y-m-t");
                 </div>
 
                 <!-- /info blocks -->
+
+                <!--------------------------------------------------------------------------------------------------->
+                <!--Modal ditar-->
+                <div id="page-modal" class="custon-modal">
+                    <div class="custon-modal-container">
+                        <div class="card custon-modal-content">
+                            <div class="custon-modal-title">
+                                <i class=""></i>
+                                <p class="h3">Parcelamento</p>
+                                <i class=""></i>
+                            </div>
+                            <form id="editarProduto" method="POST">
+                                <div class="d-flex flex-row p-2">
+                                    <div class='col-lg-3'>
+                                        <div class="form-group">
+                                            <label for="valorTotal">Valor Total</label>
+                                            <div class="input-group">
+                                                <input type="text" id="valorTotal" name="valorTotal" class="form-control" readOnly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <label for="numeroSerie">Periodicidade</label>
+                                        <div class="form-group">
+                                            <select id="cmbPeriodicidade" name="cmbPeriodicidade"
+                                                class="form-control form-control-select2">
+                                                <option value="">Selecionar</option>
+                                                <option value="">Mensal</option>
+                                                <option value="">Quinsenal</option>
+                                                <option value="">Semanal</option>
+                                                <!-- <?php
+                                                // $sql = "SELECT EstCoId, EstCoNome
+                                                //         FROM EstadoConservacao
+                                                //         JOIN Situacao on SituaId = EstCoStatus
+                                                //         WHERE SituaChave = 'ATIVO'
+                                                //         ORDER BY EstCoNome ASC";
+                                                // $result = $conn->query($sql);
+                                                // $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                // foreach ($rowEstCo as $item) {
+                                                //     print('<option value="' . $item['EstCoId'] . '">' . $item['EstCoNome'] . '</option>');
+                                                // }
+                                                ?> -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1">
+                                        <label for="numeroSerie">Parcelas</label>
+                                        <div class="form-group">
+                                            <select id="cmbPeriodicidade" name="cmbPeriodicidade"
+                                                class="form-control form-control-select2">
+                                                <option value="">1</option>
+                                                <option value="">2</option>
+                                                <option value="">3</option>
+                                                <option value="">4</option>
+                                                <option value="">5</option>
+                                                <option value="">6</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1">
+                                        <button class="btn btn-lg btn-primary mt-2" id="gerarParcelas">Gerar Parcelas</button>
+                                    </div>
+                                </div>
+                                <div class="dados-produto p-3">
+
+                                </div>
+                            </form>
+                            
+                            <div class="d-flex flex-row">
+                                <div class="col-12 d-flex flex-row justify-content-center">
+                                    <p class="col-2 p-2" style="background-color:#f2f2f2">Item</p>
+                                    <p class="col-4 p-2" style="background-color:#f2f2f2">Descrição</p>
+                                    <p class="col-3 p-2" style="background-color:#f2f2f2">Vencimento</p>
+                                    <p class="col-3 p-2" style="background-color:#f2f2f2">Valor</p>
+                            </table>
+                                </div>
+                            </div>
+
+                            <div class="card-footer mt-2 d-flex flex-column">
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <button class="btn btn-lg btn-success" id="salvar">Salvar</button>
+                                            <a id="modal-close" class="btn btn-basic" role="button">Cancelar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--------------------------------------------------------------------------------------------------->
 
             </div>
             <!-- /content area -->

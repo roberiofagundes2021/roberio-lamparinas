@@ -53,7 +53,7 @@ function queryPesquisa()
 
         $sql = "SELECT * 
                 FROM ContasAPagar
-                JOIN Fornecedor on ForneId = CnAPaFornecedor
+                LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
                 JOIN Situacao on SituaId = CnApaStatus
                 WHERE " . $string . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
             ";
@@ -62,6 +62,7 @@ function queryPesquisa()
 
         count($rowData) >= 1 ? $cont = 1 : $cont = 0;
     }
+    // print($sql);
 
     if ($cont == 1) {
         $cont = 0;
@@ -71,7 +72,10 @@ function queryPesquisa()
             print("
             
             <tr>
-                <td class='even'><input type='checkbox'></td>
+                <td class='even'>
+                    <input type='checkbox'>
+                    <input type='hidden' value='".$item['CnAPaId']."'>
+                </td>
                 <td class='even'>" . mostraData($item['CnAPaDtVencimento']) . "</td>
                 <td class='even' style='text-align: center'>" . $item['ForneNome'] . "</td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaPlanoContas'] . "</td>
@@ -79,7 +83,21 @@ function queryPesquisa()
                 <td class='even' style='text-align: center'>" . $item['CnAPaValorPago'] . "</td>
                 <td class='even' style='text-align: center'></td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaStatus'] . "</td>
-                <td class='even' style='text-align: center'></td>
+                <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
+                    <a href='#' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-pencil7'></i></a>
+                    <a href='#' class='list-icons-item'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-bin'></i></a>
+                    <div class='dropdown'>													
+						<a href='#' class='list-icons-item' data-toggle='dropdown'>
+							<i class='icon-menu9'></i>
+						</a>
+
+						<div class='dropdown-menu dropdown-menu-right' style='max-width: 20px'>
+															
+						</div>
+                    </div>
+                    <a href='#' class='list-icons-item btnParcelar'  data-popup='tooltip' data-placement='bottom' title='Parcelar'><i class='icon-file-text2'></i></a>
+                    <a href='#' class='list-icons-item'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-file-empty'></i></a>
+                </td>
             </tr>
             ");
         }

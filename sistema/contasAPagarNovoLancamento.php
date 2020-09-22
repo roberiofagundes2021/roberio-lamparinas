@@ -8,59 +8,120 @@ include('global_assets/php/conexao.php');
 
 if(isset($_POST['cmbPlanoContas'])){
 
-    try{
+    if(isset($_POST['inputEditar'])){
 
-        $sql = "SELECT SituaId
-                FROM Situacao
-                WHERE SituaChave = 'ATIVO'
-           ";
-        $result = $conn->query($sql);
-        $situacao = $result->fetch(PDO::FETCH_ASSOC);
+        try{
 
-        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
-                                      CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
-                                      CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-				VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
-                        :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-		$result = $conn->prepare($sql);
-		
-		$result->execute(array(
-                    
-						':iPlanoContas' => $_POST['cmbPlanoContas'],
-						':iFornecedor' => $_POST['cmbFornecedor'],
-						':iContaBanco' => $_POST['cmbContaBanco'],
-						':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-						':sNumDocumento' => $_POST['inputNumeroDocumento'],
-						':sNotaFiscal' => $_POST['inputNotaFiscal'],
-						':dateDtEmissao' => $_POST['inputDataEmissao'],
-						':iOrdemCompra' => $_POST['cmbOrdemCarta'],
-						':sDescricao' => $_POST['inputDescricao'],
-						':dateDtVencimento' => $_POST['inputDataVencimento'],
-						':fValorAPagar' => (float)$_POST['inputValor'],
-                        ':dateDtPagamento' => $_POST['inputDataPagamento'],
-                        ':fValorPago' => (float)$_POST['inputValorTotalPago'],
-						':sObservacao' => $_POST['inputObservacao'],
-						':iStatus' => $situacao['SituaId'],
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iUnidade' => $_SESSION['UnidadeId']
-                        ));
+            $sql = "SELECT SituaId
+		            FROM Situacao
+		            WHERE SituaChave = 'ATIVO'";
+            $result = $conn->query($sql);
+            $situacao = $result->fetch(PDO::FETCH_ASSOC);
+		    
+		    $sql = "UPDATE ContasAPagar SET CnAPaPlanoContas = :iPlanoContas, CnAPaFornecedor = :iFornecedor, CnAPaContaBanco = :iContaBanco, CnAPaFormaPagamento = :iFormaPagamento, CnAPaNumDocumento = :sNumDocumento,
+                                            CnAPaNotaFiscal = :sNotaFiscal, CnAPaDtEmissao = :dateDtEmissao, CnAPaOrdemCompra = :iOrdemCompra, CnAPaDescricao = :sDescricao, CnAPaDtVencimento = :dateDtVencimento, CnAPaValorAPagar = :fValorAPagar,
+                                            CnAPaDtPagamento = :dateDtPagamento, CnAPaValorPago = :fValorPago, CnAPaObservacao = :sObservacao, CnAPaStatus = :iStatus, CnAPaUsuarioAtualizador = :iUsuarioAtualizador, CnAPaUnidade = :iUnidade
+		    		WHERE CnAPaId = ".$_POST['inputContaId']."";
+		    $result = $conn->prepare($sql);
+		    		
+		    $result->execute(array(
+                                ':iPlanoContas' => $_POST['cmbPlanoContas'],
+                                ':iFornecedor' => $_POST['cmbFornecedor'],
+                                ':iContaBanco' => $_POST['cmbContaBanco'],
+                                ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
+                                ':sNumDocumento' => $_POST['inputNumeroDocumento'],
+                                ':sNotaFiscal' => $_POST['inputNotaFiscal'],
+                                ':dateDtEmissao' => $_POST['inputDataEmissao'],
+                                ':iOrdemCompra' => $_POST['cmbOrdemCarta'],
+                                ':sDescricao' => $_POST['inputDescricao'],
+                                ':dateDtVencimento' => $_POST['inputDataVencimento'],
+                                ':fValorAPagar' => (float)$_POST['inputValor'],
+                                ':dateDtPagamento' => $_POST['inputDataPagamento'],
+                                ':fValorPago' => (float)$_POST['inputValorTotalPago'],
+                                ':sObservacao' => $_POST['inputObservacao'],
+                                ':iStatus' => $situacao['SituaId'],
+                                ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                ':iUnidade' => $_SESSION['UnidadeId']
+                            ));
                         
-        $_SESSION['msg']['titulo'] = "Sucesso";
-        $_SESSION['msg']['mensagem'] = "Orçamento incluído!!!";
-        $_SESSION['msg']['tipo'] = "success";
-        
-    } catch(PDOException $e) {
-        
-        $_SESSION['msg']['titulo'] = "Erro";
-        $_SESSION['msg']['mensagem'] = "Erro ao incluir orçamento!!!";
-        $_SESSION['msg']['tipo'] = "error";	
-        
-        echo 'Error: ' . $e->getMessage();die;
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Lançamento editado!!!";
+            $_SESSION['msg']['tipo'] = "success";
+            
+        } catch(PDOException $e) {
+            
+            $_SESSION['msg']['titulo'] = "Erro";
+            $_SESSION['msg']['mensagem'] = "Erro ao editar lançamento!!!";
+            $_SESSION['msg']['tipo'] = "error";	
+            
+            echo 'Error: ' . $e->getMessage();die;
+        }
+
+    } else {
+
+        try{
+
+            $sql = "SELECT SituaId
+                    FROM Situacao
+                    WHERE SituaChave = 'ATIVO'
+               ";
+            $result = $conn->query($sql);
+            $situacao = $result->fetch(PDO::FETCH_ASSOC);
+    
+            $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                                          CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                          CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+                    VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                            :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+            $result = $conn->prepare($sql);
+            
+            $result->execute(array(
+                        
+                            ':iPlanoContas' => $_POST['cmbPlanoContas'],
+                            ':iFornecedor' => $_POST['cmbFornecedor'],
+                            ':iContaBanco' => $_POST['cmbContaBanco'],
+                            ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
+                            ':sNumDocumento' => $_POST['inputNumeroDocumento'],
+                            ':sNotaFiscal' => $_POST['inputNotaFiscal'],
+                            ':dateDtEmissao' => $_POST['inputDataEmissao'],
+                            ':iOrdemCompra' => $_POST['cmbOrdemCarta'],
+                            ':sDescricao' => $_POST['inputDescricao'],
+                            ':dateDtVencimento' => $_POST['inputDataVencimento'],
+                            ':fValorAPagar' => (float)$_POST['inputValor'],
+                            ':dateDtPagamento' => $_POST['inputDataPagamento'],
+                            ':fValorPago' => (float)$_POST['inputValorTotalPago'],
+                            ':sObservacao' => $_POST['inputObservacao'],
+                            ':iStatus' => $situacao['SituaId'],
+                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                            ':iUnidade' => $_SESSION['UnidadeId']
+                            ));
+                            
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Lançamento incluído!!!";
+            $_SESSION['msg']['tipo'] = "success";
+            
+        } catch(PDOException $e) {
+            
+            $_SESSION['msg']['titulo'] = "Erro";
+            $_SESSION['msg']['mensagem'] = "Erro ao incluir Lançamento!!!";
+            $_SESSION['msg']['tipo'] = "error";	
+            
+            echo 'Error: ' . $e->getMessage();die;
+        }
+
     }
      
-    irpara("orcamento.php");
+    irpara("contasAPagar.php");
 }
 //$count = count($row);
+
+if(isset($_GET['lancamentoId'])){
+    $sql = "SELECT *
+    		FROM ContasAPagar
+    		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = ".$_GET['lancamentoId']."";
+    $result = $conn->query($sql);
+    $lancamento = $result->fetch(PDO::FETCH_ASSOC);
+}
 ?>
 
 <!DOCTYPE html>
@@ -96,6 +157,27 @@ if(isset($_POST['cmbPlanoContas'])){
     <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
     <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
     <script src="global_assets/js/demo_pages/form_validation.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function habilitarPagamento(){
+
+                $("#habilitarPagamento").on('click', ( e ) => {
+
+                    e.preventDefault()
+                    $dataPagamento = $("#inputDataVencimento").val()
+                    $valorTotalPago = $("#inputValor").val()
+                    $("#inputDataPagamento").val($dataPagamento)
+                    $("#inputValorTotalPago").val($valorTotalPago)
+
+                    document.getElementById('jurusDescontos').style = "";
+
+                })
+                $("#jurusDescontos")
+            }
+            habilitarPagamento()
+        })
+    </script>
 
 </head>
 
@@ -135,6 +217,13 @@ if(isset($_POST['cmbPlanoContas'])){
 
                             <div class="card-body">
                                 <form name="formMovimentacao" method="post" class="p-3">
+                                    <?php 
+                                        if(isset($lancamento)){
+                                            echo '<input type="hidden" name="inputEditar" value="sim">';
+                                            echo '<input type="hidden" name="inputContaId" value="'.$lancamento['CnAPaId'].'">';
+                                        }
+                                        
+                                    ?>
                                     <div class="row">
                                         <div class="col-lg-6">
                                             <div class="form-group">
@@ -151,10 +240,19 @@ if(isset($_POST['cmbPlanoContas'])){
 																ORDER BY PlConNome ASC";
 													$result = $conn->query($sql);
 													$rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowPlanoContas as $item) {
-														print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
-													}
+                                                    
+                                                    
+                                                    foreach ($rowPlanoContas as $item) {
+                                                        if(isset($lancamento)){
+                                                            if($lancamento['CnAPaPlanoContas'] == $item['PlConId']){
+                                                                print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConNome'] . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                            }
+                                                        } else {
+                                                            print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                        }
+                                                    }
 
 													?>
                                                 </select>
@@ -177,7 +275,15 @@ if(isset($_POST['cmbPlanoContas'])){
 													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($rowFornecedor as $item) {
-														print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                                                        if(isset($lancamento)){
+                                                            if($lancamento['CnAPaFornecedor'] == $item['ForneId']){
+                                                                print('<option value="' . $item['ForneId'] . '" selected>' . $item['ForneNome'] . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                                                            }
+                                                        } else {
+                                                            print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                                                        }
 													}
 
 													?>
@@ -202,7 +308,15 @@ if(isset($_POST['cmbPlanoContas'])){
 													$rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($rowContaBanco as $item) {
-														print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                        if(isset($lancamento)){
+                                                            if($lancamento['CnAPaContaBanco'] == $item['CnBanId']){
+                                                                print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                            }
+                                                        } else {
+                                                            print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                        }
 													}
 
 													?>
@@ -225,7 +339,15 @@ if(isset($_POST['cmbPlanoContas'])){
 													$rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($rowFormaPagamento as $item) {
-														print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                        if(isset($lancamento)){
+                                                            if($lancamento['CnAPaFormaPagamento'] == $item['FrPagId']){
+                                                                print('<option value="' . $item['FrPagId'] . '" selected>' . $item['FrPagNome'] . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                            }
+                                                        } else {
+                                                            print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                        }
 													}
 
 													?>
@@ -236,6 +358,7 @@ if(isset($_POST['cmbPlanoContas'])){
                                             <div class="form-group">
                                                 <label for="inputNumeroDocumento">Nº Documento</label>
                                                 <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento"
+                                                    value="<?php if(isset($lancamento)) echo $lancamento['CnAPaNumDocumento'] ?>"
                                                     class="form-control" placeholder="Nº Documento">
                                             </div>
                                         </div>
@@ -245,6 +368,7 @@ if(isset($_POST['cmbPlanoContas'])){
                                             <div class="form-group">
                                                 <label for="inputNotaFiscal">Nº Nota Fiscal/Documento</label>
                                                 <input type="text" id="inputNotaFiscal" name="inputNotaFiscal"
+                                                    value="<?php if(isset($lancamento)) echo $lancamento['CnAPaNotaFiscal'] ?>"
                                                     class="form-control" placeholder="Nº Nota Fiscal/Documento">
                                             </div>
                                         </div>
@@ -252,6 +376,7 @@ if(isset($_POST['cmbPlanoContas'])){
                                             <div class="form-group">
                                                 <label for="inputDataEmissao">Data de Emissão</label>
                                                 <input type="date" id="inputDataEmissao" name="inputDataEmissao"
+                                                    value="<?php if(isset($lancamento)) echo $lancamento['CnAPaDtEmissao'] ?>"
                                                     class="form-control" placeholder="Data de Emissão">
                                             </div>
                                         </div>
@@ -271,7 +396,15 @@ if(isset($_POST['cmbPlanoContas'])){
 													$rowOrdemCompra = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($rowOrdemCompra as $item) {
-														print('<option value="' . $item['OrComId'] . '">' . $item['OrComNumero'] . '</option>');
+                                                        if(isset($lancamento)){
+                                                            if($lancamento['CnAPaOrdemCompra'] == $item['OrComId']){
+                                                                print('<option value="' . $item['OrComId'] . '" selected>' . $item['OrComNumero'] . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $item['OrComId'] . '">' . $item['OrComNumero'] . '</option>');
+                                                            }
+                                                        } else {
+                                                            print('<option value="' . $item['OrComId'] . '">' . $item['OrComNumero'] . '</option>');
+                                                        }
 													}
 
 													?>
@@ -285,6 +418,7 @@ if(isset($_POST['cmbPlanoContas'])){
                                                 <label for="inputDescricao">Descrição <span
                                                         class="text-danger">*</span></label>
                                                 <textarea id="inputDescricao" class="form-control" name="inputDescricao"
+                                                value="<?php if(isset($lancamento)) echo $lancamento['CnAPaDescricao'] ?>"
                                                     rows="3" required></textarea>
                                             </div>
                                         </div>
@@ -292,7 +426,10 @@ if(isset($_POST['cmbPlanoContas'])){
                                     <div class="row">
                                         <div class="col-12 col-lg-6">
                                             <div class="d-flex flex-column">
-                                                <h5>Valor à Pagar</h5>
+                                                <div class="row justify-content-between m-0">
+                                                    <h5>Valor à Pagar</h5>
+                                                    <a href="#">Parcelar</a>
+                                                </div>
                                                 <div class="card">
                                                     <div class="card-body p-4">
                                                         <div class="row">
@@ -300,12 +437,14 @@ if(isset($_POST['cmbPlanoContas'])){
                                                                 <label for="inputDataVencimento">Data do
                                                                     Vencimento</label>
                                                                 <input type="date" id="inputDataVencimento"
+                                                                    value="<?php if(isset($lancamento)) echo $lancamento['CnAPaDtVencimento'] ?>"
                                                                     name="inputDataVencimento" class="form-control">
                                                             </div>
                                                             <div class="form-group col-6">
                                                                 <label for="inputValor">Valor</label>
                                                                 <input type="text" onKeyUp="moeda(this)" maxLength="12"
                                                                     id="inputValor" name="inputValor"
+                                                                    value="<?php if(isset($lancamento)) echo $lancamento['CnAPaValorAPagar'] ?>"
                                                                     class="form-control">
                                                             </div>
                                                         </div>
@@ -315,7 +454,14 @@ if(isset($_POST['cmbPlanoContas'])){
                                         </div>
                                         <div class="col-12 col-lg-6">
                                             <div class="d-flex flex-column">
-                                                <h5>Valor Pago</h5>
+                                                <div class="row justify-content-between m-0">
+                                                    <h5>Valor Pago</h5>
+                                                    <div class="row pr-2">
+                                                        <a id="habilitarPagamento" href="#">Habilitar Pagamento </a>
+                                                        <span class="mx-2">|</span>
+                                                        <a id="jurusDescontos" href="" style="color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none;"> Juros/Descontos</a>
+                                                    </div>
+                                                </div>
                                                 <div class="card">
                                                     <div class="card-body p-4">
                                                         <div class="row">
@@ -323,6 +469,7 @@ if(isset($_POST['cmbPlanoContas'])){
                                                                 <label for="inputDataPagamento">Data do
                                                                     Pagamento</label>
                                                                 <input type="date" id="inputDataPagamento"
+                                                                    value="<?php if(isset($lancamento)) echo $lancamento['CnAPaDtPagamento'] ?>"
                                                                     name="inputDataPagamento" class="form-control">
                                                             </div>
                                                             <div class="form-group col-6">
@@ -330,6 +477,7 @@ if(isset($_POST['cmbPlanoContas'])){
                                                                     Pago</label>
                                                                 <input type="text" onKeyUp="moeda(this)" maxLength="12"
                                                                     id="inputValorTotalPago" name="inputValorTotalPago"
+                                                                    value="<?php if(isset($lancamento)) echo $lancamento['CnAPaValorPago'] ?>"
                                                                     class="form-control">
                                                             </div>
                                                         </div>
