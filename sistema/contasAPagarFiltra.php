@@ -80,7 +80,7 @@ function queryPesquisa()
                 <td class='even' style='text-align: center'>" . $item['ForneNome'] . "</td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaPlanoContas'] . "</td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaNumDocumento'] . "</td>
-                <td class='even' style='text-align: center'>" . $item['CnAPaValorPago'] . "</td>
+                <td class='even' style='text-align: center'>" . $item['CnAPaValorAPagar'] . "</td>
                 <td class='even' style='text-align: center'></td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaStatus'] . "</td>
                 <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
