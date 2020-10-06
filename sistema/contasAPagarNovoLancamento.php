@@ -14,7 +14,7 @@ if(isset($_POST['cmbPlanoContas'])){
 
             $sql = "SELECT SituaId
 		            FROM Situacao
-		            WHERE SituaChave = 'ATIVO'";
+		            WHERE SituaChave = 'APAGAR'";
             $result = $conn->query($sql);
             $situacao = $result->fetch(PDO::FETCH_ASSOC);
 		    
@@ -57,7 +57,7 @@ if(isset($_POST['cmbPlanoContas'])){
                     var_dump($_POST['inputNumeroParcelas']);
                     $sql = "SELECT SituaId
                     FROM Situacao
-                    WHERE SituaChave = 'ATIVO'
+                    WHERE SituaChave = 'APAGAR'
                     ";
                     $result = $conn->query($sql);
                     $situacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -111,7 +111,7 @@ if(isset($_POST['cmbPlanoContas'])){
 
             $sql = "SELECT SituaId
                     FROM Situacao
-                    WHERE SituaChave = 'ATIVO'
+                    WHERE SituaChave = 'APAGAR'
                ";
             $result = $conn->query($sql);
             $situacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -323,6 +323,7 @@ if(isset($_GET['lancamentoId'])){
                         document.getElementById('jurusDescontos').style = "";
 
                         $("#habilitarPagamento").addClass('clicado')
+                        $("#habilitarPagamento").html('Desativar Pagamento')
                         preencherJurosDescontos()
                     } else {
 
@@ -333,6 +334,7 @@ if(isset($_GET['lancamentoId'])){
                             "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none;";
 
                         $("#habilitarPagamento").removeClass('clicado')
+                        $("#habilitarPagamento").html('Habilitar Pagamento')
                         limparJurosDescontos()
                     }
 
@@ -349,10 +351,16 @@ if(isset($_GET['lancamentoId'])){
                 })
 
                 let valorTotal = $('#inputValor').val()
-                console.log(valorTotal)
+                
                 $('#valorTotal').val(valorTotal)
 
                 $('#modalCloseParcelar').on('click', function () {
+                    $('#pageModalParcelar').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                    $("#parcelasContainer").html("")
+                })
+
+                $("#salvarParcelas").on('click', function () {
                     $('#pageModalParcelar').fadeOut(200);
                     $('body').css('overflow', 'scroll');
                 })
@@ -446,6 +454,7 @@ if(isset($_GET['lancamentoId'])){
                     $("#cmbContaBanco").attr('required', '')
                     $("#cmbFormaPagamento").attr('required', '')
                 }
+                $("#lancamento").submit()
             })
         })
     </script>
@@ -468,7 +477,7 @@ if(isset($_GET['lancamentoId'])){
 
             <!-- Content area -->
             <div class="content">
-                <form name="lancamento" method="post" class="p-3">
+                <form id="lancamento" name="lancamento" method="post" class="p-3">
                     <!-- Info blocks -->
                     <div class="row">
                         <div class="col-lg-12">
@@ -689,7 +698,11 @@ if(isset($_GET['lancamentoId'])){
                                             <div class="d-flex flex-column">
                                                 <div class="row justify-content-between m-0">
                                                     <h5>Valor à Pagar</h5>
-                                                    <a href="#" id="btnParcelar">Parcelar</a>
+                                                    <?php 
+                                                       if(!isset($lancamento)){
+                                                           print('<a href="#" id="btnParcelar">Parcelar</a>');
+                                                       }
+                                                    ?>
                                                 </div>
                                                 <div class="card">
                                                     <div class="card-body p-4">
@@ -760,7 +773,6 @@ if(isset($_GET['lancamentoId'])){
                                     </div>
                                     <button id="salvar" class="btn btn-principal">Salvar</button>
                                     <a href="contasAPagar.php" class="btn">Cancelar</a>
-
                                 </div>
 
                             </div>
@@ -862,7 +874,7 @@ if(isset($_GET['lancamentoId'])){
                                     <div class="row" style="margin-top: 10px;">
                                         <div class="col-lg-12">
                                             <div class="form-group">
-                                                <button class="btn btn-lg btn-success" id="salvar">Salvar</button>
+                                                <a class="btn btn-lg btn-principal" id="salvarParcelas">OK</a>
                                                 <a id="modalCloseParcelar" class="btn btn-basic"
                                                     role="button">Cancelar</a>
                                             </div>
@@ -946,8 +958,8 @@ if(isset($_GET['lancamentoId'])){
                                     <div class="row" style="margin-top: 10px;">
                                         <div class="col-lg-12">
                                             <div class="form-group">
-                                                <button class="btn btn-lg btn-success"
-                                                    id="salvarJurosDescontos">Salvar</button>
+                                                <a class="btn btn-lg btn-principal"
+                                                    id="salvarJurosDescontos">Ok</a>
                                                 <a id="modalCloseJurosDescontos" class="btn btn-basic"
                                                     role="button">Cancelar</a>
                                             </div>

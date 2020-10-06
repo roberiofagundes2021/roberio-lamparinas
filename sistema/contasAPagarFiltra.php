@@ -66,37 +66,42 @@ function queryPesquisa()
 
     if ($cont == 1) {
         $cont = 0;
+        print('<input type="hidden" id="elementosGrid" value="'.count($rowData).'">');
         foreach ($rowData as $item) {
             $cont++;     
+
+            $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Paga';
 
             print("
             
             <tr>
                 <td class='even'>
-                    <input type='checkbox'>
+                    <input type='checkbox' id='check".$cont."'>
                     <input type='hidden' value='".$item['CnAPaId']."'>
                 </td>
                 <td class='even'>" . mostraData($item['CnAPaDtVencimento']) . "</td>
-                <td class='even' style='text-align: center'>" . $item['ForneNome'] . "</td>
-                <td class='even' style='text-align: center'>" . $item['CnAPaPlanoContas'] . "</td>
+                <td class='even'>" . $item['CnAPaDescricao'] . "</td>
+                <td class='even'>" . $item['ForneNome'] . "</td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaNumDocumento'] . "</td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaValorAPagar'] . "</td>
-                <td class='even' style='text-align: center'></td>
-                <td class='even' style='text-align: center'>" . $item['CnAPaStatus'] . "</td>
+                <td class='even' style='text-align: center'>" .$status. "</td>
                 <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
-                    <a href='#' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-pencil7'></i></a>
-                    <a href='#' class='list-icons-item'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-bin'></i></a>
-                    <div class='dropdown'>													
-						<a href='#' class='list-icons-item' data-toggle='dropdown'>
-							<i class='icon-menu9'></i>
-						</a>
-
-						<div class='dropdown-menu dropdown-menu-right' style='max-width: 20px'>
-															
-						</div>
+                <div class='list-icons'>
+                    <div class='list-icons list-icons-extended'>
+                        <a href='#' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-pencil7'></i></a>
+                        <a href='#' class='list-icons-item'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-bin'></i></a>
+				        <div class='dropdown'>													
+				        	<a href='#' class='list-icons-item' data-toggle='dropdown'>
+				        		<i class='icon-menu9'></i>
+				    
+				        	<div class='dropdown-menu dropdown-menu-right'>
+                                <a href='#' class='dropdown-item btnParcelar'  data-popup='tooltip' data-placement='bottom' title='Parcelar'><i class='icon-file-text2'></i> Parcelar</a>
+                                <a href='#' class='dropdown-item'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-file-empty'></i></a>
+				        	</div>
+				        </div>
+				    </div>
+                   
                     </div>
-                    <a href='#' class='list-icons-item btnParcelar'  data-popup='tooltip' data-placement='bottom' title='Parcelar'><i class='icon-file-text2'></i></a>
-                    <a href='#' class='list-icons-item'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-file-empty'></i></a>
                 </td>
             </tr>
             ");

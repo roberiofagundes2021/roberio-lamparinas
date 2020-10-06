@@ -68,28 +68,28 @@ $dataFim = date("Y-m-t");
                 autoWidth: false,
                 responsive: true,
                 columnDefs: [{
-                        orderable: true, //Vencimento
+                        orderable: false, //selecionar
                         width: "5%",
                         targets: [0]
                     },
                     {
-                        orderable: true, //Descrição
-                        width: "20%",
+                        orderable: true, //Vencimento
+                        width: "10%",
                         targets: [1]
                     },
                     {
-                        orderable: true, //Fornecedor
-                        width: "15%",
+                        orderable: true, //Descrição
+                        width: "30%",
                         targets: [2]
                     },
                     {
-                        orderable: true, //Plano de Contas
-                        width: "15%",
+                        orderable: true, //Fornecedor
+                        width: "25%",
                         targets: [3]
                     },
                     {
                         orderable: true, //Número Doc.
-                        width: "10%",
+                        width: "15%",
                         targets: [4]
                     },
                     {
@@ -98,19 +98,14 @@ $dataFim = date("Y-m-t");
                         targets: [5]
                     },
                     {
-                        orderable: true, //Saldo
+                        orderable: true, //Status
                         width: "5%",
                         targets: [6]
                     },
                     {
-                        orderable: true, //Status
+                        orderable: true, //Ações
                         width: "5%",
                         targets: [7]
-                    },
-                    {
-                        orderable: true, //Ações
-                        width: "20%",
-                        targets: [8]
                     }
                 ],
                 dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -170,274 +165,15 @@ $dataFim = date("Y-m-t");
                 }
             });
 
-            //     // Select2 for length menu styling
-            //     var _componentSelect2 = function () {
-            //         if (!$().select2) {
-            //             console.warn('Warning - select2.min.js is not loaded.');
-            //             return;
-            //         }
+            function modalParcelas() {
 
-            //         // Initialize
-            //         $('.dataTables_length select').select2({
-            //             minimumResultsForSearch: Infinity,
-            //             dropdownAutoWidth: true,
-            //             width: 'auto'
-            //         });
-            //     };
-
-            //     _componentSelect2();
-            //     /* Fim: Tabela Personalizada */
-
-            //     //Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
-            //     $('#cmbFornecedor').on('change', function (e) {
-
-            //         var cmbTipo = $('#cmbTipo').val();
-            //         var inputFornecedor = $('#inputFornecedor').val();
-            //         var cmbFornecedor = $('#cmbFornecedor').val();
-
-            //         $('#inputFornecedor').val(cmbFornecedor);
-
-            //         FiltraCategoria();
-            //         Filtrando();
-            //         FiltraServico();
-
-            //         $.getJSON('filtraCategoria.php?idFornecedor=' + cmbFornecedor, function (dados) {
-
-            //             var option = '<option value="">Selecione a Categoria</option>';
-
-            //             if (dados.length) {
-
-            //                 $.each(dados, function (i, obj) {
-            //                     option += '<option value="' + obj.CategId + '">' + obj
-            //                         .CategNome + '</option>';
-            //                 });
-
-            //                 $('#cmbCategoria').html(option).show();
-            //             } else {
-            //                 ResetCategoria();
-            //             }
-            //         });
-
-            //         $.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor, function (dados) {
-
-            //             var option = '<option value="">Selecione a SubCategoria</option>';
-
-            //             if (dados.length) {
-
-            //                 $.each(dados, function (i, obj) {
-            //                     option += '<option value="' + obj.SbCatId + '">' + obj
-            //                         .SbCatNome + '</option>';
-            //                 });
-
-            //                 $('#cmbSubCategoria').html(option).show();
-            //             } else {
-            //                 ResetSubCategoria();
-            //             }
-            //         });
-
-            //         $.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor, function (dados) {
-
-            //             var option = '<option value="" "selected">Selecione o Produto</option>';
-
-            //             if (dados.length) {
-
-            //                 $.each(dados, function (i, obj) {
-            //                     option += '<option value="' + obj.ProduId + '">' + obj
-            //                         .ProduNome + '</option>';
-            //                 });
-
-            //                 $('#cmbProduto').html(option).show();
-            //             } else {
-            //                 ResetProduto();
-            //             }
-            //         });
-
-            //         $.getJSON('filtraServico.php?idFornecedor=' + cmbFornecedor, function (dados) {
-
-            //             var option = '<option value="" "selected">Selecione o Serviço</option>';
-
-            //             if (dados.length) {
-
-            //                 $.each(dados, function (i, obj) {
-            //                     option += '<option value="' + obj.ServiId + '">' + obj
-            //                         .ServiNome + '</option>';
-            //                 });
-
-            //                 $('#cmbServico').html(option).show();
-            //             } else {
-            //                 ResetServico();
-            //             }
-            //         });
-
-            //     });
-
-            //     //Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
-            //     $('#cmbCategoria').on('change', function (e) {
-
-            //         Filtrando();
-
-            //         var cmbCategoria = $('#cmbCategoria').val();
-
-            //         $.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function (dados) {
-
-            //             var option = '<option value="">Selecione a SubCategoria</option>';
-
-            //             if (dados.length) {
-
-            //                 $.each(dados, function (i, obj) {
-            //                     option += '<option value="' + obj.SbCatId + '">' + obj
-            //                         .SbCatNome + '</option>';
-            //                 });
-
-            //                 $('#cmbSubCategoria').html(option).show();
-            //             } else {
-            //                 ResetSubCategoria();
-            //             }
-            //         });
-
-            //         $.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria, function (dados) {
-
-            //             var option = '<option value="" "selected">Selecione o Produto</option>';
-
-            //             if (dados.length) {
-
-            //                 $.each(dados, function (i, obj) {
-            //                     option += '<option value="' + obj.ProduId + '">' + obj
-            //                         .ProduNome + '</option>';
-            //                 });
-
-            //                 $('#cmbProduto').html(option).show();
-            //             } else {
-            //                 ResetProduto();
-            //             }
-            //         });
-
-            //     });
-
-            //     //Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
-            //     $('#cmbSubCategoria').on('change', function (e) {
-
-            //         FiltraProduto();
-
-            //         var cmbTipo = $('#cmbTipo').val();
-            //         var cmbFornecedor = $('#cmbFornecedor').val();
-            //         var cmbCategoria = $('#cmbCategoria').val();
-            //         var cmbSubCategoria = $('#cmbSubCategoria').val();
-
-            //         if (cmbTipo == 'S' || cmbTipo == 'T') {
-            //             cmbFornecedor = '#';
-            //         }
-
-            //         if (cmbFornecedor != '#' && cmbFornecedor != '') {
-            //             $.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' +
-            //                 cmbCategoria + '&idSubCategoria=' + cmbSubCategoria,
-            //                 function (dados) {
-
-            //                     var option =
-            //                         '<option value="#" "selected">Selecione o Produto</option>';
-
-            //                     if (dados.length) {
-
-            //                         $.each(dados, function (i, obj) {
-            //                             option += '<option value="' + obj.ProduId + '">' + obj
-            //                                 .ProduNome + '</option>';
-            //                         });
-
-            //                         $('#cmbProduto').html(option).show();
-            //                     } else {
-            //                         ResetProduto();
-            //                     }
-            //                 });
-            //         } else if (cmbCategoria != '#' && cmbCategoria != '') {
-            //             $.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria + '&idSubCategoria=' +
-            //                 cmbSubCategoria,
-            //                 function (dados) {
-
-            //                     var option =
-            //                         '<option value="#" "selected">Selecione o Produto</option>';
-
-            //                     if (dados.length) {
-
-            //                         $.each(dados, function (i, obj) {
-            //                             option += '<option value="' + obj.ProduId + '">' + obj
-            //                                 .ProduNome + '</option>';
-            //                         });
-
-            //                         $('#cmbProduto').html(option).show();
-            //                     } else {
-            //                         ResetProduto();
-            //                     }
-            //                 });
-            //         } else {
-            //             $.getJSON('filtraProduto.php?idSubCategoria=' + cmbSubCategoria, function (dados) {
-
-            //                 var option =
-            //                     '<option value="#" "selected">Selecione o Produto</option>';
-
-            //                 if (dados.length) {
-
-            //                     $.each(dados, function (i, obj) {
-            //                         option += '<option value="' + obj.ProduId + '">' + obj
-            //                             .ProduNome + '</option>';
-            //                     });
-
-            //                     $('#cmbProduto').html(option).show();
-            //                 } else {
-            //                     ResetProduto();
-            //                 }
-            //             });
-            //         }
-
-
-            //     });
-
-            //     //Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
-            //     function Filtrando() {
-            //         $('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-
-            //     }
-
-            //     //Mostra o "Filtrando..." na combo Produto
-            //     function FiltraCategoria() {
-            //         $('#cmbCategoria').empty().append('<option>Filtrando...</option>');
-            //     }
-
-            //     //Mostra o "Filtrando..." na combo Produto
-            //     function FiltraProduto() {
-            //         $('#cmbProduto').empty().append('<option>Filtrando...</option>');
-            //     }
-
-            //     function FiltraServico() {
-            //         $('#cmbServico').empty().append('<option>Filtrando...</option>');
-            //     }
-
-            //     function ResetCategoria() {
-            //         $('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
-            //     }
-
-            //     function ResetSubCategoria() {
-            //         $('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
-            //     }
-
-            //     function ResetProduto() {
-            //         $('#cmbProduto').empty().append('<option>Sem produto</option>');
-            //     }
-
-            //     function ResetServico() {
-            //         $('#cmbServico').empty().append('<option>Sem serviço</option>');
-            //     }
-
-            //     let resultadosConsulta = '';
-            //     let inputsValues = {};
-
-            function modalAcoes() {
-                console.log('teste')
                 $('.btnParcelar').each((i, elem) => {
                     $(elem).on('click', function () {
                         $('#page-modal').fadeIn(200);
-                        
-                        
-                        let linha = $(elem).parent().parent()
+
+
+                        let linha = $(elem).parent().parent().parent().parent().parent()
+                        .parent()
 
                         // let id = linha.attr('idPatrimonio')
                         // let editado = linha.attr('editado')
@@ -449,19 +185,6 @@ $dataFim = date("Y-m-t");
 
                         $('#valorTotal').val(validade)
 
-                        //////////////////////////////
-                        // let descricao = $(tds[2]).html();
-                        // let  = $(tds[3]).html();
-                        // let aquisicao = $(tds[4]).html();
-                        // let depreciacao = $(tds[5]).html();
-                        // let origem = $(tds[7]).html();
-                        // let destino = $(tds[8]).html();
-                        // let marca = $(tds[9]).html();
-                        // let fabricante = $(tds[10]).html();
-                        // let numeroSerie = $(tds[12]).children().first().val()
-                        // let estadoConservacao = $(tds[13]).children().first().val()
-                        //console.log(numeroSerie)
-
                         const fonte1 = 'style="font-size: 1.1rem"'
                         const fonte2 = 'style="font-size: 0.9rem"'
                         const textCenter = 'style="text-align: center"'
@@ -470,123 +193,27 @@ $dataFim = date("Y-m-t");
                         const styleLabel3 = 'style="min-width: 100px; font-size: 0.9rem"'
                         const marginP = 'style="font-size: 0.9rem; margin-top: 4px"'
 
-                        var NumSerie = numeroSerie ? numeroSerie : ''
 
-                        $('#numeroSerie').val(NumSerie)
 
-                        $('#cmbEstadoConservacao').val(estadoConservacao)
+                        // if (estadoConservacao) {
+                        //     let url = 'filtraEstadoConservacao.php'
+                        //     let inputsValues = {
+                        //         inputEstadoConservacao: estadoConservacao
+                        //     }
 
-                        if (estadoConservacao) {
-                            let url = 'filtraEstadoConservacao.php'
-                            let inputsValues = {
-                                inputEstadoConservacao: estadoConservacao
-                            }
+                        //     $.post(
+                        //         url,
+                        //         inputsValues,
+                        //         (data) => {
+                        //             if (data) {
+                        //                 $('#cmbEstadoConservacao').html(data)
 
-                            $.post(
-                                url,
-                                inputsValues,
-                                (data) => {
-                                    if (data) {
-                                        $('#cmbEstadoConservacao').html(data)
+                        //             } else {}
+                        //         }
+                        //     );
+                        // }
 
-                                    } else {}
-                                }
-                            );
-                        }
 
-                        formModal = `
-                        <div class='row'>
-                             <div class='col-lg-2'>
-                                 <div class="form-group">
-                                     <label for="produto">Patrimônio</label>
-                                     <div class="input-group">
-                                        <input class='form-control' value='${patrimonio}' readOnly />
-                                     </div>
-                                </div>
-                             </div>                                    
-                             <div class='col-lg-10'>
-                                 <div class="form-group">
-                                     <label for="produto">Produto</label>
-                                     <div class="input-group">
-                                         <input class='form-control' value='${produto}' readOnly />
-                                     </div>
-                                </div>
-                             </div>
-                        </div>
-                        <div class='row'>
-                             <div class='col-lg-6'>
-                                  <div class="form-group">
-                                      <label for="produto">Origem</label>
-                                      <div class="input-group">
-                                        <input class='form-control' value='${origem}' readOnly />
-                                      </div>
-                                 </div>
-                              </div>
-                              <div class='col-lg-6'>
-                                  <div class="form-group">
-                                      <label for="produto">Destino</label>
-                                      <div class="input-group">
-                                        <input class='form-control' value='${destino}' readOnly />
-                                      </div>
-                                 </div>
-                             </div>
-                         </div>
-                         
-                        <div class='row'>
-                             <div class='col-lg-3'>
-                                 <div class="form-group">
-                                     <label for="produto">Nota Fiscal</label>
-                                     <div class="input-group">
-                                         <input class='form-control' value='${notaFisc}' readOnly />
-                                     </div>
-                                </div>
-                             </div>
-                             <div class='col-lg-3'>
-                                 <div class="form-group">
-                                     <label for="produto">Data da Compra</label>
-                                     <div class="input-group">
-                                         <input class='form-control' value='' readOnly />
-                                     </div>
-                                </div>
-                             </div>
-                             <div class='col-lg-3'>
-                                 <div class="form-group">
-                                     <label for="produto">(R$) Aquisição</label>
-                                     <div class="input-group">
-                                         <input class='form-control' value='${aquisicao}' readOnly />
-                                     </div>
-                                </div>
-                             </div>
-                             <div class='col-lg-3'>
-                                 <div class="form-group">
-                                     <label for="produto">(R$) Depreciação</label>
-                                     <div class="input-group">
-                                         <input class='form-control' value='${depreciacao}' readOnly />
-                                     </div>
-                                </div>
-                             </div>
-                         </div>
-                         <div class='row'>
-                             <div class='col-lg-6'>
-                                 <div class="form-group">
-                                     <label for="produto">Marca</label>
-                                     <div class="input-group">
-                                         <input class='form-control' value='${marca}' readOnly />
-                                     </div>
-                                </div>
-                             </div>
-                             <div class='col-lg-6'>
-                                 <div class="form-group">
-                                     <label for="produto">Fabricante</label>
-                                     <div class="input-group">
-                                         <input class='form-control' value='${fabricante}' readOnly />
-                                     </div>
-                                </div>
-                             </div>
-                         </div>
-                         <input type="text" id="inputProdutoEdita" name="inputProdutoEdita" value="${id}" style="display: none">
-                         `;
-                        $('.dados-produto').html(formModal)
                     })
                 })
 
@@ -596,17 +223,100 @@ $dataFim = date("Y-m-t");
                 })
             }
 
+            function pagamentoAgrupado() {
 
-            function editarLancamento(){
+                let numLinhas = $("#elementosGrid").val()
+
+                for (let i = 1; i <= numLinhas; i++) {
+
+                    let id = $(`#check${i}`).parent().children().last().val();
+
+                    $(`#check${i}`).on('click', () => {
+
+                        if (!$(`#check${i}`).hasClass('clicado')) {
+                            $(`#check${i}`).addClass('clicado')
+                            let input = `<input type="hidden" name="conta${i}" value="${id}">`
+                            $("#pagamentoAgrupadoForm").append(input)
+
+                            let quantInputs = $("#pagamentoAgrupadoForm").children()
+
+                            if (quantInputs.length >= 1) {
+                                $("#efetuarPagamento").removeAttr('disabled')
+                            } else {
+                                $("#efetuarPagamento").attr('disabled')
+                            }
+
+                        } else {
+                            $(`[name=conta${i}]`).remove()
+
+                            $(`#check${i}`).removeClass('clicado')
+
+                            let quantInputs = $("#pagamentoAgrupadoForm").children()
+
+                            if (quantInputs.length == 0) {
+                                $("#efetuarPagamento").prop('disabled', true)
+                            }
+                        }
+                    })
+                }
+            }
+
+            function pagamentoAgrupadoEnvia() {
+                let inputs = $("#pagamentoAgrupadoForm").children()
+
+                let ids = []
+
+                inputs.each((i, elem) => {
+                    ids[i] = $(elem).val()
+                })
+
+                data = {
+                    values: ids
+                }
+
+                url = 'contasAPagarPagamentoAgrupado.php'
+
+                $.post(
+                    url,
+                    data,
+                    (data) => {
+                        let linhas = $('tbody').children()
+                        let ids = data.split('/')
+                        for (let h = 0; h <= ids.length; h++) {
+                            for (let i = 1; i <= linhas.length - 1; i++) {
+
+                                let p = $(linhas[i]).children()[0]
+                                let irm = $(p).children()[1]
+
+                                if ($(irm).val() == ids[h]) {
+                                    
+                                    let linha = $(`#check${i}`)
+                                    let status = $(linhas[i]).children()[6]
+                                    $(status).html('Paga')
+
+                                }
+                            }
+                        }
+                    })
+            }
+
+            $("#efetuarPagamento").on("click", (e) => {
+                e.preventDefault()
+                pagamentoAgrupadoEnvia()
+            })
+
+
+            function editarLancamento() {
                 $('.editarLancamento').each((i, elem) => {
-                    $(elem).on('click', ( ) => {
+                    $(elem).on('click', () => {
                         let linha = $(elem).parent().parent()
                         let tds = linha.children();
-    
+
                         let filhosPrimeiroTd = $(tds[0]).children();
                         let idLancamento = $(filhosPrimeiroTd[1]).val()
-    
-                        window.location.href = `contasAPagarNovoLancamento.php?lancamentoId=${idLancamento}`
+
+                        window.location.href =
+                            `contasAPagarNovoLancamento.php?lancamentoId=${idLancamento}`
                     })
                 })
             }
@@ -652,8 +362,9 @@ $dataFim = date("Y-m-t");
                                 $('tbody').html(data)
                                 $('#imprimir').removeAttr('disabled')
                                 resultadosConsulta = data
-                                modalAcoes()
+                                modalParcelas()
                                 editarLancamento()
+                                pagamentoAgrupado()
 
                             } else {
                                 $('tbody').html(msg)
@@ -665,83 +376,7 @@ $dataFim = date("Y-m-t");
             }
             Filtrar()
 
-
-            // $('.btnParcelar').each((i, elem) => {
-            //     $(elem).on('click', ( ) => {
-                    
-            //     })
-            // })
-
-
-            //     function imprime() {
-            //         url = 'relatorioMovimentacaoImprime.php';
-
-            //         $('#imprimir').on('click', (e) => {
-            //             e.preventDefault()
-            //             console.log('teste')
-            //             if (resultadosConsulta) {
-            //                 let tipo = $('input[name="inputTipo"]:checked').val()
-
-            //                 $('#TipoProdutoServico').val(tipo)
-            //                 $('#inputResultado').val(resultadosConsulta)
-            //                 $('#inputDataDe_imp').val(inputsValues.inputDataDe)
-            //                 $('#inputDataAte_imp').val(inputsValues.inputDataAte)
-            //                 $('#cmbTipo_imp').val(inputsValues.cmbTipo)
-            //                 $('#cmbFornecedor_imp').val(inputsValues.cmbFornecedor)
-            //                 $('#cmbCategoria_imp').val(inputsValues.cmbCategoria)
-            //                 $('#cmbSubCategoria_imp').val(inputsValues.cmbSubCategoria)
-            //                 $('#cmbProduto_imp').val(inputsValues.cmbProduto)
-            //                 $('#cmbServico_imp').val(inputsValues.cmbServico)
-            //                 $('#cmbCodigo_imp').val(inputsValues.cmbCodigo)
-
-            //                 $('#formImprime').attr('action', url)
-
-            //                 $('#formImprime').submit()
-            //             }
-            //         })
-
-            //     }
-            //     imprime()
-
         });
-
-        //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-        // function atualizaFornecedor(ForneId, ForneNome, ForneStatus, Tipo) {
-
-        //     if (Tipo == 'imprime') {
-
-        //         document.getElementById('inputFornecedorCategoria').value = document.getElementById('cmbCategoria')
-        //             .value;
-
-        //         document.formFornecedor.action = "fornecedorImprime.php";
-        //         document.formFornecedor.setAttribute("target", "_blank");
-        //     } else {
-        //         document.getElementById('inputFornecedorId').value = ForneId;
-        //         document.getElementById('inputFornecedorNome').value = ForneNome;
-        //         document.getElementById('inputFornecedorStatus').value = ForneStatus;
-
-        //         if (Tipo == 'edita') {
-        //             document.formFornecedor.action = "fornecedorEdita.php";
-        //         } else if (Tipo == 'exclui') {
-        //             confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir esse fornecedor?",
-        //                 "fornecedorExclui.php");
-        //         } else if (Tipo == 'mudaStatus') {
-        //             document.formFornecedor.action = "fornecedorMudaSituacao.php";
-        //         }
-        //     }
-
-        //     document.formFornecedor.submit();
-        // }
-
-        // function selecionaTipo(tipo) {
-        //     if (tipo == 'P') {
-        //         document.getElementById('Produto').style.display = "block";
-        //         document.getElementById('Servico').style.display = "none";
-        //     } else {
-        //         document.getElementById('Produto').style.display = "none";
-        //         document.getElementById('Servico').style.display = "block";
-        //     }
-        // }
     </script>
 
 </head>
@@ -907,7 +542,8 @@ $dataFim = date("Y-m-t");
                                             </div>
                                             <div class="text-right col-2 pt-3">
                                                 <div>
-                                                    <button id="submitFiltro" class="btn btn-principal">Pesquisar</button>
+                                                    <button id="submitFiltro"
+                                                        class="btn btn-principal">Pesquisar</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -917,7 +553,7 @@ $dataFim = date("Y-m-t");
                                                         href="contasAPagarNovoLancamento.php"
                                                         style="text-decoration:none; color: #FFF">Novo
                                                         Lançamento</a></button>
-                                                <button id="efetuarPagamento" class="btn btn-principal">Efetuar
+                                                <button id="efetuarPagamento" class="btn btn-principal" disabled>Efetuar
                                                     Pagamento</button>
                                                 <button class="btn bg-secondary"><i class="icon-printer2"></i></button>
                                             </div>
@@ -928,13 +564,12 @@ $dataFim = date("Y-m-t");
                                 <table class="table" id="tblMovimentacao">
                                     <thead>
                                         <tr class="bg-slate">
+                                            <th></th>
                                             <th>Vencimento</th>
                                             <th style='text-align: center'>Descrição</th>
                                             <th>Fornecedor</th>
-                                            <th>Plano de Contas</th>
                                             <th>Número Doc.</th>
                                             <th>Valor Total</th>
-                                            <th>Saldo</th>
                                             <th>Status</th>
                                             <th>Ações</th>
                                         </tr>
@@ -951,6 +586,8 @@ $dataFim = date("Y-m-t");
 
                     </div>
                 </div>
+
+                <form id="pagamentoAgrupadoForm" action=""></form>
 
                 <!-- /info blocks -->
 
@@ -970,7 +607,8 @@ $dataFim = date("Y-m-t");
                                         <div class="form-group">
                                             <label for="valorTotal">Valor Total</label>
                                             <div class="input-group">
-                                                <input type="text" id="valorTotal" name="valorTotal" class="form-control" readOnly>
+                                                <input type="text" id="valorTotal" name="valorTotal"
+                                                    class="form-control" readOnly>
                                             </div>
                                         </div>
                                     </div>
@@ -1014,21 +652,22 @@ $dataFim = date("Y-m-t");
                                         </div>
                                     </div>
                                     <div class="col-lg-1">
-                                        <button class="btn btn-lg btn-primary mt-2" id="gerarParcelas">Gerar Parcelas</button>
+                                        <button class="btn btn-lg btn-primary mt-2" id="gerarParcelas">Gerar
+                                            Parcelas</button>
                                     </div>
                                 </div>
                                 <div class="dados-produto p-3">
 
                                 </div>
                             </form>
-                            
+
                             <div class="d-flex flex-row">
                                 <div class="col-12 d-flex flex-row justify-content-center">
                                     <p class="col-2 p-2" style="background-color:#f2f2f2">Item</p>
                                     <p class="col-4 p-2" style="background-color:#f2f2f2">Descrição</p>
                                     <p class="col-3 p-2" style="background-color:#f2f2f2">Vencimento</p>
                                     <p class="col-3 p-2" style="background-color:#f2f2f2">Valor</p>
-                            </table>
+                                    </table>
                                 </div>
                             </div>
 
