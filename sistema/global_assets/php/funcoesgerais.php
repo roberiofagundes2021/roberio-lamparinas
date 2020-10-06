@@ -62,11 +62,11 @@
 	//-------------------------------------------------------------------------
 	//###############################################################
 	
-	 function anti_injection($sql) //evita que aconteça ataques SQL INJECTION
+	 function anti_injection($sql) //evita que aconteï¿½a ataques SQL INJECTION
 	 {
 	 // remove palavras que contenham sintaxe sql
 	 $sql = preg_replace(sql_regcase("/(from|select|insert|delete|where|drop table|show tables|#|\*|--|\\\\)/"),"",$sql);
-	// $sql = trim($sql);//limpa espaços vazio
+	// $sql = trim($sql);//limpa espaï¿½os vazio
 	 $sql = strip_tags($sql);//tira tags html e php
 	 $sql = addslashes($sql);//Adiciona barras invertidas a uma string
 	 return $sql;
@@ -121,9 +121,9 @@
 		$string	= utf8_decode($string);
 		
 		// matriz de entrada
-		$de = array( 'ä','ã','à','á','â','ê','ë','è','é','ï','ì','í','ö','õ','ò','ó','ô','ü','ù','ú','û','À','Á','É','Í','Ó','Ú','ñ','Ñ','ç','Ç',' ','-','(',')',',',';',':','|','!','"','#','$','%','&','/','=','?','~','^','>','<','ª','º' );
+		$de = array( 'ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½','ï¿½',' ','-','(',')',',',';',':','|','!','"','#','$','%','&','/','=','?','~','^','>','<','ï¿½','ï¿½' );
 
-		// matriz de saída
+		// matriz de saï¿½da
 		$para   = array( 'a','a','a','a','a','e','e','e','e','i','i','i','o','o','o','o','o','u','u','u','u','A','A','E','I','O','U','n','n','c','C','','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_' );
 
 		// devolver a string
@@ -198,7 +198,7 @@
 	
 	function validaCPF($cpf = null) {
 
-		// Verifica se um número foi informado
+		// Verifica se um nï¿½mero foi informado
 		if(empty($cpf)) {
 			return false;
 		}
@@ -207,11 +207,11 @@
 		$cpf = preg_replace("/[^0-9]/", "", $cpf);
 		$cpf = str_pad($cpf, 11, '0', STR_PAD_LEFT);
 		
-		// Verifica se o numero de digitos informados é igual a 11 
+		// Verifica se o numero de digitos informados ï¿½ igual a 11 
 		if (strlen($cpf) != 11) {
 			return false;
 		}
-		// Verifica se nenhuma das sequências invalidas abaixo 
+		// Verifica se nenhuma das sequï¿½ncias invalidas abaixo 
 		// foi digitada. Caso afirmativo, retorna falso
 		else if ($cpf == '00000000000' || 
 			$cpf == '11111111111' || 
@@ -225,7 +225,7 @@
 			$cpf == '99999999999') {
 			return false;
 		 // Calcula os digitos verificadores para verificar se o
-		 // CPF é válido
+		 // CPF ï¿½ vï¿½lido
 		 } else {   
 			
 			for ($t = 9; $t < 11; $t++) {
@@ -253,6 +253,5 @@
 		$numero = str_pad($numero, 6, '0', STR_PAD_LEFT);
 		return $numero;
 	}
-
-	
+		
 ?>

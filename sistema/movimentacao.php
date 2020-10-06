@@ -205,7 +205,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 									<div class="col-lg-3">
 										<div class="text-right">
-											<a href="movimentacaoNovo.php" class="btn btn-principal" role="button">Nova Movimentação</a>
+											<a href="movimentacaoNovoEntrada.php" class="btn btn-principal" role="button">Nova Movimentação</a>
 											<a href="index.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Listar Requisições">Requisições</a>
 										</div>
 									</div>

@@ -1862,7 +1862,15 @@ var_dump($_POST);die;
 
 		function selecionaTipo(tipo) {
 
+			$('#divConteudo').css({"background-color":"#eeeded",
+									"box-shadow":"none"
+									});
+			$('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
+
 			if (tipo == 'E') {
+
+				location.href='movimentacaoNovoEntrada.php';
+
 				document.getElementById('EstoqueOrigem').style.display = "none";
 				document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
 				document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
@@ -1897,6 +1905,9 @@ var_dump($_POST);die;
 				mudaTotalTitulo('S')
 				limpaValorFormulario('S')
 			} else {
+
+				location.href='movimentacaoNovoTransferencia.php';
+
 				document.getElementById('EstoqueOrigem').style.display = "none";
 				document.getElementById('EstoqueOrigemLocalSetor').style.display = "block";
 				document.getElementById('DestinoLocalEstoqueSetor').style.display = "block";
@@ -2052,36 +2063,47 @@ var_dump($_POST);die;
 				<!-- Info blocks -->
 				<div class="card">
 
-					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovo.php">
-						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Movimentação</h5>
-						</div>
+					<div class="card-header header-elements-inline">
+						<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Movimentação</h5>
+					</div>
 
-						<div class="card-body">
-							<div class="row">
-								<div class="col-lg-4">
-									<div class="form-group">
-										<div class="form-check form-check-inline">
-											<label class="form-check-label">
-												<input type="radio" name="inputTipo" value="E" class="form-input-styled" onclick="selecionaTipo('E')" <?php if (!isset($_POST['inputSolicitacaoId'])) echo 'checked' ?> <?php if (isset($_POST['inputSolicitacaoId'])) echo 'disabled' ?> data-fouc>
-												Entrada
-											</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<label class="form-check-label">
-												<input type="radio" name="inputTipo" value="S" class="form-input-styled" onclick="selecionaTipo('S')" <?php if (isset($_POST['inputSolicitacaoId'])) echo 'checked' ?> <?php if (isset($_POST['inputSolicitacaoId'])) echo 'saidaSolicitacao="true"' ?> data-fouc>
-												Saída
-											</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<label class="form-check-label">
-												<input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo('T')" <?php if (isset($_POST['inputSolicitacaoId'])) echo 'disabled' ?> data-fouc>
-												Transferência
-											</label>
-										</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-4">
+								<div class="form-group">
+									<div class="form-check form-check-inline">
+										<label class="form-check-label">
+											<input type="radio" name="inputTipo" value="E" class="form-input-styled" onclick="selecionaTipo('E')" data-fouc>
+											Entrada
+										</label>
+									</div>
+									<div class="form-check form-check-inline">
+										<label class="form-check-label">
+											<input type="radio" name="inputTipo" value="S" class="form-input-styled" checked data-fouc>
+											Saída
+										</label>
+									</div>
+									<div class="form-check form-check-inline">
+										<label class="form-check-label">
+											<input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo('T')" data-fouc>
+											Transferência
+										</label>
 									</div>
 								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /card-body -->
 
+				</div>
+				<!-- /info blocks -->
+
+				<!-- Info blocks -->
+				<div class="card" id="divConteudo">
+					
+					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovo.php">
+						<div class="card-body">
+							<div class="row">
 								<div class="col-lg-4" id="motivo" style="display:none;">
 									<div class="form-group">
 										<label for="cmbMotivo">Motivo</label>
@@ -2570,18 +2592,7 @@ var_dump($_POST);die;
 												');
 										} else {
 											print('
-                                             
-											        <tr class="bg-slate" id="trEntrada">
-											            <th>Item</th>
-											            <th>Produto/Serviço</th>
-											            <th style="text-align:center">Unidade Medida</th>
-											            <th id="quantEditaEntradaSaida" style="text-align:center">Quant. Recebida</th>
-											            <th style="text-align:center">Saldo</th>
-											            <th style="text-align:right">Valor Unitário</th>
-											            <th style="text-align:right">Valor Total</th>
-											            <th class="text-center">Ações</th>
-													</tr>
-													<tr class="bg-slate" id="trSaida" style="display: none; width: 100%">
+													<tr class="bg-slate" id="trSaida" style="width: 100%">
 													    <th>Item</th>
 													    <th>Produto/Serviço</th>
 													    <th style="text-align:center">Unidade Medida</th>
@@ -2690,7 +2701,7 @@ var_dump($_POST);die;
 									</tbody>
 									<tfoot>
 										<tr>
-											<th id="totalTitulo" colspan="6" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$) Nota Fiscal: </th>
+											<th id="totalTitulo" colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$): </th>
 											<?php
 											if (isset($_POST['inputSolicitacaoId'])) {
 												print('
@@ -2811,8 +2822,9 @@ var_dump($_POST);die;
 						<!-- /card-body -->
 					</form>
 
+
 				</div>
-				<!-- /info blocks -->
+				<!-- /info blocks -->				
 
 				<div id="page-modal" class="custon-modal">
 					<div class="custon-modal-container">
