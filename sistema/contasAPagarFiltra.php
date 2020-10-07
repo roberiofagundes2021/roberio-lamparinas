@@ -20,7 +20,7 @@ function queryPesquisa()
     }
 
     if (!empty($_POST['inputNumeroDocumento'])) {
-        $args[]  = "CnAPaNumeroDocumento = '" . $_POST['cmbNumeroDocumento'] . "' ";
+        $args[]  = "CnAPaNumDocumento = '" . $_POST['inputNumeroDocumento'] . "' ";
     }
 
     if (!empty($_POST['cmbFornecedor'])) {
@@ -43,26 +43,39 @@ function queryPesquisa()
         $args[]  = "CnApaStatus = " . $_POST['cmbStatus'] . " ";
     }
 
-    if (count($args) >= 1) {
+    if($_POST['tipoFiltro'] == 'FiltroNormal')
+    {
+        if (count($args) >= 1) {
 
-        $string = implode(" and ", $args);
-
-        if ($string != '') {
-            $string .= ' and ';
+            $string = implode(" and ", $args);
+    
+            if ($string != '') {
+                $string .= ' and ';
+            }
+    
+            $sql = "SELECT * 
+                    FROM ContasAPagar
+                    LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
+                    JOIN Situacao on SituaId = CnApaStatus
+                    WHERE " . $string . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+                ";
+            $result = $conn->query($sql);
+            $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
+    
+            count($rowData) >= 1 ? $cont = 1 : $cont = 0;
         }
-
+    } else {
         $sql = "SELECT * 
                 FROM ContasAPagar
                 LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
                 JOIN Situacao on SituaId = CnApaStatus
-                WHERE " . $string . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-            ";
+                WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+        ";
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
         count($rowData) >= 1 ? $cont = 1 : $cont = 0;
     }
-    // print($sql);
 
     if ($cont == 1) {
         $cont = 0;
@@ -79,7 +92,7 @@ function queryPesquisa()
                     <input type='checkbox' id='check".$cont."'>
                     <input type='hidden' value='".$item['CnAPaId']."'>
                 </td>
-                <td class='even'>" . mostraData($item['CnAPaDtVencimento']) . "</td>
+                <td class='even'><p class='m-0'>" . mostraData($item['CnAPaDtVencimento']) . "</p><input type='hidden' value='".$item['CnAPaDtVencimento']."'></td>
                 <td class='even'>" . $item['CnAPaDescricao'] . "</td>
                 <td class='even'>" . $item['ForneNome'] . "</td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaNumDocumento'] . "</td>

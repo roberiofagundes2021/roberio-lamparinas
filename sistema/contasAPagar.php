@@ -19,9 +19,9 @@ $d = date("d");
 $m = date("m");
 $Y = date("Y");
 
-$dataInicio = date("Y-m-01"); //30 dias atrás
-$dataFim = date("Y-m-t");
-
+// $dataInicio = date("Y-m-01"); //30 dias atrás
+$dataInicio = date("Y-m-d");
+$dataFim = date("Y-m-d");
 ?>
 
 <!DOCTYPE html>
@@ -179,20 +179,18 @@ $dataFim = date("Y-m-t");
                         // let editado = linha.attr('editado')
 
                         let tds = linha.children();
-                        console.log(tds)
-                        let validade = $(tds[5]).html();
+                        let valor = $(tds[5]).html();
+                        let dataVencimentolistChild = $(tds[1]).children()
+                        let dataVencimento = $(dataVencimentolistChild[1]).val()
+                        let descricao = $(tds[2]).html()
+
                         //Conteúdo novo
 
-                        $('#valorTotal').val(validade)
+                        $('#inputValor').val(valor)
+                        $('#inputDataVencimento').val(dataVencimento)
+                        $('#inputDescricao').val(descricao)
 
                         const fonte1 = 'style="font-size: 1.1rem"'
-                        const fonte2 = 'style="font-size: 0.9rem"'
-                        const textCenter = 'style="text-align: center"'
-                        const styleLabel1 = 'style="min-width: 250px; font-size: 0.9rem"'
-                        const styleLabel2 = 'style="min-width: 150px; font-size: 0.9rem"'
-                        const styleLabel3 = 'style="min-width: 100px; font-size: 0.9rem"'
-                        const marginP = 'style="font-size: 0.9rem; margin-top: 4px"'
-
 
 
                         // if (estadoConservacao) {
@@ -222,6 +220,74 @@ $dataFim = date("Y-m-t");
                     $('body').css('overflow', 'scroll');
                 })
             }
+            /////////////////////////////////////////////////////////////////
+            function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
+                $("#parcelasContainer").html("")
+
+                let valorParcela = float2moeda(valorTotal / parcelas)
+                let numeroParcelas = `<input type="hidden" value="${parcelas}" name="inputNumeroParcelas">`
+                // let dataVencimento = dataVencimento
+                $("#parcelasContainer").append(numeroParcelas)
+                let cont = 0
+                let iAnterior = 0
+                for (let i = 1; i <= parcelas; i++) {
+
+                    let novaDataVencimento = ''
+
+                    let somadorPeriodicidade = periodicidade == 1 ? 0 : periodicidade == 2 ? 2 :
+                        periodicidade == 3 ? 3 : 6
+                    if (i > 1) {
+                        let dataArray = dataVencimento.split("-")
+                        let mes = parseInt(dataArray[1])
+                        let novoMes = 0
+                        let ano = parseInt(dataArray[0])
+
+                        novoMes = mes + i > 9 ? (mes + (i - 1)).toString() : `0${(mes + (i - 1)).toString()}`
+
+                        if (novoMes > 12) {
+                            cont++
+                            ano = ano + 1
+                            novoMes = cont > 9 ? cont : `0${cont}`
+                        }
+
+                        dataArray[1] = novoMes
+                        dataArray[0] = ano
+                        novaDataVencimento = `${dataArray[0]}-${dataArray[1]}-${dataArray[2]}`
+                    } else {
+                        novaDataVencimento = dataVencimento
+                        
+                    }
+
+                    let elem = `<div class="d-flex flex-row justify-content-center">
+                                    <p class="col-1 p-2 pl-4">${i}</p>
+                                    <div class="form-group col-5 p-2">
+                                        <input type="text" class="form-control" id="inputParcelaDescricao${i}" name="inputParcelaDescricao${i}" value="${descricao} ${i}/${parcelas}">
+                                    </div>
+                                    <div class="form-group col-3 p-2">
+                                        <input type="date" class="form-control" id="inputParcelaDataVencimento${i}" name="inputParcelaDataVencimento${i}" value="${novaDataVencimento}">
+                                    </div>
+                                    <div class="form-group col-3 p-2">
+                                        <input type="text" class="form-control" id="inputParcelaValorAPagar${i}" name="inputParcelaValorAPagar${i}" value="${valorParcela}">
+                                    </div> 
+                                </div>`
+
+                    $("#parcelasContainer").append(elem)
+                }
+            }
+
+            function parcelamento() {
+                $('#gerarParcelas').on('click', (e) => {
+                    e.preventDefault()
+                    let parcelas = $("#cmbParcelas").val()
+                    let valorTotal = $("#inputValor").val()
+                    let dataVencimento = $("#inputDataVencimento").val()
+                    let periodicidade = $("#cmbPeriodicidade").val()
+                    let descricao = $("#inputDescricao").val()
+                    geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
+                })
+            }
+            parcelamento()
+            /////////////////////////////////////////////////////////////////
 
             function pagamentoAgrupado() {
 
@@ -309,7 +375,7 @@ $dataFim = date("Y-m-t");
             function editarLancamento() {
                 $('.editarLancamento').each((i, elem) => {
                     $(elem).on('click', () => {
-                        let linha = $(elem).parent().parent()
+                        let linha = $(elem).parent().parent().parent().parent()
                         let tds = linha.children();
 
                         let filhosPrimeiroTd = $(tds[0]).children();
@@ -323,11 +389,8 @@ $dataFim = date("Y-m-t");
 
 
 
-            function Filtrar() {
+            function Filtrar(carregamentoPagina) {
                 let cont = false;
-
-                $('#submitFiltro').on('click', (e) => {
-                    e.preventDefault()
 
                     const msg = $(
                         '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
@@ -343,6 +406,7 @@ $dataFim = date("Y-m-t");
                     let planoContas = $('#cmbPlanoContas').val()
                     let status = $('#cmbStatus').val()
                     let url = "contasAPagarFiltra.php";
+                    let tipoFiltro = carregamentoPagina ? 'CarregamentoPagima' : 'FiltroNormal'
 
                     inputsValues = {
                         inputPeriodoDe: periodoDe,
@@ -350,7 +414,8 @@ $dataFim = date("Y-m-t");
                         inputNumeroDocumento: numeroDocumento,
                         cmbFornecedor: fornecedor,
                         cmbPlanoContas: planoContas,
-                        cmbStatus: status
+                        cmbStatus: status,
+                        tipoFiltro: tipoFiltro
                     };
 
                     $.post(
@@ -372,10 +437,14 @@ $dataFim = date("Y-m-t");
                             }
                         }
                     );
-                })
             }
-            Filtrar()
 
+            $('#submitFiltro').on('click', (e) => {
+                e.preventDefault()
+                Filtrar(false)
+            })
+
+            Filtrar(true)
         });
     </script>
 
@@ -605,9 +674,9 @@ $dataFim = date("Y-m-t");
                                 <div class="d-flex flex-row p-2">
                                     <div class='col-lg-3'>
                                         <div class="form-group">
-                                            <label for="valorTotal">Valor Total</label>
+                                            <label for="inputValor">Valor Total</label>
                                             <div class="input-group">
-                                                <input type="text" id="valorTotal" name="valorTotal"
+                                                <input type="text" id="inputValor" name="inputValor"
                                                     class="form-control" readOnly>
                                             </div>
                                         </div>
@@ -621,33 +690,26 @@ $dataFim = date("Y-m-t");
                                                 <option value="">Mensal</option>
                                                 <option value="">Quinsenal</option>
                                                 <option value="">Semanal</option>
-                                                <!-- <?php
-                                                // $sql = "SELECT EstCoId, EstCoNome
-                                                //         FROM EstadoConservacao
-                                                //         JOIN Situacao on SituaId = EstCoStatus
-                                                //         WHERE SituaChave = 'ATIVO'
-                                                //         ORDER BY EstCoNome ASC";
-                                                // $result = $conn->query($sql);
-                                                // $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                // foreach ($rowEstCo as $item) {
-                                                //     print('<option value="' . $item['EstCoId'] . '">' . $item['EstCoNome'] . '</option>');
-                                                // }
-                                                ?> -->
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-lg-1">
                                         <label for="numeroSerie">Parcelas</label>
                                         <div class="form-group">
-                                            <select id="cmbPeriodicidade" name="cmbPeriodicidade"
+                                            <select id="cmbParcelas" name="cmbPeriodicidade"
                                                 class="form-control form-control-select2">
-                                                <option value="">1</option>
-                                                <option value="">2</option>
-                                                <option value="">3</option>
-                                                <option value="">4</option>
-                                                <option value="">5</option>
-                                                <option value="">6</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
                                             </select>
                                         </div>
                                     </div>
@@ -656,20 +718,22 @@ $dataFim = date("Y-m-t");
                                             Parcelas</button>
                                     </div>
                                 </div>
-                                <div class="dados-produto p-3">
+                                <div class="d-flex flex-row">
+                                    <div class="col-12 d-flex flex-row justify-content-center">
+                                        <p class="col-2 p-2" style="background-color:#f2f2f2">Item</p>
+                                        <p class="col-4 p-2" style="background-color:#f2f2f2">Descrição</p>
+                                        <p class="col-3 p-2" style="background-color:#f2f2f2">Vencimento</p>
+                                        <p class="col-3 p-2" style="background-color:#f2f2f2">Valor</p>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="parcelasContainer" class="d-flex flex-column px-5"
+                                    style="overflow-Y: scroll; max-height: 300px">
 
                                 </div>
+                                <input type="hidden" id='inputDataVencimento'>
+                                <input type="hidden" id='inputDescricao'>
                             </form>
-
-                            <div class="d-flex flex-row">
-                                <div class="col-12 d-flex flex-row justify-content-center">
-                                    <p class="col-2 p-2" style="background-color:#f2f2f2">Item</p>
-                                    <p class="col-4 p-2" style="background-color:#f2f2f2">Descrição</p>
-                                    <p class="col-3 p-2" style="background-color:#f2f2f2">Vencimento</p>
-                                    <p class="col-3 p-2" style="background-color:#f2f2f2">Valor</p>
-                                    </table>
-                                </div>
-                            </div>
 
                             <div class="card-footer mt-2 d-flex flex-column">
                                 <div class="row" style="margin-top: 10px;">

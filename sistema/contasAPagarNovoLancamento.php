@@ -48,13 +48,30 @@ if(isset($_POST['cmbPlanoContas'])){
                                 ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                                 ':iUnidade' => $_SESSION['UnidadeId']
                             ));
+                        
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Lançamento editado!!!";
+            $_SESSION['msg']['tipo'] = "success";
+            
+        } catch(PDOException $e) {
+            
+            $_SESSION['msg']['titulo'] = "Erro";
+            $_SESSION['msg']['mensagem'] = "Erro ao editar lançamento!!!";
+            $_SESSION['msg']['tipo'] = "error";	
+            
+            echo 'Error: ' . $e->getMessage();die;
+        }
+
+    } else {
+
+        try{
+
 
             if(isset($_POST['inputNumeroParcelas'])){
                 
                 $numParcelas = intVal($_POST['inputNumeroParcelas']);
             
                 for($i = 1; $i <= $numParcelas; $i++){
-                    var_dump($_POST['inputNumeroParcelas']);
                     $sql = "SELECT SituaId
                     FROM Situacao
                     WHERE SituaChave = 'APAGAR'
@@ -90,60 +107,42 @@ if(isset($_POST['cmbPlanoContas'])){
                             ':iUnidade' => $_SESSION['UnidadeId']
                     ));
                 }
-            }
-                        
-            $_SESSION['msg']['titulo'] = "Sucesso";
-            $_SESSION['msg']['mensagem'] = "Lançamento editado!!!";
-            $_SESSION['msg']['tipo'] = "success";
-            
-        } catch(PDOException $e) {
-            
-            $_SESSION['msg']['titulo'] = "Erro";
-            $_SESSION['msg']['mensagem'] = "Erro ao editar lançamento!!!";
-            $_SESSION['msg']['tipo'] = "error";	
-            
-            echo 'Error: ' . $e->getMessage();die;
-        }
-
-    } else {
-
-        try{
-
-            $sql = "SELECT SituaId
+            } else {
+                $sql = "SELECT SituaId
                     FROM Situacao
                     WHERE SituaChave = 'APAGAR'
                ";
-            $result = $conn->query($sql);
-            $situacao = $result->fetch(PDO::FETCH_ASSOC);
-    
-            $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
-                                          CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
-                                          CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-                    VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
-                            :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-            $result = $conn->prepare($sql);
-            
-            $result->execute(array(
-                        
-                            ':iPlanoContas' => $_POST['cmbPlanoContas'],
-                            ':iFornecedor' => $_POST['cmbFornecedor'],
-                            ':iContaBanco' => $_POST['cmbContaBanco'],
-                            ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-                            ':sNumDocumento' => $_POST['inputNumeroDocumento'],
-                            ':sNotaFiscal' => $_POST['inputNotaFiscal'],
-                            ':dateDtEmissao' => $_POST['inputDataEmissao'],
-                            ':iOrdemCompra' => $_POST['cmbOrdemCarta'],
-                            ':sDescricao' => $_POST['inputDescricao'],
-                            ':dateDtVencimento' => $_POST['inputDataVencimento'],
-                            ':fValorAPagar' => (float)$_POST['inputValor'],
-                            ':dateDtPagamento' => $_POST['inputDataPagamento'],
-                            ':fValorPago' => isset($_POST['inputValorTotalPago']) ? (float)$_POST['inputValorTotalPago'] : null,
-                            ':sObservacao' => $_POST['inputObservacao'],
-                            ':iStatus' => $situacao['SituaId'],
-                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-                            ':iUnidade' => $_SESSION['UnidadeId']
-                            ));
-
+                $result = $conn->query($sql);
+                $situacao = $result->fetch(PDO::FETCH_ASSOC);
+        
+                $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                                              CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                              CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+                        VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                                :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+                $result = $conn->prepare($sql);
+                
+                $result->execute(array(
+                            
+                                ':iPlanoContas' => $_POST['cmbPlanoContas'],
+                                ':iFornecedor' => $_POST['cmbFornecedor'],
+                                ':iContaBanco' => $_POST['cmbContaBanco'],
+                                ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
+                                ':sNumDocumento' => $_POST['inputNumeroDocumento'],
+                                ':sNotaFiscal' => $_POST['inputNotaFiscal'],
+                                ':dateDtEmissao' => $_POST['inputDataEmissao'],
+                                ':iOrdemCompra' => $_POST['cmbOrdemCarta'],
+                                ':sDescricao' => $_POST['inputDescricao'],
+                                ':dateDtVencimento' => $_POST['inputDataVencimento'],
+                                ':fValorAPagar' => (float)$_POST['inputValor'],
+                                ':dateDtPagamento' => $_POST['inputDataPagamento'],
+                                ':fValorPago' => isset($_POST['inputValorTotalPago']) ? (float)$_POST['inputValorTotalPago'] : null,
+                                ':sObservacao' => $_POST['inputObservacao'],
+                                ':iStatus' => $situacao['SituaId'],
+                                ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                ':iUnidade' => $_SESSION['UnidadeId']
+                                ));
+            }
                             
             $_SESSION['msg']['titulo'] = "Sucesso";
             $_SESSION['msg']['mensagem'] = "Lançamento incluído!!!";
@@ -160,7 +159,7 @@ if(isset($_POST['cmbPlanoContas'])){
 
     }
      
-    // irpara("contasAPagar.php");
+    irpara("contasAPagar.php");
 }
 //$count = count($row);
 
@@ -216,7 +215,8 @@ if(isset($_GET['lancamentoId'])){
                 $("#parcelasContainer").html("")
                 let descricao = $("#inputDescricao").val()
 
-                let valorParcela = float2moeda(valorTotal / parcelas)
+                let valorParcela = float2moeda(parseFloat(valorTotal) / parcelas)
+                console.log(dataVencimento)
                 let numeroParcelas = `<input type="hidden" value="${parcelas}" name="inputNumeroParcelas">`
                 // let dataVencimento = dataVencimento
                 $("#parcelasContainer").append(numeroParcelas)
@@ -271,10 +271,10 @@ if(isset($_GET['lancamentoId'])){
                 $('#gerarParcelas').on('click', (e) => {
                     e.preventDefault()
                     let parcelas = $("#cmbParcelas").val()
-                    let valorTotal = $("#inputValor").val()
+                    let valorTotal = $("#valorTotal").val()
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
-                    // console.log($("#cmbPeriodicidade").val())
+                    
                     geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade)
                 })
             }
@@ -348,11 +348,10 @@ if(isset($_GET['lancamentoId'])){
                 $('#btnParcelar').on('click', (e) => {
                     e.preventDefault()
                     $('#pageModalParcelar').fadeIn(200);
-                })
 
-                let valorTotal = $('#inputValor').val()
-                
-                $('#valorTotal').val(valorTotal)
+                    let valorTotal = $('#inputValor').val()
+                    $('#valorTotal').val(valorTotal)
+                })
 
                 $('#modalCloseParcelar').on('click', function () {
                     $('#pageModalParcelar').fadeOut(200);
