@@ -183,12 +183,15 @@ $dataFim = date("Y-m-d");
                         let dataVencimentolistChild = $(tds[1]).children()
                         let dataVencimento = $(dataVencimentolistChild[1]).val()
                         let descricao = $(tds[2]).html()
+                        let idContainer = $(tds[0]).children()
+                        let id = $(idContainer[1]).val()
 
                         //Conteúdo novo
 
                         $('#inputValor').val(valor)
                         $('#inputDataVencimento').val(dataVencimento)
                         $('#inputDescricao').val(descricao)
+                        $('#inputId').val(id)
 
                         const fonte1 = 'style="font-size: 1.1rem"'
 
@@ -220,6 +223,46 @@ $dataFim = date("Y-m-d");
                     $('body').css('overflow', 'scroll');
                 })
             }
+
+            function cadastraParcelas(){
+                let parcelasNum = $("#cmbParcelas").val()
+                let id = $("#inputId").val()
+            
+                let dataParcelas = new Array
+
+                for(let i = 1; i <= parcelasNum; i++){
+                    // console.log(i)
+                    let arrayParcela = new Array
+
+                    dataParcelas.push({
+                        descricao: $(`#inputParcelaDescricao${i}`).val(),
+                        vencimento: $(`#inputParcelaDataVencimento${i}`).val(),
+                        valor: $(`#inputParcelaValorAPagar${i}`).val()
+                    })
+
+                    // dataParcelas.push(arrayParcela)
+
+                    data = {
+                        parcelas: JSON.stringify(dataParcelas),
+                        numParcelas: parcelasNum,
+                        idConta: id
+                    }
+                }
+                console.log(dataParcelas)
+
+                let url = 'contasAPagarParcelamento.php'
+
+                $.post(
+                    url,
+                    data,
+                    (data) => {
+                        console.log(data)
+                })
+                
+            }
+            $("#salvar").on('click', ( ) => {
+                cadastraParcelas()
+            })
             /////////////////////////////////////////////////////////////////
             function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
                 $("#parcelasContainer").html("")
@@ -733,6 +776,7 @@ $dataFim = date("Y-m-d");
                                 </div>
                                 <input type="hidden" id='inputDataVencimento'>
                                 <input type="hidden" id='inputDescricao'>
+                                <input type="hidden" id='inputId'>
                             </form>
 
                             <div class="card-footer mt-2 d-flex flex-column">
