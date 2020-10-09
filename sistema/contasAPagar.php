@@ -175,9 +175,6 @@ $dataFim = date("Y-m-d");
                         let linha = $(elem).parent().parent().parent().parent().parent()
                         .parent()
 
-                        // let id = linha.attr('idPatrimonio')
-                        // let editado = linha.attr('editado')
-
                         let tds = linha.children();
                         let valor = $(tds[5]).html();
                         let dataVencimentolistChild = $(tds[1]).children()
@@ -194,26 +191,6 @@ $dataFim = date("Y-m-d");
                         $('#inputId').val(id)
 
                         const fonte1 = 'style="font-size: 1.1rem"'
-
-
-                        // if (estadoConservacao) {
-                        //     let url = 'filtraEstadoConservacao.php'
-                        //     let inputsValues = {
-                        //         inputEstadoConservacao: estadoConservacao
-                        //     }
-
-                        //     $.post(
-                        //         url,
-                        //         inputsValues,
-                        //         (data) => {
-                        //             if (data) {
-                        //                 $('#cmbEstadoConservacao').html(data)
-
-                        //             } else {}
-                        //         }
-                        //     );
-                        // }
-
 
                     })
                 })
@@ -256,12 +233,17 @@ $dataFim = date("Y-m-d");
                     url,
                     data,
                     (data) => {
-                        console.log(data)
-                })
+                        $('tbody').append(data)
+                        alerta('Atenção', 'Parcelas geradas com sucesso!')    
+                    }
+                )
                 
             }
             $("#salvar").on('click', ( ) => {
                 cadastraParcelas()
+                $("#parcelasContainer").html('')
+                $('#page-modal').fadeOut(200);
+                $('body').css('overflow', 'scroll');
             })
             /////////////////////////////////////////////////////////////////
             function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
@@ -444,9 +426,10 @@ $dataFim = date("Y-m-d");
 
                     let periodoDe = $('#inputPeriodoDe').val()
                     let ate = $('#inputAte').val()
-                    let numeroDocumento = $('#inputNumeroDocumento').val()
+                    let contaBanco = $('#cmbContaBanco').val()
                     let fornecedor = $('#cmbFornecedor').val()
                     let planoContas = $('#cmbPlanoContas').val()
+                    let formaPagamento = $("#cmbFormaPagamento").val()
                     let status = $('#cmbStatus').val()
                     let url = "contasAPagarFiltra.php";
                     let tipoFiltro = carregamentoPagina ? 'CarregamentoPagima' : 'FiltroNormal'
@@ -454,10 +437,11 @@ $dataFim = date("Y-m-d");
                     inputsValues = {
                         inputPeriodoDe: periodoDe,
                         inputAte: ate,
-                        inputNumeroDocumento: numeroDocumento,
+                        cmbContaBanco: contaBanco,
                         cmbFornecedor: fornecedor,
                         cmbPlanoContas: planoContas,
                         cmbStatus: status,
+                        cmbFormaPagamento: formaPagamento,
                         tipoFiltro: tipoFiltro
                     };
 
@@ -574,10 +558,32 @@ $dataFim = date("Y-m-d");
                                             </div>
                                         </div>
                                         <div class="col-lg-2">
-                                            <div class="form-group">
-                                                <label for="inputNumeroDocumento">Número Doc.</label>
-                                                <input type="text" name="inputNumeroDocumento" id="inputNumeroDocumento"
-                                                    class="form-control">
+                                        <div class="form-group">
+                                                <label for="cmbContaBanco">Conta/Banco</label>
+                                                <select id="cmbContaBanco" name="cmbContaBanco"
+                                                    class="form-control form-control-select2">
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+												        $sql = "SELECT CnBanId, CnBanNome
+												        			FROM ContaBanco
+												        			JOIN Situacao on SituaId = CnBanStatus
+												        			WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+												        			ORDER BY CnBanNome ASC";
+												        $result = $conn->query($sql);
+												        $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
+												        foreach ($rowContaBanco as $item) {
+                                                            if(isset($lancamento)){
+                                                                if($lancamento['CnAPaContaBanco'] == $item['CnBanId']){
+                                                                    print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
+                                                                } else {
+                                                                    print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                                }
+                                                            } else {
+                                                                print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                            }
+												        }
+												    ?>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
@@ -603,33 +609,62 @@ $dataFim = date("Y-m-d");
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label for="cmbPlanoContas">Plano de Contas</label>
-                                                <select id="cmbPlanoContas" name="cmbPlanoContas"
-                                                    class="form-control form-control-select2">
-                                                    <option value="">Todos</option>
-                                                    <?php
-													$sql = "SELECT PlConId, PlConNome
-																FROM PlanoContas
-																JOIN Situacao on SituaId = PlConStatus
-																WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY PlConNome ASC";
-													$result = $conn->query($sql);
-													$rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowPlanoContas as $item) {
-														print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
-													}
-
-													?>
-                                                </select>
-                                            </div>
-                                        </div>
                                     </div>
                                     <div class="row justify-content-between">
-                                        <div class="row col-4">
-                                            <div class="col-lg-10">
+                                        <div class="row col-7">
+                                            <div class="col-lg-3">
+                                                <div class="form-group">
+                                                    <label for="cmbPlanoContas">Plano de Contas</label>
+                                                    <select id="cmbPlanoContas" name="cmbPlanoContas"
+                                                        class="form-control form-control-select2">
+                                                        <option value="">Todos</option>
+                                                        <?php
+											    		$sql = "SELECT PlConId, PlConNome
+											    					FROM PlanoContas
+											    					JOIN Situacao on SituaId = PlConStatus
+											    					WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+											    					ORDER BY PlConNome ASC";
+											    		$result = $conn->query($sql);
+											    		$rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+    
+											    		foreach ($rowPlanoContas as $item) {
+											    			print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+											    		}
+    
+											    		?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label for="cmbFormaPagamento">Forma de Pagamento</label>
+                                                    <select id="cmbFormaPagamento" name="cmbFormaPagamento"
+                                                        class="form-control form-control-select2">
+                                                        <option value="">Selecionar</option>
+                                                        <?php
+										        	        $sql = "SELECT FrPagId, FrPagNome
+										        	        			FROM FormaPagamento
+										        	        			JOIN Situacao on SituaId = FrPagStatus
+										        	        			WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+										        	        			ORDER BY FrPagNome ASC";
+										        	        $result = $conn->query($sql);
+										        	        $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
+										        	        foreach ($rowFormaPagamento as $item) {
+                                                                if(isset($lancamento)){
+                                                                    if($lancamento['CnAPaFormaPagamento'] == $item['FrPagId']){
+                                                                        print('<option value="' . $item['FrPagId'] . '" selected>' . $item['FrPagNome'] . '</option>');
+                                                                    } else {
+                                                                        print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                                    }
+                                                                } else {
+                                                                    print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                                }
+										        	        }
+										        	    ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3">
                                                 <div class="form-group">
                                                     <label for="cmbSubCategoria">Status</label>
                                                     <select id="cmbSubCategoria" name="cmbSubCategoria"
@@ -652,7 +687,7 @@ $dataFim = date("Y-m-d");
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="text-right col-2 pt-3">
+                                            <div class="text-right col-lg-1 pt-3">
                                                 <div>
                                                     <button id="submitFiltro"
                                                         class="btn btn-principal">Pesquisar</button>

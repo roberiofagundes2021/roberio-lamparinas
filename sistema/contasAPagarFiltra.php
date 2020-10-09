@@ -19,25 +19,17 @@ function queryPesquisa()
         $args[]  = "CnAPaDtPagamento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
     }
 
-    if (!empty($_POST['inputNumeroDocumento'])) {
-        $args[]  = "CnAPaNumDocumento = '" . $_POST['inputNumeroDocumento'] . "' ";
+    if (!empty($_POST['cmbContaBanco'])) {
+        $args[]  = "CnAPaContaBanco = '" . $_POST['cmbContaBanco'] . "' ";
     }
 
-    if (!empty($_POST['cmbFornecedor'])) {
-        $args[]  = "CnAPaFornecedor = " . $_POST['cmbFornecedor'] . " ";
+    if (!empty($_POST['cmbFormaPagamento'])) {
+        $args[]  = "CnAPaFormaPagamento = " . $_POST['cmbFormaPagamento'] . " ";
     }
 
     if (!empty($_POST['cmbPlanoContas'])) {
         $args[]  = "CnAPaPlanoContas = " . $_POST['cmbPlanoContas'] . " ";
     }
-
-    // if (!empty($_POST['cmbSubCategoria']) && $_POST['cmbSubCategoria'] != "Sem Subcategoria" && $_POST['cmbSubCategoria'] != "Filtrando...") {
-    //     $args[]  = "ProduSubCategoria = " . $_POST['cmbSubCategoria'] . " ";
-    // }
-
-    // if (!empty($_POST['cmbCodigo'])) {
-    //     $args[]  = "ProduCodigo = " . $_POST['cmbCodigo'] . " ";
-    // }
 
     if (!empty($_POST['cmbStatus'])) {
         $args[]  = "CnApaStatus = " . $_POST['cmbStatus'] . " ";
@@ -61,7 +53,7 @@ function queryPesquisa()
                 ";
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
-    
+
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
         }
     } else {
