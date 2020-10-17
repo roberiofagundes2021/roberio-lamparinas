@@ -170,8 +170,10 @@ if(isset($_POST['cmbPlanoContas'])){
 //$count = count($row);
 
 if(isset($_GET['lancamentoId'])){
-    $sql = "SELECT *
+    $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
+            CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero
     		FROM ContasAPagar
+            LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
     		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = ".$_GET['lancamentoId']."";
     $result = $conn->query($sql);
     $lancamento = $result->fetch(PDO::FETCH_ASSOC);
@@ -468,7 +470,7 @@ $dataInicio = date("Y-m-d");
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-right-visible">
 
     <?php include_once("topo.php"); ?>
 
@@ -595,30 +597,9 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="inputOrdemCarta">Ordem Compra/Carta Contrato</label>
-                                                <select id="cmbOrdemCarta" name="cmbOrdemCarta"
-                                                    class="form-control form-control-select2">
-                                                    <option value="">Selecionar</option>
-                                                    <?php
-												$sql = "SELECT OrComId, OrComNumero
-															FROM OrdemCompra
-															JOIN Situacao on SituaId = OrComSituacao
-															WHERE OrComUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADO'
-															";
-												$result = $conn->query($sql);
-												$rowOrdemCompra = $result->fetchAll(PDO::FETCH_ASSOC);
-												foreach ($rowOrdemCompra as $item) {
-                                                    if(isset($lancamento)){
-                                                        if($lancamento['CnAPaOrdemCompra'] == $item['OrComId']){
-                                                            print('<option value="' . $item['OrComId'] . '" selected>' . $item['OrComNumero'] . '</option>');
-                                                        } else {
-                                                            print('<option value="' . $item['OrComId'] . '">' . $item['OrComNumero'] . '</option>');
-                                                        }
-                                                    } else {
-                                                        print('<option value="' . $item['OrComId'] . '">' . $item['OrComNumero'] . '</option>');
-                                                    }
-												}
-												?>
-                                                </select>
+                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra"
+                                                    value="<?php if(isset($lancamento)) echo $lancamento['OrComNumero'] ?>"
+                                                    class="form-control" readOnly>
                                             </div>
                                         </div>
                                     </div>
@@ -995,6 +976,8 @@ $dataInicio = date("Y-m-d");
 
         </div>
         <!-- /main content -->
+
+        <?php include_once("sidebar-right.php"); ?>
 
     </div>
     <!-- /page content -->
