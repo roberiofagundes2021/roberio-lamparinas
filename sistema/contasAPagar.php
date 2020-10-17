@@ -225,7 +225,6 @@ $dataFim = date("Y-m-d");
                         idConta: id
                     }
                 }
-                console.log(dataParcelas)
 
                 let url = 'contasAPagarParcelamento.php'
 
@@ -353,16 +352,37 @@ $dataFim = date("Y-m-d");
             }
 
             function pagamentoAgrupadoEnvia() {
-                let inputs = $("#pagamentoAgrupadoForm").children()
+                let pagamentos = $("#pagamentoAgrupadoContainer").children()
+                let dataPagamento = $("#inputDataPagamentoPA").val()
+                let formaPagamento = $("#cmbFormaPagamentoPA").val()
+                let contaBanco = $("#cmbContaBancoPA").val()
+                let numeroDocumento = $("#inputNumeroDocumentoPA").val()
 
-                let ids = []
+                let pagamentoValores = []
 
-                inputs.each((i, elem) => {
-                    ids[i] = $(elem).val()
+                pagamentos.each((i, elem) => {
+                    let linhaFilhos = $(elem).children()
+
+                    let id = $(`#idPA${i+1}`).val()
+                    let descricao = $(`#inputDescricaoPA${i+1}`).val()
+                    let planoContas = $(`#cmbPlanoContasPA${i+1}`).val()
+                    let valor = $(`#inputValorPA${i+1}`).val()
+                    
+                    pagamentoValores[i] = {
+                        id: id,
+                        descricao: descricao,
+                        planoContas: planoContas,
+                        valor: valor
+                    }
+
                 })
 
                 data = {
-                    values: ids
+                    valores: pagamentoValores,
+                    dataPagamento: dataPagamento,
+                    formaPagamento: formaPagamento,
+                    contaBanco: contaBanco,
+                    numeroDocumento: numeroDocumento
                 }
 
                 url = 'contasAPagarPagamentoAgrupado.php'
@@ -384,18 +404,86 @@ $dataFim = date("Y-m-d");
                                     let linha = $(`#check${i}`)
                                     let status = $(linhas[i]).children()[6]
                                     $(status).html('Paga')
-
                                 }
                             }
                         }
-                    })
+                    }
+                )
             }
 
-            $("#efetuarPagamento").on("click", (e) => {
+            $("#salvarPA").on('click', (e) =>{
                 e.preventDefault()
                 pagamentoAgrupadoEnvia()
+                $('#modal-pagamentoAgrupado').fadeOut(200);
+                $('body').css('overflow', 'scroll');
             })
 
+            function modalPagamentoAgrupado(){
+                $("#efetuarPagamento").on("click", (e) => {
+                    e.preventDefault()
+                    $('#modal-pagamentoAgrupado').fadeIn(200);
+
+                    let numLinhas = $("#elementosGrid").val()
+                    let valorTotal = 0;
+
+                    for (let i = 1; i <= numLinhas; i++) {
+    
+                        let id = $(`#check${i}`).parent().children().last().val();
+                        let check = $(`#check${i}`).parent().children().first().prop('checked');
+                        let elementosLista =  $(`#check${i}`).parent().parent().children()
+                        let descricao = $(elementosLista[2]).html()
+                        let valor = $(elementosLista[5]).html()
+
+                        if(check){
+                            valorTotal += parseFloat(valor);
+
+                            let elem = `<div class="d-flex flex-row justify-content-center">
+                                        <p class="col-1 mt-3">
+                                            ${i}
+                                            <input type="hidden" id="idPA${i}" value="${id}">
+                                        </p>
+                                        <div class="form-group col-5 p-2">
+                                            <input type="text" class="form-control" id="inputDescricaoPA${i}" name="inputDescricaoPA${i}" value="${descricao}">
+                                        </div>
+                                        <div class="form-group col-3 p-2">
+                                            <div class="form-group">
+                                                <select id="cmbPlanoContasPA${i}" name="cmbPlanoContasPA${i}"
+                                                    class="form-control form-control-select2" required>
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+												        $sql = "SELECT PlConId, PlConNome
+												        			FROM PlanoContas
+												        			JOIN Situacao on SituaId = PlConStatus
+												        			WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+												        			ORDER BY PlConNome ASC";
+												        $result = $conn->query($sql);
+												        $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                        
+                                                        
+                                                        foreach ($rowPlanoContas as $item) {
+                                                            print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                        }
+												    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-3 p-2">
+                                            <input type="text" class="form-control" id="inputValorPA${i}" name="inputValorPA${i}" value="${valor}">
+                                        </div> 
+                                    </div>`
+    
+                            $("#pagamentoAgrupadoContainer").append(elem)
+                        }
+                        $('#inputValorTotalPA').val(float2moeda(valorTotal))
+                    }
+                })
+
+                $('#modal-closePA').on('click', function () {
+                    $('#modal-pagamentoAgrupado').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                })
+            }
+            modalPagamentoAgrupado()
 
             function editarLancamento() {
                 $('.editarLancamento').each((i, elem) => {
@@ -739,7 +827,7 @@ $dataFim = date("Y-m-d");
                 <!-- /info blocks -->
 
                 <!--------------------------------------------------------------------------------------------------->
-                <!--Modal ditar-->
+                <!--Modal Parcelar-->
                 <div id="page-modal" class="custon-modal">
                     <div class="custon-modal-container">
                         <div class="card custon-modal-content">
@@ -819,6 +907,144 @@ $dataFim = date("Y-m-d");
                                     <div class="col-lg-12">
                                         <div class="form-group">
                                             <button class="btn btn-lg btn-success" id="salvar">Salvar</button>
+                                            <a id="modal-closePA" class="btn btn-basic" role="button">Cancelar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--------------------------------------------------------------------------------------------------->
+                 <!--Modal Pagamen-->
+                 <div id="modal-pagamentoAgrupado" class="custon-modal">
+                    <div class="custon-modal-container">
+                        <div class="card custon-modal-content">
+                            <div class="custon-modal-title">
+                                <i class=""></i>
+                                <p class="h3">Efetuar Pagamentos Agrupados</p>
+                                <i class=""></i>
+                            </div>
+                            <form class="px-5 pt-4" id="editarProduto" method="POST">
+                                <div class="d-flex flex-row">
+                                    <div class='col-lg-4'>
+                                        <div class="form-group">
+                                            <label for="inputDataPagamentoPA">Data do Pagamento</label>
+                                            <div class="input-group">
+                                                <input type="date" id="inputDataPagamentoPA" name="inputDataPagamentoPA" value="<?php echo $dataInicio?>"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class='col-lg-4'>
+                                        <div class="form-group">
+                                            <label for="inputValorTotalPA">Valor Total</label>
+                                            <div class="input-group">
+                                                <input type="text" id="inputValorTotalPA" onKeyUp="moeda(this)" maxLength="12" name="inputValorTotalPA"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row">
+                                    <div class="col-lg-6">
+                                        <label for="cmbFormaPagamentoPA">Forma Pagamento</label>
+                                        <div class="form-group">
+                                            <select id="cmbFormaPagamentoPA" name="cmbFormaPagamentoPA" class="form-control form-control-select2">
+                                                <option value="">Selecionar</option>
+                                                <?php
+												    $sql = "SELECT FrPagId, FrPagNome
+												    			FROM FormaPagamento
+												    			JOIN Situacao on SituaId = FrPagStatus
+												    			WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+												    			ORDER BY FrPagNome ASC";
+												    $result = $conn->query($sql);
+												    $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
+												    foreach ($rowFormaPagamento as $item) {
+                                                        if(isset($lancamento)){
+                                                            if($lancamento['CnAPaFormaPagamento'] == $item['FrPagId']){
+                                                                print('<option value="' . $item['FrPagId'] . '" selected>' . $item['FrPagNome'] . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                            }
+                                                        } else {
+                                                            print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                        }
+												    }
+												?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label for="cmbContaBancoPA">Conta/Banco</label>
+                                        <div class="form-group">
+                                            <select id="cmbContaBancoPA" name="cmbContaBancoPA" class="form-control form-control-select2">
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+												        $sql = "SELECT CnBanId, CnBanNome
+												        			FROM ContaBanco
+												        			JOIN Situacao on SituaId = CnBanStatus
+												        			WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+												        			ORDER BY CnBanNome ASC";
+												        $result = $conn->query($sql);
+												        $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
+												        foreach ($rowContaBanco as $item) {
+                                                            if(isset($lancamento)){
+                                                                if($lancamento['CnAPaContaBanco'] == $item['CnBanId']){
+                                                                    print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
+                                                                } else {
+                                                                    print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                                }
+                                                            } else {
+                                                                print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                            }
+												        }
+												    ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row">
+                                    <div class='col-lg-7'>
+                                        <div class="form-group">
+                                            <label for="inputDescricaoPA">Descrição do Agrupamento</label>
+                                            <div class="input-group">
+                                                <input type="text" id="inputDescricaoPA" name="inputDescricaoPA" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class='col-lg-5'>
+                                        <div class="form-group">
+                                            <label for="inputNumeroDocumentoPA">Número Documento</label>
+                                            <div class="input-group">
+                                                <input type="text" id="inputNumeroDocumentoPA" name="inputNumeroDocumentoPA" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row">
+                                    <div class="col-12 d-flex flex-row justify-content-center">
+                                        <p class="col-2 p-2 text-center" style="background-color:#f2f2f2">Item</p>
+                                        <p class="col-4 p-2" style="background-color:#f2f2f2">Descrição</p>
+                                        <p class="col-3 p-2" style="background-color:#f2f2f2">Plano de Contas *</p>
+                                        <p class="col-3 p-2" style="background-color:#f2f2f2">Valor</p>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="pagamentoAgrupadoContainer" class="d-flex flex-column px-5"
+                                    style="overflow-Y: scroll; max-height: 200px">
+
+                                </div>
+                                <input type="hidden" id='inputDataVencimento'>
+                                <input type="hidden" id='inputDescricao'>
+                                <input type="hidden" id='inputId'>
+                            </form>
+
+                            <div class="card-footer mt-2 d-flex flex-column">
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <button class="btn btn-lg btn-success" id="salvarPA">Salvar</button>
                                             <a id="modal-close" class="btn btn-basic" role="button">Cancelar</a>
                                         </div>
                                     </div>

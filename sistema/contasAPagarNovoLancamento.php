@@ -519,27 +519,27 @@ $dataInicio = date("Y-m-d");
                                                     class="form-control form-control-select2" required>
                                                     <option value="">Selecionar</option>
                                                     <?php
-												$sql = "SELECT PlConId, PlConNome
-															FROM PlanoContas
-															JOIN Situacao on SituaId = PlConStatus
-															WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															ORDER BY PlConNome ASC";
-												$result = $conn->query($sql);
-												$rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
-                                                
-                                                
-                                                foreach ($rowPlanoContas as $item) {
-                                                    if(isset($lancamento)){
-                                                        if($lancamento['CnAPaPlanoContas'] == $item['PlConId']){
-                                                            print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConNome'] . '</option>');
-                                                        } else {
-                                                            print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+												        $sql = "SELECT PlConId, PlConNome
+												        			FROM PlanoContas
+												        			JOIN Situacao on SituaId = PlConStatus
+												        			WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+												        			ORDER BY PlConNome ASC";
+												        $result = $conn->query($sql);
+												        $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                        
+                                                        
+                                                        foreach ($rowPlanoContas as $item) {
+                                                            if(isset($lancamento)){
+                                                                if($lancamento['CnAPaPlanoContas'] == $item['PlConId']){
+                                                                    print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConNome'] . '</option>');
+                                                                } else {
+                                                                    print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                                }
+                                                            } else {
+                                                                print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                            }
                                                         }
-                                                    } else {
-                                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
-                                                    }
-                                                }
-												?>
+												    ?>
                                                 </select>
                                             </div>
                                         </div>
