@@ -574,74 +574,7 @@ $dataInicio = date("Y-m-d");
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row justify-content-between">
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label for="cmbContaBanco">Conta/Banco</label>
-                                                <select id="cmbContaBanco" name="cmbContaBanco"
-                                                    class="form-control form-control-select2">
-                                                    <option value="">Selecionar</option>
-                                                    <?php
-												        $sql = "SELECT CnBanId, CnBanNome
-												        			FROM ContaBanco
-												        			JOIN Situacao on SituaId = CnBanStatus
-												        			WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-												        			ORDER BY CnBanNome ASC";
-												        $result = $conn->query($sql);
-												        $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
-												        foreach ($rowContaBanco as $item) {
-                                                            if(isset($lancamento)){
-                                                                if($lancamento['CnAPaContaBanco'] == $item['CnBanId']){
-                                                                    print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                                                }
-                                                            } else {
-                                                                print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                                            }
-												        }
-												    ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label for="cmbFormaPagemento">Forma de Pagamento</label>
-                                                <select id="cmbFormaPagamento" name="cmbFormaPagamento"
-                                                    class="form-control form-control-select2">
-                                                    <option value="">Selecionar</option>
-                                                    <?php
-												$sql = "SELECT FrPagId, FrPagNome
-															FROM FormaPagamento
-															JOIN Situacao on SituaId = FrPagStatus
-															WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															ORDER BY FrPagNome ASC";
-												$result = $conn->query($sql);
-												$rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
-												foreach ($rowFormaPagamento as $item) {
-                                                    if(isset($lancamento)){
-                                                        if($lancamento['CnAPaFormaPagamento'] == $item['FrPagId']){
-                                                            print('<option value="' . $item['FrPagId'] . '" selected>' . $item['FrPagNome'] . '</option>');
-                                                        } else {
-                                                            print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
-                                                        }
-                                                    } else {
-                                                        print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
-                                                    }
-												}
-												?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label for="inputNumeroDocumento">Nº Documento</label>
-                                                <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento"
-                                                    value="<?php if(isset($lancamento)) echo $lancamento['CnAPaNumDocumento'] ?>"
-                                                    class="form-control" placeholder="Nº Documento">
-                                            </div>
-                                        </div>
-                                    </div>
+
                                     <div class="row">
                                         <div class="col-lg-4">
                                             <div class="form-group">
@@ -712,7 +645,7 @@ $dataInicio = date("Y-m-d");
                                                     ?>
                                                 </div>
                                                 <div class="card">
-                                                    <div class="card-body p-4">
+                                                    <div class="card-body p-4" style="background-color: #f8f8f8; border: 1px solid #ccc">
                                                         <div class="row">
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataVencimento">Data do
@@ -746,7 +679,7 @@ $dataInicio = date("Y-m-d");
                                                     </div>
                                                 </div>
                                                 <div class="card">
-                                                    <div class="card-body p-4">
+                                                    <div class="card-body p-4" style="background-color: #f8f8f8; border: 1px solid #ccc">
                                                         <div class="row">
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataPagamento">Data do
@@ -769,6 +702,83 @@ $dataInicio = date("Y-m-d");
                                             </div>
                                         </div>
                                     </div>
+
+                                    <?php
+                                        if(isset($lancamento) && $lancamento['CnAPaContaBanco'] != null){
+                                            $mostrar = '';
+                                        } else{
+                                            $mostrar = 'style="display:none;"';
+                                        }
+                                    ?>
+                                    <div id="camposPagamento" class="row justify-content-between" <?php echo $mostrar; ?>>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label for="cmbContaBanco">Conta/Banco</label>
+                                                <select id="cmbContaBanco" name="cmbContaBanco"
+                                                    class="form-control form-control-select2">
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+												        $sql = "SELECT CnBanId, CnBanNome
+												        			FROM ContaBanco
+												        			JOIN Situacao on SituaId = CnBanStatus
+												        			WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+												        			ORDER BY CnBanNome ASC";
+												        $result = $conn->query($sql);
+												        $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
+												        foreach ($rowContaBanco as $item) {
+                                                            if(isset($lancamento)){
+                                                                if($lancamento['CnAPaContaBanco'] == $item['CnBanId']){
+                                                                    print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
+                                                                } else {
+                                                                    print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                                }
+                                                            } else {
+                                                                print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                            }
+												        }
+												    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label for="cmbFormaPagemento">Forma de Pagamento</label>
+                                                <select id="cmbFormaPagamento" name="cmbFormaPagamento"
+                                                    class="form-control form-control-select2">
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+												$sql = "SELECT FrPagId, FrPagNome
+															FROM FormaPagamento
+															JOIN Situacao on SituaId = FrPagStatus
+															WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															ORDER BY FrPagNome ASC";
+												$result = $conn->query($sql);
+												$rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
+												foreach ($rowFormaPagamento as $item) {
+                                                    if(isset($lancamento)){
+                                                        if($lancamento['CnAPaFormaPagamento'] == $item['FrPagId']){
+                                                            print('<option value="' . $item['FrPagId'] . '" selected>' . $item['FrPagNome'] . '</option>');
+                                                        } else {
+                                                            print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                        }
+                                                    } else {
+                                                        print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                    }
+												}
+												?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label for="inputNumeroDocumento">Nº Documento</label>
+                                                <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento"
+                                                    value="<?php if(isset($lancamento)) echo $lancamento['CnAPaNumDocumento'] ?>"
+                                                    class="form-control" placeholder="Nº Documento">
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="form-group">
