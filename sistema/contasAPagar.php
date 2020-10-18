@@ -48,10 +48,8 @@ $dataFim = date("Y-m-d");
     <!-- /theme JS files -->
 
     <!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
-    <script type="text/javascript" language="javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-    <script type="text/javascript" language="javascript"
-        src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function () {
@@ -61,7 +59,6 @@ $dataFim = date("Y-m-d");
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
                 "order": [
-                    [0, "desc"],
                     [1, "desc"],
                     [2, "asc"]
                 ],
@@ -79,7 +76,7 @@ $dataFim = date("Y-m-d");
                     },
                     {
                         orderable: true, //Descrição
-                        width: "30%",
+                        width: "25%",
                         targets: [2]
                     },
                     {
@@ -89,12 +86,12 @@ $dataFim = date("Y-m-d");
                     },
                     {
                         orderable: true, //Número Doc.
-                        width: "15%",
+                        width: "12%",
                         targets: [4]
                     },
                     {
                         orderable: true, //Valor Total
-                        width: "5%",
+                        width: "13%",
                         targets: [5]
                     },
                     {
@@ -245,7 +242,7 @@ $dataFim = date("Y-m-d");
                 $('body').css('overflow', 'scroll');
             })
             /////////////////////////////////////////////////////////////////
-            function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
+            function gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
                 $("#parcelasContainer").html("")
 
                 let valorParcela = float2moeda(valorTotal / parcelas)
@@ -307,7 +304,7 @@ $dataFim = date("Y-m-d");
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
                     let descricao = $("#inputDescricao").val()
-                    geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
+                    gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
                 })
             }
             parcelamento()
@@ -419,8 +416,11 @@ $dataFim = date("Y-m-d");
             })
 
             function modalPagamentoAgrupado(){
+                
                 $("#efetuarPagamento").on("click", (e) => {
+                    
                     e.preventDefault()
+                    
                     $('#modal-pagamentoAgrupado').fadeIn(200);
 
                     let numLinhas = $("#elementosGrid").val()
@@ -500,8 +500,6 @@ $dataFim = date("Y-m-d");
                 })
             }
 
-
-
             function Filtrar(carregamentoPagina) {
                 let cont = false;
 
@@ -509,8 +507,9 @@ $dataFim = date("Y-m-d");
                         '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
                     )
 
-                    if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() ==
-                        'Filtrando...') $('#cmbProduto').val("")
+                    if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() == 'Filtrando...') {
+                        $('#cmbProduto').val("")
+                    }
 
                     let periodoDe = $('#inputPeriodoDe').val()
                     let ate = $('#inputAte').val()
@@ -520,7 +519,7 @@ $dataFim = date("Y-m-d");
                     let formaPagamento = $("#cmbFormaPagamento").val()
                     let status = $('#cmbStatus').val()
                     let url = "contasAPagarFiltra.php";
-                    let tipoFiltro = carregamentoPagina ? 'CarregamentoPagima' : 'FiltroNormal'
+                    let tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal'
 
                     inputsValues = {
                         inputPeriodoDe: periodoDe,
@@ -554,6 +553,11 @@ $dataFim = date("Y-m-d");
                     );
             }
 
+            $('#novoLacamento').on('click', (e) => {
+                location.href = "contasAPagarNovoLancamento.php";
+                return false;
+            })            
+
             $('#submitFiltro').on('click', (e) => {
                 e.preventDefault()
                 Filtrar(false)
@@ -565,7 +569,7 @@ $dataFim = date("Y-m-d");
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-right-visible">
 
     <?php include_once("topo.php"); ?>
 
@@ -600,8 +604,8 @@ $dataFim = date("Y-m-d");
                             </div>
 
                             <div class="card-body">
-                                <p class="font-size-lg">Utilize os filtros abaixo para gerar o relatório.</p>
-                                <br>
+                                <!--<p class="font-size-lg">Utilize os filtros abaixo para gerar o relatório.</p>
+                                <br>-->
 
                                 <form id="formImprime" method="POST" target="_blank">
                                     <input id="TipoProdutoServico" type="hidden" name="TipoProdutoServico"></input>
@@ -624,172 +628,105 @@ $dataFim = date("Y-m-d");
                                                 <label for="inputPeriodoDe">Período de</label>
                                                 <div class="input-group">
                                                     <span class="input-group-prepend">
-                                                        <span class="input-group-text"><i
-                                                                class="icon-calendar22"></i></span>
+                                                        <span class="input-group-text"><i class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputPeriodoDe" name="inputPeriodoDe"
-                                                        class="form-control" value="<?php echo $dataInicio; ?>">
+                                                    <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" value="<?php echo $dataInicio; ?>">
                                                 </div>
                                             </div>
                                         </div>
+
                                         <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label for="inputAte">Até</label>
                                                 <div class="input-group">
                                                     <span class="input-group-prepend">
-                                                        <span class="input-group-text"><i
-                                                                class="icon-calendar22"></i></span>
+                                                        <span class="input-group-text"><i class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputAte" name="inputAte"
-                                                        class="form-control" value="<?php echo $dataFim; ?>">
+                                                    <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php echo $dataFim; ?>">
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-2">
-                                        <div class="form-group">
-                                                <label for="cmbContaBanco">Conta/Banco</label>
-                                                <select id="cmbContaBanco" name="cmbContaBanco"
-                                                    class="form-control form-control-select2">
-                                                    <option value="">Selecionar</option>
-                                                    <?php
-												        $sql = "SELECT CnBanId, CnBanNome
-												        			FROM ContaBanco
-												        			JOIN Situacao on SituaId = CnBanStatus
-												        			WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-												        			ORDER BY CnBanNome ASC";
-												        $result = $conn->query($sql);
-												        $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
-												        foreach ($rowContaBanco as $item) {
-                                                            if(isset($lancamento)){
-                                                                if($lancamento['CnAPaContaBanco'] == $item['CnBanId']){
-                                                                    print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                                                }
-                                                            } else {
-                                                                print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                                            }
-												        }
-												    ?>
-                                                </select>
-                                            </div>
-                                        </div>
+
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="cmbFornecedor">Fornecedor</label>
-                                                <select id="cmbFornecedor" name="cmbFornecedor"
-                                                    class="form-control form-control-select2">
+                                                <select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
                                                     <option value="">Todos</option>
                                                     <?php
-													$sql = "SELECT ForneId, ForneNome
-																FROM Fornecedor
-																JOIN Situacao on SituaId = ForneStatus
-																WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY ForneNome ASC";
-													$result = $conn->query($sql);
-													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                        $sql = "SELECT ForneId, ForneNome
+                                                                FROM Fornecedor
+                                                                JOIN Situacao on SituaId = ForneStatus
+                                                                WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                                ORDER BY ForneNome ASC";
+                                                        $result = $conn->query($sql);
+                                                        $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowFornecedor as $item) {
-														print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
-													}
-
+                                                        foreach ($rowFornecedor as $item) {
+                                                            print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                                                        }
 													?>
                                                 </select>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row justify-content-between">
-                                        <div class="row col-7">
-                                            <div class="col-lg-3">
-                                                <div class="form-group">
-                                                    <label for="cmbPlanoContas">Plano de Contas</label>
-                                                    <select id="cmbPlanoContas" name="cmbPlanoContas"
-                                                        class="form-control form-control-select2">
-                                                        <option value="">Todos</option>
-                                                        <?php
-											    		$sql = "SELECT PlConId, PlConNome
-											    					FROM PlanoContas
-											    					JOIN Situacao on SituaId = PlConStatus
-											    					WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-											    					ORDER BY PlConNome ASC";
-											    		$result = $conn->query($sql);
-											    		$rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
-    
-											    		foreach ($rowPlanoContas as $item) {
-											    			print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
-											    		}
-    
-											    		?>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-5">
-                                                <div class="form-group">
-                                                    <label for="cmbFormaPagamento">Forma de Pagamento</label>
-                                                    <select id="cmbFormaPagamento" name="cmbFormaPagamento"
-                                                        class="form-control form-control-select2">
-                                                        <option value="">Selecionar</option>
-                                                        <?php
-										        	        $sql = "SELECT FrPagId, FrPagNome
-										        	        			FROM FormaPagamento
-										        	        			JOIN Situacao on SituaId = FrPagStatus
-										        	        			WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-										        	        			ORDER BY FrPagNome ASC";
-										        	        $result = $conn->query($sql);
-										        	        $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
-										        	        foreach ($rowFormaPagamento as $item) {
-                                                                if(isset($lancamento)){
-                                                                    if($lancamento['CnAPaFormaPagamento'] == $item['FrPagId']){
-                                                                        print('<option value="' . $item['FrPagId'] . '" selected>' . $item['FrPagNome'] . '</option>');
-                                                                    } else {
-                                                                        print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
-                                                                    }
-                                                                } else {
-                                                                    print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
-                                                                }
-										        	        }
-										        	    ?>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <div class="form-group">
-                                                    <label for="cmbSubCategoria">Status</label>
-                                                    <select id="cmbSubCategoria" name="cmbSubCategoria"
-                                                        class="form-control form-control-select2">
-                                                        <option value="">Selecione</option>
-                                                        <?php
-													        $sql = "SELECT SituaId, SituaNome, SituaChave
-													        				FROM Situacao
-													        				WHERE SituaStatus = 1
-													        				ORDER BY SituaNome ASC";
-													        $result = $conn->query($sql);
-													        $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
-        
-													        foreach ($rowSituacao as $item) {
-													        	if($item['SituaChave'] == 'APAGAR' || $item['SituaChave'] == 'PAGA'){
-                                                                    print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-                                                                }
-													        }
-													    ?>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="text-right col-lg-1 pt-3">
-                                                <div>
-                                                    <button id="submitFiltro"
-                                                        class="btn btn-principal">Pesquisar</button>
-                                                </div>
+ 
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label for="cmbPlanoContas">Plano de Contas</label>
+                                                <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
+                                                    <option value="">Todos</option>
+                                                    <?php
+                                                    $sql = "SELECT PlConId, PlConNome
+                                                            FROM PlanoContas
+                                                            JOIN Situacao on SituaId = PlConStatus
+                                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                            ORDER BY PlConNome ASC";
+                                                    $result = $conn->query($sql);
+                                                    $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                    foreach ($rowPlanoContas as $item) {
+                                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                    }
+
+                                                    ?>
+                                                </select>
                                             </div>
                                         </div>
-                                        <div class="text-right pt-3">
+        
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label for="cmbSubCategoria">Status</label>
+                                                <select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+                                                    <option value="">Selecione</option>
+                                                    <?php
+                                                        $sql = "SELECT SituaId, SituaNome, SituaChave
+                                                                FROM Situacao
+                                                                WHERE SituaStatus = 1
+                                                                ORDER BY SituaNome ASC";
+                                                        $result = $conn->query($sql);
+                                                        $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
+    
+                                                        foreach ($rowSituacao as $item) {
+                                                            if($item['SituaChave'] == 'APAGAR' || $item['SituaChave'] == 'PAGA'){
+                                                                print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+                                                            }
+                                                        }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="text-right col-lg-1 pt-3">
                                             <div>
-                                                <button id="novoLacamento" class="btn btn-success"><a
-                                                        href="contasAPagarNovoLancamento.php"
-                                                        style="text-decoration:none; color: #FFF">Novo
-                                                        Lançamento</a></button>
-                                                <button id="efetuarPagamento" class="btn btn-principal" disabled>Efetuar
-                                                    Pagamento</button>
+                                                <button id="submitFiltro" class="btn btn-principal">Pesquisar</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-right col-lg-11 pt-3">
+                                            <div>
+                                                <button id="novoLacamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo Lançamento</button>
+                                                <button id="efetuarPagamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate" disabled>Efetuar Pagamento</button>
                                                 <button class="btn bg-secondary"><i class="icon-printer2"></i></button>
                                             </div>
                                         </div>
@@ -801,7 +738,7 @@ $dataFim = date("Y-m-d");
                                         <tr class="bg-slate">
                                             <th></th>
                                             <th>Vencimento</th>
-                                            <th style='text-align: center'>Descrição</th>
+                                            <th>Descrição</th>
                                             <th>Fornecedor</th>
                                             <th>Número Doc.</th>
                                             <th>Valor Total</th>
@@ -880,8 +817,7 @@ $dataFim = date("Y-m-d");
                                         </div>
                                     </div>
                                     <div class="col-lg-1">
-                                        <button class="btn btn-lg btn-primary mt-2" id="gerarParcelas">Gerar
-                                            Parcelas</button>
+                                        <button class="btn btn-lg btn-primary mt-2" id="gerarParcelas">Gerar Parcelas</button>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-row">
@@ -1062,6 +998,8 @@ $dataFim = date("Y-m-d");
 
         </div>
         <!-- /main content -->
+
+        <?php include_once("sidebar-right.php"); ?>
 
     </div>
     <!-- /page content -->

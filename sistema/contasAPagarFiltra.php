@@ -77,11 +77,17 @@ function queryPesquisa()
 
             $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Paga';
 
+            if ($status == 'Paga'){
+                $mostrar = 'hidden';
+            } else{
+                $mostrar = 'checkbox';
+            }
+
             print("
             
             <tr>
                 <td class='even'>
-                    <input type='checkbox' id='check".$cont."'>
+                    <input type='".$mostrar."' id='check".$cont."'>
                     <input type='hidden' value='".$item['CnAPaId']."'>
                 </td>
                 <td class='even'><p class='m-0'>" . mostraData($item['CnAPaDtVencimento']) . "</p><input type='hidden' value='".$item['CnAPaDtVencimento']."'></td>
