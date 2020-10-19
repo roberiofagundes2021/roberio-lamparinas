@@ -48,8 +48,10 @@ $dataFim = date("Y-m-d");
     <!-- /theme JS files -->
 
     <!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
-    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
+    <script type="text/javascript" language="javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+    <script type="text/javascript" language="javascript"
+        src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function () {
@@ -170,7 +172,7 @@ $dataFim = date("Y-m-d");
 
 
                         let linha = $(elem).parent().parent().parent().parent().parent()
-                        .parent()
+                            .parent()
 
                         let tds = linha.children();
                         let valor = $(tds[5]).html();
@@ -198,14 +200,14 @@ $dataFim = date("Y-m-d");
                 })
             }
 
-            function cadastraParcelas(){
+            function cadastraParcelas() {
                 let parcelasNum = $("#cmbParcelas").val()
                 let id = $("#inputId").val()
-            
+
                 let dataParcelas = new Array
 
-                for(let i = 1; i <= parcelasNum; i++){
-                    // console.log(i)
+                for (let i = 1; i <= parcelasNum; i++) {
+
                     let arrayParcela = new Array
 
                     dataParcelas.push({
@@ -230,19 +232,19 @@ $dataFim = date("Y-m-d");
                     data,
                     (data) => {
                         $('tbody').append(data)
-                        alerta('Atenção', 'Parcelas geradas com sucesso!')    
+                        alerta('Atenção', 'Parcelas geradas com sucesso!')
                     }
                 )
-                
+
             }
-            $("#salvar").on('click', ( ) => {
+            $("#salvar").on('click', () => {
                 cadastraParcelas()
                 $("#parcelasContainer").html('')
                 $('#page-modal').fadeOut(200);
                 $('body').css('overflow', 'scroll');
             })
             /////////////////////////////////////////////////////////////////
-            function gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
+            function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
                 $("#parcelasContainer").html("")
 
                 let valorParcela = float2moeda(valorTotal / parcelas)
@@ -276,21 +278,21 @@ $dataFim = date("Y-m-d");
                         novaDataVencimento = `${dataArray[0]}-${dataArray[1]}-${dataArray[2]}`
                     } else {
                         novaDataVencimento = dataVencimento
-                        
+
                     }
 
                     let elem = `<div class="d-flex flex-row justify-content-center">
-                                    <p class="col-1 p-2 pl-4">${i}</p>
-                                    <div class="form-group col-5 p-2">
-                                        <input type="text" class="form-control" id="inputParcelaDescricao${i}" name="inputParcelaDescricao${i}" value="${descricao} ${i}/${parcelas}">
-                                    </div>
-                                    <div class="form-group col-3 p-2">
-                                        <input type="date" class="form-control" id="inputParcelaDataVencimento${i}" name="inputParcelaDataVencimento${i}" value="${novaDataVencimento}">
-                                    </div>
-                                    <div class="form-group col-3 p-2">
-                                        <input type="text" class="form-control" id="inputParcelaValorAPagar${i}" name="inputParcelaValorAPagar${i}" value="${valorParcela}">
-                                    </div> 
-                                </div>`
+                    <p class="col-1 p-2 pl-4">${i}</p>
+                    <div class="form-group col-5 p-2">
+                        <input type="text" class="form-control" id="inputParcelaDescricao${i}" name="inputParcelaDescricao${i}" value="${descricao} ${i}/${parcelas}">
+                    </div>
+                    <div class="form-group col-3 p-2">
+                        <input type="date" class="form-control" id="inputParcelaDataVencimento${i}" name="inputParcelaDataVencimento${i}" value="${novaDataVencimento}">
+                    </div>
+                    <div class="form-group col-3 p-2">
+                        <input type="text" class="form-control" id="inputParcelaValorAPagar${i}" name="inputParcelaValorAPagar${i}" value="${valorParcela}">
+                    </div> 
+                </div>`
 
                     $("#parcelasContainer").append(elem)
                 }
@@ -304,11 +306,27 @@ $dataFim = date("Y-m-d");
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
                     let descricao = $("#inputDescricao").val()
-                    gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
+                    geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
                 })
             }
             parcelamento()
             /////////////////////////////////////////////////////////////////
+
+            function desfazerPagamentoAgrupado() {
+                $("#pagamentoAgrupadoForm").children().remove()
+                $("#pagamentoAgrupadoContainer").html("")
+                $("#efetuarPagamento").prop('disabled', true)
+
+                $("#cmbFormaPagamentoPA").val('')
+                $("#select2-cmbFormaPagamentoPA-container").html("Selecionar")
+                $("#cmbContaBancoPA").val('')
+                $("#select2-cmbContaBancoPA-container").html("Selecionar")
+                $("#inputNumeroDocumentoPA").val("")
+
+                $(".clicado").each((i, elem) => {
+                    $(elem).removeClass('clicado').prop('checked', false)
+                })
+            }
 
             function pagamentoAgrupado() {
 
@@ -317,36 +335,49 @@ $dataFim = date("Y-m-d");
                 for (let i = 1; i <= numLinhas; i++) {
 
                     let id = $(`#check${i}`).parent().children().last().val();
+                    let elementosLista = $(`#check${i}`).parent().parent().children()
+                    let descricao = $(elementosLista[2]).html()
+                    let status = $(elementosLista[6]).html()
+                    let valor = $(elementosLista[5]).html()
 
                     $(`#check${i}`).on('click', () => {
 
-                        if (!$(`#check${i}`).hasClass('clicado')) {
-                            $(`#check${i}`).addClass('clicado')
-                            let input = `<input type="hidden" name="conta${i}" value="${id}">`
-                            $("#pagamentoAgrupadoForm").append(input)
-
-                            let quantInputs = $("#pagamentoAgrupadoForm").children()
-
-                            if (quantInputs.length >= 1) {
-                                $("#efetuarPagamento").removeAttr('disabled')
-                            } else {
-                                $("#efetuarPagamento").attr('disabled')
-                            }
-
+                        if (status == 'Paga') {
+                            alerta('Atenção', 'A conta selecionada já foi paga!', 'error');
+                            $(`#check${i}`).prop('checked', false)
+                            return false
                         } else {
-                            $(`[name=conta${i}]`).remove()
+                            if (!$(`#check${i}`).hasClass('clicado')) {
+                                $(`#check${i}`).addClass('clicado')
+                                let input =
+                                    `<input type="hidden" name="conta${i}" value="${id}" descricao="${descricao}" valor="${valor}">`
+                                $("#pagamentoAgrupadoForm").append(input)
 
-                            $(`#check${i}`).removeClass('clicado')
+                                let quantInputs = $("#pagamentoAgrupadoForm").children()
 
-                            let quantInputs = $("#pagamentoAgrupadoForm").children()
+                                if (quantInputs.length >= 1) {
+                                    $("#efetuarPagamento").removeAttr('disabled')
+                                } else {
+                                    $("#efetuarPagamento").attr('disabled')
+                                }
 
-                            if (quantInputs.length == 0) {
-                                $("#efetuarPagamento").prop('disabled', true)
+                            } else {
+                                $(`[name=conta${i}]`).remove()
+
+                                $(`#check${i}`).removeClass('clicado')
+
+                                let quantInputs = $("#pagamentoAgrupadoForm").children()
+
+                                if (quantInputs.length == 0) {
+                                    $("#efetuarPagamento").prop('disabled', true)
+                                }
                             }
                         }
                     })
                 }
             }
+
+            let countPlanoContas = 0;
 
             function pagamentoAgrupadoEnvia() {
                 let pagamentos = $("#pagamentoAgrupadoContainer").children()
@@ -364,7 +395,11 @@ $dataFim = date("Y-m-d");
                     let descricao = $(`#inputDescricaoPA${i+1}`).val()
                     let planoContas = $(`#cmbPlanoContasPA${i+1}`).val()
                     let valor = $(`#inputValorPA${i+1}`).val()
-                    
+
+                    if (planoContas == '#') {
+                        countPlanoContas += 1
+                    }
+
                     pagamentoValores[i] = {
                         id: id,
                         descricao: descricao,
@@ -384,101 +419,118 @@ $dataFim = date("Y-m-d");
 
                 url = 'contasAPagarPagamentoAgrupado.php'
 
-                $.post(
-                    url,
-                    data,
-                    (data) => {
-                        let linhas = $('tbody').children()
-                        let ids = data.split('/')
-                        for (let h = 0; h <= ids.length; h++) {
-                            for (let i = 1; i <= linhas.length - 1; i++) {
+                if (countPlanoContas >= 1) {
+                    alerta('Atenção', 'Selecione um plano de contas para cada pagamento!', 'error');
+                } else {
+                    $.post(
+                        url,
+                        data,
+                        (data) => {
+                            let linhas = $('tbody').children()
+                            let ids = data.split('/')
+                            for (let h = 0; h <= ids.length; h++) {
+                                for (let i = 1; i <= linhas.length - 1; i++) {
 
-                                let p = $(linhas[i]).children()[0]
-                                let irm = $(p).children()[1]
+                                    let p = $(linhas[i]).children()[0]
+                                    let irm = $(p).children()[1]
 
-                                if ($(irm).val() == ids[h]) {
-                                    
-                                    let linha = $(`#check${i}`)
-                                    let status = $(linhas[i]).children()[6]
-                                    $(status).html('Paga')
+                                    if ($(irm).val() == ids[h]) {
+
+                                        let linha = $(`#check${i}`)
+                                        let status = $(linhas[i]).children()[6]
+                                        $(status).html('Paga')
+                                        alerta('Atenção', 'Pagamento agrupado efetuado com sucesso!',
+                                            'success');
+                                        pagamentoAgrupado()
+                                        Filtrar(true)
+                                        desfazerPagamentoAgrupado()
+                                        $(`#check${i}`).removeClass('clicado')
+                                    }
                                 }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
 
-            $("#salvarPA").on('click', (e) =>{
+            $("#salvarPA").on('click', (e) => {
                 e.preventDefault()
                 pagamentoAgrupadoEnvia()
-                $('#modal-pagamentoAgrupado').fadeOut(200);
-                $('body').css('overflow', 'scroll');
+
+                if (countPlanoContas == 0) {
+                    desfazerPagamentoAgrupado()
+                    $('#modal-pagamentoAgrupado').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                }
+
+                countPlanoContas = 0;
             })
 
-            function modalPagamentoAgrupado(){
-                
-                $("#efetuarPagamento").on("click", (e) => {
-                    
-                    e.preventDefault()
-                    
-                    $('#modal-pagamentoAgrupado').fadeIn(200);
+            function modalPagamentoAgrupado() {
 
-                    let numLinhas = $("#elementosGrid").val()
+                $("#pagamentoAgrupadoContainer").html("")
+
+                $("#efetuarPagamento").on("click", (e) => {
+                    e.preventDefault()
+                    $('#modal-pagamentoAgrupado').fadeIn(200)
+                    $("#pagamentoAgrupadoContainer").html("")
+
+                    let numLinhas = $("#pagamentoAgrupadoForm").children().length
+                    let linhasSelecionadas = $("#pagamentoAgrupadoForm").children()
                     let valorTotal = 0;
 
-                    for (let i = 1; i <= numLinhas; i++) {
-    
-                        let id = $(`#check${i}`).parent().children().last().val();
-                        let check = $(`#check${i}`).parent().children().first().prop('checked');
-                        let elementosLista =  $(`#check${i}`).parent().parent().children()
-                        let descricao = $(elementosLista[2]).html()
-                        let valor = $(elementosLista[5]).html()
 
-                        if(check){
-                            valorTotal += parseFloat(valor);
+                    linhasSelecionadas.each((i, elem) => {
+                        let id = $(elem).val()
+                        let descricao = $(elem).attr('descricao')
+                        let valor = $(elem).attr('valor')
+                        let indice = i + 1
 
-                            let elem = `<div class="d-flex flex-row justify-content-center">
-                                        <p class="col-1 mt-3">
-                                            ${i}
-                                            <input type="hidden" id="idPA${i}" value="${id}">
-                                        </p>
-                                        <div class="form-group col-5 p-2">
-                                            <input type="text" class="form-control" id="inputDescricaoPA${i}" name="inputDescricaoPA${i}" value="${descricao}">
-                                        </div>
-                                        <div class="form-group col-3 p-2">
-                                            <div class="form-group">
-                                                <select id="cmbPlanoContasPA${i}" name="cmbPlanoContasPA${i}"
-                                                    class="form-control form-control-select2" required>
-                                                    <option value="">Selecionar</option>
-                                                    <?php
-												        $sql = "SELECT PlConId, PlConNome
-												        			FROM PlanoContas
-												        			JOIN Situacao on SituaId = PlConStatus
-												        			WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-												        			ORDER BY PlConNome ASC";
-												        $result = $conn->query($sql);
-												        $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
-                                                        
-                                                        
-                                                        foreach ($rowPlanoContas as $item) {
-                                                            print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
-                                                        }
-												    ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-3 p-2">
-                                            <input type="text" class="form-control" id="inputValorPA${i}" name="inputValorPA${i}" value="${valor}">
-                                        </div> 
-                                    </div>`
-    
-                            $("#pagamentoAgrupadoContainer").append(elem)
-                        }
-                        $('#inputValorTotalPA').val(float2moeda(valorTotal))
-                    }
+
+                        valorTotal += parseFloat(valor);
+                        let elemNode = `<div class="d-flex flex-row justify-content-center">
+                    <p class="col-1 mt-3">
+                        ${indice}
+                        <input type="hidden" id="idPA${indice}" value="${id}">
+                    </p>
+                    <div class="form-group col-5 p-2">
+                        <input type="text" class="form-control" id="inputDescricaoPA${indice}" name="inputDescricaoPA${indice}" value="${descricao}" readOnly>
+                    </div>
+                    <div class="form-group col-3 p-2">
+                        <div class="form-group">
+                            <select id="cmbPlanoContasPA${indice}" name="cmbPlanoContasPA${indice}"
+                                class="form-control form-control-select2" required>
+                                <option value="#">Selecionar</option>
+                                <?php
+                                    $sql = "SELECT PlConId, PlConNome
+                                                FROM PlanoContas
+                                                JOIN Situacao on SituaId = PlConStatus
+                                                WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                ORDER BY PlConNome ASC";
+                                    $result = $conn->query($sql);
+                                    $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+                                    
+                                    
+                                    foreach ($rowPlanoContas as $item) {
+                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-3 p-2">
+                        <input type="text" class="form-control" id="inputValorPA${indice}" name="inputValorPA${indice}" value="${valor}" readOnly>
+                    </div> 
+                </div>`
+
+                        $("#pagamentoAgrupadoContainer").append(elemNode)
+                    })
+
+                    $('#inputValorTotalPA').val(float2moeda(valorTotal))
                 })
 
                 $('#modal-closePA').on('click', function () {
+                    desfazerPagamentoAgrupado()
                     $('#modal-pagamentoAgrupado').fadeOut(200);
                     $('body').css('overflow', 'scroll');
                 })
@@ -500,63 +552,56 @@ $dataFim = date("Y-m-d");
                 })
             }
 
+
+
             function Filtrar(carregamentoPagina) {
                 let cont = false;
 
-                    const msg = $(
-                        '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-                    )
+                const msg = $(
+                    '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+                )
 
-                    if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() == 'Filtrando...') {
-                        $('#cmbProduto').val("")
-                    }
+                if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() ==
+                    'Filtrando...') $('#cmbProduto').val("")
 
-                    let periodoDe = $('#inputPeriodoDe').val()
-                    let ate = $('#inputAte').val()
-                    let contaBanco = $('#cmbContaBanco').val()
-                    let fornecedor = $('#cmbFornecedor').val()
-                    let planoContas = $('#cmbPlanoContas').val()
-                    let formaPagamento = $("#cmbFormaPagamento").val()
-                    let status = $('#cmbStatus').val()
-                    let url = "contasAPagarFiltra.php";
-                    let tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal'
+                let periodoDe = $('#inputPeriodoDe').val()
+                let ate = $('#inputAte').val()
+                let contaBanco = $('#cmbContaBanco').val()
+                let fornecedor = $('#cmbFornecedor').val()
+                let planoContas = $('#cmbPlanoContas').val()
+                let formaPagamento = $("#cmbFormaPagamento").val()
+                let status = $('#cmbStatus').val()
+                let url = "contasAPagarFiltra.php";
+                let tipoFiltro = carregamentoPagina ? 'CarregamentoPagima' : 'FiltroNormal'
 
-                    inputsValues = {
-                        inputPeriodoDe: periodoDe,
-                        inputAte: ate,
-                        cmbContaBanco: contaBanco,
-                        cmbFornecedor: fornecedor,
-                        cmbPlanoContas: planoContas,
-                        cmbStatus: status,
-                        cmbFormaPagamento: formaPagamento,
-                        tipoFiltro: tipoFiltro
-                    };
+                inputsValues = {
+                    inputPeriodoDe: periodoDe,
+                    inputAte: ate,
+                    cmbFornecedor: fornecedor,
+                    cmbPlanoContas: planoContas,
+                    cmbStatus: status,
+                    tipoFiltro: tipoFiltro
+                };
 
-                    $.post(
-                        url,
-                        inputsValues,
-                        (data) => {
-                            // console.log(data)
-                            if (data) {
-                                $('tbody').html(data)
-                                $('#imprimir').removeAttr('disabled')
-                                resultadosConsulta = data
-                                modalParcelas()
-                                editarLancamento()
-                                pagamentoAgrupado()
+                $.post(
+                    url,
+                    inputsValues,
+                    (data) => {
+                        if (data) {
+                            $('tbody').html(data)
+                            $('#imprimir').removeAttr('disabled')
+                            resultadosConsulta = data
+                            modalParcelas()
+                            editarLancamento()
+                            pagamentoAgrupado()
 
-                            } else {
-                                $('tbody').html(msg)
-                                $('#imprimir').attr('disabled', '')
-                            }
+                        } else {
+                            $('tbody').html(msg)
+                            $('#imprimir').attr('disabled', '')
                         }
-                    );
+                    }
+                );
             }
-
-            $('#novoLacamento').on('click', (e) => {
-                location.href = "contasAPagarNovoLancamento.php";
-                return false;
-            })            
 
             $('#submitFiltro').on('click', (e) => {
                 e.preventDefault()
@@ -628,9 +673,11 @@ $dataFim = date("Y-m-d");
                                                 <label for="inputPeriodoDe">Período de</label>
                                                 <div class="input-group">
                                                     <span class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="icon-calendar22"></i></span>
+                                                        <span class="input-group-text"><i
+                                                                class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" value="<?php echo $dataInicio; ?>">
+                                                    <input type="date" id="inputPeriodoDe" name="inputPeriodoDe"
+                                                        class="form-control" value="<?php echo $dataInicio; ?>">
                                                 </div>
                                             </div>
                                         </div>
@@ -640,9 +687,11 @@ $dataFim = date("Y-m-d");
                                                 <label for="inputAte">Até</label>
                                                 <div class="input-group">
                                                     <span class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="icon-calendar22"></i></span>
+                                                        <span class="input-group-text"><i
+                                                                class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php echo $dataFim; ?>">
+                                                    <input type="date" id="inputAte" name="inputAte"
+                                                        class="form-control" value="<?php echo $dataFim; ?>">
                                                 </div>
                                             </div>
                                         </div>
@@ -650,7 +699,8 @@ $dataFim = date("Y-m-d");
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="cmbFornecedor">Fornecedor</label>
-                                                <select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
+                                                <select id="cmbFornecedor" name="cmbFornecedor"
+                                                    class="form-control form-control-select2">
                                                     <option value="">Todos</option>
                                                     <?php
                                                         $sql = "SELECT ForneId, ForneNome
@@ -668,11 +718,12 @@ $dataFim = date("Y-m-d");
                                                 </select>
                                             </div>
                                         </div>
- 
+
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="cmbPlanoContas">Plano de Contas</label>
-                                                <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
+                                                <select id="cmbPlanoContas" name="cmbPlanoContas"
+                                                    class="form-control form-control-select2">
                                                     <option value="">Todos</option>
                                                     <?php
                                                     $sql = "SELECT PlConId, PlConNome
@@ -691,11 +742,12 @@ $dataFim = date("Y-m-d");
                                                 </select>
                                             </div>
                                         </div>
-        
+
                                         <div class="col-lg-2">
                                             <div class="form-group">
-                                                <label for="cmbSubCategoria">Status</label>
-                                                <select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+                                                <label for="cmbStatus">Status</label>
+                                                <select id="cmbStatus" name="cmbStatus"
+                                                    class="form-control form-control-select2">
                                                     <option value="">Selecione</option>
                                                     <?php
                                                         $sql = "SELECT SituaId, SituaNome, SituaChave
@@ -715,7 +767,7 @@ $dataFim = date("Y-m-d");
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="row">
                                         <div class="text-right col-lg-1 pt-3">
                                             <div>
@@ -725,8 +777,12 @@ $dataFim = date("Y-m-d");
 
                                         <div class="text-right col-lg-11 pt-3">
                                             <div>
-                                                <button id="novoLacamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo Lançamento</button>
-                                                <button id="efetuarPagamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate" disabled>Efetuar Pagamento</button>
+                                                <button id="novoLacamento"
+                                                    class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo
+                                                    Lançamento</button>
+                                                <button id="efetuarPagamento"
+                                                    class="btn btn-outline bg-slate-600 text-slate-600 border-slate"
+                                                    disabled>Efetuar Pagamento</button>
                                                 <button class="btn bg-secondary"><i class="icon-printer2"></i></button>
                                             </div>
                                         </div>
@@ -817,7 +873,8 @@ $dataFim = date("Y-m-d");
                                         </div>
                                     </div>
                                     <div class="col-lg-1">
-                                        <button class="btn btn-lg btn-primary mt-2" id="gerarParcelas">Gerar Parcelas</button>
+                                        <button class="btn btn-lg btn-primary mt-2" id="gerarParcelas">Gerar
+                                            Parcelas</button>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-row">
@@ -843,7 +900,7 @@ $dataFim = date("Y-m-d");
                                     <div class="col-lg-12">
                                         <div class="form-group">
                                             <button class="btn btn-lg btn-success" id="salvar">Salvar</button>
-                                            <a id="modal-closePA" class="btn btn-basic" role="button">Cancelar</a>
+                                            <a id="modal-close" class="btn btn-basic" role="button">Cancelar</a>
                                         </div>
                                     </div>
                                 </div>
@@ -852,8 +909,8 @@ $dataFim = date("Y-m-d");
                     </div>
                 </div>
                 <!--------------------------------------------------------------------------------------------------->
-                 <!--Modal Pagamen-->
-                 <div id="modal-pagamentoAgrupado" class="custon-modal">
+                <!--Modal Pagamen-->
+                <div id="modal-pagamentoAgrupado" class="custon-modal">
                     <div class="custon-modal-container">
                         <div class="card custon-modal-content">
                             <div class="custon-modal-title">
@@ -867,8 +924,8 @@ $dataFim = date("Y-m-d");
                                         <div class="form-group">
                                             <label for="inputDataPagamentoPA">Data do Pagamento</label>
                                             <div class="input-group">
-                                                <input type="date" id="inputDataPagamentoPA" name="inputDataPagamentoPA" value="<?php echo $dataInicio?>"
-                                                    class="form-control">
+                                                <input type="date" id="inputDataPagamentoPA" name="inputDataPagamentoPA"
+                                                    value="<?php echo $dataInicio?>" class="form-control">
                                             </div>
                                         </div>
                                     </div>
@@ -876,8 +933,9 @@ $dataFim = date("Y-m-d");
                                         <div class="form-group">
                                             <label for="inputValorTotalPA">Valor Total</label>
                                             <div class="input-group">
-                                                <input type="text" id="inputValorTotalPA" onKeyUp="moeda(this)" maxLength="12" name="inputValorTotalPA"
-                                                    class="form-control">
+                                                <input type="text" id="inputValorTotalPA" onKeyUp="moeda(this)"
+                                                    maxLength="12" name="inputValorTotalPA" class="form-control"
+                                                    readOnly>
                                             </div>
                                         </div>
                                     </div>
@@ -886,7 +944,8 @@ $dataFim = date("Y-m-d");
                                     <div class="col-lg-6">
                                         <label for="cmbFormaPagamentoPA">Forma Pagamento</label>
                                         <div class="form-group">
-                                            <select id="cmbFormaPagamentoPA" name="cmbFormaPagamentoPA" class="form-control form-control-select2">
+                                            <select id="cmbFormaPagamentoPA" name="cmbFormaPagamentoPA"
+                                                class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
 												    $sql = "SELECT FrPagId, FrPagNome
@@ -914,9 +973,10 @@ $dataFim = date("Y-m-d");
                                     <div class="col-lg-6">
                                         <label for="cmbContaBancoPA">Conta/Banco</label>
                                         <div class="form-group">
-                                            <select id="cmbContaBancoPA" name="cmbContaBancoPA" class="form-control form-control-select2">
-                                                    <option value="">Selecionar</option>
-                                                    <?php
+                                            <select id="cmbContaBancoPA" name="cmbContaBancoPA"
+                                                class="form-control form-control-select2">
+                                                <option value="">Selecionar</option>
+                                                <?php
 												        $sql = "SELECT CnBanId, CnBanNome
 												        			FROM ContaBanco
 												        			JOIN Situacao on SituaId = CnBanStatus
@@ -945,7 +1005,8 @@ $dataFim = date("Y-m-d");
                                         <div class="form-group">
                                             <label for="inputDescricaoPA">Descrição do Agrupamento</label>
                                             <div class="input-group">
-                                                <input type="text" id="inputDescricaoPA" name="inputDescricaoPA" class="form-control">
+                                                <input type="text" id="inputDescricaoPA" name="inputDescricaoPA"
+                                                    class="form-control">
                                             </div>
                                         </div>
                                     </div>
@@ -953,7 +1014,8 @@ $dataFim = date("Y-m-d");
                                         <div class="form-group">
                                             <label for="inputNumeroDocumentoPA">Número Documento</label>
                                             <div class="input-group">
-                                                <input type="text" id="inputNumeroDocumentoPA" name="inputNumeroDocumentoPA" class="form-control">
+                                                <input type="text" id="inputNumeroDocumentoPA"
+                                                    name="inputNumeroDocumentoPA" class="form-control">
                                             </div>
                                         </div>
                                     </div>
@@ -981,7 +1043,7 @@ $dataFim = date("Y-m-d");
                                     <div class="col-lg-12">
                                         <div class="form-group">
                                             <button class="btn btn-lg btn-success" id="salvarPA">Salvar</button>
-                                            <a id="modal-close" class="btn btn-basic" role="button">Cancelar</a>
+                                            <a id="modal-closePA" class="btn btn-basic" role="button">Cancelar</a>
                                         </div>
                                     </div>
                                 </div>
