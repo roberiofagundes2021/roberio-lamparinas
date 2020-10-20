@@ -609,6 +609,11 @@ $dataFim = date("Y-m-d");
             })
 
             Filtrar(true)
+
+            $('#novoLacamento').on('click', (e) => {
+                location.href = "contasAPagarNovoLancamento.php";
+                return false;
+            })  
         });
     </script>
 
