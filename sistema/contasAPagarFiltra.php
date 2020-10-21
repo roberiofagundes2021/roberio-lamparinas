@@ -81,7 +81,7 @@ function queryPesquisa()
                     <input type='hidden' value='".$item['CnAPaId']."'>
                 </td>
                 <td class='even'><p class='m-0'>" . mostraData($item['CnAPaDtVencimento']) . "</p><input type='hidden' value='".$item['CnAPaDtVencimento']."'></td>
-                <td class='even'>" . $item['CnAPaDescricao'] . "</td>
+                <td class='even'><a href='contasAPagarNovoLancamento.php?lancamentoId=".$item['CnAPaId']."'>" . $item['CnAPaDescricao'] . "</a></td>
                 <td class='even'>" . $item['ForneNome'] . "</td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaNumDocumento'] . "</td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaValorAPagar'] . "</td>

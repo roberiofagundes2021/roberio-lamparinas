@@ -168,7 +168,8 @@ $dataFim = date("Y-m-d");
 
                 $('.btnParcelar').each((i, elem) => {
                     $(elem).on('click', function () {
-                        $('#page-modal').fadeIn(200);
+
+                        let pagamentos = $("#pagamentoAgrupadoContainer").children()
 
 
                         let linha = $(elem).parent().parent().parent().parent().parent()
@@ -181,22 +182,30 @@ $dataFim = date("Y-m-d");
                         let descricao = $(tds[2]).html()
                         let idContainer = $(tds[0]).children()
                         let id = $(idContainer[1]).val()
+                        let status =  $(tds[6]).html();
 
-                        //Conteúdo novo
+                        if(status == 'Paga'){
+                            alerta('Atenção', 'A conta selecionada já foi paga!', 'error');
+                            return false
+                        } else {
+                            $('#page-modal').fadeIn(200);
 
-                        $('#inputValor').val(valor)
-                        $('#inputDataVencimento').val(dataVencimento)
-                        $('#inputDescricao').val(descricao)
-                        $('#inputId').val(id)
-
-                        const fonte1 = 'style="font-size: 1.1rem"'
-
+                            //Conteúdo novo
+    
+                            $('#inputValor').val(valor)
+                            $('#inputDataVencimento').val(dataVencimento)
+                            $('#inputDescricao').val(descricao)
+                            $('#inputId').val(id)
+    
+                            const fonte1 = 'style="font-size: 1.1rem"'
+                        }
                     })
                 })
 
                 $('#modal-close').on('click', function () {
                     $('#page-modal').fadeOut(200);
                     $('body').css('overflow', 'scroll');
+                    $("#parcelasContainer").html('');
                 })
             }
 
@@ -466,14 +475,28 @@ $dataFim = date("Y-m-d");
                 countPlanoContas = 0;
             })
 
+            function redirecionarPagamento(id){
+                window.location.href =`contasAPagarNovoLancamento.php?lancamentoId=${id}`
+            }
+
             function modalPagamentoAgrupado() {
 
                 $("#pagamentoAgrupadoContainer").html("")
 
                 $("#efetuarPagamento").on("click", (e) => {
                     e.preventDefault()
-                    $('#modal-pagamentoAgrupado').fadeIn(200)
-                    $("#pagamentoAgrupadoContainer").html("")
+
+                    let pagamentos = $("#pagamentoAgrupadoForm").children()
+                    
+                    if(pagamentos.length == 1){
+                        pagamentos.each((i, elem) => {
+                            let id = $(elem).val()
+                            redirecionarPagamento(id)                            
+                        })
+                    } else {
+                        $('#modal-pagamentoAgrupado').fadeIn(200)
+                        $("#pagamentoAgrupadoContainer").html("")
+                    }
 
                     let numLinhas = $("#pagamentoAgrupadoForm").children().length
                     let linhasSelecionadas = $("#pagamentoAgrupadoForm").children()
@@ -753,7 +776,6 @@ $dataFim = date("Y-m-d");
                                                 <label for="cmbStatus">Status</label>
                                                 <select id="cmbStatus" name="cmbStatus"
                                                     class="form-control form-control-select2">
-                                                    <option value="">Selecione</option>
                                                     <?php
                                                         $sql = "SELECT SituaId, SituaNome, SituaChave
                                                                 FROM Situacao
@@ -845,19 +867,7 @@ $dataFim = date("Y-m-d");
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
-                                        <label for="numeroSerie">Periodicidade</label>
-                                        <div class="form-group">
-                                            <select id="cmbPeriodicidade" name="cmbPeriodicidade"
-                                                class="form-control form-control-select2">
-                                                <option value="">Selecionar</option>
-                                                <option value="">Mensal</option>
-                                                <option value="">Quinsenal</option>
-                                                <option value="">Semanal</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-1">
+                                    <div class="col-lg-2">
                                         <label for="numeroSerie">Parcelas</label>
                                         <div class="form-group">
                                             <select id="cmbParcelas" name="cmbPeriodicidade"
