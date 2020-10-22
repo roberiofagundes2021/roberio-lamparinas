@@ -803,32 +803,6 @@ $dataInicio = date("Y-m-d");
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
-                                            <label for="numeroSerie">Periodicidade</label>
-                                            <div class="form-group">
-                                                <select id="cmbPeriodicidade" name="cmbPeriodicidade"
-                                                    class="form-control form-control-select2">
-                                                    <option value="">Selecionar</option>
-                                                    <option value="1">Mensal</option>
-                                                    <option value="2">Bimestral</option>
-                                                    <option value="3">Trimestral</option>
-                                                    <option value="4">Semestral</option>
-                                                    <!-- <?php
-                                                // $sql = "SELECT EstCoId, EstCoNome
-                                                //         FROM EstadoConservacao
-                                                //         JOIN Situacao on SituaId = EstCoStatus
-                                                //         WHERE SituaChave = 'ATIVO'
-                                                //         ORDER BY EstCoNome ASC";
-                                                // $result = $conn->query($sql);
-                                                // $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                // foreach ($rowEstCo as $item) {
-                                                //     print('<option value="' . $item['EstCoId'] . '">' . $item['EstCoNome'] . '</option>');
-                                                // }
-                                                ?> -->
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-1">
                                             <label for="cmbParcelas">Parcelas</label>
                                             <div class="form-group">
                                                 <select id="cmbParcelas" name="cmbParcelas"

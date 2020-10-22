@@ -179,7 +179,8 @@ $dataFim = date("Y-m-d");
                         let valor = $(tds[5]).html();
                         let dataVencimentolistChild = $(tds[1]).children()
                         let dataVencimento = $(dataVencimentolistChild[1]).val()
-                        let descricao = $(tds[2]).html()
+                        let descricaoContent = $(tds[2]).children()[0]
+                        let descricao = $(descricaoContent).html()
                         let idContainer = $(tds[0]).children()
                         let id = $(idContainer[1]).val()
                         let status =  $(tds[6]).html();
@@ -345,7 +346,8 @@ $dataFim = date("Y-m-d");
 
                     let id = $(`#check${i}`).parent().children().last().val();
                     let elementosLista = $(`#check${i}`).parent().parent().children()
-                    let descricao = $(elementosLista[2]).html()
+                    let descricaoLink = $(elementosLista[2]).children()[0]
+                    let descricao = $(descricaoLink).html()
                     let status = $(elementosLista[6]).html()
                     let valor = $(elementosLista[5]).html()
 

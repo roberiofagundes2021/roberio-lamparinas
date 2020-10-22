@@ -16,7 +16,7 @@ function queryPesquisa()
         empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
         empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
 
-        $args[]  = "CnAPaDtPagamento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+        $args[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
     }
 
     if (!empty($_POST['cmbFornecedor'])) {
@@ -57,7 +57,7 @@ function queryPesquisa()
                 FROM ContasAPagar
                 LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
                 JOIN Situacao on SituaId = CnApaStatus
-                WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+                WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'APAGAR'
         ";
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -89,8 +89,8 @@ function queryPesquisa()
                 <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
                 <div class='list-icons'>
                     <div class='list-icons list-icons-extended'>
-                        <a href='#' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-pencil7'></i></a>
-                        <a href='#' class='list-icons-item'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-bin'></i></a>
+                        <a href='#' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>
+                        <a href='#' class='list-icons-item'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
 				        <div class='dropdown'>													
 				        	<a href='#' class='list-icons-item' data-toggle='dropdown'>
 				        		<i class='icon-menu9'></i>
