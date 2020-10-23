@@ -20,23 +20,15 @@
                     <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2">
                         <option value="">Todos</option>
                         <?php
-                            $sql = "SELECT CnBanId, CnBanNome
-                                        FROM ContaBanco
-                                        JOIN Situacao on SituaId = CnBanStatus
-                                        WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                        ORDER BY CnBanNome ASC";
+                            $sql = "SELECT CnBanId, CnBanNome, dbo.fnDebitosDia(".$_SESSION['UnidadeId'].", CnBanId, convert(date, getdate())) as Debito
+                                    FROM ContaBanco
+                                    JOIN Situacao on SituaId = CnBanStatus
+                                    WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                    ORDER BY CnBanNome ASC";
                             $result = $conn->query($sql);
                             $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
                             foreach ($rowContaBanco as $item) {
-                                if(isset($lancamento)){
-                                    if($lancamento['CnAPaContaBanco'] == $item['CnBanId']){
-                                        print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
-                                    } else {
-                                        print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                    }
-                                } else {
-                                    print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                }
+                                print('<option value="'.$item['CnBanId'].'#'.$item['Debito'].'">' . $item['CnBanNome'] . '</option>');
                             }
                         ?>
                     </select>
