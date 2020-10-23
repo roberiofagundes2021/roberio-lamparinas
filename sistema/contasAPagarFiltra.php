@@ -53,11 +53,14 @@ function queryPesquisa()
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
         }
     } else {
+        $dataInicio = date("Y-m-d");
+        $dataFim = date("Y-m-d");
+
         $sql = "SELECT * 
                 FROM ContasAPagar
                 LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
                 JOIN Situacao on SituaId = CnApaStatus
-                WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'APAGAR'
+                WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "'  and SituaChave = 'APAGAR'
         ";
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -84,13 +87,13 @@ function queryPesquisa()
                 <td class='even'><a href='contasAPagarNovoLancamento.php?lancamentoId=".$item['CnAPaId']."'>" . $item['CnAPaDescricao'] . "</a></td>
                 <td class='even'>" . $item['ForneNome'] . "</td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaNumDocumento'] . "</td>
-                <td class='even' style='text-align: center'>" . $item['CnAPaValorAPagar'] . "</td>
+                <td class='even' style='text-align: center'>" . mostraValor($item['CnAPaValorAPagar']) . "</td>
                 <td class='even' style='text-align: center'>" .$status. "</td>
                 <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
                 <div class='list-icons'>
                     <div class='list-icons list-icons-extended'>
                         <a href='#' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>
-                        <a href='#' class='list-icons-item'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
+                        <a href='#' idContaExcluir='".$item['CnAPaId']."' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
 				        <div class='dropdown'>													
 				        	<a href='#' class='list-icons-item' data-toggle='dropdown'>
 				        		<i class='icon-menu9'></i>

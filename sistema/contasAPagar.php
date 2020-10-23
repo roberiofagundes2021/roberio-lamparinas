@@ -213,6 +213,7 @@ $dataFim = date("Y-m-d");
             function cadastraParcelas() {
                 let parcelasNum = $("#cmbParcelas").val()
                 let id = $("#inputId").val()
+                let numLinhas = $('tbody').children().length
 
                 let dataParcelas = new Array
 
@@ -226,12 +227,11 @@ $dataFim = date("Y-m-d");
                         valor: $(`#inputParcelaValorAPagar${i}`).val()
                     })
 
-                    // dataParcelas.push(arrayParcela)
-
                     data = {
                         parcelas: JSON.stringify(dataParcelas),
                         numParcelas: parcelasNum,
-                        idConta: id
+                        idConta: id,
+                        elementosNaGride: numLinhas
                     }
                 }
 
@@ -243,6 +243,11 @@ $dataFim = date("Y-m-d");
                     (data) => {
                         $('tbody').append(data)
                         alerta('Atenção', 'Parcelas geradas com sucesso!')
+                        modalParcelas()
+                        editarLancamento()
+                        excluirConta()
+                        $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
+                        pagamentoAgrupado()
                     }
                 )
 
@@ -312,7 +317,7 @@ $dataFim = date("Y-m-d");
                 $('#gerarParcelas').on('click', (e) => {
                     e.preventDefault()
                     let parcelas = $("#cmbParcelas").val()
-                    let valorTotal = $("#inputValor").val()
+                    let valorTotal = $("#inputValor").val().replace(',', '.')
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
                     let descricao = $("#inputDescricao").val()
@@ -352,7 +357,7 @@ $dataFim = date("Y-m-d");
                     let valor = $(elementosLista[5]).html()
 
                     $(`#check${i}`).on('click', () => {
-
+console.log('teste')
                         if (status == 'Paga') {
                             alerta('Atenção', 'A conta selecionada já foi paga!', 'error');
                             $(`#check${i}`).prop('checked', false)
@@ -577,7 +582,20 @@ $dataFim = date("Y-m-d");
                 })
             }
 
+            function excluirConta(){
+                let contas = $('.excluirConta').each((i, elem) => {
+                    $(elem).on('click', ( e ) => {
+                        let id = $(elem).attr('idContaExcluir')
+                        $('.idContaAPagar').val(id)
+                        e.preventDefault
+                        confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `contasAPagarExclui.php?idContaAPagar=${id}`);
 
+                        document.contaExclui.submit()
+                    })
+                })
+
+            }
+            excluirConta()
 
             function Filtrar(carregamentoPagina) {
                 let cont = false;
@@ -619,6 +637,7 @@ $dataFim = date("Y-m-d");
                             modalParcelas()
                             editarLancamento()
                             pagamentoAgrupado()
+                            excluirConta()
 
                         } else {
                             $('tbody').html(msg)
@@ -694,6 +713,10 @@ $dataFim = date("Y-m-d");
                                     <input id="cmbProduto_imp" type="hidden" name="cmbProduto_imp"></input>
                                     <input id="cmbServico_imp" type="hidden" name="cmbServico_imp"></input>
                                     <input id="cmbCodigo_imp" type="hidden" name="cmbCodigo_imp"></input>
+                                </form>
+
+                                <form name="contaExclui" action="" method="POST">
+                                    <input type="hidden" name="idContaAPagar" id="idContaAPagar">
                                 </form>
 
                                 <form name="formMovimentacao" method="post" class="p-3">
@@ -973,15 +996,7 @@ $dataFim = date("Y-m-d");
 												    $result = $conn->query($sql);
 												    $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
 												    foreach ($rowFormaPagamento as $item) {
-                                                        if(isset($lancamento)){
-                                                            if($lancamento['CnAPaFormaPagamento'] == $item['FrPagId']){
-                                                                print('<option value="' . $item['FrPagId'] . '" selected>' . $item['FrPagNome'] . '</option>');
-                                                            } else {
-                                                                print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
-                                                            }
-                                                        } else {
-                                                            print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
-                                                        }
+                                                        print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
 												    }
 												?>
                                             </select>
