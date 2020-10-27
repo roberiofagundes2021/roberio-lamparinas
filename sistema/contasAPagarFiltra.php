@@ -5,34 +5,88 @@ include('global_assets/php/conexao.php');
 
 function queryPesquisa()
 {
-
-    $cont = 0;
-
     include('global_assets/php/conexao.php');
-
-    $args = [];
-
-    if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
-        empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
-        empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
-
-        $args[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
-    }
-
-    if (!empty($_POST['cmbFornecedor'])) {
-        $args[]  = "CnAPaFornecedor = " . $_POST['cmbFornecedor'] . " ";
-    }
-
-    if (!empty($_POST['cmbPlanoContas'])) {
-        $args[]  = "CnAPaPlanoContas = " . $_POST['cmbPlanoContas'] . " ";
-    }
-
-    if (!empty($_POST['cmbStatus'])) {
-        $args[]  = "CnApaStatus = " . $_POST['cmbStatus'] . " ";
-    }
 
     if($_POST['tipoFiltro'] == 'FiltroNormal')
     {
+
+        $cont = 0;
+
+        $args = [];
+    
+        if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
+            empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
+            empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
+    
+            $args[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+
+            if(!empty($_POST['inputPeriodoDe'])){
+                $_SESSION['ContPagPeriodoDe'] = $_POST['inputPeriodoDe'];
+            } 
+
+            if(!empty($_POST['inputAte'])){
+                $_SESSION['ContPagAte'] = $_POST['inputAte'];
+            }
+        }
+    
+        if (!empty($_POST['cmbFornecedor'])) {
+            $args[]  = "CnAPaFornecedor = " . $_POST['cmbFornecedor'] . " ";
+            $_SESSION['ContPagFornecedor'] = $_POST['cmbFornecedor'];
+        }
+    
+        if (!empty($_POST['cmbPlanoContas'])) {
+            $args[]  = "CnAPaPlanoContas = " . $_POST['cmbPlanoContas'] . " ";
+            $_SESSION['ContPagPlanoContas'] = $_POST['cmbPlanoContas'];
+        }
+    
+        if (!empty($_POST['cmbStatus'])) {
+            $args[]  = "CnApaStatus = " . $_POST['cmbStatus'] . " ";
+            $_SESSION['ContPagStatus'] = $_POST['cmbStatus'];
+        }
+
+        if (count($args) >= 1) {
+
+            $string = implode(" and ", $args);
+    
+            if ($string != '') {
+                $string .= ' and ';
+            }
+    
+            $sql = "SELECT * 
+                    FROM ContasAPagar
+                    LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
+                    JOIN Situacao on SituaId = CnApaStatus
+                    WHERE " . $string . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+                ";
+            $result = $conn->query($sql);
+            $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
+
+            count($rowData) >= 1 ? $cont = 1 : $cont = 0;
+        }
+    } else if(isset($_SESSION['ContPagPeriodoDe']) ||  isset($_SESSION['ContPagAte']) || isset($_SESSION['ContPagFornecedor']) || isset($_SESSION['ContPagPlanoContas']) || isset($_SESSION['ContPagStatus'])){
+
+        $cont = 0;
+        $args = [];
+        
+        if (!empty($_SESSION['ContPagPeriodoDe']) || !empty($_SESSION['ContPagAte'])) {
+            empty($_SESSION['ContPagPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_SESSION['ContPagPeriodoDe'];
+            empty($_SESSION['ContPagAte']) ? $inputAte = '2100-01-01' : $inputAte = $_SESSION['ContPagAte'];
+    
+            $args[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+        }
+    
+        if (!empty($_SESSION['ContPagFornecedor'])) {
+            $args[]  = "CnAPaFornecedor = " . $_SESSION['ContPagFornecedor'] . " ";
+        }
+    
+        if (!empty($_SESSION['ContPagPlanoContas'])) {
+            $args[]  = "CnAPaPlanoContas = " . $_SESSION['ContPagPlanoContas'] . " ";
+        }
+    
+        if (!empty($_SESSION['ContPagStatus'])) {
+            $args[]  = "CnApaStatus = " . $_SESSION['ContPagStatus'] . " ";
+        }
+
         if (count($args) >= 1) {
 
             $string = implode(" and ", $args);
@@ -60,11 +114,10 @@ function queryPesquisa()
                 FROM ContasAPagar
                 LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
                 JOIN Situacao on SituaId = CnApaStatus
-                WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "'  and SituaChave = 'APAGAR'
+                WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' and SituaChave = 'APAGAR'
         ";
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
-
         count($rowData) >= 1 ? $cont = 1 : $cont = 0;
     }
 

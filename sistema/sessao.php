@@ -39,6 +39,20 @@ if (array_key_exists('AditivoNovo', $_SESSION) and !in_array(basename($_SERVER['
 }
 
 
+$arquivosContasAPagar = array(
+	'contasAPagar.php', 'contasAPagarNovoLancamento.php', 'contasAPagarFiltra.php'
+);
+
+if ((array_key_exists('ContPagPeriodoDe', $_SESSION) || array_key_exists('ContPagAte', $_SESSION) || array_key_exists('ContPagFornecedor', $_SESSION) || array_key_exists('ContPagPlanoContas', $_SESSION) || array_key_exists('ContPagStatus', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosContasAPagar)) {
+	
+	unset($_SESSION['ContPagPeriodoDe']);
+    unset($_SESSION['ContPagAte']);
+    unset($_SESSION['ContPagFornecedor']);
+    unset($_SESSION['ContPagPlanoContas']);
+    unset($_SESSION['ContPagStatus']);
+}
+
+
 if (!array_key_exists('UsuarId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
 	header('Expires: 0');
 	header('Pragma: no-cache');

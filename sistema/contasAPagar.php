@@ -357,7 +357,7 @@ $dataFim = date("Y-m-d");
                     let valor = $(elementosLista[5]).html()
 
                     $(`#check${i}`).on('click', () => {
-console.log('teste')
+
                         if (status == 'Paga') {
                             alerta('Atenção', 'A conta selecionada já foi paga!', 'error');
                             $(`#check${i}`).prop('checked', false)
@@ -634,6 +634,7 @@ console.log('teste')
                             $('tbody').html(data)
                             $('#imprimir').removeAttr('disabled')
                             resultadosConsulta = data
+                            console.log(data)
                             modalParcelas()
                             editarLancamento()
                             pagamentoAgrupado()
@@ -730,7 +731,7 @@ console.log('teste')
                                                                 class="icon-calendar22"></i></span>
                                                     </span>
                                                     <input type="date" id="inputPeriodoDe" name="inputPeriodoDe"
-                                                        class="form-control" value="<?php echo $dataInicio; ?>">
+                                                        class="form-control" value="<?php if(isset($_SESSION['ContPagPeriodoDe'])) echo $_SESSION['ContPagPeriodoDe'];  else echo $dataInicio; ?>">
                                                 </div>
                                             </div>
                                         </div>
@@ -744,7 +745,7 @@ console.log('teste')
                                                                 class="icon-calendar22"></i></span>
                                                     </span>
                                                     <input type="date" id="inputAte" name="inputAte"
-                                                        class="form-control" value="<?php echo $dataFim; ?>">
+                                                        class="form-control" value="<?php if(isset($_SESSION['ContPagAte'])) echo $_SESSION['ContPagAte'];  else echo $dataFim; ?>">
                                                 </div>
                                             </div>
                                         </div>
@@ -765,7 +766,15 @@ console.log('teste')
                                                         $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                         foreach ($rowFornecedor as $item) {
-                                                            print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                                                            if(isset($_SESSION['ContPagFornecedor'])){
+                                                                if($item['ForneId'] == $_SESSION['ContPagFornecedor']){
+                                                                    print('<option value="' . $item['ForneId'] . '" selected>' . $item['ForneNome'] . '</option>');   
+                                                                } else {
+                                                                    print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                                                                }
+                                                            } else {
+                                                                print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                                                            }
                                                         }
 													?>
                                                 </select>
@@ -788,7 +797,15 @@ console.log('teste')
                                                     $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                     foreach ($rowPlanoContas as $item) {
-                                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                        if(isset($_SESSION['ContPagPlanoContas'])){
+                                                            if($item['PlConId'] == $_SESSION['ContPagPlanoContas']){
+                                                                print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConNome'] . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                            }
+                                                        } else {
+                                                            print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');                                                            
+                                                        }
                                                     }
 
                                                     ?>
@@ -811,7 +828,15 @@ console.log('teste')
     
                                                         foreach ($rowSituacao as $item) {
                                                             if($item['SituaChave'] == 'APAGAR' || $item['SituaChave'] == 'PAGA'){
-                                                                print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+                                                                if(isset($_SESSION['ContPagStatus'])){
+                                                                    if($item['SituaId'] == $_SESSION['ContPagStatus']){
+                                                                        print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
+                                                                    } else {
+                                                                        print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+                                                                    }
+                                                                } else {
+                                                                    print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+                                                                }
                                                             }
                                                         }
                                                     ?>

@@ -335,6 +335,9 @@ $dataInicio = date("Y-m-d");
                         $("#habilitarPagamento").addClass('clicado')
                         $("#habilitarPagamento").html('Desativar Pagamento')
                         preencherJurosDescontos()
+
+                        $("#camposPagamento").fadeIn(200);
+
                     } else {
 
                         $("#inputDataPagamento").val("")
@@ -346,6 +349,8 @@ $dataInicio = date("Y-m-d");
                         $("#habilitarPagamento").removeClass('clicado')
                         $("#habilitarPagamento").html('Habilitar Pagamento')
                         limparJurosDescontos()
+
+                        $("#camposPagamento").fadeOut(200);
                     }
 
                 })
