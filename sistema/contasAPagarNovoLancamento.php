@@ -33,21 +33,65 @@ if(isset($_POST['cmbPlanoContas'])){
                                 ':sNumDocumento' => $_POST['inputNumeroDocumento'],
                                 ':sNotaFiscal' => $_POST['inputNotaFiscal'],
                                 ':dateDtEmissao' => $_POST['inputDataEmissao'],
-                                ':iOrdemCompra' => $_POST['cmbOrdemCarta'],
+                                ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
                                 ':sDescricao' => $_POST['inputDescricao'],
                                 ':dateDtVencimento' => $_POST['inputDataVencimento'],
-                                ':fValorAPagar' => floatval(str_replace(',', '.', $_POST['inputValor'])),
+                                ':fValorAPagar' => floatval(gravaValor($_POST['inputValor'])),
                                 ':dateDtPagamento' => $_POST['inputDataPagamento'],
-                                ':fValorPago' => isset($_POST['inputValorTotalPago']) ? floatval($_POST['inputValorTotalPago']) : null,
+                                ':fValorPago' => isset($_POST['inputValorTotalPago']) ? floatval(gravaValor($_POST['inputValorTotalPago'])) : null,
                                 ':sObservacao' => $_POST['inputObservacao'],
                                 ':sTipoJuros' => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                                ':fJuros' => isset($_POST['inputJurosJD']) ? floatval($_POST['inputJurosJD']) : null,
+                                ':fJuros' => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
                                 ':sTipoDesconto' => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                                ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval($_POST['inputDescontoJD']) : null,
+                                ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
                                 ':iStatus' => $situacao['SituaId'],
                                 ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                                 ':iUnidade' => $_SESSION['UnidadeId']
                             ));
+            
+            if(isset($_POST['inputPagamentoParcial'])){
+                if(intval($_POST['inputPagamentoParcial']) != 0){
+                    $sql = "SELECT SituaId
+                            FROM Situacao
+                            WHERE SituaChave = 'APAGAR'
+                     ";
+                    $result = $conn->query($sql);
+                    $situacao = $result->fetch(PDO::FETCH_ASSOC);
+            
+                    $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                                                  CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                                  CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
+                                                  CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+                            VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                                    :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
+                                    :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+                    $result = $conn->prepare($sql);
+                    
+                    $result->execute(array(           
+                                        ':iPlanoContas' => $_POST['cmbPlanoContas'],
+                                        ':iFornecedor' => $_POST['cmbFornecedor'],
+                                        ':iContaBanco' => $_POST['cmbContaBanco'],
+                                        ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
+                                        ':sNumDocumento' => $_POST['inputNumeroDocumento'],
+                                        ':sNotaFiscal' => $_POST['inputNotaFiscal'],
+                                        ':dateDtEmissao' => $_POST['inputDataEmissao'],
+                                        ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
+                                        ':sDescricao' => $_POST['inputDescricao'],
+                                        ':dateDtVencimento' => $_POST['inputDataVencimento'],
+                                        ':fValorAPagar' => $_POST['inputPagamentoParcial'],
+                                        ':dateDtPagamento' => $_POST['inputDataPagamento'],
+                                        ':fValorPago' => null,
+                                        ':sObservacao' => $_POST['inputObservacao'],
+                                        ':sTipoJuros' => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+                                        ':fJuros' => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+                                        ':sTipoDesconto' => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+                                        ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                                        ':iStatus' => $situacao['SituaId'],
+                                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                        ':iUnidade' => $_SESSION['UnidadeId']
+                                    ));
+                }
+            }
                         
             $_SESSION['msg']['titulo'] = "Sucesso";
             $_SESSION['msg']['mensagem'] = "Lançamento editado!!!";
@@ -95,12 +139,12 @@ if(isset($_POST['cmbPlanoContas'])){
                             ':sNumDocumento' => $_POST['inputNumeroDocumento'],
                             ':sNotaFiscal' => $_POST['inputNotaFiscal'],
                             ':dateDtEmissao' => $_POST['inputDataEmissao'],
-                            ':iOrdemCompra' => $_POST['cmbOrdemCarta'],
+                            ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
                             ':sDescricao' => $_POST['inputParcelaDescricao'.$i.''],
                             ':dateDtVencimento' => $_POST['inputParcelaDataVencimento'.$i.''],
-                            ':fValorAPagar' => (float)$_POST['inputParcelaValorAPagar'.$i.''],
+                            ':fValorAPagar' => floatval(gravaValor($_POST['inputParcelaValorAPagar'.$i.''])),
                             ':dateDtPagamento' => $_POST['inputDataPagamento'],
-                            ':fValorPago' => isset($_POST['inputValorTotalPago']) ? (float)$_POST['inputValorTotalPago'] : null,
+                            ':fValorPago' => isset($_POST['inputValorTotalPago']) ? floatval(gravaValor($_POST['inputValorTotalPago'])) : null,
                             ':sObservacao' => $_POST['inputObservacao'],
                             ':iStatus' => $situacao['SituaId'],
                             ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -108,6 +152,7 @@ if(isset($_POST['cmbPlanoContas'])){
                     ));
                 }
             } else {
+                
                 $sql = "SELECT SituaId
                     FROM Situacao
                     WHERE SituaChave = 'APAGAR'
@@ -133,21 +178,65 @@ if(isset($_POST['cmbPlanoContas'])){
                                     ':sNumDocumento' => $_POST['inputNumeroDocumento'],
                                     ':sNotaFiscal' => $_POST['inputNotaFiscal'],
                                     ':dateDtEmissao' => $_POST['inputDataEmissao'],
-                                    ':iOrdemCompra' => $_POST['cmbOrdemCarta'],
+                                    ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
                                     ':sDescricao' => $_POST['inputDescricao'],
                                     ':dateDtVencimento' => $_POST['inputDataVencimento'],
-                                    ':fValorAPagar' => floatval(str_replace(',', '.', $_POST['inputValor'])),
+                                    ':fValorAPagar' => floatval(gravaValor($_POST['inputValor'])),
                                     ':dateDtPagamento' => $_POST['inputDataPagamento'],
-                                    ':fValorPago' => isset($_POST['inputValorTotalPago']) ? floatval($_POST['inputValorTotalPago']) : null,
+                                    ':fValorPago' => isset($_POST['inputValorTotalPago']) ? floatval(gravaValor($_POST['inputValorTotalPago'])) : null,
                                     ':sObservacao' => $_POST['inputObservacao'],
                                     ':sTipoJuros' => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                                    ':fJuros' => isset($_POST['inputJurosJD']) ? floatval($_POST['inputJurosJD']) : null,
+                                    ':fJuros' => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
                                     ':sTipoDesconto' => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                                    ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval($_POST['inputDescontoJD']) : null,
+                                    ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
                                     ':iStatus' => $situacao['SituaId'],
                                     ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                                     ':iUnidade' => $_SESSION['UnidadeId']
                                 ));
+                
+                if(isset($_POST['inputPagamentoParcial'])){
+                    if(intval($_POST['inputPagamentoParcial']) != 0){
+                        $sql = "SELECT SituaId
+                                FROM Situacao
+                                WHERE SituaChave = 'APAGAR'
+                         ";
+                        $result = $conn->query($sql);
+                        $situacao = $result->fetch(PDO::FETCH_ASSOC);
+                
+                        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                                                      CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                                      CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
+                                                      CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+                                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                                        :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
+                                        :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+                        $result = $conn->prepare($sql);
+                        
+                        $result->execute(array(           
+                                            ':iPlanoContas' => $_POST['cmbPlanoContas'],
+                                            ':iFornecedor' => $_POST['cmbFornecedor'],
+                                            ':iContaBanco' => $_POST['cmbContaBanco'],
+                                            ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
+                                            ':sNumDocumento' => $_POST['inputNumeroDocumento'],
+                                            ':sNotaFiscal' => $_POST['inputNotaFiscal'],
+                                            ':dateDtEmissao' => $_POST['inputDataEmissao'],
+                                            ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
+                                            ':sDescricao' => $_POST['inputDescricao'],
+                                            ':dateDtVencimento' => $_POST['inputDataVencimento'],
+                                            ':fValorAPagar' => $_POST['inputPagamentoParcial'],
+                                            ':dateDtPagamento' => $_POST['inputDataPagamento'],
+                                            ':fValorPago' => null,
+                                            ':sObservacao' => $_POST['inputObservacao'],
+                                            ':sTipoJuros' => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+                                            ':fJuros' => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+                                            ':sTipoDesconto' => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+                                            ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                                            ':iStatus' => $situacao['SituaId'],
+                                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                            ':iUnidade' => $_SESSION['UnidadeId']
+                                        ));
+                    }
+                }
             }
                             
             $_SESSION['msg']['titulo'] = "Sucesso";
@@ -284,7 +373,7 @@ $dataInicio = date("Y-m-d");
                     let valorTotal = $("#valorTotal").val()
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
-                    
+
                     geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade)
                 })
             }
@@ -321,7 +410,9 @@ $dataInicio = date("Y-m-d");
                         $valorTotalPago = $("#inputValor").val()
                         $dataPagamento = new Date
                         $dia = $dataPagamento.getDate()
-                        $mes = parseInt($dataPagamento.getMonth()) + 1 <= 9 ? `0${parseInt($dataPagamento.getMonth()) + 1}` : parseInt($dataPagamento.getMonth()) + 1
+                        $mes = parseInt($dataPagamento.getMonth()) + 1 <= 9 ?
+                            `0${parseInt($dataPagamento.getMonth()) + 1}` : parseInt($dataPagamento
+                                .getMonth()) + 1
                         $ano = $dataPagamento.getFullYear()
                         $fullDataPagamento = `${$ano}-${$mes}-${$dia}`
 
@@ -412,14 +503,14 @@ $dataInicio = date("Y-m-d");
             }
             modalJurosDescontos()
 
-            function calcularJuros(){
+            function calcularJuros() {
                 let jurosTipo = $("#cmbTipoJurosJD").val()
                 let jurosValor = $("#inputJurosJD").val()
                 let juros = 0
 
                 let valorAPagar = $("#inputValorAPagarJD").val()
 
-                if(jurosTipo == 'P'){
+                if (jurosTipo == 'P') {
                     juros = (valorAPagar * (jurosValor / 100))
                 } else {
                     juros = jurosValor
@@ -427,16 +518,16 @@ $dataInicio = date("Y-m-d");
 
                 let descontoTipo = $("#cmbTipoDescontoJD").val()
                 let descontoValor = $("#inputDescontoJD").val()
-                let desconto= 0
+                let desconto = 0
 
-                if(descontoTipo == 'P'){
+                if (descontoTipo == 'P') {
                     desconto = (valorAPagar * (descontoValor / 100))
                 } else {
                     desconto = descontoValor
                 }
 
                 let valorTotal = 0
-                
+
 
                 valorTotal = ((parseFloat(valorAPagar) + parseFloat(juros)) - parseFloat(desconto))
 
@@ -445,30 +536,56 @@ $dataInicio = date("Y-m-d");
 
             }
 
-            $("#inputJurosJD").keyup(( ) =>{
+            $("#inputJurosJD").keyup(() => {
                 calcularJuros()
             })
-            $("#inputDescontoJD").keyup(( ) =>{
+            $("#inputDescontoJD").keyup(() => {
                 calcularJuros()
             })
-            $("#cmbTipoJurosJD").change(( ) =>{
+            $("#cmbTipoJurosJD").change(() => {
                 calcularJuros()
             })
-            $("#cmbTipoDescontoJD").change(( ) =>{
+            $("#cmbTipoDescontoJD").change(() => {
                 calcularJuros()
             })
-            
 
+            function pagamento() {
+                let valorTotal = $('#inputValor').val()
+                let valorPago = $('#inputValorTotalPago').val()
+
+                let valorTotalf = parseFloat(valorTotal.replace(",", "."))
+                let valorPagof = parseFloat(valorPago.replace(",", "."))
+                let valorRestante = (valorTotalf - valorPagof)
+                if (valorPagof < valorTotalf) {
+                    $("#inputPagamentoParcial").val(valorRestante)
+                    console.log($("#inputPagamentoParcial").val())
+                    console.log(valorPago)
+                    confirmaExclusao(document.lancamento,
+                        "O valor pago é menor que o valor total da conta. Será gerado uma nova conta com o valor restante. Deseja continuar?",
+                        'contasAPagarNovoLancamento.php');
+
+                    $dataPagamento = $("#inputDataPagamento").val()
+                    $valorTotalPago = $("#inputValorTotalPago").val()
+                    if ($dataPagamento != '' && $valorTotalPago != '') {
+                        $("#cmbContaBanco").attr('required', '')
+                        $("#cmbFormaPagamento").attr('required', '')
+                    }
+
+                    document.lancamento.submit()
+                } else {
+                    $dataPagamento = $("#inputDataPagamento").val()
+                    $valorTotalPago = $("#inputValorTotalPago").val()
+                    if ($dataPagamento != '' && $valorTotalPago != '') {
+                        $("#cmbContaBanco").attr('required', '')
+                        $("#cmbFormaPagamento").attr('required', '')
+                    }
+                    $("#lancamento").submit()
+                }
+            }
 
             $("#salvar").on('click', (e) => {
                 e.preventDefault()
-                $dataPagamento = $("#inputDataPagamento").val()
-                $valorTotalPago = $("#inputValorTotalPago").val()
-                if($dataPagamento != '' && $valorTotalPago != ''){
-                    $("#cmbContaBanco").attr('required', '')
-                    $("#cmbFormaPagamento").attr('required', '')
-                }
-                $("#lancamento").submit()
+                pagamento()
             })
         })
     </script>
@@ -493,6 +610,7 @@ $dataInicio = date("Y-m-d");
             <div class="content">
                 <form id="lancamento" name="lancamento" method="post" class="p-3">
                     <!-- Info blocks -->
+                    <input type="hidden" id="inputPagamentoParcial" name="inputPagamentoParcial">
                     <div class="row">
                         <div class="col-lg-12">
                             <!-- Basic responsive configuration -->
@@ -631,7 +749,8 @@ $dataInicio = date("Y-m-d");
                                                     ?>
                                                 </div>
                                                 <div class="card">
-                                                    <div class="card-body p-4" style="background-color: #f8f8f8; border: 1px solid #ccc">
+                                                    <div class="card-body p-4"
+                                                        style="background-color: #f8f8f8; border: 1px solid #ccc">
                                                         <div class="row">
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataVencimento">Data do
@@ -644,7 +763,7 @@ $dataInicio = date("Y-m-d");
                                                                 <label for="inputValor">Valor</label>
                                                                 <input type="text" onKeyUp="moeda(this)" maxLength="12"
                                                                     id="inputValor" name="inputValor"
-                                                                    value="<?php if(isset($lancamento)) echo $lancamento['CnAPaValorAPagar'] ?>"
+                                                                    value="<?php if(isset($lancamento)) echo mostraValor($lancamento['CnAPaValorAPagar']) ?>"
                                                                     class="form-control">
                                                             </div>
                                                         </div>
@@ -665,21 +784,23 @@ $dataInicio = date("Y-m-d");
                                                     </div>
                                                 </div>
                                                 <div class="card">
-                                                    <div class="card-body p-4" style="background-color: #f8f8f8; border: 1px solid #ccc">
+                                                    <div class="card-body p-4"
+                                                        style="background-color: #f8f8f8; border: 1px solid #ccc">
                                                         <div class="row">
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataPagamento">Data do
                                                                     Pagamento</label>
                                                                 <input type="date" id="inputDataPagamento"
                                                                     value="<?php if(isset($lancamento)) echo $lancamento['CnAPaDtPagamento'] ?>"
-                                                                    name="inputDataPagamento" class="form-control" readOnly>
+                                                                    name="inputDataPagamento" class="form-control"
+                                                                    readOnly>
                                                             </div>
                                                             <div class="form-group col-6">
                                                                 <label for="inputValorTotalPago">Valor Total
                                                                     Pago</label>
                                                                 <input type="text" onKeyUp="moeda(this)" maxLength="12"
                                                                     id="inputValorTotalPago" name="inputValorTotalPago"
-                                                                    value="<?php if(isset($lancamento)) echo $lancamento['CnAPaValorPago'] ?>"
+                                                                    value="<?php if(isset($lancamento)) echo mostraValor($lancamento['CnAPaValorPago']) ?>"
                                                                     class="form-control" disabled>
                                                             </div>
                                                         </div>
@@ -696,7 +817,8 @@ $dataInicio = date("Y-m-d");
                                             $mostrar = 'style="display:none;"';
                                         }
                                     ?>
-                                    <div id="camposPagamento" class="row justify-content-between" <?php echo $mostrar; ?>>
+                                    <div id="camposPagamento" class="row justify-content-between"
+                                        <?php echo $mostrar; ?>>
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbContaBanco">Conta/Banco</label>
@@ -897,8 +1019,8 @@ $dataInicio = date("Y-m-d");
                                         </div>
                                         <div class="form-group">
                                             <label for="inputJurosJD">Juros</label>
-                                            <input id="inputJurosJD" maxLength="12"
-                                                class="form-control" type="text" name="inputJurosJD">
+                                            <input id="inputJurosJD" maxLength="12" class="form-control" type="text"
+                                                name="inputJurosJD">
                                         </div>
                                     </div>
                                     <div class="d-flex flex-row justify-content-between">
@@ -912,8 +1034,8 @@ $dataInicio = date("Y-m-d");
                                         </div>
                                         <div class="form-group">
                                             <label for="inputDescontoJD">Desconto</label>
-                                            <input id="inputDescontoJD" maxLength="12"
-                                                class="form-control" type="text" name="inputDescontoJD">
+                                            <input id="inputDescontoJD" maxLength="12" class="form-control" type="text"
+                                                name="inputDescontoJD">
                                         </div>
                                     </div>
                                     <div class="d-flex flex-row justify-content-between">
@@ -935,8 +1057,7 @@ $dataInicio = date("Y-m-d");
                                     <div class="row" style="margin-top: 10px;">
                                         <div class="col-lg-12">
                                             <div class="form-group">
-                                                <a class="btn btn-lg btn-principal"
-                                                    id="salvarJurosDescontos">Ok</a>
+                                                <a class="btn btn-lg btn-principal" id="salvarJurosDescontos">Ok</a>
                                                 <a id="modalCloseJurosDescontos" class="btn btn-basic"
                                                     role="button">Cancelar</a>
                                             </div>
