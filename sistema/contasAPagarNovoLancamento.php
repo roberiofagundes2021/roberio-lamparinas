@@ -12,11 +12,21 @@ if(isset($_POST['cmbPlanoContas'])){
 
         try{
 
-            $sql = "SELECT SituaId
-		            FROM Situacao
-		            WHERE SituaChave = 'APAGAR'";
-            $result = $conn->query($sql);
-            $situacao = $result->fetch(PDO::FETCH_ASSOC);
+            if(isset($_POST['inputValorTotalPago'])){
+                $sql = "SELECT SituaId
+                        FROM Situacao
+                        WHERE SituaChave = 'PAGA'
+                    ";
+                $result = $conn->query($sql);
+                $situacao = $result->fetch(PDO::FETCH_ASSOC);
+            } else {
+                $sql = "SELECT SituaId
+                        FROM Situacao
+                        WHERE SituaChave = 'APAGAR'
+                    ";
+                $result = $conn->query($sql);
+                $situacao = $result->fetch(PDO::FETCH_ASSOC);
+            }
 		    
 		    $sql = "UPDATE ContasAPagar SET CnAPaPlanoContas = :iPlanoContas, CnAPaFornecedor = :iFornecedor, CnAPaContaBanco = :iContaBanco, CnAPaFormaPagamento = :iFormaPagamento, CnAPaNumDocumento = :sNumDocumento,
                                             CnAPaNotaFiscal = :sNotaFiscal, CnAPaDtEmissao = :dateDtEmissao, CnAPaOrdemCompra = :iOrdemCompra, CnAPaDescricao = :sDescricao, CnAPaDtVencimento = :dateDtVencimento, CnAPaValorAPagar = :fValorAPagar,
@@ -152,13 +162,22 @@ if(isset($_POST['cmbPlanoContas'])){
                     ));
                 }
             } else {
-                
-                $sql = "SELECT SituaId
-                    FROM Situacao
-                    WHERE SituaChave = 'APAGAR'
-               ";
-                $result = $conn->query($sql);
-                $situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+                if(isset($_POST['inputValorTotalPago'])){
+                    $sql = "SELECT SituaId
+                            FROM Situacao
+                            WHERE SituaChave = 'PAGA'
+                        ";
+                    $result = $conn->query($sql);
+                    $situacao = $result->fetch(PDO::FETCH_ASSOC);
+                } else {
+                    $sql = "SELECT SituaId
+                            FROM Situacao
+                            WHERE SituaChave = 'APAGAR'
+                        ";
+                    $result = $conn->query($sql);
+                    $situacao = $result->fetch(PDO::FETCH_ASSOC);
+                }
         
                 $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
                                               CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
@@ -553,33 +572,68 @@ $dataInicio = date("Y-m-d");
                 let valorTotal = $('#inputValor').val()
                 let valorPago = $('#inputValorTotalPago').val()
 
-                let valorTotalf = parseFloat(valorTotal.replace(",", "."))
-                let valorPagof = parseFloat(valorPago.replace(",", "."))
+                let valorTotalf = parseFloat(valorTotal.replace(".", "").replace(",", "."))
+                let valorPagof = parseFloat(valorPago.replace(".", "").replace(",", "."))
                 let valorRestante = (valorTotalf - valorPagof)
-                if (valorPagof < valorTotalf) {
-                    $("#inputPagamentoParcial").val(valorRestante)
-                    console.log($("#inputPagamentoParcial").val())
-                    console.log(valorPago)
-                    confirmaExclusao(document.lancamento,
-                        "O valor pago é menor que o valor total da conta. Será gerado uma nova conta com o valor restante. Deseja continuar?",
-                        'contasAPagarNovoLancamento.php');
 
-                    $dataPagamento = $("#inputDataPagamento").val()
-                    $valorTotalPago = $("#inputValorTotalPago").val()
-                    if ($dataPagamento != '' && $valorTotalPago != '') {
-                        $("#cmbContaBanco").attr('required', '')
-                        $("#cmbFormaPagamento").attr('required', '')
-                    }
+                let planoContas = $("#cmbPlanoContas").val()
+                let cmbFornecedor = $("#cmbFornecedor").val()
+                let inputDescricao = $("#inputDescricao").val()
+                let cmbContaBanco = $("#cmbContaBanco").val()
+                let cmbFormaPagamento = $("#cmbFormaPagamento").val()
+                let inputNumeroDocumento = $("#inputNumeroDocumento").val()
+
+                if ($("#habilitarPagamento").hasClass('clicado')) {
+                    $("#cmbContaBanco").prop('required', true)
+                    $("#cmbFormaPagamento").prop('required', true)
+                }
+                // && cmbContaBanco != '' && cmbFormaPagamento != '' && inputNumeroDocumento != ''
+                if(planoContas != '' && cmbFornecedor != '' && inputDescricao != ''){
+                    if (valorPagof < valorTotalf && valorPagof) {
+                        $("#inputPagamentoParcial").val(valorRestante)
+                        $('#inputValor').val(valorPago)
+    
+                        // $dataPagamento = $("#inputDataPagamento").val()
+                        // $valorTotalPago = $("#inputValorTotalPago").val()
+                        if ($("#habilitarPagamento").hasClass('clicado')) {
+                            $("#cmbContaBanco").prop('required', true)
+                            $("#cmbFormaPagamento").prop('required', true)
+    
+                            confirmaExclusao(document.lancamento,
+                            "O valor pago é menor que o valor total da conta. Será gerado uma nova conta com o valor restante. Deseja continuar?",
+                            'contasAPagarNovoLancamento.php');
+                        } else {
+                            confirmaExclusao(document.lancamento,
+                            "O valor pago é menor que o valor total da conta. Será gerado uma nova conta com o valor restante. Deseja continuar?",
+                            'contasAPagarNovoLancamento.php');
+                        }
 
                     document.lancamento.submit()
+                    } else {
+                        if ($("#habilitarPagamento").hasClass('clicado')) {
+    
+                            $("#cmbContaBanco").prop('required', true)
+                            $("#cmbFormaPagamento").prop('required', true)
+    
+                            $("#lancamento").submit()
+                        } else {
+                            $("#cmbContaBanco").prop('required', false)
+                            $("#cmbFormaPagamento").prop('required', false)
+                            $("#lancamento").submit()
+                        }
+                    } 
                 } else {
-                    $dataPagamento = $("#inputDataPagamento").val()
-                    $valorTotalPago = $("#inputValorTotalPago").val()
-                    if ($dataPagamento != '' && $valorTotalPago != '') {
-                        $("#cmbContaBanco").attr('required', '')
-                        $("#cmbFormaPagamento").attr('required', '')
+                    if ($("#habilitarPagamento").hasClass('clicado')) {
+    
+                        $("#cmbContaBanco").prop('required', true)
+                        $("#cmbFormaPagamento").prop('required', true)
+                    
+                        $("#lancamento").submit()
+                    } else {
+                        $("#cmbContaBanco").prop('required', false)
+                        $("#cmbFormaPagamento").prop('required', false)
+                        $("#lancamento").submit()
                     }
-                    $("#lancamento").submit()
                 }
             }
 
@@ -608,7 +662,7 @@ $dataInicio = date("Y-m-d");
 
             <!-- Content area -->
             <div class="content">
-                <form id="lancamento" name="lancamento" method="post" class="p-3">
+                <form id="lancamento" name="lancamento" class="form-validate-jquery" method="post" class="p-3">
                     <!-- Info blocks -->
                     <input type="hidden" id="inputPagamentoParcial" name="inputPagamentoParcial">
                     <div class="row">

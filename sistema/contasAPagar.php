@@ -601,8 +601,10 @@ $dataFim = date("Y-m-d");
                 let cont = false;
 
                 const msg = $(
-                    '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+                    '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>'
                 )
+
+                $('tbody').html(msg)
 
                 if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() ==
                     'Filtrando...') $('#cmbProduto').val("")
@@ -634,14 +636,18 @@ $dataFim = date("Y-m-d");
                             $('tbody').html(data)
                             $('#imprimir').removeAttr('disabled')
                             resultadosConsulta = data
-                            console.log(data)
+
                             modalParcelas()
                             editarLancamento()
                             pagamentoAgrupado()
                             excluirConta()
 
                         } else {
-                            $('tbody').html(msg)
+                            let msg2 = $(
+                                '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+                            )
+                            // console.log(msg2)
+                            $('tbody').html(msg2)
                             $('#imprimir').attr('disabled', '')
                         }
                     }
