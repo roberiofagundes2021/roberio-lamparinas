@@ -1,3 +1,13 @@
+<?php
+
+$sql = "SELECT isNull(dbo.fnDebitosDia(".$_SESSION['UnidadeId'].", null, convert(date, getdate())), 0.00) as Debito";
+$result = $conn->query($sql);
+$rowResumo = $result->fetch(PDO::FETCH_ASSOC);
+
+$fDebito = mostraValor($rowResumo['Debito']);
+
+?>
+
 <!-- Main sidebar -->
 <div class="sidebar sidebar-light sidebar-right sidebar-expand-md">
 
@@ -41,7 +51,7 @@
                 </div> 
 
                 <div class="form-group">
-                    <input id="inputDebito" name="inputDebito" class="form-control" value="1.200,00" style="font-size: 30px; text-align: right;">
+                    <input id="inputDebito" name="inputDebito" class="form-control" value="<?php echo $fDebito; ?>" style="font-size: 30px; text-align: right;">
                     <h3 class="form-text text-right" style="color: #666;">Débito</h3>
                 </div>                
 
