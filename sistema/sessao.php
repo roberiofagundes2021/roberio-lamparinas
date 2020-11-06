@@ -40,7 +40,10 @@ if (array_key_exists('AditivoNovo', $_SESSION) and !in_array(basename($_SERVER['
 
 
 $arquivosContasAPagar = array(
-	'contasAPagar.php', 'contasAPagarNovoLancamento.php', 'contasAPagarFiltra.php'
+	'contasAPagar.php', 'contasAPagarNovoLancamento.php',
+	'contasAPagarFiltra.php', 'contasAPagarExclui.php',
+	'contasAPagarPagamentoAgrupado.php',
+	'contasAPagarParcelamento.php'
 );
 
 if ((array_key_exists('ContPagPeriodoDe', $_SESSION) || array_key_exists('ContPagAte', $_SESSION) || array_key_exists('ContPagFornecedor', $_SESSION) || array_key_exists('ContPagPlanoContas', $_SESSION) || array_key_exists('ContPagStatus', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosContasAPagar)) {

@@ -428,13 +428,14 @@ $dataInicio = date("Y-m-d");
                     if (!$("#habilitarPagamento").hasClass('clicado')) {
                         $valorTotalPago = $("#inputValor").val()
                         $dataPagamento = new Date
-                        $dia = $dataPagamento.getDate()
+                        $dia = parseInt($dataPagamento.getDate()) <= 9 ? 
+                            `0${parseInt($dataPagamento.getDate())}`: parseInt($dataPagamento.getDate())
                         $mes = parseInt($dataPagamento.getMonth()) + 1 <= 9 ?
-                            `0${parseInt($dataPagamento.getMonth()) + 1}` : parseInt($dataPagamento
-                                .getMonth()) + 1
+                            `0${parseInt($dataPagamento.getMonth()) + 1}` : parseInt($dataPagamento.getMonth()) + 1
                         $ano = $dataPagamento.getFullYear()
+                        
                         $fullDataPagamento = `${$ano}-${$mes}-${$dia}`
-
+                        
                         $("#inputDataPagamento").val($fullDataPagamento)
                         $("#inputValorTotalPago").val($valorTotalPago).removeAttr('disabled')
 
@@ -443,7 +444,7 @@ $dataInicio = date("Y-m-d");
                         document.getElementById('jurusDescontos').style = "";
 
                         $("#habilitarPagamento").addClass('clicado')
-                        $("#habilitarPagamento").html('Desativar Pagamento')
+                        $("#habilitarPagamento").html('Desabilitar Pagamento')
                         preencherJurosDescontos()
 
                         $("#camposPagamento").fadeIn(200);

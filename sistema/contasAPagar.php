@@ -597,6 +597,23 @@ $dataFim = date("Y-m-d");
             }
             excluirConta()
 
+            function atualizaTotal(){
+                let childres = $('tbody').children()
+                let total = 0
+                let linhas = childres.splice(1, childres.length)
+                linhas.forEach(elem => {
+                    let listaTds = $(elem).children()
+                    let valor = $(listaTds[5]).html()
+                    let valorFormFloat = parseFloat(valor.replace(".", "").replace(",", "."))
+
+                    total += valorFormFloat
+                })
+                // console.log(total)
+                let divTotal = `<div style='position:absolute; left: 63.5%; font-weight: bold; width: 200px;'>Total: ${float2moeda(total)}</div>`
+                $('.datatable-footer').append(divTotal);
+            }
+            
+
             function Filtrar(carregamentoPagina) {
                 let cont = false;
 
@@ -641,6 +658,7 @@ $dataFim = date("Y-m-d");
                             editarLancamento()
                             pagamentoAgrupado()
                             excluirConta()
+                            atualizaTotal()
 
                         } else {
                             let msg2 = $(
@@ -886,8 +904,13 @@ $dataFim = date("Y-m-d");
                                         </tr>
                                     </thead>
                                     <tbody>
-
+                                           
                                     </tbody>
+                                    <tfoot>
+                                        <div style="width: 100%; background-color: red">
+                                        
+                                        </div>
+                                    </tfoot>
                                 </table>
 
                             </div>
