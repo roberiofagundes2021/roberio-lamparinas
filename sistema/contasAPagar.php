@@ -248,6 +248,7 @@ $dataFim = date("Y-m-d");
                         excluirConta()
                         $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
                         pagamentoAgrupado()
+                        atualizaTotal()
                     }
                 )
 
@@ -317,7 +318,7 @@ $dataFim = date("Y-m-d");
                 $('#gerarParcelas').on('click', (e) => {
                     e.preventDefault()
                     let parcelas = $("#cmbParcelas").val()
-                    let valorTotal = $("#inputValor").val().replace(',', '.')
+                    let valorTotal = parseFloat($("#inputValor").val().replace(".", "").replace(".", "").replace(",", "."))
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
                     let descricao = $("#inputDescricao").val()
@@ -461,6 +462,7 @@ $dataFim = date("Y-m-d");
                                         Filtrar(true)
                                         desfazerPagamentoAgrupado()
                                         $(`#check${i}`).removeClass('clicado')
+                                        atualizaTotal()
                                     }
                                 }
                             }
@@ -609,7 +611,10 @@ $dataFim = date("Y-m-d");
                     total += valorFormFloat
                 })
                 // console.log(total)
-                let divTotal = `<div style='position:absolute; left: 63.5%; font-weight: bold; width: 200px;'>Total: ${float2moeda(total)}</div>`
+                $('#footer-total').remove()
+
+                divTotal = `<div id='footer-total' style='position:absolute; left: 63.5%; font-weight: bold; width: 200px;'>Total: ${float2moeda(total)}</div>`                    
+            
                 $('.datatable-footer').append(divTotal);
             }
             
