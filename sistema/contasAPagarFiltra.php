@@ -128,7 +128,7 @@ function queryPesquisa()
             $cont++;     
 
             $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Paga';
-
+            $data = $_POST['statusTipo'] == 'APAGAR' ? mostraData($item['CnAPaDtVencimento']) : mostraData($item['CnAPaDtPagamento']);
             print("
             
             <tr>
@@ -136,7 +136,7 @@ function queryPesquisa()
                     <input type='checkbox' id='check".$cont."'>
                     <input type='hidden' value='".$item['CnAPaId']."'>
                 </td>
-                <td class='even'><p class='m-0'>" . mostraData($item['CnAPaDtVencimento']) . "</p><input type='hidden' value='".$item['CnAPaDtVencimento']."'></td>
+                <td class='even'><p class='m-0'>" . $data . "</p><input type='hidden' value='".$item['CnAPaDtVencimento']."'></td>
                 <td class='even'><a href='contasAPagarNovoLancamento.php?lancamentoId=".$item['CnAPaId']."'>" . $item['CnAPaDescricao'] . "</a></td>
                 <td class='even'>" . $item['ForneNome'] . "</td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaNumDocumento'] . "</td>

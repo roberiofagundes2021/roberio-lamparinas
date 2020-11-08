@@ -637,9 +637,17 @@ $dataFim = date("Y-m-d");
                 let fornecedor = $('#cmbFornecedor').val()
                 let planoContas = $('#cmbPlanoContas').val()
                 let formaPagamento = $("#cmbFormaPagamento").val()
-                let status = $('#cmbStatus').val()
+                let statusArray = $('#cmbStatus').val().split('|')
+                let status = statusArray[0]
+                let statusTipo = statusArray[1]
                 let url = "contasAPagarFiltra.php";
                 let tipoFiltro = carregamentoPagina ? 'CarregamentoPagima' : 'FiltroNormal'
+
+                if (statusArray[1] == 'APAGAR'){ 
+                    $('#dataGrid').html('Vencimento')
+                } else if (statusArray[1] == 'PAGA'){
+                    $('#dataGrid').html('Pagamento')
+                }
 
                 inputsValues = {
                     inputPeriodoDe: periodoDe,
@@ -647,6 +655,7 @@ $dataFim = date("Y-m-d");
                     cmbFornecedor: fornecedor,
                     cmbPlanoContas: planoContas,
                     cmbStatus: status,
+                    statusTipo: statusTipo,
                     tipoFiltro: tipoFiltro
                 };
 
@@ -672,6 +681,7 @@ $dataFim = date("Y-m-d");
                             // console.log(msg2)
                             $('tbody').html(msg2)
                             $('#imprimir').attr('disabled', '')
+                            $('#footer-total').remove()
                         }
                     }
                 );
@@ -859,12 +869,12 @@ $dataFim = date("Y-m-d");
                                                             if($item['SituaChave'] == 'APAGAR' || $item['SituaChave'] == 'PAGA'){
                                                                 if(isset($_SESSION['ContPagStatus'])){
                                                                     if($item['SituaId'] == $_SESSION['ContPagStatus']){
-                                                                        print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
+                                                                        print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
                                                                     } else {
-                                                                        print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+                                                                        print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
                                                                     }
                                                                 } else {
-                                                                    print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+                                                                    print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
                                                                 }
                                                             }
                                                         }
@@ -899,7 +909,7 @@ $dataFim = date("Y-m-d");
                                     <thead>
                                         <tr class="bg-slate">
                                             <th></th>
-                                            <th>Vencimento</th>
+                                            <th id='dataGrid'>Vencimento</th>
                                             <th>Descrição</th>
                                             <th>Fornecedor</th>
                                             <th>Número Doc.</th>
