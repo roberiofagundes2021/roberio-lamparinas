@@ -18,11 +18,15 @@ function queryPesquisa()
             empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
             empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
     
-            $args[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+            if($_POST['statusTipo'] == 'APAGAR'){
+                $args[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+            } else {
+                $args[]  = "CnAPaDtPagamento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";                
+            }
 
             if(!empty($_POST['inputPeriodoDe'])){
                 $_SESSION['ContPagPeriodoDe'] = $_POST['inputPeriodoDe'];
-            } 
+            }
 
             if(!empty($_POST['inputAte'])){
                 $_SESSION['ContPagAte'] = $_POST['inputAte'];
