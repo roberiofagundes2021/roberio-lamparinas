@@ -162,7 +162,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			<?php include_once("cabecalho.php"); ?>	
 
 			<!-- Content area -->
-			<div class="content">
+			<div class="content"> 
 
 				<!-- Info blocks -->		
 				<div class="row">

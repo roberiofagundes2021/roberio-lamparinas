@@ -1,10 +1,14 @@
 <?php
 
-$sql = "SELECT isNull(dbo.fnDebitosDia(".$_SESSION['UnidadeId'].", null, convert(date, getdate())), 0.00) as Debito";
+$sql = "SELECT isNull(dbo.fnDebitosDia(".$_SESSION['UnidadeId'].", null, convert(date, getdate())), 0.00) as Debito,
+               isNull(dbo.fnCreditosDia(".$_SESSION['UnidadeId'].", null, convert(date, getdate())), 0.00) as Credito";
 $result = $conn->query($sql);
 $rowResumo = $result->fetch(PDO::FETCH_ASSOC);
 
+$fCredito = mostraValor($rowResumo['Credito']);
 $fDebito = mostraValor($rowResumo['Debito']);
+
+$fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
 
 ?>
 
@@ -46,7 +50,7 @@ $fDebito = mostraValor($rowResumo['Debito']);
                 </div>
 
                 <div class="form-group">
-                    <input id="inputCredito" name="inputCredito" class="form-control" value="1.400,00" style="font-size: 30px; text-align: right;">
+                    <input id="inputCredito" name="inputCredito" class="form-control" value="<?php echo $fCredito; ?>" style="font-size: 30px; text-align: right;">
                     <h3 class="form-text text-right" style="color: #666;">Crédito</h3>
                 </div> 
 
@@ -56,7 +60,7 @@ $fDebito = mostraValor($rowResumo['Debito']);
                 </div>                
 
                 <div class="form-group">
-                    <input id="inputSaldo" name="inputSaldo" class="form-control" value="200,00" style="font-size: 30px; text-align: right;">
+                    <input id="inputSaldo" name="inputSaldo" class="form-control" value="<?php echo $fSaldo; ?>" style="font-size: 30px; text-align: right;">
                     <h3 class="form-text text-right" style="color: #666;"><b>Saldo</b> (Crédito - Débito)</h3>
                 </div>
             </div>
