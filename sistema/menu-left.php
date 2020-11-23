@@ -187,13 +187,26 @@
 								<li class="nav-item"><a href="centroCusto.php" class="nav-link">Centro de Custo</a></li>								
 								<li class="nav-item"><a href="planoContas.php" class="nav-link">Plano de Contas</a></li>
 								<li class="nav-item"><a href="formaPagamento.php" class="nav-link">Forma de Pagamento</a></li>
-								<li class="nav-item"><a href="contaBanco.php" class="nav-link">Conta/Banco</a></li>
+								<li class="nav-item"><a href="contaBanco.php" class="nav-link">Conta</a></li>
+								<li class="nav-item"><a href="caixa.php" class="nav-link">Caixa</a></li>
 							</ul>
 						</li>
 						<li class="nav-item">
 							<a href="contasAPagar.php" class="nav-link"><i class="icon-cash"></i> <span>Contas à Pagar</span></a>
+							<a href="contasAReceber.php" class="nav-link"><i class="icon-cash"></i> <span>Contas à Receber</span></a>
 						</li>
-						<!-- /Controle de Estoque -->
+						<!-- /Financeiro -->
+
+						<!-- Vendas -->
+						<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Vendas</div> <i class="icon-menu" title="Forms"></i></li>
+						
+						<li class="nav-item nav-item-submenu">
+							<a href="#" class="nav-link"> <span>Apoio</span></a>
+							<ul class="nav nav-group-sub" data-submenu-title="Text editors">
+								<li class="nav-item"><a href="cliente.php" class="nav-link">Cliente</a></li>
+							</ul>
+						</li>
+						<!-- /Vendas -->
 					</ul>
 				</div>
 				<!-- /main navigation -->
