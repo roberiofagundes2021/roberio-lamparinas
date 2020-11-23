@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Editar Conta/Banco';
+$_SESSION['PaginaAtual'] = 'Editar Conta';
 
 include('global_assets/php/conexao.php');
 
@@ -35,13 +35,13 @@ if(isset($_POST['inputNome'])){
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Conta/Banco incluída!!!";
+		$_SESSION['msg']['mensagem'] = "Conta incluída!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir Conta/Banco!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao incluir Conta!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();die;
@@ -98,7 +98,7 @@ if(isset($_POST['inputNome'])){
                     <form name="formSubCategoria" id="formSubCategoria" method="post" class="form-validate-jquery">
                         <input type="hidden" name="inputContaBancoId" value="<?php echo $row['CnBanId']?>">
                         <div class="card-header header-elements-inline">
-                            <h5 class="text-uppercase font-weight-bold">Cadastrar Nova Conta/Banco</h5>
+                            <h5 class="text-uppercase font-weight-bold">Cadastrar Nova Conta</h5>
                         </div>
                         <div class="card-body">
 
@@ -114,8 +114,8 @@ if(isset($_POST['inputNome'])){
 
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <label for="cmbBanco">Banco<span class="text-danger"> *</span></label>
-                                    <select id="cmbBanco" name="cmbBanco" class="form-control select-search" required>
+                                    <label for="cmbBanco">Banco</label>
+                                    <select id="cmbBanco" name="cmbBanco" class="form-control select-search">
                                         <option value="">Selecione</option>
                                         <?php 
 											$sql = "SELECT BancoId, BancoNome
@@ -146,9 +146,9 @@ if(isset($_POST['inputNome'])){
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="inputConta">Conta</label>
+                                        <label for="inputConta">Conta Bancária</label>
                                         <input type="text" id="inputConta" name="inputConta" value="<?php echo $row['CnBanConta']?>" class="form-control"
-                                            placeholder="Conta" autofocus>
+                                            placeholder="Conta Bancária" autofocus>
                                     </div>
                                 </div>
                             </div>

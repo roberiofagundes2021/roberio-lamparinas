@@ -9,7 +9,7 @@ include('global_assets/php/conexao.php');
 //O ALTERAR é usado na importação de Produtos (eles não devem aparecer aqui)
 $sql = "SELECT CnBanId, CnBanNome, CnBanBanco, CnBanAgencia, CnBanConta, BancoNome, SituaNome, SituaChave, SituaId, SituaCor
 		FROM ContaBanco
-        JOIN Banco on BancoId = CnBanBanco
+        LEFT JOIN Banco on BancoId = CnBanBanco
 		JOIN Situacao on SituaId = CnBanStatus
 		WHERE CnBanUnidade = ".$_SESSION['UnidadeId']."
 		ORDER BY CnBanNome ASC";
@@ -24,7 +24,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Conta/Banco</title>
+	<title>Lamparinas | Contas</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -57,7 +57,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Banco
-					width: "30%",
+					width: "27%",
 					targets: [1]
 				},
 				{ 
@@ -67,7 +67,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Conta
-					width: "10%",
+					width: "13%",
 					targets: [3]
 				},
 				{ 
@@ -156,7 +156,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Contas/Bancos</h3>
+								<h3 class="card-title">Relação de Contas</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
@@ -167,18 +167,18 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência às Contas/Bancos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right"><a href="contaBancoNovo.php" class="btn btn-principal" role="button">Nova Conta/Banco</a></div>
+								<p class="font-size-lg">A relação abaixo faz referência às Contas da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+								<div class="text-right"><a href="contaBancoNovo.php" class="btn btn-principal" role="button">Nova Conta</a></div>
 							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->
 							<table id="tblCategoria" class="table">
 								<thead>
 									<tr class="bg-slate">
-										<th data-filter>Conta/Banco</th>
+										<th data-filter>Conta</th>
                                         <th data-filter>Banco</th>
                                         <th data-filter>Agência</th>
-                                        <th data-filter>Conta</th>
+                                        <th data-filter>Conta Bancária</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>

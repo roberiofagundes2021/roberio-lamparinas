@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Nova Conta/Banco';
+$_SESSION['PaginaAtual'] = 'Nova Conta';
 
 include('global_assets/php/conexao.php');
 
@@ -97,7 +97,7 @@ if(isset($_POST['inputNome'])){
 
                     <form name="formSubCategoria" id="formSubCategoria" method="post" class="form-validate-jquery">
                         <div class="card-header header-elements-inline">
-                            <h5 class="text-uppercase font-weight-bold">Cadastrar Nova Conta/Banco</h5>
+                            <h5 class="text-uppercase font-weight-bold">Cadastrar Nova Conta</h5>
                         </div>
                         <div class="card-body">
                             
@@ -106,15 +106,15 @@ if(isset($_POST['inputNome'])){
                                     <div class="form-group">
                                         <label for="inputNome">Nome<span class="text-danger"> *</span></label>
                                         <input type="text" id="inputNome" name="inputNome" class="form-control"
-                                            placeholder="Conta/Banco" required autofocus>
+                                            placeholder="Conta" required autofocus>
                                     </div>
                                 </div>
                             </div>                            
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <label for="cmbBanco">Banco<span class="text-danger"> *</span></label>
+                                    <label for="cmbBanco">Banco</label>
                                     <select id="cmbBanco" name="cmbBanco"
-                                        class="form-control select-search" required>
+                                        class="form-control select-search">
                                         <option value="">Selecione</option>
                                         <?php 
 											$sql = "SELECT BancoId, BancoNome
@@ -141,9 +141,9 @@ if(isset($_POST['inputNome'])){
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="inputConta">Conta</label>
+                                        <label for="inputConta">Conta Bancária</label>
                                         <input type="text" id="inputConta" name="inputConta" class="form-control"
-                                            placeholder="Conta" autofocus>
+                                            placeholder="Conta Bancária" autofocus>
                                     </div>
                                 </div>
                             </div>
