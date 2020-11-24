@@ -7,103 +7,112 @@ function queryPesquisa()
 {
     include('global_assets/php/conexao.php');
 
-    if($_POST['tipoFiltro'] == 'FiltroNormal')
-    {
+    if ($_POST['tipoFiltro'] == 'FiltroNormal') {
 
         $cont = 0;
 
         $args = [];
-    
+
         if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
             empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
             empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
-    
-            if($_POST['statusTipo'] == 'APAGAR'){
-                $args[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+
+            if ($_POST['statusTipo'] == 'ARECEBER') {
+                $args[]  = "CnAReDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
             } else {
-                $args[]  = "CnAPaDtPagamento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";                
+                $args[]  = "CnAReDtRecebimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
             }
 
-            if(!empty($_POST['inputPeriodoDe'])){
-                $_SESSION['ContPagPeriodoDe'] = $_POST['inputPeriodoDe'];
+            if (!empty($_POST['inputPeriodoDe'])) {
+                $_SESSION['ContRecPeriodoDe'] = $_POST['inputPeriodoDe'];
             }
 
-            if(!empty($_POST['inputAte'])){
-                $_SESSION['ContPagAte'] = $_POST['inputAte'];
+            if (!empty($_POST['inputAte'])) {
+                $_SESSION['ContRecAte'] = $_POST['inputAte'];
             }
         }
-    
-        if (!empty($_POST['cmbFornecedor'])) {
-            $args[]  = "CnAPaFornecedor = " . $_POST['cmbFornecedor'] . " ";
-            $_SESSION['ContPagFornecedor'] = $_POST['cmbFornecedor'];
+
+        if (!empty($_POST['cmbClientes'])) {
+            $args[]  = "CnAReCliente = " . $_POST['cmbClientes'] . " ";
+            $_SESSION['ContRecFornecedor'] = $_POST['cmbClientes'];
         }
-    
+
         if (!empty($_POST['cmbPlanoContas'])) {
-            $args[]  = "CnAPaPlanoContas = " . $_POST['cmbPlanoContas'] . " ";
-            $_SESSION['ContPagPlanoContas'] = $_POST['cmbPlanoContas'];
+            $args[]  = "CnARePlanoContas = " . $_POST['cmbPlanoContas'] . " ";
+            $_SESSION['ContRecPlanoContas'] = $_POST['cmbPlanoContas'];
         }
-    
+
         if (!empty($_POST['cmbStatus'])) {
-            $args[]  = "CnApaStatus = " . $_POST['cmbStatus'] . " ";
-            $_SESSION['ContPagStatus'] = $_POST['cmbStatus'];
+            $args[]  = "CnAReStatus = " . $_POST['cmbStatus'] . " ";
+            $_SESSION['ContRecStatus'] = $_POST['cmbStatus'];
+        }
+
+        if (!empty($_POST['cmbNumDoc'])) {
+            $args[]  = "CnAReNumDocumento = " . $_POST['cmbNumDoc'] . " ";
+            $_SESSION['ContRecNumDoc'] = $_POST['cmbNumDoc'];
+        }
+
+        if (!empty($_POST['cmbFormaDeRecebimento'])) {
+            $args[]  = "CnAReFormaPagamento = " . $_POST['cmbFormaDeRecebimento'] . " ";
+            $_SESSION['ContRecFormaPagamento'] = $_POST['cmbFormaDeRecebimento'];
         }
 
         if (count($args) >= 1) {
 
             $string = implode(" and ", $args);
-    
+
             if ($string != '') {
                 $string .= ' and ';
             }
-    
+
             $sql = "SELECT * 
-                    FROM ContasAPagar
-                    LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
-                    JOIN Situacao on SituaId = CnApaStatus
-                    WHERE " . $string . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+                    FROM ContasAReceber
+                    LEFT JOIN Cliente on ClienId = CnAReCliente
+                    JOIN Situacao on SituaId = CnAReStatus
+                    WHERE " . $string . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
                 ";
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
         }
-    } else if(isset($_SESSION['ContPagPeriodoDe']) ||  isset($_SESSION['ContPagAte']) || isset($_SESSION['ContPagFornecedor']) || isset($_SESSION['ContPagPlanoContas']) || isset($_SESSION['ContPagStatus'])){
+    } else if (isset($_SESSION['ContRecPeriodoDe']) ||  isset($_SESSION['ContRecAte']) || isset($_SESSION['ContRecClientes']) || isset($_SESSION['ContRecPlanoContas']) || isset($_SESSION['ContRecStatus'])) {
 
         $cont = 0;
         $args = [];
-        
-        if (!empty($_SESSION['ContPagPeriodoDe']) || !empty($_SESSION['ContPagAte'])) {
-            empty($_SESSION['ContPagPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_SESSION['ContPagPeriodoDe'];
-            empty($_SESSION['ContPagAte']) ? $inputAte = '2100-01-01' : $inputAte = $_SESSION['ContPagAte'];
-    
-            $args[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+
+        if (!empty($_SESSION['ContRecPeriodoDe']) || !empty($_SESSION['ContRecAte'])) {
+            empty($_SESSION['ContRecPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_SESSION['ContRecPeriodoDe'];
+            empty($_SESSION['ContRecAte']) ? $inputAte = '2100-01-01' : $inputAte = $_SESSION['ContRecAte'];
+
+            $args[]  = "CnAReDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
         }
-    
-        if (!empty($_SESSION['ContPagFornecedor'])) {
-            $args[]  = "CnAPaFornecedor = " . $_SESSION['ContPagFornecedor'] . " ";
+
+        if (!empty($_SESSION['ContRecClientes'])) {
+            $args[]  = "CnAReCliente = " . $_SESSION['ContRecClientes'] . " ";
         }
-    
-        if (!empty($_SESSION['ContPagPlanoContas'])) {
-            $args[]  = "CnAPaPlanoContas = " . $_SESSION['ContPagPlanoContas'] . " ";
+
+        if (!empty($_SESSION['ContRecPlanoContas'])) {
+            $args[]  = "CnARePlanoContas = " . $_SESSION['ContRecPlanoContas'] . " ";
         }
-    
-        if (!empty($_SESSION['ContPagStatus'])) {
-            $args[]  = "CnApaStatus = " . $_SESSION['ContPagStatus'] . " ";
+
+        if (!empty($_SESSION['ContRecStatus'])) {
+            $args[]  = "CnAReStatus = " . $_SESSION['ContRecStatus'] . " ";
         }
 
         if (count($args) >= 1) {
 
             $string = implode(" and ", $args);
-    
+
             if ($string != '') {
                 $string .= ' and ';
             }
-    
+
             $sql = "SELECT * 
-                    FROM ContasAPagar
-                    LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
-                    JOIN Situacao on SituaId = CnApaStatus
-                    WHERE " . $string . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+                    FROM ContasAReceber
+                    LEFT JOIN Cliente on ClienId = CnAReCliente
+                    JOIN Situacao on SituaId = CnAReStatus
+                    WHERE " . $string . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
                 ";
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -115,10 +124,10 @@ function queryPesquisa()
         $dataFim = date("Y-m-d");
 
         $sql = "SELECT * 
-                FROM ContasAPagar
-                LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
-                JOIN Situacao on SituaId = CnApaStatus
-                WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' and SituaChave = 'APAGAR'
+                FROM ContasAReceber
+                LEFT JOIN Cliente on ClienId = CnAReCliente
+                JOIN Situacao on SituaId = CnAReStatus
+                WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' and SituaChave = 'ARECEBER'
         ";
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -127,30 +136,30 @@ function queryPesquisa()
 
     if ($cont == 1) {
         $cont = 0;
-        print('<input type="hidden" id="elementosGrid" value="'.count($rowData).'">');
+        print('<input type="hidden" id="elementosGrid" value="' . count($rowData) . '">');
         foreach ($rowData as $item) {
-            $cont++;     
+            $cont++;
 
-            $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Paga';
-            $data = $_POST['statusTipo'] == 'APAGAR' ? mostraData($item['CnAPaDtVencimento']) : mostraData($item['CnAPaDtPagamento']);
+            $status = $item['CnAReStatus'] == 13 ? 'À Receber' : 'Recebida';
+            $data = $_POST['statusTipo'] == 'ARECEBER' ? mostraData($item['CnAReDtVencimento']) : mostraData($item['CnAReDtRecebimento']);
             print("
             
             <tr>
                 <td class='even'>
-                    <input type='checkbox' id='check".$cont."'>
-                    <input type='hidden' value='".$item['CnAPaId']."'>
+                    <input type='checkbox' id='check" . $cont . "'>
+                    <input type='hidden' value='" . $item['CnAReId'] . "'>
                 </td>
-                <td class='even'><p class='m-0'>" . $data . "</p><input type='hidden' value='".$item['CnAPaDtVencimento']."'></td>
-                <td class='even'><a href='contasAPagarNovoLancamento.php?lancamentoId=".$item['CnAPaId']."'>" . $item['CnAPaDescricao'] . "</a></td>
-                <td class='even'>" . $item['ForneNome'] . "</td>
-                <td class='even' style='text-align: center'>" . $item['CnAPaNumDocumento'] . "</td>
-                <td class='even' style='text-align: center'>" . mostraValor($item['CnAPaValorAPagar']) . "</td>
-                <td class='even' style='text-align: center'>" .$status. "</td>
+                <td class='even'><p class='m-0'>" . $data . "</p><input type='hidden' value='" . $item['CnAReDtVencimento'] . "'></td>
+                <td class='even'><a href='contasAReceberNovoLancamento.php?lancamentoId=" . $item['CnAReId'] . "'>" . $item['CnAReDescricao'] . "</a></td>
+                <td class='even'>" . $item['ClienNome'] . "</td>
+                <td class='even' style='text-align: center'>" . $item['CnAReNumDocumento'] . "</td>
+                <td class='even' style='text-align: right; padding-right:1.5rem;'>" . mostraValor($item['CnAReValorAReceber']) . "</td>
+                <td class='even' style='text-align: center'>" . $status . "</td>
                 <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
                 <div class='list-icons'>
                     <div class='list-icons list-icons-extended'>
                         <a href='#' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>
-                        <a href='#' idContaExcluir='".$item['CnAPaId']."' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
+                        <a href='#' idContaExcluir='" . $item['CnAReId'] . "' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
 				        <div class='dropdown'>													
 				        	<a href='#' class='list-icons-item' data-toggle='dropdown'>
 				        		<i class='icon-menu9'></i>

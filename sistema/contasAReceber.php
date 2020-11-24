@@ -5,15 +5,18 @@ include_once("sessao.php");
 $_SESSION['PaginaAtual'] = 'Relação de Contas à Receber';
 
 include('global_assets/php/conexao.php');
-
-$sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
-		FROM Fornecedor
-		JOIN Categoria on CategId = ForneCategoria
-	    WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . "
-		ORDER BY ForneNome ASC";
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
+/*ClienId, ClienNome, ClienCpf, ClienCnpj, ClienTelefone, ClienCelular, ClienStatus, Cate*/
+try {
+    $sql = "SELECT *
+		FROM Cliente
+	    WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . "
+		ORDER BY ClienNome ASC";
+    $result = $conn->query($sql);
+    $row = $result->fetchAll(PDO::FETCH_ASSOC);
+    //$count = count($row);
+} catch (Exception $e) {
+    echo ($e);
+}
 
 $d = date("d");
 $m = date("m");
@@ -59,8 +62,7 @@ $dataFim = date("Y-m-d");
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
                 "order": [
-                    [1, "desc"],
-                    [2, "asc"]
+                    [1, "desc"]
                 ],
                 autoWidth: false,
                 responsive: true,
@@ -71,7 +73,7 @@ $dataFim = date("Y-m-d");
                     },
                     {
                         orderable: true, //Vencimento
-                        width: "10%",
+                        width: "7%",
                         targets: [1]
                     },
                     {
@@ -80,7 +82,7 @@ $dataFim = date("Y-m-d");
                         targets: [2]
                     },
                     {
-                        orderable: true, //Fornecedor
+                        orderable: true, //Cliente
                         width: "25%",
                         targets: [3]
                     },
@@ -96,7 +98,7 @@ $dataFim = date("Y-m-d");
                     },
                     {
                         orderable: true, //Status
-                        width: "5%",
+                        width: "8%",
                         targets: [6]
                     },
                     {
@@ -524,11 +526,11 @@ $dataFim = date("Y-m-d");
                         <input type="hidden" id="idPA${indice}" value="${id}">
                     </p>
                     <div class="form-group col-5 p-2">
-                        <input type="text" class="form-control" id="inputDescricaoPA${indice}" name="inputDescricaoPA${indice}" value="${descricao}" readOnly>
+                        <input type="text" class="form-control" id="inputDescricaoRE${indice}" name="inputDescricaoRE${indice}" value="${descricao}" readOnly>
                     </div>
                     <div class="form-group col-3 p-2">
                         <div class="form-group">
-                            <select id="cmbPlanoContasPA${indice}" name="cmbPlanoContasPA${indice}"
+                            <select id="cmbPlanoContasRE${indice}" name="cmbPlanoContasRE${indice}"
                                 class="form-control form-control-select2" required>
                                 <option value="#">Selecionar</option>
                                 <?php
@@ -549,17 +551,17 @@ $dataFim = date("Y-m-d");
                         </div>
                     </div>
                     <div class="form-group col-3 p-2">
-                        <input type="text" class="form-control" id="inputValorPA${indice}" name="inputValorPA${indice}" value="${valor}" readOnly>
+                        <input type="text" class="form-control" id="inputValorRE${indice}" name="inputValorRE${indice}" value="${valor}" readOnly>
                     </div> 
                 </div>`
 
                         $("#pagamentoAgrupadoContainer").append(elemNode)
                     })
 
-                    $('#inputValorTotalPA').val(float2moeda(valorTotal))
+                    $('#inputValorTotalRE').val(float2moeda(valorTotal))
                 })
 
-                $('#modal-closePA').on('click', function() {
+                $('#modal-closeRE').on('click', function() {
                     desfazerPagamentoAgrupado()
                     $('#modal-pagamentoAgrupado').fadeOut(200);
                     $('body').css('overflow', 'scroll');
@@ -586,9 +588,9 @@ $dataFim = date("Y-m-d");
                 let contas = $('.excluirConta').each((i, elem) => {
                     $(elem).on('click', (e) => {
                         let id = $(elem).attr('idContaExcluir')
-                        $('.idContaAPagar').val(id)
+                        $('.idContaAReceber').val(id)
                         e.preventDefault
-                        confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `contasAReceberExclui.php?idContaAPagar=${id}`);
+                        confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `contasAReceberExclui.php?idContaAReceber=${id}`);
 
                         document.contaExclui.submit()
                     })
@@ -611,7 +613,7 @@ $dataFim = date("Y-m-d");
                 // console.log(total)
                 $('#footer-total').remove()
 
-                divTotal = `<div id='footer-total' style='position:absolute; left: 63.5%; font-weight: bold; width: 200px;'>Total: ${float2moeda(total)}</div>`
+                divTotal = `<div id='footer-total' style='position:absolute; left: 75.1%; font-weight: bold; width: 200px;'>Total: ${float2moeda(total)}</div>`
 
                 $('.datatable-footer').append(divTotal);
             }
@@ -629,29 +631,32 @@ $dataFim = date("Y-m-d");
                 if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() ==
                     'Filtrando...') $('#cmbProduto').val("")
 
+
                 let periodoDe = $('#inputPeriodoDe').val()
                 let ate = $('#inputAte').val()
-                let contaBanco = $('#cmbContaBanco').val()
-                let fornecedor = $('#cmbFornecedor').val()
+                let numdoc = $('#cmbNumDoc').val()
+                let clientes = $('#cmbClientes').val()
                 let planoContas = $('#cmbPlanoContas').val()
-                let formaPagamento = $("#cmbFormaPagamento").val()
+                let formaRecebimento = $("#cmbFormaDeRecebimento").val()
                 let statusArray = $('#cmbStatus').val().split('|')
                 let status = statusArray[0]
                 let statusTipo = statusArray[1]
                 let url = "contasAReceberFiltra.php";
                 let tipoFiltro = carregamentoPagina ? 'CarregamentoPagima' : 'FiltroNormal'
 
-                if (statusArray[1] == 'APAGAR') {
+                if (statusArray[1] == 'ARECEBER') {
                     $('#dataGrid').html('Vencimento')
-                } else if (statusArray[1] == 'PAGA') {
-                    $('#dataGrid').html('Pagamento')
+                } else if (statusArray[1] == 'RECEBIDA') {
+                    $('#dataGrid').html('Recebimento')
                 }
 
                 inputsValues = {
                     inputPeriodoDe: periodoDe,
                     inputAte: ate,
-                    cmbFornecedor: fornecedor,
+                    cmbNumDoc: numdoc,
+                    cmbClientes: clientes,
                     cmbPlanoContas: planoContas,
+                    cmbFormaDeRecebimento: formaRecebimento,
                     cmbStatus: status,
                     statusTipo: statusTipo,
                     tipoFiltro: tipoFiltro
@@ -753,7 +758,7 @@ $dataFim = date("Y-m-d");
                                 </form>
 
                                 <form name="contaExclui" action="" method="POST">
-                                    <input type="hidden" name="idContaAPagar" id="idContaAPagar">
+                                    <input type="hidden" name="idContaAReceber" id="idContaAReceber">
                                 </form>
 
                                 <form name="formMovimentacao" method="post" class="p-3">
@@ -791,10 +796,43 @@ $dataFim = date("Y-m-d");
                                             </div>
                                         </div>
 
+
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="cmbPlanoDeContas">Plano de Contas</label>
-                                                <select id="cmbPlanoDeContas" name="cmbPlanoDeContas" class="form-control form-control-select2">
+                                                <label for="cmbClientes">Clientes</label>
+                                                <select id="cmbClientes" name="cmbClientes" class="form-control form-control-select2">
+                                                    <?php
+                                                    $sql = "SELECT *
+                                                            FROM  Cliente
+                                                            JOIN  Empresa 
+                                                            ON    ClienUnidade = EmpreId
+                                                            WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . " and EmpreStatus = 1
+                                                            ORDER BY ClienNome ASC";
+                                                    $result = $conn->query($sql);
+                                                    $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
+
+
+                                                    try {
+                                                        print('<option value= 0  selected>Todos</option>');
+
+                                                        foreach ($rowSituacao as $item) {
+                                                            if (isset($item['ClienId'])) {
+                                                                print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
+                                                                echo ($item['ClienId']);
+                                                            }
+                                                        }
+                                                    } catch (Exception $e) {
+                                                        echo 'Exceção capturada: ',  $e->getMessage(), "\n";
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label for="cmbPlanoContas">Plano de Contas</label>
+                                                <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
                                                     <option value="">Todos</option>
                                                     <?php
                                                     $sql = "SELECT PlConId, PlConNome
@@ -822,61 +860,40 @@ $dataFim = date("Y-m-d");
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label for="cmbClientes">Clientes</label>
-                                                <select id="cmbClientes" name="cmbClientes" class="form-control form-control-select2">
-                                                    <?php
-                                                    $sql = "SELECT SituaId, SituaNome, SituaChave
-                                                                FROM Situacao
-                                                                WHERE SituaStatus = 1
-                                                                ORDER BY SituaNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                    foreach ($rowSituacao as $item) {
-                                                        if ($item['SituaChave'] == 'ARECEBER' || $item['SituaChave'] == 'RECEBIDA') {
-                                                            if (isset($_SESSION['ContPagStatus'])) {
-                                                                if ($item['SituaId'] == $_SESSION['ContPagStatus']) {
-                                                                    print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
-                                                                }
-                                                            } else {
-                                                                print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
-                                                            }
-                                                        }
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                        </div>
-
                                         <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label for="cmbStatus">Status</label>
                                                 <select id="cmbStatus" name="cmbStatus" class="form-control form-control-select2">
                                                     <?php
-                                                    $sql = "SELECT SituaId, SituaNome, SituaChave
+                                                    try {
+                                                        $sql = "SELECT SituaId, SituaNome, SituaChave
                                                                 FROM Situacao
                                                                 WHERE SituaStatus = 1
                                                                 ORDER BY SituaNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                        $result = $conn->query($sql);
+                                                        $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    foreach ($rowSituacao as $item) {
-                                                        if ($item['SituaChave'] == 'ARECEBER' || $item['SituaChave'] == 'RECEBIDA') {
-                                                            if (isset($_SESSION['ContPagStatus'])) {
-                                                                if ($item['SituaId'] == $_SESSION['ContPagStatus']) {
-                                                                    print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
+                                                        try {
+                                                            foreach ($rowSituacao as $item) {
+                                                                if ($item['SituaChave'] == 'ARECEBER' || $item['SituaChave'] == 'RECEBIDA') {
+                                                                    if (isset($_SESSION['ContPagStatus'])) {
+                                                                        if ($item['SituaId'] == $_SESSION['ContPagStatus']) {
+                                                                            print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
+                                                                        } else {
+                                                                            print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
+                                                                        }
+                                                                    } else {
+                                                                        print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
+                                                                    }
                                                                 }
-                                                            } else {
-                                                                print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
                                                             }
+                                                        } catch (Exception $e) {
+                                                            echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                         }
+                                                    } catch (Exception $e) {
+                                                        echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                     }
+                                                    ?>
                                                     ?>
                                                 </select>
                                             </div>
@@ -884,28 +901,27 @@ $dataFim = date("Y-m-d");
 
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="cmbFormaDePagamento">Forma de Pagamento</label>
-                                                <select id="cmbFormaDePagamento" name="cmbFormaDePagamento" class="form-control form-control-select2">
+                                                <label for="cmbFormaDeRecebimento">Forma de Recebimento</label>
+                                                <select id="cmbFormaDeRecebimento" name="cmbFormaDeRecebimento" class="form-control form-control-select2">
                                                     <?php
-                                                    $sql = "SELECT SituaId, SituaNome, SituaChave
-                                                                FROM Situacao
-                                                                WHERE SituaStatus = 1
-                                                                ORDER BY SituaNome ASC";
+                                                    $sql = "SELECT *
+                                                            FROM FormaPagamento
+                                                            WHERE FrPagStatus = 1
+                                                            ORDER BY FrPagNome ASC";
                                                     $result = $conn->query($sql);
                                                     $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    foreach ($rowSituacao as $item) {
-                                                        if ($item['SituaChave'] == 'ARECEBER' || $item['SituaChave'] == 'RECEBIDA') {
-                                                            if (isset($_SESSION['ContPagStatus'])) {
-                                                                if ($item['SituaId'] == $_SESSION['ContPagStatus']) {
-                                                                    print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
-                                                                }
-                                                            } else {
-                                                                print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
+                                                    try {
+                                                        print('<option value=0  selected>Todos</option>');
+
+                                                        foreach ($rowSituacao as $item) {
+                                                            if (isset($item['FrPagId'])) {
+                                                                print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                                echo ($item['FrPagId']);
                                                             }
                                                         }
+                                                    } catch (Exception $e) {
+                                                        echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                     }
                                                     ?>
                                                 </select>
@@ -937,7 +953,7 @@ $dataFim = date("Y-m-d");
                                             <th></th>
                                             <th id='dataGrid'>Vencimento</th>
                                             <th>Descrição</th>
-                                            <th>Fornecedor</th>
+                                            <th>Cliente</th>
                                             <th>Número Doc.</th>
                                             <th>Valor Total</th>
                                             <th>Status</th>
@@ -962,7 +978,7 @@ $dataFim = date("Y-m-d");
                     </div>
                 </div>
 
-                <form id="pagamentoAgrupadoForm" action=""></form>
+                <form id="recebimentoAgrupadoForm" action=""></form>
 
                 <!-- /info blocks -->
 
