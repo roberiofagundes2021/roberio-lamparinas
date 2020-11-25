@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Novo Lançamento - Contas a Pagar';
+$_SESSION['PaginaAtual'] = 'Novo Lançamento - Contas a Receber';
 
 include('global_assets/php/conexao.php');
 
@@ -15,14 +15,14 @@ if (isset($_POST['cmbPlanoContas'])) {
             if (isset($_POST['inputValorTotalPago'])) {
                 $sql = "SELECT SituaId
                         FROM Situacao
-                        WHERE SituaChave = 'PAGA'
+                        WHERE SituaChave = 'RECEBIDA'
                     ";
                 $result = $conn->query($sql);
                 $situacao = $result->fetch(PDO::FETCH_ASSOC);
             } else {
                 $sql = "SELECT SituaId
                         FROM Situacao
-                        WHERE SituaChave = 'APAGAR'
+                        WHERE SituaChave = 'ARECEBER'
                     ";
                 $result = $conn->query($sql);
                 $situacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -36,27 +36,27 @@ if (isset($_POST['cmbPlanoContas'])) {
             $result = $conn->prepare($sql);
 
             $result->execute(array(
-                ':iPlanoContas' => $_POST['cmbPlanoContas'],
-                ':iFornecedor' => $_POST['cmbFornecedor'],
-                ':iContaBanco' => $_POST['cmbContaBanco'],
-                ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-                ':sNumDocumento' => $_POST['inputNumeroDocumento'],
-                ':sNotaFiscal' => $_POST['inputNotaFiscal'],
-                ':dateDtEmissao' => $_POST['inputDataEmissao'],
-                ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
-                ':sDescricao' => $_POST['inputDescricao'],
-                ':dateDtVencimento' => $_POST['inputDataVencimento'],
-                ':fValorAPagar' => floatval(gravaValor($_POST['inputValor'])),
-                ':dateDtPagamento' => $_POST['inputDataPagamento'],
-                ':fValorPago' => isset($_POST['inputValorTotalPago']) ? floatval(gravaValor($_POST['inputValorTotalPago'])) : null,
-                ':sObservacao' => $_POST['inputObservacao'],
-                ':sTipoJuros' => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                ':fJuros' => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                ':sTipoDesconto' => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
-                ':iStatus' => $situacao['SituaId'],
-                ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-                ':iUnidade' => $_SESSION['UnidadeId']
+                ':iPlanoContas'         => $_POST['cmbPlanoContas'],
+                ':iFornecedor'          => $_POST['cmbFornecedor'],
+                ':iContaBanco'          => $_POST['cmbContaBanco'],
+                ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
+                ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
+                ':sNotaFiscal'          => $_POST['inputNotaFiscal'],
+                ':dateDtEmissao'        => $_POST['inputDataEmissao'],
+                ':iOrdemCompra'         => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
+                ':sDescricao'           => $_POST['inputDescricao'],
+                ':dateDtVencimento'     => $_POST['inputDataVencimento'],
+                ':fValorAPagar'         => floatval(gravaValor($_POST['inputValor'])),
+                ':dateDtPagamento'      => $_POST['inputDataPagamento'],
+                ':fValorPago'           => isset($_POST['inputValorTotalPago']) ? floatval(gravaValor($_POST['inputValorTotalPago'])) : null,
+                ':sObservacao'          => $_POST['inputObservacao'],
+                ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+                ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+                ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+                ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                ':iStatus'              => $situacao['SituaId'],
+                ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
+                ':iUnidade'             => $_SESSION['UnidadeId']
             ));
 
             if (isset($_POST['inputPagamentoParcial'])) {
@@ -667,7 +667,7 @@ $dataInicio = date("Y-m-d");
                             <!-- Basic responsive configuration -->
                             <div class="card">
                                 <div class="card-header header-elements-inline">
-                                    <h3 class="card-title">Novo Lançamento - Contas a Pagar</h3>
+                                    <h3 class="card-title">Novo Lançamento - Contas a Receber</h3>
                                     <div class="header-elements">
                                         <div class="list-icons">
                                             <a class="list-icons-item" data-action="collapse"></a>

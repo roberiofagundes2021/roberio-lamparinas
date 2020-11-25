@@ -47,12 +47,38 @@ $arquivosContasAPagar = array(
 );
 
 if ((array_key_exists('ContPagPeriodoDe', $_SESSION) || array_key_exists('ContPagAte', $_SESSION) || array_key_exists('ContPagFornecedor', $_SESSION) || array_key_exists('ContPagPlanoContas', $_SESSION) || array_key_exists('ContPagStatus', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosContasAPagar)) {
-	
+
 	unset($_SESSION['ContPagPeriodoDe']);
-    unset($_SESSION['ContPagAte']);
-    unset($_SESSION['ContPagFornecedor']);
-    unset($_SESSION['ContPagPlanoContas']);
-    unset($_SESSION['ContPagStatus']);
+	unset($_SESSION['ContPagAte']);
+	unset($_SESSION['ContPagFornecedor']);
+	unset($_SESSION['ContPagPlanoContas']);
+	unset($_SESSION['ContPagStatus']);
+}
+
+$arquivosContasAReceber = array(
+	'contasAReceber.php', 'contasAReceberNovoLancamento.php',
+	'contasAReceberFiltra.php', 'contasAReceberExclui.php',
+	'contasAReceberPagamentoAgrupado.php',
+	'contasAReceberParcelamento.php'
+);
+
+if ((array_key_exists('ContRecPeriodoDe', $_SESSION)
+		|| array_key_exists('ContRecAte', $_SESSION)
+		|| array_key_exists('ContRecClientes', $_SESSION)
+		|| array_key_exists('ContRecPlanoContas', $_SESSION)
+		|| array_key_exists('ContRecStatus', $_SESSION)
+		|| array_key_exists('ContRecNumDoc', $_SESSION)
+		|| array_key_exists('ContRecFormaPagamento', $_SESSION))
+	&& !in_array(basename($_SERVER['PHP_SELF']), $arquivosContasAReceber)
+) {
+
+	unset($_SESSION['ContRecPeriodoDe']);
+	unset($_SESSION['ContRecAte']);
+	unset($_SESSION['ContRecCliente']);
+	unset($_SESSION['ContRecPlanoContas']);
+	unset($_SESSION['ContRecStatus']);
+	unset($_SESSION['ContRecNumDoc']);
+	unset($_SESSION['ContRecFormaPagamento']);
 }
 
 
