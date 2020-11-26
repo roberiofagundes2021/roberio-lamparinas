@@ -169,7 +169,7 @@ $dataFim = date("Y-m-d");
                 $('.btnParcelar').each((i, elem) => {
                     $(elem).on('click', function() {
 
-                        let pagamentos = $("#pagamentoAgrupadoContainer").children()
+                        let recebimentos = $("#RecebimentoAgrupadoContainer").children()
 
 
                         let linha = $(elem).parent().parent().parent().parent().parent()
@@ -224,7 +224,7 @@ $dataFim = date("Y-m-d");
                     dataParcelas.push({
                         descricao: $(`#inputParcelaDescricao${i}`).val(),
                         vencimento: $(`#inputParcelaDataVencimento${i}`).val(),
-                        valor: $(`#inputParcelaValorAPagar${i}`).val()
+                        valor: $(`#inputParcelaValorAReceber${i}`).val()
                     })
 
                     data = {
@@ -247,7 +247,7 @@ $dataFim = date("Y-m-d");
                         editarLancamento()
                         excluirConta()
                         $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
-                        pagamentoAgrupado()
+                        RecebimentoAgrupado()
                         atualizaTotal()
                     }
                 )
@@ -306,7 +306,7 @@ $dataFim = date("Y-m-d");
                         <input type="date" class="form-control" id="inputParcelaDataVencimento${i}" name="inputParcelaDataVencimento${i}" value="${novaDataVencimento}">
                     </div>
                     <div class="form-group col-3 p-2">
-                        <input type="text" class="form-control" id="inputParcelaValorAPagar${i}" name="inputParcelaValorAPagar${i}" value="${valorParcela}">
+                        <input type="text" class="form-control" id="inputParcelaValorAReceber${i}" name="inputParcelaValorAReceber${i}" value="${valorParcela}">
                     </div> 
                 </div>`
 
@@ -328,10 +328,10 @@ $dataFim = date("Y-m-d");
             parcelamento()
             /////////////////////////////////////////////////////////////////
 
-            function desfazerPagamentoAgrupado() {
-                $("#pagamentoAgrupadoForm").children().remove()
-                $("#pagamentoAgrupadoContainer").html("")
-                $("#efetuarPagamento").prop('disabled', true)
+            function desfazerRecebimentoAgrupado() {
+                $("#recebimentoAgrupadoForm").children().remove()
+                $("#RecebimentoAgrupadoContainer").html("")
+                $("#efetuarRecebimento").prop('disabled', true)
 
                 $("#cmbFormaPagamentoPA").val('')
                 $("#select2-cmbFormaPagamentoPA-container").html("Selecionar")
@@ -344,7 +344,7 @@ $dataFim = date("Y-m-d");
                 })
             }
 
-            function pagamentoAgrupado() {
+            function RecebimentoAgrupado() {
 
                 let numLinhas = $("#elementosGrid").val()
 
@@ -359,8 +359,8 @@ $dataFim = date("Y-m-d");
 
                     $(`#check${i}`).on('click', () => {
 
-                        if (status == 'Paga') {
-                            alerta('Atenção', 'A conta selecionada já foi paga!', 'error');
+                        if (status == 'Recebida') {
+                            alerta('Atenção', 'A conta selecionada já foi recebida!', 'error');
                             $(`#check${i}`).prop('checked', false)
                             return false
                         } else {
@@ -368,14 +368,14 @@ $dataFim = date("Y-m-d");
                                 $(`#check${i}`).addClass('clicado')
                                 let input =
                                     `<input type="hidden" name="conta${i}" value="${id}" descricao="${descricao}" valor="${valor}">`
-                                $("#pagamentoAgrupadoForm").append(input)
+                                $("#recebimentoAgrupadoForm").append(input)
 
-                                let quantInputs = $("#pagamentoAgrupadoForm").children()
+                                let quantInputs = $("#recebimentoAgrupadoForm").children()
 
                                 if (quantInputs.length >= 1) {
-                                    $("#efetuarPagamento").removeAttr('disabled')
+                                    $("#efetuarRecebimento").removeAttr('disabled')
                                 } else {
-                                    $("#efetuarPagamento").attr('disabled')
+                                    $("#efetuarRecebimento").attr('disabled')
                                 }
 
                             } else {
@@ -383,10 +383,10 @@ $dataFim = date("Y-m-d");
 
                                 $(`#check${i}`).removeClass('clicado')
 
-                                let quantInputs = $("#pagamentoAgrupadoForm").children()
+                                let quantInputs = $("#recebimentoAgrupadoForm").children()
 
                                 if (quantInputs.length == 0) {
-                                    $("#efetuarPagamento").prop('disabled', true)
+                                    $("#efetuarRecebimento").prop('disabled', true)
                                 }
                             }
                         }
@@ -396,16 +396,16 @@ $dataFim = date("Y-m-d");
 
             let countPlanoContas = 0;
 
-            function pagamentoAgrupadoEnvia() {
-                let pagamentos = $("#pagamentoAgrupadoContainer").children()
-                let dataPagamento = $("#inputDataPagamentoPA").val()
-                let formaPagamento = $("#cmbFormaPagamentoPA").val()
+            function RecebimentoAgrupadoEnvia() {
+                let recebimentos = $("#RecebimentoAgrupadoContainer").children()
+                let dataRecebimento = $("#inputdataRecebimentoPA").val()
+                let FormaPagamento = $("#cmbFormaPagamentoPA").val()
                 let contaBanco = $("#cmbContaBancoPA").val()
                 let numeroDocumento = $("#inputNumeroDocumentoPA").val()
 
-                let pagamentoValores = []
+                let recebimentoValores = []
 
-                pagamentos.each((i, elem) => {
+                recebimentos.each((i, elem) => {
                     let linhaFilhos = $(elem).children()
 
                     let id = $(`#idPA${i+1}`).val()
@@ -417,7 +417,7 @@ $dataFim = date("Y-m-d");
                         countPlanoContas += 1
                     }
 
-                    pagamentoValores[i] = {
+                    recebimentoValores[i] = {
                         id: id,
                         descricao: descricao,
                         planoContas: planoContas,
@@ -427,14 +427,14 @@ $dataFim = date("Y-m-d");
                 })
 
                 data = {
-                    valores: pagamentoValores,
-                    dataPagamento: dataPagamento,
-                    formaPagamento: formaPagamento,
+                    valores: recebimentoValores,
+                    dataRecebimento: dataRecebimento,
+                    FormaPagamento: FormaPagamento,
                     contaBanco: contaBanco,
                     numeroDocumento: numeroDocumento
                 }
 
-                url = 'contasAReceberPagamentoAgrupado.php'
+                url = 'contasAReceberRecebimentoAgrupado.php'
 
                 if (countPlanoContas >= 1) {
                     alerta('Atenção', 'Selecione um plano de contas para cada pagamento!', 'error');
@@ -458,9 +458,9 @@ $dataFim = date("Y-m-d");
                                         $(status).html('Paga')
                                         alerta('Atenção', 'Pagamento agrupado efetuado com sucesso!',
                                             'success');
-                                        pagamentoAgrupado()
+                                        RecebimentoAgrupado()
                                         Filtrar(true)
-                                        desfazerPagamentoAgrupado()
+                                        desfazerRecebimentoAgrupado()
                                         $(`#check${i}`).removeClass('clicado')
                                         atualizaTotal()
                                     }
@@ -473,11 +473,11 @@ $dataFim = date("Y-m-d");
 
             $("#salvarPA").on('click', (e) => {
                 e.preventDefault()
-                pagamentoAgrupadoEnvia()
+                RecebimentoAgrupadoEnvia()
 
                 if (countPlanoContas == 0) {
-                    desfazerPagamentoAgrupado()
-                    $('#modal-pagamentoAgrupado').fadeOut(200);
+                    desfazerRecebimentoAgrupado()
+                    $('#modal-RecebimentoAgrupado').fadeOut(200);
                     $('body').css('overflow', 'scroll');
                 }
 
@@ -488,27 +488,27 @@ $dataFim = date("Y-m-d");
                 window.location.href = `contasAReceberNovoLancamento.php?lancamentoId=${id}`
             }
 
-            function modalPagamentoAgrupado() {
+            function modalRecebimentoAgrupado() {
 
-                $("#pagamentoAgrupadoContainer").html("")
+                $("#RecebimentoAgrupadoContainer").html("")
 
-                $("#efetuarPagamento").on("click", (e) => {
+                $("#efetuarRecebimento").on("click", (e) => {
                     e.preventDefault()
 
-                    let pagamentos = $("#pagamentoAgrupadoForm").children()
+                    let recebimentos = $("#recebimentoAgrupadoForm").children()
 
-                    if (pagamentos.length == 1) {
-                        pagamentos.each((i, elem) => {
+                    if (recebimentos.length == 1) {
+                        recebimentos.each((i, elem) => {
                             let id = $(elem).val()
                             redirecionarPagamento(id)
                         })
                     } else {
-                        $('#modal-pagamentoAgrupado').fadeIn(200)
-                        $("#pagamentoAgrupadoContainer").html("")
+                        $('#modal-RecebimentoAgrupado').fadeIn(200)
+                        $("#RecebimentoAgrupadoContainer").html("")
                     }
 
-                    let numLinhas = $("#pagamentoAgrupadoForm").children().length
-                    let linhasSelecionadas = $("#pagamentoAgrupadoForm").children()
+                    let numLinhas = $("#recebimentoAgrupadoForm").children().length
+                    let linhasSelecionadas = $("#recebimentoAgrupadoForm").children()
                     let valorTotal = 0;
 
 
@@ -555,19 +555,19 @@ $dataFim = date("Y-m-d");
                     </div> 
                 </div>`
 
-                        $("#pagamentoAgrupadoContainer").append(elemNode)
+                        $("#RecebimentoAgrupadoContainer").append(elemNode)
                     })
 
                     $('#inputValorTotalRE').val(float2moeda(valorTotal))
                 })
 
                 $('#modal-closeRE').on('click', function() {
-                    desfazerPagamentoAgrupado()
-                    $('#modal-pagamentoAgrupado').fadeOut(200);
+                    desfazerRecebimentoAgrupado()
+                    $('#modal-RecebimentoAgrupado').fadeOut(200);
                     $('body').css('overflow', 'scroll');
                 })
             }
-            modalPagamentoAgrupado()
+            modalRecebimentoAgrupado()
 
             function editarLancamento() {
                 $('.editarLancamento').each((i, elem) => {
@@ -637,7 +637,7 @@ $dataFim = date("Y-m-d");
                 let numdoc = $('#cmbNumDoc').val()
                 let clientes = $('#cmbClientes').val()
                 let planoContas = $('#cmbPlanoContas').val()
-                let formaRecebimento = $("#cmbFormaDeRecebimento").val()
+                let FormaPagamento = $("#cmbFormaDeRecebimento").val()
                 let statusArray = $('#cmbStatus').val().split('|')
                 let status = statusArray[0]
                 let statusTipo = statusArray[1]
@@ -656,7 +656,7 @@ $dataFim = date("Y-m-d");
                     cmbNumDoc: numdoc,
                     cmbClientes: clientes,
                     cmbPlanoContas: planoContas,
-                    cmbFormaDeRecebimento: formaRecebimento,
+                    cmbFormaDeRecebimento: FormaPagamento,
                     cmbStatus: status,
                     statusTipo: statusTipo,
                     tipoFiltro: tipoFiltro
@@ -673,7 +673,7 @@ $dataFim = date("Y-m-d");
 
                             modalParcelas()
                             editarLancamento()
-                            pagamentoAgrupado()
+                            RecebimentoAgrupado()
                             excluirConta()
                             atualizaTotal()
 
@@ -894,7 +894,6 @@ $dataFim = date("Y-m-d");
                                                         echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                     }
                                                     ?>
-                                                    ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -940,7 +939,7 @@ $dataFim = date("Y-m-d");
                                             <div>
                                                 <button id="novoLacamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo
                                                     Lançamento</button>
-                                                <button id="efetuarPagamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate" disabled>Efetuar Pagamento</button>
+                                                <button id="efetuarRecebimento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate" disabled>Efetuar Recebimento</button>
                                                 <button class="btn bg-secondary"><i class="icon-printer2"></i></button>
                                             </div>
                                         </div>
@@ -1058,21 +1057,21 @@ $dataFim = date("Y-m-d");
                 </div>
                 <!--------------------------------------------------------------------------------------------------->
                 <!--Modal Pagamen-->
-                <div id="modal-pagamentoAgrupado" class="custon-modal">
+                <div id="modal-RecebimentoAgrupado" class="custon-modal">
                     <div class="custon-modal-container">
                         <div class="card custon-modal-content">
                             <div class="custon-modal-title">
                                 <i class=""></i>
-                                <p class="h3">Efetuar Pagamentos Agrupados</p>
+                                <p class="h3">Efetuar recebimentos Agrupados</p>
                                 <i class=""></i>
                             </div>
                             <form class="px-5 pt-4" id="editarProduto" method="POST">
                                 <div class="d-flex flex-row">
                                     <div class='col-lg-4'>
                                         <div class="form-group">
-                                            <label for="inputDataPagamentoPA">Data do Pagamento</label>
+                                            <label for="inputdataRecebimentoPA">Data do Pagamento</label>
                                             <div class="input-group">
-                                                <input type="date" id="inputDataPagamentoPA" name="inputDataPagamentoPA" value="<?php echo $dataInicio ?>" class="form-control">
+                                                <input type="date" id="inputdataRecebimentoPA" name="inputdataRecebimentoPA" value="<?php echo $dataInicio ?>" class="form-control">
                                             </div>
                                         </div>
                                     </div>
@@ -1162,7 +1161,7 @@ $dataFim = date("Y-m-d");
                                         </table>
                                     </div>
                                 </div>
-                                <div id="pagamentoAgrupadoContainer" class="d-flex flex-column px-5" style="overflow-Y: scroll; max-height: 200px">
+                                <div id="RecebimentoAgrupadoContainer" class="d-flex flex-column px-5" style="overflow-Y: scroll; max-height: 200px">
 
                                 </div>
                                 <input type="hidden" id='inputDataVencimento'>
