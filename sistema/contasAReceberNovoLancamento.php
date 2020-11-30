@@ -699,36 +699,41 @@ $dataInicio = date("Y-m-d");
             modalJurosDescontos()
 
             function calcularJuros() {
-                let jurosTipo = $("#cmbTipoJurosJD").val();
-                let jurosValor = $("#inputJurosJD").val();
                 let juros = 0;
                 let valorTotal = 0;
-
-
-                let valorAReceber = $("#inputValorAReceberJD").val();
-
-                if (jurosTipo == "P") {
-                    juros = (parseFloat(valorAReceber) * (jurosValor / 100));
-                } else {
-                    juros = jurosValor;
-                }
-
-                let descontoTipo = $("#cmbTipoDescontoJD").val();
-                let descontoValor = $("#inputDescontoJD").val();
                 let desconto = 0;
+                let jurosTipo = $("#cmbTipoJurosJD").val();
+                let jurosValor = $("#inputJurosJD").val();
+                let valorAReceber = moedatofloat($("#inputValorAReceberJD").val());
+                let descontoTipo = $("#cmbTipoDescontoJD").val();
+                let descontoValor = moedatofloat($("#inputDescontoJD").val());
 
-                if (descontoTipo == "P") {
-                    desconto = (parseFloat(valorAReceber) * (descontoValor / 100));
+                if (parseFloat(jurosValor) > 0) {
+                    if (jurosTipo == "P") {
+                        juros = (valorAReceber * (jurosValor / 100));
+                    } else {
+                        juros = jurosValor;
+                    }
                 } else {
-                    desconto = descontoValor;
+                    juros = 0;
                 }
 
-                valorTotal = ((parseFloat(valorAReceber) + parseFloat(juros)) - parseFloat(desconto))
-                console.log(valorTotal);
+                if (parseFloat(descontoValor) > 0) {
+                    if (descontoTipo == "P") {
+                        desconto = (valorAReceber * (descontoValor / 100));
+                    } else {
+                        desconto = descontoValor;
+                    }
+                    console.log('Desconto Total: ' + desconto);
+                } else {
+                    desconto = 0;
+                }
+
+                valorTotal = parseFloat(valorAReceber) + parseFloat(juros);
+                valorTotal = valorTotal - parseFloat(desconto);
 
                 $("#inputValorTotalAReceber").val(float2moeda(valorTotal))
                 $("#inputValorTotalRecebido").val(float2moeda(valorTotal))
-
             }
 
             $("#inputJurosJD").keyup(() => {
@@ -1275,7 +1280,7 @@ $dataInicio = date("Y-m-d");
                                             <input id="inputDataRecebimentoJD" value="<?php echo date("Y-m-d") ?>" class="form-control" type="date" name="inputDataRecebimentoJD" readOnly>
                                         </div>
                                         <div class="form-group">
-                                            <label for="inputValorTotalAReceber">Valor Total à Pagar</label>
+                                            <label for="inputValorTotalAReceber">Valor Total à Receber</label>
                                             <input id="inputValorTotalAReceber" onKeyUp="moeda(this)" maxLength="12" class="form-control" type="text" name="inputValorTotalAReceber" readOnly>
                                         </div>
                                     </div>
