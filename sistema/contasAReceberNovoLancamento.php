@@ -503,19 +503,12 @@ $dataInicio = date("Y-m-d");
 
             let styleJurosDescontos = ''
 
-            function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade) {
+            function gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade) {
                 $("#parcelasContainer").html("")
                 let descricao = $("#inputDescricao").val()
 
-                var valorTotalSemMascara = Number(valorTotal.replace(/[^0-9.-]+/g, ""));
-                var valorTotalSemMascara = Number(valorTotal.replace(/[^0-9,-]+/g, ""));
-
-                console.log(valorTotal)
-                console.log(parcelas)
-                console.log(parseFloat(valorTotal))
-
-                let valorParcela = (parseInt(valorTotal) / parcelas)
-                console.log(valorParcela)
+                let valorParcela = moedatofloat(valorTotal);
+                valorParcela = (valorParcela / parcelas)
 
                 let numeroParcelas = `<input type="hidden" value="${parcelas}" name="inputNumeroParcelas">`
                 // let dataVencimento = dataVencimento
@@ -575,7 +568,7 @@ $dataInicio = date("Y-m-d");
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
 
-                    geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade)
+                    gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade)
                 })
             }
             parcelamento()

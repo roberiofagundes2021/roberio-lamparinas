@@ -89,8 +89,18 @@ function moeda(z){
 	z.value = v;
 }
 
-function float2moeda(num) {
+function moedatofloat(num) {
+	if (num === "") {
+			num = 0;
+	} else {
+			num = num.replace(".", "");
+			num = num.replace(",", ".");
+			num = parseFloat(num);
+	}
+	return num;
+}
 
+function float2moeda(num) {
    x = 0;
 
    if(num<0) {
@@ -110,8 +120,8 @@ function float2moeda(num) {
    if (x == 1) ret = ' - ' + ret;
    
    return ret;
-
 }
+
 
 /* Só aceita numeros */
 function onlynumber(evt) {
