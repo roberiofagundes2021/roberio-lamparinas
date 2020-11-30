@@ -26,7 +26,7 @@ if(isset($_POST['inputTipo'])){
 		
 		$result->execute(array(
 			':sTipo' => $_POST['inputTipo'],
-			':sNome' => $_POST['inputTipo'] == 'J' ? $_POST['inputNomePJ']: $_POST['inputNomePF'],
+			':sNome' => $_POST['inputTipo'] == 'J' ? $_POST['inputNomePJ'] : $_POST['inputNomePF'],
 			':sRazaoSocial' => $_POST['inputTipo'] == 'J' ? $_POST['inputRazaoSocial'] : null,
 			':sCnpj' => $_POST['inputTipo'] == 'J' ? limpaCPF_CNPJ($_POST['inputCnpj']) : null,
 			':sInscricaoMunicipal' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null,
@@ -124,7 +124,7 @@ if(isset($_POST['inputTipo'])){
             //Quando o campo cep perde o foco.
             $("#inputCep").blur(function() {
 
-				$("#cmbEstado").removeClass("form-control-select2");
+				//$("#cmbEstado").removeClass("form-control-select2");
 				
                 //Nova variável "cep" somente com dígitos.
                 var cep = $(this).val().replace(/\D/g, '');
@@ -213,6 +213,8 @@ if(isset($_POST['inputTipo'])){
 							return false;
 						}
 						
+						//return false;
+						
 						$('#formCliente').submit();
 					}
 				}); //ajax
@@ -225,12 +227,20 @@ if(isset($_POST['inputTipo'])){
 			if (tipo == 'PF'){
 				document.getElementById('dadosPF').style.display = "block";
 				document.getElementById('dadosPJ').style.display = "none";
+
+				document.getElementById('inputNomePF').setAttribute('required', 'required');				
 				document.getElementById('inputCpf').setAttribute('required', 'required');
-				document.getElementById('inputCnpj').removeAttribute('required', 'required');
+
+				document.getElementById('inputNomePJ').removeAttribute('required', 'required');
+				document.getElementById('inputCnpj').removeAttribute('required', 'required');				
 			} else {			
 				document.getElementById('dadosPF').style.display = "none";
 				document.getElementById('dadosPJ').style.display = "block";
+				
+				document.getElementById('inputNomePF').removeAttribute('required', 'required');				
 				document.getElementById('inputCpf').removeAttribute('required', 'required');
+				
+				document.getElementById('inputNomePJ').setAttribute('required', 'required');
 				document.getElementById('inputCnpj').setAttribute('required', 'required');
 			}
 		}	
@@ -405,21 +415,22 @@ if(isset($_POST['inputTipo'])){
 												</div>
 											</div>										
 										</div>	
+	
 										<div class="row" >
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputNomePai">Nome do Pai</label>
-												<input type="text" id="inputNomePai" name="inputNomePai" class="form-control" placeholder="Nome do Pai">
+											<div class="col-lg-6">
+												<div class="form-group">
+													<label for="inputNomePai">Nome do Pai</label>
+													<input type="text" id="inputNomePai" name="inputNomePai" class="form-control" placeholder="Nome do Pai">
+												</div>
 											</div>
-										</div>
 
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputNomeMae">Nome da Mãe</label>
-												<input type="text" id="inputNomeMae" name="inputNomeMae" class="form-control" placeholder="Nome da Mãe">
+											<div class="col-lg-6">
+												<div class="form-group">
+													<label for="inputNomeMae">Nome da Mãe</label>
+													<input type="text" id="inputNomeMae" name="inputNomeMae" class="form-control" placeholder="Nome da Mãe">
+												</div>
 											</div>
 										</div>
-									</div>
 									</div> <!-- Fim dadosPF -->
 									
 									<div id="dadosPJ" style="display:none">
@@ -428,18 +439,18 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-9">
 												<div class="form-group">
 													<label for="inputNomePJ">Nome<span class="text-danger"> *</span></label>
-													<input type="text" id="inputNomePJ" name="inputNomePJ" class="form-control" placeholder="Nome Fantasia" required autofocus>
+													<input type="text" id="inputNomePJ" name="inputNomePJ" class="form-control" placeholder="Nome Fantasia">
 												</div>
 											</div>	
 											
 											<div class="col-lg-3">
 												<div class="form-group">				
 													<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
-													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" required>
+													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99">
 												</div>	
 											</div>						
 										</div>
-
+									
 
 										<div class="row">
 											<div class="col-lg-6">
@@ -466,8 +477,7 @@ if(isset($_POST['inputTipo'])){
 									</div> <!-- Fim dadosPJ -->
 								</div>
 								
-							</div>
-							
+							</div>					
 							<br>
 							
 							<div class="row">
@@ -620,11 +630,10 @@ if(isset($_POST['inputTipo'])){
 										<a href="cliente.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
-							</div>
-													
+							</div>						
 
-					</div>
-					<!-- /card-body -->
+						</div>
+						<!-- /card-body -->
 					
 					</form>
 					
