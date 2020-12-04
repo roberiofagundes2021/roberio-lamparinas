@@ -113,10 +113,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaCliente(ClienId, ClienNome, ClienStatus, Tipo){
 			
-			if (Tipo == 'imprime'){
-				
-				document.getElementById('inputClienteEmail').value = document.getElementById('cmbEmail').value;
-				
+			if (Tipo == 'imprime'){			
 				document.formCliente.action = "clienteImprime.php";
 				document.formCliente.setAttribute("target", "_blank");
 			} else {
@@ -131,7 +128,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					confirmaExclusao(document.formCliente, "Tem certeza que deseja excluir esse cliente", "clienteExclui.php");
 				} else if (Tipo == 'mudaStatus'){
 					document.formCliente.action = "clienteMudaSituacao.php";
-				} 
+				} else if (Tipo == 'imprimeCliente') {
+					document.formCliente.action = "clienteEspecificoImprime.php";
+					document.formCliente.setAttribute("target", "_blank");
+				}
 			}
 			
 			document.formCliente.submit();
@@ -181,9 +181,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									</div>
 									<div class="col-lg-3">
 										<div class="text-right">
-											<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
-												<a href="#collapse-imprimir-relacao" class="dropdown-toggle btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
-													<i class="icon-printer2"></i>																						
+											<div class="p-0" style="float:right; margin-left: 5px;">										
+												<a href="#" onclick="atualizaCliente(0, '','', 'imprime');" class="form-control btn bg-slate-700 btn-icon" role="button" data-placement="bottom" data-container="body">
+													<i class="icon-printer2"></i>
 												</a>
 											</div>
 											<div>
@@ -191,36 +191,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											</div>
 										</div>
 
-										<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 5px;">
-											<div class="row">
-												<div class="col-lg-1">
-												</div>
-												<div class="col-lg-11">
-													<div class="form-group">												
-														<select id="cmbCliente" name="cmbCliente" class="form-control form-control-select2">
-															<option value="#">Filtrar por: Cliente (todas)</option>
-															<?php 
-																$sql = "SELECT ClienId, ClienNome
-																		FROM Cliente
-																		JOIN Situacao on SituaId = ClienStatus		  
-																		WHERE ClienUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																		ORDER BY ClienNome ASC";
-																$result = $conn->query($sql);
-																$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-																
-																foreach ($rowCategoria as $item){															
-																	print('<option value="'.$item['ClienId'].'">'.$item['ClienNome'].'</option>');
-																}													
-															?>
-														</select>
-													</div>
-												
-													<a href="#" onclick="atualizaCliente(0, '','', 'imprime');" class="form-control btn bg-slate-700 btn-icon" role="button" data-placement="bottom" data-container="body">
-														<i class="icon-printer2"> Gerar PDF ou Imprimir</i>
-													</a>
-												</div>
-											</div>
-										</div>
 									</div>	
 								</div>
 							</div>
@@ -260,8 +230,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCliente('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCliente('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+															<a href="#" onclick="atualizaCliente('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+															<a href="#" onclick="atualizaCliente('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														<div class="dropdown">													
+															<a href="#" class="list-icons-item" data-toggle="dropdown">
+																<i class="icon-menu9"></i>
+															</a>
+														
+															<div class="dropdown-menu dropdown-menu-right">
+																<a href="#" onclick="atualizaCliente('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'imprimeCliente\')" class="dropdown-item" title="Imprimir Cadastro"><i class="icon-printer2"></i> Imprimir Cadastro</a>
+															    <a href="#" onclick="atualizaClinte('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'anexo\');" class="dropdown-item"><i class="icon-stackoverflow" title="Anexos"></i> Anexos</a>
+															<div class="dropdown-divider"></div>
+																<a href="#" onclick="atualizaCliente('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'historico\')" class="dropdown-item" title="Histórico"><i class="icon-popout"></i> Histórico</a>
+														</div>
 													</div>
 												</div>
 											</td>

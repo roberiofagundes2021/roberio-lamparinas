@@ -46,7 +46,7 @@ if(isset($_POST['inputTipo'])){
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
-						':sNome' => $_POST['inputNome'],
+						':sNome' => $_POST['inputTipo'] == 'J' ? $_POST['inputNomePJ'] : $_POST['inputNomePF'],
 						':sRazaoSocial' => $_POST['inputTipo'] == 'J' ? $_POST['inputRazaoSocial'] : null,
 						':sCnpj' => $_POST['inputTipo'] == 'J' ? limpaCPF_CNPJ($_POST['inputCnpj']) : null,
 						':sInscricaoMunicipal' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null,
@@ -197,10 +197,18 @@ if(isset($_POST['inputTipo'])){
 				e.preventDefault();
 				
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
-				var inputNomeNovo  = $('#inputNome').val();
+				var inputNomeNovo  = "";
+				var inputNomeNovoPF  = $('#inputNomePF').val();
+				var inputNomeNovoPJ  = $('#inputNomePJ').val();
 				var inputNomeVelho = $('#inputClienteNome').val();				
 				var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
 				var inputCnpj = $('#inputCnpj').val();
+
+				if (inputTipo == 'F'){ 
+					inputNomeNovo = inputNomeNovoPF; 
+				} else{ 
+                    inputNomeNovo = inputNomeNovoPJ;
+				}
 				
 				//remove os espaços desnecessários antes e depois
 				inputNomeNovo = inputNomeNovo.trim();
@@ -356,8 +364,8 @@ if(isset($_POST['inputTipo'])){
 										<div class="row">
 											<div class="col-lg-6">
 												<div class="form-group">
-													<label for="inputNome">Nome</label>
-													<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ClienNome']; ?>" required>
+													<label for="inputNomePF">Nome</label>
+													<input type="text" id="inputNomePF" name="inputNomePF" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ClienNome']; ?>" required>
 												</div>
 											</div>	
 											
@@ -468,12 +476,12 @@ if(isset($_POST['inputTipo'])){
 												<div class="row">
 											<div class="col-lg-9">
 												<div class="form-group">
-													<label for="inputNome">Nome</label>
-													<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ClienNome']; ?>" required>
+													<label for="inputNomePJ">Nome</label>
+													<input type="text" id="inputNomePJ" name="inputNomePJ" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ClienNome']; ?>" required>
 												</div>
 											</div>	
 											
-											<div class="col-lg-3" id="CNPJ">
+											<div class="col-lg-3"  id="CNPJ">
 												<div class="form-group">				
 													<label for="inputCnpj">CNPJ</label>
 													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" value="<?php echo formatarCPF_Cnpj($row['ClienCnpj']); ?>">
