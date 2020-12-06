@@ -31,8 +31,8 @@ $sql = "SELECT MovimId
 	    WHERE MovimOrdemCompra = " . $_POST['numOrdemCompra'] . " and MovimTipo = 'E' and MovimUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADO'
 		";
 $result = $conn->query($sql);
-$movimentAprovads = $result->fetchAll(PDO::FETCH_ASSOC);
-$countMovimentAprovads = count($movimentAprovads);
+$movimentAprovada = $result->fetchAll(PDO::FETCH_ASSOC);
+$countMovimentAprovada = count($movimentAprovada);
 
 
 $sql = " SELECT dbo.fnValorTotalOrdemCompra(" . $_SESSION['UnidadeId'] . ",  " . $_POST['ordemCompra'] . ") as valorTotalOrdemCompra";
@@ -43,8 +43,8 @@ $sql = " SELECT dbo.fnSaldoEntradaOrdemCompra(" . $_SESSION['UnidadeId'] . ",  "
 $result = $conn->query($sql);
 $saldoOrdemCompra = $result->fetch(PDO::FETCH_ASSOC);
 
-
-if ($countMovimentAprovads) {
+// Vefirica se já teve alguma entrada para essa Ordem de Compra
+if ($countMovimentAprovada) {
  
     if ($count) {
         $numItens = 0;
@@ -93,14 +93,14 @@ if ($countMovimentAprovads) {
              
             // var_dump($saldo);
             $output .=  '<tr class="trGrid" id="row' . $numItens . '">
-						 <td style="text-align: center">' . $numItens . '</td>
-						 <td data-popup="tooltip" data-placement="bottom" title="' . $item['detalhamento'] . '">' . $item['nome'] . '</td>
-						 <td style="text-align: center">' . $item['UnMedSigla'] . '</td>
-                         <td style="text-align: center">'.$saldo['Quantidade'].'</td>
-                         <td style="text-align: center">' . $saldo['Saldo'] . '</td>
-						 <td style="text-align: right">' . $valorCusto . '</td>
-                         <td class="valorTotal" style="text-align: right">R$ 0, 00</td>
-                         <td  style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
+						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $numItens . '</td>
+						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip">' . $item['nome'] . '</td>
+						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $item['UnMedSigla'] . '</td>
+                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">'.$saldo['Quantidade'].'</td>
+                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $saldo['Saldo'] . '</td>
+						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: right">' . $valorCusto . '</td>
+                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" class="valorTotal" style="text-align: right">R$ 0, 00</td> <!-- esse campo é calculado depois na função recalcValorTotal() -->
+                         <td style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
                          <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" idLinha="row' . $numItens . '" quantInicial="' . $saldo['Quantidade'] . '" saldoInicial="' . $saldo['Saldo'] . '"  name="campo' . $numItens . '" value="' . $item['tipo'] . '#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>
                     ';
@@ -189,13 +189,13 @@ if ($countMovimentAprovads) {
             $totalGeral += $item['quantidade'] * $item['valorCusto'];
             // var_dump($saldo);
             $output .=  '<tr class="trGrid" id="row' . $numItens . '">
-						 <td style="text-align: center">' . $numItens . '</td>
-						 <td data-popup="tooltip" data-placement="bottom" title="' . $item['detalhamento'] . '">' . $item['nome'] . '</td>
-						 <td style="text-align: center">' . $item['UnMedSigla'] . '</td>
-                         <td style="text-align: center"></td>
-                         <td style="text-align: center">' . $saldo['Saldo'] . '</td>
-						 <td style="text-align: right">' . $valorCusto . '</td>
-                         <td class="valorTotal" style="text-align: right">R$ 0, 00</td>
+						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $numItens . '</td>
+						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip">' . $item['nome'] . '</td>
+						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $item['UnMedSigla'] . '</td>
+                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center"></td>
+                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $saldo['Saldo'] . '</td>
+						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: right">' . $valorCusto . '</td>
+                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" class="valorTotal" style="text-align: right">R$ 0, 00</td>
                          <td  style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
                          <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" idLinha="row' . $numItens . '" quantInicial="' . $saldo['Quantidade'] . '" saldoInicial="' . $saldo['Saldo'] . '"  name="campo' . $numItens . '" value="' . $item['tipo'] . '#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>
@@ -219,7 +219,7 @@ if ($countMovimentAprovads) {
                             <div id="total" valorTotalGeral="" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0, 00</div>
                         </div>
                         <div>
-                            <div id="totalSaldo" style="text-align:right; font-size: 15px; font-weight:bold;" valor="' . $totalOrdemCompra['valorTotalOrdemCompra'] . '">' . formataMoeda($totalOrdemCompra['valorTotalOrdemCompra']) . '</div>
+                            <div id="totalSaldo" style="text-align:right; font-size: 15px; font-weight:bold;" valorTotalInicial="'.$totalOrdemCompra['valorTotalOrdemCompra'].'" valor="' . $totalOrdemCompra['valorTotalOrdemCompra'] . '">' . formataMoeda($totalOrdemCompra['valorTotalOrdemCompra']) . '</div>
                          </div>
                     </th>
                     <th colspan="1">

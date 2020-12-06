@@ -10,7 +10,7 @@ if (isset($_POST['inputData'])) {
 
 	try {
 
-		var_dump($_POST);die;
+		//var_dump($_POST);die;
 
 		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
@@ -30,7 +30,7 @@ if (isset($_POST['inputData'])) {
 		$conn->beginTransaction();
 
 		$result->execute(array(
-			':sTipo' => $_POST['inputTipo'],
+			':sTipo' => 'E',
 			':iMotivo' => null,
 			':dData' => gravaData($_POST['inputData']),
 			':iFinalidade' => null,
@@ -43,234 +43,77 @@ if (isset($_POST['inputData'])) {
 			':sDestinoManual' => null,
 
 			':sObservacao' => $_POST['txtareaObservacao'],
-			':iFornecedor' => $_POST['cmbFornecedor'] == '#' ? null : $_POST['cmbFornecedor'],
-			':iOrdemCompra' => $_POST['cmbOrdemCompra'] == '#' ? null : $_POST['cmbOrdemCompra'],
+			':iFornecedor' => $_POST['cmbFornecedor'] == '' ? null : $_POST['cmbFornecedor'],
+			':iOrdemCompra' => $_POST['cmbOrdemCompra'] == '' ? null : $_POST['cmbOrdemCompra'],
 			':sNotaFiscal' => $_POST['inputNotaFiscal'] == '' ? null : $_POST['inputNotaFiscal'],
 			':dDataEmissao' => $_POST['inputDataEmissao'] == '' ? null : gravaData($_POST['inputDataEmissao']),
 			':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
 			':fValorTotal' => $_POST['inputValorTotal'] == '' ? null : gravaValor($_POST['inputValorTotal']),
 			':sChaveAcesso' => $_POST['inputChaveAcesso'] == '' ? null : $_POST['inputChaveAcesso'],
-			':iSituacao' => $_POST['cmbSituacao'] == '#' ? null : $_POST['cmbSituacao'],
+			':iSituacao' => $_POST['cmbSituacao'] == '' ? null : $_POST['cmbSituacao'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		$insertId = $conn->lastInsertId();
 
-		try {
+		$numItems = intval($_POST['inputNumItens']);
 
-			$numItems = intval($_POST['inputNumItens']);
+		for ($i = 1; $i <=  $numItems; $i++) {
 
-			for ($i = 1; $i <=  $numItems; $i++) {
+			$campoSoma = $i;
 
-				$campoSoma = $i;
+			$campo = 'campo' . $i;
 
-				$campo = 'campo' . $i;
+			//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
 
-				//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
+			if (isset($_POST[$campo])) {
+				//var_dump($campo);
+				$registro = explode('#', $_POST[$campo]);
 
-				if (isset($_POST[$campo])) {
-					//var_dump($campo);
-					$registro = explode('#', $_POST[$campo]);
+				if ($registro[0] == 'P') {
 
-					if ($registro[0] == 'P') {
+					$quantItens = intval($registro[3]);  //quantidade informada no modal
 
-						$quantItens = intval($registro[3]);
-						if (isset($registro[7])) {
-							for ($i = 1; $i <= $quantItens; $i++) {
-								// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
-								
-								if ($registro[7] == 2) {
-
-									$sql = "SELECT COUNT(PatriNumero) as CONT
-							              	FROM Patrimonio
-										  	JOIN Situacao on SituaId = PatriStatus
-										  	WHERE PatriUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-										  ";
-									$result = $conn->query($sql);
-									$patrimonios = $result->fetch(PDO::FETCH_ASSOC);
-									$count = $patrimonios['CONT'];
-									
-									//Caso não seja o primeiro registro na tabela para esta empresa
-									if ($count >= 1) {
-
-										$ultimoPatri = $count;
-										$numeroPatri = intval($ultimoPatri) + 1;
-										$numeroPatriFinal = '';
-										//var_dump($i);
-
-										if ($numeroPatri < 10) $numeroPatriFinal = "000000" . $numeroPatri . "";
-										if ($numeroPatri < 100 && $numeroPatri > 9) $numeroPatriFinal = "00000" . $numeroPatri . "";
-										if ($numeroPatri < 1000 && $numeroPatri > 99) $numeroPatriFinal = "0000" . $numeroPatri . "";
-										if ($numeroPatri < 10000 && $numeroPatri > 999) $numeroPatriFinal = "000" . $numeroPatri . "";
-										if ($numeroPatri < 100000 && $numeroPatri > 9999) $numeroPatriFinal = "00" . $numeroPatri . "";
-										if ($numeroPatri < 1000000 && $numeroPatri > 99999) $numeroPatriFinal = "0" . $numeroPatri . "";
-										if ($numeroPatri < 10000000 && $numeroPatri > 999999) $numeroPatriFinal = $numeroPatri;
-
-
-										// Selecionando o id da situacao 'ATIVO'
-										$sql = "SELECT SituaId
-												 FROM Situacao
-												 WHERE SituaChave = 'ATIVO' 
-												 ";
-										$result = $conn->query($sql);
-										$situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-
-										$sql = "INSERT INTO Patrimonio
-												(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
-												VALUES 
-												(:sNumero, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-										$result = $conn->prepare($sql);
-
-										$result->execute(array(
-											':sNumero' => $numeroPatriFinal,
-											':iStatus' => $situacao['SituaId'],
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iUnidade' => $_SESSION['UnidadeId']
-										));
-
-										$insertIdPatrimonio = $conn->lastInsertId();
-
-
-										$sql = "INSERT INTO MovimentacaoXProduto
-						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-					                            VALUES 
-						                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-										$result = $conn->prepare($sql);
-
-										$result->execute(array(
-											':iMovimentacao' => $insertId,
-											':iProduto' => $registro[1],
-											':iQuantidade' => (int) $registro[3],
-											':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-											':sLote' => $registro[5],
-											':dValidade' => $registro[6] != '0' ? $registro[6] : null,
-											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iUnidade' => $_SESSION['UnidadeId'],
-											':iPatrimonio' => $insertIdPatrimonio
-										));
-									} else {
-										
-										//Caso seja o primeiro registro na tabela para esta empresa
-										$numeroPatri = '0000001';
-
-										// Selecionando o id da situacao 'ATIVO'
-										$sql = "SELECT SituaId
-												 FROM Situacao
-												 WHERE SituaChave = 'ATIVO' 
-												 ";
-										$result = $conn->query($sql);
-										$situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-										$sql = "INSERT INTO Patrimonio
-												(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
-												VALUES 
-												(:sNumero, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-										$result = $conn->prepare($sql);
-
-										$result->execute(array(
-											':sNumero' => $numeroPatri,
-											':iStatus' => $situacao['SituaId'],
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iUnidade' => $_SESSION['UnidadeId']
-										));
-
-										$insertIdPatrimonio = $conn->lastInsertId();
-
-										
-										$sql = "INSERT INTO MovimentacaoXProduto
-						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-					                            VALUES 
-						                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-										$result = $conn->prepare($sql);
-
-										$result->execute(array(
-											':iMovimentacao' => $insertId,
-											':iProduto' => $registro[1],
-											':iQuantidade' => (int) $registro[3],
-											':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-											':sLote' => $registro[5],
-											':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iUnidade' => $_SESSION['UnidadeId'],
-											':iPatrimonio' => $insertIdPatrimonio
-										));
-									}
-
-								} else {
-									$quantItens = intval($registro[3]);
-
-									for ($i = 1; $i <= $quantItens; $i++) {
-										$sql = "INSERT INTO MovimentacaoXProduto
-								            (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-								            VALUES 
-								            (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-										$result = $conn->prepare($sql);
-
-										$result->execute(array(
-											':iMovimentacao' => $insertId,
-											':iProduto' => $registro[1],
-											':iQuantidade' => (int) $registro[3],
-											':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-											':sLote' => $registro[5],
-											':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iUnidade' => $_SESSION['UnidadeId'],
-											':iPatrimonio' => null
-										));
-									}
-								}
-								break 1;
-							}
-						} else {
-							if ((int) $registro[3] > 0) {
-								$sql = "INSERT INTO MovimentacaoXProduto
-							            (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-							            VALUES 
-							            (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-								$result = $conn->prepare($sql);
-
-								$result->execute(array(
-									':iMovimentacao' => $insertId,
-									':iProduto' => $registro[1],
-									':iQuantidade' => (int) $registro[3],
-									':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-									':sLote' => $registro[5],
-									':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-									':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-									':iUnidade' => $_SESSION['UnidadeId'],
-									':iPatrimonio' => null
-								));
-							}
-						}
-					} else {
-						$sql = "INSERT INTO MovimentacaoXServico
-						        (MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrLote, MvXSrUsuarioAtualizador, MvXSrUnidade)
-					            VALUES 
-						        (:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :sLote, :iUsuarioAtualizador, :iUnidade)";
+					if ((int) $registro[3] > 0) {
+						$sql = "INSERT INTO MovimentacaoXProduto
+								(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+								VALUES 
+								(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
 						$result = $conn->prepare($sql);
 
 						$result->execute(array(
 							':iMovimentacao' => $insertId,
-							':iServico' => $registro[1],
+							':iProduto' => $registro[1],
 							':iQuantidade' => (int) $registro[3],
-							':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
+							':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 							':sLote' => $registro[5],
+							':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+							':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId']
+							':iUnidade' => $_SESSION['UnidadeId'],
+							':iPatrimonio' => null
 						));
 					}
+
+				} else {
+					$sql = "INSERT INTO MovimentacaoXServico
+							(MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrLote, MvXSrUsuarioAtualizador, MvXSrUnidade)
+							VALUES 
+							(:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :sLote, :iUsuarioAtualizador, :iUnidade)";
+					$result = $conn->prepare($sql);
+
+					$result->execute(array(
+						':iMovimentacao' => $insertId,
+						':iServico' => $registro[1],
+						':iQuantidade' => (int) $registro[3],
+						':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
+						':sLote' => $registro[5],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iUnidade' => $_SESSION['UnidadeId']
+					));
 				}
 			}
-		} catch (PDOException $e) {
-			$conn->rollback();
-			echo 'Error1: ' . $e->getMessage();
-			exit;
 		}
 
 		if (isset($_POST['cmbSituacao'])) {
@@ -577,6 +420,8 @@ if (isset($_POST['inputData'])) {
 							$(tr[4]).html(novosValores.novoSaldo)
 							$(tr[6]).html("R$ " + novosValores.valorTotal)
 							$(tr[6]).attr('valorTotalSomaGeral', novosValores.somaTotalValorGeral)
+							
+							console.log(novosValores.somaTotalValorGeral);
 
 							$('#inputNumItens').val()
 							stringVallnput = ''
@@ -595,7 +440,6 @@ if (isset($_POST['inputData'])) {
 		}
 
 		function recalcValores(quantInicial, novaQuantidade, saldoInicial, valorUni) {
-
 
 			let valorTotal = 0
 			let novoSaldo = 0
@@ -636,7 +480,10 @@ if (isset($_POST['inputData'])) {
 
 		function calcSaldoOrdemCompra() {
 			let valorTotal = $('#total').attr('valor')
-			let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial')
+			let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial')  ///??????????????????? undefined
+
+			//console.log(valorTotal)
+			//console.log(valorSaldoOrdemCompra)
 
 			let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
 
@@ -669,90 +516,6 @@ if (isset($_POST['inputData'])) {
 
 		$(document).ready(function() {
 
-			/* Início: Tabela Personalizada */
-			$('#tabelaProdutoServico').DataTable({
-				"order": [
-					[0, "asc"]
-				],
-				autoWidth: false,
-				responsive: true,
-				columnDefs: [{
-						orderable: true, //Item
-						width: "5%",
-						targets: [0]
-					},
-					{
-						orderable: true, //Produto/Servico
-						width: "21%",
-						targets: [1]
-					},
-					{
-						orderable: true, //Unidade Medida
-						width: "12%",
-						targets: [2]
-					},
-					{
-						orderable: true, //Quantidade
-						width: "12%",
-						targets: [3]
-					},
-					{
-						orderable: true, //Saldo
-						width: "10%",
-						targets: [4]
-					},
-					{
-						orderable: true, //Valor Unitário
-						width: "12%",
-						targets: [5]
-					},
-					{
-						orderable: true, //Valor Total
-						width: "10%",
-						targets: [6]
-					},
-					{
-						orderable: false, //Classificação
-						width: "13%",
-						targets: [7]
-					},
-					{
-						orderable: false, //Ações
-						width: "5%",
-						targets: [8]
-					}
-				],
-				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
-				language: {
-					search: '<span>Filtro:</span> _INPUT_',
-					searchPlaceholder: 'filtra qualquer coluna...',
-					lengthMenu: '<span>Mostrar:</span> _MENU_',
-					paginate: {
-						'first': 'Primeira',
-						'last': 'Última',
-						'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-						'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
-					}
-				}
-			});
-
-			// Select2 for length menu styling
-			var _componentSelect2 = function() {
-				if (!$().select2) {
-					console.warn('Warning - select2.min.js is not loaded.');
-					return;
-				}
-
-				// Initialize
-				$('.dataTables_length select').select2({
-					minimumResultsForSearch: Infinity,
-					dropdownAutoWidth: true,
-					width: 'auto'
-				});
-			};
-
-			_componentSelect2();
-
 			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
 
@@ -765,7 +528,7 @@ if (isset($_POST['inputData'])) {
 
 				$.get('filtraOrdemCompra.php?idFornecedor=' + cmbFornecedor, function(dados) {
 
-					var option = '<option value="#">Selecione</option>';
+					var option = '<option value="">Selecione</option>';
 					if (dados) {
 						$('#cmbOrdemCompra').html(option).show();
 						$('#cmbOrdemCompra').append(dados).show();
@@ -796,20 +559,37 @@ if (isset($_POST['inputData'])) {
 			$('#enviar').on('click', function(e) {
 
 				var inputTotal = $('#inputTotal').val();
-				var cmbOrdemCompra = $('#cmbOrdemCompra').val()
+				var cmbOrdemCompra = $('#cmbOrdemCompra').val();
+				var cmbFornecedor = $('#cmbFornecedor').val();
 				var cmbDestinoLocal = $('#cmbDestinoLocal').val();
-				var inputValorTotal = $('#inputValorTotal').val().trim()
+				var inputValorTotal = $('#inputValorTotal').val();
 
 				//Verifica se a combo Estoque de Destino foi informada
-				if (cmbDestinoLocal == '#') {
+				if (cmbDestinoLocal == '') {
 					alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
 					$('#cmbDestinoLocal').focus();
+					$("#formMovimentacao").submit();
 					return false;
 				}
 
-				if (cmbOrdemCompra == '#') {
+				if (cmbFornecedor == '') {
+					alerta('Atenção', 'Informe o Fornecedor!', 'error');
+					$('#cmbFornecedor').focus();
+					$("#formMovimentacao").submit();
+					return false;
+				}
+
+				if (cmbOrdemCompra == '') {
 					alerta('Atenção', 'Informe a Ordem Compra / Carta Contrato!', 'error');
-					$('#cmbDestinoLocal').focus();
+					$('#cmbOrdemCompra').focus();
+					$("#formMovimentacao").submit();
+					return false;
+				}
+
+				if (inputValorTotal == '') {
+					alerta('Atenção', 'Informe o Valor Total da Nota Fiscal!', 'error');
+					$('#inputValorTotal').focus();
+					$("#formMovimentacao").submit();
 					return false;
 				}
 
@@ -829,12 +609,19 @@ if (isset($_POST['inputData'])) {
 				//Verifica se tem algum produto na Grid
 				if (inputTotal == '' || inputTotal == 0) {
 					alerta('Atenção', 'Informe algum produto!', 'error');
-					$('#cmbCategoria').focus();
+					$("#formMovimentacao").submit();
 					return false;
 				}
 
+				if (cmbSituacao == '') {
+					alerta('Atenção', 'Informe a Situacao!', 'error');
+					$('#cmbSituacao').focus();
+					$("#formMovimentacao").submit();
+					return false;
+				}				
+
 				//desabilita as combos "Fornecedor" e "Situacao" na hora de gravar, senão o POST não o encontra
-				$('#cmbFornecedor').prop('disabled', false);
+				//$('#cmbFornecedor').prop('disabled', false);
 				$('#cmbSituacao').prop('disabled', false);
 
 				$("#formMovimentacao").submit();
@@ -843,44 +630,8 @@ if (isset($_POST['inputData'])) {
 			});
 
 			function FiltraOrdensCompra() {
-				$('#cmbOrdemCompra').empty().append('<option>Filtrando...</option>');
+				$('#cmbOrdemCompra').empty().append('<option value="">Filtrando...</option>');
 			}
-
-			function classBemSaidaSolicit(valor, idSelect) {
-				let grid = $('.trGrid')
-
-				grid.each((i1, elem1) => { // each sobre a grid
-					let tr = $(elem1).children() // colocando todas as linhas em um 
-
-					let td = tr.first()
-					let indiceLinha = td.html()
-
-					//let inputProdutoGridValores = inputHiddenProdutoServico.val()
-					if (idSelect == indiceLinha) {
-						//let arrayValInput = inputProdutoGridValores.split('#')
-						let valueProdutoServicoArray = $(`#campo${indiceLinha}`).val().split('#')
-						// adicionando  novos dados no array
-						valueProdutoServicoArray[7] = valor
-
-
-						var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
-
-						var stringVallnput = valueProdutoServicoArray.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
-
-						$(`#campo${indiceLinha}`).val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
-					}
-				})
-			}
-			
-			$('.selectClassific').each((i, elem) => {
-
-				$(elem).on('change', function(e) {
-
-					let valor = $(elem).val()
-					let idSelect = $(elem).attr('id')
-					classBemSaidaSolicit(valor, idSelect)
-				})
-			})
 
 		}); //document.ready
 
@@ -901,54 +652,13 @@ if (isset($_POST['inputData'])) {
 									});
 			$('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
 
-			if (tipo == 'E') {				
-
+			if (tipo == 'E') {
 				location.href='movimentacaoNovoEntrada.php';
-
-				document.getElementById('DestinoLocal').style.display = "block";
-				document.getElementById('classificacao').style.display = "none";
-				document.getElementById('motivo').style.display = "none";
-				document.getElementById('dadosNF').style.display = "block";
-				document.getElementById('dadosProduto').style.display = "none";
-				document.getElementById('trEntrada').style.display = "table-row";
 			} else if (tipo == 'S') {
-
 				location.href='movimentacaoNovoSaida.php';
-
-				document.getElementById('DestinoLocal').style.display = "none";
-				document.getElementById('classificacao').style.display = "block";
-				document.getElementById('motivo').style.display = "none";
-				document.getElementById('dadosNF').style.display = "none";
-				document.getElementById('dadosProduto').style.display = "flex";
-				document.getElementById('trEntrada').style.display = "none";
 			} else {
-
 				location.href='movimentacaoNovoTransferencia.php';
-
-				document.getElementById('DestinoLocal').style.display = "none";
-				document.getElementById('classificacao').style.display = "block";
-				document.getElementById('motivo').style.display = "block";
-				document.getElementById('dadosNF').style.display = "none";
-				document.getElementById('dadosProduto').style.display = "flex";
-
-				document.getElementById('formLote').style.display = "block";
-				document.getElementById('formValidade').style.display = "block";
-				document.getElementById('classificacao').style.display = "block";
-				$('#tituloProdutoServico').html('Dados dos Produtos')
-				$('[for=cmbProduto]').html('Produto')
 			}
-
-			$('#cmbSituacao').children().each((i, elem) => {
-				if (i == 1) {
-					$(elem).attr('selected', '')
-					let text = $(elem).html()
-					$('#select2-cmbSituacao-container').attr('title', text)
-					$('#select2-cmbSituacao-container').html(text)
-
-				} else {
-					$(elem).removeAttr('selected')
-				}
-			})
 		}
 
 		function float2moeda(num) {
@@ -1036,24 +746,26 @@ if (isset($_POST['inputData'])) {
 				<!-- Info blocks -->
 				<div class="card" id="divConteudo">
 					
-					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovo.php">
+					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovoEntrada.php">
 						<div class="card-body">
 
 							<div class="row">
 								<div class="col-lg-12">
+									<h5 class="mb-0 font-weight-semibold">Dados da Entrada</h5>
+									<br>
 									<div class="row">
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputData">Data<span style="color: red">*</span></label>
-												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" readOnly>
+												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" readOnly required>
 											</div>
 										</div>
 
 										<div class="col-lg-4" id="DestinoLocal">
 											<div class="form-group">
 												<label for="cmbDestinoLocal">Destino<span style="color: red">*</span></label>
-												<select id="cmbDestinoLocal" name="cmbDestinoLocal" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<select id="cmbDestinoLocal" name="cmbDestinoLocal" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT LcEstId, LcEstNome
 															FROM LocalEstoque
@@ -1092,8 +804,8 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor<span style="color: red">*</span></label>
-												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT ForneId, ForneNome
 															FROM Fornecedor
@@ -1156,7 +868,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorTotal">Total (R$) Nota Fiscal<span style="color: red">*</span></label>
-												<input type="text" id="inputValorTotal" name="inputValorTotal" class="form-control" onKeyUp="moeda(this)" maxLength="11">
+												<input type="text" id="inputValorTotal" name="inputValorTotal" class="form-control" onKeyUp="moeda(this)" maxLength="11" required>
 											</div>
 										</div>
 
@@ -1229,19 +941,20 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputSituacao">Situação</label>
-												<!--<option value="#">Selecione</option>-->
+
 												<?php
 
-													if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
-														$sql = "SELECT SituaId, SituaNome, SituaChave
-																FROM Situacao
-																WHERE SituaStatus = '1'
-																ORDER BY SituaNome ASC";
-														$result = $conn->query($sql);
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$sql = "SELECT SituaId, SituaNome, SituaChave
+															FROM Situacao
+															WHERE SituaStatus = '1'
+															ORDER BY SituaNome ASC";
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-														print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2">');
-														print('<option value="#">Selecione</option>');
+													if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
+
+														print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" required>');
+														print('<option value="">Selecione</option>');
 
 														foreach ($row as $item) {
 															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
@@ -1253,13 +966,6 @@ if (isset($_POST['inputData'])) {
 															}
 														}
 													} else {
-
-														$sql = "SELECT SituaId, SituaNome, SituaChave
-																FROM Situacao
-																WHERE SituaStatus = '1'
-																ORDER BY SituaNome ASC";
-														$result = $conn->query($sql);
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 														print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
 														print('<option value="#">Selecione</option>');
