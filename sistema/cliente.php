@@ -112,7 +112,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaCliente(ClienId, ClienNome, ClienStatus, Tipo){
-			
 			if (Tipo == 'imprime'){			
 				document.formCliente.action = "clienteImprime.php";
 				document.formCliente.setAttribute("target", "_blank");
@@ -128,7 +127,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					confirmaExclusao(document.formCliente, "Tem certeza que deseja excluir esse cliente", "clienteExclui.php");
 				} else if (Tipo == 'mudaStatus'){
 					document.formCliente.action = "clienteMudaSituacao.php";
-				} else if (Tipo == 'imprimeCliente') {
+				} else if (Tipo == 'anexo'){
+					document.formCliente.action = "clienteAnexo.php";
+				}else if (Tipo == 'imprimeCliente') {
 					document.formCliente.action = "clienteEspecificoImprime.php";
 					document.formCliente.setAttribute("target", "_blank");
 				}
@@ -238,10 +239,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															</a>
 														
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaCliente('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'imprimeCliente\')" class="dropdown-item" title="Imprimir Cadastro"><i class="icon-printer2"></i> Imprimir Cadastro</a>
-															    <a href="#" onclick="atualizaClinte('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'anexo\');" class="dropdown-item"><i class="icon-stackoverflow" title="Anexos"></i> Anexos</a>
+																<a href="#" onclick="atualizaCliente('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'imprimeCliente\');" class="dropdown-item" title="Imprimir Cadastro"><i class="icon-printer2"></i> Imprimir Cadastro</a>
+															    <a href="#" onclick="atualizaCliente('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'anexo\');" class="dropdown-item"><i class="icon-attachment" title="Anexos"></i> Anexos</a>
 															<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaCliente('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'historico\')" class="dropdown-item" title="Histórico"><i class="icon-popout"></i> Histórico</a>
+																<a href="#" onclick="atualizaCliente('.$item['ClienId'].', \''.$item['ClienNome'].'\','.$item['ClienStatus'].', \'historico\');" class="dropdown-item" title="Histórico"><i class="icon-stack"></i> Histórico</a>
 														</div>
 													</div>
 												</div>

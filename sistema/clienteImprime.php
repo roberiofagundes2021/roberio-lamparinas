@@ -41,7 +41,17 @@ try {
 	 </div>
 	";		
 	
-	$html = '';
+	$html = '<style>
+	th{
+		padding: 8px;				
+		border: #bbb solid 1px;
+		background-color:#F1F1F1;
+	}
+	td{
+		padding: 8px;				
+		border: #bbb solid 1px;
+	}
+	</style>';
 	
 	//Se for todas os Nomes
 				  
@@ -49,12 +59,12 @@ try {
 		<br>
 		<table style="width:100%; border-collapse: collapse;">
 			<tr>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:5%">#</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:38%">Nome</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">CPF/CNPJ</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Contato</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Celular</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">E-mail</th>
+				<th style="text-align: left; width:4%">#</th>
+				<th style="text-align: left; width:32%">Nome</th>
+				<th style="text-align: left; width:15%">CPF/CNPJ</th>
+				<th style="text-align: left; width:16%">Contato</th>
+				<th style="text-align: left; width:13%">Celular</th>
+				<th style="text-align: left; width:20%">E-mail</th>
 			</tr>
 		';					  
 	
