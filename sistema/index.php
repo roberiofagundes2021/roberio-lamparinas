@@ -484,9 +484,10 @@ if ($totalAcoes) {
 				} else {
 					if (Tipo == 'liberar') {
 						document.getElementById('inputSolicitacaoStatus').value = 'LIBERADO'; //Liberado
-						document.formBandeja.action = "movimentacaoNovo.php";
+						document.formBandeja.action = "movimentacaoNovoSaida.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
+
 					} else if (Tipo == 'naoliberar') {
 
 						bootbox.prompt({

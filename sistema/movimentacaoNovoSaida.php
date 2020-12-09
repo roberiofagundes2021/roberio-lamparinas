@@ -9,19 +9,23 @@ include('global_assets/php/conexao.php');
 //Caso a chamada à página venha da liberação de uma solicitação na bandeja.
 
 if (isset($_POST['inputSolicitacaoId'])) {
-
-	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
-			FROM SolicitacaoXProduto
-			JOIN Solicitacao on SolicId = SlXPrSolicitacao
-			JOIN Produto on ProduId = SlXPrProduto
-			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
-    ";
-	$result = $conn->query($sql);
-	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
-	$numProdutos = count($produtosSolicitacao);
-	//var_dump($produtosSolicitacao);
-
+	try {
+		$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
+						FROM SolicitacaoXProduto
+						JOIN Solicitacao on SolicId = SlXPrSolicitacao
+						JOIN Produto on ProduId = SlXPrProduto
+						JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+						WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
+					";
+		$result = $conn->query($sql);
+		$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
+		$numProdutos = count($produtosSolicitacao);
+		var_dump($produtosSolicitacao);
+	} catch (PDOException $e) {
+		$conn->rollback();
+		echo 'Exception: ' . $e->getMessage();
+		exit;
+	}
 	$idsProdutos = '';
 
 	if ($numProdutos) {
@@ -35,19 +39,30 @@ if (isset($_POST['inputSolicitacaoId'])) {
 		}
 	}
 
-	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
-			FROM SolicitacaoXProduto
-			JOIN Solicitacao on SolicId = SlXPrSolicitacao
-			JOIN Produto on ProduId = SlXPrProduto
-			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
-    ";
-	$result = $conn->query($sql);
-	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
-	$numProdutos = count($produtosSolicitacao);
+	try {
+		$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
+						FROM SolicitacaoXProduto
+						JOIN Solicitacao on SolicId = SlXPrSolicitacao
+						JOIN Produto on ProduId = SlXPrProduto
+						JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+						WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
+					";
+		$result = $conn->query($sql);
+		$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
+		$numProdutos = count($produtosSolicitacao);
+	} catch (PDOException $e) {
+		$conn->rollback();
+		echo 'Exception: ' . $e->getMessage();
+		exit;
+	}
 }
 
+
+/* VALIDA SE OS DADOS VIERAM DA MESMA PÁGINA */
 if (isset($_POST['inputData'])) {
+	var_dump($_POST);
+	print_r($_POST);
+	die;
 
 	try {
 
@@ -93,24 +108,31 @@ if (isset($_POST['inputData'])) {
 			$tipoDestino = 'DestinoSetor';
 			$idDestino = $_POST['cmbDestinoSetor'];
 		}
-var_dump($_POST);die;
+		var_dump($_POST);
+		die;
 
-		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
+		try {
+			$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
 										  MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimUnidade)
 				VALUES (:sTipo, :iMotivo, :dData, :iFinalidade, :iOrigemLocal, :iOrigemSetor, :iDestinoLocal, :iDestinoSetor, :sDestinoManual, 
 						:sObservacao, :iFornecedor, :iOrdemCompra, :sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, 
 						:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
-		$result = $conn->prepare($sql);
+			$result = $conn->prepare($sql);
 
-		/*echo $sql;
+			/*echo $sql;
 		echo "<br>";
 		var_dump($_POST['inputTipo'], $_POST['cmbClassificacao'], $iMotivo, gravaData($_POST['inputData']), $_POST['cmbFinalidade'], $_POST['cmbOrigem'], $_POST['cmbDestinoLocal'],
 		 $_POST['cmbDestinoSetor'], $_POST['inputDestinoManual'], $_POST['txtareaObservacao'], $_POST['cmbFornecedor'], $_POST['cmbOrdemCompra'], $_POST['inputNotaFiscal'],
 		 gravaData($_POST['inputDataEmissao']), $_POST['inputNumSerie'], gravaValor($_POST['inputValorTotal']), $_POST['inputChaveAcesso'],
 		 $_POST['cmbSituacao'], $_SESSION['UsuarId'], $_SESSION['EmpreId']);
 		die;*/
-		$conn->beginTransaction();
+			$conn->beginTransaction();
+		} catch (PDOException $e) {
+			$conn->rollback();
+			echo 'Exception - INSERT INTO: ' . $e->getMessage();
+			exit;
+		}
 
 		$result->execute(array(
 			':sTipo' => $_POST['inputTipo'],
@@ -163,7 +185,7 @@ var_dump($_POST);die;
 						if (isset($registro[7])) {
 							for ($i = 1; $i <= $quantItens; $i++) {
 								// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
-								
+
 								if ($registro[7] == 2) {
 
 									$sql = "SELECT COUNT(PatriNumero) as CONT
@@ -174,7 +196,7 @@ var_dump($_POST);die;
 									$result = $conn->query($sql);
 									$patrimonios = $result->fetch(PDO::FETCH_ASSOC);
 									$count = $patrimonios['CONT'];
-									
+
 									//Caso não seja o primeiro registro na tabela para esta empresa
 									if ($count >= 1) {
 
@@ -236,7 +258,7 @@ var_dump($_POST);die;
 											':iPatrimonio' => $insertIdPatrimonio
 										));
 									} else {
-										
+
 										//Caso seja o primeiro registro na tabela para esta empresa
 										$numeroPatri = '0000001';
 
@@ -263,7 +285,7 @@ var_dump($_POST);die;
 
 										$insertIdPatrimonio = $conn->lastInsertId();
 
-										
+
 										$sql = "INSERT INTO MovimentacaoXProduto
 						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
 					                            VALUES 
@@ -283,7 +305,6 @@ var_dump($_POST);die;
 											':iPatrimonio' => $insertIdPatrimonio
 										));
 									}
-
 								} else {
 									$quantItens = intval($registro[3]);
 
@@ -358,13 +379,18 @@ var_dump($_POST);die;
 		}
 
 		if (isset($_POST['cmbSituacao'])) {
-
-			$sql = "SELECT SituaId, SituaNome, SituaChave
-					FROM Situacao
-					WHERE SituaId = " . $_POST['cmbSituacao'] . "
-					";
-			$result = $conn->query($sql);
-			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+			try {
+				$sql = "SELECT SituaId, SituaNome, SituaChave
+								FROM Situacao
+							 WHERE SituaId = " . $_POST['cmbSituacao'] . "
+								";
+				$result = $conn->query($sql);
+				$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+			} catch (PDOException $e) {
+				$conn->rollback();
+				echo 'cmbSituacao: ' . $e->getMessage();
+				exit;
+			}
 
 			$destinoChave = '';
 
@@ -434,8 +460,11 @@ var_dump($_POST);die;
 		echo 'Error: ' . $e->getMessage();
 		exit;
 	}
-	
-	irpara("movimentacao.php");
+
+	irpara("movimentacaoNovoSaida.php");
+} else {
+	print('Deu ruim!');
+	var_dump($_POST);
 }
 
 ?>
@@ -474,46 +503,6 @@ var_dump($_POST);die;
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		function produtosOrdemCompra(ordemCompra) {
-			let inputLote = $('#inputLote').val();
-			let numOrdemCompra = $('#cmbOrdemCompra').val()
-
-			$.ajax({
-				type: "POST",
-				url: "movimentacaoAddProdutoOrdemCompra.php",
-				data: {
-					ordemCompra: ordemCompra,
-					numOrdemCompra: numOrdemCompra,
-					lote: inputLote
-				},
-				success: function(resposta) {
-					$("#tabelaProdutoServico").html(resposta);
-
-					let total = $('#total').html();
-
-					$("#inputTotal").val(total);
-					modalAcoes()
-					mudarValores()
-
-					let todasLinhas = $('.trGrid')
-					$('#inputNumItens').val(todasLinhas.length)
-
-				}
-
-			});
-
-			$.ajax({
-				type: "POST",
-				url: "movimentacaoSaldoOrdemCompra.php",
-				data: {
-					ordemCompra: ordemCompra,
-				},
-				success: function(resposta) {
-					$("#inputTotalOrdemCompraCartaContrato").val(float2moeda(resposta)).attr('disabled', '').attr('valor', resposta);
-				}
-			})
-		}
-
 		function modalAcoes() {
 
 			$('.btn-acoes').each((i, elem) => {
@@ -722,23 +711,6 @@ var_dump($_POST);die;
 			$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`).attr('valor', novoTotalGeral)
 		}
 
-		function calcSaldoOrdemCompra() {
-			let valorTotal = $('#total').attr('valor')
-			let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial')
-
-			let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
-
-			if (calcSaldoAtual < 0) {
-				alerta('Atenção', 'O valor total da Ordem de Compra foi ultrapaçado.', 'error');
-				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
-				return
-			} else {
-				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
-			}
-
-
-		}
-
 		function inputsModal() {
 			$('#tbody-modal')
 		}
@@ -757,11 +729,6 @@ var_dump($_POST);die;
 			}
 
 		}
-
-		$('#inputValorTotal').on('keyup', function() {
-			//verificaTotalNotaFiscal()
-		})
-
 
 		$(document).ready(function() {
 
@@ -916,102 +883,6 @@ var_dump($_POST);die;
 
 			_componentSelect2();
 
-			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
-			$('#cmbFornecedor').on('change', function(e) {
-
-				var inputTipo = $('input[name="inputTipo"]:checked').val();
-				var inputNumItens = $('#inputNumItens').val();
-				var inputFornecedor = $('#inputFornecedor').val();
-				var cmbFornecedor = $('#cmbFornecedor').val();
-
-				$('#inputFornecedor').val(cmbFornecedor);
-
-				FiltraCategoria();
-				Filtrando();
-				FiltraOrdensCompra()
-
-				$.getJSON('filtraCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
-
-					var option = '<option value="#">Selecione a Categoria</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.CategId + '">' + obj.CategNome + '</option>';
-						});
-
-						$('#cmbCategoria').html(option).show();
-					} else {
-						ResetCategoria();
-					}
-				});
-
-				$.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
-
-					var option = '<option value="#">Selecione a SubCategoria</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
-						});
-
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}
-				});
-
-				$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor, function(dados) {
-
-					var option = '<option value="#" "selected">Selecione o Produto</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							if (inputTipo == 'E') {
-								option += '<option value="' + obj.ProduId + '#' + obj.ProduValorCusto + '">' + obj.ProduNome + '</option>';
-							} else {
-								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
-							}
-						});
-
-						$('#cmbProduto').html(option).show();
-					} else {
-						ResetProduto();
-					}
-				});
-
-
-				$.get('filtraOrdemCompra.php?idFornecedor=' + cmbFornecedor, function(dados) {
-
-					var option = '<option value="#">Selecione</option>';
-					if (dados) {
-						$('#cmbOrdemCompra').html(option).show();
-						$('#cmbOrdemCompra').append(dados).show();
-
-					} else {
-						$('#cmbOrdemCompra').html(option).show();
-					}
-				});
-
-			});
-
-			$('#cmbOrdemCompra').on('change', function() {
-				var ordemCompra = '';
-				$('#cmbOrdemCompra').children().each((i, elem) => {
-					if ($(elem).val() == $('#cmbOrdemCompra').val()) {
-						ordemCompra = $(elem).attr('idOrdemCompra');
-					}
-				});
-
-				if (ordemCompra) {
-
-					produtosOrdemCompra(ordemCompra)
-				}
-
-			})
-
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e) {
 
@@ -1083,6 +954,7 @@ var_dump($_POST);die;
 					}
 				});
 			})
+
 
 			function filtraCategoriaOrigem() {
 				let cmbOrigem = $('#cmbEstoqueOrigem').val()
@@ -1170,6 +1042,7 @@ var_dump($_POST);die;
 				}
 			})
 
+
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			$('#cmbSubCategoria').on('change', function(e) {
 
@@ -1233,11 +1106,9 @@ var_dump($_POST);die;
 						});
 					}
 				})
-
-
-
-
 			});
+
+
 
 			//Ao mudar o Produto, trazer o Valor Unitário do cadastro (retorno via JSON)
 			$('#cmbProduto').on('change', function(e) {
@@ -1256,6 +1127,7 @@ var_dump($_POST);die;
 				}
 				$('#inputQuantidade').focus();
 			});
+
 
 			$("input[type=radio][name=inputTipo]").click(function() {
 
@@ -1280,16 +1152,12 @@ var_dump($_POST);die;
 				}
 			});
 
-			$("input[type=radio][name=inputProdutoServico]").click(function() {
-
-			})
 
 			$('#btnAdicionar').click(function() {
 
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputNumItens = $('#inputNumItens').val();
 				var cmbProduto = $('#cmbProduto').val();
-				var cmbFornecedor = $('#cmbFornecedor').val();
 
 				var Produto = cmbProduto.split("#");
 
@@ -1303,13 +1171,6 @@ var_dump($_POST);die;
 
 				//remove os espaços desnecessários antes e depois
 				inputQuantidade = inputQuantidade.trim();
-
-				//Verifica se o campo só possui espaços em branco
-				if (inputTipo == 'E' && cmbFornecedor == '-1' && inputNumItens == 0) {
-					alerta('Atenção', 'Para entrada de mercadoria deve-se informar o Fornecedor antes de adicionar!', 'error');
-					$('#inputQuantidade').focus();
-					return false;
-				}
 
 				//Verifica se o campo só possui espaços em branco
 				if (inputQuantidade == '') {
@@ -1372,11 +1233,8 @@ var_dump($_POST);die;
 
 								var inputTipo = $('input[name="inputTipo"]:checked').val();
 
-								if (inputTipo == 'E') {
-									$("#tabelaProdutoServico").append(resposta);
-								} else {
-									$("#tabelaProdutoServico").append(resposta);
-								}
+								$("#tabelaProdutoServico").append(resposta);
+
 
 								//Adiciona mais um item nessa contagem
 								$('#inputNumItens').val(resNumItens);
@@ -1396,9 +1254,9 @@ var_dump($_POST);die;
 
 								$('#cmbFornecedor').prop('disabled', true);
 
-								$('input[name="inputTipo"]').each((i, elem)=>{
-									if($(elem) != $('input[name="inputTipo"]:checked')){
-										$(elem).attr('disabled','')
+								$('input[name="inputTipo"]').each((i, elem) => {
+									if ($(elem) != $('input[name="inputTipo"]:checked')) {
+										$(elem).attr('disabled', '')
 									}
 								})
 
@@ -1502,6 +1360,8 @@ var_dump($_POST);die;
 				}
 			}); //click
 
+
+
 			function produtosSolicitacaoSaida() {
 				$('.produtoSolicitacao').each((i, elem) => {
 					var tds = $(elem).children()
@@ -1558,132 +1418,72 @@ var_dump($_POST);die;
 				}
 			})
 
+
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e) {
+				alert('entrou');
 
-				var inputTipo = $('input[name="inputTipo"]:checked').val();
-				var inputTotal = $('#inputTotal').val();
-				var cmbFinalidade = $('#cmbFinalidade').val();
-				var cmbMotivo = $('#cmbMotivo').val();
+				var inputTipo = $('input[name="inputTipo"]:checked').val(); //S
+				var inputTotal = $('#inputTotal').val(); //
 				var cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val();
 				var cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val();
-				var cmbOrdemCompra = $('#cmbOrdemCompra').val()
 				var cmbDestinoLocal = $('#cmbDestinoLocal').val();
 				var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val();
 				var cmbDestinoSetor = $('#cmbDestinoSetor').val();
-				var inputDestinoManual = $('#inputDestinoManual').val();
-				var inputValorTotal = $('#inputValorTotal').val().trim()
-				var Motivo = cmbMotivo.split("#");
-				var chave = Motivo[1];
+				var inputValorTotal = $('#inputValorTotal').val().trim();
 
-				//remove os espaços desnecessários antes e depois
-				inputDestinoManual = inputDestinoManual.trim();
+				console.log('Input Tipo: ' + inputTipo);
+				console.log('Input Total: ' + inputTotal);
+				console.log('cmbEsotqueOrigem ' + cmbEstoqueOrigem);
+				console.log('cmbEstoqueOrigemLocalSetor ' + cmbEstoqueOrigemLocalSetor);
+				console.log('cmbDestinoLocal ' + cmbDestinoLocal);
+				console.log('cmbDestinoLocalEstoqueSetor ' + cmbDestinoLocalEstoqueSetor);
+				console.log('cmbDestinoSetor ' + cmbDestinoSetor);
+				console.log('inputValorTotal ' + inputValorTotal);
 
-				if (inputTipo == 'E') {
+				//Verifica se a combo Estoque de Origem foi informada
+				if (cmbEstoqueOrigem == '') {
+					alerta('Atenção', 'Informe o Estoque de Origem!', 'error');
+					$('#cmbEstoqueOrigem').focus();
+					alert('Verifica se a combo Estoque de Origem foi informada');
+					$("#formMovimentacao").submit();
+					return false;
+				}
 
-					//Verifica se a combo Estoque de Destino foi informada
-					if (cmbDestinoLocal == '#') {
-						alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
-						$('#cmbDestinoLocal').focus();
-						return false;
-					}
+				//Verifica se a combo Estoque de Destino foi informada
+				if (cmbDestinoSetor == '') {
+					alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
+					$('#cmbDestinoSetor').focus();
+					alert('Verifica se a combo Estoque de Destino foi informada');
+					$("#formMovimentacao").submit();
 
-					if (cmbOrdemCompra == '#') {
-						alerta('Atenção', 'Informe a Ordem Compra / Carta Contrato!', 'error');
-						$('#cmbDestinoLocal').focus();
-						return false;
-					}
-
-					// Verifica se pelomento um produto ou serviço foi editado, na entrada.
-					if ($('#itemEditadoquantidade').val() == 0) {
-						alerta('Atenção', 'Informe a quantidade de itens que deseja dar entrada no sistema!', 'error');
-						return false;
-					}
-
-					if (inputValorTotal == '') {
-						alerta('Atenção', 'Informe o valor Total da nota fiscal!', 'error');
-						return false;
-					}
-
-					verificaTotalNotaFiscal()
-
-				} else if (inputTipo == 'S') {
-
-					//Verifica se a combo Estoque de Origem foi informada
-					if (cmbEstoqueOrigem == '#') {
-						alerta('Atenção', 'Informe o Estoque de Origem!', 'error');
-						$('#cmbEstoqueOrigem').focus();
-						return false;
-					}
-
-					//Verifica se a combo Estoque de Destino foi informada
-					if (cmbDestinoSetor == '#') {
-						alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
-						$('#cmbDestinoSetor').focus();
-						return false;
-					}
-
-				} else if (inputTipo == 'T') {
-
-					//Verifica se a combo Motivo foi informada
-					if (cmbMotivo == '#') {
-						alerta('Atenção', 'Informe o Motivo!', 'error');
-						$('#cmbMotivo').focus();
-						return false;
-					}
-
-					//Verifica se a combo Finalidade foi informada
-					if (cmbFinalidade == '#') {
-						alerta('Atenção', 'Informe a Finalidade!', 'error');
-						$('#cmbFinalidade').focus();
-						return false;
-					}
-
-					//Verifica se a combo Estoque de Origem foi informada
-					if (cmbEstoqueOrigemLocalSetor == '#') {
-						alerta('Atenção', 'Informe o Estoque de Origem!', 'error');
-						$('#cmbEstoqueOrigem').focus();
-						return false;
-					}
-
-					if (chave == 'DOACAO' || chave == 'DESCARTE' || chave == 'DEVOLUCAO' || chave == 'CONSIGNACAO') {
-
-						//Verifica se o input Destino foi informado
-						if (inputDestinoManual == '') {
-							alerta('Atenção', 'Informe o Destino!', 'error');
-							$('#inputDestinoManual').focus();
-							return false;
-						}
-					} else {
-
-						//Verifica se a combo Estoque de Destino foi informada
-						if (cmbDestinoLocalEstoqueSetor == '#') {
-							alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
-							$('#cmbDestinoLocal').focus();
-							return false;
-						}
-					}
+					return false;
 				}
 
 				//Verifica se tem algum produto na Grid
 				if (inputTotal == '' || inputTotal == 0) {
 					alerta('Atenção', 'Informe algum produto!', 'error');
 					$('#cmbCategoria').focus();
+					alert('Verifica se tem algum produto na Grid');
+					$("#formMovimentacao").submit();
 					return false;
 				}
 
-				//desabilita as combos "Fornecedor" e "Situacao" na hora de gravar, senão o POST não o encontra
-				$('#cmbFornecedor').prop('disabled', false);
+				//desabilita o combo de "Situacao" na hora de gravar, senão o POST não o encontra
 				$('#cmbSituacao').prop('disabled', false);
 
 				if (inputTipo == 'S' && $('input[name="inputTipo"]:checked').attr('saidaSolicitacao')) {
+					alert('Saida Solicitação!');
 					const submitProduto = {}
+
 					$('.inputProdutoServicoClasse').each((i, elem) => {
 						let nomeInput = $(elem).attr('name')
 						let valorInput = $(elem).val()
 						submitProduto[`${nomeInput}`] = valorInput
-
 					})
+
+					alert(submitProduto);
+
 
 					document.getElementById('EstoqueOrigem').style.display = "block";
 					document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
@@ -1691,29 +1491,20 @@ var_dump($_POST);die;
 					document.getElementById('DestinoLocal').style.display = "none";
 					document.getElementById('DestinoSetor').style.display = "block";
 					document.getElementById('classificacao').style.display = "block";
-					document.getElementById('motivo').style.display = "none";
-					document.getElementById('dadosNF').style.display = "none";
 					document.getElementById('dadosProduto').style.display = "flex";
 
 
-					submitProduto.inputData = $('#inputData').val()
+					submitProduto.inputData = document.querySelector('#inputData').value;
+					console.log(submitProduto.inputData);
 					submitProduto.cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val()
 					submitProduto.cmbDestinoSetor = $('#cmbDestinoSetor').val()
 					submitProduto.txtareaObservacao = $('#txtareaObservacao').val()
 					submitProduto.cmbSituacao = $('#cmbSituacao').val()
-					submitProduto.cmbMotivo = $('#cmbMotivo').val()
 					submitProduto.cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val()
 					submitProduto.cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val()
 					submitProduto.inputTipo = 'S'
-					submitProduto.inputDestinoManual = $('#inputDestinoManual').val()
 					submitProduto.cmbDestinoLocal = $('#cmbDestinoLocal').val()
-					submitProduto.cmbFornecedor = $('#cmbFornecedor').val()
-					submitProduto.cmbOrdemCompra = $('#cmbOrdemCompra').val()
-					submitProduto.inputNotaFiscal = $('#inputNotaFiscal').val()
-					submitProduto.inputDataEmissao = $('#inputDataEmissao').val()
-					submitProduto.inputNumSerie = $('#inputNumSerie').val()
 					submitProduto.inputValorTotal = $('#inputValorTotal').val()
-					submitProduto.inputChaveAcesso = $('#inputChaveAcesso').val()
 					submitProduto.inputNumItens = $('#inputNumItens').val()
 
 					let contSelectClass = $('.selectClassific').length
@@ -1730,7 +1521,7 @@ var_dump($_POST);die;
 					if (contSelectClass == contSelectClassVal) {
 						$.ajax({
 							type: "POST",
-							url: "movimentacaoNovo.php",
+							url: "movimentacaoNovoSaida.php",
 							data: submitProduto,
 							success: function(resposta) {
 								//window.location.href = "index.php";
@@ -1744,6 +1535,8 @@ var_dump($_POST);die;
 
 
 				} else {
+					console.log(document.querySelector('#formMovimentacao'));
+
 					$("#formMovimentacao").submit();
 				}
 				//console.log(inputTipo)
@@ -1833,21 +1626,10 @@ var_dump($_POST);die;
 
 		}
 
-		function limpaValorFormulario(tipo){
-            if(tipo == 'E'){
-				$("#cmbEstoqueOrigem").val("#")
-				$("#cmbEstoqueOrigemLocalSetor").val("#")
-				$("#cmbDestinoLocalEstoqueSetor").val("#")
-				$("#cmbDestinoSetor").val("#")
-			} else if(tipo == 'S'){
-				$("#cmbEstoqueOrigemLocalSetor").val("#")
-				$("#cmbDestinoLocalEstoqueSetor").val("#")
-				$("#cmbDestinoLocal").val("#")
-			} else {
-				$("#cmbDestinoLocal").val("#")
-				$("#cmbDestinoSetor").val("#")
-				$("#cmbEstoqueOrigem").val("#")
-			}
+		function limpaValorFormulario(tipo) {
+			$("#cmbEstoqueOrigemLocalSetor").val("#")
+			$("#cmbDestinoLocalEstoqueSetor").val("#")
+			$("#cmbDestinoLocal").val("#")
 		}
 
 		Array.prototype.remove = function(start, end) {
@@ -1862,104 +1644,45 @@ var_dump($_POST);die;
 
 		function selecionaTipo(tipo) {
 
-			$('#divConteudo').css({"background-color":"#eeeded",
-									"box-shadow":"none"
-									});
+			$('#divConteudo').css({
+				"background-color": "#eeeded",
+				"box-shadow": "none"
+			});
 			$('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
 
-			if (tipo == 'E') {
+			location.href = 'movimentacaoNovoSaida.php';
 
-				location.href='movimentacaoNovoEntrada.php';
+			document.getElementById('EstoqueOrigem').style.display = "block";
+			document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
+			document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
+			document.getElementById('DestinoLocal').style.display = "none";
+			document.getElementById('DestinoSetor').style.display = "block";
+			document.getElementById('classificacao').style.display = "block";
+			document.getElementById('motivo').style.display = "none";
+			document.getElementById('dadosNF').style.display = "none";
+			document.getElementById('dadosProduto').style.display = "flex";
+			document.getElementById('trEntrada').style.display = "none";
+			document.getElementById('trSaida').style.display = "table-row";
+			document.getElementById('radiosProdutoServico').style.display = "flex";
+			document.getElementById('Patrimonio').style.display = "none";
 
-				document.getElementById('EstoqueOrigem').style.display = "none";
-				document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
-				document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
-				document.getElementById('DestinoLocal').style.display = "block";
-				document.getElementById('DestinoSetor').style.display = "none";
-				document.getElementById('classificacao').style.display = "none";
-				document.getElementById('motivo').style.display = "none";
-				document.getElementById('dadosNF').style.display = "block";
-				document.getElementById('dadosProduto').style.display = "none";
-				document.getElementById('trEntrada').style.display = "table-row";
-				document.getElementById('trSaida').style.display = "none";
-				document.getElementById('Patrimonio').style.display = "none";
+			mudaTotalTitulo('S')
+			limpaValorFormulario('S')
 
-				mudaTotalTitulo('E')
-				limpaValorFormulario('E')
-			} else if (tipo == 'S') {
-				document.getElementById('EstoqueOrigem').style.display = "block";
-				document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
-				document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
-				document.getElementById('DestinoLocal').style.display = "none";
-				document.getElementById('DestinoSetor').style.display = "block";
-				document.getElementById('classificacao').style.display = "block";
-				document.getElementById('motivo').style.display = "none";
-				document.getElementById('dadosNF').style.display = "none";
-				document.getElementById('dadosProduto').style.display = "flex";
-				document.getElementById('trEntrada').style.display = "none";
-				document.getElementById('trSaida').style.display = "table-row";
-				document.getElementById('radiosProdutoServico').style.display = "flex";
-				document.getElementById('Patrimonio').style.display = "none";
+			$('#cmbSituacao').children().each((i, elem) => {
+				if (i == 2) {
+					$(elem).attr('selected', '')
+					let text = $(elem).html()
+					$('#select2-cmbSituacao-container').attr('title', text)
+					$('#select2-cmbSituacao-container').html(text)
 
-
-				mudaTotalTitulo('S')
-				limpaValorFormulario('S')
-			} else {
-
-				location.href='movimentacaoNovoTransferencia.php';
-
-				document.getElementById('EstoqueOrigem').style.display = "none";
-				document.getElementById('EstoqueOrigemLocalSetor').style.display = "block";
-				document.getElementById('DestinoLocalEstoqueSetor').style.display = "block";
-				document.getElementById('DestinoLocal').style.display = "none";
-				document.getElementById('DestinoSetor').style.display = "none";
-				document.getElementById('classificacao').style.display = "block";
-				document.getElementById('motivo').style.display = "block";
-				document.getElementById('dadosNF').style.display = "none";
-				document.getElementById('dadosProduto').style.display = "flex";
-				document.getElementById('radiosProdutoServico').style.display = "none";
-				document.getElementById('Patrimonio').style.display = "flex";
-
-				document.getElementById('formLote').style.display = "block";
-				document.getElementById('formValidade').style.display = "block";
-				document.getElementById('classificacao').style.display = "block";
-				$('#tituloProdutoServico').html('Dados dos Produtos')
-				$('[for=cmbProduto]').html('Produto')
-
-				limpaValorFormulario('T')
-			}
-
-
-
-			if (tipo == 'S') {
-				$('#cmbSituacao').children().each((i, elem) => {
-					if (i == 2) {
-						$(elem).attr('selected', '')
-						let text = $(elem).html()
-						$('#select2-cmbSituacao-container').attr('title', text)
-						$('#select2-cmbSituacao-container').html(text)
-
-					} else {
-						$(elem).removeAttr('selected')
-					}
-				})
-			} else {
-				$('#cmbSituacao').children().each((i, elem) => {
-					if (i == 1) {
-						$(elem).attr('selected', '')
-						let text = $(elem).html()
-						$('#select2-cmbSituacao-container').attr('title', text)
-						$('#select2-cmbSituacao-container').html(text)
-
-					} else {
-						$(elem).removeAttr('selected')
-					}
-				})
-			}
-
+				} else {
+					$(elem).removeAttr('selected')
+				}
+			})
 		}
 
-		$(document).ready(() => {
+		$(document).ready(function() {
 			$('[name=inputTipo]').each((i, elem) => {
 				if ($(elem).attr('checked') && $(elem).val() == 'S') {
 					document.getElementById('EstoqueOrigem').style.display = "block";
@@ -1975,9 +1698,7 @@ var_dump($_POST);die;
 					mudaTotalTitulo('S')
 				}
 			})
-
 		})
-
 
 
 		function selecionaProdutoServico(tipo) {
@@ -1996,25 +1717,12 @@ var_dump($_POST);die;
 			}
 		}
 
-		function selecionaMotivo(motivo) {
-			var Motivo = motivo.split("#");
-			var chave = Motivo[1];
-
-			if (chave == 'DOACAO' || chave == 'DESCARTE' || chave == 'DEVOLUCAO' || chave == 'CONSIGNACAO') {
-				document.getElementById('DestinoManual').style.display = "block";
-				document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
-			} else {
-				document.getElementById('DestinoManual').style.display = "none";
-				document.getElementById('DestinoLocalEstoqueSetor').style.display = "block";
-				document.getElementById('DestinoManual').value = '';
-			}
-		}
-
 		function verifcMumero(elem) {
 			if (typeof $(elem).val() == 'string') {
 				return false
 			}
 		}
+
 
 		function float2moeda(num) {
 
@@ -2024,18 +1732,19 @@ var_dump($_POST);die;
 				num = Math.abs(num);
 				x = 1;
 			}
+
 			if (isNaN(num)) num = "0";
 			cents = Math.floor((num * 100 + 0.5) % 100);
-
 			num = Math.floor((num * 100 + 0.5) / 100).toString();
 
 			if (cents < 10) cents = "0" + cents;
+
 			for (var i = 0; i < Math.floor((num.length - (1 + i)) / 3); i++)
 				num = num.substring(0, num.length - (4 * i + 3)) + '.' +
 				num.substring(num.length - (4 * i + 3));
 			ret = num + ',' + cents;
-			if (x == 1) ret = ' - ' + ret;
 
+			if (x == 1) ret = ' - ' + ret;
 			return ret;
 
 		}
@@ -2100,8 +1809,8 @@ var_dump($_POST);die;
 
 				<!-- Info blocks -->
 				<div class="card" id="divConteudo">
-					
-					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovo.php">
+
+					<form name="formMovimentacao" id="formMovimentacao" method="POST" class="form-validate-jquery" action="movimentacaoNovoSaida.php">
 						<div class="card-body">
 							<div class="row">
 								<div class="col-lg-4" id="motivo" style="display:none;">
@@ -2141,33 +1850,44 @@ var_dump($_POST);die;
 
 										<div class="col-lg-4" id="EstoqueOrigem" style="display:none;">
 											<div class="form-group">
-												<label for="cmbEstoqueOrigem">Origem</label>
+												<label for="cmbEstoqueOrigem">Origem<span style="color: red">*</span></label>
 												<select id="cmbEstoqueOrigem" name="cmbEstoqueOrigem" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
 													<?php
 
 													$sql = "SELECT EXUXPLocalEstoque, SetorNome
-																 FROM EmpresaXUsuarioXPerfil
-																 JOIN Setor on SetorId = EXUXPSetor
-																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
-															    ";
-													$result = $conn->query($sql);
-													$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
+																 		FROM EmpresaXUsuarioXPerfil
+																 		JOIN Setor 
+																		  ON SetorId = EXUXPSetor
+																 	 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+																	";
 
-													$sql = "SELECT LcEstId, LcEstNome
-																FROM LocalEstoque
-																JOIN Situacao on SituaId = LcEstStatus
-																WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY LcEstNome ASC";
-													$result = $conn->query($sql);
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													try {
+														$result = $conn->query($sql);
+														$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
-													foreach ($row as $item) {
-														if ($item['LcEstId'] == $usuarioPerfil['EXUXPLocalEstoque']) {
-															print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
-														} else {
-															print('<option value="' . $item['LcEstId'] . '" "' . $usuarioPerfil['EXUXPLocalEstoque'] . '">' . $item['LcEstNome'] . '</option>');
+														$sql = "SELECT LcEstId, LcEstNome
+																			FROM LocalEstoque
+																			JOIN Situacao 
+																			  ON SituaId = LcEstStatus
+																		 WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																	ORDER BY LcEstNome ASC";
+														try {
+															$result = $conn->query($sql);
+															$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+															foreach ($row as $item) {
+																if ($item['LcEstId'] == $usuarioPerfil['EXUXPLocalEstoque']) {
+																	print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
+																} else {
+																	print('<option value="' . $item['LcEstId'] . '" "' . $usuarioPerfil['EXUXPLocalEstoque'] . '">' . $item['LcEstNome'] . '</option>');
+																}
+															}
+														} catch (Exception $e) {
+															echo 'Exceção capturada: ',  $e->getMessage(), "\n";
 														}
+													} catch (Exception $e) {
+														echo 'Exceção capturada: ',  $e->getMessage(), "\n";
 													}
 
 													?>
@@ -2182,13 +1902,15 @@ var_dump($_POST);die;
 													<option value="#">Selecione</option>
 													<?php
 													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
-															FROM LocalEstoque
-															JOIN Situacao on SituaId = LcEstStatus
+																		FROM LocalEstoque
+																		JOIN Situacao 
+																		  ON SituaId = LcEstStatus
 														    WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														    UNION
-															SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
-															FROM Setor
-															JOIN Situacao on SituaId = SetorStatus
+														 	 SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
+														   	 FROM Setor
+																 JOIN Situacao 
+																   on SituaId = SetorStatus
 														    WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														    Order By Nome";
 													$result = $conn->query($sql);
@@ -2210,10 +1932,11 @@ var_dump($_POST);die;
 													<option value="#">Selecione</option>
 													<?php
 													$sql = "SELECT LcEstId, LcEstNome
-															FROM LocalEstoque
-															JOIN Situacao on SituaId = LcEstStatus
-															WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															ORDER BY LcEstNome ASC";
+																		FROM LocalEstoque
+																		JOIN Situacao 
+																		  ON SituaId = LcEstStatus
+																	 WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY LcEstNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2234,9 +1957,10 @@ var_dump($_POST);die;
 
 													if (isset($_POST['inputSolicitacaoId'])) {
 														$sql = "SELECT EXUXPSetor, SetorNome
-																 FROM EmpresaXUsuarioXPerfil
-																 JOIN Setor on SetorId = EXUXPSetor
-																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+																 			FROM EmpresaXUsuarioXPerfil
+																 			JOIN Setor 
+																			  ON SetorId = EXUXPSetor
+																 		 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
 															    ";
 														$result = $conn->query($sql);
 														$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
@@ -2245,10 +1969,10 @@ var_dump($_POST);die;
 													} else {
 
 														$sql = "SELECT SetorId, SetorNome
-														        FROM Setor
-																JOIN Situacao on SituaId = SetorStatus
-														        WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-														        ORDER BY SetorNome ASC";
+														          FROM Setor
+																      JOIN Situacao on SituaId = SetorStatus
+														         WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+														      ORDER BY SetorNome ASC";
 														$result = $conn->query($sql);
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2270,15 +1994,17 @@ var_dump($_POST);die;
 													<option value="#">Selecione</option>
 													<?php
 													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
-															FROM LocalEstoque
-															JOIN Situacao on SituaId = LcEstStatus
-															WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															UNION
-															SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
-															FROM Setor
-															JOIN Situacao on SituaId = SetorStatus
-															WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															Order By Nome";
+																		FROM LocalEstoque
+																		JOIN Situacao 
+																		  ON SituaId = LcEstStatus
+																		WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																		UNION
+															 		 SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
+																		 FROM Setor
+																		 JOIN Situacao 
+																			 ON SituaId = SetorStatus
+																	  WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																 ORDER BY Nome";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2322,10 +2048,11 @@ var_dump($_POST);die;
 													<option value="-1">Selecione</option>
 													<?php
 													$sql = "SELECT ForneId, ForneNome
-															FROM Fornecedor
-															JOIN Situacao on SituaId = ForneStatus
-															WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															ORDER BY ForneNome ASC";
+																		FROM Fornecedor
+																		JOIN Situacao 
+																		  ON SituaId = ForneStatus
+																	 WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY ForneNome ASC";
 													$result = $conn->query($sql);
 													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2814,7 +2541,7 @@ var_dump($_POST);die;
 								<div class="col-lg-12">
 									<div class="form-group">
 										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-										<a href="movimentacao.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="movimentacaoNovo.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>
@@ -2824,37 +2551,7 @@ var_dump($_POST);die;
 
 
 				</div>
-				<!-- /info blocks -->				
-
-				<div id="page-modal" class="custon-modal">
-					<div class="custon-modal-container">
-						<div class="card custon-modal-content">
-							<div class="custon-modal-title">
-								<i class=""></i>
-								<p class="h3">Itens Recebidos</p>
-								<i class=""></i>
-							</div>
-							<div class="card-footer mt-2 d-flex flex-column">
-								<table class="table table-modal">
-									<thead id="thead-modal">
-
-									</thead>
-									<tbody id="tbody-modal">
-
-									</tbody>
-								</table>
-								<div class="row" style="margin-top: 10px;">
-									<div class="col-lg-12">
-										<div class="form-group">
-											<button class="btn btn-lg btn-principal" id="salvar">Salvar</button>
-											<a id="modal-close" class="btn btn-basic" role="button">Cancelar</a>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+				<!-- /info blocks -->
 
 			</div>
 			<!-- /content area -->
@@ -2870,3 +2567,10 @@ var_dump($_POST);die;
 </body>
 
 </html>
+
+<?php
+if (isset($_POST[0])) {
+	var_dump($_POST);
+	print_r($_POST);
+}
+?>
