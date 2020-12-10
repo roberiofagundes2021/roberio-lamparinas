@@ -56,7 +56,7 @@ if ($countMovimentAprovada) {
                         <th  style="text-align: center">Item</th>
                         <th>Produto/Serviço</th>
                         <th  style="text-align: center">Unidade Medida</th>
-                        <th  style="text-align: center">Quant. Recebida</th>
+                        <th  style="text-align: center">Quantidade</th>
                         <th  style="text-align: center">Saldo</th>
                         <th  style="text-align: right; width: 10%">Valor Unitário</th>
                         <th  style="text-align: right; width: 13%">Valor Total</th>

@@ -902,8 +902,8 @@ if (isset($_POST['inputData'])) {
 														<th>Item</th>
 														<th>Produto/Serviço</th>
 														<th style="text-align:center">Unidade Medida</th>
-														<th style="text-align:center">Quant. Recebida</th>
-														<th style="text-align:center">Saldo</th>
+														<th style="text-align:center">Quantidade</th>
+														<th style="text-align:center">Saldo Recebido</th>
 														<th style="text-align:right">Valor Unitário</th>
 														<th style="text-align:right">Valor Total</th>
 														<th class="text-center">Ações</th>

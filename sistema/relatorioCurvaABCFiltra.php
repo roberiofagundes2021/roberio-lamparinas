@@ -70,7 +70,7 @@ function queryPesquisa()
 		JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 		JOIN Movimentacao on MovimId = MvXPrMovimentacao
 		JOIN Situacao on SituaId = MovimSituacao
-		WHERE " . $string . " ProduUnidade = ".$_SESSION['UnidadeId']." and MovimTipo = 'S' and SituaChave = 'FINALIZADO' and MovimData between '".$dataInicio."' and '".$dataFim."' 
+		WHERE " . $string . " ProduUnidade = ".$_SESSION['UnidadeId']." and MovimTipo = 'S' and SituaChave = 'LIBERADO' and MovimData between '".$dataInicio."' and '".$dataFim."' 
 		ORDER BY ValorTotal DESC
 		";			
 
