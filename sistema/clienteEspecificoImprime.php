@@ -62,35 +62,104 @@ try {
 		</div> 
 	 </div>
 	";	
-
-				  
+			  
 		$html = '
 		<style>
 
 			td{
-				padding: 15px;				
+				padding: 8px;				
 				border: #bbb solid 1px;
 			}
 		</style>
 		<br>
-		<br>
-		<div style="text-align:center;"><h1>'.$row['ClienNome'].'</h1></div>
+		<br>';
+
+		if ($row['ClienTipo'] == 'F'){
+			$html .= "
+		<div style='text-align:center;'><h1>CLIENTE PESSOA FISICA</h1></div>
+		  ";
+		} else{
+			$html .= "
+			<div style='text-align:center;'><h1>CLIENTE PESSOA JURIDICA</h1></div>
+			";
+		}
+
+		$html .= '
 		<br>
 
 		<table style="width:100%; border-collapse: collapse;">
+
+			<tr style="background-color:#F1F1F1;">
+				<td colspan="6" style="width:100% font-size: 13px;">DADOS PESSOAIS</td>';
+
+		if ($row['ClienTipo'] == 'F'){
+			$html .= '
 			<tr>
-				<td style="padding-top: 8px; font-size: 11px;">CPF: '.$row['ClienCpf'].'</td>
-				<td style="padding-top: 8px; font-size: 11px;">Cartão SUS: '.$row['ClienCartaoSus'].'</td>
-				<td style="padding-top: 8px; font-size: 11px;">RG: '.$row['ClienRg'].'</td>
-				<td style="padding-top: 8px; font-size: 11px;">Órgão Emissor: '.$row['ClienOrgaoEmissor'].'</td>
-				<td style="padding-top: 8px; font-size: 11px;">UF: '.$row['ClienUf'].'</td>
+				<td colspan="3" style="width:35% font-size: 13px;">Nome: '.$row['ClienNome'].'</td>
+				<td colspan="2" style="width:40% font-size: 13px;">CPF: '.$row['ClienCpf'].'</td>
+				<td colspan="1" style="width:30% font-size: 13px;">Cartão SUS: '.$row['ClienCartaoSus'].'</td>	
 			</tr>
 			<tr>
-				<td colspan="2" style="padding-top: 8px; font-size: 11px;">CPF: '.$row['ClienCpf'].'</td>
-				<td style="padding-top: 8px; font-size: 11px;">Cartão SUS: '.$row['ClienCartaoSus'].'</td>
-				<td style="padding-top: 8px; font-size: 11px;">RG: '.$row['ClienRg'].'</td>
-				<td style="padding-top: 8px; font-size: 11px;">Órgão Emissor: '.$row['ClienOrgaoEmissor'].'</td>
-			
+				<td colspan="1" style="width:30% font-size: 13px;">RG: '.$row['ClienRg'].'</td>
+				<td colspan="1" style="width:20% font-size: 13px;">Órgão Emissor: '.$row['ClienOrgaoEmissor'].'</td>
+				<td colspan="1" style="width:10% font-size: 13px;">UF: '.$row['ClienUf'].'</td>
+				<td colspan="1" style="width:15% font-size: 13px;">Sexo: '.$row['ClienSexo'].'</td>
+				<td colspan="2" style="width:25% font-size: 13px;">Data Nascimento: '.$row['ClienDtNascimento'].'</td>			
+			</tr>
+			<tr>
+				<td colspan="3" style="width:50% font-size: 13px;">Nome do Pai: '.$row['ClienNomePai'].'</td>
+				<td colspan="3" style="width:50% font-size: 13px;">Nome da Mãe: '.$row['ClienNomeMae'].'</td>
+			</tr>';        
+		} else{
+			$html .= '
+			<tr>
+				<td colspan="3" style="width:50% font-size: 13px;">Nome: '.$row['ClienNome'].'</td>
+				<td colspan="3" style="width:50% font-size: 13px;">CNPJ: '.$row['ClienCnpj'].'</td>	
+			</tr>
+			<tr>
+				<td colspan="2" style="width:33% font-size: 13px;">Razão Social: '.$row['ClienRazaoSocial'].'</td>
+				<td colspan="2" style="width:33% font-size: 13px;">Inscrição Municipal: '.$row['ClienInscricaoMunicipal'].'</td>
+				<td colspan="2" style="width:33% font-size: 13px;">Inscrição Estadual: '.$row['ClienInscricaoEstadual'].'</td>
+			</tr>';
+		}
+
+		$html .= '
+		
+		</table>
+		<br>
+		<table style="width:100%; border-collapse: collapse;">
+
+			<tr style="background-color:#F1F1F1;">
+				<td colspan="6" style="width:100% font-size: 13px;">ENDEREÇO</td>
+			<tr>
+				<td colspan="1" style="width:15% font-size: 13px;">CEP: '.$row['ClienCep'].'</td>
+				<td colspan="2" style="width:35% font-size: 13px;">Endereço: '.$row['ClienEndereco'].'</td>
+				<td colspan="1" style="width:15% font-size: 13px;">Numero: '.$row['ClienNumero'].'</td>
+				<td colspan="2" style="width:35% font-size: 13px;">Compl.: '.$row['ClienComplemento'].'</td>		
+			</tr>
+			<tr>
+				<td colspan="2" style="width:40% font-size: 13px;">Bairro: '.$row['ClienBairro'].'</td>
+				<td colspan="3" style="width:40% font-size: 13px;">Cidade: '.$row['ClienCidade'].'</td>
+				<td colspan="1" style="width:20% font-size: 13px;">Estado: '.$row['ClienEstado'].'</td>
+			</tr>
+		</table>
+		<br>
+		<table style="width:100%; border-collapse: collapse;">
+
+			<tr style="background-color:#F1F1F1;">
+				<td colspan="6" style="width:100% font-size: 13px;">CONTATO</td>
+			<tr>
+				<td colspan="2" style="width:40% font-size: 13px;">Nome: '.$row['ClienContato'].'</td>
+				<td colspan="2" style="width:30% font-size: 13px;">Telefone: '.$row['ClienTelefone'].'</td>
+				<td colspan="2" style="width:30% font-size: 13px;">Celular: '.$row['ClienCelular'].'</td>
+			</tr>
+			<tr>
+				<td colspan="3" style="width:50% font-size: 13px;">E-mail: '.$row['ClienEmail'].'</td>
+				<td colspan="3" style="width:50% font-size: 13px;">Site: '.$row['ClienSite'].'</td>		
+			</tr>
+			<tr>
+				<td colspan="6" style="width:100% font-size: 13px;">Observação: '.$row['ClienObservacao'].'</td>
+				
 			</tr>
 		</table>
 					';
