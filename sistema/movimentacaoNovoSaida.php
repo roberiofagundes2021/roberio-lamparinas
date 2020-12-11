@@ -478,6 +478,97 @@ if (isset($_POST['inputData'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+		document.addEventListener("DOMContentLoaded", () => {
+			initFunction();
+		});
+
+		function initFunction() {
+			writeFields();
+			writeDataTable();
+		}
+
+		function writeFields() {
+			const inputTipo = document.querySelector('input[type="radio"][name="inputTipo"]:checked');
+
+			if (inputTipo.checked == true && inputTipo.value == 'S') {
+				document.querySelector('#EstoqueOrigem').style.display = "block";
+				document.querySelector('#EstoqueOrigemLocalSetor').style.display = "none";
+				document.querySelector('#DestinoLocalEstoqueSetor').style.display = "none";
+				document.querySelector('#DestinoLocal').style.display = "none";
+				document.querySelector('#DestinoSetor').style.display = "block";
+				document.querySelector('#classificacao').style.display = "block";
+				document.querySelector('#dadosProduto').style.display = "flex";
+				mudaTotalTitulo();
+			}
+		};
+
+		function writeDataTable() {
+
+			/* Início: Tabela Personalizada */
+			$(document).ready(function() {
+				$('#tabelaProdutoServicoSaida').DataTable({
+					"order": [
+						[0, "asc"]
+					],
+					autoWidth: false,
+					responsive: true,
+					columnDefs: [{
+							orderable: true, //Item
+							width: "5%",
+							targets: [0]
+						},
+						{
+							orderable: true, //Produto/Servico
+							width: "30%",
+							targets: [1]
+						},
+						{
+							orderable: true, //Unidade Medida
+							width: "15%",
+							targets: [2]
+						},
+						{
+							orderable: true, //Quantidade
+							width: "10%",
+							targets: [3]
+						},
+						{
+							orderable: true, //Valor Unitário
+							width: "10%",
+							targets: [4]
+						},
+						{
+							orderable: true, //Valor Total
+							width: "10%",
+							targets: [5]
+						},
+						{
+							orderable: false, //Classificação
+							width: "15%",
+							targets: [6]
+						},
+						{
+							orderable: false, //Ações
+							width: "5%",
+							targets: [7]
+						}
+					],
+					dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+					language: {
+						search: '<span>Filtro:</span> _INPUT_',
+						searchPlaceholder: 'filtra qualquer coluna...',
+						lengthMenu: '<span>Mostrar:</span> _MENU_',
+						paginate: {
+							'first': 'Primeira',
+							'last': 'Última',
+							'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+							'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+						}
+					}
+				})
+			});
+		};
+
 		function modalAcoes() {
 
 			$('.btn-acoes').each((i, elem) => {
@@ -685,826 +776,733 @@ if (isset($_POST['inputData'])) {
 			$('#tbody-modal')
 		}
 
+		// Select2 for length menu styling
+		var _componentSelect2 = function() {
+			if (!$().select2) {
+				console.warn('Warning - select2.min.js is not loaded.');
+				return;
+			}
 
-		$(document).ready(function() {
+			// Initialize
+			$('.dataTables_length select').select2({
+				minimumResultsForSearch: Infinity,
+				dropdownAutoWidth: true,
+				width: 'auto'
+			});
+		};
+
+		_componentSelect2();
+
+		//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
+		$('#cmbCategoria').on('change', function(e) {
+
+			Filtrando();
 
 			var inputTipo = $('input[name="inputTipo"]:checked').val();
+			var cmbCategoria = $('#cmbCategoria').val();
 
-			/* Início: Tabela Personalizada */
-			$('#tabelaProdutoServicoSaida').DataTable({
-				"order": [
-					[0, "asc"]
-				],
-				autoWidth: false,
-				responsive: true,
-				columnDefs: [{
-						orderable: true, //Item
-						width: "5%",
-						targets: [0]
-					},
-					{
-						orderable: true, //Produto/Servico
-						width: "30%",
-						targets: [1]
-					},
-					{
-						orderable: true, //Unidade Medida
-						width: "15%",
-						targets: [2]
-					},
-					{
-						orderable: true, //Quantidade
-						width: "10%",
-						targets: [3]
-					},
-					{
-						orderable: true, //Valor Unitário
-						width: "10%",
-						targets: [4]
-					},
-					{
-						orderable: true, //Valor Total
-						width: "10%",
-						targets: [5]
-					},
-					{
-						orderable: false, //Classificação
-						width: "15%",
-						targets: [6]
-					},
-					{
-						orderable: false, //Ações
-						width: "5%",
-						targets: [7]
-					}
-				],
-				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
-				language: {
-					search: '<span>Filtro:</span> _INPUT_',
-					searchPlaceholder: 'filtra qualquer coluna...',
-					lengthMenu: '<span>Mostrar:</span> _MENU_',
-					paginate: {
-						'first': 'Primeira',
-						'last': 'Última',
-						'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-						'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
-					}
-				}
-			});
+			$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
 
+				var option = '<option value="#">Selecione a SubCategoria</option>';
 
-			// Select2 for length menu styling
-			var _componentSelect2 = function() {
-				if (!$().select2) {
-					console.warn('Warning - select2.min.js is not loaded.');
-					return;
-				}
+				if (dados.length) {
 
-				// Initialize
-				$('.dataTables_length select').select2({
-					minimumResultsForSearch: Infinity,
-					dropdownAutoWidth: true,
-					width: 'auto'
-				});
-			};
+					$.each(dados, function(i, obj) {
+						option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
+					});
 
-			_componentSelect2();
-
-			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
-			$('#cmbCategoria').on('change', function(e) {
-
-				Filtrando();
-
-				var inputTipo = $('input[name="inputTipo"]:checked').val();
-				var cmbCategoria = $('#cmbCategoria').val();
-
-				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
-
-					var option = '<option value="#">Selecione a SubCategoria</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
-						});
-
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}
-				}).fail(function(m) {
-
-				});
-
-				$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria, function(dados) {
-
-					var option = '<option value="#" "selected">Selecione o Produto</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
-						});
-
-						$('#cmbProduto').html(option).show();
-					} else {
-						ResetProduto();
-					}
-				});
-
-			});
-
-			$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
-				let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val()
-				Filtrando()
-				$.getJSON('filtraPatrimonio.php?idCategoria=' + cmbOrigem, function(dados) {
-
-					var option = '<option value="#" "selected">Selecione o Produto</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							if (inputTipo == 'E') {
-								option += '<option value="' + obj.ProduId + '#' + obj.ProduValorCusto + '">' + obj.ProduNome + '</option>';
-							} else {
-								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
-							}
-						});
-
-						$('#cmbProduto').html(option).show();
-					} else {
-						ResetProduto();
-					}
-				});
-			})
-
-
-			function filtraCategoriaOrigem() {
-				let cmbOrigem = $('#cmbEstoqueOrigem').val()
-				let tipoDeFiltro = 'Categoria'
-
-				$('#cmbCategoria').html('<option value="#" "selected">Filtrando...</option>');
-
-				$.ajax({
-					type: "POST",
-					url: "filtraPorOrigem.php",
-					data: {
-						origem: cmbOrigem,
-						tipoDeFiltro: tipoDeFiltro
-					},
-					success: function(resposta) {
-						var option = '<option value="#" "selected">Selecione a Categoria</option>';
-
-						if (resposta) {
-							$('#cmbCategoria').html('');
-							$('#cmbCategoria').append(option)
-							$('#cmbCategoria').append(resposta)
-
-						} else {
-							$('#cmbCategoria').html('<option value="#" "selected">Sem categorias</option>');
-						}
-					} //.fail(function(m) {
-					//console.log(m);
-					//});
-				})
-			}
-
-			$('#cmbEstoqueOrigem').on('change', function(e) {
-				filtraCategoriaOrigem()
-			})
-			filtraCategoriaOrigem()
-
-
-			function filtraPatrimonioProdutoOrigem() {
-				let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val().split('#')
-				let tipoDeFiltro = 'Patrimonio'
-
-				$('#cmbPatrimonio').html('<option value="#" "selected">Filtrando...</option>');
-
-				$.ajax({
-					type: "POST",
-					url: "filtraPorOrigem.php",
-					data: {
-						origem: cmbOrigem[0],
-						tipoDeFiltro: tipoDeFiltro
-					},
-					success: function(resposta) {
-						var option = '<option value="#" "selected">Selecione o Patrimônio</option>';
-						console.log(resposta);
-						if (resposta) {
-							$('#cmbPatrimonio').html('');
-							$('#cmbPatrimonio').append(option)
-							$('#cmbPatrimonio').append(resposta)
-						} else {
-							$('#cmbPatrimonio').html('<option value="#" "selected">Sem Patrimônios</option>');
-						}
-					} //.fail(function(m) {
-					//console.log(m);
-					//});
-				})
-			}
-
-			$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
-				filtraPatrimonioProdutoOrigem()
-			})
-			//filtraPatrimonioProdutoOrigem() 
-
-			//Impede que o input quantidade receba letras
-			$('#inputQuantidade').on('keydown', () => {
-				let valor = $('#inputQuantidade').val()
-
-				if (valor == '´' || valor == '~' || valor == '`' || valor == ';') {
-					$('#inputQuantidade').val('')
-				}
-				if (event.keyCode != '8' && event.keyCode != '48' && event.keyCode != '49' && event.keyCode != '50' && event.keyCode != '51' && event.keyCode != '52' && event.keyCode != '53' && event.keyCode != '54' && event.keyCode != '55' && event.keyCode != '56' && event.keyCode != '57' && event.keyCode != '96' && event.keyCode != '97' && event.keyCode != '98' && event.keyCode != '99' && event.keyCode != '100' && event.keyCode != '101' && event.keyCode != '102' && event.keyCode != '103' && event.keyCode != '104' && event.keyCode != '105' && event.keyCode != '106' && event.keyCode != '107') {
-					return false
-				}
-
-				if (event.keyCode == '222' && event.keyCode != '219' && event.keyCode != '191') {
-					return false
-				}
-			})
-
-
-			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
-			$('#cmbSubCategoria').on('change', function(e) {
-
-				FiltraProduto();
-
-				var inputTipo = $('input[name="inputTipo"]:checked').val();
-				var cmbFornecedor = $('#cmbFornecedor').val();
-				var cmbCategoria = $('#cmbCategoria').val();
-				var cmbSubCategoria = $('#cmbSubCategoria').val();
-
-
-				$('[name=inputProdutoServico]').each((i, elem) => {
-
-					if ($('[for=cmbProduto]').html() == 'Serviço') {
-
-						$.getJSON('filtraServico.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
-
-							var option = '<option value="#" "selected">Selecione o Serviço</option>';
-
-							if (dados.length) {
-
-								$.each(dados, function(i, obj) {
-									if (inputTipo == 'E') {
-										option += '<option value="' + obj.ServiId + '#' + obj.ServiValorCusto + '">' + obj.ServiNome + '</option>';
-									} else {
-										option += '<option value="' + obj.ServiId + '#' + obj.ServiCustoFinal + '">' + obj.ServiNome + '</option>';
-									}
-
-								});
-
-								$('#cmbProduto').html(option).show();
-							} else {
-								ResetProduto();
-							}
-						}).fail(function(m) {
-							//console.log(m);
-						});
-
-					} else {
-						$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
-
-							var option = '<option value="#" "selected">Selecione o Produto</option>';
-
-							if (dados.length) {
-
-								$.each(dados, function(i, obj) {
-									if (inputTipo == 'E') {
-										option += '<option value="' + obj.ProduId + '#' + obj.ProduValorCusto + '">' + obj.ProduNome + '</option>';
-									} else {
-										option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
-									}
-
-								});
-
-								$('#cmbProduto').html(option).show();
-							} else {
-								ResetProduto();
-							}
-						}).fail(function(m) {
-
-						});
-					}
-				})
-			});
-
-
-
-			//Ao mudar o Produto, trazer o Valor Unitário do cadastro (retorno via JSON)
-			$('#cmbProduto').on('change', function(e) {
-
-				var inputTipo = $('input[name="inputTipo"]:checked').val();
-				var cmbProduto = $('#cmbProduto').val();
-				var inputValorUnitario = $('#inputValorUnitario').val();
-
-				var Produto = cmbProduto.split("#");
-				var valor = Produto[1].replace(".", ",");
-
-				if (valor != 'null' && valor) {
-					$('#inputValorUnitario').val(valor);
+					$('#cmbSubCategoria').html(option).show();
 				} else {
-					$('#inputValorUnitario').val('0,00');
+					ResetSubCategoria();
 				}
-				$('#inputQuantidade').focus();
+			}).fail(function(m) {
+
 			});
 
+			$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria, function(dados) {
 
-			$("input[type=radio][name=inputTipo]").click(function() {
+				var option = '<option value="#" "selected">Selecione o Produto</option>';
 
-				var inputTipo = $('input[name="inputTipo"]:checked').val();
-				var inputNumItens = $('#inputNumItens').val();
+				if (dados.length) {
 
-				if (inputNumItens > 0) {
-					alerta('Atenção', 'O tipo não pode ser alterado quando se tem produto(s) na lista! Exclua-o(s) primeiro ou cancele e recomece o cadastro da movimentação.', 'error');
-					return false;
-				}
+					$.each(dados, function(i, obj) {
+						option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
+					});
 
-				$('#cmbCategoria').val("#");
-				$('#inputQuantidade').val("");
-				$('#inputValorUnitario').val("");
-				$('#inputLote').val("");
-				$('#inputValidade').val("");
-
-				//Quando mudar o tipo para Saída ou Transferência a combo Fornecedor precisa voltar a estaca zero, já que para esses tipos não tem que informar Fornecedor
-				if (inputTipo != 'E') {
-					$('#cmbFornecedor').val(-1); //Selecione
-					$("select#cmbFornecedor").trigger("change"); //Simula o change do select
+					$('#cmbProduto').html(option).show();
+				} else {
+					ResetProduto();
 				}
 			});
 
+		});
 
-			$('#btnAdicionar').click(function() {
+		$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
+			let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val()
+			Filtrando()
+			$.getJSON('filtraPatrimonio.php?idCategoria=' + cmbOrigem, function(dados) {
 
-				var inputTipo = $('input[name="inputTipo"]:checked').val();
-				var inputNumItens = $('#inputNumItens').val();
-				var cmbProduto = $('#cmbProduto').val();
+				var option = '<option value="#" "selected">Selecione o Produto</option>';
 
-				var Produto = cmbProduto.split("#");
+				if (dados.length) {
 
-				var inputQuantidade = $('#inputQuantidade').val();
-				var inputValorUnitario = $('#inputValorUnitario').val();
-				var inputTotal = $('#inputTotal').val();
-				var inputLote = $('#inputLote').val();
-				var inputValidade = $('#inputValidade').val();
-				var cmbClassificacao = $('#cmbClassificacao').val();
-				var inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
+					$.each(dados, function(i, obj) {
+						option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
+					});
 
-				//remove os espaços desnecessários antes e depois
-				inputQuantidade = inputQuantidade.trim();
-
-				//Verifica se o campo só possui espaços em branco
-				if (inputQuantidade == '') {
-					alerta('Atenção', 'Informe a quantidade antes de adicionar!', 'error');
-					$('#inputQuantidade').focus();
-					return false;
+					$('#cmbProduto').html(option).show();
+				} else {
+					ResetProduto();
 				}
+			});
+		})
 
-				//Verifica se o campo só possui espaços em branco
-				if (inputValorUnitario == '') {
-					alerta('Atenção', 'Nenhum produto foi selecionado!', 'error');
-					$('#cmbProduto').focus();
-					return false;
-				}
 
-				//Verifica se a combo Classificação foi informada
-				if (inputTipo == 'S' && cmbClassificacao == '#') {
+		function filtraCategoriaOrigem() {
+			let cmbOrigem = $('#cmbEstoqueOrigem').val()
+			let tipoDeFiltro = 'Categoria'
 
-					if ($('[for=cmbProduto]').html() == 'Produto') {
-						alerta('Atenção', 'Informe a Classificação/Bens!', 'error');
-						$('#cmbClassificacao').focus();
-						return false;
+			$('#cmbCategoria').html('<option value="#" "selected">Filtrando...</option>');
+
+			$.ajax({
+				type: "POST",
+				url: "filtraPorOrigem.php",
+				data: {
+					origem: cmbOrigem,
+					tipoDeFiltro: tipoDeFiltro
+				},
+				success: function(resposta) {
+					var option = '<option value="#" "selected">Selecione a Categoria</option>';
+
+					if (resposta) {
+						$('#cmbCategoria').html('');
+						$('#cmbCategoria').append(option)
+						$('#cmbCategoria').append(resposta)
+
+					} else {
+						$('#cmbCategoria').html('<option value="#" "selected">Sem categorias</option>');
 					}
-				}
+				} //.fail(function(m) {
+				//console.log(m);
+				//});
+			})
+		}
 
-				//Verifica se o campo já está no array
-				if (inputIdProdutos.includes(Produto[0])) {
-					alerta('Atenção', 'Esse produto já foi adicionado!', 'error');
-					$('#cmbProduto').focus();
-					return false;
-				}
-
-				var resNumItens = parseInt(inputNumItens) + 1;
-				var total = parseInt(inputQuantidade) * parseFloat(inputValorUnitario.replace(',', '.'));
-
-				total = total + parseFloat(inputTotal);
-				var totalFormatado = "R$ " + float2moeda(total).toString();
+		$('#cmbEstoqueOrigem').on('change', function(e) {
+			filtraCategoriaOrigem()
+		})
+		filtraCategoriaOrigem()
 
 
-				if ($('[for=cmbProduto]').html() == 'Produto') {
-					//Esse ajax está sendo usado para verificar no banco se o registro já existe
-					let origem = $('#cmbEstoqueOrigem').val()
-					$.ajax({
-						type: "POST",
-						url: "movimentacaoAddProduto.php",
-						data: {
-							tipo: inputTipo,
-							numItens: resNumItens,
-							idProduto: Produto[0],
-							origem: origem,
-							quantidade: inputQuantidade,
-							classific: cmbClassificacao
-						},
-						success: function(resposta) {
+		function filtraPatrimonioProdutoOrigem() {
+			let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val().split('#')
+			let tipoDeFiltro = 'Patrimonio'
 
-							//var newRow = $("<tr>");
+			$('#cmbPatrimonio').html('<option value="#" "selected">Filtrando...</option>');
 
-							//newRow.append(resposta);
-							if (resposta != 'SEMESTOQUE') {
+			$.ajax({
+				type: "POST",
+				url: "filtraPorOrigem.php",
+				data: {
+					origem: cmbOrigem[0],
+					tipoDeFiltro: tipoDeFiltro
+				},
+				success: function(resposta) {
+					var option = '<option value="#" "selected">Selecione o Patrimônio</option>';
+					console.log(resposta);
+					if (resposta) {
+						$('#cmbPatrimonio').html('');
+						$('#cmbPatrimonio').append(option)
+						$('#cmbPatrimonio').append(resposta)
+					} else {
+						$('#cmbPatrimonio').html('<option value="#" "selected">Sem Patrimônios</option>');
+					}
+				} //.fail(function(m) {
+				//console.log(m);
+				//});
+			})
+		}
 
-								var inputTipo = $('input[name="inputTipo"]:checked').val();
+		$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
+			filtraPatrimonioProdutoOrigem()
+		})
+		//filtraPatrimonioProdutoOrigem() 
 
-								$("#tabelaProdutoServico").append(resposta);
+		//Impede que o input quantidade receba letras
+		$('#inputQuantidade').on('keydown', () => {
+			let valor = $('#inputQuantidade').val()
 
+			if (valor == '´' || valor == '~' || valor == '`' || valor == ';') {
+				$('#inputQuantidade').val('')
+			}
+			if (event.keyCode != '8' && event.keyCode != '48' && event.keyCode != '49' && event.keyCode != '50' && event.keyCode != '51' && event.keyCode != '52' && event.keyCode != '53' && event.keyCode != '54' && event.keyCode != '55' && event.keyCode != '56' && event.keyCode != '57' && event.keyCode != '96' && event.keyCode != '97' && event.keyCode != '98' && event.keyCode != '99' && event.keyCode != '100' && event.keyCode != '101' && event.keyCode != '102' && event.keyCode != '103' && event.keyCode != '104' && event.keyCode != '105' && event.keyCode != '106' && event.keyCode != '107') {
+				return false
+			}
 
-								//Adiciona mais um item nessa contagem
-								$('#inputNumItens').val(resNumItens);
-								$('#cmbProduto').val("#").change();
-								$('#inputQuantidade').val('');
-								$('#inputValorUnitario').val('');
-								$('#inputTotal').val(total);
-								$('#total').text(totalFormatado);
-								$('#inputLote').val('');
-								$('#inputValidade').val('');
-
-								$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
-
-								inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
-
-								$('#inputIdProdutos').val(inputIdProdutos);
-
-								$('#cmbFornecedor').prop('disabled', true);
-
-								$('input[name="inputTipo"]').each((i, elem) => {
-									if ($(elem) != $('input[name="inputTipo"]:checked')) {
-										$(elem).attr('disabled', '')
-									}
-								})
-
-
-								function classBemSaidaSolicit(valor, idSelect) {
-									let grid = $('.trGrid')
-
-									grid.each((i1, elem1) => { // each sobre a grid
-										let tr = $(elem1).children() // colocando todas as linhas em um 
-
-										let td = tr.first()
-										let indiceLinha = td.html()
-
-										//let inputProdutoGridValores = inputHiddenProdutoServico.val()
-										if (idSelect == indiceLinha) {
-
-											let valueProdutoServicoArray = $(`#campo${indiceLinha}`).val().split('#')
-											// adicionando  novos dados no array
-											valueProdutoServicoArray[valueProdutoServicoArray.length - 1] = valor
-
-											var ponto = eval('/' + '.' + '/g')
-
-											valueProdutoServicoArray[2] = valueProdutoServicoArray[2].replace(',', '.')
+			if (event.keyCode == '222' && event.keyCode != '219' && event.keyCode != '191') {
+				return false
+			}
+		})
 
 
+		//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
+		$('#cmbSubCategoria').on('change', function(e) {
 
-											var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
+			FiltraProduto();
 
-											var stringVallnput = valueProdutoServicoArray.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
+			var inputTipo = $('input[name="inputTipo"]:checked').val();
+			var cmbFornecedor = $('#cmbFornecedor').val();
+			var cmbCategoria = $('#cmbCategoria').val();
+			var cmbSubCategoria = $('#cmbSubCategoria').val();
 
-											$(`#campo${indiceLinha}`).val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
-										}
-									})
+
+			$('[name=inputProdutoServico]').each((i, elem) => {
+
+				if ($('[for=cmbProduto]').html() == 'Serviço') {
+
+					$.getJSON('filtraServico.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
+
+						var option = '<option value="#" "selected">Selecione o Serviço</option>';
+
+						if (dados.length) {
+
+							$.each(dados, function(i, obj) {
+								if (inputTipo == 'E') {
+									option += '<option value="' + obj.ServiId + '#' + obj.ServiValorCusto + '">' + obj.ServiNome + '</option>';
+								} else {
+									option += '<option value="' + obj.ServiId + '#' + obj.ServiCustoFinal + '">' + obj.ServiNome + '</option>';
 								}
 
+							});
 
-
-								$('.selectClassific2').each((i, elem) => {
-
-									$(elem).on('change', function(e) {
-
-										let valor = $(elem).val()
-										let idSelect = $(elem).attr('id')
-										classBemSaidaSolicit(valor, idSelect)
-									})
-								})
-
-								return false;
-							} else {
-								console.log(resposta)
-								alerta('Atenção', 'Estoque indisponível!', 'error');
-								return false;
-							}
+							$('#cmbProduto').html(option).show();
+						} else {
+							ResetProduto();
 						}
-					})
+					}).fail(function(m) {
+						//console.log(m);
+					});
 
 				} else {
-					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
+
+						var option = '<option value="#" "selected">Selecione o Produto</option>';
+
+						if (dados.length) {
+
+							$.each(dados, function(i, obj) {
+								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
+							});
+
+							$('#cmbProduto').html(option).show();
+						} else {
+							ResetProduto();
+						}
+					}).fail(function(m) {
+
+					});
+				}
+			})
+		});
+
+
+
+		//Ao mudar o Produto, trazer o Valor Unitário do cadastro (retorno via JSON)
+		$('#cmbProduto').on('change', function(e) {
+
+			var inputTipo = $('input[name="inputTipo"]:checked').val();
+			var cmbProduto = $('#cmbProduto').val();
+			var inputValorUnitario = $('#inputValorUnitario').val();
+
+			var Produto = cmbProduto.split("#");
+			var valor = Produto[1].replace(".", ",");
+
+			if (valor != 'null' && valor) {
+				$('#inputValorUnitario').val(valor);
+			} else {
+				$('#inputValorUnitario').val('0,00');
+			}
+			$('#inputQuantidade').focus();
+		});
+
+
+		$("input[type=radio][name=inputTipo]").click(function() {
+
+			var inputTipo = $('input[name="inputTipo"]:checked').val();
+			var inputNumItens = $('#inputNumItens').val();
+
+			if (inputNumItens > 0) {
+				alerta('Atenção', 'O tipo não pode ser alterado quando se tem produto(s) na lista! Exclua-o(s) primeiro ou cancele e recomece o cadastro da movimentação.', 'error');
+				return false;
+			}
+
+			$('#cmbCategoria').val("#");
+			$('#inputQuantidade').val("");
+			$('#inputValorUnitario').val("");
+			$('#inputLote').val("");
+			$('#inputValidade').val("");
+		});
+
+
+		$('#btnAdicionar').click(function() {
+			var inputTipo = $('input[name="inputTipo"]:checked').val();
+			var inputNumItens = $('#inputNumItens').val();
+			var cmbProduto = $('#cmbProduto').val();
+			var Produto = cmbProduto.split("#");
+			var inputQuantidade = $('#inputQuantidade').val();
+			var inputValorUnitario = $('#inputValorUnitario').val();
+			var inputTotal = $('#inputTotal').val();
+			var inputLote = $('#inputLote').val();
+			var inputValidade = $('#inputValidade').val();
+			var cmbClassificacao = $('#cmbClassificacao').val();
+			var inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
+
+			//remove os espaços desnecessários antes e depois
+			inputQuantidade = inputQuantidade.trim();
+
+			//Verifica se o campo só possui espaços em branco
+			if (inputQuantidade == '') {
+				alerta('Atenção', 'Informe a quantidade antes de adicionar!', 'error');
+				$('#inputQuantidade').focus();
+				return false;
+			}
+
+			//Verifica se o campo só possui espaços em branco
+			if (inputValorUnitario == '') {
+				alerta('Atenção', 'Nenhum produto foi selecionado!', 'error');
+				$('#cmbProduto').focus();
+				return false;
+			}
+
+			//Verifica se a combo Classificação foi informada
+			if (inputTipo == 'S' && cmbClassificacao == '#') {
+
+				if ($('[for=cmbProduto]').html() == 'Produto') {
+					alerta('Atenção', 'Informe a Classificação/Bens!', 'error');
+					$('#cmbClassificacao').focus();
+					return false;
+				}
+			}
+
+			//Verifica se o campo já está no array
+			if (inputIdProdutos.includes(Produto[0])) {
+				alerta('Atenção', 'Esse produto já foi adicionado!', 'error');
+				$('#cmbProduto').focus();
+				return false;
+			}
+
+			var resNumItens = parseInt(inputNumItens) + 1;
+			var total = parseInt(inputQuantidade) * parseFloat(inputValorUnitario.replace(',', '.'));
+
+			total = total + parseFloat(inputTotal);
+			var totalFormatado = "R$ " + float2moeda(total).toString();
+
+
+			if ($('[for=cmbProduto]').html() == 'Produto') {
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				let origem = $('#cmbEstoqueOrigem').val()
+				$.ajax({
+					type: "POST",
+					url: "movimentacaoAddProduto.php",
+					data: {
+						tipo: inputTipo,
+						numItens: resNumItens,
+						idProduto: Produto[0],
+						origem: origem,
+						quantidade: inputQuantidade,
+						classific: cmbClassificacao
+					},
+					success: function(resposta) {
+
+						//var newRow = $("<tr>");
+
+						//newRow.append(resposta);
+						if (resposta != 'SEMESTOQUE') {
+
+							var inputTipo = $('input[name="inputTipo"]:checked').val();
+
+							$("#tabelaProdutoServico").append(resposta);
+
+
+							//Adiciona mais um item nessa contagem
+							$('#inputNumItens').val(resNumItens);
+							$('#cmbProduto').val("#").change();
+							$('#inputQuantidade').val('');
+							$('#inputValorUnitario').val('');
+							$('#inputTotal').val(total);
+							$('#total').text(totalFormatado);
+							$('#inputLote').val('');
+							$('#inputValidade').val('');
+
+							$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+
+							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
+
+							$('#inputIdProdutos').val(inputIdProdutos);
+
+							$('#cmbFornecedor').prop('disabled', true);
+
+							$('input[name="inputTipo"]').each((i, elem) => {
+								if ($(elem) != $('input[name="inputTipo"]:checked')) {
+									$(elem).attr('disabled', '')
+								}
+							})
+
+
+							function classBemSaidaSolicit(valor, idSelect) {
+								let grid = $('.trGrid')
+
+								grid.each((i1, elem1) => { // each sobre a grid
+									let tr = $(elem1).children() // colocando todas as linhas em um 
+
+									let td = tr.first()
+									let indiceLinha = td.html()
+
+									//let inputProdutoGridValores = inputHiddenProdutoServico.val()
+									if (idSelect == indiceLinha) {
+
+										let valueProdutoServicoArray = $(`#campo${indiceLinha}`).val().split('#')
+										// adicionando  novos dados no array
+										valueProdutoServicoArray[valueProdutoServicoArray.length - 1] = valor
+
+										var ponto = eval('/' + '.' + '/g')
+
+										valueProdutoServicoArray[2] = valueProdutoServicoArray[2].replace(',', '.')
+
+
+
+										var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
+
+										var stringVallnput = valueProdutoServicoArray.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
+
+										$(`#campo${indiceLinha}`).val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
+									}
+								})
+							}
+
+
+
+							$('.selectClassific2').each((i, elem) => {
+
+								$(elem).on('change', function(e) {
+
+									let valor = $(elem).val()
+									let idSelect = $(elem).attr('id')
+									classBemSaidaSolicit(valor, idSelect)
+								})
+							})
+
+							return false;
+						} else {
+							console.log(resposta)
+							alerta('Atenção', 'Estoque indisponível!', 'error');
+							return false;
+						}
+					}
+				})
+
+			} else {
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "movimentacaoAddServico.php",
+					data: {
+						tipo: inputTipo,
+						numItens: resNumItens,
+						idServico: Produto[0],
+						quantidade: inputQuantidade
+					},
+					success: function(resposta) {
+
+						//var newRow = $("<tr>");
+						if (resposta != 'SEMESTOQUE') {
+							//newRow.append(resposta);	    
+							$("#tabelaProdutoServico").append(resposta);
+
+							//Adiciona mais um item nessa contagem
+							$('#inputNumItens').val(resNumItens);
+							$('#cmbProduto').val("#").change();
+							$('#inputQuantidade').val('');
+							$('#inputValorUnitario').val('');
+							$('#inputTotal').val(total);
+							$('#total').text(totalFormatado);
+							$('#inputLote').val('');
+							$('#inputValidade').val('');
+
+							$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+
+							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
+
+							$('#inputIdProdutos').val(inputIdProdutos);
+
+							$('#cmbFornecedor').prop('disabled', true);
+
+							return false;
+						} else {
+							alerta('Atenção', 'Estoque indisponível!', 'error');
+							return false;
+						}
+
+					}
+				})
+			}
+		}); //click
+
+
+
+		function produtosSolicitacaoSaida() {
+			$('.produtoSolicitacao').each((i, elem) => {
+				var tds = $(elem).children()
+				var idProdutoGrid = $(elem).attr('idProduSolicitacao')
+				var idGridProdu = $(tds[0]).html()
+				var quantProduGrid = $(tds[3]).html()
+				var valUnitProduGrid = $(tds[5]).attr('valorUntPrSolici')
+
+				$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + 'P#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '#' + 0 + '#' + 0 + '#' + 0 + '#' + 0 + '">');
+			})
+			//$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+		}
+		produtosSolicitacaoSaida()
+
+
+		$(document).on('click', '.btn_remove', function() {
+
+			var inputTotal = $('#inputTotal').val();
+			var button_id = $(this).attr("id");
+			var Produto = button_id.split("#");
+			var inputIdProdutos = $('#inputIdProdutos').val(); //array com o Id dos produtos adicionados
+			var inputNumItens = $('#inputNumItens').val();
+
+			var item = inputIdProdutos.split(",");
+
+			var i;
+			var arr = [];
+
+			for (i = 0; i < item.length; i++) {
+				arr.push(item[i]);
+			}
+
+			var index = arr.indexOf(Produto[0]);
+
+			arr.splice(index, 1);
+
+			$('#inputIdProdutos').val(arr);
+
+			$("#row" + Produto[0] + "").remove(); //remove a linha da tabela
+			$("#campo" + Produto[0] + "").remove(); //remove o campo hidden
+
+			//Agora falta calcular o valor total novamente
+			inputTotal = parseFloat(inputTotal) - parseFloat(Produto[1]);
+			var totalFormatado = "R$ " + float2moeda(inputTotal).toString();
+
+			$('#inputTotal').val(inputTotal);
+			$('#total').text(totalFormatado);
+
+
+			var resNumItens = parseInt(inputNumItens) - 1;
+			$('#inputNumItens').val(resNumItens);
+
+			if (resNumItens == 0) {
+				$('#cmbFornecedor').prop('disabled', false);
+			}
+		})
+
+
+		//Valida Registro Duplicado
+		$('#enviar').on('click', function(e) {
+			console.log('onclick');
+			var inputTipo = $('input[name="inputTipo"]:checked').val(); //S
+			var inputTotal = $('#inputTotal').val(); //
+			var cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val();
+			var cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val();
+			var cmbDestinoLocal = $('#cmbDestinoLocal').val();
+			var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val();
+			var cmbDestinoSetor = $('#cmbDestinoSetor').val();
+			var inputValorTotal = $('#inputValorTotal').val().trim();
+
+			//Verifica se a combo Estoque de Origem foi informada
+			if (cmbEstoqueOrigem == '') {
+				alerta('Atenção', 'Informe o Estoque de Origem!', 'error');
+				$('#cmbEstoqueOrigem').focus();
+				$("#formMovimentacao").submit();
+				return false;
+			}
+
+			//Verifica se a combo Estoque de Destino foi informada
+			if (cmbDestinoSetor == '') {
+				alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
+				$('#cmbDestinoSetor').focus();
+				$("#formMovimentacao").submit();
+				return false;
+			}
+
+			//Verifica se tem algum produto na Grid
+			if (inputTotal == '' || inputTotal == 0) {
+				alerta('Atenção', 'Informe algum produto!', 'error');
+				$('#cmbCategoria').focus();
+				$("#formMovimentacao").submit();
+				return false;
+			}
+
+			//desabilita o combo de "Situacao" na hora de gravar, senão o POST não o encontra
+			$('#cmbSituacao').prop('disabled', false);
+
+			if (inputTipo == 'S' && $('input[name="inputTipo"]:checked').attr('saidaSolicitacao')) {
+				alert('Saida Solicitação!');
+				const submitProduto = {}
+
+				$('.inputProdutoServicoClasse').each((i, elem) => {
+					let nomeInput = $(elem).attr('name')
+					let valorInput = $(elem).val()
+					submitProduto[`${nomeInput}`] = valorInput
+				})
+
+
+				document.getElementById('EstoqueOrigem').style.display = "block";
+				document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
+				document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
+				document.getElementById('DestinoLocal').style.display = "none";
+				document.getElementById('DestinoSetor').style.display = "block";
+				document.getElementById('classificacao').style.display = "block";
+				document.getElementById('dadosProduto').style.display = "flex";
+
+
+				submitProduto.inputData = document.querySelector('#inputData').value;
+				console.log(submitProduto.inputData);
+				submitProduto.cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val()
+				submitProduto.cmbDestinoSetor = $('#cmbDestinoSetor').val()
+				submitProduto.txtareaObservacao = $('#txtareaObservacao').val()
+				submitProduto.cmbSituacao = $('#cmbSituacao').val()
+				submitProduto.cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val()
+				submitProduto.cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val()
+				submitProduto.inputTipo = 'S'
+				submitProduto.cmbDestinoLocal = $('#cmbDestinoLocal').val()
+				submitProduto.inputValorTotal = $('#inputValorTotal').val()
+				submitProduto.inputNumItens = $('#inputNumItens').val()
+
+				let contSelectClass = $('.selectClassific').length
+				let contSelectClassVal = 0
+
+				$('.selectClassific').each((i, elem) => {
+					let valor = $(elem).val()
+
+					if (valor != '#') {
+						contSelectClassVal++
+					}
+				})
+
+				if (contSelectClass == contSelectClassVal) {
 					$.ajax({
 						type: "POST",
-						url: "movimentacaoAddServico.php",
-						data: {
-							tipo: inputTipo,
-							numItens: resNumItens,
-							idServico: Produto[0],
-							quantidade: inputQuantidade
-						},
+						url: "movimentacaoNovoSaida.php",
+						data: submitProduto,
 						success: function(resposta) {
-
-							//var newRow = $("<tr>");
-							if (resposta != 'SEMESTOQUE') {
-								//newRow.append(resposta);	    
-								$("#tabelaProdutoServico").append(resposta);
-
-								//Adiciona mais um item nessa contagem
-								$('#inputNumItens').val(resNumItens);
-								$('#cmbProduto').val("#").change();
-								$('#inputQuantidade').val('');
-								$('#inputValorUnitario').val('');
-								$('#inputTotal').val(total);
-								$('#total').text(totalFormatado);
-								$('#inputLote').val('');
-								$('#inputValidade').val('');
-
-								$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
-
-								inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
-
-								$('#inputIdProdutos').val(inputIdProdutos);
-
-								$('#cmbFornecedor').prop('disabled', true);
-
-								return false;
-							} else {
-								alerta('Atenção', 'Estoque indisponível!', 'error');
-								return false;
-							}
-
+							//window.location.href = "index.php";
+							console.log(resposta);
 						}
 					})
-				}
-			}); //click
-
-
-
-			function produtosSolicitacaoSaida() {
-				$('.produtoSolicitacao').each((i, elem) => {
-					var tds = $(elem).children()
-					var idProdutoGrid = $(elem).attr('idProduSolicitacao')
-					var idGridProdu = $(tds[0]).html()
-					var quantProduGrid = $(tds[3]).html()
-					var valUnitProduGrid = $(tds[5]).attr('valorUntPrSolici')
-
-					$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + 'P#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '#' + 0 + '#' + 0 + '#' + 0 + '#' + 0 + '">');
-				})
-				//$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
-			}
-			produtosSolicitacaoSaida()
-
-			$(document).on('click', '.btn_remove', function() {
-
-				var inputTotal = $('#inputTotal').val();
-				var button_id = $(this).attr("id");
-				var Produto = button_id.split("#");
-				var inputIdProdutos = $('#inputIdProdutos').val(); //array com o Id dos produtos adicionados
-				var inputNumItens = $('#inputNumItens').val();
-
-				var item = inputIdProdutos.split(",");
-
-				var i;
-				var arr = [];
-
-				for (i = 0; i < item.length; i++) {
-					arr.push(item[i]);
-				}
-
-				var index = arr.indexOf(Produto[0]);
-
-				arr.splice(index, 1);
-
-				$('#inputIdProdutos').val(arr);
-
-				$("#row" + Produto[0] + "").remove(); //remove a linha da tabela
-				$("#campo" + Produto[0] + "").remove(); //remove o campo hidden
-
-				//Agora falta calcular o valor total novamente
-				inputTotal = parseFloat(inputTotal) - parseFloat(Produto[1]);
-				var totalFormatado = "R$ " + float2moeda(inputTotal).toString();
-
-				$('#inputTotal').val(inputTotal);
-				$('#total').text(totalFormatado);
-
-
-				var resNumItens = parseInt(inputNumItens) - 1;
-				$('#inputNumItens').val(resNumItens);
-
-				if (resNumItens == 0) {
-					$('#cmbFornecedor').prop('disabled', false);
-				}
-			})
-
-
-			//Valida Registro Duplicado
-			$('#enviar').on('click', function(e) {
-				console.log('onclick');
-				var inputTipo = $('input[name="inputTipo"]:checked').val(); //S
-				var inputTotal = $('#inputTotal').val(); //
-				var cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val();
-				var cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val();
-				var cmbDestinoLocal = $('#cmbDestinoLocal').val();
-				var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val();
-				var cmbDestinoSetor = $('#cmbDestinoSetor').val();
-				var inputValorTotal = $('#inputValorTotal').val().trim();
-
-				//Verifica se a combo Estoque de Origem foi informada
-				if (cmbEstoqueOrigem == '') {
-					alerta('Atenção', 'Informe o Estoque de Origem!', 'error');
-					$('#cmbEstoqueOrigem').focus();
-					$("#formMovimentacao").submit();
-					return false;
-				}
-
-				//Verifica se a combo Estoque de Destino foi informada
-				if (cmbDestinoSetor == '') {
-					alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
-					$('#cmbDestinoSetor').focus();
-					$("#formMovimentacao").submit();
-					return false;
-				}
-
-				//Verifica se tem algum produto na Grid
-				if (inputTotal == '' || inputTotal == 0) {
-					alerta('Atenção', 'Informe algum produto!', 'error');
-					$('#cmbCategoria').focus();
-					$("#formMovimentacao").submit();
-					return false;
-				}
-
-				//desabilita o combo de "Situacao" na hora de gravar, senão o POST não o encontra
-				$('#cmbSituacao').prop('disabled', false);
-
-				if (inputTipo == 'S' && $('input[name="inputTipo"]:checked').attr('saidaSolicitacao')) {
-					alert('Saida Solicitação!');
-					const submitProduto = {}
-
-					$('.inputProdutoServicoClasse').each((i, elem) => {
-						let nomeInput = $(elem).attr('name')
-						let valorInput = $(elem).val()
-						submitProduto[`${nomeInput}`] = valorInput
-					})
-
-
-					document.getElementById('EstoqueOrigem').style.display = "block";
-					document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
-					document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
-					document.getElementById('DestinoLocal').style.display = "none";
-					document.getElementById('DestinoSetor').style.display = "block";
-					document.getElementById('classificacao').style.display = "block";
-					document.getElementById('dadosProduto').style.display = "flex";
-
-
-					submitProduto.inputData = document.querySelector('#inputData').value;
-					console.log(submitProduto.inputData);
-					submitProduto.cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val()
-					submitProduto.cmbDestinoSetor = $('#cmbDestinoSetor').val()
-					submitProduto.txtareaObservacao = $('#txtareaObservacao').val()
-					submitProduto.cmbSituacao = $('#cmbSituacao').val()
-					submitProduto.cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val()
-					submitProduto.cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val()
-					submitProduto.inputTipo = 'S'
-					submitProduto.cmbDestinoLocal = $('#cmbDestinoLocal').val()
-					submitProduto.inputValorTotal = $('#inputValorTotal').val()
-					submitProduto.inputNumItens = $('#inputNumItens').val()
-
-					let contSelectClass = $('.selectClassific').length
-					let contSelectClassVal = 0
-
-					$('.selectClassific').each((i, elem) => {
-						let valor = $(elem).val()
-
-						if (valor != '#') {
-							contSelectClassVal++
-						}
-					})
-
-					if (contSelectClass == contSelectClassVal) {
-						$.ajax({
-							type: "POST",
-							url: "movimentacaoNovoSaida.php",
-							data: submitProduto,
-							success: function(resposta) {
-								//window.location.href = "index.php";
-								console.log(resposta);
-							}
-						})
-					} else {
-						alerta('Atenção', 'Informe a classificação dos produtos incluidos!', 'error');
-						return false;
-					}
-
-
 				} else {
-					document.querySelector("#formMovimentacao").submit();
+					alerta('Atenção', 'Informe a classificação dos produtos incluidos!', 'error');
+					return false;
+				}
+
+
+			} else {
+				document.querySelector("#formMovimentacao").submit();
+			}
+		});
+
+		//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
+		function Filtrando() {
+			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+			FiltraProduto();
+		}
+
+		//Mostra o "Filtrando..." na combo Produto
+		function FiltraCategoria() {
+			$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
+		}
+
+		//Mostra o "Filtrando..." na combo Produto
+		function FiltraProduto() {
+			$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+		}
+
+		function FiltraOrdensCompra() {
+			$('#cmbOrdemCompra').empty().append('<option>Filtrando...</option>');
+		}
+
+		function ResetCategoria() {
+			$('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
+		}
+
+		function ResetSubCategoria() {
+			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+		}
+
+		function ResetProduto() {
+			$('#cmbProduto').empty().append('<option>Sem produto</option>');
+		}
+
+
+		function classBemSaidaSolicit(valor, idSelect) {
+			let grid = $('.trGrid')
+
+			grid.each((i1, elem1) => { // each sobre a grid
+				let tr = $(elem1).children() // colocando todas as linhas em um 
+
+				let td = tr.first()
+				let indiceLinha = td.html()
+
+				//let inputProdutoGridValores = inputHiddenProdutoServico.val()
+				if (idSelect == indiceLinha) {
+					//let arrayValInput = inputProdutoGridValores.split('#')
+					let valueProdutoServicoArray = $(`#campo${indiceLinha}`).val().split('#')
+					// adicionando  novos dados no array
+					valueProdutoServicoArray[7] = valor
+
+
+					var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
+
+					var stringVallnput = valueProdutoServicoArray.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
+
+					$(`#campo${indiceLinha}`).val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
 				}
 			});
+		};
 
-			//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
-			function Filtrando() {
-				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-				FiltraProduto();
-			}
-
-			//Mostra o "Filtrando..." na combo Produto
-			function FiltraCategoria() {
-				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
-			}
-
-			//Mostra o "Filtrando..." na combo Produto
-			function FiltraProduto() {
-				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
-			}
-
-			function FiltraOrdensCompra() {
-				$('#cmbOrdemCompra').empty().append('<option>Filtrando...</option>');
-			}
-
-			function ResetCategoria() {
-				$('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
-			}
-
-			function ResetSubCategoria() {
-				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
-			}
-
-			function ResetProduto() {
-				$('#cmbProduto').empty().append('<option>Sem produto</option>');
-			}
-
-
-			function classBemSaidaSolicit(valor, idSelect) {
-				let grid = $('.trGrid')
-
-				grid.each((i1, elem1) => { // each sobre a grid
-					let tr = $(elem1).children() // colocando todas as linhas em um 
-
-					let td = tr.first()
-					let indiceLinha = td.html()
-
-					//let inputProdutoGridValores = inputHiddenProdutoServico.val()
-					if (idSelect == indiceLinha) {
-						//let arrayValInput = inputProdutoGridValores.split('#')
-						let valueProdutoServicoArray = $(`#campo${indiceLinha}`).val().split('#')
-						// adicionando  novos dados no array
-						valueProdutoServicoArray[7] = valor
-
-
-						var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
-
-						var stringVallnput = valueProdutoServicoArray.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
-
-						$(`#campo${indiceLinha}`).val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
-					}
-				})
-			}
-			$('.selectClassific').each((i, elem) => {
-
-				$(elem).on('change', function(e) {
-
-					let valor = $(elem).val()
-					let idSelect = $(elem).attr('id')
-					classBemSaidaSolicit(valor, idSelect)
-				})
+		$('.selectClassific').each((i, elem) => {
+			$(elem).on('change', function(e) {
+				let valor = $(elem).val();
+				let idSelect = $(elem).attr('id');
+				classBemSaidaSolicit(valor, idSelect);
 			})
+		});
 
+		function mudaTotalTitulo() {
+			$('#totalTitulo').html('Total (R$):');
+			$('#quantEditaEntradaSaida').html('Quantidade');
+		};
 
-
-		}); //document.ready	
-
-		function mudaTotalTitulo(tipoTela) {
-
-			if (tipoTela == 'E') {
-				$('#totalTitulo').html('Total (R$) Nota Fiscal:')
-				$('#quantEditaEntradaSaida').html('Quant. Recebida')
-			} else if (tipoTela == 'S') {
-				$('#totalTitulo').html('Total (R$):')
-				$('#quantEditaEntradaSaida').html('Quantidade')
-			}
-
-		}
 
 		function limpaValorFormulario(tipo) {
-			$("#cmbEstoqueOrigemLocalSetor").val("#")
-			$("#cmbDestinoLocalEstoqueSetor").val("#")
-			$("#cmbDestinoLocal").val("#")
-		}
+			document.querySelector("#cmbEstoqueOrigemLocalSetor").value = "#";
+			document.querySelector("#cmbDestinoLocalEstoqueSetor").value = "#";
+			document.querySelector("#cmbDestinoLocal").value = "#";
+		};
+
 
 		Array.prototype.remove = function(start, end) {
 			this.splice(start, end);
 			return this;
-		}
+		};
+
 
 		Array.prototype.insert = function(pos, item) {
 			this.splice(pos, 0, item);
 			return this;
-		}
+		};
+
 
 		function selecionaTipo(tipo) {
 			if (tipo == 'E') {
@@ -1513,47 +1511,18 @@ if (isset($_POST['inputData'])) {
 				window.location.href = "movimentacaoNovoTransferencia.php";
 			} else
 				window.location.href = "movimentacaoNovoSaida.php";
-		}
+		};
 
-		$(document).ready(function() {
-			$('[name=inputTipo]').each((i, elem) => {
-				if ($(elem).attr('checked') && $(elem).val() == 'S') {
-					document.getElementById('EstoqueOrigem').style.display = "block";
-					document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
-					document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
-					document.getElementById('DestinoLocal').style.display = "none";
-					document.getElementById('DestinoSetor').style.display = "block";
-					document.getElementById('classificacao').style.display = "block";
-					document.getElementById('dadosNF').style.display = "none";
-					document.getElementById('dadosProduto').style.display = "flex";
 
-					mudaTotalTitulo('S')
-				}
-			})
-		})
 
 
 		function selecionaProdutoServico(tipo) {
-			if (tipo == 'P') {
-				document.getElementById('formLote').style.display = "block";
-				document.getElementById('formValidade').style.display = "block";
-				document.getElementById('classificacao').style.display = "block";
-				$('#tituloProdutoServico').html('Dados dos Produtos')
-				$('[for=cmbProduto]').html('Produto')
-			} else {
-				document.getElementById('formLote').style.display = "none";
-				document.getElementById('formValidade').style.display = "none";
-				document.getElementById('classificacao').style.display = "none";
-				$('#tituloProdutoServico').html('Dados dos Serviços')
-				$('[for=cmbProduto]').html('Serviço')
-			}
-		}
-
-		function verifcMumero(elem) {
-			if (typeof $(elem).val() == 'string') {
-				return false
-			}
-		}
+			document.getElementById('formLote').style.display = "none";
+			document.getElementById('formValidade').style.display = "none";
+			document.getElementById('classificacao').style.display = "none";
+			$('#tituloProdutoServico').html('Dados dos Serviços');
+			$('[for=cmbProduto]').html('Serviço');
+		};
 
 
 		function float2moeda(num) {
@@ -1565,19 +1534,21 @@ if (isset($_POST['inputData'])) {
 			}
 
 			if (isNaN(num)) num = "0";
+
 			cents = Math.floor((num * 100 + 0.5) % 100);
 			num = Math.floor((num * 100 + 0.5) / 100).toString();
 
 			if (cents < 10) cents = "0" + cents;
 
-			for (var i = 0; i < Math.floor((num.length - (1 + i)) / 3); i++)
+			for (var i = 0; i < Math.floor((num.length - (1 + i)) / 3); i++) {
 				num = num.substring(0, num.length - (4 * i + 3)) + '.' +
-				num.substring(num.length - (4 * i + 3));
+					num.substring(num.length - (4 * i + 3));
+			}
 			ret = num + ',' + cents;
 
 			if (x == 1) ret = ' - ' + ret;
 			return ret;
-		}
+		};
 	</script>
 
 </head>
