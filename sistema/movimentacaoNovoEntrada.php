@@ -444,16 +444,14 @@ if (isset($_POST['inputData'])) {
 			let valorTotal = 0
 			let novoSaldo = 0
 			let quantAtualizada = 0
-			/*quantInicial == novaQuantidade ? novoSaldo = saldoInicial : */
+
 			novoSaldo = saldoInicial - novaQuantidade;
 
-			//let valorTotal = novaQuantidade * valorUni;
-			//let novoSaldo = saldoInicial - novaQuantidade;
-			quantAtualizada = parseInt(novaQuantidade) + parseInt(quantInicial)
+			//quantAtualizada = parseInt(novaQuantidade) + parseInt(quantInicial)
 
 			return {
-				quantAtualizada: quantAtualizada,
-				valorTotal: float2moeda(quantAtualizada * valorUni),
+				quantAtualizada: novaQuantidade,
+				valorTotal: float2moeda(novaQuantidade * valorUni),
 				somaTotalValorGeral: novaQuantidade * valorUni,
 				novoSaldo: novoSaldo
 			};

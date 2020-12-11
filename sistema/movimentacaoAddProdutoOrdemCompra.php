@@ -96,7 +96,7 @@ if ($countMovimentAprovada) {
 						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $numItens . '</td>
 						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip">' . $item['nome'] . '</td>
 						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $item['UnMedSigla'] . '</td>
-                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">'.$saldo['Quantidade'].'</td>
+                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">0</td>
                          <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $saldo['Saldo'] . '</td>
 						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: right">' . $valorCusto . '</td>
                          <td title="' . $item['detalhamento'] . '" data-popup="tooltip" class="valorTotal" style="text-align: right">R$ 0, 00</td> <!-- esse campo é calculado depois na função recalcValorTotal() -->
