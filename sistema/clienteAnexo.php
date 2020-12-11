@@ -166,7 +166,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<thead>
 									<tr class="bg-slate">
                                         <th>Data</th>
-										<th>Nome</th>
+										<th>Descrição</th>
 										<th>Arquivo</th>										
 										<th class="text-center">Ações</th>
 									</tr>
@@ -180,7 +180,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<tr>
 										    <td>'.mostraData($item['ClAneData']).'</td>
                                             <td>'.$item['ClAneNome'].'</td>
-											<td>'.$item['ClAneArquivo'].'</td>
+											<td><a href="global_assets/anexos/cliente/'.$item['ClAneArquivo'].'" target="_blank">'.$item['ClAneArquivo'].'</a></td>
 											');
 																										
 										print('<td class="text-center">

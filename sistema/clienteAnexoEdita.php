@@ -26,23 +26,60 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE ClienteAnexo SET ClAneData = :iData, ClAneNome = :sNome, ClAneArquivo = :iArquivo, ClAneCliente = :iCliente, ClAneUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE ClAneId = :iClienteAnexo";
-		$result = $conn->prepare($sql);
-				
-		$result->execute(array(
-                        ':iData' => $_POST['inputData'],
-                        ':sNome' => $_POST['inputNome'],
-						':iArquivo' => $_POST['inputArquivo'],
-						':iCliente' => $_SESSION['idCliente'],
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iClienteAnexo' => $_POST['inputClienteAnexoId']
-						));
+		$_UP['pasta'] = 'global_assets/anexos/cliente/';
+
+		// Renomeia o arquivo? (Se true, o arquivo será salvo como .csv e um nome único)
+		$_UP['renomeia'] = false;
+
+		// Primeiro verifica se deve trocar o nome do arquivo
+		if ($_UP['renomeia'] == true) {
+		
+			// Cria um nome baseado no UNIX TIMESTAMP atual e com extensão .csv
+			//$nome_final = time().".".$extensao;
+			$nome_final = date('d-m-Y')."-".date('H-i-s')."-".$_FILES['inputArquivo']['name'];
+		
+		} else {
+		
+			// Mantém o nome original do arquivo
+			$nome_final = $_FILES['inputArquivo']['name'];
+		}
+		
+		//echo $_FILES['inputArquivo']['tmp_name']." <br>";
+		//echo $_UP['pasta'] . $nome_final." <br>";
+		
+		// Depois verifica se é possível mover o arquivo para a pasta escolhida
+		if (move_uploaded_file($_FILES['inputArquivo']['tmp_name'], $_UP['pasta'] . $nome_final)) {
+		
+			$sql = "UPDATE ClienteAnexo SET ClAneData = :iData, ClAneNome = :sNome, ClAneArquivo = :iArquivo, ClAneUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE ClAneId = :iClienteAnexo";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':iData' => $_POST['inputData'],
+							':sNome' => $_POST['inputNome'],
+							':iArquivo' => $nome_final,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iClienteAnexo' => $_POST['inputClienteAnexoId']
+							));
+
+		} else{
+
+			$sql = "UPDATE ClienteAnexo SET ClAneData = :iData, ClAneNome = :sNome, ClAneUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE ClAneId = :iClienteAnexo";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':iData' => $_POST['inputData'],
+							':sNome' => $_POST['inputNome'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iClienteAnexo' => $_POST['inputClienteAnexoId']
+							));   
+		}
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Anexo alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
-		
+			
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
@@ -87,19 +124,42 @@ if(isset($_POST['inputNome'])){
 			$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
+
+				var arquivoSalvo = $('#inputClienteAnexoArquivo').val();	
+				var inputFile = $('#inputArquivo').val();
+				var id = $("input:file").attr('id');
+				var tamanho =  1024 * 1024 * 32; //32MB
+								
+				if (inputFile){
+									
+					//Verifica se a extensão é  diferente de PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!
+					if (ext(inputFile) != 'pdf' && ext(inputFile) != 'doc' && ext(inputFile) != 'docx' && ext(inputFile) != 'odt' && ext(inputFile) != 'jpg' && ext(inputFile) != 'jpeg' && ext(inputFile) != 'png'){
+						alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!','error');
+						$("#formClienteAnexo").submit();
+						$('#inputArquivo').focus();
+						return false;	
+					}
+					
+					//Verifica o tamanho do arquivo
+					if ($('#'+id)[0].files[0].size > tamanho){
+						alerta('Atenção','O arquivo enviado é muito grande, envie arquivos de até 32MB.','error');
+						$("#formClienteAnexo").submit();
+						$('#inputArquivo').focus();
+						return false;
+					}				
+				}
+					
+                $( "#formClienteAnexo" ).submit();
 				
-				var inputData  = $('#inputData').val();
-				//var inputNomeVelho = $('#inputCaixaNome').val();
-				var inputNome   = $('#inputNome').val();
-				var inputArquivo   = $('#inputArquivo').val();
-				var inputClienteAnexoId = $('#inputClienteAnexoId').val();
-				
-				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
-				
-				$( "#formClienteAnexo" ).submit();
 			})
 		})
+
+		 //Retorna a extenção do arquivo
+		function ext(path) {
+			var final = path.substr(path.lastIndexOf('/')+1);
+			var separador = final.lastIndexOf('.');
+			return separador <= 0 ? '' : final.substr(separador + 1);
+		}	
 	</script>
 </head>
 
@@ -123,13 +183,14 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formClienteAnexo" id="formClienteAnexo" method="post" class="form-validate-jquery">
+					<form name="formClienteAnexo" id="formClienteAnexo" method="post" enctype="multipart/form-data" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Anexo "<?php echo $row['ClAneArquivo']; ?>"</h5>
 						</div>
 						
 						<input type="hidden" id="inputClienteAnexoId" name="inputClienteAnexoId" value="<?php echo $row['ClAneId']; ?>">
 						<input type="hidden" id="inputClienteAnexoNome" name="inputClienteAnexoNome" value="<?php echo $row['ClAneNome']; ?>">
+						<input type="hidden" id="inputClienteAnexoArquivo" name="inputClienteAnexoArquivo" value="<?php echo $row['ClAneArquivo']; ?>">
 						
 						<div class="card-body">								
 							<div class="row">
@@ -149,10 +210,17 @@ if(isset($_POST['inputNome'])){
                             <div class="row">
 								<div class="col-lg-12">
 									<label for="inputArquivo">Arquivo<span class="text-danger"> *</span></label>
-									<input type="text" id="inputArquivo" name="inputArquivo" class="form-control"value="<?php echo $row['ClAneArquivo']; ?>">
+									<input type="file" id="inputArquivo" name="inputArquivo" class="form-control" value="<?php echo $row['ClAneArquivo']; ?>">
 								</div>						
 							</div>
-								
+							<div class="row">	
+								<div class="col-lg-12">
+									<div class="form-group">
+										<span style="color:red;"><?php echo $row['ClAneArquivo']; ?></span>									
+										<p>Obs.: arquivos permitidos (.pdf, .doc, .docx, .odt, .jpg, .jpeg, .png) Tamanho máximo: 32MB</p>
+									</div>
+								</div>									
+							</div>		
 							<div class="row" style="margin-top: 30px;">
 								<div class="col-lg-12">								
 									<div class="form-group">

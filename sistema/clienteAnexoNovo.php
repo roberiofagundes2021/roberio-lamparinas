@@ -8,25 +8,50 @@ include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputData'])){
 
-	try{
+	try{	
 		
-		$sql = "INSERT INTO ClienteAnexo (ClAneData, ClAneNome, ClAneArquivo, ClAneCliente, ClAneUsuarioAtualizador,ClAneUnidade)
-				VALUES (:iData, :sNome, :iArquivo, :iCliente, :iUsuarioAtualizador, :iUnidade)";
-		$result = $conn->prepare($sql);
-				
-		$result->execute(array(
-                        ':iData' => $_POST['inputData'],
-						':sNome' => $_POST['inputNome'],
-						':iArquivo' => $_POST['inputArquivo'],
-						':iCliente' => $_SESSION['idCliente'],
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iUnidade' => $_SESSION['UnidadeId'],
-						));
+		$_UP['pasta'] = 'global_assets/anexos/cliente/';
+
+		// Renomeia o arquivo? (Se true, o arquivo será salvo como .csv e um nome único)
+		$_UP['renomeia'] = false;
+
+		// Primeiro verifica se deve trocar o nome do arquivo
+		if ($_UP['renomeia'] == true) {
 		
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Anexo incluído!!!";
-		$_SESSION['msg']['tipo'] = "success";
+			// Cria um nome baseado no UNIX TIMESTAMP atual e com extensão .csv
+			//$nome_final = time().".".$extensao;
+			$nome_final = date('d-m-Y')."-".date('H-i-s')."-".$_FILES['inputArquivo']['name'];
 		
+		} else {
+		
+			// Mantém o nome original do arquivo
+			$nome_final = $_FILES['inputArquivo']['name'];
+		}
+		
+		//echo $_FILES['inputArquivo']['tmp_name']." <br>";
+		//echo $_UP['pasta'] . $nome_final." <br>";
+		
+		// Depois verifica se é possível mover o arquivo para a pasta escolhida
+		if (move_uploaded_file($_FILES['inputArquivo']['tmp_name'], $_UP['pasta'] . $nome_final)) {
+		
+			$sql = "INSERT INTO ClienteAnexo (ClAneData, ClAneNome, ClAneArquivo, ClAneCliente, ClAneUsuarioAtualizador,ClAneUnidade)
+					VALUES (:iData, :sNome, :iArquivo, :iCliente, :iUsuarioAtualizador, :iUnidade)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':iData' => $_POST['inputData'],
+							':sNome' => $_POST['inputNome'],
+							':iArquivo' => $nome_final,
+							':iCliente' => $_SESSION['idCliente'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $_SESSION['UnidadeId'],
+							));
+			
+			$_SESSION['msg']['titulo'] = "Sucesso";
+			$_SESSION['msg']['mensagem'] = "Anexo incluído!!!";
+			$_SESSION['msg']['tipo'] = "success";
+		}
+
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
@@ -71,18 +96,47 @@ if(isset($_POST['inputData'])){
 			$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
+							
+				var inputFile = $('#inputArquivo').val();
+				var id = $("input:file").attr('id');
+				var tamanho =  1024 * 1024 * 32; //32MB
+								
+				//Verifica se o campo só possui espaços em branco
+				if (inputFile == ''){
+					alerta('Atenção','Selecione o arquivo!','error');
+					$("#formClienteAnexo").submit();
+					$('#inputArquivo').focus();
+					return false;
+				}
+								
+				//Verifica se a extensão é  diferente de PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!
+				if (ext(inputFile) != 'pdf' && ext(inputFile) != 'doc' && ext(inputFile) != 'docx' && ext(inputFile) != 'odt' && ext(inputFile) != 'jpg' && ext(inputFile) != 'jpeg' && ext(inputFile) != 'png'){
+					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!','error');
+					$("#formClienteAnexo").submit();
+					$('#inputArquivo').focus();
+					return false;	
+				}
 				
-				var inputNome    = $('#inputNome').val();
-				var inputData = $('#inputData').val();
-				var inputArquivo = $('#inputArquivo').val();
+				//Verifica o tamanho do arquivo
+				if ($('#'+id)[0].files[0].size > tamanho){
+					alerta('Atenção','O arquivo enviado é muito grande, envie arquivos de até 32MB.','error');
+					$("#formClienteAnexo").submit();
+					$('#inputArquivo').focus();
+					return false;
+				}				
 				
-				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
-
+					
                 $( "#formClienteAnexo" ).submit();
 				
 			})
 		})
+
+         //Retorna a extenção do arquivo
+		function ext(path) {
+			var final = path.substr(path.lastIndexOf('/')+1);
+			var separador = final.lastIndexOf('.');
+			return separador <= 0 ? '' : final.substr(separador + 1);
+		}	
 	</script>
 </head>
 
@@ -106,7 +160,7 @@ if(isset($_POST['inputData'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formClienteAnexo" id="formClienteAnexo" method="post" class="form-validate-jquery">
+					<form name="formClienteAnexo" id="formClienteAnexo" method="post" enctype="multipart/form-data" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Anexo</h5>
 						</div>
@@ -129,10 +183,16 @@ if(isset($_POST['inputData'])){
                             <div class="row">
 								<div class="col-lg-12">
 									<label for="inputArquivo">Arquivo<span class="text-danger"> *</span></label>
-									<input type="file" id="inputArquivo" name="inputArquivo" class="form-control">
-								</div>						
-							</div>
-															
+									<input type="file" id="inputArquivo" name="inputArquivo" class="form-control" required>
+								</div>
+							</div>	
+							<div class="row">	
+								<div class="col-lg-12">
+									<div class="form-group">										
+										Obs.: arquivos permitidos (.pdf, .doc, .docx, .odt, .jpg, .jpeg, .png) Tamanho máximo: 32MB
+									</div>
+								</div>									
+							</div>												
 							<div class="row" style="margin-top: 30px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
