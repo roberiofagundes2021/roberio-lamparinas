@@ -62,7 +62,7 @@ if (isset($_POST['inputData'])) {
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
-			':sTipo' => 'S',
+			':sTipo' => 'S',  // Saída
 			':dData' => gravaData($_POST['inputData']),
 			':iOrigemLocal' => $_POST['cmbEstoqueOrigem'],
 			':iDestinoSetor' => $_POST['cmbDestinoSetor'],
@@ -85,13 +85,15 @@ if (isset($_POST['inputData'])) {
 			//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
 
 			if (isset($_POST[$campo])) {
-				//var_dump($campo);
+				
 				$registro = explode('#', $_POST[$campo]);
 
 				if ($registro[0] == 'P') {
 
 					$quantItens = intval($registro[3]);
+
 					if (isset($registro[7])) {
+					
 						for ($i = 1; $i <= $quantItens; $i++) {
 							// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
 
@@ -274,7 +276,7 @@ if (isset($_POST['inputData'])) {
 						':iServico' => $registro[1],
 						':iQuantidade' => (int) $registro[3],
 						':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
-						':sLote' => $registro[5],
+						':sLote' => $registro[5],  //?????? Lote no Serviço????????
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
 					));
@@ -1270,7 +1272,7 @@ if (isset($_POST['inputData'])) {
 				var inputTotal = $('#inputTotal').val();
 				var cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val();
 				var cmbDestinoSetor = $('#cmbDestinoSetor').val();
-				var inputValorTotal = $('#inputValorTotal').val().trim();
+				var inputValorTotal = $('#inputValorTotal').val();
 
 				//Verifica se a combo Estoque de Origem foi informada
 				if (cmbEstoqueOrigem == '') {
@@ -1292,14 +1294,10 @@ if (isset($_POST['inputData'])) {
 				if (inputTotal == '' || inputTotal == 0) {
 					alerta('Atenção', 'Informe algum produto!', 'error');
 					$('#cmbCategoria').focus();
-					$("#formMovimentacao").submit();
 					return false;
 				}
 
-				//desabilita o combo de "Situacao" na hora de gravar, senão o POST não o encontra
-				$('#cmbSituacao').prop('disabled', false);
-
-				if (inputTipo == 'S' && $('input[name="inputTipo"]:checked').attr('saidaSolicitacao')) {
+				if ($('input[name="inputTipo"]:checked').attr('saidaSolicitacao')) {
 					alert('Saida Solicitação!');
 					const submitProduto = {}
 
@@ -1973,7 +1971,6 @@ if (isset($_POST['inputData'])) {
 														<!--<option value="#">Selecione</option>-->
 														<?php
 
-														if (isset($_POST['inputSolicitacaoId'])) {
 															$sql = "SELECT SituaId, SituaNome, SituaChave
 															FROM Situacao
 															WHERE SituaStatus = '1'
@@ -1981,55 +1978,13 @@ if (isset($_POST['inputData'])) {
 															$result = $conn->query($sql);
 															$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-															print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
+															print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" readOnly>');
 
 															foreach ($row as $item) {
 																if ($item['SituaChave'] == 'LIBERADO') {
 																	print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
 																}
 															}
-														} else {
-															if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
-																$sql = "SELECT SituaId, SituaNome, SituaChave
-																		FROM Situacao
-																		WHERE SituaStatus = '1'
-																		ORDER BY SituaNome ASC";
-																$result = $conn->query($sql);
-																$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-																print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2">');
-																print('<option value="#">Selecione</option>');
-
-																foreach ($row as $item) {
-																	if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
-																		if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-																			print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-																		} else {
-																			print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-																		}
-																	}
-																}
-															} else {
-
-																$sql = "SELECT SituaId, SituaNome, SituaChave
-																		FROM Situacao
-																		WHERE SituaStatus = '1'
-																		ORDER BY SituaNome ASC";
-																$result = $conn->query($sql);
-																$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-																print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
-																print('<option value="#">Selecione</option>');
-
-																foreach ($row as $item) {
-																	if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-																		print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-																	} else if ($item['SituaChave'] == 'LIBERADO') {
-																		print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-																	}
-																}
-															}
-														}
 														?>
 														</select>
 

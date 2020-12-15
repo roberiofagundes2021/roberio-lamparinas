@@ -19,13 +19,13 @@ if (isset($_GET['idOrcamento'])){
 } else if (isset($_GET['produtoServico'])){
 
 	if ($_GET['produtoServico'] == 'S'){
-		$sql = "SELECT SbCatId, SbCatNome
+		$sql = "SELECT DISTINCT SbCatId, SbCatNome
 		FROM SubCategoria
 		JOIN Servico on ServiSubCategoria = SbCatId
 		JOIN Situacao on SituaId = SbCatStatus
 		WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = '". $_GET['idCategoria']."' and SituaChave = 'ATIVO' ";
 	} else {
-		$sql = "SELECT SbCatId, SbCatNome
+		$sql = "SELECT DISTINCT SbCatId, SbCatNome
 		FROM SubCategoria
 		JOIN Produto on ProduSubCategoria = SbCatId
 		JOIN Situacao on SituaId = SbCatStatus
