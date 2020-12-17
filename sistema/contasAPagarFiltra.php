@@ -144,7 +144,7 @@ function queryPesquisa()
                 <td class='even'><a href='contasAPagarNovoLancamento.php?lancamentoId=".$item['CnAPaId']."'>" . $item['CnAPaDescricao'] . "</a></td>
                 <td class='even'>" . $item['ForneNome'] . "</td>
                 <td class='even' style='text-align: center'>" . $item['CnAPaNumDocumento'] . "</td>
-                <td class='even' style='text-align: center'>" . mostraValor($item['CnAPaValorAPagar']) . "</td>
+                <td class='even' style='text-align: right; padding-right:1.5rem;'>" . mostraValor($item['CnAPaValorAPagar']) . "</td>
                 <td class='even' style='text-align: center'>" .$status. "</td>
                 <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
                 <div class='list-icons'>

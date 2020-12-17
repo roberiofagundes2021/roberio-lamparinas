@@ -71,9 +71,9 @@ if (isset($_POST['inputCpf'])) {
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
-			':iPerfil' => $_POST['cmbPerfil'] == '#' ? null : $_POST['cmbPerfil'],
-			':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
-			':iSetor' => $_POST['cmbSetor'] == '#' ? null : $_POST['cmbSetor'],
+			':iPerfil' => $_POST['cmbPerfil'] == '' ? null : $_POST['cmbPerfil'],
+			':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
+			':iSetor' => $_POST['cmbSetor'] == '' ? null : $_POST['cmbSetor'],
 			':iLocalEstoque' => $_POST['cmbLocalEstoque'] == '#' ? null : $_POST['cmbLocalEstoque'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iUsuario' => $_POST['inputUsuarioId'],
@@ -139,13 +139,13 @@ if (isset($_POST['inputCpf'])) {
 			var cmbUnidade = $('#cmbUnidade').val();
 			var cmbSetor = $('#cmbSetor').val();
 
-			if (cmbUnidade == '#') {
+			if (cmbUnidade == '') {
 				Reset();
 			} else {
 
 				$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
 
-					var option = '<option value="#">Selecione o Setor</option>';
+					var option = '<option value="">Selecione o Setor</option>';
 
 					if (dados.length) {
 
@@ -191,14 +191,14 @@ if (isset($_POST['inputCpf'])) {
 
 				var cmbUnidade = $('#cmbUnidade').val();
 
-				if (cmbUnidade == '#') {
+				if (cmbUnidade == '') {
 					ResetSetor();
 					ResetLocalEstoque();
 				} else {
 
 					$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
 
-						var option = '<option value="#">Selecione o Setor</option>';
+						var option = '<option value="">Selecione o Setor</option>';
 
 						if (dados.length) {
 
@@ -214,7 +214,7 @@ if (isset($_POST['inputCpf'])) {
 
 					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function(dados) {
 
-						var option = '<option value="#">Selecione o Local de Estoque</option>';
+						var option = '<option value="">Selecione o Local de Estoque</option>';
 
 						if (dados.length) {
 
@@ -272,11 +272,11 @@ if (isset($_POST['inputCpf'])) {
 				// 	return false;
 				// }
 
-				// if (inputSenha != inputConfirmaSenha) {
-				// 	alerta('Atenção', 'A confirmação de senha não confere!', 'error');
-				// 	$('#inputConfirmaSenha').focus();
-				// 	return false;
-				// }
+					if (inputSenha != inputConfirmaSenha) {
+					alerta('Atenção', 'A confirmação de senha não confere!', 'error');
+					$('#inputConfirmaSenha').focus();
+					return false;
+				}
 
 				// if (cmbUnidade == '#') {
 				// 	alerta('Atenção', 'Informe a unidade!', 'error');
@@ -284,11 +284,11 @@ if (isset($_POST['inputCpf'])) {
 				// 	return false;
 				// }
 
-				// if (cmbSetor == '#' || cmbSetor == 'Filtrando...') {
-				// 	alerta('Atenção', 'Informe o setor!', 'error');
-				// 	$('#cmSetor').focus();
-				// 	return false;
-				// }
+				//if (cmbSetor == '' || cmbSetor == 'Filtrando...') {
+				//	alerta('Atenção', 'Informe o setor!', 'error');
+				//	$('#cmSetor').focus();
+				//	return false;
+				//}
 
 				$('#cmbEmpresa').prop("disabled", false);
 
@@ -303,16 +303,16 @@ if (isset($_POST['inputCpf'])) {
 			});
 
 			function Filtrando() {
-				$('#cmbSetor').empty().append('<option value="#">Filtrando...</option>');
-				$('#cmbLocalEstoque').empty().append('<option value="#">Filtrando...</option>');
+				$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
+				$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
 			}
 
 			function ResetSetor() {
-				$('#cmbSetor').empty().append('<option value="#">Sem setor</option>');
+				$('#cmbSetor').empty().append('<option value="">Sem setor</option>');
 			}
 
 			function ResetLocalEstoque() {
-				$('#cmbLocalEstoque').empty().append('<option value="#">Sem Local de Estoque</option>');
+				$('#cmbLocalEstoque').empty().append('<option value="">Sem Local de Estoque</option>');
 			}			
 		});
 	</script>
@@ -366,19 +366,19 @@ include_once("topo.php");
 								<div class="row">
 									<div class="col-lg-2">
 										<div class="form-group">
-											<label for="inputCpf">CPF</label>
+											<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
 											<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo formatarCPF_Cnpj($row['UsuarCpf']); ?>" required readOnly>
 										</div>
 									</div>
 									<div class="col-lg-7">
 										<div class="form-group">
-											<label for="inputNome">Nome</label>
+											<label for="inputNome">Nome<span class="text-danger"> *</span></label>
 											<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['UsuarNome']; ?>" required>
 										</div>
 									</div>
 									<div class="col-lg-3">
 										<div class="form-group">
-											<label for="cmbPerfil">Perfil</label>
+											<label for="cmbPerfil">Perfil<span class="text-danger"> *</span></label>
 											<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2" required>
 												<option value="">Informe um perfil</option>
 												<?php
@@ -412,21 +412,21 @@ include_once("topo.php");
 								<div class="row">
 									<div class="col-lg-4">
 										<div class="form-group">
-											<label for="inputLogin">Login</label>
+											<label for="inputLogin">Login<span class="text-danger"> *</span></label>
 											<input type="text" id="inputLogin" name="inputLogin" class="form-control" placeholder="Login" value="<?php echo $row['UsuarLogin']; ?>" required>
 										</div>
 									</div>
 
 									<div class="col-lg-4">
 										<div class="form-group">
-											<label for="inputSenha">Senha</label>
+											<label for="inputSenha">Senha<span class="text-danger"> *</span></label>
 											<input type="password" id="inputSenha" name="inputSenha" class="form-control" placeholder="Senha" value="<?php echo $row['UsuarSenha']; ?>" required>
 										</div>
 									</div>
 
 									<div class="col-lg-4">
 										<div class="form-group">
-											<label for="inputConfirmaSenha">Confirma Senha</label>
+											<label for="inputConfirmaSenha">Confirma Senha<span class="text-danger"> *</span></label>
 											<input type="password" id="inputConfirmaSenha" name="inputConfirmaSenha" class="form-control" placeholder="Confirma Senha" value="<?php echo $row['UsuarSenha']; ?>" required>
 										</div>
 									</div>
@@ -441,7 +441,7 @@ include_once("topo.php");
 								<div class="row">
 									<div class="col-lg-4">
 										<div class="form-group">
-											<label for="inputEmail">E-mail</label>
+											<label for="inputEmail">E-mail<span class="text-danger"> *</span></label>
 											<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" value="<?php echo $row['UsuarEmail']; ?>" required>
 										</div>
 									</div>
@@ -468,7 +468,7 @@ include_once("topo.php");
 								<div class="row">
 									<div class="col-lg-6">
 										<div class="form-group">
-											<label for="cmbUnidade">Unidade</label>
+											<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
 											<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
 												<option value="">Informe uma unidade</option>
 												<?php
@@ -495,7 +495,7 @@ include_once("topo.php");
 
 									<div class="col-lg-3">
 										<div class="form-group">
-											<label for="cmbSetor">Setor</label>
+											<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
 											<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
 												<option value="">Informe um setor</option>
 												<?php
@@ -522,7 +522,7 @@ include_once("topo.php");
 
 									<div class="col-lg-3" id="LocalEstoque" <?php if ($rowPerf['PerfiChave'] == 'ALMOXARIFADO') echo 'style="display: block"' ?> <?php if ($rowPerf['PerfiChave'] != 'ALMOXARIFADO') echo 'style="display: none"' ?>>
 										<div class="form-group">
-											<label for="cmbLocalEstoque">Local de Estoque</label>
+											<label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
 											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
 												<option value="">Informe um Local de Estoque</option>
 												<?php

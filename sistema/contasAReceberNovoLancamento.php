@@ -871,7 +871,13 @@ $dataInicio = date("Y-m-d");
 
                                     ?>
                                     <div class="row">
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label for="inputDataEmissao">Data de Emissão</label>
+                                                <input type="date" id="inputDataEmissao" name="inputDataEmissao" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtEmissao'] ?>" class="form-control" placeholder="Data de Emissão">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbPlanoContas">Plano de Contas <span class="text-danger">*</span></label>
                                                 <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" required>
@@ -913,7 +919,7 @@ $dataInicio = date("Y-m-d");
                                         </div>
 
 
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-5">
                                             <div class="form-group">
                                                 <label for="cmbCliente">Cliente <span class="text-danger">*</span></label>
                                                 <select id="cmbCliente" name="cmbCliente" class="form-control form-control-select2" required>
@@ -954,19 +960,18 @@ $dataInicio = date("Y-m-d");
                                     </div>
 
                                     <div class="row">
+                                        <div class="col-8">
+                                            <div class="form-group">
+                                                <label for="inputDescricao">Descrição <span class="text-danger">*</span></label>
+                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" placeholder="Compras"required <?php if (isset($lancamento)) echo $lancamento['CnAReDescricao'] ?>>
+                                            </div>
+                                        </div>
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="inputNotaFiscal">Nº Nota Fiscal/Documento</label>
                                                 <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNumDocumento'] ?>" class="form-control" placeholder="Nº Nota Fiscal/Documento">
                                             </div>
                                         </div>
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label for="inputDataEmissao">Data de Emissão</label>
-                                                <input type="date" id="inputDataEmissao" name="inputDataEmissao" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtEmissao'] ?>" class="form-control" placeholder="Data de Emissão">
-                                            </div>
-                                        </div>
-
                                         <!--
                                         <div class="col-lg-4">
                                             <div class="form-group">
@@ -977,21 +982,13 @@ $dataInicio = date("Y-m-d");
                                         -->
                                     </div>
                                     <div class="row">
-                                        <div class="col-12">
-                                            <div class="form-group">
-                                                <label for="inputDescricao">Descrição <span class="text-danger">*</span></label>
-                                                <textarea id="inputDescricao" class="form-control" name="inputDescricao" rows="3" required><?php if (isset($lancamento)) echo $lancamento['CnAReDescricao'] ?></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
                                         <div class="col-12 col-lg-6">
                                             <div class="d-flex flex-column">
                                                 <div class="row justify-content-between m-0">
                                                     <h5>Valor à Receber</h5>
                                                     <?php
                                                     if (!isset($lancamento)) {
-                                                        print('<a href="#" id="btnParcelar">Parcelar</a>');
+                                                        print('<a href="#" id="btnParcelar" style="margin-top: 5px;">Parcelar</a>');
                                                     }
                                                     ?>
                                                 </div>
@@ -1016,9 +1013,9 @@ $dataInicio = date("Y-m-d");
                                             <div class="d-flex flex-column">
                                                 <div class="row justify-content-between m-0">
                                                     <h5>Valor Recebido</h5>
-                                                    <div class="row pr-2">
-                                                        <a id="habilitarRecebimento" href="#">Habilitar Recebimento </a>
-                                                        <span class="mx-2">|</span>
+                                                    <div class="row pr-2" style="margin-top: 5px;">
+                                                        <a id="habilitarRecebimento" href="#">Habilitar Recebimento</a>
+                                                        <span class="mx-1">|</span>
                                                         <a id="jurusDescontos" href="" style="color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none;">
                                                             Juros/Descontos</a>
                                                     </div>

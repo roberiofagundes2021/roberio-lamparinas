@@ -438,7 +438,7 @@ include_once("topo.php");
 					<div class="card-body">
 						<div class="row">
 							<div class="col-lg-2" style="max-width:150px;">
-								<label for="inputCpf">CPF</label>
+								<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
 								<div class="form-group form-group-feedback form-group-feedback-right">
 									<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required autofocus>
 									<div class="form-control-feedback" id="buscar" style="cursor: pointer;">
@@ -455,13 +455,13 @@ include_once("topo.php");
 									<div class="row">
 										<div class="col-lg-8">
 											<div class="form-group">
-												<label for="inputNome">Nome</label>
+												<label for="inputNome">Nome<span class="text-danger"> *</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
 										</div>
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="cmbPerfil">Perfil</label>
+												<label for="cmbPerfil">Perfil<span class="text-danger"> *</span></label>
 												<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2" required>
 													<option value="">Informe um perfil</option>
 													<?php
@@ -491,21 +491,21 @@ include_once("topo.php");
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="inputLogin">Login</label>
+												<label for="inputLogin">Login<span class="text-danger"> *</span></label>
 												<input type="text" id="inputLogin" name="inputLogin" class="form-control" placeholder="Login" required>
 											</div>
 										</div>
 
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="inputSenha">Senha</label>
+												<label for="inputSenha">Senha<span class="text-danger"> *</span></label>
 												<input type="password" id="inputSenha" name="inputSenha" class="form-control" placeholder="Senha" required>
 											</div>
 										</div>
 
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="inputConfirmaSenha">Confirma Senha</label>
+												<label for="inputConfirmaSenha">Confirma Senha<span class="text-danger"> *</span></label>
 												<input type="password" id="inputConfirmaSenha" name="inputConfirmaSenha" class="form-control" placeholder="Confirma Senha" required>
 											</div>
 										</div>
@@ -520,7 +520,7 @@ include_once("topo.php");
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="inputEmail">E-mail</label>
+												<label for="inputEmail">E-mail<span class="text-danger"> *</span></label>
 												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" required>
 											</div>
 										</div>
@@ -547,7 +547,7 @@ include_once("topo.php");
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbUnidade">Unidade</label>
+												<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
 												<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
 													<option value="">Informe uma unidade</option>
 													<?php
@@ -570,7 +570,7 @@ include_once("topo.php");
 
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="cmbSetor">Setor</label>
+												<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
 												<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
 													<option value="">Sem setor</option>
 												</select>
@@ -579,7 +579,7 @@ include_once("topo.php");
 
 										<div class="col-lg-3" id="LocalEstoque" style="display: none">
 											<div class="form-group">
-												<label for="cmbLocalEstoque">Local de Estoque</label>
+												<label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
 												<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
 													<option value="">Local de Estoque</option>
 												</select>

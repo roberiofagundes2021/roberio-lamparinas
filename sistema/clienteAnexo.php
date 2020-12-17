@@ -104,12 +104,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaClienteAnexo(ClAneId, ClAneData, ClAneNome, Tipo){
+		function atualizaClienteAnexo(ClAneId, ClAneData, ClAneNome, ClAneArquivo, Tipo){
 
 				document.getElementById('inputClienteAnexoId').value = ClAneId;
 				document.getElementById('inputClienteAnexoNome').value = ClAneNome;
 				document.getElementById('inputClienteAnexoData').value = ClAneData;
-						
+				document.getElementById('inputClienteAnexoArquivo').value = ClAneArquivo;	
+
 				if (Tipo == 'edita'){	
 					document.formClienteAnexo.action = "clienteAnexoEdita.php";		
 				} else if (Tipo == 'exclui'){
@@ -186,8 +187,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-															<a href="#" onclick="atualizaClienteAnexo('.$item['ClAneId'].', \''.$item['ClAneData'].'\',\''.$item['ClAneNome'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-															<a href="#" onclick="atualizaClienteAnexo('.$item['ClAneId'].', \''.$item['ClAneData'].'\',\''.$item['ClAneNome'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+															<a href="#" onclick="atualizaClienteAnexo('.$item['ClAneId'].', \''.$item['ClAneData'].'\',\''.$item['ClAneNome'].'\', \''.$item['ClAneArquivo'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+															<a href="#" onclick="atualizaClienteAnexo('.$item['ClAneId'].', \''.$item['ClAneData'].'\',\''.$item['ClAneNome'].'\', \''.$item['ClAneArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
 											</td>
@@ -209,6 +210,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					<input type="hidden" id="inputClienteAnexoId" name="inputClienteAnexoId">
 					<input type="hidden" id="inputClienteAnexoData" name="inputClienteAnexoData">
                     <input type="hidden" id="inputClienteAnexoNome" name="inputClienteAnexoNome">
+					<input type="hidden" id="inputClienteAnexoArquivo" name="inputClienteAnexoArquivo">
 				</form>
 
 			</div>
