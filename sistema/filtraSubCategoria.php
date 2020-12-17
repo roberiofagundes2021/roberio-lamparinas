@@ -16,6 +16,22 @@ if (isset($_GET['idOrcamento'])){
 			JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
 			JOIN Situacao on SituaId = SbCatStatus
 			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and FrXSCFornecedor = '". $_GET['idFornecedor']."' and SituaChave = 'ATIVO' ";
+} else if (isset($_GET['produtoServico'])){
+
+	if ($_GET['produtoServico'] == 'S'){
+		$sql = "SELECT DISTINCT SbCatId, SbCatNome
+		FROM SubCategoria
+		JOIN Servico on ServiSubCategoria = SbCatId
+		JOIN Situacao on SituaId = SbCatStatus
+		WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = '". $_GET['idCategoria']."' and SituaChave = 'ATIVO' ";
+	} else {
+		$sql = "SELECT DISTINCT SbCatId, SbCatNome
+		FROM SubCategoria
+		JOIN Produto on ProduSubCategoria = SbCatId
+		JOIN Situacao on SituaId = SbCatStatus
+		WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = '". $_GET['idCategoria']."' and SituaChave = 'ATIVO' ";
+	}
+
 } else {
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria

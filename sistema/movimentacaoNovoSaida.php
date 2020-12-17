@@ -9,26 +9,22 @@ include('global_assets/php/conexao.php');
 //Caso a chamada à página venha da liberação de uma solicitação na bandeja.
 
 if (isset($_POST['inputSolicitacaoId'])) {
-	try {
-		$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
-						FROM SolicitacaoXProduto
-						JOIN Solicitacao on SolicId = SlXPrSolicitacao
-						JOIN Produto on ProduId = SlXPrProduto
-						JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-						WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
-					";
-		$result = $conn->query($sql);
-		$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
-		$numProdutos = count($produtosSolicitacao);
-		var_dump($produtosSolicitacao);
-	} catch (PDOException $e) {
-		$conn->rollback();
-		echo 'Exception: ' . $e->getMessage();
-		exit;
-	}
+
+	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
+			FROM SolicitacaoXProduto
+			JOIN Solicitacao on SolicId = SlXPrSolicitacao
+			JOIN Produto on ProduId = SlXPrProduto
+			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
+			";
+	$result = $conn->query($sql);
+	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
+	$numProdutos = count($produtosSolicitacao);
+
 	$idsProdutos = '';
 
 	if ($numProdutos) {
+
 		foreach ($produtosSolicitacao as $chave => $produto) {
 
 			if ($chave == 0) {
@@ -39,335 +35,264 @@ if (isset($_POST['inputSolicitacaoId'])) {
 		}
 	}
 
-	try {
-		$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
-						FROM SolicitacaoXProduto
-						JOIN Solicitacao on SolicId = SlXPrSolicitacao
-						JOIN Produto on ProduId = SlXPrProduto
-						JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-						WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
-					";
-		$result = $conn->query($sql);
-		$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
-		$numProdutos = count($produtosSolicitacao);
-	} catch (PDOException $e) {
-		$conn->rollback();
-		echo 'Exception: ' . $e->getMessage();
-		exit;
-	}
+	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
+			FROM SolicitacaoXProduto
+			JOIN Solicitacao on SolicId = SlXPrSolicitacao
+			JOIN Produto on ProduId = SlXPrProduto
+			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
+			";
+	$result = $conn->query($sql);
+	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
+	$numProdutos = count($produtosSolicitacao);
 }
-
 
 /* VALIDA SE OS DADOS VIERAM DA MESMA PÁGINA */
 if (isset($_POST['inputData'])) {
+
 	print_r($_POST);
+	die;
 
 	try {
 
-		$origemArray = null;
-		$idOrigem = null;
-		$tipoOrigem = null;
-		if ($_POST['cmbEstoqueOrigemLocalSetor'] != '#') {
+		$conn->beginTransaction();
 
-			$origemArray = explode('#', $_POST['cmbEstoqueOrigemLocalSetor']);
-
-			if (count($origemArray) > 2) {
-				$idOrigem = $origemArray[0];
-				$tipoOrigem = $origemArray[2];
-			}
-		} else if ($_POST['cmbEstoqueOrigem'] != '#') {
-			$tipoOrigem = 'OrigemLocalTransferencia';
-			$idOrigem = $_POST['cmbEstoqueOrigem'];
-		}
-
-
-		$destinoArray = null;
-		$idDestino = null;
-		$tipoDestino = null;
-		if ($_POST['cmbDestinoLocalEstoqueSetor'] != '#') {
-
-			$destinoArray = explode('#', $_POST['cmbDestinoLocalEstoqueSetor']);
-
-			if (count($destinoArray) > 2) {
-				$idDestino = $destinoArray[0];
-				$tipoDestino = $destinoArray[2];
-			}
-		} else if ($_POST['cmbDestinoLocal'] != '#') {
-			$tipoDestino = 'DestinoLocal';
-			$idDestino = $_POST['cmbDestinoLocal'];
-		} else if ($_POST['cmbDestinoSetor'] != '#') {
-			$tipoDestino = 'DestinoSetor';
-			$idDestino = $_POST['cmbDestinoSetor'];
-		}
-		//var_dump($_POST);
-		//die;
-
-		try {
-			$sql = "INSERT INTO Movimentacao (MovimTipo,
-																				MovimData,
-																				MovimOrigemLocal,
-																				MovimDestinoSetor,
-																				MovimObservacao,
-																				MovimSituacao,
-																				MovimUnidade,
-																				MovimUsuarioAtualizador)
-				VALUES (:sTipo, 
-								:dData, 
-								:iOrigemLocal, 
-								:iDestinoSetor, 
-								:sObservacao, 
-								:iSituacao, 
-								:iUnidade,
-								:iUsuarioAtualizador)";
-			$result = $conn->prepare($sql);
-			$conn->beginTransaction();
-		} catch (PDOException $e) {
-			$conn->rollback();
-			echo 'Exception - INSERT INTO: ' . $e->getMessage();
-			exit;
-		}
+		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimData, MovimOrigemLocal, MovimDestinoSetor, MovimObservacao,
+				MovimSituacao, MovimUnidade, MovimUsuarioAtualizador)
+				VALUES (:sTipo, :dData, :iOrigemLocal, :iDestinoSetor, :sObservacao, :iSituacao, :iUnidade, :iUsuarioAtualizador)";
+		$result = $conn->prepare($sql);
 
 		$result->execute(array(
-			':sTipo' => 'S',
+			':sTipo' => 'S',  // Saída
 			':dData' => gravaData($_POST['inputData']),
-			':iOrigemLocal' => $tipoOrigem == 'Local' ? $idOrigem : $tipoOrigem == 'OrigemLocalTransferencia' ? $idOrigem : null,
-			':iDestinoSetor' => $tipoDestino == 'Setor' ? $idDestino : $tipoDestino == 'DestinoSetor' ? $idDestino : null,
+			':iOrigemLocal' => $_POST['cmbEstoqueOrigem'],
+			':iDestinoSetor' => $_POST['cmbDestinoSetor'],
 			':sObservacao' => $_POST['txtareaObservacao'],
-			':iSituacao' => $_POST['cmbSituacao'] == '#' ? null : $_POST['cmbSituacao'],
+			':iSituacao' => $_POST['cmbSituacao'],
 			':iUnidade' => $_SESSION['UnidadeId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId']
 		));
 
 		$insertId = $conn->lastInsertId();
 
-		try {
+		$numItems = intval($_POST['inputNumItens']);
 
-			$numItems = intval($_POST['inputNumItens']);
+		for ($i = 1; $i <=  $numItems; $i++) {
 
-			for ($i = 1; $i <=  $numItems; $i++) {
+			$campoSoma = $i;
 
-				$campoSoma = $i;
+			$campo = 'campo' . $i;
 
-				$campo = 'campo' . $i;
+			//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
 
-				//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
+			if (isset($_POST[$campo])) {
 
-				if (isset($_POST[$campo])) {
-					//var_dump($campo);
-					$registro = explode('#', $_POST[$campo]);
+				$registro = explode('#', $_POST[$campo]);
 
-					if ($registro[0] == 'P') {
+				if ($registro[0] == 'P') {
 
-						$quantItens = intval($registro[3]);
-						if (isset($registro[7])) {
-							for ($i = 1; $i <= $quantItens; $i++) {
-								// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
+					$quantItens = intval($registro[3]);
 
-								if ($registro[7] == 2) {
+					if (isset($registro[7])) {
 
-									$sql = "SELECT COUNT(PatriNumero) as CONT
-							              	FROM Patrimonio
-										  	JOIN Situacao on SituaId = PatriStatus
-										  	WHERE PatriUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-										  ";
+						for ($i = 1; $i <= $quantItens; $i++) {
+							// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
+
+							if ($registro[7] == 2) {
+
+								$sql = "SELECT COUNT(PatriNumero) as CONT
+										FROM Patrimonio
+										JOIN Situacao on SituaId = PatriStatus
+										WHERE PatriUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+										";
+								$result = $conn->query($sql);
+								$patrimonios = $result->fetch(PDO::FETCH_ASSOC);
+								$count = $patrimonios['CONT'];
+
+								//Caso não seja o primeiro registro na tabela para esta empresa
+								if ($count >= 1) {
+
+									$ultimoPatri = $count;
+									$numeroPatri = intval($ultimoPatri) + 1;
+									$numeroPatriFinal = '';
+									//var_dump($i);
+
+									if ($numeroPatri < 10) $numeroPatriFinal = "000000" . $numeroPatri . "";
+									if ($numeroPatri < 100 && $numeroPatri > 9) $numeroPatriFinal = "00000" . $numeroPatri . "";
+									if ($numeroPatri < 1000 && $numeroPatri > 99) $numeroPatriFinal = "0000" . $numeroPatri . "";
+									if ($numeroPatri < 10000 && $numeroPatri > 999) $numeroPatriFinal = "000" . $numeroPatri . "";
+									if ($numeroPatri < 100000 && $numeroPatri > 9999) $numeroPatriFinal = "00" . $numeroPatri . "";
+									if ($numeroPatri < 1000000 && $numeroPatri > 99999) $numeroPatriFinal = "0" . $numeroPatri . "";
+									if ($numeroPatri < 10000000 && $numeroPatri > 999999) $numeroPatriFinal = $numeroPatri;
+
+
+									// Selecionando o id da situacao 'ATIVO'
+									$sql = "SELECT SituaId
+												FROM Situacao
+												WHERE SituaChave = 'ATIVO' 
+												";
 									$result = $conn->query($sql);
-									$patrimonios = $result->fetch(PDO::FETCH_ASSOC);
-									$count = $patrimonios['CONT'];
-
-									//Caso não seja o primeiro registro na tabela para esta empresa
-									if ($count >= 1) {
-
-										$ultimoPatri = $count;
-										$numeroPatri = intval($ultimoPatri) + 1;
-										$numeroPatriFinal = '';
-										//var_dump($i);
-
-										if ($numeroPatri < 10) $numeroPatriFinal = "000000" . $numeroPatri . "";
-										if ($numeroPatri < 100 && $numeroPatri > 9) $numeroPatriFinal = "00000" . $numeroPatri . "";
-										if ($numeroPatri < 1000 && $numeroPatri > 99) $numeroPatriFinal = "0000" . $numeroPatri . "";
-										if ($numeroPatri < 10000 && $numeroPatri > 999) $numeroPatriFinal = "000" . $numeroPatri . "";
-										if ($numeroPatri < 100000 && $numeroPatri > 9999) $numeroPatriFinal = "00" . $numeroPatri . "";
-										if ($numeroPatri < 1000000 && $numeroPatri > 99999) $numeroPatriFinal = "0" . $numeroPatri . "";
-										if ($numeroPatri < 10000000 && $numeroPatri > 999999) $numeroPatriFinal = $numeroPatri;
+									$situacao = $result->fetch(PDO::FETCH_ASSOC);
 
 
-										// Selecionando o id da situacao 'ATIVO'
-										$sql = "SELECT SituaId
-												 FROM Situacao
-												 WHERE SituaChave = 'ATIVO' 
-												 ";
-										$result = $conn->query($sql);
-										$situacao = $result->fetch(PDO::FETCH_ASSOC);
+									$sql = "INSERT INTO Patrimonio
+											(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
+											VALUES 
+											(:sNumero, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+									$result = $conn->prepare($sql);
+
+									$result->execute(array(
+										':sNumero' => $numeroPatriFinal,
+										':iStatus' => $situacao['SituaId'],
+										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+										':iUnidade' => $_SESSION['UnidadeId']
+									));
+
+									$insertIdPatrimonio = $conn->lastInsertId();
 
 
-										$sql = "INSERT INTO Patrimonio
-												(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
-												VALUES 
-												(:sNumero, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-										$result = $conn->prepare($sql);
+									$sql = "INSERT INTO MovimentacaoXProduto
+											(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+											VALUES 
+											(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
+									$result = $conn->prepare($sql);
 
-										$result->execute(array(
-											':sNumero' => $numeroPatriFinal,
-											':iStatus' => $situacao['SituaId'],
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iUnidade' => $_SESSION['UnidadeId']
-										));
-
-										$insertIdPatrimonio = $conn->lastInsertId();
-
-
-										$sql = "INSERT INTO MovimentacaoXProduto
-						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-					                            VALUES 
-						                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-										$result = $conn->prepare($sql);
-
-										$result->execute(array(
-											':iMovimentacao' => $insertId,
-											':iProduto' => $registro[1],
-											':iQuantidade' => (int) $registro[3],
-											':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-											':sLote' => $registro[5],
-											':dValidade' => $registro[6] != '0' ? $registro[6] : null,
-											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iUnidade' => $_SESSION['UnidadeId'],
-											':iPatrimonio' => $insertIdPatrimonio
-										));
-									} else {
-
-										//Caso seja o primeiro registro na tabela para esta empresa
-										$numeroPatri = '0000001';
-
-										// Selecionando o id da situacao 'ATIVO'
-										$sql = "SELECT SituaId
-												 FROM Situacao
-												 WHERE SituaChave = 'ATIVO' 
-												 ";
-										$result = $conn->query($sql);
-										$situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-										$sql = "INSERT INTO Patrimonio
-												(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
-												VALUES 
-												(:sNumero, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-										$result = $conn->prepare($sql);
-
-										$result->execute(array(
-											':sNumero' => $numeroPatri,
-											':iStatus' => $situacao['SituaId'],
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iUnidade' => $_SESSION['UnidadeId']
-										));
-
-										$insertIdPatrimonio = $conn->lastInsertId();
-
-
-										$sql = "INSERT INTO MovimentacaoXProduto
-						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-					                            VALUES 
-						                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-										$result = $conn->prepare($sql);
-
-										$result->execute(array(
-											':iMovimentacao' => $insertId,
-											':iProduto' => $registro[1],
-											':iQuantidade' => (int) $registro[3],
-											':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-											':sLote' => $registro[5],
-											':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iUnidade' => $_SESSION['UnidadeId'],
-											':iPatrimonio' => $insertIdPatrimonio
-										));
-									}
+									$result->execute(array(
+										':iMovimentacao' => $insertId,
+										':iProduto' => $registro[1],
+										':iQuantidade' => (int) $registro[3],
+										':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
+										':sLote' => $registro[5],
+										':dValidade' => $registro[6] != '0' ? $registro[6] : null,
+										':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+										':iUnidade' => $_SESSION['UnidadeId'],
+										':iPatrimonio' => $insertIdPatrimonio
+									));
 								} else {
-									$quantItens = intval($registro[3]);
 
-									for ($i = 1; $i <= $quantItens; $i++) {
-										$sql = "INSERT INTO MovimentacaoXProduto
-								            (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-								            VALUES 
-								            (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-										$result = $conn->prepare($sql);
+									//Caso seja o primeiro registro na tabela para esta empresa
+									$numeroPatri = '0000001';
 
-										$result->execute(array(
-											':iMovimentacao' => $insertId,
-											':iProduto' => $registro[1],
-											':iQuantidade' => (int) $registro[3],
-											':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-											':sLote' => $registro[5],
-											':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-											':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-											':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-											':iUnidade' => $_SESSION['UnidadeId'],
-											':iPatrimonio' => null
-										));
-									}
+									// Selecionando o id da situacao 'ATIVO'
+									$sql = "SELECT SituaId
+												FROM Situacao
+												WHERE SituaChave = 'ATIVO' 
+												";
+									$result = $conn->query($sql);
+									$situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+									$sql = "INSERT INTO Patrimonio
+											(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
+											VALUES 
+											(:sNumero, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+									$result = $conn->prepare($sql);
+
+									$result->execute(array(
+										':sNumero' => $numeroPatri,
+										':iStatus' => $situacao['SituaId'],
+										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+										':iUnidade' => $_SESSION['UnidadeId']
+									));
+
+									$insertIdPatrimonio = $conn->lastInsertId();
+
+
+									$sql = "INSERT INTO MovimentacaoXProduto
+											(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+											VALUES 
+											(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
+									$result = $conn->prepare($sql);
+
+									$result->execute(array(
+										':iMovimentacao' => $insertId,
+										':iProduto' => $registro[1],
+										':iQuantidade' => (int) $registro[3],
+										':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
+										':sLote' => $registro[5],
+										':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+										':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+										':iUnidade' => $_SESSION['UnidadeId'],
+										':iPatrimonio' => $insertIdPatrimonio
+									));
 								}
-								break 1;
-							}
-						} else {
-							if ((int) $registro[3] > 0) {
-								$sql = "INSERT INTO MovimentacaoXProduto
-							            (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-							            VALUES 
-							            (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-								$result = $conn->prepare($sql);
+							} else {
+								$quantItens = intval($registro[3]);
 
-								$result->execute(array(
-									':iMovimentacao' => $insertId,
-									':iProduto' => $registro[1],
-									':iQuantidade' => (int) $registro[3],
-									':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-									':sLote' => $registro[5],
-									':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-									':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-									':iUnidade' => $_SESSION['UnidadeId'],
-									':iPatrimonio' => null
-								));
+								for ($i = 1; $i <= $quantItens; $i++) {
+									$sql = "INSERT INTO MovimentacaoXProduto
+										(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+										VALUES 
+										(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
+									$result = $conn->prepare($sql);
+
+									$result->execute(array(
+										':iMovimentacao' => $insertId,
+										':iProduto' => $registro[1],
+										':iQuantidade' => (int) $registro[3],
+										':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
+										':sLote' => $registro[5],
+										':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+										':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+										':iUnidade' => $_SESSION['UnidadeId'],
+										':iPatrimonio' => null
+									));
+								}
 							}
+							break 1;
 						}
 					} else {
-						$sql = "INSERT INTO MovimentacaoXServico
-						        (MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrLote, MvXSrUsuarioAtualizador, MvXSrUnidade)
-					            VALUES 
-						        (:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :sLote, :iUsuarioAtualizador, :iUnidade)";
-						$result = $conn->prepare($sql);
+						if ((int) $registro[3] > 0) {
+							$sql = "INSERT INTO MovimentacaoXProduto
+									(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+									VALUES 
+									(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
+							$result = $conn->prepare($sql);
 
-						$result->execute(array(
-							':iMovimentacao' => $insertId,
-							':iServico' => $registro[1],
-							':iQuantidade' => (int) $registro[3],
-							':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
-							':sLote' => $registro[5],
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId']
-						));
+							$result->execute(array(
+								':iMovimentacao' => $insertId,
+								':iProduto' => $registro[1],
+								':iQuantidade' => (int) $registro[3],
+								':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
+								':sLote' => $registro[5],
+								':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+								':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+								':iUnidade' => $_SESSION['UnidadeId'],
+								':iPatrimonio' => null
+							));
+						}
 					}
+				} else {
+					$sql = "INSERT INTO MovimentacaoXServico
+							(MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrLote, MvXSrUsuarioAtualizador, MvXSrUnidade)
+							VALUES 
+							(:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :sLote, :iUsuarioAtualizador, :iUnidade)";
+					$result = $conn->prepare($sql);
+
+					$result->execute(array(
+						':iMovimentacao' => $insertId,
+						':iServico' => $registro[1],
+						':iQuantidade' => (int) $registro[3],
+						':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
+						':sLote' => $registro[5],  //?????? Lote no Serviço????????
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iUnidade' => $_SESSION['UnidadeId']
+					));
 				}
 			}
-		} catch (PDOException $e) {
-			$conn->rollback();
-			echo 'Error1: ' . $e->getMessage();
-			exit;
 		}
 
 		if (isset($_POST['cmbSituacao'])) {
-			try {
-				$sql = "SELECT SituaId, SituaNome, SituaChave
-								FROM Situacao
-							 WHERE SituaId = " . $_POST['cmbSituacao'] . "
-								";
-				$result = $conn->query($sql);
-				$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
-			} catch (PDOException $e) {
-				$conn->rollback();
-				echo 'cmbSituacao: ' . $e->getMessage();
-				exit;
-			}
+
+			$sql = "SELECT SituaId, SituaNome, SituaChave
+					FROM Situacao
+					WHERE SituaId = " . $_POST['cmbSituacao'] . "
+					";
+			$result = $conn->query($sql);
+			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 			$destinoChave = '';
 
@@ -381,7 +306,6 @@ if (isset($_POST['inputData'])) {
 				        ";
 				$result = $conn->query($sql);
 				$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
-
 
 				/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
 				$sIdentificacao = 'Movimentação';
@@ -439,7 +363,6 @@ if (isset($_POST['inputData'])) {
 	}
 
 	irpara("movimentacaoNovoSaida.php");
-} else {
 }
 
 ?>
@@ -492,9 +415,6 @@ if (isset($_POST['inputData'])) {
 
 			if (inputTipo.checked == true && inputTipo.value == 'S') {
 				document.querySelector('#EstoqueOrigem').style.display = "block";
-				document.querySelector('#EstoqueOrigemLocalSetor').style.display = "none";
-				document.querySelector('#DestinoLocalEstoqueSetor').style.display = "none";
-				document.querySelector('#DestinoLocal').style.display = "none";
 				document.querySelector('#DestinoSetor').style.display = "block";
 				document.querySelector('#classificacao').style.display = "block";
 				document.querySelector('#dadosProduto').style.display = "flex";
@@ -566,6 +486,23 @@ if (isset($_POST['inputData'])) {
 						}
 					}
 				})
+
+				// Select2 for length menu styling
+				var _componentSelect2 = function() {
+					if (!$().select2) {
+						console.warn('Warning - select2.min.js is not loaded.');
+						return;
+					}
+
+					// Initialize
+					$('.dataTables_length select').select2({
+						minimumResultsForSearch: Infinity,
+						dropdownAutoWidth: true,
+						width: 'auto'
+					});
+				};
+
+				_componentSelect2();
 			});
 		};
 
@@ -582,8 +519,6 @@ if (isset($_POST['inputData'])) {
 					if ($(elem).attr('idRow') == linha.attr('id')) {
 						let tds = linha.children();
 						let tipoProdutoServico = $(tds[8]).attr('tipo');
-
-
 
 						let valores = [];
 
@@ -624,24 +559,24 @@ if (isset($_POST['inputData'])) {
 						} else {
 							cabecalho = `
 							             	<tr class="bg-slate">
-										        	<th width="5%">Item</th>
-										        	<th width="45%">Produto</th>
-										        	<th width="8%">Quantidade</th>
-										        	<th width="10%">Saldo</th>
-										        	<th width="10%">Lote</th>
-										        	<th width="12%">Validade</th>
+												<th width="5%">Item</th>
+												<th width="45%">Produto</th>
+												<th width="8%">Quantidade</th>
+												<th width="10%">Saldo</th>
+												<th width="10%">Lote</th>
+												<th width="12%">Validade</th>
 								    		</tr>
 												`;
 
 							linhaTabela = `<tr id='trModal'>
-						                                    <td>${valores[0]}</td>
-												            <td>${valores[1]}</td>
-												            <td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" style="text-align: center" autofocus></td>
-												            <td><input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center"  disabled></td>
-								                            <td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
-															<td><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
-														</tr>
-								                        `;
+												<td>${valores[0]}</td>
+												<td>${valores[1]}</td>
+												<td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" style="text-align: center" autofocus></td>
+												<td><input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center"  disabled></td>
+												<td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
+												<td><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
+											</tr>
+											`;
 						}
 
 						$('#thead-modal').html(cabecalho);
@@ -671,6 +606,7 @@ if (isset($_POST['inputData'])) {
 		}
 
 		function mudarValores() {
+
 			$('#salvar').on('click', () => {
 
 				let grid = $('.trGrid')
@@ -757,8 +693,10 @@ if (isset($_POST['inputData'])) {
 		}
 
 		function recalcValorTotal() {
+
 			let novoTotalGeral = 0
 			let velhoTotalGeral = $('#total').attr('valorTotalGeral')
+
 			$('.trGrid').each((i, elem) => {
 				$(elem).children().each((i, elem) => {
 					if ($(elem).hasClass('valorTotal')) {
@@ -769,6 +707,7 @@ if (isset($_POST['inputData'])) {
 					}
 				})
 			})
+
 			$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`).attr('valor', novoTotalGeral)
 		}
 
@@ -776,215 +715,253 @@ if (isset($_POST['inputData'])) {
 			$('#tbody-modal')
 		}
 
-		// Select2 for length menu styling
-		var _componentSelect2 = function() {
-			if (!$().select2) {
-				console.warn('Warning - select2.min.js is not loaded.');
-				return;
-			}
+		$(document).ready(function() {
 
-			// Initialize
-			$('.dataTables_length select').select2({
-				minimumResultsForSearch: Infinity,
-				dropdownAutoWidth: true,
-				width: 'auto'
-			});
-		};
+			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function(e) {
 
-		_componentSelect2();
+				Filtrando();
 
-		//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
-		$('#cmbCategoria').on('change', function(e) {
+				var inputProdutoServico = $('input[name="inputProdutoServico"]:checked').val();
+				var cmbCategoria = $('#cmbCategoria').val();
 
-			Filtrando();
+				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria + '&produtoServico=' + inputProdutoServico, function(dados) {
 
-			var inputTipo = $('input[name="inputTipo"]:checked').val();
-			var cmbCategoria = $('#cmbCategoria').val();
+					var option = '<option value="#">Selecione a SubCategoria</option>';
 
-			$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
+					if (dados.length) {
 
-				var option = '<option value="#">Selecione a SubCategoria</option>';
+						$.each(dados, function(i, obj) {
+							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
+						});
 
-				if (dados.length) {
-
-					$.each(dados, function(i, obj) {
-						option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
-					});
-
-					$('#cmbSubCategoria').html(option).show();
-				} else {
-					ResetSubCategoria();
-				}
-			}).fail(function(m) {
-
-			});
-
-			$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria, function(dados) {
-
-				var option = '<option value="#" "selected">Selecione o Produto</option>';
-
-				if (dados.length) {
-
-					$.each(dados, function(i, obj) {
-						option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
-					});
-
-					$('#cmbProduto').html(option).show();
-				} else {
-					ResetProduto();
-				}
-			});
-
-		});
-
-		$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
-			let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val()
-			Filtrando()
-			$.getJSON('filtraPatrimonio.php?idCategoria=' + cmbOrigem, function(dados) {
-
-				var option = '<option value="#" "selected">Selecione o Produto</option>';
-
-				if (dados.length) {
-
-					$.each(dados, function(i, obj) {
-						option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
-					});
-
-					$('#cmbProduto').html(option).show();
-				} else {
-					ResetProduto();
-				}
-			});
-		})
-
-
-		function filtraCategoriaOrigem() {
-			let cmbOrigem = $('#cmbEstoqueOrigem').val()
-			let tipoDeFiltro = 'Categoria'
-
-			$('#cmbCategoria').html('<option value="#" "selected">Filtrando...</option>');
-
-			$.ajax({
-				type: "POST",
-				url: "filtraPorOrigem.php",
-				data: {
-					origem: cmbOrigem,
-					tipoDeFiltro: tipoDeFiltro
-				},
-				success: function(resposta) {
-					var option = '<option value="#" "selected">Selecione a Categoria</option>';
-
-					if (resposta) {
-						$('#cmbCategoria').html('');
-						$('#cmbCategoria').append(option)
-						$('#cmbCategoria').append(resposta)
-
+						$('#cmbSubCategoria').html(option).show();
 					} else {
-						$('#cmbCategoria').html('<option value="#" "selected">Sem categorias</option>');
+						ResetSubCategoria();
 					}
-				} //.fail(function(m) {
-				//console.log(m);
-				//});
-			})
-		}
+				})
 
-		$('#cmbEstoqueOrigem').on('change', function(e) {
-			filtraCategoriaOrigem()
-		})
-		filtraCategoriaOrigem()
+				if (inputProdutoServico == 'S') {
 
-
-		function filtraPatrimonioProdutoOrigem() {
-			let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val().split('#')
-			let tipoDeFiltro = 'Patrimonio'
-
-			$('#cmbPatrimonio').html('<option value="#" "selected">Filtrando...</option>');
-
-			$.ajax({
-				type: "POST",
-				url: "filtraPorOrigem.php",
-				data: {
-					origem: cmbOrigem[0],
-					tipoDeFiltro: tipoDeFiltro
-				},
-				success: function(resposta) {
-					var option = '<option value="#" "selected">Selecione o Patrimônio</option>';
-					console.log(resposta);
-					if (resposta) {
-						$('#cmbPatrimonio').html('');
-						$('#cmbPatrimonio').append(option)
-						$('#cmbPatrimonio').append(resposta)
-					} else {
-						$('#cmbPatrimonio').html('<option value="#" "selected">Sem Patrimônios</option>');
-					}
-				} //.fail(function(m) {
-				//console.log(m);
-				//});
-			})
-		}
-
-		$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
-			filtraPatrimonioProdutoOrigem()
-		})
-		//filtraPatrimonioProdutoOrigem() 
-
-		//Impede que o input quantidade receba letras
-		$('#inputQuantidade').on('keydown', () => {
-			let valor = $('#inputQuantidade').val()
-
-			if (valor == '´' || valor == '~' || valor == '`' || valor == ';') {
-				$('#inputQuantidade').val('')
-			}
-			if (event.keyCode != '8' && event.keyCode != '48' && event.keyCode != '49' && event.keyCode != '50' && event.keyCode != '51' && event.keyCode != '52' && event.keyCode != '53' && event.keyCode != '54' && event.keyCode != '55' && event.keyCode != '56' && event.keyCode != '57' && event.keyCode != '96' && event.keyCode != '97' && event.keyCode != '98' && event.keyCode != '99' && event.keyCode != '100' && event.keyCode != '101' && event.keyCode != '102' && event.keyCode != '103' && event.keyCode != '104' && event.keyCode != '105' && event.keyCode != '106' && event.keyCode != '107') {
-				return false
-			}
-
-			if (event.keyCode == '222' && event.keyCode != '219' && event.keyCode != '191') {
-				return false
-			}
-		})
-
-
-		//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
-		$('#cmbSubCategoria').on('change', function(e) {
-
-			FiltraProduto();
-
-			var inputTipo = $('input[name="inputTipo"]:checked').val();
-			var cmbFornecedor = $('#cmbFornecedor').val();
-			var cmbCategoria = $('#cmbCategoria').val();
-			var cmbSubCategoria = $('#cmbSubCategoria').val();
-
-
-			$('[name=inputProdutoServico]').each((i, elem) => {
-
-				if ($('[for=cmbProduto]').html() == 'Serviço') {
-
-					$.getJSON('filtraServico.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
+					$.getJSON('filtraServico.php?idCategoria=' + cmbCategoria, function(dados) {
 
 						var option = '<option value="#" "selected">Selecione o Serviço</option>';
 
 						if (dados.length) {
 
 							$.each(dados, function(i, obj) {
-								if (inputTipo == 'E') {
-									option += '<option value="' + obj.ServiId + '#' + obj.ServiValorCusto + '">' + obj.ServiNome + '</option>';
-								} else {
-									option += '<option value="' + obj.ServiId + '#' + obj.ServiCustoFinal + '">' + obj.ServiNome + '</option>';
-								}
 
+								option += '<option value="' + obj.ServiId + '#' + obj.ServiCustoFinal + '">' + obj.ServiNome + '</option>';
 							});
 
 							$('#cmbProduto').html(option).show();
 						} else {
-							ResetProduto();
+							ResetServico();
 						}
 					}).fail(function(m) {
 						//console.log(m);
 					});
 
 				} else {
-					$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
+
+					$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria, function(dados) {
+
+						var option = '<option value="#" "selected">Selecione o Produto</option>';
+
+						if (dados.length) {
+
+							$.each(dados, function(i, obj) {
+								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
+							});
+
+							$('#cmbProduto').html(option).show();
+						} else {
+							ResetProduto();
+						}
+					});
+				}
+
+
+			});
+
+			function filtraCategoriaOrigem() {
+
+				let cmbOrigem = $('#cmbEstoqueOrigem').val();
+				let tipoDeFiltro = 'Categoria';
+				var inputProdutoServico = $('input[name="inputProdutoServico"]:checked').val();
+
+				$('#cmbCategoria').html('<option value="#" "selected">Filtrando...</option>');
+
+				$.ajax({
+					type: "POST",
+					url: "filtraPorOrigem.php",
+					data: {
+						origem: cmbOrigem,
+						tipoDeFiltro: tipoDeFiltro
+					},
+					success: function(resposta) {
+
+						var option = '<option value="#" "selected">Selecione a Categoria</option>';
+
+						if (resposta) {
+							$('#cmbCategoria').html('');
+							$('#cmbCategoria').append(option)
+							$('#cmbCategoria').append(resposta)
+
+						} else {
+							$('#cmbCategoria').html('<option value="#" "selected">Sem categorias</option>');
+						}
+
+					} //.fail(function(m) {
+					//console.log(m);
+					//});
+				})
+
+				Filtrando();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria=-1', function(dados) {
+
+					var option = '<option value="#">Selecione a SubCategoria</option>';
+
+					if (dados.length) {
+
+						$.each(dados, function(i, obj) {
+							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
+						});
+
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						$('#cmbSubCategoria').empty().append('<option>Selecione</option>');
+					}
+				});
+
+				if (inputProdutoServico == 'S') {
+					$.getJSON('filtraServico.php?idCategoria=-1', function(dados) {
+
+						var option = '<option value="#" "selected">Selecione o Serviço</option>';
+
+						if (dados.length) {
+
+							$.each(dados, function(i, obj) {
+
+								option += '<option value="' + obj.ServiId + '#' + obj.ServiCustoFinal + '">' + obj.ServiNome + '</option>';
+							});
+
+							$('#cmbProduto').html(option).show();
+						} else {
+							$('#cmbProduto').empty().append('<option>Selecione</option>');
+						}
+					})
+				} else {
+					$.getJSON('filtraProduto.php?idCategoria=-1', function(dados) {
+
+						var option = '<option value="#" "selected">Selecione o Produto</option>';
+
+						if (dados.length) {
+
+							$.each(dados, function(i, obj) {
+								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
+							});
+
+							$('#cmbProduto').html(option).show();
+						} else {
+							$('#cmbProduto').empty().append('<option>Selecione</option>');
+						}
+					});
+				}
+			}
+
+			$('#cmbEstoqueOrigem').on('change', function(e) {
+				filtraCategoriaOrigem();
+			})
+			//filtraCategoriaOrigem();
+
+			function filtraPatrimonioProdutoOrigem() {
+				let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val().split('#')
+				let tipoDeFiltro = 'Patrimonio'
+
+				$('#cmbPatrimonio').html('<option value="#" "selected">Filtrando...</option>');
+
+				$.ajax({
+					type: "POST",
+					url: "filtraPorOrigem.php",
+					data: {
+						origem: cmbOrigem[0],
+						tipoDeFiltro: tipoDeFiltro
+					},
+					success: function(resposta) {
+						var option = '<option value="#" "selected">Selecione o Patrimônio</option>';
+						console.log(resposta);
+						if (resposta) {
+							$('#cmbPatrimonio').html('');
+							$('#cmbPatrimonio').append(option)
+							$('#cmbPatrimonio').append(resposta)
+						} else {
+							$('#cmbPatrimonio').html('<option value="#" "selected">Sem Patrimônios</option>');
+						}
+					} //.fail(function(m) {
+					//console.log(m);
+					//});
+				})
+			}
+
+			$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
+				filtraPatrimonioProdutoOrigem()
+			})
+			//filtraPatrimonioProdutoOrigem() 
+
+			//Impede que o input quantidade receba letras
+			$('#inputQuantidade').on('keydown', () => {
+				let valor = $('#inputQuantidade').val()
+
+				if (valor == '´' || valor == '~' || valor == '`' || valor == ';') {
+					$('#inputQuantidade').val('')
+				}
+				if (event.keyCode != '8' && event.keyCode != '48' && event.keyCode != '49' && event.keyCode != '50' && event.keyCode != '51' && event.keyCode != '52' && event.keyCode != '53' && event.keyCode != '54' && event.keyCode != '55' && event.keyCode != '56' && event.keyCode != '57' && event.keyCode != '96' && event.keyCode != '97' && event.keyCode != '98' && event.keyCode != '99' && event.keyCode != '100' && event.keyCode != '101' && event.keyCode != '102' && event.keyCode != '103' && event.keyCode != '104' && event.keyCode != '105' && event.keyCode != '106' && event.keyCode != '107') {
+					return false
+				}
+
+				if (event.keyCode == '222' && event.keyCode != '219' && event.keyCode != '191') {
+					return false
+				}
+			})
+
+			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
+			$('#cmbSubCategoria').on('change', function(e) {
+
+				//Escreve "Filtrando..." no select cmbProduto
+				FiltraProduto();
+
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
+				var inputProdutoServico = $('input[name="inputProdutoServico"]:checked').val();
+				var cmbCategoria = $('#cmbCategoria').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
+
+				//Se Serviço
+				if (inputProdutoServico == 'S') {
+
+					$.getJSON('filtraServico.php?idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
+
+						var option = '<option value="#" "selected">Selecione o Serviço</option>';
+
+						if (dados.length) {
+
+							$.each(dados, function(i, obj) {
+
+								option += '<option value="' + obj.ServiId + '#' + obj.ServiCustoFinal + '">' + obj.ServiNome + '</option>';
+							});
+
+							$('#cmbProduto').html(option).show();
+						} else {
+							ResetServico();
+						}
+					}).fail(function(m) {
+						//console.log(m);
+					});
+
+				} else { //Se Produto
+
+					$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
 
 						var option = '<option value="#" "selected">Selecione o Produto</option>';
 
@@ -1002,415 +979,393 @@ if (isset($_POST['inputData'])) {
 
 					});
 				}
-			})
-		});
+			});
 
+			//Ao mudar o Produto, trazer o Valor Unitário do cadastro (retorno via JSON)
+			$('#cmbProduto').on('change', function(e) {
 
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
+				var cmbProduto = $('#cmbProduto').val();
+				var inputValorUnitario = $('#inputValorUnitario').val();
 
-		//Ao mudar o Produto, trazer o Valor Unitário do cadastro (retorno via JSON)
-		$('#cmbProduto').on('change', function(e) {
+				var Produto = cmbProduto.split("#");
+				var valor = Produto[1].replace(".", ",");
 
-			var inputTipo = $('input[name="inputTipo"]:checked').val();
-			var cmbProduto = $('#cmbProduto').val();
-			var inputValorUnitario = $('#inputValorUnitario').val();
-
-			var Produto = cmbProduto.split("#");
-			var valor = Produto[1].replace(".", ",");
-
-			if (valor != 'null' && valor) {
-				$('#inputValorUnitario').val(valor);
-			} else {
-				$('#inputValorUnitario').val('0,00');
-			}
-			$('#inputQuantidade').focus();
-		});
-
-
-		$("input[type=radio][name=inputTipo]").click(function() {
-
-			var inputTipo = $('input[name="inputTipo"]:checked').val();
-			var inputNumItens = $('#inputNumItens').val();
-
-			if (inputNumItens > 0) {
-				alerta('Atenção', 'O tipo não pode ser alterado quando se tem produto(s) na lista! Exclua-o(s) primeiro ou cancele e recomece o cadastro da movimentação.', 'error');
-				return false;
-			}
-
-			$('#cmbCategoria').val("#");
-			$('#inputQuantidade').val("");
-			$('#inputValorUnitario').val("");
-			$('#inputLote').val("");
-			$('#inputValidade').val("");
-		});
-
-
-		$('#btnAdicionar').click(function() {
-			var inputTipo = $('input[name="inputTipo"]:checked').val();
-			var inputNumItens = $('#inputNumItens').val();
-			var cmbProduto = $('#cmbProduto').val();
-			var Produto = cmbProduto.split("#");
-			var inputQuantidade = $('#inputQuantidade').val();
-			var inputValorUnitario = $('#inputValorUnitario').val();
-			var inputTotal = $('#inputTotal').val();
-			var inputLote = $('#inputLote').val();
-			var inputValidade = $('#inputValidade').val();
-			var cmbClassificacao = $('#cmbClassificacao').val();
-			var inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
-
-			//remove os espaços desnecessários antes e depois
-			inputQuantidade = inputQuantidade.trim();
-
-			//Verifica se o campo só possui espaços em branco
-			if (inputQuantidade == '') {
-				alerta('Atenção', 'Informe a quantidade antes de adicionar!', 'error');
+				if (valor != 'null' && valor) {
+					$('#inputValorUnitario').val(valor);
+				} else {
+					$('#inputValorUnitario').val('0,00');
+				}
 				$('#inputQuantidade').focus();
-				return false;
-			}
+			});
 
-			//Verifica se o campo só possui espaços em branco
-			if (inputValorUnitario == '') {
-				alerta('Atenção', 'Nenhum produto foi selecionado!', 'error');
-				$('#cmbProduto').focus();
-				return false;
-			}
+			$("input[type=radio][name=inputTipo]").click(function() {
 
-			//Verifica se a combo Classificação foi informada
-			if (inputTipo == 'S' && cmbClassificacao == '#') {
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
+				var inputNumItens = $('#inputNumItens').val();
 
-				if ($('[for=cmbProduto]').html() == 'Produto') {
-					alerta('Atenção', 'Informe a Classificação/Bens!', 'error');
-					$('#cmbClassificacao').focus();
+				if (inputNumItens > 0) {
+					alerta('Atenção', 'O tipo não pode ser alterado quando se tem produto(s) na lista! Exclua-o(s) primeiro ou cancele e recomece o cadastro da movimentação.', 'error');
 					return false;
 				}
-			}
 
-			//Verifica se o campo já está no array
-			if (inputIdProdutos.includes(Produto[0])) {
-				alerta('Atenção', 'Esse produto já foi adicionado!', 'error');
-				$('#cmbProduto').focus();
-				return false;
-			}
+				$('#cmbCategoria').val("#");
+				$('#inputQuantidade').val("");
+				$('#inputValorUnitario').val("");
+				$('#inputLote').val("");
+				$('#inputValidade').val("");
+			});
 
-			var resNumItens = parseInt(inputNumItens) + 1;
-			var total = parseInt(inputQuantidade) * parseFloat(inputValorUnitario.replace(',', '.'));
+			$('#btnAdicionar').click(function() {
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
+				var inputProdutoServico = $('input[name="inputProdutoServico"]:checked').val();
+				var inputNumItens = $('#inputNumItens').val();
+				var cmbProduto = $('#cmbProduto').val();
+				var Produto = cmbProduto.split("#");
+				var inputQuantidade = $('#inputQuantidade').val();
+				var inputValorUnitario = $('#inputValorUnitario').val();
+				var inputTotal = $('#inputTotal').val();
+				var inputLote = $('#inputLote').val();
+				var inputValidade = $('#inputValidade').val();
+				var cmbClassificacao = $('#cmbClassificacao').val();
+				var inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
 
-			total = total + parseFloat(inputTotal);
-			var totalFormatado = "R$ " + float2moeda(total).toString();
+				//remove os espaços desnecessários antes e depois
+				inputQuantidade = inputQuantidade.trim();
 
+				//Verifica se o campo só possui espaços em branco
+				if (inputQuantidade == '') {
+					alerta('Atenção', 'Informe a quantidade antes de adicionar!', 'error');
+					$('#inputQuantidade').focus();
+					return false;
+				}
 
-			if ($('[for=cmbProduto]').html() == 'Produto') {
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				let origem = $('#cmbEstoqueOrigem').val()
-				$.ajax({
-					type: "POST",
-					url: "movimentacaoAddProduto.php",
-					data: {
-						tipo: inputTipo,
-						numItens: resNumItens,
-						idProduto: Produto[0],
-						origem: origem,
-						quantidade: inputQuantidade,
-						classific: cmbClassificacao
-					},
-					success: function(resposta) {
+				//Verifica se o campo só possui espaços em branco
+				if (inputValorUnitario == '') {
+					alerta('Atenção', 'Nenhum produto foi selecionado!', 'error');
+					$('#cmbProduto').focus();
+					return false;
+				}
 
-						//var newRow = $("<tr>");
+				//Verifica se a combo Classificação foi informada
+				if (cmbClassificacao == '#') {
 
-						//newRow.append(resposta);
-						if (resposta != 'SEMESTOQUE') {
-
-							var inputTipo = $('input[name="inputTipo"]:checked').val();
-
-							$("#tabelaProdutoServico").append(resposta);
-
-
-							//Adiciona mais um item nessa contagem
-							$('#inputNumItens').val(resNumItens);
-							$('#cmbProduto').val("#").change();
-							$('#inputQuantidade').val('');
-							$('#inputValorUnitario').val('');
-							$('#inputTotal').val(total);
-							$('#total').text(totalFormatado);
-							$('#inputLote').val('');
-							$('#inputValidade').val('');
-
-							$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
-
-							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
-
-							$('#inputIdProdutos').val(inputIdProdutos);
-
-							$('#cmbFornecedor').prop('disabled', true);
-
-							$('input[name="inputTipo"]').each((i, elem) => {
-								if ($(elem) != $('input[name="inputTipo"]:checked')) {
-									$(elem).attr('disabled', '')
-								}
-							})
-
-
-							function classBemSaidaSolicit(valor, idSelect) {
-								let grid = $('.trGrid')
-
-								grid.each((i1, elem1) => { // each sobre a grid
-									let tr = $(elem1).children() // colocando todas as linhas em um 
-
-									let td = tr.first()
-									let indiceLinha = td.html()
-
-									//let inputProdutoGridValores = inputHiddenProdutoServico.val()
-									if (idSelect == indiceLinha) {
-
-										let valueProdutoServicoArray = $(`#campo${indiceLinha}`).val().split('#')
-										// adicionando  novos dados no array
-										valueProdutoServicoArray[valueProdutoServicoArray.length - 1] = valor
-
-										var ponto = eval('/' + '.' + '/g')
-
-										valueProdutoServicoArray[2] = valueProdutoServicoArray[2].replace(',', '.')
-
-
-
-										var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
-
-										var stringVallnput = valueProdutoServicoArray.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
-
-										$(`#campo${indiceLinha}`).val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
-									}
-								})
-							}
-
-
-
-							$('.selectClassific2').each((i, elem) => {
-
-								$(elem).on('change', function(e) {
-
-									let valor = $(elem).val()
-									let idSelect = $(elem).attr('id')
-									classBemSaidaSolicit(valor, idSelect)
-								})
-							})
-
-							return false;
-						} else {
-							console.log(resposta)
-							alerta('Atenção', 'Estoque indisponível!', 'error');
-							return false;
-						}
+					if (inputProdutoServico == 'P') {
+						alerta('Atenção', 'Informe a Classificação/Bens!', 'error');
+						$('#cmbClassificacao').focus();
+						return false;
 					}
-				})
+				}
 
-			} else {
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "movimentacaoAddServico.php",
-					data: {
-						tipo: inputTipo,
-						numItens: resNumItens,
-						idServico: Produto[0],
-						quantidade: inputQuantidade
-					},
-					success: function(resposta) {
+				//Verifica se o campo já está no array
+				if (inputIdProdutos.includes(Produto[0])) {
+					alerta('Atenção', 'Esse produto já foi adicionado!', 'error');
+					$('#cmbProduto').focus();
+					return false;
+				}
 
-						//var newRow = $("<tr>");
-						if (resposta != 'SEMESTOQUE') {
-							//newRow.append(resposta);	    
-							$("#tabelaProdutoServico").append(resposta);
+				var resNumItens = parseInt(inputNumItens) + 1;
+				var total = parseInt(inputQuantidade) * parseFloat(inputValorUnitario.replace(',', '.'));
 
-							//Adiciona mais um item nessa contagem
-							$('#inputNumItens').val(resNumItens);
-							$('#cmbProduto').val("#").change();
-							$('#inputQuantidade').val('');
-							$('#inputValorUnitario').val('');
-							$('#inputTotal').val(total);
-							$('#total').text(totalFormatado);
-							$('#inputLote').val('');
-							$('#inputValidade').val('');
+				total = total + parseFloat(inputTotal);
+				var totalFormatado = "R$ " + float2moeda(total).toString();
 
-							$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
-
-							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
-
-							$('#inputIdProdutos').val(inputIdProdutos);
-
-							$('#cmbFornecedor').prop('disabled', true);
-
-							return false;
-						} else {
-							alerta('Atenção', 'Estoque indisponível!', 'error');
-							return false;
-						}
-
-					}
-				})
-			}
-		}); //click
-
-
-
-		function produtosSolicitacaoSaida() {
-			$('.produtoSolicitacao').each((i, elem) => {
-				var tds = $(elem).children()
-				var idProdutoGrid = $(elem).attr('idProduSolicitacao')
-				var idGridProdu = $(tds[0]).html()
-				var quantProduGrid = $(tds[3]).html()
-				var valUnitProduGrid = $(tds[5]).attr('valorUntPrSolici')
-
-				$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + 'P#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '#' + 0 + '#' + 0 + '#' + 0 + '#' + 0 + '">');
-			})
-			//$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
-		}
-		produtosSolicitacaoSaida()
-
-
-		$(document).on('click', '.btn_remove', function() {
-
-			var inputTotal = $('#inputTotal').val();
-			var button_id = $(this).attr("id");
-			var Produto = button_id.split("#");
-			var inputIdProdutos = $('#inputIdProdutos').val(); //array com o Id dos produtos adicionados
-			var inputNumItens = $('#inputNumItens').val();
-
-			var item = inputIdProdutos.split(",");
-
-			var i;
-			var arr = [];
-
-			for (i = 0; i < item.length; i++) {
-				arr.push(item[i]);
-			}
-
-			var index = arr.indexOf(Produto[0]);
-
-			arr.splice(index, 1);
-
-			$('#inputIdProdutos').val(arr);
-
-			$("#row" + Produto[0] + "").remove(); //remove a linha da tabela
-			$("#campo" + Produto[0] + "").remove(); //remove o campo hidden
-
-			//Agora falta calcular o valor total novamente
-			inputTotal = parseFloat(inputTotal) - parseFloat(Produto[1]);
-			var totalFormatado = "R$ " + float2moeda(inputTotal).toString();
-
-			$('#inputTotal').val(inputTotal);
-			$('#total').text(totalFormatado);
-
-
-			var resNumItens = parseInt(inputNumItens) - 1;
-			$('#inputNumItens').val(resNumItens);
-
-			if (resNumItens == 0) {
-				$('#cmbFornecedor').prop('disabled', false);
-			}
-		})
-
-
-		//Valida Registro Duplicado
-		$('#enviar').on('click', function(e) {
-			console.log('onclick');
-			var inputTipo = $('input[name="inputTipo"]:checked').val(); //S
-			var inputTotal = $('#inputTotal').val(); //
-			var cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val();
-			var cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val();
-			var cmbDestinoLocal = $('#cmbDestinoLocal').val();
-			var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val();
-			var cmbDestinoSetor = $('#cmbDestinoSetor').val();
-			var inputValorTotal = $('#inputValorTotal').val().trim();
-
-			//Verifica se a combo Estoque de Origem foi informada
-			if (cmbEstoqueOrigem == '') {
-				alerta('Atenção', 'Informe o Estoque de Origem!', 'error');
-				$('#cmbEstoqueOrigem').focus();
-				$("#formMovimentacao").submit();
-				return false;
-			}
-
-			//Verifica se a combo Estoque de Destino foi informada
-			if (cmbDestinoSetor == '') {
-				alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
-				$('#cmbDestinoSetor').focus();
-				$("#formMovimentacao").submit();
-				return false;
-			}
-
-			//Verifica se tem algum produto na Grid
-			if (inputTotal == '' || inputTotal == 0) {
-				alerta('Atenção', 'Informe algum produto!', 'error');
-				$('#cmbCategoria').focus();
-				$("#formMovimentacao").submit();
-				return false;
-			}
-
-			//desabilita o combo de "Situacao" na hora de gravar, senão o POST não o encontra
-			$('#cmbSituacao').prop('disabled', false);
-
-			if (inputTipo == 'S' && $('input[name="inputTipo"]:checked').attr('saidaSolicitacao')) {
-				alert('Saida Solicitação!');
-				const submitProduto = {}
-
-				$('.inputProdutoServicoClasse').each((i, elem) => {
-					let nomeInput = $(elem).attr('name')
-					let valorInput = $(elem).val()
-					submitProduto[`${nomeInput}`] = valorInput
-				})
-
-
-				document.getElementById('EstoqueOrigem').style.display = "block";
-				document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
-				document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
-				document.getElementById('DestinoLocal').style.display = "none";
-				document.getElementById('DestinoSetor').style.display = "block";
-				document.getElementById('classificacao').style.display = "block";
-				document.getElementById('dadosProduto').style.display = "flex";
-
-
-				submitProduto.inputData = document.querySelector('#inputData').value;
-				console.log(submitProduto.inputData);
-				submitProduto.cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val()
-				submitProduto.cmbDestinoSetor = $('#cmbDestinoSetor').val()
-				submitProduto.txtareaObservacao = $('#txtareaObservacao').val()
-				submitProduto.cmbSituacao = $('#cmbSituacao').val()
-				submitProduto.cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val()
-				submitProduto.cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val()
-				submitProduto.inputTipo = 'S'
-				submitProduto.cmbDestinoLocal = $('#cmbDestinoLocal').val()
-				submitProduto.inputValorTotal = $('#inputValorTotal').val()
-				submitProduto.inputNumItens = $('#inputNumItens').val()
-
-				let contSelectClass = $('.selectClassific').length
-				let contSelectClassVal = 0
-
-				$('.selectClassific').each((i, elem) => {
-					let valor = $(elem).val()
-
-					if (valor != '#') {
-						contSelectClassVal++
-					}
-				})
-
-				if (contSelectClass == contSelectClassVal) {
+				if (inputProdutoServico == 'P') {
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					let origem = $('#cmbEstoqueOrigem').val()
 					$.ajax({
 						type: "POST",
-						url: "movimentacaoNovoSaida.php",
-						data: submitProduto,
+						url: "movimentacaoAddProduto.php",
+						data: {
+							tipo: inputTipo,
+							numItens: resNumItens,
+							idProduto: Produto[0],
+							origem: origem,
+							quantidade: inputQuantidade,
+							classific: cmbClassificacao
+						},
 						success: function(resposta) {
-							//window.location.href = "index.php";
-							console.log(resposta);
+
+							//var newRow = $("<tr>");
+
+							//newRow.append(resposta);
+							if (resposta != 'SEMESTOQUE') {
+
+								var inputTipo = $('input[name="inputTipo"]:checked').val();
+
+								$("#tabelaProdutoServicoSaida").append(resposta);
+
+								//Adiciona mais um item nessa contagem
+								$('#inputNumItens').val(resNumItens);
+								$('#cmbProduto').val("#").change();
+								$('#inputQuantidade').val('');
+								$('#inputValorUnitario').val('');
+								$('#inputTotal').val(total);
+								$('#total').text(totalFormatado);
+								$('#inputLote').val('');
+								$('#inputValidade').val('');
+
+								$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+
+								inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
+
+								$('#inputIdProdutos').val(inputIdProdutos);
+
+								$('input[name="inputTipo"]').each((i, elem) => {
+									if ($(elem) != $('input[name="inputTipo"]:checked')) {
+										$(elem).attr('disabled', '')
+									}
+								})
+
+								function classBemSaidaSolicit(valor, idSelect) {
+									let grid = $('.trGrid')
+
+									grid.each((i1, elem1) => { // each sobre a grid
+										let tr = $(elem1).children() // colocando todas as linhas em um 
+
+										let td = tr.first()
+										let indiceLinha = td.html()
+
+										//let inputProdutoGridValores = inputHiddenProdutoServico.val()
+										if (idSelect == indiceLinha) {
+
+											let valueProdutoServicoArray = $(`#campo${indiceLinha}`).val().split('#')
+											// adicionando  novos dados no array
+											valueProdutoServicoArray[valueProdutoServicoArray.length - 1] = valor
+
+											var ponto = eval('/' + '.' + '/g')
+
+											valueProdutoServicoArray[2] = valueProdutoServicoArray[2].replace(',', '.')
+
+
+
+											var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
+
+											var stringVallnput = valueProdutoServicoArray.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
+
+											$(`#campo${indiceLinha}`).val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
+										}
+									})
+								}
+
+								$('.selectClassific2').each((i, elem) => {
+
+									$(elem).on('change', function(e) {
+
+										let valor = $(elem).val()
+										let idSelect = $(elem).attr('id')
+										classBemSaidaSolicit(valor, idSelect)
+									})
+								})
+
+								return false;
+							} else {
+								console.log(resposta)
+								alerta('Atenção', 'Estoque indisponível!', 'error');
+								return false;
+							}
 						}
 					})
+
 				} else {
-					alerta('Atenção', 'Informe a classificação dos produtos incluidos!', 'error');
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "movimentacaoAddServico.php",
+						data: {
+							tipo: inputTipo,
+							numItens: resNumItens,
+							idServico: Produto[0],
+							quantidade: inputQuantidade
+						},
+						success: function(resposta) {
+
+							//var newRow = $("<tr>");
+							if (resposta != 'SEMESTOQUE') {
+								//newRow.append(resposta);	    
+								$("#tabelaProdutoServicoSaida").append(resposta);
+
+								//Adiciona mais um item nessa contagem
+								$('#inputNumItens').val(resNumItens);
+								$('#cmbProduto').val("#").change();
+								$('#inputQuantidade').val('');
+								$('#inputValorUnitario').val('');
+								$('#inputTotal').val(total);
+								$('#total').text(totalFormatado);
+								$('#inputLote').val('');
+								$('#inputValidade').val('');
+
+								$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+
+								inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
+
+								$('#inputIdProdutos').val(inputIdProdutos);
+
+								return false;
+							} else {
+								alerta('Atenção', 'Estoque indisponível!', 'error');
+								return false;
+							}
+
+						}
+					})
+				}
+			}); //click
+
+			function produtosSolicitacaoSaida() {
+				$('.produtoSolicitacao').each((i, elem) => {
+					var tds = $(elem).children()
+					var idProdutoGrid = $(elem).attr('idProduSolicitacao')
+					var idGridProdu = $(tds[0]).html()
+					var quantProduGrid = $(tds[3]).html()
+					var valUnitProduGrid = $(tds[5]).attr('valorUntPrSolici')
+
+					$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + 'P#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '#' + 0 + '#' + 0 + '#' + 0 + '#' + 0 + '">');
+				})
+				//$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+			}
+			produtosSolicitacaoSaida()
+
+
+			$(document).on('click', '.btn_remove', function() {
+
+				var inputTotal = $('#inputTotal').val();
+				var button_id = $(this).attr("id");
+				var Produto = button_id.split("#");
+				var inputIdProdutos = $('#inputIdProdutos').val(); //array com o Id dos produtos adicionados
+				var inputNumItens = $('#inputNumItens').val();
+
+				var item = inputIdProdutos.split(",");
+
+				var i;
+				var arr = [];
+
+				for (i = 0; i < item.length; i++) {
+					arr.push(item[i]);
+				}
+
+				var index = arr.indexOf(Produto[0]);
+
+				arr.splice(index, 1);
+
+				$('#inputIdProdutos').val(arr);
+
+				$("#row" + Produto[0] + "").remove(); //remove a linha da tabela
+				$("#campo" + Produto[0] + "").remove(); //remove o campo hidden
+
+				//Agora falta calcular o valor total novamente
+				inputTotal = parseFloat(inputTotal) - parseFloat(Produto[1]);
+				var totalFormatado = "R$ " + float2moeda(inputTotal).toString();
+
+				$('#inputTotal').val(inputTotal);
+				$('#total').text(totalFormatado);
+
+				var resNumItens = parseInt(inputNumItens) - 1;
+				$('#inputNumItens').val(resNumItens);
+
+			})
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e) {
+
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
+				var inputTotal = $('#inputTotal').val();
+				var cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val();
+				var cmbDestinoSetor = $('#cmbDestinoSetor').val();
+				var inputValorTotal = $('#inputValorTotal').val();
+
+				//Verifica se a combo Estoque de Origem foi informada
+				if (cmbEstoqueOrigem == '') {
+					alerta('Atenção', 'Informe o Estoque de Origem!', 'error');
+					$('#cmbEstoqueOrigem').focus();
+					$("#formMovimentacao").submit();
 					return false;
 				}
 
+				//Verifica se a combo Estoque de Destino foi informada
+				if (cmbDestinoSetor == '') {
+					alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
+					$('#cmbDestinoSetor').focus();
+					$("#formMovimentacao").submit();
+					return false;
+				}
 
-			} else {
-				document.querySelector("#formMovimentacao").submit();
-			}
+				//Verifica se tem algum produto na Grid
+				if (inputTotal == '' || inputTotal == 0) {
+					alerta('Atenção', 'Informe algum produto!', 'error');
+					$('#cmbCategoria').focus();
+					return false;
+				}
+
+				if ($('input[name="inputTipo"]:checked').attr('saidaSolicitacao')) {
+					alert('Saida Solicitação!');
+					const submitProduto = {}
+
+					$('.inputProdutoServicoClasse').each((i, elem) => {
+						let nomeInput = $(elem).attr('name')
+						let valorInput = $(elem).val()
+						submitProduto[`${nomeInput}`] = valorInput
+					})
+
+					document.getElementById('classificacao').style.display = "block";
+					document.getElementById('dadosProduto').style.display = "flex";
+
+					submitProduto.inputData = document.querySelector('#inputData').value;
+					submitProduto.cmbEstoqueOrigem = $('#cmbEstoqueOrigem').val()
+					submitProduto.cmbDestinoSetor = $('#cmbDestinoSetor').val()
+					submitProduto.txtareaObservacao = $('#txtareaObservacao').val()
+					submitProduto.cmbSituacao = $('#cmbSituacao').val()
+					submitProduto.inputTipo = 'S'
+					submitProduto.inputValorTotal = $('#inputValorTotal').val()
+					submitProduto.inputNumItens = $('#inputNumItens').val()
+
+					let contSelectClass = $('.selectClassific').length
+					let contSelectClassVal = 0
+
+					$('.selectClassific').each((i, elem) => {
+						let valor = $(elem).val()
+
+						if (valor != '#') {
+							contSelectClassVal++
+						}
+					})
+
+					if (contSelectClass == contSelectClassVal) {
+						$.ajax({
+							type: "POST",
+							url: "movimentacaoNovoSaida.php",
+							data: submitProduto,
+							success: function(resposta) {
+								//window.location.href = "index.php";
+								console.log(resposta);
+							}
+						})
+					} else {
+						alerta('Atenção', 'Informe a classificação dos produtos incluidos!', 'error');
+						return false;
+					}
+
+				} else {
+					document.querySelector("#formMovimentacao").submit();
+				}
+			});
 		});
+
+		function selecionaProdutoServico(tipo) {
+			if (tipo == 'P') {
+				document.getElementById('formLote').style.display = "block";
+				document.getElementById('formValidade').style.display = "block";
+				document.getElementById('classificacao').style.display = "block";
+				$('#tituloProdutoServico').html('Dados dos Produtos');
+			} else {
+				document.getElementById('formLote').style.display = "none";
+				document.getElementById('formValidade').style.display = "none";
+				document.getElementById('classificacao').style.display = "none";
+				$('#tituloProdutoServico').html('Dados dos Serviços');
+			}
+
+			$('#cmbEstoqueOrigem').trigger("change"); //aciona o OnChange do cmbEstoqueOrigem, esse método selecionaProdutoServico não pode ficar dentro do $(document).ready(function() { se não esse gatilho não é acionado.
+		};
 
 		//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
 		function Filtrando() {
@@ -1428,10 +1383,6 @@ if (isset($_POST['inputData'])) {
 			$('#cmbProduto').empty().append('<option>Filtrando...</option>');
 		}
 
-		function FiltraOrdensCompra() {
-			$('#cmbOrdemCompra').empty().append('<option>Filtrando...</option>');
-		}
-
 		function ResetCategoria() {
 			$('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
 		}
@@ -1444,6 +1395,9 @@ if (isset($_POST['inputData'])) {
 			$('#cmbProduto').empty().append('<option>Sem produto</option>');
 		}
 
+		function ResetServico() {
+			$('#cmbProduto').empty().append('<option>Sem serviço</option>');
+		}
 
 		function classBemSaidaSolicit(valor, idSelect) {
 			let grid = $('.trGrid')
@@ -1484,25 +1438,15 @@ if (isset($_POST['inputData'])) {
 			$('#quantEditaEntradaSaida').html('Quantidade');
 		};
 
-
-		function limpaValorFormulario(tipo) {
-			document.querySelector("#cmbEstoqueOrigemLocalSetor").value = "#";
-			document.querySelector("#cmbDestinoLocalEstoqueSetor").value = "#";
-			document.querySelector("#cmbDestinoLocal").value = "#";
-		};
-
-
 		Array.prototype.remove = function(start, end) {
 			this.splice(start, end);
 			return this;
 		};
 
-
 		Array.prototype.insert = function(pos, item) {
 			this.splice(pos, 0, item);
 			return this;
 		};
-
 
 		function selecionaTipo(tipo) {
 			if (tipo == 'E') {
@@ -1511,17 +1455,6 @@ if (isset($_POST['inputData'])) {
 				window.location.href = "movimentacaoNovoTransferencia.php";
 			} else
 				window.location.href = "movimentacaoNovoSaida.php";
-		};
-
-
-
-
-		function selecionaProdutoServico(tipo) {
-			document.getElementById('formLote').style.display = "none";
-			document.getElementById('formValidade').style.display = "none";
-			document.getElementById('classificacao').style.display = "none";
-			$('#tituloProdutoServico').html('Dados dos Serviços');
-			$('[for=cmbProduto]').html('Serviço');
 		};
 
 
@@ -1629,120 +1562,55 @@ if (isset($_POST['inputData'])) {
 													</div>
 												</div>
 
-												<div class="col-lg-4" id="EstoqueOrigem" style="display:none;">
+												<div class="col-lg-4" id="EstoqueOrigem">
 													<div class="form-group">
 														<label for="cmbEstoqueOrigem">Origem<span style="color: red">*</span></label>
-														<select id="cmbEstoqueOrigem" name="cmbEstoqueOrigem" class="form-control form-control-select2">
-															<option value="#">Selecione</option>
+														<select id="cmbEstoqueOrigem" name="cmbEstoqueOrigem" class="form-control form-control-select2" required>
+															<option value="">Selecione</option>
 															<?php
 
 															$sql = "SELECT EXUXPLocalEstoque, SetorNome
-																 		FROM EmpresaXUsuarioXPerfil
-																 		JOIN Setor 
-																		  ON SetorId = EXUXPSetor
-																 	 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
-																	";
-
-															try {
-																$result = $conn->query($sql);
-																$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
-
-																$sql = "SELECT LcEstId, LcEstNome
-																			FROM LocalEstoque
-																			JOIN Situacao 
-																			  ON SituaId = LcEstStatus
-																		 WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																	ORDER BY LcEstNome ASC";
-																try {
-																	$result = $conn->query($sql);
-																	$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-																	foreach ($row as $item) {
-																		if ($item['LcEstId'] == $usuarioPerfil['EXUXPLocalEstoque']) {
-																			print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
-																		} else {
-																			print('<option value="' . $item['LcEstId'] . '" "' . $usuarioPerfil['EXUXPLocalEstoque'] . '">' . $item['LcEstNome'] . '</option>');
-																		}
-																	}
-																} catch (Exception $e) {
-																	echo 'Exceção capturada: ',  $e->getMessage(), "\n";
-																}
-															} catch (Exception $e) {
-																echo 'Exceção capturada: ',  $e->getMessage(), "\n";
-															}
-
-															?>
-														</select>
-													</div>
-												</div>
-
-												<div class="col-lg-4" id="EstoqueOrigemLocalSetor" style="display:none;">
-													<div class="form-group">
-														<label for="cmbEstoqueOrigemLocalSetor">Origem</label>
-														<select id="cmbEstoqueOrigemLocalSetor" name="cmbEstoqueOrigemLocalSetor" class="form-control form-control-select2">
-															<option value="#">Selecione</option>
-															<?php
-															$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
-																		FROM LocalEstoque
-																		JOIN Situacao 
-																		  ON SituaId = LcEstStatus
-														    WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-														    UNION
-														 	 SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
-														   	 FROM Setor
-																 JOIN Situacao 
-																   on SituaId = SetorStatus
-														    WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-														    Order By Nome";
+																		FROM EmpresaXUsuarioXPerfil
+																		JOIN Setor ON SetorId = EXUXPSetor
+																		WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+																		";
 															$result = $conn->query($sql);
-															$row = $result->fetchAll(PDO::FETCH_ASSOC);
+															$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
-															foreach ($row as $item) {
-																print('<option value="' . $item['Id'] . '#' . $item['Nome'] . '#' . $item['Referencia'] . '">' . $item['Nome'] . '</option>');
-															}
-
-															?>
-														</select>
-													</div>
-												</div>
-
-												<div class="col-lg-4" id="DestinoLocal">
-													<div class="form-group">
-														<label for="cmbDestinoLocal">Destino<span style="color: red">*</span></label>
-														<select id="cmbDestinoLocal" name="cmbDestinoLocal" class="form-control form-control-select2">
-															<option value="#">Selecione</option>
-															<?php
 															$sql = "SELECT LcEstId, LcEstNome
 																		FROM LocalEstoque
-																		JOIN Situacao 
-																		  ON SituaId = LcEstStatus
-																	 WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY LcEstNome ASC";
+																		JOIN Situacao ON SituaId = LcEstStatus
+																		WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																		ORDER BY LcEstNome ASC";
 															$result = $conn->query($sql);
 															$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 															foreach ($row as $item) {
-																print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+																if ($item['LcEstId'] == $usuarioPerfil['EXUXPLocalEstoque']) {
+																	print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
+																} else {
+																	print('<option value="' . $item['LcEstId'] . '" "' . $usuarioPerfil['EXUXPLocalEstoque'] . '">' . $item['LcEstNome'] . '</option>');
+																}
 															}
+
 															?>
 														</select>
 													</div>
 												</div>
 
-												<div class="col-lg-4" id="DestinoSetor" style="display:none">
+												<div class="col-lg-4" id="DestinoSetor">
 													<div class="form-group">
 														<label for="cmbDestinoSetor">Destino<span style="color: red">*</span></label>
-														<select id="cmbDestinoSetor" name="cmbDestinoSetor" class="form-control form-control-select2" <?php if (isset($_POST['inputSolicitacaoId'])) echo 'disabled' ?>>
-															<option value="#">Selecione</option>
+														<select id="cmbDestinoSetor" name="cmbDestinoSetor" class="form-control form-control-select2" <?php if (isset($_POST['inputSolicitacaoId'])) echo 'disabled' ?> required>
+															<option value="">Selecione</option>
 															<?php
 
 															if (isset($_POST['inputSolicitacaoId'])) {
 																$sql = "SELECT EXUXPSetor, SetorNome
-																 			FROM EmpresaXUsuarioXPerfil
-																 			JOIN Setor 
-																			  ON SetorId = EXUXPSetor
-																 		 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
-															    ";
+																			FROM EmpresaXUsuarioXPerfil
+																			JOIN Setor ON SetorId = EXUXPSetor
+																			WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+																	";
 																$result = $conn->query($sql);
 																$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -1750,57 +1618,20 @@ if (isset($_POST['inputData'])) {
 															} else {
 
 																$sql = "SELECT SetorId, SetorNome
-														          FROM Setor
-																      JOIN Situacao on SituaId = SetorStatus
-														         WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-														      ORDER BY SetorNome ASC";
+																			FROM Setor
+																			JOIN Situacao on SituaId = SetorStatus
+																			WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																			ORDER BY SetorNome ASC";
 																$result = $conn->query($sql);
 																$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 																foreach ($row as $item) {
-
 																	print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
 																}
 															}
 
 															?>
 														</select>
-													</div>
-												</div>
-
-												<div class="col-lg-4" id="DestinoLocalEstoqueSetor" style="display:none;">
-													<div class="form-group">
-														<label for="cmbDestinoLocalEstoqueSetor">Destino<span style="color: red">*</span></label>
-														<select id="cmbDestinoLocalEstoqueSetor" name="cmbDestinoLocalEstoqueSetor" class="form-control form-control-select2">
-															<option value="#">Selecione</option>
-															<?php
-															$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
-																		FROM LocalEstoque
-																		JOIN Situacao 
-																		  ON SituaId = LcEstStatus
-																		WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																		UNION
-															 		 SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
-																		 FROM Setor
-																		 JOIN Situacao 
-																			 ON SituaId = SetorStatus
-																	  WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																 ORDER BY Nome";
-															$result = $conn->query($sql);
-															$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-															foreach ($row as $item) {
-																print('<option value="' . $item['Id'] . '#' . $item['Nome'] . '#' . $item['Referencia'] . '">' . $item['Nome'] . '</option>');
-															}
-															?>
-														</select>
-													</div>
-												</div>
-
-												<div class="col-lg-4" id="DestinoManual" style="display:none">
-													<div class="form-group">
-														<label for="inputDestinoManual">Destino<span style="color: red">*</span></label>
-														<input type="text" id="inputDestinoManual" name="inputDestinoManual" class="form-control">
 													</div>
 												</div>
 											</div>
@@ -1816,11 +1647,9 @@ if (isset($_POST['inputData'])) {
 										</div>
 									</div>
 									<br>
-
-
 									<br>
 
-									<div class="row" id="dadosProduto" style="display: none">
+									<div class="row" id="dadosProduto">
 										<div class="col-lg-12">
 											<div id="radiosProdutoServico" class="col-lg-4 px-0">
 												<div class="form-group">
@@ -1856,20 +1685,6 @@ if (isset($_POST['inputData'])) {
 														<label for="cmbCategoria">Categoria</label>
 														<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 															<option value="#">Selecione</option>
-															<?php
-															$sql = "SELECT CategId, CategNome
-															FROM Categoria
-															JOIN Situacao on SituaId = CategStatus
-															WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															ORDER BY CategNome ASC";
-															$result = $conn->query($sql);
-															$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-															foreach ($row as $item) {
-																print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
-															}
-
-															?>
 														</select>
 													</div>
 												</div>
@@ -1930,17 +1745,16 @@ if (isset($_POST['inputData'])) {
 															<option value="#">Selecione</option>
 															<?php
 															$sql = "SELECT ClassId, ClassNome
-															FROM Classificacao
-															JOIN Situacao on SituaId = ClassStatus
-															WHERE SituaChave = 'ATIVO'
-															ORDER BY ClassNome ASC";
+																		FROM Classificacao
+																		JOIN Situacao on SituaId = ClassStatus
+																		WHERE SituaChave = 'ATIVO'
+																		ORDER BY ClassNome ASC";
 															$result = $conn->query($sql);
 															$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
 															foreach ($rowClassificacao as $item) {
 																print('<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>');
 															}
-
 															?>
 														</select>
 													</div>
@@ -1997,33 +1811,31 @@ if (isset($_POST['inputData'])) {
 												<?php
 												if (isset($_POST['inputSolicitacaoId'])) {
 													print('
-												    <tr class="bg-slate" id="trSaida" >
-												        <th>Item</th>
-												        <th>Produto/Serviço</th>
-												        <th style="text-align:center">Unidade Medida</th>
-												        <th id="quantEditaEntradaSaida" style="text-align:center">Quantidade</th>
-												        <th style="text-align:right">Valor Unitário</th>
-												        <th style="text-align:right">Valor Total</th>
-												        <th id="classificacaoSaida">Classificação</th>
-												        <th class="text-center">Ações</th>
-											        </tr>
-												');
+														<tr class="bg-slate" id="trSaida" >
+															<th>Item</th>
+															<th>Produto/Serviço</th>
+															<th style="text-align:center">Unidade Medida</th>
+															<th id="quantEditaEntradaSaida" style="text-align:center">Quantidade</th>
+															<th style="text-align:right">Valor Unitário</th>
+															<th style="text-align:right">Valor Total</th>
+															<th id="classificacaoSaida">Classificação</th>
+															<th class="text-center">Ações</th>
+														</tr>
+														');
 												} else {
 													print('
-													<tr class="bg-slate" id="trSaida" style="width: 100%">
-													    <th>Item</th>
-													    <th>Produto/Serviço</th>
-													    <th style="text-align:center">Unidade Medida</th>
-													    <th id="quantEditaEntradaSaida" style="text-align:center">Quantidade</th>
-													    <th style="text-align:right">Valor Unitário</th>
-													    <th style="text-align:right">Valor Total</th>
-													    <th id="classificacaoSaida">Classificação</th>
-													    <th class="text-center">Ações</th>
-												    </tr>
-											');
+														<tr class="bg-slate" id="trSaida" style="width: 100%">
+															<th>Item</th>
+															<th>Produto/Serviço</th>
+															<th style="text-align:center">Unidade Medida</th>
+															<th id="quantEditaEntradaSaida" style="text-align:center">Quantidade</th>
+															<th style="text-align:right">Valor Unitário</th>
+															<th style="text-align:right">Valor Total</th>
+															<th id="classificacaoSaida">Classificação</th>
+															<th class="text-center">Ações</th>
+														</tr>
+														');
 												}
-
-
 												?>
 											</thead>
 											<tbody>
@@ -2033,37 +1845,40 @@ if (isset($_POST['inputData'])) {
 													$totalGeral = 0;
 
 													print('<tr style="display:none;">
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-										            </tr>
-											');
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																</tr>
+															');
 												} else {
 													print('<tr style="display:none;">
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-														<td>&nbsp;</td>
-														<td>&nbsp;</td>
-										            </tr>
-								            ');
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																	<td>&nbsp;</td>
+																</tr>
+															');
 												}
 												?>
 
 												<?php
 												if (isset($_POST['inputSolicitacaoId'])) {
+
 													$idProdutoSolicitacao = 0;
 													$totalGeral = 0;
+
 													foreach ($produtosSolicitacao  as $produto) {
+
 														$idProdutoSolicitacao++;
 
 														$valorCusto = formataMoeda($produto['ProduValorVenda']);
@@ -2075,28 +1890,28 @@ if (isset($_POST['inputData'])) {
 														$linha = '';
 
 														$linha .= "
-															   <tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
-															        <td>" . $idProdutoSolicitacao . "</td>
-															        <td>" . $produto['ProduNome'] . "</td>
-															        <td style='text-align:center'>" . $produto['UnMedNome'] . "</td>
-																	<td style='text-align:center'>" . $produto['SlXPrQuantidade'] . "</td>
-																	<td valorUntPrSolici='" . $produto['ProduValorVenda'] . "' style='text-align:right'>" . $valorCusto . "</td>
-																	<td style='text-align:right'>" . $valorTotal . "</td>
-															   
-														";
+																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
+																		<td>" . $idProdutoSolicitacao . "</td>
+																		<td>" . $produto['ProduNome'] . "</td>
+																		<td style='text-align:center'>" . $produto['UnMedNome'] . "</td>
+																		<td style='text-align:center'>" . $produto['SlXPrQuantidade'] . "</td>
+																		<td valorUntPrSolici='" . $produto['ProduValorVenda'] . "' style='text-align:right'>" . $valorCusto . "</td>
+																		<td style='text-align:right'>" . $valorTotal . "</td>
+																
+															";
 
 														$linha .= '
-																<td style="text-align:center">
-																    <div class="d-flex flex-row ">
-																        <select id="' . $idProdutoSolicitacao . '" name="cmbClassificacao" class="form-control form-control-select2 selectClassific">
-																            <option value="#">Selecione</option>
-													    ';
+																	<td style="text-align:center">
+																		<div class="d-flex flex-row ">
+																			<select id="' . $idProdutoSolicitacao . '" name="cmbClassificacao" class="form-control form-control-select2 selectClassific">
+																				<option value="#">Selecione</option>
+															';
 
 														$sql = "SELECT ClassId, ClassNome
-														FROM Classificacao
-														JOIN Situacao on SituaId = ClassStatus
-														WHERE SituaChave = 'ATIVO'
-														ORDER BY ClassNome ASC";
+																	FROM Classificacao
+																	JOIN Situacao on SituaId = ClassStatus
+																	WHERE SituaChave = 'ATIVO'
+																	ORDER BY ClassNome ASC";
 														$result = $conn->query($sql);
 														$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2105,12 +1920,12 @@ if (isset($_POST['inputData'])) {
 														}
 
 														$linha .= "
-																	    </select>
-																	</div>
-																</td>
-																<td style='text-align:center;'><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
-															</tr>
-														";
+																			</select>
+																		</div>
+																	</td>
+																	<td style='text-align:center;'><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
+																</tr>
+															";
 
 														print($linha);
 													}
@@ -2123,28 +1938,22 @@ if (isset($_POST['inputData'])) {
 													<?php
 													if (isset($_POST['inputSolicitacaoId'])) {
 														print('
-														    <th colspan="1">
-														        <div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">' . formataMoeda($totalGeral) . '</div>
-													        </th>
+																<th colspan="1">
+																	<div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">' . formataMoeda($totalGeral) . '</div>
+																</th>
+																<th colspan="1">
+																</th>
 															');
-
-														print('<th colspan="1">
-
-												       </th>
-												');
 													} else {
 														print('
-														    <th colspan="1">
-														        <div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0,00</div>
-													        </th>
-												');
-														print('<th colspan="2">
-
-														</th>
-												');
+																<th colspan="1">
+																	<div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0,00</div>
+																</th>
+																<th colspan="2">
+																</th>
+															');
 													}
 													?>
-
 												</tr>
 											</tfoot>
 											</table>
@@ -2162,61 +1971,18 @@ if (isset($_POST['inputData'])) {
 														<!--<option value="#">Selecione</option>-->
 														<?php
 
-														if (isset($_POST['inputSolicitacaoId'])) {
-															$sql = "SELECT SituaId, SituaNome, SituaChave
+														$sql = "SELECT SituaId, SituaNome, SituaChave
 															FROM Situacao
 															WHERE SituaStatus = '1'
 															ORDER BY SituaNome ASC";
-															$result = $conn->query($sql);
-															$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-															print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
+														print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" readOnly>');
 
-															foreach ($row as $item) {
-																if ($item['SituaChave'] == 'LIBERADO') {
-																	print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-																}
-															}
-														} else {
-															if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
-																$sql = "SELECT SituaId, SituaNome, SituaChave
-																FROM Situacao
-																WHERE SituaStatus = '1'
-																ORDER BY SituaNome ASC";
-																$result = $conn->query($sql);
-																$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-																print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2">');
-																print('<option value="#">Selecione</option>');
-
-																foreach ($row as $item) {
-																	if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
-																		if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-																			print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-																		} else {
-																			print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-																		}
-																	}
-																}
-															} else {
-
-																$sql = "SELECT SituaId, SituaNome, SituaChave
-																	FROM Situacao
-																	WHERE SituaStatus = '1'
-																	ORDER BY SituaNome ASC";
-																$result = $conn->query($sql);
-																$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-																print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
-																print('<option value="#">Selecione</option>');
-
-																foreach ($row as $item) {
-																	if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-																		print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-																	} else if ($item['SituaChave'] == 'LIBERADO') {
-																		print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-																	}
-																}
+														foreach ($row as $item) {
+															if ($item['SituaChave'] == 'LIBERADO') {
+																print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
 															}
 														}
 														?>
@@ -2238,8 +2004,9 @@ if (isset($_POST['inputData'])) {
 									</div>
 								</div>
 								<!-- /card-body -->
+							</div>
+						</div>
 					</form>
-
 
 				</div>
 				<!-- /info blocks -->
@@ -2258,10 +2025,3 @@ if (isset($_POST['inputData'])) {
 </body>
 
 </html>
-
-<?php
-if (isset($_POST[0])) {
-	var_dump($_POST);
-	print_r($_POST);
-}
-?>

@@ -6,15 +6,15 @@ include('global_assets/php/conexao.php');
 
 if ($_POST['tipoDeFiltro'] == 'Categoria') {
 	$sql = "SELECT MvXPrProduto as id
-		FROM MovimentacaoXProduto
-		LEFT JOIN Movimentacao on MovimId = MvXPrMovimentacao
-		WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " and MovimDestinoLocal = " . $_POST['origem'] . " and MovimTipo = 'E'
-		UNION
-		SELECT MvXSrServico as id
-		FROM MovimentacaoXServico
-		LEFT JOIN Movimentacao on MovimId = MvXSrMovimentacao
-		WHERE MvXSrUnidade = " . $_SESSION['UnidadeId'] . " and MovimDestinoLocal = " . $_POST['origem'] . " and MovimTipo = 'E'
-		";
+			FROM MovimentacaoXProduto
+			JOIN Movimentacao on MovimId = MvXPrMovimentacao
+			WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " and MovimDestinoLocal = " . $_POST['origem'] . " and MovimTipo = 'E'
+			UNION
+			SELECT MvXSrServico as id
+			FROM MovimentacaoXServico
+			JOIN Movimentacao on MovimId = MvXSrMovimentacao
+			WHERE MvXSrUnidade = " . $_SESSION['UnidadeId'] . " and MovimDestinoLocal = " . $_POST['origem'] . " and MovimTipo = 'E'
+			";
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
 	$cont = count($row);
@@ -25,9 +25,9 @@ if ($_POST['tipoDeFiltro'] == 'Categoria') {
 		foreach ($row as $value) {
 
 			$sql = "SELECT ProduCategoria
-		        FROM Produto
-		        WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId = " . $value['id'] . "
-		";
+		       		FROM Produto
+		        	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId = " . $value['id'] . "
+					";
 			$result = $conn->query($sql);
 			$row = $result->fetch(PDO::FETCH_ASSOC);
 			$produtosIds[] = $row['ProduCategoria'];
