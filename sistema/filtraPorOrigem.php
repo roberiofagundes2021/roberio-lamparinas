@@ -37,8 +37,8 @@ if ($_POST['tipoDeFiltro'] == 'Categoria') {
 
 		$sql = "SELECT CategId, CategNome
 		        FROM Categoria
-				JOIN Situacao on SituaStatus = CategStatus
-		        WHERE CategUnidade = " . $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+						JOIN Situacao on SituaStatus = CategStatus
+		        WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 		";
 		$result = $conn->query($sql);
 		$categorias = $result->fetchAll(PDO::FETCH_ASSOC);

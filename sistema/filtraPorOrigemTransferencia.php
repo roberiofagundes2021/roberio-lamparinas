@@ -1,0 +1,153 @@
+<?php
+
+include_once("sessao.php");
+
+include('global_assets/php/conexao.php');
+
+
+
+if (isset($_POST['origem'])) {
+	$post_string = implode("", $_POST);
+	$post_string = explode('#', $post_string);
+}
+
+// alerta($_POST['tipoDeFiltro']);
+// alerta($post_string[0]);
+
+if ($_POST['tipoDeFiltro'] == '#Categoria') {
+
+	if ($post_string[2] == 'Local') {
+		$sql = "SELECT DISTINCT CategId, CategNome
+							FROM MovimentacaoXProduto
+							JOIN Movimentacao 
+							  ON MovimId = MvXPrMovimentacao
+							JOIN Produto 
+							  ON ProduId = MvXPrProduto
+							JOIN Categoria 
+							  ON CategId = ProduCategoria
+							JOIN Situacao 
+							  ON SituaId = MovimSituacao
+							WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . "
+							  AND MovimDestinoLocal = " . $post_string[0] . " 
+								AND SituaChave = 'LIBERADO'
+					ORDER BY CategNome ASC";
+
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+		$cont = count($row);
+
+		if ($cont) {
+			foreach ($row as $value) {
+				// print_r($value);
+				print('<option value="' . $value['CategId'] . '">' . $value['CategNome'] . '</option>');
+			}
+		} else {
+			echo 'sem dados';
+		}
+	} else if ($post_string[2] == 'Setor') {
+		$sql = "SELECT DISTINCT CategId, CategNome
+							FROM MovimentacaoXProduto
+							JOIN Movimentacao 
+							  on MovimId = MvXPrMovimentacao
+							JOIN Produto 
+							  on ProduId = MvXPrProduto
+							JOIN Categoria 
+							  on CategId = ProduCategoria
+							JOIN Situacao 
+							  on SituaId = MovimSituacao
+							WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " 
+							  and MovimDestinoSetor = " . $post_string[0] . "  
+								and SituaChave = 'LIBERADO'
+								AND PatriId 						= " . $_POST['valor'] . "
+						ORDER BY CategNome ASC";
+
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+		$cont = count($row);
+
+		if ($cont) {
+			foreach ($row as $value) {
+				// print_r($value);
+				print('<option value="' . $value['CategId'] . '">' . $value['CategNome'] . '</option>');
+			}
+		} else {
+			echo 'sem dados';
+		}
+	}
+} else if ($_POST['tipoDeFiltro'] == '#CategoriaPatrimonio') {
+
+	$sql = "SELECT CategId,
+									 CategNome,
+									 SbCatId,
+									 SbCatNome,
+									 CONVERT(varchar(10), produid) 
+								 + '#' 
+								 + CONVERT(varchar(10),ProduValorCusto) as ProduValue,
+									 produNome
+							FROM PRODUTO
+							JOIN PATRIMONIO
+							  ON PatriProduto = ProduId
+							JOIN categoria
+							  ON categid = produCategoria
+							JOIN SubCategoria
+							  ON SbCatId = ProduSubCategoria
+						 WHERE PATRINUMERO = " . $_POST['valor'] . "";
+
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+	$cont = count($row);
+
+
+	if ($_POST['campo'] == 'categoria') {
+		if ($cont) {
+			foreach ($row as $value) {
+				print('<option value="' . $value['CategId'] . '" selected>' . $value['CategNome'] . '</option>');
+			}
+		} else {
+			echo 'sem dados';
+		}
+	}
+
+	if ($_POST['campo'] == 'subcategoria') {
+		if ($cont) {
+			foreach ($row as $value) {
+				print('<option value="' . $value['SbCatId'] . '" selected>' . $value['SbCatNome'] . '</option>');
+			}
+		} else {
+			echo 'sem dados';
+		}
+	}
+
+	if ($_POST['campo'] == 'produto') {
+		if ($cont) {
+			foreach ($row as $value) {
+				print('<option value="' . $value['ProduValue'] . '" selected>' . $value['produNome'] . '</option>');
+			}
+		} else {
+			echo 'sem dados';
+		}
+	}
+} else if ($_POST['tipoDeFiltro'] === 'Patrimonio') {
+
+	$sql = "SELECT PatriId, PatriNumero
+						FROM Patrimonio
+			 LEFT JOIN MovimentacaoXProduto 
+							ON MvXPrPatrimonio = PatriId
+			 LEFT JOIN Movimentacao 
+			        ON MovimId 	= MvXPrMovimentacao
+					 WHERE MvXPrUnidade 			= " . $_SESSION['UnidadeId'] . "
+						 AND MovimDestinoSetor 	= " . $_POST['origem'] . " 
+						 AND MovimTipo 					= 'S'";
+
+	$result = $conn->query($sql);
+	$rowPatrimonios = $result->fetchAll(PDO::FETCH_ASSOC);
+	$cont = count($rowPatrimonios);
+
+	if ($cont >= 1) {
+		foreach ($rowPatrimonios as $value) {
+			print('<option value="' . $value['PatriId'] . '">' . $value['PatriNumero'] . '</option>');
+		}
+	}
+} else {
+	alerta('CategoriaPatrimonioPHP');
+}

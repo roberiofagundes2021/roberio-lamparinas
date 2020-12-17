@@ -24,7 +24,7 @@ if (isset($_POST['inputSolicitacaoId'])) {
 	$idsProdutos = '';
 
 	if ($numProdutos) {
-		
+
 		foreach ($produtosSolicitacao as $chave => $produto) {
 
 			if ($chave == 0) {
@@ -49,8 +49,9 @@ if (isset($_POST['inputSolicitacaoId'])) {
 
 /* VALIDA SE OS DADOS VIERAM DA MESMA PÁGINA */
 if (isset($_POST['inputData'])) {
-	
-	print_r($_POST);die;
+
+	print_r($_POST);
+	die;
 
 	try {
 
@@ -71,7 +72,7 @@ if (isset($_POST['inputData'])) {
 			':iUnidade' => $_SESSION['UnidadeId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId']
 		));
-	
+
 		$insertId = $conn->lastInsertId();
 
 		$numItems = intval($_POST['inputNumItens']);
@@ -85,7 +86,7 @@ if (isset($_POST['inputData'])) {
 			//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
 
 			if (isset($_POST[$campo])) {
-				
+
 				$registro = explode('#', $_POST[$campo]);
 
 				if ($registro[0] == 'P') {
@@ -93,7 +94,7 @@ if (isset($_POST['inputData'])) {
 					$quantItens = intval($registro[3]);
 
 					if (isset($registro[7])) {
-					
+
 						for ($i = 1; $i <= $quantItens; $i++) {
 							// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
 
@@ -400,7 +401,6 @@ if (isset($_POST['inputData'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		
 		document.addEventListener("DOMContentLoaded", () => {
 			initFunction();
 		});
@@ -693,10 +693,10 @@ if (isset($_POST['inputData'])) {
 		}
 
 		function recalcValorTotal() {
-			
+
 			let novoTotalGeral = 0
 			let velhoTotalGeral = $('#total').attr('valorTotalGeral')
-			
+
 			$('.trGrid').each((i, elem) => {
 				$(elem).children().each((i, elem) => {
 					if ($(elem).hasClass('valorTotal')) {
@@ -707,7 +707,7 @@ if (isset($_POST['inputData'])) {
 					}
 				})
 			})
-			
+
 			$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`).attr('valor', novoTotalGeral)
 		}
 
@@ -721,7 +721,7 @@ if (isset($_POST['inputData'])) {
 			$('#cmbCategoria').on('change', function(e) {
 
 				Filtrando();
-				
+
 				var inputProdutoServico = $('input[name="inputProdutoServico"]:checked').val();
 				var cmbCategoria = $('#cmbCategoria').val();
 
@@ -741,7 +741,7 @@ if (isset($_POST['inputData'])) {
 					}
 				})
 
-				if (inputProdutoServico == 'S'){
+				if (inputProdutoServico == 'S') {
 
 					$.getJSON('filtraServico.php?idCategoria=' + cmbCategoria, function(dados) {
 
@@ -762,8 +762,8 @@ if (isset($_POST['inputData'])) {
 						//console.log(m);
 					});
 
-				} else{
-					
+				} else {
+
 					$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria, function(dados) {
 
 						var option = '<option value="#" "selected">Selecione o Produto</option>';
@@ -800,7 +800,7 @@ if (isset($_POST['inputData'])) {
 						tipoDeFiltro: tipoDeFiltro
 					},
 					success: function(resposta) {
-						
+
 						var option = '<option value="#" "selected">Selecione a Categoria</option>';
 
 						if (resposta) {
@@ -835,7 +835,7 @@ if (isset($_POST['inputData'])) {
 					}
 				});
 
-				if (inputProdutoServico == 'S'){
+				if (inputProdutoServico == 'S') {
 					$.getJSON('filtraServico.php?idCategoria=-1', function(dados) {
 
 						var option = '<option value="#" "selected">Selecione o Serviço</option>';
@@ -960,7 +960,7 @@ if (isset($_POST['inputData'])) {
 					});
 
 				} else { //Se Produto
-					
+
 					$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
 
 						var option = '<option value="#" "selected">Selecione o Produto</option>';
@@ -1365,7 +1365,7 @@ if (isset($_POST['inputData'])) {
 			}
 
 			$('#cmbEstoqueOrigem').trigger("change"); //aciona o OnChange do cmbEstoqueOrigem, esse método selecionaProdutoServico não pode ficar dentro do $(document).ready(function() { se não esse gatilho não é acionado.
-		};	
+		};
 
 		//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
 		function Filtrando() {
@@ -1397,7 +1397,7 @@ if (isset($_POST['inputData'])) {
 
 		function ResetServico() {
 			$('#cmbProduto').empty().append('<option>Sem serviço</option>');
-		}		
+		}
 
 		function classBemSaidaSolicit(valor, idSelect) {
 			let grid = $('.trGrid')
@@ -1569,29 +1569,29 @@ if (isset($_POST['inputData'])) {
 															<option value="">Selecione</option>
 															<?php
 
-																$sql = "SELECT EXUXPLocalEstoque, SetorNome
+															$sql = "SELECT EXUXPLocalEstoque, SetorNome
 																		FROM EmpresaXUsuarioXPerfil
 																		JOIN Setor ON SetorId = EXUXPSetor
 																		WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
 																		";
-																$result = $conn->query($sql);
-																$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
+															$result = $conn->query($sql);
+															$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
-																$sql = "SELECT LcEstId, LcEstNome
+															$sql = "SELECT LcEstId, LcEstNome
 																		FROM LocalEstoque
 																		JOIN Situacao ON SituaId = LcEstStatus
 																		WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																		ORDER BY LcEstNome ASC";
-																$result = $conn->query($sql);
-																$row = $result->fetchAll(PDO::FETCH_ASSOC);
+															$result = $conn->query($sql);
+															$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-																foreach ($row as $item) {
-																	if ($item['LcEstId'] == $usuarioPerfil['EXUXPLocalEstoque']) {
-																		print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
-																	} else {
-																		print('<option value="' . $item['LcEstId'] . '" "' . $usuarioPerfil['EXUXPLocalEstoque'] . '">' . $item['LcEstNome'] . '</option>');
-																	}
+															foreach ($row as $item) {
+																if ($item['LcEstId'] == $usuarioPerfil['EXUXPLocalEstoque']) {
+																	print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
+																} else {
+																	print('<option value="' . $item['LcEstId'] . '" "' . $usuarioPerfil['EXUXPLocalEstoque'] . '">' . $item['LcEstNome'] . '</option>');
 																}
+															}
 
 															?>
 														</select>
@@ -1605,30 +1605,30 @@ if (isset($_POST['inputData'])) {
 															<option value="">Selecione</option>
 															<?php
 
-																if (isset($_POST['inputSolicitacaoId'])) {
-																	$sql = "SELECT EXUXPSetor, SetorNome
+															if (isset($_POST['inputSolicitacaoId'])) {
+																$sql = "SELECT EXUXPSetor, SetorNome
 																			FROM EmpresaXUsuarioXPerfil
 																			JOIN Setor ON SetorId = EXUXPSetor
 																			WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
 																	";
-																	$result = $conn->query($sql);
-																	$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
+																$result = $conn->query($sql);
+																$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
-																	print('<option value="' . $usuarioPerfil['EXUXPSetor'] . '" selected>' . $usuarioPerfil['SetorNome'] . '</option>');
-																} else {
+																print('<option value="' . $usuarioPerfil['EXUXPSetor'] . '" selected>' . $usuarioPerfil['SetorNome'] . '</option>');
+															} else {
 
-																	$sql = "SELECT SetorId, SetorNome
+																$sql = "SELECT SetorId, SetorNome
 																			FROM Setor
 																			JOIN Situacao on SituaId = SetorStatus
 																			WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 																			ORDER BY SetorNome ASC";
-																	$result = $conn->query($sql);
-																	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+																$result = $conn->query($sql);
+																$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-																	foreach ($row as $item) {
-																		print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
-																	}
+																foreach ($row as $item) {
+																	print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
 																}
+															}
 
 															?>
 														</select>
@@ -1684,7 +1684,7 @@ if (isset($_POST['inputData'])) {
 													<div class="form-group">
 														<label for="cmbCategoria">Categoria</label>
 														<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-															<option value="#">Selecione</option>															
+															<option value="#">Selecione</option>
 														</select>
 													</div>
 												</div>
@@ -1744,17 +1744,17 @@ if (isset($_POST['inputData'])) {
 														<select id="cmbClassificacao" name="cmbClassificacao" class="form-control form-control-select2">
 															<option value="#">Selecione</option>
 															<?php
-																$sql = "SELECT ClassId, ClassNome
+															$sql = "SELECT ClassId, ClassNome
 																		FROM Classificacao
 																		JOIN Situacao on SituaId = ClassStatus
 																		WHERE SituaChave = 'ATIVO'
 																		ORDER BY ClassNome ASC";
-																$result = $conn->query($sql);
-																$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+															$result = $conn->query($sql);
+															$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
-																foreach ($rowClassificacao as $item) {
-																	print('<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>');
-																}
+															foreach ($rowClassificacao as $item) {
+																print('<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>');
+															}
 															?>
 														</select>
 													</div>
@@ -1772,45 +1772,45 @@ if (isset($_POST['inputData'])) {
 
 									<div id="inputProdutos">
 										<?php
-											if (isset($_POST['inputSolicitacaoId'])) {
-												print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="' . $numProdutos . '">');
-											} else {
-												print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">');
-											}
+										if (isset($_POST['inputSolicitacaoId'])) {
+											print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="' . $numProdutos . '">');
+										} else {
+											print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">');
+										}
 										?>
 										<input type="hidden" id="itemEditadoquantidade" name="itemEditadoquantidade" value="0">
 										<?php
-											if (isset($_POST['inputSolicitacaoId'])) {
-												print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="' . $idsProdutos . '">');
-											} else {
-												print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">');
-											}
+										if (isset($_POST['inputSolicitacaoId'])) {
+											print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="' . $idsProdutos . '">');
+										} else {
+											print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">');
+										}
 										?>
 										<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
 										<?php
-											if (isset($_POST['inputSolicitacaoId'])) {
-												$totalGeral = 0;
+										if (isset($_POST['inputSolicitacaoId'])) {
+											$totalGeral = 0;
 
-												foreach ($produtosSolicitacao  as $produto) {
-													$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
-												}
-
-												print('<input type="hidden" id="inputTotal" name="inputTotal" value="' . $totalGeral . '">');
-											} else {
-												print('<input type="hidden" id="inputTotal" name="inputTotal" value="0">');
+											foreach ($produtosSolicitacao  as $produto) {
+												$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
 											}
+
+											print('<input type="hidden" id="inputTotal" name="inputTotal" value="' . $totalGeral . '">');
+										} else {
+											print('<input type="hidden" id="inputTotal" name="inputTotal" value="0">');
+										}
 										?>
 									</div>
 
 									<div class="row">
 										<div class="col-lg-12">
 											<?php
-												print('<table class="table" id="tabelaProdutoServicoSaida">');
+											print('<table class="table" id="tabelaProdutoServicoSaida">');
 											?>
 											<thead>
 												<?php
-													if (isset($_POST['inputSolicitacaoId'])) {
-														print('
+												if (isset($_POST['inputSolicitacaoId'])) {
+													print('
 														<tr class="bg-slate" id="trSaida" >
 															<th>Item</th>
 															<th>Produto/Serviço</th>
@@ -1822,8 +1822,8 @@ if (isset($_POST['inputData'])) {
 															<th class="text-center">Ações</th>
 														</tr>
 														');
-													} else {
-														print('
+												} else {
+													print('
 														<tr class="bg-slate" id="trSaida" style="width: 100%">
 															<th>Item</th>
 															<th>Produto/Serviço</th>
@@ -1835,16 +1835,16 @@ if (isset($_POST['inputData'])) {
 															<th class="text-center">Ações</th>
 														</tr>
 														');
-													}
+												}
 												?>
 											</thead>
 											<tbody>
 												<?php
-													if (isset($_POST['inputSolicitacaoId'])) {
-														$idProdutoSolicitacao = 0;
-														$totalGeral = 0;
+												if (isset($_POST['inputSolicitacaoId'])) {
+													$idProdutoSolicitacao = 0;
+													$totalGeral = 0;
 
-														print('<tr style="display:none;">
+													print('<tr style="display:none;">
 																	<td>&nbsp;</td>
 																	<td>&nbsp;</td>
 																	<td>&nbsp;</td>
@@ -1855,8 +1855,8 @@ if (isset($_POST['inputData'])) {
 																	<td>&nbsp;</td>
 																</tr>
 															');
-													} else {
-														print('<tr style="display:none;">
+												} else {
+													print('<tr style="display:none;">
 																	<td>&nbsp;</td>
 																	<td>&nbsp;</td>
 																	<td>&nbsp;</td>
@@ -1868,28 +1868,28 @@ if (isset($_POST['inputData'])) {
 																	<td>&nbsp;</td>
 																</tr>
 															');
-													}
+												}
 												?>
 
 												<?php
-													if (isset($_POST['inputSolicitacaoId'])) {
-														
-														$idProdutoSolicitacao = 0;
-														$totalGeral = 0;
-														
-														foreach ($produtosSolicitacao  as $produto) {
-														
-															$idProdutoSolicitacao++;
+												if (isset($_POST['inputSolicitacaoId'])) {
 
-															$valorCusto = formataMoeda($produto['ProduValorVenda']);
-															$valorTotal = formataMoeda($produto['SlXPrQuantidade'] * $produto['ProduValorVenda']);
-															$valorTotalSemFormatacao = $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+													$idProdutoSolicitacao = 0;
+													$totalGeral = 0;
 
-															$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+													foreach ($produtosSolicitacao  as $produto) {
 
-															$linha = '';
+														$idProdutoSolicitacao++;
 
-															$linha .= "
+														$valorCusto = formataMoeda($produto['ProduValorVenda']);
+														$valorTotal = formataMoeda($produto['SlXPrQuantidade'] * $produto['ProduValorVenda']);
+														$valorTotalSemFormatacao = $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+
+														$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+
+														$linha = '';
+
+														$linha .= "
 																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
 																		<td>" . $idProdutoSolicitacao . "</td>
 																		<td>" . $produto['ProduNome'] . "</td>
@@ -1900,26 +1900,26 @@ if (isset($_POST['inputData'])) {
 																
 															";
 
-															$linha .= '
+														$linha .= '
 																	<td style="text-align:center">
 																		<div class="d-flex flex-row ">
 																			<select id="' . $idProdutoSolicitacao . '" name="cmbClassificacao" class="form-control form-control-select2 selectClassific">
 																				<option value="#">Selecione</option>
 															';
 
-															$sql = "SELECT ClassId, ClassNome
+														$sql = "SELECT ClassId, ClassNome
 																	FROM Classificacao
 																	JOIN Situacao on SituaId = ClassStatus
 																	WHERE SituaChave = 'ATIVO'
 																	ORDER BY ClassNome ASC";
-															$result = $conn->query($sql);
-															$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+														$result = $conn->query($sql);
+														$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
-															foreach ($rowClassificacao as $item) {
-																$linha .= '<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>';
-															}
+														foreach ($rowClassificacao as $item) {
+															$linha .= '<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>';
+														}
 
-															$linha .= "
+														$linha .= "
 																			</select>
 																		</div>
 																	</td>
@@ -1927,32 +1927,32 @@ if (isset($_POST['inputData'])) {
 																</tr>
 															";
 
-															print($linha);
-														}
+														print($linha);
 													}
+												}
 												?>
 											</tbody>
 											<tfoot>
 												<tr>
 													<th id="totalTitulo" colspan="5" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$): </th>
 													<?php
-														if (isset($_POST['inputSolicitacaoId'])) {
-															print('
+													if (isset($_POST['inputSolicitacaoId'])) {
+														print('
 																<th colspan="1">
 																	<div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">' . formataMoeda($totalGeral) . '</div>
 																</th>
 																<th colspan="1">
 																</th>
 															');
-														} else {
-															print('
+													} else {
+														print('
 																<th colspan="1">
 																	<div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0,00</div>
 																</th>
 																<th colspan="2">
 																</th>
 															');
-														}
+													}
 													?>
 												</tr>
 											</tfoot>
@@ -1971,20 +1971,20 @@ if (isset($_POST['inputData'])) {
 														<!--<option value="#">Selecione</option>-->
 														<?php
 
-															$sql = "SELECT SituaId, SituaNome, SituaChave
+														$sql = "SELECT SituaId, SituaNome, SituaChave
 															FROM Situacao
 															WHERE SituaStatus = '1'
 															ORDER BY SituaNome ASC";
-															$result = $conn->query($sql);
-															$row = $result->fetchAll(PDO::FETCH_ASSOC);
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-															print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" readOnly>');
+														print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" readOnly>');
 
-															foreach ($row as $item) {
-																if ($item['SituaChave'] == 'LIBERADO') {
-																	print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-																}
+														foreach ($row as $item) {
+															if ($item['SituaChave'] == 'LIBERADO') {
+																print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
 															}
+														}
 														?>
 														</select>
 
