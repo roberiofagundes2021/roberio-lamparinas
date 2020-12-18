@@ -133,7 +133,7 @@ if (isset($_POST['inputCpf'])) {
 		$(document).ready(function() {
 
 			//Garantindo que ninguém mude a empresa na tela de edição
-			$('#cmbEmpresa').prop("disabled", true);
+			//$('#cmbEmpresa').prop("disabled", true);
 
 			//Já realiza o filtro dos possíveis setores e seleciona o que está informado no banco		
 			var cmbUnidade = $('#cmbUnidade').val();
@@ -175,9 +175,12 @@ if (isset($_POST['inputCpf'])) {
 					if (valOption == valorcmb) {
 
 						if (perfil == 'ALMOXARIFADO') {
+							$('#LocalEstoque').attr("required")
 
 							$('#LocalEstoque').fadeIn('300')
 						} else {
+							$('#LocalEstoque').removeAttr("required")
+
 							$('#LocalEstoque').fadeOut('300')
 						}
 					}
@@ -244,8 +247,8 @@ if (isset($_POST['inputCpf'])) {
 				var cmbSetor = $('#cmbSetor').val();
 
 				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
-				inputLogin = inputLogin.trim();
+				//inputNome = inputNome.trim();
+				//inputLogin = inputLogin.trim();
 
 				
 				// if (inputNome == '') {
@@ -290,14 +293,14 @@ if (isset($_POST['inputCpf'])) {
 				//	return false;
 				//}
 
-				$('#cmbEmpresa').prop("disabled", false);
+				//$('#cmbEmpresa').prop("disabled", false);
 
 				$("#formUsuario").submit();
 			})
 
 			$('#cancelar').on('click', function(e) {
 
-				$('#cmbEmpresa').prop("disabled", false);
+				//$('#cmbEmpresa').prop("disabled", false);
 
 				$(window.document.location).attr('href', "usuario.php");
 			});
@@ -520,10 +523,10 @@ include_once("topo.php");
 										</div>
 									</div>
 
-									<div class="col-lg-3" id="LocalEstoque" <?php if ($rowPerf['PerfiChave'] == 'ALMOXARIFADO') echo 'style="display: block"' ?> <?php if ($rowPerf['PerfiChave'] != 'ALMOXARIFADO') echo 'style="display: none"' ?>>
+									<div class="col-lg-3" id="LocalEstoque" <?php if ($rowPerf['PerfiChave'] == 'ALMOXARIFADO') echo 'style="display: block"'; ?> <?php if ($rowPerf['PerfiChave'] != 'ALMOXARIFADO') echo 'style="display: none"'; ?>>
 										<div class="form-group">
 											<label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
-											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
+											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" <?php if ($rowPerf['PerfiChave'] == 'ALMOXARIFADO') echo 'required'; ?>>
 												<option value="">Informe um Local de Estoque</option>
 												<?php
 												$sql = "SELECT LcEstId, LcEstNome

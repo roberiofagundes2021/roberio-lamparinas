@@ -963,13 +963,13 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-8">
                                             <div class="form-group">
                                                 <label for="inputDescricao">Descrição <span class="text-danger">*</span></label>
-                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" placeholder="Compras"required <?php if (isset($lancamento)) echo $lancamento['CnAReDescricao'] ?>>
+                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3"required <?php if (isset($lancamento)) echo $lancamento['CnAReDescricao'] ?>>
                                             </div>
                                         </div>
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="inputNotaFiscal">Nº Nota Fiscal/Documento</label>
-                                                <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNumDocumento'] ?>" class="form-control" placeholder="Nº Nota Fiscal/Documento">
+                                                <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNumDocumento'] ?>" class="form-control">
                                             </div>
                                         </div>
                                         <!--

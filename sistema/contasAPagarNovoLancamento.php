@@ -753,22 +753,22 @@ $dataInicio = date("Y-m-d");
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-5">
+                                        <div class="col-6">
                                             <div class="form-group">
                                                 <label for="inputDescricao">Descrição <span class="text-danger">*</span></label>
-                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" placeholder="Compras" required <?php if (isset($lancamento)) echo $lancamento['CnAPaDescricao'] ?>>
+                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" required <?php if (isset($lancamento)) echo $lancamento['CnAPaDescricao'] ?>>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="inputOrdemCarta">Ordem Compra/Carta Contrato</label>
-                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra" value="<?php if (isset($lancamento)) echo $lancamento['OrComNumero'] ?>" class="form-control" placeholder="Nº Ordem Compra/Carta Contrato">
+                                                <label for="inputOrdemCarta">Ordem Compra/C. Contrato</label>
+                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra" value="<?php if (isset($lancamento)) echo $lancamento['OrComNumero'] ?>" class="form-control" >
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputNotaFiscal">Nº Nota Fiscal/Documento</label>
-                                                <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNotaFiscal'] ?>" class="form-control" placeholder="Nº Nota Fiscal/Documento">
+                                                <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNotaFiscal'] ?>" class="form-control">
                                             </div>
                                         </div>
                                     </div>                              
