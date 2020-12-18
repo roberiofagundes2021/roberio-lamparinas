@@ -255,7 +255,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 													<div class="list-icons">
 														<div class="list-icons list-icons-extended">
-															<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'edita\', \'\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+															<!--<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'edita\', \'\');" class="list-icons-item"><i class="icon-pencil7"></i></a>-->
 															<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin"></i></a>
 															<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">

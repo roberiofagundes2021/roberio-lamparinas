@@ -50,9 +50,6 @@ if (isset($_POST['inputSolicitacaoId'])) {
 /* VALIDA SE OS DADOS VIERAM DA MESMA PÁGINA */
 if (isset($_POST['inputData'])) {
 
-	print_r($_POST);
-	die;
-
 	try {
 
 		$conn->beginTransaction();
@@ -84,7 +81,6 @@ if (isset($_POST['inputData'])) {
 			$campo = 'campo' . $i;
 
 			//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
-
 			if (isset($_POST[$campo])) {
 
 				$registro = explode('#', $_POST[$campo]);
@@ -96,15 +92,21 @@ if (isset($_POST['inputData'])) {
 					if (isset($registro[7])) {
 
 						for ($i = 1; $i <= $quantItens; $i++) {
-							// Incerindo o registro na tabela Patrimonio, caso o produto seja um bem permanente.
-
+							
+							// Se produto é um bem permanente (Insere na tabela Patrimonio).
 							if ($registro[7] == 2) {
+
+								// Selecionando o id da situacao 'ATIVO'
+								$sql = "SELECT SituaId
+										FROM Situacao
+										WHERE SituaChave = 'ATIVO' ";
+								$result = $conn->query($sql);
+								$situacao = $result->fetch(PDO::FETCH_ASSOC);
 
 								$sql = "SELECT COUNT(PatriNumero) as CONT
 										FROM Patrimonio
 										JOIN Situacao on SituaId = PatriStatus
-										WHERE PatriUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-										";
+										WHERE PatriUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' ";
 								$result = $conn->query($sql);
 								$patrimonios = $result->fetch(PDO::FETCH_ASSOC);
 								$count = $patrimonios['CONT'];
@@ -125,99 +127,51 @@ if (isset($_POST['inputData'])) {
 									if ($numeroPatri < 1000000 && $numeroPatri > 99999) $numeroPatriFinal = "0" . $numeroPatri . "";
 									if ($numeroPatri < 10000000 && $numeroPatri > 999999) $numeroPatriFinal = $numeroPatri;
 
-
-									// Selecionando o id da situacao 'ATIVO'
-									$sql = "SELECT SituaId
-												FROM Situacao
-												WHERE SituaChave = 'ATIVO' 
-												";
-									$result = $conn->query($sql);
-									$situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-
-									$sql = "INSERT INTO Patrimonio
-											(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
-											VALUES 
-											(:sNumero, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-									$result = $conn->prepare($sql);
-
-									$result->execute(array(
-										':sNumero' => $numeroPatriFinal,
-										':iStatus' => $situacao['SituaId'],
-										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-										':iUnidade' => $_SESSION['UnidadeId']
-									));
-
-									$insertIdPatrimonio = $conn->lastInsertId();
-
-
-									$sql = "INSERT INTO MovimentacaoXProduto
-											(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-											VALUES 
-											(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-									$result = $conn->prepare($sql);
-
-									$result->execute(array(
-										':iMovimentacao' => $insertId,
-										':iProduto' => $registro[1],
-										':iQuantidade' => (int) $registro[3],
-										':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-										':sLote' => $registro[5],
-										':dValidade' => $registro[6] != '0' ? $registro[6] : null,
-										':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-										':iUnidade' => $_SESSION['UnidadeId'],
-										':iPatrimonio' => $insertIdPatrimonio
-									));
 								} else {
 
 									//Caso seja o primeiro registro na tabela para esta empresa
-									$numeroPatri = '0000001';
-
-									// Selecionando o id da situacao 'ATIVO'
-									$sql = "SELECT SituaId
-												FROM Situacao
-												WHERE SituaChave = 'ATIVO' 
-												";
-									$result = $conn->query($sql);
-									$situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-									$sql = "INSERT INTO Patrimonio
-											(PatriNumero, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
-											VALUES 
-											(:sNumero, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-									$result = $conn->prepare($sql);
-
-									$result->execute(array(
-										':sNumero' => $numeroPatri,
-										':iStatus' => $situacao['SituaId'],
-										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-										':iUnidade' => $_SESSION['UnidadeId']
-									));
-
-									$insertIdPatrimonio = $conn->lastInsertId();
-
-
-									$sql = "INSERT INTO MovimentacaoXProduto
-											(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-											VALUES 
-											(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-									$result = $conn->prepare($sql);
-
-									$result->execute(array(
-										':iMovimentacao' => $insertId,
-										':iProduto' => $registro[1],
-										':iQuantidade' => (int) $registro[3],
-										':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-										':sLote' => $registro[5],
-										':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-										':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-										':iUnidade' => $_SESSION['UnidadeId'],
-										':iPatrimonio' => $insertIdPatrimonio
-									));
+									$numeroPatriFinal = '0000001';
 								}
+
+								$sql = "INSERT INTO Patrimonio
+										(PatriNumero, PatriNumSerie, PatriEstadoConservacao, PatriProduto, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
+										VALUES 
+										(:sNumero, :sNumSerie, :iEstadoConservacao, :iProduto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+								$result = $conn->prepare($sql);
+
+								$result->execute(array(
+									':sNumero' => $numeroPatriFinal,
+									':sNumSerie' => null,
+									':iEstadoConservacao' => null,
+									':iProduto' => $registro[1],
+									':iStatus' => $situacao['SituaId'],
+									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+									':iUnidade' => $_SESSION['UnidadeId']
+								));
+
+								$insertIdPatrimonio = $conn->lastInsertId();
+
+								$sql = "INSERT INTO MovimentacaoXProduto
+										(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+										VALUES 
+										(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
+								$result = $conn->prepare($sql);
+
+								$result->execute(array(
+									':iMovimentacao' => $insertId,
+									':iProduto' => $registro[1],
+									':iQuantidade' => (int) $registro[3],
+									':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
+									':sLote' => $registro[5] != '' ? $registro[5] : null,
+									':dValidade' => $registro[6] != '' ? $registro[6] : gravaData('12/09/2333'),
+									':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+									':iUnidade' => $_SESSION['UnidadeId'],
+									':iPatrimonio' => $insertIdPatrimonio
+								));
+								
 							} else {
+
 								$quantItens = intval($registro[3]);
 
 								for ($i = 1; $i <= $quantItens; $i++) {
@@ -241,7 +195,6 @@ if (isset($_POST['inputData'])) {
 									));
 								}
 							}
-							break 1;
 						}
 					} else {
 						if ((int) $registro[3] > 0) {
@@ -277,7 +230,7 @@ if (isset($_POST['inputData'])) {
 						':iServico' => $registro[1],
 						':iQuantidade' => (int) $registro[3],
 						':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
-						':sLote' => $registro[5],  //?????? Lote no Serviço????????
+						':sLote' => null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
 					));
@@ -285,77 +238,17 @@ if (isset($_POST['inputData'])) {
 			}
 		}
 
-		if (isset($_POST['cmbSituacao'])) {
-
-			$sql = "SELECT SituaId, SituaNome, SituaChave
-					FROM Situacao
-					WHERE SituaId = " . $_POST['cmbSituacao'] . "
-					";
-			$result = $conn->query($sql);
-			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
-
-			$destinoChave = '';
-
-			if ($rowSituacao['SituaChave'] == 'AGUARDANDOLIBERACAO') $destinoChave = 'CENTROADMINISTRATIVO';
-			if ($rowSituacao['SituaChave'] == 'PENDENTE') $destinoChave = 'ALMOXARIFADO';
-
-			if ($rowSituacao['SituaChave'] != 'LIBERADO') {
-				$sql = "SELECT PerfiId
-				        FROM Perfil
-				        WHERE PerfiChave = '" . $destinoChave . "' 
-				        ";
-				$result = $conn->query($sql);
-				$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
-
-				/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
-				$sIdentificacao = 'Movimentação';
-
-				$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
-								BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
-					VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, 
-							:iStatus, :iUsuarioAtualizador, :iUnidade)";
-				$result = $conn->prepare($sql);
-
-				$result->execute(array(
-					':sIdentificacao' => $sIdentificacao,
-					':dData' => date("Y-m-d"),
-					':sDescricao' => 'Liberar Movimentacao',
-					':sURL' => '',
-					':iSolicitante' => $_SESSION['UsuarId'],
-					':sTabela' => 'Movimentacao',
-					':iTabelaId' => $insertId,
-					':iStatus' => $rowSituacao['SituaId'],
-					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-					':iUnidade' => $_SESSION['UnidadeId']
-				));
-
-				$insertIdBande = $conn->lastInsertId();
-
-				$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeUnidade)
-						VALUES (:iBandeja, :iPerfil, :iUnidade)";
-				$result = $conn->prepare($sql);
-
-				$result->execute(array(
-					':iBandeja' => $insertIdBande,
-					':iPerfil' => $rowPerfil['PerfiId'],
-					':iUnidade' => $_SESSION['UnidadeId']
-				));
-
-				/* Fim Insere Bandeja */
-			}
-		}
-
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Movimentação realizada!!!";
+		$_SESSION['msg']['mensagem'] = "Movimentação de saída realizada!!!";
 		$_SESSION['msg']['tipo'] = "success";
 	} catch (PDOException $e) {
 
 		$conn->rollback();
 
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao realizar movimentação!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao realizar movimentação de saída!!!";
 		$_SESSION['msg']['tipo'] = "error";
 
 		echo 'Error: ' . $e->getMessage();
