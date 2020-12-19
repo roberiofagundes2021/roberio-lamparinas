@@ -10,7 +10,7 @@ if (isset($_POST['inputData'])) {
 
 	try {
 
-		if ($_POST['cmbMotivo'] != '') {
+		if ($_POST['cmbMotivo'] !== '') {
 			$aMotivo = explode("#", $_POST['cmbMotivo']);
 			$iMotivo = $aMotivo[0];
 		} else {
@@ -20,30 +20,29 @@ if (isset($_POST['inputData'])) {
 		$origemArray = null;
 		$idOrigem = null;
 		$tipoOrigem = null;
-		if ($_POST['cmbEstoqueOrigemLocalSetor'] != '') {
 
+		if ($_POST['cmbEstoqueOrigemLocalSetor'] !== '') {
 			$origemArray = explode('#', $_POST['cmbEstoqueOrigemLocalSetor']);
 
 			if (count($origemArray) > 2) {
 				$idOrigem = $origemArray[0];
 				$tipoOrigem = $origemArray[2];
 			}
-		} 
+		}
 
 		$destinoArray = null;
 		$idDestino = null;
 		$tipoDestino = null;
-		if ($_POST['cmbDestinoLocalEstoqueSetor'] != '#') {
 
+		if ($_POST['cmbDestinoLocalEstoqueSetor'] != '#') {
 			$destinoArray = explode('#', $_POST['cmbDestinoLocalEstoqueSetor']);
 
 			if (count($destinoArray) > 2) {
 				$idDestino = $destinoArray[0];
 				$tipoDestino = $destinoArray[2];
 			}
-		} 
-		var_dump($_POST);
-		die;
+		}
+
 
 		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
@@ -53,13 +52,6 @@ if (isset($_POST['inputData'])) {
 						:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
-		/*echo $sql;
-		echo "<br>";
-		var_dump($_POST['inputTipo'], $_POST['cmbClassificacao'], $iMotivo, gravaData($_POST['inputData']), $_POST['cmbFinalidade'], $_POST['cmbOrigem'], $_POST['cmbDestinoLocal'],
-		 $_POST['cmbDestinoSetor'], $_POST['inputDestinoManual'], $_POST['txtareaObservacao'], $_POST['cmbFornecedor'], $_POST['cmbOrdemCompra'], $_POST['inputNotaFiscal'],
-		 gravaData($_POST['inputDataEmissao']), $_POST['inputNumSerie'], gravaValor($_POST['inputValorTotal']), $_POST['inputChaveAcesso'],
-		 $_POST['cmbSituacao'], $_SESSION['UsuarId'], $_SESSION['EmpreId']);
-		die;*/
 		$conn->beginTransaction();
 
 		$result->execute(array(
@@ -67,14 +59,10 @@ if (isset($_POST['inputData'])) {
 			':iMotivo' => $iMotivo,
 			':dData' => gravaData($_POST['inputData']),
 			':iFinalidade' => null,
-
 			':iOrigemLocal' => $tipoOrigem == 'Local' ? $idOrigem : $tipoOrigem == 'OrigemLocalTransferencia' ? $idOrigem : null,
 			':iOrigemSetor' => $tipoOrigem == 'Setor' ? $idOrigem : null,
-
 			':iDestinoLocal' => $tipoDestino == 'Local' ? $idDestino : $tipoDestino == 'DestinoLocal' ? $idDestino : null,
-
 			':iDestinoSetor' => $tipoDestino == 'Setor' ? $idDestino : $tipoDestino == 'DestinoSetor' ? $idDestino : null,
-
 			':sDestinoManual' => $_POST['inputDestinoManual'] == '' ? null : $_POST['inputDestinoManual'],
 			':sObservacao' => $_POST['txtareaObservacao'],
 			':iFornecedor' => null,
@@ -84,7 +72,7 @@ if (isset($_POST['inputData'])) {
 			':sNumSerie' => null,
 			':fValorTotal' => $_POST['inputValorTotal'] == '' ? null : gravaValor($_POST['inputValorTotal']),
 			':sChaveAcesso' => null,
-			':iSituacao' => $_POST['cmbSituacao'] == '#' ? null : $_POST['cmbSituacao'],
+			':iSituacao' => $_POST['cmbSituacao'] == '' ? null : $_POST['cmbSituacao'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
@@ -124,9 +112,9 @@ if (isset($_POST['inputData'])) {
 							':iClassificacao' => null,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId'],
-							':iPatrimonio' => null // ???????
+							':iPatrimonio' => $_POST['cmbPatrimonio'] = '' ? null : $_POST['cmbPatrimonio']
 						));
-					}			
+					}
 				}
 			}
 		} catch (PDOException $e) {
@@ -252,133 +240,6 @@ if (isset($_POST['inputData'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		function mudarValores() {
-			$('#salvar').on('click', () => {
-
-				let grid = $('.trGrid')
-				let tdsModal = $('#trModal').children()
-
-				grid.each((i1, elem1) => { // each sobre a grid
-					let tr = $(elem1).children() // colocando todas as linhas em um 
-
-					let td = tr.first()
-					let indiceLinha = td.html()
-
-					tdsModal.each((i, elem2) => {
-						let indiceProdutoModal = $(elem2).html()
-						let inputHiddenProdutoServico = $(`#campo${indiceLinha}`)
-						let tipo = inputHiddenProdutoServico.attr('tipo')
-
-						if (i == 0 && indiceProdutoModal == indiceLinha) {
-
-							let novaQuantidade = $(tdsModal[2]).children().val() // pegando a quantidade digitada pelo usuário
-							let saldo = $(tdsModal[3]).children().val() // pegando o saldo do produto
-							let lote = $(tdsModal[4]).children().val() // pegando o lote digitado pelo usuário
-							let validade = $(tdsModal[5]).children().val() // pegando a validade digitada pelo usuário
-
-							let inputProdutoGridValores = inputHiddenProdutoServico.val()
-							let arrayValInput = inputProdutoGridValores.split('#')
-
-							// adicionando  novos dados no array
-							arrayValInput[3] = novaQuantidade
-							arrayValInput[4] = saldo
-							arrayValInput[5] = lote
-							arrayValInput[6] = validade
-
-							var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
-
-							var stringVallnput = arrayValInput.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
-
-							inputHiddenProdutoServico.val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
-
-
-
-							let quantInicial = inputHiddenProdutoServico.attr('quantInicial')
-							let saldoInicial = inputHiddenProdutoServico.attr('saldoInicial')
-
-							let novosValores = recalcValores(quantInicial, novaQuantidade, saldoInicial, arrayValInput[2])
-
-							$(tr[3]).html(novosValores.quantAtualizada)
-							$(tr[4]).html(novosValores.novoSaldo)
-							$(tr[6]).html("R$ " + novosValores.valorTotal)
-							$(tr[6]).attr('valorTotalSomaGeral', novosValores.somaTotalValorGeral)
-
-							$('#inputNumItens').val()
-							stringVallnput = ''
-
-							// O input itemEditadoquantidade recebe como valor a ultima quantidade editata, para garantir que pelo menos uma quantidade de produtos ou serviços foi editada 
-							$('#itemEditadoquantidade').val(novaQuantidade)
-						}
-					})
-				})
-				$('#page-modal').fadeOut(200);
-				$('body').css('overflow', 'scroll');
-
-				recalcValorTotal()
-				calcSaldoOrdemCompra()
-			})
-		}
-
-		function recalcValores(quantInicial, novaQuantidade, saldoInicial, valorUni) {
-			let valorTotal = 0
-			let novoSaldo = 0
-			let quantAtualizada = 0
-			/*quantInicial == novaQuantidade ? novoSaldo = saldoInicial : */
-			novoSaldo = saldoInicial - novaQuantidade;
-
-			//let valorTotal = novaQuantidade * valorUni;
-			//let novoSaldo = saldoInicial - novaQuantidade;
-			quantAtualizada = parseInt(novaQuantidade) + parseInt(quantInicial)
-
-			return {
-				quantAtualizada: quantAtualizada,
-				valorTotal: float2moeda(quantAtualizada * valorUni),
-				somaTotalValorGeral: novaQuantidade * valorUni,
-				novoSaldo: novoSaldo
-			};
-		}
-
-		function recalcValorTotal() {
-			let novoTotalGeral = 0
-			let velhoTotalGeral = $('#total').attr('valorTotalGeral')
-			$('.trGrid').each((i, elem) => {
-				$(elem).children().each((i, elem) => {
-					if ($(elem).hasClass('valorTotal')) {
-
-						if ($(elem).attr('valorTotalSomaGeral')) {
-							novoTotalGeral += parseFloat($(elem).attr('valorTotalSomaGeral'))
-
-							//$('#total').attr('valorTotalGeral', `${novoTotalGeral}`)
-						}
-					}
-				})
-			})
-
-			$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`).attr('valor', novoTotalGeral)
-		}
-
-
-		function inputsModal() {
-			$('#tbody-modal')
-		}
-
-		function verificaTotalNotaFiscal() {
-			let valorTotalNotaFiscal = $('#inputValorTotal').val().replace('.', '').replace(',', '.')
-			let valorTotalNotaFiscalGrid = $('#total').attr('valor')
-
-			if (parseFloat(valorTotalNotaFiscalGrid) != parseFloat(valorTotalNotaFiscal)) {
-				alerta('Atenção', 'O valor total da Nota Fiscal informado não corresponde ao total da entrada.', 'error');
-				$('#inputValorTotal').focus();
-				$("#formMovimentacao").submit((e) => {
-					e.preventDefault()
-				})
-				return false
-			}
-
-		}
-
-
-
 		$(document).ready(function() {
 
 			/* Início: Tabela Personalizada */
@@ -449,6 +310,34 @@ if (isset($_POST['inputData'])) {
 			});
 
 
+			$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
+				limpaSubCategProd();
+				FiltraCategoriaOrigem('#Categoria');
+				filtraPatrimonioProdutoOrigem();
+			});
+
+
+			$('#cmbPatrimonio').on('change', function(e) {
+				FiltraCategoriaPatrimonio({
+					tipo: '#CategoriaPatrimonio',
+					valor: e.target.value
+				});
+				// $('#cmbProduto').change();
+			});
+
+			$('#cmbSubCategoria').on('change', function(e) {
+				const idCategoria = $('#cmbCategoria').val()
+				const idSubCategoria = $('#cmbSubCategoria').val()
+				const tipoDeFiltro = 'produto';
+
+				FiltraCategoriaProduto({
+					tipoDeFiltro: 'produto',
+					idCategoria: idCategoria,
+					idSubCategoria: idSubCategoria
+				});
+			});
+
+
 			// Select2 for length menu styling
 			var _componentSelect2 = function() {
 				if (!$().select2) {
@@ -467,21 +356,21 @@ if (isset($_POST['inputData'])) {
 			_componentSelect2();
 
 
+			function limpaSubCategProd() {
+				$('#inputQuantidade').val("");
+				$('#inputValorUnitario').val("");
+				$('#inputLote').val("");
 
-			$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
-				FiltraCategoriaOrigem('#Categoria');
-				filtraPatrimonioProdutoOrigem();
-			});
+				const optionSubCategoria = '<option value="" "selected">Selecione a Subcategoria</option>';
+				const optionProduto = '<option value="" "selected">Selecione o Produto</option>';
 
+				$('#cmbSubCategoria').html('');
+				$('#cmbSubCategoria').append(optionSubCategoria)
 
+				$('#cmbProduto').html('');
+				$('#cmbProduto').append(optionProduto)
+			}
 
-			$('#cmbPatrimonio').on('change', function(e) {
-				FiltraCategoriaPatrimonio({
-					tipo: '#CategoriaPatrimonio',
-					valor: e.target.value
-				});
-				// $('#cmbProduto').change();
-			});
 
 			function filtraPatrimonioProdutoOrigem() {
 				const cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val().split('#')
@@ -512,7 +401,6 @@ if (isset($_POST['inputData'])) {
 					console.log('Erro ao filtrar patrimonios: ' + err);
 				}
 			}
-
 
 
 			function FiltraCategoriaOrigem(props) {
@@ -668,9 +556,6 @@ if (isset($_POST['inputData'])) {
 					} catch (err) {
 						console.log('Erro ao carregar dados da Categoria: ' + err);
 					}
-
-
-
 				}
 			}
 
@@ -700,15 +585,20 @@ if (isset($_POST['inputData'])) {
 						});
 
 						$('#cmbSubCategoria').html(option).show();
+
 					} else {
 						ResetSubCategoria();
 					}
 				}).fail(function(m) {
-
+					console.log(m);
 				});
 
+				FiltraCategoriaProduto({
+					tipoDeFiltro: 'produto',
+					idCategoria: idCategoria,
+					idSubCategoria: idSubCategoria
+				});
 			});
-
 
 
 
@@ -730,23 +620,11 @@ if (isset($_POST['inputData'])) {
 
 
 
-			$('#cmbSubCategoria').on('change', function(e) {
-				const idCategoria = $('#cmbCategoria').val()
-				const idSubCategoria = $('#cmbSubCategoria').val()
-				const tipoDeFiltro = 'produto';
-
-				FiltraCategoriaProduto({
-					tipoDeFiltro: 'produto',
-					idCategoria: idCategoria,
-					idSubCategoria: idSubCategoria
-				});
-			});
 
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			function FiltraCategoriaProduto(props) {
 
 				$('#cmbProduto').html('<option value="" "selected">Filtrando...</option>');
-
 
 				try {
 					$.ajax({
@@ -758,8 +636,7 @@ if (isset($_POST['inputData'])) {
 							idSubCategoria: props.idSubCategoria
 						},
 						success: function(respostaProduto) {
-
-							var option = '<option value="#" selected>Selecione o produto</option>';
+							var option = '<option value="" selected>Selecione o produto</option>';
 							if (respostaProduto !== 'sem dados') {
 								$('#cmbProduto').html('');
 								$('#cmbProduto').append(option)
@@ -770,10 +647,10 @@ if (isset($_POST['inputData'])) {
 						}
 					})
 				} catch (err) {
-					console.log('Erro ao carregar dados da Categoria: ' + err);
+					console.log('Erro ao carregar dados do Produto: ' + err);
 				}
-
 			};
+
 
 			//Ao mudar o Produto, trazer o Valor Unitário do cadastro (retorno via JSON)
 			$('#cmbProduto').on('change', function(e) {
@@ -796,7 +673,9 @@ if (isset($_POST['inputData'])) {
 			});
 
 
+
 			$("input[type=radio][name=inputTipo]").click(function() {
+				console.log('INPUT TIPO E PRODUTO NA LISTA, LINHA 806')
 
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputNumItens = $('#inputNumItens').val();
@@ -806,7 +685,7 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
-				$('#cmbCategoria').val("#");
+				$('#cmbCategoria').val("");
 				$('#inputQuantidade').val("");
 				$('#inputValorUnitario').val("");
 				$('#inputLote').val("");
@@ -1020,7 +899,6 @@ if (isset($_POST['inputData'])) {
 			//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
 			function Filtrando() {
 				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-				FiltraProduto();
 			}
 
 			//Mostra o "Filtrando..." na combo Produto
@@ -1073,14 +951,6 @@ if (isset($_POST['inputData'])) {
 		};
 
 
-		function selecionaProdutoServico(tipo) {
-			document.getElementById('formLote').style.display = "block";
-			document.getElementById('formValidade').style.display = "block";
-			document.getElementById('classificacao').style.display = "block";
-			$('#tituloProdutoServico').html('Dados dos Produtos')
-			$('[for=cmbProduto]').html('Produto')
-		}
-
 		function selecionaMotivo(motivo) {
 			var Motivo = motivo.split("#");
 			var chave = Motivo[1];
@@ -1095,16 +965,16 @@ if (isset($_POST['inputData'])) {
 			}
 		}
 
+
 		function verifcMumero(elem) {
 			if (typeof $(elem).val() == 'string') {
 				return false
 			}
 		}
 
+
 		function float2moeda(num) {
-
 			x = 0;
-
 			if (num < 0) {
 				num = Math.abs(num);
 				x = 1;
@@ -1122,7 +992,6 @@ if (isset($_POST['inputData'])) {
 			if (x == 1) ret = ' - ' + ret;
 
 			return ret;
-
 		}
 	</script>
 
@@ -1191,8 +1060,9 @@ if (isset($_POST['inputData'])) {
 
 							<div class="row">
 								<div class="col-lg-12">
+									<h5 class="mb-0 font-weight-semibold">Dados da Transferência</h5>
+									<br>
 									<div class="row">
-
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputData">Data<span style="color: red">*</span></label>
@@ -1405,9 +1275,9 @@ if (isset($_POST['inputData'])) {
 									?>
 									<thead>
 										<?php
-									
-											print('
-												<tr class="bg-slate" id="trGrid" >
+
+										print('
+												<tr class="bg-slate"  >
 													<th>Item</th>
 													<th>Produto</th>
 													<th>Nº do Patrimônio</th>
@@ -1444,12 +1314,12 @@ if (isset($_POST['inputData'])) {
 											<th id="totalTitulo" colspan="6" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$): </th>
 											<?php
 
-												print('
+											print('
 													<th colspan="1">
 														<div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0,00</div>
 													</th>
 												');
-												print('
+											print('
 													<th colspan="2">
 													</th>
 												');
@@ -1471,47 +1341,32 @@ if (isset($_POST['inputData'])) {
 												<!--<option value="#">Selecione</option>-->
 												<?php
 
-													if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
-														$sql = "SELECT SituaId, SituaNome, SituaChave
+												if ($_SESSION['PerfiChave'] == 'CONTROLADORIA' || $_SESSION['PerfiChave'] == 'SUPER') {
+													$sql = "SELECT SituaId, SituaNome, SituaChave
 																FROM Situacao
 																WHERE SituaStatus = '1'
 																ORDER BY SituaNome ASC";
-														$result = $conn->query($sql);
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-														print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2">');
-														print('<option value="#">Selecione</option>');
+													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2">');
+													print('<option value="#">Selecione</option>');
 
-														foreach ($row as $item) {
-															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
-																if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-																	print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-																} else {
-																	print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-																}
-															}
-														}
-													} else {
-
-														$sql = "SELECT SituaId, SituaNome, SituaChave
-																	FROM Situacao
-																	WHERE SituaStatus = '1'
-																	ORDER BY SituaNome ASC";
-														$result = $conn->query($sql);
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-														print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
-														print('<option value="#">Selecione</option>');
-
-														foreach ($row as $item) {
+													foreach ($row as $item) {
+														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
 															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
 																print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-															} else if ($item['SituaChave'] == 'LIBERADO') {
+															} else {
 																print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
 															}
 														}
 													}
-												
+												} else {
+													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
+													print('<option value="#">Selecione</option>');
+													print('<option value="9" selected>Aguardando Liberação</option>');
+												}
+
 												?>
 												</select>
 
@@ -1536,38 +1391,6 @@ if (isset($_POST['inputData'])) {
 
 				</div>
 				<!-- /info blocks -->
-
-				<div id="page-modal" class="custon-modal">
-					<div class="custon-modal-container">
-						<div class="card custon-modal-content">
-							<!-- <div class="custon-modal-title">
-								<i class=""></i>
-								<p class="h3">Itens Recebidos</p>
-								<i class=""></i>
-							</div> -->
-
-
-							<div class="card-footer mt-2 d-flex flex-column">
-								<!-- <table class="table table-modal">
-									<thead id="thead-modal">
-
-									</thead>
-									<tbody id="tbody-modal">
-
-									</tbody>
-								</table> -->
-								<div class="row" style="margin-top: 10px;">
-									<div class="col-lg-12">
-										<div class="form-group">
-											<button class="btn btn-lg btn-principal" id="salvar">Salvar</button>
-											<a id="modal-close" class="btn btn-basic" role="button">Cancelar</a>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
 
 			</div>
 			<!-- /content area -->

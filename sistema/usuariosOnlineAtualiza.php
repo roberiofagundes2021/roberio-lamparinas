@@ -19,7 +19,7 @@ if (isset($_POST['timesTampUsuarioOnline'])) {
 
     $segundos = $segundos + 1;
 
-    $string = $hora.":".$minuto.":".$segundos;
+    $string = $hora . ":" . $minuto . ":" . $segundos;
 
     $sql = "SELECT UsuarId, UsuarNome, UsuarDataAcesso, SetorNome
                 FROM Usuario
@@ -29,10 +29,10 @@ if (isset($_POST['timesTampUsuarioOnline'])) {
                 ORDER BY UsuarDataAcesso";
     $result = $conn->query($sql);
     $row = $result->fetchAll(PDO::FETCH_ASSOC);
-var_dump($row);
+    var_dump($row);
 
 
-/**$ultimoAcesso = $_POST['timesTampUsuarioOnline'];
+    /**$ultimoAcesso = $_POST['timesTampUsuarioOnline'];
     $hora = intval($_POST['hora']);
     $minuto = intVal($_POST['minuto']);
     $segundos = intval($_POST['segundos']);

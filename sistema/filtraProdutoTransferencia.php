@@ -5,10 +5,17 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 
-if ($_POST['tipoDeFiltro'] == 'produto') {
+if (
+	$_POST['tipoDeFiltro'] == 'produto'
+	&& $_POST['idSubCategoria'] !== ''
+	&& $_POST['idSubCategoria'] !== null
+) {
 	$sql = "SELECT DISTINCT CONVERT(varchar(10), produid) 
 	+ '#' 
-	+ CONVERT(varchar(10),ProduValorCusto) as ProduValue, ProduNome, ProduValorCusto, ProduCustoFinal
+	+ CONVERT(varchar(10),ProduValorCusto) as ProduValue, 
+	       ProduNome, 
+				 ProduValorCusto, 
+				 ProduCustoFinal
 		from Produto
 		JOIN MovimentacaoXProduto
 			on MvXPrProduto = ProduId
@@ -24,6 +31,26 @@ if ($_POST['tipoDeFiltro'] == 'produto') {
 		and MovimTipo = 'E'
 		and ProduCategoria = " . $_POST['idCategoria'] . "
 		and ProduSubCategoria = " . $_POST['idSubCategoria'] . "
+		ORDER BY ProduNome ASC";
+} else {
+	$sql = "SELECT DISTINCT CONVERT(varchar(10), produid) 
+	+ '#' 
+	+ CONVERT(varchar(10),ProduValorCusto) as ProduValue, 
+	       ProduNome, 
+				 ProduValorCusto, 
+				 ProduCustoFinal
+		from Produto
+		JOIN MovimentacaoXProduto
+			on MvXPrProduto = ProduId
+		JOIN Movimentacao 
+			on MovimId = MvXPrMovimentacao
+		JOIN Categoria 
+			on CategId = ProduCategoria
+		JOIN Situacao 
+			on SituaId = MovimSituacao
+		WHERE SituaChave = 'LIBERADO'
+		and MovimTipo = 'E'
+		and ProduCategoria = " . $_POST['idCategoria'] . "
 		ORDER BY ProduNome ASC";
 }
 

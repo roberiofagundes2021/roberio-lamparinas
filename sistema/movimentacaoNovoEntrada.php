@@ -95,7 +95,6 @@ if (isset($_POST['inputData'])) {
 							':iPatrimonio' => null
 						));
 					}
-
 				} else {
 					$sql = "INSERT INTO MovimentacaoXServico
 							(MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrLote, MvXSrUsuarioAtualizador, MvXSrUnidade)
@@ -193,7 +192,7 @@ if (isset($_POST['inputData'])) {
 		echo 'Error: ' . $e->getMessage();
 		exit;
 	}
-	
+
 	irpara("movimentacao.php");
 }
 
@@ -233,7 +232,6 @@ if (isset($_POST['inputData'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		
 		function produtosOrdemCompra(ordemCompra) {
 			let inputLote = $('#inputLote').val();
 			let numOrdemCompra = $('#cmbOrdemCompra').val()
@@ -420,7 +418,7 @@ if (isset($_POST['inputData'])) {
 							$(tr[4]).html(novosValores.novoSaldo)
 							$(tr[6]).html("R$ " + novosValores.valorTotal)
 							$(tr[6]).attr('valorTotalSomaGeral', novosValores.somaTotalValorGeral)
-							
+
 							console.log(novosValores.somaTotalValorGeral);
 
 							$('#inputNumItens').val()
@@ -478,7 +476,7 @@ if (isset($_POST['inputData'])) {
 
 		function calcSaldoOrdemCompra() {
 			let valorTotal = $('#total').attr('valor')
-			let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial')  ///??????????????????? undefined
+			let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial') ///??????????????????? undefined
 
 			//console.log(valorTotal)
 			//console.log(valorSaldoOrdemCompra)
@@ -616,14 +614,14 @@ if (isset($_POST['inputData'])) {
 					$('#cmbSituacao').focus();
 					$("#formMovimentacao").submit();
 					return false;
-				}				
+				}
 
 				//desabilita as combos "Fornecedor" e "Situacao" na hora de gravar, senão o POST não o encontra
 				//$('#cmbFornecedor').prop('disabled', false);
 				$('#cmbSituacao').prop('disabled', false);
 
 				$("#formMovimentacao").submit();
-				
+
 				//console.log(inputTipo)
 			});
 
@@ -645,17 +643,18 @@ if (isset($_POST['inputData'])) {
 
 		function selecionaTipo(tipo) {
 
-			$('#divConteudo').css({"background-color":"#eeeded",
-									"box-shadow":"none"
-									});
+			$('#divConteudo').css({
+				"background-color": "#eeeded",
+				"box-shadow": "none"
+			});
 			$('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
 
 			if (tipo == 'E') {
-				location.href='movimentacaoNovoEntrada.php';
+				location.href = 'movimentacaoNovoEntrada.php';
 			} else if (tipo == 'S') {
-				location.href='movimentacaoNovoSaida.php';
+				location.href = 'movimentacaoNovoSaida.php';
 			} else {
-				location.href='movimentacaoNovoTransferencia.php';
+				location.href = 'movimentacaoNovoTransferencia.php';
 			}
 		}
 
@@ -743,7 +742,7 @@ if (isset($_POST['inputData'])) {
 
 				<!-- Info blocks -->
 				<div class="card" id="divConteudo">
-					
+
 					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovoEntrada.php">
 						<div class="card-body">
 
@@ -895,7 +894,7 @@ if (isset($_POST['inputData'])) {
 									<table class="table" id="tabelaProdutoServico">
 										<thead>
 											<?php
-												print('
+											print('
 													<tr class="bg-slate" id="trEntrada">
 														<th>Item</th>
 														<th>Produto/Serviço</th>
@@ -915,12 +914,12 @@ if (isset($_POST['inputData'])) {
 											<tr>
 												<th id="totalTitulo" colspan="6" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$) Nota Fiscal: </th>
 												<?php
-													print('
+												print('
 															<th colspan="1">
 																<div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0,00</div>
 															</th>
 													');
-													print('<th colspan="2">
+												print('<th colspan="2">
 
 															</th>
 													');
@@ -942,40 +941,40 @@ if (isset($_POST['inputData'])) {
 
 												<?php
 
-													$sql = "SELECT SituaId, SituaNome, SituaChave
+												$sql = "SELECT SituaId, SituaNome, SituaChave
 															FROM Situacao
 															WHERE SituaStatus = '1'
 															ORDER BY SituaNome ASC";
-													$result = $conn->query($sql);
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+												$result = $conn->query($sql);
+												$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
+												if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
 
-														print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" required>');
-														print('<option value="">Selecione</option>');
+													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" required>');
+													print('<option value="">Selecione</option>');
 
-														foreach ($row as $item) {
-															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
-																if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-																	print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-																} else {
-																	print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-																}
-															}
-														}
-													} else {
-
-														print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
-														print('<option value="#">Selecione</option>');
-
-														foreach ($row as $item) {
+													foreach ($row as $item) {
+														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
 															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
 																print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-															} else if ($item['SituaChave'] == 'LIBERADO') {
+															} else {
 																print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
 															}
 														}
 													}
+												} else {
+
+													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
+													print('<option value="#">Selecione</option>');
+
+													foreach ($row as $item) {
+														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
+															print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
+														} else if ($item['SituaChave'] == 'LIBERADO') {
+															print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+														}
+													}
+												}
 												?>
 												</select>
 
@@ -999,7 +998,7 @@ if (isset($_POST['inputData'])) {
 
 
 				</div>
-				<!-- /info blocks -->				
+				<!-- /info blocks -->
 
 				<div id="page-modal" class="custon-modal">
 					<div class="custon-modal-container">
