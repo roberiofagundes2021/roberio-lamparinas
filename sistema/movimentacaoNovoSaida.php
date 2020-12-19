@@ -197,7 +197,7 @@ if (isset($_POST['inputData'])) {
 							}
 						}
 					} else {
-						if ((int) $registro[3] > 0) {
+						if ((int) $registro[3] > 0) { //Quantidade > 0
 							$sql = "INSERT INTO MovimentacaoXProduto
 									(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
 									VALUES 

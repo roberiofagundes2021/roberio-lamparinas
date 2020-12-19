@@ -90,7 +90,7 @@ if ($_POST['tipoDeFiltro'] == '#Categoria') {
 							  ON categid = produCategoria
 							JOIN SubCategoria
 							  ON SbCatId = ProduSubCategoria
-						 WHERE PATRINUMERO = " . $_POST['valor'] . "";
+						 WHERE PatriId = " . $_POST['valor'] . "";
 
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);

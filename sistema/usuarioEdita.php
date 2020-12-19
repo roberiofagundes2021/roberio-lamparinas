@@ -135,37 +135,58 @@ if (isset($_POST['inputCpf'])) {
 			//Garantindo que ninguém mude a empresa na tela de edição
 			//$('#cmbEmpresa').prop("disabled", true);
 
+			let perfil = $('#cmbPerfil').find(':selected').attr('chaveperfil');
+			let almoxarifado = perfil == 'ALMOXARIFADO'
+
+			//Não está funcionado.. deveria!!!!	
+			$("#formUsuario").validate({
+				rules: {
+					cmbLocalEstoque: {
+						required: true //aqui deveria vir a variável "almoxarifado" no lugar do true
+					},
+					'inputSenha': "required",
+				    'inputConfirmaSenha': {
+      					equalTo: "#inputSenha"
+    				}
+				}
+			});
+
 			//Já realiza o filtro dos possíveis setores e seleciona o que está informado no banco		
 			var cmbUnidade = $('#cmbUnidade').val();
 			var cmbSetor = $('#cmbSetor').val();
 
-			if (cmbUnidade == '') {
-				Reset();
-			} else {
+			$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
 
-				$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
+				var option = '<option value="">Selecione o Setor</option>';
 
-					var option = '<option value="">Selecione o Setor</option>';
+				if (dados.length) {
 
-					if (dados.length) {
+					$.each(dados, function(i, obj) {
+						if (obj.SetorId == cmbSetor) {
+							option += '<option value="' + obj.SetorId + '" selected="selected">' + obj.SetorNome + '</option>';
+						} else {
+							option += '<option value="' + obj.SetorId + '">' + obj.SetorNome + '</option>';
+						}
+					});
 
-						$.each(dados, function(i, obj) {
-							if (obj.SetorId == cmbSetor) {
-								option += '<option value="' + obj.SetorId + '" selected="selected">' + obj.SetorNome + '</option>';
-							} else {
-								option += '<option value="' + obj.SetorId + '">' + obj.SetorNome + '</option>';
-							}
-						});
-
-						$('#cmbSetor').html(option).show();
-					} else {
-						Reset();
-					}
-				});
-			}
+					$('#cmbSetor').html(option).show();
+				}
+			});
 
 			$('#cmbPerfil').on('change', function(e) {
 			
+				let cmbPerfil = $('#cmbPerfil').val();
+				let perfil = $('#cmbPerfil').find(':selected').attr('chaveperfil');
+
+				if (perfil == 'ALMOXARIFADO') {
+					alert('Entrou1')
+					$('#cmbLocalEstoque').show()
+				} else {
+					alert('Entrou2')
+					$('#cmbLocalEstoque').hide()
+				}
+
+				/*
 				let filhos = $('#cmbPerfil').children()
 				let valorcmb = $('#cmbPerfil').val()
 				filhos.each((i, elem) => {
@@ -183,8 +204,10 @@ if (isset($_POST['inputCpf'])) {
 
 							$('#LocalEstoque').fadeOut('300')
 						}
+					} else {
+						$('#LocalEstoque').removeAttr("required")
 					}
-				})
+				})*/
 			})
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
@@ -238,60 +261,15 @@ if (isset($_POST['inputCpf'])) {
 
 				e.preventDefault();
 
-				var inputNome = $('#inputNome').val();
-				var cmbPerfil = $('#cmbPerfil').val();
-				var inputLogin = $('#inputLogin').val();
 				var inputSenha = $('#inputSenha').val();
 				var inputConfirmaSenha = $('#inputConfirmaSenha').val();
-				var cmbUnidade = $('#cmbUnidade').val();
-				var cmbSetor = $('#cmbSetor').val();
 
-				//remove os espaços desnecessários antes e depois
-				//inputNome = inputNome.trim();
-				//inputLogin = inputLogin.trim();
-
-				
-				// if (inputNome == '') {
-				// 	alerta('Atenção', 'Informe o nome do usuário!', 'error');
-				// 	$('#inputNome').focus();
-				// 	return false;
-				// }
-
-				// if (cmbPerfil == '#') {
-				// 	alerta('Atenção', 'Informe o perfil!', 'error');
-				// 	$('#cmPerfil').focus();
-				// 	return false;
-				// }
-
-				// if (inputLogin == '') {
-				// 	alerta('Atenção', 'Informe o login!', 'error');
-				// 	$('#inputLogin').focus();
-				// 	return false;
-				// }
-
-				// if (inputSenha == '') {
-				// 	alerta('Atenção', 'Informe senha!', 'error');
-				// 	$('#inputSenha').focus();
-				// 	return false;
-				// }
-
-					if (inputSenha != inputConfirmaSenha) {
+				if (inputSenha != inputConfirmaSenha) {
 					alerta('Atenção', 'A confirmação de senha não confere!', 'error');
 					$('#inputConfirmaSenha').focus();
+					$("#formUsuario").submit();
 					return false;
 				}
-
-				// if (cmbUnidade == '#') {
-				// 	alerta('Atenção', 'Informe a unidade!', 'error');
-				// 	$('#cmUnidade').focus();
-				// 	return false;
-				// }
-
-				//if (cmbSetor == '' || cmbSetor == 'Filtrando...') {
-				//	alerta('Atenção', 'Informe o setor!', 'error');
-				//	$('#cmSetor').focus();
-				//	return false;
-				//}
 
 				//$('#cmbEmpresa').prop("disabled", false);
 
@@ -526,7 +504,7 @@ include_once("topo.php");
 									<div class="col-lg-3" id="LocalEstoque" <?php if ($rowPerf['PerfiChave'] == 'ALMOXARIFADO') echo 'style="display: block"'; ?> <?php if ($rowPerf['PerfiChave'] != 'ALMOXARIFADO') echo 'style="display: none"'; ?>>
 										<div class="form-group">
 											<label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
-											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" <?php if ($rowPerf['PerfiChave'] == 'ALMOXARIFADO') echo 'required'; ?>>
+											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" <?php //if ($rowPerf['PerfiChave'] == 'ALMOXARIFADO') echo 'required'; ?>>
 												<option value="">Informe um Local de Estoque</option>
 												<?php
 												$sql = "SELECT LcEstId, LcEstNome
