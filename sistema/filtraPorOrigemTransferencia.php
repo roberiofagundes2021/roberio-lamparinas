@@ -58,7 +58,6 @@ if ($_POST['tipoDeFiltro'] == '#Categoria') {
 							WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " 
 							  and MovimDestinoSetor = " . $post_string[0] . "  
 								and SituaChave = 'LIBERADO'
-								AND PatriId 						= " . $_POST['valor'] . "
 						ORDER BY CategNome ASC";
 
 		$result = $conn->query($sql);
@@ -131,13 +130,15 @@ if ($_POST['tipoDeFiltro'] == '#Categoria') {
 
 	$sql = "SELECT PatriId, PatriNumero
 						FROM Patrimonio
-			 LEFT JOIN MovimentacaoXProduto 
-							ON MvXPrPatrimonio = PatriId
-			 LEFT JOIN Movimentacao 
-			        ON MovimId 	= MvXPrMovimentacao
+						JOIN MovimentacaoXProduto 
+						  ON MvXPrPatrimonio = PatriId
+						JOIN Movimentacao 
+						  ON MovimId = MvXPrMovimentacao
+						JOIN Situacao 
+						  ON SituaId = MovimSituacao
 					 WHERE MvXPrUnidade 			= " . $_SESSION['UnidadeId'] . "
-						 AND MovimDestinoSetor 	= " . $_POST['origem'] . " 
-						 AND MovimTipo 					= 'S'";
+					   AND MovimDestinoSetor 	= " . $_POST['origem'] . " 
+						 AND SituaChave = 'LIBERADO'";
 
 	$result = $conn->query($sql);
 	$rowPatrimonios = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -474,147 +474,6 @@ if (isset($_POST['inputData'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		function produtosOrdemCompra(ordemCompra) {
-			let inputLote = $('#inputLote').val();
-			let numOrdemCompra = $('#cmbOrdemCompra').val()
-
-			$.ajax({
-				type: "POST",
-				url: "movimentacaoAddProdutoOrdemCompra.php",
-				data: {
-					ordemCompra: ordemCompra,
-					numOrdemCompra: numOrdemCompra,
-					lote: inputLote
-				},
-				success: function(resposta) {
-					$("#tabelaProdutoServico").html(resposta);
-
-					let total = $('#total').html();
-
-					$("#inputTotal").val(total);
-					modalAcoes()
-					mudarValores()
-
-					let todasLinhas = $('.trGrid')
-					$('#inputNumItens').val(todasLinhas.length)
-
-				}
-
-			});
-
-			$.ajax({
-				type: "POST",
-				url: "movimentacaoSaldoOrdemCompra.php",
-				data: {
-					ordemCompra: ordemCompra,
-				},
-				success: function(resposta) {
-					$("#inputTotalOrdemCompraCartaContrato").val(float2moeda(resposta)).attr('disabled', '').attr('valor', resposta);
-				}
-			})
-		}
-
-		function modalAcoes() {
-
-			$('.btn-acoes').each((i, elem) => {
-				$(elem).on('click', function() {
-					$('#page-modal').fadeIn(200);
-
-					let linha = $(elem).parent().parent()
-					let todasLinhas = $(elem).parent().parent().parent()
-					let saldoinicialModal = $(elem).parent().next().attr('saldoInicial') // selecionando o valor do input hidden
-
-					if ($(elem).attr('idRow') == linha.attr('id')) {
-						let tds = linha.children();
-						let tipoProdutoServico = $(tds[8]).attr('tipo');
-
-
-
-						let valores = [];
-
-						let inputItem = $('<td></td>');
-						let inputProdutoServico = $('<input type="text">');
-						let inputQuantidade = $('<input type="text">');
-						let inputSaldo = $('<input type="text">');
-						let inputValidade = $('<input type="text">');
-
-						let linhaTabela = '';
-
-						tds.each((i, elem) => {
-							valores[i] = $(elem).html();
-						})
-
-						inputItem.val(valores[0]);
-
-						if (tipoProdutoServico != 'P') {
-
-							cabecalho = `
-							               
-							                <tr class="bg-slate">
-											     <th width="5%">Item</th>
-											     <th width="75%">Serviço</th>
-											     <th width="10%">Quantidade</th>
-												 <th width="10%">Saldo</th>
-											     <th width="10%"></th>
-									     	</tr>
-							                    `;
-
-							linhaTabela = `<tr id='trModal'>
-						                        <td>${valores[0]}</td>
-												<td>${valores[1]}</td>
-												<td><input id='quantidade' type="text" class="form-control" value="" style="text-align: center" autofocus></td>
-												<td><input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled></td>
-											</tr>
-						                  `;
-						} else {
-							cabecalho = `
-							             	<tr class="bg-slate">
-										        	<th width="5%">Item</th>
-										        	<th width="45%">Produto</th>
-										        	<th width="8%">Quantidade</th>
-										        	<th width="10%">Saldo</th>
-										        	<th width="10%">Lote</th>
-										        	<th width="12%">Validade</th>
-								    		</tr>
-												`;
-
-							linhaTabela = `<tr id='trModal'>
-						                                    <td>${valores[0]}</td>
-												            <td>${valores[1]}</td>
-												            <td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" style="text-align: center" autofocus></td>
-												            <td><input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center"  disabled></td>
-								                            <td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
-															<td><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
-														</tr>
-								                        `;
-						}
-
-						$('#thead-modal').html(cabecalho);
-
-						$('#tbody-modal').html(linhaTabela);
-
-						// Esta função não permite que o valor digitado pelo usuário seja maior que o valor de saldo.
-						function validaQuantInputModal(quantMax) {
-							$('#quantidade').on('keyup', function() {
-								if (parseInt($('#quantidade').val()) > parseInt(quantMax)) {
-									$('#quantidade').val(quantMax)
-								}
-							})
-						}
-
-						validaQuantInputModal($('#saldo').val())
-
-						$('#quantidade').focus()
-					}
-				})
-			})
-
-			$('#modal-close').on('click', function() {
-				$('#page-modal').fadeOut(200);
-				$('body').css('overflow', 'scroll');
-			})
-		}
-
 		function mudarValores() {
 			$('#salvar').on('click', () => {
 
@@ -683,8 +542,6 @@ if (isset($_POST['inputData'])) {
 		}
 
 		function recalcValores(quantInicial, novaQuantidade, saldoInicial, valorUni) {
-
-
 			let valorTotal = 0
 			let novoSaldo = 0
 			let quantAtualizada = 0
@@ -747,7 +604,7 @@ if (isset($_POST['inputData'])) {
 		$(document).ready(function() {
 
 			/* Início: Tabela Personalizada */
-			$('#tabelaProdutoServicoSaida').DataTable({
+			$('#tabelaProduto').DataTable({
 				"order": [
 					[0, "asc"]
 				],
@@ -759,39 +616,44 @@ if (isset($_POST['inputData'])) {
 						targets: [0]
 					},
 					{
-						orderable: true, //Produto/Servico
+						orderable: true, //Produto
 						width: "30%",
 						targets: [1]
 					},
 					{
-						orderable: true, //Unidade Medida
-						width: "15%",
+						orderable: true, //Nª do patrimonio
+						width: "10%",
 						targets: [2]
 					},
 					{
-						orderable: true, //Quantidade
+						orderable: true, //Unidade Medida
 						width: "10%",
 						targets: [3]
 					},
 					{
-						orderable: true, //Valor Unitário
+						orderable: true, //Quantidade
 						width: "10%",
 						targets: [4]
 					},
 					{
-						orderable: true, //Valor Total
+						orderable: true, //Valor Unitário
 						width: "10%",
 						targets: [5]
 					},
 					{
-						orderable: false, //Classificação
-						width: "15%",
+						orderable: true, //Valor Total
+						width: "10%",
 						targets: [6]
+					},
+					{
+						orderable: false, //Validade
+						whidth: "10",
+						targets: [7]
 					},
 					{
 						orderable: false, //Ações
 						width: "5%",
-						targets: [7]
+						targets: [8]
 					}
 				],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -829,31 +691,7 @@ if (isset($_POST['inputData'])) {
 
 
 			$('#cmbEstoqueOrigemLocalSetor').on('change', function(e) {
-				const cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val();
-
-				try {
-
-					$.getJSON('filtraPatrimonio.php?idCategoria=' + cmbOrigem, function(dados) {
-						let option = '<option value="#" "selected">Selecione o Produto</option>';
-						if (dados.length) {
-
-							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
-							});
-
-							$('#cmbProduto').html(option).show();
-						} else {
-							ResetProduto();
-						}
-					});
-
-
-					FiltraCategoriaOrigem('#Categoria');
-
-				} catch (err) {
-					console.log('OrigemLocalSetor: ' + err);
-				}
-
+				FiltraCategoriaOrigem('#Categoria');
 				filtraPatrimonioProdutoOrigem();
 			});
 
@@ -872,7 +710,7 @@ if (isset($_POST['inputData'])) {
 				const selectPatrimonio = document.querySelector('#cmbPatrimonio');
 				let tipoDeFiltro = 'Patrimonio'
 
-				$('#cmbPatrimonio').html('<option value="#" "selected">Filtrando...</option>');
+				$('#cmbPatrimonio').html('<option value="" "selected">Filtrando...</option>');
 				try {
 					$.ajax({
 						type: "POST",
@@ -882,13 +720,13 @@ if (isset($_POST['inputData'])) {
 							tipoDeFiltro: tipoDeFiltro
 						},
 						success: function(resposta) {
-							var option = '<option value="#" "selected">Selecione o Patrimônio</option>';
+							var option = '<option value="" "selected">Selecione o Patrimônio</option>';
 							if (resposta !== '') {
 								$('#cmbPatrimonio').html('');
 								$('#cmbPatrimonio').append(option)
 								$('#cmbPatrimonio').append(resposta)
 							} else {
-								$('#cmbPatrimonio').html('<option value="#" "selected">Sem Patrimônios</option>');
+								$('#cmbPatrimonio').html('<option value="" "selected">Sem Patrimônios</option>');
 							}
 						}
 					})
@@ -905,7 +743,7 @@ if (isset($_POST['inputData'])) {
 
 				FiltraCategoria();
 
-				$('#cmbCategoria').html('<option value="#" "selected">Filtrando...</option>');
+				$('#cmbCategoria').html('<option value="" "selected">Filtrando...</option>');
 
 				try {
 					$.ajax({
@@ -916,14 +754,14 @@ if (isset($_POST['inputData'])) {
 							tipoDeFiltro: tipoDeFiltro
 						},
 						success: function(resposta) {
-							var option = '<option value="#" "selected">Selecione a Categoria</option>';
+							var option = '<option value="" "selected">Selecione a Categoria</option>';
 							if (resposta !== 'sem dados') {
 								$('#cmbCategoria').html('');
 								$('#cmbCategoria').append(option)
 								$('#cmbCategoria').append(resposta)
 
 							} else {
-								$('#cmbCategoria').html('<option value="#" "selected">Sem categorias</option>');
+								$('#cmbCategoria').html('<option value="" "selected">Sem categorias</option>');
 							}
 						}
 					})
@@ -939,7 +777,7 @@ if (isset($_POST['inputData'])) {
 
 				FiltraCategoria();
 
-				$('#cmbCategoria').html('<option value="#" "selected">Filtrando...</option>');
+				$('#cmbCategoria').html('<option value="" "selected">Filtrando...</option>');
 
 				if (props.valor === "#") {
 					$('#cmbCategoria').html('<option value="" "selected">Selecione a Categoria</option>');
@@ -968,7 +806,7 @@ if (isset($_POST['inputData'])) {
 								campo: 'categoria'
 							},
 							success: function(respostaCategoria) {
-								var option = '<option value="#" >Selecione a Categoria</option>';
+								var option = '<option value="" >Selecione a Categoria</option>';
 								if (respostaCategoria !== 'sem dados') {
 									$('#cmbCategoria').html('');
 									$('#cmbCategoria').append(option)
@@ -996,7 +834,7 @@ if (isset($_POST['inputData'])) {
 								campo: 'subcategoria'
 							},
 							success: function(respostaSubCategoria) {
-								var option = '<option value="#" >Selecione a SubCategoria</option>';
+								var option = '<option value="" >Selecione a SubCategoria</option>';
 								if (respostaSubCategoria !== 'sem dados') {
 									$('#cmbSubCategoria').html('');
 									$('#cmbSubCategoria').append(option)
@@ -1023,7 +861,7 @@ if (isset($_POST['inputData'])) {
 								campo: 'produto'
 							},
 							success: function(respostaProduto) {
-								var option = '<option value="#" >Selecione o produto</option>';
+								var option = '<option value="" >Selecione o produto</option>';
 								if (respostaProduto !== 'sem dados') {
 									$('#cmbProduto').html('');
 									$('#cmbProduto').append(option)
@@ -1075,7 +913,7 @@ if (isset($_POST['inputData'])) {
 
 				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
 
-					let option = '<option value="#">Selecione a SubCategoria</option>';
+					let option = '<option value="">Selecione a SubCategoria</option>';
 
 					if (dados.length) {
 
@@ -1129,7 +967,7 @@ if (isset($_POST['inputData'])) {
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			function FiltraCategoriaProduto(props) {
 
-				$('#cmbProduto').html('<option value="#" "selected">Filtrando...</option>');
+				$('#cmbProduto').html('<option value="" "selected">Filtrando...</option>');
 
 
 				try {
@@ -1162,19 +1000,21 @@ if (isset($_POST['inputData'])) {
 			//Ao mudar o Produto, trazer o Valor Unitário do cadastro (retorno via JSON)
 			$('#cmbProduto').on('change', function(e) {
 
-				var inputTipo = $('input[name="inputTipo"]:checked').val();
-				var cmbProduto = $('#cmbProduto').val();
-				var inputValorUnitario = $('#inputValorUnitario').val();
+				let inputTipo = $('input[name="inputTipo"]:checked').val();
+				let cmbProduto = $('#cmbProduto').val();
+				let inputValorUnitario = $('#inputValorUnitario').val();
 
-				var Produto = cmbProduto.split("#");
-				var valor = Produto[1].replace(".", ",");
+				if (cmbProduto !== null && cmbProduto !== "") {
+					let Produto = cmbProduto.split("#");
+					let valor = Produto[1].replace(".", ",");
 
-				if (valor != 'null' && valor) {
-					$('#inputValorUnitario').val(valor);
-				} else {
-					$('#inputValorUnitario').val('0,00');
+					if (valor != 'null' && valor) {
+						$('#inputValorUnitario').val(valor);
+					} else {
+						$('#inputValorUnitario').val('0,00');
+					}
+					$('#inputQuantidade').focus();
 				}
-				$('#inputQuantidade').focus();
 			});
 
 
@@ -1198,17 +1038,30 @@ if (isset($_POST['inputData'])) {
 
 
 			$('#btnAdicionar').click(function() {
-				var inputTipo = $('input[name="inputTipo"]:checked').val();
-				var inputNumItens = $('#inputNumItens').val();
-				var cmbProduto = $('#cmbProduto').val();
-				var Produto = cmbProduto.split("#");
-				var inputQuantidade = $('#inputQuantidade').val();
-				var inputValorUnitario = $('#inputValorUnitario').val();
-				var inputTotal = $('#inputTotal').val();
-				var inputLote = $('#inputLote').val();
-				var inputValidade = $('#inputValidade').val();
-				var cmbClassificacao = $('#cmbClassificacao').val();
-				var inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
+				let inputTipo = $('input[name="inputTipo"]:checked').val();
+				let inputNumItens = $('#inputNumItens').val();
+				let cmbProduto = $('#cmbProduto').val();
+				let Produto = cmbProduto.split("#");
+				let inputQuantidade = $('#inputQuantidade').val();
+				let inputValorUnitario = $('#inputValorUnitario').val();
+				let inputTotal = $('#inputTotal').val();
+				let inputLote = $('#inputLote').val();
+				let inputValidade = $('#inputValidade').val();
+				let cmbClassificacao = $('#cmbClassificacao').val();
+				let inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
+				let resNumItens = parseInt(inputNumItens) + 1;
+				let total = parseInt(inputQuantidade) * parseFloat(inputValorUnitario.replace(',', '.'));
+				let cmbPatrimonio = $('#cmbPatrimonio').val();
+				cmbPatrimonio = cmbPatrimonio.split('#');
+				cmbPatrimonio[0] = parseInt(cmbPatrimonio[0]);
+				// console.log(cmbPatrimonio[1]);
+				let totalFormatado = "R$ " + float2moeda(total).toString();
+				total = total + parseFloat(inputTotal);
+
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				let origem = $('#cmbEstoqueOrigemLocalSetor').val();
+				origem = origem.split('#');
+				origem[0] = parseInt(origem[0]);
 
 				//remove os espaços desnecessários antes e depois
 				inputQuantidade = inputQuantidade.trim();
@@ -1227,16 +1080,6 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
-				//Verifica se a combo Classificação foi informada
-				if (cmbClassificacao == '#') {
-
-					if (inputProdutoServico == 'P') {
-						alerta('Atenção', 'Informe a Classificação/Bens!', 'error');
-						$('#cmbClassificacao').focus();
-						return false;
-					}
-				}
-
 				//Verifica se o campo já está no array
 				// if (inputIdProdutos.includes(Produto[0])) {
 				// 	alerta('Atenção', 'Esse produto já foi adicionado!', 'error');
@@ -1244,123 +1087,65 @@ if (isset($_POST['inputData'])) {
 				// 	return false;
 				// }
 
-				var resNumItens = parseInt(inputNumItens) + 1;
-				var total = parseInt(inputQuantidade) * parseFloat(inputValorUnitario.replace(',', '.'));
 
-				total = total + parseFloat(inputTotal);
-				var totalFormatado = "R$ " + float2moeda(total).toString();
-
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				let origem = $('#cmbEstoqueOrigem').val()
 				$.ajax({
 					type: "POST",
-					url: "movimentacaoAddProduto.php",
+					url: "movimentacaoAddProdutoTransferencia.php",
 					data: {
 						tipo: inputTipo,
 						numItens: resNumItens,
 						idProduto: Produto[0],
-						origem: origem,
+						origem: origem[0],
 						quantidade: inputQuantidade,
-						classific: cmbClassificacao
+						classific: cmbClassificacao,
+						patrimonioId: cmbPatrimonio[1]
 					},
 					success: function(resposta) {
+						let inputTipo = $('input[name="inputTipo"]:checked').val();
 
-						//var newRow = $("<tr>");
+						$("#tabelaProduto").append(resposta);
 
-						//newRow.append(resposta);
-						if (resposta != 'SEMESTOQUE') {
+						//Adiciona mais um item nessa contagem
+						$('#cmbPatrimonio').val('').change();
+						$('#cmbCategoria').val('').change();
+						$('#cmbSubCategoria').val('').change();
+						$('#inputNumItens').val(resNumItens);
+						$('#cmbProduto').val("").change();
+						$('#inputQuantidade').val('');
+						$('#inputValorUnitario').val('');
+						$('#inputTotal').val(total);
+						$('#total').text(totalFormatado);
+						$('#inputLote').val('');
 
-							var inputTipo = $('input[name="inputTipo"]:checked').val();
+						$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 
-							$("#tabelaProdutoServicoSaida").append(resposta);
+						inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
 
-							//Adiciona mais um item nessa contagem
-							$('#inputNumItens').val(resNumItens);
-							$('#cmbProduto').val("#").change();
-							$('#inputQuantidade').val('');
-							$('#inputValorUnitario').val('');
-							$('#inputTotal').val(total);
-							$('#total').text(totalFormatado);
-							$('#inputLote').val('');
-							$('#inputValidade').val('');
+						$('#inputIdProdutos').val(inputIdProdutos);
 
-							$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
-
-							inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
-
-							$('#inputIdProdutos').val(inputIdProdutos);
-
-							$('input[name="inputTipo"]').each((i, elem) => {
-								if ($(elem) != $('input[name="inputTipo"]:checked')) {
-									$(elem).attr('disabled', '')
-								}
-							})
-
-							function classBemSaidaSolicit(valor, idSelect) {
-								let grid = $('.trGrid')
-
-								grid.each((i1, elem1) => { // each sobre a grid
-									let tr = $(elem1).children() // colocando todas as linhas em um 
-
-									let td = tr.first()
-									let indiceLinha = td.html()
-
-									//let inputProdutoGridValores = inputHiddenProdutoServico.val()
-									if (idSelect == indiceLinha) {
-
-										let valueProdutoServicoArray = $(`#campo${indiceLinha}`).val().split('#')
-										// adicionando  novos dados no array
-										valueProdutoServicoArray[valueProdutoServicoArray.length - 1] = valor
-
-										var ponto = eval('/' + '.' + '/g')
-
-										valueProdutoServicoArray[2] = valueProdutoServicoArray[2].replace(',', '.')
-
-
-
-										var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
-
-										var stringVallnput = valueProdutoServicoArray.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
-
-										$(`#campo${indiceLinha}`).val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
-									}
-								})
+						$('input[name="inputTipo"]').each((i, elem) => {
+							if ($(elem) != $('input[name="inputTipo"]:checked')) {
+								$(elem).attr('disabled', '')
 							}
+						})
 
-							$('.selectClassific2').each((i, elem) => {
+						$('.selectClassific2').each((i, elem) => {
+							console.log(elem)
 
-								$(elem).on('change', function(e) {
+							$(elem).on('change', function(e) {
 
-									let valor = $(elem).val()
-									let idSelect = $(elem).attr('id')
-									classBemSaidaSolicit(valor, idSelect)
-								})
-							})
+								let valor = $(elem).val();
+								let idSelect = $(elem).attr('id');
+								classBemSaidaSolicit(valor, idSelect);
+							});
+						});
 
-							return false;
-						} else {
-							console.log(resposta)
-							alerta('Atenção', 'Estoque indisponível!', 'error');
-							return false;
-						}
+						return false;
 					}
 				})
 
 			}); //click
 
-			function produtosSolicitacaoSaida() {
-				$('.produtoSolicitacao').each((i, elem) => {
-					var tds = $(elem).children()
-					var idProdutoGrid = $(elem).attr('idProduSolicitacao')
-					var idGridProdu = $(tds[0]).html()
-					var quantProduGrid = $(tds[3]).html()
-					var valUnitProduGrid = $(tds[5]).attr('valorUntPrSolici')
-
-					$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + 'P#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '#' + 0 + '#' + 0 + '#' + 0 + '#' + 0 + '">');
-				})
-				//$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
-			}
-			produtosSolicitacaoSaida()
 
 			$(document).on('click', '.btn_remove', function() {
 
@@ -1549,39 +1334,8 @@ if (isset($_POST['inputData'])) {
 					classBemSaidaSolicit(valor, idSelect)
 				})
 			})
-
-
-
 		}); //document.ready	
 
-		function mudaTotalTitulo(tipoTela) {
-
-			if (tipoTela == 'E') {
-				$('#totalTitulo').html('Total (R$) Nota Fiscal:')
-				$('#quantEditaEntradaSaida').html('Quant. Recebida')
-			} else if (tipoTela == 'S') {
-				$('#totalTitulo').html('Total (R$):')
-				$('#quantEditaEntradaSaida').html('Quantidade')
-			}
-
-		}
-
-		function limpaValorFormulario(tipo) {
-			if (tipo == 'E') {
-				$("#cmbEstoqueOrigem").val("#")
-				$("#cmbEstoqueOrigemLocalSetor").val("#")
-				$("#cmbDestinoLocalEstoqueSetor").val("#")
-				$("#cmbDestinoSetor").val("#")
-			} else if (tipo == 'S') {
-				$("#cmbEstoqueOrigemLocalSetor").val("#")
-				$("#cmbDestinoLocalEstoqueSetor").val("#")
-				$("#cmbDestinoLocal").val("#")
-			} else {
-				$("#cmbDestinoLocal").val("#")
-				$("#cmbDestinoSetor").val("#")
-				$("#cmbEstoqueOrigem").val("#")
-			}
-		}
 
 		Array.prototype.remove = function(start, end) {
 			this.splice(start, end);
@@ -1593,141 +1347,23 @@ if (isset($_POST['inputData'])) {
 			return this;
 		}
 
+
 		function selecionaTipo(tipo) {
-
-			$('#divConteudo').css({
-				"background-color": "#eeeded",
-				"box-shadow": "none"
-			});
-			$('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
-
 			if (tipo == 'E') {
-
-				location.href = 'movimentacaoNovoEntrada.php';
-
-				document.getElementById('EstoqueOrigem').style.display = "none";
-				document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
-				document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
-				document.getElementById('DestinoLocal').style.display = "block";
-				document.getElementById('DestinoSetor').style.display = "none";
-				document.getElementById('classificacao').style.display = "none";
-				document.getElementById('motivo').style.display = "none";
-				document.getElementById('dadosNF').style.display = "block";
-				document.getElementById('dadosProduto').style.display = "none";
-				document.getElementById('trEntrada').style.display = "table-row";
-				document.getElementById('trSaida').style.display = "none";
-				document.getElementById('Patrimonio').style.display = "none";
-
-				mudaTotalTitulo('E')
-				limpaValorFormulario('E')
+				window.location.href = "movimentacaoNovoEntrada.php";
 			} else if (tipo == 'S') {
-
-				location.href = 'movimentacaoNovoSaida.php';
-
-				document.getElementById('EstoqueOrigem').style.display = "block";
-				document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
-				document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
-				document.getElementById('DestinoLocal').style.display = "none";
-				document.getElementById('DestinoSetor').style.display = "block";
-				document.getElementById('classificacao').style.display = "block";
-				document.getElementById('motivo').style.display = "none";
-				document.getElementById('dadosNF').style.display = "none";
-				document.getElementById('dadosProduto').style.display = "flex";
-				document.getElementById('trEntrada').style.display = "none";
-				document.getElementById('trSaida').style.display = "table-row";
-				document.getElementById('radiosProdutoServico').style.display = "flex";
-				document.getElementById('Patrimonio').style.display = "none";
-
-
-				mudaTotalTitulo('S')
-				limpaValorFormulario('S')
-			} else {
-				document.getElementById('EstoqueOrigem').style.display = "none";
-				document.getElementById('EstoqueOrigemLocalSetor').style.display = "block";
-				document.getElementById('DestinoLocalEstoqueSetor').style.display = "block";
-				document.getElementById('DestinoLocal').style.display = "none";
-				document.getElementById('DestinoSetor').style.display = "none";
-				document.getElementById('classificacao').style.display = "block";
-				document.getElementById('motivo').style.display = "block";
-				document.getElementById('dadosNF').style.display = "none";
-				document.getElementById('dadosProduto').style.display = "flex";
-				document.getElementById('radiosProdutoServico').style.display = "none";
-				document.getElementById('Patrimonio').style.display = "flex";
-
-				document.getElementById('formLote').style.display = "block";
-				document.getElementById('formValidade').style.display = "block";
-				document.getElementById('classificacao').style.display = "block";
-				$('#tituloProdutoServico').html('Dados dos Produtos')
-				$('[for=cmbProduto]').html('Produto')
-
-				limpaValorFormulario('T')
-			}
-
-
-
-			if (tipo == 'S') {
-				$('#cmbSituacao').children().each((i, elem) => {
-					if (i == 2) {
-						$(elem).attr('selected', '')
-						let text = $(elem).html()
-						$('#select2-cmbSituacao-container').attr('title', text)
-						$('#select2-cmbSituacao-container').html(text)
-
-					} else {
-						$(elem).removeAttr('selected')
-					}
-				})
-			} else {
-				$('#cmbSituacao').children().each((i, elem) => {
-					if (i == 1) {
-						$(elem).attr('selected', '')
-						let text = $(elem).html()
-						$('#select2-cmbSituacao-container').attr('title', text)
-						$('#select2-cmbSituacao-container').html(text)
-
-					} else {
-						$(elem).removeAttr('selected')
-					}
-				})
-			}
-
-		}
-
-		$(document).ready(() => {
-			$('[name=inputTipo]').each((i, elem) => {
-				if ($(elem).attr('checked') && $(elem).val() == 'S') {
-					document.getElementById('EstoqueOrigem').style.display = "block";
-					document.getElementById('EstoqueOrigemLocalSetor').style.display = "none";
-					document.getElementById('DestinoLocalEstoqueSetor').style.display = "none";
-					document.getElementById('DestinoLocal').style.display = "none";
-					document.getElementById('DestinoSetor').style.display = "block";
-					document.getElementById('classificacao').style.display = "block";
-					document.getElementById('motivo').style.display = "none";
-					document.getElementById('dadosNF').style.display = "none";
-					document.getElementById('dadosProduto').style.display = "flex";
-
-					mudaTotalTitulo('S')
-				}
-			})
-
-		})
-
+				window.location.href = "movimentacaoNovoSaida.php";
+			} else
+				window.location.href = "movimentacaoNovoTransferencia.php";
+		};
 
 
 		function selecionaProdutoServico(tipo) {
-			if (tipo == 'P') {
-				document.getElementById('formLote').style.display = "block";
-				document.getElementById('formValidade').style.display = "block";
-				document.getElementById('classificacao').style.display = "block";
-				$('#tituloProdutoServico').html('Dados dos Produtos')
-				$('[for=cmbProduto]').html('Produto')
-			} else {
-				document.getElementById('formLote').style.display = "none";
-				document.getElementById('formValidade').style.display = "none";
-				document.getElementById('classificacao').style.display = "none";
-				$('#tituloProdutoServico').html('Dados dos Serviços')
-				$('[for=cmbProduto]').html('Serviço')
-			}
+			document.getElementById('formLote').style.display = "block";
+			document.getElementById('formValidade').style.display = "block";
+			document.getElementById('classificacao').style.display = "block";
+			$('#tituloProdutoServico').html('Dados dos Produtos')
+			$('[for=cmbProduto]').html('Produto')
 		}
 
 		function selecionaMotivo(motivo) {
@@ -1961,7 +1597,7 @@ if (isset($_POST['inputData'])) {
 											<div class="form-group">
 												<label for="cmbPatrimonio">Patrimônio</label>
 												<select id="cmbPatrimonio" name="cmbPatrimonio" class="form-control form-control-select2">
-													<option value="#">Informe a origem</option>
+													<option value="">Informe a origem</option>
 												</select>
 											</div>
 										</div>
@@ -2027,8 +1663,9 @@ if (isset($_POST['inputData'])) {
 										</div>
 
 
+
 										<div class="col-lg-2">
-											<div class="form-group">
+											<div class="form-group" style='text-align:left'>
 												<button type="button" id="btnAdicionar" class="btn btn-lg btn-principal" style="margin-top:20px;">Adicionar</button>
 												<!--<button id="adicionar" type="button">Teste</button>-->
 											</div>
@@ -2036,106 +1673,159 @@ if (isset($_POST['inputData'])) {
 									</div>
 								</div>
 							</div>
+							<br>
 
-
+							<div id="inputProdutos">
+								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
+								<input type="hidden" id="itemEditadoquantidade" name="itemEditadoquantidade" value="0">
+								<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">
+								<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
+								<input type="hidden" id="inputTotal" name="inputTotal" value="0">
+							</div>
 
 							<div class="row">
 								<div class="col-lg-12">
 									<?php
-									if (isset($_POST['inputSolicitacaoId'])) {
-										print('<table class="table" id="tabelaProdutoServicoSaida">');
-									} else {
-										print('<table class="table" id="tabelaProdutoServico">');
-									}
+									print('<table class="table" id="tabelaProduto" class="dataTables_length">');
 									?>
 									<thead>
 										<?php
 										if (isset($_POST['inputSolicitacaoId'])) {
 											print('
-												    <tr class="bg-slate" id="trSaida" >
-												        <th>Item</th>
-												        <th>Produto/Serviço</th>
-												        <th style="text-align:center">Unidade Medida</th>
-												        <th id="quantEditaEntradaSaida" style="text-align:center">Quantidade</th>
-												        <th style="text-align:right">Valor Unitário</th>
-												        <th style="text-align:right">Valor Total</th>
-												        <th id="classificacaoSaida">Classificação</th>
-												        <th class="text-center">Ações</th>
-											        </tr>
-												');
+															<tr class="bg-slate" id="trGrid" >
+																<th>Item</th>
+																<th>Produto</th>
+																<th>Nº do Patrimônio</th>
+																<th style="text-align:center">Unidade Medida</th>
+																<th id="quantEditaEntradaSaida" style="text-align:center">Quantidade</th>
+																<th style="text-align:right">Valor Unitário</th>
+																<th style="text-align:right">Valor Total</th>
+																<th id="classificacaoSaida">Validade</th>
+																<th class="text-center">Ações</th>
+															</tr>
+														');
 										} else {
 											print('
-                                             
-											        <tr class="bg-slate" id="trEntrada">
-											            <th>Item</th>
-											            <th>Produto/Serviço</th>
-											            <th style="text-align:center">Unidade Medida</th>
-											            <th id="quantEditaEntradaSaida" style="text-align:center">Quant. Recebida</th>
-											            <th style="text-align:center">Saldo</th>
-											            <th style="text-align:right">Valor Unitário</th>
-											            <th style="text-align:right">Valor Total</th>
-											            <th class="text-center">Ações</th>
-													</tr>
-													<tr class="bg-slate" id="trSaida" style="display: none; width: 100%">
-													    <th>Item</th>
-													    <th>Produto/Serviço</th>
-													    <th style="text-align:center">Unidade Medida</th>
-													    <th id="quantEditaEntradaSaida" style="text-align:center">Quantidade</th>
-													    <th style="text-align:right">Valor Unitário</th>
-													    <th style="text-align:right">Valor Total</th>
-													    <th id="classificacaoSaida">Classificação</th>
-													    <th class="text-center">Ações</th>
-												    </tr>
-											');
+															<tr class="bg-slate" id="trGrid" >
+																<th>Item</th>
+																<th>Produto</th>
+																<th>Nº do Patrimônio</th>
+																<th style="text-align:center">Unidade Medida</th>
+																<th id="quantEditaEntradaSaida" style="text-align:center">Quantidade</th>
+																<th style="text-align:right">Valor Unitário</th>
+																<th style="text-align:right">Valor Total</th>
+																<th id="classificacaoSaida">Validade</th>
+																<th class="text-center">Ações</th>
+															</tr>
+														');
 										}
-
 
 										?>
 									</thead>
 									<tbody>
 										<?php
 										print('<tr style="display:none;">
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-											            <td>&nbsp;</td>
-														<td>&nbsp;</td>
-														<td>&nbsp;</td>
-										            </tr>
-								            ');
+															<td>&nbsp;</td>
+															<td>&nbsp;</td>
+															<td>&nbsp;</td>
+															<td>&nbsp;</td>
+															<td>&nbsp;</td>
+															<td>&nbsp;</td>
+															<td>&nbsp;</td>
+															<td>&nbsp;</td>
+															<td>&nbsp;</td>
+														</tr>
+													');
+										?>
+										<?php
+										if (isset($_POST['inputSolicitacaoId'])) {
+
+											$idProdutoSolicitacao = 0;
+											$totalGeral = 0;
+
+											foreach ($produtosSolicitacao  as $produto) {
+
+												$idProdutoSolicitacao++;
+
+												$valorCusto = formataMoeda($produto['ProduValorVenda']);
+												$valorTotal = formataMoeda($produto['SlXPrQuantidade'] * $produto['ProduValorVenda']);
+												$valorTotalSemFormatacao = $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+
+												$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+
+												$linha = '';
+
+												$linha .= "
+																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
+																		<td>" . $idProdutoSolicitacao . "</td>
+																		<td>" . $produto['ProduNome'] . "</td>
+																		<td style='text-align:center'>" . $produto['UnMedNome'] . "</td>
+																		<td style='text-align:center'>" . $produto['SlXPrQuantidade'] . "</td>
+																		<td valorUntPrSolici='" . $produto['ProduValorVenda'] . "' style='text-align:right'>" . $valorCusto . "</td>
+																		<td style='text-align:right'>" . $valorTotal . "</td>
+																
+															";
+
+												$linha .= '
+																	<td style="text-align:center">
+																		<div class="d-flex flex-row ">
+																			<select id="' . $idProdutoSolicitacao . '" name="cmbClassificacao" class="form-control form-control-select2 selectClassific">
+																				<option value="#">Selecione</option>
+															';
+
+												$sql = "SELECT ClassId, ClassNome
+																	FROM Classificacao
+																	JOIN Situacao on SituaId = ClassStatus
+																	WHERE SituaChave = 'ATIVO'
+																	ORDER BY ClassNome ASC";
+												$result = $conn->query($sql);
+												$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+
+												foreach ($rowClassificacao as $item) {
+													$linha .= '<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>';
+												}
+
+												$linha .= "
+																			</select>
+																		</div>
+																	</td>
+																	<td style='text-align:center;'><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
+																</tr>
+															";
+
+												print($linha);
+											}
+										}
 										?>
 									</tbody>
+
 									<tfoot>
 										<tr>
 											<th id="totalTitulo" colspan="6" style="text-align:right; font-size: 16px; font-weight:bold;">Total (R$): </th>
 											<?php
 											if (isset($_POST['inputSolicitacaoId'])) {
 												print('
-														    <th colspan="1">
-														        <div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">' . formataMoeda($totalGeral) . '</div>
-													        </th>
+																<th colspan="1">
+																	<div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">' . formataMoeda($totalGeral) . '</div>
+																</th>
 															');
 
-												print('<th colspan="1">
-
-												       </th>
-												');
+												print('
+																<th colspan="2">
+																</th>
+															');
 											} else {
 												print('
-														    <th colspan="1">
-														        <div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0,00</div>
-													        </th>
-												');
-												print('<th colspan="2">
-
-														</th>
-												');
+																<th colspan="1">
+																	<div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0,00</div>
+																</th>
+															');
+												print('
+																<th colspan="2">
+																</th>
+															');
 											}
 											?>
-
 										</tr>
 									</tfoot>
 									</table>
@@ -2225,7 +1915,7 @@ if (isset($_POST['inputData'])) {
 								<div class="col-lg-12">
 									<div class="form-group">
 										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-										<a href="movimentacao.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="movimentacaoNovo.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>
@@ -2240,20 +1930,22 @@ if (isset($_POST['inputData'])) {
 				<div id="page-modal" class="custon-modal">
 					<div class="custon-modal-container">
 						<div class="card custon-modal-content">
-							<div class="custon-modal-title">
+							<!-- <div class="custon-modal-title">
 								<i class=""></i>
 								<p class="h3">Itens Recebidos</p>
 								<i class=""></i>
-							</div>
+							</div> -->
+
+
 							<div class="card-footer mt-2 d-flex flex-column">
-								<table class="table table-modal">
+								<!-- <table class="table table-modal">
 									<thead id="thead-modal">
 
 									</thead>
 									<tbody id="tbody-modal">
 
 									</tbody>
-								</table>
+								</table> -->
 								<div class="row" style="margin-top: 10px;">
 									<div class="col-lg-12">
 										<div class="form-group">
