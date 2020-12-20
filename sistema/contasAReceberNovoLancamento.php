@@ -667,6 +667,27 @@ $dataInicio = date("Y-m-d");
             }
             modalParcelar()
 
+            function modalCheque() {
+
+                $('#btnCheque').on('click', (e) => {
+                    e.preventDefault()
+                    $('#pageModalCheque').fadeIn(200);
+
+                })
+
+                $('#modalCloseCheque').on('click', function() {
+                    $('#pageModalCheque').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                    $("#chequeContainer").html("")
+                })
+
+                $("#salvarCheques").on('click', function() {
+                    $('#pageModalCheque').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                })
+                }
+                modalCheque()
+
             function modalJurosDescontos() {
                 $('#jurusDescontos').on('click', (e) => {
                     e.preventDefault()
@@ -1048,7 +1069,7 @@ $dataInicio = date("Y-m-d");
                                     }
                                     ?>
                                     <div id="camposRecebimento" class="row justify-content-between" <?php echo $mostrar; ?>>
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-5">
                                             <div class="form-group">
                                                 <label for="cmbContaBanco">Conta/Banco</label>
                                                 <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2">
@@ -1085,7 +1106,7 @@ $dataInicio = date("Y-m-d");
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-5">
                                             <div class="form-group">
                                                 <label for="cmbFormaPagamento">Forma de Pagamento</label>
                                                 <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2">
@@ -1123,11 +1144,12 @@ $dataInicio = date("Y-m-d");
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label for="inputNumeroDocumento">Nº Documento</label>
-                                                <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNumDocumento'] ?>" class="form-control" placeholder="Nº Documento">
-                                            </div>
+                                        <div class="col-lg-2" style="margin-top: 30px;">
+                                                <?php
+                                                    if (!isset($lancamento)) {
+                                                        print('<a href="#" id="btnCheque" style="margin-top: 5px;" class="icon-pencil">  Cheque</a>');
+                                                    }
+                                                    ?>  
                                         </div>
                                     </div>
 
@@ -1225,7 +1247,103 @@ $dataInicio = date("Y-m-d");
                     <!--------------------------------------------------------------------------------------->
 
                     <!--------------------------------------------------------------------------------------->
-                    <!--Modal Parcelar-->
+                    <!--Modal Cheque-->
+                    <div id="pageModalCheque" class="custon-modal">
+                        <div class="custon-modal-container">
+                            <div class="card custon-modal-content">
+                                <div class="custon-modal-title">
+                                    <i class=""></i>
+                                    <p class="h3">Detalhamento do Cheque</p>
+                                    <i class=""></i>
+                                </div>
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label for="inputNumeroCheque">Nº do Cheque<span class="text-danger"> *</span></label>
+                                                <input type="text" id="inputNumeroCheque" name="inputNumeroCheque" class="form-control" placeholder="Número do Cheque" required>
+                                            </div>
+                                        </div>	
+                                        <div class='col-lg-3'>
+                                            <div class="form-group">
+                                                <label for="inputValor">Valor<span class="text-danger"> *</span></label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputValor" onKeyUp="moeda(this)" maxLength="12" name="inputValor" class="form-control" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group" >
+                                                <label for="inputDataEmissao">Data da Emissão<span class="text-danger"> *</span></label>
+                                                <input id="inputDataEmissao" value="<?php echo date("Y-m-d") ?>" class="form-control" type="date" name="inputDataEmissao" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label for="inputDataVencimento">Data do Vencimento<span class="text-danger"> *</span></label>
+                                                <input id="inputDataVencimento" class="form-control" type="date" name="inputDataVencimento" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label for="inputBanco">Banco<span class="text-danger"> *</span></label>
+                                                <input type="text" id="inputBanco" name="inputBanco" class="form-control" placeholder="Número do Banco" required>
+                                            </div>
+                                        </div>	
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label for="inputAgencia">Agência<span class="text-danger"> *</span></label>
+                                                <input type="text" id="inputAgencia" name="inputAgencia" class="form-control" placeholder="Número da Agência" required>
+                                            </div>
+                                        </div>	
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label for="inputConta">Conta<span class="text-danger"> *</span></label>
+                                                <input type="text" id="inputConta" name="inputConta" class="form-control" placeholder="Número da Conta" required>
+                                            </div>
+                                        </div>	     
+                                    </div>
+                                </div> 
+                               <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class="col-lg-9">
+                                            <div class="form-group">
+                                                <label for="inputNome">Nome<span class="text-danger"> *</span></label>
+                                                <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" required>
+                                            </div>
+                                        </div>	
+                                        
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label for="inputCpf">CPF<span class="text-danger"> *</span></label>
+                                                <input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required>
+                                            </div>	
+                                        </div>
+                                    </div>
+                                </div> 
+                                
+                                <div class="card-footer mt-2 d-flex flex-column">
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-lg-12">
+                                            <div class="form-group">
+                                                <a class="btn btn-lg btn-principal" id="salvarCheque">Salvar</a>
+                                                <a id="modalCloseCheque" class="btn btn-basic" role="button">Cancelar</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--------------------------------------------------------------------------------------->
+
+                    <!--------------------------------------------------------------------------------------->
+                    <!--Modal Juros e Descontos-->
                     <div id="pageModalJurosDescontos" class="custon-modal">
                         <div class="custon-modal-container">
                             <div class="card cardJuDes custon-modal-content">
