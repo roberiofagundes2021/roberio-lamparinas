@@ -70,7 +70,7 @@ if (isset($_POST['inputData'])) {
 			':sNotaFiscal' => null,
 			':dDataEmissao' => null,
 			':sNumSerie' => null,
-			':fValorTotal' => $_POST['inputValorTotal'] == '' ? null : gravaValor($_POST['inputValorTotal']),
+			':fValorTotal' => $_POST['inputTotal'] == '' ? null : gravaValor($_POST['inputTotal']),
 			':sChaveAcesso' => null,
 			':iSituacao' => $_POST['cmbSituacao'] == '' ? null : $_POST['cmbSituacao'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -685,32 +685,35 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
-				$('#cmbCategoria').val("");
+				// $('#cmbCategoria').val("");
+				// $('#inputValorUnitario').val("");
+				// $('#inputLote').val("");
+				// $('#inputValidade').val("");
 				$('#inputQuantidade').val("");
-				$('#inputValorUnitario').val("");
-				$('#inputLote').val("");
-				$('#inputValidade').val("");
 			});
 
 
 
 			$('#btnAdicionar').click(function() {
+				let cmbProduto = $('#cmbProduto').val();
+				let cmbPatrimonio = $('#cmbPatrimonio').val();
+				let cmbCategoria = $('#cmbCategoria').val();
+				let cmbClassificacao = $('#cmbClassificacao').val();
+				let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val();
+				let Produto = cmbProduto.split("#");
 				let inputTipo = $('input[name="inputTipo"]:checked').val();
 				let inputNumItens = $('#inputNumItens').val();
-				let cmbProduto = $('#cmbProduto').val();
-				let Produto = cmbProduto.split("#");
 				let inputQuantidade = $('#inputQuantidade').val();
 				let inputValorUnitario = $('#inputValorUnitario').val();
-				let inputTotal = $('#inputTotal').val();
 				let inputLote = $('#inputLote').val();
 				let inputValidade = $('#inputValidade').val();
-				let cmbClassificacao = $('#cmbClassificacao').val();
 				let inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
 				let resNumItens = parseInt(inputNumItens) + 1;
+				let inputTotal = $('#inputTotal').val();
 				let total = parseInt(inputQuantidade) * parseFloat(inputValorUnitario.replace(',', '.'));
-				let cmbPatrimonio = $('#cmbPatrimonio').val();
-				let totalFormatado = "R$ " + float2moeda(total).toString();
+
 				total = total + parseFloat(inputTotal);
+				let totalFormatado = "R$ " + float2moeda(total).toString();
 
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				let origem = $('#cmbEstoqueOrigemLocalSetor').val();
@@ -721,25 +724,49 @@ if (isset($_POST['inputData'])) {
 				inputQuantidade = inputQuantidade.trim();
 
 				//Verifica se o campo só possui espaços em branco
-				if (inputQuantidade == '') {
+				if (cmbOrigem == '' || cmbOrigem == null) {
+					alerta('Atenção', 'Informe a origem antes de adicionar!', 'error');
+					$('html, body').animate({
+						scrollTop: $("#cmbEstoqueOrigemLocalSetor")[0].scrollHeight
+					}, 1500);
+					$('#cmbEstoqueOrigemLocalSetor').focus();
+					return false;
+				} else if ((cmbCategoria == '' || cmbCategoria == null) && (cmbPatrimonio == '' || cmbPatrimonio == null)) {
+					alerta('Atenção', 'Informe a categoria ou o patrimonio antes de adicionar!', 'error');
+					$('html, body').animate({
+						scrollTop: $("#cmbCategoria").scrollHeight
+					}, 1500);
+					$('#cmbCategoria').focus();
+					return false;
+				} else if (cmbProduto == '') {
+					alerta('Atenção', 'Informe o produto antes de adicionar!', 'error');
+					$('html, body').animate({
+						scrollTop: $("#cmbProduto").scrollHeight
+					}, 1500);
+					$('#cmbProduto').focus();
+					return false;
+				} else if (inputQuantidade == '') {
 					alerta('Atenção', 'Informe a quantidade antes de adicionar!', 'error');
+					$('html, body').animate({
+						scrollTop: $("#inputQuantidade").scrollHeight
+					}, 1500);
 					$('#inputQuantidade').focus();
 					return false;
-				}
-
-				//Verifica se o campo só possui espaços em branco
-				if (inputValorUnitario == '') {
+				} else if (inputValorUnitario == '') {
 					alerta('Atenção', 'Nenhum produto foi selecionado!', 'error');
+					$('html, body').animate({
+						scrollTop: $("#cmbProduto").scrollHeight
+					}, 1500);
 					$('#cmbProduto').focus();
 					return false;
 				}
 
 				//Verifica se o campo já está no array
-				// if (inputIdProdutos.includes(Produto[0])) {
-				// 	alerta('Atenção', 'Esse produto já foi adicionado!', 'error');
-				// 	$('#cmbProduto').focus();
-				// 	return false;
-				// }
+				if (inputIdProdutos.includes(Produto[0])) {
+					alerta('Atenção', 'Esse produto já foi adicionado!', 'error');
+					$('#cmbProduto').focus();
+					return false;
+				}
 
 				$.ajax({
 					type: "POST",
@@ -759,11 +786,7 @@ if (isset($_POST['inputData'])) {
 						$("#tblTransferencia").append(resposta);
 
 						//Adiciona mais um item nessa contagem
-						$('#cmbPatrimonio').val('').change();
-						$('#cmbCategoria').val('').change();
-						$('#cmbSubCategoria').val('').change();
 						$('#inputNumItens').val(resNumItens);
-						$('#cmbProduto').val("").change();
 						$('#inputQuantidade').val('');
 						$('#inputValorUnitario').val('');
 						$('#inputTotal').val(total);
@@ -777,7 +800,7 @@ if (isset($_POST['inputData'])) {
 						$('#inputIdProdutos').val(inputIdProdutos);
 
 						$('input[name="inputTipo"]').each((i, elem) => {
-							if ($(elem) != $('input[name="inputTipo"]:checked')) {
+							if ($(elem) !== $('input[name="inputTipo"]:checked')) {
 								$(elem).attr('disabled', '')
 							}
 						})
@@ -833,65 +856,73 @@ if (isset($_POST['inputData'])) {
 
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e) {
-
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputTotal = $('#inputTotal').val();
 				var cmbMotivo = $('#cmbMotivo').val();
 				var cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val();
 				var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val();
 				var inputDestinoManual = $('#inputDestinoManual').val();
-				var inputValorTotal = $('#inputValorTotal').val().trim()
+
 				var Motivo = cmbMotivo.split("#");
 				var chave = Motivo[1];
 
 				//remove os espaços desnecessários antes e depois
 				inputDestinoManual = inputDestinoManual.trim();
 
+
 				//Verifica se a combo Motivo foi informada
-				if (cmbMotivo == '') {
+				if (cmbMotivo == '' && cmbMotivo == null) {
+					console.log(cmbMotivo)
 					alerta('Atenção', 'Informe o Motivo!', 'error');
+					$('html, body').animate({
+						scrollTop: $("#cmbMotivo")[0].scrollHeight
+					}, 1500);
 					$('#cmbMotivo').focus();
+					$('#btnAdicionar').click();
 					return false;
 				}
 
 				//Verifica se a combo Estoque de Origem foi informada
-				if (cmbEstoqueOrigemLocalSetor == '') {
+				if (cmbEstoqueOrigemLocalSetor == '' || cmbEstoqueOrigemLocalSetor == null) {
+					event.preventDefault();
 					alerta('Atenção', 'Informe o Estoque de Origem!', 'error');
-					$('#cmbEstoqueOrigem').focus();
+					$('html, body').animate({
+						scrollTop: $("#cmbEstoqueOrigemLocalSetor")[0].scrollHeight
+					}, 1500);
+					$('#cmbEstoqueOrigemLocalSetor').focus();
+					$('#btnAdicionar').click();
+					// $("#formMovimentacao").submit();
 					return false;
 				}
 
 				if (chave == 'DOACAO' || chave == 'DESCARTE' || chave == 'DEVOLUCAO' || chave == 'CONSIGNACAO') {
 
 					//Verifica se o input Destino foi informado
-					if (inputDestinoManual == '') {
+					if ((cmbDestinoLocalEstoqueSetor == '' || cmbDestinoLocalEstoqueSetor == null) &&
+						(inputDestinoManual == '' || inputDestinoManual == null)) {
+						event.preventDefault();
 						alerta('Atenção', 'Informe o Destino!', 'error');
+						$('html, body').animate({
+							scrollTop: $("#inputDestinoManual")[0].scrollHeight
+						}, 1500);
 						$('#inputDestinoManual').focus();
-						return false;
-					}
-				} else {
-
-					//Verifica se a combo Estoque de Destino foi informada
-					if (cmbDestinoLocalEstoqueSetor == '') {
-						alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
-						$('#cmbDestinoLocal').focus();
+						$('#btnAdicionar').click();
+						// $("#formMovimentacao").submit();
 						return false;
 					}
 				}
-
 
 				//Verifica se tem algum produto na Grid
 				if (inputTotal == '' || inputTotal == 0) {
 					alerta('Atenção', 'Informe algum produto!', 'error');
 					$('#cmbCategoria').focus();
+					$('#btnAdicionar').click();
 					return false;
 				}
 
 				//desabilita as combos "Fornecedor" e "Situacao" na hora de gravar, senão o POST não o encontra
 				$('#cmbSituacao').prop('disabled', false);
-
 				$("#formMovimentacao").submit();
-				//console.log(inputTipo)
 			});
 
 
