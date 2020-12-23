@@ -44,14 +44,23 @@ if (isset($_POST['cmbPlanoContas'])) {
                                                     CnAReContaBanco                   = :iContaBanco, 
                                                     CnAReFormaPagamento               = :iFormaPagamento, 
                                                     CnAReNumDocumento                 = :sNumDocumento,
-                                                    CnAReDtEmissao                    = :dateDtEmissao, 
+                                                    CnAReDtEmissao                    = :dDtEmissao, 
                                                     CnAReVenda                        = :iVenda, 
                                                     CnAReDescricao                    = :sDescricao, 
-                                                    CnAReDtVencimento                 = :dateDtVencimento, 
+                                                    CnAReDtVencimento                 = :dDtVencimento, 
                                                     CnAReValorAReceber                = :fValorAReceber,
-                                                    CnAReDtRecebimento                = :dateDtRecebimento, 
+                                                    CnAReDtRecebimento                = :dDtRecebimento, 
                                                     CnAReValorRecebido                = :fValorRecebido, 
                                                     CnAReObservacao                   = :sObservacao, 
+                                                    CnAReNumCheque                    = :sNumCheque,
+                                                    CnAReValorCheque                  = :fValorCheque,
+                                                    CnAReDtEmissaoCheque              = :dDtEmissaoCheque,
+                                                    CnAReDtVencimentoCheque           = :dDtVencimentoCheque,
+                                                    CnAReBancoCheque                  = :iBancoCheque,
+                                                    CnAReAgenciaCheque                = :iAgenciaCheque,
+                                                    CnAReContaCheque                  = :iContaCheque,
+                                                    CnAReNomeCheque                   = :iNomeCheque,
+                                                    CnAReCpfCheque                    = :iCpfCheque,
                                                     CnAReStatus                       = :iStatus, 
                                                     CnAReUsuarioAtualizador           = :iUsuarioAtualizador, 
                                                     CnAReUnidade                      = :iUnidade,
@@ -67,15 +76,24 @@ if (isset($_POST['cmbPlanoContas'])) {
                     ':iCliente'             => $_POST['cmbCliente'],
                     ':iContaBanco'          => $_POST['cmbContaBanco'],
                     ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
-                    ':sNumDocumento'        => $_POST['inputNotaFiscal'],
-                    ':dateDtEmissao'        => $_POST['inputDataEmissao'],
+                    ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
+                    ':dDtEmissao'           => $_POST['inputDataEmissao'],
                     ':iVenda'               => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
                     ':sDescricao'           => $_POST['inputDescricao'],
-                    ':dateDtVencimento'     => $_POST['inputDataVencimento'],
+                    ':dDtVencimento'        => $_POST['inputDataVencimento'],
                     ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
-                    ':dateDtRecebimento'    => $_POST['inputDataRecebimento'],
+                    ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
                     ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
                     ':sObservacao'          => $_POST['inputObservacao'],
+                    ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
+                    ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
+                    ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
+                    ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
+                    ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? $_POST['cmbBancoCheque'] : null,
+                    ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
+                    ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
+                    ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
+                    ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,
                     ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
                     ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
                     ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
@@ -111,7 +129,16 @@ if (isset($_POST['cmbPlanoContas'])) {
                                                          CnAReValorAReceber,
                                                          CnAReDtRecebimento, 
                                                          CnAReValorRecebido, 
-                                                         CnAReObservacao, 
+                                                         CnAReObservacao,
+                                                         CnAReNumCheque,                    
+                                                         CnAReValorCheque,                  
+                                                         CnAReDtEmissaoCheque,             
+                                                         CnAReDtVencimentoCheque,           
+                                                         CnAReBancoCheque,                 
+                                                         CnAReAgenciaCheque,                
+                                                         CnAReContaCheque,                  
+                                                         CnAReNomeCheque,                  
+                                                         CnAReCpfCheque,             
                                                          CnAReTipoJuros, 
                                                          CnAReJuros, 
                                                          CnAReTipoDesconto, 
@@ -124,13 +151,22 @@ if (isset($_POST['cmbPlanoContas'])) {
                                      :iContaBanco, 
                                      :iFormaPagamento,
                                      :sNumDocumento,  
-                                     :dateDtEmissao, 
+                                     :dDtEmissao, 
                                      :sDescricao, 
-                                     :dateDtVencimento, 
+                                     :dDtVencimento, 
                                      :fValorAReceber, 
-                                     :dateDtRecebimento, 
+                                     :dDtRecebimento, 
                                      :fValorRecebido, 
-                                     :sObservacao, 
+                                     :sObservacao,
+                                     :sNumCheque,
+                                     :fValorCheque,
+                                     :dDtEmissaoCheque,
+                                     :dDtVencimentoCheque,
+                                     :iBancoCheque,
+                                     :iAgenciaCheque,
+                                     :iContaCheque,
+                                     :iNomeCheque,
+                                     :iCpfCheque, 
                                      :sTipoJuros, 
                                      :fJuros, 
                                      :sTipoDesconto, 
@@ -147,13 +183,22 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':iContaBanco'          => $_POST['cmbContaBanco'],
                         ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
                         ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
-                        ':dateDtEmissao'        => $_POST['inputDataEmissao'],
+                        ':dDtEmissao'           => $_POST['inputDataEmissao'],
                         ':sDescricao'           => $_POST['inputDescricao'],
-                        ':dateDtVencimento'     => $_POST['inputDataVencimento'],
+                        ':dDtVencimento'        => $_POST['inputDataVencimento'],
                         ':fValorAReceber'       => $_POST['inputRecebimentoParcial'],
-                        ':dateDtRecebimento'    => $_POST['inputDataRecebimento'],
+                        ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
                         ':fValorRecebido'       => null,
                         ':sObservacao'          => $_POST['inputObservacao'],
+                        ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
+                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
+                        ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
+                        ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
+                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? $_POST['cmbBancoCheque'] : null,
+                        ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
+                        ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
+                        ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
+                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,
                         ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
                         ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
                         ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
@@ -205,7 +250,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                                                          CnAReValorAReceber,
                                                          CnAReDtRecebimento, 
                                                          CnAReValorRecebido,
-                                                         CnAReObservacao, 
+                                                         CnAReObservacao,
                                                          CnAReStatus, 
                                                          CnAReUsuarioAtualizador, 
                                                          CnAReUnidade)
@@ -214,13 +259,13 @@ if (isset($_POST['cmbPlanoContas'])) {
                                      :iContaBanco, 
                                      :iFormaPagamento,
                                      :sNumDocumento,  
-                                     :dateDtEmissao, 
+                                     :dDtEmissao, 
                                      :sDescricao, 
-                                     :dateDtVencimento, 
+                                     :dDtVencimento, 
                                      :fValorAReceber, 
-                                     :dateDtRecebimento, :
+                                     :dDtRecebimento,
                                      :fValorRecebido, 
-                                     :sObservacao, 
+                                     :sObservacao,
                                      :iStatus, 
                                      :iUsuarioAtualizador, 
                                      :iUnidade)";
@@ -233,11 +278,11 @@ if (isset($_POST['cmbPlanoContas'])) {
                             ':iContaBanco'          => $_POST['cmbContaBanco'],
                             ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
                             ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
-                            ':dateDtEmissao'        => $_POST['inputDataEmissao'],
+                            ':dDtEmissao'           => $_POST['inputDataEmissao'],
                             ':sDescricao'           => $_POST['inputParcelaDescricao' . $i . ''],
-                            ':dateDtVencimento'     => $_POST['inputParcelaDataVencimento' . $i . ''],
+                            ':dDtVencimento'        => $_POST['inputParcelaDataVencimento' . $i . ''],
                             ':fValorAReceber'       => floatval(gravaValor($_POST['inputParcelaValorAReceber' . $i . ''])),
-                            ':dateDtRecebimento'    => $_POST['inputDataRecebimento'],
+                            ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
                             ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
                             ':sObservacao'          => $_POST['inputObservacao'],
                             ':iStatus'              => $situacao['SituaId'],
@@ -288,6 +333,15 @@ if (isset($_POST['cmbPlanoContas'])) {
                                                          CnAReDtRecebimento, 
                                                          CnAReValorRecebido, 
                                                          CnAReObservacao, 
+                                                         CnAReNumCheque,                    
+                                                         CnAReValorCheque,                  
+                                                         CnAReDtEmissaoCheque,             
+                                                         CnAReDtVencimentoCheque,           
+                                                         CnAReBancoCheque,                 
+                                                         CnAReAgenciaCheque,                
+                                                         CnAReContaCheque,                  
+                                                         CnAReNomeCheque,                  
+                                                         CnAReCpfCheque,             
                                                          CnAReTipoJuros, 
                                                          CnAReJuros,
                                                          CnAReTipoDesconto, 
@@ -300,13 +354,22 @@ if (isset($_POST['cmbPlanoContas'])) {
                                  :iContaBanco, 
                                  :iFormaPagamento,
                                  :sNumDocumento, 
-                                 :dateDtEmissao, 
+                                 :dDtEmissao, 
                                  :sDescricao, 
-                                 :dateDtVencimento, 
+                                 :dDtVencimento, 
                                  :fValorAReceber, 
-                                 :dateDtRecebimento, 
+                                 :dDtRecebimento, 
                                  :fValorRecebido, 
-                                 :sObservacao, 
+                                 :sObservacao,
+                                 :sNumCheque,
+                                 :fValorCheque,
+                                 :dDtEmissaoCheque,
+                                 :dDtVencimentoCheque,
+                                 :iBancoCheque,
+                                 :iAgenciaCheque,
+                                 :iContaCheque,
+                                 :iNomeCheque,
+                                 :iCpfCheque, 
                                  :sTipoJuros, 
                                  :fJuros, 
                                  :sTipoDesconto, 
@@ -323,13 +386,22 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':iContaBanco'          => $_POST['cmbContaBanco'],
                         ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
                         ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
-                        ':dateDtEmissao'        => $_POST['inputDataEmissao'],
+                        ':dDtEmissao'           => $_POST['inputDataEmissao'],
                         ':sDescricao'           => $_POST['inputDescricao'],
-                        ':dateDtVencimento'     => $_POST['inputDataVencimento'],
+                        ':dDtVencimento'        => $_POST['inputDataVencimento'],
                         ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
-                        ':dateDtRecebimento'    => $_POST['inputDataRecebimento'],
+                        ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
                         ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
                         ':sObservacao'          => $_POST['inputObservacao'],
+                        ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
+                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
+                        ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
+                        ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
+                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? $_POST['cmbBancoCheque'] : null,
+                        ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
+                        ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
+                        ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
+                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,    
                         ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
                         ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
                         ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
@@ -364,7 +436,16 @@ if (isset($_POST['cmbPlanoContas'])) {
                                                              CnAReValorAReceber,
                                                              CnAReDtRecebimento, 
                                                              CnAReValorRecebido, 
-                                                             CnAReObservacao, 
+                                                             CnAReObservacao,
+                                                             CnAReNumCheque,                    
+                                                             CnAReValorCheque,                  
+                                                             CnAReDtEmissaoCheque,             
+                                                             CnAReDtVencimentoCheque,           
+                                                             CnAReBancoCheque,                 
+                                                             CnAReAgenciaCheque,                
+                                                             CnAReContaCheque,                  
+                                                             CnAReNomeCheque,                  
+                                                             CnAReCpfCheque,                                                                              
                                                              CnAReTipoJuros, 
                                                              CnAReJuros, 
                                                              CnAReTipoDesconto, 
@@ -377,13 +458,22 @@ if (isset($_POST['cmbPlanoContas'])) {
                                          :iContaBanco, 
                                          :iFormaPagamento,
                                          :sNumDocumento, 
-                                         :dateDtEmissao,
+                                         :dDtEmissao,
                                          :sDescricao,
-                                         :dateDtVencimento, 
+                                         :dDtVencimento, 
                                          :fValorAReceber, 
-                                         :dateDtRecebimento, 
+                                         :dDtRecebimento, 
                                          :fValorRecebido, 
-                                         :sObservacao, 
+                                         :sObservacao,
+                                         :sNumCheque,
+                                         :fValorCheque,
+                                         :dDtEmissaoCheque,
+                                         :dDtVencimentoCheque,
+                                         :iBancoCheque,
+                                         :iAgenciaCheque,
+                                         :iContaCheque,
+                                         :iNomeCheque,
+                                         :iCpfCheque, 
                                          :sTipoJuros, 
                                          :fJuros, 
                                          :sTipoDesconto, 
@@ -399,13 +489,22 @@ if (isset($_POST['cmbPlanoContas'])) {
                                 ':iContaBanco'          => $_POST['cmbContaBanco'],
                                 ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
                                 ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
-                                ':dateDtEmissao'        => $_POST['inputDataEmissao'],
+                                ':dDtEmissao'           => $_POST['inputDataEmissao'],
                                 ':sDescricao'           => $_POST['inputDescricao'],
-                                ':dateDtVencimento'     => $_POST['inputDataVencimento'],
+                                ':dDtVencimento'        => $_POST['inputDataVencimento'],
                                 ':fValorAReceber'       => $_POST['inputRecebimentoParcial'],
-                                ':dateDtRecebimento'    => $_POST['inputDataRecebimento'],
+                                ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
                                 ':fValorRecebido'       => null,
                                 ':sObservacao'          => $_POST['inputObservacao'],
+                                ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
+                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
+                        ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
+                        ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
+                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? $_POST['cmbBancoCheque'] : null,
+                        ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
+                        ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
+                        ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
+                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,
                                 ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
                                 ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
                                 ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
@@ -452,7 +551,16 @@ if (isset($_GET['lancamentoId'])) {
                        CnAReValorRecebido, 
                        CnAReContaBanco, 
                        CnAReFormaPagamento, 
-                       CnAReNumDocumento
+                       CnAReNumDocumento,
+                       CnAReNumCheque,                    
+                       CnAReValorCheque,                  
+                       CnAReDtEmissaoCheque,             
+                       CnAReDtVencimentoCheque,           
+                       CnAReBancoCheque,                 
+                       CnAReAgenciaCheque,                
+                       CnAReContaCheque,                  
+                       CnAReNomeCheque,                  
+                       CnAReCpfCheque              
     		      FROM ContasAReceber
     		     WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " . $_GET['lancamentoId'] . "";
 
@@ -573,6 +681,17 @@ $dataInicio = date("Y-m-d");
             }
             parcelamento()
 
+            function limparCheque() {
+                $("#inputNumCheque").val("");
+                $("#inputValorCheque").val("");
+                $("#inputDtVencimentoCheque").val("");
+                $("#cmbBancoCheque").val("");
+                $("#inputAgenciaCheque").val("");
+                $("#inputContaCheque").val("");
+                $("#inputNomeCheque").val("");
+                $("#inputCpfCheque").val("");
+            }
+
             function limparJurosDescontos() {
                 $("#inputVencimentoJD").val("");
                 $("#inputValorAReceberJD").val("");
@@ -678,10 +797,11 @@ $dataInicio = date("Y-m-d");
                 $('#modalCloseCheque').on('click', function() {
                     $('#pageModalCheque').fadeOut(200);
                     $('body').css('overflow', 'scroll');
-                    $("#chequeContainer").html("")
+                    
+                    limparCheque()
                 })
 
-                $("#salvarCheques").on('click', function() {
+                $("#salvarCheque").on('click', function() {
                     $('#pageModalCheque').fadeOut(200);
                     $('body').css('overflow', 'scroll');
                 })
@@ -784,7 +904,7 @@ $dataInicio = date("Y-m-d");
                 let inputDescricao = $("#inputDescricao").val()
                 let cmbContaBanco = $("#cmbContaBanco").val()
                 let cmbFormaPagamento = $("#cmbFormaPagamento").val()
-                let inputNumeroDocumento = $("#inputNumeroDocumento").val()
+               
 
                 if ($("#habilitarRecebimento").hasClass('clicado')) {
                     $("#cmbContaBanco").prop('required', true)
@@ -984,13 +1104,13 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-8">
                                             <div class="form-group">
                                                 <label for="inputDescricao">Descrição <span class="text-danger">*</span></label>
-                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3"required <?php if (isset($lancamento)) echo $lancamento['CnAReDescricao'] ?>>
+                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDescricao'] ?>" required>
                                             </div>
                                         </div>
                                         <div class="col-lg-4">
                                             <div class="form-group">
-                                                <label for="inputNotaFiscal">Nº Nota Fiscal/Documento</label>
-                                                <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNumDocumento'] ?>" class="form-control">
+                                                <label for="inputNumeroDocumento">Nº Nota Fiscal/Documento</label>
+                                                <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNumDocumento'] ?>" class="form-control">
                                             </div>
                                         </div>
                                         <!--
@@ -1069,7 +1189,7 @@ $dataInicio = date("Y-m-d");
                                     }
                                     ?>
                                     <div id="camposRecebimento" class="row justify-content-between" <?php echo $mostrar; ?>>
-                                        <div class="col-lg-5">
+                                        <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="cmbContaBanco">Conta/Banco</label>
                                                 <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2">
@@ -1106,7 +1226,7 @@ $dataInicio = date("Y-m-d");
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-5">
+                                        <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbFormaPagamento">Forma de Pagamento</label>
                                                 <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2">
@@ -1144,6 +1264,7 @@ $dataInicio = date("Y-m-d");
                                                 </select>
                                             </div>
                                         </div>
+                                        
                                         <div class="col-lg-2" style="margin-top: 30px;">
                                                 <?php
                                                     if (!isset($lancamento)) {
@@ -1260,28 +1381,28 @@ $dataInicio = date("Y-m-d");
                                     <div class="d-flex flex-row p-1">
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="inputNumeroCheque">Nº do Cheque<span class="text-danger"> *</span></label>
-                                                <input type="text" id="inputNumeroCheque" name="inputNumeroCheque" class="form-control" placeholder="Número do Cheque" required>
+                                                <label for="inputNumCheque">Nº do Cheque</span></label>
+                                                <input type="text" id="inputNumCheque" name="inputNumCheque" class="form-control" placeholder="Número do Cheque">
                                             </div>
                                         </div>	
                                         <div class='col-lg-3'>
                                             <div class="form-group">
-                                                <label for="inputValor">Valor<span class="text-danger"> *</span></label>
+                                                <label for="inputValorCheque">Valor</span></label>
                                                 <div class="input-group">
-                                                    <input type="text" id="inputValor" onKeyUp="moeda(this)" maxLength="12" name="inputValor" class="form-control" required>
+                                                    <input type="text" id="inputValorCheque" onKeyUp="moeda(this)" maxLength="12" name="inputValorCheque" class="form-control">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group" >
-                                                <label for="inputDataEmissao">Data da Emissão<span class="text-danger"> *</span></label>
-                                                <input id="inputDataEmissao" value="<?php echo date("Y-m-d") ?>" class="form-control" type="date" name="inputDataEmissao" required>
+                                                <label for="inputDtEmissaoCheque">Data da Emissão</span></label>
+                                                <input id="inputDtEmissaoCheque" class="form-control" type="date" name="inputDtEmissaoCheque">
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="inputDataVencimento">Data do Vencimento<span class="text-danger"> *</span></label>
-                                                <input id="inputDataVencimento" class="form-control" type="date" name="inputDataVencimento" required>
+                                                <label for="inputDtVencimentoCheque">Data do Vencimento</span></label>
+                                                <input id="inputDtVencimentoCheque" class="form-control" type="date" name="inputDtVencimentoCheque">
                                             </div>
                                         </div>
                                     </div>
@@ -1289,22 +1410,36 @@ $dataInicio = date("Y-m-d");
 
                                 <div class="px-3 pt-3">
                                     <div class="d-flex flex-row p-1">
+                                        <div class="col-lg-6">
+											<label for="cmbBancoCheque">Banco</label>
+											<select id="cmbBancoCheque" name="cmbBancoCheque" class="form-control form-control-select2">
+												<option value="#">Selecione um banco</option>
+												<?php 
+													$sql = "SELECT BancoId, BancoCodigo, BancoNome
+															FROM Banco
+															JOIN Situacao on SituaId = BancoStatus
+															WHERE SituaChave = 'ATIVO'
+															ORDER BY BancoCodigo ASC";
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													
+													foreach ($row as $item){
+														print('<option value="'.$item['BancoId'].'">'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
+													}
+												
+												?>
+											</select>
+										</div>
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="inputBanco">Banco<span class="text-danger"> *</span></label>
-                                                <input type="text" id="inputBanco" name="inputBanco" class="form-control" placeholder="Número do Banco" required>
+                                                <label for="inputAgenciaCheque">Agência</span></label>
+                                                <input type="text" id="inputAgenciaCheque" name="inputAgenciaCheque" class="form-control" placeholder="Número da Agência">
                                             </div>
                                         </div>	
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="inputAgencia">Agência<span class="text-danger"> *</span></label>
-                                                <input type="text" id="inputAgencia" name="inputAgencia" class="form-control" placeholder="Número da Agência" required>
-                                            </div>
-                                        </div>	
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label for="inputConta">Conta<span class="text-danger"> *</span></label>
-                                                <input type="text" id="inputConta" name="inputConta" class="form-control" placeholder="Número da Conta" required>
+                                                <label for="inputContaCheque">Conta</span></label>
+                                                <input type="text" id="inputContaCheque" name="inputContaCheque" class="form-control" placeholder="Número da Conta">
                                             </div>
                                         </div>	     
                                     </div>
@@ -1313,15 +1448,15 @@ $dataInicio = date("Y-m-d");
                                     <div class="d-flex flex-row p-1">
                                         <div class="col-lg-9">
                                             <div class="form-group">
-                                                <label for="inputNome">Nome<span class="text-danger"> *</span></label>
-                                                <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" required>
+                                                <label for="inputNomeCheque">Nome</label>
+                                                <input type="text" id="inputNomeCheque" name="inputNomeCheque" class="form-control" placeholder="Nome Completo">
                                             </div>
                                         </div>	
                                         
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="inputCpf">CPF<span class="text-danger"> *</span></label>
-                                                <input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required>
+                                                <label for="inputCpfCheque">CPF</label>
+                                                <input type="text" id="inputCpfCheque" name="inputCpfCheque" class="form-control" placeholder="CPF" data-mask="999.999.999-99">
                                             </div>	
                                         </div>
                                     </div>
