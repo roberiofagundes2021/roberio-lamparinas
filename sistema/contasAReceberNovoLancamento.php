@@ -7,6 +7,7 @@ $_SESSION['PaginaAtual'] = 'Novo Lançamento - Contas a Receber';
 include('global_assets/php/conexao.php');
 
 if (isset($_POST['cmbPlanoContas'])) {
+    
     if (isset($_POST['inputEditar'])) {
 
         try {
@@ -383,8 +384,8 @@ if (isset($_POST['cmbPlanoContas'])) {
 
                         ':iPlanoContas'         => $_POST['cmbPlanoContas'],
                         ':iCliente'             => $_POST['cmbCliente'],
-                        ':iContaBanco'          => $_POST['cmbContaBanco'],
-                        ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
+                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? $_POST['cmbContaBanco'] : null,
+                        ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? $_POST['cmbFormaPagamento'] : null,
                         ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
                         ':dDtEmissao'           => $_POST['inputDataEmissao'],
                         ':sDescricao'           => $_POST['inputDescricao'],
@@ -1266,11 +1267,9 @@ $dataInicio = date("Y-m-d");
                                         </div>
                                         
                                         <div class="col-lg-2" style="margin-top: 30px;">
-                                                <?php
-                                                    if (!isset($lancamento)) {
-                                                        print('<a href="#" id="btnCheque" style="margin-top: 5px;" class="icon-pencil">  Cheque</a>');
-                                                    }
-                                                    ?>  
+                                            <?php
+                                                print('<a href="#" id="btnCheque" style="margin-top: 5px;" class="icon-pencil">  Cheque</a>');
+                                            ?>  
                                         </div>
                                     </div>
 

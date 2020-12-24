@@ -255,7 +255,7 @@ if (isset($_POST['inputData'])) {
 		exit;
 	}
 
-	irpara("movimentacaoNovoSaida.php");
+	irpara("movimentacao.php");
 }
 
 ?>
@@ -1250,11 +1250,13 @@ if (isset($_POST['inputData'])) {
 				document.getElementById('formValidade').style.display = "block";
 				document.getElementById('classificacao').style.display = "block";
 				$('#tituloProdutoServico').html('Dados dos Produtos');
+				$('#labelProdutoServico').html('Produto');
 			} else {
 				document.getElementById('formLote').style.display = "none";
 				document.getElementById('formValidade').style.display = "none";
 				document.getElementById('classificacao').style.display = "none";
 				$('#tituloProdutoServico').html('Dados dos Serviços');
+				$('#labelProdutoServico').html('Serviço');
 			}
 
 			$('#cmbEstoqueOrigem').trigger("change"); //aciona o OnChange do cmbEstoqueOrigem, esse método selecionaProdutoServico não pode ficar dentro do $(document).ready(function() { se não esse gatilho não é acionado.
@@ -1593,7 +1595,7 @@ if (isset($_POST['inputData'])) {
 
 												<div class="col-lg-4">
 													<div class="form-group">
-														<label for="cmbProduto">Produto</label>
+														<label for="cmbProduto"><span id="labelProdutoServico">Produto</span></label>
 														<select id="cmbProduto" name="cmbProduto" class="form-control form-control-select2">
 															<option value="#">Selecione</option>
 														</select>
