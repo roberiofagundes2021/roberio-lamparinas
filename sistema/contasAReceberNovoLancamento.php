@@ -40,18 +40,22 @@ if (isset($_POST['cmbPlanoContas'])) {
 
 
             try {
-                $sql = "UPDATE ContasAReceber SET   CnARePlanoContas                  = :iPlanoContas,
+            $sql = "UPDATE ContasAReceber SET       CnAReDtEmissao                    = :dDtEmissao,
+                                                    CnARePlanoContas                  = :iPlanoContas,  
                                                     CnAReCliente                      = :iCliente, 
-                                                    CnAReContaBanco                   = :iContaBanco, 
-                                                    CnAReFormaPagamento               = :iFormaPagamento, 
+                                                    CnAReDescricao                    = :sDescricao,
                                                     CnAReNumDocumento                 = :sNumDocumento,
-                                                    CnAReDtEmissao                    = :dDtEmissao, 
-                                                    CnAReVenda                        = :iVenda, 
-                                                    CnAReDescricao                    = :sDescricao, 
-                                                    CnAReDtVencimento                 = :dDtVencimento, 
-                                                    CnAReValorAReceber                = :fValorAReceber,
-                                                    CnAReDtRecebimento                = :dDtRecebimento, 
-                                                    CnAReValorRecebido                = :fValorRecebido, 
+                                                    CnAReContaBanco                   = :iContaBanco, 
+                                                    CnAReFormaPagamento               = :iFormaPagamento,
+                                                    CnAReVenda                        = :iVenda,
+                                                    CnAReDtVencimento                 = :dDtVencimento,
+                                                    CnAReValorAReceber                = :fValorAReceber, 
+                                                    CnAReDtRecebimento                = :dDtRecebimento,
+                                                    CnAReValorRecebido                = :fValorRecebido,
+                                                    CnAReTipoJuros                    = :sTipoJuros, 
+                                                    CnAReJuros                        = :fJuros, 
+                                                    CnAReTipoDesconto                 = :sTipoDesconto, 
+                                                    CnAReDesconto                     = :fDesconto,  
                                                     CnAReObservacao                   = :sObservacao, 
                                                     CnAReNumCheque                    = :sNumCheque,
                                                     CnAReValorCheque                  = :fValorCheque,
@@ -64,28 +68,28 @@ if (isset($_POST['cmbPlanoContas'])) {
                                                     CnAReCpfCheque                    = :iCpfCheque,
                                                     CnAReStatus                       = :iStatus, 
                                                     CnAReUsuarioAtualizador           = :iUsuarioAtualizador, 
-                                                    CnAReUnidade                      = :iUnidade,
-                                                    CnAReTipoJuros                    = :sTipoJuros, 
-                                                    CnAReJuros                        = :fJuros, 
-                                                    CnAReTipoDesconto                 = :sTipoDesconto, 
-                                                    CnAReDesconto                     = :fDesconto
+                                                    CnAReUnidade                      = :iUnidade
                     WHERE CnAReId = " . $_POST['inputContaId'] . "";
 
                 $result = $conn->prepare($sql);
                 $result->execute(array(
-                    ':iPlanoContas'         => $_POST['cmbPlanoContas'],
+                    ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
+                    ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? $_POST['cmbPlanoContas'] : null,
                     ':iCliente'             => $_POST['cmbCliente'],
-                    ':iContaBanco'          => $_POST['cmbContaBanco'],
-                    ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
-                    ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
-                    ':dDtEmissao'           => $_POST['inputDataEmissao'],
-                    ':iVenda'               => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
                     ':sDescricao'           => $_POST['inputDescricao'],
+                    ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
+                    ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? $_POST['cmbContaBanco'] : null,
+                    ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? $_POST['cmbFormaPagamento'] : null,
+                    ':iVenda'               =>  null,
                     ':dDtVencimento'        => $_POST['inputDataVencimento'],
                     ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
-                    ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
+                    ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
                     ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
-                    ':sObservacao'          => $_POST['inputObservacao'],
+                    ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+                    ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+                    ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+                    ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                    ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
                     ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
                     ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
                     ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
@@ -94,11 +98,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                     ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
                     ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
                     ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
-                    ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,
-                    ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                    ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                    ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                    ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                    ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,  
                     ':iStatus'              => $situacao['SituaId'],
                     ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
                     ':iUnidade'             => $_SESSION['UnidadeId']
@@ -119,78 +119,86 @@ if (isset($_POST['cmbPlanoContas'])) {
                     $result = $conn->query($sql);
                     $situacao = $result->fetch(PDO::FETCH_ASSOC);
 
-                    $sql = "INSERT INTO ContasAReceber ( CnARePlanoContas, 
-                                                         CnAReCliente, 
-                                                         CnAReContaBanco, 
-                                                         CnAReFormaPagamento, 
-                                                         CnAReNumDocumento,
-                                                         CnAReDtEmissao, 
-                                                         CnAReDescricao,
-                                                         CnAReDtVencimento, 
-                                                         CnAReValorAReceber,
-                                                         CnAReDtRecebimento, 
-                                                         CnAReValorRecebido, 
-                                                         CnAReObservacao,
-                                                         CnAReNumCheque,                    
-                                                         CnAReValorCheque,                  
-                                                         CnAReDtEmissaoCheque,             
-                                                         CnAReDtVencimentoCheque,           
-                                                         CnAReBancoCheque,                 
-                                                         CnAReAgenciaCheque,                
-                                                         CnAReContaCheque,                  
-                                                         CnAReNomeCheque,                  
-                                                         CnAReCpfCheque,             
-                                                         CnAReTipoJuros, 
-                                                         CnAReJuros, 
-                                                         CnAReTipoDesconto, 
-                                                         CnAReDesconto, 
-                                                         CnAReStatus, 
-                                                         CnAReUsuarioAtualizador, 
-                                                         CnAReUnidade)
-                            VALUES ( :iPlanoContas, 
-                                     :iCliente, 
-                                     :iContaBanco, 
-                                     :iFormaPagamento,
-                                     :sNumDocumento,  
-                                     :dDtEmissao, 
-                                     :sDescricao, 
-                                     :dDtVencimento, 
-                                     :fValorAReceber, 
-                                     :dDtRecebimento, 
-                                     :fValorRecebido, 
-                                     :sObservacao,
-                                     :sNumCheque,
-                                     :fValorCheque,
-                                     :dDtEmissaoCheque,
-                                     :dDtVencimentoCheque,
-                                     :iBancoCheque,
-                                     :iAgenciaCheque,
-                                     :iContaCheque,
-                                     :iNomeCheque,
-                                     :iCpfCheque, 
-                                     :sTipoJuros, 
-                                     :fJuros, 
-                                     :sTipoDesconto, 
-                                     :fDesconto, 
-                                     :iStatus, 
-                                     :iUsuarioAtualizador, 
-                                     :iUnidade)";
+                    $sql = "INSERT INTO ContasAReceber ( CnAReDtEmissao,
+                                                        CnARePlanoContas, 
+                                                        CnAReCliente,
+                                                        CnAReDescricao,
+                                                        CnAReNumDocumento,  
+                                                        CnAReContaBanco,                   
+                                                        CnAReFormaPagamento,
+                                                        CnAReVenda,                              
+                                                        CnAReDtVencimento, 
+                                                        CnAReValorAReceber,
+                                                        CnAReDtRecebimento, 
+                                                        CnAReValorRecebido,
+                                                        CnAReTipoJuros, 
+                                                        CnAReJuros,
+                                                        CnAReTipoDesconto, 
+                                                        CnAReDesconto, 
+                                                        CnAReObservacao, 
+                                                        CnAReNumCheque,                    
+                                                        CnAReValorCheque,                  
+                                                        CnAReDtEmissaoCheque,             
+                                                        CnAReDtVencimentoCheque,           
+                                                        CnAReBancoCheque,                 
+                                                        CnAReAgenciaCheque,                
+                                                        CnAReContaCheque,                  
+                                                        CnAReNomeCheque,                  
+                                                        CnAReCpfCheque,             
+                                                        CnAReStatus, 
+                                                        CnAReUsuarioAtualizador, 
+                                                        CnAReUnidade)
+                           VALUES ( :dDtEmissao, 
+                                    :iPlanoContas, 
+                                    :iCliente,
+                                    :sDescricao,
+                                    :sNumDocumento, 
+                                    :iContaBanco, 
+                                    :iFormaPagamento,
+                                    :iVenda,
+                                    :dDtVencimento, 
+                                    :fValorAReceber, 
+                                    :dDtRecebimento, 
+                                    :fValorRecebido,
+                                    :sTipoJuros, 
+                                    :fJuros, 
+                                    :sTipoDesconto, 
+                                    :fDesconto,  
+                                    :sObservacao,
+                                    :sNumCheque,
+                                    :fValorCheque,
+                                    :dDtEmissaoCheque,
+                                    :dDtVencimentoCheque,
+                                    :iBancoCheque,
+                                    :iAgenciaCheque,
+                                    :iContaCheque,
+                                    :iNomeCheque,
+                                    :iCpfCheque, 
+                                    :iStatus, 
+                                    :iUsuarioAtualizador, 
+                                    :iUnidade)";
 
                     $result = $conn->prepare($sql);
 
                     $result->execute(array(
-                        ':iPlanoContas'         => $_POST['cmbPlanoContas'],
+
+                        ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
+                        ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? $_POST['cmbPlanoContas'] : null,
                         ':iCliente'             => $_POST['cmbCliente'],
-                        ':iContaBanco'          => $_POST['cmbContaBanco'],
-                        ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
-                        ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
-                        ':dDtEmissao'           => $_POST['inputDataEmissao'],
                         ':sDescricao'           => $_POST['inputDescricao'],
+                        ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
+                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? $_POST['cmbContaBanco'] : null,
+                        ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? $_POST['cmbFormaPagamento'] : null,
+                        ':iVenda'               =>  null,
                         ':dDtVencimento'        => $_POST['inputDataVencimento'],
-                        ':fValorAReceber'       => $_POST['inputRecebimentoParcial'],
-                        ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
-                        ':fValorRecebido'       => null,
-                        ':sObservacao'          => $_POST['inputObservacao'],
+                        ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
+                        ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
+                        ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
+                        ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+                        ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+                        ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+                        ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                        ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
                         ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
                         ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
                         ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
@@ -199,11 +207,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
                         ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
                         ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
-                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,
-                        ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                        ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                        ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                        ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
                         ':iStatus'              => $situacao['SituaId'],
                         ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
                         ':iUnidade'             => $_SESSION['UnidadeId']
@@ -237,59 +241,59 @@ if (isset($_POST['cmbPlanoContas'])) {
                              WHERE SituaChave = 'ARECEBER'
                     ";
 
-                        $result = $conn->query($sql);
-                        $situacao = $result->fetch(PDO::FETCH_ASSOC);
+                       $result = $conn->query($sql);
+                       $situacao = $result->fetch(PDO::FETCH_ASSOC);
 
-                        $sql = "INSERT INTO ContasAReceber ( CnARePlanoContas, 
-                                                         CnAReCliente, 
-                                                         CnAReContaBanco, 
-                                                         CnAReFormaPagamento, 
-                                                         CnAReNumDocumento,
-                                                         CnAReDtEmissao, 
-                                                         CnAReDescricao, 
-                                                         CnAReDtVencimento, 
-                                                         CnAReValorAReceber,
-                                                         CnAReDtRecebimento, 
-                                                         CnAReValorRecebido,
-                                                         CnAReObservacao,
-                                                         CnAReStatus, 
-                                                         CnAReUsuarioAtualizador, 
-                                                         CnAReUnidade)
-                            VALUES ( :iPlanoContas, 
-                                     :iCliente,
-                                     :iContaBanco, 
-                                     :iFormaPagamento,
-                                     :sNumDocumento,  
-                                     :dDtEmissao, 
-                                     :sDescricao, 
-                                     :dDtVencimento, 
-                                     :fValorAReceber, 
-                                     :dDtRecebimento,
-                                     :fValorRecebido, 
-                                     :sObservacao,
-                                     :iStatus, 
-                                     :iUsuarioAtualizador, 
-                                     :iUnidade)";
+                       $sql = "INSERT INTO ContasAReceber ( CnARePlanoContas, 
+                                                            CnAReCliente, 
+                                                            CnAReContaBanco, 
+                                                            CnAReFormaPagamento, 
+                                                            CnAReNumDocumento,
+                                                            CnAReDtEmissao, 
+                                                            CnAReDescricao, 
+                                                            CnAReDtVencimento, 
+                                                            CnAReValorAReceber,
+                                                            CnAReDtRecebimento, 
+                                                            CnAReValorRecebido,
+                                                            CnAReObservacao,
+                                                            CnAReStatus, 
+                                                            CnAReUsuarioAtualizador, 
+                                                            CnAReUnidade)
+                                    VALUES ( :iPlanoContas, 
+                                        :iCliente,
+                                        :iContaBanco, 
+                                        :iFormaPagamento,
+                                        :sNumDocumento,  
+                                        :dDtEmissao, 
+                                        :sDescricao, 
+                                        :dDtVencimento, 
+                                        :fValorAReceber, 
+                                        :dDtRecebimento,
+                                        :fValorRecebido, 
+                                        :sObservacao,
+                                        :iStatus, 
+                                        :iUsuarioAtualizador, 
+                                        :iUnidade)";
 
-                        $result = $conn->prepare($sql);
-                        $result->execute(array(
+                                    $result = $conn->prepare($sql);
+                                    $result->execute(array(
 
-                            ':iPlanoContas'         => $_POST['cmbPlanoContas'],
-                            ':iCliente   '          => $_POST['cmbCliente'],
-                            ':iContaBanco'          => $_POST['cmbContaBanco'],
-                            ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
-                            ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
-                            ':dDtEmissao'           => $_POST['inputDataEmissao'],
-                            ':sDescricao'           => $_POST['inputParcelaDescricao' . $i . ''],
-                            ':dDtVencimento'        => $_POST['inputParcelaDataVencimento' . $i . ''],
-                            ':fValorAReceber'       => floatval(gravaValor($_POST['inputParcelaValorAReceber' . $i . ''])),
-                            ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
-                            ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
-                            ':sObservacao'          => $_POST['inputObservacao'],
-                            ':iStatus'              => $situacao['SituaId'],
-                            ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
-                            ':iUnidade'             => $_SESSION['UnidadeId']
-                        ));
+                                    ':iPlanoContas'         => $_POST['cmbPlanoContas'],
+                                    ':iCliente   '          => $_POST['cmbCliente'],
+                                    ':iContaBanco'          => $_POST['cmbContaBanco'],
+                                    ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
+                                    ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
+                                    ':dDtEmissao'           => $_POST['inputDataEmissao'],
+                                    ':sDescricao'           => $_POST['inputParcelaDescricao' . $i . ''],
+                                    ':dDtVencimento'        => $_POST['inputParcelaDataVencimento' . $i . ''],
+                                    ':fValorAReceber'       => floatval(gravaValor($_POST['inputParcelaValorAReceber' . $i . ''])),
+                                    ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
+                                    ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
+                                    ':sObservacao'          => $_POST['inputObservacao'],
+                                    ':iStatus'              => $situacao['SituaId'],
+                                    ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
+                                    ':iUnidade'             => $_SESSION['UnidadeId']
+                                    ));
                     } catch (Exception $e) {
                         echo 'Error: ',  $e->getMessage(), "\n";
                     }
@@ -322,45 +326,51 @@ if (isset($_POST['cmbPlanoContas'])) {
                 }
 
                 try {
-                    $sql = "INSERT INTO ContasAReceber ( CnARePlanoContas, 
-                                                         CnAReCliente, 
-                                                         CnAReContaBanco, 
-                                                         CnAReFormaPagamento, 
-                                                         CnAReNumDocumento,
-                                                         CnAReDtEmissao,
-                                                         CnAReDescricao, 
+                    $sql = "INSERT INTO ContasAReceber ( CnAReDtEmissao,
+                                                         CnARePlanoContas, 
+                                                         CnAReCliente,
+                                                         CnAReDescricao,
+                                                         CnAReNumDocumento,  
+                                                         CnAReContaBanco,                   
+                                                         CnAReFormaPagamento,
+                                                         CnAReVenda,                              
                                                          CnAReDtVencimento, 
                                                          CnAReValorAReceber,
                                                          CnAReDtRecebimento, 
-                                                         CnAReValorRecebido, 
+                                                         CnAReValorRecebido,
+                                                         CnAReTipoJuros, 
+                                                         CnAReJuros,
+                                                         CnAReTipoDesconto, 
+                                                         CnAReDesconto, 
                                                          CnAReObservacao, 
                                                          CnAReNumCheque,                    
                                                          CnAReValorCheque,                  
                                                          CnAReDtEmissaoCheque,             
-                                                         CnAReDtVencimentoCheque,           
+                                                         CnAReDtVencimentoCheque,          
                                                          CnAReBancoCheque,                 
                                                          CnAReAgenciaCheque,                
                                                          CnAReContaCheque,                  
                                                          CnAReNomeCheque,                  
-                                                         CnAReCpfCheque,             
-                                                         CnAReTipoJuros, 
-                                                         CnAReJuros,
-                                                         CnAReTipoDesconto, 
-                                                         CnAReDesconto,
+                                                         CnAReCpfCheque,          
                                                          CnAReStatus, 
                                                          CnAReUsuarioAtualizador, 
                                                          CnAReUnidade)
-                        VALUES ( :iPlanoContas, 
-                                 :iCliente, 
+                        VALUES ( :dDtEmissao, 
+                                 :iPlanoContas, 
+                                 :iCliente,
+                                 :sDescricao,
+                                 :sNumDocumento, 
                                  :iContaBanco, 
                                  :iFormaPagamento,
-                                 :sNumDocumento, 
-                                 :dDtEmissao, 
-                                 :sDescricao, 
+                                 :iVenda,
                                  :dDtVencimento, 
                                  :fValorAReceber, 
                                  :dDtRecebimento, 
-                                 :fValorRecebido, 
+                                 :fValorRecebido,
+                                 :sTipoJuros, 
+                                 :fJuros, 
+                                 :sTipoDesconto, 
+                                 :fDesconto,  
                                  :sObservacao,
                                  :sNumCheque,
                                  :fValorCheque,
@@ -371,10 +381,6 @@ if (isset($_POST['cmbPlanoContas'])) {
                                  :iContaCheque,
                                  :iNomeCheque,
                                  :iCpfCheque, 
-                                 :sTipoJuros, 
-                                 :fJuros, 
-                                 :sTipoDesconto, 
-                                 :fDesconto, 
                                  :iStatus, 
                                  :iUsuarioAtualizador, 
                                  :iUnidade)";
@@ -382,18 +388,23 @@ if (isset($_POST['cmbPlanoContas'])) {
                     $result = $conn->prepare($sql);
                     $result->execute(array(
 
-                        ':iPlanoContas'         => $_POST['cmbPlanoContas'],
+                        ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
+                        ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? $_POST['cmbPlanoContas'] : null,
                         ':iCliente'             => $_POST['cmbCliente'],
+                        ':sDescricao'           => $_POST['inputDescricao'],
+                        ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
                         ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? $_POST['cmbContaBanco'] : null,
                         ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? $_POST['cmbFormaPagamento'] : null,
-                        ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
-                        ':dDtEmissao'           => $_POST['inputDataEmissao'],
-                        ':sDescricao'           => $_POST['inputDescricao'],
+                        ':iVenda'               =>  null,
                         ':dDtVencimento'        => $_POST['inputDataVencimento'],
                         ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
-                        ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
+                        ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
                         ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
-                        ':sObservacao'          => $_POST['inputObservacao'],
+                        ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+                        ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+                        ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+                        ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                        ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
                         ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
                         ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
                         ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
@@ -402,11 +413,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
                         ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
                         ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
-                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,    
-                        ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                        ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                        ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                        ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
                         ':iStatus'              => $situacao['SituaId'],
                         ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
                         ':iUnidade'             => $_SESSION['UnidadeId']
@@ -426,90 +433,93 @@ if (isset($_POST['cmbPlanoContas'])) {
                             $result = $conn->query($sql);
                             $situacao = $result->fetch(PDO::FETCH_ASSOC);
 
-                            $sql = "INSERT INTO ContasAReceber ( CnARePlanoContas, 
-                                                             CnAReCliente, 
-                                                             CnAReContaBanco, 
-                                                             CnAReFormaPagamento, 
-                                                             CnAReNumDocumento,
-                                                             CnAReDtEmissao, 
-                                                             CnAReDescricao, 
-                                                             CnAReDtVencimento, 
-                                                             CnAReValorAReceber,
-                                                             CnAReDtRecebimento, 
-                                                             CnAReValorRecebido, 
-                                                             CnAReObservacao,
-                                                             CnAReNumCheque,                    
-                                                             CnAReValorCheque,                  
-                                                             CnAReDtEmissaoCheque,             
-                                                             CnAReDtVencimentoCheque,           
-                                                             CnAReBancoCheque,                 
-                                                             CnAReAgenciaCheque,                
-                                                             CnAReContaCheque,                  
-                                                             CnAReNomeCheque,                  
-                                                             CnAReCpfCheque,                                                                              
-                                                             CnAReTipoJuros, 
-                                                             CnAReJuros, 
-                                                             CnAReTipoDesconto, 
-                                                             CnAReDesconto, 
-                                                             CnAReStatus, 
-                                                             CnAReUsuarioAtualizador, 
-                                                             CnAReUnidade)
-                                VALUES ( :iPlanoContas, 
-                                         :iCliente, 
-                                         :iContaBanco, 
-                                         :iFormaPagamento,
-                                         :sNumDocumento, 
-                                         :dDtEmissao,
-                                         :sDescricao,
-                                         :dDtVencimento, 
-                                         :fValorAReceber, 
-                                         :dDtRecebimento, 
-                                         :fValorRecebido, 
-                                         :sObservacao,
-                                         :sNumCheque,
-                                         :fValorCheque,
-                                         :dDtEmissaoCheque,
-                                         :dDtVencimentoCheque,
-                                         :iBancoCheque,
-                                         :iAgenciaCheque,
-                                         :iContaCheque,
-                                         :iNomeCheque,
-                                         :iCpfCheque, 
-                                         :sTipoJuros, 
-                                         :fJuros, 
-                                         :sTipoDesconto, 
-                                         :fDesconto, 
-                                         :iStatus, 
-                                         :iUsuarioAtualizador, 
-                                         :iUnidade)";
+                            $sql = "INSERT INTO ContasAReceber( CnAReDtEmissao,
+                                                                CnARePlanoContas, 
+                                                                CnAReCliente,
+                                                                CnAReDescricao,
+                                                                CnAReNumDocumento,  
+                                                                CnAReContaBanco,                   
+                                                                CnAReFormaPagamento,
+                                                                CnAReVenda,                              
+                                                                CnAReDtVencimento, 
+                                                                CnAReValorAReceber,
+                                                                CnAReDtRecebimento, 
+                                                                CnAReValorRecebido,
+                                                                CnAReTipoJuros, 
+                                                                CnAReJuros,
+                                                                CnAReTipoDesconto, 
+                                                                CnAReDesconto, 
+                                                                CnAReObservacao, 
+                                                                CnAReNumCheque,                    
+                                                                CnAReValorCheque,                  
+                                                                CnAReDtEmissaoCheque,             
+                                                                CnAReDtVencimentoCheque,           
+                                                                CnAReBancoCheque,                 
+                                                                CnAReAgenciaCheque,                
+                                                                CnAReContaCheque,                  
+                                                                CnAReNomeCheque,                  
+                                                                CnAReCpfCheque,             
+                                                                CnAReStatus, 
+                                                                CnAReUsuarioAtualizador, 
+                                                                CnAReUnidade)
+                               VALUES ( :dDtEmissao, 
+                                        :iPlanoContas, 
+                                        :iCliente,
+                                        :sDescricao,
+                                        :sNumDocumento, 
+                                        :iContaBanco, 
+                                        :iFormaPagamento,
+                                        :iVenda,
+                                        :dDtVencimento, 
+                                        :fValorAReceber, 
+                                        :dDtRecebimento, 
+                                        :fValorRecebido,
+                                        :sTipoJuros, 
+                                        :fJuros, 
+                                        :sTipoDesconto, 
+                                        :fDesconto,  
+                                        :sObservacao,
+                                        :sNumCheque,
+                                        :fValorCheque,
+                                        :dDtEmissaoCheque,
+                                        :dDtVencimentoCheque,
+                                        :iBancoCheque,
+                                        :iAgenciaCheque,
+                                        :iContaCheque,
+                                        :iNomeCheque,
+                                        :iCpfCheque, 
+                                        :iStatus, 
+                                        :iUsuarioAtualizador, 
+                                        :iUnidade)";
 
                             $result = $conn->prepare($sql);
                             $result->execute(array(
-                                ':iPlanoContas'         => $_POST['cmbPlanoContas'],
+                                ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
+                                ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? $_POST['cmbPlanoContas'] : null,
                                 ':iCliente'             => $_POST['cmbCliente'],
-                                ':iContaBanco'          => $_POST['cmbContaBanco'],
-                                ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
-                                ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
-                                ':dDtEmissao'           => $_POST['inputDataEmissao'],
                                 ':sDescricao'           => $_POST['inputDescricao'],
+                                ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
+                                ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? $_POST['cmbContaBanco'] : null,
+                                ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? $_POST['cmbFormaPagamento'] : null,
+                                ':iVenda'               =>  null,
                                 ':dDtVencimento'        => $_POST['inputDataVencimento'],
-                                ':fValorAReceber'       => $_POST['inputRecebimentoParcial'],
-                                ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
-                                ':fValorRecebido'       => null,
-                                ':sObservacao'          => $_POST['inputObservacao'],
-                                ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
-                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
-                        ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
-                        ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
-                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? $_POST['cmbBancoCheque'] : null,
-                        ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
-                        ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
-                        ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
-                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,
+                                ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
+                                ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
+                                ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
                                 ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
                                 ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
                                 ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
                                 ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                                ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
+                                ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
+                                ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
+                                ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
+                                ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
+                                ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? $_POST['cmbBancoCheque'] : null,
+                                ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
+                                ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
+                                ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
+                                ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,    
                                 ':iStatus'              => $situacao['SituaId'],
                                 ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
                                 ':iUnidade'             => $_SESSION['UnidadeId']
@@ -541,29 +551,38 @@ if (isset($_POST['cmbPlanoContas'])) {
 
 if (isset($_GET['lancamentoId'])) {
     try {
-        $sql = "SELECT CnAReId, 
-                       CnARePlanoContas, 
-                       CnAReCliente, 
-                       CnAReDtEmissao, 
-                       CnAReDescricao, 
-                       CnAReDtVencimento, 
-                       CnAReValorAReceber, 
-                       CnAReDtRecebimento, 
-                       CnAReValorRecebido, 
-                       CnAReContaBanco, 
-                       CnAReFormaPagamento, 
-                       CnAReNumDocumento,
-                       CnAReNumCheque,                    
-                       CnAReValorCheque,                  
-                       CnAReDtEmissaoCheque,             
-                       CnAReDtVencimentoCheque,           
-                       CnAReBancoCheque,                 
-                       CnAReAgenciaCheque,                
-                       CnAReContaCheque,                  
-                       CnAReNomeCheque,                  
-                       CnAReCpfCheque              
-    		      FROM ContasAReceber
-    		     WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " . $_GET['lancamentoId'] . "";
+        $sql = "SELECT  CnAReId,
+                        CnAReDtEmissao,  
+                        CnARePlanoContas, 
+                        CnAReCliente, 
+                        CnAReDescricao, 
+                        CnAReNumDocumento,
+                        CnAReContaBanco, 
+                        CnAReFormaPagamento,
+                        CnAReVenda,
+                        CnAReDtVencimento, 
+                        CnAReValorAReceber, 
+                        CnAReDtRecebimento, 
+                        CnAReValorRecebido, 
+                        CnAReTipoJuros, 
+                        CnAReJuros, 
+                        CnAReTipoDesconto, 
+                        CnAReDesconto, 
+                        CnAReObservacao,
+                        CnAReNumCheque,                    
+                        CnAReValorCheque,                  
+                        CnAReDtEmissaoCheque,             
+                        CnAReDtVencimentoCheque,           
+                        CnAReBancoCheque,                 
+                        CnAReAgenciaCheque,                
+                        CnAReContaCheque,                  
+                        CnAReNomeCheque,                  
+                        CnAReCpfCheque, 
+                        CnAReStatus, 
+                        CnAReUsuarioAtualizador, 
+                        CnAReUnidade             
+    		       FROM ContasAReceber
+    		      WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " . $_GET['lancamentoId'] . "";
 
         $result = $conn->query($sql);
         $lancamento = $result->fetch(PDO::FETCH_ASSOC);
@@ -1381,27 +1400,27 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputNumCheque">Nº do Cheque</span></label>
-                                                <input type="text" id="inputNumCheque" name="inputNumCheque" class="form-control" placeholder="Número do Cheque">
+                                                <input type="text" id="inputNumCheque" name="inputNumCheque" class="form-control" placeholder="Número do Cheque" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNumCheque'] ?>">
                                             </div>
                                         </div>	
                                         <div class='col-lg-3'>
                                             <div class="form-group">
                                                 <label for="inputValorCheque">Valor</span></label>
                                                 <div class="input-group">
-                                                    <input type="text" id="inputValorCheque" onKeyUp="moeda(this)" maxLength="12" name="inputValorCheque" class="form-control">
+                                                    <input type="text" id="inputValorCheque" onKeyUp="moeda(this)" maxLength="12" name="inputValorCheque" class="form-control" value="<?php if (isset($lancamento)) echo $lancamento['CnAReValorCheque'] ?>">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group" >
                                                 <label for="inputDtEmissaoCheque">Data da Emissão</span></label>
-                                                <input id="inputDtEmissaoCheque" class="form-control" type="date" name="inputDtEmissaoCheque">
+                                                <input id="inputDtEmissaoCheque" class="form-control" type="date" name="inputDtEmissaoCheque" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtEmissaoCheque'] ?>">
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputDtVencimentoCheque">Data do Vencimento</span></label>
-                                                <input id="inputDtVencimentoCheque" class="form-control" type="date" name="inputDtVencimentoCheque">
+                                                <input id="inputDtVencimentoCheque" class="form-control" type="date" name="inputDtVencimentoCheque" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtVencimentoCheque'] ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -1411,7 +1430,7 @@ $dataInicio = date("Y-m-d");
                                     <div class="d-flex flex-row p-1">
                                         <div class="col-lg-6">
 											<label for="cmbBancoCheque">Banco</label>
-											<select id="cmbBancoCheque" name="cmbBancoCheque" class="form-control form-control-select2">
+											<select id="cmbBancoCheque" name="cmbBancoCheque" class="form-control form-control-select2" value="<?php if (isset($lancamento)) echo $lancamento['CnAReBancoCheque'] ?>">
 												<option value="#">Selecione um banco</option>
 												<?php 
 													$sql = "SELECT BancoId, BancoCodigo, BancoNome
@@ -1432,13 +1451,13 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputAgenciaCheque">Agência</span></label>
-                                                <input type="text" id="inputAgenciaCheque" name="inputAgenciaCheque" class="form-control" placeholder="Número da Agência">
+                                                <input type="text" id="inputAgenciaCheque" name="inputAgenciaCheque" class="form-control" placeholder="Número da Agência" value="<?php if (isset($lancamento)) echo $lancamento['CnAReAgenciaCheque'] ?>">
                                             </div>
                                         </div>	
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputContaCheque">Conta</span></label>
-                                                <input type="text" id="inputContaCheque" name="inputContaCheque" class="form-control" placeholder="Número da Conta">
+                                                <input type="text" id="inputContaCheque" name="inputContaCheque" class="form-control" placeholder="Número da Conta" value="<?php if (isset($lancamento)) echo $lancamento['CnAReContaCheque'] ?>">
                                             </div>
                                         </div>	     
                                     </div>
@@ -1448,14 +1467,14 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-9">
                                             <div class="form-group">
                                                 <label for="inputNomeCheque">Nome</label>
-                                                <input type="text" id="inputNomeCheque" name="inputNomeCheque" class="form-control" placeholder="Nome Completo">
+                                                <input type="text" id="inputNomeCheque" name="inputNomeCheque" class="form-control" placeholder="Nome Completo" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNomeCheque'] ?>">
                                             </div>
                                         </div>	
                                         
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputCpfCheque">CPF</label>
-                                                <input type="text" id="inputCpfCheque" name="inputCpfCheque" class="form-control" placeholder="CPF" data-mask="999.999.999-99">
+                                                <input type="text" id="inputCpfCheque" name="inputCpfCheque" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php if (isset($lancamento)) echo $lancamento['CnAReCpfCheque'] ?>">
                                             </div>	
                                         </div>
                                     </div>
