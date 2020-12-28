@@ -1492,7 +1492,7 @@ if (isset($_POST['inputData'])) {
 														</select>
 													</div>
 												</div>
-
+<?php echo $_POST['inputSolicitacaoId']; ?>
 												<div class="col-lg-4" id="DestinoSetor">
 													<div class="form-group">
 														<label for="cmbDestinoSetor">Destino<span style="color: red">*</span></label>
@@ -1501,22 +1501,23 @@ if (isset($_POST['inputData'])) {
 															<?php
 
 															if (isset($_POST['inputSolicitacaoId'])) {
-																$sql = "SELECT EXUXPSetor, SetorNome
-																			FROM EmpresaXUsuarioXPerfil
-																			JOIN Setor ON SetorId = EXUXPSetor
-																			WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
-																	";
+																$sql = "SELECT SetorId, SetorNome
+																		FROM Setor 
+																		JOIN EmpresaXUsuarioXPerfil ON EXUXPSetor = SetorId
+																		JOIN Solicitacao ON SolicSolicitante = EXUXPUsuario
+																		WHERE SolicId = " . $_POST['inputSolicitacaoId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+																		";
 																$result = $conn->query($sql);
 																$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
-																print('<option value="' . $usuarioPerfil['EXUXPSetor'] . '" selected>' . $usuarioPerfil['SetorNome'] . '</option>');
-															} else {
+																print('<option value="' . $usuarioPerfil['SetorId'] . '" selected>' . $usuarioPerfil['SetorNome'] . '</option>');
 
+															} else {
 																$sql = "SELECT SetorId, SetorNome
-																			FROM Setor
-																			JOIN Situacao on SituaId = SetorStatus
-																			WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																			ORDER BY SetorNome ASC";
+																		FROM Setor
+																		JOIN Situacao on SituaId = SetorStatus
+																		WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																		ORDER BY SetorNome ASC";
 																$result = $conn->query($sql);
 																$row = $result->fetchAll(PDO::FETCH_ASSOC);
 

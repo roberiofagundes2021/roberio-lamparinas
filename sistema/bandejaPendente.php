@@ -35,12 +35,40 @@
 					</div>
 				</div>
 			</td>
+		');
+		
+		if ($item['BandeTabela'] == 'Solicitacao'){
+			if ($item['SetorAtual'] == $item['SetorQuandoSolicitou']){
+				print('
+					<td>
+						<a href="#" class="text-default">
+							<div class="font-weight-semibold">[#'.$item['BandeTabelaId'].'] '.$item['BandeIdentificacao'].'</div>
+							<span class="text-muted">Ação: '.$item['BandeDescricao'].'</span>
+						</a>
+					</td>
+				');
+			} else{
+				print('
+					<td>
+						<a href="#" class="text-default">
+							<div class="font-weight-semibold">[#'.$item['BandeTabelaId'].'] '.$item['BandeIdentificacao'].' <span style="color:red;">Obs.: O solicitante mudou de setor, portanto, não é permitido liberar a solicitação.</span></div>
+							<span class="text-muted">Ação: '.$item['BandeDescricao'].'</span>
+						</a>
+					</td>
+				');
+			}
+		} else{
+			print('
 			<td>
 				<a href="#" class="text-default">
 					<div class="font-weight-semibold">[#'.$item['BandeTabelaId'].'] '.$item['BandeIdentificacao'].'</div>
 					<span class="text-muted">Ação: '.$item['BandeDescricao'].'</span>
 				</a>
 			</td>
+			');			
+		}
+
+		print('
 			<td class="text-center">
 				<div class="list-icons">
 					<div class="list-icons-item dropdown">
@@ -48,8 +76,19 @@
 						<div class="dropdown-menu dropdown-menu-right">
 							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'imprimir\');" class="dropdown-item"><i class="icon-printer2"></i> Visualizar</a>
 							
-							<div class="dropdown-divider"></div>							
-							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberar\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
+							<div class="dropdown-divider"></div>
+			');
+
+			//Verifica se for Solicitação e se o Setor atual de quem solicitou não houve alteração, já que não faz sentido aprovar uma solicitação para um setor antigo de quem solicitou
+			if ($item['BandeTabela'] == 'Solicitacao'){
+				if ($item['SetorAtual'] == $item['SetorQuandoSolicitou']){
+					print('<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberar\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>');
+				}	
+			} else{
+				print('<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberar\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>');
+			}
+
+			print('
 							<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'naoliberar\');" class="dropdown-item" id="motivo"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
 						</div>
 					</div>

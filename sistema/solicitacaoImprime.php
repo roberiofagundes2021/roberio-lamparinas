@@ -16,14 +16,22 @@ if (isset($_POST['inputSolicitacaoId'])){
 		   </script> ');
 }
 
-$sql = "SELECT SolicNumero, SolicData, SolicObservacao, UsuarNome, UsuarTelefone, UsuarCelular, UsuarEmail, SetorNome
+$sql = "SELECT SolicNumero, SolicData, SolicObservacao, UsuarNome, UsuarTelefone, UsuarCelular, UsuarEmail, SetorNome, 
+		BandeSolicitanteSetor as SetorQuandoSolicitou, SolicSolicitante
 		FROM Solicitacao
+		JOIN Bandeja on BandeTabela = 'Solicitacao' and BandeTabelaId = SolicId
         JOIN Usuario on UsuarId = SolicSolicitante
-        JOIN Setor on SetorId = SolicSetor
+        JOIN Setor on SetorId = BandeSolicitanteSetor
 		WHERE SolicUnidade = ". $_SESSION['UnidadeId'] ." and SolicId = ".$iSolicitacao;
-
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
+
+$sql = "SELECT SetorId
+		FROM Setor
+		JOIN EmpresaXUsuarioXPerfil on EXUXPSetor = SetorId
+		WHERE SetorUnidade = ". $_SESSION['UnidadeId'] ." and EXUXPUsuario = ".$row['SolicSolicitante'];
+$result = $conn->query($sql);
+$rowSetorAtual = $result->fetch(PDO::FETCH_ASSOC);
 
 try {
 	$mpdf = new mPDF([
@@ -66,7 +74,7 @@ try {
 			<div style='margin-top:8px;'>Solicitacao Nº: ".$row['SolicNumero']."</div>
 		</div> 
 	</div>
-
+	
 	<div style='text-align:center; margin-top: 20px;'><h1>SOLICITAÇÃO DE MATERIAIS</h1></div>
 	";
 	
@@ -84,9 +92,20 @@ try {
             <td colspan="1" style="width:20%; font-size:12px;">E-mail: '.$row['UsuarEmail'].'</td>
 		</tr>';
 	
-	if ($row['SolicObservacao'] != null && $row['SolicObservacao'] != ''){
+	$obs = $row['SolicObservacao'];
+
+	$trocouSetor = 0;
+
+	// Verifica se quando o usuário solicitou e no momento ele não mudou de setor. Se sim, apresenta esse alerta no relatório
+	if ($row['SetorQuandoSolicitou'] != $rowSetorAtual['SetorId']){
+		$obs .= " <span style='color: red;'>ATENÇÃO: o setor do usuário solicitante foi alterado desde quando ele solicitou. Portanto, a liberação nào foi permitida.</span>";
+
+		$trocouSetor = 1;
+	}	
+
+	if (($row['SolicObservacao'] != null && $row['SolicObservacao'] != '') || $trocouSetor){
 		$html .= '<tr>
-					<td colspan="4">Observação: '.$row['SolicObservacao'].'</td>
+					<td colspan="4">Observação: '.$obs.'</td>
 				  </tr>';
 	}
 
@@ -158,7 +177,7 @@ try {
 		<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
 		<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
 	</div>";
-    
+
     //$mpdf->SetHTMLHeader($topo,'O',true); //o SetHTMLHeader deve vir antes do WriteHTML para que o cabeçalho apareça em todas as páginas
     $mpdf->SetHTMLFooter($rodape); 	//o SetHTMLFooter deve vir antes do WriteHTML para que o rodapé apareça em todas as páginas
     $mpdf->WriteHTML($html);
