@@ -75,22 +75,27 @@ if ($_POST['tipoDeFiltro'] == '#Categoria') {
 	}
 } else if ($_POST['tipoDeFiltro'] == '#CategoriaPatrimonio') {
 
-	$sql = "SELECT CategId,
-									 CategNome,
-									 SbCatId,
-									 SbCatNome,
-									 CONVERT(varchar(10), produid) 
-								 + '#' 
-								 + CONVERT(varchar(10),ProduValorCusto) as ProduValue,
-									 produNome
-							FROM PRODUTO
-							JOIN PATRIMONIO
-							  ON PatriProduto = ProduId
-							JOIN categoria
-							  ON categid = produCategoria
-							JOIN SubCategoria
-							  ON SbCatId = ProduSubCategoria
-						 WHERE PatriId = " . $_POST['valor'] . "";
+	$sql = "SELECT DISTINCT CategId,
+													CategNome,
+													SbCatId,
+													SbCatNome,
+													CONVERT(varchar(10), produid) 
+												+ '#' 
+												+ CONVERT(varchar(10),ProduValorCusto) as ProduValue,
+													produNome,
+													MvXPrValidade
+												FROM PRODUTO
+												JOIN PATRIMONIO
+													ON PatriProduto = ProduId
+												JOIN categoria
+													ON categid = produCategoria
+												JOIN SubCategoria
+													ON SbCatId = ProduSubCategoria
+												join MovimentacaoXProduto
+													on MvXPrPatrimonio = PatriId
+												join movimentacao
+													on MovimId = MvXPrMovimentacao
+													WHERE PatriId = " . $_POST['valor'] . "";
 
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -120,7 +125,11 @@ if ($_POST['tipoDeFiltro'] == '#Categoria') {
 	if ($_POST['campo'] == 'produto') {
 		if ($cont) {
 			foreach ($row as $value) {
-				print('<option value="' . $value['ProduValue'] . '" selected>' . $value['produNome'] . '</option>');
+				if ($value['MvXPrValidade'] == null ){
+					print('<option value="' . $value['ProduValue'] . '#null' .'" selected>' . $value['produNome'] . '</option>');
+				} else {
+					print('<option value="' . $value['ProduValue'] . '#' . $value['MvXPrValidade'] . '" selected>' . $value['produNome'] . '</option>');
+				}
 			}
 		} else {
 			echo 'sem dados';

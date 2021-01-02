@@ -15,7 +15,8 @@ if (
 	+ CONVERT(varchar(10),ProduValorCusto) as ProduValue, 
 	       ProduNome, 
 				 ProduValorCusto, 
-				 ProduCustoFinal
+				 ProduCustoFinal,
+				 MvXPrValidade
 		from Produto
 		JOIN MovimentacaoXProduto
 			on MvXPrProduto = ProduId
@@ -38,7 +39,8 @@ if (
 	+ CONVERT(varchar(10),ProduValorCusto) as ProduValue, 
 	       ProduNome, 
 				 ProduValorCusto, 
-				 ProduCustoFinal
+				 ProduCustoFinal,
+				 MvXPrValidade
 		from Produto
 		JOIN MovimentacaoXProduto
 			on MvXPrProduto = ProduId
@@ -62,7 +64,11 @@ $cont = count($row);
 
 if ($cont) {
 	foreach ($row as $value) {
-		print('<option value="' . $value['ProduValue'] . '">' . $value['ProduNome'] . '</option>');
+		if ($value['MvXPrValidade'] == null ) {
+			print('<option value="' . $value['ProduValue'] . '#null' .'">' . $value['ProduNome'] . '</option>');
+		} else {
+			print('<option value="' . $value['ProduValue'] . '#' . $value['MvXPrValidade'] .'">' . $value['ProduNome'] . '</option>');
+		}
 	}
 } else {
 	echo 'sem dados';

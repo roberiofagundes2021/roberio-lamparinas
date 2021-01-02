@@ -49,13 +49,13 @@ if (isset($_POST['patrimonioId']) && $_POST['patrimonioId'] !== '') {
 												<td style="text-align: right">' . $valorCusto . '</td>
 												<td style="text-align: right">' . $valorTotal . '</td>
 										';
-	if ($row['MvXPrValidade'] !== '')
+	if ($row['MvXPrValidade'] != null)
 		$output .= '
 												<td style="text-align: right">' . mostraData($row['MvXPrValidade']) . '</td>
 										';
 	else
 		$output .= '
-												<td style="text-align: right">  /  /  </td>
+												<td style="text-align: right"></td>
 										';
 
 	$output .= 	"
@@ -102,13 +102,13 @@ if (isset($_POST['patrimonioId']) && $_POST['patrimonioId'] !== '') {
 												<td style="text-align: right">' . $valorCusto . '</td>
 												<td style="text-align: right">' . $valorTotal . '</td>
 										';
-	if ($row['MvXPrValidade'] !== '')
+	if ($row['MvXPrValidade'] != null)
 		$output .= '
 												<td style="text-align: right">' . mostraData($row['MvXPrValidade']) . '</td>
 										';
 	else
 		$output .= '
-												<td style="text-align: right">  /  /  </td>
+												<td style="text-align: right"></td>
 										';
 
 	$output .= 	"
