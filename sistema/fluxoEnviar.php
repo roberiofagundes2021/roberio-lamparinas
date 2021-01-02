@@ -61,9 +61,9 @@ try{
             $sIdentificacao = 'Fluxo Operacional (Nº Contrato: '.$rowFluxo['FlOpeNumContrato'].' | Nº Processo: '.$rowFluxo['FlOpeNumProcesso'].')';
         
             $sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
-                    BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
-                    VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, 
-                    :iStatus, :iUsuarioAtualizador, :iUnidade)";
+                    BandeSolicitanteSetor, BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
+                    VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :iSolicitanteSetor, :sTabela, 
+					:iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade)";
             $result = $conn->prepare($sql);
                     
             $result->execute(array(
@@ -71,7 +71,8 @@ try{
                             ':dData' => date("Y-m-d"),
                             ':sDescricao' => 'Liberar Fluxo',
                             ':sURL' => '',
-                            ':iSolicitante' => $_SESSION['UsuarId'],
+							':iSolicitante' => $_SESSION['UsuarId'],
+							':iSolicitanteSetor' => null,
                             ':sTabela' => 'FluxoOperacional',
                             ':iTabelaId' => $iFluxoOperacional,
                             ':iStatus' => $rowSituacao['SituaId'],

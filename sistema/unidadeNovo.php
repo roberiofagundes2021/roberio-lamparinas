@@ -10,6 +10,8 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
+		$conn->beginTransaction();
+
 		$sql = "INSERT INTO Unidade (UnidaNome, UnidaCep, UnidaEndereco, UnidaNumero, UnidaComplemento, UnidaBairro, 
 									 UnidaCidade, UnidaEstado, UnidaStatus, UnidaUsuarioAtualizador, UnidaEmpresa)
 				VALUES (:sNome, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
@@ -29,18 +31,64 @@ if(isset($_POST['inputNome'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpresaId'],
 						));
-		
+
+		$insertId = $conn->lastInsertId();				
+
+		$sql = "INSERT INTO FormaPagamento (FrPagNome, FrPagChave, FrPagStatus, FrPagUsuarioAtualizador, FrPagUnidade)
+				VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+							':sNome' => 'Boleto Bancário',
+							':sChave' => 'BOLETO',
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $insertId
+						));
+		$result->execute(array(
+							':sNome' => 'Cartão de Crédito',
+							':sChave' => 'CARTAOCREDITO',
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $insertId
+						));				
+		$result->execute(array(
+							':sNome' => 'Cartão de Débito',
+							':sChave' => 'CARTAODEBITO',
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $insertId
+						));
+		$result->execute(array(
+							':sNome' => 'Cheque',
+							':sChave' => 'CHEQUE',
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $insertId
+						));	
+		$result->execute(array(
+							':sNome' => 'Dinheiro',
+							':sChave' => 'DINHEIRO',
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $insertId
+						));							
+					
+		$conn->commit();			
+
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Unidade incluída!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
+
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir unidade!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 	
 	irpara("unidade.php");

@@ -165,9 +165,9 @@ if (isset($_POST['inputDataInicio'])) {
 			$sIdentificacao = 'Fluxo Aditivo';
 
 			$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
-				BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
-				VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, 
-				:iStatus, :iUsuarioAtualizador, :iUnidade)";
+					BandeSolicitanteSetor, BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
+					VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :iSolicitanteSetor, :sTabela, 
+					:iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
@@ -176,6 +176,7 @@ if (isset($_POST['inputDataInicio'])) {
 				':sDescricao' => 'Liberar Fluxo Aditivo',
 				':sURL' => '',
 				':iSolicitante' => $_SESSION['UsuarId'],
+				':iSolicitanteSetor' => null,
 				':sTabela' => 'Aditivo',
 				':iTabelaId' => $_SESSION['AditivoNovo'],
 				':iStatus' => $rowSituacao['SituaId'],
@@ -220,9 +221,8 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 
 
 		$sql = "SELECT SituaId, SituaNome, SituaChave
-		            FROM Situacao
-		            WHERE SituaStatus = 1 and SituaChave = 'AGUARDANDOLIBERACAO'
-		";
+		        FROM Situacao
+		        WHERE SituaStatus = 1 and SituaChave = 'AGUARDANDOLIBERACAO' ";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -237,9 +237,9 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		$sIdentificacao = 'Fluxo Aditivo';
 
 		$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
-					    BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
-		                VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, 
-				        :iStatus, :iUsuarioAtualizador, :iUnidade)";
+				BandeSolicitanteSetor, BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
+		        VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :iSolicitanteSetor, :sTabela, 
+				:iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -248,6 +248,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 			':sDescricao' => 'Liberar Fluxo Aditivo',
 			':sURL' => '',
 			':iSolicitante' => $_SESSION['UsuarId'],
+			':iSolicitanteSetor' => null,
 			':sTabela' => 'Aditivo',
 			':iTabelaId' => $_SESSION['AditivoNovo'],
 			':iStatus' => $rowSituacao['SituaId'],

@@ -51,6 +51,72 @@ $count = count($row);
 	<!-- /theme JS files -->	
 	
 	<script language ="javascript">
+
+		$(document).ready(function (){	
+		
+			$('#tblUnidade').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+				{
+					orderable: true,   //Unidade
+					width: "30%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Bairro
+					width: "20%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //Cidade
+					width: "20%",
+					targets: [2]
+				},
+				{ 
+					orderable: true,   //Estado
+					width: "10%",
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //Situacao
+					width: "10%",
+					targets: [4]
+				},
+				{ 
+					orderable: true,   //Ações
+					width: "10%",
+					targets: [5]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */					
+		});	
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaUnidade(UnidaId, UnidaNome, UnidaStatus, Tipo){
@@ -118,7 +184,7 @@ $count = count($row);
 							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->
-							<table class="table datatable-responsive">
+							<table id="tblUnidade" class="table">
 								<thead>
 									<tr class="bg-slate">
 										<th width="30%">Unidade</th>
