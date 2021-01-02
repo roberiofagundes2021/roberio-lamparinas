@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Parâmetro';
 include('global_assets/php/conexao.php');
 
 if (isset($_SESSION['EmpresaId'])) {
-	$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamPrecoGridProduto, ParamServicoOrcamento
+	$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamPrecoGridProduto, ParamServicoOrcamento,ParamValidadeObrigatoria
 	        FROM Parametro
 	        WHERE ParamEmpresa = " . $_SESSION['EmpresaId'] . "";
 	$result = $conn->query($sql);
@@ -28,7 +28,9 @@ if (isset($_POST['inputIdEmpresa'])) {
 	try {
 		//var_dump($_POST);die;
 		$sql = "UPDATE Parametro SET ParamEmpresaPublica = :iEmpresaPublica, ParamValorAtualizadoFluxo = :iValorAtualizadoFluxo, 
-					   ParamValorAtualizadoOrdemCompra = :iValorAtualizadoOrdemCompra, ParamProdutoOrcamento = :iProdutoOrcamento, ParamServicoOrcamento = :iServicoOrcamento, ParamPrecoGridProduto = :sPrecoGridProduto, ParamUsuarioAtualizador = :iUsuarioAtualizador, ParamValorObsImpreRetirada = :iValorObsImpreRetirada
+					   ParamValorAtualizadoOrdemCompra = :iValorAtualizadoOrdemCompra, ParamProdutoOrcamento = :iProdutoOrcamento, 
+					   ParamServicoOrcamento = :iServicoOrcamento, ParamPrecoGridProduto = :sPrecoGridProduto, ParamValidadeObrigatoria = :iValidadeObrigatoria,
+					   ParamUsuarioAtualizador = :iUsuarioAtualizador, ParamValorObsImpreRetirada = :iValorObsImpreRetirada
 				WHERE ParamEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
 
@@ -40,6 +42,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 			':iProdutoOrcamento' => isset($_POST['inputProdutoOrcamento']) && $_POST['inputProdutoOrcamento'] == "on" ? 1 : 0,
 			':iServicoOrcamento' => isset($_POST['inputServicoOrcamento']) && $_POST['inputServicoOrcamento'] == "on" ? 1 : 0,
 			':sPrecoGridProduto' => $_POST['cmbPrecoGridProduto'],
+			':iValidadeObrigatoria' => isset($_POST['inputValidadeObrigatoria']) && $_POST['inputValidadeObrigatoria'] == "on" ? 1 : 0,
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iEmpresa' => $_SESSION['EmpresaId']
 		));
@@ -262,6 +265,22 @@ if (isset($_POST['inputIdEmpresa'])) {
 											}
 											?>
 										</select>
+									</div>
+									<!-- /switch single -->
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-lg-6">
+									<!-- Switch single -->
+									<div class="form-group row">
+										<label class="col-lg-3 col-form-label">Validade Obrigatória<span class="text-danger">*</span></label>
+										<div class="col-lg-9">
+											<div class="form-check form-check-switch form-check-switch-left">
+												<label class="form-check-label d-flex align-items-center">
+													<input type="checkbox" name="inputValidadeObrigatoria" id="inputValidadeObrigatoria" data-on-text="Sim" data-off-text="Não" class="form-input-switch" <?php if ($row['ParamValidadeObrigatoria']) echo "checked"; ?>>
+												</label>
+											</div>
+										</div>
 									</div>
 									<!-- /switch single -->
 								</div>

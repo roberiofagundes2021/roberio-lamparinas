@@ -73,13 +73,14 @@ if (isset($_POST['cmbPlanoContas'])) {
 
                 $result = $conn->prepare($sql);
                 $result->execute(array(
+                    
                     ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
-                    ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? $_POST['cmbPlanoContas'] : null,
-                    ':iCliente'             => $_POST['cmbCliente'],
+                    ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? intval($_POST['cmbPlanoContas']) : null,
+                    ':iCliente'             => intval($_POST['cmbCliente']),
                     ':sDescricao'           => $_POST['inputDescricao'],
                     ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-                    ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? $_POST['cmbContaBanco'] : null,
-                    ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? $_POST['cmbFormaPagamento'] : null,
+                    ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
+                    ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? intval($_POST['cmbFormaPagamento']) : null,
                     ':iVenda'               =>  null,
                     ':dDtVencimento'        => $_POST['inputDataVencimento'],
                     ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
@@ -91,17 +92,17 @@ if (isset($_POST['cmbPlanoContas'])) {
                     ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
                     ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
                     ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
-                    ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
+                    ':fValorCheque'         => isset($_POST['inputValorCheque']) ? floatval(gravaValor($_POST['inputValorCheque'])) : null,
                     ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
                     ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
-                    ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? $_POST['cmbBancoCheque'] : null,
+                    ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? intval($_POST['cmbBancoCheque']) : null,
                     ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
                     ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
                     ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
-                    ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,  
-                    ':iStatus'              => $situacao['SituaId'],
-                    ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
-                    ':iUnidade'             => $_SESSION['UnidadeId']
+                    ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
+                    ':iStatus'              => intval($situacao['SituaId']),
+                    ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
+                    ':iUnidade'             => intval($_SESSION['UnidadeId'])
                 ));
             } catch (Exception $e) {
                 echo 'Error: ',  $e->getMessage(), "\n";
@@ -183,12 +184,12 @@ if (isset($_POST['cmbPlanoContas'])) {
                     $result->execute(array(
 
                         ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
-                        ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? $_POST['cmbPlanoContas'] : null,
-                        ':iCliente'             => $_POST['cmbCliente'],
+                        ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? intval($_POST['cmbPlanoContas']) : null,
+                        ':iCliente'             => intval($_POST['cmbCliente']),
                         ':sDescricao'           => $_POST['inputDescricao'],
                         ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? $_POST['cmbContaBanco'] : null,
-                        ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? $_POST['cmbFormaPagamento'] : null,
+                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
+                        ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? intval($_POST['cmbFormaPagamento']) : null,
                         ':iVenda'               =>  null,
                         ':dDtVencimento'        => $_POST['inputDataVencimento'],
                         ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
@@ -200,17 +201,17 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
                         ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
                         ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
-                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
+                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? floatval(gravaValor($_POST['inputValorCheque'])) : null,
                         ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
                         ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
-                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? $_POST['cmbBancoCheque'] : null,
+                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? intval($_POST['cmbBancoCheque']) : null,
                         ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
                         ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
                         ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
                         ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
-                        ':iStatus'              => $situacao['SituaId'],
-                        ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
-                        ':iUnidade'             => $_SESSION['UnidadeId']
+                        ':iStatus'              => intval($situacao['SituaId']),
+                        ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
+                        ':iUnidade'             => intval($_SESSION['UnidadeId'])
                     ));
                 }
             }
@@ -385,16 +386,17 @@ if (isset($_POST['cmbPlanoContas'])) {
                                  :iUsuarioAtualizador, 
                                  :iUnidade)";
 
+
                     $result = $conn->prepare($sql);
                     $result->execute(array(
 
                         ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
-                        ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? $_POST['cmbPlanoContas'] : null,
-                        ':iCliente'             => $_POST['cmbCliente'],
+                        ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? intval($_POST['cmbPlanoContas']) : null,
+                        ':iCliente'             => intval($_POST['cmbCliente']),
                         ':sDescricao'           => $_POST['inputDescricao'],
                         ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? $_POST['cmbContaBanco'] : null,
-                        ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? $_POST['cmbFormaPagamento'] : null,
+                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
+                        ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? intval($_POST['cmbFormaPagamento']) : null,
                         ':iVenda'               =>  null,
                         ':dDtVencimento'        => $_POST['inputDataVencimento'],
                         ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
@@ -406,17 +408,17 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
                         ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
                         ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
-                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
+                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? floatval(gravaValor($_POST['inputValorCheque'])) : null,
                         ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
                         ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
-                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? $_POST['cmbBancoCheque'] : null,
+                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? intval($_POST['cmbBancoCheque']) : null,
                         ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
                         ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
                         ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
                         ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
-                        ':iStatus'              => $situacao['SituaId'],
-                        ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
-                        ':iUnidade'             => $_SESSION['UnidadeId']
+                        ':iStatus'              => intval($situacao['SituaId']),
+                        ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
+                        ':iUnidade'             => intval($_SESSION['UnidadeId'])
                     ));
                 } catch (Exception $e) {
                     echo 'Error: ',  $e->getMessage(), "\n";
@@ -492,37 +494,39 @@ if (isset($_POST['cmbPlanoContas'])) {
                                         :iUsuarioAtualizador, 
                                         :iUnidade)";
 
+                      
+
                             $result = $conn->prepare($sql);
                             $result->execute(array(
-                                ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
-                                ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? $_POST['cmbPlanoContas'] : null,
-                                ':iCliente'             => $_POST['cmbCliente'],
-                                ':sDescricao'           => $_POST['inputDescricao'],
-                                ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-                                ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? $_POST['cmbContaBanco'] : null,
-                                ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? $_POST['cmbFormaPagamento'] : null,
-                                ':iVenda'               =>  null,
-                                ':dDtVencimento'        => $_POST['inputDataVencimento'],
-                                ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
-                                ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
-                                ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
-                                ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                                ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                                ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                                ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
-                                ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
-                                ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
-                                ':fValorCheque'         => isset($_POST['inputValorCheque']) ? gravaValor($_POST['inputValorCheque']) : null,
-                                ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
-                                ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
-                                ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? $_POST['cmbBancoCheque'] : null,
-                                ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
-                                ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
-                                ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
-                                ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,    
-                                ':iStatus'              => $situacao['SituaId'],
-                                ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
-                                ':iUnidade'             => $_SESSION['UnidadeId']
+                        ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
+                        ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? intval($_POST['cmbPlanoContas']) : null,
+                        ':iCliente'             => intval($_POST['cmbCliente']),
+                        ':sDescricao'           => $_POST['inputDescricao'],
+                        ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
+                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
+                        ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? intval($_POST['cmbFormaPagamento']) : null,
+                        ':iVenda'               =>  null,
+                        ':dDtVencimento'        => $_POST['inputDataVencimento'],
+                        ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
+                        ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
+                        ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
+                        ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+                        ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+                        ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+                        ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                        ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
+                        ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
+                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? floatval(gravaValor($_POST['inputValorCheque'])) : null,
+                        ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
+                        ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
+                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? intval($_POST['cmbBancoCheque']) : null,
+                        ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
+                        ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
+                        ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
+                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
+                        ':iStatus'              => intval($situacao['SituaId']),
+                        ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
+                        ':iUnidade'             => intval($_SESSION['UnidadeId'])
                             ));
                         } catch (Exception $e) {
                             echo 'Error: ',  $e->getMessage(), "\n";
@@ -1431,8 +1435,8 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-6">
 											<label for="cmbBancoCheque">Banco</label>
 											<select id="cmbBancoCheque" name="cmbBancoCheque" class="form-control form-control-select2" value="<?php if (isset($lancamento)) echo $lancamento['CnAReBancoCheque'] ?>">
-												<option value="#">Selecione um banco</option>
-												<?php 
+												<option value="">Selecione um banco</option>
+                                                <?php 
 													$sql = "SELECT BancoId, BancoCodigo, BancoNome
 															FROM Banco
 															JOIN Situacao on SituaId = BancoStatus
@@ -1444,7 +1448,7 @@ $dataInicio = date("Y-m-d");
 													foreach ($row as $item){
 														print('<option value="'.$item['BancoId'].'">'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
 													}
-												
+                                                
 												?>
 											</select>
 										</div>
