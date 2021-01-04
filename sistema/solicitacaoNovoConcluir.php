@@ -111,9 +111,10 @@ if (isset($_SESSION['Carrinho'])) {
 
 		$sIdentificacao = 'Solicitação de materiais (' . $Setor['SetorNome'] . ')';
 
-		$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, BandeTabela, BandeTabelaId,
-				BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
-				VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+		$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
+				BandeSolicitanteSetor, BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
+				VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :iSolicitanteSetor, :sTabela, 
+				:iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -122,6 +123,7 @@ if (isset($_SESSION['Carrinho'])) {
 			':sDescricao' => 'Liberar Solicitação',
 			':sURL' => '',
 			':iSolicitante' => $_SESSION['UsuarId'],
+			':iSolicitanteSetor' => $Setor['EXUXPSetor'],
 			':sTabela' => 'Solicitacao',
 			':iTabelaId' => $SolicitacaoId,
 			':iStatus' => $Situacao['SituaId'],

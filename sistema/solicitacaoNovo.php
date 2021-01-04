@@ -6,7 +6,8 @@ $_SESSION['PaginaAtual'] = 'Nova Solicitação';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
+$sql = "SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, 
+		dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN Situacao on SituaId = ProduStatus
@@ -54,7 +55,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
+
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 	<!-- btn group do modal-->
 	<script src="global_assets/js/demo_pages/form_input_groups.js"></script>
 
@@ -372,6 +375,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					$('#submitFiltro').on('click', (e) => {
 						e.preventDefault()
 
+						var produtoServico = $('input[name="inputProdutoServico"]:checked').val();
 						let pesquisaProduto = $('#inputPesquisaProduto').val()
 						let categoria = $('#cmbCategoria').val()
 						let subCategoria = $('#cmbSubCategoria').val()
@@ -382,6 +386,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						let url = "solicitacaoFiltraProdutos.php";
 
 						inputsValues = {
+							inputProdutoServico: produtoServico, 
 							inputPesquisaProduto: pesquisaProduto,
 							inputCategoria: categoria,
 							inputSubCategoria: subCategoria,
@@ -482,10 +487,26 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<div id="produtos" class="row">
 							<!--Search Filter-->
 							<div id="filter" class="col-12">
-								<div class="card py-3">
+								<div class="card pt-3 pb-3 pl-2 pr-2">
 									<div class="card-bod">
 										<form class="col-12" id="pesquisa" action="">
 											<div class="row">
+												<div class="col-lg-2 pt-3">
+													<div class="form-group">
+														<div class="form-check form-check-inline">
+															<label class="form-check-label">
+																<input type="radio" name="inputProdutoServico" value="P" class="form-input-styled" checked data-fouc>
+																Produto
+															</label>
+														</div>
+														<div class="form-check form-check-inline">
+															<label class="form-check-label">
+																<input type="radio" name="inputProdutoServico" value="S" class="form-input-styled" data-fouc>
+																Serviço
+															</label>
+														</div>
+													</div>
+												</div>
 												<div class="col-lg-4">
 													<div class="form-group">
 														<label for="inputPesquisaProduto">Pesquisa</label>
@@ -497,7 +518,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														</div>
 													</div>
 												</div>
-												<div class="col-lg-4">
+												<div class="col-lg-3">
 													<div class="form-group">
 														<label for="cmbCategoria">Categoria</label>
 														<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
@@ -518,7 +539,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														</select>
 													</div>
 												</div>
-												<div class="col-lg-4">
+												<div class="col-lg-3">
 													<div class="form-group">
 														<label for="cmbSubCategoria">SubCategoria</label>
 														<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
@@ -549,7 +570,28 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														</select>
 													</div>
 												</div>
-												<div class="col-lg-4">
+												<div class="col-lg-3">
+													<div class="form-group">
+														<label for="cmbModelo">Modelo</label>
+														<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
+															<option value="">Selecionar</option>
+															<?php
+															$sql = "SELECT ModelId, ModelNome
+																	FROM Modelo														     
+																	JOIN Situacao on SituaId = ModelStatus											     
+																	WHERE ModelUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																	ORDER BY ModelNome ASC";
+															$result = $conn->query($sql);
+															$rowModel = $result->fetchAll(PDO::FETCH_ASSOC);
+
+															foreach ($rowModel as $item) {
+																print('<option value="' . $item['ModelId'] . '">' . $item['ModelNome'] . '</option>');
+															}
+															?>
+														</select>
+													</div>
+												</div>
+												<div class="col-lg-3">
 													<div class="form-group">
 														<label for="cmbFabricante">Fabricante</label>
 														<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
@@ -571,31 +613,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														</select>
 													</div>
 												</div>
-												<div class="col-lg-4">
-													<div class="form-group">
-														<label for="cmbModelo">Modelo</label>
-														<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
-															<option value="">Selecionar</option>
-															<?php
-															$sql = "SELECT ModelId, ModelNome
-																	FROM Modelo														     
-																	JOIN Situacao on SituaId = ModelStatus											     
-																	WHERE ModelUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																	ORDER BY ModelNome ASC";
-															$result = $conn->query($sql);
-															$rowModel = $result->fetchAll(PDO::FETCH_ASSOC);
-
-															foreach ($rowModel as $item) {
-																print('<option value="' . $item['ModelId'] . '">' . $item['ModelNome'] . '</option>');
-															}
-															?>
-														</select>
+												<div class="col-lg-2">
+													<div class="form-group pt-4">
+														<button id="submitFiltro" class="btn btn-principal form-control">Consultar</button>
 													</div>
-												</div>
-											</div>
-											<div class="text-right">
-												<div>
-													<button id="submitFiltro" class="btn btn-principal">Consultar</button>
 												</div>
 											</div>
 										</form>
@@ -757,7 +778,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			<div class="card custon-modal-content">
 				<div class="custon-modal-title">
 					<i class="fab-icon-open icon-cart p-3"></i>
-					<p class="h3">Produtos Selecionados</p>
+					<p class="h3">Itens Selecionados</p>
 					<i id="modal-close" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
 				</div>
 				<div class="custon-modal-lista d-flex flex-column">

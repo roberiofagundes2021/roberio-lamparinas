@@ -33,7 +33,8 @@ if(isset($_POST['inputNome'])){
 						));
 
 		$insertId = $conn->lastInsertId();				
-
+		
+		/* Após criar a Unidade deve se cadastrar as Formas de Pagamento Padrão para essa Unidade nova criada */
 		$sql = "INSERT INTO FormaPagamento (FrPagNome, FrPagChave, FrPagStatus, FrPagUsuarioAtualizador, FrPagUnidade)
 				VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);

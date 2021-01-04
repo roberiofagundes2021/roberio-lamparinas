@@ -61,9 +61,9 @@ try{
 			$sIdentificacao = 'Ordem de Compra (Nº Ordem Compra: '.$rowOrdemCompra['OrComNumero'].' | Nº Processo: '.$rowOrdemCompra['OrComNumProcesso'].')';
 		
 			$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
-								BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
-					VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :sTabela, :iTabelaId, 
-							:iStatus, :iUsuarioAtualizador, :iUnidade)";
+								BandeSolicitanteSetor, BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
+					VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :iSolicitanteSetor, :sTabela, 
+							:iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -72,6 +72,7 @@ try{
 							':sDescricao' => 'Liberar Ordem de Compra',
 							':sURL' => '',
 							':iSolicitante' => $_SESSION['UsuarId'],
+							':iSolicitanteSetor' => null,
 							':sTabela' => 'OrdemCompra',
 							':iTabelaId' => $iOrdemCompra,
 							':iStatus' => $rowSituacao['SituaId'],

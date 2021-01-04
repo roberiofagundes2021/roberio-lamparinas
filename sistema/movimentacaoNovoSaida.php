@@ -1492,7 +1492,7 @@ if (isset($_POST['inputData'])) {
 														</select>
 													</div>
 												</div>
-<?php echo $_POST['inputSolicitacaoId']; ?>
+
 												<div class="col-lg-4" id="DestinoSetor">
 													<div class="form-group">
 														<label for="cmbDestinoSetor">Destino<span style="color: red">*</span></label>
