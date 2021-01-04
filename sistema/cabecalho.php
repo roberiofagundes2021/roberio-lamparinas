@@ -62,8 +62,8 @@
 								if ($_SESSION['PerfiChave'] == "SUPER") {
 									print('<div class="dropdown-divider"></div>
 												<a href="banco.php" class="dropdown-item"><i class="icon-piggy-bank"></i> Bancos</a>
-												<a href="modalidadeLicitacao.php" class="dropdown-item"><i class="icon-table"></i> Modalidade Licitação</a>
-												<a href="ncm.php" class="dropdown-item"><i class="icon-price-tag"></i> NCM</a>
+												<!--<a href="modalidadeLicitacao.php" class="dropdown-item"><i class="icon-table"></i> Modalidade Licitação</a>
+												<a href="ncm.php" class="dropdown-item"><i class="icon-price-tag"></i> NCM</a>-->
 											</div>');
 								}
 
