@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Forma de Pagamento';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT FrPagId, FrPagNome, FrPagStatus, SituaNome, SituaCor, SituaChave
+$sql = "SELECT FrPagId, FrPagNome, FrPagChave, FrPagStatus, SituaNome, SituaCor, SituaChave
 		FROM FormaPagamento
 		JOIN Situacao on SituaId = FrPagStatus
 	    WHERE FrPagUnidade = ". $_SESSION['UnidadeId'] ."
@@ -174,13 +174,21 @@ $count = count($row);
 										
 										print('<td><a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
-										print('<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\','.$item['FrPagStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\','.$item['FrPagStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
-													</div>
+										print('<td class="text-center">');
+
+										if ($item['FrPagChave'] != 'CHEQUE') {
+
+											print('
+											<div class="list-icons">
+												<div class="list-icons list-icons-extended">
+													<a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\', \''.$item['FrPagChave'].'\', '.$item['FrPagStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar" ></i></a>
+													<a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\', \''.$item['FrPagChave'].'\', '.$item['FrPagStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 												</div>
+											</div>								
+											');            
+										}	
+										
+										print('
 											</td>
 										</tr>');
 									}

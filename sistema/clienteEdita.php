@@ -118,6 +118,11 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	<!-- /theme JS files -->	
 
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 
@@ -212,38 +217,7 @@ if(isset($_POST['inputTipo'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNomeNovo = inputNomeNovo.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNomeNovo == ''){
-					alerta('Atenção','Informe o nome do cliente!','error');
-					$('#inputNome').focus();
-					return false;
-				}
-				
-				// Se Pessoa Física
-				if (inputTipo  == "F"){
-					//Verifica se o campo só possui espaços em branco
-					if (inputCpf == ''){
-						alerta('Atenção','Informe o CPF!','error');
-						$('#inputCPF').focus();
-						return false;
-					}
 					
-					if (!validaCPF(inputCpf)){
-						alerta('Atenção','CPF inválido!','error');
-						$('#inputCpf').focus();
-						return false;					
-					}						
-				} else {
-					//Verifica se o campo só possui espaços em branco
-					if (inputCnpj == '' || inputCnpj == '__.___.___/____-__'){
-						alerta('Atenção','Informe o CNPJ!','error');
-						$('#inputCNPJ').focus();
-						return false;
-					}
-				}
-				
-				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
@@ -274,12 +248,22 @@ if(isset($_POST['inputTipo'])){
 				document.getElementById('dadosPF').style.display = "block";
 				document.getElementById('dadosPJ').style.display = "none";
 				document.getElementById('inputNome').placeholder = "Nome Completo";
+
+				document.getElementById('inputNomePF').setAttribute('required', 'required');				
+				document.getElementById('inputCpf').setAttribute('required', 'required');
+				document.getElementById('inputNomePJ').removeAttribute('required', 'required');
+				document.getElementById('inputCnpj').removeAttribute('required', 'required');	
 			} else {
 				document.getElementById('CPF').style.display = "none";
 				document.getElementById('CNPJ').style.display = "block";				
 				document.getElementById('dadosPF').style.display = "none";
 				document.getElementById('dadosPJ').style.display = "block";
 				document.getElementById('inputNome').placeholder = "Nome Fantasia";
+
+				document.getElementById('inputNomePF').removeAttribute('required', 'required');				
+				document.getElementById('inputCpf').removeAttribute('required', 'required');
+				document.getElementById('inputNomePJ').setAttribute('required', 'required');
+				document.getElementById('inputCnpj').setAttribute('required', 'required');
 			}
 		}
 		
@@ -328,7 +312,7 @@ if(isset($_POST['inputTipo'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formCliente" id="formCliente" method="post" class="form-validate" action="clienteEdita.php">
+					<form name="formCliente" id="formCliente" method="post" class="form-validate-jquery" action="clienteEdita.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Cliente "<?php echo $row['ClienNome']; ?>"</h5>
 						</div>
@@ -364,14 +348,14 @@ if(isset($_POST['inputTipo'])){
 										<div class="row">
 											<div class="col-lg-6">
 												<div class="form-group">
-													<label for="inputNomePF">Nome</label>
-													<input type="text" id="inputNomePF" name="inputNomePF" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ClienNome']; ?>" required>
+												<label for="inputNomePF">Nome<span class="text-danger"> *</span></label>
+													<input type="text" id="inputNomePF" name="inputNomePF" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ClienNome']; ?>" required autofocus>
 												</div>
 											</div>	
 											
 											<div class="col-lg-3" id="CPF">
 												<div class="form-group">
-													<label for="inputCpf">CPF</label>
+													<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
 													<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php echo formatarCPF_Cnpj($row['ClienCpf']); ?>">
 												</div>	
 											</div>
@@ -476,14 +460,14 @@ if(isset($_POST['inputTipo'])){
 												<div class="row">
 											<div class="col-lg-9">
 												<div class="form-group">
-													<label for="inputNomePJ">Nome</label>
-													<input type="text" id="inputNomePJ" name="inputNomePJ" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ClienNome']; ?>" required>
+												    <label for="inputNomePJ">Nome<span class="text-danger"> *</span></label>
+													<input type="text" id="inputNomePJ" name="inputNomePJ" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ClienNome']; ?>" required autofocus>
 												</div>
 											</div>	
 											
 											<div class="col-lg-3"  id="CNPJ">
 												<div class="form-group">				
-													<label for="inputCnpj">CNPJ</label>
+													<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
 													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" value="<?php echo formatarCPF_Cnpj($row['ClienCnpj']); ?>">
 												</div>	
 											</div>							
