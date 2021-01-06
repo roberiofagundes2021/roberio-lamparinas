@@ -62,123 +62,123 @@ if(isset($_POST['inputNome'])){
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Perfil</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Lamparinas | Perfil</title>
 
-	<?php include_once("head.php"); ?>
-	
-	<script type="text/javascript" >
+  <?php include_once("head.php"); ?>
 
-        $(document).ready(function() {
-			
-			//Valida Registro Duplicado
-			$('#enviar').on('click', function(e){
+  <!-- Validação -->
+  <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+  <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+  <script src="global_assets/js/demo_pages/form_validation.js"></script>
 
-				e.preventDefault();
-				
-				var inputNomeNovo  = $('#inputNome').val();
-				var inputNomeVelho = $('#inputPerfilNome').val();
-				
-				//remove os espaços desnecessários antes e depois
-				inputNomeNovo = inputNomeNovo.trim();
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNomeNovo == ''){
-					alerta('Atenção','Informe o perfil!','error');
-					return false;
-				}
-				
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "perfilValida.php",
-					data: ('nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho),
-					success: function(resposta){
-						
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;								
-						}
-						
-						$( "#formPerfil" ).submit();
-					}
-				})
+  <script type="text/javascript">
+  $(document).ready(function() {
 
-			})
-		})
-	
-	</script>
+    //Valida Registro Duplicado
+    $('#enviar').on('click', function(e) {
+
+      e.preventDefault();
+
+      var inputNomeNovo = $('#inputNome').val();
+      var inputNomeVelho = $('#inputPerfilNome').val();
+
+      //remove os espaços desnecessários antes e depois
+      inputNomeNovo = inputNomeNovo.trim();
+
+      //Esse ajax está sendo usado para verificar no banco se o registro já existe
+      $.ajax({
+        type: "POST",
+        url: "perfilValida.php",
+        data: ('nomeNovo=' + inputNomeNovo + '&nomeVelho=' + inputNomeVelho),
+        success: function(resposta) {
+          if (resposta == 1) {
+            alerta('Atenção', 'Esse registro já existe!', 'error');
+            return false;
+          }
+
+          $("#formPerfil").submit();
+        }
+      })
+
+
+      $("#formPerfil").submit();
+
+    })
+  })
+  </script>
 
 
 </head>
 
 <body class="navbar-top">
 
-	<?php include_once("topo.php"); ?>	
+  <?php include_once("topo.php"); ?>
 
-	<!-- Page content -->
-	<div class="page-content">
-		
-		<?php include_once("menu-left.php"); ?>
+  <!-- Page content -->
+  <div class="page-content">
 
-		<!-- Main content -->
-		<div class="content-wrapper">
+    <?php include_once("menu-left.php"); ?>
 
-			<?php include_once("cabecalho.php"); ?>	
+    <!-- Main content -->
+    <div class="content-wrapper">
 
-			<!-- Content area -->
-			<div class="content">		
-				
-				<!-- Info blocks -->
-				<div class="card">
-					
-					<form name="formPerfil" id="formPerfil" method="post" class="form-validate">
-						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Perfil "<?php echo $row['PerfiNome']; ?>"</h5>
-						</div>
-						
-						<input type="hidden" id="inputPerfilId" name="inputPerfilId" value="<?php echo $row['PerfiId']; ?>" >
-						<input type="hidden" id="inputPerfilNome" name="inputPerfilNome" value="<?php echo $row['PerfiNome']; ?>" >
-						
-						<div class="card-body">								
-							<div class="row">
-								<div class="col-lg-12">
-									<div class="form-group">
-										<label for="inputNome">Perfil</label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Perfil" value="<?php echo $row['PerfiNome']; ?>" required>
-									</div>
-								</div>
-							</div>
-								
-							<div class="row" style="margin-top: 10px;">
-								<div class="col-lg-12">								
-									<div class="form-group">
-										<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>
-										<a href="perfil.php" class="btn btn-basic" role="button">Cancelar</a>
-									</div>
-								</div>
-							</div>
-						</form>								
+      <?php include_once("cabecalho.php"); ?>
 
-					</div>
-					<!-- /card-body -->
-					
-				</div>
-				<!-- /info blocks -->
+      <!-- Content area -->
+      <div class="content">
 
-			</div>
-			<!-- /content area -->			
-			
-			<?php include_once("footer.php"); ?>
+        <!-- Info blocks -->
+        <div class="card">
 
-		</div>
-		<!-- /main content -->
+          <form name="formPerfil" id="formPerfil" method="post" class="form-validate-jquery">
+            <div class="card-header header-elements-inline">
+              <h5 class="text-uppercase font-weight-bold">Editar Perfil "<?php echo $row['PerfiNome']; ?>"</h5>
+            </div>
 
-	</div>
-	<!-- /page content -->
+            <input type="hidden" id="inputPerfilId" name="inputPerfilId" value="<?php echo $row['PerfiId']; ?>">
+            <input type="hidden" id="inputPerfilNome" name="inputPerfilNome" value="<?php echo $row['PerfiNome']; ?>">
 
+            <div class="card-body">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label for="inputNome">Perfil <span class='text-danger'>*</span></label>
+                    <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Perfil" value="<?php echo $row['PerfiNome']; ?>" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row" style="margin-top: 10px;">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <button class="btn btn-lg btn-principal" id="enviar">Alterar</button>
+                    <a href="perfil.php" class="btn btn-basic" role="button">Cancelar</a>
+                  </div>
+                </div>
+              </div>
+          </form>
+
+        </div>
+        <!-- /card-body -->
+
+      </div>
+      <!-- /info blocks -->
+
+    </div>
+    <!-- /content area -->
+
+    <?php include_once("footer.php"); ?>
+
+  </div>
+  <!-- /main content -->
+
+  </div>
+  <!-- /page content -->
 </body>
+
 </html>

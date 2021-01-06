@@ -245,10 +245,17 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 
 							<div class="card-body">
 								<div class="row">
+<<<<<<< HEAD
 									<div class="col-lg-7">		
 										<p class="font-size-lg">A relação abaixo faz referência aos produtos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 									</div>
 									<div class="col-lg-5">	
+=======
+									<div class="col-lg-9">
+										<p class="font-size-lg">A relação abaixo faz referência aos produtos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+									</div>
+									<div class="col-lg-3">			
+>>>>>>> a71c0882f8c5a1345c16d075b1d3b26fad927968
 										<div class="text-right">
 											<a href="produtoNovo.php" class="btn btn-principal" role="button">Novo Produto</a>
 											<a href="#" style="float:right; margin-left: 5px;" onclick="atualizaProduto(0, '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>
@@ -279,8 +286,12 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 											</div>
 										</div>
 
+<<<<<<< HEAD
 
 										<?php
+=======
+								<?php
+>>>>>>> a71c0882f8c5a1345c16d075b1d3b26fad927968
 
 										if (isset($_SESSION['RelImportacao']) and $_SESSION['RelImportacao'] != '') {
 
