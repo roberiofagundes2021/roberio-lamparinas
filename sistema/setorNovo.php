@@ -42,102 +42,104 @@ if(isset($_POST['inputNome'])){
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Setor</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Lamparinas | Setor</title>
 
-	<?php include_once("head.php"); ?>
-	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
-	<!-- /theme JS files -->	
+  <?php include_once("head.php"); ?>
 
-	<script type="text/javascript" >
+  <!-- Theme JS files -->
+  <script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
-        $(document).ready(function() {
-			
-			//Valida Registro Duplicado
-			$('#enviar').on('click', function(e){
-				
-				e.preventDefault();
-				
-				var inputNome = $('#inputNome').val();
-				var cmbUnidade = $('#cmbUnidade').val();
-				
-				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
-				
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "setorValida.php",
-					data: ('nome=' + inputNome + '&unidade=' + cmbUnidade),
-					success: function(resposta){
-						
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;
-						}
-						
-						$( "#formSetor" ).submit();
-					}
-				})
-			})
-		})
-	</script>	
-	
+  <script src="global_assets/js/demo_pages/form_layouts.js"></script>
+  <script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+
+  <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+  <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+  <script src="global_assets/js/demo_pages/form_validation.js"></script>
+  <!-- /theme JS files -->
+
+  <script type="text/javascript">
+  $(document).ready(function() {
+
+    //Valida Registro Duplicado
+    $('#enviar').on('click', function(e) {
+
+      e.preventDefault();
+
+      var inputNome = $('#inputNome').val();
+      var cmbUnidade = $('#cmbUnidade').val();
+
+      !inputNome || !cmbUnidade && $("#formSetor").submit();
+
+      //remove os espaços desnecessários antes e depois
+      inputNome = inputNome.trim();
+
+      //Esse ajax está sendo usado para verificar no banco se o registro já existe
+      $.ajax({
+        type: "POST",
+        url: "setorValida.php",
+        data: ('nome=' + inputNome + '&unidade=' + cmbUnidade),
+        success: function(resposta) {
+
+          if (resposta == 1) {
+            alerta('Atenção', 'Esse registro já existe!', 'error');
+            return false;
+          }
+
+          $("#formSetor").submit();
+        }
+      })
+    })
+  })
+  </script>
+
 </head>
 
 <body class="navbar-top sidebar-xs">
 
-	<?php include_once("topo.php"); ?>	
+  <?php include_once("topo.php"); ?>
 
-	<!-- Page content -->
-	<div class="page-content">
-		
-		<?php include_once("menu-left.php"); ?>
-		
-		<?php include_once("menuLeftSecundario.php"); ?>
+  <!-- Page content -->
+  <div class="page-content">
 
-		<!-- Main content -->
-		<div class="content-wrapper">
+    <?php include_once("menu-left.php"); ?>
 
-			<?php include_once("cabecalho.php"); ?>	
+    <?php include_once("menuLeftSecundario.php"); ?>
 
-			<!-- Content area -->
-			<div class="content">
-				
-				<!-- Info blocks -->
-				<div class="card">
-					
-					<form name="formSetor" id="formSetor" method="post" class="form-validate-jquery" action="setorNovo.php">
-						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Setor</h5>
-						</div>
-						
-						<div class="card-body">								
-							<div class="row">
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="inputNome">Nome do Setor</label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Setor" required autofocus>
-									</div>
-								</div>
-								
-								<div class="col-lg-6">
-									<label for="cmbUnidade">Unidade</label>
-									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
-										<option value="">Selecione</option>
-										<?php 
+    <!-- Main content -->
+    <div class="content-wrapper">
+
+      <?php include_once("cabecalho.php"); ?>
+
+      <!-- Content area -->
+      <div class="content">
+
+        <!-- Info blocks -->
+        <div class="card">
+
+          <form name="formSetor" id="formSetor" method="post" class="form-validate-jquery" action="setorNovo.php">
+            <div class="card-header header-elements-inline">
+              <h5 class="text-uppercase font-weight-bold">Cadastrar Novo Setor</h5>
+            </div>
+
+            <div class="card-body">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label for="inputNome">Nome do Setor <span class='text-danger'>*</span></label>
+                    <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Setor" required autofocus>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <label for="cmbUnidade">Unidade <span class='text-danger'>*</span></label>
+                  <select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
+                    <option value="">Selecione</option>
+                    <?php 
 											$sql = "SELECT UnidaId, UnidaNome
 													FROM Unidade
 													JOIN Situacao on SituaId = UnidaStatus
@@ -151,37 +153,38 @@ if(isset($_POST['inputNome'])){
 											}
 										
 										?>
-									</select>
-								</div>
-								
-							</div>
-															
-							<div class="row" style="margin-top: 10px;">
-								<div class="col-lg-12">								
-									<div class="form-group">
-										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-										<a href="setor.php" class="btn btn-basic" role="button">Cancelar</a>
-									</div>
-								</div>
-							</div>
-						</form>								
+                  </select>
+                </div>
 
-					</div>
-					<!-- /card-body -->
-					
-				</div>
-				<!-- /info blocks -->
+              </div>
 
-			</div>
-			<!-- /content area -->			
-			
-			<?php include_once("footer.php"); ?>
+              <div class="row" style="margin-top: 10px;">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+                    <a href="setor.php" class="btn btn-basic" role="button">Cancelar</a>
+                  </div>
+                </div>
+              </div>
+          </form>
 
-		</div>
-		<!-- /main content -->
+        </div>
+        <!-- /card-body -->
 
-	</div>
-	<!-- /page content -->
+      </div>
+      <!-- /info blocks -->
+
+    </div>
+    <!-- /content area -->
+
+    <?php include_once("footer.php"); ?>
+
+  </div>
+  <!-- /main content -->
+
+  </div>
+  <!-- /page content -->
 
 </body>
+
 </html>
