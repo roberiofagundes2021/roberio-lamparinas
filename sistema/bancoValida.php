@@ -4,14 +4,10 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['nomeVelho'])){
+if(isset($_POST['nome'])){
 	$sql = ("SELECT BancoId
 			 FROM Banco
-			 WHERE (BancoCodigo = '". $_POST['codigo']."' or BancoNome = '". $_POST['nomeNovo']."') and BancoNome <> '". $_POST['nomeVelho']."'");
-} else{
-	$sql = ("SELECT BancoId
-			 FROM Banco
-			 WHERE BancoCodigo = '". $_POST['codigo']."' or BancoNome = '". $_POST['nome']."'");
+			 WHERE BancoCodigo = '". $_POST['codigo']."' and BancoNome = '". $_POST['nome']."'");
 }
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
