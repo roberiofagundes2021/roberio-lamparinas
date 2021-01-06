@@ -244,58 +244,64 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos produtos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right">
-									<a href="produtoNovo.php" class="btn btn-principal" role="button">Novo Produto</a>
-									<a href="#" style="float:right; margin-left: 5px;" onclick="atualizaProduto(0, '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>
-									<div class="dropdown p-0" style="float:right; margin-left: 5px;">
-										<a href="#collapse-imprimir-relacao" class="dropdown-toggle btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
-											<i class="icon-drawer-in"></i>
-										</a>
+								<div class="row">
+									<div class="col-lg-7">		
+										<p class="font-size-lg">A relação abaixo faz referência aos produtos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 									</div>
-									<!--<a href="produtoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Imprimir</a></div>-->
-								</div>
+									<div class="col-lg-5">	
+										<div class="text-right">
+											<a href="produtoNovo.php" class="btn btn-principal" role="button">Novo Produto</a>
+											<a href="#" style="float:right; margin-left: 5px;" onclick="atualizaProduto(0, '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>
+											<div class="dropdown p-0" style="float:right; margin-left: 5px;">
+												<a href="#collapse-imprimir-relacao" class="dropdown-toggle btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
+													<i class="icon-drawer-in"></i>
+												</a>
+											</div>
+											<!--<a href="produtoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Imprimir</a></div>-->
+										</div>
 
-								<!--<a href="produtoImportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>-->
-								<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 15px; border-top:1px solid #ddd; padding-top: 10px;">
-									<div class="row">
-										<div class="col-lg-9">
-											<a href="#">
-												<h2>Modelo de importação</h2>
-											</a>
-											<p style="font-weight: bold;">CodigoBarras | Nome do Produto | Detalhamento do Produto</p>
-											<p>Observação: Favor salvar a planilha como tipo (Planilha XML 2003). O arquivo deve conter 3 colunas apenas, sendo que a primeira linha deve ter o cabeçalho acima.</p>
+										<!--<a href="produtoImportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>-->
+										<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 15px; border-top:1px solid #ddd; padding-top: 10px;">
+											<div class="row">
+												<div class="col-lg-9">
+													<a href="#">
+														<h2>Modelo de importação</h2>
+													</a>
+													<p style="font-weight: bold;">CodigoBarras | Nome do Produto | Detalhamento do Produto</p>
+													<p>Observação: Favor salvar a planilha como tipo (Planilha XML 2003). O arquivo deve conter 3 colunas apenas, sendo que a primeira linha deve ter o cabeçalho acima.</p>
+												</div>
+												<div class="col-lg-3">
+													<form name="formUpload" id="formUpload" method="post" enctype="multipart/form-data" action="produtoImporta.php">
+														<input type="file" class="form-control" id="arquivo" name="arquivo">
+														<button class="btn bg-slate-700 btn-icon" id="enviar"><i class="icon-printer2"> Importar produtos</i></button>
+													</form>
+												</div>
+											</div>
 										</div>
-										<div class="col-lg-3">
-											<form name="formUpload" id="formUpload" method="post" enctype="multipart/form-data" action="produtoImporta.php">
-												<input type="file" class="form-control" id="arquivo" name="arquivo">
-												<button class="btn bg-slate-700 btn-icon" id="enviar"><i class="icon-printer2"> Importar produtos</i></button>
-											</form>
-										</div>
+
+
+										<?php
+
+										if (isset($_SESSION['RelImportacao']) and $_SESSION['RelImportacao'] != '') {
+
+											if (isset($_SESSION['Importacao']) and $_SESSION['Importacao'] == 'Erro') {
+												$classe = 'alert alert-warning';
+											} else {
+												$classe = 'alert alert-success';
+											}
+
+											print('<div class="' . $classe . ' alert-dismissible fade show" role="alert" style="margin-top: 10px;">' . $_SESSION['RelImportacao'] . '
+														<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+														</button>
+													</div>');
+											unset($_SESSION['RelImportacao']);
+											//echo "<script> alerta('Atenção','".$_SESSION['RelImportacao']."','error'); </script>";  //Nao sei porque nao aparece
+										}
+
+										?>
 									</div>
 								</div>
-
-
-								<?php
-
-								if (isset($_SESSION['RelImportacao']) and $_SESSION['RelImportacao'] != '') {
-
-									if (isset($_SESSION['Importacao']) and $_SESSION['Importacao'] == 'Erro') {
-										$classe = 'alert alert-warning';
-									} else {
-										$classe = 'alert alert-success';
-									}
-
-									print('<div class="' . $classe . ' alert-dismissible fade show" role="alert" style="margin-top: 10px;">' . $_SESSION['RelImportacao'] . '
-										          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-												  <span aria-hidden="true">&times;</span>
-												  </button>
-											   </div>');
-									unset($_SESSION['RelImportacao']);
-									//echo "<script> alerta('Atenção','".$_SESSION['RelImportacao']."','error'); </script>";  //Nao sei porque nao aparece
-								}
-
-								?>
 							</div>
 
 							<table class="table" id="tblProduto">

@@ -163,8 +163,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">Os usuários cadastrados abaixo pertencem a empresa <b><?php echo $EmpresaNome; ?></b>.</p>
-								<div class="text-right"><a href="usuarioNovo.php" class="btn btn-principal" role="button">Novo usuário</a></div>
+								<div class="row">
+									<div class="col-lg-9">
+										<p class="font-size-lg">Os usuários cadastrados abaixo pertencem a empresa <b><?php echo $EmpresaNome; ?></b>.</p>
+									</div>
+									<div class="col-lg-3">	
+										<div class="text-right"><a href="usuarioNovo.php" class="btn btn-principal" role="button">Novo usuário</a></div>
+									</div>
+								</div>
 							</div>							
 
 							<table class="table" id="tblUsuario">

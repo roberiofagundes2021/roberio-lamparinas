@@ -178,8 +178,15 @@ $count = count($row);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">As empresas cadastradas abaixo estarão aptas a utilizar o sistema, desde que ativas e com licença vigente.</p>
-								<div class="text-right"><a href="empresaNovo.php" class="btn btn-principal" role="button">Nova Empresa</a></div>
+								<div class="row">
+									<div class="col-lg-9">
+										<p class="font-size-lg">As empresas cadastradas abaixo estarão aptas a utilizar o sistema, desde que ativas e com licença vigente.</p>
+									</div>
+										<div class="col-lg-3">
+											<div class="text-right"><a href="empresaNovo.php" class="btn btn-principal" role="button">Nova Empresa</a>
+											</div>		
+									 	</div>			 
+								</div>
 							</div>							
 
 							<table id="tblEmpresa" class="table">
