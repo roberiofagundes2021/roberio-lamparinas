@@ -195,6 +195,13 @@
 							<a href="contasAPagar.php" class="nav-link"><i class="icon-cash"></i> <span>Contas à Pagar</span></a>
 							<a href="contasAReceber.php" class="nav-link"><i class="icon-cash"></i> <span>Contas à Receber</span></a>
 						</li>
+						<li class="nav-item nav-item-submenu">
+							<a href="#" class="nav-link"> <span>Relatórios</span></a>
+							<ul class="nav nav-group-sub" data-submenu-title="Text editors">
+								<li class="nav-item"><a href="#" class="nav-link">Cheques Emitidos</a></li>								
+							</ul>
+						</li>
+
 						<!-- /Financeiro -->
 
 						<!-- Vendas -->

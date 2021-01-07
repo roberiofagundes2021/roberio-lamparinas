@@ -1315,7 +1315,7 @@ $dataInicio = date("Y-m-d");
                                             <?php
                                                 $mostraCheque = "";
                                                 
-                                                if ($lancamento['FrPagChave'] != 'CHEQUE') {
+                                                if (isset($lancamento['FrPagChave']) && $lancamento['FrPagChave'] != 'CHEQUE') {
                                                     $mostraCheque = "display:none";    
                                                 }
                                                
