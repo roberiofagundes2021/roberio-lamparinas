@@ -156,8 +156,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência às unidades de medida da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right"><a href="unidademedidaNovo.php" class="btn btn-principal" role="button">Nova Unidade de Medida</a></div>
+								<div class="row">
+									<div class="col-lg-9">
+										<p class="font-size-lg">A relação abaixo faz referência às unidades de medida da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+									</div>	
+									<div class="col-lg-3">
+										<div class="text-right"><a href="unidademedidaNovo.php" class="btn btn-principal" role="button">Nova Unidade de Medida</a></div>
+									</div>
+								</div>
 							</div>
 							
 							<table id="tblUnidadeMedida" class="table">

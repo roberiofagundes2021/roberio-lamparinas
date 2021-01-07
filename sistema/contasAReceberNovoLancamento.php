@@ -950,7 +950,15 @@ $dataInicio = date("Y-m-d");
                 let inputDescricao = $("#inputDescricao").val()
                 let cmbContaBanco = $("#cmbContaBanco").val()
                 let cmbFormaPagamento = $("#cmbFormaPagamento").val()
-               
+                let formaPagamento = ''
+                let filhos = $('#cmbFormaPagamento').children()
+				filhos.each((i, elem) => {
+                    formaPagamento = $(elem).attr('chaveformaPagamento')
+                })
+                if (formaPagamento = 'CHEQUE') { 
+                    alerta('Atenção','Você selecionou a forma de pagamento cheque, portanto, favor preencher os dados do cheque.')
+                    return false;
+                }
 
                 if ($("#habilitarRecebimento").hasClass('clicado')) {
                     $("#cmbContaBanco").prop('required', true)
@@ -1314,11 +1322,16 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-2" style="margin-top: 30px;">
                                             <?php
                                                 $mostraCheque = "";
-                                                
-                                                if (isset($lancamento['FrPagChave']) && $lancamento['FrPagChave'] != 'CHEQUE') {
-                                                    $mostraCheque = "display:none";    
+
+                                                // se tiver editando
+                                                if (isset($lancamento)){  
+                                                    if ($lancamento['FrPagChave'] != 'CHEQUE') {
+                                                        $mostraCheque = "display:none";    
+                                                    } 
+                                                } else{ // se for novo
+                                                    $mostraCheque = "display:none";   
                                                 }
-                                               
+                                                
                                               print('<a href="#" id="btnCheque" style="margin-top: 5px; '. $mostraCheque .' " class="icon-pencil">  Cheque</a>');
                                             ?>  
                                         </div>
