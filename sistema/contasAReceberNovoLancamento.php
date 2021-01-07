@@ -7,6 +7,12 @@ $_SESSION['PaginaAtual'] = 'Novo Lançamento - Contas a Receber';
 include('global_assets/php/conexao.php');
 
 if (isset($_POST['cmbPlanoContas'])) {
+
+    if (isset($_POST['cmbFormaPagamento'])){
+                
+        $aFormaPagamento = explode('#', $_POST['cmbFormaPagamento']);                                
+        $idFormaPagamento = $aFormaPagamento[0];
+    }
     
     if (isset($_POST['inputEditar'])) {
 
@@ -38,8 +44,8 @@ if (isset($_POST['cmbPlanoContas'])) {
                 }
             }
 
-
             try {
+
             $sql = "UPDATE ContasAReceber SET       CnAReDtEmissao                    = :dDtEmissao,
                                                     CnARePlanoContas                  = :iPlanoContas,  
                                                     CnAReCliente                      = :iCliente, 
@@ -80,7 +86,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                     ':sDescricao'           => $_POST['inputDescricao'],
                     ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
                     ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
-                    ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? intval($_POST['cmbFormaPagamento']) : null,
+                    ':iFormaPagamento'      => isset($idFormaPagamento) ? $idFormaPagamento : null,
                     ':iVenda'               =>  null,
                     ':dDtVencimento'        => $_POST['inputDataVencimento'],
                     ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
@@ -189,7 +195,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':sDescricao'           => $_POST['inputDescricao'],
                         ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
                         ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
-                        ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? intval($_POST['cmbFormaPagamento']) : null,
+                        ':iFormaPagamento'      => isset($idFormaPagamento) ? $idFormaPagamento : null,
                         ':iVenda'               =>  null,
                         ':dDtVencimento'        => $_POST['inputDataVencimento'],
                         ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
@@ -282,7 +288,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                                     ':iPlanoContas'         => $_POST['cmbPlanoContas'],
                                     ':iCliente   '          => $_POST['cmbCliente'],
                                     ':iContaBanco'          => $_POST['cmbContaBanco'],
-                                    ':iFormaPagamento'      => $_POST['cmbFormaPagamento'],
+                                    ':iFormaPagamento'      => isset($idFormaPagamento) ? $idFormaPagamento : null,
                                     ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
                                     ':dDtEmissao'           => $_POST['inputDataEmissao'],
                                     ':sDescricao'           => $_POST['inputParcelaDescricao' . $i . ''],
@@ -396,7 +402,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':sDescricao'           => $_POST['inputDescricao'],
                         ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
                         ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
-                        ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? intval($_POST['cmbFormaPagamento']) : null,
+                        ':iFormaPagamento'      => isset($idFormaPagamento) ? $idFormaPagamento : null,
                         ':iVenda'               =>  null,
                         ':dDtVencimento'        => $_POST['inputDataVencimento'],
                         ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
@@ -504,7 +510,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':sDescricao'           => $_POST['inputDescricao'],
                         ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
                         ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
-                        ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? intval($_POST['cmbFormaPagamento']) : null,
+                        ':iFormaPagamento'      => isset($idFormaPagamento) ? $idFormaPagamento : null,
                         ':iVenda'               =>  null,
                         ':dDtVencimento'        => $_POST['inputDataVencimento'],
                         ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
@@ -950,14 +956,20 @@ $dataInicio = date("Y-m-d");
                 let inputDescricao = $("#inputDescricao").val()
                 let cmbContaBanco = $("#cmbContaBanco").val()
                 let cmbFormaPagamento = $("#cmbFormaPagamento").val()
-                let formaPagamento = ''
-                let filhos = $('#cmbFormaPagamento').children()
-				filhos.each((i, elem) => {
-                    formaPagamento = $(elem).attr('chaveformaPagamento')
-                })
-                if (formaPagamento = 'CHEQUE') { 
-                    alerta('Atenção','Você selecionou a forma de pagamento cheque, portanto, favor preencher os dados do cheque.')
-                    return false;
+                
+                if (cmbFormaPagamento != ''){
+                    
+                    let formaPagamento = cmbFormaPagamento.split('#');
+                    
+                    let inputNumCheque = $("#inputNumCheque").val();
+                    let inputNumCheque = $("#inputNumCheque").val();
+                    let inputNumCheque = $("#inputNumCheque").val();
+                    let inputNumCheque = $("#inputNumCheque").val();
+
+                    if (formaPagamento[1] == "CHEQUE" && inputNumCheque == "" && inputNumCheque == "" && inputNumCheque == "" && inputNumCheque == "") { 
+                        alerta('Atenção','Você selecionou a forma de pagamento cheque, portanto, favor preencher os dados do cheque.')
+                        return false;
+                    }
                 }
 
                 if ($("#habilitarRecebimento").hasClass('clicado')) {
@@ -1288,10 +1300,10 @@ $dataInicio = date("Y-m-d");
                                                     <?php
                                                     try {
                                                         $sql = "SELECT FrPagId, FrPagNome, FrPagChave
-                                                                    FROM FormaPagamento
-                                                                    JOIN Situacao on SituaId = FrPagStatus
-                                                                    WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                                    ORDER BY FrPagNome ASC";
+                                                                FROM FormaPagamento
+                                                                JOIN Situacao on SituaId = FrPagStatus
+                                                                WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                                ORDER BY FrPagNome ASC";
                                                         $result = $conn->query($sql);
                                                         $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1299,12 +1311,12 @@ $dataInicio = date("Y-m-d");
                                                             foreach ($rowFormaPagamento as $item) {
                                                                 if (isset($lancamento)) {
                                                                     if ($lancamento['CnAReFormaPagamento'] == $item['FrPagId']) {
-                                                                        print('<option value="' . $item['FrPagId'] . '" chaveformaPagamento="'.$item['FrPagChave']. '" selected>' . $item['FrPagNome'] . '</option>');
+                                                                        print('<option value="' . $item['FrPagId'] . '#'.$item['FrPagChave']. '" chaveformaPagamento="'.$item['FrPagChave']. '" selected>' . $item['FrPagNome'] . '</option>');
                                                                     } else {
-                                                                        print('<option value="' . $item['FrPagId'] . '" chaveformaPagamento="'.$item['FrPagChave']. '" >' . $item['FrPagNome'] . '</option>');
+                                                                        print('<option value="' . $item['FrPagId'] . '#'.$item['FrPagChave']. '" chaveformaPagamento="'.$item['FrPagChave']. '" >' . $item['FrPagNome'] . '</option>');
                                                                     }
                                                                 } else {
-                                                                    print('<option value="' . $item['FrPagId'] . '" chaveformaPagamento="'.$item['FrPagChave']. '" >' . $item['FrPagNome'] . '</option>');
+                                                                    print('<option value="' . $item['FrPagId'] . '#'.$item['FrPagChave']. '" chaveformaPagamento="'.$item['FrPagChave']. '" >' . $item['FrPagNome'] . '</option>');
                                                                 }
                                                             }
                                                         } catch (Exception $e) {
