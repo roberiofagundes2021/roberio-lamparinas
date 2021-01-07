@@ -46,7 +46,7 @@ if(isset($_POST['inputNome'])){
 						':sComplemento' => $_POST['inputComplemento'],
 						':sBairro' => $_POST['inputBairro'],
 						':sCidade' => $_POST['inputCidade'],
-						':sEstado' => $_POST['cmbEstado'] == "#" ? null : $_POST['cmbEstado'],
+						':sEstado' => $_POST['cmbEstado'] == "" ? null : $_POST['cmbEstado'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_POST['inputUnidadeId']
 						));
@@ -287,7 +287,7 @@ if(isset($_POST['inputNome'])){
                       <div class="form-group">
                         <label for="cmbEstado">Estado <span class='text-danger'>*</span></label>
                         <select id="cmbEstado" name="cmbEstado" class="form-control form-control-select2" required>
-                          <option value="#">Selecione um estado</option>
+                          <option value="">Selecione um estado</option>
                           <option value="AC" <?php if ($row['UnidaEstado'] == 'AC') echo "selected"; ?>>Acre</option>
                           <option value="AL" <?php if ($row['UnidaEstado'] == 'AL') echo "selected"; ?>>Alagoas</option>
                           <option value="AP" <?php if ($row['UnidaEstado'] == 'AP') echo "selected"; ?>>Amapá</option>

@@ -106,6 +106,7 @@ if(isset($_POST['inputNome']) && isset($_POST['inputCodigo'])){
         data: {
           codigo: inputCodigo,
           nome: inputNomeNovo,
+          nomeVelho: inputNomeVelho
         },
         success: function(resposta) {
           if (resposta == '1') {

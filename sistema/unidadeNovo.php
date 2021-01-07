@@ -26,7 +26,7 @@ if(isset($_POST['inputNome'])){
 						':sComplemento' => $_POST['inputComplemento'],
 						':sBairro' => $_POST['inputBairro'],
 						':sCidade' => $_POST['inputCidade'],
-						':sEstado' => $_POST['cmbEstado'] == "#" ? null : $_POST['cmbEstado'],
+						':sEstado' => $_POST['cmbEstado'] == "" ? null : $_POST['cmbEstado'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpresaId'],
