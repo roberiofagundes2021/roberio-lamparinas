@@ -51,7 +51,7 @@ if (isset($_POST['inputSolicitacaoId'])) {
 if (isset($_POST['inputData'])) {
 
 	try {
-		var_dump($_POST);die;
+		//var_dump($_POST);die;
 
 		$conn->beginTransaction();
 
@@ -163,7 +163,7 @@ if (isset($_POST['inputData'])) {
 								':iQuantidade' => (int) $registro[3],
 								':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 								':sLote' => $registro[5] != '' ? $registro[5] : null,
-								':dValidade' => $registro[6] != '' ? $registro[6] : gravaData('12/09/2333'),
+								':dValidade' => $registro[6] != '' ? $registro[6] : null,
 								':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 								':iUnidade' => $_SESSION['UnidadeId'],
@@ -184,7 +184,7 @@ if (isset($_POST['inputData'])) {
 								':iQuantidade' => (int) $registro[3],
 								':fValorUnitario' => isset($registro[2]) ? gravaValor($registro[2]) : null,
 								':sLote' => $registro[5],
-								':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+								':dValidade' => $registro[6] != '0' ? $registro[6] : null,
 								':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 								':iUnidade' => $_SESSION['UnidadeId'],
@@ -205,7 +205,7 @@ if (isset($_POST['inputData'])) {
 								':iQuantidade' => (int) $registro[3],
 								':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 								':sLote' => $registro[5],
-								':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+								':dValidade' => $registro[6] != '0' ? $registro[6] : null,
 								':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 								':iUnidade' => $_SESSION['UnidadeId'],
@@ -215,9 +215,9 @@ if (isset($_POST['inputData'])) {
 					}
 				} else {
 					$sql = "INSERT INTO MovimentacaoXServico
-							(MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrLote, MvXSrUsuarioAtualizador, MvXSrUnidade)
+							(MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrUsuarioAtualizador, MvXSrUnidade)
 							VALUES 
-							(:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :sLote, :iUsuarioAtualizador, :iUnidade)";
+							(:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 					$result = $conn->prepare($sql);
 
 					$result->execute(array(
@@ -225,7 +225,6 @@ if (isset($_POST['inputData'])) {
 						':iServico' => $registro[1],
 						':iQuantidade' => (int) $registro[3],
 						':fValorUnitario' => $registro[2] != '' ? gravaValor($registro[2]) : null,
-						':sLote' => null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
 					));

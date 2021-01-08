@@ -33,9 +33,9 @@
                             <td colspan="7" style="border: none;"></td>
                         </tr>
                         <tr>
-                            <td rowspan="3" style="text-align: center; background-color: #eee;">Patrimônio: '.$value['PatriNumero'].'</td>
-                            <td colspan="5">Produto: '.$value['ProduNome'].'</td>
-                            <td colspan="1">Código: '.$value['ProduCodigo'].'</td>
+                            <td rowspan="3" width="15%" style="text-align: center; background-color: #eee;">Patrimônio: '.$value['PatriNumero'].'</td>
+                            <td colspan="5" width="65%">Produto: '.$value['ProduNome'].'</td>
+                            <td colspan="1" width="20%">Código: '.$value['ProduCodigo'].'</td>
                         </tr>
                         <tr>
                             <td colspan="3">Marca: '. $value['MarcaNome'] .'</td>

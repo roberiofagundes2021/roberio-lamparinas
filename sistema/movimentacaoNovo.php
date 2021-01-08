@@ -334,9 +334,9 @@ if (isset($_POST['inputData'])) {
 						}
 					} else {
 						$sql = "INSERT INTO MovimentacaoXServico
-						        (MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrLote, MvXSrUsuarioAtualizador, MvXSrUnidade)
+						        (MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrUsuarioAtualizador, MvXSrUnidade)
 					            VALUES 
-						        (:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :sLote, :iUsuarioAtualizador, :iUnidade)";
+						        (:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 						$result = $conn->prepare($sql);
 
 						$result->execute(array(
@@ -344,7 +344,6 @@ if (isset($_POST['inputData'])) {
 							':iServico' => $registro[1],
 							':iQuantidade' => (int) $registro[3],
 							':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
-							':sLote' => $registro[5],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId']
 						));
