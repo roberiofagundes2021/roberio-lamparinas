@@ -969,7 +969,7 @@ $dataInicio = date("Y-m-d");
                     let inputNomeCheque = $("#inputNomeCheque").val();
                     let inputCpfCheque = $("#inputCpfCheque").val();
 
-                    if (formaPagamento[1] == "CHEQUE" && inputNumCheque == "" && inputValorCheque == "" && cmbBancoCheque == "" && inputAgenciaCheque == "" && inputContaCheque == "" && inputNomeCheque == "" && inputCpfCheque == "") { 
+                    if (formaPagamento[1] == "CHEQUE" && (inputNumCheque == "" || inputValorCheque == "" || cmbBancoCheque == "" || inputAgenciaCheque == "" || inputContaCheque == "" || inputNomeCheque == "" || inputCpfCheque == "")) { 
                         alerta('Atenção','Você selecionou a forma de pagamento cheque, portanto, favor preencher os dados do cheque.')
                         return false;
                     }
