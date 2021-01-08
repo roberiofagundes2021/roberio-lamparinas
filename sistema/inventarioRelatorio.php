@@ -80,8 +80,8 @@ try {
 		$iLocal = $item['InXLELocal'];
 		
 		$sql = ("SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, 
-						dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, MovimDestinoLocal) as Saldo, 
-						dbo.fnCalculaValorTotalInventario(dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, MovimDestinoLocal), ProduCustoFinal) as ValorTotal
+						dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, 'P', MovimDestinoLocal) as Saldo, 
+						dbo.fnCalculaValorTotalInventario(dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, 'P', MovimDestinoLocal), ProduCustoFinal) as ValorTotal
 				 FROM Produto
 				 JOIN Categoria on CategId = ProduCategoria
 				 JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -151,7 +151,7 @@ try {
 		$iCategoria = $item['InvenCategoria'];
 		$iSetor = $item['InXSeSetor'];
 		
-		$sql ="SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, MovimDestinoLocal) as Saldo, LcEstNome, MvXPrValorUnitario
+		$sql ="SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, 'P', MovimDestinoLocal) as Saldo, LcEstNome, MvXPrValorUnitario
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida

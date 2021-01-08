@@ -51,12 +51,14 @@ if (isset($_POST['inputSolicitacaoId'])) {
 if (isset($_POST['inputData'])) {
 
 	try {
+		var_dump($_POST);die;
 
 		$conn->beginTransaction();
 
-		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimData, MovimOrigemLocal, MovimDestinoSetor, MovimObservacao,
-				MovimSituacao, MovimUnidade, MovimUsuarioAtualizador)
-				VALUES (:sTipo, :dData, :iOrigemLocal, :iDestinoSetor, :sObservacao, :iSituacao, :iUnidade, :iUsuarioAtualizador)";
+		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimData, MovimOrigemLocal, MovimDestinoSetor, MovimObservacao, 
+				MovimValorTotal, MovimSituacao, MovimUnidade, MovimUsuarioAtualizador)
+				VALUES (:sTipo, :dData, :iOrigemLocal, :iDestinoSetor, :sObservacao, :fValorTotal, :iSituacao, 
+				:iUnidade, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -65,6 +67,7 @@ if (isset($_POST['inputData'])) {
 			':iOrigemLocal' => $_POST['cmbEstoqueOrigem'],
 			':iDestinoSetor' => $_POST['cmbDestinoSetor'],
 			':sObservacao' => $_POST['txtareaObservacao'],
+			':fValorTotal' => $_POST['inputTotal'],
 			':iSituacao' => $_POST['cmbSituacao'],
 			':iUnidade' => $_SESSION['UnidadeId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId']
@@ -75,8 +78,6 @@ if (isset($_POST['inputData'])) {
 		$numItems = intval($_POST['inputNumItens']);
 
 		for ($i = 1; $i <=  $numItems; $i++) {
-
-			$campoSoma = $i;
 
 			$campo = 'campo' . $i;
 
@@ -89,112 +90,106 @@ if (isset($_POST['inputData'])) {
 
 					$quantItens = intval($registro[3]);
 
+					//Se classificação
 					if (isset($registro[7])) {
-
-						for ($i = 1; $i <= $quantItens; $i++) {
 							
-							// Se produto é um bem permanente (Insere na tabela Patrimonio).
-							if ($registro[7] == 2) {
+						// Se produto é um bem permanente (Insere na tabela Patrimonio).
+						if ($registro[7] == 2) {
 
-								// Selecionando o id da situacao 'ATIVO'
-								$sql = "SELECT SituaId
-										FROM Situacao
-										WHERE SituaChave = 'ATIVO' ";
-								$result = $conn->query($sql);
-								$situacao = $result->fetch(PDO::FETCH_ASSOC);
+							// Selecionando o id da situacao 'ATIVO'
+							$sql = "SELECT SituaId
+									FROM Situacao
+									WHERE SituaChave = 'ATIVO' ";
+							$result = $conn->query($sql);
+							$situacao = $result->fetch(PDO::FETCH_ASSOC);
 
-								$sql = "SELECT COUNT(PatriNumero) as CONT
-										FROM Patrimonio
-										JOIN Situacao on SituaId = PatriStatus
-										WHERE PatriUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' ";
-								$result = $conn->query($sql);
-								$patrimonios = $result->fetch(PDO::FETCH_ASSOC);
-								$count = $patrimonios['CONT'];
+							$sql = "SELECT COUNT(PatriNumero) as CONT
+									FROM Patrimonio
+									JOIN Situacao on SituaId = PatriStatus
+									WHERE PatriUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' ";
+							$result = $conn->query($sql);
+							$patrimonios = $result->fetch(PDO::FETCH_ASSOC);
+							$count = $patrimonios['CONT'];
 
-								//Caso não seja o primeiro registro na tabela para esta empresa
-								if ($count >= 1) {
+							//Caso não seja o primeiro registro na tabela para esta empresa
+							if ($count >= 1) {
 
-									$ultimoPatri = $count;
-									$numeroPatri = intval($ultimoPatri) + 1;
-									$numeroPatriFinal = '';
-									//var_dump($i);
+								$ultimoPatri = $count;
+								$numeroPatri = intval($ultimoPatri) + 1;
+								$numeroPatriFinal = '';
+								//var_dump($i);
 
-									if ($numeroPatri < 10) $numeroPatriFinal = "000000" . $numeroPatri . "";
-									if ($numeroPatri < 100 && $numeroPatri > 9) $numeroPatriFinal = "00000" . $numeroPatri . "";
-									if ($numeroPatri < 1000 && $numeroPatri > 99) $numeroPatriFinal = "0000" . $numeroPatri . "";
-									if ($numeroPatri < 10000 && $numeroPatri > 999) $numeroPatriFinal = "000" . $numeroPatri . "";
-									if ($numeroPatri < 100000 && $numeroPatri > 9999) $numeroPatriFinal = "00" . $numeroPatri . "";
-									if ($numeroPatri < 1000000 && $numeroPatri > 99999) $numeroPatriFinal = "0" . $numeroPatri . "";
-									if ($numeroPatri < 10000000 && $numeroPatri > 999999) $numeroPatriFinal = $numeroPatri;
+								if ($numeroPatri < 10) $numeroPatriFinal = "000000" . $numeroPatri . "";
+								if ($numeroPatri < 100 && $numeroPatri > 9) $numeroPatriFinal = "00000" . $numeroPatri . "";
+								if ($numeroPatri < 1000 && $numeroPatri > 99) $numeroPatriFinal = "0000" . $numeroPatri . "";
+								if ($numeroPatri < 10000 && $numeroPatri > 999) $numeroPatriFinal = "000" . $numeroPatri . "";
+								if ($numeroPatri < 100000 && $numeroPatri > 9999) $numeroPatriFinal = "00" . $numeroPatri . "";
+								if ($numeroPatri < 1000000 && $numeroPatri > 99999) $numeroPatriFinal = "0" . $numeroPatri . "";
+								if ($numeroPatri < 10000000 && $numeroPatri > 999999) $numeroPatriFinal = $numeroPatri;
 
-								} else {
-
-									//Caso seja o primeiro registro na tabela para esta empresa
-									$numeroPatriFinal = '0000001';
-								}
-
-								$sql = "INSERT INTO Patrimonio
-										(PatriNumero, PatriNumSerie, PatriEstadoConservacao, PatriProduto, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
-										VALUES 
-										(:sNumero, :sNumSerie, :iEstadoConservacao, :iProduto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-								$result = $conn->prepare($sql);
-
-								$result->execute(array(
-									':sNumero' => $numeroPatriFinal,
-									':sNumSerie' => null,
-									':iEstadoConservacao' => null,
-									':iProduto' => $registro[1],
-									':iStatus' => $situacao['SituaId'],
-									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-									':iUnidade' => $_SESSION['UnidadeId']
-								));
-
-								$insertIdPatrimonio = $conn->lastInsertId();
-
-								$sql = "INSERT INTO MovimentacaoXProduto
-										(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-										VALUES 
-										(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-								$result = $conn->prepare($sql);
-
-								$result->execute(array(
-									':iMovimentacao' => $insertId,
-									':iProduto' => $registro[1],
-									':iQuantidade' => (int) $registro[3],
-									':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-									':sLote' => $registro[5] != '' ? $registro[5] : null,
-									':dValidade' => $registro[6] != '' ? $registro[6] : gravaData('12/09/2333'),
-									':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-									':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-									':iUnidade' => $_SESSION['UnidadeId'],
-									':iPatrimonio' => $insertIdPatrimonio
-								));
-								
 							} else {
 
-								$quantItens = intval($registro[3]);
-
-								for ($i = 1; $i <= $quantItens; $i++) {
-									$sql = "INSERT INTO MovimentacaoXProduto
-										(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
-										VALUES 
-										(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-									$result = $conn->prepare($sql);
-
-									$result->execute(array(
-										':iMovimentacao' => $insertId,
-										':iProduto' => $registro[1],
-										':iQuantidade' => (int) $registro[3],
-										':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
-										':sLote' => $registro[5],
-										':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-										':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
-										':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-										':iUnidade' => $_SESSION['UnidadeId'],
-										':iPatrimonio' => null
-									));
-								}
+								//Caso seja o primeiro registro na tabela para esta empresa
+								$numeroPatriFinal = '0000001';
 							}
+
+							$sql = "INSERT INTO Patrimonio
+									(PatriNumero, PatriNumSerie, PatriEstadoConservacao, PatriProduto, PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
+									VALUES 
+									(:sNumero, :sNumSerie, :iEstadoConservacao, :iProduto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+							$result = $conn->prepare($sql);
+
+							$result->execute(array(
+								':sNumero' => $numeroPatriFinal,
+								':sNumSerie' => null,
+								':iEstadoConservacao' => null,
+								':iProduto' => $registro[1],
+								':iStatus' => $situacao['SituaId'],
+								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+								':iUnidade' => $_SESSION['UnidadeId']
+							));
+
+							$insertIdPatrimonio = $conn->lastInsertId();
+
+							$sql = "INSERT INTO MovimentacaoXProduto
+									(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+									VALUES 
+									(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
+							$result = $conn->prepare($sql);
+
+							$result->execute(array(
+								':iMovimentacao' => $insertId,
+								':iProduto' => $registro[1],
+								':iQuantidade' => (int) $registro[3],
+								':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
+								':sLote' => $registro[5] != '' ? $registro[5] : null,
+								':dValidade' => $registro[6] != '' ? $registro[6] : gravaData('12/09/2333'),
+								':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+								':iUnidade' => $_SESSION['UnidadeId'],
+								':iPatrimonio' => $insertIdPatrimonio
+							));
+							
+						} else {
+
+							$sql = "INSERT INTO MovimentacaoXProduto
+								(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+								VALUES 
+								(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
+							$result = $conn->prepare($sql);
+
+							$result->execute(array(
+								':iMovimentacao' => $insertId,
+								':iProduto' => $registro[1],
+								':iQuantidade' => (int) $registro[3],
+								':fValorUnitario' => isset($registro[2]) ? gravaValor($registro[2]) : null,
+								':sLote' => $registro[5],
+								':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
+								':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+								':iUnidade' => $_SESSION['UnidadeId'],
+								':iPatrimonio' => null
+							));
 						}
 					} else {
 						if ((int) $registro[3] > 0) { //Quantidade > 0
@@ -229,7 +224,7 @@ if (isset($_POST['inputData'])) {
 						':iMovimentacao' => $insertId,
 						':iServico' => $registro[1],
 						':iQuantidade' => (int) $registro[3],
-						':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
+						':fValorUnitario' => $registro[2] != '' ? gravaValor($registro[2]) : null,
 						':sLote' => null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
@@ -1667,7 +1662,10 @@ if (isset($_POST['inputData'])) {
 									</div>
 
 									<div id="inputProdutos">
-										<?php
+										
+									</div>
+
+									<?php
 										if (isset($_POST['inputSolicitacaoId'])) {
 											print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="' . $numProdutos . '">');
 										} else {
@@ -1696,7 +1694,6 @@ if (isset($_POST['inputData'])) {
 											print('<input type="hidden" id="inputTotal" name="inputTotal" value="0">');
 										}
 										?>
-									</div>
 
 									<div class="row">
 										<div class="col-lg-12">

@@ -4,7 +4,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ServiId, ServiNome, ServiValorCusto, ServiCustoFinal, ServiDetalhamento, dbo.fnSaldoEstoque(ServiUnidade, ServiId, NULL) as Estoque
+$sql = "SELECT ServiId, ServiNome, ServiValorCusto, ServiCustoFinal, ServiDetalhamento, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
 		FROM Servico
 		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiId = ". $_POST['idServico'];
 $result = $conn->query($sql);
@@ -31,8 +31,8 @@ $count = count($row);
 							 <td data-popup="tooltip" title="'.$row['ServiDetalhamento'].'">'.$row['ServiNome'].'</td>
 							 <td></td>
 							 <td style="text-align: center">'.$_POST['quantidade'].'</td>
-							 <td>'.$valorCusto.'</td>
-							 <td>'.$valorTotal.'</td>
+							 <td style="text-align: right">'.$valorCusto.'</td>
+							 <td style="text-align: right">'.$valorTotal.'</td>
 							 <td></td>
 							 <td><span name="remove" id="'.$_POST['numItens'].'#'.$total.'" class="btn btn_remove">X</span></td>
 						 <tr>

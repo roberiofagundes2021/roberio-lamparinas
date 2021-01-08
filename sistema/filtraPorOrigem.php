@@ -5,12 +5,12 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 if ($_POST['tipoDeFiltro'] == 'Categoria') {
-	$sql = "SELECT MvXPrProduto as id
+	$sql = "SELECT MvXPrProduto as id, 'Produto' as Tipo
 			FROM MovimentacaoXProduto
 			JOIN Movimentacao on MovimId = MvXPrMovimentacao
 			WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " and MovimDestinoLocal = " . $_POST['origem'] . " and MovimTipo = 'E'
 			UNION
-			SELECT MvXSrServico as id
+			SELECT MvXSrServico as id, 'Servico' as Tipo
 			FROM MovimentacaoXServico
 			JOIN Movimentacao on MovimId = MvXSrMovimentacao
 			WHERE MvXSrUnidade = " . $_SESSION['UnidadeId'] . " and MovimDestinoLocal = " . $_POST['origem'] . " and MovimTipo = 'E'
@@ -24,15 +24,21 @@ if ($_POST['tipoDeFiltro'] == 'Categoria') {
 	if ($cont) {
 		foreach ($row as $value) {
 
-			$sql = "SELECT ProduCategoria
-		       		FROM Produto
-		        	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId = " . $value['id'] . "
-					";
+			if ($value['Tipo'] == 'Produto'){
+				$sql = "SELECT ProduCategoria as Categoria
+						FROM Produto
+						WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId = " . $value['id'];
+			} else {
+				$sql = "SELECT ServiCategoria as Categoria
+						FROM Servico
+						WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiId = " . $value['id'];
+			}
+
 			$result = $conn->query($sql);
 			$row = $result->fetch(PDO::FETCH_ASSOC);
-			$produtosIds[] = $row['ProduCategoria'];
+			$categoriaIds[] = $row['Categoria'];
 		}
-		$categoriasUnic = array_unique($produtosIds);
+		$categoriasUnic = array_unique($categoriaIds);
 		//var_dump($categorias);
 
 		$sql = "SELECT CategId, CategNome
@@ -49,7 +55,7 @@ if ($_POST['tipoDeFiltro'] == 'Categoria') {
 			}
 		}
 	} else {
-		echo 'sem dados';
+		echo 0;
 	}
 } else if ($_POST['tipoDeFiltro'] == 'Patrimonio') {
 	$sql = "SELECT PatriId, PatriNumero

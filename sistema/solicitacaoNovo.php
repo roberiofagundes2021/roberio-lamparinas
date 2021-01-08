@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Nova Solicitação';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, 
-		dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
+		dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN Situacao on SituaId = ProduStatus
@@ -787,7 +787,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 						foreach ($_SESSION['Carrinho'] as $item) {
 							if ($item['quantidade'] > 0) {
-								$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
+								$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
 		                            FROM Produto
 		                            JOIN Categoria on CategId = ProduCategoria
 									JOIN Situacao on SituaId = ProduStatus

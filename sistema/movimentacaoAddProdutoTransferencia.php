@@ -13,7 +13,7 @@ if (isset($_POST['patrimonioId']) && $_POST['patrimonioId'] !== '') {
 									ProduCustoFinal, 
 									UnMedSigla, 
 									ProduDetalhamento, 
-									dbo.fnSaldoEstoque(ProduUnidade, ProduId, '" . $_POST['origem'] . "') as Estoque,
+									dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', '" . $_POST['origem'] . "') as Estoque,
 									PatriNumero,
 									MvXPrValidade
 						FROM  Produto
@@ -70,7 +70,7 @@ if (isset($_POST['patrimonioId']) && $_POST['patrimonioId'] !== '') {
 							 ProduCustoFinal, 
 							 UnMedSigla, 
 							 ProduDetalhamento, 
-							 dbo.fnSaldoEstoque(ProduUnidade, ProduId, '" . $_POST['origem'] . "') as Estoque,
+							 dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', '" . $_POST['origem'] . "') as Estoque,
 							 MvXPrValidade
 					FROM Produto
 					JOIN UnidadeMedida 

@@ -47,13 +47,13 @@ function queryPesquisa()
             }
 
             if ($_POST['inputProdutoServico'] == 'S'){
-                $sql = "SELECT ServiId, ServiCodigo, ServiNome, ServiDetalhamento, CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, NULL) as Estoque
+                $sql = "SELECT ServiId, ServiCodigo, ServiNome, ServiDetalhamento, CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
                 FROM Servico
                 JOIN Categoria on CategId = ServiCategoria
                 JOIN Situacao on SituaId = ServiStatus
                 WHERE " . $string . " ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' ";
             } else {
-                $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduDetalhamento, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
+                $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduDetalhamento, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
                 FROM Produto
                 JOIN Categoria on CategId = ProduCategoria
                 JOIN Situacao on SituaId = ProduStatus
@@ -73,7 +73,7 @@ function queryPesquisa()
             if ($_POST['inputProdutoServico'] == 'S'){
                 
                 $sql = "SELECT ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
-                CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, NULL) as Estoque
+                CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
                 FROM Servico
                 JOIN Categoria on CategId = ServiCategoria
                 JOIN Situacao on SituaId = ServiStatus
@@ -82,7 +82,7 @@ function queryPesquisa()
             } else {
                 
                 $sql = "SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-                ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
+                ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
                 FROM Produto
                 JOIN Categoria on CategId = ProduCategoria
                 JOIN Situacao on SituaId = ProduStatus

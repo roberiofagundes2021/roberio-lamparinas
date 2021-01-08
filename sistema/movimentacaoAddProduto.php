@@ -4,7 +4,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla, ProduDetalhamento, dbo.fnSaldoEstoque(ProduUnidade, ProduId, '".$_POST['origem']."') as Estoque
+$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla, ProduDetalhamento, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', '".$_POST['origem']."') as Estoque
 		FROM Produto
 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId = " . $_POST['idProduto'];
@@ -15,19 +15,13 @@ $count = count($row);
 //Verifica se já existe esse registro (se existir, retorna true )
 if ($count) {
 
-	//if ($row['Estoque'] >= 1) {
-		if ($_POST['tipo'] == 'E') {
-			$valorCusto = formataMoeda($row['ProduValorCusto']);
-			$valorTotal = formataMoeda($_POST['quantidade'] * $row['ProduValorCusto']);
+	if ($row['Estoque'] >= 1) {
+		
+		$valorCusto = formataMoeda($row['ProduCustoFinal']);
+		$valorTotal = formataMoeda($_POST['quantidade'] * $row['ProduCustoFinal']);
 
-			$total = $_POST['quantidade'] * $row['ProduValorCusto'];
-		} else {
-			$valorCusto = formataMoeda($row['ProduCustoFinal']);
-			$valorTotal = formataMoeda($_POST['quantidade'] * $row['ProduCustoFinal']);
-
-			$total = $_POST['quantidade'] * $row['ProduCustoFinal'];
-		}
-
+		$total = $_POST['quantidade'] * $row['ProduCustoFinal'];
+		
 		$output = 	'<tr id="row' . $_POST['numItens'] . '" class="trGrid">
 						 <td>' . $_POST['numItens'] . '</td>
 						 <td data-popup="tooltip" title="' . $row['ProduDetalhamento'] . '">' . $row['ProduNome'] . '</td>
@@ -69,24 +63,14 @@ if ($count) {
 						<td><span name='remove' id='" . $_POST['numItens'] . "#" . $total . "' class='btn btn_remove'>X</span></td>
 					</tr>
 			";
+
 		echo $output;
-	/*} else {
 
-		if ($_POST['tipo'] == 'E') {
-			$valorCusto = formataMoeda($row['ProduValorCusto']);
-			$valorTotal = formataMoeda($_POST['quantidade'] * $row['ProduValorCusto']);
-
-			$total = $_POST['quantidade'] * $row['ProduValorCusto'];
-		} else {
-			$valorCusto = formataMoeda($row['ProduCustoFinal']);
-			$valorTotal = formataMoeda($_POST['quantidade'] * $row['ProduCustoFinal']);
-
-			$total = $_POST['quantidade'] * $row['ProduCustoFinal'];
-		}
+	} else {
 
 		$output = 	'SEMESTOQUE';
 		echo $output;
-	}*/
+	}
 } else {
 	echo 0;
 }

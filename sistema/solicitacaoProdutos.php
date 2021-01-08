@@ -5,7 +5,7 @@ include('global_assets/php/conexao.php');
 
 if (isset($_POST['solicitacaoId'])) {
 
-    $sql = "SELECT SolicId, SlXPrQuantidade, ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, NULL) as Estoque
+    $sql = "SELECT SolicId, SlXPrQuantidade, ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
             FROM Solicitacao
             JOIN SolicitacaoXProduto on SlXPrSolicitacao = SolicId
             JOIN Produto on ProduId = SlXPrProduto

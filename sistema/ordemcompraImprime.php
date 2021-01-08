@@ -137,8 +137,8 @@ try {
 				$valorUnitario = $itemProduto['OCXPrValorUnitario'];
 				$valorTotal = $itemProduto['OCXPrQuantidade'] * $itemProduto['OCXPrValorUnitario'];
 			} else {
-				$valorUnitario = "";
-				$valorTotal = "";
+				$valorUnitario = 0;
+				$valorTotal = 0;
 			}
 
 			if($totalProdutos == ($cont)){
@@ -207,8 +207,8 @@ try {
 				$valorUnitario = $itemServico['OCXSrValorUnitario'];
 				$valorTotal = $itemServico['OCXSrQuantidade'] * $itemServico['OCXSrValorUnitario'];
 			} else {
-				$valorUnitario = "";
-				$valorTotal = "";
+				$valorUnitario = 0;
+				$valorTotal = 0;
 			}
 
 			if($totalServicos == ($cont)){
