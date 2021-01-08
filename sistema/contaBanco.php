@@ -167,8 +167,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência às Contas da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right"><a href="contaBancoNovo.php" class="btn btn-principal" role="button">Nova Conta</a></div>
+								<div class="row">
+									<div class="col-lg-9">
+										<p class="font-size-lg">A relação abaixo faz referência às Contas da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+									</div>
+									<div class="col-lg-3">	
+										<div class="text-right"><a href="contaBancoNovo.php" class="btn btn-principal" role="button">Nova Conta</a></div>
+									</div>
+								</div>
 							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->

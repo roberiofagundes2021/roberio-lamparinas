@@ -962,11 +962,14 @@ $dataInicio = date("Y-m-d");
                     let formaPagamento = cmbFormaPagamento.split('#');
                     
                     let inputNumCheque = $("#inputNumCheque").val();
-                    let inputNumCheque = $("#inputNumCheque").val();
-                    let inputNumCheque = $("#inputNumCheque").val();
-                    let inputNumCheque = $("#inputNumCheque").val();
+                    let inputValorCheque = $("#inputValorCheque").val();
+                    let cmbBancoCheque = $("#cmbBancoCheque").val();
+                    let inputAgenciaCheque = $("#inputAgenciaCheque").val();
+                    let inputContaCheque = $("#inputContaCheque").val();
+                    let inputNomeCheque = $("#inputNomeCheque").val();
+                    let inputCpfCheque = $("#inputCpfCheque").val();
 
-                    if (formaPagamento[1] == "CHEQUE" && inputNumCheque == "" && inputNumCheque == "" && inputNumCheque == "" && inputNumCheque == "") { 
+                    if (formaPagamento[1] == "CHEQUE" && inputNumCheque == "" && inputValorCheque == "" && cmbBancoCheque == "" && inputAgenciaCheque == "" && inputContaCheque == "" && inputNomeCheque == "" && inputCpfCheque == "") { 
                         alerta('Atenção','Você selecionou a forma de pagamento cheque, portanto, favor preencher os dados do cheque.')
                         return false;
                     }
@@ -1456,13 +1459,13 @@ $dataInicio = date("Y-m-d");
                                     <div class="d-flex flex-row p-1">
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="inputNumCheque">Nº do Cheque</span></label>
+                                                <label for="inputNumCheque">Nº do Cheque<span class="text-danger">*</span></label>
                                                 <input type="text" id="inputNumCheque" name="inputNumCheque" class="form-control" placeholder="Número do Cheque" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNumCheque'] ?>">
                                             </div>
                                         </div>	
                                         <div class='col-lg-3'>
                                             <div class="form-group">
-                                                <label for="inputValorCheque">Valor</span></label>
+                                                <label for="inputValorCheque">Valor<span class="text-danger">*</span></label>
                                                 <div class="input-group">
                                                     <input type="text" id="inputValorCheque" onKeyUp="moeda(this)" maxLength="12" name="inputValorCheque" class="form-control" value="<?php if (isset($lancamento)) echo $lancamento['CnAReValorCheque'] ?>">
                                                 </div>
@@ -1470,13 +1473,13 @@ $dataInicio = date("Y-m-d");
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group" >
-                                                <label for="inputDtEmissaoCheque">Data da Emissão</span></label>
+                                                <label for="inputDtEmissaoCheque">Data da Emissão<span class="text-danger">*</span></label>
                                                 <input id="inputDtEmissaoCheque" class="form-control" type="date" name="inputDtEmissaoCheque" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtEmissaoCheque'] ?>">
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="inputDtVencimentoCheque">Data do Vencimento</span></label>
+                                                <label for="inputDtVencimentoCheque">Data do Vencimento<span class="text-danger">*</span></label>
                                                 <input id="inputDtVencimentoCheque" class="form-control" type="date" name="inputDtVencimentoCheque" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtVencimentoCheque'] ?>">
                                             </div>
                                         </div>
@@ -1486,7 +1489,7 @@ $dataInicio = date("Y-m-d");
                                 <div class="px-3 pt-3">
                                     <div class="d-flex flex-row p-1">
                                         <div class="col-lg-6">
-											<label for="cmbBancoCheque">Banco</label>
+											<label for="cmbBancoCheque">Banco<span class="text-danger">*</span></label>
 											<select id="cmbBancoCheque" name="cmbBancoCheque" class="form-control form-control-select2" value="<?php if (isset($lancamento)) echo $lancamento['CnAReBancoCheque'] ?>">
 												<option value="">Selecione um banco</option>
                                                 <?php 
@@ -1507,13 +1510,13 @@ $dataInicio = date("Y-m-d");
 										</div>
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="inputAgenciaCheque">Agência</span></label>
+                                                <label for="inputAgenciaCheque">Agência<span class="text-danger">*</span></label>
                                                 <input type="text" id="inputAgenciaCheque" name="inputAgenciaCheque" class="form-control" placeholder="Número da Agência" value="<?php if (isset($lancamento)) echo $lancamento['CnAReAgenciaCheque'] ?>">
                                             </div>
                                         </div>	
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="inputContaCheque">Conta</span></label>
+                                                <label for="inputContaCheque">Conta<span class="text-danger">*</span></label>
                                                 <input type="text" id="inputContaCheque" name="inputContaCheque" class="form-control" placeholder="Número da Conta" value="<?php if (isset($lancamento)) echo $lancamento['CnAReContaCheque'] ?>">
                                             </div>
                                         </div>	     
@@ -1523,14 +1526,14 @@ $dataInicio = date("Y-m-d");
                                     <div class="d-flex flex-row p-1">
                                         <div class="col-lg-9">
                                             <div class="form-group">
-                                                <label for="inputNomeCheque">Nome</label>
+                                                <label for="inputNomeCheque">Nome<span class="text-danger">*</span></label>
                                                 <input type="text" id="inputNomeCheque" name="inputNomeCheque" class="form-control" placeholder="Nome Completo" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNomeCheque'] ?>">
                                             </div>
                                         </div>	
                                         
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="inputCpfCheque">CPF</label>
+                                                <label for="inputCpfCheque">CPF<span class="text-danger">*</span></label>
                                                 <input type="text" id="inputCpfCheque" name="inputCpfCheque" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php if (isset($lancamento)) echo $lancamento['CnAReCpfCheque'] ?>">
                                             </div>	
                                         </div>

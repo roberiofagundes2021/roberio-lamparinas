@@ -182,10 +182,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência aos fluxos operacionais da
-									unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-								<div class="text-right"><a href="fluxoNovo.php" class="btn btn-principal"
+								<div class="row">
+									<div class="col-lg-9">
+										<p class="font-size-lg">A relação abaixo faz referência aos fluxos operacionais da
+										unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+									</div>		
+									<div class="col-lg-3">
+										<div class="text-right"><a href="fluxoNovo.php" class="btn btn-principal"
 										role="button">Novo Fluxo Operacional</a></div>
+									</div>
+								</div>
 							</div>
 
 							<table class="table" id="tblFluxo">

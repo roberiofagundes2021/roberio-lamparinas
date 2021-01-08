@@ -193,8 +193,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-								A relação abaixo faz referência aos orçamentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
-								<div class="text-right"><a href="orcamentoNovo.php" class="btn btn-principal" role="button">Novo Orçamento</a></div>
+							<div class="row">
+									<div class="col-lg-9">
+										A relação abaixo faz referência aos orçamentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
+									</div>	
+									<div class="col-lg-3">	
+										<div class="text-right"><a href="orcamentoNovo.php" class="btn btn-principal" role="button">Novo Orçamento</a></div>
+									</div>
+								</div>
 							</div>
 							
 							<table class="table" id="tblOrcamento">
