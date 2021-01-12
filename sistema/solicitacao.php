@@ -181,8 +181,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			} else if (Tipo == 'imprimir') {
 				document.formSolicitacao.action = "solicitacaoImprime.php";
 				document.formSolicitacao.setAttribute("target", "_blank");
-			} else if (Tipo == 'exclui') {
-				confirmaExclusao(document.formSolicitacao, "Tem certeza que deseja excluir essa solicitação?", "solicitacaoExclui.php");
+			} else if (Tipo == 'cancelar') {
+				confirmaExclusao(document.formSolicitacao, "Tem certeza que deseja Cancelar essa solicitação?", "solicitacaoCancela.php");
 				document.formSolicitacao.setAttribute("target", "_self");
 			}
 
@@ -269,13 +269,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																<div class="dropdown-menu dropdown-menu-right">
 																	<a id="' . $item['SolicId'] . '" class="btn-modal dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 																	<div class="dropdown-divider"></div>
-																	<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir Solicitação"><i class="icon-printer2"></i> Imprimir</a>
-																');
+																	' );
+
+																	if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
+                                    									print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'cancelar\', \'\')" class="dropdown-item" title="Cancelar Solicitação"><i class="icon-cancel-circle2"></i> Cancelar</a>');
+																	}
+																		   
+																	print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir Solicitação"><i class="icon-printer2"></i> Imprimir</a>');
 
 																	if (isset($item['BandeMotivo'])){
-
-																		print('																		
-																		<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
+																		print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
 																	}
 										print('		
 																</div>
