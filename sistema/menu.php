@@ -108,8 +108,14 @@ $count = count($row);
 							</div>
 
 							<div class="card-body">
-								<p class="font-size-lg">A relação abaixo faz referência às menus da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>
-								<div class="text-right"><a href="menuNovo.php" class="btn btn-principal" role="button">Novo Item de Menu</a></div>
+								<div class="row">
+									<div class="col-lg-9">
+										<p class="font-size-lg">A relação abaixo faz referência às menus da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>
+									</div>	
+									<div class="col-lg-3">	
+										<div class="text-right"><a href="menuNovo.php" class="btn btn-principal" role="button">Novo Item de Menu</a></div>
+									</div>
+								</div>
 							</div>				
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->

@@ -15,7 +15,7 @@ $sql = "SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaN
 		LEFT JOIN Bandeja on BandeTabelaId = MovimId and BandeTabela = 'Movimentacao' and BandeUnidade = " . $_SESSION['UnidadeId'] . "
 	    WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . "
 		ORDER BY MovimData, MovimId DESC";
-$result = $conn->query($sql);
+$result = $conn->query(eId$sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
