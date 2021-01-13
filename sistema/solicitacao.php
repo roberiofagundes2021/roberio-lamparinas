@@ -14,7 +14,7 @@ $sql = "SELECT SolicId, SolicNumero, SolicData, SolicObservacao, SolicSetor, Sol
 		JOIN Situacao on SituaId = SolicSituacao
 		LEFT JOIN Bandeja on BandeTabelaId = SolicId and BandeTabela = 'Solicitacao' and BandeUnidade = " . $_SESSION['UnidadeId'] . "
 	    WHERE SolicUnidade = " . $_SESSION['UnidadeId'] . " and UsuarId = ".$_SESSION['UsuarId']."
-		ORDER BY SolicData DESC";
+		ORDER BY SolicData, SolicId DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
