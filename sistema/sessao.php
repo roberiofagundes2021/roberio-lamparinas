@@ -38,6 +38,19 @@ if (array_key_exists('AditivoNovo', $_SESSION) and !in_array(basename($_SERVER['
 	unset($_SESSION['AditivoNovo']);
 }
 
+$arquivosMovimentacaoFinanceira = array(
+	'movimentacaoFinanceira.php'
+);
+
+if ((array_key_exists('MovFinancPeriodoDe', $_SESSION) || array_key_exists('MovFinancAte', $_SESSION) || array_key_exists('MovFinancFornecedor', $_SESSION) || array_key_exists('MovFinancPlanoContas', $_SESSION) || array_key_exists('MovFinancStatus', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoFinanceira)) {
+	
+	unset($_SESSION['MovFinancPeriodoDe']);
+	unset($_SESSION['MovFinancAte']);
+	unset($_SESSION['MovFinancFornecedor']);
+	unset($_SESSION['MovFinancPlanoContas']);
+	unset($_SESSION['MovFinancStatus']);
+}
+
 
 $arquivosContasAPagar = array(
 	'contasAPagar.php', 'contasAPagarNovoLancamento.php',
