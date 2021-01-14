@@ -178,7 +178,12 @@ if(isset($_POST['inputTipo'])){
                 }             
                 
             });
-            
+			
+			//Método JQuery (tem que ficar dentro do $(document).ready(function(){
+			document.getElementById('inputCnpj').addEventListener('input', function (e) {
+				var x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,3})(\d{0,3})(\d{0,4})(\d{0,2})/);
+				e.target.value = !x[2] ? x[1] : x[1] + '.' + x[2] + '.' + x[3] + '/' + x[4] + (x[5] ? '-' + x[5] : '');
+			});
 
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
@@ -190,6 +195,16 @@ if(isset($_POST['inputTipo'])){
 				var inputNomePJ = $('#inputNomePJ').val();
 				var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
 				var inputCnpj = $('#inputCnpj').val().replace(/[^\d]+/g,'');
+				
+				if (inputNomePJ != '' && inputTipo == 'J'){
+					if (!validaCNPJ(inputCnpj)){
+						$('#inputCnpj').val('');
+						alerta('Atenção','CNPJ inválido!','error');	
+						$("#formCliente").submit();
+						
+						return false;
+					}
+				}
 
 				if (inputTipo == 'F'){ 
 					inputNome = inputNomePF; 
@@ -199,7 +214,6 @@ if(isset($_POST['inputTipo'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
-
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -243,7 +257,25 @@ if(isset($_POST['inputTipo'])){
 				document.getElementById('inputNomePJ').setAttribute('required', 'required');
 				document.getElementById('inputCnpj').setAttribute('required', 'required');
 			}
+		}
+
+		function mCPF(cpf){
+			cpf=cpf.replace(/\D/g,"")
+			cpf=cpf.replace(/(\d{3})(\d)/,"$1.$2")
+			cpf=cpf.replace(/(\d{3})(\d)/,"$1.$2")
+			cpf=cpf.replace(/(\d{3})(\d{1,2})$/,"$1-$2")
+			return cpf
 		}	
+
+		function fMasc(objeto,mascara) {
+			obj=objeto
+			masc=mascara
+			setTimeout("fMascEx()",1)
+		}
+
+		function fMascEx() {
+			obj.value=masc(obj.value)
+		}
 
 		function validaCPF(strCPF) {
 			var Soma;
@@ -265,6 +297,59 @@ if(isset($_POST['inputTipo'])){
 			if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
 			return true;
 		}			
+
+		function validaCNPJ(cnpj) {
+
+			cnpj = cnpj.replace(/[^\d]+/g,'');
+
+			if(cnpj == '') return false;
+
+			if (cnpj.length != 14)
+				return false;
+
+			// Elimina CNPJs invalidos conhecidos
+			if (cnpj == "00000000000000" || 
+				cnpj == "11111111111111" || 
+				cnpj == "22222222222222" || 
+				cnpj == "33333333333333" || 
+				cnpj == "44444444444444" || 
+				cnpj == "55555555555555" || 
+				cnpj == "66666666666666" || 
+				cnpj == "77777777777777" || 
+				cnpj == "88888888888888" || 
+				cnpj == "99999999999999")
+				return false;
+				
+			// Valida DVs
+			tamanho = cnpj.length - 2
+			numeros = cnpj.substring(0,tamanho);
+			digitos = cnpj.substring(tamanho);
+			soma = 0;
+			pos = tamanho - 7;
+			for (i = tamanho; i >= 1; i--) {
+			soma += numeros.charAt(tamanho - i) * pos--;
+			if (pos < 2)
+					pos = 9;
+			}
+			resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+			if (resultado != digitos.charAt(0))
+				return false;
+				
+			tamanho = tamanho + 1;
+			numeros = cnpj.substring(0,tamanho);
+			soma = 0;
+			pos = tamanho - 7;
+			for (i = tamanho; i >= 1; i--) {
+			soma += numeros.charAt(tamanho - i) * pos--;
+			if (pos < 2)
+					pos = 9;
+			}
+			resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+			if (resultado != digitos.charAt(1))
+				return false;
+				
+			return true;
+		}	
 
     </script>	
 	
@@ -333,7 +418,7 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
-													<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required>
+													<input type="text" id="inputCpf" name="inputCpf" class="form-control" pattern="[0-9]{11}" onkeydown="javascript: fMasc( this, mCPF );" required>
 												</div>	
 											</div>
 
@@ -446,7 +531,7 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-3">
 												<div class="form-group">				
 													<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
-													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99">
+													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control">
 												</div>	
 											</div>						
 										</div>
