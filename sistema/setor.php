@@ -34,22 +34,76 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
+	
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<script src="global_assets/js/lamparinas/stop-back.js"></script>
 	
-<!--	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
-	<script src="global_assets/js/plugins/notifications/noty.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_jgrowl_noty.js"></script>
-	<script src="global_assets/js/demo_pages/components_popups.js"></script>-->
-	
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<!-- /theme JS files -->	
 	
-	<script language ="javascript">
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+			
+			/* Início: Tabela Personalizada */
+			$('#tblSetor').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [{ 
+					orderable: true,   //Setor
+					width: "40%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Unidade
+					width: "40%",
+					targets: [1]
+				},				
+				{ 
+					orderable: true,   //Situação
+					width: "10%",
+					targets: [2]
+				},
+				{ 
+					orderable: false,  //Ações
+					width: "10%",
+					targets: [3]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */		
+		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaSetor(SetorId, SetorNome, SetorStatus, Tipo){
@@ -115,20 +169,20 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="row">
 									<div class="col-lg-9">
 										<p class="font-size-lg">A relação abaixo faz referência aos setores da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>
-									</div>
-									<div class="col-lg-3">	
+									</div>	
+										<div class="col-lg-3">	
 										<div class="text-right"><a href="setorNovo.php" class="btn btn-principal" role="button">Novo Setor</a></div>
 									</div>
 								</div>
 							</div>
 							
-							<table class="table datatable-responsive">
+							<table class="table" id="tblSetor">
 								<thead>
 									<tr class="bg-slate">
-										<th width="40%">Setor</th>
-										<th width="40%">Unidade</th>
-										<th width="10%">Situação</th>
-										<th width="10%" class="text-center">Ações</th>
+										<th >Setor</th>
+										<th >Unidade</th>
+										<th >Situação</th>
+										<th class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
