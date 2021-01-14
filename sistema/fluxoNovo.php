@@ -31,9 +31,9 @@ if (isset($_POST['inputDataInicio'])) {
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao,
-											  FlOpeValor, FlOpeObservacao, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa, FlOpeUnidade)
+											  FlOpeValor, FlOpeObservacao, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeUnidade)
 				VALUES (:iFornecedor, :iCategoria, :iSubCategoria, :dDataInicio, :dDataFim, :iNumContrato, :iNumProcesso, :iModalidadeLicitacao,
-						:fValor, :sObservacao, :bStatus, :iUsuarioAtualizador, :iEmpresa, :iUnidade)";
+						:fValor, :sObservacao, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -49,7 +49,6 @@ if (isset($_POST['inputDataInicio'])) {
 			':sObservacao' => $_POST['txtareaObservacao'] == '' ? null : $_POST['txtareaObservacao'],
 			':bStatus' => $rowSituacao['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iEmpresa' => $_SESSION['EmpreId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
 		/*	
