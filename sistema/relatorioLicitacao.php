@@ -504,7 +504,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                         <!-- Basic responsive configuration -->
                         <div class="card">
                             <div class="card-header header-elements-inline">
-                                <h3 class="card-title">Licitação</h3>
+                                <h3 class="card-title">Relação de Licitações</h3>
                                 <div class="header-elements">
                                     <div class="list-icons">
                                         <a class="list-icons-item" data-action="collapse"></a>
