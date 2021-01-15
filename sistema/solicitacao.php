@@ -6,8 +6,8 @@ $_SESSION['PaginaAtual'] = 'Solicitação';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT SolicId, SolicNumero, SolicData, SolicObservacao, SolicSetor, SolicSolicitante, SolicSituacao, UsuarNome, 
-		SetorNome, SituaChave, SituaNome, SituaCor, BandeMotivo
+$sql = "SELECT SolicId, SolicNumero, SolicData, SolicObservacao, SolicSetor, SolicSolicitante, SolicSituacao, 
+		SolicMotivo, UsuarNome, SetorNome, SituaChave, SituaNome, SituaCor, BandeMotivo
 		FROM Solicitacao
 		JOIN Usuario on UsuarId = SolicSolicitante
 		JOIN Setor on SetorId = SolicSetor
@@ -40,14 +40,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	<!-- /theme JS files -->	
+
+	<!-- Modal -->
+	<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>
 
 	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
 	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
-
-	<!-- Modal -->
-	<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>	
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>	
 
 	<script type="text/javascript">
 		
@@ -168,7 +167,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaSolicitacao(SolicId, Tipo, Motivo) {
+		function atualizaSolicitacao(SolicId, Tipo, Motivo, Numero) {
 
 			document.getElementById('inputSolicitacaoId').value = SolicId;
 
@@ -178,12 +177,47 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                     message: Motivo
                 });
                 return false;
+			} else if (Tipo == 'motivoCancelamento'){
+	            bootbox.alert({
+                    title: '<strong>Motivo do Cancelamento da Solicitação</strong>',
+                    message: Motivo
+                });
+                return false;
 			} else if (Tipo == 'imprimir') {
 				document.formSolicitacao.action = "solicitacaoImprime.php";
 				document.formSolicitacao.setAttribute("target", "_blank");
 			} else if (Tipo == 'cancelar') {
-				confirmaExclusao(document.formSolicitacao, "Tem certeza que deseja Cancelar essa solicitação?", "solicitacaoCancela.php");
-				document.formSolicitacao.setAttribute("target", "_self");
+
+				bootbox.prompt({
+					title: 'Informe o motivo do cancelamento da solicitação',
+					inputType: 'textarea',
+					buttons: {
+						confirm: {
+							label: 'Enviar',
+							className: 'btn-principal'
+						},
+						cancel: {
+							label: 'Cancelar',
+							className: 'btn-link'
+						}
+					},
+					callback: function(result) {
+
+						if (result === null) {
+							bootbox.alert({
+								title: 'Cancelamento da solicitação abortado',
+								message: 'A solicitação <b>' + Numero + '</b> não foi cancelada!'
+							});
+						} else {
+
+							document.getElementById('inputMotivo').value = result;
+							document.formSolicitacao.action = "solicitacaoCancela.php";
+							document.formSolicitacao.setAttribute("target", "_self");
+							document.formSolicitacao.submit();
+						}
+					}
+				});
+				return false;
 			}
 
 			document.formSolicitacao.submit();
@@ -278,14 +312,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																	' );
 
 																	if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-                                    									print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'cancelar\', \'\')" class="dropdown-item" title="Cancelar Solicitação"><i class="icon-cancel-circle2"></i> Cancelar</a>');
+                                    									print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'cancelar\', \'\', \''.$item['SolicNumero'].'\')" class="dropdown-item" title="Cancelar Solicitação"><i class="icon-cancel-circle2"></i> Cancelar</a>');
 																	}
 																		   
-																	print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir Solicitação"><i class="icon-printer2"></i> Imprimir</a>');
+																	print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'imprimir\', \'\', \''.$item['SolicNumero'].'\')" class="dropdown-item" title="Imprimir Solicitação"><i class="icon-printer2"></i> Imprimir</a>');
 
 																	if (isset($item['BandeMotivo'])){
-																		print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
+																		print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'motivo\', \''.$item['BandeMotivo'].'\', \''.$item['SolicNumero'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo da Não Liberação</a>');
 																	}
+
+																	if (isset($item['SolicMotivo'])){
+																		print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'motivoCancelamento\', \''.$item['SolicMotivo'].'\', \''.$item['SolicNumero'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo Cancelamento</a>');
+																	}
+
 										print('		
 																</div>
 															</div>
@@ -309,6 +348,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<form name="formSolicitacao" method="post">
 					<input type="hidden" id="inputSolicitacaoId" name="inputSolicitacaoId">
 					<input type="hidden" id="inputSolicitacaoTipo" name="inputSolicitacaoTipo">
+					<input type="hidden" id="inputMotivo" name="inputMotivo">
 				</form>
 
 			</div>
