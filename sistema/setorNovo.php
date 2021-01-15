@@ -73,7 +73,7 @@ if(isset($_POST['inputNome'])){
       var inputNome = $('#inputNome').val();
       var cmbUnidade = $('#cmbUnidade').val();
 
-      !inputNome || !cmbUnidade && $("#formSetor").submit();
+    //  !inputNome || !cmbUnidade && $("#formSetor").submit();
 
       //remove os espaços desnecessários antes e depois
       inputNome = inputNome.trim();
@@ -82,7 +82,7 @@ if(isset($_POST['inputNome'])){
       $.ajax({
         type: "POST",
         url: "setorValida.php",
-        data: ('nome=' + inputNome + '&unidade=' + cmbUnidade),
+        data: ('nomeNovo=' + inputNome + '&unidade=' + cmbUnidade),
         success: function(resposta) {
 
           if (resposta == 1) {

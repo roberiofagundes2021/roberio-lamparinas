@@ -94,8 +94,6 @@ if(isset($_POST['inputNome'])){
       var inputNomeVelho = $('#inputSetorNome').val();
       var cmbUnidade = $('#cmbUnidade').val();
 
-      !inputNome || !cmbUnidade && $("#formSetor").submit();
-
       //remove os espaços desnecessários antes e depois
       inputNomeNovo = inputNomeNovo.trim();
 
