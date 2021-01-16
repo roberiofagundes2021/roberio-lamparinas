@@ -13,8 +13,8 @@ function alerta(titulo, msg, tipo, modal) {
 	opts.text = msg;
 	opts.type = tipo;
 	//opts.desktop = {desktop: true}
-	opts.addclass = 'stack-modal',
-	opts.stack = {'dir1': 'down', 'dir2': 'right', 'modal': false}
+	opts.addclass = 'stack-modal';
+	opts.stack = {'dir1': 'down', 'dir2': 'right', 'modal': false};
 	
 	
 	switch (tipo) {
@@ -80,7 +80,7 @@ function confirmaExclusao(form, texto, acao) {
 
 function moeda(z){
 	v = z.value;
-	v = v.replace(/\D/g,"") //permite digitar apenas números
+	v = v.replace(/\D/g,"") //Permite digitar apenas números
 	v = v.replace(/[0-9]{12}/,"inválido") //limita pra máximo 999.999.999,99
 	v=v.replace(/(\d)(\d{8})$/,"$1.$2");//coloca o ponto dos milhões
 	v=v.replace(/(\d)(\d{5})$/,"$1.$2");//coloca o ponto dos milhares
@@ -114,8 +114,7 @@ function float2moeda(num) {
 
    if(cents < 10) cents = "0" + cents;
 	  for (var i = 0; i < Math.floor((num.length-(1+i))/3); i++)
-		 num = num.substring(0,num.length-(4*i+3))+'.'
-			   +num.substring(num.length-(4*i+3));
+		 num = num.substring(0,num.length-(4*i+3)) + '.' + num.substring(num.length-(4*i+3));
    ret = num + ',' + cents;
    if (x == 1) ret = ' - ' + ret;
    

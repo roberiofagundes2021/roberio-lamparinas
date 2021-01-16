@@ -1003,7 +1003,7 @@ $dataInicio = date("Y-m-d");
 
   function selecionaTipo(tipo) {
     if (tipo == 'P') {
-      window.location.href = "movimentacaoFinanceiraTransferencia.php";
+      window.location.href = "movimentacaoFinanceiraPagamento.php";
     } else if (tipo == 'R') {
       window.location.href = "movimentacaoFinanceiraRecebimento.php";
     } else
@@ -1054,7 +1054,7 @@ $dataInicio = date("Y-m-d");
                         <div class="form-check form-check-inline">
                           <label class="form-check-label">
                             <input type="radio" name="inputTipo" value="P" class="form-input-styled" onclick="selecionaTipo('P')" data-fouc>
-                            Transferencia
+                            Pagamento
                           </label>
                         </div>
                         <div class="form-check form-check-inline">
@@ -1184,14 +1184,6 @@ $dataInicio = date("Y-m-d");
                         <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNumDocumento'] ?>" class="form-control">
                       </div>
                     </div>
-                    <!--
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label for="inputNumDocDaVenda">Num. Doc - Venda</label>
-                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra" value="<?php if (isset($lancamento)) echo $lancamento['OrComNumero'] ?>" class="form-control" readOnly>
-                                            </div>
-                                        </div>
-                                        -->
                   </div>
                   <div class="row">
 

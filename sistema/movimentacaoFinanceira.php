@@ -494,8 +494,6 @@ $dataFim = date("Y-m-d");
               </div>
 
               <div class="card-body">
-                <!--<p class="font-size-lg">Utilize os filtros abaixo para gerar o relatório.</p>
-                                <br>-->
 
                 <form id="formImprime" method="POST" target="_blank">
                   <input id="TipoProdutoServico" type="hidden" name="TipoProdutoServico"></input>
@@ -542,8 +540,6 @@ $dataFim = date("Y-m-d");
                         </div>
                       </div>
                     </div>
-
-                    <!-- <?php  print_r($_SESSION)?> -->
 
                     <div class="col-lg-4">
                       <div class="form-group">
