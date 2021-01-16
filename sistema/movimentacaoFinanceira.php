@@ -158,7 +158,6 @@ $dataFim = date("Y-m-d");
 
         total += valorFormFloat
       })
-      console.log(total)
       $('#footer-total').remove()
 
       if (total < 0) {

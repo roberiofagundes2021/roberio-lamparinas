@@ -389,6 +389,7 @@ $dataInicio = date("Y-m-d");
         $('#pageModalCheque').fadeOut(200);
         $('body').css('overflow', 'scroll');
         limparCheque();
+        $("#lancamento").submit();
       });
 
       $("#salvarCheque").on('click', function() {
@@ -846,7 +847,7 @@ $dataInicio = date("Y-m-d");
                                     print('<option value="'.$item['BancoId'].'">'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
                                   }
                               } else {
-                                  print('<option value="'.$item['BancoId'].'" selected>'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
+                                  print('<option value="'.$item['BancoId'].'">'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
                               }
                           }
 												?>
