@@ -132,20 +132,20 @@ $dataFim = date("Y-m-d");
     //   })
     // }
 
-    function excluirConta() {
-      let contas = $('.excluirConta').each((i, elem) => {
-        $(elem).on('click', (e) => {
-          let id = $(elem).attr('idContaExcluir')
-          $('.idContaAReceber').val(id)
-          e.preventDefault
-          confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `contasAReceberExclui.php?idContaAReceber=${id}`);
+    // function excluirConta() {
+    //   let contas = $('.excluirConta').each((i, elem) => {
+    //     $(elem).on('click', (e) => {
+    //       let id = $(elem).attr('idContaExcluir')
+    //       $('.idContaAReceber').val(id)
+    //       e.preventDefault
+    //       confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `contasAReceberExclui.php?idContaAReceber=${id}`);
 
-          document.contaExclui.submit()
-        })
-      })
+    //       document.contaExclui.submit()
+    //     })
+    //   })
 
-    }
-    excluirConta()
+    // }
+    // excluirConta()
 
     function atualizaTotal() {
       let childres = $('tbody').children()

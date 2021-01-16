@@ -320,8 +320,11 @@ $dataInicio = date("Y-m-d");
       $ano = $dataRecebimento.getFullYear();
 
       $fullDataRecebimento = `${$ano}-${$mes}-${$dia}`;
-      $('#inputDataEmissao').val($fullDataRecebimento);
-      $('#inputDataRecebimento').val($fullDataRecebimento);
+
+      if ($('#inputDataEmissao').val() == "")
+        $('#inputDataEmissao').val($fullDataRecebimento);
+      if ($('#inputDataRecebimento').val() == "")
+        $('#inputDataRecebimento').val($fullDataRecebimento);
     }
 
 
@@ -597,7 +600,7 @@ $dataInicio = date("Y-m-d");
                     <div class="col-lg-2">
                       <div class="form-group">
                         <label for="inputDataEmissao">Data de Emissão <span class="text-danger">*</span></label>
-                        <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" value="<?php if (isset($lancamento)) echo mostraData($lancamento['CnAReDtEmissao']) ?>" required>
+                        <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtEmissao'] ?>" required>
                       </div>
                     </div>
 
@@ -744,7 +747,7 @@ $dataInicio = date("Y-m-d");
                             <div class="row">
                               <div class="form-group col-6">
                                 <label for="inputDataRecebimento">Data do Recebimento <span class="text-danger">*</span></label>
-                                <input type="date" id="inputDataRecebimento" name="inputDataRecebimento" class="form-control" placeholder="Data do Pagamento" value="<?php if (isset($lancamento)) echo mostraData($lancamento['CnAReDtRecebimento']) ?>" required>
+                                <input type="date" id="inputDataRecebimento" name="inputDataRecebimento" class="form-control" placeholder="Data do Pagamento" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtRecebimento'] ?>" required>
                               </div>
 
                               <div class="form-group col-6">
