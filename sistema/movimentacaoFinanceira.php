@@ -116,233 +116,21 @@ $dataFim = date("Y-m-d");
       }
     });
 
-    $('#tblParcelamento').DataTable({
-      "order": [
-        [0, "desc"],
-        [1, "desc"],
-        [2, "asc"]
-      ],
-      autoWidth: false,
-      responsive: true,
-      columnDefs: [{
-          orderable: true, //Item
-          width: "10%",
-          targets: [0]
-        },
-        {
-          orderable: true, //Descrição
-          width: "40%",
-          targets: [1]
-        },
-        {
-          orderable: true, //Vencimento
-          width: "25%",
-          targets: [2]
-        },
-        {
-          orderable: true, //Valor
-          width: "25%",
-          targets: [3]
-        }
-      ],
-      dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
-      language: {
-        search: '<span>Filtro:</span> _INPUT_',
-        searchPlaceholder: 'filtra qualquer coluna...',
-        lengthMenu: '<span>Mostrar:</span> _MENU_',
-        paginate: {
-          'first': 'Primeira',
-          'last': 'Última',
-          'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-          'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
-        }
-      }
-    });
 
-    function modalParcelas() {
+    // function editarLancamento() {
+    //   $('.editarLancamento').each((i, elem) => {
+    //     $(elem).on('click', () => {
+    //       let linha = $(elem).parent().parent().parent().parent()
+    //       let tds = linha.children();
 
-      $('.btnParcelar').each((i, elem) => {
-        $(elem).on('click', function() {
+    //       let filhosPrimeiroTd = $(tds[0]).children();
+    //       let idLancamento = $(filhosPrimeiroTd[1]).val()
 
-          let recebimentos = $("#RecebimentoAgrupadoContainer").children()
-
-
-          let linha = $(elem).parent().parent().parent().parent().parent()
-            .parent()
-
-          let tds = linha.children();
-          let valor = $(tds[5]).html();
-          let dataVencimentolistChild = $(tds[1]).children()
-          let dataVencimento = $(dataVencimentolistChild[1]).val()
-          let descricaoContent = $(tds[2]).children()[0]
-          let descricao = $(descricaoContent).html()
-          let idContainer = $(tds[0]).children()
-          let id = $(idContainer[1]).val()
-          let status = $(tds[6]).html();
-
-          if (status == 'Paga') {
-            alerta('Atenção', 'A conta selecionada já foi paga!', 'error');
-            return false
-          } else {
-            $('#page-modal').fadeIn(200);
-
-            //Conteúdo novo
-
-            $('#inputValor').val(valor)
-            $('#inputDataVencimento').val(dataVencimento)
-            $('#inputDescricao').val(descricao)
-            $('#inputId').val(id)
-
-            const fonte1 = 'style="font-size: 1.1rem"'
-          }
-        })
-      })
-
-      $('#modal-close').on('click', function() {
-        $('#page-modal').fadeOut(200);
-        $('body').css('overflow', 'scroll');
-        $("#parcelasContainer").html('');
-      })
-    }
-
-    function cadastraParcelas() {
-      let parcelasNum = $("#cmbParcelas").val()
-      let id = $("#inputId").val()
-      let numLinhas = $('tbody').children().length
-
-      let dataParcelas = new Array
-
-      for (let i = 1; i <= parcelasNum; i++) {
-
-        let arrayParcela = new Array
-
-        dataParcelas.push({
-          descricao: $(`#inputParcelaDescricao${i}`).val(),
-          vencimento: $(`#inputParcelaDataVencimento${i}`).val(),
-          valor: $(`#inputParcelaValorAReceber${i}`).val()
-        })
-
-        data = {
-          parcelas: JSON.stringify(dataParcelas),
-          numParcelas: parcelasNum,
-          idConta: id,
-          elementosNaGride: numLinhas
-        }
-      }
-
-      let url = 'contasAReceberParcelamento.php'
-
-      $.post(
-        url,
-        data,
-        (data) => {
-          $('tbody').append(data)
-          alerta('Atenção', 'Parcelas geradas com sucesso!')
-          modalParcelas()
-          editarLancamento()
-          excluirConta()
-          $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
-          RecebimentoAgrupado()
-          atualizaTotal()
-        }
-      )
-
-    }
-    $("#salvar").on('click', () => {
-      cadastraParcelas()
-      $("#parcelasContainer").html('')
-      $('#page-modal').fadeOut(200);
-      $('body').css('overflow', 'scroll');
-    })
-    /////////////////////////////////////////////////////////////////
-    function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
-      $("#parcelasContainer").html("")
-
-      let valorParcela = float2moeda(valorTotal / parcelas)
-      let numeroParcelas = `<input type="hidden" value="${parcelas}" name="inputNumeroParcelas">`
-      // let dataVencimento = dataVencimento
-      $("#parcelasContainer").append(numeroParcelas)
-      let cont = 0
-      let iAnterior = 0
-      for (let i = 1; i <= parcelas; i++) {
-
-        let novaDataVencimento = ''
-
-        let somadorPeriodicidade = periodicidade == 1 ? 0 : periodicidade == 2 ? 2 :
-          periodicidade == 3 ? 3 : 6
-        if (i > 1) {
-          let dataArray = dataVencimento.split("-")
-          let mes = parseInt(dataArray[1])
-          let novoMes = 0
-          let ano = parseInt(dataArray[0])
-
-          novoMes = mes + i > 9 ? (mes + (i - 1)).toString() : `0${(mes + (i - 1)).toString()}`
-
-          if (novoMes > 12) {
-            cont++
-            ano = ano + 1
-            novoMes = cont > 9 ? cont : `0${cont}`
-          }
-
-          dataArray[1] = novoMes
-          dataArray[0] = ano
-          novaDataVencimento = `${dataArray[0]}-${dataArray[1]}-${dataArray[2]}`
-        } else {
-          novaDataVencimento = dataVencimento
-
-        }
-
-        let elem = `<div class="d-flex flex-row justify-content-center">
-                    <p class="col-1 p-2 pl-4">${i}</p>
-                    <div class="form-group col-5 p-2">
-                        <input type="text" class="form-control" id="inputParcelaDescricao${i}" name="inputParcelaDescricao${i}" value="${descricao} ${i}/${parcelas}">
-                    </div>
-                    <div class="form-group col-3 p-2">
-                        <input type="date" class="form-control" id="inputParcelaDataVencimento${i}" name="inputParcelaDataVencimento${i}" value="${novaDataVencimento}">
-                    </div>
-                    <div class="form-group col-3 p-2">
-                        <input type="text" class="form-control" id="inputParcelaValorAReceber${i}" name="inputParcelaValorAReceber${i}" value="${valorParcela}">
-                    </div> 
-                </div>`
-
-        $("#parcelasContainer").append(elem)
-      }
-    }
-
-    function parcelamento() {
-      $('#gerarParcelas').on('click', (e) => {
-        e.preventDefault()
-        let parcelas = $("#cmbParcelas").val()
-        let valorTotal = parseFloat($("#inputValor").val().replace(".", "").replace(".", "").replace(",", "."))
-        let dataVencimento = $("#inputDataVencimento").val()
-        let periodicidade = $("#cmbPeriodicidade").val()
-        let descricao = $("#inputDescricao").val()
-        geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
-      })
-    }
-    parcelamento()
-    /////////////////////////////////////////////////////////////////
-
-
-
-    function redirecionarPagamento(id) {
-      window.location.href = `contasAReceberNovoLancamento.php?lancamentoId=${id}`
-    }
-
-    function editarLancamento() {
-      $('.editarLancamento').each((i, elem) => {
-        $(elem).on('click', () => {
-          let linha = $(elem).parent().parent().parent().parent()
-          let tds = linha.children();
-
-          let filhosPrimeiroTd = $(tds[0]).children();
-          let idLancamento = $(filhosPrimeiroTd[1]).val()
-
-          window.location.href =
-            `contasAReceberNovoLancamento.php?lancamentoId=${idLancamento}`
-        })
-      })
-    }
+    //       window.location.href =
+    //         `contasAReceberNovoLancamento.php?lancamentoId=${idLancamento}`
+    //     })
+    //   })
+    // }
 
     function excluirConta() {
       let contas = $('.excluirConta').each((i, elem) => {
@@ -370,10 +158,14 @@ $dataFim = date("Y-m-d");
 
         total += valorFormFloat
       })
-      // console.log(total)
+      console.log(total)
       $('#footer-total').remove()
 
-      divTotal = `<div id='footer-total' style='position:absolute; left: 75.1%; font-weight: bold; width: 200px;'>Total: ${float2moeda(total)}</div>`
+      if (total < 0) {
+        divTotal = `<div id='footer-total' style='position:absolute; left: 80.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(total)}</div>`
+      } else {
+        divTotal = `<div id='footer-total' style='position:absolute; left: 80.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(total)}</div>`
+      }
 
       $('.datatable-footer').append(divTotal);
     }
@@ -386,8 +178,8 @@ $dataFim = date("Y-m-d");
 
       $('tbody').html(msg);
 
-      if ($('#cmbProduto').val() === 'Sem produto' || $('#cmbProduto').val() === 'Filtrando...')
-        $('#cmbProduto').val("");
+      // if ($('#cmbProduto').val() === 'Sem produto' || $('#cmbProduto').val() === 'Filtrando...')
+      //   $('#cmbProduto').val("");
 
       const periodoDe = $('#inputPeriodoDe').val();
       const ate = $('#inputAte').val();
@@ -422,8 +214,7 @@ $dataFim = date("Y-m-d");
             $('#imprimir').removeAttr('disabled')
             resultadosConsulta = data
 
-            modalParcelas()
-            editarLancamento()
+            // editarLancamento()
             excluirConta()
             atualizaTotal()
 
@@ -656,7 +447,8 @@ $dataFim = date("Y-m-d");
                       <div class="form-group">
                         <label for="cmbStatus">Status</label>
                         <select id="cmbStatus" name="cmbStatus" class="form-control form-control-select2">
-                          <?php
+                          <option value="1">Recebidas/Pagas</option>
+                          <!-- <?php
                                                     try {
                                                         $sql = "SELECT SituaId, SituaNome, SituaChave
                                                                 FROM Situacao
@@ -685,7 +477,7 @@ $dataFim = date("Y-m-d");
                                                     } catch (Exception $e) {
                                                         echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                     }
-                                                    ?>
+                                                    ?> -->
                         </select>
                       </div>
                     </div>

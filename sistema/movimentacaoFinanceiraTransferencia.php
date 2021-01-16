@@ -2,606 +2,204 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Novo Lançamento - Contas a Receber';
+$_SESSION['PaginaAtual'] = 'Financeiro / Movimentação do Financeiro / Novo Lançamento';
 
 include('global_assets/php/conexao.php');
 
-if (isset($_POST['cmbPlanoContas'])) {
-
-    if (isset($_POST['cmbFormaTransferencia'])){
-                
-        $aFormaTransferencia = explode('#', $_POST['cmbFormaTransferencia']);                                
-        $idFormaTransferencia = $aFormaTransferencia[0];
-    }
-    
-    if (isset($_POST['inputEditar'])) {
-
-        try {
-            if (isset($_POST['inputValorTotalRecebido'])) {
-
-                try {
-                    $sql = "SELECT SituaId
-                            FROM Situacao
-                            WHERE SituaChave = 'RECEBIDA'
-                        ";
-                    $result = $conn->query($sql);
-                    $situacao = $result->fetch(PDO::FETCH_ASSOC);
-                } catch (Exception $e) {
-                    echo 'Error: ',  $e->getMessage(), "\n";
-                }
-            } else {
-
-                try {
-                    $sql = "SELECT SituaId
-                              FROM Situacao
-                             WHERE SituaChave = 'ARECEBER'
-                        ";
-
-                    $result = $conn->query($sql);
-                    $situacao = $result->fetch(PDO::FETCH_ASSOC);
-                } catch (Exception $e) {
-                    echo 'Error: ',  $e->getMessage(), "\n";
-                }
-            }
-
-            try {
-
-            $sql = "UPDATE ContasAReceber SET       CnAReDtEmissao                    = :dDtEmissao,
-                                                    CnARePlanoContas                  = :iPlanoContas,  
-                                                    CnAReCliente                      = :iCliente, 
-                                                    CnAReDescricao                    = :sDescricao,
-                                                    CnAReNumDocumento                 = :sNumDocumento,
-                                                    CnAReContaBanco                   = :iContaBanco, 
-                                                    CnAReFormaTransferencia               = :iFormaTransferencia,
-                                                    CnAReVenda                        = :iVenda,
-                                                    CnAReDtVencimento                 = :dDtVencimento,
-                                                    CnAReValorAReceber                = :fValorAReceber, 
-                                                    CnAReDtRecebimento                = :dDtRecebimento,
-                                                    CnAReValorRecebido                = :fValorRecebido,
-                                                    CnAReTipoJuros                    = :sTipoJuros, 
-                                                    CnAReJuros                        = :fJuros, 
-                                                    CnAReTipoDesconto                 = :sTipoDesconto, 
-                                                    CnAReDesconto                     = :fDesconto,  
-                                                    CnAReObservacao                   = :sObservacao, 
-                                                    CnAReNumCheque                    = :sNumCheque,
-                                                    CnAReValorCheque                  = :fValorCheque,
-                                                    CnAReDtEmissaoCheque              = :dDtEmissaoCheque,
-                                                    CnAReDtVencimentoCheque           = :dDtVencimentoCheque,
-                                                    CnAReBancoCheque                  = :iBancoCheque,
-                                                    CnAReAgenciaCheque                = :iAgenciaCheque,
-                                                    CnAReContaCheque                  = :iContaCheque,
-                                                    CnAReNomeCheque                   = :iNomeCheque,
-                                                    CnAReCpfCheque                    = :iCpfCheque,
-                                                    CnAReStatus                       = :iStatus, 
-                                                    CnAReUsuarioAtualizador           = :iUsuarioAtualizador, 
-                                                    CnAReUnidade                      = :iUnidade
-                    WHERE CnAReId = " . $_POST['inputContaId'] . "";
-
-                $result = $conn->prepare($sql);
-                $result->execute(array(
-                    
-                    ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
-                    ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? intval($_POST['cmbPlanoContas']) : null,
-                    ':iCliente'             => intval($_POST['cmbCliente']),
-                    ':sDescricao'           => $_POST['inputDescricao'],
-                    ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-                    ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
-                    ':iFormaTransferencia'      => isset($idFormaTransferencia) ? $idFormaTransferencia : null,
-                    ':iVenda'               =>  null,
-                    ':dDtVencimento'        => $_POST['inputDataVencimento'],
-                    ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
-                    ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
-                    ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
-                    ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                    ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                    ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                    ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
-                    ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
-                    ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
-                    ':fValorCheque'         => isset($_POST['inputValorCheque']) ? floatval(gravaValor($_POST['inputValorCheque'])) : null,
-                    ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
-                    ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
-                    ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? intval($_POST['cmbBancoCheque']) : null,
-                    ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
-                    ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
-                    ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
-                    ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
-                    ':iStatus'              => intval($situacao['SituaId']),
-                    ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
-                    ':iUnidade'             => intval($_SESSION['UnidadeId'])
-                ));
-            } catch (Exception $e) {
-                echo 'Error: ',  $e->getMessage(), "\n";
-            }
-
-
-            if (isset($_POST['inputRecebimentoParcial'])) {
-                if (intval($_POST['inputRecebimentoParcial']) != 0) {
-
-                    $sql = "SELECT SituaId
-                              FROM Situacao
-                             WHERE SituaChave = 'ARECEBER'
-                     ";
-
-                    $result = $conn->query($sql);
-                    $situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-                    $sql = "INSERT INTO ContasAReceber ( CnAReDtEmissao,
-                                                        CnARePlanoContas, 
-                                                        CnAReCliente,
-                                                        CnAReDescricao,
-                                                        CnAReNumDocumento,  
-                                                        CnAReContaBanco,                   
-                                                        CnAReFormaTransferencia,
-                                                        CnAReVenda,                              
-                                                        CnAReDtVencimento, 
-                                                        CnAReValorAReceber,
-                                                        CnAReDtRecebimento, 
-                                                        CnAReValorRecebido,
-                                                        CnAReTipoJuros, 
-                                                        CnAReJuros,
-                                                        CnAReTipoDesconto, 
-                                                        CnAReDesconto, 
-                                                        CnAReObservacao, 
-                                                        CnAReNumCheque,                    
-                                                        CnAReValorCheque,                  
-                                                        CnAReDtEmissaoCheque,             
-                                                        CnAReDtVencimentoCheque,           
-                                                        CnAReBancoCheque,                 
-                                                        CnAReAgenciaCheque,                
-                                                        CnAReContaCheque,                  
-                                                        CnAReNomeCheque,                  
-                                                        CnAReCpfCheque,             
-                                                        CnAReStatus, 
-                                                        CnAReUsuarioAtualizador, 
-                                                        CnAReUnidade)
-                           VALUES ( :dDtEmissao, 
-                                    :iPlanoContas, 
-                                    :iCliente,
-                                    :sDescricao,
-                                    :sNumDocumento, 
-                                    :iContaBanco, 
-                                    :iFormaTransferencia,
-                                    :iVenda,
-                                    :dDtVencimento, 
-                                    :fValorAReceber, 
-                                    :dDtRecebimento, 
-                                    :fValorRecebido,
-                                    :sTipoJuros, 
-                                    :fJuros, 
-                                    :sTipoDesconto, 
-                                    :fDesconto,  
-                                    :sObservacao,
-                                    :sNumCheque,
-                                    :fValorCheque,
-                                    :dDtEmissaoCheque,
-                                    :dDtVencimentoCheque,
-                                    :iBancoCheque,
-                                    :iAgenciaCheque,
-                                    :iContaCheque,
-                                    :iNomeCheque,
-                                    :iCpfCheque, 
-                                    :iStatus, 
-                                    :iUsuarioAtualizador, 
-                                    :iUnidade)";
-
-                    $result = $conn->prepare($sql);
-
-                    $result->execute(array(
-
-                        ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
-                        ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? intval($_POST['cmbPlanoContas']) : null,
-                        ':iCliente'             => intval($_POST['cmbCliente']),
-                        ':sDescricao'           => $_POST['inputDescricao'],
-                        ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
-                        ':iFormaTransferencia'      => isset($idFormaTransferencia) ? $idFormaTransferencia : null,
-                        ':iVenda'               =>  null,
-                        ':dDtVencimento'        => $_POST['inputDataVencimento'],
-                        ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
-                        ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
-                        ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
-                        ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                        ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                        ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                        ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
-                        ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
-                        ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
-                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? floatval(gravaValor($_POST['inputValorCheque'])) : null,
-                        ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
-                        ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
-                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? intval($_POST['cmbBancoCheque']) : null,
-                        ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
-                        ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
-                        ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
-                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
-                        ':iStatus'              => intval($situacao['SituaId']),
-                        ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
-                        ':iUnidade'             => intval($_SESSION['UnidadeId'])
-                    ));
-                }
-            }
-
-            $_SESSION['msg']['titulo'] = "Sucesso";
-            $_SESSION['msg']['mensagem'] = "Lançamento editado!!!";
-            $_SESSION['msg']['tipo'] = "success";
-        } catch (PDOException $e) {
-
-            $_SESSION['msg']['titulo'] = "Erro";
-            $_SESSION['msg']['mensagem'] = "Erro ao editar lançamento!!!";
-            $_SESSION['msg']['tipo'] = "error";
-
-            echo 'Error: ' . $e->getMessage();
-            die;
+if (isset($_POST['inputDataEmissao'])) {
+    if (isset($_POST['inputEditar'])) { //EDIÇÃO
+      try {
+        if (isset($_POST['inputValorTotal'])) {
+            $sql = "SELECT SituaId
+                    FROM Situacao
+                    WHERE SituaChave = 'PAGA'
+                ";
+            $result = $conn->query($sql);
+            $situacao = $result->fetch(PDO::FETCH_ASSOC);
+        } else {
+            $sql = "SELECT SituaId
+                    FROM Situacao
+                    WHERE SituaChave = 'APAGAR'
+                ";
+            $result = $conn->query($sql);
+            $situacao = $result->fetch(PDO::FETCH_ASSOC);
         }
-    } else {
 
-        try {
-            if (isset($_POST['inputNumeroParcelas'])) {
+        $sql = "UPDATE ContasAPagar SET CnAPaPlanoContas = :iPlanoContas, CnAPaFornecedor = :iFornecedor, CnAPaContaBanco = :iContaBanco, CnAPaFormaPagamento = :iFormaPagamento, CnAPaNumDocumento = :sNumDocumento,
+                                        CnAPaNotaFiscal = :sNotaFiscal, CnAPaDtEmissao = :dateDtEmissao, CnAPaOrdemCompra = :iOrdemCompra, CnAPaDescricao = :sDescricao, CnAPaDtVencimento = :dateDtVencimento, CnAPaValorAPagar = :fValorAPagar,
+                                        CnAPaDtPagamento = :dateDtPagamento, CnAPaValorPago = :fValorPago, CnAPaObservacao = :sObservacao, CnAPaStatus = :iStatus, CnAPaUsuarioAtualizador = :iUsuarioAtualizador, CnAPaUnidade = :iUnidade,
+                                        CnAPaTipoJuros = :sTipoJuros, CnAPaJuros = :fJuros, CnAPaTipoDesconto = :sTipoDesconto, CnAPaDesconto = :fDesconto
+        WHERE CnAPaId = " . $_POST['inputContaId'] . "";
+        $result = $conn->prepare($sql);
 
-                $numParcelas = intVal($_POST['inputNumeroParcelas']);
+        $result->execute(array(
+            ':iPlanoContas' => $_POST['cmbPlanoContas'],
+            ':iFornecedor' => 0,
+            ':iContaBanco' => $_POST['cmbContaBanco'],
+            ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
+            ':sNumDocumento' => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
+            ':sNotaFiscal' => null,
+            ':dateDtEmissao' => $_POST['inputDataEmissao'],
+            ':iOrdemCompra' => null,
+            ':sDescricao' => $_POST['inputDescricao'],
+            ':dateDtVencimento' => $_POST['inputDataDaTransferencia'],
+            ':fValorAPagar' => floatval(gravaValor($_POST['inputValorTotal'])),
+            ':dateDtPagamento' => $_POST['inputDataDaTransferencia'],
+            ':fValorPago' => isset($_POST['inputValorTotal']) ? floatval(gravaValor($_POST['inputValorTotal'])) : null,
+            ':sObservacao' => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
+            ':sTipoJuros' => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+            ':fJuros' => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+            ':sTipoDesconto' => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+            ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+            ':iStatus' => $situacao['SituaId'],
+            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+            ':iUnidade' => $_SESSION['UnidadeId']
+        ));
 
-                for ($i = 1; $i <= $numParcelas; $i++) {
-                    try {
-                        $sql = "SELECT SituaId
-                              FROM Situacao
-                             WHERE SituaChave = 'ARECEBER'
-                    ";
+        $_SESSION['msg']['titulo'] = "Sucesso";
+        $_SESSION['msg']['mensagem'] = "Lançamento editado!!!";
+        $_SESSION['msg']['tipo'] = "success";
+        
+      } catch (PDOException $e) {
+        $_SESSION['msg']['titulo'] = "Erro";
+        $_SESSION['msg']['mensagem'] = "Erro ao editar lançamento!!!";
+        $_SESSION['msg']['tipo'] = "error";
 
-                       $result = $conn->query($sql);
-                       $situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-                       $sql = "INSERT INTO ContasAReceber ( CnARePlanoContas, 
-                                                            CnAReCliente, 
-                                                            CnAReContaBanco, 
-                                                            CnAReFormaTransferencia, 
-                                                            CnAReNumDocumento,
-                                                            CnAReDtEmissao, 
-                                                            CnAReDescricao, 
-                                                            CnAReDtVencimento, 
-                                                            CnAReValorAReceber,
-                                                            CnAReDtRecebimento, 
-                                                            CnAReValorRecebido,
-                                                            CnAReObservacao,
-                                                            CnAReStatus, 
-                                                            CnAReUsuarioAtualizador, 
-                                                            CnAReUnidade)
-                                    VALUES ( :iPlanoContas, 
-                                        :iCliente,
-                                        :iContaBanco, 
-                                        :iFormaTransferencia,
-                                        :sNumDocumento,  
-                                        :dDtEmissao, 
-                                        :sDescricao, 
-                                        :dDtVencimento, 
-                                        :fValorAReceber, 
-                                        :dDtRecebimento,
-                                        :fValorRecebido, 
-                                        :sObservacao,
-                                        :iStatus, 
-                                        :iUsuarioAtualizador, 
-                                        :iUnidade)";
-
-                                    $result = $conn->prepare($sql);
-                                    $result->execute(array(
-
-                                    ':iPlanoContas'         => $_POST['cmbPlanoContas'],
-                                    ':iCliente   '          => $_POST['cmbCliente'],
-                                    ':iContaBanco'          => $_POST['cmbContaBanco'],
-                                    ':iFormaTransferencia'      => isset($idFormaTransferencia) ? $idFormaTransferencia : null,
-                                    ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
-                                    ':dDtEmissao'           => $_POST['inputDataEmissao'],
-                                    ':sDescricao'           => $_POST['inputParcelaDescricao' . $i . ''],
-                                    ':dDtVencimento'        => $_POST['inputParcelaDataVencimento' . $i . ''],
-                                    ':fValorAReceber'       => floatval(gravaValor($_POST['inputParcelaValorAReceber' . $i . ''])),
-                                    ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
-                                    ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
-                                    ':sObservacao'          => $_POST['inputObservacao'],
-                                    ':iStatus'              => $situacao['SituaId'],
-                                    ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
-                                    ':iUnidade'             => $_SESSION['UnidadeId']
-                                    ));
-                    } catch (Exception $e) {
-                        echo 'Error: ',  $e->getMessage(), "\n";
-                    }
-                }
-            } else {
-                if (isset($_POST['inputValorTotalRecebido'])) {
-                    try {
-                        $sql = "SELECT SituaId
-                                  FROM Situacao
-                                 WHERE SituaChave = 'RECEBIDA'
-                        ";
-
-                        $result = $conn->query($sql);
-                        $situacao = $result->fetch(PDO::FETCH_ASSOC);
-                    } catch (Exception $e) {
-                        echo 'Error: ',  $e->getMessage(), "\n";
-                    }
-                } else {
-                    try {
-                        $sql = "SELECT SituaId
-                                  FROM Situacao
-                                 WHERE SituaChave = 'ARECEBER'
-                        ";
-
-                        $result = $conn->query($sql);
-                        $situacao = $result->fetch(PDO::FETCH_ASSOC);
-                    } catch (Exception $e) {
-                        echo 'Error: ',  $e->getMessage(), "\n";
-                    }
-                }
-
-                try {
-                    $sql = "INSERT INTO ContasAReceber ( CnAReDtEmissao,
-                                                         CnARePlanoContas, 
-                                                         CnAReCliente,
-                                                         CnAReDescricao,
-                                                         CnAReNumDocumento,  
-                                                         CnAReContaBanco,                   
-                                                         CnAReFormaTransferencia,
-                                                         CnAReVenda,                              
-                                                         CnAReDtVencimento, 
-                                                         CnAReValorAReceber,
-                                                         CnAReDtRecebimento, 
-                                                         CnAReValorRecebido,
-                                                         CnAReTipoJuros, 
-                                                         CnAReJuros,
-                                                         CnAReTipoDesconto, 
-                                                         CnAReDesconto, 
-                                                         CnAReObservacao, 
-                                                         CnAReNumCheque,                    
-                                                         CnAReValorCheque,                  
-                                                         CnAReDtEmissaoCheque,             
-                                                         CnAReDtVencimentoCheque,          
-                                                         CnAReBancoCheque,                 
-                                                         CnAReAgenciaCheque,                
-                                                         CnAReContaCheque,                  
-                                                         CnAReNomeCheque,                  
-                                                         CnAReCpfCheque,          
-                                                         CnAReStatus, 
-                                                         CnAReUsuarioAtualizador, 
-                                                         CnAReUnidade)
-                        VALUES ( :dDtEmissao, 
-                                 :iPlanoContas, 
-                                 :iCliente,
-                                 :sDescricao,
-                                 :sNumDocumento, 
-                                 :iContaBanco, 
-                                 :iFormaTransferencia,
-                                 :iVenda,
-                                 :dDtVencimento, 
-                                 :fValorAReceber, 
-                                 :dDtRecebimento, 
-                                 :fValorRecebido,
-                                 :sTipoJuros, 
-                                 :fJuros, 
-                                 :sTipoDesconto, 
-                                 :fDesconto,  
-                                 :sObservacao,
-                                 :sNumCheque,
-                                 :fValorCheque,
-                                 :dDtEmissaoCheque,
-                                 :dDtVencimentoCheque,
-                                 :iBancoCheque,
-                                 :iAgenciaCheque,
-                                 :iContaCheque,
-                                 :iNomeCheque,
-                                 :iCpfCheque, 
-                                 :iStatus, 
-                                 :iUsuarioAtualizador, 
-                                 :iUnidade)";
-
-
-                    $result = $conn->prepare($sql);
-                    $result->execute(array(
-
-                        ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
-                        ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? intval($_POST['cmbPlanoContas']) : null,
-                        ':iCliente'             => intval($_POST['cmbCliente']),
-                        ':sDescricao'           => $_POST['inputDescricao'],
-                        ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
-                        ':iFormaTransferencia'      => isset($idFormaTransferencia) ? $idFormaTransferencia : null,
-                        ':iVenda'               =>  null,
-                        ':dDtVencimento'        => $_POST['inputDataVencimento'],
-                        ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
-                        ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
-                        ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
-                        ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                        ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                        ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                        ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
-                        ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
-                        ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
-                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? floatval(gravaValor($_POST['inputValorCheque'])) : null,
-                        ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
-                        ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
-                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? intval($_POST['cmbBancoCheque']) : null,
-                        ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
-                        ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
-                        ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
-                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
-                        ':iStatus'              => intval($situacao['SituaId']),
-                        ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
-                        ':iUnidade'             => intval($_SESSION['UnidadeId'])
-                    ));
-                } catch (Exception $e) {
-                    echo 'Error: ',  $e->getMessage(), "\n";
-                }
-
-                if (isset($_POST['inputRecebimentoParcial'])) {
-                    if (intval($_POST['inputRecebimentoParcial']) != 0) {
-                        try {
-                            $sql = "SELECT SituaId
-                                  FROM Situacao
-                                 WHERE SituaChave = 'ARECEBER'
-                         ";
-
-                            $result = $conn->query($sql);
-                            $situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-                            $sql = "INSERT INTO ContasAReceber( CnAReDtEmissao,
-                                                                CnARePlanoContas, 
-                                                                CnAReCliente,
-                                                                CnAReDescricao,
-                                                                CnAReNumDocumento,  
-                                                                CnAReContaBanco,                   
-                                                                CnAReFormaTransferencia,
-                                                                CnAReVenda,                              
-                                                                CnAReDtVencimento, 
-                                                                CnAReValorAReceber,
-                                                                CnAReDtRecebimento, 
-                                                                CnAReValorRecebido,
-                                                                CnAReTipoJuros, 
-                                                                CnAReJuros,
-                                                                CnAReTipoDesconto, 
-                                                                CnAReDesconto, 
-                                                                CnAReObservacao, 
-                                                                CnAReNumCheque,                    
-                                                                CnAReValorCheque,                  
-                                                                CnAReDtEmissaoCheque,             
-                                                                CnAReDtVencimentoCheque,           
-                                                                CnAReBancoCheque,                 
-                                                                CnAReAgenciaCheque,                
-                                                                CnAReContaCheque,                  
-                                                                CnAReNomeCheque,                  
-                                                                CnAReCpfCheque,             
-                                                                CnAReStatus, 
-                                                                CnAReUsuarioAtualizador, 
-                                                                CnAReUnidade)
-                               VALUES ( :dDtEmissao, 
-                                        :iPlanoContas, 
-                                        :iCliente,
-                                        :sDescricao,
-                                        :sNumDocumento, 
-                                        :iContaBanco, 
-                                        :iFormaTransferencia,
-                                        :iVenda,
-                                        :dDtVencimento, 
-                                        :fValorAReceber, 
-                                        :dDtRecebimento, 
-                                        :fValorRecebido,
-                                        :sTipoJuros, 
-                                        :fJuros, 
-                                        :sTipoDesconto, 
-                                        :fDesconto,  
-                                        :sObservacao,
-                                        :sNumCheque,
-                                        :fValorCheque,
-                                        :dDtEmissaoCheque,
-                                        :dDtVencimentoCheque,
-                                        :iBancoCheque,
-                                        :iAgenciaCheque,
-                                        :iContaCheque,
-                                        :iNomeCheque,
-                                        :iCpfCheque, 
-                                        :iStatus, 
-                                        :iUsuarioAtualizador, 
-                                        :iUnidade)";
-
-                      
-
-                            $result = $conn->prepare($sql);
-                            $result->execute(array(
-                               ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
-                        ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? intval($_POST['cmbPlanoContas']) : null,
-                        ':iCliente'             => intval($_POST['cmbCliente']),
-                        ':sDescricao'           => $_POST['inputDescricao'],
-                        ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
-                        ':iFormaTransferencia'      => isset($idFormaTransferencia) ? $idFormaTransferencia : null,
-                        ':iVenda'               =>  null,
-                        ':dDtVencimento'        => $_POST['inputDataVencimento'],
-                        ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
-                        ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
-                        ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
-                        ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                        ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                        ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                        ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
-                        ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
-                        ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
-                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? floatval(gravaValor($_POST['inputValorCheque'])) : null,
-                        ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
-                        ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
-                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? intval($_POST['cmbBancoCheque']) : null,
-                        ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
-                        ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
-                        ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
-                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
-                        ':iStatus'              => intval($situacao['SituaId']),
-                        ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
-                        ':iUnidade'             => intval($_SESSION['UnidadeId'])
-                            ));
-                        } catch (Exception $e) {
-                            echo 'Error: ',  $e->getMessage(), "\n";
-                        }
-                    }
-                }
-            }
-
-            $_SESSION['msg']['titulo'] = "Sucesso";
-            $_SESSION['msg']['mensagem'] = "Lançamento incluído!!!";
-            $_SESSION['msg']['tipo'] = "success";
-        } catch (PDOException $e) {
-
-            $_SESSION['msg']['titulo'] = "Erro";
-            $_SESSION['msg']['mensagem'] = "Erro ao incluir Lançamento!!!";
-            $_SESSION['msg']['tipo'] = "error";
-
-            echo 'Error: ' . $e->getMessage();
-            die;
-        }
-    }
-
-    irpara("ContasAReceber.php");
-}
-//$count = count($row);
-
-// SE TIVER EDITANDO 
-if (isset($_GET['lancamentoId'])) {
-    try {
-        $sql = "SELECT  CnAReId,
-                        CnAReDtEmissao,  
-                        CnARePlanoContas, 
-                        CnAReCliente, 
-                        CnAReDescricao, 
-                        CnAReNumDocumento,
-                        CnAReContaBanco, 
-                        CnAReFormaTransferencia,
-                        CnAReVenda,
-                        CnAReDtVencimento, 
-                        CnAReValorAReceber, 
-                        CnAReDtRecebimento, 
-                        CnAReValorRecebido, 
-                        CnAReTipoJuros, 
-                        CnAReJuros, 
-                        CnAReTipoDesconto, 
-                        CnAReDesconto, 
-                        CnAReObservacao,
-                        CnAReNumCheque,                    
-                        CnAReValorCheque,                  
-                        CnAReDtEmissaoCheque,             
-                        CnAReDtVencimentoCheque,           
-                        CnAReBancoCheque,                 
-                        CnAReAgenciaCheque,                
-                        CnAReContaCheque,                  
-                        CnAReNomeCheque,                  
-                        CnAReCpfCheque, 
-                        CnAReStatus, 
-                        CnAReUsuarioAtualizador, 
-                        CnAReUnidade,
-                        FrPagChave            
-    		       FROM ContasAReceber
-                   LEFT JOIN FormaTransferencia on FrPagId = CnAReFormaTransferencia
-    		       WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " . $_GET['lancamentoId'] . "";
-
+        echo 'Error: ' . $e->getMessage();
+        die;
+      }
+        
+    } else { //INSERÇÃO
+      try {
+        $sql = "SELECT SituaId
+                  FROM Situacao
+                  WHERE SituaChave = 'PAGA'
+                ";
         $result = $conn->query($sql);
-        $lancamento = $result->fetch(PDO::FETCH_ASSOC);
-    } catch (Exception $e) {
-        echo 'Error: ',  $e->getMessage(), "\n";
+        $situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+
+        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                                      CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                      CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
+                                      CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                        :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
+                        :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+        $result = $conn->prepare($sql);
+
+        $result->execute(array(
+            ':iPlanoContas' => null,
+            ':iFornecedor' => 0,
+            ':iContaBanco' => $_POST['cmbContaBancoOrigem'],
+            ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
+            ':sNumDocumento' => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
+            ':sNotaFiscal' => null,
+            ':dateDtEmissao' => $_POST['inputDataEmissao'],
+            ':iOrdemCompra' => null,
+            ':sDescricao' => $_POST['inputDescricao'],
+            ':dateDtVencimento' => $_POST['inputDataDaTransferencia'],
+            ':fValorAPagar' => floatval(gravaValor($_POST['inputValorTotal'])),
+            ':dateDtPagamento' => $_POST['inputDataDaTransferencia'],
+            ':fValorPago' => isset($_POST['inputValorTotal']) ? floatval(gravaValor($_POST['inputValorTotal'])) : null,
+            ':sObservacao' => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] . " - Saída gerada por trasnferência entre contas" : "Saída gerada por trasnferência entre contas" ,
+            ':sTipoJuros' => null,
+            ':fJuros' => null,
+            ':sTipoDesconto' => null,
+            ':fDesconto' => null,
+            ':iStatus' => $situacao['SituaId'],
+            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+            ':iUnidade' => $_SESSION['UnidadeId']
+        ));
+
+        $_SESSION['msg']['titulo'] = "Sucesso";
+        $_SESSION['msg']['mensagem'] = "Lançamento incluído!!!";
+        $_SESSION['msg']['tipo'] = "success";
+      } catch (PDOException $e) {
+
+        $_SESSION['msg']['titulo'] = "Erro";
+        $_SESSION['msg']['mensagem'] = "Erro ao incluir Lançamento!!!";
+        $_SESSION['msg']['tipo'] = "error";
+
+        echo 'Error: ' . $e->getMessage();
+        die;
+      }
+
+      try {
+
+      if (isset($_POST['cmbFormaDePagamento'])){
+        $aFormaPagamento = explode('#', $_POST['cmbFormaDePagamento']);                                
+        $idFormaPagamento = $aFormaPagamento[0];
+      }
+    
+            $sql = "SELECT SituaId
+                      FROM Situacao
+                     WHERE SituaChave = 'RECEBIDA'";
+
+            $result = $conn->query($sql);
+            $situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+        $sql = "INSERT INTO ContasAReceber (CnAReDtEmissao,CnARePlanoContas, CnAReCliente,CnAReDescricao,CnAReNumDocumento, CnAReContaBanco,CnAReFormaPagamento,CnAReVenda,CnAReDtVencimento, CnAReValorAReceber,CnAReDtRecebimento, CnAReValorRecebido,CnAReTipoJuros, CnAReJuros,CnAReTipoDesconto, CnAReDesconto, CnAReObservacao, CnAReNumCheque,CnAReValorCheque,CnAReDtEmissaoCheque,CnAReDtVencimentoCheque,CnAReBancoCheque,CnAReAgenciaCheque,CnAReContaCheque,CnAReNomeCheque,CnAReCpfCheque,CnAReStatus,CnAReUsuarioAtualizador,CnAReUnidade)
+                    VALUES ( :dDtEmissao, :iPlanoContas, :iCliente,:sDescricao,:sNumDocumento, :iContaBanco, :iFormaPagamento,:iVenda,:dDtVencimento, :fValorAReceber, :dDtRecebimento, :fValorRecebido,:sTipoJuros, :fJuros, :sTipoDesconto, :fDesconto,  :sObservacao,:sNumCheque,:fValorCheque,:dDtEmissaoCheque,:dDtVencimentoCheque,:iBancoCheque,:iAgenciaCheque,:iContaCheque,:iNomeCheque,:iCpfCheque, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+
+        $result = $conn->prepare($sql);
+        $result->execute(array(
+            ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
+            ':iPlanoContas'         => null,
+            ':iCliente'             => 0,
+            ':sDescricao'           => $_POST['inputDescricao'],
+            ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
+            ':iContaBanco'          => isset($_POST['cmbContaBancoDestino']) ? intval($_POST['cmbContaBancoDestino']) : null,
+            ':iFormaPagamento'      => isset($idFormaPagamento) ? $idFormaPagamento : null,
+            ':iVenda'               =>  null,
+            ':dDtVencimento'        => $_POST['inputDataDaTransferencia'],
+            ':fValorAReceber'       => floatval(gravaValor($_POST['inputValorTotal'])),
+            ':dDtRecebimento'       => isset($_POST['inputDataDaTransferencia']) ? $_POST['inputDataDaTransferencia'] : null,
+            ':fValorRecebido'       => isset($_POST['inputValorTotal']) ? floatval(gravaValor($_POST['inputValorTotal'])) : null,
+            ':sTipoJuros'           =>  null,
+            ':fJuros'               =>  null,
+            ':sTipoDesconto'        =>  null,
+            ':fDesconto'            =>  null,
+            ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] . " - Entrada gerada por trasnferência entre contas" : "Entrada gerada por trasnferência entre contas",
+            ':sNumCheque'           =>  null,
+            ':fValorCheque'         =>  null,
+            ':dDtEmissaoCheque'     =>  null,
+            ':dDtVencimentoCheque'  =>  null,
+            ':iBancoCheque'         =>  null,
+            ':iAgenciaCheque'       =>  null,
+            ':iContaCheque'         =>  null,
+            ':iNomeCheque'          =>  null,
+            ':iCpfCheque'           =>  null,   
+            ':iStatus'              => intval($situacao['SituaId']),
+            ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
+            ':iUnidade'             => intval($_SESSION['UnidadeId'])
+        ));
+
+        $_SESSION['msg']['titulo'] = "Sucesso";
+        $_SESSION['msg']['mensagem'] = "Lançamento incluído!!!";
+        $_SESSION['msg']['tipo'] = "success";
+
+      } catch (PDOException $e) {
+
+        $_SESSION['msg']['titulo'] = "Erro";
+        $_SESSION['msg']['mensagem'] = "Erro ao incluir Lançamento!!!";
+        $_SESSION['msg']['tipo'] = "error";
+        echo 'Error: ' . $e->getMessage();
+        die;
+      }
     }
+
+    irpara("movimentacaoFinanceira.php");
+}
+
+if (isset($_GET['lancamentoId'])) {
+    $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
+            CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero
+    		FROM ContasAPagar
+            LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
+    		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_GET['lancamentoId'] . "";
+    $result = $conn->query($sql);
+    $lancamento = $result->fetch(PDO::FETCH_ASSOC);
 }
 
 $dataInicio = date("Y-m-d");
@@ -614,7 +212,7 @@ $dataInicio = date("Y-m-d");
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Lamparinas | Relatório de Movimentação</title>
+  <title>Lamparinas | Lançar Contas</title>
 
   <?php include_once("head.php"); ?>
 
@@ -630,10 +228,6 @@ $dataInicio = date("Y-m-d");
   <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
   <!-- /theme JS files -->
 
-  <!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
-  <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-  <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
-
   <!-- Validação -->
   <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
   <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
@@ -642,364 +236,45 @@ $dataInicio = date("Y-m-d");
   <script type="text/javascript">
   $(document).ready(function() {
 
-    let styleJurosDescontos = ''
+    function preencheDatas() {
+      $dataRecebimento = new Date
+      $dia = parseInt($dataRecebimento.getDate()) <= 9 ? `0${parseInt($dataRecebimento.getDate())}` : parseInt($dataRecebimento.getDate());
+      $mes = parseInt($dataRecebimento.getMonth()) + 1 <= 9 ? `0${parseInt($dataRecebimento.getMonth()) + 1}` : parseInt($dataRecebimento.getMonth()) + 1;
+      $ano = $dataRecebimento.getFullYear();
 
-    function gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade) {
-      $("#parcelasContainer").html("")
-      let descricao = $("#inputDescricao").val()
-
-      let valorParcela = moedatofloat(valorTotal);
-      valorParcela = (valorParcela / parcelas)
-
-      let numeroParcelas = `<input type="hidden" value="${parcelas}" name="inputNumeroParcelas">`
-      // let dataVencimento = dataVencimento
-      $("#parcelasContainer").append(numeroParcelas)
-      let cont = 0
-      let iAnterior = 0
-      for (let i = 1; i <= parcelas; i++) {
-
-        let novaDataVencimento = ''
-
-        let somadorPeriodicidade = periodicidade == 1 ? 0 : periodicidade == 2 ? 2 :
-          periodicidade == 3 ? 3 : 6
-        if (i > 1) {
-          let dataArray = dataVencimento.split("-")
-          let mes = parseInt(dataArray[1])
-          let novoMes = 0
-          let ano = parseInt(dataArray[0])
-
-          novoMes = mes + i > 9 ? (mes + (i - 1)).toString() : `0${(mes + (i - 1)).toString()}`
-
-          if (novoMes > 12) {
-            cont++
-            ano = ano + 1
-            novoMes = cont > 9 ? cont : `0${cont}`
-          }
-
-          dataArray[1] = novoMes
-          dataArray[0] = ano
-          novaDataVencimento = `${dataArray[0]}-${dataArray[1]}-${dataArray[2]}`
-        } else {
-          novaDataVencimento = dataVencimento
-        }
-
-        let elem = `<div class="d-flex flex-row justify-content-center">
-                                    <p class="col-1 p-2 pl-4">${i}</p>
-                                    <div class="form-group col-5 p-2">
-                                        <input type="text" class="form-control" id="inputParcelaDescricao${i}" name="inputParcelaDescricao${i}" value="${descricao} ${i}/${parcelas}">
-                                    </div>
-                                    <div class="form-group col-3 p-2">
-                                        <input type="date" class="form-control" id="inputParcelaDataVencimento${i}" name="inputParcelaDataVencimento${i}" value="${novaDataVencimento}">
-                                    </div>
-                                    <div class="form-group col-3 p-2">
-                                        <input type="text" class="form-control" id="inputParcelaValorAReceber${i}" name="inputParcelaValorAReceber${i}" value="${valorParcela}">
-                                    </div> 
-                                </div>`
-
-        $("#parcelasContainer").append(elem)
-      }
+      $fullDataRecebimento = `${$ano}-${$mes}-${$dia}`;
+      $('#inputDataEmissao').val($fullDataRecebimento);
+      $('#inputDataDaTransferencia').val($fullDataRecebimento);
     }
 
+    function salvar() {
+      const inputDataEmissao = $('#inputDataEmissao').val();
+      const inputDescricao = $('#inputDescricao').val();
+      const cmbContaBancoOrigem = $('#cmbContaBancoOrigem').val();
+      const cmbContaBancoDestino = $('#cmbContaBancoDestino').val();
+      const cmbFormaPagamento = $('#cmbFormaPagamento').val();
+      const inputDataDaTransferencia = $('#inputDataDaTransferencia').val();
+      const inputValorTotal = $('#inputValorTotal').val();
 
-    function parcelamento() {
-      $('#gerarParcelas').on('click', (e) => {
-        e.preventDefault()
-        let parcelas = $("#cmbParcelas").val()
-        let valorTotal = $("#valorTotal").val()
-        let dataVencimento = $("#inputDataVencimento").val()
-        let periodicidade = $("#cmbPeriodicidade").val()
-
-        gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade)
-      })
-    }
-    parcelamento()
-
-    function limparCheque() {
-      $("#inputNumCheque").val("");
-      $("#inputValorCheque").val("");
-      $("#inputDtVencimentoCheque").val("");
-      $("#cmbBancoCheque").val("");
-      $("#inputAgenciaCheque").val("");
-      $("#inputContaCheque").val("");
-      $("#inputNomeCheque").val("");
-      $("#inputCpfCheque").val("");
-    }
-
-    function limparJurosDescontos() {
-      $("#inputVencimentoJD").val("");
-      $("#inputValorAReceberJD").val("");
-      $("#inputJurosJD").val("");
-      $("#inputDescontoJD").val("");
-      $("#inputDataRecebimentoJD").val("");
-      $("#inputValorTotalAReceber").val("");
-    }
-
-    function preencherJurosDescontos() {
-
-      $valorAReceber = $("#inputValor").val();
-      $dataVencimento = $("#inputDataVencimento").val();
-      $dataRecebimento = $("#inputDataRecebimento").val();
-      $valorTotalRecebido = $("#inputValorTotalRecebido").val();
-
-      $("#inputVencimentoJD").val($dataVencimento);
-      $("#inputValorAReceberJD").val($valorAReceber);
-      $("#inputDataRecebimentoJD").val($dataRecebimento);
-
-    }
-
-    function habilitarTransferencia() {
-      $valorTotalPago = $("#inputValor").val()
-      $dataTransferencia = new Date
-      $dia = parseInt($dataTransferencia.getDate()) <= 9 ?
-        `0${parseInt($dataTransferencia.getDate())}` : parseInt($dataTransferencia.getDate())
-      $mes = parseInt($dataTransferencia.getMonth()) + 1 <= 9 ?
-        `0${parseInt($dataTransferencia.getMonth()) + 1}` : parseInt($dataTransferencia.getMonth()) + 1
-      $ano = $dataTransferencia.getFullYear()
-
-      $fullDataTransferencia = `${$ano}-${$mes}-${$dia}`
-
-      $("#inputDataRecebimento").val($fullDataTransferencia)
-    }
-    habilitarTransferencia();
-
-    function modalParcelar() {
-
-      $('#btnParcelar').on('click', (e) => {
-        e.preventDefault()
-        $('#pageModalParcelar').fadeIn(200);
-
-        let valorTotal = $('#inputValor').val()
-        $('#valorTotal').val(valorTotal)
-      })
-
-      $('#modalCloseParcelar').on('click', function() {
-        $('#pageModalParcelar').fadeOut(200);
-        $('body').css('overflow', 'scroll');
-        $("#parcelasContainer").html("")
-      })
-
-      $("#salvarParcelas").on('click', function() {
-        $('#pageModalParcelar').fadeOut(200);
-        $('body').css('overflow', 'scroll');
-      })
-    }
-    modalParcelar()
-
-    function modalCheque() {
-
-      $('#btnCheque').on('click', (e) => {
-        e.preventDefault()
-        $('#pageModalCheque').fadeIn(200);
-
-      })
-
-      $('#modalCloseCheque').on('click', function() {
-        $('#pageModalCheque').fadeOut(200);
-        $('body').css('overflow', 'scroll');
-
-        limparCheque()
-      })
-
-      $("#salvarCheque").on('click', function() {
-        $('#pageModalCheque').fadeOut(200);
-        $('body').css('overflow', 'scroll');
-      })
-    }
-    modalCheque()
-
-    $('#cmbFormaTransferencia').on('change', function(e) {
-      let filhos = $('#cmbFormaTransferencia').children()
-      let valorcmb = $('#cmbFormaTransferencia').val()
-      filhos.each((i, elem) => {
-        let formaTransferencia = $(elem).attr('chaveformaTransferencia')
-        let valOption = $(elem).attr('value')
-
-        if (valOption == valorcmb) {
-
-          if (formaTransferencia == 'CHEQUE') {
-
-            $('#btnCheque').fadeIn('300')
-          } else {
-            $('#btnCheque').fadeOut('300')
-          }
-        }
-      })
-    })
-
-    function modalJurosDescontos() {
-      $('#jurusDescontos').on('click', (e) => {
-        e.preventDefault()
-        $('#pageModalJurosDescontos').fadeIn(200);
-        $('.cardJuDes').css('width', '500px').css('margin', '0px auto')
-
-        let dataVencimento = $("#inputDataVencimento").val()
-        let valor = $("#inputValor").val()
-
-        $("#inputValorAReceberJD").val(valor)
-        $("#inputVencimentoJD").val(dataVencimento)
-      })
-
-      let valorTotal = $('#inputValor').val()
-
-      $('#valorTotal').val(valorTotal)
-
-      $('#modalCloseJurosDescontos').on('click', function() {
-        $('#pageModalJurosDescontos').fadeOut(200);
-        $('body').css('overflow', 'scroll');
-
-        limparJurosDescontos()
-      })
-
-      $("#salvarJurosDescontos").on('click', function() {
-        $('#pageModalJurosDescontos').fadeOut(200);
-        $('body').css('overflow', 'scroll');
-      })
-    }
-    modalJurosDescontos()
-
-    function calcularJuros() {
-      let juros = 0;
-      let valorTotal = 0;
-      let desconto = 0;
-      let jurosTipo = $("#cmbTipoJurosJD").val();
-      let jurosValor = $("#inputJurosJD").val();
-      let valorAReceber = moedatofloat($("#inputValorAReceberJD").val());
-      let descontoTipo = $("#cmbTipoDescontoJD").val();
-      let descontoValor = moedatofloat($("#inputDescontoJD").val());
-
-      if (parseFloat(jurosValor) > 0) {
-        if (jurosTipo == "P") {
-          juros = (valorAReceber * (jurosValor / 100));
-        } else {
-          juros = jurosValor;
-        }
+      if (inputDataEmissao === '' || inputDescricao === '' || cmbContaBancoOrigem === '' || cmbContaBancoDestino === ' ' || cmbFormaPagamento === '' || inputDataDaTransferencia === '' || inputValorTotal === '') {
+        $("#lancamento").submit();
+      } else if (cmbContaBancoOrigem === cmbContaBancoDestino) {
+        alerta('Atenção', 'Você selecionou a conta de origem igual a conta de destino!')
+        return false;
       } else {
-        juros = 0;
-      }
-
-      if (parseFloat(descontoValor) > 0) {
-        if (descontoTipo == "P") {
-          desconto = (valorAReceber * (descontoValor / 100));
-        } else {
-          desconto = descontoValor;
-        }
-        console.log('Desconto Total: ' + desconto);
-      } else {
-        desconto = 0;
-      }
-
-      valorTotal = parseFloat(valorAReceber) + parseFloat(juros);
-      valorTotal = valorTotal - parseFloat(desconto);
-
-      $("#inputValorTotalAReceber").val(float2moeda(valorTotal))
-      $("#inputValorTotalRecebido").val(float2moeda(valorTotal))
-    }
-
-    $("#inputJurosJD").keyup(() => {
-      calcularJuros()
-    })
-    $("#inputDescontoJD").keyup(() => {
-      calcularJuros()
-    })
-    $("#cmbTipoJurosJD").change(() => {
-      calcularJuros()
-    })
-    $("#cmbTipoDescontoJD").change(() => {
-      calcularJuros()
-    })
-
-
-    function Transferencia() {
-      let valorTotal = $('#inputValor').val()
-      let valorRecebido = $('#inputValorTotalRecebido').val()
-
-      let valorTotalf = parseFloat(valorTotal.replace(".", "").replace(",", "."))
-      let valorRecebidof = parseFloat(valorRecebido.replace(".", "").replace(",", "."))
-      let valorRestante = (valorTotalf - valorRecebidof)
-
-      let planoContas = $("#cmbPlanoContas").val()
-      let cmbCliente = $("#cmbCliente").val()
-      let inputDescricao = $("#inputDescricao").val()
-      let cmbContaBanco = $("#cmbContaBanco").val()
-      let cmbFormaTransferencia = $("#cmbFormaTransferencia").val()
-
-      if (cmbFormaTransferencia != '') {
-
-        let formaTransferencia = cmbFormaTransferencia.split('#');
-
-        let inputNumCheque = $("#inputNumCheque").val();
-        let inputValorCheque = $("#inputValorCheque").val();
-        let cmbBancoCheque = $("#cmbBancoCheque").val();
-        let inputAgenciaCheque = $("#inputAgenciaCheque").val();
-        let inputContaCheque = $("#inputContaCheque").val();
-        let inputNomeCheque = $("#inputNomeCheque").val();
-        let inputCpfCheque = $("#inputCpfCheque").val();
-
-        if (formaTransferencia[1] == "CHEQUE" && (inputNumCheque == "" || inputValorCheque == "" || cmbBancoCheque == "" || inputAgenciaCheque == "" || inputContaCheque == "" || inputNomeCheque == "" || inputCpfCheque == "")) {
-          alerta('Atenção', 'Você selecionou a forma de Transferencia cheque, portanto, favor preencher os dados do cheque.')
-          return false;
-        }
-      }
-
-      if ($("#habilitarRecebimento").hasClass('clicado')) {
-        $("#cmbContaBanco").prop('required', true)
-        $("#cmbFormaTransferencia").prop('required', true)
-      }
-      // && cmbContaBanco != '' && cmbFormaTransferencia != '' && inputNumeroDocumento != ''
-      if (planoContas != '' && cmbCliente != '' && inputDescricao != '') {
-        if (valorRecebidof < valorTotalf && valorRecebidof) {
-          $("#inputRecebimentoParcial").val(valorRestante)
-          $('#inputValor').val(valorRecebido)
-
-          // $dataRecebimento = $("#inputDataRecebimento").val()
-          // $valorTotalRecebido = $("#inputValorTotalRecebido").val()
-          if ($("#habilitarRecebimento").hasClass('clicado')) {
-            $("#cmbContaBanco").prop('required', true)
-            $("#cmbFormaTransferencia").prop('required', true)
-
-            confirmaExclusao(document.lancamento,
-              "O valor recebido é menor que o valor total da conta. Será gerado uma nova conta com o valor restante. Deseja continuar?",
-              'contasAReceberNovoLancamento.php');
-          } else {
-            confirmaExclusao(document.lancamento,
-              "O valor recebido é menor que o valor total da conta. Será gerado uma nova conta com o valor restante. Deseja continuar?",
-              'contasAReceberNovoLancamento.php');
-          }
-
-          document.lancamento.submit()
-        } else {
-          if ($("#habilitarRecebimento").hasClass('clicado')) {
-
-            $("#cmbContaBanco").prop('required', true)
-            $("#cmbFormaTransferencia").prop('required', true)
-
-            $("#lancamento").submit()
-          } else {
-            $("#cmbContaBanco").prop('required', false)
-            $("#cmbFormaTransferencia").prop('required', false)
-            $("#lancamento").submit()
-          }
-        }
-      } else {
-        if ($("#habilitarRecebimento").hasClass('clicado')) {
-
-          $("#cmbContaBanco").prop('required', true)
-          $("#cmbFormaTransferencia").prop('required', true)
-
-          $("#lancamento").submit()
-        } else {
-          $("#cmbContaBanco").prop('required', false)
-          $("#cmbFormaTransferencia").prop('required', false)
-          $("#lancamento").submit()
-        }
+        $("#lancamento").submit();
       }
     }
+
 
     $("#salvar").on('click', (e) => {
-      e.preventDefault()
-      Transferencia()
-    })
-  })
+      e.preventDefault();
+      salvar();
+    });
+
+    preencheDatas();
+  });
+
 
   function selecionaTipo(tipo) {
     if (tipo == 'P') {
@@ -1029,9 +304,10 @@ $dataInicio = date("Y-m-d");
 
       <!-- Content area -->
       <div class="content">
+
         <form id="lancamento" name="lancamento" class="form-validate-jquery" method="post" class="p-3">
           <!-- Info blocks -->
-          <input type="hidden" id="inputRecebimentoParcial" name="inputRecebimentoParcial">
+          <input type="hidden" id="inputPagamentoParcial" name="inputPagamentoParcial">
           <div class="row">
             <div class="col-lg-12">
               <!-- Basic responsive configuration -->
@@ -1048,6 +324,8 @@ $dataInicio = date("Y-m-d");
                 </div>
 
                 <div class="card-body">
+
+                  <br />
                   <div class="row">
                     <div class="col-lg-4">
                       <div class="form-group">
@@ -1072,243 +350,144 @@ $dataInicio = date("Y-m-d");
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="card-body">
+                  <br />
+
                   <?php
-                                    if (isset($lancamento)) {
-                                        echo '<input type="hidden" name="inputEditar" value="sim">';
-                                        echo '<input type="hidden" name="inputContaId" value="' . $lancamento['CnAReId'] . '">';
-                                    }
+                    if (isset($lancamento)) {
+                        echo '<input type="hidden" name="inputEditar" value="sim">';
+                        echo '<input type="hidden" name="inputContaId" value="' . $lancamento['CnAReId'] . '">';
+                    }
+                  ?>
 
-                                    ?>
                   <div class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                       <div class="form-group">
-                        <label for="inputDataEmissao">Data de Emissão</label>
-                        <input type="date" id="inputDataEmissao" name="inputDataEmissao" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtEmissao'] ?>" class="form-control" placeholder="Data de Emissão">
+                        <label for="inputDataEmissao">Data de Emissão <span class="text-danger">*</span></label>
+                        <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data de Emissão" required>
                       </div>
                     </div>
+
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for="inputDescricao">Descrição <span class='text-danger'>*</span></label>
+                        <input type="text" id="inputDescricao" name="inputDescricao" class="form-control" placeholder="Compras" required>
+                      </div>
+                    </div>
+
                     <div class="col-lg-4">
                       <div class="form-group">
-                        <label for="cmbPlanoContas">Plano de Contas <span class="text-danger">*</span></label>
-                        <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" required>
-                          <option value="">Selecionar</option>
+                        <label for="inputNumeroDocumento">Número Documento</label>
+                        <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" class="form-control" placeholder="Nº Documento">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group">
+                        <label for="cmbContaBancoOrigem">Conta Origem <span class="text-danger">*</span></label>
+                        <select id="cmbContaBancoOrigem" name="cmbContaBancoOrigem" class="form-control form-control-select2" required>
+                          <option value="" selected>Todos</option>
                           <?php
-                                                    try {
-                                                        $sql = "SELECT PlConId, PlConNome
-                                                                  FROM PlanoContas
-                                                                  JOIN Situacao 
-                                                                    ON SituaId = PlConStatus
-                                                                 WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                              ORDER BY PlConNome ASC";
-                                                        $result = $conn->query($sql);
-                                                        $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+                              $sql = "SELECT CnBanId,
+                                             CnBanNome
+                                        FROM ContaBanco
+                                        JOIN Situacao 
+                                          ON SituaId = CnBanStatus
+                                       WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " 
+                                         AND SituaChave = 'ATIVO'
+                                    ORDER BY CnBanNome ASC";
+                              $result = $conn->query($sql);
+                              $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 
-
-                                                        try {
-                                                            foreach ($rowPlanoContas as $item) {
-                                                                if (isset($lancamento)) {
-                                                                    if ($lancamento['CnARePlanoContas'] == $item['PlConId']) {
-                                                                        print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConNome'] . '</option>');
-                                                                    } else {
-                                                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
-                                                                    }
-                                                                } else {
-                                                                    print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
-                                                                }
-                                                            }
-                                                        } catch (Exception $e) {
-                                                            echo 'Error: ',  $e->getMessage(), "\n";
-                                                        }
-                                                    } catch (Exception $e) {
-                                                        echo 'Error: ',  $e->getMessage(), "\n";
-                                                    }
-
-                                                    ?>
+                              foreach ($rowContaBanco as $item) {
+                                  if (isset($item['CnBanId'])) {
+                                      print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                  }
+                              }
+                            ?>
                         </select>
                       </div>
                     </div>
 
-
-                    <div class="col-lg-5">
+                    <div class="col-lg-4">
                       <div class="form-group">
-                        <label for="cmbCliente">Cliente <span class="text-danger">*</span></label>
-                        <select id="cmbCliente" name="cmbCliente" class="form-control form-control-select2" required>
-                          <option value="">Selecionar</option>
+                        <label for="cmbContaBancoDestino">Conta Destino <span class="text-danger">*</span></label>
+                        <select id="cmbContaBancoDestino" name="cmbContaBancoDestino" class="form-control form-control-select2" required>
+                          <option value="" selected>Todos</option>
                           <?php
-                                                    try {
-                                                        $sql = "SELECT ClienId, ClienNome
-                                                                  FROM Cliente
-                                                                  JOIN Situacao 
-                                                                    ON SituaId = ClienStatus
-                                                                 WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                              ORDER BY ClienNome ASC";
+                              $sql = "SELECT CnBanId,
+                                             CnBanNome
+                                        FROM ContaBanco
+                                        JOIN Situacao 
+                                          ON SituaId = CnBanStatus
+                                       WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " 
+                                         AND SituaChave = 'ATIVO'
+                                    ORDER BY CnBanNome ASC";
+                              $result = $conn->query($sql);
+                              $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                        $result = $conn->query($sql);
-                                                        $rowCliente = $result->fetchAll(PDO::FETCH_ASSOC);
-                                                        try {
-                                                            foreach ($rowCliente as $item) {
-                                                                if (isset($lancamento)) {
-                                                                    if ($lancamento['CnAReCliente'] == $item['ClienId']) {
-                                                                        print('<option value="' . $item['ClienId'] . '" selected>' . $item['ClienNome'] . '</option>');
-                                                                    } else {
-                                                                        print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
-                                                                    }
-                                                                } else {
-                                                                    print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
-                                                                }
-                                                            }
-                                                        } catch (Exception $e) {
-                                                            echo 'Error: ',  $e->getMessage(), "\n";
-                                                        }
-                                                    } catch (Exception $e) {
-                                                        echo 'Error: ',  $e->getMessage(), "\n";
-                                                    }
-                                                    ?>
+                              foreach ($rowContaBanco as $item) {
+                                  if (isset($item['CnBanId'])) {
+                                      print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                  }
+                              }
+                            ?>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                      <div class="form-group">
+                        <label for="cmbFormaPagamento">Forma de Pagamento <span class="text-danger">*</span></label>
+                        <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2" required>
+                          <option value="" selected>Todos</option>
+                          <?php
+                              $sql = "SELECT FrPagId,
+                                             FrPagNome
+                                        FROM FormaPagamento
+                                        JOIN Situacao 
+                                          ON SituaId = FrPagStatus
+                                       WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " 
+                                         AND SituaChave = 'ATIVO'
+                                    ORDER BY FrPagNome ASC";
+                              $result = $conn->query($sql);
+                              $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
+                              
+                              foreach ($rowFormaPagamento as $item) {
+                                  if (isset($item['FrPagId'])) {
+                                      print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                  }
+                              }
+                            ?>
                         </select>
                       </div>
                     </div>
                   </div>
 
                   <div class="row">
-                    <div class="col-8">
-                      <div class="form-group">
-                        <label for="inputDescricao">Descrição <span class="text-danger">*</span></label>
-                        <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDescricao'] ?>" required>
-                      </div>
-                    </div>
-                    <div class="col-lg-4">
-                      <div class="form-group">
-                        <label for="inputNumeroDocumento">Nº Nota Fiscal/Documento</label>
-                        <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNumDocumento'] ?>" class="form-control">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-
                     <div class="col-12 col-lg-6">
                       <div class="d-flex flex-column">
+
                         <div class="row justify-content-between m-0">
                           <h5>Valor Transferido</h5>
                         </div>
-                        <div class="card">
+                        <div class=" card">
                           <div class="card-body p-4" style="background-color: #f8f8f8; border: 1px solid #ccc">
                             <div class="row">
                               <div class="form-group col-6">
-                                <label for="inputDataRecebimento">Data da Transferencia</label>
-                                <input type="date" id="inputDataRecebimento" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtRecebimento'] ?>" name="inputDataRecebimento" class="form-control" readOnly>
+                                <label for="inputDataDaTransferencia">Data da Transferência <span class="text-danger">*</span></label>
+                                <input type="date" id="inputDataDaTransferencia" name="inputDataDaTransferencia" class="form-control" placeholder="Data do Pagamento" required>
                               </div>
                               <div class="form-group col-6">
-                                <label for="inputValorTotalRecebido">Valor Total Transferido (=)</label>
-                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotalRecebido" name="inputValorTotalRecebido" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAReValorRecebido']) ?>" class="form-control">
+                                <label for="inputValorTotal">Valor Total Transferido (=) <span class="text-danger">*</span> </label>
+                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotal" name="inputValorTotal" class="form-control" placeholder='0,00' required>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-
-                  <?php
-                                    if (isset($lancamento) && $lancamento['CnAReContaBanco'] != null) {
-                                        $mostrar = '';
-                                    } else {
-                                        $mostrar = 'style="display:none;"';
-                                    }
-                                    ?>
-                  <div id="camposRecebimento" class="row justify-content-between" <?php echo $mostrar; ?>>
-                    <div class="col-lg-6">
-                      <div class="form-group">
-                        <label for="cmbContaBanco">Conta/Banco</label>
-                        <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2">
-                          <option value="">Selecionar</option>
-                          <?php
-                                                    try {
-                                                        $sql = "SELECT CnBanId, CnBanNome
-                                                                            FROM ContaBanco
-                                                                            JOIN Situacao on SituaId = CnBanStatus
-                                                                            WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                                            ORDER BY CnBanNome ASC";
-                                                        $result = $conn->query($sql);
-                                                        $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                        try {
-                                                            foreach ($rowContaBanco as $item) {
-                                                                if (isset($lancamento)) {
-                                                                    if ($lancamento['CnAReContaBanco'] == $item['CnBanId']) {
-                                                                        print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
-                                                                    } else {
-                                                                        print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                                                    }
-                                                                } else {
-                                                                    print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                                                }
-                                                            }
-                                                        } catch (Exception $e) {
-                                                            echo 'Error: ',  $e->getMessage(), "\n";
-                                                        }
-                                                    } catch (Exception $e) {
-                                                        echo 'Error: ',  $e->getMessage(), "\n";
-                                                    }
-                                                    ?>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="col-lg-4">
-                      <div class="form-group">
-                        <label for="cmbFormaTransferencia">Forma de Transferencia</label>
-                        <select id="cmbFormaTransferencia" name="cmbFormaTransferencia" class="form-control form-control-select2">
-                          <option value="">Selecionar</option>
-                          <?php
-                                                    try {
-                                                        $sql = "SELECT FrPagId, FrPagNome, FrPagChave
-                                                                FROM FormaTransferencia
-                                                                JOIN Situacao on SituaId = FrPagStatus
-                                                                WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                                ORDER BY FrPagNome ASC";
-                                                        $result = $conn->query($sql);
-                                                        $rowFormaTransferencia = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                        try {
-                                                            foreach ($rowFormaTransferencia as $item) {
-                                                                if (isset($lancamento)) {
-                                                                    if ($lancamento['CnAReFormaTransferencia'] == $item['FrPagId']) {
-                                                                        print('<option value="' . $item['FrPagId'] . '#'.$item['FrPagChave']. '" chaveformaTransferencia="'.$item['FrPagChave']. '" selected>' . $item['FrPagNome'] . '</option>');
-                                                                    } else {
-                                                                        print('<option value="' . $item['FrPagId'] . '#'.$item['FrPagChave']. '" chaveformaTransferencia="'.$item['FrPagChave']. '" >' . $item['FrPagNome'] . '</option>');
-                                                                    }
-                                                                } else {
-                                                                    print('<option value="' . $item['FrPagId'] . '#'.$item['FrPagChave']. '" chaveformaTransferencia="'.$item['FrPagChave']. '" >' . $item['FrPagNome'] . '</option>');
-                                                                }
-                                                            }
-                                                        } catch (Exception $e) {
-                                                            echo 'Error: ',  $e->getMessage(), "\n";
-                                                        }
-                                                    } catch (Exception $e) {
-                                                        echo 'Error: ',  $e->getMessage(), "\n";
-                                                    }
-
-                                                    ?>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div class="col-lg-2" style="margin-top: 30px;">
-                      <?php
-                                                $mostraCheque = "";
-
-                                                // se tiver editando
-                                                if (isset($lancamento)){  
-                                                    if ($lancamento['FrPagChave'] != 'CHEQUE') {
-                                                        $mostraCheque = "display:none";    
-                                                    } 
-                                                } else{ // se for novo
-                                                    $mostraCheque = "display:none";   
-                                                }
-                                                
-                                              print('<a href="#" id="btnCheque" style="margin-top: 5px; '. $mostraCheque .' " class="icon-pencil">  Cheque</a>');
-                                            ?>
                     </div>
                   </div>
 
@@ -1320,6 +499,7 @@ $dataInicio = date("Y-m-d");
                       </div>
                     </div>
                   </div>
+
                   <button id="salvar" class="btn btn-principal">Salvar</button>
                   <a href="movimentacaoFinanceira.php" class="btn">Cancelar</a>
                 </div>
@@ -1332,189 +512,6 @@ $dataInicio = date("Y-m-d");
 
           <!-- /info blocks -->
 
-          <!--------------------------------------------------------------------------------------->
-          <!--Modal Cheque-->
-          <div id="pageModalCheque" class="custon-modal">
-            <div class="custon-modal-container">
-              <div class="card custon-modal-content">
-                <div class="custon-modal-title">
-                  <i class=""></i>
-                  <p class="h3">Detalhamento do Cheque</p>
-                  <i class=""></i>
-                </div>
-                <div class="px-3 pt-3">
-                  <div class="d-flex flex-row p-1">
-                    <div class="col-lg-3">
-                      <div class="form-group">
-                        <label for="inputNumCheque">Nº do Cheque<span class="text-danger">*</span></label>
-                        <input type="text" id="inputNumCheque" name="inputNumCheque" class="form-control" placeholder="Número do Cheque" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNumCheque'] ?>">
-                      </div>
-                    </div>
-                    <div class='col-lg-3'>
-                      <div class="form-group">
-                        <label for="inputValorCheque">Valor<span class="text-danger">*</span></label>
-                        <div class="input-group">
-                          <input type="text" id="inputValorCheque" onKeyUp="moeda(this)" maxLength="12" name="inputValorCheque" class="form-control" value="<?php if (isset($lancamento)) echo $lancamento['CnAReValorCheque'] ?>">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-lg-3">
-                      <div class="form-group">
-                        <label for="inputDtEmissaoCheque">Data da Emissão<span class="text-danger">*</span></label>
-                        <input id="inputDtEmissaoCheque" class="form-control" type="date" name="inputDtEmissaoCheque" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtEmissaoCheque'] ?>">
-                      </div>
-                    </div>
-                    <div class="col-lg-3">
-                      <div class="form-group">
-                        <label for="inputDtVencimentoCheque">Data do Vencimento<span class="text-danger">*</span></label>
-                        <input id="inputDtVencimentoCheque" class="form-control" type="date" name="inputDtVencimentoCheque" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtVencimentoCheque'] ?>">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="px-3 pt-3">
-                  <div class="d-flex flex-row p-1">
-                    <div class="col-lg-6">
-                      <label for="cmbBancoCheque">Banco<span class="text-danger">*</span></label>
-                      <select id="cmbBancoCheque" name="cmbBancoCheque" class="form-control form-control-select2" value="<?php if (isset($lancamento)) echo $lancamento['CnAReBancoCheque'] ?>">
-                        <option value="">Selecione um banco</option>
-                        <?php 
-													$sql = "SELECT BancoId, BancoCodigo, BancoNome
-															FROM Banco
-															JOIN Situacao on SituaId = BancoStatus
-															WHERE SituaChave = 'ATIVO'
-															ORDER BY BancoCodigo ASC";
-													$result = $conn->query($sql);
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($row as $item){
-														print('<option value="'.$item['BancoId'].'">'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
-													}
-                                                
-												?>
-                      </select>
-                    </div>
-                    <div class="col-lg-3">
-                      <div class="form-group">
-                        <label for="inputAgenciaCheque">Agência<span class="text-danger">*</span></label>
-                        <input type="text" id="inputAgenciaCheque" name="inputAgenciaCheque" class="form-control" placeholder="Número da Agência" value="<?php if (isset($lancamento)) echo $lancamento['CnAReAgenciaCheque'] ?>">
-                      </div>
-                    </div>
-                    <div class="col-lg-3">
-                      <div class="form-group">
-                        <label for="inputContaCheque">Conta<span class="text-danger">*</span></label>
-                        <input type="text" id="inputContaCheque" name="inputContaCheque" class="form-control" placeholder="Número da Conta" value="<?php if (isset($lancamento)) echo $lancamento['CnAReContaCheque'] ?>">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="px-3 pt-3">
-                  <div class="d-flex flex-row p-1">
-                    <div class="col-lg-9">
-                      <div class="form-group">
-                        <label for="inputNomeCheque">Nome<span class="text-danger">*</span></label>
-                        <input type="text" id="inputNomeCheque" name="inputNomeCheque" class="form-control" placeholder="Nome Completo" value="<?php if (isset($lancamento)) echo $lancamento['CnAReNomeCheque'] ?>">
-                      </div>
-                    </div>
-
-                    <div class="col-lg-3">
-                      <div class="form-group">
-                        <label for="inputCpfCheque">CPF<span class="text-danger">*</span></label>
-                        <input type="text" id="inputCpfCheque" name="inputCpfCheque" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php if (isset($lancamento)) echo $lancamento['CnAReCpfCheque'] ?>">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="card-footer mt-2 d-flex flex-column">
-                  <div class="row" style="margin-top: 10px;">
-                    <div class="col-lg-12">
-                      <div class="form-group">
-                        <a class="btn btn-lg btn-principal" id="salvarCheque">Salvar</a>
-                        <a id="modalCloseCheque" class="btn btn-basic" role="button">Cancelar</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!--------------------------------------------------------------------------------------->
-
-          <!--------------------------------------------------------------------------------------->
-          <!--Modal Juros e Descontos-->
-          <div id="pageModalJurosDescontos" class="custon-modal">
-            <div class="custon-modal-container">
-              <div class="card cardJuDes custon-modal-content">
-                <div class="custon-modal-title">
-                  <i class=""></i>
-                  <p class="h3">Juros e descontos</p>
-                  <i class=""></i>
-                </div>
-                <div class="p-5">
-                  <div class="d-flex flex-row justify-content-between">
-                    <div class="form-group" style="width: 200px">
-                      <label for="inputVencimentoJD">Data do Vencimento</label>
-                      <input id="inputVencimentoJD" class="form-control" type="date" name="inputVencimentoJD" readOnly>
-                    </div>
-                    <div class="form-group">
-                      <label for="inputValorAReceberJD">Valor à Receber</label>
-                      <input id="inputValorAReceberJD" onKeyUp="moeda(this)" maxLength="12" class="form-control" type="text" name="inputValorAReceberJD" readOnly>
-                    </div>
-                  </div>
-                  <div class="d-flex flex-row justify-content-between">
-                    <div class="form-group" style="width: 200px">
-                      <label for="cmbTipoJurosJD">Tipo</label>
-                      <select id="cmbTipoJurosJD" name="cmbTipoJurosJD" class="form-control form-control-select2">
-                        <option value="P">Porcentagem</option>
-                        <option value="V">Valor</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="inputJurosJD">Juros</label>
-                      <input id="inputJurosJD" maxLength="12" class="form-control" type="text" name="inputJurosJD">
-                    </div>
-                  </div>
-                  <div class="d-flex flex-row justify-content-between">
-                    <div class="form-group" style="width: 200px">
-                      <label for="cmbTipoDescontoJD">Tipo</label>
-                      <select id="cmbTipoDescontoJD" name="cmbTipoDescontoJD" class="form-control form-control-select2">
-                        <option value="P">Porcentagem</option>
-                        <option value="V">Valor</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="inputDescontoJD">Desconto</label>
-                      <input id="inputDescontoJD" maxLength="12" class="form-control" type="text" name="inputDescontoJD">
-                    </div>
-                  </div>
-                  <div class="d-flex flex-row justify-content-between">
-                    <div class="form-group" style="width: 200px">
-                      <label for="inputDataRecebimentoJD">Data do Transferencia</label>
-                      <input id="inputDataRecebimentoJD" value="<?php echo date("Y-m-d") ?>" class="form-control" type="date" name="inputDataRecebimentoJD" readOnly>
-                    </div>
-                    <div class="form-group">
-                      <label for="inputValorTotalAReceber">Valor Total à Receber</label>
-                      <input id="inputValorTotalAReceber" onKeyUp="moeda(this)" maxLength="12" class="form-control" type="text" name="inputValorTotalAReceber" readOnly>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="card-footer mt-2 d-flex flex-column">
-                  <div class="row" style="margin-top: 10px;">
-                    <div class="col-lg-12">
-                      <div class="form-group">
-                        <a class="btn btn-lg btn-principal" id="salvarJurosDescontos">Ok</a>
-                        <a id="modalCloseJurosDescontos" class="btn btn-basic" role="button">Cancelar</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!--------------------------------------------------------------------------------------->
         </form>
       </div>
       <!-- /content area -->
