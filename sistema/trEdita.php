@@ -44,6 +44,26 @@ if (isset($_POST['inputTRId'])) {
 	$result = $conn->query($sql);
 	$rowTrOr = $result->fetchAll(PDO::FETCH_ASSOC);
 
+	//Equipe do TermoReferencia
+	$sql = ("SELECT UsuarId, UsuarLogin
+	FROM Usuario
+	JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+	JOIN TRXEquipe on TRXEqUsuario = UsuarId
+	WHERE EXUXPEmpresa = " . $_SESSION['EmpreId'] . " and TRXEqTermoReferencia =  " . $iTR . " and EXUXPStatus = 1
+	ORDER BY UsuarLogin ASC");
+	$result = $conn->query("$sql");
+	$rowBDEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
+
+	$aEquipes = '';
+
+	foreach ($rowBDEquipe as $item) {
+
+	$aEquipe[] = $item['UsuarId'];
+
+	$aEquipes .= $item['UsuarId'] . ",";
+	}
+	$aEquipes = substr($aEquipes, 0, -1); // retira a última vírgula
+
 	$_SESSION['msg'] = array();
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
@@ -172,6 +192,29 @@ if (isset($_POST['inputTRData'])) {
 			}
 
 		}
+		$sql = "DELETE FROM TRXEquipe
+				WHERE TRXEqTermoReferencia = :iTermoReferencia";
+		$result = $conn->prepare($sql);
+
+		$result->execute(array(':iTermoReferencia' => $_POST['inputTRId']));
+
+		if ($_POST['cmbEquipe']) {
+
+			$sql = "INSERT INTO TRXEquipe
+						(TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente)
+					VALUES 
+						(:iTermoReferencia, :iUsuario, :bPresidente)";
+			$result = $conn->prepare($sql);
+
+			foreach ($_POST['cmbEquipe'] as $key => $value) {
+
+				$result->execute(array(
+					':iTermoReferencia' => $_POST['inputTRId'],
+					':iUsuario' => $value,
+					':bPresidente' => $value == $_POST['cmbPresidente'] ? 1 : 0
+				));
+			}
+		}
 
 		$conn->commit();
 
@@ -208,9 +251,13 @@ if (isset($_POST['inputTRData'])) {
 
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+
+	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
+	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
 
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_checkboxes_radios.js"></script>
@@ -283,6 +330,7 @@ if (isset($_POST['inputTRData'])) {
 
 				var TrProduto = document.getElementById("TrProduto");
 				var TrServico = document.getElementById("TrServico");
+				var cmbEquipe = $('#cmbEquipe').val();
 
 				if (!TrProduto.checked && !TrServico.checked) {
 					alerta('Atenção', 'Informe se o Termo de Referência terá Produtos e/ou Serviços!', 'error');
@@ -356,7 +404,36 @@ if (isset($_POST['inputTRData'])) {
 					$("#formTR").submit();					
 				}
 
-			}); // enviar			
+			}); // enviar	
+
+			//Ao mudar a Equipe, filtra o possível presidente via ajax (retorno via JSON)
+			$('#cmbEquipe').on('change', function(e) {
+
+				var cmbEquipe = $('#cmbEquipe').val();
+
+				//Esse IF é para quando se exclui todos que estavam selecionados entrar no ELSE e limpar a combo do Presidente
+				if (cmbEquipe != '') {
+
+					$.getJSON('filtraPresidente.php?aEquipe=' + cmbEquipe, function(dados) {
+
+						var option = '';
+
+						if (dados.length) {
+
+							$.each(dados, function(i, obj) {
+								option += '<option value="' + obj.UsuarId + '">' + obj.UsuarLogin + '</option>';
+							});
+
+							$('#cmbPresidente').html(option).show();
+						} else {
+							ResetPresidente();
+						}
+					});
+				} else {
+					ResetPresidente();
+				}
+			});
+
 		}); //document.ready
 
 		//Mostra o "Filtrando..." na combo SubCategoria
@@ -367,6 +444,16 @@ if (isset($_POST['inputTRData'])) {
 		function ResetSubCategoria() {
 			$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
 		}
+
+		//Mostra o "Filtrando..." na combo Presidente da Comissão
+		function FiltraPresidente() {
+			$('#cmbPresidente').empty().append('<option>Filtrando...</option>');
+		}
+
+		function ResetPresidente() {
+			$('#cmbPresidente').empty().append('<option value="#">Nenhum</option>');
+		}
+		
 	</script>
 
 </head>
@@ -568,6 +655,55 @@ if (isset($_POST['inputTRData'])) {
 									</div>
 								</div>
 							</div>
+
+							<h5 class="mb-0 font-weight-semibold">Comissão do Processo Licitatório</h5>
+							<br>
+							<div class="row">
+								<div class="col-lg-9">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
+											<label for="cmbEquipe">Equipe Responsável<span class="text-danger"> *</span></label>
+											<select id="cmbEquipe" name="cmbEquipe[]" class="form-control select" multiple="multiple" data-fouc required>
+												<?php
+												$sql = ("SELECT UsuarId, UsuarLogin
+																FROM Usuario
+																JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+																WHERE EXUXPEmpresa = " . $_SESSION['EmpreId'] . " and EXUXPStatus = 1
+																ORDER BY UsuarLogin ASC");
+												$result = $conn->query("$sql");
+												$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
+
+												foreach ($rowEquipe as $item) {
+													$seleciona = in_array($item['UsuarId'], $aEquipe) ? "selected" : "";
+													print('<option value="' . $item['UsuarId'] . '" ' . $seleciona . '>' . $item['UsuarLogin'] . '</option>');
+												}
+
+												?>
+										</select>
+									</div>
+								</div>
+
+								<div class="col-lg-3">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
+										<label for="cmbPresidente">Presidente da Comissão</label>
+										<select id="cmbPresidente" name="cmbPresidente" class="form-control form-control-select2">
+											<?php
+											$sql = "SELECT UsuarId, UsuarLogin
+														 FROM Usuario
+														 JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+														 WHERE EXUXPEmpresa = " . $_SESSION['EmpreId'] . " and EXUXPUsuario in (" . $aEquipes . ") and EXUXPStatus = 1";
+											$result = $conn->query("$sql");
+											$rowPresidente = $result->fetchAll(PDO::FETCH_ASSOC);
+
+											foreach ($rowPresidente as $item) {
+												$seleciona = in_array($item['UsuarId'], $aEquipe) ? "selected" : "";
+												print('<option value="' . $item['UsuarId'] . '" ' . $iTR . '>' . $item['UsuarLogin'] . '</option>');
+											}
+											?>
+										</select>
+									</div>
+								</div>
+							</div>
+							<br>
 
 							<div class="row">
 								<div class="col-lg-12">
