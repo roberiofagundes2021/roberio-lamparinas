@@ -132,20 +132,23 @@ $dataFim = date("Y-m-d");
     //   })
     // }
 
-    // function excluirConta() {
-    //   let contas = $('.excluirConta').each((i, elem) => {
-    //     $(elem).on('click', (e) => {
-    //       let id = $(elem).attr('idContaExcluir')
-    //       $('.idContaAReceber').val(id)
-    //       e.preventDefault
-    //       confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `contasAReceberExclui.php?idContaAReceber=${id}`);
+    function excluirConta() {
+      let contas = $('.excluirConta').each((i, elem) => {
+        $(elem).on('click', (e) => {
+          const id = $(elem).attr('idContaExcluir');
+          const tipo = $(elem).attr('tipo');
 
-    //       document.contaExclui.submit()
-    //     })
-    //   })
+          $('#idMov').val(id);
+          $('#tipoMov').val(tipo);
 
-    // }
-    // excluirConta()
+          e.preventDefault;
+          confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `movimentacaoFinanceiraExclui.php`);
+          document.contaExclui.submit();
+        })
+      })
+
+    }
+    excluirConta()
 
     function atualizaTotal() {
       let childres = $('tbody').children()
@@ -214,8 +217,8 @@ $dataFim = date("Y-m-d");
             resultadosConsulta = data
 
             // editarLancamento()
-            excluirConta()
-            atualizaTotal()
+            excluirConta();
+            atualizaTotal();
 
           } else {
             let msg2 = $(
@@ -299,8 +302,9 @@ $dataFim = date("Y-m-d");
                   <input id="cmbCodigo_imp" type="hidden" name="cmbCodigo_imp"></input>
                 </form>
 
-                <form name="contaExclui" action="" method="POST">
-                  <input type="hidden" name="idContaAReceber" id="idContaAReceber">
+                <form name="contaExclui" method="POST">
+                  <input type="hidden" name="idMov" id="idMov">
+                  <input type="hidden" name="tipoMov" id="tipoMov">
                 </form>
 
                 <form name="formMovimentacao" method="post" class="p-3">

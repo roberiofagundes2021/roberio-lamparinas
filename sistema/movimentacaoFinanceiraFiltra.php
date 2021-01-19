@@ -73,10 +73,10 @@ function queryPesquisa(){
                 $stringCp .= ' and ';
             }
 
-            $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'E' FROM ContasAReceber
+            $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' FROM ContasAReceber
                     WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
                     UNION 
-                    SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'S' FROM ContasAPagar
+                    SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' FROM ContasAPagar
                     WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
                     ORDER BY DATA ASC";
             $result = $conn->query($sql);
@@ -136,10 +136,10 @@ function queryPesquisa(){
                 $stringCp .= ' and ';
             }
 
-            $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'E' FROM ContasAReceber
+            $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' FROM ContasAReceber
                     WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
                     UNION 
-                    SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'S' FROM ContasAPagar
+                    SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' FROM ContasAPagar
                     WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
                     ORDER BY DATA ASC";
             $result = $conn->query($sql);
@@ -152,10 +152,10 @@ function queryPesquisa(){
         $dataInicio = date("Y-m-d");
         $dataFim = date("Y-m-d");
 
-        $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'E' FROM ContasAReceber
+        $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' FROM ContasAReceber
                 WHERE CNARESTATUS = 14
                 UNION 
-                SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'S' FROM ContasAPagar
+                SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' FROM ContasAPagar
                 WHERE CNAPASTATUS = 12
                 ORDER BY DATA ASC";
                 
@@ -172,7 +172,7 @@ function queryPesquisa(){
         
         foreach ($rowData as $item) {
             $cont++;
-            if ($item['TIPO'] === 'E'){
+            if ($item['TIPO'] === 'R'){
                 $saldo += $item['TOTAL'];
             }
             else {
@@ -185,7 +185,7 @@ function queryPesquisa(){
                 <tr>
                     <td class='even'><p class='m-0'>" . $data . "</p><input type='hidden' value='" . $item['DATA'] . "'></td>";
 
-                    if ($item['TIPO'] === 'E'){
+                    if ($item['TIPO'] === 'R'){
                         $print .= "<td class='even'><a href='movimentacaoFinanceiraRecebimento.php?lancamentoId=" . $item['ID'] . "'>" . $item['HISTORICO'] . "</a></td>";
                     }
                     else {
@@ -194,7 +194,7 @@ function queryPesquisa(){
 
                 $print .= "<td class='even' style='text-align: left;width: 15%;'>" . $item['NUMDOC'] . "</td>";
 
-                    if ($item['TIPO'] === 'E'){
+                    if ($item['TIPO'] === 'R'){
                         $print .= "<td class='even' style='color:green'>" . mostraValor($item['TOTAL']) . "</td>
                                    <td class='even'></td>";
                     }
@@ -215,7 +215,7 @@ function queryPesquisa(){
                         <div class='list-icons'>
                             <div class='list-icons list-icons-extended'>
                                 <a href='#' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>
-                                <a href='#' idContaExcluir='" . $item['ID'] . "' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
+                                <a href='#' idContaExcluir='" . $item['ID'] . "' tipo='" . $item['TIPO'] . "' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
                             </div>
                         </div>
                     </td>
