@@ -643,7 +643,7 @@ $dataInicio = date("Y-m-d");
 
 </head>
 
-<body class="navbar-top sidebar-right-visible">
+<body class="navbar-top sidebar-right-visible sidebar-xs">
 
     <?php include_once("topo.php"); ?>
 
@@ -668,13 +668,6 @@ $dataInicio = date("Y-m-d");
                             <div class="card">
                                 <div class="card-header header-elements-inline">
                                     <h3 class="card-title">Novo Lançamento - Contas a Pagar</h3>
-                                    <div class="header-elements">
-                                        <div class="list-icons">
-                                            <a class="list-icons-item" data-action="collapse"></a>
-                                            <a href="relatorioMovimentacao.php" class="list-icons-item" data-action="reload"></a>
-                                            <!--<a class="list-icons-item" data-action="remove"></a>-->
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <div class="card-body">

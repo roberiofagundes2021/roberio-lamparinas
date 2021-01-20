@@ -470,7 +470,7 @@ $dataFim = date("Y-m-d");
 
 </head>
 
-<body class="navbar-top sidebar-right-visible">
+<body class="navbar-top sidebar-right-visible sidebar-xs">
 
     <?php include_once("topo.php"); ?>
 
@@ -669,7 +669,8 @@ $dataFim = date("Y-m-d");
                                                     <?php
                                                     $sql = "SELECT *
                                                             FROM FormaPagamento
-                                                            WHERE FrPagStatus = 1
+                                                            JOIN Situacao on SituaId = FrPagStatus
+                                                            WHERE FrPagUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
                                                             ORDER BY FrPagNome ASC";
                                                     $result = $conn->query($sql);
                                                     $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);

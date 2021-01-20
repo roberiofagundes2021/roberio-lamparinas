@@ -703,7 +703,7 @@ $dataFim = date("Y-m-d");
 
 </head>
 
-<body class="navbar-top sidebar-right-visible">
+<body class="navbar-top sidebar-right-visible sidebar-xs">
 
     <?php include_once("topo.php"); ?>
 
