@@ -66,13 +66,19 @@ if(isset($_POST['inputTRId'])){
 		$result->bindParam(':iTR', $iTR);
 		$result->bindParam(':iUnidade', $iUnidade); 
 		$result->execute();	
+	
+		$sql = "DELETE FROM TRXEquipe
+				WHERE TRXEqTermoReferencia = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iTR);
+		$result->execute();
 		
 		$sql = "DELETE FROM TermoReferencia
 				WHERE TrRefId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iTR); 
 		$result->execute();
-		
+
 		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
