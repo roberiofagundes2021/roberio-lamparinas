@@ -12,6 +12,9 @@ function queryPesquisa(){
         $cont = 0;
         $argsCr = [];
         $argsCp = [];
+        $argsCenCustCr = '';
+        $argsCenCustCp = '';
+        $status = explode('|', $_POST['cmbStatus']);
 
         if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
             empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
@@ -35,11 +38,21 @@ function queryPesquisa(){
             $_SESSION['MovFinancContaBanco'] = $_POST['cmbContaBanco'];
         }
 
-        // if (!empty($_POST['cmbCentroDeCustos'])) {
-        //     $argsCr[]  = "CnARePlanoContas = " . $_POST['cmbPlanoContas'] . " ";
-        //     $argsCp[]  = "CnAPaPlanoContas = " . $_POST['cmbPlanoContas'] . " ";
-        //     $_SESSION['MovFinancPlanoContas'] = $_POST['cmbPlanoContas'];
-        // }
+        if (!empty($_POST['cmbCentroDeCustos'])) {
+            $argsCenCustCp = " join PlanoContas
+                                on PlConId = CnAPaPlanoContas
+                                join CentroCusto
+                                on CnCusId = PlConCentroCusto ";
+
+            $argsCenCustCr = " join PlanoContas
+                                on PlConId = CnARePlanoContas
+                                join CentroCusto
+                                on CnCusId = PlConCentroCusto ";
+                            
+            $argsCr[]  = "CnCusId = " . $_POST['cmbCentroDeCustos'] . " ";
+            $argsCp[]  = "CnCusId = " . $_POST['cmbCentroDeCustos'] . " ";
+            $_SESSION['MovFinancCentroDeCustos'] = $_POST['cmbCentroDeCustos'];
+        }
 
         if (!empty($_POST['cmbPlanoContas'])) {
             $argsCr[]  = "CnARePlanoContas = " . $_POST['cmbPlanoContas'] . " ";
@@ -54,8 +67,16 @@ function queryPesquisa(){
         }
 
         if (!empty($_POST['cmbStatus'])) {
-            $argsCr[]  = "CnAReStatus = 14";
-            $argsCp[]  = "CnAPaStatus = 12";
+            if ($status[0] === "12") {
+                $argsCp[]  = "CnAPaStatus = 12";
+
+            } else if ($status[0] === "14") {
+                $argsCp[]  = "CnAReStatus = 14";
+
+            } else {
+                $argsCr[]  = "CnAReStatus = 14";
+                $argsCp[]  = "CnAPaStatus = 12";
+            }
             $_SESSION['MovFinancStatus'] = $_POST['cmbStatus'];
         }
 
@@ -73,22 +94,54 @@ function queryPesquisa(){
                 $stringCp .= ' and ';
             }
 
-            $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' FROM ContasAReceber
-                    WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
-                    UNION 
-                    SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' FROM ContasAPagar
-                    WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                    ORDER BY DATA ASC";
+            if ($status[0] === "12") {
+                $sql = "SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' 
+                        FROM ContasAPagar ";
+                        if (isset($argsCenCustCp)) {
+                            $sql .= " $argsCenCustCp ";
+                        }
+                $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+                         ORDER BY DATA ASC";
+                        
+            } else if ($status[0] === "14") {
+                $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
+                        FROM ContasAReceber ";
+                        if (isset($argsCenCustCr)) {
+                            $sql .= " $argsCenCustCr ";
+                        }
+                $sql .= "WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
+                        ORDER BY DATA ASC";
+                        
+            } else {
+                $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
+                        FROM ContasAReceber ";
+                        if (isset($argsCenCustCr)) {
+                            $sql .= " $argsCenCustCr ";
+                        }
+                $sql .= "WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
+                        UNION 
+                        SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' 
+                        FROM ContasAPagar ";
+                        if (isset($argsCenCustCp)) {
+                            $sql .= " $argsCenCustCp ";
+                        }
+                $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+                        ORDER BY DATA ASC";
+            }
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
         }
+
     } else if (isset($_SESSION['MovFinancPeriodoDe']) ||  isset($_SESSION['MovFinancAte']) || isset($_SESSION['MovFinancContaBanco']) || isset($_SESSION['MovFinancCentroDeCustos']) || isset($_SESSION['MovFinancPlanoContas']) || isset($_SESSION['MovFinancFormaPagamento']) || isset($_SESSION['MovFinancStatus'])) {
 
         $cont = 0;
         $argsCr = [];
         $argsCp = [];
+        $argsCenCustCr = '';
+        $argsCenCustCp = '';
+        $status = explode('|', $_POST['cmbStatus']);
 
         if (!empty($_SESSION['MovFinancPeriodoDe']) || !empty($_SESSION['MovFinancAte'])) {
             empty($_SESSION['MovFinancPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_SESSION['MovFinancPeriodoDe'];
@@ -103,10 +156,21 @@ function queryPesquisa(){
             $argsCp[]  = "CnAPaContaBanco = " . $_SESSION['MovFinancContaBanco'] . " ";
         }
 
-        // if (!empty($_SESSION['MovFinancCentroDeCustos'])) {
-        //     $argsCr[]  = "CnAReContaBanco = " . $_SESSION['MovFinancContaBanco'] . " ";
-        //     $argsCp[]  = "CnAPaContaBanco = " . $_SESSION['MovFinancContaBanco'] . " ";
-        // }
+        if (!empty($_SESSION['MovFinancCentroDeCustos'])) {
+            $argsCenCustCp = " join PlanoContas
+                                on PlConId = CnAPaPlanoContas
+                                join CentroCusto
+                                on CnCusId = PlConCentroCusto ";
+
+            $argsCenCustCr = " join PlanoContas
+                                on PlConId = CnARePlanoContas
+                                join CentroCusto
+                                on CnCusId = PlConCentroCusto ";
+                            
+            $argsCr[]  = "CnCusId = " . $_SESSION['MovFinancContaBanco'] . " ";
+            $argsCp[]  = "CnCusId = " . $_SESSION['MovFinancContaBanco'] . " ";
+            $_SESSION['MovFinancCentroDeCustos'] = $_POST['cmbCentroDeCustos'];
+        }
 
         if (!empty($_SESSION['MovFinancPlanoContas'])) {
             $argsCr[]  = "CnARePlanoContas = " . $_SESSION['MovFinancPlanoContas'] . " ";
@@ -119,8 +183,18 @@ function queryPesquisa(){
         }
 
         if (!empty($_POST['MovFinancStatus'])) {
-            $argsCr[]  = "CnAReStatus = 14";
-            $argsCp[]  = "CnAPaStatus = 12";
+            $statusSession = explode('|', $_SESSION['MovFinancStatus']);
+
+            if ($statusSession[0] === "12") {
+                $argsCp[]  = "CnAPaStatus = 12";
+
+            } else if ($statusSession[0] === "14") {
+                $argsCp[]  = "CnAReStatus = 14";
+
+            } else {
+                $argsCr[]  = "CnAReStatus = 14";
+                $argsCp[]  = "CnAPaStatus = 12";
+            }
         }
 
         if ((count($argsCr) >= 1) || (count($stringCp) >= 1)) {
@@ -136,17 +210,47 @@ function queryPesquisa(){
                 $stringCp .= ' and ';
             }
 
-            $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' FROM ContasAReceber
-                    WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
-                    UNION 
-                    SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' FROM ContasAPagar
-                    WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                    ORDER BY DATA ASC";
+            if ($status[0] === "12") {
+                $sql = "SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' 
+                        FROM ContasAPagar ";
+                        if (isset($argsCenCustCp)) {
+                            $sql .= " $argsCenCustCp ";
+                        }
+                $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+                         ORDER BY DATA ASC";
+                        
+            } else if ($status[0] === "14") {
+                $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
+                        FROM ContasAReceber ";
+                        if (isset($argsCenCustCr)) {
+                            $sql .= " $argsCenCustCr ";
+                        }
+                $sql .= "WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
+                        ORDER BY DATA ASC";
+                        
+            } else {
+                $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
+                        FROM ContasAReceber ";
+                        if (isset($argsCenCustCr)) {
+                            $sql .= " $argsCenCustCr ";
+                        }
+                $sql .= "WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
+                        UNION 
+                        SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' 
+                        FROM ContasAPagar ";
+                        if (isset($argsCenCustCp)) {
+                            $sql .= " $argsCenCustCp ";
+                        }
+                $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+                        ORDER BY DATA ASC";
+            }
+
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
         }
+        
     } else {
 
         $dataInicio = date("Y-m-d");
@@ -154,9 +258,13 @@ function queryPesquisa(){
 
         $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' FROM ContasAReceber
                 WHERE CNARESTATUS = 14
+                AND CnAReUnidade = " . $_SESSION['UnidadeId'] . " 
+                AND CnAReDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' 
                 UNION 
                 SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' FROM ContasAPagar
                 WHERE CNAPASTATUS = 12
+                AND CnAPaUnidade = " . $_SESSION['UnidadeId'] . " 
+                AND CnAPaDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' 
                 ORDER BY DATA ASC";
                 
         $result = $conn->query($sql);
@@ -213,9 +321,17 @@ function queryPesquisa(){
                 $print .= "
                     <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
                         <div class='list-icons'>
-                            <div class='list-icons list-icons-extended'>
-                                <a href='#' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>
-                                <a href='#' idContaExcluir='" . $item['ID'] . "' tipo='" . $item['TIPO'] . "' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
+                            <div class='list-icons list-icons-extended'> ";
+
+                                if ($item['TIPO'] === 'R'){
+                                    $print .= "<a href='movimentacaoFinanceiraRecebimento.php?lancamentoId=" . $item['ID'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
+                                    
+                                } else if ($item['TIPO'] === 'P') {
+                                    $print .= "<a href='movimentacaoFinanceiraPagamento.php?lancamentoId=" . $item['ID'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
+                                }
+                                
+                                $print .= "
+                                    <a href='#' idContaExcluir='" . $item['ID'] . "' tipo='" . $item['TIPO'] . "' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
                             </div>
                         </div>
                     </td>

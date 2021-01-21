@@ -116,22 +116,6 @@ $dataFim = date("Y-m-d");
       }
     });
 
-
-    // function editarLancamento() {
-    //   $('.editarLancamento').each((i, elem) => {
-    //     $(elem).on('click', () => {
-    //       let linha = $(elem).parent().parent().parent().parent()
-    //       let tds = linha.children();
-
-    //       let filhosPrimeiroTd = $(tds[0]).children();
-    //       let idLancamento = $(filhosPrimeiroTd[1]).val()
-
-    //       window.location.href =
-    //         `contasAReceberNovoLancamento.php?lancamentoId=${idLancamento}`
-    //     })
-    //   })
-    // }
-
     function excluirConta() {
       let contas = $('.excluirConta').each((i, elem) => {
         $(elem).on('click', (e) => {
@@ -148,7 +132,7 @@ $dataFim = date("Y-m-d");
       })
 
     }
-    excluirConta()
+    excluirConta();
 
     function atualizaTotal() {
       let childres = $('tbody').children()
@@ -179,9 +163,6 @@ $dataFim = date("Y-m-d");
       const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
 
       $('tbody').html(msg);
-
-      // if ($('#cmbProduto').val() === 'Sem produto' || $('#cmbProduto').val() === 'Filtrando...')
-      //   $('#cmbProduto').val("");
 
       const periodoDe = $('#inputPeriodoDe').val();
       const ate = $('#inputAte').val();
@@ -216,7 +197,6 @@ $dataFim = date("Y-m-d");
             $('#imprimir').removeAttr('disabled')
             resultadosConsulta = data
 
-            // editarLancamento()
             excluirConta();
             atualizaTotal();
 
@@ -224,7 +204,6 @@ $dataFim = date("Y-m-d");
             let msg2 = $(
               '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
             )
-            // console.log(msg2)
             $('tbody').html(msg2)
             $('#imprimir').attr('disabled', '')
             $('#footer-total').remove()
@@ -235,10 +214,10 @@ $dataFim = date("Y-m-d");
 
     $('#submitPesquisar').on('click', (e) => {
       e.preventDefault()
-      Filtrar(false)
+      Filtrar(false);
     })
 
-    Filtrar(true)
+    Filtrar(true);
 
     $('#novoLacamento').on('click', (e) => {
       location.href = "movimentacaoFinanceiraPagamento.php";
@@ -249,18 +228,15 @@ $dataFim = date("Y-m-d");
 
 </head>
 
-<body class="navbar-top sidebar-right-visible">
-
+<body class="navbar-top sidebar-right-visible sidebar-xs">
   <?php include_once("topo.php"); ?>
 
   <!-- Page content -->
   <div class="page-content">
-
     <?php include_once("menu-left.php"); ?>
 
     <!-- Main content -->
     <div class="content-wrapper">
-
       <?php include_once("cabecalho.php"); ?>
 
       <!-- Content area -->
@@ -269,6 +245,7 @@ $dataFim = date("Y-m-d");
         <!-- Info blocks -->
         <div class="row">
           <div class="col-lg-12">
+
             <!-- Basic responsive configuration -->
             <div class="card">
               <div class="card-header">
@@ -278,7 +255,6 @@ $dataFim = date("Y-m-d");
                     <div class="list-icons">
                       <a class="list-icons-item" data-action="collapse"></a>
                       <a href="relatorioMovimentacao.php" class="list-icons-item" data-action="reload"></a>
-                      <!--<a class="list-icons-item" data-action="remove"></a>-->
                     </div>
                   </div>
                 </div>
@@ -316,8 +292,12 @@ $dataFim = date("Y-m-d");
                           <span class="input-group-prepend">
                             <span class="input-group-text"><i class="icon-calendar22"></i></span>
                           </span>
-                          <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" value="<?php if (isset($_SESSION['ContPagPeriodoDe'])) echo $_SESSION['ContPagPeriodoDe'];
-                                                                                                                                                else echo $dataInicio; ?>">
+                          <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" value="<?php 
+                                          if (isset($_SESSION['MovFinancPeriodoDe'])) {
+                                            echo $_SESSION['MovFinancPeriodoDe'];
+                                          }else 
+                                            echo $dataInicio; 
+                                        ?>">
                         </div>
                       </div>
                     </div>
@@ -329,8 +309,12 @@ $dataFim = date("Y-m-d");
                           <span class="input-group-prepend">
                             <span class="input-group-text"><i class="icon-calendar22"></i></span>
                           </span>
-                          <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php if (isset($_SESSION['ContPagAte'])) echo $_SESSION['ContPagAte'];
-                                                                                                                                    else echo $dataFim; ?>">
+                          <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php 
+                                          if (isset($_SESSION['MovFinancAte'])) 
+                                            echo $_SESSION['MovFinancAte'];
+                                          else 
+                                            echo $dataFim; 
+                                        ?>">
                         </div>
                       </div>
                     </div>
@@ -450,8 +434,8 @@ $dataFim = date("Y-m-d");
                       <div class="form-group">
                         <label for="cmbStatus">Status</label>
                         <select id="cmbStatus" name="cmbStatus" class="form-control form-control-select2">
-                          <option value="1">Recebidas/Pagas</option>
-                          <!-- <?php
+                          <option value="">Todos</option>
+                          <?php
                                                     try {
                                                         $sql = "SELECT SituaId, SituaNome, SituaChave
                                                                 FROM Situacao
@@ -462,7 +446,7 @@ $dataFim = date("Y-m-d");
 
                                                         try {
                                                             foreach ($rowSituacao as $item) {
-                                                                if ($item['SituaChave'] == 'ARECEBER' || $item['SituaChave'] == 'RECEBIDA') {
+                                                                if ($item['SituaChave'] == 'RECEBIDA' || $item['SituaChave'] === 'PAGA') {
                                                                     if (isset($_SESSION['ContPagStatus'])) {
                                                                         if ($item['SituaId'] == $_SESSION['ContPagStatus']) {
                                                                             print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
@@ -480,14 +464,11 @@ $dataFim = date("Y-m-d");
                                                     } catch (Exception $e) {
                                                         echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                     }
-                                                    ?> -->
+                                                    ?>
                         </select>
                       </div>
                     </div>
 
-
-                    <!-- <div class="col-lg-5">
-                    <div class="form-group"> -->
                     <div class="text-right col-lg-5 pt-3">
                       <button id="submitPesquisar" class="btn btn-principal">Pesquisar</button>
 
@@ -524,101 +505,23 @@ $dataFim = date("Y-m-d");
               </div>
 
             </div>
-            <!-- /basic responsive configuration -->
 
+            <!-- /basic responsive configuration -->
           </div>
         </div>
 
         <!-- /info blocks -->
-
-        <!--------------------------------------------------------------------------------------------------->
-        <!--Modal Parcelar-->
-        <div id="page-modal" class="custon-modal">
-          <div class="custon-modal-container">
-            <div class="card custon-modal-content">
-              <div class="custon-modal-title">
-                <i class=""></i>
-                <p class="h3">Parcelamento</p>
-                <i class=""></i>
-              </div>
-              <form id="editarProduto" method="POST">
-                <div class="d-flex flex-row p-2">
-                  <div class='col-lg-3'>
-                    <div class="form-group">
-                      <label for="inputValor">Valor Total</label>
-                      <div class="input-group">
-                        <input type="text" id="inputValor" name="inputValor" class="form-control" readOnly>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-lg-2">
-                    <label for="numeroSerie">Parcelas</label>
-                    <div class="form-group">
-                      <select id="cmbParcelas" name="cmbPeriodicidade" class="form-control form-control-select2">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="11">11</option>
-                        <option value="12">12</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-lg-1">
-                    <button class="btn btn-lg btn-primary mt-2" id="gerarParcelas">Gerar
-                      Parcelas</button>
-                  </div>
-                </div>
-                <div class="d-flex flex-row">
-                  <div class="col-12 d-flex flex-row justify-content-center">
-                    <p class="col-2 p-2" style="background-color:#f2f2f2">Item</p>
-                    <p class="col-4 p-2" style="background-color:#f2f2f2">Descrição</p>
-                    <p class="col-3 p-2" style="background-color:#f2f2f2">Vencimento</p>
-                    <p class="col-3 p-2" style="background-color:#f2f2f2">Valor</p>
-                    </table>
-                  </div>
-                </div>
-                <div id="parcelasContainer" class="d-flex flex-column px-5" style="overflow-Y: scroll; max-height: 300px">
-
-                </div>
-                <input type="hidden" id='inputDataVencimento'>
-                <input type="hidden" id='inputDescricao'>
-                <input type="hidden" id='inputId'>
-              </form>
-
-              <div class="card-footer mt-2 d-flex flex-column">
-                <div class="row" style="margin-top: 10px;">
-                  <div class="col-lg-12">
-                    <div class="form-group">
-                      <button class="btn btn-lg btn-success" id="salvar">Salvar</button>
-                      <a id="modal-close" class="btn btn-basic" role="button">Cancelar</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!--------------------------------------------------------------------------------------------------->
       </div>
+
       <!-- /content area -->
-
       <?php include_once("footer.php"); ?>
-
     </div>
+
     <!-- /main content -->
-
     <?php include_once("sidebar-right.php"); ?>
-
   </div>
-  <!-- /page content -->
 
+  <!-- /page content -->
   <?php include_once("alerta.php"); ?>
 
 </body>

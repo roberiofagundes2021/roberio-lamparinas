@@ -341,7 +341,6 @@ $dataInicio = date("Y-m-d");
                     if (isset($lancamento)) {
                         echo '<input type="hidden" name="inputEditar" value="sim">';
                         echo '<input type="hidden" name="inputContaId" value="' . $lancamento['CnAPaId'] . '">';
-                        print_r($lancamento);
                     }
                   ?>
 
