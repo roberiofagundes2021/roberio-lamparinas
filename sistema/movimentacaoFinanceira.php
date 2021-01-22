@@ -56,6 +56,8 @@ $dataFim = date("Y-m-d");
 
   <script type="text/javascript">
   $(document).ready(function() {
+    let resultadosConsulta = '';
+    let inputsValues = {};
 
     $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data			
 
@@ -148,9 +150,9 @@ $dataFim = date("Y-m-d");
       $('#footer-total').remove()
 
       if (total < 0) {
-        divTotal = `<div id='footer-total' style='position:absolute; left: 80.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(total)}</div>`
+        divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(total)}</div>`
       } else {
-        divTotal = `<div id='footer-total' style='position:absolute; left: 80.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(total)}</div>`
+        divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(total)}</div>`
       }
 
       $('.datatable-footer').append(divTotal);
@@ -223,6 +225,32 @@ $dataFim = date("Y-m-d");
       location.href = "movimentacaoFinanceiraPagamento.php";
       return false;
     })
+
+    function imprime() {
+      let url = 'movimentacaoFinanceiraImprime.php';
+
+      $('#imprimir').on('click', (e) => {
+        console.log(resultadosConsulta);
+        e.preventDefault()
+        if (resultadosConsulta) {
+          $('#inputResultado').val(resultadosConsulta)
+          $('#inputDataDe_imp').val(inputsValues.inputPeriodoDe)
+          $('#inputDataAte_imp').val(inputsValues.inputAte)
+          $('#cmbContaBanco_imp').val(inputsValues.cmbContaBanco)
+          $('#cmbCentroDeCustos_imp').val(inputsValues.cmbCentroDeCustos)
+          $('#cmbPlanoContas_imp').val(inputsValues.cmbPlanoContas)
+          $('#cmbFormaDeRecebimento_imp').val(inputsValues.cmbFormaDeRecebimento)
+          $('#inputStatus_imp').val(inputsValues.cmbStatus)
+          $('#inputStatusTipo_imp').val(inputsValues.statusTipo)
+
+
+          $('#formImprime').attr('action', url)
+
+          $('#formImprime').submit()
+        }
+      })
+    }
+    imprime()
   });
   </script>
 
@@ -265,17 +293,16 @@ $dataFim = date("Y-m-d");
               <div class="card-body">
 
                 <form id="formImprime" method="POST" target="_blank">
-                  <input id="TipoProdutoServico" type="hidden" name="TipoProdutoServico"></input>
                   <input id="inputResultado" type="hidden" name="resultados"></input>
                   <input id="inputDataDe_imp" type="hidden" name="inputDataDe_imp"></input>
                   <input id="inputDataAte_imp" type="hidden" name="inputDataAte_imp"></input>
-                  <input id="cmbTipo_imp" type="hidden" name="cmbTipo_imp"></input>
-                  <input id="cmbFornecedor_imp" type="hidden" name="cmbFornecedor_imp"></input>
-                  <input id="cmbCategoria_imp" type="hidden" name="cmbCategoria_imp"></input>
-                  <input id="cmbSubCategoria_imp" type="hidden" name="cmbSubCategoria_imp"></input>
-                  <input id="cmbProduto_imp" type="hidden" name="cmbProduto_imp"></input>
-                  <input id="cmbServico_imp" type="hidden" name="cmbServico_imp"></input>
-                  <input id="cmbCodigo_imp" type="hidden" name="cmbCodigo_imp"></input>
+                  <input id="cmbContaBanco_imp" type="hidden" name="cmbContaBanco_imp"></input>
+                  <input id="cmbCentroDeCustos_imp" type="hidden" name="cmbCentroDeCustos_imp"></input>
+                  <input id="cmbPlanoContas_imp" type="hidden" name="cmbPlanoContas_imp"></input>
+                  <input id="cmbFormaDeRecebimento_imp" type="hidden" name="cmbFormaDeRecebimento_imp"></input>
+                  <input id="inputStatus_imp" type="hidden" name="inputStatus_imp"></input>
+                  <input id="inputStatusTipo_imp" type="hidden" name="inputStatusTipo_imp"></input>
+                  <input id="inputTipoFiltro_imp" type="hidden" name="inputTipoFiltro_imp"></input>
                 </form>
 
                 <form name="contaExclui" method="POST">
@@ -372,7 +399,7 @@ $dataFim = date("Y-m-d");
                     </div>
 
 
-                    <div class="col-lg-2">
+                    <div class="col-lg-4">
                       <div class="form-group">
                         <label for="cmbPlanoContas">Plano de Contas</label>
                         <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
@@ -469,12 +496,12 @@ $dataFim = date("Y-m-d");
                       </div>
                     </div>
 
-                    <div class="text-right col-lg-5 pt-3">
+                    <div class="text-right col-lg-3 pt-3">
                       <button id="submitPesquisar" class="btn btn-principal">Pesquisar</button>
 
                       <button id="novoLacamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo Lançamento</button>
 
-                      <button class="btn bg-secondary"><i class="icon-printer2"></i></button>
+                      <button id="imprimir" class="btn bg-secondary"><i class="icon-printer2"></i></button>
                     </div>
 
                   </div>
@@ -486,9 +513,9 @@ $dataFim = date("Y-m-d");
                       <th>Data</th>
                       <th>Histórico</th>
                       <th>Número Doc.</th>
-                      <th>Entrada</th>
-                      <th>Saída</th>
-                      <th>Saldo</th>
+                      <th style='text-align: right;'>Entrada</th>
+                      <th style='text-align: right;'>Saída</th>
+                      <th style='text-align: right;'>Saldo</th>
                       <th>Ações</th>
                     </tr>
                   </thead>

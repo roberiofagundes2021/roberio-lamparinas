@@ -101,7 +101,7 @@ function queryPesquisa(){
                             $sql .= " $argsCenCustCp ";
                         }
                 $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                         ORDER BY DATA ASC";
+                         ORDER BY DATA DESC";
                         
             } else if ($status[0] === "14") {
                 $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
@@ -110,7 +110,7 @@ function queryPesquisa(){
                             $sql .= " $argsCenCustCr ";
                         }
                 $sql .= "WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
-                        ORDER BY DATA ASC";
+                        ORDER BY DATA DESC";
                         
             } else {
                 $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
@@ -126,7 +126,7 @@ function queryPesquisa(){
                             $sql .= " $argsCenCustCp ";
                         }
                 $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                        ORDER BY DATA ASC";
+                        ORDER BY DATA DESC";
             }
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -217,7 +217,7 @@ function queryPesquisa(){
                             $sql .= " $argsCenCustCp ";
                         }
                 $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                         ORDER BY DATA ASC";
+                         ORDER BY DATA DESC";
                         
             } else if ($status[0] === "14") {
                 $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
@@ -226,7 +226,7 @@ function queryPesquisa(){
                             $sql .= " $argsCenCustCr ";
                         }
                 $sql .= "WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
-                        ORDER BY DATA ASC";
+                        ORDER BY DATA DESC";
                         
             } else {
                 $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
@@ -242,7 +242,7 @@ function queryPesquisa(){
                             $sql .= " $argsCenCustCp ";
                         }
                 $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                        ORDER BY DATA ASC";
+                        ORDER BY DATA DESC";
             }
 
             $result = $conn->query($sql);
@@ -265,7 +265,7 @@ function queryPesquisa(){
                 WHERE CNAPASTATUS = 12
                 AND CnAPaUnidade = " . $_SESSION['UnidadeId'] . " 
                 AND CnAPaDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' 
-                ORDER BY DATA ASC";
+                ORDER BY DATA DESC";
                 
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -303,19 +303,19 @@ function queryPesquisa(){
                 $print .= "<td class='even' style='text-align: left;width: 15%;'>" . $item['NUMDOC'] . "</td>";
 
                     if ($item['TIPO'] === 'R'){
-                        $print .= "<td class='even' style='color:green'>" . mostraValor($item['TOTAL']) . "</td>
+                        $print .= "<td class='even' style='color:green;text-align: right;padding-right:40px;'>" . mostraValor($item['TOTAL']) . "</td>
                                    <td class='even'></td>";
                     }
                     else {
                         $print .= "<td class='even'></td>
-                                   <td class='even' style='color:red'>-" . mostraValor($item['TOTAL']) . "</td>";
+                                   <td class='even' style='color:red;text-align: right;padding-right:40px;'>" . mostraValor($item['TOTAL']) . "</td>";
                     }
 
                     if ($saldo < 0) {
-                        $print .= "<td class='even' style='color: red';>" . mostraValor($saldo) . "</td>";
+                        $print .= "<td class='even' style='color: red;text-align: right;padding-right:40px;'>" . mostraValor($saldo) . "</td>";
                     }
                     else {
-                        $print .= "<td class='even' style='color: green';>" . mostraValor($saldo) . "</td>";
+                        $print .= "<td class='even' style='color: green;text-align: right;padding-right:40px;'>" . mostraValor($saldo) . "</td>";
                     }
                     
                 $print .= "

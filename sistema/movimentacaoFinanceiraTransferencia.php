@@ -288,7 +288,7 @@ $dataInicio = date("Y-m-d");
 
 </head>
 
-<body class="navbar-top sidebar-right-visible">
+<body class="navbar-top sidebar-right-visible sidebar-xs">
 
   <?php include_once("topo.php"); ?>
 
@@ -327,7 +327,7 @@ $dataInicio = date("Y-m-d");
 
                   <br />
                   <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-12">
                       <div class="form-group">
                         <div class="form-check form-check-inline">
                           <label class="form-check-label">
@@ -371,7 +371,7 @@ $dataInicio = date("Y-m-d");
                     <div class="col-lg-6">
                       <div class="form-group">
                         <label for="inputDescricao">Descrição <span class='text-danger'>*</span></label>
-                        <input type="text" id="inputDescricao" name="inputDescricao" class="form-control" placeholder="Compras" required>
+                        <input type="text" id="inputDescricao" name="inputDescricao" class="form-control" placeholder="Descrição" required>
                       </div>
                     </div>
 
