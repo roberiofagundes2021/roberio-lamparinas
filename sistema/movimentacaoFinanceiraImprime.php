@@ -219,11 +219,25 @@ try {
         $html .= "</table>";
     }
 
-    $html .= '<hr/>
-            <br>
-            Observação: Esse relatório foi gerado a partir dos seguintes critérios: Tipo ('.$_POST["inputStatus_imp"].'), Conta/Banco ('.$_POST["cmbContaBanco_imp"].'), Centro de Custos ('.$_POST["cmbCentroDeCustos_imp"].'), Plano de Contas ('.$_POST["cmbPlanoContas_imp"].'), Forma de Recebimento ('.$_POST["cmbFormaDeRecebimento_imp"].')
-            <br><br>
+    $html .= "<hr/>
+            <br>";
+            
+    if (isset($_POST['inputStatus_imp']) || isset($_POST['cmbContaBanco_imp']) || isset($_POST['cmbCentroDeCustos_imp'])|| isset($_POST['cmbPlanoContas_imp'])|| isset($_POST['cmbFormaDeRecebimento_imp'])){
+
+        $html .= 'Observação: Esse relatório foi gerado a partir dos seguintes critérios: ';
+        (isset($_POST['inputStatus_imp']) && $_POST['inputStatus_imp'] !== null && $_POST['inputStatus_imp'] !== '' ) && $html .= "Tipo (" . $_POST['inputStatus_imp'].") ";
+
+        (isset($_POST['cmbContaBanco_imp']) && $_POST['cmbContaBanco_imp'] !== null && $_POST['cmbContaBanco_imp'] !== '' )&& $html .= "Conta/Banco (" . $_POST['cmbContaBanco_imp'].") ";
+
+        (isset($_POST['cmbCentroDeCustos_imp']) && $_POST['cmbCentroDeCustos_imp'] !== null && $_POST['cmbCentroDeCustos_imp'] !== '' ) && $html .= "Centro de Custos (" . $_POST['cmbCentroDeCustos_imp'].") ";
+
+        (isset($_POST['cmbPlanoContas_imp']) && $_POST['cmbPlanoContas_imp'] !== null && $_POST['cmbPlanoContas_imp'] !== '' ) & $html .= "Plano de Contas (" . $_POST['cmbPlanoContas_imp'].") ";
+        
+        (isset($_POST['cmbFormaDeRecebimento_imp']) && $_POST['cmbFormaDeRecebimento_imp'] !== null && $_POST['cmbFormaDeRecebimento_imp'] !== '' ) && $html .= "Forma de Recebimento (" . $_POST['cmbFormaDeRecebimento_imp'].") ";
+        $html .= '<br><br>
             ';
+    }
+
 
     $rodape = "<hr/>
     <div style='width:100%'>
