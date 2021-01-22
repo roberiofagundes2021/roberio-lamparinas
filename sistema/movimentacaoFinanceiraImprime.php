@@ -195,17 +195,17 @@ try {
             
             $html .= "
             <tr>
-                <td style='padding-top: 8px; font-size: 11px;'>" . $item['ID'] . "</td>
-                <td style='padding-top: 8px; font-size: 11px;'>" . mostraData($item['DATA']) . "</td>
-                <td style='padding-top: 8px; font-size: 11px;'>" . $item['HISTORICO'] . "</td>
-                <td style='padding-top: 8px; font-size: 11px;'>" . $item['NUMDOC'] . "</td>
-                <td style='padding-top: 8px; font-size: 11px;'>" . $item['TIPO'] . "</td>
-                <td style='padding-top: 8px; font-size: 11px;'>" . mostraValor($item['TOTAL']) . "</td>";
+                <td style='font-size: 11px;'>" . $item['ID'] . "</td>
+                <td style='font-size: 11px;'>" . mostraData($item['DATA']) . "</td>
+                <td style='font-size: 11px;'>" . $item['HISTORICO'] . "</td>
+                <td style='font-size: 11px;'>" . $item['NUMDOC'] . "</td>
+                <td style='font-size: 11px;'>" . $item['TIPO'] . "</td>
+                <td style='font-size: 11px;'>" . mostraValor($item['TOTAL']) . "</td>";
                 if ($saldo < 0) {
-                    $html .= "<td style='color: red; padding-top: 8px; font-size: 11px;';>" . mostraValor($saldo) . "</td>";
+                    $html .= "<td style='color: red; font-size: 11px;';>" . mostraValor($saldo) . "</td>";
                 }
                 else {
-                    $html .= "<td style='color: green; padding-top: 8px; font-size: 11px;';>" . mostraValor($saldo) . "</td>";
+                    $html .= "<td style='color: green; font-size: 11px;';>" . mostraValor($saldo) . "</td>";
                 }
                 $html .= "
             </tr>
