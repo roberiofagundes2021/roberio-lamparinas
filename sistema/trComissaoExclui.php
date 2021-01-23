@@ -7,36 +7,29 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputTRId'])){
 	
 	$iTR = $_POST['inputTRId'];
+	$iUsuario = $_POST['inputUsuarioId'];
 	$iUnidade = $_SESSION['UnidadeId'];
         	
 	try{
-		$conn->beginTransaction();	
-
-		/* Aqui não estou usando o Foreign Key on Cascade. Portanto, preciso excluir primeiro o TRXOrcamentoXProduto, TRXOrcamentoXServico e TRXOrcamentoXSubCategoria */
-
-		$sql = "SELECT TrXOrId
-				FROM TRXOrcamento
-				WHERE TrXOrTermoReferencia = $iTR and TrXOrUnidade = $iUnidade";
-		$result = $conn->query($sql);
-		$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
-		  
+		$conn->beginTransaction();		  
 		
 		$sql = "DELETE FROM TRXEquipe
-				WHERE TRXEqTermoReferencia = :id";
+				WHERE TRXEqTermoReferencia = :iTr and TRXEqUsuario = :iUsuario";
 		$result = $conn->prepare($sql);
-		$result->bindParam(':id', $iTR);
+		$result->bindParam(':iTr', $iTR);
+		$result->bindParam(':iUsuario', $iUsuario);
 		$result->execute();
 		
 		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Termo de Referência excluído!!!";
+		$_SESSION['msg']['mensagem'] = "Membro excluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 			
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir termo de referência!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir membro!!!";
 		$_SESSION['msg']['tipo'] = "error";			
 		
 		$conn->rollback();
@@ -45,6 +38,6 @@ if(isset($_POST['inputTRId'])){
 	}
 }
 
-irpara("tr.php");
+irpara("trComissao.php");
 
 ?>

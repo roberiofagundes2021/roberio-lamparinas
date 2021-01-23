@@ -6,10 +6,16 @@ $_SESSION['PaginaAtual'] = 'Comissão do Processo Licitatório';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputTRId'])){
+	
+	$_SESSION['TRId'] = $_POST['inputTRId'];
+	$_SESSION['TRNumero'] = $_POST['inputTRNumero'];
+}
+
 $sql = "SELECT TRXEqTermoReferencia,TRXEqUsuario,TRXEqPresidente, TRXEqUnidade, UsuarLogin		
-        FROM TRXEquipe
-        JOIN Usuario on UsuarId = TRXEqUsuario
-		WHERE TRXEqUnidade = ". $_SESSION['UnidadeId'] ." and  TRXEqTermoReferencia = ".$_POST['inputTRId']."
+		FROM TRXEquipe
+		JOIN Usuario on UsuarId = TRXEqUsuario
+		WHERE TRXEqUnidade = ". $_SESSION['UnidadeId'] ." and TRXEqTermoReferencia = ".$_SESSION['TRId']."
 		ORDER BY UsuarLogin ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -17,7 +23,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 if(isset($_POST['cmbUsuario'])){
 	
-
 	try{
 		
 		$sql = "INSERT INTO TRXEquipe (TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente, TRXEqUnidade)
@@ -133,7 +138,7 @@ if(isset($_POST['cmbUsuario'])){
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaComissao(TRXEqTermoReferencia,TRXEqUsuario ){
+		function atualizaComissao(TRXEqTermoReferencia, TRXEqUsuario, Tipo){
 		
 			document.getElementById('inputTRId').value = TRXEqTermoReferencia;
 			document.getElementById('inputUsuarioId').value = TRXEqUsuario;
@@ -167,7 +172,8 @@ if(isset($_POST['cmbUsuario'])){
 			<!-- Content area -->
 			<div class="content">
 				<form name="formComissao" id="formComissao" method="post">
-					<input type="hidden" id="inputTRId" name="inputTRId" value="<?php echo $_POST['inputTRId']; ?>">
+					<input type="hidden" id="inputTRId" name="inputTRId" value="<?php echo $_SESSION['TRId']; ?>">
+					<input type="hidden" id="inputTRNumero" name="inputTRNumero" value="<?php echo $_SESSION['TRNumero']; ?>">
 					<input type="hidden" id="inputUsuarioId" name="inputUsuarioId" >
 
 					<!-- Info blocks -->		
@@ -187,7 +193,7 @@ if(isset($_POST['cmbUsuario'])){
 									<br>
 									<div class="row">
 										<div class="col-lg-6">
-											<div class="form-group" style="border-bottom:1px solid #ddd;">
+											<div class="form-group">
 												<label for="cmbUsuario"> Membro<span class="text-danger">
 														*</span></label>
 												<select id="cmbUsuario" name="cmbUsuario" class="form-control select">
@@ -212,42 +218,43 @@ if(isset($_POST['cmbUsuario'])){
 										<div class="col-lg-6">
 											<button class="btn btn-lg btn-principal" style="margin-top: 25px;" id="adicionar">Adicionar</button>
 										</div>
-									</div>	
-									<table id="tblComissao" class="table">
-										<thead>
-											<tr class="bg-slate">
-												<th>Membro</th>
-												<th>Presidente</th>
-												<th class="text-center">Ações</th>
-											</tr>
-										</thead>
-										<tbody>
-										<?php
-											foreach ($row as $item){
-												
-												
-												print('
-												<tr>
-													<td>'.$item['UsuarLogin'].'</td>
-													<td>'.$item['TRXEqPresidente'].'</td>
-													');
-												
-												
-												print('<td class="text-center">
-														<div class="list-icons">
-															<div class="list-icons list-icons-extended">
-																<a href="#" onclick="atualizaComissao('.$item['TRXEqTermoReferencia'].', '.$item['TRXEqUsuario'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
-															</div>
-														</div>
-													</td>
-												</tr>');
-											}
-										?>
+									</div>										
+								</div>	
 
-										</tbody>
-									</table>
-									
-								</div>							
+								<table id="tblComissao" class="table">
+									<thead>
+										<tr class="bg-slate">
+											<th>Membro</th>
+											<th>Presidente</th>
+											<th class="text-center">Ações</th>
+										</tr>
+									</thead>
+									<tbody>
+									<?php
+										foreach ($row as $item){
+											
+											
+											print('
+											<tr>
+												<td>'.$item['UsuarLogin'].'</td>
+												<td>'.$item['TRXEqPresidente'].'</td>
+												');
+											
+											
+											print('<td class="text-center">
+													<div class="list-icons">
+														<div class="list-icons list-icons-extended">
+															<a href="#" onclick="atualizaComissao('.$item['TRXEqTermoReferencia'].', '.$item['TRXEqUsuario'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														</div>
+													</div>
+												</td>
+											</tr>');
+										}
+									?>
+
+									</tbody>
+								</table>
+
 							</div>
 							<!-- /basic responsive configuration -->
 
