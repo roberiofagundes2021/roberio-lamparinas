@@ -81,12 +81,32 @@ if(isset($_POST['cmbUsuario'])){
 		$(document).ready(function (){	
 
 			//Valida Registro Duplicado
-			$("#adicionar").on('click', function(e){
-				
-				e.preventDefault();		
-						
-				$("#formComissao").submit();
-			});
+			$('#adicionar').on('click', function(e) {
+
+				e.preventDefault();
+
+				var cmbUsuario = $('#cmbUsuario').val();
+
+				//remove os espaços desnecessários antes e depois
+				cmbUsuarioNovo = cmbUsuario.trim();
+
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "trComissaoValida.php",
+					data: ('usuario=' + cmbUsuario),
+					success: function(resposta) {
+
+						if (resposta == 1) {
+							alerta('Atenção', 'Esse registro já existe!', 'error');
+							return false;
+						}
+
+						$("#formComissao").submit();
+					}
+				})
+			})
+
 
 			$('#tblComissao').DataTable( {
 				"order": [[ 0, "asc" ]],
@@ -186,9 +206,9 @@ if(isset($_POST['cmbUsuario'])){
 								</div>
 								<div class="card-body">
 									<div class="row">
-										<div class="col-lg-12">
-											<p class="font-size-lg">A relação abaixo faz referência a Comissão do Processo Licitatório da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-										</div>	
+										<div class="col-lg-12" class="card-body">	
+												A relação abaixo faz referência a Comissão do Processo Licitatório da <span style="color: #FF0000; font-weight: bold;">TR nº <?php echo $_SESSION['TRNumero']; ?></span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>	
+										</div>		
 									</div>
 									<br>
 									<div class="row">
@@ -215,8 +235,12 @@ if(isset($_POST['cmbUsuario'])){
 												</select>
 											</div>
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-3">
 											<button class="btn btn-lg btn-principal" style="margin-top: 25px;" id="adicionar">Adicionar</button>
+										</div>
+										<div class="col-lg-3">
+											<div class="text-right" style="margin-top: 40px;"><a href="tr.php" role="button"><< Termo de Referência</a>&nbsp;&nbsp;&nbsp;
+											</div>
 										</div>
 									</div>										
 								</div>	
