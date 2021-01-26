@@ -198,8 +198,13 @@ try {
                 <td style='font-size: 11px; margin:0;'>" . $item['ID'] . "</td>
                 <td style='font-size: 11px; margin:0;'>" . mostraData($item['DATA']) . "</td>
                 <td style='font-size: 11px; margin:0;'>" . $item['HISTORICO'] . "</td>
-                <td style='font-size: 11px; margin:0;'>" . $item['NUMDOC'] . "</td>
-                <td style='font-size: 11px; margin:0;'>" . $item['TIPO'] . "</td>
+                <td style='font-size: 11px; margin:0;'>" . $item['NUMDOC'] . "</td>'";
+                if ($item['TIPO'] === 'R') {
+                    $html .= "<td style='font-size: 11px; margin:0;'>Recebido</td>";
+                } else if ($item['TIPO'] === 'P') {
+                    $html .= "<td style='font-size: 11px; margin:0;'>Pago</td>";
+                }
+            $html .= "
                 <td style='font-size: 11px; margin:0;'>" . mostraValor($item['TOTAL']) . "</td>";
                 if ($saldo < 0) {
                     $html .= "<td style='color: red; font-size: 11px;';>" . mostraValor($saldo) . "</td>";
