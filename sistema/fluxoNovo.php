@@ -31,9 +31,9 @@ if (isset($_POST['inputDataInicio'])) {
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao,
-											  FlOpeValor, FlOpeObservacao, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeUnidade)
+											  FlOpeValor, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa, FlOpeUnidade)
 				VALUES (:iFornecedor, :iCategoria, :iSubCategoria, :dDataInicio, :dDataFim, :iNumContrato, :iNumProcesso, :iModalidadeLicitacao,
-						:fValor, :sObservacao, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+						:fValor, :sFlOpeConteudoInicio, :sFlOpeConteudoFim, :bStatus, :iUsuarioAtualizador, :iEmpresa, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -46,9 +46,11 @@ if (isset($_POST['inputDataInicio'])) {
 			':iNumProcesso' => $_POST['inputNumProcesso'],
 			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'],
 			':fValor' => gravaValor($_POST['inputValor']),
-			':sObservacao' => $_POST['txtareaObservacao'] == '' ? null : $_POST['txtareaObservacao'],
+			':sFlOpeConteudoInicio' => $_POST['txtareaConteudoInicio'],
+			':sFlOpeConteudoFim' => $_POST['txtareaConteudoFim'],
 			':bStatus' => $rowSituacao['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+			':iEmpresa' => $_SESSION['EmpreId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
 		/*	
@@ -116,6 +118,9 @@ if (isset($_POST['inputDataInicio'])) {
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_checkboxes_radios.js"></script>
+
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
@@ -124,6 +129,11 @@ if (isset($_POST['inputDataInicio'])) {
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
 		$(document).ready(function() {
+
+			//Inicializa o editor de texto que será usado pelos campos "Conteúdo Personalizado - Inicialização" e "Conteúdo Personalizado - Finalização"
+			$('#summernoteInicio').summernote();
+			$('#summernoteFim').summernote();
+
 
 			//Ao mudar o Fornecedor, filtra a categoria e a SubCategoria via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
@@ -398,14 +408,28 @@ if (isset($_POST['inputDataInicio'])) {
 									</div>
 								</div>
 							</div>
-							<div class="row" style="margin-top: 10px;">
+							<br>
+							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaObservacao">Observação</label>
-										<textarea rows="3" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" maxlength="4000"></textarea>
+										<label for="txtareaConteudo">Conteúdo Personalizado - Introdução</label>
+										<!--<div id="summernote" name="txtareaConteudo"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do Fluxo (informe aqui o texto que você queira que apareça no Fluxo)"></textarea>
 									</div>
 								</div>
 							</div>
+							<br>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudoFinalizacao">Conteúdo Personalizado - Finalização</label>
+										<!--<div id="summernote" name="txtareaConteudo"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Fluxo (informe aqui o texto que você queira que apareça no término do Fluxo)"></textarea>
+									</div>
+								</div>
+							</div>
+							<br>
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">

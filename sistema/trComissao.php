@@ -86,6 +86,7 @@ if(isset($_POST['cmbUsuario'])){
 				e.preventDefault();
 
 				var cmbUsuario = $('#cmbUsuario').val();
+				var inputTRId = $('#inputTRId').val();
 
 				//remove os espaços desnecessários antes e depois
 				cmbUsuarioNovo = cmbUsuario.trim();
