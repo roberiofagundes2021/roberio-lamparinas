@@ -95,7 +95,7 @@ if(isset($_POST['cmbUsuario'])){
 				$.ajax({
 					type: "POST",
 					url: "trComissaoValida.php",
-					data: ('usuario=' + cmbUsuario),
+					data: ('usuario=' + cmbUsuario + '&TRId=' + inputTRId  ),
 					success: function(resposta) {
 
 						if (resposta == 1) {

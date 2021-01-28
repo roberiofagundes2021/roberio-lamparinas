@@ -7,11 +7,11 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['usuarioVelho'])){
 	$sql = "SELECT TRXEqUsuario
 			 FROM  TRXEquipe
-			 WHERE TRXEqUnidade = ".$_SESSION['UnidadeId']." and TRXEqUsuario = '". $_POST['usuario']."' and TRXEqUsuario <> '". $_POST['usuarioVelho']."'";
+			 WHERE TRXEqUnidade = ".$_SESSION['UnidadeId']." and TRXEqUsuario = ". $_POST['usuario']." and TRXEqUsuario <> ". $_POST['usuarioVelho']." and TRXEqTermoReferencia =".$_POST['TRId']."";
 } else{
 	$sql = "SELECT TRXEqUsuario
 			 FROM TRXEquipe
-			 WHERE TRXEqUnidade = ".$_SESSION['UnidadeId']." and TRXEqUsuario = '". $_POST['usuario']."'";
+			 WHERE TRXEqUnidade = ".$_SESSION['UnidadeId']." and TRXEqUsuario = ". $_POST['usuario']." and TRXEqTermoReferencia =".$_POST['TRId']."";
 }
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
