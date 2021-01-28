@@ -198,7 +198,7 @@ try {
                 <td style='font-size: 11px; margin:0;'>" . $item['ID'] . "</td>
                 <td style='font-size: 11px; margin:0;'>" . mostraData($item['DATA']) . "</td>
                 <td style='font-size: 11px; margin:0;'>" . $item['HISTORICO'] . "</td>
-                <td style='font-size: 11px; margin:0;'>" . $item['NUMDOC'] . "</td>'";
+                <td style='font-size: 11px; margin:0;'>" . $item['NUMDOC'] . "</td>";
                 if ($item['TIPO'] === 'R') {
                     $html .= "<td style='font-size: 11px; margin:0;'>Recebido</td>";
                 } else if ($item['TIPO'] === 'P') {
@@ -207,10 +207,10 @@ try {
             $html .= "
                 <td style='font-size: 11px; margin:0;'>" . mostraValor($item['TOTAL']) . "</td>";
                 if ($saldo < 0) {
-                    $html .= "<td style='color: red; font-size: 11px;';>" . mostraValor($saldo) . "</td>";
+                    $html .= "<td style='color: red; font-size: 11px;'>" . mostraValor($saldo) . "</td>";
                 }
                 else {
-                    $html .= "<td style='color: green; font-size: 11px;';>" . mostraValor($saldo) . "</td>";
+                    $html .= "<td style='color: green; font-size: 11px;'>" . mostraValor($saldo) . "</td>";
                 }
                 $html .= "
             </tr>
@@ -231,11 +231,11 @@ try {
         $html .= 'Observação: Esse relatório foi gerado a partir dos seguintes critérios: ';
         (isset($_POST['inputStatus_imp']) && $_POST['inputStatus_imp'] !== null && $_POST['inputStatus_imp'] !== '' ) && $html .= "Tipo (" . $_POST['inputStatus_imp'].") ";
 
-        (isset($_POST['cmbContaBanco_imp']) && $_POST['cmbContaBanco_imp'] !== null && $_POST['cmbContaBanco_imp'] !== '' )&& $html .= "Conta/Banco (" . $_POST['cmbContaBanco_imp'].") ";
+        (isset($_POST['cmbContaBanco_imp']) && $_POST['cmbContaBanco_imp'] !== null && $_POST['cmbContaBanco_imp'] !== '' ) && $html .= "Conta/Banco (" . $_POST['cmbContaBanco_imp'].") ";
 
         (isset($_POST['cmbCentroDeCustos_imp']) && $_POST['cmbCentroDeCustos_imp'] !== null && $_POST['cmbCentroDeCustos_imp'] !== '' ) && $html .= "Centro de Custos (" . $_POST['cmbCentroDeCustos_imp'].") ";
 
-        (isset($_POST['cmbPlanoContas_imp']) && $_POST['cmbPlanoContas_imp'] !== null && $_POST['cmbPlanoContas_imp'] !== '' ) & $html .= "Plano de Contas (" . $_POST['cmbPlanoContas_imp'].") ";
+        (isset($_POST['cmbPlanoContas_imp']) && $_POST['cmbPlanoContas_imp'] !== null && $_POST['cmbPlanoContas_imp'] !== '' ) && $html .= "Plano de Contas (" . $_POST['cmbPlanoContas_imp'].") ";
         
         (isset($_POST['cmbFormaDeRecebimento_imp']) && $_POST['cmbFormaDeRecebimento_imp'] !== null && $_POST['cmbFormaDeRecebimento_imp'] !== '' ) && $html .= "Forma de Recebimento (" . $_POST['cmbFormaDeRecebimento_imp'].") ";
         $html .= '<br><br>
