@@ -44,7 +44,7 @@ if (isset($_POST['inputDataInicio'])) {
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':iNumContrato' => $_POST['inputNumContrato'],
 			':iNumProcesso' => $_POST['inputNumProcesso'],
-			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'],
+			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'] == '' ? null : $_POST['cmbModalidadeLicitacao'],
 			':fValor' => gravaValor($_POST['inputValor']),
 			':sFlOpeConteudoInicio' => $_POST['txtareaConteudoInicio'],
 			':sFlOpeConteudoFim' => $_POST['txtareaConteudoFim'],
@@ -220,43 +220,13 @@ if (isset($_POST['inputDataInicio'])) {
 				var inputDataInicio = $('#inputDataInicio').val();
 				var inputDataFim = $('#inputDataFim').val();
 				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
-				/*
-								if (cmbFornecedor == '#'){
-									alerta('Atenção','Informe o fornecedor!','error');
-									$('#cmbFornecedor').focus();
-									return false;				
-								}
-								
-								if (cmbCategoria == '#'){
-									alerta('Atenção','Informe a categoria!','error');
-									$('#cmbCategoria').focus();
-									return false;				
-								}
 
-								if (cmbSubCategoria == '#'){
-									alerta('Atenção','Informe a subcategoria!','error');
-									$('#cmbSubCategoria').focus();
-									return false;				
-								}				
-								
-								if (inputDataInicio == ''){
-									alerta('Atenção','Informe a data de início do contrato!','error');
-									$('#inputDataInicio').focus();
-									return false;				
-								}
-				*/
 				if (inputDataFim < inputDataInicio) {
 					alerta('Atenção', 'A Data Fim deve ser maior que a Data Início!', 'error');
 					$('#inputDataFim').focus();
 					return false;
 				}
-				/*
-								if (inputValor == '' || inputValor <= 0){
-									alerta('Atenção','Informe o valor total do contrato!','error');
-									$('#inputValor').focus();
-									return false;				
-								}				
-				*/
+
 				$("#formFluxoOperacional").submit();
 
 			});
@@ -303,10 +273,10 @@ if (isset($_POST['inputDataInicio'])) {
 											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-														FROM Fornecedor
-														JOIN Situacao on SituaId = ForneStatus
-														WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-														ORDER BY ForneNome ASC";
+													FROM Fornecedor
+													JOIN Situacao on SituaId = ForneStatus
+													WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+													ORDER BY ForneNome ASC";
 											$result = $conn->query($sql);
 											$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -379,10 +349,10 @@ if (isset($_POST['inputDataInicio'])) {
 											<option value="#">Selecione</option>
 											<?php
 											$sql = "SELECT MdLicId, MdLicNome
-															FROM ModalidadeLicitacao
-															JOIN Situacao on SituaId = MdLicStatus
-															WHERE SituaChave = 'ATIVO'
-															ORDER BY MdLicNome ASC";
+													FROM ModalidadeLicitacao
+													JOIN Situacao on SituaId = MdLicStatus
+													WHERE SituaChave = 'ATIVO'
+													ORDER BY MdLicNome ASC";
 											$result = $conn->query($sql);
 											$row = $result->fetchAll(PDO::FETCH_ASSOC);
 

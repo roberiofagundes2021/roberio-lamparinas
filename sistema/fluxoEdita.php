@@ -56,13 +56,13 @@ if (isset($_POST['inputDataInicio'])) {
 
 		$result->execute(array(
 			':iFornecedor' => $_POST['cmbFornecedor'],
-			':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-			':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+			':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
+			':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
 			':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':iNumContrato' => $_POST['inputNumContrato'],
 			':iNumProcesso' => $_POST['inputNumProcesso'],
-			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'],
+			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'] == '' ? null : $_POST['cmbModalidadeLicitacao'],
 			':fValor' => gravaValor($_POST['inputValor']),
 			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
 			':sConteudoFim' => $_POST['txtareaConteudoFim'],
@@ -200,37 +200,7 @@ if (isset($_POST['inputDataInicio'])) {
 				var inputDataInicio = $('#inputDataInicio').val();
 				var inputDataFim = $('#inputDataFim').val();
 				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
-				/*
-								if (cmbFornecedor == '#'){
-									alerta('Atenção','Informe o fornecedor!','error');
-									$('#cmbFornecedor').focus();
-									return false;				
-								}
-								
-								if (cmbCategoria == '#'){
-									alerta('Atenção','Informe a categoria!','error');
-									$('#cmbCategoria').focus();
-									return false;				
-								}
 
-								if (cmbSubCategoria == '#'){
-									alerta('Atenção','Informe a subcategoria!','error');
-									$('#cmbSubCategoria').focus();
-									return false;				
-								}				
-								
-								if (inputDataInicio == ''){
-									alerta('Atenção','Informe a data de início do contrato!','error');
-									$('#inputDataInicio').focus();
-									return false;				
-								}
-
-								if (inputValor == '' || inputValor <= 0){
-									alerta('Atenção','Informe o valor total do contrato!','error');
-									$('#inputValor').focus();
-									return false;				
-								}
-				*/
 				if (inputDataFim < inputDataInicio) {
 					alerta('Atenção', 'A Data Fim deve ser maior que a Data Início!', 'error');
 					$('#inputDataFim').focus();
@@ -285,9 +255,10 @@ if (isset($_POST['inputDataInicio'])) {
 											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-														FROM Fornecedor														     
-														WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and ForneStatus = 1
-														ORDER BY ForneNome ASC";
+													FROM Fornecedor
+													JOIN Situacao on SituaId = ForneStatus
+													WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+													ORDER BY ForneNome ASC";
 											$result = $conn->query($sql);
 											$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -308,10 +279,12 @@ if (isset($_POST['inputDataInicio'])) {
 											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT CategId, CategNome
-														FROM Categoria
-														JOIN Fornecedor on ForneCategoria = CategId
-														WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and ForneId = " . $row['FlOpeFornecedor'] . "
-														ORDER BY CategNome ASC";
+													FROM Categoria
+													JOIN Fornecedor on ForneCategoria = CategId
+													JOIN Situacao on SituaId = CategStatus
+													WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and ForneId = " . $row['FlOpeFornecedor'] . "
+													and SituaChave = 'ATIVO'
+													ORDER BY CategNome ASC";
 											$result = $conn->query($sql);
 											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -332,10 +305,12 @@ if (isset($_POST['inputDataInicio'])) {
 										<?php
 
 										$sql = "SELECT SbCatId, SbCatNome
-													FROM SubCategoria
-													LEFT JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
-													WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and FrXSCFornecedor = '" . $row['FlOpeFornecedor'] . "' and SbCatStatus = 1
-													Order By SbCatNome ASC";
+												FROM SubCategoria
+												JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
+												JOIN Situacao on SituaId = SbCatStatus
+												WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FrXSCFornecedor = " . $row['FlOpeFornecedor'] . "
+												and SituaChave = 'ATIVO'
+												Order By SbCatNome ASC";
 										$result = $conn->query($sql);
 										$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -387,13 +362,13 @@ if (isset($_POST['inputDataInicio'])) {
 									<div class="form-group">
 										<label for="cmbModalidadeLicitacao">Modalidade de Licitação</label>
 										<select id="cmbModalidadeLicitacao" name="cmbModalidadeLicitacao" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
+											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT MdLicId, MdLicNome
-															FROM ModalidadeLicitacao
-															JOIN Situacao on SituaId = MdLicStatus
-															WHERE SituaChave = 'ATIVO'
-															ORDER BY MdLicNome ASC";
+													FROM ModalidadeLicitacao
+													JOIN Situacao on SituaId = MdLicStatus
+													WHERE SituaChave = 'ATIVO'
+													ORDER BY MdLicNome ASC";
 											$result = $conn->query($sql);
 											$rowMdLic = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -452,8 +427,8 @@ if (isset($_POST['inputDataInicio'])) {
 										<?php
 
 										$sql = "SELECT SUM(FOXPrQuantidade * FOXPrValorUnitario) as total
-													FROM FluxoOperacionalXProduto
-													WHERE FOXPrEmpresa = " . $_SESSION['EmpreId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
+												FROM FluxoOperacionalXProduto
+												WHERE FOXPrUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
 										$result = $conn->query($sql);
 										$rowTotal = $result->fetch(PDO::FETCH_ASSOC);
 										$count = count($rowTotal);
