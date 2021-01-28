@@ -25,6 +25,7 @@ $Y = date("Y");
 // $dataInicio = date("Y-m-01"); //30 dias atrás
 $dataInicio = date("Y-m-d");
 $dataFim = date("Y-m-d");
+
 ?>
 
 <!DOCTYPE html>
