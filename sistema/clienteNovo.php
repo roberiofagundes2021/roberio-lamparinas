@@ -118,7 +118,9 @@ if(isset($_POST['inputTipo'])){
                 $("#inputEndereco").val("");
                 $("#inputBairro").val("");
                 $("#inputCidade").val("");
-                $("#cmbEstado").val("");                
+                $("#cmbEstado").val("");
+				$("#inputNumero").val("");
+				$("#inputComplemento").val(""); 				
             }
             
             //Quando o campo cep perde o foco.
@@ -168,6 +170,7 @@ if(isset($_POST['inputTipo'])){
                     } //end if.
                     else {
                         //cep é inválido.
+						$("#inputCep").val("");
                         limpa_formulário_cep();
                         alerta("Erro","Formato de CEP inválido.","erro");
                     }
@@ -179,12 +182,6 @@ if(isset($_POST['inputTipo'])){
                 
             });
 			
-			//Método JQuery (tem que ficar dentro do $(document).ready(function(){
-			document.getElementById('inputCnpj').addEventListener('input', function (e) {
-				var x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,3})(\d{0,3})(\d{0,4})(\d{0,2})/);
-				e.target.value = !x[2] ? x[1] : x[1] + '.' + x[2] + '.' + x[3] + '/' + x[4] + (x[5] ? '-' + x[5] : '');
-			});
-
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
 				e.preventDefault();
@@ -195,21 +192,33 @@ if(isset($_POST['inputTipo'])){
 				var inputNomePJ = $('#inputNomePJ').val();
 				var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
 				var inputCnpj = $('#inputCnpj').val().replace(/[^\d]+/g,'');
-				
-				if (inputNomePJ != '' && inputTipo == 'J'){
-					if (!validaCNPJ(inputCnpj)){
-						$('#inputCnpj').val('');
-						alerta('Atenção','CNPJ inválido!','error');	
-						$("#formCliente").submit();
-						
-						return false;
-					}
-				}
 
 				if (inputTipo == 'F'){ 
 					inputNome = inputNomePF; 
+
+					if (inputCpf.trim() == ''){
+						$('#inputCpf').val('');
+					} else {
+						if (inputNome != '' && !validaCPF(inputCpf)){
+							$('#inputCpf').val('');
+							alerta('Atenção','CPF inválido!','error');
+							$('#inputCpf').focus();
+							return false;
+						}
+					}
 				} else{ 
                     inputNome = inputNomePJ;
+
+					if (inputCnpj.trim() == ''){
+						$('#inputCnpj').val('');
+					} else {
+						if (inputNome != '' && !validarCNPJ(inputCnpj)){
+							$('#inputCnpj').val('');
+							alerta('Atenção','CNPJ inválido!','error');
+							$('#inputCnpj').focus();
+							return false;
+						}
+					}
 				}
 				
 				//remove os espaços desnecessários antes e depois
@@ -244,7 +253,6 @@ if(isset($_POST['inputTipo'])){
 
 				document.getElementById('inputNomePF').setAttribute('required', 'required');				
 				document.getElementById('inputCpf').setAttribute('required', 'required');
-
 				document.getElementById('inputNomePJ').removeAttribute('required', 'required');
 				document.getElementById('inputCnpj').removeAttribute('required', 'required');				
 			} else {			
@@ -252,29 +260,10 @@ if(isset($_POST['inputTipo'])){
 				document.getElementById('dadosPJ').style.display = "block";
 				
 				document.getElementById('inputNomePF').removeAttribute('required', 'required');				
-				document.getElementById('inputCpf').removeAttribute('required', 'required');
-				
+				document.getElementById('inputCpf').removeAttribute('required', 'required');				
 				document.getElementById('inputNomePJ').setAttribute('required', 'required');
 				document.getElementById('inputCnpj').setAttribute('required', 'required');
 			}
-		}
-
-		function mCPF(cpf){
-			cpf=cpf.replace(/\D/g,"")
-			cpf=cpf.replace(/(\d{3})(\d)/,"$1.$2")
-			cpf=cpf.replace(/(\d{3})(\d)/,"$1.$2")
-			cpf=cpf.replace(/(\d{3})(\d{1,2})$/,"$1-$2")
-			return cpf
-		}	
-
-		function fMasc(objeto,mascara) {
-			obj=objeto
-			masc=mascara
-			setTimeout("fMascEx()",1)
-		}
-
-		function fMascEx() {
-			obj.value=masc(obj.value)
 		}
 
 		function validaCPF(strCPF) {
@@ -298,12 +287,12 @@ if(isset($_POST['inputTipo'])){
 			return true;
 		}			
 
-		function validaCNPJ(cnpj) {
-
+		function validarCNPJ(cnpj) {
+ 
 			cnpj = cnpj.replace(/[^\d]+/g,'');
 
 			if(cnpj == '') return false;
-
+			
 			if (cnpj.length != 14)
 				return false;
 
@@ -347,9 +336,10 @@ if(isset($_POST['inputTipo'])){
 			resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
 			if (resultado != digitos.charAt(1))
 				return false;
-				
+					
 			return true;
-		}	
+			
+		}		
 
     </script>	
 	
@@ -418,7 +408,7 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
-													<input type="text" id="inputCpf" name="inputCpf" class="form-control" pattern="[0-9]{11}" onkeydown="javascript: fMasc( this, mCPF );" required>
+													<input type="text" id="inputCpf" name="inputCpf" class="form-control" data-mask="999.999.999-99" required>
 												</div>	
 											</div>
 
@@ -531,7 +521,7 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-3">
 												<div class="form-group">				
 													<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
-													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control">
+													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" data-mask="99.999.999/9999-99">
 												</div>	
 											</div>						
 										</div>

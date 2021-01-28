@@ -14,7 +14,7 @@ if(isset($_POST['inputClienteId'])){
 	$sql = "SELECT *
 			FROM Cliente
 			WHERE ClienId = $iCliente ";
-	$result = $conn->query("$sql");
+	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	
 	
@@ -129,9 +129,8 @@ if(isset($_POST['inputTipo'])){
 		window.onload = function(){
 			//Ao carregar a página é verificado se é PF ou PJ para aparecer os campos relacionados e esconder o que não estiver
 			var tipo = $('input[name="inputTipo"]:checked').val();
-			
+
 			selecionaPessoa(tipo);
-	
 		}
 
         $(document).ready(function() {			
@@ -141,7 +140,9 @@ if(isset($_POST['inputTipo'])){
                 $("#inputEndereco").val("");
                 $("#inputBairro").val("");
                 $("#inputCidade").val("");
-                $("#cmbEstado").val("");                
+                $("#cmbEstado").val("");   
+				$("#inputNumero").val("");
+				$("#inputComplemento").val("");             
             }
             
             //Quando o campo cep perde o foco.
@@ -186,6 +187,7 @@ if(isset($_POST['inputTipo'])){
                     } //end if.
                     else {
                         //cep é inválido.
+						$("#inputCep").val("");
                         limpa_formulário_cep();
                         alerta("Erro","Formato de CEP inválido.","erro");
                     }
@@ -207,12 +209,36 @@ if(isset($_POST['inputTipo'])){
 				var inputNomeNovoPJ  = $('#inputNomePJ').val();
 				var inputNomeVelho = $('#inputClienteNome').val();				
 				var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
-				var inputCnpj = $('#inputCnpj').val();
+				var inputCnpj = $('#inputCnpj').val().replace(/[^\d]+/g,'');
 
 				if (inputTipo == 'F'){ 
 					inputNomeNovo = inputNomeNovoPF; 
+
+					if (inputCpf.trim() == ''){
+						$('#inputCpf').val('');
+					} else {
+						if (!validaCPF(inputCpf)){
+							$('#inputCpf').val('');
+							alerta('Atenção','CPF inválido!','error');
+							$('#inputCpf').focus();
+							return false;
+						}
+					}
+
 				} else{ 
                     inputNomeNovo = inputNomeNovoPJ;
+
+					if (inputCnpj.trim() == ''){
+						$('#inputCnpj').val('');
+					} else {
+						if (!validarCNPJ(inputCnpj)){
+							$('#inputCnpj').val('');
+							alerta('Atenção','CNPJ inválido!','error');
+							$('#inputCnpj').focus();
+							return false;
+						}
+					}			
+
 				}
 				
 				//remove os espaços desnecessários antes e depois
@@ -243,27 +269,25 @@ if(isset($_POST['inputTipo'])){
         function selecionaPessoa(tipo) {
 
 			if (tipo == 'F'){
-				document.getElementById('CPF').style.display = "block";
-				document.getElementById('CNPJ').style.display = "none";
+				
 				document.getElementById('dadosPF').style.display = "block";
 				document.getElementById('dadosPJ').style.display = "none";
-				document.getElementById('inputNome').placeholder = "Nome Completo";
 
 				document.getElementById('inputNomePF').setAttribute('required', 'required');				
 				document.getElementById('inputCpf').setAttribute('required', 'required');
 				document.getElementById('inputNomePJ').removeAttribute('required', 'required');
 				document.getElementById('inputCnpj').removeAttribute('required', 'required');	
+				
 			} else {
-				document.getElementById('CPF').style.display = "none";
-				document.getElementById('CNPJ').style.display = "block";				
+								
 				document.getElementById('dadosPF').style.display = "none";
 				document.getElementById('dadosPJ').style.display = "block";
-				document.getElementById('inputNome').placeholder = "Nome Fantasia";
 
 				document.getElementById('inputNomePF').removeAttribute('required', 'required');				
 				document.getElementById('inputCpf').removeAttribute('required', 'required');
 				document.getElementById('inputNomePJ').setAttribute('required', 'required');
 				document.getElementById('inputCnpj').setAttribute('required', 'required');
+				
 			}
 		}
 		
@@ -286,6 +310,60 @@ if(isset($_POST['inputTipo'])){
 			if ((Resto == 10) || (Resto == 11))  Resto = 0;
 			if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
 			return true;
+		}
+
+		function validarCNPJ(cnpj) {
+ 
+			cnpj = cnpj.replace(/[^\d]+/g,'');
+
+			if(cnpj == '') return false;
+			
+			if (cnpj.length != 14)
+				return false;
+
+			// Elimina CNPJs invalidos conhecidos
+			if (cnpj == "00000000000000" || 
+				cnpj == "11111111111111" || 
+				cnpj == "22222222222222" || 
+				cnpj == "33333333333333" || 
+				cnpj == "44444444444444" || 
+				cnpj == "55555555555555" || 
+				cnpj == "66666666666666" || 
+				cnpj == "77777777777777" || 
+				cnpj == "88888888888888" || 
+				cnpj == "99999999999999")
+				return false;
+				
+			// Valida DVs
+			tamanho = cnpj.length - 2
+			numeros = cnpj.substring(0,tamanho);
+			digitos = cnpj.substring(tamanho);
+			soma = 0;
+			pos = tamanho - 7;
+			for (i = tamanho; i >= 1; i--) {
+			soma += numeros.charAt(tamanho - i) * pos--;
+			if (pos < 2)
+					pos = 9;
+			}
+			resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+			if (resultado != digitos.charAt(0))
+				return false;
+				
+			tamanho = tamanho + 1;
+			numeros = cnpj.substring(0,tamanho);
+			soma = 0;
+			pos = tamanho - 7;
+			for (i = tamanho; i >= 1; i--) {
+			soma += numeros.charAt(tamanho - i) * pos--;
+			if (pos < 2)
+					pos = 9;
+			}
+			resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+			if (resultado != digitos.charAt(1))
+				return false;
+					
+			return true;
+			
 		}		
 
     </script>	
@@ -356,7 +434,7 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-3" id="CPF">
 												<div class="form-group">
 													<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
-													<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php echo formatarCPF_Cnpj($row['ClienCpf']); ?>">
+													<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php echo formatarCPF_Cnpj($row['ClienCpf']); ?>" <?php if ($row['ClienTipo'] == 'F') echo "required"; ?>>
 												</div>	
 											</div>
 
@@ -465,10 +543,10 @@ if(isset($_POST['inputTipo'])){
 												</div>
 											</div>	
 											
-											<div class="col-lg-3"  id="CNPJ">
+											<div class="col-lg-3" id="CNPJ">
 												<div class="form-group">				
 													<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
-													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" value="<?php echo formatarCPF_Cnpj($row['ClienCnpj']); ?>">
+													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" value="<?php echo formatarCPF_Cnpj($row['ClienCnpj']); ?>" <?php if ($row['ClienTipo'] == 'J') echo "required"; ?>>
 												</div>	
 											</div>							
 										</div>
