@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Parâmetro';
 include('global_assets/php/conexao.php');
 
 if (isset($_SESSION['EmpresaId'])) {
-	$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamPrecoGridProduto, ParamServicoOrcamento,ParamValidadeObrigatoria
+	$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamPrecoGridProduto, ParamServicoOrcamento,ParamValidadeObrigatoria,ParamPatrimonioInicial 
 	        FROM Parametro
 	        WHERE ParamEmpresa = " . $_SESSION['EmpresaId'] . "";
 	$result = $conn->query($sql);
@@ -30,7 +30,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 		$sql = "UPDATE Parametro SET ParamEmpresaPublica = :iEmpresaPublica, ParamValorAtualizadoFluxo = :iValorAtualizadoFluxo, 
 					   ParamValorAtualizadoOrdemCompra = :iValorAtualizadoOrdemCompra, ParamProdutoOrcamento = :iProdutoOrcamento, 
 					   ParamServicoOrcamento = :iServicoOrcamento, ParamPrecoGridProduto = :sPrecoGridProduto, ParamValidadeObrigatoria = :iValidadeObrigatoria,
-					   ParamUsuarioAtualizador = :iUsuarioAtualizador, ParamValorObsImpreRetirada = :iValorObsImpreRetirada
+					   ParamPatrimonioInicial = :sPatrimonioInicial, ParamUsuarioAtualizador = :iUsuarioAtualizador, ParamValorObsImpreRetirada = :iValorObsImpreRetirada
 				WHERE ParamEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
 
@@ -43,6 +43,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 			':iServicoOrcamento' => isset($_POST['inputServicoOrcamento']) && $_POST['inputServicoOrcamento'] == "on" ? 1 : 0,
 			':sPrecoGridProduto' => $_POST['cmbPrecoGridProduto'],
 			':iValidadeObrigatoria' => isset($_POST['inputValidadeObrigatoria']) && $_POST['inputValidadeObrigatoria'] == "on" ? 1 : 0,
+			':sPatrimonioInicial' => $_POST['cmbPatrimonioInicial'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iEmpresa' => $_SESSION['EmpresaId']
 		));
@@ -281,6 +282,16 @@ if (isset($_POST['inputIdEmpresa'])) {
 												</label>
 											</div>
 										</div>
+									</div>
+									<!-- /switch single -->
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-lg-3">
+									<!-- Switch single -->
+									<div class="form-group">
+										<label for="cmbPatrimonioInicial">Patrimonio Inicial<span class="text-danger">*</span></label>
+										<input type="text" id="cmbPatrimonioInicial" name="cmbPatrimonioInicial" class="form-control" placeholder="Patrimonio Inicial" required autofocus>
 									</div>
 									<!-- /switch single -->
 								</div>
