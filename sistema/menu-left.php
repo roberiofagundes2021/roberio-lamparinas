@@ -155,7 +155,7 @@
           </ul>
         </li>
         <li class="nav-item nav-item-submenu">
-          <a href="#" class="nav-link"><i class="icon-bag"></i> <span>Licitações</span></a>
+          <a href="#" class="nav-link"><i class="icon-bag"></i> <span>Processo Licitatório</span></a>
           <ul class="nav nav-group-sub" data-submenu-title="Text editors">
             <li class="nav-item"><a href="tr.php" class="nav-link">Termo de Referência</a></li>
             <li class="nav-item"><a href="relatorioLicitacao.php" class="nav-link">Rol de Licitações</a></li>
