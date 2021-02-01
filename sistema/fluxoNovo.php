@@ -31,9 +31,9 @@ if (isset($_POST['inputDataInicio'])) {
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao,
-											  FlOpeValor, FlOpeObservacao, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeUnidade)
+											  FlOpeValor, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa, FlOpeUnidade)
 				VALUES (:iFornecedor, :iCategoria, :iSubCategoria, :dDataInicio, :dDataFim, :iNumContrato, :iNumProcesso, :iModalidadeLicitacao,
-						:fValor, :sObservacao, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+						:fValor, :sFlOpeConteudoInicio, :sFlOpeConteudoFim, :bStatus, :iUsuarioAtualizador, :iEmpresa, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -44,11 +44,13 @@ if (isset($_POST['inputDataInicio'])) {
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':iNumContrato' => $_POST['inputNumContrato'],
 			':iNumProcesso' => $_POST['inputNumProcesso'],
-			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'],
+			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'] == '' ? null : $_POST['cmbModalidadeLicitacao'],
 			':fValor' => gravaValor($_POST['inputValor']),
-			':sObservacao' => $_POST['txtareaObservacao'] == '' ? null : $_POST['txtareaObservacao'],
+			':sFlOpeConteudoInicio' => $_POST['txtareaConteudoInicio'],
+			':sFlOpeConteudoFim' => $_POST['txtareaConteudoFim'],
 			':bStatus' => $rowSituacao['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+			':iEmpresa' => $_SESSION['EmpreId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
 		/*	
@@ -116,6 +118,9 @@ if (isset($_POST['inputDataInicio'])) {
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_checkboxes_radios.js"></script>
+
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
@@ -124,6 +129,11 @@ if (isset($_POST['inputDataInicio'])) {
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
 		$(document).ready(function() {
+
+			//Inicializa o editor de texto que será usado pelos campos "Conteúdo Personalizado - Inicialização" e "Conteúdo Personalizado - Finalização"
+			$('#summernoteInicio').summernote();
+			$('#summernoteFim').summernote();
+
 
 			//Ao mudar o Fornecedor, filtra a categoria e a SubCategoria via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
@@ -210,43 +220,13 @@ if (isset($_POST['inputDataInicio'])) {
 				var inputDataInicio = $('#inputDataInicio').val();
 				var inputDataFim = $('#inputDataFim').val();
 				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
-				/*
-								if (cmbFornecedor == '#'){
-									alerta('Atenção','Informe o fornecedor!','error');
-									$('#cmbFornecedor').focus();
-									return false;				
-								}
-								
-								if (cmbCategoria == '#'){
-									alerta('Atenção','Informe a categoria!','error');
-									$('#cmbCategoria').focus();
-									return false;				
-								}
 
-								if (cmbSubCategoria == '#'){
-									alerta('Atenção','Informe a subcategoria!','error');
-									$('#cmbSubCategoria').focus();
-									return false;				
-								}				
-								
-								if (inputDataInicio == ''){
-									alerta('Atenção','Informe a data de início do contrato!','error');
-									$('#inputDataInicio').focus();
-									return false;				
-								}
-				*/
 				if (inputDataFim < inputDataInicio) {
 					alerta('Atenção', 'A Data Fim deve ser maior que a Data Início!', 'error');
 					$('#inputDataFim').focus();
 					return false;
 				}
-				/*
-								if (inputValor == '' || inputValor <= 0){
-									alerta('Atenção','Informe o valor total do contrato!','error');
-									$('#inputValor').focus();
-									return false;				
-								}				
-				*/
+
 				$("#formFluxoOperacional").submit();
 
 			});
@@ -293,10 +273,10 @@ if (isset($_POST['inputDataInicio'])) {
 											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-														FROM Fornecedor
-														JOIN Situacao on SituaId = ForneStatus
-														WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-														ORDER BY ForneNome ASC";
+													FROM Fornecedor
+													JOIN Situacao on SituaId = ForneStatus
+													WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+													ORDER BY ForneNome ASC";
 											$result = $conn->query($sql);
 											$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -369,10 +349,10 @@ if (isset($_POST['inputDataInicio'])) {
 											<option value="#">Selecione</option>
 											<?php
 											$sql = "SELECT MdLicId, MdLicNome
-															FROM ModalidadeLicitacao
-															JOIN Situacao on SituaId = MdLicStatus
-															WHERE SituaChave = 'ATIVO'
-															ORDER BY MdLicNome ASC";
+													FROM ModalidadeLicitacao
+													JOIN Situacao on SituaId = MdLicStatus
+													WHERE SituaChave = 'ATIVO'
+													ORDER BY MdLicNome ASC";
 											$result = $conn->query($sql);
 											$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -398,14 +378,28 @@ if (isset($_POST['inputDataInicio'])) {
 									</div>
 								</div>
 							</div>
-							<div class="row" style="margin-top: 10px;">
+							<br>
+							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaObservacao">Observação</label>
-										<textarea rows="3" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" maxlength="4000"></textarea>
+										<label for="txtareaConteudo">Conteúdo Personalizado - Introdução</label>
+										<!--<div id="summernote" name="txtareaConteudo"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do Fluxo (informe aqui o texto que você queira que apareça no Fluxo)"></textarea>
 									</div>
 								</div>
 							</div>
+							<br>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudoFinalizacao">Conteúdo Personalizado - Finalização</label>
+										<!--<div id="summernote" name="txtareaConteudo"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Fluxo (informe aqui o texto que você queira que apareça no término do Fluxo)"></textarea>
+									</div>
+								</div>
+							</div>
+							<br>
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">

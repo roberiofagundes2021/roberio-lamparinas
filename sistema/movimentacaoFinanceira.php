@@ -25,6 +25,7 @@ $Y = date("Y");
 // $dataInicio = date("Y-m-01"); //30 dias atrás
 $dataInicio = date("Y-m-d");
 $dataFim = date("Y-m-d");
+
 ?>
 
 <!DOCTYPE html>
@@ -399,7 +400,7 @@ $dataFim = date("Y-m-d");
                     </div>
 
 
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                       <div class="form-group">
                         <label for="cmbPlanoContas">Plano de Contas</label>
                         <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
@@ -496,7 +497,7 @@ $dataFim = date("Y-m-d");
                       </div>
                     </div>
 
-                    <div class="text-right col-lg-3 pt-3">
+                    <div class="text-right col-lg-4 pt-3">
                       <button id="submitPesquisar" class="btn btn-principal">Pesquisar</button>
 
                       <button id="novoLacamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo Lançamento</button>

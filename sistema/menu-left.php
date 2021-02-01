@@ -193,17 +193,18 @@
         <li class="nav-item nav-item-submenu">
           <a href="#" class="nav-link"> <span>Apoio</span></a>
           <ul class="nav nav-group-sub" data-submenu-title="Text editors">
-            <li class="nav-item"><a href="centroCusto.php" class="nav-link">Centro de Custo</a></li>
-            <li class="nav-item"><a href="planoContas.php" class="nav-link">Plano de Contas</a></li>
-            <li class="nav-item"><a href="formaPagamento.php" class="nav-link">Forma de Pagamento</a></li>
-            <li class="nav-item"><a href="contaBanco.php" class="nav-link">Conta</a></li>
             <li class="nav-item"><a href="caixa.php" class="nav-link">Caixa</a></li>
+            <li class="nav-item"><a href="centroCusto.php" class="nav-link">Centro de Custo</a></li>            
+            <li class="nav-item"><a href="contaBanco.php" class="nav-link">Conta</a></li>
+            <li class="nav-item"><a href="formaPagamento.php" class="nav-link">Forma de Pagamento</a></li>            
+            <li class="nav-item"><a href="grupo.php" class="nav-link">Grupos</a></li>
+            <li class="nav-item"><a href="planoContas.php" class="nav-link">Plano de Contas</a></li>            
           </ul>
         </li>
         <li class="nav-item">
           <a href="contasAPagar.php" class="nav-link"><i class="icon-cash"></i> <span>Contas à Pagar</span></a>
-          <a href="contasAReceber.php" class="nav-link"><i class="icon-cash"></i> <span>Contas à Receber</span></a>
-          <a href="movimentacaoFinanceira.php" class="nav-link"><i class="icon-cash"></i> <span>Movimentação</span></a>
+          <a href="contasAReceber.php" class="nav-link"><i class="icon-cash2"></i> <span>Contas à Receber</span></a>
+          <a href="movimentacaoFinanceira.php" class="nav-link"><i class="icon-coins"></i> <span>Movimentação</span></a>
         </li>
         <li class="nav-item nav-item-submenu">
           <a href="#" class="nav-link"> <span>Relatórios</span></a>

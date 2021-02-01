@@ -673,7 +673,7 @@ $dataFim = date("Y-m-d");
                                 <div class="d-flex flex-row p-2">
                                     <div class='col-lg-6'>
                                         <div class="form-group">
-                                            <label for="numeroSerie">Nº Série <span
+                                            <label for="numeroSerie">Nº Série/Chassi <span
                                                     class="text-danger">(Editável)</span></label>
                                             <div class="input-group">
                                                 <input type="text" id="numeroSerie" name="numeroSerie"

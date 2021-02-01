@@ -105,24 +105,6 @@ if (isset($_POST['inputData'])) {
 			include("trGravaServico.php");
 		}
 
-		if ($_POST['cmbEquipe']) {
-
-			$sql = "INSERT INTO TRXEquipe 
-						(TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente)
-					VALUES 
-						(:iTermoReferencia, :iUsuario, :bPresidente)";
-			$result = $conn->prepare($sql);
-
-			foreach ($_POST['cmbEquipe'] as $key => $value) {
-
-				$result->execute(array(
-					':iTermoReferencia' => $insertId,
-					':iUsuario' => $value,
-					':bPresidente' => $value == $_POST['cmbPresidente'] ? 1 : 0
-				));
-			}
-		}
-
 		$conn->commit();
 
 		// Fim de cadastro
@@ -160,13 +142,9 @@ if (isset($_POST['inputData'])) {
 
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
-	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
-
 
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_checkboxes_radios.js"></script>
@@ -216,7 +194,6 @@ if (isset($_POST['inputData'])) {
 
 				var TrProduto = document.getElementById("TrProduto");
 				var TrServico = document.getElementById("TrServico");
-				var cmbEquipe = $('#cmbEquipe').val();
 				/*				var parametroProduto = $('#parametroProduto').val() == 'ProdutoOrcamento' ? 1 : 0;
 								var parametroServico = $('#parametroServico').val() == 'ServicoOrcamento' ? 1 : 0;
 								var cmbCategoria = $('#cmbCategoria').val();
@@ -273,35 +250,6 @@ if (isset($_POST['inputData'])) {
 					$("#formTR").submit();
 				}
 			});
-			//Ao mudar a Equipe, filtra o possível presidente via ajax (retorno via JSON)
-			$('#cmbEquipe').on('change', function (e) {
-
-				var cmbEquipe = $('#cmbEquipe').val();
-
-				//Esse IF é para quando se exclui todos que estavam selecionados entrar no ELSE e limpar a combo do Presidente
-				if (cmbEquipe != '') {
-
-					$.getJSON('filtraPresidente.php?aEquipe=' + cmbEquipe, function (dados) {
-
-						var option = '';
-
-						if (dados.length) {
-
-							$.each(dados, function (i, obj) {
-								option += '<option value="' + obj.UsuarId + '">' + obj
-									.UsuarLogin + '</option>';
-							});
-
-							$('#cmbPresidente').html(option).show();
-						} else {
-							ResetPresidente();
-						}
-					});
-				} else {
-					ResetPresidente();
-				}
-			});
-
 		}); //document.ready
 
 		//Mostra o "Filtrando..." na combo SubCategoria
@@ -311,15 +259,6 @@ if (isset($_POST['inputData'])) {
 
 		function ResetSubCategoria() {
 			$('#cmbSubCategoria').empty().append('<p>Sem Subcategoria</>');
-		}
-
-		//Mostra o "Filtrando..." na combo Presidente da Comissão
-		function FiltraPresidente() {
-			$('#cmbPresidente').empty().append('<option>Filtrando...</option>');
-		}
-
-		function ResetPresidente() {
-			$('#cmbPresidente').empty().append('<option value="#">Nenhum</option>');
 		}
 	</script>
 
@@ -415,44 +354,7 @@ if (isset($_POST['inputData'])) {
 									</div>
 								</div>
 							</div>
-							<h5 class="mb-0 font-weight-semibold">Comissão de Inventário</h5>
-							<br>
-							<div class="row">
-								<div class="col-lg-9">
-									<div class="form-group" style="border-bottom:1px solid #ddd;">
-										<label for="cmbEquipe">Equipe Responsável<span class="text-danger">
-												*</span></label>
-										<select id="cmbEquipe" name="cmbEquipe[]" class="form-control select"
-											multiple="multiple" data-fouc required>
-											<?php
-											$sql = "SELECT UsuarId, UsuarLogin
-														FROM Usuario
-														JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
-														JOIN Situacao on SituaId = EXUXPStatus
-														WHERE EXUXPUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-														ORDER BY UsuarLogin ASC";
-											$result = $conn->query($sql);
-											$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
 
-											foreach ($rowEquipe as $item) {
-												print('<option value="' . $item['UsuarId'] . '">' . $item['UsuarLogin'] . '</option>');
-											}
-											?>
-										</select>
-									</div>
-								</div>
-
-								<div class="col-lg-3">
-									<div class="form-group" style="border-bottom:1px solid #ddd;">
-										<label for="cmbPresidente">Presidente da Comissão</label>
-										<select id="cmbPresidente" name="cmbPresidente"
-											class="form-control form-control-select2">
-											<option value="#">Nenhum</option>
-										</select>
-									</div>
-								</div>
-							</div>
-							<br>
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">

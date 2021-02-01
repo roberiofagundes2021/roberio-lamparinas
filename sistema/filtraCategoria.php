@@ -6,21 +6,24 @@ include('global_assets/php/conexao.php');
 
 if (isset($_GET['idOrcamento'])){
 	$sql = "SELECT CategId, CategNome
-						FROM Categoria
-						JOIN Orcamento on OrcamCategoria = CategId
-						WHERE CategUnidade = ".$_SESSION['UnidadeId']." and CategStatus = 1 and OrcamId = ".$_GET['idOrcamento']."
-						ORDER BY CategNome ASC";
+			FROM Categoria
+			JOIN Orcamento on OrcamCategoria = CategId
+			JOIN Situacao on SituaId = CategStatus 
+			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO' and OrcamId = ".$_GET['idOrcamento']."
+			ORDER BY CategNome ASC";
 } else if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != -1){
 	$sql = "SELECT CategId, CategNome
-						FROM Categoria
-						JOIN Fornecedor on ForneCategoria = CategId
-						WHERE CategUnidade = ".$_SESSION['UnidadeId']." and ForneId = '". $_GET['idFornecedor']."' and CategStatus = 1
-						ORDER BY CategNome ASC";
+			FROM Categoria
+			JOIN Fornecedor on ForneCategoria = CategId
+			JOIN Situacao on SituaId = CategStatus
+			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and ForneId = '". $_GET['idFornecedor']."' and SituaChave = 'ATIVO'
+			ORDER BY CategNome ASC";
 } else{
 	$sql = "SELECT CategId, CategNome
-					FROM Categoria
-					WHERE CategUnidade = ".$_SESSION['UnidadeId']." and CategStatus = 1
-					ORDER BY CategNome ASC";
+			FROM Categoria
+			JOIN Situacao on SituaId = CategStatus
+			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+			ORDER BY CategNome ASC";
 }
 
 $result = $conn->query($sql);

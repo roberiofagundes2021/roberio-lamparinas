@@ -47,24 +47,30 @@ if (isset($_POST['inputDataInicio'])) {
 
 		$sql = "UPDATE FluxoOperacional SET FlOpeFornecedor = :iFornecedor, FlOpeCategoria = :iCategoria, FlOpeSubCategoria = :iSubCategoria, 
 										    FlOpeDataInicio = :dDataInicio, FlOpeDataFim = :dDataFim, FlOpeNumContrato = :iNumContrato, 
-										    FlOpeNumProcesso = :iNumProcesso, FlOpeModalidadeLicitacao = :iModalidadeLicitacao, FlOpeValor = :fValor, FlOpeObservacao =  :sObservacao, FlOpeUsuarioAtualizador = :iUsuarioAtualizador
+										    FlOpeNumProcesso = :iNumProcesso, FlOpeModalidadeLicitacao = :iModalidadeLicitacao, FlOpeValor = :fValor,
+										    FlOpeConteudoInicio = :sConteudoInicio, FlOpeConteudoFim = :sConteudoFim,
+											FlOpeUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE FlOpeId = " . $_POST['inputFluxoOperacionalId'] . "
 				";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 			':iFornecedor' => $_POST['cmbFornecedor'],
-			':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-			':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+			':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
+			':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
 			':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':iNumContrato' => $_POST['inputNumContrato'],
 			':iNumProcesso' => $_POST['inputNumProcesso'],
-			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'],
+			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'] == '' ? null : $_POST['cmbModalidadeLicitacao'],
 			':fValor' => gravaValor($_POST['inputValor']),
-			':sObservacao' => $_POST['txtareaObservacao'] == '' ? null : $_POST['txtareaObservacao'],
+			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+			':sConteudoFim' => $_POST['txtareaConteudoFim'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId']
 		));
+
+
+		
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Fluxo Operacional alterado!!!";
@@ -100,6 +106,9 @@ if (isset($_POST['inputDataInicio'])) {
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_checkboxes_radios.js"></script>
+
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 
 	<!-- Validação -->
@@ -110,6 +119,10 @@ if (isset($_POST['inputDataInicio'])) {
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
 		$(document).ready(function() {
+
+			//Inicializa o editor de texto que será usado pelos campos "Conteúdo Personalizado - Inicialização" e "Conteúdo Personalizado - Finalização"
+			$('#summernoteInicio').summernote();
+			$('#summernoteFim').summernote();
 
 			//Ao mudar o Fornecedor, filtra a categoria e o Orçamento via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
@@ -187,37 +200,7 @@ if (isset($_POST['inputDataInicio'])) {
 				var inputDataInicio = $('#inputDataInicio').val();
 				var inputDataFim = $('#inputDataFim').val();
 				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
-				/*
-								if (cmbFornecedor == '#'){
-									alerta('Atenção','Informe o fornecedor!','error');
-									$('#cmbFornecedor').focus();
-									return false;				
-								}
-								
-								if (cmbCategoria == '#'){
-									alerta('Atenção','Informe a categoria!','error');
-									$('#cmbCategoria').focus();
-									return false;				
-								}
 
-								if (cmbSubCategoria == '#'){
-									alerta('Atenção','Informe a subcategoria!','error');
-									$('#cmbSubCategoria').focus();
-									return false;				
-								}				
-								
-								if (inputDataInicio == ''){
-									alerta('Atenção','Informe a data de início do contrato!','error');
-									$('#inputDataInicio').focus();
-									return false;				
-								}
-
-								if (inputValor == '' || inputValor <= 0){
-									alerta('Atenção','Informe o valor total do contrato!','error');
-									$('#inputValor').focus();
-									return false;				
-								}
-				*/
 				if (inputDataFim < inputDataInicio) {
 					alerta('Atenção', 'A Data Fim deve ser maior que a Data Início!', 'error');
 					$('#inputDataFim').focus();
@@ -272,9 +255,10 @@ if (isset($_POST['inputDataInicio'])) {
 											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-														FROM Fornecedor														     
-														WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and ForneStatus = 1
-														ORDER BY ForneNome ASC";
+													FROM Fornecedor
+													JOIN Situacao on SituaId = ForneStatus
+													WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+													ORDER BY ForneNome ASC";
 											$result = $conn->query($sql);
 											$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -295,10 +279,12 @@ if (isset($_POST['inputDataInicio'])) {
 											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT CategId, CategNome
-														FROM Categoria
-														JOIN Fornecedor on ForneCategoria = CategId
-														WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and ForneId = " . $row['FlOpeFornecedor'] . "
-														ORDER BY CategNome ASC";
+													FROM Categoria
+													JOIN Fornecedor on ForneCategoria = CategId
+													JOIN Situacao on SituaId = CategStatus
+													WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and ForneId = " . $row['FlOpeFornecedor'] . "
+													and SituaChave = 'ATIVO'
+													ORDER BY CategNome ASC";
 											$result = $conn->query($sql);
 											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -319,10 +305,12 @@ if (isset($_POST['inputDataInicio'])) {
 										<?php
 
 										$sql = "SELECT SbCatId, SbCatNome
-													FROM SubCategoria
-													LEFT JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
-													WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and FrXSCFornecedor = '" . $row['FlOpeFornecedor'] . "' and SbCatStatus = 1
-													Order By SbCatNome ASC";
+												FROM SubCategoria
+												JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
+												JOIN Situacao on SituaId = SbCatStatus
+												WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FrXSCFornecedor = " . $row['FlOpeFornecedor'] . "
+												and SituaChave = 'ATIVO'
+												Order By SbCatNome ASC";
 										$result = $conn->query($sql);
 										$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -374,13 +362,13 @@ if (isset($_POST['inputDataInicio'])) {
 									<div class="form-group">
 										<label for="cmbModalidadeLicitacao">Modalidade de Licitação</label>
 										<select id="cmbModalidadeLicitacao" name="cmbModalidadeLicitacao" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
+											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT MdLicId, MdLicNome
-															FROM ModalidadeLicitacao
-															JOIN Situacao on SituaId = MdLicStatus
-															WHERE SituaChave = 'ATIVO'
-															ORDER BY MdLicNome ASC";
+													FROM ModalidadeLicitacao
+													JOIN Situacao on SituaId = MdLicStatus
+													WHERE SituaChave = 'ATIVO'
+													ORDER BY MdLicNome ASC";
 											$result = $conn->query($sql);
 											$rowMdLic = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -411,14 +399,27 @@ if (isset($_POST['inputDataInicio'])) {
 								</div>
 							</div>
 
-							<div class="row" style="margin-top: 10px;">
+							<br>
+
+							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaObservacao">Observação</label>
-										<textarea rows="3" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" maxlength="4000"><?php echo $row['FlOpeObservacao']?></textarea>
+										<label for="txtareaConteudoInicio">Conteúdo personalizado - Introdução</label>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do TR (informe aqui o texto que você queira que apareça no TR)"><?php echo $row['FlOpeConteudoInicio']; ?></textarea>
 									</div>
 								</div>
 							</div>
+							<br>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudoFim">Conteúdo personalizado - Finalização</label>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais da TR (informe aqui o texto que você queira que apareça no término da TR)"><?php echo $row['FlOpeConteudoFim']; ?></textarea>
+									</div>
+								</div>
+							</div>
+							<br>
 
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
@@ -426,8 +427,8 @@ if (isset($_POST['inputDataInicio'])) {
 										<?php
 
 										$sql = "SELECT SUM(FOXPrQuantidade * FOXPrValorUnitario) as total
-													FROM FluxoOperacionalXProduto
-													WHERE FOXPrEmpresa = " . $_SESSION['EmpreId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
+												FROM FluxoOperacionalXProduto
+												WHERE FOXPrUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
 										$result = $conn->query($sql);
 										$rowTotal = $result->fetch(PDO::FETCH_ASSOC);
 										$count = count($rowTotal);

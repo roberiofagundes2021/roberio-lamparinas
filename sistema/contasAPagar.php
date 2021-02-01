@@ -641,7 +641,7 @@ $dataFim = date("Y-m-d");
                 let status = statusArray[0]
                 let statusTipo = statusArray[1]
                 let url = "contasAPagarFiltra.php";
-                let tipoFiltro = carregamentoPagina ? 'CarregamentoPagima' : 'FiltroNormal'
+                let tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal'
 
                 if (statusArray[1] == 'APAGAR'){ 
                     $('#dataGrid').html('Vencimento')

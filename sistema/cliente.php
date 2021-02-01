@@ -122,7 +122,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				console.log(ClienId, ClienNome, ClienStatus, Tipo)
 						
 				if (Tipo == 'edita'){	
-					document.formCliente.action = "ClienteEdita.php";		
+					document.formCliente.action = "clienteEdita.php";		
 				} else if (Tipo == 'exclui'){
 					confirmaExclusao(document.formCliente, "Tem certeza que deseja excluir esse cliente", "clienteExclui.php");
 				} else if (Tipo == 'mudaStatus'){
