@@ -70,7 +70,9 @@ if (isset($_POST['inputDataEmissao'])) {
       }
         
     } else { //INSERÇÃO
+      //TRANSFERENCIA 
       try {
+        $last_id = 0;
         $sql = "SELECT SituaId
                   FROM Situacao
                   WHERE SituaChave = 'PAGA'
@@ -79,108 +81,145 @@ if (isset($_POST['inputDataEmissao'])) {
         $situacao = $result->fetch(PDO::FETCH_ASSOC);
 
 
-        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
-                                      CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
-                                      CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
-                                      CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
-                        :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
-                        :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-        $result = $conn->prepare($sql);
+        $sql = "INSERT INTO ContasTransferencia ( CnTraDtEmissao, CnTraDescricao, CnTraNumDocumento, 
+                                                  CnTraContaOrigem, CnTraContaDestino, CnTraFormaPagamento, 
+                                                  CnTraDtTransferencia, CnTraValor, CnTraObservacao, 
+                                                  CnTraStatus, CnTraUsuarioAtualizador, CnTraUnidade)
 
+                VALUES ( :dateCnTraDtEmissao, :sCnTraDescricao, :sCnTraNumDocumento, :iCnTraContaOrigem, 
+                         :iCnTraContaDestino, :iCnTraFormaPagamento, :dateCnTraDtTransferencia, 
+                         :fCnTraValor, :sCnTraObservacao, :iCnTraStatus, :iCnTraUsuarioAtualizador, 
+                         :iCnTraUnidade )";
+
+        $result = $conn->prepare($sql);
         $result->execute(array(
-            ':iPlanoContas' => null,
-            ':iFornecedor' => 0,
-            ':iContaBanco' => $_POST['cmbContaBancoOrigem'],
-            ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-            ':sNumDocumento' => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-            ':sNotaFiscal' => null,
-            ':dateDtEmissao' => $_POST['inputDataEmissao'],
-            ':iOrdemCompra' => null,
-            ':sDescricao' => $_POST['inputDescricao'],
-            ':dateDtVencimento' => $_POST['inputDataDaTransferencia'],
-            ':fValorAPagar' => floatval(gravaValor($_POST['inputValorTotal'])),
-            ':dateDtPagamento' => $_POST['inputDataDaTransferencia'],
-            ':fValorPago' => isset($_POST['inputValorTotal']) ? floatval(gravaValor($_POST['inputValorTotal'])) : null,
-            ':sObservacao' => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] . " - Saída gerada por trasnferência entre contas" : "Saída gerada por trasnferência entre contas" ,
-            ':sTipoJuros' => null,
-            ':fJuros' => null,
-            ':sTipoDesconto' => null,
-            ':fDesconto' => null,
-            ':iStatus' => $situacao['SituaId'],
-            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-            ':iUnidade' => $_SESSION['UnidadeId']
+          ':dateCnTraDtEmissao'       => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
+          ':sCnTraDescricao'          => isset($_POST['inputDescricao']) ? $_POST['inputDescricao'] : null,
+          ':sCnTraNumDocumento'       => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
+          ':iCnTraContaOrigem'        => isset($_POST['cmbContaBancoOrigem']) ? intval($_POST['cmbContaBancoOrigem']) : null,
+          ':iCnTraContaDestino'       => isset($_POST['cmbContaBancoDestino']) ? intval($_POST['cmbContaBancoDestino']) : null,
+          ':iCnTraFormaPagamento'     => isset($_POST['cmbFormaPagamento']) ? intval($_POST['cmbFormaPagamento']) : null,
+          ':dateCnTraDtTransferencia' => isset($_POST['inputDataDaTransferencia']) ? $_POST['inputDataDaTransferencia'] : null,
+          ':fCnTraValor'              => isset($_POST['inputValorTotal']) ? floatval(gravaValor($_POST['inputValorTotal'])) : null,
+          ':sCnTraObservacao'         => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
+          ':iCnTraStatus'             => 16,
+          ':iCnTraUsuarioAtualizador' => isset($_SESSION['UsuarId']) ? $_SESSION['UsuarId'] : null,
+          ':iCnTraUnidade'            => isset($_SESSION['UnidadeId']) ? $_SESSION['UnidadeId'] : null,
         ));
 
-        $_SESSION['msg']['titulo'] = "Sucesso";
-        $_SESSION['msg']['mensagem'] = "Lançamento incluído!!!";
-        $_SESSION['msg']['tipo'] = "success";
-      } catch (PDOException $e) {
+        $last_id  = $conn->lastInsertId();
 
-        $_SESSION['msg']['titulo'] = "Erro";
-        $_SESSION['msg']['mensagem'] = "Erro ao incluir Lançamento!!!";
-        $_SESSION['msg']['tipo'] = "error";
-
-        echo 'Error: ' . $e->getMessage();
-        die;
-      }
-
-      try {
-
-      if (isset($_POST['cmbFormaDePagamento'])){
-        $aFormaPagamento = explode('#', $_POST['cmbFormaDePagamento']);                                
-        $idFormaPagamento = $aFormaPagamento[0];
-      }
-    
+        if ($last_id > 0) {
+          //CONTAS A PAGAR
+          try {
             $sql = "SELECT SituaId
                       FROM Situacao
-                     WHERE SituaChave = 'RECEBIDA'";
+                      WHERE SituaChave = 'PAGA'
+                    ";
+            $result = $conn->query($sql);
+            $situacao = $result->fetch(PDO::FETCH_ASSOC);
+    
+    
+            $sql = "INSERT INTO ContasAPagar (CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                                          CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                          CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTransferencia, CnAPaTipoJuros, CnAPaJuros, 
+                                          CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+                    VALUES (:iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                            :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :iTransferencia, :sTipoJuros, :fJuros, 
+                            :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+            $result = $conn->prepare($sql);
+    
+            $result->execute(array(
+                ':iPlanoContas'         => null,
+                ':iFornecedor'          => 0,
+                ':iContaBanco'          => isset($_POST['cmbContaBancoOrigem']) ? $_POST['cmbContaBancoOrigem'] : null,
+                ':iFormaPagamento'      => isset($_POST['cmbFormaPagamento']) ? $_POST['cmbFormaPagamento'] : null,
+                ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
+                ':sNotaFiscal'          => null,
+                ':dateDtEmissao'        => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
+                ':iOrdemCompra'         => null,
+                ':sDescricao'           => isset($_POST['inputDescricao']) ? $_POST['inputDescricao'] : null,
+                ':dateDtVencimento'     => isset($_POST['inputDataDaTransferencia']) ? $_POST['inputDataDaTransferencia'] : null,
+                ':fValorAPagar'         => isset($_POST['inputValorTotal']) ? floatval(gravaValor($_POST['inputValorTotal'])) : null,
+                ':dateDtPagamento'      => isset($_POST['inputDataDaTransferencia']) ? $_POST['inputDataDaTransferencia'] : null,
+                ':fValorPago'           => isset($_POST['inputValorTotal']) ? floatval(gravaValor($_POST['inputValorTotal'])) : null,
+                ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
+                ':iTransferencia'       => isset($last_id) ? intval($last_id) : null,
+                ':sTipoJuros'           => null,
+                ':fJuros'               => null,
+                ':sTipoDesconto'        => null,
+                ':fDesconto'            => null,
+                ':iStatus'              => 12,
+                ':iUsuarioAtualizador'  => isset($_SESSION['UsuarId']) ? $_SESSION['UsuarId'] : null,
+                ':iUnidade'             => isset($_SESSION['UnidadeId']) ? $_SESSION['UnidadeId'] : null,
+            ));
+          } catch (PDOException $e) {
+            echo 'Error: ' . $e->getMessage();
+            die;
+          }
+    
+          //CONTAS A RECEBER
+          try {
+            if (isset($_POST['cmbFormaDePagamento'])){
+              $aFormaPagamento = explode('#', $_POST['cmbFormaDePagamento']);                                
+              $idFormaPagamento = $aFormaPagamento[0];
+            }
+        
+            $sql = "SELECT SituaId
+                      FROM Situacao
+                    WHERE SituaChave = 'RECEBIDA'";
 
             $result = $conn->query($sql);
             $situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-        $sql = "INSERT INTO ContasAReceber (CnAReDtEmissao,CnARePlanoContas, CnAReCliente,CnAReDescricao,CnAReNumDocumento, CnAReContaBanco,CnAReFormaPagamento,CnAReVenda,CnAReDtVencimento, CnAReValorAReceber,CnAReDtRecebimento, CnAReValorRecebido,CnAReTipoJuros, CnAReJuros,CnAReTipoDesconto, CnAReDesconto, CnAReObservacao, CnAReNumCheque,CnAReValorCheque,CnAReDtEmissaoCheque,CnAReDtVencimentoCheque,CnAReBancoCheque,CnAReAgenciaCheque,CnAReContaCheque,CnAReNomeCheque,CnAReCpfCheque,CnAReStatus,CnAReUsuarioAtualizador,CnAReUnidade)
-                    VALUES ( :dDtEmissao, :iPlanoContas, :iCliente,:sDescricao,:sNumDocumento, :iContaBanco, :iFormaPagamento,:iVenda,:dDtVencimento, :fValorAReceber, :dDtRecebimento, :fValorRecebido,:sTipoJuros, :fJuros, :sTipoDesconto, :fDesconto,  :sObservacao,:sNumCheque,:fValorCheque,:dDtEmissaoCheque,:dDtVencimentoCheque,:iBancoCheque,:iAgenciaCheque,:iContaCheque,:iNomeCheque,:iCpfCheque, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-
-        $result = $conn->prepare($sql);
-        $result->execute(array(
-            ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
-            ':iPlanoContas'         => null,
-            ':iCliente'             => 0,
-            ':sDescricao'           => $_POST['inputDescricao'],
-            ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-            ':iContaBanco'          => isset($_POST['cmbContaBancoDestino']) ? intval($_POST['cmbContaBancoDestino']) : null,
-            ':iFormaPagamento'      => isset($idFormaPagamento) ? $idFormaPagamento : null,
-            ':iVenda'               =>  null,
-            ':dDtVencimento'        => $_POST['inputDataDaTransferencia'],
-            ':fValorAReceber'       => floatval(gravaValor($_POST['inputValorTotal'])),
-            ':dDtRecebimento'       => isset($_POST['inputDataDaTransferencia']) ? $_POST['inputDataDaTransferencia'] : null,
-            ':fValorRecebido'       => isset($_POST['inputValorTotal']) ? floatval(gravaValor($_POST['inputValorTotal'])) : null,
-            ':sTipoJuros'           =>  null,
-            ':fJuros'               =>  null,
-            ':sTipoDesconto'        =>  null,
-            ':fDesconto'            =>  null,
-            ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] . " - Entrada gerada por trasnferência entre contas" : "Entrada gerada por trasnferência entre contas",
-            ':sNumCheque'           =>  null,
-            ':fValorCheque'         =>  null,
-            ':dDtEmissaoCheque'     =>  null,
-            ':dDtVencimentoCheque'  =>  null,
-            ':iBancoCheque'         =>  null,
-            ':iAgenciaCheque'       =>  null,
-            ':iContaCheque'         =>  null,
-            ':iNomeCheque'          =>  null,
-            ':iCpfCheque'           =>  null,   
-            ':iStatus'              => intval($situacao['SituaId']),
-            ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
-            ':iUnidade'             => intval($_SESSION['UnidadeId'])
-        ));
-
-        $_SESSION['msg']['titulo'] = "Sucesso";
-        $_SESSION['msg']['mensagem'] = "Lançamento incluído!!!";
-        $_SESSION['msg']['tipo'] = "success";
+    
+            $sql = "INSERT INTO ContasAReceber (CnAReDtEmissao, CnARePlanoContas, CnAReCliente, CnAReDescricao, CnAReNumDocumento, CnAReContaBanco, CnAReFormaPagamento, CnAReVenda, CnAReDtVencimento, CnAReValorAReceber, CnAReDtRecebimento, CnAReValorRecebido, CnAReTipoJuros, CnAReJuros, CnAReTipoDesconto, CnAReDesconto, CnAReObservacao, CnAReTransferencia, CnAReNumCheque, CnAReValorCheque, CnAReDtEmissaoCheque, CnAReDtVencimentoCheque, CnAReBancoCheque, CnAReAgenciaCheque, CnAReContaCheque, CnAReNomeCheque, CnAReCpfCheque, CnAReStatus, CnAReUsuarioAtualizador, CnAReUnidade)
+                        VALUES ( :dDtEmissao, :iPlanoContas, :iCliente, :sDescricao, :sNumDocumento, :iContaBanco, :iFormaPagamento, :iVenda, :dDtVencimento, :fValorAReceber, :dDtRecebimento, :fValorRecebido, :sTipoJuros, :fJuros, :sTipoDesconto, :fDesconto,  :sObservacao, :iTransferencia, :sNumCheque, :fValorCheque, :dDtEmissaoCheque, :dDtVencimentoCheque, :iBancoCheque, :iAgenciaCheque, :iContaCheque, :iNomeCheque, :iCpfCheque, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+    
+            $result = $conn->prepare($sql);
+            $result->execute(array(
+                ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
+                ':iPlanoContas'         => null,
+                ':iCliente'             => 0,
+                ':sDescricao'           => $_POST['inputDescricao'],
+                ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
+                ':iContaBanco'          => isset($_POST['cmbContaBancoDestino']) ? intval($_POST['cmbContaBancoDestino']) : null,
+                ':iFormaPagamento'      => isset($idFormaPagamento) ? $idFormaPagamento : null,
+                ':iVenda'               => null,
+                ':dDtVencimento'        => $_POST['inputDataDaTransferencia'],
+                ':fValorAReceber'       => floatval(gravaValor($_POST['inputValorTotal'])),
+                ':dDtRecebimento'       => isset($_POST['inputDataDaTransferencia']) ? $_POST['inputDataDaTransferencia'] : null,
+                ':fValorRecebido'       => isset($_POST['inputValorTotal']) ? floatval(gravaValor($_POST['inputValorTotal'])) : null,
+                ':sTipoJuros'           => null,
+                ':fJuros'               => null,
+                ':sTipoDesconto'        => null,
+                ':fDesconto'            => null,
+                ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
+                ':iTransferencia'       => isset($last_id) ? intval($last_id) : null,
+                ':sNumCheque'           => null,
+                ':fValorCheque'         => null,
+                ':dDtEmissaoCheque'     => null,
+                ':dDtVencimentoCheque'  => null,
+                ':iBancoCheque'         => null,
+                ':iAgenciaCheque'       => null,
+                ':iContaCheque'         => null,
+                ':iNomeCheque'          => null,
+                ':iCpfCheque'           => null,   
+                ':iStatus'              => 14,
+                ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
+                ':iUnidade'             => intval($_SESSION['UnidadeId'])
+            ));
+    
+          } catch (PDOException $e) {
+            echo 'Error: ' . $e->getMessage();
+            die;
+          }
+        
+          $_SESSION['msg']['titulo'] = "Sucesso";
+          $_SESSION['msg']['mensagem'] = "Lançamento incluído!!!";
+          $_SESSION['msg']['tipo'] = "success";
+        }
 
       } catch (PDOException $e) {
-
         $_SESSION['msg']['titulo'] = "Erro";
         $_SESSION['msg']['mensagem'] = "Erro ao incluir Lançamento!!!";
         $_SESSION['msg']['tipo'] = "error";
@@ -189,7 +228,7 @@ if (isset($_POST['inputDataEmissao'])) {
       }
     }
 
-    irpara("movimentacaoFinanceira.php");
+  irpara("movimentacaoFinanceira.php");
 }
 
 if (isset($_GET['lancamentoId'])) {
@@ -371,7 +410,7 @@ $dataInicio = date("Y-m-d");
                     <div class="col-lg-6">
                       <div class="form-group">
                         <label for="inputDescricao">Descrição <span class='text-danger'>*</span></label>
-                        <input type="text" id="inputDescricao" name="inputDescricao" class="form-control" placeholder="Descrição" required>
+                        <input type="text" id="inputDescricao" name="inputDescricao" class="form-control" placeholder="Descrição" value='Transferência entre contas' readonly required>
                       </div>
                     </div>
 
