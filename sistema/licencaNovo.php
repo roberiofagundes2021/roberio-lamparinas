@@ -8,80 +8,32 @@ include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputDataInicio'])) {
 
-	$sql = "SELECT MAX(LicenId)
-	        FROM Licenca 
-	        JOIN Situacao on SituaId = LicenStatus 
-	        WHERE LicenEmpresa = " . $_SESSION['EmpresaId'] . "
-        ";
-	$result = $conn->query($sql);
-	$rowMAXId = $result->fetch(PDO::FETCH_ASSOC);
-
 	try {
+	
+		$sql = "INSERT INTO Licenca (LicenEmpresa, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenStatus, LicenUsuarioAtualizador)
+			VALUES (:iEmpresa, :dDtInicio, :dDtFim, :iLimiteUsuarios, :bStatus, :iUsuarioAtualizador)";
+		$result = $conn->prepare($sql);
 
-		if ($rowMAXId['']) {
-			$sql = "SELECT LicenDtFim, SituaId
-		        FROM Licenca 
-				JOIN Situacao on SituaId = LicenStatus 
-				WHERE LicenId = " . $rowMAXId[''] . " and LicenEmpresa = " . $_SESSION['EmpresaId'] . "
-			   ";
-			$result = $conn->query($sql);
-			$row = $result->fetch(PDO::FETCH_ASSOC);
+		$result->execute(array(
+			':iEmpresa' => $_SESSION['EmpresaId'],
+			':dDtInicio' => $_POST['inputDataInicio'],
+			':dDtFim' => $_POST['inputDataFim'],
+			':iLimiteUsuarios' => $_POST['inputLimiteUsuarios'],
+			':bStatus' => 1,
+			':iUsuarioAtualizador' => $_SESSION['UsuarId']
+		));
 
-			if (strtotime($_POST['inputDataInicio']) > strtotime($row['LicenDtFim'])) {
-				$sql = "INSERT INTO Licenca (LicenEmpresa, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenStatus, LicenUsuarioAtualizador)
-				VALUES (:iEmpresa, :dDtInicio, :dDtFim, :iLimiteUsuarios, :bStatus, :iUsuarioAtualizador)";
-				$result = $conn->prepare($sql);
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Licença incluída!!!";
+		$_SESSION['msg']['tipo'] = "success";
 
-				$result->execute(array(
-					':iEmpresa' => $_SESSION['EmpresaId'],
-					':dDtInicio' => $_POST['inputDataInicio'],
-					':dDtFim' => $_POST['inputDataFim'],
-					':iLimiteUsuarios' => $_POST['inputLimiteUsuarios'],
-					':bStatus' => $row['SituaId'],
-					':iUsuarioAtualizador' => $_SESSION['UsuarId']
-				));
-
-				$_SESSION['msg']['titulo'] = "Sucesso";
-				$_SESSION['msg']['mensagem'] = "Licença incluída!!!";
-				$_SESSION['msg']['tipo'] = "success";
-			} else {
-				$_SESSION['msg']['titulo'] = "Erro";
-				$_SESSION['msg']['mensagem'] = "Erro ao incluir Licença!!! A data inicial da nova licença deve ser superior a data fim da última licença.";
-				$_SESSION['msg']['tipo'] = "error";
-			}
-		} else {
-
-			$sql = "SELECT LicenDtFim, SituaId
-				    FROM Situacao on SituaChave = 'ATIVO' 
-				    WHERE LicenId = " . $rowMAXId[''] . " and LicenEmpresa = " . $_SESSION['EmpresaId'] . "
-			   ";
-			$result = $conn->query($sql);
-			$row = $result->fetch(PDO::FETCH_ASSOC);
-
-			$sql = "INSERT INTO Licenca (LicenEmpresa, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenStatus, LicenUsuarioAtualizador)
-				VALUES (:iEmpresa, :dDtInicio, :dDtFim, :iLimiteUsuarios, :bStatus, :iUsuarioAtualizador)";
-			$result = $conn->prepare($sql);
-
-			$result->execute(array(
-				':iEmpresa' => $_SESSION['EmpresaId'],
-				':dDtInicio' => $_POST['inputDataInicio'],
-				':dDtFim' => $_POST['inputDataFim'],
-				':iLimiteUsuarios' => $_POST['inputLimiteUsuarios'],
-				':bStatus' => $row['SituaId'],
-				':iUsuarioAtualizador' => $_SESSION['UsuarId']
-			));
-
-			$_SESSION['msg']['titulo'] = "Sucesso";
-			$_SESSION['msg']['mensagem'] = "Licença incluída!!!";
-			$_SESSION['msg']['tipo'] = "success";
-		}
 	} catch (PDOException $e) {
 
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir Licença!!!";
 		$_SESSION['msg']['tipo'] = "error";
 
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 
 	irpara("licenca.php");

@@ -22,7 +22,7 @@ if(isset($_POST['inputCategoriaId'])){
 		
 		$sql = "UPDATE Categoria SET CategStatus = :iStatus
 				WHERE CategId = :id";
-		$result = $conn->prepare("$sql");
+		$result = $conn->prepare($sql);
 		$result->bindParam(':iStatus', $iStatus); 
 		$result->bindParam(':id', $iCategoria); 
 		$result->execute();

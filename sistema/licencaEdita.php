@@ -137,7 +137,6 @@ if(isset($_POST['inputDataInicio'])){
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>																					
 											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['LicenDtFim']; ?>" required>
-											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['FlOpeDataFim']; ?>" required>
 										</div>
 									</div>
 								</div>

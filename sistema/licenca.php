@@ -10,11 +10,11 @@ if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
 
-$sql = ("SELECT LicenId, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenStatus, EmpreNomeFantasia
-		 FROM Licenca
-		 JOIN Empresa on EmpreId = LicenEmpresa
-		 WHERE EmpreId = ".$_SESSION['EmpresaId']."
-		 ORDER BY LicenDtInicio DESC"); 
+$sql = "SELECT LicenId, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenStatus, SituaNome, SituaChave, SituaCor
+		FROM Licenca
+		JOIN Situacao on SituaId = LicenStatus
+		WHERE LicenEmpresa = ".$_SESSION['EmpresaId']."
+		ORDER BY LicenDtInicio DESC"; 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -36,7 +36,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>	
 	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
@@ -44,8 +44,68 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>		
 	<!-- /theme JS files -->	
 	
-	<script>
+	<script type="text/javascript">
 		
+		$(document).ready(function (){	
+			$('#tblLicenca').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+				{
+					orderable: true,   //Data Início
+					width: "30%",
+					targets: [0]
+				},
+				{
+					orderable: true,   //Data Fim
+					width: "30%",
+					targets: [1]
+				},
+				{
+					orderable: true,   //Limite Usuários
+					width: "20%",
+					targets: [2]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "10%",
+					targets: [3]
+				},
+				{ 
+					orderable: false,   //Ações
+					width: "10%",
+					targets: [4]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+			
+			// Select2 for length menu styling
+			var _componentSelect2 = function() {
+				if (!$().select2) {
+					console.warn('Warning - select2.min.js is not loaded.');
+					return;
+				}
+
+				// Initialize
+				$('.dataTables_length select').select2({
+					minimumResultsForSearch: Infinity,
+					dropdownAutoWidth: true,
+					width: 'auto'
+				});
+			};	
+
+			_componentSelect2();
+			
+			/* Fim: Tabela Personalizada */					
+		});
+
 		function atualizaLicenca(LicenId, LicenStatus, Tipo){
 
 			document.getElementById('inputLicencaId').value = LicenId;
@@ -92,14 +152,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h5 class="card-title">Relação das Licenças</h5>
-								<div class="header-elements">
-									<div class="list-icons">
-										<!--<a href="empresa.php" class="icon-backward2"> Voltar</a>-->
-										<!--<a class="list-icons-item" data-action="collapse"></a>-->
-										<!--<a href="empresa.php" class="list-icons-item" data-action="reload"></a>-->
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
@@ -113,12 +165,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								</div>
 							</div>							
 
-							<table class="table datatable-responsive">
+							<table id="tblLicenca" class="table">
 								<thead>
 									<tr class="bg-slate">
 										<th>Data Início</th>
 										<th>Data Fim</th>
-										<th>Limite Usuários</th>
+										<th>Limite de Usuários</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -127,8 +179,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['LicenStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['LicenStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
@@ -136,13 +188,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.mostraData($item['LicenDtFim']).'</td>
 											<td>'.$item['LicenLimiteUsuarios'].'</td>');
 										
-										print('<td><a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaLicenca('.$item['LicenId'].',\''.$item['SituaChave'].'\', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 																				
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].', '.$item['LicenStatus'].', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>														
+														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].',\''.$item['SituaChave'].'\', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].',\''.$item['SituaChave'].'\', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>														
 													</div>
 												</div>
 											</td>
