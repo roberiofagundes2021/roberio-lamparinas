@@ -95,7 +95,15 @@ function queryPesquisa(){
             }
 
             if ($status[0] === "12") {
-                $sql = "SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' 
+                $sql = "SELECT CNAPAID AS ID, 
+                               CNAPADTEMISSAO AS DATA, 
+                               CNAPADESCRICAO AS HISTORICO, 
+                               CnAPANUMDOCUMENTO AS NUMDOC, 
+                               CNAPAVALORPAGO as TOTAL, 
+                               TIPO = 'P' ,
+                               CODTRANSFREC = 0,
+                               CnAPaTransferencia as CODTRANSFPAG,
+                               CNAPACONTABANCO AS CONTABANCO
                         FROM ContasAPagar ";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
@@ -104,7 +112,15 @@ function queryPesquisa(){
                          ORDER BY DATA DESC";
                         
             } else if ($status[0] === "14") {
-                $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
+                $sql = "SELECT CNAREID AS ID, 
+                               CNAREDTEMISSAO AS DATA, 
+                               CNAREDESCRICAO AS HISTORICO, 
+                               CnARENUMDOCUMENTO AS NUMDOC, 
+                               CNAREVALORRECEBIDO as TOTAL, 
+                               TIPO = 'R' , 
+                               CnAReTransferencia as CODTRANSFREC, 
+                               CODTRANSFPAG = 0,
+                               CNARECONTABANCO AS CONTABANCO
                         FROM ContasAReceber ";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
@@ -113,14 +129,30 @@ function queryPesquisa(){
                         ORDER BY DATA DESC";
                         
             } else {
-                $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
+                $sql = "SELECT CNAREID AS ID, 
+                               CNAREDTEMISSAO AS DATA, 
+                               CNAREDESCRICAO AS HISTORICO, 
+                               CnARENUMDOCUMENTO AS NUMDOC, 
+                               CNAREVALORRECEBIDO as TOTAL, 
+                               TIPO = 'R' , 
+                               CnAReTransferencia as CODTRANSFREC, 
+                               CODTRANSFPAG = 0,
+                               CNARECONTABANCO AS CONTABANCO
                         FROM ContasAReceber ";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
                         }
                 $sql .= "WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
                         UNION 
-                        SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' 
+                        SELECT CNAPAID AS ID, 
+                               CNAPADTEMISSAO AS DATA, 
+                               CNAPADESCRICAO AS HISTORICO, 
+                               CnAPANUMDOCUMENTO AS NUMDOC, 
+                               CNAPAVALORPAGO as TOTAL, 
+                               TIPO = 'P' ,
+                               CODTRANSFREC = 0 ,
+                               CnAPaTransferencia as CODTRANSFPAG,
+                               CNAPACONTABANCO AS CONTABANCO
                         FROM ContasAPagar ";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
@@ -211,8 +243,16 @@ function queryPesquisa(){
             }
 
             if ($status[0] === "12") {
-                $sql = "SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' 
-                        FROM ContasAPagar ";
+                $sql = "SELECT CNAPAID AS ID, 
+                               CNAPADTEMISSAO AS DATA, 
+                               CNAPADESCRICAO AS HISTORICO, 
+                               CnAPANUMDOCUMENTO AS NUMDOC, 
+                               CNAPAVALORPAGO as TOTAL, 
+                               TIPO = 'P',
+                               CODTRANSFREC = 0 ,
+                               CnAPaTransferencia as CODTRANSFPAG,
+                               CNAPACONTABANCO AS CONTABANCO
+                          FROM ContasAPagar ";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
                         }
@@ -220,7 +260,15 @@ function queryPesquisa(){
                          ORDER BY DATA DESC";
                         
             } else if ($status[0] === "14") {
-                $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
+                $sql = "SELECT CNAREID AS ID, 
+                               CNAREDTEMISSAO AS DATA, 
+                               CNAREDESCRICAO AS HISTORICO, 
+                               CnARENUMDOCUMENTO AS NUMDOC, 
+                               CNAREVALORRECEBIDO as TOTAL, 
+                               TIPO = 'R', 
+                               CnAReTransferencia as CODTRANSFREC, 
+                               CODTRANSFPAG = 0,
+                               CNARECONTABANCO AS CONTABANCO
                         FROM ContasAReceber ";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
@@ -229,15 +277,31 @@ function queryPesquisa(){
                         ORDER BY DATA DESC";
                         
             } else {
-                $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' 
-                        FROM ContasAReceber ";
+                $sql = "SELECT CNAREID AS ID, 
+                               CNAREDTEMISSAO AS DATA, 
+                               CNAREDESCRICAO AS HISTORICO, 
+                               CnARENUMDOCUMENTO AS NUMDOC, 
+                               CNAREVALORRECEBIDO as TOTAL, 
+                               TIPO = 'R',
+                               CnAReTransferencia as CODTRANSFREC, 
+                               CODTRANSFPAG = 0,
+                               CNARECONTABANCO AS CONTABANCO
+                          FROM ContasAReceber ";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
                         }
                 $sql .= "WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
                         UNION 
-                        SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' 
-                        FROM ContasAPagar ";
+                        SELECT CNAPAID AS ID, 
+                               CNAPADTEMISSAO AS DATA, 
+                               CNAPADESCRICAO AS HISTORICO, 
+                               CnAPANUMDOCUMENTO AS NUMDOC, 
+                               CNAPAVALORPAGO as TOTAL, 
+                               TIPO = 'P' , 
+                               CODTRANSFREC = 0 ,
+                               CnAPaTransferencia as CODTRANSFPAG,
+                               CNAPACONTABANCO AS CONTABANCO
+                          FROM ContasAPagar ";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
                         }
@@ -256,15 +320,33 @@ function queryPesquisa(){
         $dataInicio = date("Y-m-d");
         $dataFim = date("Y-m-d");
 
-        $sql = "SELECT CNAREID AS ID, CNAREDTEMISSAO AS DATA, CNAREDESCRICAO AS HISTORICO, CnARENUMDOCUMENTO AS NUMDOC, CNAREVALORRECEBIDO as TOTAL, TIPO = 'R' FROM ContasAReceber
-                WHERE CNARESTATUS = 14
-                AND CnAReUnidade = " . $_SESSION['UnidadeId'] . " 
-                AND CnAReDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' 
-                UNION 
-                SELECT CNAPAID AS ID, CNAPADTEMISSAO AS DATA, CNAPADESCRICAO AS HISTORICO, CnAPANUMDOCUMENTO AS NUMDOC, CNAPAVALORPAGO as TOTAL, TIPO = 'P' FROM ContasAPagar
-                WHERE CNAPASTATUS = 12
-                AND CnAPaUnidade = " . $_SESSION['UnidadeId'] . " 
-                AND CnAPaDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' 
+        $sql = "SELECT CNAREID AS ID, 
+                       CNAREDTEMISSAO AS DATA, 
+                       CNAREDESCRICAO AS HISTORICO, 
+                       CNARENUMDOCUMENTO AS NUMDOC, 
+                       CNAREVALORRECEBIDO AS TOTAL, 
+                       TIPO = 'R', 
+                       CNAReTransferencia AS CODTRANSFREC, 
+                       CODTRANSFPAG = 0,
+                       CNARECONTABANCO AS CONTABANCO
+                  FROM ContasAReceber
+                 WHERE CNARESTATUS = 14
+                   AND CnAReUnidade = " . $_SESSION['UnidadeId'] . " 
+                   AND CnAReDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' 
+                 UNION 
+                SELECT CNAPAID AS ID, 
+                       CNAPADTEMISSAO AS DATA, 
+                       CNAPADESCRICAO AS HISTORICO, 
+                       CnAPANUMDOCUMENTO AS NUMDOC, 
+                       CNAPAVALORPAGO as TOTAL, 
+                       TIPO = 'P',
+                       CODTRANSFREC = 0,
+                       CnAPaTransferencia as CODTRANSFPAG,
+                       CNAPACONTABANCO AS CONTABANCO
+                  FROM ContasAPagar
+                 WHERE CNAPASTATUS = 12
+                   AND CnAPaUnidade = " . $_SESSION['UnidadeId'] . " 
+                   AND CnAPaDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' 
                 ORDER BY DATA DESC";
                 
         $result = $conn->query($sql);
@@ -293,24 +375,56 @@ function queryPesquisa(){
                 <tr>
                     <td class='even'><p class='m-0'>" . $data . "</p><input type='hidden' value='" . $item['DATA'] . "'></td>";
 
-                    if ($item['TIPO'] === 'R'){
+
+                    //HISTÓRICO
+                    if (intval($item['CODTRANSFREC']) > 0){
+                        $print .= "<td class='even'><a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFREC'] . "'>" . $item['HISTORICO'] . "</a></td>";
+
+                    } else if (intval($item['CODTRANSFPAG']) > 0) {
+                        $print .= "<td class='even'><a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFPAG'] . "'>" . $item['HISTORICO'] . "</a></td>";
+
+                    } else if ($item['TIPO'] === 'R'){
                         $print .= "<td class='even'><a href='movimentacaoFinanceiraRecebimento.php?lancamentoId=" . $item['ID'] . "'>" . $item['HISTORICO'] . "</a></td>";
-                    }
-                    else {
+
+                    } else if ($item['TIPO'] === 'P') {
                         $print .= "<td class='even'><a href='movimentacaoFinanceiraPagamento.php?lancamentoId=" . $item['ID'] . "'>" . $item['HISTORICO'] . "</a></td>";
                     }
 
-                $print .= "<td class='even' style='text-align: left;width: 15%;'>" . $item['NUMDOC'] . "</td>";
 
+                    //CONTA CAIXA
+                    if (isset($item['CONTABANCO']) && $item['CONTABANCO'] != 0) {
+                        $sql = "SELECT  CnBanNome
+                                  FROM  ContaBanco
+                                  JOIN  Situacao 
+                                    ON  SituaId = CnBanStatus
+                                 WHERE  CnBanUnidade = " . $_SESSION['UnidadeId'] . " 
+                                   AND  SituaChave = 'ATIVO'
+                                   AND  CnBanId = ". $item['CONTABANCO'] ."";
+                        $result = $conn->query($sql);
+                        $ContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                        $print .= "<td class='even' style='text-align: left;'>" . $ContaBanco[0]['CnBanNome'] . "</td>";
+                    } else {
+                        $print .= "<td class='even' style='text-align: left;'></td>";
+                    }
+
+
+                    //NUMERO DO DOCUMENTO
+                    $print .= "<td class='even' style='text-align: left;width: 15%;'>" . $item['NUMDOC'] . "</td>";
+
+                    
                     if ($item['TIPO'] === 'R'){
+                        //ENTRADA
                         $print .= "<td class='even' style='color:green;text-align: right;padding-right:40px;'>" . mostraValor($item['TOTAL']) . "</td>
                                    <td class='even'></td>";
-                    }
-                    else {
+                    } else {
+                        //SAIDA
                         $print .= "<td class='even'></td>
                                    <td class='even' style='color:red;text-align: right;padding-right:40px;'>" . mostraValor($item['TOTAL']) . "</td>";
                     }
 
+                    
+                    //APLICANDO ESTILO NA COLUNA SALDO
                     if ($saldo < 0) {
                         $print .= "<td class='even' style='color: red;text-align: right;padding-right:40px;'>" . mostraValor($saldo) . "</td>";
                     }
@@ -318,24 +432,44 @@ function queryPesquisa(){
                         $print .= "<td class='even' style='color: green;text-align: right;padding-right:40px;'>" . mostraValor($saldo) . "</td>";
                     }
                     
-                $print .= "
-                    <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
-                        <div class='list-icons'>
-                            <div class='list-icons list-icons-extended'> ";
+                    //MENU EDITAR E EXCLUIR
+                    $print .= "
+                        <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
+                            <div class='list-icons'>
+                                <div class='list-icons list-icons-extended'> ";
 
-                                if ($item['TIPO'] === 'R'){
-                                    $print .= "<a href='movimentacaoFinanceiraRecebimento.php?lancamentoId=" . $item['ID'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
+                                    //BOTAO EDITAR
+                                    if (intval($item['CODTRANSFREC']) > 0){
+                                        $print .= "<a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFREC'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
+                
+                                    } else if (intval($item['CODTRANSFPAG']) > 0) {
+                                        $print .= "<a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFPAG'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
+                
+                                    } else if ($item['TIPO'] === 'R'){
+                                        $print .= "<a href='movimentacaoFinanceiraRecebimento.php?lancamentoId=" . $item['ID'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
+                                        
+                                    } else if ($item['TIPO'] === 'P') {
+                                        $print .= "<a href='movimentacaoFinanceiraPagamento.php?lancamentoId=" . $item['ID'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
+                                    }
                                     
-                                } else if ($item['TIPO'] === 'P') {
-                                    $print .= "<a href='movimentacaoFinanceiraPagamento.php?lancamentoId=" . $item['ID'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
-                                }
-                                
-                                $print .= "
-                                    <a href='#' idContaExcluir='" . $item['ID'] . "' tipo='" . $item['TIPO'] . "' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
+                                    //BOTAO EXCLUIR
+                                    if (intval($item['CODTRANSFREC']) > 0){
+                                        $print .= "
+                                            <a href='#' idContaExcluir='" . $item['CODTRANSFREC'] . "' tipo='T' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>";
+                
+                                    } else if (intval($item['CODTRANSFPAG']) > 0) {
+                                        $print .= "
+                                            <a href='#' idContaExcluir='" . $item['CODTRANSFPAG'] . "' tipo='T' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>";
+
+                                    } else {
+                                        $print .= "
+                                            <a href='#' idContaExcluir='" . $item['ID'] . "' tipo='" . $item['TIPO'] . "' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>";
+                                    }
+                                    $print .= "
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
                 ";
             print($print);
         }
