@@ -193,7 +193,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 								<div class="col-lg-6">
 									<!-- Switch single -->
 									<div class="form-group row">
-										<label class="col-lg-3 col-form-label">Mostrar "Observação" na impressão das saídas e transferências<span class="text-danger">*</span></label>
+										<label class="col-lg-3 col-form-label">Mostrar "Observação" na impressão das saídas e transferências <span class="text-danger">*</span></label>
 										<div class="col-lg-9">
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
@@ -209,7 +209,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 								<div class="col-lg-6">
 									<!-- Switch single -->
 									<div class="form-group row">
-										<label class="col-lg-3 col-form-label">Usar "Produtos para Orçamento" nos Orçamentos da TR<span class="text-danger">*</span></label>
+										<label class="col-lg-3 col-form-label">Usar "Produtos para Orçamento" nos Orçamentos da TR <span class="text-danger">*</span></label>
 										<div class="col-lg-9">
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
@@ -225,7 +225,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 								<div class="col-lg-6">
 									<!-- Switch single -->
 									<div class="form-group row">
-										<label class="col-lg-3 col-form-label">Usar "Serviços para Orçamento" nos Orçamentos da TR<span class="text-danger">*</span></label>
+										<label class="col-lg-3 col-form-label">Usar "Serviços para Orçamento" nos Orçamentos da TR <span class="text-danger">*</span></label>
 										<div class="col-lg-9">
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
@@ -241,7 +241,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 								<div class="col-lg-3">
 									<!-- Switch single -->
 									<div class="form-group">
-										<label for="cmbPrecoGridProduto">Coluna preço na relação dos produtos<span class="text-danger">*</span></label>
+										<label for="cmbPrecoGridProduto">Coluna preço na relação dos produtos <span class="text-danger">*</span></label>
 										<select id="cmbPrecoGridProduto" name="cmbPrecoGridProduto" class="form-control form-control-select2">
 											<?php
 											if ($row['ParamPrecoGridProduto'] == 'precoCustoFinal') {
@@ -274,7 +274,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 								<div class="col-lg-6">
 									<!-- Switch single -->
 									<div class="form-group row">
-										<label class="col-lg-3 col-form-label">Validade Obrigatória<span class="text-danger">*</span></label>
+										<label class="col-lg-3 col-form-label">Validade Obrigatória <span class="text-danger">*</span></label>
 										<div class="col-lg-9">
 											<div class="form-check form-check-switch form-check-switch-left">
 												<label class="form-check-label d-flex align-items-center">
@@ -290,8 +290,8 @@ if (isset($_POST['inputIdEmpresa'])) {
 								<div class="col-lg-3">
 									<!-- Switch single -->
 									<div class="form-group">
-										<label for="cmbPatrimonioInicial">Patrimonio Inicial<span class="text-danger">*</span></label>
-										<input type="text" id="cmbPatrimonioInicial" name="cmbPatrimonioInicial" class="form-control" placeholder="Patrimonio Inicial" required autofocus>
+										<label for="cmbPatrimonioInicial">Patrimônio Inicial <span class="text-danger">*</span></label>
+										<input type="text" id="cmbPatrimonioInicial" name="cmbPatrimonioInicial" class="form-control" placeholder="Patrimônio Inicial" required autofocus>
 									</div>
 									<!-- /switch single -->
 								</div>

@@ -17,6 +17,13 @@ if(isset($_POST['inputLicencaId'])){
 				WHERE LicenId = $iLicenca ";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		$sql = "SELECT TOP 1 LicenDtFim
+				FROM Licenca
+				WHERE LicenEmpresa = ".$_SESSION['EmpresaId']." and LicenDtFim < (select max(LicenDtFim) from Licenca where LicenEmpresa = ".$_SESSION['EmpresaId'].")
+				ORDER BY LicenDtFim DESC"; 
+		$result = $conn->query($sql);
+		$rowUltimaLicenca = $result->fetch(PDO::FETCH_ASSOC);		
 		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
@@ -71,18 +78,58 @@ if(isset($_POST['inputDataInicio'])){
 
 	<?php include_once("head.php"); ?>
 	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
-	
+	<!-- Theme JS files -->	
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>	<!-- CV Documentacao: https://jqueryvalidation.org/ -->
-	<!-- /theme JS files -->	
+
+	<!-- Adicionando Javascript -->
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+
+			//Garantindo que ninguém mude a empresa na tela de Edição
+			$('#cmbEmpresa').prop("disabled", true);
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e) {
+
+				e.preventDefault();
+
+				var inputDataInicio = $('#inputDataInicio').val();
+				var inputDataFim = $('#inputDataFim').val();
+				var inputUltimaData = $('#inputUltimaData').val();
+
+				if (inputDataFim < inputDataInicio) {
+					alerta('Atenção', 'A Data Fim deve ser maior que a Data Início!', 'error');
+					$('#inputDataFim').focus();
+					return false;
+				}
+
+				//Aqui falta verificar se a licença com data maior e ativa é menor que a data início (TEM QUE SER)
+				if (inputUltimaData > inputDataInicio) {
+					alerta('Atenção', 'A Data Início deve ser maior que a data fim da última licença!', 'error');
+					$('#inputDataInicio').focus();
+					return false;
+				}
+
+				$('#cmbEmpresa').prop("disabled", false);
+
+				$("#formLicenca").submit();
+
+			});
+
+			$('#cancelar').on('click', function(e) {
+
+				$('#cmbEmpresa').prop("disabled", false);
+				$(window.document.location).attr('href', "licenca.php");
+			});
+
+		});
+	</script>
 	
 </head>
 
@@ -114,6 +161,7 @@ if(isset($_POST['inputDataInicio'])){
 						</div>
 						
 						<input type="hidden" id="inputLicencaId" name="inputLicencaId" value="<?php echo $row['LicenId']; ?>" >
+						<input type="hidden" id="inputUltimaData" name="inputUltimaData" class="form-control" value="<?php echo $rowUltimaLicenca['LicenDtFim']; ?>">
 						
 						<div class="card-body">			
 							<div class="row">
@@ -152,8 +200,8 @@ if(isset($_POST['inputDataInicio'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-principal" type="submit">Alterar</button>
-										<a href="licenca.php" class="btn btn-basic" role="button">Cancelar</a>
+										<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>
+										<a href="licenca.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 									</div>
 								</div>
 							</div>

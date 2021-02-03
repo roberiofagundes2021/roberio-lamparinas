@@ -6,6 +6,13 @@ $_SESSION['PaginaAtual'] = 'Nova Licenca';
 
 include('global_assets/php/conexao.php');
 
+$sql = "SELECT TOP 1 LicenDtFim
+		FROM Licenca
+		WHERE LicenEmpresa = ".$_SESSION['EmpresaId']."
+		ORDER BY LicenDtFim DESC"; 
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+
 if (isset($_POST['inputDataInicio'])) {
 
 	try {
@@ -53,14 +60,6 @@ if (isset($_POST['inputDataInicio'])) {
 	<?php include_once("head.php"); ?>
 
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	<!-- /theme JS files -->
-
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 
 	<!-- Validação -->
@@ -70,6 +69,7 @@ if (isset($_POST['inputDataInicio'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+		
 		$(document).ready(function() {
 
 			//Garantindo que ninguém mude a empresa na tela de inclusão
@@ -82,6 +82,7 @@ if (isset($_POST['inputDataInicio'])) {
 
 				var inputDataInicio = $('#inputDataInicio').val();
 				var inputDataFim = $('#inputDataFim').val();
+				var inputUltimaData = $('#inputUltimaData').val();
 
 				if (inputDataFim < inputDataInicio) {
 					alerta('Atenção', 'A Data Fim deve ser maior que a Data Início!', 'error');
@@ -90,6 +91,11 @@ if (isset($_POST['inputDataInicio'])) {
 				}
 
 				//Aqui falta verificar se a licença com data maior e ativa é menor que a data início (TEM QUE SER)
+				if (inputUltimaData > inputDataInicio) {
+					alerta('Atenção', 'A Data Início deve ser maior que a data fim da última licença!', 'error');
+					$('#inputDataInicio').focus();
+					return false;
+				}
 
 				$('#cmbEmpresa').prop("disabled", false);
 
@@ -133,6 +139,7 @@ if (isset($_POST['inputDataInicio'])) {
 					<form name="formLicenca" id="formLicenca" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Licença</h5>
+							<input type="hidden" id="inputUltimaData" name="inputUltimaData" class="form-control" value="<?php echo $row['LicenDtFim']; ?>">
 						</div>
 
 						<div class="card-body">
