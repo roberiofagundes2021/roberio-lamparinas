@@ -6,6 +6,11 @@ $_SESSION['PaginaAtual'] = 'Usuário';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputEmpresaId'])){
+	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
+	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
+}
+
 if (isset($_SESSION['EmpresaId'])){	
 	$EmpresaId =   $_SESSION['EmpresaId'];
 	$EmpresaNome = $_SESSION['EmpresaNome'];
@@ -15,15 +20,15 @@ if (isset($_SESSION['EmpresaId'])){
 	$_SESSION['UC'] = 'Usuario';
 }
 
-$sql = ("SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPStatus, PerfiNome, EmpreNomeFantasia, SituaNome, SituaChave, SituaCor
-		 FROM Usuario
-		 JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
-		 JOIN Empresa on EXUXPEmpresa = EmpreId
-		 JOIN Perfil on PerfiId = EXUXPPerfil
-		 JOIN Situacao on SituaId =  EXUXPStatus
-		 Where EmpreId = ".$EmpresaId."
-		 ORDER BY UsuarNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPStatus, PerfiNome, EmpreNomeFantasia, SituaNome, SituaChave, SituaCor
+		FROM Usuario
+		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+		JOIN Empresa on EXUXPEmpresa = EmpreId
+		JOIN Perfil on PerfiId = EXUXPPerfil
+		JOIN Situacao on SituaId =  EXUXPStatus
+		Where EmpreId = ".$EmpresaId."
+		ORDER BY UsuarNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 

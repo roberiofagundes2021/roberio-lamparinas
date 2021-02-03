@@ -6,6 +6,11 @@ $_SESSION['PaginaAtual'] = 'Licença';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputEmpresaId'])){
+	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
+	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
+}
+
 if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }

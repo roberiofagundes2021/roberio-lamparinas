@@ -6,15 +6,20 @@ $_SESSION['PaginaAtual'] = 'Unidade';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputEmpresaId'])){
+	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
+	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
+}
+
 if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
 
-$sql = ("SELECT UnidaId, UnidaNome, UnidaBairro, UnidaCidade, UnidaEstado, UnidaStatus
-		 FROM Unidade
-	     WHERE UnidaEmpresa = ". $_SESSION['EmpresaId'] ."
-		 ORDER BY UnidaNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT UnidaId, UnidaNome, UnidaBairro, UnidaCidade, UnidaEstado, UnidaStatus
+		FROM Unidade
+	    WHERE UnidaEmpresa = ". $_SESSION['EmpresaId'] ."
+		ORDER BY UnidaNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 //var_dump($count);die;

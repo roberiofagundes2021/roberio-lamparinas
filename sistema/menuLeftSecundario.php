@@ -123,12 +123,12 @@
 									</span>
 								</a>
 							</li>
-							<li class="nav-item">
+							<!--<li class="nav-item">
 								<a href="menu.php" class="nav-link">
 									<i class="icon-menu2"></i>
 									Menu									
 								</a>
-							</li>
+							</li>-->
 							<!--<li class="nav-item">
 							
 								<?php

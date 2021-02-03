@@ -6,6 +6,11 @@ $_SESSION['PaginaAtual'] = 'Parâmetro';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputEmpresaId'])){
+	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
+	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
+}
+
 if (isset($_SESSION['EmpresaId'])) {
 	$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamPrecoGridProduto, ParamServicoOrcamento,ParamValidadeObrigatoria,ParamPatrimonioInicial 
 	        FROM Parametro
@@ -291,7 +296,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 									<!-- Switch single -->
 									<div class="form-group">
 										<label for="cmbPatrimonioInicial">Patrimônio Inicial <span class="text-danger">*</span></label>
-										<input type="text" id="cmbPatrimonioInicial" name="cmbPatrimonioInicial" class="form-control" placeholder="Patrimônio Inicial" required autofocus>
+										<input type="text" id="cmbPatrimonioInicial" name="cmbPatrimonioInicial" class="form-control" placeholder="Patrimônio Inicial">
 									</div>
 									<!-- /switch single -->
 								</div>

@@ -109,13 +109,13 @@ $count = count($row);
 			document.getElementById('inputEmpresaId').value = EmpresaId;
 			document.getElementById('inputEmpresaNome').value = EmpresaNome;
 			document.getElementById('inputEmpresaStatus').value = EmpresaStatus;
-					
+			/*		
 			//Aqui é só para preecher a $_SESSION['EmpresaId'] e $_SESSION['EmpresaNome'] para levar para licenca, unidade, setor, usuario
 			$.ajax({
 				type: "POST",
 				url: "menuLeftSecundarioAjax.php",
 				data: ('id='+EmpresaId+'&nome='+EmpresaNome)
-			});
+			});*/
 					
 			if (Tipo == 'edita'){	
 				document.formEmpresa.action = "empresaEdita.php";		
@@ -236,7 +236,7 @@ $count = count($row);
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'unidade\');" class="dropdown-item"><i class="icon-home7"></i> Unidade</a>
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'setor\');" class="dropdown-item"><i class="icon-store"></i> Setor</a>																
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'usuario\');" class="dropdown-item"><i class="icon-user-plus"></i> Usuários</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'menu\');" class="dropdown-item"><i class="icon-menu2"></i> Menu</a>
+																<!--<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'menu\');" class="dropdown-item"><i class="icon-menu2"></i> Menu</a>-->
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'parametro\');" class="dropdown-item"><i class="icon-equalizer"></i> Parâmetro</a>
 															</div>
 														</div>
