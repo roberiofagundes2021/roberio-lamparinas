@@ -6,6 +6,11 @@ $_SESSION['PaginaAtual'] = 'Veiculo';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputEmpresaId'])){
+	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
+	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
+}
+
 if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
@@ -17,7 +22,7 @@ $sql = "SELECT VeicuId, VeicuNome, VeicuPlaca, UnidaNome, SetorNome, VeicuStatus
 		JOIN Situacao on SituaId = VeicuStatus
 	    WHERE VeicuEmpresa = ". $_SESSION['EmpresaId'] ."
 		ORDER BY UnidaNome, VeicuNome ASC";
-$result = $conn->query("$sql");
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
@@ -45,7 +50,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	<script src="global_assets/js/lamparinas/stop-back.js"></script>
 	
 	<!-- /theme JS files -->	
 	
@@ -167,13 +171,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação de Veículos</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="Veiculo.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">

@@ -7,11 +7,11 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['nomeVelho'])){
 	$sql = "SELECT VeicuId
 			FROM Veiculo
-			WHERE VeicuEmpresa = ".$_SESSION['EmpresaId']." and VeicuPlaca = '". $_POST['nomeNovo']."' and VeicuPlaca <> '". $_POST['nomeVelho']."' and VeicuUnidade = ".$_POST['unidade'];
+			WHERE VeicuEmpresa = ".$_SESSION['EmpresaId']." and VeicuPlaca = '". $_POST['nomeNovo']."' and VeicuPlaca <> '". $_POST['nomeVelho']."'";
 } else {
 	$sql = "SELECT VeicuId
 			FROM Veiculo
-			WHERE VeicuEmpresa = ".$_SESSION['EmpresaId']." and VeicuPlaca = '". $_POST['nomeNovo']."' and VeicuUnidade = ". $_POST['unidade'];
+			WHERE VeicuEmpresa = ".$_SESSION['EmpresaId']." and VeicuPlaca = '". $_POST['nomeNovo']."'";
 } 
 
 $result = $conn->query($sql);

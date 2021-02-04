@@ -236,7 +236,7 @@ $count = count($row);
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'licenca\');" class="dropdown-item"><i class="icon-certificate"></i> Licença</a>
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'unidade\');" class="dropdown-item"><i class="icon-home7"></i> Unidade</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'veiculo\');" class="dropdown-item"><i class="icon-store"></i> Veículo</a>
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'veiculo\');" class="dropdown-item"><i class="icon-car"></i> Veículo</a>
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'setor\');" class="dropdown-item"><i class="icon-store"></i> Setor</a>																
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'usuario\');" class="dropdown-item"><i class="icon-user-plus"></i> Usuários</a>
 																<!--<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'menu\');" class="dropdown-item"><i class="icon-menu2"></i> Menu</a>-->

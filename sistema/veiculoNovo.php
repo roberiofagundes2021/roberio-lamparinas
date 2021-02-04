@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Novo Veiculo';
+$_SESSION['PaginaAtual'] = 'Novo Veículo';
 
 include('global_assets/php/conexao.php');
 
@@ -71,8 +71,8 @@ if(isset($_POST['inputNome'])){
   <!-- /theme JS files -->
 
   <script type="text/javascript">
-    $(document).ready(function() {
 
+    $(document).ready(function() {
 
       $('#cmbUnidade').on('change', function(e) {
 
@@ -80,13 +80,13 @@ if(isset($_POST['inputNome'])){
 
         var cmbUnidade = $('#cmbUnidade').val();
 
-        if (cmbUnidade == '#') {
+        if (cmbUnidade == '') {
           ResetSetor();
         } else {
 
           $.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
 
-            var option = '<option value="#">Selecione o Setor</option>';
+            var option = '<option value="">Selecione o Setor</option>';
 
             if (dados.length) {
 
@@ -124,7 +124,7 @@ if(isset($_POST['inputNome'])){
         success: function(resposta) {
 
           if (resposta == 1) {
-            alerta('Atenção', 'Esse registro já existe!', 'error');
+            alerta('Atenção', 'Essa placa já existe!', 'error');
             return false;
           }
 
@@ -182,56 +182,57 @@ if(isset($_POST['inputNome'])){
                   </div>
                 </div>
 
-                  <div class="col-lg-2">
-                    <label for="inputPlaca">Placa do Veículo </label>
-                    <input type="text" id="inputPlaca" name="inputPlaca" class="form-control" placeholder="Placa">
-                  </div>
-                  <div class="col-lg-3">
-                    <label for="inputRenavam">Renavam do Veículo </label>
-                    <input type="text" id="inputRenavam" name="inputRenavam" class="form-control" placeholder="Renavam">
-                  </div>
-                  <div class="col-lg-3">
-                    <label for="inputChassi">Chassi do Veículo </label>
-                    <input type="text" id="inputChassi" name="inputChassi" class="form-control" placeholder="Chassi">
-                  </div>
+                <div class="col-lg-2">
+                  <label for="inputPlaca">Placa do Veículo </label>
+                  <input type="text" id="inputPlaca" name="inputPlaca" class="form-control" placeholder="Placa">
+                </div>
+                <div class="col-lg-3">
+                  <label for="inputRenavam">Renavam do Veículo </label>
+                  <input type="text" id="inputRenavam" name="inputRenavam" class="form-control" placeholder="Renavam">
+                </div>
+                <div class="col-lg-3">
+                  <label for="inputChassi">Chassi do Veículo </label>
+                  <input type="text" id="inputChassi" name="inputChassi" class="form-control" placeholder="Chassi">
+                </div>
               </div>
-                    <h5 class="mb-0 font-weight-semibold">Lotação</h5>
-                    <br>
               
-                    <div class="row">
-                      <div class="col-lg-6">
-                        <div class="form-group">
-                          <label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
-                          <select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
-                            <option value="">Informe uma unidade</option>
-                            <?php
-                            $sql = "SELECT UnidaId, UnidaNome
-                                FROM Unidade
-                                JOIN Situacao on SituaId = UnidaStatus															     
-                                WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
-                                ORDER BY UnidaNome ASC";
-                            $result = $conn->query($sql);
-                            $rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+              <h5 class="mb-0 font-weight-semibold">Lotação</h5>
+              <br>
+          
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
+                    <select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
+                      <option value="">Informe uma unidade</option>
+                      <?php
+                      $sql = "SELECT UnidaId, UnidaNome
+                              FROM Unidade
+                              JOIN Situacao on SituaId = UnidaStatus															     
+                              WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
+                              ORDER BY UnidaNome ASC";
+                      $result = $conn->query($sql);
+                      $rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                            foreach ($rowUnidade as $item) {
-                              print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
-                            }
+                      foreach ($rowUnidade as $item) {
+                        print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
+                      }
 
-                            ?>
-                          </select>
-                        </div>
-                      </div>
+                      ?>
+                    </select>
+                  </div>
+                </div>
 
-                      <div class="col-lg-6">
-                        <div class="form-group">
-                          <label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
-                          <select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
-                            <option value="">Sem setor</option>
-                          </select>
-                        </div>
-                      </div>									
-                    </div>
-                  
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
+                    <select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
+                      <option value="">Sem setor</option>
+                    </select>
+                  </div>
+                </div>									
+              </div>
+                
               <div class="row" style="margin-top: 10px;">
                 <div class="col-lg-12">
                   <div class="form-group">

@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Editar Veiculo';
+$_SESSION['PaginaAtual'] = 'Editar Veículo';
 
 include('global_assets/php/conexao.php');
 
@@ -17,7 +17,7 @@ if(isset($_POST['inputVeicuId'])){
 		$sql = "SELECT VeicuId, VeicuNome, VeicuPlaca, VeicuRenavam, VeicuChassi, VeicuUnidade, VeicuSetor
 				FROM Veiculo
 				WHERE VeicuId = $iVeiculo and VeicuEmpresa = $EmpresaId ";
-		$result = $conn->query("$sql");
+		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
 	} catch(PDOException $e) {
@@ -83,6 +83,7 @@ if(isset($_POST['inputNome'])){
   <script src="global_assets/js/demo_pages/form_layouts.js"></script>
   <script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
   <!-- /theme JS files -->
+  
   <!-- Validação -->
   <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
   <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
@@ -164,7 +165,7 @@ if(isset($_POST['inputNome'])){
         success: function(resposta) {
 
           if (resposta == 1) {
-            alerta('Atenção', 'Esse registro já existe!', 'error');
+            alerta('Atenção', 'Essa placa já existe!', 'error');
             return false;
           }
 
@@ -237,64 +238,64 @@ if(isset($_POST['inputNome'])){
                     <input type="text" id="inputChassi" name="inputChassi" class="form-control" placeholder="Chassi" value="<?php echo $row['VeicuChassi']; ?>">
                 </div>   
               </div>
-                     <h5 class="mb-0 font-weight-semibold">Lotação</h5>
-                    <br>
-                <div class="row">
-									<div class="col-lg-6">
-										<div class="form-group">
-											<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
-											<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
-												<option value="">Informe uma unidade</option>
-												<?php
-												$sql = "SELECT UnidaId, UnidaNome
-														FROM Unidade															     
-														JOIN Situacao on SituaId = UnidaStatus															     
-														WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
-														ORDER BY UnidaNome ASC";
-												$result = $conn->query($sql);
-												$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+              <h5 class="mb-0 font-weight-semibold">Lotação</h5>
+              <br>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
+                    <select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
+                      <option value="">Informe uma unidade</option>
+                      <?php
+                      $sql = "SELECT UnidaId, UnidaNome
+                          FROM Unidade															     
+                          JOIN Situacao on SituaId = UnidaStatus															     
+                          WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
+                          ORDER BY UnidaNome ASC";
+                      $result = $conn->query($sql);
+                      $rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
 
-												foreach ($rowUnidade as $item) {
-													if ($item['UnidaId'] == $row['VeicuUnidade']) {
-														print('<option value="' . $item['UnidaId'] . '" selected="selected">' . $item['UnidaNome'] . '</option>');
-													} else {
-														print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
-													}
-												}
+                      foreach ($rowUnidade as $item) {
+                        if ($item['UnidaId'] == $row['VeicuUnidade']) {
+                          print('<option value="' . $item['UnidaId'] . '" selected="selected">' . $item['UnidaNome'] . '</option>');
+                        } else {
+                          print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
+                        }
+                      }
 
-												?>
-											</select>
-										</div>
-									</div>
-
-									<div class="col-lg-6">
-										<div class="form-group">
-											<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
-											<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
-												<option value="">Informe um setor</option>
-												<?php
-												$sql = "SELECT SetorId, SetorNome
-														FROM Setor
-														JOIN Situacao on SituaId = SetorStatus															     															     
-														WHERE SetorEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
-														ORDER BY SetorNome ASC";
-												$result = $conn->query("$sql");
-												$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
-
-												foreach ($rowSetor as $item) {
-													if ($item['SetorId'] == $row['VeicuSetor']) {
-														print('<option value="' . $item['SetorId'] . '" selected="selected">' . $item['SetorNome'] . '</option>');
-													} else {
-														print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
-													}
-												}
-
-												?>
-											</select>
-										</div>
-									</div>
-
+                      ?>
+                    </select>
+                  </div>
                 </div>
+
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
+                    <select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
+                      <option value="">Informe um setor</option>
+                      <?php
+                      $sql = "SELECT SetorId, SetorNome
+                          FROM Setor
+                          JOIN Situacao on SituaId = SetorStatus															     															     
+                          WHERE SetorEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
+                          ORDER BY SetorNome ASC";
+                      $result = $conn->query("$sql");
+                      $rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                      foreach ($rowSetor as $item) {
+                        if ($item['SetorId'] == $row['VeicuSetor']) {
+                          print('<option value="' . $item['SetorId'] . '" selected="selected">' . $item['SetorNome'] . '</option>');
+                        } else {
+                          print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
+                        }
+                      }
+
+                      ?>
+                    </select>
+                  </div>
+                </div>
+
+              </div>
 
 
               <div class="row" style="margin-top: 10px;">
