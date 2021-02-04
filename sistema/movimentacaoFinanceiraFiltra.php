@@ -227,6 +227,10 @@ function queryPesquisa(){
             } else if ($statusSession[0] === "14") {
                 $argsCp[]  = "CnAReStatus = 14";
 
+            } else if ($statusSession[0] === '16'){
+                $argsCr[]  = "CnAReTransferencia > 0";
+                $argsCp[]  = "CnAPaTransferencia > 0";
+
             } else {
                 $argsCr[]  = "CnAReStatus = 14";
                 $argsCp[]  = "CnAPaStatus = 12";
