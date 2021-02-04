@@ -518,7 +518,7 @@ $dataFim = date("Y-m-d");
                     <tr class="bg-slate">
                       <th>Data</th>
                       <th>Histórico</th>
-                      <th>Conta Caixa</th>
+                      <th>Conta / Banco</th>
                       <th>Número Doc.</th>
                       <th style='text-align: right;'>Entrada</th>
                       <th style='text-align: right;'>Saída</th>

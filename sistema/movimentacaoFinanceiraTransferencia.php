@@ -371,19 +371,19 @@ $dataInicio = date("Y-m-d");
                       <div class="form-group">
                         <div class="form-check form-check-inline">
                           <label class="form-check-label">
-                            <input type="radio" name="inputTipo" value="P" class="form-input-styled" onclick="selecionaTipo('P')" data-fouc>
+                            <input type="radio" name="inputTipo" value="P" class="form-input-styled" onclick="selecionaTipo('P')" data-fouc <?php if (isset($lancamento)) echo 'disabled' ?>>
                             Pagamento
                           </label>
                         </div>
                         <div class="form-check form-check-inline">
                           <label class="form-check-label">
-                            <input type="radio" name="inputTipo" value="R" class="form-input-styled" onclick="selecionaTipo('R')" data-fouc>
+                            <input type="radio" name="inputTipo" value="R" class="form-input-styled" onclick="selecionaTipo('R')" data-fouc <?php if (isset($lancamento)) echo 'disabled' ?>>
                             Recebimento
                           </label>
                         </div>
                         <div class="form-check form-check-inline">
                           <label class="form-check-label">
-                            <input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo('T')" data-fouc checked>
+                            <input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo('T')" data-fouc <?php if (isset($lancamento)) echo 'disabled' ?> checked>
                             Transferência
                           </label>
                         </div>
@@ -553,7 +553,7 @@ $dataInicio = date("Y-m-d");
                     <div class="col-12">
                       <div class="form-group">
                         <label for="inputObservacao">Observação</label>
-                        <textarea id="inputObservacao" class="form-control" name="inputObservacao" rows="3" value="<?php if (isset($lancamento)) echo $lancamento['CnTraObservacao']; ?>"></textarea>
+                        <textarea id="inputObservacao" class="form-control" name="inputObservacao" rows="3" <?php if (isset($lancamento)) echo 'readonly' ?>><?php if (isset($lancamento)) echo $lancamento['CnTraObservacao']; ?></textarea>
                       </div>
                     </div>
                   </div>
@@ -573,7 +573,7 @@ $dataInicio = date("Y-m-d");
                       </div>
 
                       <div class="col-lg-6" style="text-align: right; color: red;">
-                        <i class="icon-info3" data-popup="tooltip" data-placement="bottom" data-original-title="" title=""></i>Preenchimento Concluído (Ativo)								
+                        <i class="icon-info3" data-popup="tooltip" data-placement="bottom" data-original-title="" title=""></i>Esse registro não pode ser alterado. <br/>Caso haja necessidade de alteração deve ser feito um estorno.
                       </div>
                     </div>
                   <?php } else { ?>
