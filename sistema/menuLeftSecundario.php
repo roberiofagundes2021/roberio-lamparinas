@@ -12,7 +12,7 @@
 					url: "menuLeftSecundarioAjax.php",
 					data: ('id='+id+'&nome='+nome),
 					success: function(resposta){
-												
+							alert(resposta);					
 						if(resposta){
 							location.reload();
 							return false;
@@ -47,6 +47,7 @@
 				<div class="card"  style="padding-top:10px;">
 					<div class="card-header bg-transparent header-elements-inline">
 						<span class="text-uppercase font-size-sm font-weight-semibold">Empresa</span>
+						<?php echo $_SESSION['EmpresaId']; ?>
 					</div>
 
 					<div class="card-body">
@@ -54,10 +55,10 @@
 							<div class="form-group-feedback form-group-feedback-right">
 								<select id="cmbEmpresa" name="cmbEmpresa" class="form-control form-control-select2" onChange="mudarEmpresa(this.value); ">
 									<?php 
-										$sql = ("SELECT EmpreId, EmpreNomeFantasia
-												 FROM Empresa
-												 ORDER BY EmpreNomeFantasia ASC");
-										$result = $conn->query("$sql");
+										$sql = "SELECT EmpreId, EmpreNomeFantasia
+												FROM Empresa
+												ORDER BY EmpreNomeFantasia ASC";
+										$result = $conn->query($sql);
 										$rowEmpresa = $result->fetchAll(PDO::FETCH_ASSOC);										
 										
 										foreach ($rowEmpresa as $item){

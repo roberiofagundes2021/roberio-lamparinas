@@ -29,10 +29,10 @@ if(isset($_POST['inputEmpresaId'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir empresa!!!";
+		$_SESSION['msg']['mensagem'] = "Não é possível excluir essa empresa, pois existem registros ligados a ela.";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();die;
+		//echo 'Error: ' . $e->getMessage();die;
 	}
 }
 
