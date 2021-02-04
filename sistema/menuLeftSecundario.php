@@ -86,6 +86,9 @@
 								<a href="unidade.php" class="nav-link"><i class="icon-home7"></i> Unidade</a>
 							</li>
 							<li class="nav-item">
+								<a href="veiculo.php" class="nav-link"><i class="icon-car"></i> Veículo</a>
+							</li>
+							<li class="nav-item">
 								<a href="setor.php" class="nav-link"><i class="icon-cabinet"></i> Setor</a>
 							</li>
 							<li class="nav-item">
