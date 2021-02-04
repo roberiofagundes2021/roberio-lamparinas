@@ -6,6 +6,11 @@ $_SESSION['PaginaAtual'] = 'Setor';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputEmpresaId'])){
+	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
+	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
+}
+
 if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
@@ -15,7 +20,7 @@ $sql = "SELECT SetorId, SetorNome, UnidaNome, SetorStatus
 		JOIN Unidade ON UnidaId = SetorUnidade
 	    WHERE SetorEmpresa = ". $_SESSION['EmpresaId'] ."
 		ORDER BY UnidaNome, SetorNome ASC";
-$result = $conn->query("$sql");
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 

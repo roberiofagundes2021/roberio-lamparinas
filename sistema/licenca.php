@@ -6,6 +6,11 @@ $_SESSION['PaginaAtual'] = 'Licença';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputEmpresaId'])){
+	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
+	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
+}
+
 if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
@@ -14,7 +19,7 @@ $sql = "SELECT LicenId, LicenDtInicio, LicenDtFim, LicenLimiteUsuarios, LicenSta
 		FROM Licenca
 		JOIN Situacao on SituaId = LicenStatus
 		WHERE LicenEmpresa = ".$_SESSION['EmpresaId']."
-		ORDER BY LicenDtInicio DESC"; 
+		ORDER BY LicenDtInicio DESC"; 		
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -41,14 +46,20 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>		
-	<!-- /theme JS files -->	
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+
+	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
 	
 	<script type="text/javascript">
 		
 		$(document).ready(function (){	
+
+			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
+
 			$('#tblLicenca').DataTable( {
-				"order": [[ 0, "asc" ]],
+				"order": [[ 0, "desc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [
@@ -177,6 +188,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								</thead>
 								<tbody>
 								<?php
+
+									$cont = 1;
+
 									foreach ($row as $item){
 										
 										$situacao = $item['SituaNome'];
@@ -186,19 +200,27 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<tr>
 											<td>'.mostraData($item['LicenDtInicio']).'</td>
 											<td>'.mostraData($item['LicenDtFim']).'</td>
-											<td>'.$item['LicenLimiteUsuarios'].'</td>');
+											<td>'.$item['LicenLimiteUsuarios'].'</td>');										
 										
-										print('<td><a href="#" onclick="atualizaLicenca('.$item['LicenId'].',\''.$item['SituaChave'].'\', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
-																				
-										print('<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].',\''.$item['SituaChave'].'\', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaLicenca('.$item['LicenId'].',\''.$item['SituaChave'].'\', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>														
-													</div>
-												</div>
-											</td>
-										</tr>');
+										if ($cont == 1){
+											print('<td><a href="#" onclick="atualizaLicenca('.$item['LicenId'].',\''.$item['SituaChave'].'\', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+
+											print('<td class="text-center">
+														<div class="list-icons">
+															<div class="list-icons list-icons-extended">
+																<a href="#" onclick="atualizaLicenca('.$item['LicenId'].',\''.$item['SituaChave'].'\', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
+																<a href="#" onclick="atualizaLicenca('.$item['LicenId'].',\''.$item['SituaChave'].'\', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>														
+															</div>
+														</div>
+													</td>');
+										} else{
+											print('<td><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></td>');
+											print('<td></td>');
+										}
+
+										print('</tr>');
+
+										$cont++;
 									}
 								?>
 

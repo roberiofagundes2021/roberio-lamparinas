@@ -45,9 +45,9 @@ if (isset($_POST['inputCpf'])) {
 				':iEmpresa' => $EmpresaId,
 				':iUsuario' => $LAST_ID,
 				':iPerfil' => $_POST['cmbPerfil'],
-				':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
-				':iSetor' => $_POST['cmbSetor'] == '#' ? null : $_POST['cmbSetor'],
-				':iLocalEstoque' => $_POST['cmbLocalEstoque'] == '#' ? null : $_POST['cmbLocalEstoque'],
+				':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
+				':iSetor' => $_POST['cmbSetor'] == '' ? null : $_POST['cmbSetor'],
+				':iLocalEstoque' => $_POST['cmbLocalEstoque'] == '' ? null : $_POST['cmbLocalEstoque'],
 				':bStatus' => 1,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId']
 			));
@@ -75,10 +75,10 @@ if (isset($_POST['inputCpf'])) {
 			$result->execute(array(
 				':iEmpresa' => $EmpresaId,
 				':iUsuario' => $_POST['inputId'],
-				':iPerfil' => $_POST['cmbPerfil'] == '#' ? null : $_POST['cmbPerfil'],
-				':iUnidade' => $_POST['cmbUnidade'] == '#' ? null : $_POST['cmbUnidade'],
-				':iSetor' => $_POST['cmbSetor'] == '#' ? null : $_POST['cmbSetor'],
-				':iLocalEstoque' => $_POST['cmbLocalEstoque'] == '#' ? null : $_POST['cmbLocalEstoque'],
+				':iPerfil' => $_POST['cmbPerfil'] == '' ? null : $_POST['cmbPerfil'],
+				':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
+				':iSetor' => $_POST['cmbSetor'] == '' ? null : $_POST['cmbSetor'],
+				':iLocalEstoque' => $_POST['cmbLocalEstoque'] == '' ? null : $_POST['cmbLocalEstoque'],
 				':bStatus' => 1,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId']
 			));
@@ -209,15 +209,15 @@ if (isset($_POST['inputCpf'])) {
 						} else { // se o usuário não está cadastrado
 							document.getElementById('demaisCampos').style.display = "block";
 							$('#inputNome').val("");
-							$('#cmbPerfil').val("#");
+							$('#cmbPerfil').val("");
 							$('#inputLogin').val("");
 							$('#inputSenha').val("");
 							$('#inputConfirmaSenha').val("");
 							$('#inputEmail').val("");
 							$('#inputTelefone').val("");
 							$('#inputCelular').val("");
-							$('#cmbUnidade').val("#");
-							$('#cmbSetor').val("#");
+							$('#cmbUnidade').val("");
+							$('#cmbSetor').val("");
 							$('#inputNome').focus();
 							$('#enviar').prop("disabled", false);
 							$('#inputId').val(0);
@@ -252,14 +252,14 @@ if (isset($_POST['inputCpf'])) {
 
 				var cmbUnidade = $('#cmbUnidade').val();
 
-				if (cmbUnidade == '#') {
+				if (cmbUnidade == '') {
 					ResetSetor();
 					ResetLocalEstoque();
 				} else {
 
 					$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
 
-						var option = '<option value="#">Selecione o Setor</option>';
+						var option = '<option value="">Selecione o Setor</option>';
 
 						if (dados.length) {
 
@@ -275,7 +275,7 @@ if (isset($_POST['inputCpf'])) {
 
 					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function(dados) {
 
-						var option = '<option value="#">Selecione o Local de Estoque</option>';
+						var option = '<option value="">Selecione o Local de Estoque</option>';
 
 						if (dados.length) {
 
@@ -324,44 +324,13 @@ if (isset($_POST['inputCpf'])) {
 					return false;
 				}
 
-				// //Verifica se o campo só possui espaços em branco
-				// if (inputNome == '') {
-				// 	alerta('Atenção', 'Informe o nome do usuário!', 'error');
-				// 	$('#inputNome').focus();
-				// 	return false;
-				// }
-
-				// if (cmbPerfil == '#') {
-				// 	alerta('Atenção', 'Informe o perfil!', 'error');
-				// 	$('#cmPerfil').focus();
-				// 	return false;
-				// }
-
-				// if (inputLogin == '') {
-				// 	alerta('Atenção', 'Informe o login!', 'error');
-				// 	$('#inputLogin').focus();
-				// 	return false;
-				// }
-
-				// if (inputSenha == '') {
-				// 	alerta('Atenção', 'Informe a senha!', 'error');
-				// 	$('#inputSenha').focus();
-				// 	return false;
-				// }
-
 				if (inputSenha != inputConfirmaSenha) {
 					alerta('Atenção', 'A confirmação de senha não confere!', 'error');
 					$('#inputConfirmaSenha').focus();
 					return false;
 				}
 
-				// if (cmbUnidade == '#') {
-				// 	alerta('Atenção', 'Informe a unidade!', 'error');
-				// 	$('#cmUnidade').focus();
-				// 	return false;
-				// }
-
-				if (cmbSetor == '#' || cmbSetor == 'Filtrando...' ) {
+				if (cmbSetor == '' || cmbSetor == 'Filtrando...' ) {
 					alerta('Atenção', 'Informe o setor!', 'error');
 					$('#cmSetor').focus();
 					return false;
@@ -380,16 +349,16 @@ if (isset($_POST['inputCpf'])) {
 			});
 
 			function Filtrando() {
-				$('#cmbSetor').empty().append('<option value="#">Filtrando...</option>');
-				$('#cmbLocalEstoque').empty().append('<option value="#">Filtrando...</option>');
+				$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
+				$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
 			}
 
 			function ResetSetor() {
-				$('#cmbSetor').empty().append('<option value="#">Sem setor</option>');
+				$('#cmbSetor').empty().append('<option value="">Sem setor</option>');
 			}
 
 			function ResetLocalEstoque() {
-				$('#cmbLocalEstoque').empty().append('<option value="#">Sem Local de Estoque</option>');
+				$('#cmbLocalEstoque').empty().append('<option value="">Sem Local de Estoque</option>');
 			}			
 		});
 	</script>
@@ -465,12 +434,12 @@ include_once("topo.php");
 												<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2" required>
 													<option value="">Informe um perfil</option>
 													<?php
-													$sql = ("SELECT PerfiId, PerfiNome, PerfiChave
-																	 FROM Perfil
-																	 JOIN Situacao on SituaId = PerfiStatus															     
-																	 WHERE SituaChave = 'ATIVO'
-																	 ORDER BY PerfiNome ASC");
-													$result = $conn->query("$sql");
+													$sql = "SELECT PerfiId, PerfiNome, PerfiChave
+															FROM Perfil
+															JOIN Situacao on SituaId = PerfiStatus															     
+															WHERE SituaChave = 'ATIVO'
+															ORDER BY PerfiNome ASC";
+													$result = $conn->query($sql);
 													$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($rowPerfil as $item) {

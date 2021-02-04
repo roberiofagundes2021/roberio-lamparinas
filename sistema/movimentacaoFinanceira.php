@@ -76,28 +76,33 @@ $dataFim = date("Y-m-d");
         },
         {
           orderable: true, //Histórico
-          width: "40%",
+          width: "25%",
           targets: [1]
         },
         {
-          orderable: true, //Nª doc
-          width: "15%",
+          orderable: true, //Conta Caixa
+          width: "22%",
           targets: [2]
+        },
+        {
+          orderable: true, //Nª doc
+          width: "8%",
+          targets: [3]
         },
         {
           orderable: true, //Entrada
           width: "10%",
-          targets: [3]
+          targets: [4]
         },
         {
           orderable: true, //Saída
           width: "10%",
-          targets: [4]
+          targets: [5]
         },
         {
           orderable: true, //Saldo
           width: "10%",
-          targets: [5]
+          targets: [6]
         },
         {
           orderable: false, //Ações
@@ -513,6 +518,7 @@ $dataFim = date("Y-m-d");
                     <tr class="bg-slate">
                       <th>Data</th>
                       <th>Histórico</th>
+                      <th>Conta Caixa</th>
                       <th>Número Doc.</th>
                       <th style='text-align: right;'>Entrada</th>
                       <th style='text-align: right;'>Saída</th>

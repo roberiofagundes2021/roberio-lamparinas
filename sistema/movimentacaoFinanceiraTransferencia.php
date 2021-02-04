@@ -232,11 +232,10 @@ if (isset($_POST['inputDataEmissao'])) {
 }
 
 if (isset($_GET['lancamentoId'])) {
-    $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
-            CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero
-    		FROM ContasAPagar
-            LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
-    		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_GET['lancamentoId'] . "";
+    $sql = "SELECT  *
+              FROM  ContasTransferencia
+             WHERE  CnTraUnidade = " . $_SESSION['UnidadeId'] . "
+               AND  CnTraId = " . $_GET['lancamentoId'] . "";
     $result = $conn->query($sql);
     $lancamento = $result->fetch(PDO::FETCH_ASSOC);
 }
@@ -282,8 +281,11 @@ $dataInicio = date("Y-m-d");
       $ano = $dataRecebimento.getFullYear();
 
       $fullDataRecebimento = `${$ano}-${$mes}-${$dia}`;
-      $('#inputDataEmissao').val($fullDataRecebimento);
-      $('#inputDataDaTransferencia').val($fullDataRecebimento);
+
+      if ($('#inputDataEmissao').val() == "")
+        $('#inputDataEmissao').val($fullDataRecebimento);
+      if ($('#inputDataDaTransferencia').val() == "")
+        $('#inputDataDaTransferencia').val($fullDataRecebimento);
     }
 
     function salvar() {
@@ -304,7 +306,6 @@ $dataInicio = date("Y-m-d");
         $("#lancamento").submit();
       }
     }
-
 
     $("#salvar").on('click', (e) => {
       e.preventDefault();
@@ -394,8 +395,7 @@ $dataInicio = date("Y-m-d");
 
                   <?php
                     if (isset($lancamento)) {
-                        echo '<input type="hidden" name="inputEditar" value="sim">';
-                        echo '<input type="hidden" name="inputContaId" value="' . $lancamento['CnAReId'] . '">';
+                        echo '<input type="hidden" name="inputContaId" value="' . $lancamento['CnTraId'] . '">';
                     }
                   ?>
 
@@ -403,21 +403,21 @@ $dataInicio = date("Y-m-d");
                     <div class="col-lg-2">
                       <div class="form-group">
                         <label for="inputDataEmissao">Data de Emissão <span class="text-danger">*</span></label>
-                        <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data de Emissão" required>
+                        <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data de Emissão" value="<?php if (isset($lancamento)) echo $lancamento['CnTraDtEmissao']; ?>"  <?php if (isset($lancamento)) echo 'readonly' ?> required>
                       </div>
                     </div>
 
                     <div class="col-lg-6">
                       <div class="form-group">
                         <label for="inputDescricao">Descrição <span class='text-danger'>*</span></label>
-                        <input type="text" id="inputDescricao" name="inputDescricao" class="form-control" placeholder="Descrição" value='Transferência entre contas' readonly required>
+                        <input type="text" id="inputDescricao" name="inputDescricao" class="form-control" placeholder="Descrição" value="<?php if (isset($lancamento)){ echo $lancamento['CnTraDescricao']; } else {echo 'Transferência entre contas';} ?>" readonly required>
                       </div>
                     </div>
 
                     <div class="col-lg-4">
                       <div class="form-group">
                         <label for="inputNumeroDocumento">Número Documento</label>
-                        <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" class="form-control" placeholder="Nº Documento">
+                        <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" class="form-control" placeholder="Nº Documento" value="<?php if (isset($lancamento)) echo $lancamento['CnTraNumDocumento']; ?>" <?php if (isset($lancamento)) echo 'readonly' ?>>
                       </div>
                     </div>
                   </div>
@@ -426,7 +426,7 @@ $dataInicio = date("Y-m-d");
                     <div class="col-lg-4">
                       <div class="form-group">
                         <label for="cmbContaBancoOrigem">Conta Origem <span class="text-danger">*</span></label>
-                        <select id="cmbContaBancoOrigem" name="cmbContaBancoOrigem" class="form-control form-control-select2" required>
+                        <select id="cmbContaBancoOrigem" name="cmbContaBancoOrigem" class="form-control form-control-select2"  <?php if (isset($lancamento)) echo 'disabled' ?> required>
                           <option value="" selected>Todos</option>
                           <?php
                               $sql = "SELECT CnBanId,
@@ -441,10 +441,17 @@ $dataInicio = date("Y-m-d");
                               $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 
                               foreach ($rowContaBanco as $item) {
-                                  if (isset($item['CnBanId'])) {
-                                      print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                  }
+                                if (isset($lancamento)) {
+                                    if ($lancamento['CnTraContaOrigem'] == $item['CnBanId']) {
+                                        print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
+                                    } else {
+                                        print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                    }
+                                } else {
+                                    print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                }
                               }
+
                             ?>
                         </select>
                       </div>
@@ -453,7 +460,7 @@ $dataInicio = date("Y-m-d");
                     <div class="col-lg-4">
                       <div class="form-group">
                         <label for="cmbContaBancoDestino">Conta Destino <span class="text-danger">*</span></label>
-                        <select id="cmbContaBancoDestino" name="cmbContaBancoDestino" class="form-control form-control-select2" required>
+                        <select id="cmbContaBancoDestino" name="cmbContaBancoDestino" class="form-control form-control-select2"  <?php if (isset($lancamento)) echo 'disabled' ?> required>
                           <option value="" selected>Todos</option>
                           <?php
                               $sql = "SELECT CnBanId,
@@ -468,9 +475,15 @@ $dataInicio = date("Y-m-d");
                               $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 
                               foreach ($rowContaBanco as $item) {
-                                  if (isset($item['CnBanId'])) {
-                                      print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                  }
+                                if (isset($lancamento)) {
+                                    if ($lancamento['CnTraContaDestino'] == $item['CnBanId']) {
+                                        print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
+                                    } else {
+                                        print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                    }
+                                } else {
+                                    print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                }
                               }
                             ?>
                         </select>
@@ -480,7 +493,7 @@ $dataInicio = date("Y-m-d");
                     <div class="col-lg-4">
                       <div class="form-group">
                         <label for="cmbFormaPagamento">Forma de Pagamento <span class="text-danger">*</span></label>
-                        <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2" required>
+                        <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2"  <?php if (isset($lancamento)) echo 'disabled' ?> required>
                           <option value="" selected>Todos</option>
                           <?php
                               $sql = "SELECT FrPagId,
@@ -495,9 +508,15 @@ $dataInicio = date("Y-m-d");
                               $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
                               
                               foreach ($rowFormaPagamento as $item) {
-                                  if (isset($item['FrPagId'])) {
-                                      print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
-                                  }
+                                if (isset($lancamento)) {
+                                    if ($lancamento['CnTraFormaPagamento'] == $item['FrPagId']) {
+                                        print('<option value="' . $item['FrPagId'] . '" selected>' . $item['FrPagNome'] . '</option>');
+                                    } else {
+                                        print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                    }
+                                } else {
+                                    print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                }
                               }
                             ?>
                         </select>
@@ -517,11 +536,11 @@ $dataInicio = date("Y-m-d");
                             <div class="row">
                               <div class="form-group col-6">
                                 <label for="inputDataDaTransferencia">Data da Transferência <span class="text-danger">*</span></label>
-                                <input type="date" id="inputDataDaTransferencia" name="inputDataDaTransferencia" class="form-control" placeholder="Data do Pagamento" required>
+                                <input type="date" id="inputDataDaTransferencia" name="inputDataDaTransferencia" class="form-control" placeholder="Data do Pagamento" value="<?php if (isset($lancamento)) echo $lancamento['CnTraDtTransferencia']; ?>" <?php if (isset($lancamento)) echo 'readonly' ?> required>
                               </div>
                               <div class="form-group col-6">
                                 <label for="inputValorTotal">Valor Total Transferido (=) <span class="text-danger">*</span> </label>
-                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotal" name="inputValorTotal" class="form-control" placeholder='0,00' required>
+                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotal" name="inputValorTotal" class="form-control" placeholder='0,00' value="<?php if (isset($lancamento)) echo number_format($lancamento['CnTraValor'], 2, ',', '.'); ?>" <?php if (isset($lancamento)) echo 'readonly' ?> required>
                               </div>
                             </div>
                           </div>
@@ -534,13 +553,33 @@ $dataInicio = date("Y-m-d");
                     <div class="col-12">
                       <div class="form-group">
                         <label for="inputObservacao">Observação</label>
-                        <textarea id="inputObservacao" class="form-control" name="inputObservacao" rows="3"></textarea>
+                        <textarea id="inputObservacao" class="form-control" name="inputObservacao" rows="3" value="<?php if (isset($lancamento)) echo $lancamento['CnTraObservacao']; ?>"></textarea>
                       </div>
                     </div>
                   </div>
 
-                  <button id="salvar" class="btn btn-principal">Salvar</button>
-                  <a href="movimentacaoFinanceira.php" class="btn">Cancelar</a>
+                  <?php if (isset($lancamento)) { ?>
+                    <style>
+                      .btn.voltar {
+                        border: 1px solid #2196f3;
+                      }
+                    </style>
+
+                    <div class="row">
+                      <div class="col-lg-6">
+                        <div class="form-group">
+                          <a href="movimentacaoFinanceira.php" class="btn voltar">Voltar</a>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-6" style="text-align: right; color: red;">
+                        <i class="icon-info3" data-popup="tooltip" data-placement="bottom" data-original-title="" title=""></i>Preenchimento Concluído (Ativo)								
+                      </div>
+                    </div>
+                  <?php } else { ?>
+                    <button id="salvar" class="btn btn-principal">Salvar</button>
+                    <a href="movimentacaoFinanceira.php" class="btn">Cancelar</a>
+                  <?php } ?>
                 </div>
 
               </div>
