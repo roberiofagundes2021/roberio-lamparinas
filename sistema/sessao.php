@@ -10,7 +10,7 @@ $arquivosEmpresa = array(
 	'setor.php', 'setorNovo.php', 'setorEdita.php', 'setorExclui.php', 'setorMudaSituacao.php', 'filtraSetor.php', 'setorValida.php',
 	'menu.php', 'menuNovo.php', 'menuEdita.php', 'menuExclui.php', 'menuMudaSituacao.php', 'menuLeftSecundario.php',
 	'parametro.php', 'menuLeftSecundarioAjax.php' , 'veiculo.php', 'veiculoNovo.php', 'veiculoMudaSituacao.php', 'veiculoValida.php', 
-	'veiculoExclui.php', 'veiculoEdita.php'
+	'veiculoExclui.php', 'veiculoEdita.php', 'filtraLocalEstoque.php'
 );
 
 //Se existe a sessão $_SESSION['EmpresaId'] e a página que está sendo acessada não é nenhuma das sitadas acima, limpa essa sessão.	  

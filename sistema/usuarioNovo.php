@@ -133,26 +133,6 @@ if (isset($_POST['inputCpf'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		function validaCPF(strCPF) {
-			var Soma;
-			var Resto;
-			Soma = 0;
-			if (strCPF == "00000000000") return false;
-
-			for (i = 1; i <= 9; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (11 - i);
-			Resto = (Soma * 10) % 11;
-
-			if ((Resto == 10) || (Resto == 11)) Resto = 0;
-			if (Resto != parseInt(strCPF.substring(9, 10))) return false;
-
-			Soma = 0;
-			for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (12 - i);
-			Resto = (Soma * 10) % 11;
-
-			if ((Resto == 10) || (Resto == 11)) Resto = 0;
-			if (Resto != parseInt(strCPF.substring(10, 11))) return false;
-			return true;
-		}
 
 		$(document).ready(function() {
 
@@ -311,9 +291,9 @@ if (isset($_POST['inputCpf'])) {
 				var cmbPerfil = $('#cmbPerfil').val();
 				var inputLogin = $('#inputLogin').val();
 				var inputSenha = $('#inputSenha').val();
+				var inputEmail = $('#inputEmail').val();
 				var inputConfirmaSenha = $('#inputConfirmaSenha').val();
 				var cmbUnidade = $('#cmbUnidade').val();
-				var cmbSetor = $('#cmbSetor').val();
 
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
@@ -324,43 +304,60 @@ if (isset($_POST['inputCpf'])) {
 					return false;
 				}
 
-				if (inputSenha != inputConfirmaSenha) {
-					alerta('Atenção', 'A confirmação de senha não confere!', 'error');
-					$('#inputConfirmaSenha').focus();
-					return false;
+				if (inputNome != '' && inputLogin != '' && inputEmail != '' && cmbPerfil != '' && cmbUnidade != ''){
+					if (inputSenha != inputConfirmaSenha) {
+						alerta('Atenção', 'A confirmação de senha não confere!', 'error');
+						$('#inputConfirmaSenha').focus();
+						return false;
+					}
 				}
 
-				if (cmbSetor == '' || cmbSetor == 'Filtrando...' ) {
-					alerta('Atenção', 'Informe o setor!', 'error');
-					$('#cmSetor').focus();
-					return false;
-				} 
+				$('#cmbEmpresa').prop("disabled", false); 
 
-				$('#cmbEmpresa').prop("disabled", false);
-
-				$("#formUsuario").submit();
-			})
+				document.formUsuario.submit();				
+			});
 
 			$('#cancelar').on('click', function(e) {
 
 				$('#cmbEmpresa').prop("disabled", false);
 
 				$(window.document.location).attr('href', "usuario.php");
-			});
-
-			function Filtrando() {
-				$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
-				$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
-			}
-
-			function ResetSetor() {
-				$('#cmbSetor').empty().append('<option value="">Sem setor</option>');
-			}
-
-			function ResetLocalEstoque() {
-				$('#cmbLocalEstoque').empty().append('<option value="">Sem Local de Estoque</option>');
-			}			
+			});			
 		});
+
+		function Filtrando() {
+			$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
+			$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
+		}
+
+		function ResetSetor() {
+			$('#cmbSetor').empty().append('<option value="">Sem setor</option>');
+		}
+
+		function ResetLocalEstoque() {
+			$('#cmbLocalEstoque').empty().append('<option value="">Sem Local de Estoque</option>');
+		}	
+
+		function validaCPF(strCPF) {
+			var Soma;
+			var Resto;
+			Soma = 0;
+			if (strCPF == "00000000000") return false;
+
+			for (i = 1; i <= 9; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (11 - i);
+			Resto = (Soma * 10) % 11;
+
+			if ((Resto == 10) || (Resto == 11)) Resto = 0;
+			if (Resto != parseInt(strCPF.substring(9, 10))) return false;
+
+			Soma = 0;
+			for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (12 - i);
+			Resto = (Soma * 10) % 11;
+
+			if ((Resto == 10) || (Resto == 11)) Resto = 0;
+			if (Resto != parseInt(strCPF.substring(10, 11))) return false;
+			return true;
+		}			
 	</script>
 
 </head>
@@ -563,26 +560,27 @@ include_once("topo.php");
 						<div class="row" style="margin-top: 20px;">
 							<div class="col-lg-12">
 								<div class="form-group">
-									<button class="btn btn-lg btn-principal" disabled id="enviar">Incluir</button>
+									<button class="btn btn-lg btn-principal" id="enviar" disabled>Incluir</button>
 									<a href="usuario.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 								</div>
 							</div>
 						</div>
-				</form>
+
+					</div>
+					<!-- /card-body -->
+				
+				</form>	
 
 			</div>
-			<!-- /card-body -->
+			<!-- /info blocks -->
 
 		</div>
-		<!-- /info blocks -->
+		<!-- /content area -->
+
+		<?php include_once("footer.php"); ?>
 
 	</div>
-	<!-- /content area -->
-
-	<?php include_once("footer.php"); ?>
-
-</div>
-<!-- /main content -->
+	<!-- /main content -->
 
 </div>
 <!-- /page content -->

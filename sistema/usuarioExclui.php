@@ -9,18 +9,30 @@ if(isset($_POST['inputUsuarioId'])){
 	$iUsuario = $_POST['inputUsuarioId'];
         	
 	try{
-		
-		$sql = "DELETE FROM Usuario
-				WHERE UsuarId = :id";
-		$result = $conn->prepare("$sql");
+
+		$conn->beginTransaction();
+
+		$sql = "DELETE FROM EmpresaXUsuarioXPerfil
+				WHERE EXUXPUsuario = :id";
+		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iUsuario);
 		$result->execute();
+
+		$sql = "DELETE FROM Usuario
+				WHERE UsuarId = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iUsuario);
+		$result->execute();
+
+		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Usuário excluído!!!";
 		$_SESSION['msg']['tipo'] = "success";	
 		
 	} catch(PDOException $e) {
+
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] ="Erro ao excluir usuário!!! O registro a ser excluído está sendo usado em outro local.";

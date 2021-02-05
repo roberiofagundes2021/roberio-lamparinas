@@ -4,7 +4,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-//Aqui eu verifico qual ID da Empresa devo usar: $_SESSION['EmpreId'] ou $_SESSION['EmpresaId']? Ou seja, estou adicionando um usu?rio da empresa logada ou de outra empresa?
+//Aqui eu verifico qual ID da Empresa devo usar: $_SESSION['EmpreId'] ou $_SESSION['EmpresaId']? Ou seja, estou adicionando um usuario da empresa logada ou de outra empresa?
 if(isset($_SESSION['EmpresaId']) and $_SESSION['EmpresaId'] <> $_SESSION['EmpreId']){
 	$sql = "SELECT SetorId, SetorNome
 			FROM Setor
