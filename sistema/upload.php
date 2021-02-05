@@ -6,8 +6,12 @@
 	//echo json_encode($_FILES['imagem']['name']);die;
     //print_r($_POST);die;
     //print_r($_FILES); die;
-    $pasta = "global_assets/images/produtos/";
-     
+    if ($_POST['tela'] ==  'produto'){
+        $pasta = "global_assets/images/produtos/";
+    } else if ($_POST['tela'] ==  'empresa') {
+        $pasta = "global_assets/images/empresas/";
+    }
+    
     // formatos de imagem permitidos
     $permitidos = array(".jpg", ".jpeg", ".gif", ".png", ".bmp");   
          

@@ -272,7 +272,7 @@ if(isset($_POST['inputNome'])){
 				//alert($('#imagem')[0].files[0]);
 				
 				formData.append('file', $('#imagem')[0].files[0] );
-				//formData.append('foto', inputFoto );
+				formData.append('tela', 'produto' );
 				
 				$.ajax({
 					type: "POST",

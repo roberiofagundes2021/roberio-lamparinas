@@ -519,7 +519,7 @@ $dataFim = date("Y-m-d");
                       <th>Data</th>
                       <th>Histórico</th>
                       <th>Conta / Banco</th>
-                      <th>Número Doc.</th>
+                      <th>Documento</th>
                       <th style='text-align: right;'>Entrada</th>
                       <th style='text-align: right;'>Saída</th>
                       <th style='text-align: right;'>Saldo</th>
