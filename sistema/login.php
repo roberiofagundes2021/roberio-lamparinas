@@ -92,7 +92,7 @@ if(isset($_POST['usuario'])){
 			}
 		} else { */
 		
-			$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EXUXPUnidade, UnidaNome
+			$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EXUXPUnidade, UnidaNome, EmpreFoto
 					FROM Usuario
 					JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
 					JOIN Situacao on SituaId = EXUXPStatus
@@ -120,7 +120,7 @@ if(isset($_POST['usuario'])){
 				}
 			} else if ($piEmpresa) {
 							
-				$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EXUXPUnidade, UnidaNome
+				$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EXUXPUnidade, UnidaNome, EmpreFoto
 						FROM Usuario
 						JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
 						JOIN Situacao on SituaId = EXUXPStatus
@@ -139,9 +139,10 @@ if(isset($_POST['usuario'])){
 					$_SESSION['UsuarNome'] = $row['UsuarNome'];
 					$_SESSION['EmpreId'] = $row['EmpreId'];
 					$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
+					$_SESSION['EmpreFoto'] = $row['EmpreFoto'];
 					$_SESSION['UnidadeId'] = $row['EXUXPUnidade'];
 					$_SESSION['UnidadeNome'] = $row['UnidaNome'];
-					$_SESSION['PerfiChave'] = $row['PerfiChave'];
+					$_SESSION['PerfiChave'] = $row['PerfiChave'];					
 					//$_SESSION['UsuarLogado'] = 1;
 					
 					unset($_SESSION['UsuarSenha']);
@@ -159,6 +160,7 @@ if(isset($_POST['usuario'])){
 				$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
 				$_SESSION['EmpreId'] = $row[0]['EmpreId'];
 				$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
+				$_SESSION['EmpreFoto'] = $row[0]['EmpreFoto'];
 				$_SESSION['UnidadeId'] = $row[0]['EXUXPUnidade'];
 				$_SESSION['UnidadeNome'] = $row[0]['UnidaNome'];
 				$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
