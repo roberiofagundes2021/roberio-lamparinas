@@ -137,7 +137,7 @@ if (isset($_POST['inputCpf'])) {
 		$(document).ready(function() {
 
 			//Garantindo que ninguém mude a empresa na tela de inclusão
-			$('#cmbEmpresa').prop("disabled", true);
+			//$('#cmbEmpresa').prop("disabled", true);
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#buscar').on('click', function(e) {
@@ -228,13 +228,23 @@ if (isset($_POST['inputCpf'])) {
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbUnidade').on('change', function(e) {
 
-				Filtrando();
+				var isVisible = $("#cmbLocalEstoque").is(":visible");  
+				
+				FiltrandoSetor();
+				
+				//Verifica se o cmbLocalEstoque está visível
+				if (isVisible){
+					FiltrandoLocalEstoque();
+				}				
 
 				var cmbUnidade = $('#cmbUnidade').val();
 
 				if (cmbUnidade == '') {
 					ResetSetor();
-					ResetLocalEstoque();
+					
+					if (isVisible){
+						ResetLocalEstoque();
+					}
 				} else {
 
 					$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
@@ -253,22 +263,24 @@ if (isset($_POST['inputCpf'])) {
 						}
 					});
 
-					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function(dados) {
+					if (isVisible){
+						$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function(dados) {
 
-						var option = '<option value="">Selecione o Local de Estoque</option>';
+							var option = '<option value="">Selecione o Local de Estoque</option>';
 
-						if (dados.length) {
+							if (dados.length) {
 
-							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.LcEstId + '">' + obj.LcEstNome + '</option>';
-							});
+								$.each(dados, function(i, obj) {
+									option += '<option value="' + obj.LcEstId + '">' + obj.LcEstNome + '</option>';
+								});
 
-							$('#cmbLocalEstoque').html(option).show();
-						} else {
-							ResetLocalEstoque();
-						}
-					});
-				}
+								$('#cmbLocalEstoque').html(option).show();
+							} else {
+								ResetLocalEstoque();
+							}
+						});
+					}
+				} 
 			});
 
 			$('#inputCpf').on('change', function(e) {
@@ -286,7 +298,7 @@ if (isset($_POST['inputCpf'])) {
 
 				e.preventDefault();
 
-				var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
+	/*			var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
 				var inputNome = $('#inputNome').val();
 				var cmbPerfil = $('#cmbPerfil').val();
 				var inputLogin = $('#inputLogin').val();
@@ -296,13 +308,19 @@ if (isset($_POST['inputCpf'])) {
 				var cmbUnidade = $('#cmbUnidade').val();
 
 				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
-				inputLogin = inputLogin.trim();
+				//inputNome = inputNome.trim();
+				//inputLogin = inputLogin.trim();
 
 				if (inputCpf.length < 11) {
 					alerta('Atenção', 'O CPF precisa ser informado corretamente!', 'error');
 					return false;
 				}
+
+				if (!validaCPF(inputCpf)) {
+					alerta('Atenção', 'CPF inválido!', 'error');
+					$('#inputCpf').focus();
+					return false;
+				}				
 
 				if (inputNome != '' && inputLogin != '' && inputEmail != '' && cmbPerfil != '' && cmbUnidade != ''){
 					if (inputSenha != inputConfirmaSenha) {
@@ -310,25 +328,29 @@ if (isset($_POST['inputCpf'])) {
 						$('#inputConfirmaSenha').focus();
 						return false;
 					}
-				}
+				}*/
 
-				$('#cmbEmpresa').prop("disabled", false); 
+				//$('#cmbEmpresa').prop("disabled", false); 
 
-				document.formUsuario.submit();				
+				$("#formUsuario").submit();
+				//document.formUsuario.submit();				
 			});
 
 			$('#cancelar').on('click', function(e) {
 
-				$('#cmbEmpresa').prop("disabled", false);
+				//$('#cmbEmpresa').prop("disabled", false);
 
 				$(window.document.location).attr('href', "usuario.php");
 			});			
 		});
 
-		function Filtrando() {
+		function FiltrandoSetor() {
 			$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
+		}		
+
+		function FiltrandoLocalEstoque() {
 			$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
-		}
+		}		
 
 		function ResetSetor() {
 			$('#cmbSetor').empty().append('<option value="">Sem setor</option>');

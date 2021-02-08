@@ -16,18 +16,19 @@ if (isset($_POST['inputUsuarioId'])) {
 
 	$iUsuario = $_POST['inputUsuarioId'];
 
-	$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, EXUXPPerfil, EXUXPUnidade, EXUXPSetor, EXUXPLocalEstoque
+	$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, 
+			EXUXPPerfil, EXUXPUnidade, EXUXPSetor, EXUXPLocalEstoque
 			FROM Usuario
 			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 			WHERE UsuarId = $iUsuario and EXUXPEmpresa = $EmpresaId ";
-	$result = $conn->query("$sql");
+	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 	$sql = "SELECT PerfiChave
-				FROM Perfil
-				JOIN Situacao on SituaId = PerfiStatus															     
-				WHERE SituaChave = 'ATIVO' and PerfiId = " . $row['EXUXPPerfil'] . "
-				ORDER BY PerfiNome ASC";
+			FROM Perfil
+			JOIN Situacao on SituaId = PerfiStatus															     
+			WHERE SituaChave = 'ATIVO' and PerfiId = " . $row['EXUXPPerfil'] . "
+			ORDER BY PerfiNome ASC";
 	$result = $conn->query($sql);
 	$rowPerf = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -46,6 +47,12 @@ if (isset($_POST['inputCpf'])) {
 				WHERE UsuarId = $iUsuario and EXUXPEmpresa = $EmpresaId ";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		$sql = "SELECT PerfiId
+				FROM Perfil
+				WHERE PerfiChave = 'ALMOXARIFADO' ";
+		$result = $conn->query($sql);
+		$rowPerfilId = $result->fetch(PDO::FETCH_ASSOC);		
 
 		$senha = '';
 		$row['UsuarSenha'] == $_POST['inputSenha'] ? $senha = $_POST['inputSenha'] : $senha = md5($_POST['inputSenha']);
@@ -74,7 +81,7 @@ if (isset($_POST['inputCpf'])) {
 			':iPerfil' => $_POST['cmbPerfil'] == '' ? null : $_POST['cmbPerfil'],
 			':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
 			':iSetor' => $_POST['cmbSetor'] == '' ? null : $_POST['cmbSetor'],
-			':iLocalEstoque' => $_POST['cmbLocalEstoque'] == '#' ? null : $_POST['cmbLocalEstoque'],
+			':iLocalEstoque' => $_POST['cmbLocalEstoque'] == '' || $_POST['cmbPerfil'] != $rowPerfilId['PerfiId'] ? null : $_POST['cmbLocalEstoque'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iUsuario' => $_POST['inputUsuarioId'],
 			':iEmpresa' => $EmpresaId
@@ -133,23 +140,7 @@ if (isset($_POST['inputCpf'])) {
 		$(document).ready(function() {
 
 			//Garantindo que ninguém mude a empresa na tela de edição
-			//$('#cmbEmpresa').prop("disabled", true);
-
-			let perfil = $('#cmbPerfil').find(':selected').attr('chaveperfil');
-			let almoxarifado = perfil == 'ALMOXARIFADO'
-
-			//Não está funcionado.. deveria!!!!	
-			$("#formUsuario").validate({
-				rules: {
-					cmbLocalEstoque: {
-						required: true //aqui deveria vir a variável "almoxarifado" no lugar do true
-					},
-					'inputSenha': "required",
-				    'inputConfirmaSenha': {
-      					equalTo: "#inputSenha"
-    				}
-				}
-			});
+			$('#cmbEmpresa').prop("disabled", true);
 
 			//Já realiza o filtro dos possíveis setores e seleciona o que está informado no banco		
 			var cmbUnidade = $('#cmbUnidade').val();
@@ -174,40 +165,24 @@ if (isset($_POST['inputCpf'])) {
 			});
 
 			$('#cmbPerfil').on('change', function(e) {
-			
-				let cmbPerfil = $('#cmbPerfil').val();
-				let perfil = $('#cmbPerfil').find(':selected').attr('chaveperfil');
-
-				if (perfil == 'ALMOXARIFADO') {
-					alert('Entrou1')
-					$('#cmbLocalEstoque').show()
-				} else {
-					alert('Entrou2')
-					$('#cmbLocalEstoque').hide()
-				}
-
-				/*
 				let filhos = $('#cmbPerfil').children()
 				let valorcmb = $('#cmbPerfil').val()
 				filhos.each((i, elem) => {
-					let perfil = $(elem).attr('chaveperfil')
+					let perfil = $(elem).attr('chavePerfil')
 					let valOption = $(elem).attr('value')
 
-					if (valOption == valorcmb) {
+					if (valOption == valorcmb){
 
 						if (perfil == 'ALMOXARIFADO') {
-							$('#LocalEstoque').attr("required")
-
-							$('#LocalEstoque').fadeIn('300')
+							
+							$('#LocalEstoque').fadeIn('300');
+							document.getElementById('cmbLocalEstoque').setAttribute('required', 'required');
 						} else {
-							$('#LocalEstoque').removeAttr("required")
-
-							$('#LocalEstoque').fadeOut('300')
+							document.getElementById('cmbLocalEstoque').removeAttribute('required', 'required');
+							$('#LocalEstoque').fadeOut('300');							
 						}
-					} else {
-						$('#LocalEstoque').removeAttr("required")
 					}
-				})*/
+				})
 			})
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
@@ -261,24 +236,31 @@ if (isset($_POST['inputCpf'])) {
 
 				e.preventDefault();
 
+				var inputNome = $('#inputNome').val();
+				var cmbPerfil = $('#cmbPerfil').val();
+				var inputLogin = $('#inputLogin').val();
+				var inputEmail = $('#inputEmail').val();
 				var inputSenha = $('#inputSenha').val();
 				var inputConfirmaSenha = $('#inputConfirmaSenha').val();
+				var cmbUnidade = $('#cmbUnidade').val();				
 
-				if (inputSenha != inputConfirmaSenha) {
-					alerta('Atenção', 'A confirmação de senha não confere!', 'error');
-					$('#inputConfirmaSenha').focus();
-					$("#formUsuario").submit();
-					return false;
+				if (inputNome != '' && inputLogin != '' && inputEmail != '' && cmbPerfil != '' && cmbUnidade != ''){
+					if (inputSenha != inputConfirmaSenha) {
+						alerta('Atenção', 'A confirmação de senha não confere!', 'error');
+						$('#inputConfirmaSenha').focus();
+						$("#formUsuario").submit();
+						return false;
+					}
 				}
 
-				//$('#cmbEmpresa').prop("disabled", false);
+				$('#cmbEmpresa').prop("disabled", false);
 
 				$("#formUsuario").submit();
 			})
 
 			$('#cancelar').on('click', function(e) {
 
-				//$('#cmbEmpresa').prop("disabled", false);
+				$('#cmbEmpresa').prop("disabled", false);
 
 				$(window.document.location).attr('href', "usuario.php");
 			});
@@ -483,9 +465,9 @@ include_once("topo.php");
 												$sql = "SELECT SetorId, SetorNome
 														FROM Setor
 														JOIN Situacao on SituaId = SetorStatus															     															     
-														WHERE SetorEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
+														WHERE SetorEmpresa = " . $EmpresaId . " and SetorUnidade = ". $row['EXUXPUnidade']." and SituaChave = 'ATIVO'
 														ORDER BY SetorNome ASC";
-												$result = $conn->query("$sql");
+												$result = $conn->query($sql);
 												$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
 
 												foreach ($rowSetor as $item) {
@@ -501,16 +483,16 @@ include_once("topo.php");
 										</div>
 									</div>
 
-									<div class="col-lg-3" id="LocalEstoque" <?php if ($rowPerf['PerfiChave'] == 'ALMOXARIFADO') echo 'style="display: block"'; ?> <?php if ($rowPerf['PerfiChave'] != 'ALMOXARIFADO') echo 'style="display: none"'; ?>>
+									<div class="col-lg-3" id="LocalEstoque" <?php if ($rowPerf['PerfiChave'] != 'ALMOXARIFADO') echo 'style="display: none"'; ?>>
 										<div class="form-group">
 											<label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
-											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" <?php //if ($rowPerf['PerfiChave'] == 'ALMOXARIFADO') echo 'required'; ?>>
+											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" <?php if ($rowPerf['PerfiChave'] == 'ALMOXARIFADO') echo 'required'; ?>>
 												<option value="">Informe um Local de Estoque</option>
 												<?php
 												$sql = "SELECT LcEstId, LcEstNome
 														FROM LocalEstoque
 														JOIN Situacao on SituaId = LcEstStatus															     															     
-														WHERE LcEstEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
+														WHERE LcEstUnidade = " . $row['EXUXPUnidade'] . " and SituaChave = 'ATIVO'
 														ORDER BY LcEstNome ASC";
 												$result = $conn->query($sql);
 												$rowLcEst = $result->fetchAll(PDO::FETCH_ASSOC);

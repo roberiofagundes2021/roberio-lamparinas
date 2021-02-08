@@ -66,10 +66,36 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
-				columnDefs: [{ 
-					orderable: false,
-					width: 100,
-					targets: [ 5 ]
+				columnDefs: [
+				{ 			
+					orderable: true,		//Nome
+					width: "20%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,		//Login
+					width: "20%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,		//CPF
+					width: "20%",
+					targets: [2]
+				},
+				{ 
+					orderable: true,		//Perfil
+					width: "20%",
+					targets: [3]
+				},
+				{ 
+					orderable: true,		//Situação
+					width: "10%",
+					targets: [4]
+				},
+				{ 
+					orderable: false,		//Ações
+					width: "10%",
+					targets: [5]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
