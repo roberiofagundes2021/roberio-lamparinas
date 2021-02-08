@@ -127,7 +127,6 @@ if (isset($_POST['inputCpf'])) {
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
-	<!-- /theme JS files -->
 
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>

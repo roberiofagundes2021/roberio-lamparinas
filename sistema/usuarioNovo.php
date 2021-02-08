@@ -129,7 +129,6 @@ if (isset($_POST['inputCpf'])) {
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
-	<!-- /theme JS files -->
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
@@ -137,7 +136,7 @@ if (isset($_POST['inputCpf'])) {
 		$(document).ready(function() {
 
 			//Garantindo que ninguém mude a empresa na tela de inclusão
-			//$('#cmbEmpresa').prop("disabled", true);
+			$('#cmbEmpresa').prop("disabled", true);
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#buscar').on('click', function(e) {
@@ -217,9 +216,11 @@ if (isset($_POST['inputCpf'])) {
 
 						if (perfil == 'ALMOXARIFADO') {
 							
-							$('#LocalEstoque').fadeIn('300')
+							$('#LocalEstoque').fadeIn('300');
+							document.getElementById('cmbLocalEstoque').setAttribute('required', 'required');
 						} else {
-							$('#LocalEstoque').fadeOut('300')
+							document.getElementById('cmbLocalEstoque').removeAttribute('required', 'required');
+							$('#LocalEstoque').fadeOut('300');
 						}
 					}
 				})
@@ -228,23 +229,13 @@ if (isset($_POST['inputCpf'])) {
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbUnidade').on('change', function(e) {
 
-				var isVisible = $("#cmbLocalEstoque").is(":visible");  
-				
-				FiltrandoSetor();
-				
-				//Verifica se o cmbLocalEstoque está visível
-				if (isVisible){
-					FiltrandoLocalEstoque();
-				}				
+				Filtrando();
 
 				var cmbUnidade = $('#cmbUnidade').val();
 
 				if (cmbUnidade == '') {
 					ResetSetor();
-					
-					if (isVisible){
-						ResetLocalEstoque();
-					}
+					ResetLocalEstoque();
 				} else {
 
 					$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
@@ -263,24 +254,22 @@ if (isset($_POST['inputCpf'])) {
 						}
 					});
 
-					if (isVisible){
-						$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function(dados) {
+					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function(dados) {
 
-							var option = '<option value="">Selecione o Local de Estoque</option>';
+						var option = '<option value="">Selecione o Local de Estoque</option>';
 
-							if (dados.length) {
+						if (dados.length) {
 
-								$.each(dados, function(i, obj) {
-									option += '<option value="' + obj.LcEstId + '">' + obj.LcEstNome + '</option>';
-								});
+							$.each(dados, function(i, obj) {
+								option += '<option value="' + obj.LcEstId + '">' + obj.LcEstNome + '</option>';
+							});
 
-								$('#cmbLocalEstoque').html(option).show();
-							} else {
-								ResetLocalEstoque();
-							}
-						});
-					}
-				} 
+							$('#cmbLocalEstoque').html(option).show();
+						} else {
+							ResetLocalEstoque();
+						}
+					});
+				}
 			});
 
 			$('#inputCpf').on('change', function(e) {
@@ -298,39 +287,24 @@ if (isset($_POST['inputCpf'])) {
 
 				e.preventDefault();
 
-	/*			var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
 				var inputNome = $('#inputNome').val();
 				var cmbPerfil = $('#cmbPerfil').val();
 				var inputLogin = $('#inputLogin').val();
-				var inputSenha = $('#inputSenha').val();
 				var inputEmail = $('#inputEmail').val();
+				var inputSenha = $('#inputSenha').val();
 				var inputConfirmaSenha = $('#inputConfirmaSenha').val();
-				var cmbUnidade = $('#cmbUnidade').val();
-
-				//remove os espaços desnecessários antes e depois
-				//inputNome = inputNome.trim();
-				//inputLogin = inputLogin.trim();
-
-				if (inputCpf.length < 11) {
-					alerta('Atenção', 'O CPF precisa ser informado corretamente!', 'error');
-					return false;
-				}
-
-				if (!validaCPF(inputCpf)) {
-					alerta('Atenção', 'CPF inválido!', 'error');
-					$('#inputCpf').focus();
-					return false;
-				}				
+				var cmbUnidade = $('#cmbUnidade').val();				
 
 				if (inputNome != '' && inputLogin != '' && inputEmail != '' && cmbPerfil != '' && cmbUnidade != ''){
 					if (inputSenha != inputConfirmaSenha) {
 						alerta('Atenção', 'A confirmação de senha não confere!', 'error');
 						$('#inputConfirmaSenha').focus();
+						$("#formUsuario").submit();
 						return false;
 					}
-				}*/
+				}
 
-				//$('#cmbEmpresa').prop("disabled", false); 
+				$('#cmbEmpresa').prop("disabled", false);				
 
 				$("#formUsuario").submit();
 				//document.formUsuario.submit();				
@@ -338,19 +312,16 @@ if (isset($_POST['inputCpf'])) {
 
 			$('#cancelar').on('click', function(e) {
 
-				//$('#cmbEmpresa').prop("disabled", false);
+				$('#cmbEmpresa').prop("disabled", false);
 
 				$(window.document.location).attr('href', "usuario.php");
 			});			
 		});
 
-		function FiltrandoSetor() {
+		function Filtrando() {
 			$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
-		}		
-
-		function FiltrandoLocalEstoque() {
 			$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
-		}		
+		}
 
 		function ResetSetor() {
 			$('#cmbSetor').empty().append('<option value="">Sem setor</option>');
@@ -358,7 +329,7 @@ if (isset($_POST['inputCpf'])) {
 
 		function ResetLocalEstoque() {
 			$('#cmbLocalEstoque').empty().append('<option value="">Sem Local de Estoque</option>');
-		}	
+		}		
 
 		function validaCPF(strCPF) {
 			var Soma;
