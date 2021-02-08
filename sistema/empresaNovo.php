@@ -12,9 +12,9 @@ if(isset($_POST['inputCnpj'])){
 		
 		$sql = "INSERT INTO Empresa (EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreCep, EmpreEndereco, EmpreNumero, EmpreComplemento, 
 									 EmpreBairro, EmpreCidade, EmpreEstado, EmpreContato, EmpreTelefone, EmpreCelular, EmpreEmail, 
-									 EmpreSite, EmpreObservacao, EmpreStatus, EmpreUsuarioAtualizador)
+									 EmpreSite, EmpreObservacao, EmpreStatus, EmpreUsuarioAtualizador, EmpreFoto)
 				VALUES (:sCnpj, :sRazaoSocial, :sNomeFantasia,  :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, :sCidade, 
-						:sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, :bStatus, :iUsuarioAtualizador)";
+						:sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, :bStatus, :iUsuarioAtualizador, :sFoto)";
 		$result = $conn->prepare($sql);
 		
 		$conn->beginTransaction();
@@ -37,7 +37,8 @@ if(isset($_POST['inputCnpj'])){
 						':sSite' => $_POST['inputSite'],
 						':sObservacao' => $_POST['txtareaObservacao'],						
 						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId']
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':sFoto' => isset($_POST['inputFoto']) ? $_POST['inputFoto'] : null
 						));
 						
 		$insertId = $conn->lastInsertId();
@@ -171,6 +172,58 @@ if(isset($_POST['inputCnpj'])){
                     limpa_formulário_cep();
                 }
             }); //end blur
+
+			//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
+			$('#addFoto').on('click', function(e){	
+				e.preventDefault(); // Isso aqui não deixa o formulário "formProduto" ser submetido ao clicar no INcluir Foto, ou seja, ao executar o método ajax
+			
+				$('#imagem').trigger("click");
+			});			
+			
+			// #imagem é o id do input, ao alterar o conteudo do input execurará a função abaixo
+			$('#imagem').on('change',function(){
+
+				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
+								
+				// Get form
+				var form = $('#formFoto')[0];
+				var formData = new FormData(form);
+				//var inputFoto = $('#inputFoto').val();
+				//alert($('#imagem')[0].files[0]);
+				
+				formData.append('file', $('#imagem')[0].files[0] );
+				formData.append('tela', 'empresa' );
+				
+				$.ajax({
+					type: "POST",
+					enctype: 'multipart/form-data',
+					url: "upload.php",
+					processData: false,  // impedir que o jQuery tranforma a "data" em querystring					
+					contentType: false,  // desabilitar o cabeçalho "Content-Type"
+					cache: false, // desabilitar o "cache"
+					data: formData,//{imagem: inputImagem},
+					success: function(resposta){
+						//console.log(resposta);
+						
+						$('#visualizar').html(resposta);
+						$('#addFoto').text("Alterar Foto...");
+						
+						//Aqui sou obrigado a instanciar novamente a utilização do fancybox
+						$(".fancybox").fancybox({
+							// options
+						});	
+						
+						return false;						
+					}
+				}); //ajax
+				
+				//$('#formFoto').submit();
+				
+				// Efetua o Upload sem dar refresh na pagina
+				$('#formFoto').ajaxForm({
+					target:'#visualizar' // o callback será no elemento com o id #visualizar
+				}).submit();
+			});			
        
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
@@ -222,7 +275,29 @@ if(isset($_POST['inputCnpj'])){
 						$( "#formEmpresa" ).submit();
 					}
 				})
-			})       
+			})  
+
+			//Valida Registro Duplicado
+			$('#cancelar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputFoto = $('#inputFoto').val();
+				
+				//Esse ajax está sendo usado para excluir a imagem que nao será mais usada
+				$.ajax({
+					type: "POST",
+					url: "empresaExcluiImagem.php",
+					data: ('foto='+inputFoto),
+					success: function(resposta){
+						
+					}
+				})				
+				
+				$(window.document.location).attr('href',"empresa.php");
+				
+			}); // cancelar		
+
         });	
      </script>	
 
@@ -253,36 +328,50 @@ if(isset($_POST['inputCnpj'])){
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Empresa</h5>
 						</div>
 						
-						<div class="card-body">								
-							<div class="row">
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputCnpj">CNPJ</label>
-										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" required>
-									</div>
-								</div>
-							</div>
-								
-							<div class="row">				
-								<div class="col-lg-12">
+						<div class="card-body">	
+							<div class="media">
+								<div class="media-body">
+
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputRazaoSocial">Razão Social</label>
-												<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" required>
-											</div>
-										</div>
-										
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputNomeFantasia">Nome Fantasia</label>
-												<input type="text" id="inputNomeFantasia" name="inputNomeFantasia" class="form-control" placeholder="Nome Fantasia" required>
+												<label for="inputCnpj">CNPJ</label>
+												<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" required>
 											</div>
 										</div>
 									</div>
+										
+									<div class="row">				
+										<div class="col-lg-12">
+											<div class="row">
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label for="inputRazaoSocial">Razão Social</label>
+														<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" required>
+													</div>
+												</div>			
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label for="inputNomeFantasia">Nome Fantasia</label>
+														<input type="text" id="inputNomeFantasia" name="inputNomeFantasia" class="form-control" placeholder="Nome Fantasia" required>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									
+								</div> <!-- media-body -->
+
+								<div style="text-align:center;">
+									<div id="visualizar">										
+										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Empresa" style="max-height:200px; border:2px solid #ccc;">
+									</div>
+									<br>
+									<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>	
 								</div>
-							</div>
 								
+							</div> <!-- media -->
+
 							<div class="row">
 								<div class="col-lg-12">									
 									<h5 class="mb-0 font-weight-semibold">Endereço</h5>
@@ -432,6 +521,10 @@ if(isset($_POST['inputCnpj'])){
 									</div>
 								</div>
 							</div>
+						</form>	
+
+						<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
+							<input type="file" id="imagem" name="imagem" style="display:none;" />
 						</form>								
 
 					</div>

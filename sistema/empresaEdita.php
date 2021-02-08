@@ -14,11 +14,26 @@ if(isset($_POST['inputEmpresaId'])){
 		
 		$sql = "SELECT EmpreId, EmpreCnpj, EmpreRazaoSocial, EmpreNomeFantasia, EmpreCep, EmpreEndereco, EmpreNumero, EmpreComplemento, 
 					   EmpreBairro, EmpreCidade, EmpreEstado, EmpreContato, EmpreTelefone, EmpreCelular, EmpreEmail, 
-					   EmpreSite, EmpreObservacao, EmpreStatus
+					   EmpreSite, EmpreObservacao, EmpreStatus, EmpreFoto
 				FROM Empresa
 				WHERE EmpreId = $iEmpresa ";
 		$result = $conn->query("$sql");
 		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		//Primeiro verifica se no banco está nulo
+		if ($row['EmpreFoto'] != null){
+			
+			//Depois verifica se o arquivo físico ainda existe no servidor
+			if (file_exists("global_assets/images/empresas/".$row['EmpreFoto'])){
+				$sFoto = "global_assets/images/empresas/".$row['EmpreFoto'];
+			} else {
+				$sFoto = "global_assets/images/lamparinas/sem_foto.gif";
+			}
+			$sButtonFoto = "Alterar Foto...";
+		} else {
+			$sFoto = "global_assets/images/lamparinas/sem_foto.gif";
+			$sButtonFoto = "Adicionar Foto...";
+		}
 		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
@@ -35,7 +50,7 @@ if(isset($_POST['inputCnpj'])){
 					   EmpreCep = :sCep, EmpreEndereco = :sEndereco, EmpreNumero = :sNumero, EmpreComplemento = :sComplemento,
 					   EmpreBairro = :sBairro, EmpreCidade = :sCidade, EmpreEstado = :sEstado, EmpreContato = :sContato, 
 					   EmpreTelefone = :sTelefone, EmpreCelular = :sCelular, EmpreEmail = :sEmail, EmpreSite = :sSite, 
-					   EmpreObservacao = :sObservacao, EmpreUsuarioAtualizador = :iUsuarioAtualizador
+					   EmpreObservacao = :sObservacao, EmpreUsuarioAtualizador = :iUsuarioAtualizador, EmpreFoto = :sFoto
 				WHERE EmpreId = :iEmpresa";
 		$result = $conn->prepare($sql);
 				
@@ -57,6 +72,7 @@ if(isset($_POST['inputCnpj'])){
 						':sSite' => $_POST['inputSite'],
 						':sObservacao' => $_POST['txtareaObservacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':sFoto' => isset($_POST['inputFoto']) ? $_POST['inputFoto'] : null,
 						':iEmpresa' => $_POST['inputEmpreId']
 						));
 		
@@ -219,7 +235,57 @@ if(isset($_POST['inputCnpj'])){
 						$( "#formEmpresa" ).submit();
 					}
 				})
-			}) //end enviar click            
+			}) //end enviar click  
+			
+			//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
+			$('#addFoto').on('click', function(e){	
+				e.preventDefault(); // Isso aqui não deixa o formulário "formEmpresa" ser submetido ao clicar no INcluir Foto, ou seja, ao executar o método ajax
+			
+				$('#imagem').trigger("click");
+			});			
+			
+			// #imagem é o id do input, ao alterar o conteudo do input execurará a função abaixo
+			$('#imagem').on('change',function(){
+
+				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
+								
+				// Get form
+				var form = $('#formFoto')[0];
+				var formData = new FormData(form);
+				
+				formData.append('file', $('#imagem')[0].files[0] );
+				formData.append('tela', 'empresa' );
+				
+				$.ajax({
+					type: "POST",
+					enctype: 'multipart/form-data',
+					url: "upload.php",
+					processData: false,  // impedir que o jQuery tranforma a "data" em querystring					
+					contentType: false,  // desabilitar o cabeçalho "Content-Type"
+					cache: false, // desabilitar o "cache"
+					data: formData,//{imagem: inputImagem},
+					success: function(resposta){
+						//console.log(resposta);
+						
+						$('#visualizar').html(resposta);
+						$('#addFoto').text("Alterar Foto...");
+						
+						//Aqui sou obrigado a instanciar novamente a utilização do fancybox
+						$(".fancybox").fancybox({
+							// options
+						});	
+						
+						return false;						
+					}
+				}); //ajax
+				
+				//$('#formFoto').submit();
+				
+				// Efetua o Upload sem dar refresh na pagina
+				$('#formFoto').ajaxForm({
+					target:'#visualizar' // o callback será no elemento com o id #visualizar
+				}).submit();
+			});			
         });	
      </script>	
 
@@ -253,35 +319,55 @@ if(isset($_POST['inputCnpj'])){
 						<input type="hidden" id="inputEmpreId" name="inputEmpreId" value="<?php echo $row['EmpreId']; ?>" >
 						<input type="hidden" id="inputEmpreCnpj" name="inputEmpreCnpj" value="<?php echo $row['EmpreCnpj']; ?>" >
 						
-						<div class="card-body">								
-							<div class="row">
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputCnpj">CNPJ</label>
-										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" value="<?php echo formatarCPF_Cnpj($row['EmpreCnpj']); ?>" data-mask="99.999.999/9999-99" required>
-									</div>
-								</div>
-							</div>
+						<div class="card-body">	
+
+							<div class="media">
 								
-							<div class="row">				
-								<div class="col-lg-12">
+								<div class="media-body">
+
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputRazaoSocial">Razão Social</label>
-												<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" value="<?php echo $row['EmpreRazaoSocial']; ?>" required>
-											</div>
-										</div>
-										
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputNomeFantasia">Nome Fantasia</label>
-												<input type="text" id="inputNomeFantasia" name="inputNomeFantasia" class="form-control" placeholder="Nome Fantasia" value="<?php echo $row['EmpreNomeFantasia']; ?>" required>
+												<label for="inputCnpj">CNPJ</label>
+												<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" value="<?php echo formatarCPF_Cnpj($row['EmpreCnpj']); ?>" data-mask="99.999.999/9999-99" required>
 											</div>
 										</div>
 									</div>
-								</div>
-							</div>
+										
+									<div class="row">				
+										<div class="col-lg-12">
+											<div class="row">
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label for="inputRazaoSocial">Razão Social</label>
+														<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" value="<?php echo $row['EmpreRazaoSocial']; ?>" required>
+													</div>
+												</div>
+												
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label for="inputNomeFantasia">Nome Fantasia</label>
+														<input type="text" id="inputNomeFantasia" name="inputNomeFantasia" class="form-control" placeholder="Nome Fantasia" value="<?php echo $row['EmpreNomeFantasia']; ?>" required>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div> <!-- media-body -->									
+									
+								<div style="text-align:center;">
+									<div id="visualizar">
+										<a href="<?php echo $sFoto; ?>" class="fancybox">
+											<img class="ml-3" src="<?php echo $sFoto; ?>" style="max-height:200px; border:2px solid #ccc;">
+										</a>
+										<input type="hidden" id="inputFoto" name="inputFoto" value="<?php echo $row['EmpreFoto']; ?>" >
+									</div>
+									<br>
+									<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%"><?php echo $sButtonFoto; ?></button>									
+								</div>									
+									
+							</div> <!-- media -->
 								
 							<div class="row">
 								<div class="col-lg-12">									
@@ -432,7 +518,11 @@ if(isset($_POST['inputCnpj'])){
 									</div>
 								</div>
 							</div>
-						</form>								
+						</form>	
+
+						<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
+							<input type="file" id="imagem" name="imagem" style="display:none;" />
+						</form>										
 
 					</div>
 					<!-- /card-body -->
