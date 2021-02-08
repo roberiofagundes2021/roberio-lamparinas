@@ -111,6 +111,8 @@ if(isset($_POST['inputCnpj'])){
 	
 	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
 	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
+
+	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>	
 	
 	<!-- /theme JS files -->	
 	
@@ -118,6 +120,11 @@ if(isset($_POST['inputCnpj'])){
     <script type="text/javascript" >
 
         $(document).ready(function() {
+
+			//Aqui sou obrigado a instanciar novamente a utilização do fancybox
+			$(".fancybox").fancybox({
+				// options
+			});				
 
             function limpa_formulário_cep() {
                 // Limpa valores do formulário de cep.
