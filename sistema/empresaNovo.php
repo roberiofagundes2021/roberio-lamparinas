@@ -247,60 +247,34 @@ if(isset($_POST['inputCnpj'])){
 				var inputRazaoSocial = $('#inputRazaoSocial').val();
 				var inputNomeFantasia = $('#inputNomeFantasia').val();
 
-					if (inputCnpj.trim() == ''){
+				if (inputCnpj.trim() == ''){
+					$('#inputCnpj').val('');
+				} else {
+					if (!validarCNPJ(inputCnpj)){
 						$('#inputCnpj').val('');
-					} else {
-						if (!validarCNPJ(inputCnpj)){
-							$('#inputCnpj').val('');
-							alerta('Atenção','CNPJ inválido!','error');
-							$('#inputCnpj').focus();
-							return false;
-						}
-					}	
-
-						
-				
-				//remove os espaços desnecessários antes e depois
-				inputRazaoSocial = inputRazaoSocial.trim();
-				inputNomeFantasia = inputNomeFantasia.trim();
-								
-				//Verifica se o campo só possui espaços em branco
-				if (inputCnpj == ''){
-					alerta('Atenção','Informe o CNPJ da empresa!','error');
-					$('#inputCnpj').focus();
-					return false;
-				}
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputRazaoSocial == ''){
-					alerta('Atenção','Informe a Razão Social da empresa!','error');
-					$('#inputRazaoSocial').focus();
-					return false;
-				}				
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNomeFantasia == ''){
-					alerta('Atenção','Informe o nome fantasia da empresa!','error');
-					$('#inputNomeFantasia').focus();
-					return false;
-				}
-								
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "empresaValida.php",
-					data: ('cnpj='+inputCnpj),
-					success: function(resposta){
-						
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;
-						}
-						
-						$( "#formEmpresa" ).submit();
+						alerta('Atenção','CNPJ inválido!','error');
+						$('#inputCnpj').focus();
+						return false;
 					}
-				})
-			})  
+																																		
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "empresaValida.php",
+						data: ('cnpj='+inputCnpj),
+						success: function(resposta){
+							
+							if(resposta == 1){
+								alerta('Atenção','Esse registro já existe!','error');
+								return false;
+							}
+							
+						}
+					})
+				}
+
+				$( "#formEmpresa" ).submit();
+			})
 
 			//Valida Registro Duplicado
 			$('#cancelar').on('click', function(e){
@@ -403,7 +377,7 @@ if(isset($_POST['inputCnpj'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formEmpresa" id="formEmpresa" method="post" class="form-validate" action="empresaNovo.php">
+					<form name="formEmpresa" id="formEmpresa" method="post" class="form-validate-jquery" >
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Empresa</h5>
 						</div>
@@ -413,10 +387,10 @@ if(isset($_POST['inputCnpj'])){
 								<div class="media-body">
 
 									<div class="row">
-										<div class="col-lg-2">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
-												<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" required>
+												<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" >
 											</div>
 										</div>
 									</div>
@@ -427,13 +401,13 @@ if(isset($_POST['inputCnpj'])){
 												<div class="col-lg-6">
 													<div class="form-group">
 														<label for="inputRazaoSocial">Razão Social<span class="text-danger"> *</span></label>
-														<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" required>
+														<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" >
 													</div>
 												</div>			
 												<div class="col-lg-6">
 													<div class="form-group">
 														<label for="inputNomeFantasia">Nome Fantasia<span class="text-danger"> *</span></label>
-														<input type="text" id="inputNomeFantasia" name="inputNomeFantasia" class="form-control" placeholder="Nome Fantasia" required>
+														<input type="text" id="inputNomeFantasia" name="inputNomeFantasia" class="form-control" placeholder="Nome Fantasia" >
 													</div>
 												</div>
 											</div>
