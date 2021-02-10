@@ -208,57 +208,37 @@ if(isset($_POST['inputCnpj'])){
 				var inputNomeFantasia = $('#inputNomeFantasia').val();	
 
 
-					if (inputCnpjNovo.trim() == ''){
+				if (inputCnpjNovo.trim() == ''){
+					$('#inputCnpj').val('');
+					$("#formEmpresa").submit();
+				} else {
+
+					if (!validarCNPJ(inputCnpjNovo)){
 						$('#inputCnpj').val('');
-					} else {
-						if (!validarCNPJ(inputCnpjNovo)){
-							$('#inputCnpj').val('');
-							alerta('Atenção','CNPJ inválido!','error');
-							$('#inputCnpj').focus();
-							return false;
-						}
-					}				
-				
-				//remove os espaços desnecessários antes e depois
-				inputRazaoSocial = inputRazaoSocial.trim();
-				inputNomeFantasia = inputNomeFantasia.trim();
+						alerta('Atenção','CNPJ inválido!','error');
+						$('#inputCnpj').focus();
+						return false;
+					}
+
+					if (inputRazaoSocial != '' && inputNomeFantasia != ''){	
+						//Esse ajax está sendo usado para verificar no banco se o registro já existe
+						$.ajax({
+							type: "POST",
+							url: "empresaValida.php",
+							data: ('cnpjNovo='+inputCnpjNovo+'&cnpjVelho='+inputCnpjVelho),
+							success: function(resposta){
 								
-				//Verifica se o campo só possui espaços em branco
-				if (inputCnpj == ''){
-					alerta('Atenção','Informe o CNPJ da empresa!','error');
-					$('#inputCnpj').focus();
-					return false;
-				}
-				
-				//Verifica se o campo só possui espaços em branco
-				if (inputRazaoSocial == ''){
-					alerta('Atenção','Informe a Razão Social da empresa!','error');
-					$('#inputRazaoSocial').focus();
-					return false;
+								if(resposta == 1){
+									alerta('Atenção','Essa empresa já foi cadastrada no sistema!','error');
+									return false;
+								}
+								
+								$( "#formEmpresa" ).submit();
+							}
+						})
+					}	
 				}				
 				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNomeFantasia == ''){
-					alerta('Atenção','Informe o nome fantasia da empresa!','error');
-					$('#inputNomeFantasia').focus();
-					return false;
-				}
-								
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "empresaValida.php",
-					data: ('cnpjNovo='+inputCnpjNovo+'&cnpjVelho='+inputCnpjVelho),
-					success: function(resposta){
-						
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;
-						}
-						
-						$( "#formEmpresa" ).submit();
-					}
-				})
 			}) //end enviar click  
 			
 			//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
@@ -390,7 +370,7 @@ if(isset($_POST['inputCnpj'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formEmpresa" id="formEmpresa" method="post" class="form-validate" action="empresaEdita.php">
+					<form name="formEmpresa" id="formEmpresa" method="post" class="form-validate-jquery" >
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Empresa "<?php echo $row['EmpreNomeFantasia']; ?>"</h5>
 						</div>
@@ -597,14 +577,17 @@ if(isset($_POST['inputCnpj'])){
 									</div>
 								</div>
 							</div>
-						</form>	
+
+						</div>
+					    <!-- /card-body -->
+          
+					</form>	
 
 						<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
 							<input type="file" id="imagem" name="imagem" style="display:none;" />
 						</form>										
 
-					</div>
-					<!-- /card-body -->
+					
 					
 				</div>
 				<!-- /info blocks -->
