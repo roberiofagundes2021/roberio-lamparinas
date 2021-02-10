@@ -249,31 +249,35 @@ if(isset($_POST['inputCnpj'])){
 
 				if (inputCnpj.trim() == ''){
 					$('#inputCnpj').val('');
+					$("#formEmpresa").submit();
 				} else {
+
 					if (!validarCNPJ(inputCnpj)){
 						$('#inputCnpj').val('');
 						alerta('Atenção','CNPJ inválido!','error');
 						$('#inputCnpj').focus();
 						return false;
 					}
-																																		
-					//Esse ajax está sendo usado para verificar no banco se o registro já existe
-					$.ajax({
-						type: "POST",
-						url: "empresaValida.php",
-						data: ('cnpj='+inputCnpj),
-						success: function(resposta){
-							
-							if(resposta == 1){
-								alerta('Atenção','Esse registro já existe!','error');
-								return false;
-							}
-							
-						}
-					})
-				}
 
-				$( "#formEmpresa" ).submit();
+					if (inputRazaoSocial != '' && inputNomeFantasia != ''){
+																																			
+						//Esse ajax está sendo usado para verificar no banco se o registro já existe
+						$.ajax({
+							type: "POST",
+							url: "empresaValida.php",
+							data: ('cnpj='+inputCnpj),
+							success: function(resposta){
+								
+								if(resposta == 1){
+									alerta('Atenção','Essa empresa já foi cadastrada no sistema!','error');
+									return;
+								} 
+
+								$("#formEmpresa").submit();
+							}
+						})
+					}
+				}
 			})
 
 			//Valida Registro Duplicado
@@ -390,7 +394,7 @@ if(isset($_POST['inputCnpj'])){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
-												<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" >
+												<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" required >
 											</div>
 										</div>
 									</div>
@@ -401,13 +405,13 @@ if(isset($_POST['inputCnpj'])){
 												<div class="col-lg-6">
 													<div class="form-group">
 														<label for="inputRazaoSocial">Razão Social<span class="text-danger"> *</span></label>
-														<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" >
+														<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" required >
 													</div>
 												</div>			
 												<div class="col-lg-6">
 													<div class="form-group">
 														<label for="inputNomeFantasia">Nome Fantasia<span class="text-danger"> *</span></label>
-														<input type="text" id="inputNomeFantasia" name="inputNomeFantasia" class="form-control" placeholder="Nome Fantasia" >
+														<input type="text" id="inputNomeFantasia" name="inputNomeFantasia" class="form-control" placeholder="Nome Fantasia" required >
 													</div>
 												</div>
 											</div>
@@ -574,16 +578,16 @@ if(isset($_POST['inputCnpj'])){
 										<a href="empresa.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
-							</div>
-						</form>	
+							</div>						
 
-						<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
-							<input type="file" id="imagem" name="imagem" style="display:none;" />
-						</form>								
+						</div>
+						<!-- /card-body -->
+					</form>	
 
-					</div>
-					<!-- /card-body -->
-					
+					<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
+						<input type="file" id="imagem" name="imagem" style="display:none;" />
+					</form>		
+
 				</div>
 				<!-- /info blocks -->
 
