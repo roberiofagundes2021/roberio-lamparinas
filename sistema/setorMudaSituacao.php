@@ -15,7 +15,7 @@ if(isset($_POST['inputSetorId'])){
 		
 		$sql = "UPDATE Setor SET SetorStatus = :bStatus
 				WHERE SetorId = :id";
-		$result = $conn->prepare("$sql");
+		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $bStatus); 
 		$result->bindParam(':id', $iSetor); 
 		$result->execute();
