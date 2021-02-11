@@ -816,6 +816,14 @@ $dataInicio = date("Y-m-d");
                     $('#pageModalParcelar').fadeOut(200);
                     $('body').css('overflow', 'scroll');
                 })
+                 
+                var input = document.getElementById('inputDataVencimento');
+                input.addEventListener('change', function() {
+                var agora = new Date();
+                var escolhida = new Date(this.value);
+                if (escolhida < agora) this.value = [agora.getFullYear(), agora.getMonth() + 1, agora.getDate()].map(v => v < 10 ? '0' + v : v).join('-');
+                });
+
             }
             modalParcelar()
 
@@ -1078,13 +1086,12 @@ $dataInicio = date("Y-m-d");
                                         echo '<input type="hidden" name="inputEditar" value="sim">';
                                         echo '<input type="hidden" name="inputContaId" value="' . $lancamento['CnAReId'] . '">';
                                     }
-
                                     ?>
                                     <div class="row">
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputDataEmissao">Data de Emissão</label>
-                                                <input type="date" id="inputDataEmissao" name="inputDataEmissao" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtEmissao'] ?>" class="form-control" placeholder="Data de Emissão">
+                                                <input type="text" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
                                             </div>
                                         </div>
                                         <div class="col-lg-4">
