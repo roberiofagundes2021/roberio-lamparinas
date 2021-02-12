@@ -642,6 +642,15 @@ $dataInicio = date("Y-m-d");
     <script type="text/javascript">
         $(document).ready(function() {
 
+            var input = document.getElementById('inputDataVencimento');
+            input.addEventListener('change', function() {
+                var agora = new Date();
+                var escolhida = new Date(this.value);
+                if (escolhida < agora) {
+                    this.value = [agora.getFullYear(), agora.getMonth() + 1, agora.getDate()].map(v => v < 10 ? '0' + v : v).join('-');
+                }
+            });        
+
             let styleJurosDescontos = ''
 
             function gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade) {
@@ -815,15 +824,7 @@ $dataInicio = date("Y-m-d");
                 $("#salvarParcelas").on('click', function() {
                     $('#pageModalParcelar').fadeOut(200);
                     $('body').css('overflow', 'scroll');
-                })
-                 
-                var input = document.getElementById('inputDataVencimento');
-                input.addEventListener('change', function() {
-                var agora = new Date();
-                var escolhida = new Date(this.value);
-                if (escolhida < agora) this.value = [agora.getFullYear(), agora.getMonth() + 1, agora.getDate()].map(v => v < 10 ? '0' + v : v).join('-');
-                });
-
+                })                         
             }
             modalParcelar()
 
