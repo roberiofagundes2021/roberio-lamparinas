@@ -53,14 +53,15 @@ if ($countMovimentAprovada) {
 
         $output .= '<thead>
                     <tr class="bg-slate">
-                        <th  style="text-align: center">Item</th>
+                        <th style="text-align: center">Item</th>
                         <th>Produto/Serviço</th>
-                        <th  style="text-align: center">Unidade Medida</th>
-                        <th  style="text-align: center">Quantidade</th>
-                        <th  style="text-align: center">Saldo</th>
-                        <th  style="text-align: right; width: 10%">Valor Unitário</th>
-                        <th  style="text-align: right; width: 13%">Valor Total</th>
-                        <th  style="text-align: center">Ações</th>
+                        <th style="text-align: center">Unidade Medida</th>
+                        <th style="text-align: center">Quantidade</th>
+                        <th style="text-align: center">Saldo</th>
+                        <th style="text-align: right; width: 10%">Valor Unitário</th>
+                        <th style="text-align: right; width: 13%">Valor Total</th>
+                        <th style="text-align: center; width: 10%">Validade</th>
+                        <th style="text-align: center">Ações</th>
                     </tr>
                 </thead>
         ';
@@ -100,6 +101,7 @@ if ($countMovimentAprovada) {
                          <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $saldo['Saldo'] . '</td>
 						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: right">' . $valorCusto . '</td>
                          <td title="' . $item['detalhamento'] . '" data-popup="tooltip" class="valorTotal" style="text-align: right">R$ 0, 00</td> <!-- esse campo é calculado depois na função recalcValorTotal() -->
+                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center"></td>
                          <td style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
                          <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" idLinha="row' . $numItens . '" quantInicial="' . $saldo['Quantidade'] . '" saldoInicial="' . $saldo['Saldo'] . '"  name="campo' . $numItens . '" value="' . $item['tipo'] . '#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>
@@ -126,7 +128,7 @@ if ($countMovimentAprovada) {
                             <div id="totalSaldo" style="text-align:right; font-size: 15px; font-weight:bold;" valorTotalInicial="'.$saldoOrdemCompra['saldoOrdemCompra'].'" valor="' . $saldoOrdemCompra['saldoOrdemCompra'] . '">' . formataMoeda($saldoOrdemCompra['saldoOrdemCompra']) . '</div>
                          </div>
                     </th>
-                    <th colspan="1">
+                    <th colspan="2">
                     </th>
                 </tr>
             </tfoot>
@@ -149,14 +151,15 @@ if ($countMovimentAprovada) {
 
         $output .= '<thead>
                     <tr class="bg-slate">
-                        <th  style="text-align: center">Item</th>
+                        <th style="text-align: center">Item</th>
                         <th>Produto/Serviço</th>
-                        <th  style="text-align: center">Unidade Medida</th>
-                        <th  style="text-align: center">Quant. Recebida</th>
-                        <th  style="text-align: center">Saldo</th>
-                        <th  style="text-align: right; width: 10%">Valor Unitário</th>
-                        <th  style="text-align: right; width: 13%">Valor Total</th>
-                        <th  style="text-align: center">Ações</th>
+                        <th style="text-align: center">Unidade Medida</th>
+                        <th style="text-align: center">Quant. Recebida</th>
+                        <th style="text-align: center">Saldo</th>
+                        <th style="text-align: right; width: 10%">Valor Unitário</th>
+                        <th style="text-align: right; width: 13%">Valor Total</th>
+                        <th style="text-align: center; width: 10%">Validade</th>
+                        <th style="text-align: center">Ações</th>
                     </tr>
                 </thead>
         ';
@@ -196,6 +199,7 @@ if ($countMovimentAprovada) {
                          <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $saldo['Saldo'] . '</td>
 						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: right">' . $valorCusto . '</td>
                          <td title="' . $item['detalhamento'] . '" data-popup="tooltip" class="valorTotal" style="text-align: right">R$ 0, 00</td>
+                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center"></td>
                          <td  style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
                          <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" idLinha="row' . $numItens . '" quantInicial="' . $saldo['Quantidade'] . '" saldoInicial="' . $saldo['Saldo'] . '"  name="campo' . $numItens . '" value="' . $item['tipo'] . '#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>
@@ -222,7 +226,7 @@ if ($countMovimentAprovada) {
                             <div id="totalSaldo" style="text-align:right; font-size: 15px; font-weight:bold;" valorTotalInicial="'.$totalOrdemCompra['valorTotalOrdemCompra'].'" valor="' . $totalOrdemCompra['valorTotalOrdemCompra'] . '">' . formataMoeda($totalOrdemCompra['valorTotalOrdemCompra']) . '</div>
                          </div>
                     </th>
-                    <th colspan="1">
+                    <th colspan="2">
                     </th>
                 </tr>
             </tfoot>

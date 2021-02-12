@@ -232,6 +232,15 @@ if (isset($_POST['inputData'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+
+		function formatDate(data, formato) {
+			if (formato == 'pt-BR') {
+				return (data.substr(0, 10).split('-').reverse().join('/'));
+			} else {
+				return (data.substr(0, 10).split('/').reverse().join('-'));
+			}
+		}
+
 		function produtosOrdemCompra(ordemCompra) {
 			let inputLote = $('#inputLote').val();
 			let numOrdemCompra = $('#cmbOrdemCompra').val()
@@ -283,7 +292,7 @@ if (isset($_POST['inputData'])) {
 
 					if ($(elem).attr('idRow') == linha.attr('id')) {
 						let tds = linha.children();
-						let tipoProdutoServico = $(tds[8]).attr('tipo');
+						let tipoProdutoServico = $(tds[9]).attr('tipo');
 
 						let valores = [];
 
@@ -418,14 +427,16 @@ if (isset($_POST['inputData'])) {
 							$(tr[4]).html(novosValores.novoSaldo)
 							$(tr[6]).html("R$ " + novosValores.valorTotal)
 							$(tr[6]).attr('valorTotalSomaGeral', novosValores.somaTotalValorGeral)
+							$(tr[7]).html(formatDate(validade, 'pt-BR'))
 
 							console.log(novosValores.somaTotalValorGeral);
 
 							$('#inputNumItens').val()
 							stringVallnput = ''
 
-							// O input itemEditadoquantidade recebe como valor a ultima quantidade editata, para garantir que pelo menos uma quantidade de produtos ou serviços foi editada 
+							// O input itemEditadoquantidade recebe como valor a ultima quantidade editada, para garantir que pelo menos uma quantidade de produtos ou serviços foi editada 
 							$('#itemEditadoquantidade').val(novaQuantidade)
+
 						}
 					})
 				})
@@ -559,6 +570,8 @@ if (isset($_POST['inputData'])) {
 				var cmbFornecedor = $('#cmbFornecedor').val();
 				var cmbDestinoLocal = $('#cmbDestinoLocal').val();
 				var inputValorTotal = $('#inputValorTotal').val();
+				var itemEditado = $('#itemEditadoquantidade').val();
+				var validadeNaoInformada = $('#validadeNaoInformada').val();
 
 				//Verifica se a combo Estoque de Destino foi informada
 				if (cmbDestinoLocal == '') {
@@ -589,11 +602,16 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
-				// Verifica se pelomento um produto ou serviço foi editado, na entrada.
-				if ($('#itemEditadoquantidade').val() == 0) {
+				// Verifica se pelo menos um produto ou serviço foi editado, na entrada.
+				if (itemEditado == 0) {
 					alerta('Atenção', 'Informe a quantidade de itens que deseja dar entrada no sistema!', 'error');
 					return false;
 				}
+
+				if (validadeNaoInformada > 0) {
+					alerta('Atenção', 'Tem itens sem validade!', 'error');
+					return false;
+				}				
 
 				if (inputValorTotal == '') {
 					alerta('Atenção', 'Informe o valor Total da nota fiscal!', 'error');
@@ -884,6 +902,7 @@ if (isset($_POST['inputData'])) {
 							<div id="inputProdutos">
 								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
 								<input type="hidden" id="itemEditadoquantidade" name="itemEditadoquantidade" value="0">
+								<input type="text" id="validadeNaoInformada" name="validadeNaoInformada" value="0">
 								<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">
 								<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
 								<input type="hidden" id="inputTotal" name="inputTotal" value="0">
@@ -903,6 +922,7 @@ if (isset($_POST['inputData'])) {
 														<th style="text-align:center">Saldo Recebido</th>
 														<th style="text-align:right">Valor Unitário</th>
 														<th style="text-align:right">Valor Total</th>
+														<th style="text-align:center">Validade</th>
 														<th class="text-center">Ações</th>
 													</tr>
 												');
@@ -919,7 +939,7 @@ if (isset($_POST['inputData'])) {
 																<div id="total" style="text-align:right; font-size: 15px; font-weight:bold;">R$ 0,00</div>
 															</th>
 													');
-												print('<th colspan="2">
+												print('<th colspan="3">
 
 															</th>
 													');
