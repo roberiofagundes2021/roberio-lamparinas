@@ -65,13 +65,13 @@ function queryPesquisa()
 		
 		$sql = "SELECT distinct ProduId, ProduCodigo, ProduNome, MvXPrValorUnitario, 
 				dbo.fnTotalSaidas(ProduUnidade, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim') as Saidas,
-			   (MvXPrValorUnitario * dbo.fnTotalSaidas(ProduUnidade, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim')) as ValorTotal
-		FROM Produto
-		JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
-		JOIN Movimentacao on MovimId = MvXPrMovimentacao
-		JOIN Situacao on SituaId = MovimSituacao
-		WHERE " . $string . " ProduUnidade = ".$_SESSION['UnidadeId']." and MovimTipo = 'S' and SituaChave = 'LIBERADO' and MovimData between '".$dataInicio."' and '".$dataFim."' 
-		ORDER BY ValorTotal DESC
+			    (MvXPrValorUnitario * dbo.fnTotalSaidas(ProduUnidade, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim')) as ValorTotal
+				FROM Produto
+				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
+				JOIN Movimentacao on MovimId = MvXPrMovimentacao
+				JOIN Situacao on SituaId = MovimSituacao
+				WHERE " . $string . " ProduUnidade = ".$_SESSION['UnidadeId']." and MovimTipo = 'S' and SituaChave = 'LIBERADO' and MovimData between '".$dataInicio."' and '".$dataFim."' 
+				ORDER BY ValorTotal DESC
 		";			
 
 		//echo $sql;die;
@@ -133,8 +133,8 @@ function queryPesquisa()
 			';
 
 		$fTotalUnit = 0;
-		$iTotalSaidas = 0;
-		$fTotalGeral = 0;
+		$iTotalSaidas = 1;  //Deveria ser 0 (coloquei 1 por enquanto para não ocorrer divisão por zero)
+		$fTotalGeral = 1;	//Deveria ser 0 (coloquei 1 por enquanto para não ocorrer divisão por zero)
      
 		foreach ($rowData as $item) {
 

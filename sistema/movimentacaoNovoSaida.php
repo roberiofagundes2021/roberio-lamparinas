@@ -718,7 +718,7 @@ if (isset($_POST['inputData'])) {
 
 						$('#cmbSubCategoria').html(option).show();
 					} else {
-						$('#cmbSubCategoria').empty().append('<option>Selecione</option>');
+						$('#cmbSubCategoria').empty().append('<option value="#">Selecione</option>');
 					}
 				});
 
@@ -736,7 +736,7 @@ if (isset($_POST['inputData'])) {
 
 							$('#cmbProduto').html(option).show();
 						} else {
-							$('#cmbProduto').empty().append('<option>Selecione</option>');
+							$('#cmbProduto').empty().append('<option value="#">Selecione</option>');
 						}
 					})
 				} else {
@@ -752,7 +752,7 @@ if (isset($_POST['inputData'])) {
 
 							$('#cmbProduto').html(option).show();
 						} else {
-							$('#cmbProduto').empty().append('<option>Selecione</option>');
+							$('#cmbProduto').empty().append('<option value="#">Selecione</option>');
 						}
 					});
 				}
@@ -908,7 +908,7 @@ if (isset($_POST['inputData'])) {
 				var inputProdutoServico = $('input[name="inputProdutoServico"]:checked').val();
 				var inputNumItens = $('#inputNumItens').val();
 				var cmbProduto = $('#cmbProduto').val();
-				var Produto = cmbProduto.split("#");
+				var Item = cmbProduto.split("#");
 				var inputQuantidade = $('#inputQuantidade').val();
 				var inputValorUnitario = $('#inputValorUnitario').val();
 				var inputTotal = $('#inputTotal').val();
@@ -916,21 +916,25 @@ if (isset($_POST['inputData'])) {
 				var inputValidade = $('#inputValidade').val();
 				var cmbClassificacao = $('#cmbClassificacao').val();
 				var inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
+				var inputIdServicos = $('#inputIdServicos').val(); //esse aqui guarda todos os IDs de serviços que estão na grid para serem movimentados
+				console.log('Id_Produtos: '+inputIdProdutos);
+				console.log('Id_Servicos: '+inputIdServicos);
+				console.log('Item: '+Item[0]);
 
 				//remove os espaços desnecessários antes e depois
 				inputQuantidade = inputQuantidade.trim();
 
 				//Verifica se o campo só possui espaços em branco
-				if (inputQuantidade == '') {
-					alerta('Atenção', 'Informe a quantidade antes de adicionar!', 'error');
-					$('#inputQuantidade').focus();
+				if (inputValorUnitario == '') {
+					alerta('Atenção', 'Nenhum item foi selecionado!', 'error');
+					$('#cmbProduto').focus();
 					return false;
 				}
 
 				//Verifica se o campo só possui espaços em branco
-				if (inputValorUnitario == '') {
-					alerta('Atenção', 'Nenhum produto foi selecionado!', 'error');
-					$('#cmbProduto').focus();
+				if (inputQuantidade == '') {
+					alerta('Atenção', 'Informe a quantidade antes de adicionar!', 'error');
+					$('#inputQuantidade').focus();
 					return false;
 				}
 
@@ -944,11 +948,36 @@ if (isset($_POST['inputData'])) {
 					}
 				}
 
+				//Verifica se o ID do Item tem 1 caracter, se sim adiciona um zero antes, para o 2, por exemplo, não aparecer no 20
+				//if(Item[0].length == 1) Item[0] = "0"+Item[0];
+
 				//Verifica se o campo já está no array
-				if (inputIdProdutos.includes(Produto[0])) {
-					alerta('Atenção', 'Esse produto já foi adicionado!', 'error');
-					$('#cmbProduto').focus();
-					return false;
+				if (inputProdutoServico == 'P'){
+
+					if (cmbProduto == '#' || cmbProduto == ''){
+						alerta('Atenção', 'Informe o produto!', 'error');						
+						$('#cmbProduto').focus();
+						return false;
+					}
+
+					if (inputIdProdutos.includes(Item[0])) {
+						alerta('Atenção', 'Esse produto já foi adicionado!', 'error');						
+						$('#cmbProduto').focus();
+						return false;
+					}
+				} else{
+
+					if (cmbProduto == '#' || cmbProduto == ''){
+						alerta('Atenção', 'Informe o serviço!', 'error');						
+						$('#cmbProduto').focus();
+						return false;
+					}
+
+					if (inputIdServicos.includes(Item[0])) {
+						alerta('Atenção', 'Esse serviço já foi adicionado!', 'error');
+						$('#cmbProduto').focus();
+						return false;
+					}
 				}
 
 				var resNumItens = parseInt(inputNumItens) + 1;
@@ -966,7 +995,7 @@ if (isset($_POST['inputData'])) {
 						data: {
 							tipo: inputTipo,
 							numItens: resNumItens,
-							idProduto: Produto[0],
+							idProduto: Item[0],
 							origem: origem,
 							quantidade: inputQuantidade,
 							classific: cmbClassificacao
@@ -992,11 +1021,15 @@ if (isset($_POST['inputData'])) {
 								$('#inputLote').val('');
 								$('#inputValidade').val('');
 
-								$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+								$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Item[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 
-								inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
-
-								$('#inputIdProdutos').val(inputIdProdutos);
+								if (inputProdutoServico == 'P') {
+									inputIdProdutos = inputIdProdutos + ', ' + Item[0];
+									$('#inputIdProdutos').val(inputIdProdutos);
+								} else{
+									inputIdServicos = inputIdServicos + ', ' + Item[0];
+									$('#inputIdServicos').val(inputIdServicos);
+								}
 
 								$('input[name="inputTipo"]').each((i, elem) => {
 									if ($(elem) != $('input[name="inputTipo"]:checked')) {
@@ -1062,7 +1095,7 @@ if (isset($_POST['inputData'])) {
 						data: {
 							tipo: inputTipo,
 							numItens: resNumItens,
-							idServico: Produto[0],
+							idServico: Item[0],
 							quantidade: inputQuantidade
 						},
 						success: function(resposta) {
@@ -1082,11 +1115,11 @@ if (isset($_POST['inputData'])) {
 								$('#inputLote').val('');
 								$('#inputValidade').val('');
 
-								$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'S#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
+								$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'S#' + Item[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 
-								inputIdProdutos = inputIdProdutos + ', ' + parseInt(Produto[0]);
+								inputIdServicos = inputIdServicos + ', ' + Item[0];
 
-								$('#inputIdProdutos').val(inputIdProdutos);
+								$('#inputIdServicos').val(inputIdServicos);
 
 								return false;
 							} else {
@@ -1116,13 +1149,21 @@ if (isset($_POST['inputData'])) {
 
 			$(document).on('click', '.btn_remove', function() {
 
+				var inputProdutoServico = $('input[name="inputProdutoServico"]:checked').val();
 				var inputTotal = $('#inputTotal').val();
 				var button_id = $(this).attr("id");
 				var Produto = button_id.split("#");
 				var inputIdProdutos = $('#inputIdProdutos').val(); //array com o Id dos produtos adicionados
+				var inputIdServicos = $('#inputIdServicos').val(); //array com o Id dos servicos adicionados
 				var inputNumItens = $('#inputNumItens').val();
 
-				var item = inputIdProdutos.split(",");
+				var item = '';
+
+				if(inputProdutoServico == 'P'){
+					item = inputIdProdutos.split(",");
+				} else{
+					item = inputIdServicos.split(",");
+				}				
 
 				var i;
 				var arr = [];
@@ -1135,7 +1176,11 @@ if (isset($_POST['inputData'])) {
 
 				arr.splice(index, 1);
 
-				$('#inputIdProdutos').val(arr);
+				if (inputProdutoServico == 'P'){
+					$('#inputIdProdutos').val(arr);
+				} else{
+					$('#inputIdServicos').val(arr);
+				}				
 
 				$("#row" + Produto[0] + "").remove(); //remove a linha da tabela
 				$("#campo" + Produto[0] + "").remove(); //remove o campo hidden
@@ -1179,7 +1224,7 @@ if (isset($_POST['inputData'])) {
 
 				//Verifica se tem algum produto na Grid
 				if (inputTotal == '' || inputTotal == 0) {
-					alerta('Atenção', 'Informe algum produto!', 'error');
+					alerta('Atenção', 'Informe algum produto ou serviço!', 'error');
 					$('#cmbCategoria').focus();
 					return false;
 				}
@@ -1258,34 +1303,34 @@ if (isset($_POST['inputData'])) {
 
 		//Mostra o "Filtrando..." na combo SubCategoria e Produto ao mesmo tempo
 		function Filtrando() {
-			$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
+			$('#cmbSubCategoria').empty().append('<option value="#">Filtrando...</option>');
 			FiltraProduto();
 		}
 
 		//Mostra o "Filtrando..." na combo Produto
 		function FiltraCategoria() {
-			$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
+			$('#cmbCategoria').empty().append('<option value="#">Filtrando...</option>');
 		}
 
 		//Mostra o "Filtrando..." na combo Produto
 		function FiltraProduto() {
-			$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+			$('#cmbProduto').empty().append('<option value="#">Filtrando...</option>');
 		}
 
 		function ResetCategoria() {
-			$('#cmbCategoria').empty().append('<option>Sem Categoria</option>');
+			$('#cmbCategoria').empty().append('<option value="#">Sem Categoria</option>');
 		}
 
 		function ResetSubCategoria() {
-			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+			$('#cmbSubCategoria').empty().append('<option value="#">Sem Subcategoria</option>');
 		}
 
 		function ResetProduto() {
-			$('#cmbProduto').empty().append('<option>Sem produto</option>');
+			$('#cmbProduto').empty().append('<option value="#">Sem produto</option>');
 		}
 
 		function ResetServico() {
-			$('#cmbProduto').empty().append('<option>Sem serviço</option>');
+			$('#cmbProduto').empty().append('<option value="#">Sem serviço</option>');
 		}
 
 		function classBemSaidaSolicit(valor, idSelect) {
@@ -1675,8 +1720,10 @@ if (isset($_POST['inputData'])) {
 										<?php
 										if (isset($_POST['inputSolicitacaoId'])) {
 											print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="' . $idsProdutos . '">');
+											print('<input type="hidden" id="inputIdServicos" name="inputIdServicos" value="' . $idsProdutos . '">');
 										} else {
 											print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">');
+											print('<input type="hidden" id="inputIdServicos" name="inputIdServicos" value="0">');
 										}
 										?>
 										<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
