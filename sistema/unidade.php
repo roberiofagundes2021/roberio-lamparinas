@@ -15,8 +15,9 @@ if (!isset($_SESSION['EmpresaId'])) {
 	irpara("empresa.php");
 }
 
-$sql = "SELECT UnidaId, UnidaNome, UnidaBairro, UnidaCidade, UnidaEstado, UnidaStatus
+$sql = "SELECT UnidaId, UnidaNome, UnidaBairro, UnidaCidade, UnidaEstado, UnidaStatus, SituaNome, SituaChave, SituaCor
 		FROM Unidade
+		JOIN Situacao on SituaId = UnidaStatus
 	    WHERE UnidaEmpresa = ". $_SESSION['EmpresaId'] ."
 		ORDER BY UnidaNome ASC";
 $result = $conn->query($sql);
@@ -210,8 +211,8 @@ $count = count($row);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['UnidaStatus'] ? 'Ativo' : 'Inativo';
-										$situacaoClasse = $item['UnidaStatus'] ? 'badge-success' : 'badge-secondary';
+										$situacao = $item['SituaNome'];
+										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
 										print('
 										<tr>
@@ -221,13 +222,13 @@ $count = count($row);
 											<td>'.$item['UnidaEstado'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaUnidade('.$item['UnidaId'].', \''.$item['UnidaNome'].'\','.$item['UnidaStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaUnidade('.$item['UnidaId'].', \''.$item['UnidaNome'].'\', \''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaUnidade('.$item['UnidaId'].', \''.$item['UnidaNome'].'\','.$item['UnidaStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaUnidade('.$item['UnidaId'].', \''.$item['UnidaNome'].'\','.$item['UnidaStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaUnidade('.$item['UnidaId'].', \''.$item['UnidaNome'].'\', \''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaUnidade('.$item['UnidaId'].', \''.$item['UnidaNome'].'\', \''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>
