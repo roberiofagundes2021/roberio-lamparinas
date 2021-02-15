@@ -313,6 +313,15 @@ $dataInicio = date("Y-m-d");
   <script type="text/javascript">
   $(document).ready(function() {
 
+    var input = document.getElementById('inputDataRecebimento');
+    input.addEventListener('change', function() {
+        var agora = new Date();
+        var escolhida = new Date(this.value);
+        if (escolhida < agora) {
+            this.value = [agora.getFullYear(), agora.getMonth() + 1, agora.getDate()].map(v => v < 10 ? '0' + v : v).join('-');
+        }
+    });  
+
     function preencheDatas() {
       $dataRecebimento = new Date
       $dia = parseInt($dataRecebimento.getDate()) <= 9 ? `0${parseInt($dataRecebimento.getDate())}` : parseInt($dataRecebimento.getDate());
@@ -600,9 +609,9 @@ $dataInicio = date("Y-m-d");
                   <div class="row">
                     <div class="col-lg-2">
                       <div class="form-group">
-                        <label for="inputDataEmissao">Data de Emissão <span class="text-danger">*</span></label>
-                        <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtEmissao'] ?>" required>
-                      </div>
+                        <label for="inputDataEmissao">Data de Emissão <span class="text-danger">*</span></label>          
+                        <input type="text" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
+                     </div>
                     </div>
 
                     <div class=" col-lg-6">
