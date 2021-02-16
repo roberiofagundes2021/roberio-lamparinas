@@ -3,6 +3,7 @@
 include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Relação de Movimentações Financeiras';
+$_SESSION['Conciliacao'] = true;
 
 include('global_assets/php/conexao.php');
 /*ClienId, ClienNome, ClienCpf, ClienCnpj, ClienTelefone, ClienCelular, ClienStatus, Cate*/
@@ -25,6 +26,8 @@ $Y = date("Y");
 // $dataInicio = date("Y-m-01"); //30 dias atrás
 $dataInicio = date("Y-m-d");
 $dataFim = date("Y-m-d");
+
+
 ?>
 
 <!DOCTYPE html>
@@ -79,34 +82,34 @@ $dataFim = date("Y-m-d");
           targets: [1]
         },
         {
-          orderable: true, //Conta Caixa
-          width: "22%",
-          targets: [2]
-        },
-        {
           orderable: true, //Nª doc
-          width: "8%",
-          targets: [3]
+          width: "10%",
+          targets: [2]
         },
         {
           orderable: true, //Entrada
           width: "10%",
-          targets: [4]
+          targets: [3]
         },
         {
           orderable: true, //Saída
           width: "10%",
-          targets: [5]
+          targets: [4]
         },
         {
           orderable: true, //Saldo
           width: "10%",
+          targets: [5]
+        },
+        {
+          orderable: true, //Saldo Conciliado
+          width: "15%",
           targets: [6]
         },
         {
           orderable: false, //Ações
-          width: "5%",
-          targets: [6]
+          width: "10%",
+          targets: [7]
         }
       ],
       dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -123,44 +126,68 @@ $dataFim = date("Y-m-d");
       }
     });
 
-    function excluirConta() {
-      let contas = $('.excluirConta').each((i, elem) => {
-        $(elem).on('click', (e) => {
-          const id = $(elem).attr('idContaExcluir');
-          const tipo = $(elem).attr('tipo');
-
-          $('#idMov').val(id);
-          $('#tipoMov').val(tipo);
-
-          e.preventDefault;
-          confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `movimentacaoFinanceiraExclui.php`);
-          document.contaExclui.submit();
-        })
-      })
-
-    }
-    excluirConta();
-
     function atualizaTotal() {
-      let childres = $('tbody').children()
-      let total = 0
-      let linhas = childres.splice(1, childres.length)
+      let childres = $('tbody').children();
+      let totalEntrada = 0;
+      let totalSaida = 0; 
+      let totalSaldo = 0;
+      let totalSaldoConciliado = 0;
+      let linhas = childres.splice(1, childres.length);
+
       linhas.forEach(elem => {
-        let listaTds = $(elem).children()
-        let valor = $(listaTds[5]).html()
-        let valorFormFloat = parseFloat(valor.replace(".", "").replace(",", "."))
+        let valorFormFloatEntrada = 0;
+        let listaTds = $(elem).children();
+        let valorEntrada = $(listaTds[3]).html();
+        valorFormFloatEntrada = isNaN(valorEntrada) ? parseFloat(valorEntrada.replace(".", "").replace(",", ".")) : 0;
+        totalEntrada += valorFormFloatEntrada;
+      });
 
-        total += valorFormFloat
-      })
-      $('#footer-total').remove()
+      linhas.forEach(elem => {
+        let valorFormFloatSaida = 0;
+        let listaTds = $(elem).children();
+        let valorSaida = $(listaTds[4]).html();
+        valorFormFloatSaida = isNaN(valorSaida) ?  parseFloat(valorSaida.replace(".", "").replace(",", ".")) : 0;
+        totalSaida += valorFormFloatSaida;
+      });
 
-      if (total < 0) {
-        divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(total)}</div>`
-      } else {
-        divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(total)}</div>`
-      }
+      linhas.forEach(elem => {
+        let valorFormFloatSaldo = 0;
+        let listaTds = $(elem).children();
+        let valorSaldo = $(listaTds[5]).html();
+        valorFormFloatSaldo = isNaN(valorSaldo) ? parseFloat(valorSaldo.replace(".", "").replace(",", ".")) : 0;
+        totalSaldo += valorFormFloatSaldo;
+      });
 
-      $('.datatable-footer').append(divTotal);
+      linhas.forEach(elem => {
+        let valorFormFloatSaldoConciliado = 0;
+        let listaTds = $(elem).children();
+        let valorSaldoConciliado = $(listaTds[6]).html();
+        let conciliado = $(listaTds[7]).html().split(' ');
+        conciliado = conciliado[48].split('=');
+        conciliado = conciliado[1].replace(/[^\d]+/g,'');
+        
+        if (parseInt(conciliado) > 0) {
+          valorFormFloatSaldoConciliado = isNaN(valorSaldoConciliado) ? parseFloat(valorSaldoConciliado.replace(".", "").replace(",", ".")) : 0;
+        } 
+        totalSaldoConciliado += valorFormFloatSaldoConciliado;
+      });
+
+      $('#footer-total').remove();
+      totalEntrada < 0 ? divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 52%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalEntrada)}</div>` : divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 52%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalEntrada)}</div>`;
+
+      $('#footer-total').remove();
+      totalSaida < 0 ? divTotalSaida = `<div id='footer-total' style='position:absolute; left: 61%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaida)}</div>` : divTotalSaida = `<div id='footer-total' style='position:absolute; left: 61%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaida)}</div>`;
+
+      $('#footer-total').remove();
+      totalSaldo < 0 ? divTotalSaldo = `<div id='footer-total' style='position:absolute; left: 71%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaldo)}</div>` : divTotalSaldo = `<div id='footer-total' style='position:absolute; left: 71%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaldo)}</div>`;
+
+      $('#footer-total').remove();
+      totalSaldoConciliado < 0 ? divTotalSaldoConciliado = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaldoConciliado)}</div>` : divTotalSaldoConciliado = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaldoConciliado)}</div>`;
+
+      $('.datatable-footer').append(divTotalEntrada);
+      $('.datatable-footer').append(divTotalSaida);
+      $('.datatable-footer').append(divTotalSaldo);
+      $('.datatable-footer').append(divTotalSaldoConciliado);
     }
 
 
@@ -180,10 +207,10 @@ $dataFim = date("Y-m-d");
       const statusArray = $('#cmbStatus').val().split('|');
       const status = statusArray[0];
       const statusTipo = statusArray[1];
-      const url = "movimentacaoFinanceiraFiltra.php";
+      const url = "movimentacaoFinanceiraConciliacaoFiltra.php";
       const tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal';
 
-      inputsValues = {
+      var inputsValues = {
         inputPeriodoDe: periodoDe,
         inputAte: ate,
         cmbContaBanco: contaBanco,
@@ -192,7 +219,7 @@ $dataFim = date("Y-m-d");
         cmbFormaDeRecebimento: FormaPagamento,
         cmbStatus: status,
         statusTipo: statusTipo,
-        tipoFiltro: tipoFiltro
+        tipoFiltro: tipoFiltro,
       };
 
       $.post(
@@ -204,7 +231,6 @@ $dataFim = date("Y-m-d");
             $('#imprimir').removeAttr('disabled')
             resultadosConsulta = data
 
-            excluirConta();
             atualizaTotal();
 
           } else {
@@ -214,13 +240,16 @@ $dataFim = date("Y-m-d");
             $('tbody').html(msg2)
             $('#imprimir').attr('disabled', '')
             $('#footer-total').remove()
+            $('#footer-total').remove()
+            $('#footer-total').remove()
+            $('#footer-total').remove()
           }
         }
       );
     }
 
     $('#submitPesquisar').on('click', (e) => {
-      e.preventDefault()
+      e.preventDefault();
       Filtrar(false);
     })
 
@@ -256,7 +285,140 @@ $dataFim = date("Y-m-d");
       })
     }
     imprime()
+
   });
+
+
+  const atualizarConciliado = () => {
+    event.preventDefault();
+
+    const custom = event.target.id.split('#');
+    custom.push(event.target.value == 1 ? 0 : 1);
+
+    function atualizaTotal() {
+      let childres = $('tbody').children();
+      let totalEntrada = 0;
+      let totalSaida = 0; 
+      let totalSaldo = 0;
+      let totalSaldoConciliado = 0;
+      let linhas = childres.splice(1, childres.length);
+
+      linhas.forEach(elem => {
+        let valorFormFloatEntrada = 0;
+        let listaTds = $(elem).children();
+        let valorEntrada = $(listaTds[3]).html();
+        valorFormFloatEntrada = isNaN(valorEntrada) ? parseFloat(valorEntrada.replace(".", "").replace(",", ".")) : 0;
+        totalEntrada += valorFormFloatEntrada;
+      });
+
+      linhas.forEach(elem => {
+        let valorFormFloatSaida = 0;
+        let listaTds = $(elem).children();
+        let valorSaida = $(listaTds[4]).html();
+        valorFormFloatSaida = isNaN(valorSaida) ?  parseFloat(valorSaida.replace(".", "").replace(",", ".")) : 0;
+        totalSaida += valorFormFloatSaida;
+      });
+
+      linhas.forEach(elem => {
+        let valorFormFloatSaldo = 0;
+        let listaTds = $(elem).children();
+        let valorSaldo = $(listaTds[5]).html();
+        valorFormFloatSaldo = isNaN(valorSaldo) ? parseFloat(valorSaldo.replace(".", "").replace(",", ".")) : 0;
+        totalSaldo += valorFormFloatSaldo;
+      });
+
+      linhas.forEach(elem => {
+        let valorFormFloatSaldoConciliado = 0;
+        let listaTds = $(elem).children();
+        let valorSaldoConciliado = $(listaTds[6]).html();
+        let conciliado = $(listaTds[7]).html().split(' ');
+        conciliado = conciliado[48].split('=');
+        conciliado = conciliado[1].replace(/[^\d]+/g,'');
+        
+        if (parseInt(conciliado) > 0) {
+          valorFormFloatSaldoConciliado = isNaN(valorSaldoConciliado) ? parseFloat(valorSaldoConciliado.replace(".", "").replace(",", ".")) : 0;
+        } 
+        totalSaldoConciliado += valorFormFloatSaldoConciliado;
+      });
+
+      $('#footer-total').remove();
+      totalEntrada < 0 ? divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 52%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalEntrada)}</div>` : divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 52%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalEntrada)}</div>`;
+
+      $('#footer-total').remove();
+      totalSaida < 0 ? divTotalSaida = `<div id='footer-total' style='position:absolute; left: 61%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaida)}</div>` : divTotalSaida = `<div id='footer-total' style='position:absolute; left: 61%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaida)}</div>`;
+
+      $('#footer-total').remove();
+      totalSaldo < 0 ? divTotalSaldo = `<div id='footer-total' style='position:absolute; left: 71%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaldo)}</div>` : divTotalSaldo = `<div id='footer-total' style='position:absolute; left: 71%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaldo)}</div>`;
+
+      $('#footer-total').remove();
+      totalSaldoConciliado < 0 ? divTotalSaldoConciliado = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaldoConciliado)}</div>` : divTotalSaldoConciliado = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaldoConciliado)}</div>`;
+
+      $('.datatable-footer').append(divTotalEntrada);
+      $('.datatable-footer').append(divTotalSaida);
+      $('.datatable-footer').append(divTotalSaldo);
+      $('.datatable-footer').append(divTotalSaldoConciliado);
+    }
+
+
+    function Filtrar(carregamentoPagina) {
+      let cont = false;
+
+      const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
+
+      $('tbody').html(msg);
+
+      const periodoDe = $('#inputPeriodoDe').val();
+      const ate = $('#inputAte').val();
+      const contaBanco = $('#cmbContaBanco').val();
+      const centroDeCustos = $('#cmbCentroDeCustos').val();
+      const planoContas = $('#cmbPlanoContas').val();
+      const FormaPagamento = $('#cmbFormaDeRecebimento').val();
+      const statusArray = $('#cmbStatus').val().split('|');
+      const status = statusArray[0];
+      const statusTipo = statusArray[1];
+      const url = "movimentacaoFinanceiraConciliacaoFiltra.php";
+      const tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal';
+
+      var inputsValues = {
+        inputPeriodoDe: periodoDe,
+        inputAte: ate,
+        cmbContaBanco: contaBanco,
+        cmbCentroDeCustos: centroDeCustos,
+        cmbPlanoContas: planoContas,
+        cmbFormaDeRecebimento: FormaPagamento,
+        cmbStatus: status,
+        statusTipo: statusTipo,
+        tipoFiltro: tipoFiltro,
+        tpConciliado: custom[1],
+        valorConciliado: custom[2],
+        idConciliado: custom[0],
+      };
+
+      $.post(
+        url,
+        inputsValues,
+        (data) => {
+          if (data) {
+            $('tbody').html(data)
+            $('#imprimir').removeAttr('disabled')
+            resultadosConsulta = data
+
+            atualizaTotal();
+
+          } else {
+            let msg2 = $(
+              '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+            )
+            $('tbody').html(msg2)
+            $('#imprimir').attr('disabled', '')
+            $('#footer-total').remove()
+          }
+        }
+      );
+    }
+
+    Filtrar(false);
+  }
   </script>
 
 </head>
@@ -283,7 +445,7 @@ $dataFim = date("Y-m-d");
             <div class="card">
               <div class="card-header">
                 <div class="header-elements-inline">
-                  <h3 class="card-title">Relação de Movimentações Financeiras</h3>
+                  <h3 class="card-title">Conciliação das Movimentações Financeiras</h3>
                   <div class="header-elements">
                     <div class="list-icons">
                       <a class="list-icons-item" data-action="collapse"></a>
@@ -517,12 +679,12 @@ $dataFim = date("Y-m-d");
                     <tr class="bg-slate">
                       <th>Data</th>
                       <th>Histórico</th>
-                      <th>Conta / Banco</th>
-                      <th>Documento</th>
+                      <th>Nº Documento</th>
                       <th style='text-align: right;'>Entrada</th>
                       <th style='text-align: right;'>Saída</th>
                       <th style='text-align: right;'>Saldo</th>
-                      <th>Ações</th>
+                      <th style='text-align: right;'>Saldo Conciliado</th>
+                      <th>Conciliado</th>
                     </tr>
                   </thead>
                   <tbody>

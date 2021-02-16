@@ -7,7 +7,28 @@ function queryPesquisa(){
     
     include('global_assets/php/conexao.php');
 
+
+
     if ($_POST['tipoFiltro'] == 'FiltroNormal') {
+        
+
+        if (isset($_POST['idConciliado'])) {
+            try {
+                if ($_POST['tpConciliado'] == "R") {
+                        $sql = "UPDATE ContasAReceber 
+                                    SET CnAReConciliado = ".$_POST['valorConciliado']."
+                                WHERE CnAReId = ".$_POST['idConciliado']."";
+                } else {
+                        $sql = "UPDATE ContasAPagar
+                                    SET CnAPaConciliado = ".$_POST['valorConciliado']."
+                                WHERE CnAPaId = ".$_POST['idConciliado']."";
+                }
+                $result = $conn->prepare($sql);
+                $result->execute();
+            } catch (Exception $e) {
+                echo ($e);
+            }
+        }
 
         $cont = 0;
         $argsCr = [];
@@ -107,7 +128,7 @@ function queryPesquisa(){
                                TIPO = 'P' ,
                                CODTRANSFREC = 0,
                                CnAPaTransferencia as CODTRANSFPAG,
-                               CNAPACONTABANCO AS CONTABANCO
+                               CNAPACONCILIADO AS CONCILIADO
                         FROM ContasAPagar ";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
@@ -124,7 +145,7 @@ function queryPesquisa(){
                                TIPO = 'R' , 
                                CnAReTransferencia as CODTRANSFREC, 
                                CODTRANSFPAG = 0,
-                               CNARECONTABANCO AS CONTABANCO
+                               CNARECONCILIADO AS CONCILIADO
                         FROM ContasAReceber ";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
@@ -141,7 +162,7 @@ function queryPesquisa(){
                                TIPO = 'R' , 
                                CnAReTransferencia as CODTRANSFREC, 
                                CODTRANSFPAG = 0,
-                               CNARECONTABANCO AS CONTABANCO
+                               CNARECONCILIADO AS CONCILIADO
                         FROM ContasAReceber ";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
@@ -156,7 +177,7 @@ function queryPesquisa(){
                                TIPO = 'P' ,
                                CODTRANSFREC = 0 ,
                                CnAPaTransferencia as CODTRANSFPAG,
-                               CNAPACONTABANCO AS CONTABANCO
+                               CNAPACONCILIADO AS CONCILIADO
                         FROM ContasAPagar ";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
@@ -259,7 +280,7 @@ function queryPesquisa(){
                                TIPO = 'P',
                                CODTRANSFREC = 0 ,
                                CnAPaTransferencia as CODTRANSFPAG,
-                               CNAPACONTABANCO AS CONTABANCO
+                               CNAPACONCILIADO AS CONCILIADO
                           FROM ContasAPagar ";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
@@ -276,7 +297,7 @@ function queryPesquisa(){
                                TIPO = 'R', 
                                CnAReTransferencia as CODTRANSFREC, 
                                CODTRANSFPAG = 0,
-                               CNARECONTABANCO AS CONTABANCO
+                               CNARECONCILIADO AS CONCILIADO
                         FROM ContasAReceber ";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
@@ -293,7 +314,7 @@ function queryPesquisa(){
                                TIPO = 'R',
                                CnAReTransferencia as CODTRANSFREC, 
                                CODTRANSFPAG = 0,
-                               CNARECONTABANCO AS CONTABANCO
+                               CNARECONCILIADO AS CONCILIADO
                           FROM ContasAReceber ";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
@@ -308,7 +329,7 @@ function queryPesquisa(){
                                TIPO = 'P' , 
                                CODTRANSFREC = 0 ,
                                CnAPaTransferencia as CODTRANSFPAG,
-                               CNAPACONTABANCO AS CONTABANCO
+                               CNAPACONCILIADO AS CONCILIADO
                           FROM ContasAPagar ";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
@@ -336,7 +357,7 @@ function queryPesquisa(){
                        TIPO = 'R', 
                        CNAReTransferencia AS CODTRANSFREC, 
                        CODTRANSFPAG = 0,
-                       CNARECONTABANCO AS CONTABANCO
+                       CNARECONCILIADO AS CONCILIADO
                   FROM ContasAReceber
                  WHERE CNARESTATUS = 14
                    AND CnAReUnidade = " . $_SESSION['UnidadeId'] . " 
@@ -350,13 +371,12 @@ function queryPesquisa(){
                        TIPO = 'P',
                        CODTRANSFREC = 0,
                        CnAPaTransferencia as CODTRANSFPAG,
-                       CNAPACONTABANCO AS CONTABANCO
+                       CNAPACONCILIADO AS CONCILIADO
                   FROM ContasAPagar
                  WHERE CNAPASTATUS = 12
                    AND CnAPaUnidade = " . $_SESSION['UnidadeId'] . " 
                    AND CnAPaDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' 
                 ORDER BY DATA DESC";
-        
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
         count($rowData) >= 1 ? $cont = 1 : $cont = 0;
@@ -442,40 +462,21 @@ function queryPesquisa(){
                     
                     //MENU EDITAR E EXCLUIR
                     $print .= "
-                        <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
-                            <div class='list-icons'>
-                                <div class='list-icons list-icons-extended'> ";
+                        <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>";
 
-                                    //BOTAO EDITAR
-                                    if (intval($item['CODTRANSFREC']) > 0){
-                                        $print .= "<a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFREC'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
-                
-                                    } else if (intval($item['CODTRANSFPAG']) > 0) {
-                                        $print .= "<a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFPAG'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
-                
-                                    } else if ($item['TIPO'] === 'R'){
-                                        $print .= "<a href='movimentacaoFinanceiraRecebimento.php?lancamentoId=" . $item['ID'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
-                                        
-                                    } else if ($item['TIPO'] === 'P') {
-                                        $print .= "<a href='movimentacaoFinanceiraPagamento.php?lancamentoId=" . $item['ID'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
-                                    }
-                                    
-                                    //BOTAO EXCLUIR
-                                    if (intval($item['CODTRANSFREC']) > 0){
+                                    $prod = $item['ID'].'#'.$item['TIPO'];
+                                    //BOTAO CONCILIADO
+                                    if ($item['CONCILIADO'] >= 1) {
                                         $print .= "
-                                            <a href='#' idContaExcluir='" . $item['CODTRANSFREC'] . "' tipo='T' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>";
-                
-                                    } else if (intval($item['CODTRANSFPAG']) > 0) {
-                                        $print .= "
-                                            <a href='#' idContaExcluir='" . $item['CODTRANSFPAG'] . "' tipo='T' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>";
-
+                                            <input type='checkbox' id='".$prod."' onchange='atualizarConciliado()' value='1' checked/>
+                                        ";
                                     } else {
                                         $print .= "
-                                            <a href='#' idContaExcluir='" . $item['ID'] . "' tipo='" . $item['TIPO'] . "' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>";
+                                            <input type='checkbox' id='".$prod."' onchange='atualizarConciliado()'  value='0' />
+                                        ";
                                     }
+
                                     $print .= "
-                                </div>
-                            </div>
                         </td>
                     </tr>
                 ";

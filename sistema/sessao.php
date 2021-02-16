@@ -53,6 +53,20 @@ if ((array_key_exists('MovFinancPeriodoDe', $_SESSION) || array_key_exists('MovF
 	unset($_SESSION['MovFinancFormaPagamento']);
 }
 
+$arquivosMovimentacaoFinanceiraConciliacao = array(
+	'movimentacaoFinanceiraConciliacao.php', 'movimentacaoFinanceiraFiltra.php', 'movimentacaoFinanceiraExclui.php', 'movimentacaoFinanceiraImprime.php', 'movimentacaoFinanceiraPagamento.php', 'movimentacaoFinanceiraRecebimento.php', 'movimentacaoFinanceiraTransferencia.php');
+
+if ((array_key_exists('MovFinancPeriodoDe', $_SESSION) || array_key_exists('MovFinancAte', $_SESSION) || array_key_exists('MovFinancContaBanco', $_SESSION) || array_key_exists('MovFinancPlanoContas', $_SESSION)|| array_key_exists('MovFinancCentroDeCustos', $_SESSION) || array_key_exists('MovFinancStatus', $_SESSION) || array_key_exists('MovFinancFormaPagamento', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoFinanceiraConciliacao)) {
+	
+	unset($_SESSION['MovFinancPeriodoDe']);
+	unset($_SESSION['MovFinancAte']);
+	unset($_SESSION['MovFinancContaBanco']);
+	unset($_SESSION['MovFinancPlanoContas']);
+	unset($_SESSION['MovFinancCentroDeCustos']);
+	unset($_SESSION['MovFinancStatus']);
+	unset($_SESSION['MovFinancFormaPagamento']);
+}
+
 
 $arquivosContasAPagar = array(
 	'contasAPagar.php', 'contasAPagarNovoLancamento.php',
