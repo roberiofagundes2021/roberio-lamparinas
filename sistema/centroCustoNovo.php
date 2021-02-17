@@ -10,12 +10,14 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO CentroCusto (CnCusNome, CnCusStatus, CnCusUsuarioAtualizador, CnCusUnidade)
-				VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+		$sql = "INSERT INTO CentroCusto (CnCusCodigo, CnCusNome, CnCusTipo, CnCusStatus, CnCusUsuarioAtualizador, CnCusUnidade)
+				VALUES (:iCodigo, :sNome, :sTipo, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
+						':iCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
+						':sTipo' => $_POST['cmbTipo'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId'],
@@ -115,12 +117,32 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-12">
+
+								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputNome">Centro de Custo<span class="text-danger"> *</span></label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Centro de Custo" required autofocus>
+										<label for="inputCodigo">Código<span class="text-danger"> *</span></label>
+										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" required autofocus>
 									</div>
 								</div>
+
+								<div class="col-lg-5">
+									<div class="form-group">
+										<label for="inputNome">Centro de Custo<span class="text-danger"> *</span></label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Centro de Custo" required>
+									</div>
+								</div>
+
+								<div class="col-lg-5">
+									<div class="form-group">
+										<label for="cmbTipo">Tipo<span class="text-danger"> *</span></label>
+										<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
+													<option value="R">Receita</option>
+													<option value="D">Despesa</option>
+										</select>
+									</div>
+								</div>
+
 							</div>
 															
 							<div class="row" style="margin-top: 10px;">
