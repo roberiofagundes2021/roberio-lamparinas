@@ -51,6 +51,9 @@ if(isset($_POST['inputNome'])){
 
 	<?php include_once("head.php"); ?>
 
+	<!-- Theme JS files -->
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
@@ -133,14 +136,12 @@ if(isset($_POST['inputNome'])){
 								</div>
 
 								<div class="col-lg-5">
-									<div class="form-group">
 										<label for="cmbTipo">Tipo<span class="text-danger"> *</span></label>
 										<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<option value="R">Receita</option>
 													<option value="D">Despesa</option>
-										</select>
-									</div>
+										</select>		
 								</div>
 
 							</div>
