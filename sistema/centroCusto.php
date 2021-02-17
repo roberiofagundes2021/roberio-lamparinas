@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Centro de Custo';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT CnCusId, CnCusNome, CnCusStatus, SituaNome, SituaCor, SituaChave
+$sql = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusStatus, SituaNome, SituaCor, SituaChave
 		FROM CentroCusto
 		JOIN Situacao on SituaId = CnCusStatus
 	    WHERE CnCusUnidade = ". $_SESSION['UnidadeId'] ."
@@ -47,19 +47,24 @@ $count = count($row);
 				responsive: true,
 			    columnDefs: [
 				{
-					orderable: true,   //Centro de Custo
-					width: "80%",
+					orderable: true,   //Código
+					width: "10%",
 					targets: [0]
+				},
+				{
+					orderable: true,   //Centro de Custo
+					width: "70%",
+					targets: [1]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "10%",
-					targets: [1]
+					targets: [2]
 				},
 				{ 
 					orderable: false,   //Ações
 					width: "10%",
-					targets: [2]
+					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -160,6 +165,7 @@ $count = count($row);
 							<table id="tblCentroCusto" class="table">
 								<thead>
 									<tr class="bg-slate">
+										<th data-filter>Código</th>
 										<th data-filter>Centro de Custo</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
@@ -175,6 +181,7 @@ $count = count($row);
 										
 										print('
 										<tr>
+											<td>'.$item['CnCusCodigo'].'</td>
 											<td>'.$item['CnCusNome'].'</td>
 											');
 										
