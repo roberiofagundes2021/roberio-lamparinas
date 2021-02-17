@@ -19,23 +19,38 @@ if(isset($_POST['inputLocalEstoqueId'])){
 	$_SESSION['msg'] = array();
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
-	irpara("localestoque.php");
+	irpara("localEstoque.php");
 }
 
 if(isset($_POST['inputNome'])){
 	
 	try{
-		
-		$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE LcEstId = :iLocalEstoque";
-		$result = $conn->prepare($sql);
-				
-		$result->execute(array(
-						':sNome' => $_POST['inputNome'],
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iLocalEstoque' => $_POST['inputLocalEstoqueId']
-						));
 
+		if (isset($_SESSION['EmpresaId'])){
+
+			$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstUnidade = :iUnidade, LcEstUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE LcEstId = :iLocalEstoque";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':iUnidade' => $_POST['cmbUnidade'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iLocalEstoque' => $_POST['inputLocalEstoqueId']
+							));
+
+		} else {
+			$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE LcEstId = :iLocalEstoque";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iLocalEstoque' => $_POST['inputLocalEstoqueId']
+							));
+		}
+		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Local do Estoque alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
@@ -49,7 +64,7 @@ if(isset($_POST['inputNome'])){
 		echo 'Error: ' . $e->getMessage();
 	}
 	
-	irpara("localestoque.php");
+	irpara("localEstoque.php");
 }
 
 ?>
@@ -95,8 +110,8 @@ if(isset($_POST['inputNome'])){
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
-					url: "localestoqueValida.php",
-					data: ('nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho),
+					url: "localEstoqueValida.php",
+					data: ('nomeNovo='+inputNomeNovo+'&nomeVelho='+inputNomeVelho+'&unidade='+cmbUnidade),
 					success: function(resposta){
 						
 						if(resposta == 1){
@@ -143,19 +158,59 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-12">
+								<?php 
+									if (isset($_SESSION['EmpresaId'])){ 
+										print('<div class="col-lg-6">');
+									} else{
+										print('<div class="col-lg-12">');  
+									}
+								?>
 									<div class="form-group">
 										<label for="inputNome">Local do Estoque<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local do Estoque" value="<?php echo $row['LcEstNome']; ?>" required autofocus>
 									</div>
 								</div>
+
+								<?php 
+							
+									if (isset($_SESSION['EmpresaId'])){
+										
+										print('
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
+												<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
+													<option value="">Informe uma unidade</option>');
+													
+													$sql = "SELECT UnidaId, UnidaNome
+															FROM Unidade
+															JOIN Situacao on SituaId = UnidaStatus															     
+															WHERE UnidaEmpresa = " . $_SESSION['EmpresaId'] . " and SituaChave = 'ATIVO'
+															ORDER BY UnidaNome ASC";
+													$result = $conn->query($sql);
+													$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowUnidade as $item) {
+														$seleciona = $item['UnidaId'] == $row['LcEstUnidade'] ? "selected" : "";
+														print('<option value="'. $item['UnidaId'].'" '. $seleciona .'>' . $item['UnidaNome'] . '</option>');
+													}
+
+										print('												
+												</select>
+											</div>
+										</div>
+										');
+									} else{
+										print('<input type="hidden" id="cmbUnidade" value="0" >');
+									}
+								?>								
 							</div>
 								
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>
-										<a href="localestoque.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="localEstoque.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

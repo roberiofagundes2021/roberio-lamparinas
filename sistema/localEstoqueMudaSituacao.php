@@ -21,7 +21,7 @@ if(isset($_POST['inputLocalEstoqueId'])){
 		
 		$sql = "UPDATE LocalEstoque SET LcEstStatus = :bStatus
 				WHERE LcEstId = :id";
-		$result = $conn->prepare("$sql");
+		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $iStatus); 
 		$result->bindParam(':id', $iLocalEstoque); 
 		$result->execute();
@@ -40,6 +40,6 @@ if(isset($_POST['inputLocalEstoqueId'])){
 	}
 }
 
-irpara("localestoque.php");
+irpara("localEstoque.php");
 
 ?>

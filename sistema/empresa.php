@@ -127,13 +127,15 @@ $count = count($row);
 				document.formEmpresa.action = "licenca.php";
 			} else if (Tipo == 'unidade'){
 				document.formEmpresa.action = "unidade.php";
-			} else if (Tipo == 'veiculo'){
-				document.formEmpresa.action = "veiculo.php";
+			} else if (Tipo == 'localestoque'){
+				document.formEmpresa.action = "localEstoque.php";
 			} else if (Tipo == 'setor'){
 				document.formEmpresa.action = "setor.php";
 			} else if (Tipo == 'usuario') {
 				document.formEmpresa.action = "usuario.php";
-			}  else if (Tipo == 'menu'){
+			} else if (Tipo == 'veiculo'){
+				document.formEmpresa.action = "veiculo.php";
+			} else if (Tipo == 'menu'){
 				document.formEmpresa.action = "menu.php";
 			} else if (Tipo == 'parametro'){
 				document.formEmpresa.action = "parametro.php";
@@ -236,9 +238,10 @@ $count = count($row);
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'licenca\');" class="dropdown-item"><i class="icon-certificate"></i> Licença</a>
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'unidade\');" class="dropdown-item"><i class="icon-home7"></i> Unidade</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'veiculo\');" class="dropdown-item"><i class="icon-car"></i> Veículo</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'setor\');" class="dropdown-item"><i class="icon-store"></i> Setor</a>																
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'setor\');" class="dropdown-item"><i class="icon-store"></i> Setor</a>
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'localestoque\');" class="dropdown-item"><i class="icon-box"></i> Local de Estoque</a>																
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'usuario\');" class="dropdown-item"><i class="icon-user-plus"></i> Usuários</a>
+																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'veiculo\');" class="dropdown-item"><i class="icon-car"></i> Veículo</a>
 																<!--<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'menu\');" class="dropdown-item"><i class="icon-menu2"></i> Menu</a>-->
 																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'parametro\');" class="dropdown-item"><i class="icon-equalizer"></i> Parâmetro</a>
 															</div>

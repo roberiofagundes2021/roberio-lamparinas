@@ -30,6 +30,6 @@ if(isset($_POST['inputLocalEstoqueId'])){
 	}
 }
 
-irpara("localestoque.php");
+irpara("localEstoque.php");
 
 ?>

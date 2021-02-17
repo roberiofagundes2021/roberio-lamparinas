@@ -6,14 +6,32 @@ $_SESSION['PaginaAtual'] = 'Local do Estoque';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, SituaNome, SituaCor, SituaChave
-		FROM LocalEstoque
-		JOIN Situacao on SituaId = LcEstStatus
-	    WHERE LcEstUnidade = ". $_SESSION['UnidadeId'] ."
-		ORDER BY LcEstNome ASC";
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
+if (isset($_POST['inputEmpresaId'])){
+	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
+	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
+}
+
+if (isset($_SESSION['EmpresaId'])){
+	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, UnidaNome, SituaNome, SituaCor, SituaChave
+			FROM LocalEstoque
+			JOIN Situacao on SituaId = LcEstStatus
+			JOIN Unidade on UnidaId = LcEstUnidade
+			WHERE UnidaEmpresa = ". $_SESSION['EmpresaId'] ."
+			ORDER BY LcEstNome ASC";
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+	//$count = count($row);
+
+} else{
+	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, SituaNome, SituaCor, SituaChave
+			FROM LocalEstoque
+			JOIN Situacao on SituaId = LcEstStatus
+			WHERE LcEstUnidade = ". $_SESSION['UnidadeId'] ."
+			ORDER BY LcEstNome ASC";
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+	//$count = count($row);
+}
 
 ?>
 
@@ -43,6 +61,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script type="text/javascript">
 
 		$(document).ready(function (){	
+			
 			$('#tblLocalEstoque').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
@@ -72,6 +91,40 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				}
 			});
 			
+			$('#tblLocalEstoqueEmpresa').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+				{
+					orderable: true,   //Local de Estoque
+					width: "40%",
+					targets: [0]
+				},
+				{
+					orderable: true,   //Unidade
+					width: "40%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "10%",
+					targets: [2]
+				},
+				{ 
+					orderable: true,   //Ações
+					width: "10%",
+					targets: [3]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+
 			// Select2 for length menu styling
 			var _componentSelect2 = function() {
 				if (!$().select2) {
@@ -100,13 +153,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			document.getElementById('inputLocalEstoqueStatus').value = LcEstStatus;
 					
 			if (Tipo == 'edita'){	
-				document.formLocalEstoque.action = "localestoqueEdita.php";		
+				document.formLocalEstoque.action = "localEstoqueEdita.php";		
 			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formLocalEstoque, "Tem certeza que deseja excluir esse local?", "localestoqueExclui.php");
+				confirmaExclusao(document.formLocalEstoque, "Tem certeza que deseja excluir esse local?", "localEstoqueExclui.php");
 			} else if (Tipo == 'mudaStatus'){
-				document.formLocalEstoque.action = "localestoqueMudaSituacao.php";
+				document.formLocalEstoque.action = "localEstoqueMudaSituacao.php";
 			} else if (Tipo == 'imprime'){
-				document.formLocalEstoque.action = "localestoqueImprime.php";
+				document.formLocalEstoque.action = "localEstoqueImprime.php";
 				document.formLocalEstoque.setAttribute("target", "_blank");
 			}
 			
@@ -117,7 +170,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top <?php if (isset($_SESSION['EmpresaId'])) echo "sidebar-xs"; ?>">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -125,6 +178,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<div class="page-content">
 		
 		<?php include_once("menu-left.php"); ?>
+
+		<?php 
+			  if (isset($_SESSION['EmpresaId'])){ 
+				include_once("menuLeftSecundario.php");
+			  } 
+		?>		
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -144,7 +203,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="localestoque.php" class="list-icons-item" data-action="reload"></a>
+										<a href="localEstoque.php" class="list-icons-item" data-action="reload"></a>
 										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
@@ -153,18 +212,39 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-9">
-										<p class="font-size-lg">A relação abaixo faz referência aos locais de estoque da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+										<?php 
+							
+											if (isset($_SESSION['EmpresaId'])){
+												print('<p class="font-size-lg">A relação abaixo faz referência aos locais de estoque da empresa <b>'.$_SESSION['EmpresaNome'].'</b></p>');
+											} else{
+												print('<p class="font-size-lg">A relação abaixo faz referência aos locais de estoque da unidade <b>'.$_SESSION['UnidadeNome'].'</b></p>');
+											}
+										?>
 									</div>
 									<div class="col-lg-3">
-										<div class="text-right"><a href="localestoqueNovo.php" class="btn btn-principal" role="button">Novo Local do Estoque</a></div>
+										<div class="text-right"><a href="localEstoqueNovo.php" class="btn btn-principal" role="button">Novo Local do Estoque</a></div>
 									</div>
 								</div>
 							</div>
 							
-							<table id="tblLocalEstoque" class="table">
+							<?php 
+							
+								if (isset($_SESSION['EmpresaId'])){
+									print('<table id="tblLocalEstoqueEmpresa" class="table">');
+								} else {
+									print('<table id="tblLocalEstoque" class="table">');
+								}
+							?>	
+							
 								<thead>
 									<tr class="bg-slate">
 										<th>Local do Estoque</th>
+
+										<?php 
+											if (isset($_SESSION['EmpresaId'])){
+												print('<td>Unidade</td>');
+											}
+										?>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -181,6 +261,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['LcEstNome'].'</td>
 											');
 										
+										if (isset($_SESSION['EmpresaId'])){
+											print('<td>'.$item['UnidaNome'].'</td>');
+										}
+
 										print('<td><a href="#" onclick="atualizaLocalEstoque('.$item['LcEstId'].', \''.$item['LcEstNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
@@ -197,6 +281,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 								</tbody>
 							</table>
+							
 						</div>
 						<!-- /basic responsive configuration -->
 

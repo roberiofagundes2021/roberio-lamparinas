@@ -9,6 +9,12 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputNome'])){
 
 	try{
+
+		if (isset($_SESSION['EmpresaId'])){
+			$iUnidade = $_POST['cmbUnidade'];
+		} else{
+			$iUnidade = $_SESSION['UnidadeId'];
+		}
 		
 		$sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstUnidade, LcEstStatus, LcEstUsuarioAtualizador)
 				VALUES (:sNome, :iUnidade, :bStatus, :iUsuarioAtualizador)";
@@ -16,7 +22,7 @@ if(isset($_POST['inputNome'])){
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
-						':iUnidade' => $_SESSION['UnidadeId'],
+						':iUnidade' => $iUnidade,
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']
 						));
@@ -34,7 +40,7 @@ if(isset($_POST['inputNome'])){
 		echo 'Error: ' . $e->getMessage();
 	}
 	
-	irpara("localestoque.php");
+	irpara("localEstoque.php");
 }
 
 ?>
@@ -71,6 +77,7 @@ if(isset($_POST['inputNome'])){
 				e.preventDefault();
 				
 				var inputNome  = $('#inputNome').val();
+				var cmdUnidade  = $('#cmbUnidade').val();
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
@@ -78,8 +85,8 @@ if(isset($_POST['inputNome'])){
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
-					url: "localestoqueValida.php",
-					data: ('nome='+inputNome),
+					url: "localEstoqueValida.php",
+					data: ('nome='+inputNome+'&unidade='+cmbUnidade),
 					success: function(resposta){
 						
 						if(resposta == 1){
@@ -96,7 +103,7 @@ if(isset($_POST['inputNome'])){
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top <?php if (isset($_SESSION['EmpresaId'])) echo "sidebar-xs"; ?>">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -104,6 +111,12 @@ if(isset($_POST['inputNome'])){
 	<div class="page-content">
 		
 		<?php include_once("menu-left.php"); ?>
+
+		<?php 
+			if (isset($_SESSION['EmpresaId'])){ 
+				include_once("menuLeftSecundario.php");
+			} 
+		?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -123,19 +136,59 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-12">
+								<?php 
+									if (isset($_SESSION['EmpresaId'])){ 
+										print('<div class="col-lg-6">');
+									} else{
+										print('<div class="col-lg-12">');  
+									}
+								?>
 									<div class="form-group">
 										<label for="inputNome">Local do Estoque<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local do Estoque" required autofocus>
 									</div>
-								</div>			
+								</div>	
+
+								<?php 
+							
+									if (isset($_SESSION['EmpresaId'])){
+										
+										print('
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
+												<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
+													<option value="">Informe uma unidade</option>');
+													
+													$sql = "SELECT UnidaId, UnidaNome
+															FROM Unidade
+															JOIN Situacao on SituaId = UnidaStatus															     
+															WHERE UnidaEmpresa = " . $_SESSION['EmpresaId'] . " and SituaChave = 'ATIVO'
+															ORDER BY UnidaNome ASC";
+													$result = $conn->query($sql);
+													$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowUnidade as $item) {
+														print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
+													}
+
+										print('												
+												</select>
+											</div>
+										</div>
+										');
+									} else{
+										print('<input type="hidden" id="cmbUnidade" value="0" >');
+									}
+								?>
+
 							</div>
-															
+							
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-										<a href="localestoque.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="localEstoque.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

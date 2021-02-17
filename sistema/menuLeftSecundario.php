@@ -87,10 +87,10 @@
 								<a href="unidade.php" class="nav-link"><i class="icon-home7"></i> Unidade</a>
 							</li>
 							<li class="nav-item">
-								<a href="veiculo.php" class="nav-link"><i class="icon-car"></i> Veículo</a>
+								<a href="setor.php" class="nav-link"><i class="icon-cabinet"></i> Setor</a>
 							</li>
 							<li class="nav-item">
-								<a href="setor.php" class="nav-link"><i class="icon-cabinet"></i> Setor</a>
+								<a href="localEstoque.php" class="nav-link"><i class="icon-box"></i> Local de Estoque</a>
 							</li>
 							<li class="nav-item">
 								<a href="usuario.php" class="nav-link">
@@ -127,6 +127,9 @@
 									</span>
 								</a>
 							</li>
+							<li class="nav-item">
+								<a href="veiculo.php" class="nav-link"><i class="icon-car"></i> Veículo</a>
+							</li>							
 							<!--<li class="nav-item">
 								<a href="menu.php" class="nav-link">
 									<i class="icon-menu2"></i>
