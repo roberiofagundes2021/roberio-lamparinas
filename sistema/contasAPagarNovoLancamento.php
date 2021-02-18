@@ -691,7 +691,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputDataEmissao">Data de Emissão</label>
-                                                <input type="text" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
+                                                <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>"  readOnly>
                                             </div>
                                         </div>
                                         <div class="col-lg-4">

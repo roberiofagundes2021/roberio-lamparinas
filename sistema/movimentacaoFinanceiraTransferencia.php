@@ -412,7 +412,7 @@ $dataInicio = date("Y-m-d");
                     <div class="col-lg-2">
                       <div class="form-group">
                         <label for="inputDataEmissao">Data de Emissão <span class="text-danger">*</span></label>
-                        <input type="text" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
+                        <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>"  readOnly>
                       </div>
                     </div>
 
