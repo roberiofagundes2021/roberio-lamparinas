@@ -12,7 +12,7 @@ if(isset($_POST['inputUnidadeId'])){
 		
 		$sql = "DELETE FROM Unidade
 				WHERE UnidaId = :id";
-		$result = $conn->prepare("$sql");
+		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iUnidade); 
 		$result->execute();
 		
@@ -23,10 +23,10 @@ if(isset($_POST['inputUnidadeId'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir unidade!!!";
+		$_SESSION['msg']['mensagem'] = "Não é possível excluir essa unidade, pois existem registros ligados a ela!!!";
 		$_SESSION['msg']['tipo'] = "error";			
 		
-		echo 'Error: ' . $e->getMessage();
+		//echo 'Error: ' . $e->getMessage();
 	}
 }
 

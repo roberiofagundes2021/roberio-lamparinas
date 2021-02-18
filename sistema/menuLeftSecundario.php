@@ -12,7 +12,7 @@
 					url: "menuLeftSecundarioAjax.php",
 					data: ('id='+id+'&nome='+nome),
 					success: function(resposta){
-							alert(resposta);					
+				
 						if(resposta){
 							location.reload();
 							return false;
@@ -47,7 +47,6 @@
 				<div class="card"  style="padding-top:10px;">
 					<div class="card-header bg-transparent header-elements-inline">
 						<span class="text-uppercase font-size-sm font-weight-semibold">Empresa</span>
-						<?php echo $_SESSION['EmpresaId']; ?>
 					</div>
 
 					<div class="card-body">
@@ -96,21 +95,22 @@
 								<a href="usuario.php" class="nav-link">
 								
 									<?php 
-										$sql = ("SELECT EXUXPUsuario
-												 FROM EmpresaXUsuarioXPerfil
-												 WHERE EXUXPEmpresa = ".$_SESSION['EmpresaId']."
-												");
-										$result = $conn->query("$sql");
+										$sql = "SELECT EXUXPUsuario
+												FROM EmpresaXUsuarioXPerfil
+												WHERE EXUXPEmpresa = ".$_SESSION['EmpresaId']."
+												";
+										$result = $conn->query($sql);
 										$rowUsuario = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countUsuario = count($rowUsuario);
 										//var_dump($countUsuario);die;
 										
-										$sql = ("SELECT isnull(LicenLimiteUsuarios,0) as Limite
-												 FROM Licenca
-												 WHERE LicenEmpresa = ".$_SESSION['EmpresaId']." and LicenStatus = 1
+										$sql = "SELECT isnull(LicenLimiteUsuarios,0) as Limite
+												FROM Licenca
+												JOIN Situacao on SituaId = LicenStatus
+												WHERE LicenEmpresa = ".$_SESSION['EmpresaId']." and SituaChave = 'ATIVO'
 												 Order By LicenDtInicio DESC
-												");
-										$result = $conn->query("$sql");
+												";
+										$result = $conn->query($sql);
 										$rowLimite = $result->fetch(PDO::FETCH_ASSOC);
 
 									?>								

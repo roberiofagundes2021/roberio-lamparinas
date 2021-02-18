@@ -30,7 +30,17 @@ $sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPStatus, PerfiNome,
 		ORDER BY UsuarNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
+$usuariosCadastrados = count($row);
+
+$sql = "SELECT LicenLimiteUsuarios
+		FROM Licenca
+		JOIN Situacao on SituaId = LicenStatus
+		WHERE LicenEmpresa = ".$EmpresaId." and SituaChave = 'ATIVO'
+		ORDER BY LicenDtFim desc";
+$result = $conn->query($sql);
+$rowLimite = $result->fetch(PDO::FETCH_ASSOC);
+
+$limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 
 ?>
 
@@ -130,8 +140,20 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			document.getElementById('inputUsuarioId').value = UsuarioId;
 			document.getElementById('inputUsuarioStatus').value = UsuarioStatus;
-		
-			if (Tipo == 'edita'){
+			
+			if (Tipo == 'novo'){
+
+				var limiteUsuarios = $('#inputLimiteUsuarios').val();
+				var usuariosCadastrados = $('#inputUsuariosCadastrados').val();
+
+				if (usuariosCadastrados > limiteUsuarios){
+					alerta('Atenção', 'O limite de usuários para essa empresa foi atingido! Para adicionar mais usuários, favor contactar a empresa Lamparinas', 'error');
+					return false;
+				} else{
+					document.formUsuario.action = "usuarioNovo.php";
+				}	
+					
+			} else if (Tipo == 'edita'){
 				document.formUsuario.action = "usuarioEdita.php";
 			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formUsuario, "Tem certeza que deseja excluir esse usuário?", "usuarioExclui.php");
@@ -199,7 +221,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<p class="font-size-lg">Os usuários cadastrados abaixo pertencem a empresa <b><?php echo $EmpresaNome; ?></b>.</p>
 									</div>
 									<div class="col-lg-3">	
-										<div class="text-right"><a href="usuarioNovo.php" class="btn btn-principal" role="button">Novo usuário</a></div>
+										<div class="text-right"><a href="#" onclick="atualizaUsuario(0, '', 'novo')" class="btn btn-principal" role="button">Novo usuário</a></div>
 									</div>
 								</div>
 							</div>							
@@ -262,6 +284,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<form name="formUsuario" method="post" action="usuarioEdita.php">
 					<input type="hidden" id="inputUsuarioId" name="inputUsuarioId" >
 					<input type="hidden" id="inputUsuarioStatus" name="inputUsuarioStatus" >
+					<input type="hidden" id="inputLimiteUsuarios" value="<?php echo $limiteUsuarios; ?>" >
+					<input type="hidden" id="inputUsuariosCadastrados" value="<?php echo $usuariosCadastrados; ?>" >
 				</form>
 
 			</div>
