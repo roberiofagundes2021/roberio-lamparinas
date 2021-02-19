@@ -384,11 +384,11 @@ $dataInicio = date("Y-m-d");
                         <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" required>
                           <option value="">Selecionar</option>
                           <?php
-                            $sql = "SELECT PlConId, PlConNome
+                            $sql = "SELECT PlConId, PlConCodigo, PlConNome
                                       FROM PlanoContas
                                       JOIN Situacao on SituaId = PlConStatus
                                       WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                      ORDER BY PlConNome ASC";
+                                      ORDER BY PlConCodigo ASC";
 
                             $result = $conn->query($sql);
                             $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -396,12 +396,12 @@ $dataInicio = date("Y-m-d");
                             foreach ($rowPlanoContas as $item) {
                                 if (isset($lancamento)) {
                                     if ($lancamento['CnAPaPlanoContas'] == $item['PlConId']) {
-                                        print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConNome'] . '</option>');
+                                        print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                     } else {
-                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                     }
                                 } else {
-                                    print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                    print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                 }
                             }
                           ?>

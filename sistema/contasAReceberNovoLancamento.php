@@ -1102,12 +1102,12 @@ $dataInicio = date("Y-m-d");
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     try {
-                                                        $sql = "SELECT PlConId, PlConNome
+                                                        $sql = "SELECT PlConId, PlConCodigo, PlConNome
                                                                   FROM PlanoContas
                                                                   JOIN Situacao 
                                                                     ON SituaId = PlConStatus
                                                                  WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                              ORDER BY PlConNome ASC";
+                                                              ORDER BY PlConCodigo ASC";
                                                         $result = $conn->query($sql);
                                                         $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1116,12 +1116,12 @@ $dataInicio = date("Y-m-d");
                                                             foreach ($rowPlanoContas as $item) {
                                                                 if (isset($lancamento)) {
                                                                     if ($lancamento['CnARePlanoContas'] == $item['PlConId']) {
-                                                                        print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConNome'] . '</option>');
+                                                                        print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                                                     } else {
-                                                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                                                     }
                                                                 } else {
-                                                                    print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                                    print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                                                 }
                                                             }
                                                         } catch (Exception $e) {

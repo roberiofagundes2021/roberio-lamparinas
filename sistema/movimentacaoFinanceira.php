@@ -25,6 +25,7 @@ $Y = date("Y");
 // $dataInicio = date("Y-m-01"); //30 dias atrás
 $dataInicio = date("Y-m-d");
 $dataFim = date("Y-m-d");
+
 ?>
 
 <!DOCTYPE html>
@@ -383,19 +384,18 @@ $dataFim = date("Y-m-d");
                         <select id="cmbCentroDeCustos" name="cmbCentroDeCustos" class="form-control form-control-select2">
                           <option value="">Todos</option>
                           <?php
-                                                    $sql = "SELECT CnCusId,
-                                                                   CnCusNome
+                                                    $sql = "SELECT CnCusId, CnCusCodigo, CnCusNome
                                                               FROM CentroCusto
                                                               JOIN Situacao 
                                                                 ON SituaId = CnCusStatus
                                                              WHERE CnCusUnidade = " . $_SESSION['UnidadeId'] . " 
                                                                and SituaChave = 'ATIVO'
-                                                          ORDER BY CnCusNome ASC";
+                                                          ORDER BY CnCusCodigo ASC";
                                                     $result = $conn->query($sql);
                                                     $rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                     foreach ($rowCentroDeCustos as $item) {
-                                                      print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusNome'] . '</option>');
+                                                      print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusCodigo'] . ' - ' . $item['CnCusNome'] . '</option>');
                                                     }
 
                                                     ?>
@@ -410,18 +410,18 @@ $dataFim = date("Y-m-d");
                         <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
                           <option value="">Todos</option>
                           <?php
-                                                    $sql = "SELECT PlConId, PlConNome
+                                                    $sql = "SELECT PlConId, PlConCodigo, PlConNome
                                                               FROM PlanoContas
                                                               JOIN Situacao 
                                                                 ON SituaId = PlConStatus
                                                              WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " 
                                                                AND SituaChave = 'ATIVO'
-                                                          ORDER BY PlConNome ASC";
+                                                          ORDER BY PlConCodigo ASC";
                                                     $result = $conn->query($sql);
                                                     $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                     foreach ($rowPlanoContas as $item) {
-                                                      print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                      print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                                     }
 
                                                     ?>
