@@ -387,7 +387,8 @@ $dataInicio = date("Y-m-d");
                             $sql = "SELECT PlConId, PlConCodigo, PlConNome
                                       FROM PlanoContas
                                       JOIN Situacao on SituaId = PlConStatus
-                                      WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                      JOIN CentroCusto on CnCusId = PlConCentroCusto
+                                      WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and CnCusTipo = 'D'
                                       ORDER BY PlConCodigo ASC";
 
                             $result = $conn->query($sql);
