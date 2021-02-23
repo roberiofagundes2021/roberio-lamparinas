@@ -50,6 +50,7 @@ $dataFim = date("Y-m-d");
   <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
   <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
   <!-- /theme JS files -->
+  
 
   <!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
   <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
@@ -57,6 +58,48 @@ $dataFim = date("Y-m-d");
 
   <script type="text/javascript">
   $(document).ready(function() {
+
+
+    
+    (function selectPlanoContas() {
+                const cmbCentroDeCustos = $('#cmbCentroDeCustos')
+
+                cmbCentroDeCustos.on('change', () => {
+                    Filtrando()
+                    const valCentroDeCustos = $('#cmbCentroDeCustos').val()
+
+                    $.getJSON('filtraPlanoContas.php?idCentroDeCustos=' + valCentroDeCustos, function (
+                    dados) {
+
+                        var option = '<option value="">Selecione a Plano de Contas</option>';
+
+                        if (dados.length) {
+
+                            $.each(dados, function (i, obj) {
+                                option += '<option value="' + obj.PlConId + '">' +
+                                    obj.PlConNome + '</option>';
+                            });
+
+                            $('#cmbPlanoContas').html(option).show();
+                        } else {
+                            Reset();
+                        }
+                    });
+                })
+            })()
+
+            function Filtrando() {
+                $('#cmbPlanoContas').empty().append('<option>Filtrando...</option>');
+            }
+
+            function Reset() {
+                $('#cmbPlanoContas').empty().append('<option value="">Sem Plano de Contas</option>');
+            }
+
+
+
+
+
     let resultadosConsulta = '';
     let inputsValues = {};
 
@@ -258,6 +301,48 @@ $dataFim = date("Y-m-d");
     }
     imprime()
   });
+
+      //Ao mudar a centro de custo, filtra o Plano de Contas via ajax (retorno via JSON)
+      $('#cmbCentroDeCustos').on('change', function(e) {
+
+        Filtrando();
+
+        var cmbCentroDeCustos = $('#cmbCentroDeCustos').val();
+
+        if (cmbCentroDeCustos == '') {
+          ResetPlanoContas();
+        } else {
+
+          $.getJSON('filtraPlanoContas.php?idCentroCusto=' + cmbCentroDeCustos, function(dados) {
+
+            var option = '<option value="">Selecione o Plano de Contas</option>';
+
+            if (dados.length) {
+
+              $.each(dados, function(i, obj) {
+                option += '<option value="' + obj.PlConId + '">' + obj.PlConNome + '</option>';
+              });
+
+              $('#cmbPlanoContas').html(option).show();
+            } else {
+              ResetPlanoContas();
+            }
+          });
+
+        }
+      });
+
+      function Filtrando() {
+        $('#cmbPlanoContas').empty().append('<option value="">Filtrando...</option>');
+        
+        }
+
+        function ResetPlanoContas() {
+        $('#cmbPlanoContas').empty().append('<option value="">Sem Plano de Contas</option>');
+      } 
+
+	
+
   </script>
 
 </head>
@@ -384,50 +469,35 @@ $dataFim = date("Y-m-d");
                         <select id="cmbCentroDeCustos" name="cmbCentroDeCustos" class="form-control form-control-select2">
                           <option value="">Todos</option>
                           <?php
-                                                    $sql = "SELECT CnCusId, CnCusCodigo, CnCusNome
-                                                              FROM CentroCusto
-                                                              JOIN Situacao 
-                                                                ON SituaId = CnCusStatus
-                                                             WHERE CnCusUnidade = " . $_SESSION['UnidadeId'] . " 
-                                                               and SituaChave = 'ATIVO'
-                                                          ORDER BY CnCusCodigo ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
+                                  $sql = "SELECT CnCusId, CnCusCodigo, CnCusNome
+                                            FROM CentroCusto
+                                            JOIN Situacao 
+                                              ON SituaId = CnCusStatus
+                                            WHERE CnCusUnidade = " . $_SESSION['UnidadeId'] . " 
+                                              and SituaChave = 'ATIVO'
+                                        ORDER BY CnCusCodigo ASC";
+                                  $result = $conn->query($sql);
+                                  $rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    foreach ($rowCentroDeCustos as $item) {
-                                                      print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusCodigo'] . ' - ' . $item['CnCusNome'] . '</option>');
-                                                    }
+                                  foreach ($rowCentroDeCustos as $item) {
+                                    print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusCodigo'] . ' - ' . $item['CnCusNome'] . '</option>');
+                                  }
 
-                                                    ?>
+                           ?>
                         </select>
                       </div>
                     </div>
-
 
                     <div class="col-lg-3">
-                      <div class="form-group">
-                        <label for="cmbPlanoContas">Plano de Contas</label>
-                        <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
-                          <option value="">Todos</option>
-                          <?php
-                                                    $sql = "SELECT PlConId, PlConCodigo, PlConNome
-                                                              FROM PlanoContas
-                                                              JOIN Situacao 
-                                                                ON SituaId = PlConStatus
-                                                             WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " 
-                                                               AND SituaChave = 'ATIVO'
-                                                          ORDER BY PlConCodigo ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                    foreach ($rowPlanoContas as $item) {
-                                                      print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
-                                                    }
-
-                                                    ?>
-                        </select>
-                      </div>
+                        <div class="form-group">
+                            <label for="cmbPlanoContas">Plano de Contas</label>
+                            <select id="cmbPlanoContas" name="cmbPlanoContas"
+                                class="form-control form-control-select2">
+                                <option value="">Selecionar</option>
+                            </select>
+                        </div>
                     </div>
+                    
 
                     <div class="col-lg-3">
                       <div class="form-group">
