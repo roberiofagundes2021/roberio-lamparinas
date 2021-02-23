@@ -184,12 +184,14 @@ $count = count($row);
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
+
+										$tipo = $item['CnCusTipo'] == 'R' ? 'Receita' : 'Despesa';
 										
 										print('
 										<tr>
 											<td>'.$item['CnCusCodigo'].'</td>
 											<td>'.$item['CnCusNome'].'</td>
-											<td>'.$item['CnCusTipo'].'</td>
+											<td>'.$tipo.'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaCentroCusto('.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$situacaoChave .', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

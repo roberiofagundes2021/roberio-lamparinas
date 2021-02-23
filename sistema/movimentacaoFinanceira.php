@@ -57,292 +57,241 @@ $dataFim = date("Y-m-d");
   <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
 
   <script type="text/javascript">
-  $(document).ready(function() {
+    $(document).ready(function() {
 
+      let resultadosConsulta = '';
+      let inputsValues = {};
 
-    
-    (function selectPlanoContas() {
-                const cmbCentroDeCustos = $('#cmbCentroDeCustos')
+      $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data			
 
-                cmbCentroDeCustos.on('change', () => {
-                    Filtrando()
-                    const valCentroDeCustos = $('#cmbCentroDeCustos').val()
-
-                    $.getJSON('filtraPlanoContas.php?idCentroDeCustos=' + valCentroDeCustos, function (
-                    dados) {
-
-                        var option = '<option value="">Selecione a Plano de Contas</option>';
-
-                        if (dados.length) {
-
-                            $.each(dados, function (i, obj) {
-                                option += '<option value="' + obj.PlConId + '">' +
-                                    obj.PlConNome + '</option>';
-                            });
-
-                            $('#cmbPlanoContas').html(option).show();
-                        } else {
-                            Reset();
-                        }
-                    });
-                })
-            })()
-
-            function Filtrando() {
-                $('#cmbPlanoContas').empty().append('<option>Filtrando...</option>');
-            }
-
-            function Reset() {
-                $('#cmbPlanoContas').empty().append('<option value="">Sem Plano de Contas</option>');
-            }
-
-
-
-
-
-    let resultadosConsulta = '';
-    let inputsValues = {};
-
-    $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data			
-
-    /* Início: Tabela Personalizada */
-    $('#tblMovimentacaoFinanceira').DataTable({
-      "order": [
-        [1, "desc"]
-      ],
-      autoWidth: false,
-      responsive: true,
-      columnDefs: [{
-          orderable: true, //Data
-          width: "10%",
-          targets: [0]
-        },
-        {
-          orderable: true, //Histórico
-          width: "25%",
-          targets: [1]
-        },
-        {
-          orderable: true, //Conta Caixa
-          width: "22%",
-          targets: [2]
-        },
-        {
-          orderable: true, //Nª doc
-          width: "8%",
-          targets: [3]
-        },
-        {
-          orderable: true, //Entrada
-          width: "10%",
-          targets: [4]
-        },
-        {
-          orderable: true, //Saída
-          width: "10%",
-          targets: [5]
-        },
-        {
-          orderable: true, //Saldo
-          width: "10%",
-          targets: [6]
-        },
-        {
-          orderable: false, //Ações
-          width: "5%",
-          targets: [6]
-        }
-      ],
-      dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
-      language: {
-        search: '<span>Filtro:</span> _INPUT_',
-        searchPlaceholder: 'filtra qualquer coluna...',
-        lengthMenu: '<span>Mostrar:</span> _MENU_',
-        paginate: {
-          'first': 'Primeira',
-          'last': 'Última',
-          'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-          'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
-        }
-      }
-    });
-
-    function excluirConta() {
-      let contas = $('.excluirConta').each((i, elem) => {
-        $(elem).on('click', (e) => {
-          const id = $(elem).attr('idContaExcluir');
-          const tipo = $(elem).attr('tipo');
-
-          $('#idMov').val(id);
-          $('#tipoMov').val(tipo);
-
-          e.preventDefault;
-          confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `movimentacaoFinanceiraExclui.php`);
-          document.contaExclui.submit();
-        })
-      })
-
-    }
-    excluirConta();
-
-    function atualizaTotal() {
-      let childres = $('tbody').children()
-      let total = 0
-      let linhas = childres.splice(1, childres.length)
-      linhas.forEach(elem => {
-        let listaTds = $(elem).children()
-        let valor = $(listaTds[5]).html()
-        let valorFormFloat = parseFloat(valor.replace(".", "").replace(",", "."))
-
-        total += valorFormFloat
-      })
-      $('#footer-total').remove()
-
-      if (total < 0) {
-        divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(total)}</div>`
-      } else {
-        divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(total)}</div>`
-      }
-
-      $('.datatable-footer').append(divTotal);
-    }
-
-
-    function Filtrar(carregamentoPagina) {
-      let cont = false;
-
-      const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
-
-      $('tbody').html(msg);
-
-      const periodoDe = $('#inputPeriodoDe').val();
-      const ate = $('#inputAte').val();
-      const contaBanco = $('#cmbContaBanco').val();
-      const centroDeCustos = $('#cmbCentroDeCustos').val();
-      const planoContas = $('#cmbPlanoContas').val();
-      const FormaPagamento = $('#cmbFormaDeRecebimento').val();
-      const statusArray = $('#cmbStatus').val().split('|');
-      const status = statusArray[0];
-      const statusTipo = statusArray[1];
-      const url = "movimentacaoFinanceiraFiltra.php";
-      const tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal';
-
-      inputsValues = {
-        inputPeriodoDe: periodoDe,
-        inputAte: ate,
-        cmbContaBanco: contaBanco,
-        cmbCentroDeCustos: centroDeCustos,
-        cmbPlanoContas: planoContas,
-        cmbFormaDeRecebimento: FormaPagamento,
-        cmbStatus: status,
-        statusTipo: statusTipo,
-        tipoFiltro: tipoFiltro
-      };
-
-      $.post(
-        url,
-        inputsValues,
-        (data) => {
-          if (data) {
-            $('tbody').html(data)
-            $('#imprimir').removeAttr('disabled')
-            resultadosConsulta = data
-
-            excluirConta();
-            atualizaTotal();
-
-          } else {
-            let msg2 = $(
-              '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-            )
-            $('tbody').html(msg2)
-            $('#imprimir').attr('disabled', '')
-            $('#footer-total').remove()
+      /* Início: Tabela Personalizada */
+      $('#tblMovimentacaoFinanceira').DataTable({
+        "order": [
+          [1, "desc"]
+        ],
+        autoWidth: false,
+        responsive: true,
+        columnDefs: [{
+            orderable: true, //Data
+            width: "10%",
+            targets: [0]
+          },
+          {
+            orderable: true, //Histórico
+            width: "25%",
+            targets: [1]
+          },
+          {
+            orderable: true, //Conta Caixa
+            width: "22%",
+            targets: [2]
+          },
+          {
+            orderable: true, //Nª doc
+            width: "8%",
+            targets: [3]
+          },
+          {
+            orderable: true, //Entrada
+            width: "10%",
+            targets: [4]
+          },
+          {
+            orderable: true, //Saída
+            width: "10%",
+            targets: [5]
+          },
+          {
+            orderable: true, //Saldo
+            width: "10%",
+            targets: [6]
+          },
+          {
+            orderable: false, //Ações
+            width: "5%",
+            targets: [6]
+          }
+        ],
+        dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+        language: {
+          search: '<span>Filtro:</span> _INPUT_',
+          searchPlaceholder: 'filtra qualquer coluna...',
+          lengthMenu: '<span>Mostrar:</span> _MENU_',
+          paginate: {
+            'first': 'Primeira',
+            'last': 'Última',
+            'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+            'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
           }
         }
-      );
-    }
+      });
 
-    $('#submitPesquisar').on('click', (e) => {
-      e.preventDefault()
-      Filtrar(false);
-    })
+      function excluirConta() {
+        let contas = $('.excluirConta').each((i, elem) => {
+          $(elem).on('click', (e) => {
+            const id = $(elem).attr('idContaExcluir');
+            const tipo = $(elem).attr('tipo');
 
-    Filtrar(true);
+            $('#idMov').val(id);
+            $('#tipoMov').val(tipo);
 
-    $('#novoLacamento').on('click', (e) => {
-      location.href = "movimentacaoFinanceiraPagamento.php";
-      return false;
-    })
+            e.preventDefault;
+            confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `movimentacaoFinanceiraExclui.php`);
+            document.contaExclui.submit();
+          })
+        })
 
-    function imprime() {
-      let url = 'movimentacaoFinanceiraImprime.php';
+      }
+      excluirConta();
 
-      $('#imprimir').on('click', (e) => {
-        console.log(resultadosConsulta);
-        e.preventDefault()
-        if (resultadosConsulta) {
-          $('#inputResultado').val(resultadosConsulta)
-          $('#inputDataDe_imp').val(inputsValues.inputPeriodoDe)
-          $('#inputDataAte_imp').val(inputsValues.inputAte)
-          $('#cmbContaBanco_imp').val(inputsValues.cmbContaBanco)
-          $('#cmbCentroDeCustos_imp').val(inputsValues.cmbCentroDeCustos)
-          $('#cmbPlanoContas_imp').val(inputsValues.cmbPlanoContas)
-          $('#cmbFormaDeRecebimento_imp').val(inputsValues.cmbFormaDeRecebimento)
-          $('#inputStatus_imp').val(inputsValues.cmbStatus)
-          $('#inputStatusTipo_imp').val(inputsValues.statusTipo)
+      function atualizaTotal() {
+        let childres = $('tbody').children()
+        let total = 0
+        let linhas = childres.splice(1, childres.length)
+        linhas.forEach(elem => {
+          let listaTds = $(elem).children()
+          let valor = $(listaTds[5]).html()
+          let valorFormFloat = parseFloat(valor.replace(".", "").replace(",", "."))
 
+          total += valorFormFloat
+        })
+        $('#footer-total').remove()
 
-          $('#formImprime').attr('action', url)
-
-          $('#formImprime').submit()
+        if (total < 0) {
+          divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(total)}</div>`
+        } else {
+          divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(total)}</div>`
         }
+
+        $('.datatable-footer').append(divTotal);
+      }
+
+
+      function Filtrar(carregamentoPagina) {
+        let cont = false;
+
+        const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
+
+        $('tbody').html(msg);
+
+        const periodoDe = $('#inputPeriodoDe').val();
+        const ate = $('#inputAte').val();
+        const contaBanco = $('#cmbContaBanco').val();
+        const centroDeCustos = $('#cmbCentroDeCustos').val();
+        const planoContas = $('#cmbPlanoContas').val();
+        const FormaPagamento = $('#cmbFormaDeRecebimento').val();
+        const statusArray = $('#cmbStatus').val().split('|');
+        const status = statusArray[0];
+        const statusTipo = statusArray[1];
+        const url = "movimentacaoFinanceiraFiltra.php";
+        const tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal';
+
+        inputsValues = {
+          inputPeriodoDe: periodoDe,
+          inputAte: ate,
+          cmbContaBanco: contaBanco,
+          cmbCentroDeCustos: centroDeCustos,
+          cmbPlanoContas: planoContas,
+          cmbFormaDeRecebimento: FormaPagamento,
+          cmbStatus: status,
+          statusTipo: statusTipo,
+          tipoFiltro: tipoFiltro
+        };
+
+        $.post(
+          url,
+          inputsValues,
+          (data) => {
+            if (data) {
+              $('tbody').html(data)
+              $('#imprimir').removeAttr('disabled')
+              resultadosConsulta = data
+
+              excluirConta();
+              atualizaTotal();
+
+            } else {
+              let msg2 = $(
+                '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+              )
+              $('tbody').html(msg2)
+              $('#imprimir').attr('disabled', '')
+              $('#footer-total').remove()
+            }
+          }
+        );
+      }
+
+      $('#submitPesquisar').on('click', (e) => {
+        e.preventDefault()
+        Filtrar(false);
       })
-    }
-    imprime()
-  });
+
+      Filtrar(true);
+
+      $('#novoLacamento').on('click', (e) => {
+        location.href = "movimentacaoFinanceiraPagamento.php";
+        return false;
+      })
+
+      function imprime() {
+        let url = 'movimentacaoFinanceiraImprime.php';
+
+        $('#imprimir').on('click', (e) => {
+          console.log(resultadosConsulta);
+          e.preventDefault()
+          if (resultadosConsulta) {
+            $('#inputResultado').val(resultadosConsulta)
+            $('#inputDataDe_imp').val(inputsValues.inputPeriodoDe)
+            $('#inputDataAte_imp').val(inputsValues.inputAte)
+            $('#cmbContaBanco_imp').val(inputsValues.cmbContaBanco)
+            $('#cmbCentroDeCustos_imp').val(inputsValues.cmbCentroDeCustos)
+            $('#cmbPlanoContas_imp').val(inputsValues.cmbPlanoContas)
+            $('#cmbFormaDeRecebimento_imp').val(inputsValues.cmbFormaDeRecebimento)
+            $('#inputStatus_imp').val(inputsValues.cmbStatus)
+            $('#inputStatusTipo_imp').val(inputsValues.statusTipo)
+
+
+            $('#formImprime').attr('action', url)
+
+            $('#formImprime').submit()
+          }
+        })
+      }
+      imprime()
 
       //Ao mudar a centro de custo, filtra o Plano de Contas via ajax (retorno via JSON)
       $('#cmbCentroDeCustos').on('change', function(e) {
 
-        Filtrando();
+        FiltraPlanoContas();
 
         var cmbCentroDeCustos = $('#cmbCentroDeCustos').val();
 
-        if (cmbCentroDeCustos == '') {
-          ResetPlanoContas();
-        } else {
+        $.getJSON('filtraPlanoContas.php?idCentroCusto=' + cmbCentroDeCustos, function(dados) {
 
-          $.getJSON('filtraPlanoContas.php?idCentroCusto=' + cmbCentroDeCustos, function(dados) {
+          var option = '<option value="">Todos</option>';
 
-            var option = '<option value="">Selecione o Plano de Contas</option>';
+          if (dados.length) {
 
-            if (dados.length) {
+            $.each(dados, function(i, obj) {
+              option += '<option value="' + obj.PlConId + '">' + obj.PlConCodigo + ' - ' + obj.PlConNome + '</option>';
+            });
 
-              $.each(dados, function(i, obj) {
-                option += '<option value="' + obj.PlConId + '">' + obj.PlConNome + '</option>';
-              });
+            $('#cmbPlanoContas').html(option).show();
+          } else {
+            ResetPlanoContas();
+          }
+        });
+      });    
+    });
 
-              $('#cmbPlanoContas').html(option).show();
-            } else {
-              ResetPlanoContas();
-            }
-          });
+    function FiltraPlanoContas() {
+      $('#cmbPlanoContas').empty().append('<option value="">Filtrando...</option>');    
+    }
 
-        }
-      });
-
-      function Filtrando() {
-        $('#cmbPlanoContas').empty().append('<option value="">Filtrando...</option>');
-        
-        }
-
-        function ResetPlanoContas() {
-        $('#cmbPlanoContas').empty().append('<option value="">Sem Plano de Contas</option>');
-      } 
-
-	
-
+    function ResetPlanoContas() {
+      $('#cmbPlanoContas').empty().append('<option value="">Sem Plano de Contas</option>');
+    } 
   </script>
 
 </head>
@@ -491,9 +440,24 @@ $dataFim = date("Y-m-d");
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label for="cmbPlanoContas">Plano de Contas</label>
-                            <select id="cmbPlanoContas" name="cmbPlanoContas"
-                                class="form-control form-control-select2">
-                                <option value="">Selecionar</option>
+                            <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
+                              <option value="">Todos</option>
+                                 <?php
+                                    $sql = "SELECT PlConId, PlConCodigo, PlConNome
+                                              FROM PlanoContas
+                                              JOIN Situacao 
+                                                ON SituaId = PlConStatus
+                                              WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " 
+                                                AND SituaChave = 'ATIVO'
+                                          ORDER BY PlConCodigo ASC";
+                                    $result = $conn->query($sql);
+                                    $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                    foreach ($rowPlanoContas as $item) {
+                                      print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
+                                    }
+
+                                 ?>
                             </select>
                         </div>
                     </div>
