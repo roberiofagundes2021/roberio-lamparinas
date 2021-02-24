@@ -711,7 +711,7 @@ $dataFim = date("Y-m-d");
                     <tr class="bg-slate">
                       <th>Data</th>
                       <th>Histórico</th>
-                      <th>Nº Documento</th>
+                      <th>Documento</th>
                       <th style='text-align: right;'>Entrada</th>
                       <th style='text-align: right;'>Saída</th>
                       <th style='text-align: right;'>Saldo</th>
