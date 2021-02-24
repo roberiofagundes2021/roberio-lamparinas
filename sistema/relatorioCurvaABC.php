@@ -178,7 +178,7 @@ $dataFim = date('Y-m-d');
 				let cmbSetor = $('#cmbSetor').val();
 				let cmbCategoria = $('#cmbCategoria').val();
 				let cmbSubCategoria = $('#cmbSubCategoria').val();
-				let cmbClassificacao = $('#cmbClassificacao').val();
+				let cmbClassificacao = $('#cmbClassificacao').val();	
 
 				let url = "relatorioCurvaABCFiltra.php";
 
@@ -203,12 +203,11 @@ $dataFim = date('Y-m-d');
 							$('#resultado').html(data);
 
 							$('#grafico').show();
-
+/*
 							var line_basic_element1 = document.getElementById('line_basic1');
 
 				            // Initialize chart
 				            var line_basic1 = echarts.init(line_basic_element1);
-
 
 				            //
 				            // Chart config
@@ -365,169 +364,169 @@ $dataFim = date('Y-m-d');
 				                                borderWidth: 2
 				                            }
 				                        }
-				                    } */
+				                    } 
 				                ]
-				            });
+				            }); */
 
+							let linhaX_saidasA = document.getElementById('inputSaidasA').value;
+							let linhaX_saidasB = document.getElementById('inputSaidasB').value;
+							let linhaX_saidasC = document.getElementById('inputSaidasC').value;
 
+							linhaX_saidasB = parseFloat(linhaX_saidasB) + parseFloat(linhaX_saidasA);
+							linhaX_saidasC = parseFloat(linhaX_saidasC) + parseFloat(linhaX_saidasB);
 
-
-
-
-							var area_basic_element1 = document.getElementById('area_basic');
+							var area_basic_element1 = document.getElementById('area_basic1');
 
 				            // Initialize chart
 				            var area_basic1 = echarts.init(area_basic_element1);
-
 
 				            //
 				            // Chart config
 				            //
 
-				            // Options
-				            area_basic1.setOption({
+							// Options
+							area_basic1.setOption({
 
-				                // Define colors
-				                color: ['#f55246','#2ec7c9', '#5ab1ef','#ffb980','#d87a80'], //2ec7c9
+							// Define colors
+							color: ['#F55246', '#009688','#339EF4'],
 
-				                // Global text styles
-				                textStyle: {
-				                    fontFamily: 'Roboto, Arial, Verdana, sans-serif',
-				                    fontSize: 13
-				                },
+							// Global text styles
+							textStyle: {
+								fontFamily: 'Roboto, Arial, Verdana, sans-serif',
+								fontSize: 13
+							},
 
-				                // Chart animation duration
-				                animationDuration: 750,
+							// Chart animation duration
+							animationDuration: 750,
 
-				                // Setup grid
-				                grid: {
-				                    left: 0,
-				                    right: 40,
-				                    top: 35,
-				                    bottom: 0,
-				                    containLabel: true
-				                },
+							// Setup grid
+							grid: {
+								left: 0,
+								right: 40,
+								top: 35,
+								bottom: 0,
+								containLabel: true
+							},
 
-				                // Add legend
-				                legend: {
-				                    data: ['A', 'B', 'C'],
-				                    itemHeight: 8,
-				                    itemGap: 20
-				                },
+							// Add legend
+							legend: {
+								data: ['A', 'B', 'C'],
+								itemHeight: 8,
+								itemGap: 20
+							},
 
-				                // Add tooltip
-				                tooltip: {
-				                    trigger: 'axis',
-				                    backgroundColor: 'rgba(0,0,0,0.75)',
-				                    padding: [10, 15],
-				                    textStyle: {
-				                        fontSize: 13,
-				                        fontFamily: 'Roboto, sans-serif'
-				                    }
-				                },
+							// Add tooltip
+							tooltip: {
+								trigger: 'axis',
+								backgroundColor: 'rgba(0,0,0,0.75)',
+								padding: [10, 15],
+								textStyle: {
+									fontSize: 13,
+									fontFamily: 'Roboto, sans-serif'
+								}
+							},
 
-				                // Horizontal axis
-				                xAxis: [{
-				                    type: 'category',
-				                    boundaryGap: true,
-				                    data: ['000032', '000021', '000133', '000321', '000111', '000231', '000142', '000165'],
-				                    axisLabel: {
-				                        color: '#333'
-				                    },
-				                    axisLine: {
-				                        lineStyle: {
-				                            color: '#999'
-				                        }
-				                    },
-				                    splitLine: {
-				                        show: true,
-				                        lineStyle: {
-				                            color: '#eee',
-				                            type: 'dashed'
-				                        }
-				                    }
-				                }],
+							// Horizontal axis
+							xAxis: [{
+								type: 'category',
+								boundaryGap: false,
+								data: ['0', parseFloat(linhaX_saidasA).toFixed(2) + '%', parseFloat(linhaX_saidasB).toFixed(2) + '%', parseFloat(linhaX_saidasC).toFixed(2) + '%'],
+								axisLabel: {
+									color: '#333'
+								},
+								axisLine: {
+									lineStyle: {
+										color: '#999'
+									}
+								},
+								splitLine: {
+									show: true,
+									lineStyle: {
+										color: '#eee',
+										type: 'dashed'
+									}
+								}
+							}],
 
-				                // Vertical axis
-				                yAxis: [{
-				                    type: 'value',
-				                    axisLabel: {
-				                        color: '#333'
-				                    },
-				                    axisLine: {
-				                        lineStyle: {
-				                            color: '#999'
-				                        }
-				                    },
-				                    splitLine: {
-				                        lineStyle: {
-				                            color: '#eee'
-				                        }
-				                    },
-				                    splitArea: {
-				                        show: true,
-				                        areaStyle: {
-				                            color: ['rgba(250,250,250,0.1)', 'rgba(0,0,0,0.01)']
-				                        }
-				                    }
-				                }],
+							// Vertical axis
+							yAxis: [{
+								type: 'value',
+								axisLabel: {
+									color: '#333'
+								},
+								axisLine: {
+									lineStyle: {
+										color: '#999'
+									}
+								},
+								splitLine: {
+									lineStyle: {
+										color: '#eee'
+									}
+								},
+								splitArea: {
+									show: true,
+									areaStyle: {
+										color: ['rgba(250,250,250,0.1)', 'rgba(0,0,0,0.01)']
+									}
+								}
+							}],
 
-				                // Add series
-				                series: [
-									{
-				                        name: 'A',
-				                        type: 'line',
-				                        data: [0, 64, 74],
-				                        areaStyle: {
-				                            normal: {
-				                                opacity: 0.85
-				                            }
-				                        },
-				                        smooth: true,
-				                        symbolSize: 7,
-				                        itemStyle: {
-				                            normal: {
-				                                borderWidth: 2
-				                            }
-				                        }
-				                    },				                
-				                    {
-				                        name: 'B',
-				                        type: 'line',
-				                        smooth: true,
-				                        symbolSize: 7,
-				                        itemStyle: {
-				                            normal: {
-				                                borderWidth: 2
-				                            }
-				                        },
-				                        areaStyle: {
-				                            normal: {
-				                                opacity: 0.25
-				                            }
-				                        },
-				                        data: [0, 64, 74, 86, 91, 91, 91, 91]
-				                    },
-				                    {
-				                        name: 'C',
-				                        type: 'line',
-				                        smooth: true,
-				                        symbolSize: 7,
-				                        itemStyle: {
-				                            normal: {
-				                                borderWidth: 2
-				                            }
-				                        },
-				                        areaStyle: {
-				                            normal: {
-				                                opacity: 0.25
-				                            }
-				                        },
-				                        data: [0, 64, 74, 86, 91, 95, 98, 100]
-				                    }				                    				                    
-				                ]
-				            });
-
+							// Add series
+							series: [
+								{
+									name: 'A',
+									type: 'line',
+									data: [0, 33],
+									areaStyle: {
+										normal: {
+											opacity: 0.25
+										}
+									},
+									smooth: true,
+									symbolSize: 7,
+									itemStyle: {
+										normal: {
+											borderWidth: 2
+										}
+									}
+								},
+								{
+									name: 'B',
+									type: 'line',
+									smooth: true,
+									symbolSize: 7,
+									itemStyle: {
+										normal: {
+											borderWidth: 2
+										}
+									}
+									data: [33, 51],
+									areaStyle: {
+										normal: {
+											opacity: 0.25
+										}
+									}									
+								},
+								{
+									name: 'C',
+									type: 'line',
+									smooth: true,
+									symbolSize: 7,
+									itemStyle: {
+										normal: {
+											borderWidth: 2
+										}
+									},
+									areaStyle: {
+										normal: {
+											opacity: 0.25
+										}
+									},
+									data: [85, 99.47, 99.75, 100]
+								}
+							]
+							});
 					        //
 					        // Resize charts
 					        //
@@ -782,14 +781,14 @@ $dataFim = date('Y-m-d');
 				<!-- Info blocks -->		
 				<div class="row" id="resultado">
 
-
-
 				</div>				
 				<!-- /info blocks -->
 
 				<div class="card" id="grafico">
 					<div class="card-body">
-						<div class="chart has-fixed-height" id="line_basic1"></div>
+						<div class="chart-container">
+							<div class="chart has-fixed-height" id="area_basic1"></div>
+						</div>
 					</div>
 				</div>
 			</div>

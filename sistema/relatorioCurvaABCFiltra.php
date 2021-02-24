@@ -133,8 +133,8 @@ function queryPesquisa()
 			';
 
 		$fTotalUnit = 0;
-		$iTotalSaidas = 1;  //Deveria ser 0 (coloquei 1 por enquanto para não ocorrer divisão por zero)
-		$fTotalGeral = 1;	//Deveria ser 0 (coloquei 1 por enquanto para não ocorrer divisão por zero)
+		$iTotalSaidas = 0;  //Deveria ser 0 (coloquei 1 por enquanto para não ocorrer divisão por zero)
+		$fTotalGeral = 0;	//Deveria ser 0 (coloquei 1 por enquanto para não ocorrer divisão por zero)
      
 		foreach ($rowData as $item) {
 
@@ -156,17 +156,15 @@ function queryPesquisa()
 		foreach ($rowData as $item) {
 			
 			$fPorcentagem = $item['ValorTotal'] / $fTotalGeral * 100;
-			$fTotalPorcentagem += round($fPorcentagem, 2);
+			$fTotalPorcentagem += $fPorcentagem;
 			$fAcumulada += $fPorcentagem;
 			$fTotalAcumulada = $fAcumulada;
 
-			echo $fPorcentagem . " - ";
-
-			if ($fAcumulada < 85){
+			if ($fAcumulada < 80){
 				$cor = 'background-color:#fde1df; padding: 10px 20px 10px 20px; border: 1px solid #f55246; color:#7f231c;'; //color:#5b071d
 				$classificacao = 'A';
 				$saidasA += $item['Saidas'];
-			} else if ($fAcumulada > 85 and $fAcumulada < 95){
+			} else if ($fAcumulada > 80 and $fAcumulada < 95){
 				$cor = 'background-color:#e0f2f1; padding: 10px 20px 10px 20px; border: 1px solid #009688; color: #00695c;'; //color: #8e6d08
 				$classificacao = 'B';
 				$saidasB += $item['Saidas'];
@@ -209,7 +207,15 @@ function queryPesquisa()
 		$resultado .= '				
 							</tbody>
 						</table>
-					</div>
+					</div>';
+
+		$resultado .= '
+			<input type="hidden" id="inputSaidasA" value="'.$totalSaidasA.'" >
+			<input type="hidden" id="inputSaidasB" value="'.$totalSaidasB.'" >
+			<input type="hidden" id="inputSaidasC" value="'.$totalSaidasC.'" >
+		';			
+
+		$resultado .= '
 
 					<!--
 					<div class="tab-pane fade" id="card-tab2">
