@@ -154,11 +154,13 @@ function queryPesquisa()
 		$totalSaidasC = 0;
 
 		foreach ($rowData as $item) {
-
+			
 			$fPorcentagem = $item['ValorTotal'] / $fTotalGeral * 100;
-			$fTotalPorcentagem += $fPorcentagem;
+			$fTotalPorcentagem += round($fPorcentagem, 2);
 			$fAcumulada += $fPorcentagem;
 			$fTotalAcumulada = $fAcumulada;
+
+			echo $fPorcentagem . " - ";
 
 			if ($fAcumulada < 85){
 				$cor = 'background-color:#fde1df; padding: 10px 20px 10px 20px; border: 1px solid #f55246; color:#7f231c;'; //color:#5b071d
