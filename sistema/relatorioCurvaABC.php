@@ -99,6 +99,10 @@ $dataFim = date('Y-m-d');
 	<script src="global_assets/js/demo_pages/charts/echarts/areas.js"></script>
 	<!-- /theme JS files -->	
 	
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@4/map/js/china.js?_v_=1611323308745"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@4/map/js/world.js?_v_=1611323308745"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@4/dist/extension/bmap.js?_v_=1611323308745"></script>
+
 	<script type="text/javascript">
 		
 		$(document).ready(function() {	
@@ -375,6 +379,10 @@ $dataFim = date('Y-m-d');
 							linhaX_saidasB = parseFloat(linhaX_saidasB) + parseFloat(linhaX_saidasA);
 							linhaX_saidasC = parseFloat(linhaX_saidasC) + parseFloat(linhaX_saidasB);
 
+							let saidasA_meio = parseFloat(linhaX_saidasA) / 2;
+							let saidasB_meio = (parseFloat(linhaX_saidasB) - parseFloat(linhaX_saidasA))/2 + parseFloat(linhaX_saidasA);
+							let saidasC_meio = (parseFloat(linhaX_saidasC) - parseFloat(linhaX_saidasB))/2 + parseFloat(linhaX_saidasB);
+
 							var area_basic_element1 = document.getElementById('area_basic1');
 
 				            // Initialize chart
@@ -423,14 +431,21 @@ $dataFim = date('Y-m-d');
 								textStyle: {
 									fontSize: 13,
 									fontFamily: 'Roboto, sans-serif'
-								}
+								},
+								formatter: "{a}<br/>{c} (%)",  // ao passar o mouse ele mostra (https://echarts.apache.org/en/option.html#tooltip.formatter)
+								axisPointer: {  // CV: adicionei para o cursor ficar marcando a medida que eu passo o mouse no gráfico
+									type: 'cross',
+									label: {
+										backgroundColor: '#6a7985'
+									}
+								}								
 							},
 
 							// Horizontal axis
 							xAxis: [{
-								type: 'category',
+								type: 'value',  //category (esse não funciona sequencialmente, daí passei para value)
 								boundaryGap: false,
-								data: ['0', parseFloat(linhaX_saidasA).toFixed(2) + '%', parseFloat(linhaX_saidasB).toFixed(2) + '%', parseFloat(linhaX_saidasC).toFixed(2) + '%'],
+								data: ['0', parseFloat(linhaX_saidasA).toFixed(2) + '(%)', parseFloat(linhaX_saidasB).toFixed(2) + '%', parseFloat(linhaX_saidasC).toFixed(2) + '%'],
 								axisLabel: {
 									color: '#333'
 								},
@@ -477,7 +492,11 @@ $dataFim = date('Y-m-d');
 								{
 									name: 'A',
 									type: 'line',
-									data: [0, 33],
+									data: [
+											[0, 0], 
+											[parseFloat(saidasA_meio).toFixed(2), 50],
+											[parseFloat(linhaX_saidasA).toFixed(2), 80]
+										  ], // 0, 33
 									areaStyle: {
 										normal: {
 											opacity: 0.25
@@ -500,8 +519,12 @@ $dataFim = date('Y-m-d');
 										normal: {
 											borderWidth: 2
 										}
-									}
-									data: [33, 51],
+									},
+									data: [
+											[parseFloat(linhaX_saidasA).toFixed(2), 80], 
+											[parseFloat(saidasB_meio).toFixed(2), 89], // O 89 não precisa mexer
+											[parseFloat(linhaX_saidasB).toFixed(2), 95]
+										  ],	  // 33, 51
 									areaStyle: {
 										normal: {
 											opacity: 0.25
@@ -523,7 +546,11 @@ $dataFim = date('Y-m-d');
 											opacity: 0.25
 										}
 									},
-									data: [85, 99.47, 99.75, 100]
+									data: [
+											[parseFloat(linhaX_saidasB).toFixed(2), 95],
+											[parseFloat(saidasC_meio).toFixed(2), 98], // O 98 não precisa mexer.
+											[100, 100]
+									]
 								}
 							]
 							});
