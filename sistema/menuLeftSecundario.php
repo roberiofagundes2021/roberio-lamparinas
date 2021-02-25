@@ -97,6 +97,7 @@
 									<?php 
 										$sql = "SELECT EXUXPUsuario
 												FROM EmpresaXUsuarioXPerfil
+												JOIN Situacao on SituaId =  EXUXPStatus
 												WHERE EXUXPEmpresa = ".$_SESSION['EmpresaId']."
 												";
 										$result = $conn->query($sql);
