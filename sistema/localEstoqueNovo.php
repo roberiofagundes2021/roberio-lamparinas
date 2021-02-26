@@ -77,7 +77,7 @@ if(isset($_POST['inputNome'])){
 				e.preventDefault();
 				
 				var inputNome  = $('#inputNome').val();
-				var cmdUnidade  = $('#cmbUnidade').val();
+				var cmbUnidade  = $('#cmbUnidade').val();
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
