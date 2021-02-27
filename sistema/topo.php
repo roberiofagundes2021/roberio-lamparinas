@@ -37,8 +37,8 @@
 <!-- Main navbar -->
 <div class="navbar navbar-expand-md navbar-dark bg-black fixed-top">
 	<div class="navbar-brand">
-		<span style="color:#fff; font-size: 12px;"><?php echo $_SESSION['EmpreNomeFantasia'] ?> | </span> 
-		<span style="color:#fff; font-size: 11px;">Unidade: <?php echo $_SESSION['UnidadeNome'] ?> <span>
+		<span style="color:#fff; font-size: 13px;"><?php echo $_SESSION['EmpreNomeFantasia'] ?> | </span> 
+		<span style="color:#fff; font-size: 12px;">Unidade: <?php echo $_SESSION['UnidadeNome'] ?> <span>
 		<!--<a href="index.html" class="d-inline-block">
 				<img src="global_assets/images/logo_light.png" alt="">
 			</a>-->
