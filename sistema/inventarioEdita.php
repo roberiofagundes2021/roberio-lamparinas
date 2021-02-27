@@ -18,15 +18,16 @@ if (isset($_POST['inputInventarioId'])) {
 				FROM Inventario
 				JOIN Usuario on UsuarId = InvenSolicitante
 				WHERE InvenId = $iInventario ";
-		$result = $conn->query("$sql");
+		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 
 		//Locais do inventário
-		$sql = ("SELECT LcEstId, LcEstNome
-				 FROM LocalEstoque
-				 JOIN InventarioXLocalEstoque on InXLELocal = LcEstId
-				 WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and InXLEInventario = " . $iInventario . " and LcEstStatus = 1
-				 ORDER BY LcEstNome ASC");
+		$sql = "SELECT LcEstId, LcEstNome
+				FROM LocalEstoque
+				JOIN InventarioXLocalEstoque on InXLELocal = LcEstId
+				JOIN Situacao on SituaId = LcEstStatus
+				WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and InXLEInventario = " . $iInventario . " and SituaChave = 'ATIVO'
+				ORDER BY LcEstNome ASC";
 		$result = $conn->query("$sql");
 		$rowBDLocal = $result->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($rowBDLocal as $item) {
@@ -36,7 +37,8 @@ if (isset($_POST['inputInventarioId'])) {
 		$sql = "SELECT SetorId, SetorNome
 				 FROM Setor
 				 JOIN InventarioXSetor on InXSeSetor = SetorId
-				 WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . " and InXSeInventario = " . $iInventario . " and SetorStatus = 1
+				 JOIN Situacao on SituaId = SetorStatus
+				 WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . " and InXSeInventario = " . $iInventario . " and SituaChave = 'ATIVO'
 				 ORDER BY SetorNome ASC";
 		$result = $conn->query($sql);
 		$rowBDSetor = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -45,13 +47,14 @@ if (isset($_POST['inputInventarioId'])) {
 		}
 
 		//Equipe do inventário
-		$sql = ("SELECT UsuarId, UsuarLogin
-				 FROM Usuario
-				 JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
-				 JOIN InventarioXEquipe on InXEqUsuario = UsuarId
-				 WHERE EXUXPEmpresa = " . $_SESSION['EmpreId'] . " and InXEqInventario =  " . $iInventario . " and EXUXPStatus = 1
-				 ORDER BY UsuarLogin ASC");
-		$result = $conn->query("$sql");
+		$sql = "SELECT UsuarId, UsuarLogin
+				FROM Usuario
+				JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+				JOIN InventarioXEquipe on InXEqUsuario = UsuarId
+				JOIN Situacao on SituaId = EXUXPStatus
+				WHERE EXUXPEmpresa = " . $_SESSION['EmpreId'] . " and InXEqInventario =  " . $iInventario . " and SituaChave = 'ATIVO'
+				ORDER BY UsuarLogin ASC";
+		$result = $conn->query($sql);
 		$rowBDEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$aEquipes = '';
@@ -392,10 +395,11 @@ if (isset($_POST['inputData'])) {
 									<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 										<option value="#">Selecione</option>
 										<?php
-										$sql = ("SELECT CategId, CategNome
-													 FROM Categoria
-													 WHERE CategStatus = 1 and CategEmpresa = " . $_SESSION['EmpreId'] . "
-													 ORDER BY CategNome ASC");
+										$sql = "SELECT CategId, CategNome
+												FROM Categoria
+												JOIN Situacao on SituaId = CategStatus
+												WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+												ORDER BY CategNome ASC";
 										$result = $conn->query("$sql");
 										$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -431,11 +435,12 @@ if (isset($_POST['inputData'])) {
 										<label for="cmbLocalEstoque">Locais do Estoque<span class="text-danger"> *</span></label>
 										<select id="cmbLocalEstoque" name="cmbLocalEstoque[]" class="form-control multiselect" multiple="multiple" data-fouc required>
 											<?php
-											$sql = ("SELECT LcEstId, LcEstNome
-														 FROM LocalEstoque														 
-														 WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and LcEstUnidade = " . $row['InvenUnidade'] . " and LcEstStatus = 1
-														 ORDER BY LcEstNome ASC");
-											$result = $conn->query("$sql");
+											$sql = "SELECT LcEstId, LcEstNome
+													FROM LocalEstoque
+													JOIN Situacao on SituaId = LcEstStatus
+													WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and LcEstUnidade = " . $row['InvenUnidade'] . " and SituaChave = 'ATIVO'
+													ORDER BY LcEstNome ASC";
+											$result = $conn->query($sql);
 											$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
 											$count = count($rowLocal);
 
@@ -456,9 +461,10 @@ if (isset($_POST['inputData'])) {
 											<option value="">Todos</option>
 											<?php
 											$sql = "SELECT SetorId, SetorNome
-													 FROM Setor
-													 WHERE SetorStatus = 1 and SetorEmpresa = " . $_SESSION['EmpreId'] . "
-													 ORDER BY SetorNome ASC";
+													FROM Setor
+													JOIN Situacao on SituaId = SetorStatus
+													WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+													ORDER BY SetorNome ASC";
 											$result = $conn->query($sql);
 											$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
 											$count = count($rowSetor);
@@ -493,12 +499,13 @@ foreach ($rowSetor as $key => $item) {
 										<label for="cmbEquipe">Equipe Responsável<span class="text-danger"> *</span></label>
 										<select id="cmbEquipe" name="cmbEquipe[]" class="form-control select" multiple="multiple" data-fouc required>
 											<?php
-											$sql = ("SELECT UsuarId, UsuarLogin
-														 FROM Usuario
-														 JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
-														 WHERE EXUXPEmpresa = " . $_SESSION['EmpreId'] . " and EXUXPStatus = 1
-														 ORDER BY UsuarLogin ASC");
-											$result = $conn->query("$sql");
+											$sql = "SELECT UsuarId, UsuarLogin
+													FROM Usuario
+													JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+													JOIN Situacao on SituaId = EXUXPStatus
+													WHERE EXUXPEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+													ORDER BY UsuarLogin ASC";
+											$result = $conn->query($sql);
 											$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
 
 											foreach ($rowEquipe as $item) {
@@ -517,10 +524,11 @@ foreach ($rowSetor as $key => $item) {
 										<select id="cmbPresidente" name="cmbPresidente" class="form-control form-control-select2">
 											<?php
 											$sql = "SELECT UsuarId, UsuarLogin
-														 FROM Usuario
-														 JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
-														 WHERE EXUXPEmpresa = " . $_SESSION['EmpreId'] . " and EXUXPUsuario in (" . $aEquipes . ") and EXUXPStatus = 1";
-											$result = $conn->query("$sql");
+													FROM Usuario
+													JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+													JOIN Situacao on SituaId = EXUXPStatus
+													WHERE EXUXPEmpresa = " . $_SESSION['EmpreId'] . " and EXUXPUsuario in (" . $aEquipes . ") and SituaChave = 'ATIVO'";
+											$result = $conn->query($sql);
 											$rowPresidente = $result->fetchAll(PDO::FETCH_ASSOC);
 
 											foreach ($rowPresidente as $item) {

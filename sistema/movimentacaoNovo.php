@@ -2138,10 +2138,10 @@ if (isset($_POST['inputData'])) {
 													<?php
 
 													$sql = "SELECT EXUXPLocalEstoque, SetorNome
-																 FROM EmpresaXUsuarioXPerfil
-																 JOIN Setor on SetorId = EXUXPSetor
-																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
-															    ";
+															FROM EmpresaXUsuarioXPerfil
+															JOIN Setor on SetorId = EXUXPSetor
+															WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+														";
 													$result = $conn->query($sql);
 													$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
