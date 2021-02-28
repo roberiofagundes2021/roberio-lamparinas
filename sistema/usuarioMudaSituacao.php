@@ -20,8 +20,8 @@ if(isset($_POST['inputUsuarioId'])){
 	try{
 
 		$sql = "SELECT SituaId
-		            FROM Situacao
-		            WHERE SituaChave = '$sStatus'";
+				FROM Situacao
+				WHERE SituaChave = '$sStatus'";
 		$result = $conn->query($sql);
 		$situacao = $result->fetch(PDO::FETCH_ASSOC);
 		$iStatus = $situacao['SituaId'];

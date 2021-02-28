@@ -16,8 +16,8 @@ if (isset($_POST['inputUsuarioId'])) {
 
 	$iUsuario = $_POST['inputUsuarioId'];
 
-	$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, 
-			EXUXPPerfil, EXUXPUnidade, EXUXPSetor, EXUXPLocalEstoque
+	$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, 
+			UsuarEmail, UsuarTelefone, UsuarCelular, EXUXPPerfil
 			FROM Usuario
 			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 			WHERE UsuarId = $iUsuario and EXUXPEmpresa = $EmpresaId ";
@@ -72,16 +72,12 @@ if (isset($_POST['inputCpf'])) {
 			':iUsuario' => $_POST['inputUsuarioId']
 		));
 
-		$sql = "UPDATE EmpresaXUsuarioXPerfil SET EXUXPPerfil = :iPerfil, EXUXPUnidade = :iUnidade, 
-												  EXUXPSetor = :iSetor, EXUXPLocalEstoque = :iLocalEstoque, EXUXPUsuarioAtualizador = :iUsuarioAtualizador
+		$sql = "UPDATE EmpresaXUsuarioXPerfil SET EXUXPPerfil = :iPerfil, EXUXPUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE EXUXPUsuario = :iUsuario and EXUXPEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 			':iPerfil' => $_POST['cmbPerfil'] == '' ? null : $_POST['cmbPerfil'],
-			':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
-			':iSetor' => $_POST['cmbSetor'] == '' ? null : $_POST['cmbSetor'],
-			':iLocalEstoque' => $_POST['cmbLocalEstoque'] == '' || $_POST['cmbPerfil'] != $rowPerfilId['PerfiId'] ? null : $_POST['cmbLocalEstoque'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iUsuario' => $_POST['inputUsuarioId'],
 			':iEmpresa' => $EmpresaId
@@ -422,97 +418,7 @@ include_once("topo.php");
 								</div>
 							</div>
 						</div>
-
-						<h5 class="mb-0 font-weight-semibold">Lotação</h5>
-						<br>
-						<div class="row">
-							<div class="col-lg-12">
-								<div class="row">
-									<div class="col-lg-6">
-										<div class="form-group">
-											<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
-											<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
-												<option value="">Informe uma unidade</option>
-												<?php
-												$sql = "SELECT UnidaId, UnidaNome
-														FROM Unidade															     
-														JOIN Situacao on SituaId = UnidaStatus															     
-														WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
-														ORDER BY UnidaNome ASC";
-												$result = $conn->query($sql);
-												$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
-
-												foreach ($rowUnidade as $item) {
-													if ($item['UnidaId'] == $row['EXUXPUnidade']) {
-														print('<option value="' . $item['UnidaId'] . '" selected="selected">' . $item['UnidaNome'] . '</option>');
-													} else {
-														print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
-													}
-												}
-
-												?>
-											</select>
-										</div>
-									</div>
-
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
-											<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
-												<option value="">Informe um setor</option>
-												<?php
-												$sql = "SELECT SetorId, SetorNome
-														FROM Setor
-														JOIN Situacao on SituaId = SetorStatus															     															     
-														WHERE SetorEmpresa = " . $EmpresaId . " and SetorUnidade = ". $row['EXUXPUnidade']." and SituaChave = 'ATIVO'
-														ORDER BY SetorNome ASC";
-												$result = $conn->query($sql);
-												$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
-
-												foreach ($rowSetor as $item) {
-													if ($item['SetorId'] == $row['EXUXPSetor']) {
-														print('<option value="' . $item['SetorId'] . '" selected="selected">' . $item['SetorNome'] . '</option>');
-													} else {
-														print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
-													}
-												}
-
-												?>
-											</select>
-										</div>
-									</div>
-
-									<div class="col-lg-3" id="LocalEstoque" <?php if ($rowPerf['PerfiChave'] != 'ALMOXARIFADO') echo 'style="display: none"'; ?>>
-										<div class="form-group">
-											<label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
-											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" <?php if ($rowPerf['PerfiChave'] == 'ALMOXARIFADO') echo 'required'; ?>>
-												<option value="">Informe um Local de Estoque</option>
-												<?php
-												$sql = "SELECT LcEstId, LcEstNome
-														FROM LocalEstoque
-														JOIN Situacao on SituaId = LcEstStatus															     															     
-														WHERE LcEstUnidade = " . $row['EXUXPUnidade'] . " and SituaChave = 'ATIVO'
-														ORDER BY LcEstNome ASC";
-												$result = $conn->query($sql);
-												$rowLcEst = $result->fetchAll(PDO::FETCH_ASSOC);
-
-												foreach ($rowLcEst as $item) {
-													if ($item['LcEstId'] == $row['EXUXPLocalEstoque']) {
-														print('<option value="' . $item['LcEstId'] . '" selected="selected">' . $item['LcEstNome'] . '</option>');
-													} else {
-														print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
-													}
-												}
-
-												?>
-											</select>
-										</div>
-									</div>
-
-								</div>
-							</div>
-						</div>
-
+						
 						<div class="row" style="margin-top: 20px;">
 							<div class="col-lg-12">
 								<div class="form-group">

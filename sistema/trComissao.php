@@ -221,11 +221,12 @@ if(isset($_POST['cmbUsuario'])){
 												<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT UsuarId, UsuarLogin
-																FROM Usuario
-																JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
-																JOIN Situacao on SituaId = EXUXPStatus
-																WHERE EXUXPUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY UsuarLogin ASC";
+															FROM Usuario
+															JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+															JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+															JOIN Situacao on SituaId = EXUXPStatus
+															WHERE UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															ORDER BY UsuarLogin ASC";
 													$result = $conn->query($sql);
 													$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
 

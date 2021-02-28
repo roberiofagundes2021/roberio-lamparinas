@@ -37,17 +37,13 @@ if (isset($_POST['inputCpf'])) {
 			$LAST_ID = $conn->lastInsertId();
 
 
-			$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPUnidade, 
-														EXUXPSetor, EXUXPLocalEstoque, EXUXPStatus, EXUXPUsuarioAtualizador)
-					VALUES (:iEmpresa, :iUsuario, :iPerfil, :iUnidade, :iSetor, :iLocalEstoque, :bStatus, :iUsuarioAtualizador)";
+			$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPStatus, EXUXPUsuarioAtualizador)
+					VALUES (:iEmpresa, :iUsuario, :iPerfil, :bStatus, :iUsuarioAtualizador)";
 			$result = $conn->prepare($sql);
 			$result->execute(array(
 				':iEmpresa' => $EmpresaId,
 				':iUsuario' => $LAST_ID,
 				':iPerfil' => $_POST['cmbPerfil'],
-				':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
-				':iSetor' => $_POST['cmbSetor'] == '' ? null : $_POST['cmbSetor'],
-				':iLocalEstoque' => $_POST['cmbLocalEstoque'] == '' ? null : $_POST['cmbLocalEstoque'],
 				':bStatus' => 1,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId']
 			));
@@ -68,17 +64,13 @@ if (isset($_POST['inputCpf'])) {
 				':iUsuario' =>  $_POST['inputId']
 			));
 
-			$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPUnidade, 
-														EXUXPSetor, EXUXPLocalEstoque, EXUXPStatus, EXUXPUsuarioAtualizador)
-					VALUES (:iEmpresa, :iUsuario, :iPerfil, :iUnidade, :iSetor, :iLocalEstoque, :bStatus, :iUsuarioAtualizador)";
+			$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPStatus, EXUXPUsuarioAtualizador)
+					VALUES (:iEmpresa, :iUsuario, :iPerfil, :bStatus, :iUsuarioAtualizador)";
 			$result = $conn->prepare($sql);
 			$result->execute(array(
 				':iEmpresa' => $EmpresaId,
 				':iUsuario' => $_POST['inputId'],
 				':iPerfil' => $_POST['cmbPerfil'] == '' ? null : $_POST['cmbPerfil'],
-				':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
-				':iSetor' => $_POST['cmbSetor'] == '' ? null : $_POST['cmbSetor'],
-				':iLocalEstoque' => $_POST['cmbLocalEstoque'] == '' ? null : $_POST['cmbLocalEstoque'],
 				':bStatus' => 1,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId']
 			));
@@ -495,56 +487,6 @@ include_once("topo.php");
 												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
 											</div>
 										</div>
-									</div>
-								</div>
-							</div>
-
-							<h5 class="mb-0 font-weight-semibold">Lotação</h5>
-							<br>
-							<div class="row">
-								<div class="col-lg-12">
-									<div class="row">
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
-												<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
-													<option value="">Informe uma unidade</option>
-													<?php
-													$sql = "SELECT UnidaId, UnidaNome
-															FROM Unidade
-															JOIN Situacao on SituaId = UnidaStatus															     
-															WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
-															ORDER BY UnidaNome ASC";
-													$result = $conn->query($sql);
-													$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowUnidade as $item) {
-														print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
-													}
-
-													?>
-												</select>
-											</div>
-										</div>
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
-												<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
-													<option value="">Sem setor</option>
-												</select>
-											</div>
-										</div>
-
-										<div class="col-lg-3" id="LocalEstoque" style="display: none">
-											<div class="form-group">
-												<label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
-												<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
-													<option value="">Local de Estoque</option>
-												</select>
-											</div>
-										</div>
-
 									</div>
 								</div>
 							</div>

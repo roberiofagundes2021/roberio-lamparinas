@@ -398,15 +398,16 @@ if (isset($_POST['inputData'])) {
 									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2"
 										required>
 										<?php
-										$sql = "SELECT EXUXPUnidade, UnidaNome
+										$sql = "SELECT UsXUnUnidade, UnidaNome
 												FROM EmpresaXUsuarioXPerfil
-												JOIN Unidade on UnidaId = EXUXPUnidade
-												WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+												JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+												JOIN Unidade on UnidaId = UsXUnUnidade
+												WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . "
 												";
 										$result = $conn->query($sql);
 										$usuarioUnidade = $result->fetch(PDO::FETCH_ASSOC);
 
-										print('<option value="' . $usuarioUnidade['EXUXPUnidade'] . '" selected>' . $usuarioUnidade['UnidaNome'] . '</option>');
+										print('<option value="' . $usuarioUnidade['UsXUnUnidade'] . '" selected>' . $usuarioUnidade['UnidaNome'] . '</option>');
 										?>
 									</select>
 								</div>
@@ -473,8 +474,9 @@ if (isset($_POST['inputData'])) {
 											$sql = "SELECT UsuarId, UsuarLogin
 													FROM Usuario
 													JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+													JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
 													JOIN Situacao on SituaId = EXUXPStatus
-													WHERE EXUXPUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+													WHERE UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 													ORDER BY UsuarLogin ASC";
 											$result = $conn->query($sql);
 											$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);

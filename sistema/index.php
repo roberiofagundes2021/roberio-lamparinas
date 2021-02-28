@@ -22,16 +22,17 @@ if (isset($_POST['cmbPerfil'])) {
 /* AGUARDANDOLIBERACAO */
 $sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, 
 		SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, OrComNumero, OrComSituacao, OrComTipo, MovimTipo, 
-		EXUXPSetor as SetorAtual, BandeSolicitanteSetor as SetorQuandoSolicitou
+		UsXUnSetor as SetorAtual, BandeSolicitanteSetor as SetorQuandoSolicitou
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+		JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
 		LEFT JOIN Movimentacao on MovimId = BandeTabelaId		
 		JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-		WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . " and 
+		WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and 
 		SituaChave = 'AGUARDANDOLIBERACAO' and BnXPePerfil in (" . $idPerfilLogado . ")
 		ORDER BY BandeData DESC, BandeId DESC";
 //echo $sql;die;		
@@ -55,12 +56,13 @@ $sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL,
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+		JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
 		LEFT JOIN Movimentacao on MovimId = BandeTabelaId		
 		JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADO' and BnXPePerfil in (" . $idPerfilLogado . ")
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADO' and BnXPePerfil in (" . $idPerfilLogado . ")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -81,12 +83,13 @@ $sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL,
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+		JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
 		LEFT JOIN Movimentacao on MovimId = BandeTabelaId		
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'NAOLIBERADO' and BnXPePerfil in (" . $idPerfilLogado . ")
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'NAOLIBERADO' and BnXPePerfil in (" . $idPerfilLogado . ")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowNaoLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
