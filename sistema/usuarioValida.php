@@ -11,17 +11,18 @@ if (isset($_SESSION['EmpresaId'])){
 }
 
 if(isset($_POST['nomeVelho'])){
-	$sql = ("SELECT UsuarId
-			 FROM Usuario
-			 WHERE UsuarEmpresa = ".$_SESSION['EmpreId']." and UsuarNome = '". $_POST['nomeNovo']."' and UsuarNome <> '". $_POST['nomeVelho']."'");
+	$sql = "SELECT UsuarId
+			FROM Usuario
+			WHERE UsuarEmpresa = ".$_SESSION['EmpreId']." and UsuarNome = '". $_POST['nomeNovo']."' and UsuarNome <> '". $_POST['nomeVelho']."'";
 } else{
-	$sql = ("SELECT UsuarId, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, 
-					EXUXPEmpresa, EXUXPPerfil, EXUXPUnidade, EXUXPSetor
-			 FROM Usuario
-			 JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
-			 WHERE UsuarCpf = '". $_GET['cpf']."'");
+	$sql = "SELECT UsuarId, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, 
+				   EXUXPEmpresa, EXUXPPerfil, UsXUnUnidade, UsXUnSetor
+			FROM Usuario
+			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+			JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+			WHERE UsuarCpf = '". $_GET['cpf']."'";
 			 
-	$result = $conn->query("$sql");
+	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
 	$count = count($row);
 	

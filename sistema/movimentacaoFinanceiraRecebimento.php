@@ -610,7 +610,7 @@ $dataInicio = date("Y-m-d");
                     <div class="col-lg-2">
                       <div class="form-group">
                         <label for="inputDataEmissao">Data de Emissão <span class="text-danger">*</span></label>          
-                        <input type="text" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
+                        <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>"  readOnly>
                      </div>
                     </div>
 
@@ -636,23 +636,24 @@ $dataInicio = date("Y-m-d");
                         <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" required>
                           <option value="">Selecionar</option>
                           <?php
-                              $sql = "SELECT PlConId, PlConNome
+                              $sql = "SELECT PlConId, PlConCodigo, PlConNome
 												        			FROM PlanoContas
 												        			JOIN Situacao on SituaId = PlConStatus
-												        			WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-												        			ORDER BY PlConNome ASC";
+                                      JOIN CentroCusto on CnCusId = PlConCentroCusto
+												        			WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and CnCusTipo = 'R'
+												        			ORDER BY PlConCodigo ASC";
                               $result = $conn->query($sql);
                               $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
                               foreach ($rowPlanoContas as $item) {
                                   if (isset($lancamento)) {
                                       if ($lancamento['CnARePlanoContas'] == $item['PlConId']) {
-                                          print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConNome'] . '</option>');
+                                          print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                       } else {
-                                          print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                          print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                       }
                                   } else {
-                                      print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                      print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                   }
                               }
                             ?>

@@ -353,10 +353,10 @@ if (isset($_POST['inputData'])) {
 											<option value="#">Selecione</option>
 											<?php
 											$sql = "SELECT ClassId, ClassNome
-														FROM Classificacao
-														JOIN Situacao on SituaId = ClassStatus
-														WHERE SituaChave = 'ATIVO'
-														ORDER BY ClassNome ASC";
+													FROM Classificacao
+													JOIN Situacao on SituaId = ClassStatus
+													WHERE SituaChave = 'ATIVO'
+													ORDER BY ClassNome ASC";
 											$result = $conn->query($sql);
 											$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -398,15 +398,16 @@ if (isset($_POST['inputData'])) {
 									<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2"
 										required>
 										<?php
-										$sql = "SELECT EXUXPUnidade, UnidaNome
-													FROM EmpresaXUsuarioXPerfil
-													JOIN Unidade on UnidaId = EXUXPUnidade
-													WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
-													";
+										$sql = "SELECT UsXUnUnidade, UnidaNome
+												FROM EmpresaXUsuarioXPerfil
+												JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+												JOIN Unidade on UnidaId = UsXUnUnidade
+												WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . "
+												";
 										$result = $conn->query($sql);
 										$usuarioUnidade = $result->fetch(PDO::FETCH_ASSOC);
 
-										print('<option value="' . $usuarioUnidade['EXUXPUnidade'] . '" selected>' . $usuarioUnidade['UnidaNome'] . '</option>');
+										print('<option value="' . $usuarioUnidade['UsXUnUnidade'] . '" selected>' . $usuarioUnidade['UnidaNome'] . '</option>');
 										?>
 									</select>
 								</div>
@@ -419,10 +420,10 @@ if (isset($_POST['inputData'])) {
 											class="form-control multiselect" multiple="multiple" data-fouc>
 											<?php
 											$sql = "SELECT LcEstId, LcEstNome
-														FROM LocalEstoque
-														JOIN Situacao on SituaId = LcEstStatus														     
-														WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-														ORDER BY LcEstNome ASC";
+													FROM LocalEstoque
+													JOIN Situacao on SituaId = LcEstStatus														     
+													WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+													ORDER BY LcEstNome ASC";
 											$result = $conn->query($sql);
 											$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -442,10 +443,10 @@ if (isset($_POST['inputData'])) {
 											multiple="multiple" data-fouc="">
 											<?php
 											$sql = "SELECT SetorId, SetorNome
-														FROM Setor
-														JOIN Situacao on SituaId = SetorStatus
-														WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-														ORDER BY SetorNome ASC";
+													FROM Setor
+													JOIN Situacao on SituaId = SetorStatus
+													WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+													ORDER BY SetorNome ASC";
 											$result = $conn->query($sql);
 											$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -471,11 +472,12 @@ if (isset($_POST['inputData'])) {
 											multiple="multiple" data-fouc required>
 											<?php
 											$sql = "SELECT UsuarId, UsuarLogin
-														FROM Usuario
-														JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
-														JOIN Situacao on SituaId = EXUXPStatus
-														WHERE EXUXPUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-														ORDER BY UsuarLogin ASC";
+													FROM Usuario
+													JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+													JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+													JOIN Situacao on SituaId = EXUXPStatus
+													WHERE UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+													ORDER BY UsuarLogin ASC";
 											$result = $conn->query($sql);
 											$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
 

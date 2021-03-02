@@ -1092,7 +1092,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputDataEmissao">Data de Emissão</label>
-                                                <input type="text" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
+                                                <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>"  readOnly>
                                             </div>
                                         </div>
                                         <div class="col-lg-4">
@@ -1102,12 +1102,12 @@ $dataInicio = date("Y-m-d");
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     try {
-                                                        $sql = "SELECT PlConId, PlConNome
+                                                        $sql = "SELECT PlConId, PlConCodigo, PlConNome
                                                                   FROM PlanoContas
-                                                                  JOIN Situacao 
-                                                                    ON SituaId = PlConStatus
-                                                                 WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                              ORDER BY PlConNome ASC";
+                                                                  JOIN Situacao  ON SituaId = PlConStatus
+                                                                  JOIN CentroCusto on CnCusId = PlConCentroCusto
+                                                                 WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and SituaChave = 'ATIVO' and CnCusTipo = 'R'
+                                                              ORDER BY PlConCodigo ASC";
                                                         $result = $conn->query($sql);
                                                         $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1116,12 +1116,12 @@ $dataInicio = date("Y-m-d");
                                                             foreach ($rowPlanoContas as $item) {
                                                                 if (isset($lancamento)) {
                                                                     if ($lancamento['CnARePlanoContas'] == $item['PlConId']) {
-                                                                        print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConNome'] . '</option>');
+                                                                        print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                                                     } else {
-                                                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                                                     }
                                                                 } else {
-                                                                    print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                                    print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                                                 }
                                                             }
                                                         } catch (Exception $e) {

@@ -37,12 +37,13 @@
 <!-- Main navbar -->
 <div class="navbar navbar-expand-md navbar-dark bg-black fixed-top">
 	<div class="navbar-brand">
-		<span style="color:#fff; margin-top: 13px; font-size: 15px;">Painel Principal</span>
+		<span style="color:#fff; font-size: 13px;"><?php echo $_SESSION['EmpreNomeFantasia'] ?> | </span> 
+		<span style="color:#fff; font-size: 12px;">Unidade: <?php echo $_SESSION['UnidadeNome'] ?> <span>
 		<!--<a href="index.html" class="d-inline-block">
 				<img src="global_assets/images/logo_light.png" alt="">
 			</a>-->
 	</div>
-	<div class="navbar-nav">
+	<div class="navbar-nav" style="display:none;">
 		<ul class="navbar-nav">
 			<li class="nav-item dropdown">
 				<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">
@@ -86,7 +87,7 @@
 		<ul class="navbar-nav">
 			<li class="nav-item">
 				<a href="#" class="navbar-nav-link sidebar-control sidebar-main-toggle d-none d-md-block">
-					<i class="icon-paragraph-justify3"></i>
+					<i class="icon-drag-left"></i>
 				</a>
 			</li>
 		</ul>
@@ -99,7 +100,7 @@
 
 		<ul class="navbar-nav ml-md-auto">
 
-			<li class="nav-item dropdown">
+			<li class="nav-item dropdown" style="display:none;">
 				<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">
 					<i class="icon-people"></i>
 					<span class="d-md-none ml-2">Usuários</span>

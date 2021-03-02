@@ -2137,27 +2137,28 @@ if (isset($_POST['inputData'])) {
 													<option value="#">Selecione</option>
 													<?php
 
-													$sql = "SELECT EXUXPLocalEstoque, SetorNome
-																 FROM EmpresaXUsuarioXPerfil
-																 JOIN Setor on SetorId = EXUXPSetor
-																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
-															    ";
+													$sql = "SELECT UsXUnLocalEstoque, SetorNome
+															FROM EmpresaXUsuarioXPerfil
+															JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+															JOIN Setor on SetorId = UsXUnSetor
+															WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . "
+														";
 													$result = $conn->query($sql);
 													$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
 													$sql = "SELECT LcEstId, LcEstNome
-																FROM LocalEstoque
-																JOIN Situacao on SituaId = LcEstStatus
-																WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY LcEstNome ASC";
+															FROM LocalEstoque
+															JOIN Situacao on SituaId = LcEstStatus
+															WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															ORDER BY LcEstNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($row as $item) {
-														if ($item['LcEstId'] == $usuarioPerfil['EXUXPLocalEstoque']) {
+														if ($item['LcEstId'] == $usuarioPerfil['UsXUnLocalEstoque']) {
 															print('<option value="' . $item['LcEstId'] . '" selected>' . $item['LcEstNome'] . '</option>');
 														} else {
-															print('<option value="' . $item['LcEstId'] . '" "' . $usuarioPerfil['EXUXPLocalEstoque'] . '">' . $item['LcEstNome'] . '</option>');
+															print('<option value="' . $item['LcEstId'] . '" "' . $usuarioPerfil['UsXUnLocalEstoque'] . '">' . $item['LcEstNome'] . '</option>');
 														}
 													}
 
@@ -2224,15 +2225,16 @@ if (isset($_POST['inputData'])) {
 													<?php
 
 													if (isset($_POST['inputSolicitacaoId'])) {
-														$sql = "SELECT EXUXPSetor, SetorNome
-																 FROM EmpresaXUsuarioXPerfil
-																 JOIN Setor on SetorId = EXUXPSetor
-																 WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+														$sql = "SELECT SetorId, SetorNome
+																FROM EmpresaXUsuarioXPerfil
+																JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+																JOIN Setor on SetorId = UsXUnSetor
+																WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . "
 															    ";
 														$result = $conn->query($sql);
 														$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
-														print('<option value="' . $usuarioPerfil['EXUXPSetor'] . '" selected>' . $usuarioPerfil['SetorNome'] . '</option>');
+														print('<option value="' . $usuarioPerfil['SetorId'] . '" selected>' . $usuarioPerfil['SetorNome'] . '</option>');
 													} else {
 
 														$sql = "SELECT SetorId, SetorNome

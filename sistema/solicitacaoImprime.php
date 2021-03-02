@@ -28,7 +28,8 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $sql = "SELECT SetorId
 		FROM Setor
-		JOIN EmpresaXUsuarioXPerfil on EXUXPSetor = SetorId
+		JOIN UsuarioXUnidade on UsXUnSetor = SetorId
+		JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
 		WHERE SetorUnidade = ". $_SESSION['UnidadeId'] ." and EXUXPUsuario = ".$row['SolicSolicitante'];
 $result = $conn->query($sql);
 $rowSetorAtual = $result->fetch(PDO::FETCH_ASSOC);

@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Plano de Contas';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT PlConId, PlConNome, PlConStatus, CnCusNome, SituaNome, SituaCor, SituaChave
+$sql = "SELECT PlConId, PlConCodigo, PlConNome, PlConStatus, CnCusNome, SituaNome, SituaCor, SituaChave
 		FROM PlanoContas
 		JOIN CentroCusto on CnCusId = PlConCentroCusto
 		JOIN Situacao on SituaId = PlConStatus
@@ -50,23 +50,28 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [
 				{
 					orderable: true,   //Plano de Contas
-					width: "40%",
+					width: "10%",
 					targets: [0]
 				},	
 				{
-					orderable: true,   //Centro de Custo
-					width: "40%",
+					orderable: true,   //Plano de Contas
+					width: "35%",
 					targets: [1]
+				},	
+				{
+					orderable: true,   //Centro de Custo
+					width: "35%",
+					targets: [2]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "10%",
-					targets: [2]
+					targets: [3]
 				},
 				{ 
 					orderable: false,   //Ações
 					width: "10%",
-					targets: [3]
+					targets: [4]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -166,6 +171,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<table id="tblPlanoContas" class="table">
 								<thead>
 									<tr class="bg-slate">
+										<th>Código</th>
 										<th>Plano de Contas</th>
 										<th>Centro de Custo</th>
 										<th>Situação</th>
@@ -182,6 +188,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										print('
 										<tr>
+											<td>'.$item['PlConCodigo'].'</td>
 											<td>'.$item['PlConNome'].'</td>
 											<td>'.$item['CnCusNome'].'</td>
 											');

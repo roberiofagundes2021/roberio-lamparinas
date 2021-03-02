@@ -12,6 +12,7 @@ include('global_assets/php/conexao.php');
 $erro = array();
 $empresas = array();
 $piEmpresa = 0;
+$piUnidade = 0;
 
 // Se a pessoa preencheu o login
 if(isset($_POST['usuario'])){
@@ -24,6 +25,11 @@ if(isset($_POST['usuario'])){
 		$_SESSION['EmpreId'] = $piEmpresa;
 	}
 
+	if (isset($_POST['unidade'])){
+		$piUnidade = $_POST['unidade'];
+		$_SESSION['UnidadeId'] = $piUnidade;
+	}	
+
 	$_SESSION['UsuarLogin'] = $_POST['usuario'];
 	$_SESSION['UsuarSenha'] = $_POST['senha'];
 
@@ -32,20 +38,20 @@ if(isset($_POST['usuario'])){
 
 	$sql = "SELECT Top 1 UsuarId, UsuarLogin, UsuarNome, UsuarSenha, EXUXPStatus, PerfiChave, SituaChave
 			FROM Usuario
-			JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 			JOIN Situacao on SituaId = EXUXPStatus	
 			JOIN Perfil on PerfiId = EXUXPPerfil			 
 			WHERE UsuarLogin = '$usuario_escape' ";
 	$result = $conn->query($sql);
 	$row = $result->fetch();
-	
-//	$_SESSION['UsuarLogado'] = 0;
+	//echo $sql;die;
+	//	$_SESSION['UsuarLogado'] = 0;
 	
 	$sPerfilChave = $row['PerfiChave'];
 	
 	if ($row == 0){	
 		$erro[] = "O usuário não está cadastrado.";
-	} else if ($row['EXUXPStatus'] == 0 || $row['SituaChave'] == 'INATIVO'){
+	} else if ($row['SituaChave'] == 'INATIVO'){
 		$erro[] = "Esse usuário está desativado.";
 	} else if (strcmp($row['UsuarSenha'], ($psSenha)) != 0){  //"strcmp": compara 2 strings (se for 0 significa que são iguais)
 		$erro[] = "<strong>Senha</strong> incorreta.";
@@ -92,21 +98,20 @@ if(isset($_POST['usuario'])){
 			}
 		} else { */
 		
-			$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EXUXPUnidade, UnidaNome, EmpreFoto
+			$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EmpreFoto
 					FROM Usuario
-					JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+					JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 					JOIN Situacao on SituaId = EXUXPStatus
 					JOIN Perfil on PerfiId = EXUXPPerfil
 					JOIN Empresa on EmpreId = EXUXPEmpresa
-					JOIN Unidade on UnidaId = EXUXPUnidade
 					WHERE UsuarLogin = '$usuario_escape' and SituaChave = 'ATIVO' and 
 					      EmpreId in (Select LicenEmpresa from Licenca JOIN Situacao on SituaId = LicenStatus where LicenDtFim is null or LicenDtFim > GETDATE() and SituaChave = 'ATIVO')
 					";
-
 			$result = $conn->query($sql);
 			$row = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
-			$count = count($row);
-			
+			$count = count($row);		
+			//echo $sql;die;
+
 			if ($count == 0){
 				$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";			
 			} else if ($count > 1 and $piEmpresa == 0) {
@@ -119,56 +124,131 @@ if(isset($_POST['usuario'])){
 					$_SESSION['Empresa'][$linhas['EmpreId']] = $linhas['EmpreNomeFantasia'];
 				}
 			} else if ($piEmpresa) {
-							
-				$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EXUXPUnidade, UnidaNome, EmpreFoto
-						FROM Usuario
-						JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-						JOIN Situacao on SituaId = EXUXPStatus
-						JOIN Perfil on PerfiId = EXUXPPerfil
-						JOIN Empresa on EmpreId = EXUXPEmpresa
-						JOIN Unidade on UnidaId = EXUXPUnidade
-						WHERE UsuarLogin = '$usuario_escape' and SituaChave = 'ATIVO' and EmpreId = $piEmpresa and 
-						   EmpreId in (Select LicenEmpresa from Licenca JOIN Situacao on SituaId = LicenStatus where LicenDtFim is null or LicenDtFim > GETDATE() and SituaChave = 'ATIVO')
+
+				$sql = "SELECT UnidaId, UnidaNome
+						FROM UsuarioXUnidade
+						JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
+						JOIN Unidade on UnidaId = UsXUnUnidade
+						WHERE EXUXPUsuario = ".$row['UsuarId']." and EXUXPEmpresa = ".$piEmpresa."
 						";
 				$result = $conn->query($sql);
-				$row = $result->fetch();
+				$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
+				$countUnidade = count($rowUnidade);					
 				
-				if ($row > 0){
-					$_SESSION['UsuarId'] = $row['UsuarId'];
-					$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
-					$_SESSION['UsuarNome'] = $row['UsuarNome'];
-					$_SESSION['EmpreId'] = $row['EmpreId'];
-					$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
-					$_SESSION['EmpreFoto'] = $row['EmpreFoto'];
-					$_SESSION['UnidadeId'] = $row['EXUXPUnidade'];
-					$_SESSION['UnidadeNome'] = $row['UnidaNome'];
-					$_SESSION['PerfiChave'] = $row['PerfiChave'];					
-					//$_SESSION['UsuarLogado'] = 1;
+				if ($countUnidade == 0){
+					$erro[] = "O usuário está cadastrado em uma empresa, porém não está vinculado a nenhuma unidade. Favor acionar o responsável pelo cadastro na sua empresa.";			
+				} else if ($countUnidade == 1) {
 					
-					unset($_SESSION['UsuarSenha']);
+					$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EmpreFoto
+							FROM Usuario
+							JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
+							JOIN Situacao on SituaId = EXUXPStatus
+							JOIN Perfil on PerfiId = EXUXPPerfil
+							JOIN Empresa on EmpreId = EXUXPEmpresa
+							WHERE UsuarLogin = '$usuario_escape' and SituaChave = 'ATIVO' and EmpreId = $piEmpresa and 
+							EmpreId in (Select LicenEmpresa from Licenca JOIN Situacao on SituaId = LicenStatus where LicenDtFim is null or LicenDtFim > GETDATE() and SituaChave = 'ATIVO')
+							";
+					$result = $conn->query($sql);
+					$row = $result->fetch();
+					
+					if ($row > 0){
+						$_SESSION['UsuarId'] = $row['UsuarId'];
+						$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
+						$_SESSION['UsuarNome'] = $row['UsuarNome'];
+						$_SESSION['EmpreId'] = $row['EmpreId'];
+						$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
+						$_SESSION['EmpreFoto'] = $row['EmpreFoto'];
+						$_SESSION['UnidadeId'] = $rowUnidade[0]['UnidaId'];
+						$_SESSION['UnidadeNome'] = $rowUnidade[0]['UnidaNome'];
+						$_SESSION['PerfiChave'] = $row['PerfiChave'];					
+						//$_SESSION['UsuarLogado'] = 1;
+						
+						unset($_SESSION['UsuarSenha']);
 
-					irpara("index.php");
+						irpara("index.php");
+					} else {
+						$erro[] = "Login inválido. Verifique se o usuário informado faz parte dessa empresa.";
+					}
 				} else {
-					$erro[] = "Login inválido. Verifique se o usuário informado faz parte dessa empresa.";
+					$erro[] = "Você está vinculado em mais de uma unidade dessa empresa. Informe qual deseja acessar.";
+				
+					$_SESSION['UnidadeId'] = 99999999;  // Se preferirem deixar pre-selecionado já uma empresa basta trocar o 9999999 por $row[0]['EmpreId']
+					
+					$result = $conn->query($sql);
+					while ($linhas = $result->fetch()){
+						$_SESSION['Unidade'][$linhas['UnidaId']] = $linhas['UnidaNome'];
+					}
 				}
 				
-			} else {		
-				
-				//Pra esse caso aqui só vai vim um registro mesmo, daí precisa do [0] sem fazer o foreach
-				$_SESSION['UsuarId'] = $row[0]['UsuarId'];
-				$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
-				$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
-				$_SESSION['EmpreId'] = $row[0]['EmpreId'];
-				$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
-				$_SESSION['EmpreFoto'] = $row[0]['EmpreFoto'];
-				$_SESSION['UnidadeId'] = $row[0]['EXUXPUnidade'];
-				$_SESSION['UnidadeNome'] = $row[0]['UnidaNome'];
-				$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
-				//$_SESSION['UsuarLogado'] = 1;
+			} else {
 
-				unset($_SESSION['UsuarSenha']);
-				
-				irpara("index.php");
+				if ($piUnidade){
+
+					$sql = "SELECT UnidaId, UnidaNome
+							FROM Unidade
+							WHERE UnidaId = ".$piUnidade;
+					$result = $conn->query($sql);
+					$rowUnidade = $result->fetch(PDO::FETCH_ASSOC);
+
+					//Pra esse caso aqui só vai vim um registro mesmo, daí precisa do [0] sem fazer o foreach
+					$_SESSION['UsuarId'] = $row[0]['UsuarId'];
+					$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
+					$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
+					$_SESSION['EmpreId'] = $row[0]['EmpreId'];
+					$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
+					$_SESSION['EmpreFoto'] = $row[0]['EmpreFoto'];
+					$_SESSION['UnidadeId'] = $rowUnidade[0]['UnidaId'];;
+					$_SESSION['UnidadeNome'] = $rowUnidade[0]['UnidaNome'];
+					$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
+					//$_SESSION['UsuarLogado'] = 1;
+
+					unset($_SESSION['UsuarSenha']);
+
+					irpara("index.php");					
+
+				} else {
+					$sql = "SELECT UnidaId, UnidaNome
+							FROM UsuarioXUnidade
+							JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
+							JOIN Unidade on UnidaId = UsXUnUnidade
+							WHERE EXUXPUsuario = ".$row[0]['UsuarId']." and EXUXPEmpresa = ".$row[0]['EmpreId']."
+							";
+					$result = $conn->query($sql);
+					$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
+					$countUnidade = count($rowUnidade);	
+					//echo "Entrou aqui: ".$sql;die;
+					
+					if ($countUnidade == 0){
+						$erro[] = "O usuário está cadastrado em uma empresa, porém não está vinculado a nenhuma unidade. Favor acionar o responsável pelo cadastro na sua empresa.";			
+					} else if ($countUnidade == 1) {				
+		
+						//Pra esse caso aqui só vai vim um registro mesmo, daí precisa do [0] sem fazer o foreach
+						$_SESSION['UsuarId'] = $row[0]['UsuarId'];
+						$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
+						$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
+						$_SESSION['EmpreId'] = $row[0]['EmpreId'];
+						$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
+						$_SESSION['EmpreFoto'] = $row[0]['EmpreFoto'];
+						$_SESSION['UnidadeId'] = $rowUnidade[0]['UnidaId'];;
+						$_SESSION['UnidadeNome'] = $rowUnidade[0]['UnidaNome'];
+						$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
+						//$_SESSION['UsuarLogado'] = 1;
+
+						unset($_SESSION['UsuarSenha']);
+						
+						irpara("index.php");
+
+					} else {
+						$erro[] = "Você está vinculado em mais de uma unidade dessa empresa. Informe qual deseja acessar.";
+					
+						$_SESSION['UnidadeId'] = 99999999;  // Se preferirem deixar pre-selecionado já uma empresa basta trocar o 9999999 por $row[0]['EmpreId']
+						
+						$result = $conn->query($sql);
+						while ($linhas = $result->fetch()){
+							$_SESSION['Unidade'][$linhas['UnidaId']] = $linhas['UnidaNome'];
+						}
+					}
+				}				
 			}
 	//	}
 	} 
@@ -240,12 +320,34 @@ if(isset($_POST['usuario'])){
 											}
 											
 											print('
-											</optgroup>
 										</select>
 									</div>
 									
 									');
-								}								
+								}
+								
+								if (isset($_SESSION['UnidadeId'])){	
+									
+									print('
+									
+									<div class="form-group">
+										<select name="unidade" class="form-control select" data-fouc>
+											<option value="0">Selecione uma unidade</option>');
+											
+											foreach($_SESSION['Unidade'] as $indice => $valor){
+												if ($_SESSION['UnidadeId'] == $indice){
+													echo '<option value="'.$indice.'" selected>'.$valor.'</option>';
+												} else {
+													echo '<option value="'.$indice.'">'.$valor.'</option>';
+												}
+											}
+											
+											print('
+										</select>
+									</div>
+									
+									');
+								}									
                             ?>							
 							
 							<div class="form-group form-group-feedback form-group-feedback-left">

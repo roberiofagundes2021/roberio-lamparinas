@@ -45,9 +45,10 @@ if (isset($_SESSION['Carrinho'])) {
 		$conn->beginTransaction();
 
 		// Selecionando dados do setor do usuário
-		$sql = "SELECT EXUXPSetor, SetorNome
+		$sql = "SELECT SetorId, SetorNome
                 FROM EmpresaXUsuarioXPerfil 
-                JOIN Setor on SetorId = EXUXPSetor
+				JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+                JOIN Setor on SetorId = UsXUnSetor
 		        WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . "
 		       ";
 		$result = $conn->query($sql);
@@ -83,7 +84,7 @@ if (isset($_SESSION['Carrinho'])) {
 			':iNumero' => gerarNumeracao(),
 			':iData' => date('Y-m-d'),
 			':iObservacao' => $soliObservacao,
-			':iSetor' => $Setor['EXUXPSetor'],
+			':iSetor' => $Setor['SetorId'],
 			':iSolicitante' => $_SESSION['UsuarId'],
 			':iSituacao' => $Situacao['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -123,7 +124,7 @@ if (isset($_SESSION['Carrinho'])) {
 			':sDescricao' => 'Liberar Solicitação',
 			':sURL' => '',
 			':iSolicitante' => $_SESSION['UsuarId'],
-			':iSolicitanteSetor' => $Setor['EXUXPSetor'],
+			':iSolicitanteSetor' => $Setor['SetorId'],
 			':sTabela' => 'Solicitacao',
 			':iTabelaId' => $SolicitacaoId,
 			':iStatus' => $Situacao['SituaId'],

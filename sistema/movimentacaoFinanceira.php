@@ -28,6 +28,7 @@ $Y = date("Y");
 // $dataInicio = date("Y-m-01"); //30 dias atrás
 $dataInicio = date("Y-m-d");
 $dataFim = date("Y-m-d");
+
 ?>
 
 <!DOCTYPE html>
@@ -52,214 +53,248 @@ $dataFim = date("Y-m-d");
   <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
   <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
   <!-- /theme JS files -->
+  
 
   <!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
   <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
   <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
 
   <script type="text/javascript">
-  $(document).ready(function() {
-    let resultadosConsulta = '';
-    let inputsValues = {};
+    $(document).ready(function() {
 
-    $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data			
+      let resultadosConsulta = '';
+      let inputsValues = {};
 
-    /* Início: Tabela Personalizada */
-    $('#tblMovimentacaoFinanceira').DataTable({
-      "order": [
-        [1, "desc"]
-      ],
-      autoWidth: false,
-      responsive: true,
-      columnDefs: [{
-          orderable: true, //Data
-          width: "10%",
-          targets: [0]
-        },
-        {
-          orderable: true, //Histórico
-          width: "25%",
-          targets: [1]
-        },
-        {
-          orderable: true, //Conta Caixa
-          width: "22%",
-          targets: [2]
-        },
-        {
-          orderable: true, //Nª doc
-          width: "8%",
-          targets: [3]
-        },
-        {
-          orderable: true, //Entrada
-          width: "10%",
-          targets: [4]
-        },
-        {
-          orderable: true, //Saída
-          width: "10%",
-          targets: [5]
-        },
-        {
-          orderable: true, //Saldo
-          width: "10%",
-          targets: [6]
-        },
-        {
-          orderable: false, //Ações
-          width: "5%",
-          targets: [6]
-        }
-      ],
-      dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
-      language: {
-        search: '<span>Filtro:</span> _INPUT_',
-        searchPlaceholder: 'filtra qualquer coluna...',
-        lengthMenu: '<span>Mostrar:</span> _MENU_',
-        paginate: {
-          'first': 'Primeira',
-          'last': 'Última',
-          'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-          'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
-        }
-      }
-    });
+      $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data			
 
-    function excluirConta() {
-      let contas = $('.excluirConta').each((i, elem) => {
-        $(elem).on('click', (e) => {
-          const id = $(elem).attr('idContaExcluir');
-          const tipo = $(elem).attr('tipo');
-
-          $('#idMov').val(id);
-          $('#tipoMov').val(tipo);
-
-          e.preventDefault;
-          confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `movimentacaoFinanceiraExclui.php`);
-          document.contaExclui.submit();
-        })
-      })
-
-    }
-    excluirConta();
-
-    function atualizaTotal() {
-      let childres = $('tbody').children()
-      let total = 0
-      let linhas = childres.splice(1, childres.length)
-      linhas.forEach(elem => {
-        let listaTds = $(elem).children()
-        let valor = $(listaTds[5]).html()
-        let valorFormFloat = parseFloat(valor.replace(".", "").replace(",", "."))
-
-        total += valorFormFloat
-      })
-      $('#footer-total').remove()
-
-      if (total < 0) {
-        divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(total)}</div>`
-      } else {
-        divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(total)}</div>`
-      }
-
-      $('.datatable-footer').append(divTotal);
-    }
-
-
-    function Filtrar(carregamentoPagina) {
-      let cont = false;
-
-      const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
-
-      $('tbody').html(msg);
-
-      const periodoDe = $('#inputPeriodoDe').val();
-      const ate = $('#inputAte').val();
-      const contaBanco = $('#cmbContaBanco').val();
-      const centroDeCustos = $('#cmbCentroDeCustos').val();
-      const planoContas = $('#cmbPlanoContas').val();
-      const FormaPagamento = $('#cmbFormaDeRecebimento').val();
-      const statusArray = $('#cmbStatus').val().split('|');
-      const status = statusArray[0];
-      const statusTipo = statusArray[1];
-      const url = "movimentacaoFinanceiraFiltra.php";
-      const tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal';
-
-      inputsValues = {
-        inputPeriodoDe: periodoDe,
-        inputAte: ate,
-        cmbContaBanco: contaBanco,
-        cmbCentroDeCustos: centroDeCustos,
-        cmbPlanoContas: planoContas,
-        cmbFormaDeRecebimento: FormaPagamento,
-        cmbStatus: status,
-        statusTipo: statusTipo,
-        tipoFiltro: tipoFiltro
-      };
-
-      $.post(
-        url,
-        inputsValues,
-        (data) => {
-          if (data) {
-            $('tbody').html(data)
-            $('#imprimir').removeAttr('disabled')
-            resultadosConsulta = data
-
-            excluirConta();
-            atualizaTotal();
-
-          } else {
-            let msg2 = $(
-              '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-            )
-            $('tbody').html(msg2)
-            $('#imprimir').attr('disabled', '')
-            $('#footer-total').remove()
+      /* Início: Tabela Personalizada */
+      $('#tblMovimentacaoFinanceira').DataTable({
+        "order": [
+          [1, "desc"]
+        ],
+        autoWidth: false,
+        responsive: true,
+        columnDefs: [{
+            orderable: true, //Data
+            width: "10%",
+            targets: [0]
+          },
+          {
+            orderable: true, //Histórico
+            width: "25%",
+            targets: [1]
+          },
+          {
+            orderable: true, //Conta Caixa
+            width: "22%",
+            targets: [2]
+          },
+          {
+            orderable: true, //Nª doc
+            width: "8%",
+            targets: [3]
+          },
+          {
+            orderable: true, //Entrada
+            width: "10%",
+            targets: [4]
+          },
+          {
+            orderable: true, //Saída
+            width: "10%",
+            targets: [5]
+          },
+          {
+            orderable: true, //Saldo
+            width: "10%",
+            targets: [6]
+          },
+          {
+            orderable: false, //Ações
+            width: "5%",
+            targets: [6]
+          }
+        ],
+        dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+        language: {
+          search: '<span>Filtro:</span> _INPUT_',
+          searchPlaceholder: 'filtra qualquer coluna...',
+          lengthMenu: '<span>Mostrar:</span> _MENU_',
+          paginate: {
+            'first': 'Primeira',
+            'last': 'Última',
+            'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+            'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
           }
         }
-      );
-    }
+      });
 
-    $('#submitPesquisar').on('click', (e) => {
-      e.preventDefault()
-      Filtrar(false);
-    })
+      function excluirConta() {
+        let contas = $('.excluirConta').each((i, elem) => {
+          $(elem).on('click', (e) => {
+            const id = $(elem).attr('idContaExcluir');
+            const tipo = $(elem).attr('tipo');
 
-    Filtrar(true);
+            $('#idMov').val(id);
+            $('#tipoMov').val(tipo);
 
-    $('#novoLacamento').on('click', (e) => {
-      location.href = "movimentacaoFinanceiraPagamento.php";
-      return false;
-    })
+            e.preventDefault;
+            confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `movimentacaoFinanceiraExclui.php`);
+            document.contaExclui.submit();
+          })
+        })
 
-    function imprime() {
-      let url = 'movimentacaoFinanceiraImprime.php';
+      }
+      excluirConta();
 
-      $('#imprimir').on('click', (e) => {
-        console.log(resultadosConsulta);
-        e.preventDefault()
-        if (resultadosConsulta) {
-          $('#inputResultado').val(resultadosConsulta)
-          $('#inputDataDe_imp').val(inputsValues.inputPeriodoDe)
-          $('#inputDataAte_imp').val(inputsValues.inputAte)
-          $('#cmbContaBanco_imp').val(inputsValues.cmbContaBanco)
-          $('#cmbCentroDeCustos_imp').val(inputsValues.cmbCentroDeCustos)
-          $('#cmbPlanoContas_imp').val(inputsValues.cmbPlanoContas)
-          $('#cmbFormaDeRecebimento_imp').val(inputsValues.cmbFormaDeRecebimento)
-          $('#inputStatus_imp').val(inputsValues.cmbStatus)
-          $('#inputStatusTipo_imp').val(inputsValues.statusTipo)
+      function atualizaTotal() {
+        let childres = $('tbody').children()
+        let total = 0
+        let linhas = childres.splice(1, childres.length)
+        linhas.forEach(elem => {
+          let listaTds = $(elem).children()
+          let valor = $(listaTds[5]).html()
+          let valorFormFloat = parseFloat(valor.replace(".", "").replace(",", "."))
 
+          total += valorFormFloat
+        })
+        $('#footer-total').remove()
 
-          $('#formImprime').attr('action', url)
-
-          $('#formImprime').submit()
+        if (total < 0) {
+          divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(total)}</div>`
+        } else {
+          divTotal = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(total)}</div>`
         }
+
+        $('.datatable-footer').append(divTotal);
+      }
+
+
+      function Filtrar(carregamentoPagina) {
+        let cont = false;
+
+        const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
+
+        $('tbody').html(msg);
+
+        const periodoDe = $('#inputPeriodoDe').val();
+        const ate = $('#inputAte').val();
+        const contaBanco = $('#cmbContaBanco').val();
+        const centroDeCustos = $('#cmbCentroDeCustos').val();
+        const planoContas = $('#cmbPlanoContas').val();
+        const FormaPagamento = $('#cmbFormaDeRecebimento').val();
+        const statusArray = $('#cmbStatus').val().split('|');
+        const status = statusArray[0];
+        const statusTipo = statusArray[1];
+        const url = "movimentacaoFinanceiraFiltra.php";
+        const tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal';
+
+        inputsValues = {
+          inputPeriodoDe: periodoDe,
+          inputAte: ate,
+          cmbContaBanco: contaBanco,
+          cmbCentroDeCustos: centroDeCustos,
+          cmbPlanoContas: planoContas,
+          cmbFormaDeRecebimento: FormaPagamento,
+          cmbStatus: status,
+          statusTipo: statusTipo,
+          tipoFiltro: tipoFiltro
+        };
+
+        $.post(
+          url,
+          inputsValues,
+          (data) => {
+            if (data) {
+              $('tbody').html(data)
+              $('#imprimir').removeAttr('disabled')
+              resultadosConsulta = data
+
+              excluirConta();
+              atualizaTotal();
+
+            } else {
+              let msg2 = $(
+                '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+              )
+              $('tbody').html(msg2)
+              $('#imprimir').attr('disabled', '')
+              $('#footer-total').remove()
+            }
+          }
+        );
+      }
+
+      $('#submitPesquisar').on('click', (e) => {
+        e.preventDefault()
+        Filtrar(false);
       })
+
+      Filtrar(true);
+
+      $('#novoLacamento').on('click', (e) => {
+        location.href = "movimentacaoFinanceiraPagamento.php";
+        return false;
+      })
+
+      function imprime() {
+        let url = 'movimentacaoFinanceiraImprime.php';
+
+        $('#imprimir').on('click', (e) => {
+          console.log(resultadosConsulta);
+          e.preventDefault()
+          if (resultadosConsulta) {
+            $('#inputResultado').val(resultadosConsulta)
+            $('#inputDataDe_imp').val(inputsValues.inputPeriodoDe)
+            $('#inputDataAte_imp').val(inputsValues.inputAte)
+            $('#cmbContaBanco_imp').val(inputsValues.cmbContaBanco)
+            $('#cmbCentroDeCustos_imp').val(inputsValues.cmbCentroDeCustos)
+            $('#cmbPlanoContas_imp').val(inputsValues.cmbPlanoContas)
+            $('#cmbFormaDeRecebimento_imp').val(inputsValues.cmbFormaDeRecebimento)
+            $('#inputStatus_imp').val(inputsValues.cmbStatus)
+            $('#inputStatusTipo_imp').val(inputsValues.statusTipo)
+
+
+            $('#formImprime').attr('action', url)
+
+            $('#formImprime').submit()
+          }
+        })
+      }
+      imprime()
+
+      //Ao mudar a centro de custo, filtra o Plano de Contas via ajax (retorno via JSON)
+      $('#cmbCentroDeCustos').on('change', function(e) {
+
+        FiltraPlanoContas();
+
+        var cmbCentroDeCustos = $('#cmbCentroDeCustos').val();
+
+        $.getJSON('filtraPlanoContas.php?idCentroCusto=' + cmbCentroDeCustos, function(dados) {
+
+          var option = '<option value="">Todos</option>';
+
+          if (dados.length) {
+
+            $.each(dados, function(i, obj) {
+              option += '<option value="' + obj.PlConId + '">' + obj.PlConCodigo + ' - ' + obj.PlConNome + '</option>';
+            });
+
+            $('#cmbPlanoContas').html(option).show();
+          } else {
+            ResetPlanoContas();
+          }
+        });
+      });    
+    });
+
+    function FiltraPlanoContas() {
+      $('#cmbPlanoContas').empty().append('<option value="">Filtrando...</option>');    
     }
-    imprime()
-  });
+
+    function ResetPlanoContas() {
+      $('#cmbPlanoContas').empty().append('<option value="">Sem Plano de Contas</option>');
+    } 
   </script>
 
 </head>
@@ -386,51 +421,50 @@ $dataFim = date("Y-m-d");
                         <select id="cmbCentroDeCustos" name="cmbCentroDeCustos" class="form-control form-control-select2">
                           <option value="">Todos</option>
                           <?php
-                                                    $sql = "SELECT CnCusId,
-                                                                   CnCusNome
-                                                              FROM CentroCusto
-                                                              JOIN Situacao 
-                                                                ON SituaId = CnCusStatus
-                                                             WHERE CnCusUnidade = " . $_SESSION['UnidadeId'] . " 
-                                                               and SituaChave = 'ATIVO'
-                                                          ORDER BY CnCusNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
+                                  $sql = "SELECT CnCusId, CnCusCodigo, CnCusNome
+                                            FROM CentroCusto
+                                            JOIN Situacao 
+                                              ON SituaId = CnCusStatus
+                                            WHERE CnCusUnidade = " . $_SESSION['UnidadeId'] . " 
+                                              and SituaChave = 'ATIVO'
+                                        ORDER BY CnCusCodigo ASC";
+                                  $result = $conn->query($sql);
+                                  $rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    foreach ($rowCentroDeCustos as $item) {
-                                                      print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusNome'] . '</option>');
-                                                    }
+                                  foreach ($rowCentroDeCustos as $item) {
+                                    print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusCodigo'] . ' - ' . $item['CnCusNome'] . '</option>');
+                                  }
 
-                                                    ?>
+                           ?>
                         </select>
                       </div>
                     </div>
-
 
                     <div class="col-lg-3">
-                      <div class="form-group">
-                        <label for="cmbPlanoContas">Plano de Contas</label>
-                        <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
-                          <option value="">Todos</option>
-                          <?php
-                                                    $sql = "SELECT PlConId, PlConNome
-                                                              FROM PlanoContas
-                                                              JOIN Situacao 
-                                                                ON SituaId = PlConStatus
-                                                             WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " 
-                                                               AND SituaChave = 'ATIVO'
-                                                          ORDER BY PlConNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+                        <div class="form-group">
+                            <label for="cmbPlanoContas">Plano de Contas</label>
+                            <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
+                              <option value="">Todos</option>
+                                 <?php
+                                    $sql = "SELECT PlConId, PlConCodigo, PlConNome
+                                              FROM PlanoContas
+                                              JOIN Situacao 
+                                                ON SituaId = PlConStatus
+                                              WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " 
+                                                AND SituaChave = 'ATIVO'
+                                          ORDER BY PlConCodigo ASC";
+                                    $result = $conn->query($sql);
+                                    $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    foreach ($rowPlanoContas as $item) {
-                                                      print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
-                                                    }
+                                    foreach ($rowPlanoContas as $item) {
+                                      print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
+                                    }
 
-                                                    ?>
-                        </select>
-                      </div>
+                                 ?>
+                            </select>
+                        </div>
                     </div>
+                    
 
                     <div class="col-lg-3">
                       <div class="form-group">

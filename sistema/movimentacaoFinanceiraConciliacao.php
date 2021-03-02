@@ -59,6 +59,7 @@ $dataFim = date("Y-m-d");
 
   <script type="text/javascript">
   $(document).ready(function() {
+
     let resultadosConsulta = '';
     let inputsValues = {};
 
@@ -286,6 +287,38 @@ $dataFim = date("Y-m-d");
       })
     }
     imprime()
+
+     //Ao mudar a centro de custo, filtra o Plano de Contas via ajax (retorno via JSON)
+     $('#cmbCentroDeCustos').on('change', function(e) {
+
+        FiltraPlanoContas();
+
+          var cmbCentroDeCustos = $('#cmbCentroDeCustos').val();
+
+          $.getJSON('filtraPlanoContas.php?idCentroCusto=' + cmbCentroDeCustos, function(dados) {
+
+            var option = '<option value="">Todos</option>';
+
+            if (dados.length) {
+
+              $.each(dados, function(i, obj) {
+                option += '<option value="' + obj.PlConId + '">' + obj.PlConCodigo + ' - ' + obj.PlConNome + '</option>';
+              });
+
+              $('#cmbPlanoContas').html(option).show();
+            } else {
+              ResetPlanoContas();
+            }
+          });
+        }); 
+
+        function FiltraPlanoContas() {
+          $('#cmbPlanoContas').empty().append('<option value="">Filtrando...</option>');    
+          }
+
+          function ResetPlanoContas() {
+          $('#cmbPlanoContas').empty().append('<option value="">Sem Plano de Contas</option>');
+          }    
 
   });
 
@@ -546,19 +579,18 @@ $dataFim = date("Y-m-d");
                         <select id="cmbCentroDeCustos" name="cmbCentroDeCustos" class="form-control form-control-select2">
                           <option value="">Todos</option>
                           <?php
-                                                    $sql = "SELECT CnCusId,
-                                                                   CnCusNome
+                                                    $sql = "SELECT CnCusId, CnCusNome, CnCusCodigo
                                                               FROM CentroCusto
                                                               JOIN Situacao 
                                                                 ON SituaId = CnCusStatus
                                                              WHERE CnCusUnidade = " . $_SESSION['UnidadeId'] . " 
                                                                and SituaChave = 'ATIVO'
-                                                          ORDER BY CnCusNome ASC";
+                                                          ORDER BY CnCusCodigo ASC";
                                                     $result = $conn->query($sql);
                                                     $rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                     foreach ($rowCentroDeCustos as $item) {
-                                                      print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusNome'] . '</option>');
+                                                      print('<option value="' . $item['CnCusId'] . '">'. $item['CnCusCodigo'] .' - '. $item['CnCusNome'] . '</option>');
                                                     }
 
                                                     ?>
@@ -573,18 +605,18 @@ $dataFim = date("Y-m-d");
                         <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
                           <option value="">Todos</option>
                           <?php
-                                                    $sql = "SELECT PlConId, PlConNome
+                                                    $sql = "SELECT PlConId, PlConNome, PlConCodigo
                                                               FROM PlanoContas
                                                               JOIN Situacao 
                                                                 ON SituaId = PlConStatus
                                                              WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " 
                                                                AND SituaChave = 'ATIVO'
-                                                          ORDER BY PlConNome ASC";
+                                                          ORDER BY PlConCodigo ASC";
                                                     $result = $conn->query($sql);
                                                     $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                     foreach ($rowPlanoContas as $item) {
-                                                      print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                                      print('<option value="' . $item['PlConId'] . '">'. $item['PlConCodigo'] .' - '. $item['PlConNome'] . '</option>');
                                                     }
 
                                                     ?>
@@ -680,7 +712,7 @@ $dataFim = date("Y-m-d");
                     <tr class="bg-slate">
                       <th>Data</th>
                       <th>Histórico</th>
-                      <th>Nº Documento</th>
+                      <th>Documento</th>
                       <th style='text-align: right;'>Entrada</th>
                       <th style='text-align: right;'>Saída</th>
                       <th style='text-align: right;'>Saldo</th>

@@ -10,11 +10,12 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO PlanoContas (PlConNome, PlConCentroCusto, PlConStatus, PlConUsuarioAtualizador, PlConUnidade)
-				VALUES (:sNome, :sCentroCusto, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+		$sql = "INSERT INTO PlanoContas (PlConCodigo, PlConNome, PlConCentroCusto, PlConStatus, PlConUsuarioAtualizador, PlConUnidade)
+				VALUES (:iCodigo, :sNome, :sCentroCusto, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
+						':iCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
 						':sCentroCusto' => $_POST['cmbCentroCusto'],
 						':bStatus' => 1,
@@ -125,27 +126,33 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-6">
+								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputNome">Plano de Contas<span class="text-danger"> *</span></label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Plano de Contas" required autofocus>
+										<label for="inputCodigo">Código<span class="text-danger"> *</span></label>
+										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" required autofocus>
 									</div>
 								</div>
-								<div class="col-lg-6">
+								<div class="col-lg-5">
+									<div class="form-group">
+										<label for="inputNome">Plano de Contas<span class="text-danger"> *</span></label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Plano de Contas" required>
+									</div>
+								</div>
+								<div class="col-lg-5">
 									<label for="cmbCentroCusto">Centro de Custo<span class="text-danger"> *</span></label>
 									<select id="cmbCentroCusto" name="cmbCentroCusto" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 
-											$sql = "SELECT CnCusId, CnCusNome
+											$sql = "SELECT CnCusId, CnCusCodigo, CnCusNome
 													FROM CentroCusto
 													JOIN Situacao on SituaId = CnCusStatus
 													WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
-													ORDER BY CnCusNome ASC";
+													ORDER BY CnCusCodigo ASC";
 											$result = $conn->query($sql);
 											$row = $result->fetchAll(PDO::FETCH_ASSOC);
 											
 											foreach ($row as $item){
-												print('<option value="'.$item['CnCusId'].'">'.$item['CnCusNome'].'</option>');
+												print('<option value="'.$item['CnCusId'].'">'.$item['CnCusCodigo'].' - '.$item['CnCusNome'].'</option>');
 											}
 										
 										?>

@@ -22,11 +22,12 @@ if (isset($_POST['timesTampUsuarioOnline'])) {
     $string = $hora . ":" . $minuto . ":" . $segundos;
 
     $sql = "SELECT UsuarId, UsuarNome, UsuarDataAcesso, SetorNome
-                FROM Usuario
-                JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario =  UsuarId
-                JOIN Setor on SetorId =  EXUXPSetor
-                WHERE UsuarDataAcesso >= '$string'  and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
-                ORDER BY UsuarDataAcesso";
+            FROM Usuario
+            JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario =  UsuarId
+            JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+            JOIN Setor on SetorId =  UsXUnSetor
+            WHERE UsuarDataAcesso >= '$string'  and UsXUnUnidade = " . $_SESSION['UnidadeId'] . "
+            ORDER BY UsuarDataAcesso";
     $result = $conn->query($sql);
     $row = $result->fetchAll(PDO::FETCH_ASSOC);
     var_dump($row);
@@ -53,8 +54,9 @@ if (isset($_POST['timesTampUsuarioOnline'])) {
     $sql = "SELECT UsuarId, UsuarNome, UsuarDataAcesso, SetorNome
                 FROM Usuario
                 JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario =  UsuarId
-                JOIN Setor on SetorId =  EXUXPSetor
-                WHERE UsuarDataAcesso >= '$string'  and EXUXPUnidade = " . $_SESSION['UnidadeId'] . "
+                JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+                JOIN Setor on SetorId =  UsXUnSetor
+                WHERE UsuarDataAcesso >= '$string'  and UsXUnUnidade = " . $_SESSION['UnidadeId'] . "
                 ORDER BY UsuarDataAcesso";
     $result = $conn->query($sql);
     $row = $result->fetchAll(PDO::FETCH_ASSOC);

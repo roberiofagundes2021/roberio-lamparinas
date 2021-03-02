@@ -146,7 +146,7 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 				var limiteUsuarios = $('#inputLimiteUsuarios').val();
 				var usuariosCadastrados = $('#inputUsuariosCadastrados').val();
 
-				if (usuariosCadastrados > limiteUsuarios){
+				if (parseInt(usuariosCadastrados) >= parseInt(limiteUsuarios)){
 					alerta('Atenção', 'O limite de usuários para essa empresa foi atingido! Para adicionar mais usuários, favor contactar a empresa Lamparinas', 'error');
 					return false;
 				} else{
