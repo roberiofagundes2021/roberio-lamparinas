@@ -24,7 +24,7 @@ if(isset($_POST['cmbUnidade'])){
             ':iEmpresaUsarioPerfil' => $_SESSION['EmpresaUsuarioPerfil'],
             ':iUnidade' => $_POST['cmbUnidade'],
             ':iSetor' => $_POST['cmbSetor'],
-            ':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) && $_POST['cmbLocalEstoque'] == "" ? $_POST['cmbLocalEstoque'] : null,
+            ':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) ? $_POST['cmbLocalEstoque'] : null,
             ':iUsuarioAtualizador' => $_SESSION['UsuarId']
             ));
 		
@@ -166,16 +166,34 @@ if(isset($_POST['cmbUnidade'])){
 
 </head>
 
-<body class="navbar-top sidebar-xs">
+  <?php
+  
+      if (isset($_SESSION['EmpresaId'])){	
+        print('<body class="navbar-top sidebar-xs">');
+      } else {
+        print('<body class="navbar-top">');
+      }
 
-  <?php include_once("topo.php"); ?>
+      include_once("topo.php");
+
+  ?>	
+
+
+
+
+
 
   <!-- Page content -->
-  <div class="page-content">
-
-  <?php include_once("menu-left.php"); ?>
-  <?php include_once("menuLeftSecundario.php"); ?>
-
+	<div class="page-content">
+		
+		<?php 
+			
+			include_once("menu-left.php"); 
+		
+			if (isset($_SESSION['EmpresaId'])){
+				include_once("menuLeftSecundario.php");
+			}
+		?>			
     <!-- Main content -->
     <div class="content-wrapper">
 
