@@ -152,7 +152,9 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 				} else{
 					document.formUsuario.action = "usuarioNovo.php";
 				}	
-					
+
+            } else if (Tipo == 'lotacao'){
+			document.formUsuario.action = "usuarioLotacao.php";		
 			} else if (Tipo == 'edita'){
 				document.formUsuario.action = "usuarioEdita.php";
 			} else if (Tipo == 'exclui'){
@@ -262,8 +264,9 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 										print('	<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', '.$item['EXUXPStatus'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', '.$item['EXUXPStatus'].', \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', '.$item['EXUXPStatus'].', \'lotacao\')" class="list-icons-item"><i class="icon-users4" data-popup="tooltip" data-placement="bottom" title="Lotação"></i></a>
+														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', '.$item['EXUXPStatus'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', '.$item['EXUXPStatus'].', \'exclui\')" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>
