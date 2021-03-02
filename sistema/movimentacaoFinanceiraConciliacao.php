@@ -174,7 +174,7 @@ $dataFim = date("Y-m-d");
       });
 
       $('#footer-total').remove();
-      totalEntrada < 0 ? divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 52%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalEntrada)}</div>` : divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 52%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalEntrada)}</div>`;
+      totalEntrada < 0 ? divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 51%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalEntrada)}</div>` : divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 51%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalEntrada)}</div>`;
 
       $('#footer-total').remove();
       totalSaida < 0 ? divTotalSaida = `<div id='footer-total' style='position:absolute; left: 61%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaida)}</div>` : divTotalSaida = `<div id='footer-total' style='position:absolute; left: 61%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaida)}</div>`;
@@ -193,6 +193,7 @@ $dataFim = date("Y-m-d");
 
 
     function Filtrar(carregamentoPagina) {
+      console.log('entrou');
       let cont = false;
 
       const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
@@ -520,8 +521,8 @@ $dataFim = date("Y-m-d");
                             <span class="input-group-text"><i class="icon-calendar22"></i></span>
                           </span>
                           <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" value="<?php 
-                                          if (isset($_SESSION['MovFinancPeriodoDe'])) {
-                                            echo $_SESSION['MovFinancPeriodoDe'];
+                                          if (isset($_SESSION['MovimentacaoFinanceiraConciliacaoPeriodoDe'])) {
+                                            echo $_SESSION['MovimentacaoFinanceiraConciliacaoPeriodoDe'];
                                           }else 
                                             echo $dataInicio; 
                                         ?>">
@@ -537,8 +538,8 @@ $dataFim = date("Y-m-d");
                             <span class="input-group-text"><i class="icon-calendar22"></i></span>
                           </span>
                           <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php 
-                                          if (isset($_SESSION['MovFinancAte'])) 
-                                            echo $_SESSION['MovFinancAte'];
+                                          if (isset($_SESSION['MovimentacaoFinanceiraConciliacaoAte'])) 
+                                            echo $_SESSION['MovimentacaoFinanceiraConciliacaoAte'];
                                           else 
                                             echo $dataFim; 
                                         ?>">

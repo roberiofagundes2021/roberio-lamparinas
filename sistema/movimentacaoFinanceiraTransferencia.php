@@ -587,7 +587,12 @@ $dataInicio = date("Y-m-d");
                     </div>
                   <?php } else { ?>
                     <button id="salvar" class="btn btn-principal">Salvar</button>
-                    <a href="movimentacaoFinanceira.php" class="btn">Cancelar</a>
+                    
+                    <?php if($_SESSION['Conciliacao'] === true) { ?>
+                      <a href="movimentacaoFinanceiraConciliacao.php" class="btn">Cancelar</a>
+                    <?php } else { ?>
+                      <a href="movimentacaoFinanceira.php" class="btn">Cancelar</a>
+                    <?php } ?>
                   <?php } ?>
                 </div>
 
