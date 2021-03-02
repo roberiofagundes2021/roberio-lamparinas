@@ -5,6 +5,9 @@ include_once("sessao.php");
 $_SESSION['PaginaAtual'] = 'Relação de Movimentações Financeiras';
 
 include('global_assets/php/conexao.php');
+
+$_SESSION['Conciliacao'] = false;
+
 /*ClienId, ClienNome, ClienCpf, ClienCnpj, ClienTelefone, ClienCelular, ClienStatus, Cate*/
 try {
     $sql = "SELECT *

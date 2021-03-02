@@ -206,6 +206,7 @@
           <a href="contasAReceber.php" class="nav-link"><i class="icon-cash2"></i> <span>Contas à Receber</span></a>
           <a href="movimentacaoFinanceira.php" class="nav-link"><i class="icon-coins"></i> <span>Movimentação</span></a>
           <a href="movimentacaoFinanceiraConciliacao.php" class="nav-link"><i class="icon-coins"></i> <span>Conciliação</span></a>
+          <a href="fluxoDeCaixa.php" class="nav-link"><i class="icon-calendar"></i> <span>Fluxo de caixa</span></a>
         </li>
         <li class="nav-item nav-item-submenu">
           <a href="#" class="nav-link"> <span>Relatórios</span></a>

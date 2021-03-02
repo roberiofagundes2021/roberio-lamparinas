@@ -45,18 +45,18 @@ function queryPesquisa(){
             $argsCp[]  = "CNAPADTEMISSAO BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
 
             if (!empty($_POST['inputPeriodoDe'])) {
-                $_SESSION['MovFinancPeriodoDe'] = $_POST['inputPeriodoDe'];
+                $_SESSION['MovimentacaoFinanceiraConciliacaoPeriodoDe'] = $_POST['inputPeriodoDe'];
             }
 
             if (!empty($_POST['inputAte'])) {
-                $_SESSION['MovFinancAte'] = $_POST['inputAte'];
+                $_SESSION['MovimentacaoFinanceiraConciliacaoAte'] = $_POST['inputAte'];
             }
         }
 
         if (!empty($_POST['cmbContaBanco'])) {
             $argsCr[]  = "CnAReContaBanco = " . $_POST['cmbContaBanco'] . " ";
             $argsCp[]  = "CnAPaContaBanco = " . $_POST['cmbContaBanco'] . " ";
-            $_SESSION['MovFinancContaBanco'] = $_POST['cmbContaBanco'];
+            $_SESSION['MovimentacaoFinanceiraConciliacaoContaBanco'] = $_POST['cmbContaBanco'];
         }
 
         if (!empty($_POST['cmbCentroDeCustos'])) {
@@ -72,19 +72,19 @@ function queryPesquisa(){
                             
             $argsCr[]  = "CnCusId = " . $_POST['cmbCentroDeCustos'] . " ";
             $argsCp[]  = "CnCusId = " . $_POST['cmbCentroDeCustos'] . " ";
-            $_SESSION['MovFinancCentroDeCustos'] = $_POST['cmbCentroDeCustos'];
+            $_SESSION['MovimentacaoFinanceiraConciliacaoCentroDeCustos'] = $_POST['cmbCentroDeCustos'];
         }
 
         if (!empty($_POST['cmbPlanoContas'])) {
             $argsCr[]  = "CnARePlanoContas = " . $_POST['cmbPlanoContas'] . " ";
             $argsCp[]  = "CnAPaPlanoContas = " . $_POST['cmbPlanoContas'] . " ";
-            $_SESSION['MovFinancPlanoContas'] = $_POST['cmbPlanoContas'];
+            $_SESSION['MovimentacaoFinanceiraConciliacaoPlanoContas'] = $_POST['cmbPlanoContas'];
         }
 
         if (!empty($_POST['cmbFormaDeRecebimento'])) {
             $argsCr[]  = "CnAReFormaPagamento = " . $_POST['cmbFormaDeRecebimento'] . " ";
             $argsCp[]  = "CnAPaFormaPagamento = " . $_POST['cmbFormaDeRecebimento'] . " ";
-            $_SESSION['MovFinancFormaPagamento'] = $_POST['cmbFormaDeRecebimento'];
+            $_SESSION['MovimentacaoFinanceiraConciliacaoFormaPagamento'] = $_POST['cmbFormaDeRecebimento'];
         }
 
         if (!empty($_POST['cmbStatus'])) {
@@ -102,7 +102,7 @@ function queryPesquisa(){
                 $argsCr[]  = "CnAReStatus = 14";
                 $argsCp[]  = "CnAPaStatus = 12";
             }
-            $_SESSION['MovFinancStatus'] = $_POST['cmbStatus'];
+            $_SESSION['MovimentacaoFinanceiraConciliacaoStatus'] = $_POST['cmbStatus'];
         }
 
 
@@ -191,7 +191,7 @@ function queryPesquisa(){
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
         }
 
-    } else if (isset($_SESSION['MovFinancPeriodoDe']) ||  isset($_SESSION['MovFinancAte']) || isset($_SESSION['MovFinancContaBanco']) || isset($_SESSION['MovFinancCentroDeCustos']) || isset($_SESSION['MovFinancPlanoContas']) || isset($_SESSION['MovFinancFormaPagamento']) || isset($_SESSION['MovFinancStatus'])) {
+    } else if (isset($_SESSION['MovimentacaoFinanceiraConciliacaoPeriodoDe']) ||  isset($_SESSION['MovimentacaoFinanceiraConciliacaoAte']) || isset($_SESSION['MovimentacaoFinanceiraConciliacaoContaBanco']) || isset($_SESSION['MovimentacaoFinanceiraConciliacaoCentroDeCustos']) || isset($_SESSION['MovimentacaoFinanceiraConciliacaoPlanoContas']) || isset($_SESSION['MovimentacaoFinanceiraConciliacaoFormaPagamento']) || isset($_SESSION['MovimentacaoFinanceiraConciliacaoStatus'])) {
 
         $cont = 0;
         $argsCr = [];
@@ -200,20 +200,20 @@ function queryPesquisa(){
         $argsCenCustCp = '';
         $status = explode('|', $_POST['cmbStatus']);
 
-        if (!empty($_SESSION['MovFinancPeriodoDe']) || !empty($_SESSION['MovFinancAte'])) {
-            empty($_SESSION['MovFinancPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_SESSION['MovFinancPeriodoDe'];
-            empty($_SESSION['MovFinancAte']) ? $inputAte = '2100-01-01' : $inputAte = $_SESSION['MovFinancAte'];
+        if (!empty($_SESSION['MovimentacaoFinanceiraConciliacaoPeriodoDe']) || !empty($_SESSION['MovimentacaoFinanceiraConciliacaoAte'])) {
+            empty($_SESSION['MovimentacaoFinanceiraConciliacaoPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_SESSION['MovimentacaoFinanceiraConciliacaoPeriodoDe'];
+            empty($_SESSION['MovimentacaoFinanceiraConciliacaoAte']) ? $inputAte = '2100-01-01' : $inputAte = $_SESSION['MovimentacaoFinanceiraConciliacaoAte'];
 
             $argsCr[]  = "CnAReDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
             $argsCp[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
         }
 
-        if (!empty($_SESSION['MovFinancContaBanco'])) {
-            $argsCr[]  = "CnAReContaBanco = " . $_SESSION['MovFinancContaBanco'] . " ";
-            $argsCp[]  = "CnAPaContaBanco = " . $_SESSION['MovFinancContaBanco'] . " ";
+        if (!empty($_SESSION['MovimentacaoFinanceiraConciliacaoContaBanco'])) {
+            $argsCr[]  = "CnAReContaBanco = " . $_SESSION['MovimentacaoFinanceiraConciliacaoContaBanco'] . " ";
+            $argsCp[]  = "CnAPaContaBanco = " . $_SESSION['MovimentacaoFinanceiraConciliacaoContaBanco'] . " ";
         }
 
-        if (!empty($_SESSION['MovFinancCentroDeCustos'])) {
+        if (!empty($_SESSION['MovimentacaoFinanceiraConciliacaoCentroDeCustos'])) {
             $argsCenCustCp = " join PlanoContas
                                 on PlConId = CnAPaPlanoContas
                                 join CentroCusto
@@ -224,23 +224,23 @@ function queryPesquisa(){
                                 join CentroCusto
                                 on CnCusId = PlConCentroCusto ";
                             
-            $argsCr[]  = "CnCusId = " . $_SESSION['MovFinancContaBanco'] . " ";
-            $argsCp[]  = "CnCusId = " . $_SESSION['MovFinancContaBanco'] . " ";
-            $_SESSION['MovFinancCentroDeCustos'] = $_POST['cmbCentroDeCustos'];
+            $argsCr[]  = "CnCusId = " . $_SESSION['MovimentacaoFinanceiraConciliacaoContaBanco'] . " ";
+            $argsCp[]  = "CnCusId = " . $_SESSION['MovimentacaoFinanceiraConciliacaoContaBanco'] . " ";
+            $_SESSION['MovimentacaoFinanceiraConciliacaoCentroDeCustos'] = $_POST['cmbCentroDeCustos'];
         }
 
-        if (!empty($_SESSION['MovFinancPlanoContas'])) {
-            $argsCr[]  = "CnARePlanoContas = " . $_SESSION['MovFinancPlanoContas'] . " ";
-            $argsCp[]  = "CnAPaPlanoContas = " . $_SESSION['MovFinancPlanoContas'] . " ";
+        if (!empty($_SESSION['MovimentacaoFinanceiraConciliacaoPlanoContas'])) {
+            $argsCr[]  = "CnARePlanoContas = " . $_SESSION['MovimentacaoFinanceiraConciliacaoPlanoContas'] . " ";
+            $argsCp[]  = "CnAPaPlanoContas = " . $_SESSION['MovimentacaoFinanceiraConciliacaoPlanoContas'] . " ";
         }
 
-        if (!empty($_SESSION['MovFinancFormaPagamento'])) {
-            $argsCr[]  = "CnAReFormaPagamento = " . $_SESSION['MovFinancFormaPagamento'] . " ";
-            $argsCp[]  = "CnAPaFormaPagamento = " . $_SESSION['MovFinancFormaPagamento'] . " ";
+        if (!empty($_SESSION['MovimentacaoFinanceiraConciliacaoFormaPagamento'])) {
+            $argsCr[]  = "CnAReFormaPagamento = " . $_SESSION['MovimentacaoFinanceiraConciliacaoFormaPagamento'] . " ";
+            $argsCp[]  = "CnAPaFormaPagamento = " . $_SESSION['MovimentacaoFinanceiraConciliacaoFormaPagamento'] . " ";
         }
 
-        if (!empty($_POST['MovFinancStatus'])) {
-            $statusSession = explode('|', $_SESSION['MovFinancStatus']);
+        if (!empty($_POST['MovimentacaoFinanceiraConciliacaoStatus'])) {
+            $statusSession = explode('|', $_SESSION['MovimentacaoFinanceiraConciliacaoStatus']);
 
             if ($statusSession[0] === "12") {
                 $argsCp[]  = "CnAPaStatus = 12";
@@ -337,7 +337,7 @@ function queryPesquisa(){
                 $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
                         ORDER BY DATA DESC";
             }
-
+    
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -419,24 +419,6 @@ function queryPesquisa(){
                     }
 
 
-                    //CONTA CAIXA
-                    if (isset($item['CONTABANCO']) && $item['CONTABANCO'] != 0) {
-                        $sql = "SELECT  CnBanNome
-                                  FROM  ContaBanco
-                                  JOIN  Situacao 
-                                    ON  SituaId = CnBanStatus
-                                 WHERE  CnBanUnidade = " . $_SESSION['UnidadeId'] . " 
-                                   AND  SituaChave = 'ATIVO'
-                                   AND  CnBanId = ". $item['CONTABANCO'] ."";
-                        $result = $conn->query($sql);
-                        $ContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                        $print .= "<td class='even' style='text-align: left;'>" . $ContaBanco[0]['CnBanNome'] . "</td>";
-                    } else {
-                        $print .= "<td class='even' style='text-align: left;'></td>";
-                    }
-
-
                     //NUMERO DO DOCUMENTO
                     $print .= "<td class='even' style='text-align: left;width: 15%;'>" . $item['NUMDOC'] . "</td>";
 
@@ -458,6 +440,13 @@ function queryPesquisa(){
                     }
                     else {
                         $print .= "<td class='even' style='color: green;text-align: right;padding-right:40px;'>" . mostraValor($saldo) . "</td>";
+                    }
+
+                    if ($item['CONCILIADO'] >= 1) {
+                        $saldo < 0 ? $print .= "<td class='even' style='color: red;text-align: right;padding-right:40px;'>" . mostraValor($saldo) . "</td>" : $print .= "<td class='even' style='color: green;text-align: right;padding-right:40px;'>" . mostraValor($saldo) . "</td>";
+
+                    } else if ($item['CONCILIADO'] !== 0) {
+                        $print .= "<td class='even' style='color: red;text-align: right;padding-right:40px;'>0,00</td>";
                     }
                     
                     //MENU EDITAR E EXCLUIR

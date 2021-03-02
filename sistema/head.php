@@ -30,3 +30,4 @@
 	<!-- /theme JS files -->
 
 	<link href="global_assets/css/lamparinas/custom.css" rel="stylesheet" type="text/css">
+	<script src="https://kit.fontawesome.com/b50bb46703.js" crossorigin="anonymous"></script>
