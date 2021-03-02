@@ -6,20 +6,24 @@ $_SESSION['PaginaAtual'] = 'Lotacao';
 
 include('global_assets/php/conexao.php');
 
-if (isset($_POST['inputEmpresaId'])){
-	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
-	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
+if (isset($_POST['inputUsuarioId'])){
+	$_SESSION['UsuarioId'] = $_POST['inputUsuarioId'];
+	$_SESSION['UsuarioNome'] = $_POST['inputUsuarioNome'];
+	$_SESSION['UsuarioPerfil'] = $_POST['inputUsuarioPerfil'];
+	$_SESSION['EmpresaUsuarioPerfil'] = $_POST['inputEmpresaUsuarioPerfil'];
 }
 
-if (!isset($_SESSION['EmpresaId'])) {
-	irpara("empresa.php");
+if (!isset($_SESSION['UsuarioId'])){
+	irpara('usuario.php');
 }
 
-$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UnidaNome, SetorNome
+$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome
 		FROM UsuarioXUnidade
 		JOIN Unidade ON UnidaId = UsXUnUnidade
 		JOIN Setor ON SetorId = UsXUnSetor
-	    WHERE UsXUnEmpresaUsuarioPerfil = ". $_SESSION['EmpresaId'] ."
+		LEFT JOIN LocalEstoque on LcEstId = UsXUnLocalEstoque
+		JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
+	    WHERE EXUXPUsuario = ". $_SESSION['UsuarioId'] ."
 		ORDER BY UsXUnUnidade";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -112,17 +116,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaLotacao( UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, Tipo){
+		function atualizaLotacao(UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, Tipo){
 		
-		
+			document.getElementById('inputEmpresaUsuarioPerfil').value = UsXUnEmpresaUsuarioPerfil;
 			document.getElementById('inputUnidade').value = UsXUnUnidade;
-			document.getElementById('inputSetor').value = UsXUnSetor;
-			document.getElementById('inputLocalEstoque').value = UsXUnLocalEstoque;
 			
-					
 			if (Tipo == 'exclui'){
-				confirmaExclusao(document.formLotacao, "Tem certeza que deseja excluir esse Lotação?", "usuarioLotacaoExclui.php");
+				confirmaExclusao(document.formLotacao, "Tem certeza que deseja excluir essa Lotação?", "usuarioLotacaoExclui.php");
 			} 		
+
 			document.formLotacao.submit();
 		}		
 			
@@ -130,16 +132,28 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 </head>
 
-<body class="navbar-top sidebar-xs">
+	<?php
+		
+		if (isset($_SESSION['EmpresaId'])){	
+			print('<body class="navbar-top sidebar-xs">');
+		} else {
+			print('<body class="navbar-top">');
+		}
 
-	<?php include_once("topo.php"); ?>	
+		include_once("topo.php");
+	?>	
 
 	<!-- Page content -->
 	<div class="page-content">
 		
-		<?php include_once("menu-left.php"); ?>
+		<?php 
+			
+			include_once("menu-left.php"); 
 		
-		<?php include_once("menuLeftSecundario.php"); ?>		
+			if (isset($_SESSION['EmpresaId'])){
+				include_once("menuLeftSecundario.php");
+			}
+		?>			
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -161,11 +175,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-9" class="card-body">	
-									A relação abaixo faz referência a Lotação do <span style="color: #FF0000; font-weight: bold;">Usúario <?php echo $_SESSION['UsuarNome']; ?></span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>	
+									A relação abaixo faz referência a lotação do usúario<span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['UsuarioNome']; ?></span> na empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b>	
 									</div>	
 									
 									<div class="col-lg-3">	
-										<div class="text-right"><a href="usuarioLotacaoNovo.php" class="btn btn-principal" role="button">Nova Lotação</a></div>
+										<div class="text-right">
+											<a href="usuario.php" style="margin-right: 10px;"><< Usuários</a>
+											<a href="usuarioLotacaoNovo.php" class="btn btn-principal" role="button">Nova Lotação</a>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -189,14 +206,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<tr>
 											<td>'.$item['UnidaNome'].'</td>
 											<td>'.$item['SetorNome'].'</td>
-											<td>'.$item['UsXUnLocalEstoque'].'</td>
+											<td>'.$item['LcEstNome'].'</td>
 											');
 										
 										
 										print('<td class="text-center">                             
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-													<a href="#" onclick="atualizaLotacao('.$item['UsXUnUnidade'].', \''.$item['UsXUnSetor'].'\', \''.$item['UsXUnLocalEstoque'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>							
+													<a href="#" onclick="atualizaLotacao('.$item['UsXUnEmpresaUsuarioPerfil'].', '.$item['UsXUnUnidade'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>							
 													</div>
 												</div>
 											</td>
@@ -215,10 +232,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<!-- /info blocks -->
 				
 				<form name="formLotacao" method="post">
+					<input type="hidden" id="inputEmpresaUsuarioPerfil" name="inputEmpresaUsuarioPerfil" >
 					<input type="hidden" id="inputUnidade" name="inputUnidade" >
-					<input type="hidden" id="inputSetor" name="inputSetor" >
-					<input type="hidden" id="inputLocalEstoque" name="inputLocalEstoque" >
-					</form>
+				</form>
 
 			</div>
 			<!-- /content area -->

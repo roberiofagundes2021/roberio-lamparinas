@@ -6,29 +6,30 @@ $_SESSION['PaginaAtual'] = 'Nova Lotacao';
 
 include('global_assets/php/conexao.php');
 
-
-$EmpresaId = $_SESSION['EmpresaId'];
-
+if (isset($_SESSION['EmpresaId'])){	
+	$EmpresaId = $_SESSION['EmpresaId'];
+} else {	
+	$EmpresaId = $_SESSION['EmpreId'];
+}
 
 if(isset($_POST['cmbUnidade'])){
 
 	try{
 		//echo $_POST['cmbUnidade'];die;
 		$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
-				    VALUES (:iEmpresa, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
+				    VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-           
+            ':iEmpresaUsarioPerfil' => $_SESSION['EmpresaUsuarioPerfil'],
             ':iUnidade' => $_POST['cmbUnidade'],
             ':iSetor' => $_POST['cmbSetor'],
-            ':iLocalEstoque' => $_POST['cmbLocalEstoque'] == "" ? null : $_POST['cmbLocalEstoque'],
-            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-            ':iEmpresa' => $EmpresaId
+            ':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) && $_POST['cmbLocalEstoque'] == "" ? $_POST['cmbLocalEstoque'] : null,
+            ':iUsuarioAtualizador' => $_SESSION['UsuarId']
             ));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Lotação incluído!!!";
+		$_SESSION['msg']['mensagem'] = "Lotação incluída!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
@@ -122,41 +123,37 @@ if(isset($_POST['cmbUnidade'])){
 
       e.preventDefault();
 
-     
       var cmbUnidade = $('#cmbUnidade').val(); 
-      
+      var cmbSetor = $('#cmbSetor').val(); 
+           
+      if (cmbSetor == '') {
+        $("#formLotacao").submit();
+      } else {
+        //Esse ajax está sendo usado para verificar no banco se o registro já existe
+        $.ajax({
+          type: "POST",
+          url: "usuarioLotacaoValida.php",
+          data: ('unidade='+cmbUnidade),
+          success: function(resposta) {
 
-     //   !cmbUnidade && $("#formSetor").submit();
+            if (resposta == 1) {
+              alerta('Atenção','Essa Unidade já existe!','error');
+              return false;
+            }
 
-     //remove os espaços desnecessários antes e depois
-     
-     cmbUnidade = cmbUnidade.trim();
-
-     
-      //Esse ajax está sendo usado para verificar no banco se o registro já existe
-      $.ajax({
-        type: "POST",
-        url: "usuarioLotacaoValida.php",
-        data: ('nome='+cmbUnidade),
-        success: function(resposta) {
-
-          if (resposta == 1) {
-            alerta('Atenção','Essa Unidade já existe!','error');
-            return false;
+            $("#formLotacao").submit();
           }
-
-          $("#formLotacao").submit();
-        }
-      })    
+        })
+      }
     })
 
       function Filtrando() {
-				$('#cmbSetor').empty().append('<option value="#">Filtrando...</option>');
-				$('#cmbLocalEstoque').empty().append('<option value="#">Filtrando...</option>');
+				$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
+				$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
 			}
 
 			function ResetSetor() {
-				$('#cmbSetor').empty().append('<option value="#">Sem setor</option>');
+				$('#cmbSetor').empty().append('<option value="">Sem setor</option>');
 			}
 
       function ResetLocalEstoque() {
@@ -228,15 +225,23 @@ if(isset($_POST['cmbUnidade'])){
                     </select>
                   </div>
                 </div>	
-                <div class="col-lg-3">
-                  <div class="form-group">
-                    <label for="cmbLocalEstoque">Local de Estoque</span></label>
-                    <select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2">
-                      <option value="">Local de Estoque</option>
-                    </select>
-                  </div>
-                </div>
+                
+                <?php 
 
+                  if ($_SESSION['UsuarioPerfil'] == 'ALMOXARIFADO'){
+                    print('
+                      <div class="col-lg-3">
+                        <div class="form-group">
+                          <label for="cmbLocalEstoque">Local de Estoque</span></label>
+                          <select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
+                            <option value="">Local de Estoque</option>
+                          </select>
+                        </div>
+                      </div>
+                    ');
+                  }
+
+                ?>
               </div>
                 
               <div class="row" style="margin-top: 10px;">

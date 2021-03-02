@@ -4,16 +4,18 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['input'])){
+if(isset($_POST['inputEmpresaUsuarioPerfil'])){
 	
-	$$iLotação = $_POST['input'];
+	$iEmpresaUsuarioPerfil = $_POST['inputEmpresaUsuarioPerfil'];
+	$iUnidade = $_POST['inputUnidade'];
         	
 	try{
 		
 		$sql = "DELETE FROM UsuarioXUnidade
-				WHERE UsXUnEmpresaUsuarioPerfil = :id";
-		$result = $conn->prepare("$sql");
-		$result->bindParam(':id', $iLotação); 
+				WHERE UsXUnEmpresaUsuarioPerfil = :iEmpresaUsuarioPerfil and UsXUnUnidade = :iUnidade";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':iEmpresaUsuarioPerfil', $iEmpresaUsuarioPerfil); 
+		$result->bindParam(':iUnidade', $iUnidade); 
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -30,6 +32,6 @@ if(isset($_POST['input'])){
 	}
 }
 
-irpara("veiculo.php");
+irpara("usuarioLotacao.php");
 
 ?>
