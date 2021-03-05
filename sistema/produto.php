@@ -259,7 +259,11 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 											</div>
 											<!--<a href="produtoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Imprimir</a></div>-->
 										</div>
+									</div>
+								</div>
 
+								<div class="row">
+									<div class="col-lg-12">
 										<!--<a href="produtoImportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>-->
 										<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 15px; border-top:1px solid #ddd; padding-top: 10px;">
 											<div class="row">
@@ -279,25 +283,24 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 											</div>
 										</div>
 
-
 										<?php
 
-										if (isset($_SESSION['RelImportacao']) and $_SESSION['RelImportacao'] != '') {
+											if (isset($_SESSION['RelImportacao']) and $_SESSION['RelImportacao'] != '') {
 
-											if (isset($_SESSION['Importacao']) and $_SESSION['Importacao'] == 'Erro') {
-												$classe = 'alert alert-warning';
-											} else {
-												$classe = 'alert alert-success';
+												if (isset($_SESSION['Importacao']) and $_SESSION['Importacao'] == 'Erro') {
+													$classe = 'alert alert-warning';
+												} else {
+													$classe = 'alert alert-success';
+												}
+
+												print('<div class="' . $classe . ' alert-dismissible fade show" role="alert" style="margin-top: 10px;">' . $_SESSION['RelImportacao'] . '
+															<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+															<span aria-hidden="true">&times;</span>
+															</button>
+														</div>');
+												unset($_SESSION['RelImportacao']);
+												//echo "<script> alerta('Atenção','".$_SESSION['RelImportacao']."','error'); </script>";  //Nao sei porque nao aparece
 											}
-
-											print('<div class="' . $classe . ' alert-dismissible fade show" role="alert" style="margin-top: 10px;">' . $_SESSION['RelImportacao'] . '
-														<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-														<span aria-hidden="true">&times;</span>
-														</button>
-													</div>');
-											unset($_SESSION['RelImportacao']);
-											//echo "<script> alerta('Atenção','".$_SESSION['RelImportacao']."','error'); </script>";  //Nao sei porque nao aparece
-										}
 
 										?>
 									</div>

@@ -402,7 +402,7 @@ if (isset($_POST['inputData'])) {
 												JOIN Situacao on SituaId = CategStatus
 												WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 												ORDER BY CategNome ASC";
-										$result = $conn->query("$sql");
+										$result = $conn->query($sql);
 										$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
 										foreach ($rowCategoria as $item) {
@@ -441,7 +441,7 @@ if (isset($_POST['inputData'])) {
 											$sql = "SELECT LcEstId, LcEstNome
 													FROM LocalEstoque
 													JOIN Situacao on SituaId = LcEstStatus
-													WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and LcEstUnidade = " . $row['InvenUnidade'] . " and SituaChave = 'ATIVO'
+													WHERE LcEstUnidade = " . $row['InvenUnidade'] . " and SituaChave = 'ATIVO'
 													ORDER BY LcEstNome ASC";
 											$result = $conn->query($sql);
 											$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
