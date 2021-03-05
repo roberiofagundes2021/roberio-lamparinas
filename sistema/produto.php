@@ -263,14 +263,14 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 										<!--<a href="produtoImportar.php" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Importar Produtos"><i class="icon-drawer-in"></i></a>-->
 										<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 15px; border-top:1px solid #ddd; padding-top: 10px;">
 											<div class="row">
-												<div class="col-lg-9">
+												<div class="col-lg-7">
 													<a href="#">
 														<h2>Modelo de importação</h2>
 													</a>
 													<p style="font-weight: bold;">CodigoBarras | Nome do Produto | Detalhamento do Produto</p>
 													<p>Observação: Favor salvar a planilha como tipo (Planilha XML 2003). O arquivo deve conter 3 colunas apenas, sendo que a primeira linha deve ter o cabeçalho acima.</p>
 												</div>
-												<div class="col-lg-3">
+												<div class="col-lg-5">
 													<form name="formUpload" id="formUpload" method="post" enctype="multipart/form-data" action="produtoImporta.php">
 														<input type="file" class="form-control" id="arquivo" name="arquivo">
 														<button class="btn bg-slate-700 btn-icon" id="enviar"><i class="icon-printer2"> Importar produtos</i></button>

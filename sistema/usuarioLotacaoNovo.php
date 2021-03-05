@@ -250,7 +250,7 @@ if(isset($_POST['cmbUnidade'])){
                     print('
                       <div class="col-lg-3">
                         <div class="form-group">
-                          <label for="cmbLocalEstoque">Local de Estoque</span></label>
+                          <label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
                           <select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
                             <option value="">Local de Estoque</option>
                           </select>

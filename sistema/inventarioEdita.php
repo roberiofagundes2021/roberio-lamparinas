@@ -26,7 +26,7 @@ if (isset($_POST['inputInventarioId'])) {
 				FROM LocalEstoque
 				JOIN InventarioXLocalEstoque on InXLELocal = LcEstId
 				JOIN Situacao on SituaId = LcEstStatus
-				WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and InXLEInventario = " . $iInventario . " and SituaChave = 'ATIVO'
+				WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and InXLEInventario = " . $iInventario . " and SituaChave = 'ATIVO'
 				ORDER BY LcEstNome ASC";
 		$result = $conn->query("$sql");
 		$rowBDLocal = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -38,7 +38,7 @@ if (isset($_POST['inputInventarioId'])) {
 				 FROM Setor
 				 JOIN InventarioXSetor on InXSeSetor = SetorId
 				 JOIN Situacao on SituaId = SetorStatus
-				 WHERE SetorEmpresa = " . $_SESSION['EmpreId'] . " and InXSeInventario = " . $iInventario . " and SituaChave = 'ATIVO'
+				 WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and InXSeInventario = " . $iInventario . " and SituaChave = 'ATIVO'
 				 ORDER BY SetorNome ASC";
 		$result = $conn->query($sql);
 		$rowBDSetor = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -486,13 +486,14 @@ if (isset($_POST['inputData'])) {
 							</div>
 							<br>
 <?php 
-foreach ($rowSetor as $key => $item) {
+//foreach ($rowSetor as $key => $item) {
 	//$seleciona = array_key_exists($item['SetorId'], $aSetores) ? "selected" : "";
 	//$seleciona = array_key_exists($item['SetorId'], $aSetores) ? "selected" : "";
-	if(in_array                                                ($item['SetorId'], $aSetores)){
-		printf('existe');
-	}
-} ?>
+//	if(in_array                                                ($item['SetorId'], $aSetores)){
+//		printf('existe');
+//	}
+//} 
+?>
 <?php ///var_dump($aSetores); ?>
 							<h5 class="mb-0 font-weight-semibold">Comissão de Inventário</h5>
 							<br>
