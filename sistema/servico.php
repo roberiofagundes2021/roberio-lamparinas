@@ -242,6 +242,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											</div>	
 											<!--<a href="produtoImprimir.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Imprimir Relação" target="_blank">Imprimir</a></div>-->
 										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-lg-12">
 
 										<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 15px; border-top:1px solid #ddd; padding-top: 10px;">
 											<div class="row">
