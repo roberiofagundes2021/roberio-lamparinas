@@ -226,7 +226,7 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 										<p class="font-size-lg">Os usuários cadastrados abaixo pertencem a empresa <b><?php echo $EmpresaNome; ?></b>.</p>
 									</div>
 									<div class="col-lg-3">	
-										<div class="text-right"><a href="#" onclick="atualizaUsuario(0, '', '', 'novo')" class="btn btn-principal" role="button">Novo usuário</a></div>
+										<div class="text-right"><a href="#" onclick="atualizaUsuario(0, '', '', '', '', 'novo')" class="btn btn-principal" role="button">Novo usuário</a></div>
 									</div>
 								</div>
 							</div>							

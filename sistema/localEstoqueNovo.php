@@ -81,6 +81,11 @@ if(isset($_POST['inputNome'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
+
+				if (inputNome == '' || cmbUnidade == ''){
+					$( "#formLocalEstoque" ).submit();
+					return false;
+				}
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({

@@ -106,6 +106,11 @@ if(isset($_POST['inputNome'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNomeNovo = inputNomeNovo.trim();
+
+				if (inputNomeNovo == '' || cmbUnidade == ''){
+					$( "#formLocalEstoque" ).submit();
+					return false;
+				}				
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -128,7 +133,7 @@ if(isset($_POST['inputNome'])){
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top <?php if (isset($_SESSION['EmpresaId'])) echo "sidebar-xs"; ?>">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -136,6 +141,12 @@ if(isset($_POST['inputNome'])){
 	<div class="page-content">
 		
 		<?php include_once("menu-left.php"); ?>
+
+		<?php 
+			if (isset($_SESSION['EmpresaId'])){ 
+				include_once("menuLeftSecundario.php");
+			} 
+		?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
