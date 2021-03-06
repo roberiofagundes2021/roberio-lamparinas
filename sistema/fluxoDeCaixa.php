@@ -1,30 +1,9 @@
 <?php 
 
+include('global_assets/php/conexao.php');
 include_once("sessao.php"); 
-
 $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
-include('global_assets/php/conexao.php');
-
-// try {
-// 	$sql = "SELECT *
-// 	FROM Cliente
-// 		WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . "
-// 	ORDER BY ClienNome ASC";
-// 	$result = $conn->query($sql);
-// 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
-// 	//$count = count($row);
-// } catch (Exception $e) {
-// 	echo ($e);
-// }
-
-// $d = date("d");
-// $m = date("m");
-// $Y = date("Y");
-
-// // $dataInicio = date("Y-m-01"); //30 dias atrás
-// $dataInicio = date("Y-m-d");
-// $dataFim = date("Y-m-d");
 ?>
 
 <!DOCTYPE html>
@@ -62,36 +41,134 @@ include('global_assets/php/conexao.php');
 
 
 		document.addEventListener('DOMContentLoaded', () => {
-			// MUDANCA DO CAMPO DE DATAS
+			// Atribuição dos campos de filtro da tela
 			const buttonDay = document.querySelector('#submitDay');
 			const buttonMonth = document.querySelector('#submitMonth');
-			const dateInitial = document.querySelector('#inputDataInicio');
-			const dateEnd = document.querySelector('#inputDataFim');
+			const inputDateInitial = document.querySelector('#inputDataInicio');
+			const inputDateEnd = document.querySelector('#inputDataFim');
+			const cmbCentroDeCustos = document.querySelector('#cmbCentroDeCustos');
+			const cmbPlanoContas = document.querySelector('#cmbPlanoContas');
+			const submitPesquisar = document.querySelector('#submitPesquisar');
+
+
+			inputDateInitial.addEventListener('change', (e) => {
+				const monthInitial = (inputDateInitial.value).split('-')[1] ? (inputDateInitial.value).split('-')[1] : "";
+				const monthEnd = (inputDateEnd.value).split('-')[1] ? (inputDateEnd.value).split('-')[1] : "";
+				const dayInitial = (inputDateInitial.value).split('-')[2] ? (inputDateInitial.value).split('-')[2] : "";
+				const dayEnd = (inputDateEnd.value).split('-')[2] ? (inputDateEnd.value).split('-')[2] : "";
+				const typeDate = document.querySelector('.btn.active').textContent;
+
+				if (typeDate === 'Dia') {
+					if ((monthEnd !== '' && monthEnd !== null) && (monthInitial !== '' && monthInitial !== null) && (monthEnd !== monthInitial)) {
+						alerta('Atenção','A data final está com um mês diferente da data que você está informando. Você só pode pesquisar períodos dentro do mesmo mês!', 'error');
+						inputDateInitial.value = "";
+					} else if ((dayInitial !== '' && dayInitial !== null) && (dayEnd !== '' && dayEnd !== null) && (dayInitial > dayEnd)) {
+						alerta('Atenção','A data inicial tem que ser menor que a data final!', 'error');
+						inputDateInitial.value = "";
+					}
+				}
+				
+			});
+
+
+			inputDateEnd.addEventListener('change', (e) => {
+				const monthInitial = (inputDateInitial.value).split('-')[1] ? (inputDateInitial.value).split('-')[1] : "";
+				const monthEnd = (inputDateEnd.value).split('-')[1] ? (inputDateEnd.value).split('-')[1] : "";
+				const dayInitial = (inputDateInitial.value).split('-')[2] ? (inputDateInitial.value).split('-')[2] : "";
+				const dayEnd = (inputDateEnd.value).split('-')[2] ? (inputDateEnd.value).split('-')[2] : "";
+				const typeDate = document.querySelector('.btn.active').textContent;
+
+				if (typeDate === 'Dia') {
+					if ((monthEnd !== '' && monthEnd !== null) && (monthInitial !== '' && monthInitial !== null) && (monthEnd !== monthInitial)) {
+						alerta('Atenção','A data inicial está com um mês diferente da data que você está informando. Você só pode pesquisar períodos dentro do mesmo mês!', 'error');
+						inputDateEnd.value = "";
+					} else if ((dayInitial !== '' && dayInitial !== null) && (dayEnd !== '' && dayEnd !== null) && (dayEnd < dayInitial)) {
+						alerta('Atenção','A data final tem que ser maior que a data inicial!', 'error');
+						inputDateEnd.value = "";
+					}
+				}
+			});
+
 
 			buttonDay.addEventListener('click', (e) => {
 				e.preventDefault();
-				dateInitial.type = 'date';
-				dateEnd.type = 'date';
+				inputDateInitial.type = 'date';
+				inputDateEnd.type = 'date';
 
 				buttonDay.style.background = '#607D8B';
 				buttonDay.style.color = 'white';
+				buttonDay.classList.add('active');
 
 				buttonMonth.style.background = '#CCCCCC';
 				buttonMonth.style.color = 'black';
+				buttonMonth.classList.remove('active');
 			})
+
 
 			buttonMonth.addEventListener('click', (e) => {
 				e.preventDefault();
-				dateInitial.type = 'month';
-				dateEnd.type = 'month';
+				inputDateInitial.type = 'month';
+				inputDateEnd.type = 'month';
 
 				buttonMonth.style.background = '#607D8B';
 				buttonMonth.style.color = 'white';
+				buttonMonth.classList.add('active');
 
 				buttonDay.style.background = '#CCCCCC';
 				buttonDay.style.color = 'black';
-			})
-		})
+				buttonDay.classList.remove('active');
+			});
+
+
+			submitPesquisar.addEventListener('click', (e) => {
+				e.preventDefault();
+				
+				const getData = () => {
+					let url = "fluxoDeCaixaFiltra.php";
+					const typeDate = buttonDay.classList.contains('active') ? 'D' : 'M';
+					const dayInitial = (inputDateInitial.value).split('-')[2] ? (inputDateInitial.value).split('-')[2] : "";
+					const dayEnd = (inputDateEnd.value).split('-')[2] ? (inputDateEnd.value).split('-')[2] : "";
+					const quantityDays = dayEnd - dayInitial;
+					const quantityPages = Math.ceil(quantityDays / 4);
+
+					request = {
+						quantityPages: quantityPages,
+						typeDate: typeDate,
+						quantityDays: quantityDays,
+						dayInitial: dayInitial,
+						dayEnd: dayEnd,
+						inputDateInitial: inputDateInitial.value,
+						inputDateEnd: inputDateEnd.value,
+						cmbCentroDeCustos: cmbCentroDeCustos.value,
+						cmbPlanoContas: cmbPlanoContas.value,
+					};
+
+					try {
+						$.post(
+							url,
+							request,
+							(response) => {
+								if (response) {
+									$('#dataResponse').html(response);
+								}
+							}
+						);
+					} catch(err) {
+					console.error('Houve um error: ',err);
+					}
+				} 
+
+				inputDateInitial.value === '' || inputDateInitial.value === null 
+					? alerta('Atenção','Informe o período inicial!', 'error')
+				: inputDateEnd.value === '' || inputDateEnd.value === null 
+					? alerta('Atenção','Informe o período final!', 'error')
+				: cmbCentroDeCustos.value === '' || cmbCentroDeCustos.value === null 
+					? alerta('Atenção','Selecione pelo menos um Centro de Custo!', 'error') 
+				: cmbPlanoContas.value === '' || cmbPlanoContas.value === null 
+				  ? alerta('Atenção','Selecione pelo menos um Plano de Contas!', 'error')
+					: getData();
+			});
+		});
 	</script>
 
 </head>
@@ -134,7 +211,7 @@ include('global_assets/php/conexao.php');
 									<div class="row">
 										<div class="text-left col-lg-2 pt-3">
 												<span>Exibição: </span>
-												<button id="submitDay" class="btn" style="margin-left: 1rem; background:#607D8B; color:white;">Dia</button>
+												<button id="submitDay" class="btn active" style="margin-left: 1rem; background:#607D8B; color:white;">Dia</button>
 												<button id="submitMonth" class="btn">Mês</button>
                     </div>
 
@@ -219,22 +296,7 @@ include('global_assets/php/conexao.php');
 								</form>
 							</div>
 
-
-							<div class="row">
-								<div class="col-lg-12">
-									<!-- Basic responsive configuration -->
-										<div class="card-body" >
-											<div class="row">
-												<div class="col-lg-2">
-												</div>
-												<div class="col-lg-2" style='text-align:center; border-top: 2px solid #1B3280; padding-top: 1rem;'>
-													<span><strong>2021</strong></span><br/>
-													<span><strong>JAN</strong></span>
-												</div>
-											</div>
-										</div>
-								</div>
-							</div>
+							<div id="dataResponse"></div>
 
 							<!-- <div class="row">
 								<div class="col-lg-12">
@@ -252,224 +314,6 @@ include('global_assets/php/conexao.php');
 								</div>
 							</div> -->
 
-							
-							<div class="row" style="margin-bottom: 1rem;">
-								<!-- SALDO INICIAL -->
-								<div class="col-lg-12">
-									<!-- Basic responsive configuration -->
-										<div class="card-body" style="padding-top: 0;">
-											<div class="row" style="background: #CCCCCC; line-height: 3rem; box-sizing:border-box">
-												<div class="col-lg-2" style="border-right: 1px dotted black;">
-													<span><strong>Saldo Inicial</strong></span>
-												</div>
-
-												<div class="dataOpeningBalance col-lg-2" style="border-right: 1px dotted black; text-align:center;">
-													<div class="row">
-														<div class='col-md-6'>
-															<span>2000,00</span>
-														</div>
-
-														<div class='col-md-6'>
-															<span>3000,00</span>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-								</div>
-							</div>
-							<!-- SALDO INICIAL -->
-
-							<!-- ENTRADA -->
-							<div class="row">
-								<div class="col-lg-12">
-									<!-- Basic responsive configuration -->
-									<div class="card-body" style="padding-top: 0; padding-bottom: 0">
-										<div class="row" style="background: #607D8B; line-height: 3rem; box-sizing:border-box; color:white;">
-											<div class="col-lg-2" style="border-right: 1px dotted black;"><strong>ENTRADA</strong></div> 
-
-											<div class="dataOpeningBalance col-lg-2" style="border-right: 1px dotted black; text-align:center;">
-												<div class="row">
-													<div class='col-md-6'>
-														<span><strong>Previsto</strong></span>
-													</div>
-
-													<div class='col-md-6'>
-														<span><strong>Realizado</strong></span>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-
-									<div class="card-body" style="padding-top: 0;">
-										<div class="row" style="background: #CCCCCC; line-height: 3rem; box-sizing:border-box">
-											<div class="col-lg-2" style="border-right: 1px dotted black;">
-												<span>Lista com os Centros de Custo</span>
-											</div>
-
-											<div class="dataOpeningBalance col-lg-2" style="border-right: 1px dotted black; text-align:center;">
-												<div class="row">
-													<div class='col-md-6'>
-														<span>2000,00</span>
-													</div>
-
-													<div class='col-md-6'>
-														<span>3000,00</span>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							
-
-							<!-- TOTAL ENTRADA -->
-							<div class="row">
-								<div class="col-lg-12">
-									<!-- Basic responsive configuration -->
-										<div class="card-body" style="padding-top: 0;">
-											<div class="row" style="background: #CCCCCC; line-height: 3rem; box-sizing:border-box">
-												<div class="col-lg-2" style="border-right: 1px dotted black;">
-												<span><strong>TOTAL</strong></span>
-												</div>
-
-												<div class="dataOpeningBalance col-lg-2" style="border-right: 1px dotted black; text-align:center;">
-													<div class="row">
-														<div class='col-md-6'>
-															<span>2000,00</span>
-														</div>
-
-														<div class='col-md-6'>
-															<span>3000,00</span>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-								</div>
-							</div>
-							<!-- TOTAL ENTRADA -->
-							<!-- ENTRADA -->
-
-							<!-- SAIDA -->
-							<div class="row" style="margin-top: 1rem;">
-								<div class="col-lg-12">
-									<!-- Basic responsive configuration -->
-									<div class="card-body" style="padding-top: 0; padding-bottom: 0">
-										<div class="row" style="background: #607D8B; line-height: 3rem; box-sizing:border-box; color:white;">
-											<div class="col-lg-2" style="border-right: 1px dotted black;"><strong>SAÍDA</strong></div> 
-
-											<div class="dataOpeningBalance col-lg-2" style="border-right: 1px dotted black; text-align:center;">
-												<div class="row">
-													<div class='col-md-6'>
-														<span><strong>Previsto</strong></span>
-													</div>
-
-													<div class='col-md-6'>
-														<span><strong>Realizado</strong></span>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-
-										<div class="card-body" style="padding-top: 0;">
-											<div class="row" style="background: #CCCCCC; line-height: 3rem; box-sizing:border-box">
-												<div class="col-lg-2" style="border-right: 1px dotted black;">
-													<span>Lista com os Centros de Custo</span>
-												</div>
-
-												<div class="dataOpeningBalance col-lg-2" style="border-right: 1px dotted black; text-align:center;">
-													<div class="row">
-														<div class='col-md-6'>
-															<span>2000,00</span>
-														</div>
-
-														<div class='col-md-6'>
-															<span>3000,00</span>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-								</div>
-							</div>
-							
-							<!-- TOTAL SAIDA -->
-							<div class="row" >
-								<div class="col-lg-12">
-									<!-- Basic responsive configuration -->
-										<div class="card-body" style="padding-top: 0;">
-											<div class="row" style="background: #CCCCCC; line-height: 3rem; box-sizing:border-box">
-												<div class="col-lg-2" style="border-right: 1px dotted black;">
-													<span><strong>TOTAL</strong></span>
-												</div>
-
-												<div class="dataOpeningBalance col-lg-2" style="border-right: 1px dotted black; text-align:center;">
-													<div class="row">
-														<div class='col-md-6'>
-															<span>2000,00</span>
-														</div>
-
-														<div class='col-md-6'>
-															<span>3000,00</span>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-								</div>
-							</div>
-							<!-- TOTAL SAIDA -->
-							<!-- SAIDA -->
-
-							<!-- SALDO FINAL -->
-							<div class="row" style="margin-top: 1rem;">
-								<div class="col-lg-12">
-									<!-- Basic responsive configuration -->
-										<div class="card-body" style="padding-top: 0;">
-											<div class="row" style="background: #CCCCCC; line-height: 3rem; box-sizing:border-box">
-												<div class="col-lg-2" style="border-right: 1px dotted black;">
-												<span><strong>SALDO FINAL</strong></span>
-												</div>
-
-												<div class="dataOpeningBalance col-lg-2" style="border-right: 1px dotted black; text-align:center;">
-													<div class="row">
-														<div class='col-md-6'>
-															<span>2000,00</span>
-														</div>
-
-														<div class='col-md-6'>
-															<span>3000,00</span>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-								</div>
-							</div>
-							<!-- SALDO FINAL -->
-
-							<!-- SALDO FINAL -->
-							<div class="row" style="margin-top: 2rem;">
-								<div class="col-lg-12">
-									<!-- Basic responsive configuration -->
-										<div class="card-body" style="padding-top: 0;">
-											<div class="row col-lg-12" style="background: #607D8B; color:white; line-height: 3rem; box-sizing:border-box">
-												<span><strong>COMPARATIVO DO PERÍODO (ENTRADA E SAÍDA): </strong></span>
-											</div>
-
-											<div class="row col-lg-12" style="background: #fff; line-height: 3rem; box-sizing:border-box">
-												<span>TOTAL SAÍDAS / TOTAL ENTRADAS * 100 = 100%</span>
-											</div>
-										</div>
-								</div>
-							</div>
-							
-							<!-- SALDO FINAL -->
-
 						<!-- FIM DO CARD -->	
 						</div>
 						<!-- /basic responsive configuration -->
@@ -479,7 +323,6 @@ include('global_assets/php/conexao.php');
 
 			</div>
 			<!-- /content area -->
-			
 			<?php include_once("footer.php"); ?>
 
 		</div>
