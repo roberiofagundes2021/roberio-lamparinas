@@ -197,8 +197,8 @@ if(isset($_POST['usuario'])){
 					$_SESSION['EmpreId'] = $row[0]['EmpreId'];
 					$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
 					$_SESSION['EmpreFoto'] = $row[0]['EmpreFoto'];
-					$_SESSION['UnidadeId'] = $rowUnidade[0]['UnidaId'];;
-					$_SESSION['UnidadeNome'] = $rowUnidade[0]['UnidaNome'];
+					$_SESSION['UnidadeId'] = $rowUnidade['UnidaId'];;
+					$_SESSION['UnidadeNome'] = $rowUnidade['UnidaNome'];
 					$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
 					//$_SESSION['UsuarLogado'] = 1;
 
