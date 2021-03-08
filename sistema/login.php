@@ -129,7 +129,7 @@ if(isset($_POST['usuario'])){
 						FROM UsuarioXUnidade
 						JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
 						JOIN Unidade on UnidaId = UsXUnUnidade
-						WHERE EXUXPUsuario = ".$row['UsuarId']." and EXUXPEmpresa = ".$piEmpresa."
+						WHERE EXUXPUsuario = ".$row[0]['UsuarId']." and EXUXPEmpresa = ".$piEmpresa."
 						";
 				$result = $conn->query($sql);
 				$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta

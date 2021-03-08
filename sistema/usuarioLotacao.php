@@ -17,17 +17,26 @@ if (!isset($_SESSION['UsuarioId'])){
 	irpara('usuario.php');
 }
 
+if (isset($_SESSION['EmpresaId'])){	
+	$EmpresaId =   $_SESSION['EmpresaId'];
+	$EmpresaNome = $_SESSION['EmpresaNome'];
+} else {	
+	$EmpresaId = $_SESSION['EmpreId'];
+	$EmpresaNome = $_SESSION['EmpreNomeFantasia'];
+}
+
 $sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome
 		FROM UsuarioXUnidade
 		JOIN Unidade ON UnidaId = UsXUnUnidade
 		JOIN Setor ON SetorId = UsXUnSetor
 		LEFT JOIN LocalEstoque on LcEstId = UsXUnLocalEstoque
 		JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
-	    WHERE EXUXPUsuario = ". $_SESSION['UsuarioId'] ."
+	    WHERE EXUXPEmpresa = ".$EmpresaId." and EXUXPUsuario = ". $_SESSION['UsuarioId'] ."
 		ORDER BY UsXUnUnidade";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
+//echo $sql;die;
 
 ?>
 
@@ -175,7 +184,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-9" class="card-body">	
-									A relação abaixo faz referência a lotação do usúario<span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['UsuarioNome']; ?></span> na empresa <b><?php echo $_SESSION['EmpreNomeFantasia']; ?></b>	
+									A relação abaixo faz referência a lotação do usúario<span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['UsuarioNome']; ?></span> na empresa <b><?php echo $EmpresaNome; ?></b>	
 									</div>	
 									
 									<div class="col-lg-3">	
