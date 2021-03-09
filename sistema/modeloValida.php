@@ -5,15 +5,16 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['nomeVelho'])){
-	$sql = ("SELECT ModelId
-			 FROM Modelo
-			 WHERE ModelEmpresa = ".$_SESSION['EmpreId']." and ModelNome = '". $_POST['nomeNovo']."' and ModelNome <> '". $_POST['nomeVelho']."'");
+	$sql = "SELECT ModelId
+			FROM Modelo
+			WHERE ModelUnidade = ".$_SESSION['UnidadeId']." and ModelNome = '". $_POST['nomeNovo']."' and ModelNome <> '". $_POST['nomeVelho']."'";
 } else{
-	$sql = ("SELECT ModelId
-			 FROM Modelo
-			 WHERE ModelEmpresa = ".$_SESSION['EmpreId']." and ModelNome = '". $_POST['nome']."'");
+	$sql = "SELECT ModelId
+			FROM Modelo
+			WHERE ModelUnidade = ".$_SESSION['UnidadeId']." and ModelNome = '". $_POST['nome']."'";
 }
-$result = $conn->query("$sql");
+
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 
@@ -21,7 +22,12 @@ $count = count($row);
 if($count){
 	echo 1;
 } else{
-	echo 0;
+
+	if ($_POST['estadoAtual'] == 'EDITA'){
+		echo "EDITA";
+	} else{
+		echo 0;
+	}
 }
 
 ?>

@@ -5,7 +5,7 @@ include_once("sessao.php");
 $_SESSION['PaginaAtual'] = 'Categoria';
 
 include('global_assets/php/conexao.php');
-
+//Essa consulta é para preencher a grid
 //O ALTERAR é usado na importação de Produtos (eles não devem aparecer aqui)
 $sql = "SELECT CategId, CategNome, CategStatus, SituaNome, SituaChave, SituaCor
 		FROM Categoria
@@ -16,6 +16,71 @@ $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 //var_dump($count);die;
+
+//Se estiver editando
+if(isset($_POST['inputCategoriaId']) && $_POST['inputCategoriaId']){
+
+	//Essa consulta é para preencher o campo Nome com a categoria a ser editar
+	$sql = "SELECT CategId, CategNome
+			FROM Categoria
+			WHERE CategId = " . $_POST['inputCategoriaId'];
+	$result = $conn->query($sql);
+	$rowCategoria = $result->fetch(PDO::FETCH_ASSOC);
+		
+	$_SESSION['msg'] = array();
+} 
+
+//Se estiver gravando (inclusão ou edição)
+if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5) == 'GRAVA'){
+
+	try{
+
+		//Edição
+		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
+			
+			$sql = "UPDATE Categoria SET CategNome = :sNome, CategUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE CategId = :iCategoria";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iCategoria' => $_POST['inputCategoriaId']
+							));
+	
+			$_SESSION['msg']['mensagem'] = "Categoria alterada!!!";
+	
+		} else { //inclusão
+		
+			$sql = "INSERT INTO Categoria (CategNome, CategStatus, CategUsuarioAtualizador, CategUnidade)
+					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $_SESSION['UnidadeId'],
+							));
+	
+			$_SESSION['msg']['mensagem'] = "Categoria incluída!!!";
+					
+		}
+	
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['tipo'] = "success";
+					
+	} catch(PDOException $e) {
+		
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro reportado com a categoria!!!";
+		$_SESSION['msg']['tipo'] = "error";	
+		
+		echo 'Error: ' . $e->getMessage();
+	}
+
+	irpara("categoria.php");
+}
 
 ?>
 
@@ -41,7 +106,11 @@ $count = count($row);
 	<!-- Não permite que o usuário retorne para o EDITAR -->
 	<script src="global_assets/js/lamparinas/stop-back.js"></script>
 	
-	<!-- /theme JS files -->	
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+	
 	
 	<script type="text/javascript">
 
@@ -92,7 +161,43 @@ $count = count($row);
 
 			_componentSelect2();
 			
-			/* Fim: Tabela Personalizada */					
+			/* Fim: Tabela Personalizada */	
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputNomeNovo = $('#inputNome').val();
+				var inputNomeVelho = $('#inputCategoriaNome').val();
+				var inputEstadoAtual = $('#inputEstadoAtual').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNomeNovo.trim();
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "categoriaValida.php",
+					data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
+					success: function(resposta){
+
+						if(resposta == 1){
+							alerta('Atenção','Esse registro já existe!','error');
+							return false;
+						}
+
+						if (resposta == 'EDITA'){
+							document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
+						} else{
+							document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
+						}						
+						
+						$( "#formCategoria" ).submit();
+					}
+				})
+			})			
+
 		})
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -103,7 +208,8 @@ $count = count($row);
 			document.getElementById('inputCategoriaStatus').value = CategStatus;
 					
 			if (Tipo == 'edita'){	
-				document.formCategoria.action = "categoriaEdita.php";		
+				document.getElementById('inputEstadoAtual').value = "EDITA";
+				document.formCategoria.action = "categoria.php";				
 			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formCategoria, "Tem certeza que deseja excluir essa categoria?", "categoriaExclui.php");
 			} else if (Tipo == 'mudaStatus'){
@@ -141,24 +247,45 @@ $count = count($row);
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação de Categorias</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="categoria.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
+								
+
 							</div>
 
 							<div class="card-body">
-								<div class="row">
-									<div class="col-lg-9">
-										<p class="font-size-lg">A relação abaixo faz referência às categorias da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-									</div>	
-									<div class="col-lg-3">	
-										<div class="text-right"><a href="categoriaNovo.php" class="btn btn-principal" role="button">Nova Categoria</a></div>
+												
+								
+								<form name="formCategoria" id="formCategoria" method="post" class="form-validate-jquery">
+
+									<input type="hidden" id="inputCategoriaId" name="inputCategoriaId" value="<?php if (isset($_POST['inputCategoriaId'])) echo $_POST['inputCategoriaId']; ?>" >
+									<input type="hidden" id="inputCategoriaNome" name="inputCategoriaNome" value="<?php if (isset($_POST['inputCategoriaNome'])) echo $_POST['inputCategoriaNome']; ?>" >
+									<input type="hidden" id="inputCategoriaStatus" name="inputCategoriaStatus" >
+									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
+
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="inputNome">Nome da Categoria <span class="text-danger"> *</span></label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Categoria" value="<?php if (isset($_POST['inputCategoriaId'])) echo $rowCategoria['CategNome']; ?>" required autofocus>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group" style="padding-top:25px;">
+												<?php
+
+													//editando
+													if (isset($_POST['inputCategoriaId'])){
+														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+														print('<a href="categoria.php" class="btn btn-basic" role="button">Cancelar</a>');
+													} else{ //inserindo
+														print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
+													}
+
+												?>
+											</div>
+										</div>
 									</div>
-								</div>
+								</form>
+		
 							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->
@@ -205,12 +332,6 @@ $count = count($row);
 				</div>				
 				
 				<!-- /info blocks -->
-				
-				<form name="formCategoria" method="post" action="categoriaEdita.php">
-					<input type="hidden" id="inputCategoriaId" name="inputCategoriaId" >
-					<input type="hidden" id="inputCategoriaNome" name="inputCategoriaNome" >
-					<input type="hidden" id="inputCategoriaStatus" name="inputCategoriaStatus" >
-				</form>
 
 			</div>
 			<!-- /content area -->
