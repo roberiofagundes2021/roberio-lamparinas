@@ -21,7 +21,12 @@ $count = count($row);
 if($count){
 	echo 1;
 } else{
-	echo 0;
+
+	if ($_POST['estadoAtual'] == 'EDITA'){
+		echo "EDITA";
+	} else{
+		echo 0;
+	}
 }
 
 ?>

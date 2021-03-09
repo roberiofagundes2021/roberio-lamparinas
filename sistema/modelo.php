@@ -271,7 +271,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNome">Nome da Modelo <span class="text-danger"> *</span></label>
+												<label for="inputNome">Nome do Modelo <span class="text-danger"> *</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Modelo" value="<?php if (isset($_POST['inputModeloId'])) echo $rowModelo['ModelNome']; ?>" required autofocus>
 											</div>
 										</div>
