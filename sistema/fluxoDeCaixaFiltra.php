@@ -11,6 +11,36 @@ include('global_assets/php/conexao.php');
   ["cmbPlanoContas"]=>string(2) "78"
 */
 
+
+
+$sql = "SELECT CnCusId,
+CnCusNome, PlConNome, 
+dbo.fnPrevistoCentroCusto(CnCusId, ". $_SESSION['UnidadeId'].", ) as PrevistoCC, dbo.fnRealizadoCentroCusto(CnCusId, ". $_SESSION['UnidadeId'].") as RealizadoCC,
+dbo.fnPrevistoPlanoContas() as PrevistoPL, dbo.fnRealizadoPlanoContas() as RealizadoPL
+FROM CentroCusto CC
+JOIN PlanoContas PL
+ON PlConCentroCusto = CnCusId
+JOIN Situacao S1
+ON S1.SituaId = CC.CnCusStatus
+JOIN Situacao S2
+ON S2.SituaId = PL.PlConStatus
+WHERE CnCusUnidade = " . $_SESSION['UnidadeId'] . " 
+and S1.SituaChave = 'ATIVO' and S2.SituaChave = 'ATIVO'
+ORDER BY CnCusNome ASC";
+$result = $conn->query($sql);
+$rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
+
+
+foreach ($rowCentroDeCustos as $item) {
+
+}
+
+//$dia['01-02']['Previsto'] = 2000;
+//$dia['01-02']['Realizado'] = 3000;
+
+//$dia['02-02']['Previsto'] = 2000;
+//$dia['02-02']['Realizado'] = 3000;
+
 $print = "
         <div id='carouselExampleControls' class='carousel slide' data-ride='carousel'>
           <div class='carousel-inner'>
