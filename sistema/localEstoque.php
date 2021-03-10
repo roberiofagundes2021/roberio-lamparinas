@@ -6,13 +6,14 @@ $_SESSION['PaginaAtual'] = 'Local do Estoque';
 
 include('global_assets/php/conexao.php');
 
-//Essa consulta é para preencher a grid
 if (isset($_POST['inputEmpresaId'])){
 	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
 	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
 }
 
 if (isset($_SESSION['EmpresaId'])){
+	
+	//Essa consulta é para preencher a grid usando a coluna Unidade
 	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, UnidaNome, SituaNome, SituaCor, SituaChave
 			FROM LocalEstoque
 			JOIN Situacao on SituaId = LcEstStatus
@@ -24,6 +25,8 @@ if (isset($_SESSION['EmpresaId'])){
 	//$count = count($row);
 
 } else{
+	
+	//Essa consulta é para preencher a grid sem a coluna Unidade, já que aqui é a unidade do usuário logado
 	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, SituaNome, SituaCor, SituaChave
 			FROM LocalEstoque
 			JOIN Situacao on SituaId = LcEstStatus
@@ -37,8 +40,8 @@ if (isset($_SESSION['EmpresaId'])){
 //Se estiver editando
 if(isset($_POST['inputLocalEstoqueId']) && $_POST['inputLocalEstoqueId']){
 
-	//Essa consulta é para preencher o campo Nome com a Local de Estoque a ser editar
-	$sql = "SELECT LcEstId, LcEstNome
+	//Essa consulta é para preencher o campo Nome com a Local de Estoque a ser editado
+	$sql = "SELECT LcEstId, LcEstNome, LcEstUnidade
 			FROM LocalEstoque
 			WHERE LcEstId = " . $_POST['inputLocalEstoqueId'];
 	$result = $conn->query($sql);
@@ -52,20 +55,27 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 	try{
 
+		if (isset($_SESSION['EmpresaId'])){
+			$iUnidade = $_POST['cmbUnidade'];
+		} else{
+			$iUnidade = $_SESSION['UnidadeId'];
+		}
+
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
-			$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstUsuarioAtualizador = :iUsuarioAtualizador
+			$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstUnidade = :iUnidade, LcEstUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE LcEstId = :iLocalEstoque";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':iUnidade' => $iUnidade,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iLocalEstoque' => $_POST['inputLocalEstoqueId']
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Local de Estoque alterada!!!";
+			$_SESSION['msg']['mensagem'] = "Local de Estoque alterado!!!";
 	
 		} else { //inclusão
 		
@@ -77,10 +87,10 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':sNome' => $_POST['inputNome'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId'],
+							':iUnidade' => $iUnidade,
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Local de Estoque incluída!!!";
+			$_SESSION['msg']['mensagem'] = "Local de Estoque incluído!!!";
 					
 		}
 	
@@ -96,7 +106,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		echo 'Error: ' . $e->getMessage();
 	}
 
-	irpara("LocalEstoque.php");
+	irpara("localEstoque.php");
 }
 
 ?>
@@ -233,7 +243,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				$.ajax({
 					type: "POST",
 					url: "localEstoqueValida.php",
-					data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
+					data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual+'&unidade='+cmbUnidade),
 					success: function(resposta){
 
 						if(resposta == 1){
@@ -321,13 +331,54 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 								<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 
 								<div class="row">
-									<div class="col-lg-6">
+									<?php 
+										if (isset($_SESSION['EmpresaId'])){ 
+											print('<div class="col-lg-5">');
+										} else{
+											print('<div class="col-lg-9">');  
+										}
+									?>
 										<div class="form-group">
 											<label for="inputNome">Nome do Local de Estoque <span class="text-danger"> *</span></label>
 											<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local de Estoque" value="<?php if (isset($_POST['inputLocalEstoqueId'])) echo $rowLocalEstoque['LcEstNome']; ?>" required autofocus>
 										</div>
 									</div>
-									<div class="col-lg-6">
+
+									<?php 
+							
+										if (isset($_SESSION['EmpresaId'])){
+											
+											print('
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
+													<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
+														<option value="">Informe uma unidade</option>');
+														
+														$sql = "SELECT UnidaId, UnidaNome
+																FROM Unidade
+																JOIN Situacao on SituaId = UnidaStatus															     
+																WHERE UnidaEmpresa = " . $_SESSION['EmpresaId'] . " and SituaChave = 'ATIVO'
+																ORDER BY UnidaNome ASC";
+														$result = $conn->query($sql);
+														$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($rowUnidade as $item) {
+															$seleciona = $item['UnidaId'] == $rowLocalEstoque['LcEstUnidade'] ? "selected" : "";
+															print('<option value="' . $item['UnidaId'].'" '. $seleciona .'>' . $item['UnidaNome'] . '</option>');
+														}
+
+											print('												
+													</select>
+												</div>
+											</div>
+											');
+										} else{
+											print('<input type="hidden" id="cmbUnidade" value="0" >');
+										}
+									?>
+
+									<div class="col-lg-3">
 										<div class="form-group" style="padding-top:25px;">
 											<?php
 

@@ -174,27 +174,33 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNomeNovo.trim();
 				
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "marcaValida.php",
-					data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
-					success: function(resposta){
+				//Se o usuário preencheu com espaços em branco ou não preencheu nada
+				if (inputNome == ''){
+					$('#inputNome').val('');
+					$("#formMarca").submit();
+				} else {
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "marcaValida.php",
+						data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
+						success: function(resposta){
 
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;
+							if(resposta == 1){
+								alerta('Atenção','Esse registro já existe!','error');
+								return false;
+							}
+
+							if (resposta == 'EDITA'){
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
+							} else{
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
+							}						
+							
+							$( "#formMarca" ).submit();
 						}
-
-						if (resposta == 'EDITA'){
-							document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
-						} else{
-							document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
-						}						
-						
-						$( "#formMarca" ).submit();
-					}
-				})
+					})
+				}
 			})				
 		});
 			
