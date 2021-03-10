@@ -6,6 +6,7 @@ $_SESSION['PaginaAtual'] = 'Local do Estoque';
 
 include('global_assets/php/conexao.php');
 
+//Essa consulta é para preencher a grid
 if (isset($_POST['inputEmpresaId'])){
 	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
 	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
@@ -33,6 +34,71 @@ if (isset($_SESSION['EmpresaId'])){
 	//$count = count($row);
 }
 
+//Se estiver editando
+if(isset($_POST['inputLocalEstoqueId']) && $_POST['inputLocalEstoqueId']){
+
+	//Essa consulta é para preencher o campo Nome com a Local de Estoque a ser editar
+	$sql = "SELECT LcEstId, LcEstNome
+			FROM LocalEstoque
+			WHERE LcEstId = " . $_POST['inputLocalEstoqueId'];
+	$result = $conn->query($sql);
+	$rowLocalEstoque = $result->fetch(PDO::FETCH_ASSOC);
+		
+	$_SESSION['msg'] = array();
+} 
+
+//Se estiver gravando (inclusão ou edição)
+if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5) == 'GRAVA'){
+
+	try{
+
+		//Edição
+		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
+			
+			$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE LcEstId = :iLocalEstoque";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iLocalEstoque' => $_POST['inputLocalEstoqueId']
+							));
+	
+			$_SESSION['msg']['mensagem'] = "Local de Estoque alterada!!!";
+	
+		} else { //inclusão
+		
+			$sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstStatus, LcEstUsuarioAtualizador, LcEstUnidade)
+					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $_SESSION['UnidadeId'],
+							));
+	
+			$_SESSION['msg']['mensagem'] = "Local de Estoque incluída!!!";
+					
+		}
+	
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['tipo'] = "success";
+					
+	} catch(PDOException $e) {
+		
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro reportado com o Local do Estoque!!!";
+		$_SESSION['msg']['tipo'] = "error";	
+		
+		echo 'Error: ' . $e->getMessage();
+	}
+
+	irpara("LocalEstoque.php");
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +122,12 @@ if (isset($_SESSION['EmpresaId'])){
 
 	<!-- Não permite que o usuário retorne para o EDITAR -->
 	<script src="global_assets/js/lamparinas/stop-back.js"></script>
-	<!-- /theme JS files -->	
+	
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+		
 	
 	<script type="text/javascript">
 
@@ -142,7 +213,45 @@ if (isset($_SESSION['EmpresaId'])){
 
 			_componentSelect2();
 			
-			/* Fim: Tabela Personalizada */					
+			/* Fim: Tabela Personalizada */	
+
+			
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputNomeNovo = $('#inputNome').val();
+				var inputNomeVelho = $('#inputLcEstNome').val();
+				var inputEstadoAtual = $('#inputEstadoAtual').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNomeNovo.trim();
+				
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "localEstoqueValida.php",
+					data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
+					success: function(resposta){
+
+						if(resposta == 1){
+							alerta('Atenção','Esse registro já existe!','error');
+							return false;
+						}
+
+						if (resposta == 'EDITA'){
+							document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
+						} else{
+							document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
+						}						
+						
+						$( "#formLocalEstoque" ).submit();
+					}
+				})
+			})				
+
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -153,7 +262,8 @@ if (isset($_SESSION['EmpresaId'])){
 			document.getElementById('inputLocalEstoqueStatus').value = LcEstStatus;
 					
 			if (Tipo == 'edita'){	
-				document.formLocalEstoque.action = "localEstoqueEdita.php";		
+				document.getElementById('inputEstadoAtual').value = "EDITA";
+				document.formLocalEstoque.action = "localEstoque.php";		
 			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formLocalEstoque, "Tem certeza que deseja excluir esse local?", "localEstoqueExclui.php");
 			} else if (Tipo == 'mudaStatus'){
@@ -200,31 +310,41 @@ if (isset($_SESSION['EmpresaId'])){
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação de Locais do Estoque</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="localEstoque.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
+							<form name="formLocalEstoque" id="formLocalEstoque" method="post" class="form-validate-jquery">
+
+								<input type="hidden" id="inputLocalEstoqueId" name="inputLocalEstoqueId" value="<?php if (isset($_POST['inputLocalEstoqueId'])) echo $_POST['inputLocalEstoqueId']; ?>" >
+								<input type="hidden" id="inputLocalEstoqueNome" name="inputLocalEstoqueNome" value="<?php if (isset($_POST['inputLocalEstoqueNome'])) echo $_POST['inputLocalEstoqueNome']; ?>" >
+								<input type="hidden" id="inputLocalEstoqueStatus" name="inputLocalEstoqueStatus" >
+								<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
+
 								<div class="row">
-									<div class="col-lg-9">
-										<?php 
-							
-											if (isset($_SESSION['EmpresaId'])){
-												print('<p class="font-size-lg">A relação abaixo faz referência aos locais de estoque da empresa <b>'.$_SESSION['EmpresaNome'].'</b></p>');
-											} else{
-												print('<p class="font-size-lg">A relação abaixo faz referência aos locais de estoque da unidade <b>'.$_SESSION['UnidadeNome'].'</b></p>');
-											}
-										?>
+									<div class="col-lg-6">
+										<div class="form-group">
+											<label for="inputNome">Nome do Local de Estoque <span class="text-danger"> *</span></label>
+											<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local de Estoque" value="<?php if (isset($_POST['inputLocalEstoqueId'])) echo $rowLocalEstoque['LcEstNome']; ?>" required autofocus>
+										</div>
 									</div>
-									<div class="col-lg-3">
-										<div class="text-right"><a href="localEstoqueNovo.php" class="btn btn-principal" role="button">Novo Local do Estoque</a></div>
+									<div class="col-lg-6">
+										<div class="form-group" style="padding-top:25px;">
+											<?php
+
+												//editando
+												if (isset($_POST['inputLocalEstoqueId'])){
+													print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+													print('<a href="localEstoque.php" class="btn btn-basic" role="button">Cancelar</a>');
+												} else{ //inserindo
+													print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
+												}
+
+											?>
+										</div>
 									</div>
 								</div>
+							</form>
+
 							</div>
 							
 							<?php 
@@ -289,12 +409,6 @@ if (isset($_SESSION['EmpresaId'])){
 				</div>				
 				
 				<!-- /info blocks -->
-				
-				<form name="formLocalEstoque" method="post">
-					<input type="hidden" id="inputLocalEstoqueId" name="inputLocalEstoqueId" >
-					<input type="hidden" id="inputLocalEstoqueNome" name="inputLocalEstoqueNome" >
-					<input type="hidden" id="inputLocalEstoqueStatus" name="inputLocalEstoqueStatus" >
-				</form>
 
 			</div>
 			<!-- /content area -->
