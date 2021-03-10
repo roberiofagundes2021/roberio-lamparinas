@@ -233,33 +233,41 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				e.preventDefault();
 				
 				var inputNomeNovo = $('#inputNome').val();
-				var inputNomeVelho = $('#inputLcEstNome').val();
+				var inputNomeVelho = $('#inputLocalEstoqueNome').val();
 				var inputEstadoAtual = $('#inputEstadoAtual').val();
+				var cmbUnidade  = $('#cmbUnidade').val();
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNomeNovo.trim();
+
+				//Se o usuário preencheu com espaços em branco ou não preencheu nada
+				if (inputNome == ''){
+					$('#inputNome').val('');
+					$("#formLocalEstoque").submit();
+				} else {
 				
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "localEstoqueValida.php",
-					data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual+'&unidade='+cmbUnidade),
-					success: function(resposta){
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "localEstoqueValida.php",
+						data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual+'&unidade='+cmbUnidade),
+						success: function(resposta){
 
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;
+							if(resposta == 1){
+								alerta('Atenção','Esse registro já existe!','error');
+								return false;
+							}
+
+							if (resposta == 'EDITA'){
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
+							} else{
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
+							}						
+							
+							$( "#formLocalEstoque" ).submit();
 						}
-
-						if (resposta == 'EDITA'){
-							document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
-						} else{
-							document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
-						}						
-						
-						$( "#formLocalEstoque" ).submit();
-					}
-				})
+					})
+				}	
 			})				
 
 		});
