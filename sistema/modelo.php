@@ -47,7 +47,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iModel' => $_POST['inputModeloId']
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Modelo alterada!!!";
+			$_SESSION['msg']['mensagem'] = "Modelo alterado!!!";
 	
 		} else { //inclusão
 		
@@ -62,7 +62,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iUnidade' => $_SESSION['UnidadeId'],
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Modelo incluída!!!";
+			$_SESSION['msg']['mensagem'] = "Modelo incluído!!!";
 					
 		}
 	
@@ -180,28 +180,35 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNomeNovo.trim();
+
+				//Se o usuário preencheu com espaços em branco ou não preencheu nada
+				if (inputNome == ''){
+					$('#inputNome').val('');
+					$("#formModelo").submit();
+				} else {
 				
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "modeloValida.php",
-					data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
-					success: function(resposta){
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "modeloValida.php",
+						data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
+						success: function(resposta){
 
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;
+							if(resposta == 1){
+								alerta('Atenção','Esse registro já existe!','error');
+								return false;
+							}
+
+							if (resposta == 'EDITA'){
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
+							} else{
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
+							}						
+							
+							$( "#formModelo" ).submit();
 						}
-
-						if (resposta == 'EDITA'){
-							document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
-						} else{
-							document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
-						}						
-						
-						$( "#formModelo" ).submit();
-					}
-				})
+					})
+				}	
 			})				
 
 		});
