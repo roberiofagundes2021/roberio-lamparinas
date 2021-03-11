@@ -6,6 +6,7 @@ $_SESSION['PaginaAtual'] = 'Forma de Pagamento';
 
 include('global_assets/php/conexao.php');
 
+//Essa consulta é para preencher a grid
 $sql = "SELECT FrPagId, FrPagNome, FrPagChave, FrPagStatus, SituaNome, SituaCor, SituaChave
 		FROM FormaPagamento
 		JOIN Situacao on SituaId = FrPagStatus
@@ -15,6 +16,73 @@ $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 //var_dump($count);die;
+
+//Se estiver editando
+if(isset($_POST['inputFormaPagamentoId']) && $_POST['inputFormaPagamentoId']){
+
+	//Essa consulta é para preencher o campo Nome com a Forma de Pagamento a ser editar
+	$sql = "SELECT FrPagId, FrPagNome, FrPagChave
+			FROM FormaPagamento
+			WHERE FrPagId = " . $_POST['inputFormaPagamentoId'];
+	$result = $conn->query($sql);
+	$rowFormaPagamento = $result->fetch(PDO::FETCH_ASSOC);
+		
+	$_SESSION['msg'] = array();
+} 
+
+//Se estiver gravando (inclusão ou edição)
+if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5) == 'GRAVA'){
+
+	try{
+
+		//Edição
+		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
+			
+			$sql = "UPDATE FormaPagamento SET FrPagNome = :sNome, FrPagChave = :sChave, FrPagUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE FrPagId = :iFormaPagamento";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':sChave' => formatarChave($_POST['inputNome']),
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iFormaPagamento' => $_POST['inputFormaPagamentoId']
+							));
+	
+			$_SESSION['msg']['mensagem'] = "Forma de Pagamento alterado!!!";
+	
+		} else { //inclusão
+		
+			$sql = "INSERT INTO FormaPagamento (FrPagNome, FrPagChave, FrPagStatus, FrPagUsuarioAtualizador, FrPagUnidade)
+					VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':sChave' => formatarChave($_POST['inputNome']),
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $_SESSION['UnidadeId'],
+							));
+	
+			$_SESSION['msg']['mensagem'] = "Forma de Pagamento incluído!!!";
+					
+		}
+	
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['tipo'] = "success";
+					
+	} catch(PDOException $e) {
+		
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro reportado com a Forma de Pagamento!!!";
+		$_SESSION['msg']['tipo'] = "error";	
+		
+		echo 'Error: ' . $e->getMessage();
+	}
+
+	irpara("formaPagamento.php");
+}
 
 ?>
 
@@ -36,7 +104,12 @@ $count = count($row);
 	
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>	
-	<!-- /theme JS files -->	
+	
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+		
 	
 	<script type="text/javascript">
 
@@ -87,18 +160,62 @@ $count = count($row);
 
 			_componentSelect2();
 			
-			/* Fim: Tabela Personalizada */					
+			/* Fim: Tabela Personalizada */	
+
+					//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputNomeNovo = $('#inputNome').val();
+				var inputNomeVelho = $('#inputFormaPagamentoNome').val();
+				var inputEstadoAtual = $('#inputEstadoAtual').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNomeNovo.trim();
+
+				//Se o usuário preencheu com espaços em branco ou não preencheu nada
+				if (inputNome == ''){
+					$('#inputNome').val('');
+					$("#formFormaPagamento").submit();
+				} else {
+				
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "formaPagamentoValida.php",
+						data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
+						success: function(resposta){
+
+							if(resposta == 1){
+								alerta('Atenção','Esse registro já existe!','error');
+								return false;
+							}
+
+							if (resposta == 'EDITA'){
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
+							} else{
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
+							}						
+							
+							$( "#formFormaPagamento" ).submit();
+						}
+					})
+				}	
+			})							
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaFormaPagamento(FrPagId, FrPagNome, FrPagStatus, Tipo){
+		function atualizaFormaPagamento(FrPagId, FrPagNome, FrPagChave, FrPagStatus, Tipo){
 		
 			document.getElementById('inputFormaPagamentoId').value = FrPagId;
 			document.getElementById('inputFormaPagamentoNome').value = FrPagNome;
+			document.getElementById('inputFormaPagamentoChave').value = FrPagChave;
 			document.getElementById('inputFormaPagamentoStatus').value = FrPagStatus;
 					
 			if (Tipo == 'edita'){	
-				document.formFormaPagamento.action = "formaPagamentoEdita.php";		
+				document.getElementById('inputEstadoAtual').value = "EDITA";
+				document.formFormaPagamento.action = "formaPagamento.php";		
 			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formFormaPagamento, "Tem certeza que deseja excluir essa Forma de Pagamento?", "formaPagamentoExclui.php");
 			} else if (Tipo == 'mudaStatus'){
@@ -136,24 +253,41 @@ $count = count($row);
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação de Forma de Pagamento</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="formaPagamento.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
-								<div class="row">
-									<div class="col-lg-9">
-										<p class="font-size-lg">A relação abaixo faz referência as Formas de Pagamento da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+								<form name="formFormaPagamento" id="formFormaPagamento" method="post" class="form-validate-jquery">
+
+									<input type="hidden" id="inputFormaPagamentoId" name="inputFormaPagamentoId" value="<?php if (isset($_POST['inputFormaPagamentoId'])) echo $_POST['inputFormaPagamentoId']; ?>" >
+									<input type="hidden" id="inputFormaPagamentoNome" name="inputFormaPagamentoNome" value="<?php if (isset($_POST['inputFormaPagamentoNome'])) echo $_POST['inputFormaPagamentoNome']; ?>" >
+									<input type="hidden" id="inputFormaPagamentoChave" name="inputFormaPagamentoChave" value="<?php if (isset($_POST['inputFormaPagamentoChave'])) echo $_POST['inputFormaPagamentoChave']; ?>" >
+									<input type="hidden" id="inputFormaPagamentoStatus" name="inputFormaPagamentoStatus" >
+									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
+
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="inputNome">Nome da Forma de Pagamento <span class="text-danger"> *</span></label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Forma de Pagamento" value="<?php if (isset($_POST['inputFormaPagamentoId'])) echo $rowFormaPagamento['FrPagNome']; ?>" required autofocus>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group" style="padding-top:25px;">
+												<?php
+
+													//editando
+													if (isset($_POST['inputFormaPagamentoId'])){
+														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+														print('<a href="formaPagamento.php" class="btn btn-basic" role="button">Cancelar</a>');
+													} else{ //inserindo
+														print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
+													}
+
+												?>
+											</div>
+										</div>
 									</div>
-									<div class="col-lg-3">	
-										<div class="text-right"><a href="formaPagamentoNovo.php" class="btn btn-principal" role="button">Nova Forma de Pagamento</a></div>
-									</div>
-								</div>	
+								</form>
 							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->
@@ -208,12 +342,6 @@ $count = count($row);
 				</div>				
 				
 				<!-- /info blocks -->
-				
-				<form name="formFormaPagamento" method="post" action="formaPagamentoEdita.php">
-					<input type="hidden" id="inputFormaPagamentoId" name="inputFormaPagamentoId" >
-					<input type="hidden" id="inputFormaPagamentoNome" name="inputFormaPagamentoNome" >
-					<input type="hidden" id="inputFormaPagamentoStatus" name="inputFormaPagamentoStatus" >
-				</form>
 
 			</div>
 			<!-- /content area -->
