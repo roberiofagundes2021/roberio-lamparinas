@@ -6,6 +6,7 @@ $_SESSION['PaginaAtual'] = 'Unidade de Medida';
 
 include('global_assets/php/conexao.php');
 
+//Essa consulta é para preencher a grid
 $sql = "SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus, SituaNome, SituaCor, SituaChave
 		FROM UnidadeMedida
 		JOIN Situacao on SituaId = UnMedStatus
@@ -14,6 +15,74 @@ $sql = "SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus, SituaNome, SituaCor,
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
+
+//Se estiver editando
+if(isset($_POST['inputUnidadeMedidaId']) && $_POST['inputUnidadeMedidaId']){
+
+	//Essa consulta é para preencher o campo Nome com a Unidade de Medida a ser editar
+	$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
+			FROM UnidadeMedida
+			WHERE UnMedId = " . $_POST['inputUnidadeMedidaId'];
+	$result = $conn->query($sql);
+	$rowUnidadeMedida = $result->fetch(PDO::FETCH_ASSOC);
+		
+	$_SESSION['msg'] = array();
+} 
+
+//Se estiver gravando (inclusão ou edição)
+if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5) == 'GRAVA'){
+
+	try{
+
+		//Edição
+		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
+			
+			$sql = "UPDATE UnidadeMedida SET UnMedNome = :sNome, UnMedSigla = :sSigla, UnMedUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE UnMedId = :iUnidadeMedida";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':sSigla' => $_POST['inputSigla'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidadeMedida' => $_POST['inputUnidadeMedidaId']
+							));
+	
+			$_SESSION['msg']['mensagem'] = "Unidade de Medida alterada!!!";
+	
+		} else { //inclusão
+		
+			$sql = "INSERT INTO UnidadeMedida (UnMedNome,  UnMedSigla, UnMedStatus, UnMedUsuarioAtualizador, UnMedUnidade)
+					VALUES (:sNome, :sSigla, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':sSigla' => $_POST['inputSigla'],
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $_SESSION['UnidadeId'],
+							));
+	
+			$_SESSION['msg']['mensagem'] = "Unidade de Medida incluída!!!";
+					
+		}
+	
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['tipo'] = "success";
+					
+	} catch(PDOException $e) {
+		
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro reportado com a Unidade de Medida!!!";
+		$_SESSION['msg']['tipo'] = "error";	
+		
+		echo 'Error: ' . $e->getMessage();
+	}
+
+	irpara("unidadeMedida.php");
+}
+
 
 ?>
 
@@ -38,7 +107,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<!-- Não permite que o usuário retorne para o EDITAR -->
 	<script src="global_assets/js/lamparinas/stop-back.js"></script>
-	<!-- /theme JS files -->	
+	
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+	
 	
 	<script type="text/javascript">
 
@@ -94,7 +168,49 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			_componentSelect2();
 			
-			/* Fim: Tabela Personalizada */					
+			/* Fim: Tabela Personalizada */
+
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputNomeNovo = $('#inputNome').val();
+				var inputNomeVelho = $('#inputUnidadeMedidaNome').val();
+				var inputEstadoAtual = $('#inputEstadoAtual').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNomeNovo.trim();
+
+				if (inputNome == ''){
+					$('#inputNome').val('');
+					$("#formUnidadeMedida").submit();
+				} else {
+				
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "unidadeMedidaValida.php",
+						data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
+						success: function(resposta){
+
+							if(resposta == 1){
+								alerta('Atenção','Esse registro já existe!','error');
+								return false;
+							}
+
+							if (resposta == 'EDITA'){
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
+							} else{
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
+							}						
+							
+							$( "#formUnidadeMedida" ).submit();
+						}
+					})
+				}	
+			})
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -105,7 +221,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			document.getElementById('inputUnidadeMedidaStatus').value = UnMedStatus;
 					
 			if (Tipo == 'edita'){	
-				document.formUnidadeMedida.action = "unidademedidaEdita.php";		
+				document.getElementById('inputEstadoAtual').value = "EDITA";
+				document.formUnidadeMedida.action = "unidadeMedida.php";		
 			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formUnidadeMedida, "Tem certeza que deseja excluir essa unidade de medida?", "unidademedidaExclui.php");
 			} else if (Tipo == 'mudaStatus'){
@@ -146,24 +263,47 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação de Unidades de Medida</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="unidademedida.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
-								<div class="row">
-									<div class="col-lg-9">
-										<p class="font-size-lg">A relação abaixo faz referência às unidades de medida da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-									</div>	
-									<div class="col-lg-3">
-										<div class="text-right"><a href="unidademedidaNovo.php" class="btn btn-principal" role="button">Nova Unidade de Medida</a></div>
+								<form name="formUnidadeMedida" id="formUnidadeMedida" method="post" class="form-validate-jquery">
+
+									<input type="hidden" id="inputUnidadeMedidaId" name="inputUnidadeMedidaId" value="<?php if (isset($_POST['inputUnidadeMedidaId'])) echo $_POST['inputUnidadeMedidaId']; ?>" >
+									<input type="hidden" id="inputUnidadeMedidaNome" name="inputUnidadeMedidaNome" value="<?php if (isset($_POST['inputUnidadeMedidaNome'])) echo $_POST['inputUnidadeMedidaNome']; ?>" >
+									<input type="hidden" id="inputUnidadeMedidaStatus" name="inputUnidadeMedidaStatus" >
+									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
+
+									<div class="row">
+										<div class="col-lg-5">
+											<div class="form-group">
+												<label for="inputNome">Nome da Unidade de Medida <span class="text-danger"> *</span></label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Unidade de Medida" value="<?php if (isset($_POST['inputUnidadeMedidaId'])) echo $rowUnidadeMedida['UnMedNome']; ?>" required autofocus>
+											</div>
+										</div>
+
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputSigla">Sigla <span class="text-danger"> *</span></label>
+												<input type="text" id="inputSigla" name="inputSigla" class="form-control" placeholder="Sigla" value="<?php if (isset($_POST['inputUnidadeMedidaId'])) echo $rowUnidadeMedida['UnMedSigla']; ?>" required autofocus>
+											</div>
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group" style="padding-top:25px;">
+												<?php
+
+													//editando
+													if (isset($_POST['inputUnidadeMedidaId'])){
+														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+														print('<a href="unidadeMedida.php" class="btn btn-basic" role="button">Cancelar</a>');
+													} else{ //inserindo
+														print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
+													}
+
+												?>
+											</div>
+										</div>
 									</div>
-								</div>
+								</form>
 							</div>
 							
 							<table id="tblUnidadeMedida" class="table">
@@ -211,12 +351,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				</div>				
 				
 				<!-- /info blocks -->
-				
-				<form name="formUnidadeMedida" method="post">
-					<input type="hidden" id="inputUnidadeMedidaId" name="inputUnidadeMedidaId" >
-					<input type="hidden" id="inputUnidadeMedidaNome" name="inputUnidadeMedidaNome" >
-					<input type="hidden" id="inputUnidadeMedidaStatus" name="inputUnidadeMedidaStatus" >
-				</form>
 
 			</div>
 			<!-- /content area -->
