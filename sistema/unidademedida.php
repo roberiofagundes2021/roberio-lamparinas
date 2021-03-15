@@ -181,26 +181,24 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				var inputSigla = $('#inputSigla').val();
 				var inputEstadoAtual = $('#inputEstadoAtual').val();
 				
-				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNomeNovo.trim();
 				inputSigla = inputSigla.trim();
-
 				
-				//Verifica se o campo só possui espaços em branco
-				if (inputNome == '') {
-					alerta('Atenção', 'Informe a Unidade de Medida!', 'error');
-					$('#inputNome').focus();
-					return false;
-				}
+				//Se o usuário preencheu com espaços em branco ou não preencheu nada
+				if (inputNome == '' || inputSigla == ''){
+					
+					if (inputNome == ''){
+						$('#inputNome').val('');
+					}
 
-					//Verifica se o campo só possui espaços em branco
-				if (inputSigla == '') {
-					alerta('Atenção', 'Nenhuma Sigla foi adicionada!', 'error');
-					$('#inputSigla').focus();
-					return false;
-				}
-				
+					if (inputSigla == ''){
+						$('#inputSigla').val('');
+					}
+
+					$("#formUnidadeMedida").submit();
+				} else {
+
 					//Esse ajax está sendo usado para verificar no banco se o registro já existe
 					$.ajax({
 						type: "POST",
@@ -222,7 +220,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							$( "#formUnidadeMedida" ).submit();
 						}
 					})
-					
+				}					
 			})
 		});
 			
