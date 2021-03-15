@@ -178,15 +178,28 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				
 				var inputNomeNovo = $('#inputNome').val();
 				var inputNomeVelho = $('#inputUnidadeMedidaNome').val();
+				var inputSigla = $('#inputSigla').val();
 				var inputEstadoAtual = $('#inputEstadoAtual').val();
+				
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNomeNovo.trim();
+				inputSigla = inputSigla.trim();
 
-				if (inputNome == ''){
-					$('#inputNome').val('');
-					$("#formUnidadeMedida").submit();
-				} else {
+				
+				//Verifica se o campo só possui espaços em branco
+				if (inputNome == '') {
+					alerta('Atenção', 'Informe a Unidade de Medida!', 'error');
+					$('#inputNome').focus();
+					return false;
+				}
+
+					//Verifica se o campo só possui espaços em branco
+				if (inputSigla == '') {
+					alerta('Atenção', 'Nenhuma Sigla foi adicionada!', 'error');
+					$('#inputSigla').focus();
+					return false;
+				}
 				
 					//Esse ajax está sendo usado para verificar no banco se o registro já existe
 					$.ajax({
@@ -209,7 +222,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							$( "#formUnidadeMedida" ).submit();
 						}
 					})
-				}	
+					
 			})
 		});
 			
@@ -274,14 +287,14 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 
 									<div class="row">
-										<div class="col-lg-5">
+										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNome">Nome da Unidade de Medida <span class="text-danger"> *</span></label>
+												<label for="inputNome">Unidade de Medida <span class="text-danger"> *</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Unidade de Medida" value="<?php if (isset($_POST['inputUnidadeMedidaId'])) echo $rowUnidadeMedida['UnMedNome']; ?>" required autofocus>
 											</div>
 										</div>
 
-										<div class="col-lg-4">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputSigla">Sigla <span class="text-danger"> *</span></label>
 												<input type="text" id="inputSigla" name="inputSigla" class="form-control" placeholder="Sigla" value="<?php if (isset($_POST['inputUnidadeMedidaId'])) echo $rowUnidadeMedida['UnMedSigla']; ?>" required autofocus>

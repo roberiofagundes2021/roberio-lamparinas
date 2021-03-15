@@ -343,11 +343,11 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										if (isset($_SESSION['EmpresaId'])){ 
 											print('<div class="col-lg-5">');
 										} else{
-											print('<div class="col-lg-9">');  
+											print('<div class="col-lg-6">');  
 										}
 									?>
 										<div class="form-group">
-											<label for="inputNome">Nome do Local de Estoque <span class="text-danger"> *</span></label>
+											<label for="inputNome">Local de Estoque <span class="text-danger"> *</span></label>
 											<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local de Estoque" value="<?php if (isset($_POST['inputLocalEstoqueId'])) echo $rowLocalEstoque['LcEstNome']; ?>" required autofocus>
 										</div>
 									</div>

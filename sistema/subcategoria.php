@@ -6,7 +6,8 @@ $_SESSION['PaginaAtual'] = 'Sub Categoria';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT SbCatId, SbCatNome, SbCatStatus, CategNome, SituaNome, SituaCor, SituaChave
+//Essa consulta é para preencher a grid
+$sql = "SELECT SbCatId, SbCatNome, SbCatCategoria, SbCatStatus, CategNome, SituaNome, SituaCor, SituaChave
 		FROM SubCategoria
 		JOIN Categoria on CategId = SbCatCategoria
 		JOIN Situacao on SituaId = SbCatStatus
@@ -15,6 +16,74 @@ $sql = "SELECT SbCatId, SbCatNome, SbCatStatus, CategNome, SituaNome, SituaCor, 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
+
+//Se estiver editando
+if(isset($_POST['inputSubCategoriaId']) && $_POST['inputSubCategoriaId']){
+
+	//Essa consulta é para preencher o campo Nome com a SubCategoria a ser editar
+	$sql = "SELECT SbCatId, SbCatNome, SbCatCategoria
+			FROM SubCategoria
+			WHERE SbCatId = " . $_POST['inputSubCategoriaId'];
+	$result = $conn->query($sql);
+	$rowSubCategoria = $result->fetch(PDO::FETCH_ASSOC);
+		
+	$_SESSION['msg'] = array();
+} 
+
+//Se estiver gravando (inclusão ou edição)
+if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5) == 'GRAVA'){
+
+	try{
+
+		//Edição
+		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
+			
+			$sql = "UPDATE SubCategoria SET SbCatNome = :sNome, SbCatCategoria = :iCategoria, SbCatUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE SbCatId = :iSubCategoria";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':iCategoria' => $_POST['cmbCategoria'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iSubCategoria' => $_POST['inputSubCategoriaId']
+							));
+	
+			$_SESSION['msg']['mensagem'] = "SubCategoria alterada!!!";
+	
+		} else { //inclusão
+		
+			$sql = "INSERT INTO SubCategoria (SbCatNome, SbCatCategoria, SbCatStatus, SbCatUsuarioAtualizador, SbCatUnidade)
+					VALUES (:sNome, :sCategoria, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':sCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $_SESSION['UnidadeId'],
+							));
+	
+			$_SESSION['msg']['mensagem'] = "SubCategoria incluída!!!";
+					
+		}
+	
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['tipo'] = "success";
+					
+	} catch(PDOException $e) {
+		
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro reportado com a SubCategoria!!!";
+		$_SESSION['msg']['tipo'] = "error";	
+		
+		echo 'Error: ' . $e->getMessage();
+	}
+
+	irpara("subCategoria.php");
+}
+
 
 ?>
 
@@ -39,7 +108,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<!-- Não permite que o usuário retorne para o EDITAR -->
 	<script src="global_assets/js/lamparinas/stop-back.js"></script>
-	<!-- /theme JS files -->	
+	
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+		
 	
 	<script type="text/javascript">
 
@@ -95,18 +169,65 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			_componentSelect2();
 			
-			/* Fim: Tabela Personalizada */		
+				/* Fim: Tabela Personalizada */
+
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputNomeNovo = $('#inputNome').val();
+				var inputNomeVelho = $('#inputSubCategoriaNome').val();
+				var inputEstadoAtual = $('#inputEstadoAtual').val();
+				var cmbCategoria = $('#cmbCategoria').val();
+				var subCategoriaId = $('#inputSubCategoriaId').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNomeNovo.trim();
+
+				//Se o usuário preencheu com espaços em branco ou não preencheu nada
+				if (inputNome == ''){
+					$('#inputNome').val('');
+					$("#formSubCategoria").submit();
+				} else {
+				
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "subCategoriaValida.php",
+						data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual+'&cmbCategoria='+cmbCategoria+'&SubCategoriaId='+inputSubCategoriaId),
+						success: function(resposta){
+
+							if(resposta == 1){
+								alerta('Atenção','Esse registro já existe!','error');
+								return false;
+							}
+
+							if (resposta == 'EDITA'){
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
+							} else{
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
+							}						
+							
+							$( "#formSubCategoria" ).submit();
+						}
+					})
+				}
+			})		
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaSubCategoria(SbCatId, SbCatNome, SbCatStatus, Tipo){
+		function atualizaSubCategoria(SbCatId, SbCatNome,  SbCatCategoria, SbCatStatus, Tipo){
 		
 			document.getElementById('inputSubCategoriaId').value = SbCatId;
+			document.getElementById('cmbCategoria').value = SbCatCategoria;
 			document.getElementById('inputSubCategoriaNome').value = SbCatNome;
 			document.getElementById('inputSubCategoriaStatus').value = SbCatStatus;
 					
 			if (Tipo == 'edita'){	
-				document.formSubCategoria.action = "subcategoriaEdita.php";		
+				document.getElementById('inputEstadoAtual').value = "EDITA";
+				document.formSubCategoria.action = "subCategoria.php";	
 			} else if (Tipo == 'exclui'){
 				confirmaExclusao(document.formSubCategoria, "Tem certeza que deseja excluir essa subcategoria?", "subcategoriaExclui.php");
 			} else if (Tipo == 'mudaStatus'){
@@ -147,24 +268,63 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação de Sub Categorias</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="subcategoria.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
-								<div class="row">
-									<div class="col-lg-9">
-										<p class="font-size-lg">A relação abaixo faz referência às sub categorias da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+								<form name="formSubCategoria" id="formSubCategoria" method="post" class="form-validate-jquery">
+
+									<input type="hidden" id="inputSubCategoriaId" name="inputSubCategoriaId" value="<?php if (isset($_POST['inputSubCategoriaId'])) echo $_POST['inputSubCategoriaId']; ?>" >
+									<input type="hidden" id="inputSubCategoriaNome" name="inputSubCategoriaNome" value="<?php if (isset($_POST['inputSubCategoriaNome'])) echo $_POST['inputSubCategoriaNome']; ?>" >
+									<input type="hidden" id="cmbCategoria" name="cmbCategoria" value="<?php if (isset($_POST['cmbCategoria'])) echo $_POST['cmbCategoria']; ?>" >
+									<input type="hidden" id="inputSubCategoriaStatus" name="inputSubCategoriaStatus" >
+									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
+
+									<div class="row">
+										<div class="col-lg-5">
+											<div class="form-group">
+												<label for="inputNome">Nome da SubCategoria <span class="text-danger"> *</span></label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="SubCategoria" value="<?php if (isset($_POST['inputSubCategoriaId'])) echo $rowSubCategoria['SbCatNome']; ?>" required autofocus>
+											</div>
+										</div>
+										<div class="col-lg-4">
+											<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
+											<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+												<option value="">Selecione</option>
+												<?php 
+													$sql = "SELECT CategId, CategNome
+															FROM Categoria
+															JOIN Situacao on SituaId = CategStatus
+															WHERE SituaChave = 'ATIVO' and CategUnidade = ".$_SESSION['UnidadeId']."
+															ORDER BY CategNome ASC";
+													$result = $conn->query($sql);
+													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+													
+													foreach ($rowCategoria as $item){
+														$seleciona = $item['CategId'] == $rowSubCategoria['SbCatCategoria'] ? "selected" : "";
+														print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
+													}
+												
+
+												?>
+											</select>
+										</div>			
+										<div class="col-lg-3">
+											<div class="form-group" style="padding-top:25px;">
+												<?php
+
+													//editando
+													if (isset($_POST['inputSubCategoriaId'])){
+														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+														print('<a href="subCategoria.php" class="btn btn-basic" role="button">Cancelar</a>');
+													} else{ //inserindo
+														print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
+													}
+
+												?>
+											</div>
+										</div>
 									</div>
-									<div class="col-lg-3">
-										<div class="text-right"><a href="subcategoriaNovo.php" class="btn btn-principal" role="button">Nova Sub Categoria</a></div>
-									</div>
-								</div>
+								</form>
 							</div>
 							
 							<table id="tblSubCategoria" class="table">
@@ -190,13 +350,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['CategNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.$item['SbCatNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.$item['SbCatNome'].'\', '.$item['SbCatCategoria'].', '.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.$item['SbCatNome'].'\','.$item['SbCatStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.$item['SbCatNome'].'\','.$item['SbCatStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														<a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.$item['SbCatNome'].'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.$item['SbCatNome'].'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
 											</td>
@@ -213,12 +373,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				</div>				
 				
 				<!-- /info blocks -->
-				
-				<form name="formSubCategoria" method="post">
-					<input type="hidden" id="inputSubCategoriaId" name="inputSubCategoriaId" >
-					<input type="hidden" id="inputSubCategoriaNome" name="inputSubCategoriaNome" >
-					<input type="hidden" id="inputSubCategoriaStatus" name="inputSubCategoriaStatus" >
-				</form>
 
 			</div>
 			<!-- /content area -->
