@@ -46,8 +46,6 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			const buttonMonth = document.querySelector('#submitMonth');
 			const inputDateInitial = document.querySelector('#inputDataInicio');
 			const inputDateEnd = document.querySelector('#inputDataFim');
-			const cmbCentroDeCustos = document.querySelector('#cmbCentroDeCustos');
-			const cmbPlanoContas = document.querySelector('#cmbPlanoContas');
 			const submitPesquisar = document.querySelector('#submitPesquisar');
 
 
@@ -122,6 +120,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
 			submitPesquisar.addEventListener('click', (e) => {
 				e.preventDefault();
+				const cmbCentroDeCustosReq = $('#cmbCentroDeCustos').val();
+				const cmbPlanoContasReq = $('#cmbPlanoContas').val();
 				
 				const getData = () => {
 					let url = "fluxoDeCaixaFiltra.php";
@@ -139,8 +139,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 						dayEnd: dayEnd,
 						inputDateInitial: inputDateInitial.value,
 						inputDateEnd: inputDateEnd.value,
-						cmbCentroDeCustos: cmbCentroDeCustos.value,
-						cmbPlanoContas: cmbPlanoContas.value,
+						cmbCentroDeCustos: cmbCentroDeCustosReq,
+						cmbPlanoContas: cmbPlanoContasReq,
 					};
 
 					try {
@@ -149,6 +149,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 							request,
 							(response) => {
 								if (response) {
+									$('#dataResponse').html('');
 									$('#dataResponse').html(response);
 								}
 							}
@@ -162,9 +163,10 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 					? alerta('Atenção','Informe o período inicial!', 'error')
 				: inputDateEnd.value === '' || inputDateEnd.value === null 
 					? alerta('Atenção','Informe o período final!', 'error')
-				: cmbCentroDeCustos.value === '' || cmbCentroDeCustos.value === null 
+				: cmbCentroDeCustos === '' || cmbCentroDeCustos
+                                        === null 
 					? alerta('Atenção','Selecione pelo menos um Centro de Custo!', 'error') 
-				: cmbPlanoContas.value === '' || cmbPlanoContas.value === null 
+				: cmbPlanoContas === '' || cmbPlanoContas === null 
 				  ? alerta('Atenção','Selecione pelo menos um Plano de Contas!', 'error')
 					: getData();
 			});
@@ -209,10 +211,15 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 							<div class="card-body">
 								<form name="formFluxoOperacional" method="post">
 									<div class="row">
-										<div class="text-left col-lg-2 pt-3">
-												<span>Exibição: </span>
-												<button id="submitDay" class="btn active" style="margin-left: 1rem; background:#607D8B; color:white;">Dia</button>
-												<button id="submitMonth" class="btn">Mês</button>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="submitDay">Exibição </label>
+												<div class="input-group">
+													<button id="submitDay" class="btn active" style="background:#607D8B; color:white;">Dia</button>
+													<button id="submitMonth" class="btn">Mês</button>
+												</div>
+											</div>
                     </div>
 
 										<div class="col-lg-2">
@@ -223,7 +230,6 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 														<span class="input-group-text"><i class="icon-calendar22"></i></span>
 													</span>
 													<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="" >
-													<!-- value="<?php echo $dataInicio; ?>" -->
 												</div>
 											</div>
 										</div>
