@@ -6,6 +6,32 @@ $_SESSION['PaginaAtual'] = 'Relatório de Movimentação';
 
 include('global_assets/php/conexao.php');
 
+$sql = "SELECT MovimData, MovimTipo, 
+		CASE 
+			WHEN MovimOrigemLocal IS NULL THEN SetorO.SetorNome
+		ELSE LocalO.LcEstNome 
+		END as Origem,
+		CASE 
+			WHEN MovimDestinoLocal IS NULL THEN ISNULL(SetorD.SetorNome, MovimDestinoManual)
+		ELSE LocalD.LcEstNome
+		END as Destino, 
+		MovimNotaFiscal, MvXPrQuantidade, MvXPrLote,
+		MvXPrValidade, MvXPrValorUnitario, ProduNome, ForneNome, ClassNome
+		FROM Movimentacao
+		JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
+		JOIN Produto on ProduId = MvXPrProduto
+		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
+		LEFT JOIN LocalEstoque LocalO on LocalO.LcEstId = MovimOrigemLocal 
+		LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
+		LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
+		LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
+		LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
+		JOIN Situacao on SituaId = MovimSituacao
+		";
+$result = $conn->query($sql);
+$rowData = $result->fetchAll(PDO::FETCH_ASSOC);
+
+
 $sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
 		FROM Fornecedor
 		JOIN Categoria on CategId = ForneCategoria
@@ -381,6 +407,9 @@ $dataFim = date("Y-m-d");
 					let categoria = $('#cmbCategoria').val()
 					let subCategoria = $('#cmbSubCategoria').val()
 					let inputProduto = $('#cmbProduto').val()
+					let localEstoque = $('#cmbLocalEstoque').val()
+					let setor = $('#cmbSetor').val()
+					let Classificacao = $('#cmbClassificacao').val()
 					let inputServico = $('#cmbServico').val()
 					let codigo = $('#cmbCodigo').val()
 					let tipoDeFiltro = $('input[name="inputTipo"]:checked').val();
@@ -395,6 +424,9 @@ $dataFim = date("Y-m-d");
 						cmbCategoria: categoria,
 						cmbSubCategoria: subCategoria,
 						cmbProduto: inputProduto,
+						cmbLocalEstoque: localEstoque,
+						cmbSetor: setor,
+						cmbClassificacao: Classificacao,
 						cmbServico: inputServico,
 						cmbCodigo: codigo,
 					};
@@ -437,6 +469,9 @@ $dataFim = date("Y-m-d");
 						$('#cmbCategoria_imp').val(inputsValues.cmbCategoria)
 						$('#cmbSubCategoria_imp').val(inputsValues.cmbSubCategoria)
 						$('#cmbProduto_imp').val(inputsValues.cmbProduto)
+						$('#cmbLocalEstoque_imp').val(inputsValues.cmbLocalEstoque)
+						$('#cmbSetor_imp').val(inputsValues.cmbSetor)
+						$('#cmbClassificacao_imp').val(inputsValues.cmbClassificacao)
 						$('#cmbServico_imp').val(inputsValues.cmbServico)
 						$('#cmbCodigo_imp').val(inputsValues.cmbCodigo)
 
@@ -537,6 +572,9 @@ $dataFim = date("Y-m-d");
 									<input id="cmbCategoria_imp" type="hidden" name="cmbCategoria_imp"></input>
 									<input id="cmbSubCategoria_imp" type="hidden" name="cmbSubCategoria_imp"></input>
 									<input id="cmbProduto_imp" type="hidden" name="cmbProduto_imp"></input>
+									<input id="cmbLocalEstoque_imp" type="hidden" name="cmbLocalEstoque_imp"></input>
+									<input id="cmbSetor_imp" type="hidden" name="cmbSetor_imp"></input>
+									<input id="cmbClassificacao_imp" type="hidden" name="cmbClassificacao_imp"></input>
 									<input id="cmbServico_imp" type="hidden" name="cmbServico_imp"></input>
 									<input id="cmbCodigo_imp" type="hidden" name="cmbCodigo_imp"></input>
 								</form>
@@ -662,8 +700,78 @@ $dataFim = date("Y-m-d");
 											</div>
 										</div>
 									</div>
-									<div class="row">
+
+									<div class="row">	
+										<div class="col-lg-5">
+											<div class="form-group">
+												<label for="cmbLocalEstoque">Origem</label>
+												<select id="cmbLocalEstoque" name="cmbLocalEstoque"
+													class="form-control form-control-select2">
+													<option value="">Selecionar</option>
+													<?php
+													$sql = "SELECT LcEstId, LcEstNome
+															FROM LocalEstoque
+															JOIN Situacao on SituaId = LcEstStatus
+															WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															ORDER BY LcEstNome ASC";
+													$result = $conn->query($sql);
+													$rowLcEst = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowLcEst as $item) {
+														print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+													}
+													?>
+												</select>
+											</div>
+                                    	</div>
+										<div class="col-lg-5">
+											<div class="form-group">
+												<label for="cmbSetor">Destino</label>
+												<select id="cmbSetor" name="cmbSetor"
+													class="form-control form-control-select2">
+													<option value="">Selecionar</option>
+													<?php
+													$sql = "SELECT SetorId, SetorNome
+															FROM Setor
+															JOIN Situacao on SituaId = SetorStatus
+															WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															ORDER BY SetorNome ASC";
+													$result = $conn->query($sql);
+													$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowSetor as $item) {
+														print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
+													}
+													?>
+												</select>
+											</div>
+                                   		 </div>
+                                         
 										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="cmbClassificacao">Classificação</label>
+												<select id="cmbClassificacao" name="cmbClassificacao"
+													class="form-control form-control-select2">
+													<option value="">Selecionar</option>
+													<?php
+													$sql = "SELECT ClassId, ClassNome
+															FROM Classificacao
+															JOIN Situacao on SituaId = ClassStatus
+															ORDER BY ClassNome ASC";
+													$result = $conn->query($sql);
+													$rowClass = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowClass as $item) {
+														print('<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>');
+													}
+													?>
+												</select>
+											</div>
+                                    	</div>
+									</div>
+
+									<div class="row">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCodigo">Código</label>
 												<select id="cmbCodigo" name="cmbCodigo" class="form-control form-control-select2">
@@ -685,7 +793,7 @@ $dataFim = date("Y-m-d");
 												</select>
 											</div>
 										</div>
-										<div class="col-lg-10" id="Produto">
+										<div class="col-lg-8" id="Produto">
 											<div class="form-group">
 												<label for="cmbProduto">Produto</label>
 												<select id="cmbProduto" name="cmbProduto" class="form-control form-control-select2">
@@ -706,7 +814,28 @@ $dataFim = date("Y-m-d");
 												</select>
 											</div>
 										</div>
-										<div class="col-lg-10" id="Servico" style="display: none">
+										<div class="col-lg-8" id="Servico" style="display: none">
+											<div class="form-group">
+												<label for="x">Serviço</label>
+												<select id="cmbServico" name="cmbServico" class="form-control form-control-select2">
+													<option value="">Todos</option>
+													<?php
+													$sql = "SELECT ServiId, ServiNome
+																	FROM Servico
+																	JOIN Situacao on SituaId = ServiStatus
+																	WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	ORDER BY ServiNome ASC";
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($row as $item) {
+														print('<option value="' . $item['ServiId'] . '">' . $item['ServiNome'] . '</option>');
+													}
+													?>
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-8" id="Servico" style="display: none">
 											<div class="form-group">
 												<label for="x">Serviço</label>
 												<select id="cmbServico" name="cmbServico" class="form-control form-control-select2">

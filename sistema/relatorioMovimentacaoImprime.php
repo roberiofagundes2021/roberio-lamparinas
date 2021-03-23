@@ -17,6 +17,9 @@ $iCategoria = isset($_POST['cmbCategoria_imp']) ? $_POST['cmbCategoria_imp'] : 0
 $iSubCategoria = isset($_POST['cmbSubCategoria_imp']) ? $_POST['cmbSubCategoria_imp'] : 0;
 $sCodigo = isset($_POST['cmbCodigo_imp']) ? $_POST['cmbCodigo_imp'] : 0;
 $iProduto = isset($_POST['cmbProduto_imp']) ? $_POST['cmbProduto_imp'] : 0;
+$iLocalEstoque = isset($_POST['cmbLocalEstoque_imp']) ? $_POST['cmbLocalEstoque_imp'] : 0;
+$iSetor = isset($_POST['cmbSetor_imp']) ? $_POST['cmbSetor_imp'] : 0;
+$iClassificacao = isset($_POST['cmbClassificacao_imp']) ? $_POST['cmbClassificacao_imp'] : 0;
 $iServico = isset($_POST['cmbServico_imp']) ? $_POST['cmbServico_imp'] : 0;
 
 if ($iCategoria != '#' and $iCategoria != 0) {
@@ -54,6 +57,36 @@ if ($iFornecedor != '#' and $iFornecedor != 0) {
 	$result = $conn->query($sqlNome);
 	$rowNome = $result->fetch(PDO::FETCH_ASSOC);		
 	$sFornecedor = $rowNome['ForneNome']; 
+}
+
+if ($iLocalEstoque != '#' and $iLocalEstoque != 0) {
+
+	$sqlNome = "SELECT LcEstNome
+				FROM LocalEstoque
+				WHERE LcEstId = ".$iLocalEstoque;
+	$result = $conn->query($sqlNome);
+	$rowNome = $result->fetch(PDO::FETCH_ASSOC);		
+	$sLocalEstoque = $rowNome['LcEstNome']; 
+}
+
+if ($iSetor != '#' and $iSetor != 0) {
+
+	$sqlNome = "SELECT SetorNome
+				FROM Setor
+				WHERE SetorId = ".$iSetor;
+	$result = $conn->query($sqlNome);
+	$rowNome = $result->fetch(PDO::FETCH_ASSOC);		
+	$sSetor = $rowNome['SetorNome']; 
+}	
+
+if ($iClassificacao != '#' and $iClassificacao != 0) {
+
+	$sqlNome = "SELECT ClassNome
+				FROM Classificacao
+				WHERE ClassId = ".$iClassificacao;
+	$result = $conn->query($sqlNome);
+	$rowNome = $result->fetch(PDO::FETCH_ASSOC);		
+	$sClassificacao = $rowNome['ClassNome']; 
 }	
 
 if ($sTipoProdutoServico == 'P') {
@@ -101,6 +134,19 @@ if ($sTipoProdutoServico == 'P') {
 	if ($iFornecedor != '#' and $iFornecedor != 0) {
 		$sql .= " and MovimFornecedor = $iFornecedor ";
 	}
+
+	if ($iLocalEstoque != '#' and $iLocalEstoque != 0) {
+		$sql .= " and MovimOrigemLocal = $iLocalEstoque ";
+	}
+
+	if ($iSetor != '#' and $iSetor != 0) {
+		$sql .= " and MovimDestinoSetor = $iSetor ";
+	}
+
+	if ($iClassificacao != '#' and $iClassificacao != 0) {
+		$sql .= " and MvXPrClassificacao = $iClassificacao ";
+	}
+
 } else {
 	$sql = "SELECT MovimData, MovimTipo, 
 			CASE 
@@ -139,6 +185,16 @@ if ($sTipoProdutoServico == 'P') {
 	if ($iFornecedor != '#' and $iFornecedor != 0) {
 		$sql .= " and MovimFornecedor = $iFornecedor ";
 	}
+
+	if ($iLocalEstoque != '#' and $iLocalEstoque != 0) {
+		$sql .= " and MovimOrigemLocal = $iLocalEstoque ";
+	}
+
+	if ($iSetor != '#' and $iSetor != 0) {
+		$sql .= " and MovimDestinoSetor = $iSetor ";
+	}
+
+	
 }
 
 $sql .= " Order By MovimData DESC";
@@ -197,6 +253,10 @@ try {
 	$sSubCategoria = $iSubCategoria ? $sSubCategoria : 'Todos';
 	$sCodigo = $sCodigo ? $sCodigo : 'Todos';
 	$sProduto = $iProduto ? $sProduto : 'Todos';
+	$sLocalEstoque = $iLocalEstoque ? $sLocalEstoque : 'Todos';
+	$sSetor = $iSetor ? $sSetor : 'Todos';
+	$sClassificacao = $iClassificacao ? $sClassificacao : 'Todos';
+	
 
 	$htmlEntrada = '';
 	$htmlSaida = '';

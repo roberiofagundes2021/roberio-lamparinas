@@ -43,6 +43,18 @@ function queryPesquisa()
         $args[]  = "ProduId = " . $_POST['cmbProduto'] . " ";
     }
 
+    if(!empty($_POST['cmbLocalEstoque'])){
+        $args[]  = "MovimOrigemLocal = ".$_POST['cmbLocalEstoque']." ";
+    }
+
+     if(!empty($_POST['cmbSetor'])){
+        $args[]  = "MovimDestinoSetor = ".$_POST['cmbSetor']." ";
+    }
+
+    if (!empty($_POST['cmbClassificacao'])) {
+        $args[]  = "MvXPrClassificacao = " . $_POST['cmbClassificacao'] . " ";
+    }
+
     if (count($args) >= 1) {
 
         $string = implode(" and ", $args);
@@ -71,6 +83,7 @@ function queryPesquisa()
             LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
             LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
             LEFT JOIN Fornecedor on ForneId = MovimFornecedor
+            LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
             WHERE " . $string . " MovimUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADO'
             ";
         $result = $conn->query($sql);

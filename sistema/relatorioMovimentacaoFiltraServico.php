@@ -43,6 +43,14 @@ function queryPesquisa()
         $args[]  = "ServiId = '" . $_POST['cmbServico'] . "'";
     }
 
+    if(!empty($_POST['cmbLocalEstoque'])){
+        $args[]  = "MovimOrigemLocal = ".$_POST['cmbLocalEstoque']." ";
+    }
+
+    if(!empty($_POST['cmbSetor'])){
+        $args[]  = "MovimDestinoSetor = ".$_POST['cmbSetor']." ";
+    }
+
     if (count($args) >= 1) {
 
         $string = implode(" and ", $args);
