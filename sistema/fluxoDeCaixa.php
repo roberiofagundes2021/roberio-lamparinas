@@ -122,7 +122,28 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 				e.preventDefault();
 				const cmbCentroDeCustosReq = $('#cmbCentroDeCustos').val();
 				const cmbPlanoContasReq = $('#cmbPlanoContas').val();
+				const msg = $('<div style="width:100%; text-align:center;"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></div>');
+
+				if (inputDateInitial.value === '' || inputDateInitial.value === null){
+					alerta('Atenção','Informe o período inicial!', 'error');
+					return false;
+				}
 				
+				if (inputDateEnd.value === '' || inputDateEnd.value === null){
+					alerta('Atenção','Informe o período final!', 'error');
+					return false;
+				}
+				
+				if (cmbCentroDeCustos === '' || cmbCentroDeCustos === null){
+					alerta('Atenção','Selecione pelo menos um Centro de Custo!', 'error');
+					return false;
+				}
+										
+				if (cmbPlanoContas === '' || cmbPlanoContas === null){
+					alerta('Atenção','Selecione pelo menos um Plano de Contas!', 'error');
+					return false;
+				}
+
 				const getData = () => {
 					let url = "fluxoDeCaixaFiltra.php";
 					const typeDate = buttonDay.classList.contains('active') ? 'D' : 'M';
@@ -143,6 +164,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 						cmbPlanoContas: cmbPlanoContasReq,
 					};
 
+					$('#dataResponse').html(msg);
+
 					try {
 						$.post(
 							url,
@@ -159,23 +182,15 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 					}
 				} 
 
-				inputDateInitial.value === '' || inputDateInitial.value === null 
-					? alerta('Atenção','Informe o período inicial!', 'error')
-				: inputDateEnd.value === '' || inputDateEnd.value === null 
-					? alerta('Atenção','Informe o período final!', 'error')
-				: cmbCentroDeCustos === '' || cmbCentroDeCustos
-                                        === null 
-					? alerta('Atenção','Selecione pelo menos um Centro de Custo!', 'error') 
-				: cmbPlanoContas === '' || cmbPlanoContas === null 
-				  ? alerta('Atenção','Selecione pelo menos um Plano de Contas!', 'error')
-					: getData();
+				getData();
+
 			});
 		});
 	</script>
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -199,13 +214,6 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Fluxo de Caixa</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="fluxo.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">

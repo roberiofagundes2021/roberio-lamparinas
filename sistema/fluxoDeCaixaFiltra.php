@@ -42,11 +42,11 @@ function centroDeCusto($CCNome,$CCPrevisto,$CC2Previsto,$CCRealizado,$CC2Realiza
                         <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                           <div class='row'>
                             <div class='col-md-6'>
-                              <span>".number_format($CCPrevisto, 2, '.', '') ."</span>
+                              <span>".mostraValor($CCPrevisto) ."</span>
                             </div>
 
                             <div class='col-md-6'>
-                              <span>".number_format($CCRealizado, 2, '.', '')."</span>
+                              <span>".mostraValor($CCRealizado)."</span>
                             </div>
                           </div>
                         </div>
@@ -66,7 +66,7 @@ function centroDeCusto($CCNome,$CCPrevisto,$CC2Previsto,$CCRealizado,$CC2Realiza
                         <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                           <div class='row'>
                             <div class='col-md-12'>
-                              <span>".number_format($porc_cc_1, 2, '.', '') ."%</span>
+                              <span>".mostraValor($porc_cc_1) ."%</span>
                             </div>
                           </div>
                         </div>
@@ -89,23 +89,20 @@ function planoDeContas($PL,$PL2,$tipo)
   for($i = 0;$i < count($PL,0);$i++)
   {
     $Retorno['HTML'] .= "<div class='card-body' style='padding-top: 0; padding-bottom: 0'>
-      <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
+      <div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
 
-        <div class='col-lg-1' style='border-right: 0'>          
-        </div>
-
-        <div class='col-lg-3' style='border-right: 1px dotted black;'>
-          <span>". $PL[$i]['PlConNome'] ."</span>
+        <div class='col-lg-4' style='border-right: 1px dotted black; padding-left: 20px;'>
+          <span title='".$PL[$i]['PlConNome']."'>". substr($PL[$i]['PlConNome'], 0, 50) ."</span>
         </div>
 
         <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
           <div class='row'>
             <div class='col-md-6'>
-              <span>".number_format($PL[$i]['PL_Previsto'.$tipo], 2, '.', '')."</span>
+              <span>".mostraValor($PL[$i]['PL_Previsto'.$tipo])."</span>
             </div>
 
             <div class='col-md-6'>
-              <span>".number_format($PL[$i]['PL_Realizado'.$tipo], 2, '.', '')."</span>
+              <span>".mostraValor($PL[$i]['PL_Realizado'.$tipo])."</span>
             </div>
           </div>
         </div>
@@ -113,11 +110,11 @@ function planoDeContas($PL,$PL2,$tipo)
         <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
           <div class='row'>
             <div class='col-md-6'>
-              <span>".(is_array($PL2)? number_format($PL2[$i]['PL_Previsto'.$tipo], 2, '.', ''):"")."</span>
+              <span>".(is_array($PL2)? mostraValor($PL2[$i]['PL_Previsto'.$tipo]):"")."</span>
             </div>
 
             <div class='col-md-6'>
-              <span>".(is_array($PL2)?number_format($PL2[$i]['PL_Realizado'.$tipo], 2, '.', ''):"")."</span>
+              <span>".(is_array($PL2)? mostraValor($PL2[$i]['PL_Realizado'.$tipo]):"")."</span>
             </div>
           </div>
         </div>";    
@@ -144,7 +141,7 @@ function planoDeContas($PL,$PL2,$tipo)
     $Retorno['HTML'] .= "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
           <div class='row'>
             <div class='col-md-12'>
-              <span>".number_format($porc_cc_1, 2, '.', '') ."%</span>
+              <span>".mostraValor($porc_cc_1) ."%</span>
             </div>
           </div>
         </div>
@@ -326,14 +323,14 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
   
   
   if(isset($saldoIni_p2))
-    $saldoIni_p2 = number_format( $saldoIni_p2, 2, '.', '');
+    $saldoIni_p2 = $saldoIni_p2;
   else
-    $saldoIni_p2 = "";
+    $saldoIni_p2 = 0;
   
   if(isset($saldoIni_r2))
-    $saldoIni_r2 = number_format($saldoIni_r2, 2, '.', '');
+    $saldoIni_r2 = $saldoIni_r2;
   else
-    $saldoIni_r2 = "";
+    $saldoIni_r2 = 0;
 
   $print .= " <div class='carousel-item ".($i == $diaInicio ? " active":"")."'> 
                 <div class='row'>
@@ -342,12 +339,16 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                     <div class='card-body' >
                       <div class='row'>
                           
-                        <div class='col-lg-3'>
+                        <div class='col-lg-4'>
                         </div>
 
-                        <div class='col-lg-3' style='text-align:center; border-top: 2px solid #1B3280; padding-top: 1rem;'>
-                          <span><strong>".date('Y',strtotime($dataInicio))."-".date('F',strtotime($dataInicio))."-". $i.($teste ?" / ".($i+1):"")."</strong></span>
+                        <div class='col-lg-3' style='text-align:center; border-top: 2px solid #1B3280; padding-top: 1rem; margin-right: 2px; '>
+                          <span><strong>".$i."-".date('F',strtotime($dataInicio))."-". date('Y',strtotime($dataInicio))."</strong></span>
                         </div>
+
+                        <div class='col-lg-3' style='text-align:center; border-top: 2px solid #1B3280; padding-top: 1rem; margin-left: 2px;'>
+                          <span><strong>".($teste ? ($i+1) : "") ."-". date('F',strtotime($dataInicio)) . "-" . date('Y',strtotime($dataInicio))."</strong></span>
+                        </div>                        
                       </div>
                     </div>
                   </div>
@@ -367,11 +368,11 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                           <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
-                                <span>".number_format($saldoIni_p1, 2, '.', '') ."</span>
+                                <span>".mostraValor($saldoIni_p1)."</span>
                               </div>
 
                               <div class='col-md-6'>
-                                <span>".number_format($saldoIni_r1, 2, '.', '') ."</span>
+                                <span>".mostraValor($saldoIni_r1)."</span>
                               </div>
                             </div>
                           </div>
@@ -379,11 +380,11 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                         <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
-                                <span>".(string)$saldoIni_p2."</span>
+                                <span>".mostraValor($saldoIni_p2)."</span>
                               </div>
 
                               <div class='col-md-6'>
-                                <span>".(string)$saldoIni_r2."</span>
+                                <span>".mostraValor($saldoIni_r2)."</span>
                               </div>
                             </div>
                           </div>
@@ -595,11 +596,11 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                           <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
-                                <span>".number_format($tot_previsto_entrada1, 2, '.', '') ."</span>
+                                <span>".mostraValor($tot_previsto_entrada1) ."</span>
                               </div>
 
                               <div class='col-md-6'>
-                                <span>".number_format($tot_realizado_entrada1, 2, '.', '') ."</span>
+                                <span>".mostraValor($tot_realizado_entrada1) ."</span>
                               </div>
                             </div>
                           </div>
@@ -607,11 +608,11 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                           <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
-                                <span>".($teste ? number_format($tot_previsto_entrada2, 2, '.', '') :"") ."</span>
+                                <span>".($teste ? mostraValor($tot_previsto_entrada2) :"") ."</span>
                               </div>
 
                               <div class='col-md-6'>
-                                <span>".($teste ? number_format($tot_realizado_entrada2, 2, '.', '') :"") ."</span>
+                                <span>".($teste ? mostraValor($tot_realizado_entrada2) :"") ."</span>
                               </div>
                             </div>
                           </div>
@@ -647,11 +648,11 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                           <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
-                                <span>".number_format($tot_previsto_saida1, 2, '.', '') ."</span>
+                                <span>".mostraValor($tot_previsto_saida1) ."</span>
                               </div>
 
                               <div class='col-md-6'>
-                                <span>".number_format($tot_realizado_saida1, 2, '.', '') ."</span>
+                                <span>".mostraValor($tot_realizado_saida1) ."</span>
                               </div>
                             </div>
                           </div>
@@ -659,11 +660,11 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                           <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
-                                <span>".($teste ? number_format($tot_previsto_saida2, 2, '.', '') :"") ."</span>
+                                <span>".($teste ? mostraValor($tot_previsto_saida2) :"") ."</span>
                               </div>
 
                               <div class='col-md-6'>
-                                <span>".($teste ? number_format($tot_realizado_saida2, 2, '.', '') :"") ."</span>
+                                <span>".($teste ? mostraValor($tot_realizado_saida2) :"") ."</span>
                               </div>
                             </div>
                           </div>  
@@ -701,11 +702,11 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                         <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                           <div class='row'>
                             <div class='col-md-6'>
-                              <span>". number_format($tot_geral_previsto1+$tot_geral_previsto2, 2, '.', '')  ."</span>
+                              <span>". mostraValor($tot_geral_previsto1+$tot_geral_previsto2)  ."</span>
                             </div>
 
                             <div class='col-md-6'>
-                              <span>". number_format($tot_geral_realizado1+$tot_geral_realizado2, 2, '.', '')  ."</span>
+                              <span>". mostraValor($tot_geral_realizado1+$tot_geral_realizado2)  ."</span>
                             </div>
                           </div>
                         </div>
@@ -747,22 +748,24 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                   <div class='col-lg-12'>
                     <!-- Basic responsive configuration -->
                       <div class='card-body' style='padding-top: 0;'>
-                        <div class='row col-lg-12' style='background: #607D8B; color:white; line-height: 3rem; box-sizing:border-box'>
-                          <span><strong>COMPARATIVO DO PERÍODO (ENTRADA E SAÍDA): </strong></span>
+                        <div class='row'>
+                          <div class='col-lg-12' style='background: #607D8B; color:white; line-height: 3rem; box-sizing:border-box'>
+                            <span><strong>COMPARATIVO DO PERÍODO (ENTRADA E SAÍDA): </strong></span>
+                          </div>
                         </div>
 
                         <div class='row col-lg-12' style='background: #fff; line-height: 3rem; box-sizing:border-box'>";
   if(isset($tot_geral_previsto1) && $tot_geral_previsto1 != 0 && isset($tot_geral_previsto2) && $tot_geral_previsto2 != 0)
   {
-    $print .= "<span>".number_format(((($tot_geral_realizado1+$tot_geral_realizado2) /($tot_geral_previsto1+$tot_geral_previsto2)) * 100), 2, '.', '') ."%</span>";
+    $print .= "<span>".mostraValor(((($tot_geral_realizado1+$tot_geral_realizado2) /($tot_geral_previsto1+$tot_geral_previsto2)) * 100)) ."%</span>";
   }
   else if(isset($tot_geral_previsto1) && $tot_geral_previsto1 != 0)
   {
-    $print .= "<span>".number_format(((($tot_geral_realizado1) /($tot_geral_previsto1)) * 100), 2, '.', '') ."%</span>";  
+    $print .= "<span>".mostraValor(((($tot_geral_realizado1) /($tot_geral_previsto1)) * 100)) ."%</span>";  
   }
   else
   {
-    $print .= " <span>0.00%</span>";
+    $print .= " <span>0,00%</span>";
   }
 
   $print .= "           <!--span>TOTAL SAÍDAS / TOTAL ENTRADAS * 100 = 100%</span-->
@@ -782,12 +785,12 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
 
 $print .= "</div>
             <a class='carousel-control-prev' href='#carouselExampleControls' role='button' data-slide='prev' style='color:black;'>
-              <span class='carousel-control-prev-icon' aria-hidden='true' >Previous</span>
+              <span class='carousel-control-prev-icon' aria-hidden='true' ><</span>
               <span class='sr-only'>Previous</span>
             </a>
 
             <a class='carousel-control-next' href='#carouselExampleControls' role='button' data-slide='next' style='color:black;'>
-              <span class='carousel-control-next-icon' aria-hidden='true'>Next</span>
+              <span class='carousel-control-next-icon' aria-hidden='true'>></span>
               <span class='sr-only'>Next</span>
             </a>
           </div>";
