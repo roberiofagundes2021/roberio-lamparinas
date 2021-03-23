@@ -1,7 +1,6 @@
 <?php
 
 include_once("sessao.php");
-include('global_assets/php/conexao.php');
 /* 
   --------------- $_POST -------------
   ["typeDate"]=> "D"/"M"
@@ -12,13 +11,26 @@ include('global_assets/php/conexao.php');
 */
 
 //gera os centros de custo
-function centroDeCusto($CCNome,$CCPrevisto,$CCRealizado,$planoDeContas)
+function centroDeCusto($CCNome,$CCPrevisto,$CC2Previsto,$CCRealizado,$CC2Realizado,$planoDeContas)
 {      
   $porc_cc_1  = 0.00;
+  
+  $CC2Previsto = ($CC2Previsto != "" ? number_format($CC2Previsto, 2, '.', ''):"");
+  $CC2Realizado = ($CC2Realizado != "" ? number_format($CC2Realizado, 2, '.', ''):"");
 
-  if(($CCPrevisto) != 0)
+  if($CC2Previsto != "")
   {
-    $porc_cc_1  =  (($CCRealizado * 100) / $CCPrevisto);
+    if(($CCPrevisto+$CC2Previsto) != 0)
+    {
+      $porc_cc_1  =  ((($CCRealizado + $CC2Realizado) * 100) / ($CCPrevisto+$CC2Previsto));
+    }
+  }
+  else
+  {
+     if(($CCPrevisto) != 0)
+    {
+      $porc_cc_1  =  (($CCRealizado  * 100) / $CCPrevisto);
+    } 
   }
 
   $retorno = "      <div class='card-body' style='padding-top: 0;padding-bottom: 0'>
@@ -27,7 +39,7 @@ function centroDeCusto($CCNome,$CCPrevisto,$CCRealizado,$planoDeContas)
                           <span>". $CCNome ."</span>
                         </div>
 
-                        <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+                        <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                           <div class='row'>
                             <div class='col-md-6'>
                               <span>".number_format($CCPrevisto, 2, '.', '') ."</span>
@@ -38,7 +50,20 @@ function centroDeCusto($CCNome,$CCPrevisto,$CCRealizado,$planoDeContas)
                             </div>
                           </div>
                         </div>
-                        <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+                        
+                        <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
+                          <div class='row'>
+                            <div class='col-md-6'>
+                              <span>". $CC2Previsto ."</span>
+                            </div>
+
+                            <div class='col-md-6'>
+                              <span>". $CC2Realizado ."</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                           <div class='row'>
                             <div class='col-md-12'>
                               <span>".number_format($porc_cc_1, 2, '.', '') ."%</span>
@@ -56,9 +81,9 @@ function centroDeCusto($CCNome,$CCPrevisto,$CCRealizado,$planoDeContas)
 }
 
 //gera os planos de contas
-function planoDeContas($PL,$tipo)
+function planoDeContas($PL,$PL2,$tipo)
 {
-  $Retorno    = array('HTML' => '','total_previsto' => 0.00, 'total_realizado' => 0.00 );
+  $Retorno    = array('HTML' => '','total_previsto' => 0.00, 'total_realizado' => 0.00,'total_previsto2' => 0.00, 'total_realizado2' => 0.00  );
   $porc_cc_1  = 0;
 
   for($i = 0;$i < count($PL,0);$i++)
@@ -73,7 +98,7 @@ function planoDeContas($PL,$tipo)
           <span>". $PL[$i]['PlConNome'] ."</span>
         </div>
 
-        <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+        <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
           <div class='row'>
             <div class='col-md-6'>
               <span>".number_format($PL[$i]['PL_Previsto'.$tipo], 2, '.', '')."</span>
@@ -83,19 +108,40 @@ function planoDeContas($PL,$tipo)
               <span>".number_format($PL[$i]['PL_Realizado'.$tipo], 2, '.', '')."</span>
             </div>
           </div>
+        </div>
+        
+        <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
+          <div class='row'>
+            <div class='col-md-6'>
+              <span>".(is_array($PL2)? number_format($PL2[$i]['PL_Previsto'.$tipo], 2, '.', ''):"")."</span>
+            </div>
+
+            <div class='col-md-6'>
+              <span>".(is_array($PL2)?number_format($PL2[$i]['PL_Realizado'.$tipo], 2, '.', ''):"")."</span>
+            </div>
+          </div>
         </div>";    
 
     //totaliza os valores
     $Retorno['total_previsto']  += $PL[$i]['PL_Previsto'.$tipo];
     $Retorno['total_realizado'] += $PL[$i]['PL_Realizado'.$tipo];  
+    
+    $Retorno['total_previsto2']  += (is_array($PL2))?$PL2[$i]['PL_Previsto'.$tipo]:0;
+    $Retorno['total_realizado2'] += (is_array($PL2))?$PL2[$i]['PL_Realizado'.$tipo]:0; 
 
     //calculo de porcentagem dos previstos e realizados
-    if($PL[$i]['PL_Previsto'.$tipo] != 0)
+    if(isset($PL2)&&(is_array($PL2)))
+        $vlrPl2 = $PL2[$i]['PL_Previsto'.$tipo];
+    else
+        $vlrPl2 = 0;
+    
+    if(($PL[$i]['PL_Previsto'.$tipo] + $vlrPl2)  != 0)
     {
-      $porc_cc_1  =  (($PL[$i]['PL_Realizado'.$tipo] * 100) / $PL[$i]['PL_Previsto'.$tipo] );
+      $porc_cc_1  =  ((($PL[$i]['PL_Realizado'.$tipo] + $vlrPl2) * 100) / 
+                            ($PL[$i]['PL_Previsto'.$tipo]+$vlrPl2));
     }    
 
-    $Retorno['HTML'] .= "<div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+    $Retorno['HTML'] .= "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
           <div class='row'>
             <div class='col-md-12'>
               <span>".number_format($porc_cc_1, 2, '.', '') ."%</span>
@@ -109,32 +155,11 @@ function planoDeContas($PL,$tipo)
 
   return $Retorno;
 }
-//-------------------------------------------------------------------------------------
-// loop dos dias 
-//-------------------------------------------------------------------------------------
 
-$numDias    = $_POST["quantityDays"];
-$diaInicio  = $_POST["dayInitial"];
-$diaFim     = $_POST["dayEnd"];
-$dataInicio = $_POST["inputDateInitial"];
-$dataFim    = $_POST["inputDateEnd"];
-$ccFiltro   = rtrim(implode($_POST["cmbCentroDeCustos"],','));
-$plFiltro   = rtrim(implode($_POST["cmbPlanoContas"],','));
-
-$print = "<div id='carouselExampleControls' class='carousel slide' data-ride='carousel'>
-            <div class='carousel-inner'> ";
-
-for($i = $diaInicio;$i <= $diaFim;$i++)
-{
-  $dataFiltro = trim(date('Y-m',strtotime($dataInicio))).'-'.$i;
-
-  if(isset($pl_Entrada))
-    unset($pl_Entrada);
-
-  if(isset($pl_Saida))
-    unset($pl_Saida);
-
-  $sql = "SELECT 
+function retornaBuscaComoArray($dataFiltro,$ccFiltro,$plFiltro)
+{        
+    include('global_assets/php/conexao.php');
+    $sql = "SELECT 
             CnCusId, 
             CnCusNome, 
             dbo.fnCentroCustoPrevisto(CnCusUnidade, CnCusId, '".$dataFiltro."', 'E') as CC_PrevistoEntrada,  
@@ -205,8 +230,112 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
   $sql_saldo_ini_r = "select dbo.fnFluxoCaixaSaldoInicialRealizado(1,'".$dataFiltro."') as SaldoInicialRealizado";
   $result_saldo_ini_r = $conn->query($sql_saldo_ini_r);
   $rowSaldoIni_r      = $result_saldo_ini_r->fetchAll(PDO::FETCH_ASSOC);
+    
+  $retorno = array('cc'=>$cc,'pl'=>$pl,'saldoIni_p'=>$rowSaldoIni_p,'saldoIni_r'=>$rowSaldoIni_r);
+  
+  unset($cc);
+  unset($pl);
+  unset($result);
+  unset($rowCentroDeCustos);
+  
+  return $retorno;
+}
 
-  $print .= " <div class='carousel-item ".(($i == $diaInicio)? " active":"")."'> 
+//-------------------------------------------------------------------------------------
+// loop dos dias 
+//-------------------------------------------------------------------------------------
+
+$numDias    = $_POST["quantityDays"];
+$diaInicio  = $_POST["dayInitial"];
+$diaFim     = $_POST["dayEnd"];
+$dataInicio = $_POST["inputDateInitial"];
+$dataFim    = $_POST["inputDateEnd"];
+$ccFiltro   = rtrim(implode($_POST["cmbCentroDeCustos"],','));
+$plFiltro   = rtrim(implode($_POST["cmbPlanoContas"],','));
+
+$print = "<div id='carouselExampleControls' class='carousel slide' data-ride='carousel'>
+            <div class='carousel-inner'> ";
+
+$teste = false;
+
+for($i = $diaInicio;$i <= $diaFim;$i++)
+{  
+  $teste = false;
+    
+  //limpa as variaveis
+  if(isset($dia1))
+  {
+    unset($dia1);
+    unset($cc1);
+    unset($pl1);
+    unset($saldoIni_p1);
+    unset($saldoIni_r1);
+  }
+  
+  //limpa as variaveis
+  if(isset($dia2))  
+  {
+    unset($dia2);
+    unset($cc2);
+    unset($pl2);
+    unset($saldoIni_p2);
+    unset($saldoIni_r2);
+  }    
+    
+  $dataFiltro = trim(date('Y-m',strtotime($dataInicio))).'-'.$i;
+  
+  //Pea TODOS os dads do dia $i
+  $dia1 = retornaBuscaComoArray($dataFiltro,$ccFiltro,$plFiltro);
+  
+ // echo "".$dataFiltro."---".$ccFiltro."---".$plFiltro."<br>";
+  
+  $cc1           = $dia1['cc'];
+  $pl1           = $dia1['pl'];
+  $saldoIni_p1   = $dia1['saldoIni_p'][0]['SaldoInicialPrevisto'];
+  $saldoIni_r1   = $dia1['saldoIni_r'][0]['SaldoInicialRealizado'];
+  
+  if(($i+1) <= $diaFim)
+  {        
+    $dataFiltro = trim(date('Y-m',strtotime($dataInicio))).'-'.($i+1);      
+    
+   //Pea TODOS os dads do dia $i+1 se ele estiver na faixa de dias do filtro
+    $dia2 = retornaBuscaComoArray($dataFiltro,$ccFiltro,$plFiltro);
+    
+    $cc2           = $dia2['cc'];
+    $pl2           = $dia2['pl'];
+    $saldoIni_p2   = $dia2['saldoIni_p'][0]['SaldoInicialPrevisto'];
+    $saldoIni_r2   = $dia2['saldoIni_r'][0]['SaldoInicialRealizado'];
+    
+    $teste = true;
+  }
+  
+  //echo "<pre>".print_r($cc1)."</pre>";;
+ // echo "<pre>".print_r($cc2)."</pre>";
+ // echo "<pre>".print_r($pl1)."</pre>";
+ // echo "<pre>".print_r($pl2)."</pre>";  exit();
+
+  if(isset($pl_Entrada))
+  {
+    unset($pl_Entrada);
+  }
+
+  if(isset($pl_Saida))
+  {
+    unset($pl_Saida);
+  }
+  
+  
+  if(isset($saldoIni_p2))
+    $saldoIni_p2 = number_format( $saldoIni_p2, 2, '.', '');
+  else
+    $saldoIni_p2 = "";
+  
+  if(isset($saldoIni_r2))
+    $saldoIni_r2 = number_format($saldoIni_r2, 2, '.', '');
+  else
+    $saldoIni_r2 = "";
+
+  $print .= " <div class='carousel-item ".($i == $diaInicio ? " active":"")."'> 
                 <div class='row'>
                   <div class='col-lg-12'>
                     <!-- Basic responsive configuration -->
@@ -217,7 +346,7 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                         </div>
 
                         <div class='col-lg-3' style='text-align:center; border-top: 2px solid #1B3280; padding-top: 1rem;'>
-                          <span><strong>".date('Y',strtotime($dataInicio))."-".date('F',strtotime($dataInicio))."-". $i ."</strong></span>
+                          <span><strong>".date('Y',strtotime($dataInicio))."-".date('F',strtotime($dataInicio))."-". $i.($teste ?" / ".($i+1):"")."</strong></span>
                         </div>
                       </div>
                     </div>
@@ -235,14 +364,26 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                             <span><strong>Saldo Inicial</strong></span>
                           </div>
 
-                          <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+                          <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
-                                <span>".number_format($rowSaldoIni_p[0]['SaldoInicialPrevisto'], 2, '.', '') ."</span>
+                                <span>".number_format($saldoIni_p1, 2, '.', '') ."</span>
                               </div>
 
                               <div class='col-md-6'>
-                                <span>".number_format($rowSaldoIni_r[0]['SaldoInicialRealizado'], 2, '.', '') ."</span>
+                                <span>".number_format($saldoIni_r1, 2, '.', '') ."</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                        <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
+                            <div class='row'>
+                              <div class='col-md-6'>
+                                <span>".(string)$saldoIni_p2."</span>
+                              </div>
+
+                              <div class='col-md-6'>
+                                <span>".(string)$saldoIni_r2."</span>
                               </div>
                             </div>
                           </div>
@@ -269,9 +410,22 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                     
                     <div class='card-body' style='padding-top: 0; padding-bottom: 0'>
                       <div class='row' style='background: #607D8B; line-height: 3rem; box-sizing:border-box; color:white;'>
-                        <div class='col-lg-4' style='border-right: 1px dotted black;'><strong>ENTRADA</strong></div> 
+                        <div class='col-lg-4' style='border-right: 1px dotted black;'>
+                            <strong>ENTRADA</strong>
+                        </div> 
                         
-                        <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+                        <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
+                          <div class='row'>
+                            <div class='col-md-6'>
+                              <span><strong>Previsto</strong></span>
+                            </div>
+                            <div class='col-md-6'>
+                              <span><strong>Realizado</strong></span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                           <div class='row'>
                             <div class='col-md-6'>
                               <span><strong>Previsto</strong></span>
@@ -282,10 +436,10 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                           </div>
                         </div>
 
-                        <div class='dataOpeningBalance col-lg-3' style='text-align:center;'>
+                        <div class='dataOpeningBalance col-lg-2' style='text-align:center;'>
                           <div class='row'>
-                            <div class='col-md-8'>
-                              <span><strong>Previsto/Realizado %</strong></span>
+                            <div class='col-md-12'>
+                              <span style='padding:0 px;margin:0px;'><strong style='padding:0px;margin:0px;'>Previsto/Realizado%</strong></span>
                             </div>
                           </div>
                         </div>
@@ -302,9 +456,22 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                     
                     <div class='card-body' style='padding-top: 0; padding-bottom: 0'>
                       <div class='row' style='background: #607D8B; line-height: 3rem; box-sizing:border-box; color:white;'>
-                        <div class='col-lg-4' style='border-right: 1px dotted black;'><strong>SAIDA</strong></div> 
+                        <div class='col-lg-4' style='border-right: 1px dotted black;'>
+                            <strong>SAIDA</strong>
+                        </div> 
                         
-                        <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+                        <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
+                          <div class='row'>
+                            <div class='col-md-6'>
+                              <span><strong>Previsto</strong></span>
+                            </div>
+                            <div class='col-md-6'>
+                              <span><strong>Realizado</strong></span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                           <div class='row'>
                             <div class='col-md-6'>
                               <span><strong>Previsto</strong></span>
@@ -315,9 +482,9 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                           </div>
                         </div>
 
-                        <div class='dataOpeningBalance col-lg-3' style='text-align:center;'>
+                        <div class='dataOpeningBalance col-lg-2' style='text-align:center;'>
                           <div class='row'>
-                            <div class='col-md-8'>
+                            <div class='col-md-12'>
                               <span><strong>Previsto/Realizado %</strong></span>
                             </div>
                           </div>
@@ -326,18 +493,25 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                       </div>
                     </div>";
 
-  // totaliza as entradas e saidas
-  $tot_previsto_entrada  = 0.00;
-  $tot_previsto_saida    = 0.00;
-  $tot_realizado_entrada = 0.00;
-  $tot_realizado_saida   = 0.00;
+    // totaliza as entradas e saidas
+    $tot_previsto_entrada1  = 0;
+    $tot_previsto_saida1    = 0;
+    $tot_realizado_entrada1 = 0;
+    $tot_realizado_saida1   = 0;      
+    $tot_previsto_entrada2  = 0;
+    $tot_previsto_saida2    = 0;
+    $tot_realizado_entrada2 = 0;
+    $tot_realizado_saida2   = 0;
 
-  $tot_geral_previsto  = 0.00;
-  $tot_geral_realizado = 0.00;
+    // totaliza as entradas e saidas
+    $tot_geral_previsto1  = 0;
+    $tot_geral_realizado1 = 0;
+    $tot_geral_previsto2  = 0;
+    $tot_geral_realizado2 = 0;  
 
-  if(isset($cc) && (!empty($cc)))
+  if(isset($cc1) && (!empty($cc1)))
   {
-    foreach($cc as $cCusto)
+    foreach($cc1 as $cCusto)
     {
       if(isset($pl_Entrada))
         unset($pl_Entrada);
@@ -346,41 +520,64 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
         unset($pl_Saida);
 
       //gera o html de plano de contas das entradas e soma os totais
-      $pl_Entrada = planoDeContas($pl[$cCusto['CnCusId']],"Entrada");
+      $pl_Entrada = planoDeContas($pl1[$cCusto['CnCusId']],($teste)?$pl2[$cCusto['CnCusId']]:"","Entrada");
       //gera o html de plano de contas das saidas e soma os totais
-      $pl_Saida = planoDeContas($pl[$cCusto['CnCusId']],"Saida");
-
+      $pl_Saida = planoDeContas($pl1[$cCusto['CnCusId']],($teste)?$pl2[$cCusto['CnCusId']]:"","Saida");
+      
       //gera o html dos centros de custo das entradas
       //concatena com o htm gerado pelo plano de contas
       $print_ent .= centroDeCusto($cCusto['CnCusNome'],
                                     $cCusto['CC_PrevistoEntrada'],
+                                    ($teste)?$cc2[$cCusto['CnCusId']]['CC_PrevistoEntrada']:"",
                                     $cCusto['CC_RealizadoEntrada'],
+                                    ($teste)?$cc2[$cCusto['CnCusId']]['CC_RealizadoEntrada']:"",
                                     $pl_Entrada['HTML']);                  
 
       //gera o html dos centros de custo das saidas
       //concatena com o htm gerado pelo plano de contas
       $print_sai .= centroDeCusto($cCusto['CnCusNome'],
                                     $cCusto['CC_PrevistoSaida'],
+                                    ($teste)?$cc2[$cCusto['CnCusId']]['CC_PrevistoSaida']:"",
                                     $cCusto['CC_RealizadoSaida'],
+                                    ($teste)?$cc2[$cCusto['CnCusId']]['CC_RealizadoSaida']:"",
                                     $pl_Saida['HTML']);
 
       //soma os totais dos planos de contas das entradas com o centro de custo atual
       $pl_Entrada['total_previsto']  += $cCusto['CC_PrevistoEntrada'];
       $pl_Entrada['total_realizado'] += $cCusto['CC_RealizadoEntrada'];
+      $pl_Entrada['total_previsto2']  += ($teste)?$cc2[$cCusto['CnCusId']]['CC_PrevistoEntrada']:0;
+      $pl_Entrada['total_realizado2'] += ($teste)?$cc2[$cCusto['CnCusId']]['CC_RealizadoEntrada']:0;
 
       //soma os totais dos planos de contas das saidas com o centro de custo atual
       $pl_Saida['total_previsto']  += $cCusto['CC_PrevistoSaida'];
       $pl_Saida['total_realizado'] += $cCusto['CC_RealizadoSaida'];
+      $pl_Saida['total_previsto2']  += ($teste)?$cc2[$cCusto['CnCusId']]['CC_PrevistoSaida']:0;
+      $pl_Saida['total_realizado2'] += ($teste)?$cc2[$cCusto['CnCusId']]['CC_RealizadoSaida']:0;
 
       // totaliza as entradas e saidas
-      $tot_previsto_entrada  += $pl_Entrada['total_previsto'];
-      $tot_previsto_saida    += $pl_Saida['total_previsto'];
-      $tot_realizado_entrada += $pl_Entrada['total_realizado'];
-      $tot_realizado_saida   += $pl_Saida['total_realizado'];
+      $tot_previsto_entrada1  += $pl_Entrada['total_previsto'];
+      $tot_previsto_saida1    += $pl_Saida['total_previsto'];
+      $tot_realizado_entrada1 += $pl_Entrada['total_realizado'];
+      $tot_realizado_saida1   += $pl_Saida['total_realizado'];      
+      $tot_previsto_entrada2  += $pl_Entrada['total_previsto2'];
+      $tot_previsto_saida2    += $pl_Saida['total_previsto2'];
+      $tot_realizado_entrada2 += $pl_Entrada['total_realizado2'];
+      $tot_realizado_saida2   += $pl_Saida['total_realizado2'];
 
       // totaliza as entradas e saidas
-      $tot_geral_previsto  += ($pl_Entrada['total_previsto'] - $pl_Saida['total_previsto'])+$rowSaldoIni_p[0]['SaldoInicialPrevisto'];
-      $tot_geral_realizado += ($pl_Entrada['total_realizado'] - $pl_Saida['total_realizado'])+$rowSaldoIni_r[0]['SaldoInicialRealizado'];
+      $tot_geral_previsto1  += ($tot_previsto_entrada1 - $tot_previsto_saida1 )+($saldoIni_p1);
+      $tot_geral_realizado1 += ($tot_realizado_entrada1 - $tot_realizado_saida1)+($saldoIni_r1);
+      
+      if ($teste)
+      {
+        $tot_geral_previsto2  += ($tot_previsto_entrada2 - $tot_previsto_saida2 )+($saldoIni_p2);
+        $tot_geral_realizado2 += ($tot_realizado_entrada2 - $tot_realizado_saida2)+($saldoIni_r2);
+      }
+      else 
+      {        
+        $tot_geral_previsto2  += 0;
+        $tot_geral_realizado2 += 0;  
+      }
     }
   }
   //------------------------------------------------------------------------
@@ -395,19 +592,31 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                           <span><strong>TOTAL</strong></span>
                           </div>
 
-                          <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+                          <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
-                                <span>".number_format($tot_previsto_entrada, 2, '.', '') ."</span>
+                                <span>".number_format($tot_previsto_entrada1, 2, '.', '') ."</span>
                               </div>
 
                               <div class='col-md-6'>
-                                <span>".number_format($tot_realizado_entrada, 2, '.', '') ."</span>
+                                <span>".number_format($tot_realizado_entrada1, 2, '.', '') ."</span>
                               </div>
                             </div>
                           </div>
 
-                          <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+                          <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
+                            <div class='row'>
+                              <div class='col-md-6'>
+                                <span>".($teste ? number_format($tot_previsto_entrada2, 2, '.', '') :"") ."</span>
+                              </div>
+
+                              <div class='col-md-6'>
+                                <span>".($teste ? number_format($tot_realizado_entrada2, 2, '.', '') :"") ."</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                               <div class='row'>
                                 <div class='col-md-12'>
                                 </div>
@@ -435,19 +644,31 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                           <span><strong>TOTAL</strong></span>
                           </div>
 
-                          <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+                          <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
-                                <span>".number_format($tot_previsto_saida, 2, '.', '') ."</span>
+                                <span>".number_format($tot_previsto_saida1, 2, '.', '') ."</span>
                               </div>
 
                               <div class='col-md-6'>
-                                <span>".number_format($tot_realizado_saida, 2, '.', '') ."</span>
+                                <span>".number_format($tot_realizado_saida1, 2, '.', '') ."</span>
                               </div>
                             </div>
                           </div>
+                          
+                          <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
+                            <div class='row'>
+                              <div class='col-md-6'>
+                                <span>".($teste ? number_format($tot_previsto_saida2, 2, '.', '') :"") ."</span>
+                              </div>
 
-                          <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+                              <div class='col-md-6'>
+                                <span>".($teste ? number_format($tot_realizado_saida2, 2, '.', '') :"") ."</span>
+                              </div>
+                            </div>
+                          </div>  
+
+                          <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                               <div class='row'>
                                 <div class='col-md-12'>
                                 </div>
@@ -472,24 +693,36 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                   <div class='col-lg-12'>
                     <!-- Basic responsive configuration -->
                       <div class='card-body' style='padding-top: 0;'>
-                        <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
-                          <div class='col-lg-4' style='border-right: 1px dotted black;'>
+                       <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
+                        <div class='col-lg-4' style='border-right: 1px dotted black;'>
                           <span><strong>SALDO FINAL</strong></span>
-                          </div>
+                        </div>
 
-                          <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+                        <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
+                          <div class='row'>
+                            <div class='col-md-6'>
+                              <span>". number_format($tot_geral_previsto1+$tot_geral_previsto2, 2, '.', '')  ."</span>
+                            </div>
+
+                            <div class='col-md-6'>
+                              <span>". number_format($tot_geral_realizado1+$tot_geral_realizado2, 2, '.', '')  ."</span>
+                            </div>
+                          </div>
+                        </div>
+                          
+                        <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
-                                <span>". number_format($tot_geral_previsto, 2, '.', '')  ."</span>
+                                <span>". /*number_format($tot_geral_previsto2, 2, '.', '')*/ "" ."</span>
                               </div>
 
                               <div class='col-md-6'>
-                                <span>". number_format($tot_geral_realizado, 2, '.', '')  ."</span>
+                                <span>". /*number_format($tot_geral_realizado2, 2, '.', '')*/""  ."</span>
                               </div>
                             </div>
                           </div>
 
-                          <div class='dataOpeningBalance col-lg-4' style='border-right: 1px dotted black; text-align:center;'>
+                          <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
                                 <span> </span>
@@ -519,9 +752,13 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                         </div>
 
                         <div class='row col-lg-12' style='background: #fff; line-height: 3rem; box-sizing:border-box'>";
-  if($tot_geral_previsto != 0)
+  if(isset($tot_geral_previsto1) && $tot_geral_previsto1 != 0 && isset($tot_geral_previsto2) && $tot_geral_previsto2 != 0)
   {
-    $print .= "<span>".number_format((($tot_geral_realizado /$tot_geral_previsto) * 100), 2, '.', '') ."%</span>";
+    $print .= "<span>".number_format(((($tot_geral_realizado1+$tot_geral_realizado2) /($tot_geral_previsto1+$tot_geral_previsto2)) * 100), 2, '.', '') ."%</span>";
+  }
+  else if(isset($tot_geral_previsto1) && $tot_geral_previsto1 != 0)
+  {
+    $print .= "<span>".number_format(((($tot_geral_realizado1) /($tot_geral_previsto1)) * 100), 2, '.', '') ."%</span>";  
   }
   else
   {
@@ -537,7 +774,10 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
               </div>  
               ";
   
-  
+  if(($i+1) <= $diaFim)
+  {
+      $i++;
+  }  
 }
 
 $print .= "</div>
