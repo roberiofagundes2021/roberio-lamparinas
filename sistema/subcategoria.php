@@ -34,7 +34,7 @@ if(isset($_POST['inputSubCategoriaId']) && $_POST['inputSubCategoriaId']){
 if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5) == 'GRAVA'){
 
 	try{
-		echo $_POST['inputEstadoAtual'];die;
+		//echo $_POST['inputEstadoAtual'];die;
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
@@ -180,7 +180,9 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				var inputNomeNovo = $('#inputNome').val();
 				var inputNomeVelho = $('#inputSubCategoriaNome').val();
 				var inputEstadoAtual = $('#inputEstadoAtual').val();
-				var cmbCategoria = $('#cmbCategoria').val();
+				var cmbCategoriaNovo = $('#cmbCategoria').val();
+				var cmbCategoriaVelho = $('#cmbCategoriaEdita').val();
+				var url = "subcategoriaValida.php";
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNomeNovo.trim();
@@ -190,32 +192,35 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					$('#inputNome').val('');
 					$("#formSubCategoria").submit();
 				} else {
-					
-					//Esse ajax está sendo usado para verificar no banco se o registro já existe
-					$.ajax({
-						type: "POST",
-						url: "subcategoriaValida.php",
-						data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual+'&cmbCategoria='+cmbCategoria),
-						success: function(resposta){
 
-							if(resposta == 1){
+					inputsValues = {
+						nomeNovo: inputNome,
+						nomeVelho: inputNomeVelho,
+						estadoAtual: inputEstadoAtual,
+						categoriaNovo: cmbCategoriaNovo,
+						categoriaVelho: cmbCategoriaVelho
+					};
+
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.post(
+						url,
+						inputsValues,
+						(data) => {
+
+							if(data == 1){
 								alerta('Atenção','Esse registro já existe!','error');
 								return false;
-							}
+							}							
 
-							if (resposta == 'EDITA'){
+							if (data == 'EDITA'){
 								document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
-								alert("Entro1");
 							} else{
 								document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
-								alert("Entro2");
-							}						
-
-							return false;
+							}
 
 							$( "#formSubCategoria" ).submit();
 						}
-					})
+					);
 				}
 			})		
 		});
@@ -278,7 +283,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 									<input type="hidden" id="inputSubCategoriaId" name="inputSubCategoriaId" value="<?php if (isset($_POST['inputSubCategoriaId'])) echo $_POST['inputSubCategoriaId']; ?>" >
 									<input type="hidden" id="inputSubCategoriaNome" name="inputSubCategoriaNome" value="<?php if (isset($_POST['inputSubCategoriaNome'])) echo $_POST['inputSubCategoriaNome']; ?>" >
-									<!--<input type="hidden" id="cmbCategoria" name="cmbCategoria" value="<?php //if (isset($_POST['cmbCategoria'])) echo $_POST['cmbCategoria']; ?>" >-->
+									<input type="hidden" id="cmbCategoriaEdita" name="cmbCategoriaEdita" value="<?php if (isset($_POST['cmbCategoria'])) echo $_POST['cmbCategoria']; ?>" >
 									<input type="hidden" id="inputSubCategoriaStatus" name="inputSubCategoriaStatus" >
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 

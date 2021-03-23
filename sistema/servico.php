@@ -5,7 +5,7 @@ include('global_assets/php/conexao.php');
 
 $_SESSION['PaginaAtual'] = 'Serviço';
 
-$sql = "SELECT ServiId, ServiCodigo, ServiNome, CategNome, SbCatNome, ServiValorVenda, ServiStatus, SituaNome, SituaChave, SituaCor
+$sql = "SELECT ServiId, ServiCodigo, ServiNome, ServiValorCusto, ServiCustoFinal, ServiValorVenda, CategNome, SbCatNome, ServiValorVenda, ServiStatus, SituaNome, SituaChave, SituaCor
 		FROM Servico
 		JOIN Categoria on CategId = ServiCategoria
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
@@ -15,6 +15,13 @@ $sql = "SELECT ServiId, ServiCodigo, ServiNome, CategNome, SbCatNome, ServiValor
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
+
+$sql = "SELECT ParamPrecoGridServico
+	    FROM Parametro
+		WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . "
+	   ";
+$result = $conn->query($sql);
+$parametro = $result->fetch(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -295,7 +302,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>Servico</th>
 										<th>Categoria</th>
 										<th>SubCategoria</th>
-										<th>Preço Venda</th>
+										<?php
+										if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') print('<th>Preço Custo Final</th>');
+										else if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTO') print('<th>Preço Custo</th>');
+										else if ($parametro['ParamPrecoGridServico'] == 'PRECOVENDA') print('<th>Preço Venda</th>');
+										else print('<th>Preço Venda</th>');
+										?>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -303,7 +315,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<tbody>
 								<?php
 									foreach ($row as $item){
-										
+
+										$tipoValorServico = '';										
+
+										if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') $tipoValorServico = '<td>' . formataMoeda($item['ServiCustoFinal']) . '</td>';
+										else if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTO') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorCusto']) . '</td>';
+										else if ($parametro['ParamPrecoGridServico'] == 'PRECOVENDA') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
+										else $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
+	
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
@@ -313,7 +332,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['ServiNome'].'</td>
 											<td>'.$item['CategNome'].'</td>
 											<td>'.$item['SbCatNome'].'</td>
-											<td>'.formataMoeda($item['ServiValorVenda']).'</td>
+											' . $tipoValorServico . '
 											');
 										
 										print('<td><a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');" data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

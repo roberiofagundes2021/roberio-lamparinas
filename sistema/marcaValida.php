@@ -11,7 +11,7 @@ if(isset($_POST['nomeVelho'])){
 } else{
 	$sql = "SELECT MarcaId
 			FROM Marca
-			WHERE MarcaUnidade = ".$_SESSION['UnidadeId']." and MarcaNome = '". $_POST['nome']."'";
+			WHERE MarcaUnidade = ".$_SESSION['UnidadeId']." and MarcaNome = '". $_POST['nomeNovo']."'";
 }
 
 $result = $conn->query($sql);

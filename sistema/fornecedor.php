@@ -194,9 +194,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 										<div class="collapse" id="collapse-imprimir-relacao" style="margin-top: 5px;">
 											<div class="row">
-												<div class="col-lg-9">
-												</div>
-												<div class="col-lg-3">
+												<div class="col-lg-12">
 													<div class="form-group">												
 														<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
 															<option value="#">Filtrar por: Categoria (todas)</option>

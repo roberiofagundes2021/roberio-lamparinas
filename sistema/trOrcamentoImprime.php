@@ -18,7 +18,7 @@ if (isset($_POST['inputOrcamentoId'])) {
 
 try {
 
-	$sql = "SELECT TrXOrNumero, TrRefData, TrXOrTabelaProduto, TrXOrTabelaServico, TrRefId, TrRefTabelaProduto, TrRefTabelaServico, TrRefNumero, TrRefTipo, ForneNome, CategNome
+	$sql = "SELECT TrXOrNumero, TrRefData, TrXOrConteudo, TrXOrTabelaProduto, TrXOrTabelaServico, TrRefId, TrRefTabelaProduto, TrRefTabelaServico, TrRefNumero, TrRefTipo, ForneNome, CategNome
 			FROM TRXOrcamento
             JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
 			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
@@ -125,6 +125,10 @@ try {
 		$html .= "<div style='text-align:center;'><h2>FORNECEDOR</h2></div>";
 		$html .= '<div style="text-align:center; margin-top: -20px"><p style="font-size:18px;">' . $row['ForneNome'] . '</p></div>';	
 	}
+
+	$html .= '
+	<div>' . $row['TrXOrConteudo'] . '</div>
+	<br>';
 
 	if ($rowProdutoUtilizado['CONT'] > 0) {
 

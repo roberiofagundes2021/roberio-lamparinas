@@ -12,7 +12,7 @@ if (isset($_POST['inputEmpresaId'])){
 }
 
 if (isset($_SESSION['EmpresaId'])) {
-	$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamPrecoGridProduto, ParamServicoOrcamento,ParamValidadeObrigatoria,ParamPatrimonioInicial 
+	$sql = "SELECT ParamId, ParamEmpresaPublica, ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra, ParamValorObsImpreRetirada, ParamProdutoOrcamento, ParamPrecoGridProduto, ParamPrecoGridServico, ParamServicoOrcamento,ParamValidadeObrigatoria,ParamPatrimonioInicial 
 	        FROM Parametro
 	        WHERE ParamEmpresa = " . $_SESSION['EmpresaId'] . "";
 	$result = $conn->query($sql);
@@ -34,7 +34,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 		//var_dump($_POST);die;
 		$sql = "UPDATE Parametro SET ParamEmpresaPublica = :iEmpresaPublica, ParamValorAtualizadoFluxo = :iValorAtualizadoFluxo, 
 					   ParamValorAtualizadoOrdemCompra = :iValorAtualizadoOrdemCompra, ParamProdutoOrcamento = :iProdutoOrcamento, 
-					   ParamServicoOrcamento = :iServicoOrcamento, ParamPrecoGridProduto = :sPrecoGridProduto, ParamValidadeObrigatoria = :iValidadeObrigatoria,
+					   ParamServicoOrcamento = :iServicoOrcamento, ParamPrecoGridProduto = :sPrecoGridProduto, ParamPrecoGridServico = :sPrecoGridServico, ParamValidadeObrigatoria = :iValidadeObrigatoria,
 					   ParamPatrimonioInicial = :sPatrimonioInicial, ParamUsuarioAtualizador = :iUsuarioAtualizador, ParamValorObsImpreRetirada = :iValorObsImpreRetirada
 				WHERE ParamEmpresa = :iEmpresa";
 		$result = $conn->prepare($sql);
@@ -47,6 +47,7 @@ if (isset($_POST['inputIdEmpresa'])) {
 			':iProdutoOrcamento' => isset($_POST['inputProdutoOrcamento']) && $_POST['inputProdutoOrcamento'] == "on" ? 1 : 0,
 			':iServicoOrcamento' => isset($_POST['inputServicoOrcamento']) && $_POST['inputServicoOrcamento'] == "on" ? 1 : 0,
 			':sPrecoGridProduto' => $_POST['cmbPrecoGridProduto'],
+			':sPrecoGridServico' => $_POST['cmbPrecoGridServico'],
 			':iValidadeObrigatoria' => isset($_POST['inputValidadeObrigatoria']) && $_POST['inputValidadeObrigatoria'] == "on" ? 1 : 0,
 			':sPatrimonioInicial' => $_POST['cmbPatrimonioInicial'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -249,24 +250,57 @@ if (isset($_POST['inputIdEmpresa'])) {
 										<label for="cmbPrecoGridProduto">Coluna preço na relação dos produtos <span class="text-danger">*</span></label>
 										<select id="cmbPrecoGridProduto" name="cmbPrecoGridProduto" class="form-control form-control-select2">
 											<?php
-											if ($row['ParamPrecoGridProduto'] == 'precoCustoFinal') {
+											if ($row['ParamPrecoGridProduto'] == 'PRECOCUSTOFINAL') {
 												print('
-														<option value="precoCustoFinal" selected>Preço de custo final</option>
-														<option value="precoCusto">Preço de custo</option>
-														<option value="precoVenda">Preço de venda</option>
+														<option value="PRECOCUSTOFINAL" selected>Preço de custo final</option>
+														<option value="PRECOCUSTO">Preço de custo</option>
+														<option value="PRECOVENDA">Preço de venda</option>
 												   ');
-											} else if ($row['ParamPrecoGridProduto'] == 'precoCusto') {
+											} else if ($row['ParamPrecoGridProduto'] == 'PRECOCUSTO') {
 												print('
-												        <option value="precoCustoFinal">Preço de custo final</option>
-														<option value="precoCusto" selected>Preço de custo</option>
-														<option value="precoVenda">Preço de venda</option>
+												        <option value="PRECOCUSTOFINAL">Preço de custo final</option>
+														<option value="PRECOCUSTO" selected>Preço de custo</option>
+														<option value="PRECOVENDA">Preço de venda</option>
 													');
 											} else {
 
 												print('
-												        <option value="precoCustoFinal">Preço de custo final</option>
-														<option value="precoCusto">Preço de custo</option>
-												        <option value="precoVenda" selected>Preço de venda</option>
+												        <option value="PRECOCUSTOFINAL">Preço de custo final</option>
+														<option value="PRECOCUSTO">Preço de custo</option>
+												        <option value="PRECOVENDA" selected>Preço de venda</option>
+												   ');
+											}
+											?>
+										</select>
+									</div>
+									<!-- /switch single -->
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-lg-3">
+									<!-- Switch single -->
+									<div class="form-group">
+										<label for="cmbPrecoGridServico">Coluna preço na relação de Serviço <span class="text-danger">*</span></label>
+										<select id="cmbPrecoGridServico" name="cmbPrecoGridServico" class="form-control form-control-select2">
+											<?php
+											if ($row['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') {
+												print('
+														<option value="PRECOCUSTOFINAL" selected>Preço de custo final</option>
+														<option value="PRECOCUSTO">Preço de custo</option>
+														<option value="PRECOVENDA">Preço de venda</option>
+												   ');
+											} else if ($row['ParamPrecoGridServico'] == 'PRECOCUSTO') {
+												print('
+												        <option value="PRECOCUSTOFINAL">Preço de custo final</option>
+														<option value="PRECOCUSTO" selected>Preço de custo</option>
+														<option value="PRECOVENDA">Preço de venda</option>
+													');
+											} else {
+
+												print('
+												        <option value="PRECOCUSTOFINAL">Preço de custo final</option>
+														<option value="PRECOCUSTO">Preço de custo</option>
+												        <option value="PRECOVENDA" selected>Preço de venda</option>
 												   ');
 											}
 											?>
