@@ -228,7 +228,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 													<button id="submitMonth" class="btn">Mês</button>
 												</div>
 											</div>
-                    </div>
+                   						 </div>
 
 										<div class="col-lg-2">
 											<div class="form-group">
@@ -255,53 +255,52 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 										</div>
 
 										<div class="col-lg-2">
-                      <div class="form-group container-cmbCentroDeCustos" >
-                        <label for="cmbCentroDeCustos">Centro de Custos</label>
-                        <select id="cmbCentroDeCustos" name="cmbCentroDeCustos" class="form-control multiselect-select-all" multiple="multiple" data-fouc>
-                          <?php
-                                                    $sql = "SELECT CnCusId,
-                                                                   CnCusNome
-                                                              FROM CentroCusto
-                                                              JOIN Situacao 
-                                                                ON SituaId = CnCusStatus
-                                                             WHERE CnCusUnidade = " . $_SESSION['UnidadeId'] . " 
-                                                               and SituaChave = 'ATIVO'
-                                                          ORDER BY CnCusNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
+											<div class="form-group container-cmbCentroDeCustos" >
+												<label for="cmbCentroDeCustos">Centro de Custos</label>
+												<select id="cmbCentroDeCustos" name="cmbCentroDeCustos" class="form-control multiselect-select-all" multiple="multiple" data-fouc>
+													<?php
+														$sql = "SELECT CnCusId,
+																	CnCusNome
+																FROM CentroCusto
+																JOIN Situacao 
+																	ON SituaId = CnCusStatus
+																WHERE CnCusUnidade = " . $_SESSION['UnidadeId'] . " 
+																and SituaChave = 'ATIVO'
+															ORDER BY CnCusNome ASC";
+														$result = $conn->query($sql);
+														$rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    foreach ($rowCentroDeCustos as $item) {
-                                                      print('<option value="' . $item['CnCusId'] . '" selected>' . $item['CnCusNome'] . '</option>');
-                                                    }
-
-                                                    ?>
-                        </select>
-                      </div>
-                    </div>
+														foreach ($rowCentroDeCustos as $item) {
+															print('<option value="' . $item['CnCusId'] . '" selected>' . $item['CnCusNome'] . '</option>');
+														}
+													?>
+												</select>
+											</div>
+										</div>
 
 										<div class="col-lg-3">
-                      <div class="form-group container-cmbPlanoContas">
-                        <label for="cmbPlanoContas">Plano de Contas</label>
-                        <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control multiselect-select-all" multiple="multiple" data-fouc>
-												<?php
-                                                    $sql = "SELECT PlConId, PlConNome
-																															FROM PlanoContas
-																															JOIN Situacao 
-																															  ON SituaId = PlConStatus
-																													   WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " 
-																															 AND SituaChave = 'ATIVO'
-																													ORDER BY PlConNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+											<div class="form-group container-cmbPlanoContas">
+												<label for="cmbPlanoContas">Plano de Contas</label>
+												<select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control multiselect-select-all" multiple="multiple" data-fouc>
+													<?php
+														$sql = "SELECT PlConId, PlConNome
+																FROM PlanoContas
+																JOIN Situacao 
+																ON SituaId = PlConStatus
+																WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " 
+																		AND SituaChave = 'ATIVO'
+																ORDER BY PlConNome ASC";
+														$result = $conn->query($sql);
+														$rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    foreach ($rowPlanoContas as $item) {
-                                                      print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConNome'] . '</option>');
-                                                    }
+														foreach ($rowPlanoContas as $item) {
+															print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConNome'] . '</option>');
+														}
 
-                                                    ?>
-                        </select>
-                      </div>
-                    </div>
+														?>
+												</select>
+											</div>
+										</div>
 
 										<div class="text-left col-lg-1 pt-3">
 											<button id="submitPesquisar" class="btn btn-principal" style='margin-left:1rem'><i class="fas fa-search"></i></button>

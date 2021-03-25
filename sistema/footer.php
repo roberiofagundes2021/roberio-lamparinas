@@ -14,7 +14,7 @@
 
 
 			<ul class="navbar-nav ml-lg-auto">
-				<li class="nav-item"><a href="#" class="navbar-nav-link" target="_blank"><span style="margin-right:10px; padding-right:10px; border-right: 1px solid #333;">AWS</span><i class="icon-phone2 mr-2"></i>(98) 9547-00045</a></li>
+				<li class="nav-item"><a href="#" class="navbar-nav-link" target="_blank"><span style="margin-right:10px; padding-right:10px; border-right: 1px solid #333;">SUPORTE</span><i class="icon-phone2 mr-2"></i>(98) 9547-00045</a></li>
 				<!--
 				<li class="nav-item"><a href="https://kopyov.ticksy.com/" class="navbar-nav-link" target="_blank"><i class="icon-lifebuoy mr-2"></i> Support</a></li>
 				<li class="nav-item"><a href="http://demo.interface.club/limitless/docs/" class="navbar-nav-link" target="_blank"><i class="icon-file-text2 mr-2"></i> Manual do Usuário</a></li>

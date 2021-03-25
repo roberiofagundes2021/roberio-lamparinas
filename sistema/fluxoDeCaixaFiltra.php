@@ -1,6 +1,10 @@
 <?php
 
 include_once("sessao.php");
+
+// Para a data ficar em português. Foi usado lá embaixo onde tem strftime (referência: https://www.linhadecomando.com/php/php-funcao-date-para-strftime-em-portugues)
+setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
+
 /* 
   --------------- $_POST -------------
   ["typeDate"]=> "D"/"M"
@@ -15,10 +19,10 @@ function centroDeCusto($CCNome,$CCPrevisto,$CC2Previsto,$CCRealizado,$CC2Realiza
 {      
   $porc_cc_1  = 0.00;
   
-  $CC2Previsto = ($CC2Previsto != "" ? number_format($CC2Previsto, 2, '.', ''):"");
-  $CC2Realizado = ($CC2Realizado != "" ? number_format($CC2Realizado, 2, '.', ''):"");
+  $CC2Previsto = ($CC2Previsto != "" ? $CC2Previsto : 0);
+  $CC2Realizado = ($CC2Realizado != "" ? $CC2Realizado : 0);
 
-  if($CC2Previsto != "")
+  if($CC2Previsto != 0)
   {
     if(($CCPrevisto+$CC2Previsto) != 0)
     {
@@ -54,11 +58,11 @@ function centroDeCusto($CCNome,$CCPrevisto,$CC2Previsto,$CCRealizado,$CC2Realiza
                         <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                           <div class='row'>
                             <div class='col-md-6'>
-                              <span>". $CC2Previsto ."</span>
+                              <span>". mostraValor($CC2Previsto) ."</span>
                             </div>
 
                             <div class='col-md-6'>
-                              <span>". $CC2Realizado ."</span>
+                              <span>". mostraValor($CC2Realizado) ."</span>
                             </div>
                           </div>
                         </div>
@@ -88,11 +92,13 @@ function planoDeContas($PL,$PL2,$tipo)
 
   for($i = 0;$i < count($PL,0);$i++)
   {
+    $nomePL = strlen($PL[$i]['PlConNome']) > 50 ? substr($PL[$i]['PlConNome'], 0, 50)."..." : $PL[$i]['PlConNome'];
+
     $Retorno['HTML'] .= "<div class='card-body' style='padding-top: 0; padding-bottom: 0'>
       <div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
 
         <div class='col-lg-4' style='border-right: 1px dotted black; padding-left: 20px;'>
-          <span title='".$PL[$i]['PlConNome']."'>". substr($PL[$i]['PlConNome'], 0, 50) ."</span>
+          <span title='".$PL[$i]['PlConNome']."'>". $nomePL ."</span>
         </div>
 
         <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
@@ -181,7 +187,7 @@ function retornaBuscaComoArray($dataFiltro,$ccFiltro,$plFiltro)
         ORDER BY CnCusNome ASC";
   
   
-  //echo $ccFiltro."<br>".$sql."<br>".$plFiltro."<br>".print_r($_POST);exit;
+  //echo $ccFiltro."<br>".$sql."<br>".$plFiltro."<br>".print_r($_POST)."<br><br>";
 
   $result            = $conn->query($sql);
   $rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -218,13 +224,17 @@ function retornaBuscaComoArray($dataFiltro,$ccFiltro,$plFiltro)
     $cont++;
   }
 
+  //CV: Essas funções precisam trazer os CC e PL como foi feito com as consultas acima, pois dependerá de quais CC e PL estão sendo mostrados
+
   //pega o saldo inicial presumido
-  $sql_saldo_ini_p   = "select dbo.fnFluxoCaixaSaldoInicialPrevisto(1,'".$dataFiltro."') as SaldoInicialPrevisto";
+  $sql_saldo_ini_p   = "select dbo.fnFluxoCaixaSaldoInicialPrevisto(".$_SESSION['UnidadeId'].",'".$dataFiltro."') as SaldoInicialPrevisto";
   $result_saldo_ini_p = $conn->query($sql_saldo_ini_p);
   $rowSaldoIni_p      = $result_saldo_ini_p->fetchAll(PDO::FETCH_ASSOC);
+  
+  //echo $sql_saldo_ini_p."<br>";
 
   //pega o saldo inicial realizado
-  $sql_saldo_ini_r = "select dbo.fnFluxoCaixaSaldoInicialRealizado(1,'".$dataFiltro."') as SaldoInicialRealizado";
+  $sql_saldo_ini_r = "select dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$dataFiltro."') as SaldoInicialRealizado";
   $result_saldo_ini_r = $conn->query($sql_saldo_ini_r);
   $rowSaldoIni_r      = $result_saldo_ini_r->fetchAll(PDO::FETCH_ASSOC);
     
@@ -342,12 +352,12 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                         <div class='col-lg-4'>
                         </div>
 
-                        <div class='col-lg-3' style='text-align:center; border-top: 2px solid #1B3280; padding-top: 1rem; margin-right: 2px; '>
-                          <span><strong>".$i."-".date('F',strtotime($dataInicio))."-". date('Y',strtotime($dataInicio))."</strong></span>
+                        <div class='col-lg-3' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-right: 2px; '>
+                          <span><strong>".str_pad($i, 2, '0', STR_PAD_LEFT)." ".ucfirst(strftime("%B de %Y", strtotime($dataInicio)))."</strong></span>
                         </div>
 
-                        <div class='col-lg-3' style='text-align:center; border-top: 2px solid #1B3280; padding-top: 1rem; margin-left: 2px;'>
-                          <span><strong>".($teste ? ($i+1) : "") ."-". date('F',strtotime($dataInicio)) . "-" . date('Y',strtotime($dataInicio))."</strong></span>
+                        <div class='col-lg-3' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-left: 2px;'>
+                          <span><strong>".($teste ? str_pad($i+1, 2, '0', STR_PAD_LEFT) : "") ." ". ucfirst(strftime("%B de %Y", strtotime($dataInicio)))."</strong></span>
                         </div>                        
                       </div>
                     </div>
@@ -508,10 +518,11 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
     $tot_geral_previsto1  = 0;
     $tot_geral_realizado1 = 0;
     $tot_geral_previsto2  = 0;
-    $tot_geral_realizado2 = 0;  
+    $tot_geral_realizado2 = 0;
 
   if(isset($cc1) && (!empty($cc1)))
   {
+    //var_dump($cc1);
     foreach($cc1 as $cCusto)
     {
       if(isset($pl_Entrada))
@@ -543,43 +554,49 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                                     ($teste)?$cc2[$cCusto['CnCusId']]['CC_RealizadoSaida']:"",
                                     $pl_Saida['HTML']);
 
-      //soma os totais dos planos de contas das entradas com o centro de custo atual
-      $pl_Entrada['total_previsto']  += $cCusto['CC_PrevistoEntrada'];
-      $pl_Entrada['total_realizado'] += $cCusto['CC_RealizadoEntrada'];
-      $pl_Entrada['total_previsto2']  += ($teste)?$cc2[$cCusto['CnCusId']]['CC_PrevistoEntrada']:0;
-      $pl_Entrada['total_realizado2'] += ($teste)?$cc2[$cCusto['CnCusId']]['CC_RealizadoEntrada']:0;
+      //soma os totais dos centro de custo das entradas
+      $tot_entrada_prev_cc  = $cCusto['CC_PrevistoEntrada'];
+      $tot_entrada_real_cc  = $cCusto['CC_RealizadoEntrada'];
+      $tot_entrada_prev_cc2 = ($teste)?$cc2[$cCusto['CnCusId']]['CC_PrevistoEntrada']:0;
+      $tot_entrada_real_cc2 = ($teste)?$cc2[$cCusto['CnCusId']]['CC_RealizadoEntrada']:0;
 
       //soma os totais dos planos de contas das saidas com o centro de custo atual
-      $pl_Saida['total_previsto']  += $cCusto['CC_PrevistoSaida'];
-      $pl_Saida['total_realizado'] += $cCusto['CC_RealizadoSaida'];
-      $pl_Saida['total_previsto2']  += ($teste)?$cc2[$cCusto['CnCusId']]['CC_PrevistoSaida']:0;
-      $pl_Saida['total_realizado2'] += ($teste)?$cc2[$cCusto['CnCusId']]['CC_RealizadoSaida']:0;
+      $tot_saida_prev_cc  = $cCusto['CC_PrevistoSaida'];
+      $tot_saida_real_cc  = $cCusto['CC_RealizadoSaida'];
+      $tot_saida_prev_cc2 = ($teste)?$cc2[$cCusto['CnCusId']]['CC_PrevistoSaida']:0;
+      $tot_saida_real_cc2 = ($teste)?$cc2[$cCusto['CnCusId']]['CC_RealizadoSaida']:0;
 
       // totaliza as entradas e saidas
-      $tot_previsto_entrada1  += $pl_Entrada['total_previsto'];
-      $tot_previsto_saida1    += $pl_Saida['total_previsto'];
-      $tot_realizado_entrada1 += $pl_Entrada['total_realizado'];
-      $tot_realizado_saida1   += $pl_Saida['total_realizado'];      
-      $tot_previsto_entrada2  += $pl_Entrada['total_previsto2'];
-      $tot_previsto_saida2    += $pl_Saida['total_previsto2'];
-      $tot_realizado_entrada2 += $pl_Entrada['total_realizado2'];
-      $tot_realizado_saida2   += $pl_Saida['total_realizado2'];
+      $tot_previsto_entrada1  += $tot_entrada_prev_cc;
+      $tot_previsto_saida1    += $tot_saida_prev_cc;
+      $tot_realizado_entrada1 += $tot_entrada_real_cc;
+      $tot_realizado_saida1   += $tot_saida_real_cc;
+      $tot_previsto_entrada2  += $tot_entrada_prev_cc2;
+      $tot_previsto_saida2    += $tot_saida_prev_cc2;
+      $tot_realizado_entrada2 += $tot_entrada_real_cc2;
+      $tot_realizado_saida2   += $tot_saida_real_cc2;
 
       // totaliza as entradas e saidas
-      $tot_geral_previsto1  += ($tot_previsto_entrada1 - $tot_previsto_saida1 )+($saldoIni_p1);
-      $tot_geral_realizado1 += ($tot_realizado_entrada1 - $tot_realizado_saida1)+($saldoIni_r1);
+      $tot_previsto1  += ($tot_entrada_prev_cc - $tot_saida_prev_cc);
+      $tot_realizado1 += ($tot_entrada_real_cc - $tot_saida_real_cc);
       
       if ($teste)
       {
-        $tot_geral_previsto2  += ($tot_previsto_entrada2 - $tot_previsto_saida2 )+($saldoIni_p2);
-        $tot_geral_realizado2 += ($tot_realizado_entrada2 - $tot_realizado_saida2)+($saldoIni_r2);
+        $tot_previsto2  += ($tot_entrada_prev_cc2 - $tot_saida_prev_cc2);
+        $tot_realizado2 += ($tot_entrada_real_cc2 - $tot_saida_real_cc2);
       }
       else 
       {        
-        $tot_geral_previsto2  += 0;
-        $tot_geral_realizado2 += 0;  
+        $tot_previsto2  += 0;
+        $tot_realizado2 += 0;  
       }
     }
+
+    $tot_geral_previsto1 = $tot_previsto1 + $saldoIni_p1;
+    $tot_geral_realizado1 = $tot_realizado1 + $saldoIni_r1;
+
+    $tot_geral_previsto2 = $tot_previsto2 + $saldoIni_p2;
+    $tot_geral_realizado2 = $tot_realizado2 + $saldoIni_r2;
   }
   //------------------------------------------------------------------------
   //recebe entradas apenas
@@ -702,11 +719,11 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                         <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                           <div class='row'>
                             <div class='col-md-6'>
-                              <span>". mostraValor($tot_geral_previsto1+$tot_geral_previsto2)  ."</span>
+                              <span>". mostraValor($tot_geral_previsto1)  ."</span>
                             </div>
 
                             <div class='col-md-6'>
-                              <span>". mostraValor($tot_geral_realizado1+$tot_geral_realizado2)  ."</span>
+                              <span>". mostraValor($tot_geral_realizado1)  ."</span>
                             </div>
                           </div>
                         </div>
@@ -714,11 +731,11 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                         <div class='dataOpeningBalance col-lg-3' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
                               <div class='col-md-6'>
-                                <span>". /*number_format($tot_geral_previsto2, 2, '.', '')*/ "" ."</span>
+                                <span>". mostraValor($tot_geral_previsto2) ."</span>
                               </div>
 
                               <div class='col-md-6'>
-                                <span>". /*number_format($tot_geral_realizado2, 2, '.', '')*/""  ."</span>
+                                <span>". mostraValor($tot_geral_realizado2)  ."</span>
                               </div>
                             </div>
                           </div>
@@ -785,12 +802,12 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
 
 $print .= "</div>
             <a class='carousel-control-prev' href='#carouselExampleControls' role='button' data-slide='prev' style='color:black;'>
-              <span class='carousel-control-prev-icon' aria-hidden='true' ><</span>
+              <span class='carousel-control-prev-icon' aria-hidden='true' ><img src='global_assets/images/lamparinas/seta-left.png' width='32' /></span>
               <span class='sr-only'>Previous</span>
             </a>
 
             <a class='carousel-control-next' href='#carouselExampleControls' role='button' data-slide='next' style='color:black;'>
-              <span class='carousel-control-next-icon' aria-hidden='true'>></span>
+              <span class='carousel-control-next-icon' aria-hidden='true'><img src='global_assets/images/lamparinas/seta-right.png' width='32' /></span>
               <span class='sr-only'>Next</span>
             </a>
           </div>";
