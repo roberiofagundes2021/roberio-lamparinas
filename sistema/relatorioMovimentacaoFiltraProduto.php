@@ -43,12 +43,28 @@ function queryPesquisa()
         $args[]  = "ProduId = " . $_POST['cmbProduto'] . " ";
     }
 
-    if(!empty($_POST['cmbLocalEstoque'])){
-        $args[]  = "MovimOrigemLocal = ".$_POST['cmbLocalEstoque']." ";
+    if(!empty($_POST['cmbOrigem'])){
+
+        $aOrigem = explode("#", $_POST['cmbOrigem']);
+
+        if ($aOrigem[2] == 'Local'){
+            $args[]  = "MovimOrigemLocal = ".$aOrigem[0]." ";
+        } else {
+            $args[]  = "MovimOrigemSetor = ".$aOrigem[0]." ";
+        }
     }
 
-     if(!empty($_POST['cmbSetor'])){
-        $args[]  = "MovimDestinoSetor = ".$_POST['cmbSetor']." ";
+    if(!empty($_POST['cmbDestino'])){
+
+        $aDestino = explode("#", $_POST['cmbDestino']);
+
+        if ($aDestino[2] == 'Local'){
+            $args[]  = "MovimDestinoLocal = ".$aDestino[0]." ";
+        } else if ($aDestino[2] == 'Setor') {
+            $args[]  = "MovimDestinoSetor = ".$aDestino[0]." ";
+        } else {
+            $args[]  = "MovimDestinoManual = '".$aDestino[1]."' ";
+        }
     }
 
     if (!empty($_POST['cmbClassificacao'])) {

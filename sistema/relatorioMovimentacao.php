@@ -78,6 +78,7 @@ $dataFim = date("Y-m-d");
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
 
 	<script type="text/javascript">
+		
 		$(document).ready(function() {
 
 			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data			
@@ -396,7 +397,10 @@ $dataFim = date("Y-m-d");
 				$('#submitFiltro').on('click', (e) => {
 					e.preventDefault()
 
-					const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>')
+					const msgSemResultado = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>')
+					const msgProcurando = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>')
+					
+					$('tbody').html(msgProcurando)
 
 					if ($('#cmbProduto').val() == 'Sem produto' || $('#cmbProduto').val() == 'Filtrando...') $('#cmbProduto').val("")
 
@@ -407,8 +411,8 @@ $dataFim = date("Y-m-d");
 					let categoria = $('#cmbCategoria').val()
 					let subCategoria = $('#cmbSubCategoria').val()
 					let inputProduto = $('#cmbProduto').val()
-					let localEstoque = $('#cmbLocalEstoque').val()
-					let setor = $('#cmbSetor').val()
+					let origem = $('#cmbOrigem').val()
+					let destino = $('#cmbDestino').val()
 					let Classificacao = $('#cmbClassificacao').val()
 					let inputServico = $('#cmbServico').val()
 					let codigo = $('#cmbCodigo').val()
@@ -424,8 +428,8 @@ $dataFim = date("Y-m-d");
 						cmbCategoria: categoria,
 						cmbSubCategoria: subCategoria,
 						cmbProduto: inputProduto,
-						cmbLocalEstoque: localEstoque,
-						cmbSetor: setor,
+						cmbOrigem: origem,
+						cmbDestino: destino,
 						cmbClassificacao: Classificacao,
 						cmbServico: inputServico,
 						cmbCodigo: codigo,
@@ -441,7 +445,7 @@ $dataFim = date("Y-m-d");
 								$('#imprimir').removeAttr('disabled')
 								resultadosConsulta = data
 							} else {
-								$('tbody').html(msg)
+								$('tbody').html(msgSemResultado)
 								$('#imprimir').attr('disabled', '')
 							}
 						}
@@ -469,8 +473,8 @@ $dataFim = date("Y-m-d");
 						$('#cmbCategoria_imp').val(inputsValues.cmbCategoria)
 						$('#cmbSubCategoria_imp').val(inputsValues.cmbSubCategoria)
 						$('#cmbProduto_imp').val(inputsValues.cmbProduto)
-						$('#cmbLocalEstoque_imp').val(inputsValues.cmbLocalEstoque)
-						$('#cmbSetor_imp').val(inputsValues.cmbSetor)
+						$('#cmbOrigem_imp').val(inputsValues.cmbOrigem)
+						$('#cmbDestino_imp').val(inputsValues.cmbDestino)
 						$('#cmbClassificacao_imp').val(inputsValues.cmbClassificacao)
 						$('#cmbServico_imp').val(inputsValues.cmbServico)
 						$('#cmbCodigo_imp').val(inputsValues.cmbCodigo)
@@ -572,8 +576,8 @@ $dataFim = date("Y-m-d");
 									<input id="cmbCategoria_imp" type="hidden" name="cmbCategoria_imp"></input>
 									<input id="cmbSubCategoria_imp" type="hidden" name="cmbSubCategoria_imp"></input>
 									<input id="cmbProduto_imp" type="hidden" name="cmbProduto_imp"></input>
-									<input id="cmbLocalEstoque_imp" type="hidden" name="cmbLocalEstoque_imp"></input>
-									<input id="cmbSetor_imp" type="hidden" name="cmbSetor_imp"></input>
+									<input id="cmbOrigem_imp" type="hidden" name="cmbOrigem_imp"></input>
+									<input id="cmbDestino_imp" type="hidden" name="cmbDestino_imp"></input>
 									<input id="cmbClassificacao_imp" type="hidden" name="cmbClassificacao_imp"></input>
 									<input id="cmbServico_imp" type="hidden" name="cmbServico_imp"></input>
 									<input id="cmbCodigo_imp" type="hidden" name="cmbCodigo_imp"></input>
@@ -701,21 +705,21 @@ $dataFim = date("Y-m-d");
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="cmbLocalEstoque">Origem</label>
-												<select id="cmbLocalEstoque" name="cmbLocalEstoque"
+												<label for="cmbOrigem">Origem</label>
+												<select id="cmbOrigem" name="cmbOrigem"
 													class="form-control form-control-select2">
 													<option value="">Selecionar</option>
 													<?php
 													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
-																		FROM LocalEstoque
-																		JOIN Situacao on SituaId = LcEstStatus
-																		WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																		UNION
-																		SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
-																		FROM Setor
-																		JOIN Situacao on SituaId = SetorStatus
-																		WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																		Order By Nome";
+															FROM LocalEstoque
+															JOIN Situacao on SituaId = LcEstStatus
+															WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															UNION
+															SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
+															FROM Setor
+															JOIN Situacao on SituaId = SetorStatus
+															WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															Order By Nome";
 
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -730,21 +734,25 @@ $dataFim = date("Y-m-d");
                                     	</div>
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="cmbSetor">Destino</label>
-												<select id="cmbSetor" name="cmbSetor"
+												<label for="cmbDestino">Destino</label>
+												<select id="cmbDestino" name="cmbDestino"
 													class="form-control form-control-select2">
 													<option value="">Selecionar</option>
 													<?php
 													$sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
-																		FROM LocalEstoque
-																		JOIN Situacao on SituaId = LcEstStatus
-																		WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																		UNION
-																		SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
-																		FROM Setor
-																		JOIN Situacao on SituaId = SetorStatus
-																		WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																		Order By Nome";
+															FROM LocalEstoque
+															JOIN Situacao on SituaId = LcEstStatus
+															WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															UNION
+															SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
+															FROM Setor
+															JOIN Situacao on SituaId = SetorStatus
+															WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															UNION 
+															SELECT '' as Id, MovimDestinoManual as Nome, 'Manual' as Referencia
+															From Movimentacao
+															WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimTipo = 'T'
+															Order By Nome";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -857,25 +865,26 @@ $dataFim = date("Y-m-d");
 										</div>
 									</div>
 								</form>
+								
+								<div id="grid">
+									<table class="table" id="tblMovimentacao">
+										<thead>
+											<tr class="bg-slate">
+												<th>Data</th>
+												<th style='text-align: center'>Tipo</th>
+												<th>Produto</th> <!-- O Hint deve aparecer Código, Patrimônio e Detalhamento -->
+												<th>Categoria</th>
+												<th>Fornecedor</th>
+												<th>Quantidade</th>
+												<th>Origem</th>
+												<th>Destino</th>
+											</tr>
+										</thead>
+										<tbody>
 
-								<table class="table" id="tblMovimentacao">
-									<thead>
-										<tr class="bg-slate">
-											<th>Data</th>
-											<th style='text-align: center'>Tipo</th>
-											<th>Produto</th> <!-- O Hint deve aparecer Código, Patrimônio e Detalhamento -->
-											<th>Categoria</th>
-											<th>Fornecedor</th>
-											<th>Quantidade</th>
-											<th>Origem</th>
-											<th>Destino</th>
-										</tr>
-									</thead>
-									<tbody>
-
-									</tbody>
-								</table>
-
+										</tbody>
+									</table>
+								</div>
 							</div>
 
 						</div>

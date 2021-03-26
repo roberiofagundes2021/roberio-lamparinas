@@ -17,12 +17,12 @@ $iCategoria = isset($_POST['cmbCategoria_imp']) ? $_POST['cmbCategoria_imp'] : 0
 $iSubCategoria = isset($_POST['cmbSubCategoria_imp']) ? $_POST['cmbSubCategoria_imp'] : 0;
 $sCodigo = isset($_POST['cmbCodigo_imp']) ? $_POST['cmbCodigo_imp'] : 0;
 $iProduto = isset($_POST['cmbProduto_imp']) ? $_POST['cmbProduto_imp'] : 0;
-$iLocalEstoque = isset($_POST['cmbLocalEstoque_imp']) ? $_POST['cmbLocalEstoque_imp'] : 0;
-$iSetor = isset($_POST['cmbSetor_imp']) ? $_POST['cmbSetor_imp'] : 0;
+$iOrigem = isset($_POST['cmbOrigem_imp']) ? $_POST['cmbOrigem_imp'] : 0;
+$iDestino = isset($_POST['cmbDestino_imp']) ? $_POST['cmbDestino_imp'] : 0;
 $iClassificacao = isset($_POST['cmbClassificacao_imp']) ? $_POST['cmbClassificacao_imp'] : 0;
 $iServico = isset($_POST['cmbServico_imp']) ? $_POST['cmbServico_imp'] : 0;
 
-if ($iCategoria != '#' and $iCategoria != 0) {
+if ($iCategoria != '' and $iCategoria != 0) {
 
 	$sqlNome = "SELECT CategNome
 				FROM Categoria
@@ -32,7 +32,7 @@ if ($iCategoria != '#' and $iCategoria != 0) {
 	$sCategoria = $rowNome['CategNome']; 
 }	
 
-if ($iSubCategoria != '#' and $iSubCategoria != 0) {
+if ($iSubCategoria != '' and $iSubCategoria != 0) {
 	$sqlNome = "SELECT SbCatNome
 				FROM SubCategoria
 				WHERE SbCatId = ".$iSubCategoria;
@@ -41,7 +41,7 @@ if ($iSubCategoria != '#' and $iSubCategoria != 0) {
 	$sSubCategoria = $rowNome['SbCatNome']; 
 }
 
-if ($iProduto != '#' and $iProduto != 0) {
+if ($iProduto != '' and $iProduto != 0) {
 	$sqlNome = "SELECT ProduNome
 				FROM Produto
 				WHERE ProduId = ".$iProduto;
@@ -50,7 +50,7 @@ if ($iProduto != '#' and $iProduto != 0) {
 	$sProduto = $rowNome['ProduNome']; 
 }	
 
-if ($iFornecedor != '#' and $iFornecedor != 0) {
+if ($iFornecedor != '' and $iFornecedor != 0) {
 	$sqlNome = "SELECT ForneNome
 				FROM Fornecedor
   				WHERE ForneId = ".$iFornecedor;
@@ -59,27 +59,21 @@ if ($iFornecedor != '#' and $iFornecedor != 0) {
 	$sFornecedor = $rowNome['ForneNome']; 
 }
 
-if ($iLocalEstoque != '#' and $iLocalEstoque != 0) {
+if ($iOrigem != '' and $iOrigem != 0) {
 
-	$sqlNome = "SELECT LcEstNome
-				FROM LocalEstoque
-				WHERE LcEstId = ".$iLocalEstoque;
-	$result = $conn->query($sqlNome);
-	$rowNome = $result->fetch(PDO::FETCH_ASSOC);		
-	$sLocalEstoque = $rowNome['LcEstNome']; 
+	$aOrigem = explode("#", $iOrigem);
+
+	$sOrigem = $aOrigem[1]; 
 }
 
-if ($iSetor != '#' and $iSetor != 0) {
+if ($iDestino != '') {
+	
+	$aDestino = explode("#", $iDestino);
 
-	$sqlNome = "SELECT SetorNome
-				FROM Setor
-				WHERE SetorId = ".$iSetor;
-	$result = $conn->query($sqlNome);
-	$rowNome = $result->fetch(PDO::FETCH_ASSOC);		
-	$sSetor = $rowNome['SetorNome']; 
+	$sDestino = $aDestino[1]; 
 }	
 
-if ($iClassificacao != '#' and $iClassificacao != 0) {
+if ($iClassificacao != '' and $iClassificacao != 0) {
 
 	$sqlNome = "SELECT ClassNome
 				FROM Classificacao
@@ -119,31 +113,47 @@ if ($sTipoProdutoServico == 'P') {
 		$sql .= " and MovimTipo = $iTipo ";
 	}
 	
-	if ($iCategoria != '#' and $iCategoria != 0) {
+	if ($iCategoria != '' and $iCategoria != 0) {
 		$sql .= " and ProduCategoria = $iCategoria ";
 	}
 
-	if ($iSubCategoria != '#' and $iSubCategoria != 0) {
+	if ($iSubCategoria != '' and $iSubCategoria != 0) {
 		$sql .= " and ProduSubCategoria = $iSubCategoria ";
 	}
 
-	if ($iProduto != '#' and $iProduto != 0) {
+	if ($iProduto != '' and $iProduto != 0) {
 		$sql .= " and ProduId = $iProduto ";
 	}
 
-	if ($iFornecedor != '#' and $iFornecedor != 0) {
+	if ($iFornecedor != '' and $iFornecedor != 0) {
 		$sql .= " and MovimFornecedor = $iFornecedor ";
 	}
 
-	if ($iLocalEstoque != '#' and $iLocalEstoque != 0) {
-		$sql .= " and MovimOrigemLocal = $iLocalEstoque ";
+	if ($iOrigem != '' and $iOrigem != 0) {
+
+		$aOrigem = explode("#", $iOrigem);
+
+		if ($aOrigem[2] == 'Local'){
+			$sql .= " and MovimOrigemLocal = ".$aOrigem[0];
+		} else{
+			$sql .= " and MovimOrigemSetor = ".$aOrigem[0];
+		}
 	}
 
-	if ($iSetor != '#' and $iSetor != 0) {
-		$sql .= " and MovimDestinoSetor = $iSetor ";
+	if ($iDestino != '') {
+		
+		$aDestino = explode("#", $iDestino);
+
+		if ($aDestino[2] == 'Local'){
+			$sql .= " and MovimDestinoLocal = ".$aDestino[0];
+		} else if ($aDestino[2] == 'Setor') {
+			$sql .= " and MovimDestinoSetor = ".$aDestino[0];
+		} else {
+			$sql .= " and MovimDestinoManual = '".$aDestino[1]."'";
+		}
 	}
 
-	if ($iClassificacao != '#' and $iClassificacao != 0) {
+	if ($iClassificacao != '' and $iClassificacao != 0) {
 		$sql .= " and MvXPrClassificacao = $iClassificacao ";
 	}
 
@@ -170,27 +180,27 @@ if ($sTipoProdutoServico == 'P') {
 		    Where MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimData between '" . $dDataInicio . "' and '" . $dDataFim . "' 
 		    and SituaChave = 'LIBERADO' ";
 
-	if ($iCategoria != '#' and $iCategoria != 0) {
+	if ($iCategoria != '' and $iCategoria != 0) {
 		$sql .= " and ServiCategoria = $iCategoria ";
 	}
 
-	if ($iSubCategoria != '#' and $iSubCategoria != 0) {
+	if ($iSubCategoria != '' and $iSubCategoria != 0) {
 		$sql .= " and ServiSubCategoria = $iSubCategoria ";
 	}
 
-	if ($iProduto != '#' and $iProduto != 0) {
+	if ($iProduto != '' and $iProduto != 0) {
 		$sql .= " and ServiId = $iServico ";
 	}
 
-	if ($iFornecedor != '#' and $iFornecedor != 0) {
+	if ($iFornecedor != '' and $iFornecedor != 0) {
 		$sql .= " and MovimFornecedor = $iFornecedor ";
 	}
 
-	if ($iLocalEstoque != '#' and $iLocalEstoque != 0) {
+	if ($iLocalEstoque != '' and $iLocalEstoque != 0) {
 		$sql .= " and MovimOrigemLocal = $iLocalEstoque ";
 	}
 
-	if ($iSetor != '#' and $iSetor != 0) {
+	if ($iSetor != '' and $iSetor != 0) {
 		$sql .= " and MovimDestinoSetor = $iSetor ";
 	}
 
@@ -198,6 +208,9 @@ if ($sTipoProdutoServico == 'P') {
 }
 
 $sql .= " Order By MovimData DESC";
+
+//echo $sql;die;
+
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -253,8 +266,8 @@ try {
 	$sSubCategoria = $iSubCategoria ? $sSubCategoria : 'Todos';
 	$sCodigo = $sCodigo ? $sCodigo : 'Todos';
 	$sProduto = $iProduto ? $sProduto : 'Todos';
-	$sLocalEstoque = $iLocalEstoque ? $sLocalEstoque : 'Todos';
-	$sSetor = $iSetor ? $sSetor : 'Todos';
+	$sOrigem = $iOrigem ? $sOrigem : 'Todos';
+	$sDestino = $iDestino ? $sDestino : 'Todos';
 	$sClassificacao = $iClassificacao ? $sClassificacao : 'Todos';
 	
 
@@ -556,7 +569,7 @@ try {
 
 	$html .= '<hr/>
 			  <br>
-			  Observação: Esse relatório foi gerado a partir dos seguintes critérios: Tipo ('.$sTipo.'), Fornecedor ('.$sFornecedor.'), Categoria ('.$sCategoria.'), SubCategoria ('.$sSubCategoria.'), Código ('.$sCodigo.'), Produto ('.$sProduto.')
+			  Observação: Esse relatório foi gerado a partir dos seguintes critérios: Tipo ('.$sTipo.'), Fornecedor ('.$sFornecedor.'), Categoria ('.$sCategoria.'), SubCategoria ('.$sSubCategoria.'), Código ('.$sCodigo.'), Produto ('.$sProduto.'), Origem ('.$sOrigem.'), Destino ('.$sDestino.'), Classificação ('.$sClassificacao.')
 			  <br><br>
 			  ';
 
