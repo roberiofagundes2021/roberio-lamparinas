@@ -196,12 +196,28 @@ if ($sTipoProdutoServico == 'P') {
 		$sql .= " and MovimFornecedor = $iFornecedor ";
 	}
 
-	if ($iLocalEstoque != '' and $iLocalEstoque != 0) {
-		$sql .= " and MovimOrigemLocal = $iLocalEstoque ";
+	if ($iOrigem != '' and $iOrigem != 0) {
+
+		$aOrigem = explode("#", $iOrigem);
+
+		if ($aOrigem[2] == 'Local'){
+			$sql .= " and MovimOrigemLocal = ".$aOrigem[0];
+		} else{
+			$sql .= " and MovimOrigemSetor = ".$aOrigem[0];
+		}
 	}
 
-	if ($iSetor != '' and $iSetor != 0) {
-		$sql .= " and MovimDestinoSetor = $iSetor ";
+	if ($iDestino != '') {
+		
+		$aDestino = explode("#", $iDestino);
+
+		if ($aDestino[2] == 'Local'){
+			$sql .= " and MovimDestinoLocal = ".$aDestino[0];
+		} else if ($aDestino[2] == 'Setor') {
+			$sql .= " and MovimDestinoSetor = ".$aDestino[0];
+		} else {
+			$sql .= " and MovimDestinoManual = '".$aDestino[1]."'";
+		}
 	}
 
 	
