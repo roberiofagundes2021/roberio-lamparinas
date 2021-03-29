@@ -55,7 +55,7 @@ if (isset($_POST['inputData'])) {
 			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
 			':sConteudoFim' => $_POST['txtareaConteudoFim'],
 			':sTipo' => $tipoTr,
-			':bStatus' => 1,
+			':bStatus' => 7,
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iUnidade' => $_SESSION['UnidadeId'],
 			':sTabelaProduto' => $parametroProduto,

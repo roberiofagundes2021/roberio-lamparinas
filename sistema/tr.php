@@ -7,11 +7,11 @@ $_SESSION['PaginaAtual'] = 'Termo de Referência';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefStatus, 
-		SituaId, SituaCor, SituaChave, dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias
+		SituaId, SituaCor, SituaChave, SituaNome, dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias
 		FROM TermoReferencia
 		JOIN Categoria on CategId = TrRefCategoria
 		JOIN Situacao on SituaId = TrRefStatus
-	    WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+	    WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . "
 		ORDER BY TrRefData DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -156,7 +156,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				}else if (Tipo == 'S') {
 					document.formTR.action = "trServico.php";
 					document.formTR.submit();
-				} else if (Tipo == 'A') {
+				} else if (Tipo == 'aprovacao') {
 					document.formTR.action = 'trAtualizacao.php'
 					document.formTR.submit();
 				} else if (Tipo == 'orcamento') {
@@ -242,8 +242,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<tbody>
 									<?php
 									foreach ($row as $item) {
-
-										$situacao = $item['TrRefStatus'] == 1 ? 'Ativo' : 'Inativo';
+										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
 
@@ -389,7 +388,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<?php include_once("alerta.php"); ?>
 	
 	<?php $total1 = microtime(true) - $inicio1;
-	echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; ?>
+	// echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; ?>
 </body>
 
 </html>
