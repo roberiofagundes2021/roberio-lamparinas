@@ -342,6 +342,7 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
   else
     $saldoIni_r2 = 0;
 
+  /* Obs.: utf8_encode é para o servidor da AZURE. Localmente não precisaria, mas para o servidor sim. */  
   $print .= " <div class='carousel-item ".($i == $diaInicio ? " active":"")."'> 
                 <div class='row'>
                   <div class='col-lg-12'>
@@ -353,11 +354,11 @@ for($i = $diaInicio;$i <= $diaFim;$i++)
                         </div>
 
                         <div class='col-lg-3' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-right: 2px; '>
-                          <span><strong>".str_pad($i, 2, '0', STR_PAD_LEFT)." ".ucfirst(strftime("%B de %Y", strtotime($dataInicio)))."</strong></span>
+                          <span><strong>".str_pad($i, 2, '0', STR_PAD_LEFT)." ".utf8_encode(ucfirst(strftime("%B de %Y", strtotime($dataInicio))))."</strong></span>
                         </div>
 
                         <div class='col-lg-3' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-left: 2px;'>
-                          <span><strong>".($teste ? str_pad($i+1, 2, '0', STR_PAD_LEFT) : "") ." ". ucfirst(strftime("%B de %Y", strtotime($dataInicio)))."</strong></span>
+                          <span><strong>".($teste ? str_pad($i+1, 2, '0', STR_PAD_LEFT) : "") ." ". utf8_encode(ucfirst(strftime("%B de %Y", strtotime($dataInicio))))."</strong></span>
                         </div>                        
                       </div>
                     </div>

@@ -11,7 +11,7 @@ require_once 'global_assets/php/vendor/autoload.php';
 $iInventario = $_POST['inputInventarioId'];
 $sNumero = $_POST['inputInventarioNumero'];
 
-$sql = "SELECT InvenNumero, InvenCategoria, InXLELocal, LcEstNome
+$sql = "SELECT InvenNumero, InvenCategoria, InXLELocal, LcEstNome, InvenUnidade
 		FROM Inventario
 		JOIN InventarioXLocalEstoque on InXLEInventario = InvenId
 		JOIN LocalEstoque on LcEstId = InXLELocal
@@ -20,7 +20,7 @@ $sql = "SELECT InvenNumero, InvenCategoria, InXLELocal, LcEstNome
 $result = $conn->query($sql);
 $rowLocalEstoque = $result->fetchAll(PDO::FETCH_ASSOC);
 
-$sql = "SELECT InvenNumero, InvenCategoria, InvenObservacao, CategNome, InXSeSetor, SetorNome
+$sql = "SELECT InvenNumero, InvenCategoria, InvenObservacao, InvenUnidade, CategNome, InXSeSetor, SetorNome
 		 FROM Inventario
 		 JOIN InventarioXSetor on InXSeInventario = InvenId
 		 JOIN Setor on SetorId = InXSeSetor
@@ -40,7 +40,7 @@ try {
 		'orientation' => 'L'
 	]);
 
-	$topo = "
+	$html = "
 	<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
 		<div style='width:300px; float:left; display: inline;'>
 			<img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
@@ -48,13 +48,11 @@ try {
 			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: " . $_SESSION['UnidadeNome'] . "</div>
 		</div>
 		<div style='width:150px; float:right; display: inline; text-align:right;'>
-			<div>{DATE j/m/Y}</div>
+			<div>".date('d/m/Y')."</div>
 			<div style='margin-top:8px;'>Inventário: " . formatarNumero($sNumero) . "</div>
 		</div> 
 	 </div>
 	";
-
-	$html = '';
 
 	foreach ($rowLocalEstoque as $item) {
 
@@ -76,9 +74,11 @@ try {
 		$iCategoria = $item['InvenCategoria'];
 		$iLocal = $item['InXLELocal'];
 
-		$sql = "SELECT Distinct ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, 'P', MovimDestinoLocal) as Saldo, LcEstNome
+		$sql = "SELECT Distinct ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, 
+				dbo.fnSaldoEstoque(" . $item['InvenUnidade'] . ", ProduId, 'P', MovimDestinoLocal) as Saldo, 
+				LcEstNome
 				FROM Produto
-				JOIN Categoria on CategId = ProduCategoria
+				LEFT JOIN Categoria on CategId = ProduCategoria
 				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 				JOIN Patrimonio on PatriId = MvXPrPatrimonio
@@ -86,9 +86,12 @@ try {
 				LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
 				LEFT JOIN Setor on SetorId = MovimDestinoSetor
 				JOIN Situacao on SituaId = MovimSituacao
-				WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduStatus = 1 and
-					  ProduCategoria = " . $iCategoria . " and MovimDestinoLocal = (" . $iLocal . ") and SituaChave = 'FINALIZADO'
+				WHERE ProduUnidade = " . $item['InvenUnidade'] . " and ProduStatus = 1 and
+					  MovimDestinoLocal = (" . $iLocal . ") and SituaChave = 'LIBERADO'
 				 ";
+		if ($icategoria){
+			$sql .= " and ProduCategoria = " . $iCategoria;
+		}
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -128,9 +131,11 @@ try {
 		$iCategoria = $item['InvenCategoria'];
 		$iSetor = $item['InXSeSetor'];
 
-		$sql = "SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, 'P', MovimDestinoLocal) as Saldo, LcEstNome
+		$sql = "SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, 
+				dbo.fnSaldoEstoque(" . $item['InvenUnidade'] . ", ProduId, 'P', MovimDestinoLocal) as Saldo, 
+				LcEstNome
 				FROM Produto
-				JOIN Categoria on CategId = ProduCategoria
+				LEFT JOIN Categoria on CategId = ProduCategoria
 				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 				JOIN Patrimonio on PatriId = MvXPrPatrimonio
@@ -138,9 +143,12 @@ try {
 				LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
 				LEFT JOIN Setor on SetorId = MovimDestinoSetor
 				JOIN Situacao on SituaId = MovimSituacao
-				WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduStatus = 1 and
-					  ProduCategoria = ".$iCategoria." and MovimDestinoSetor = $iSetor and SituaChave = 'LIBERADO'
+				WHERE ProduUnidade = " . $item['InvenUnidade'] . " and ProduStatus = 1 and
+					  MovimDestinoSetor = $iSetor and SituaChave = 'LIBERADO'
 				 ";
+		if ($icategoria){
+			$sql .= " and ProduCategoria = " . $iCategoria;
+		}				 
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -176,9 +184,9 @@ try {
 		<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
 	</div>";
 
-	$mpdf->SetHTMLHeader($topo, 'O', true);
-	$mpdf->WriteHTML($html);
-	$mpdf->SetHTMLFooter($rodape);
+	//$mpdf->SetHTMLHeader($topo, 'O', true);
+    $mpdf->SetHTMLFooter($rodape); 	//o SetHTMLFooter deve vir antes do WriteHTML para que o rodapé apareça em todas as páginas
+    $mpdf->WriteHTML($html);
 
 	// Other code
 	$mpdf->Output();
