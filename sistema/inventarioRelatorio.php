@@ -11,7 +11,7 @@ require_once 'global_assets/php/vendor/autoload.php';
 $iInventario = $_POST['inputInventarioId'];
 $sNumero = $_POST['inputInventarioNumero'];
 
-$sql = "SELECT InvenNumero, InvenCategoria, InvenObservacao, CategNome, InXLELocal, LcEstNome
+$sql = "SELECT InvenNumero, InvenCategoria, InvenObservacao, InvenUnidade, CategNome, InXLELocal, LcEstNome
 		 FROM Inventario
 		 JOIN InventarioXLocalEstoque on InXLEInventario = InvenId
 		 JOIN LocalEstoque on LcEstId = InXLELocal
@@ -22,7 +22,7 @@ $result = $conn->query($sql);
 $rowLocalEstoque = $result->fetchAll(PDO::FETCH_ASSOC);
 
 
-$sql = "SELECT InvenNumero, InvenCategoria, InvenObservacao, CategNome, InXSeSetor, SetorNome
+$sql = "SELECT InvenNumero, InvenCategoria, InvenObservacao, InvenUnidade, CategNome, InXSeSetor, SetorNome
 		 FROM Inventario
 		 JOIN InventarioXSetor on InXSeInventario = InvenId
 		 JOIN Setor on SetorId = InXSeSetor
@@ -42,7 +42,7 @@ try {
         'orientation' => 'L'
 	]);
 	
-	$topo = "
+	$html = "
 	<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
 		<div style='width:300px; float:left; display: inline;'>
 			<img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
@@ -50,13 +50,11 @@ try {
 			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: ".$_SESSION['UnidadeNome']."</div>
 		</div>
 		<div style='width:150px; float:right; display: inline; text-align:right;'>
-			<div>{DATE j/m/Y}</div>
+			<div>".date('d/m/Y')."</div>
 			<div style='margin-top:8px;'>Inventário: ".formatarNumero($sNumero)."</div>
 		</div> 
 	 </div>
-	";		
-	
-	$html = '';
+	";
 	
 	foreach ($rowLocalEstoque as $item){	
 		
@@ -69,32 +67,34 @@ try {
 			<tr>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Patrimônio</th>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:40%">Produto</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Unitário</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Total</th>
+				<th style="text-align: center; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
+				<th style="text-align: center; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
+				<th style="text-align: right; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Unitário</th>
+				<th style="text-align: right; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Total</th>
 			</tr>
 		';	
 		
 		$iCategoria = $item['InvenCategoria'];
 		$iLocal = $item['InXLELocal'];
 		
-		$sql = ("SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, 
-						dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, 'P', MovimDestinoLocal) as Saldo, 
-						dbo.fnCalculaValorTotalInventario(dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, 'P', MovimDestinoLocal), ProduCustoFinal) as ValorTotal
-				 FROM Produto
-				 JOIN Categoria on CategId = ProduCategoria
-				 JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-				 JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
-				 JOIN Patrimonio on PatriId = MvXPrPatrimonio
-				 JOIN Movimentacao on MovimId = MvXPrMovimentacao
-				 JOIN LocalEstoque on LcEstId = MovimDestinoLocal
-				 JOIN Situacao on SituaId = MovimSituacao
-				 WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduStatus = 1 and
-					   ProduCategoria = ".$iCategoria." and
-					   MovimDestinoLocal = (".$iLocal.") and SituaChave = 'FINALIZADO'
-				 ");
-		$result = $conn->query("$sql");
+		$sql = "SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, 
+						dbo.fnSaldoEstoque(".$item['InvenUnidade'].", ProduId, 'P', MovimDestinoLocal) as Saldo, 
+						dbo.fnCalculaValorTotalInventario(dbo.fnSaldoEstoque(".$item['InvenUnidade'].", ProduId, 'P', MovimDestinoLocal), ProduCustoFinal) as ValorTotal
+				FROM Produto
+				LEFT JOIN Categoria on CategId = ProduCategoria
+				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
+				JOIN Patrimonio on PatriId = MvXPrPatrimonio
+				JOIN Movimentacao on MovimId = MvXPrMovimentacao
+				JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+				JOIN Situacao on SituaId = MovimSituacao
+				WHERE ProduUnidade = ".$item['InvenUnidade']." and ProduStatus = 1 and
+					  MovimDestinoLocal = (".$iLocal.") and SituaChave = 'LIBERADO'
+				 ";
+		if ($icategoria){
+			$sql .= " and ProduCategoria = " . $iCategoria;
+		}
+		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);		
 		
 		$totalGeral = 0;
@@ -105,10 +105,10 @@ try {
 				<tr>
 					<td style='padding-top: 8px;'>".formatarNumero($itemProduto['PatriNumero'])."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome']."</td>
-					<td style='padding-top: 8px;'>".$itemProduto['UnMedSigla']."</td>
-					<td style='padding-top: 8px;'>".$itemProduto['Saldo']."</td>
-					<td style='padding-top: 8px;'>".mostraValor($itemProduto['ProduCustoFinal'])."</td>
-					<td style='padding-top: 8px;'>".formataMoeda($itemProduto['ValorTotal'])."</td>
+					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['UnMedSigla']."</td>
+					<td style='padding-top: 8px; text-align: right;'>".$itemProduto['Saldo']."</td>
+					<td style='padding-top: 8px; text-align: right;'>".mostraValor($itemProduto['ProduCustoFinal'])."</td>
+					<td style='padding-top: 8px; text-align: right;'>".formataMoeda($itemProduto['ValorTotal'])."</td>
 				</tr>
 			";
 			
@@ -122,14 +122,14 @@ try {
 					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
 					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
 					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>".formataMoeda($totalGeral)."</td>
+					<td style='padding-top: 8px; border-top: 1px solid #333; text-align: right;'>".formataMoeda($totalGeral)."</td>
 				</tr>
 			";		
 		
 		$html .= "</table>";
 		
 	}
-/////////////////////////////////////////////////////
+
 	foreach ($rowSetor as $item){	
 		
 		$html .= '
@@ -141,30 +141,35 @@ try {
 			<tr>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Patrimônio</th>
 				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:40%">Produto</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Unitário</th>
-				<th style="text-align: left; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Total</th>
+				<th style="text-align: center; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
+				<th style="text-align: center; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">Quantidade</th>
+				<th style="text-align: right; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Unitário</th>
+				<th style="text-align: right; border-top: 1px solid #333; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:15%">Valor Total</th>
 			</tr>
 		';	
 		
 		$iCategoria = $item['InvenCategoria'];
 		$iSetor = $item['InXSeSetor'];
 		
-		$sql ="SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, 'P', MovimDestinoLocal) as Saldo, LcEstNome, MvXPrValorUnitario
-		FROM Produto
-		JOIN Categoria on CategId = ProduCategoria
-		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
-		JOIN Patrimonio on PatriId = MvXPrPatrimonio
-		JOIN Movimentacao on MovimId = MvXPrMovimentacao
-		LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
-		LEFT JOIN Setor on SetorId = MovimDestinoSetor
-		JOIN Situacao on SituaId = MovimSituacao
-		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduStatus = 1 and
-			  ProduCategoria = ".$iCategoria." and MovimDestinoSetor = $iSetor and SituaChave = 'LIBERADO'
+		$sql ="SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, 
+			   dbo.fnSaldoEstoque(" . $item['InvenUnidade'] . ", ProduId, 'P', MovimDestinoLocal) as Saldo, 
+			   LcEstNome, MvXPrValorUnitario
+			   FROM Produto
+			   LEFT JOIN Categoria on CategId = ProduCategoria
+			   JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			   JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
+			   JOIN Patrimonio on PatriId = MvXPrPatrimonio
+			   JOIN Movimentacao on MovimId = MvXPrMovimentacao
+			   LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+			   LEFT JOIN Setor on SetorId = MovimDestinoSetor
+			   JOIN Situacao on SituaId = MovimSituacao
+			   WHERE ProduUnidade = " . $item['InvenUnidade'] . " and ProduStatus = 1 and
+					MovimDestinoSetor = $iSetor and SituaChave = 'LIBERADO'
 		 ";
-		$result = $conn->query("$sql");
+		if ($icategoria){
+			$sql .= " and ProduCategoria = " . $iCategoria;
+		}
+		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);		
 		
 		$totalGeral = 0;
@@ -177,10 +182,10 @@ try {
 				<tr>
 					<td style='padding-top: 8px;'>".formatarNumero($itemProduto['PatriNumero'])."</td>
 					<td style='padding-top: 8px;'>".$itemProduto['ProduNome']."</td>
-					<td style='padding-top: 8px;'>".$itemProduto['UnMedSigla']."</td>
-					<td style='padding-top: 8px;'>".$itemProduto['Saldo']."</td>
-					<td style='padding-top: 8px;'>".mostraValor($itemProduto['MvXPrValorUnitario'])."</td>
-					<td style='padding-top: 8px;'>".formataMoeda($total)."</td>
+					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['UnMedSigla']."</td>
+					<td style='padding-top: 8px; text-align: center;'>".$itemProduto['Saldo']."</td>
+					<td style='padding-top: 8px; text-align: right;'>".mostraValor($itemProduto['MvXPrValorUnitario'])."</td>
+					<td style='padding-top: 8px; text-align: right;'>".formataMoeda($total)."</td>
 				</tr>
 			";
 			
@@ -194,7 +199,7 @@ try {
 					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
 					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
 					<td style='padding-top: 8px; border-top: 1px solid #333;'></td>
-					<td style='padding-top: 8px; border-top: 1px solid #333;'>".formataMoeda($totalGeral)."</td>
+					<td style='padding-top: 8px; border-top: 1px solid #333; text-align: right;'>".formataMoeda($totalGeral)."</td>
 				</tr>
 			";		
 		
@@ -221,9 +226,9 @@ try {
 		<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
 	</div>";
     
-    $mpdf->SetHTMLHeader($topo,'O',true);
+    //$mpdf->SetHTMLHeader($topo,'O',true);
+    $mpdf->SetHTMLFooter($rodape); 	//o SetHTMLFooter deve vir antes do WriteHTML para que o rodapé apareça em todas as páginas
     $mpdf->WriteHTML($html);
-    $mpdf->SetHTMLFooter($rodape);
     
     // Other code
     $mpdf->Output();

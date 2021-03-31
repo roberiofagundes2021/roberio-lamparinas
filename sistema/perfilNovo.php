@@ -83,8 +83,6 @@ if(isset($_POST['inputNome'])){
           $("#formPerfil").submit();
         }
       })
-
-      $("#formPerfil").submit();
     })
   })
   </script>
