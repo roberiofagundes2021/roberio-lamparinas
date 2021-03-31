@@ -53,14 +53,15 @@
 
 											<div class="dropdown-menu dropdown-menu-right">');
 
-								if ($_SESSION['PerfiChave'] == "SUPER") {
-									print('<a href="empresa.php" class="dropdown-item"><i class="icon-office"></i> Empresas</a>');
-								}
+								print('<a href="usuario.php" class="dropdown-item"><i class="icon-users"></i> Usuários</a>
+									   <a href="localEstoque.php" class="dropdown-item"><i class="icon-home7"></i> Local de Estoque</a>
+									   <a href="setor.php" class="dropdown-item"><i class="icon-cabinet"></i> Setor</a>
+									   <a href="veiculo.php" class="dropdown-item"><i class="icon-car"></i> Veículo</a>');
 
-								print('<a href="usuario.php" class="dropdown-item"><i class="icon-users"></i> Usuários</a>										  
-												<a href="perfil.php" class="dropdown-item"><i class="icon-user-check"></i> Perfis</a>	');
 								if ($_SESSION['PerfiChave'] == "SUPER") {
 									print('<div class="dropdown-divider"></div>
+												<a href="empresa.php" class="dropdown-item"><i class="icon-office"></i> Empresas</a>
+												<a href="perfil.php" class="dropdown-item"><i class="icon-user-check"></i> Perfis</a>
 												<a href="banco.php" class="dropdown-item"><i class="icon-piggy-bank"></i> Bancos</a>
 												<a href="tipoFiscal.php" class="dropdown-item"><i class="icon-cart-add"></i> Tipo Fiscal</a>
 												<!--<a href="modalidadeLicitacao.php" class="dropdown-item"><i class="icon-table"></i> Modalidade Licitação</a>

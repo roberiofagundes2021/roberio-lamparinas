@@ -195,11 +195,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 								document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
 							} else{
 								document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
-							}		
-							
-							alert('-'+resposta+'-')
-
-							return false;
+							}
 							
 							$( "#formMarca" ).submit();
 						}

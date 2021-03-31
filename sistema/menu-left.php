@@ -128,7 +128,6 @@
             <li class="nav-item"><a href="unidademedida.php" class="nav-link">Unidade de Medida</a></li>
             <li class="nav-item"><a href="produtoOrcamento.php" class="nav-link">Produtos para Orçamento</a></li>
             <li class="nav-item"><a href="servicoOrcamento.php" class="nav-link">Serviços para Orçamento</a></li>
-            <li class="nav-item"><a href="localEstoque.php" class="nav-link">Local do Estoque</a></li>
           </ul>
         </li>
 

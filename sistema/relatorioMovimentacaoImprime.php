@@ -595,10 +595,14 @@ try {
 
 	$html .= '<hr/>
 			  <br>
-			  Observação: Esse relatório foi gerado a partir dos seguintes critérios: Tipo ('.$sTipo.'), Fornecedor ('.$sFornecedor.'), Categoria ('.$sCategoria.'), SubCategoria ('.$sSubCategoria.'), Código ('.$sCodigo.'), Produto ('.$sProduto.'), Serviço ('.$sServico.'), Origem ('.$sOrigem.'), Destino ('.$sDestino.'), Classificação ('.$sClassificacao.')
-			  <br><br>
-			  ';
+			  Observação: Esse relatório foi gerado a partir dos seguintes critérios: ';
 
+	if ($sTipoProdutoServico == 'P'){
+		$html .= 'Tipo ('.$sTipo.'), Fornecedor ('.$sFornecedor.'), Categoria ('.$sCategoria.'), SubCategoria ('.$sSubCategoria.'), Código ('.$sCodigo.'), Produto ('.$sProduto.'), Origem ('.$sOrigem.'), Destino ('.$sDestino.'), Classificação ('.$sClassificacao.') <br><br>';	
+	} else{
+		$html .= 'Tipo ('.$sTipo.'), Fornecedor ('.$sFornecedor.'), Categoria ('.$sCategoria.'), SubCategoria ('.$sSubCategoria.'), Código ('.$sCodigo.'), Serviço ('.$sServico.'), Origem ('.$sOrigem.'), Destino ('.$sDestino.')<br><br>';	
+	}
+	
 	$rodape = "<hr/>
     <div style='width:100%'>
 		<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
