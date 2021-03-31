@@ -238,9 +238,8 @@ try{
 					
 					<form name="formOrdemCompraProduto" id="formOrdemCompraProduto" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Listar Produtos - Ordem de Compra Nº "<?php echo $row['OrComNumero']; ?>"</h5>
-						</div>					
-						
+							<h5 class="text-uppercase font-weight-bold">Listar Produtos - <?php echo $row['OrComTipo'] == 'C' ? 'Carta Contrato' : 'Ordem de Compra'; ?>  Nº "<?php echo $row['OrComNumero']; ?>"</h5>
+						</div>				
 						<input type="hidden" id="inputIdOrdemCompra" name="inputIdOrdemCompra" class="form-control" value="<?php echo $row['OrComId']; ?>">
 						
 						<div class="card-body">		
