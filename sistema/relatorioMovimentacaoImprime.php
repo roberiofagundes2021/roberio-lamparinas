@@ -50,6 +50,15 @@ if ($iProduto != '' and $iProduto != 0) {
 	$sProduto = $rowNome['ProduNome']; 
 }	
 
+if ($iServico != '' and $iServico != 0) {
+	$sqlNome = "SELECT ServiNome
+				FROM Servico 
+				WHERE ServiId = ".$iServico;
+	$result = $conn->query($sqlNome);
+	$rowNome = $result->fetch(PDO::FETCH_ASSOC);		
+	$sServico = $rowNome['ServiNome']; 
+}	
+
 if ($iFornecedor != '' and $iFornecedor != 0) {
 	$sqlNome = "SELECT ForneNome
 				FROM Fornecedor
@@ -188,7 +197,7 @@ if ($sTipoProdutoServico == 'P') {
 		$sql .= " and ServiSubCategoria = $iSubCategoria ";
 	}
 
-	if ($iProduto != '' and $iProduto != 0) {
+	if ($iServico != '' and $iServico != 0) {
 		$sql .= " and ServiId = $iServico ";
 	}
 
@@ -282,6 +291,7 @@ try {
 	$sSubCategoria = $iSubCategoria ? $sSubCategoria : 'Todos';
 	$sCodigo = $sCodigo ? $sCodigo : 'Todos';
 	$sProduto = $iProduto ? $sProduto : 'Todos';
+	$sServico = $iServico ? $sServico : 'Todos';
 	$sOrigem = $iOrigem ? $sOrigem : 'Todos';
 	$sDestino = $iDestino ? $sDestino : 'Todos';
 	$sClassificacao = $iClassificacao ? $sClassificacao : 'Todos';
@@ -585,7 +595,7 @@ try {
 
 	$html .= '<hr/>
 			  <br>
-			  Observação: Esse relatório foi gerado a partir dos seguintes critérios: Tipo ('.$sTipo.'), Fornecedor ('.$sFornecedor.'), Categoria ('.$sCategoria.'), SubCategoria ('.$sSubCategoria.'), Código ('.$sCodigo.'), Produto ('.$sProduto.'), Origem ('.$sOrigem.'), Destino ('.$sDestino.'), Classificação ('.$sClassificacao.')
+			  Observação: Esse relatório foi gerado a partir dos seguintes critérios: Tipo ('.$sTipo.'), Fornecedor ('.$sFornecedor.'), Categoria ('.$sCategoria.'), SubCategoria ('.$sSubCategoria.'), Código ('.$sCodigo.'), Produto ('.$sProduto.'), Serviço ('.$sServico.'), Origem ('.$sOrigem.'), Destino ('.$sDestino.'), Classificação ('.$sClassificacao.')
 			  <br><br>
 			  ';
 
