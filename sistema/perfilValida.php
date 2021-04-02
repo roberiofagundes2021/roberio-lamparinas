@@ -20,8 +20,13 @@ $count = count($row);
 //Verifica se já existe esse registro (se existir, retorna true )
 if($count){
 	echo 1;
-} else{
-	echo 0;
+}  else{
+
+	if ($_POST['estadoAtual'] == 'EDITA'){
+		echo "EDITA";
+	} else{
+		echo 0;
+	}
 }
 
 ?>
