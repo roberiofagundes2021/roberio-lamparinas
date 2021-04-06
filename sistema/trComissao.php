@@ -155,7 +155,7 @@ if(isset($_POST['cmbUsuario'])){
 
 			_componentSelect2();
 			
-			/* Fim: Tabela Personalizada */					
+			/* Fim: Tabela Personalizada */		
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -170,6 +170,18 @@ if(isset($_POST['cmbUsuario'])){
 			}
 			
 			document.formComissao.submit();
+		}	
+
+		const updatePresident = (e, referenceTermId, userId, isPresident , unitId) => {
+			e.preventDefault();
+
+			$(this).prop('checked', false);
+			$('#inputReferenceTermId').val(referenceTermId);
+			$('#inputUserId').val(userId);
+			$('#inputIsPresident').val(isPresident);
+			$('#inputUnitId').val(unitId);
+
+			confirmaExclusao(document.formUpdatePresident, "Essa ação trocar o presidente da comissão. Tem certeza que deseja enviar?", "trComissaoPresidente.php");
 		}		
 			
 	</script>
@@ -258,14 +270,16 @@ if(isset($_POST['cmbUsuario'])){
 									<tbody>
 									<?php
 										foreach ($row as $item){
-											
+											$isPresident = $item['TRXEqPresidente'] == 1 ? 1 : 0;
+											$checked = 	$isPresident == 1 ? 'checked' : '';
 											
 											print('
 											<tr>
 												<td>'.$item['UsuarLogin'].'</td>
-												<td>'.$item['TRXEqPresidente'].'</td>
+												<td>
+													<input type="checkbox" name="atualizaPresidente" id="atualizaPresidente" '."$checked".' onclick="updatePresident(event,'.$item['TRXEqTermoReferencia'].','.$item['TRXEqUsuario'].','.$isPresident.','.$item['TRXEqUnidade'].')">
+												</td>
 												');
-											
 											
 											print('<td class="text-center">
 													<div class="list-icons">
@@ -281,6 +295,8 @@ if(isset($_POST['cmbUsuario'])){
 									</tbody>
 								</table>
 
+
+
 							</div>
 							<!-- /basic responsive configuration -->
 
@@ -288,6 +304,13 @@ if(isset($_POST['cmbUsuario'])){
 					</div>				
 				
 					<!-- /info blocks -->			
+				</form>
+
+				<form name="formUpdatePresident" id='formUpdatePresident' method="post">
+					<input type="hidden" id="inputReferenceTermId" name="inputReferenceTermId">
+					<input type="hidden" id="inputUserId" name="inputUserId">
+					<input type="hidden" id="inputIsPresident" name="inputIsPresident">
+					<input type="hidden" id="inputUnitId" name="inputUnitId">
 				</form>
 
 			</div>

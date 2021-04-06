@@ -651,6 +651,61 @@ if ($totalAcoes) {
 				}
 			}
 
+			if (BandeTabela == 'TermoReferencia') {
+				console.log(BandeId, BandeTabela, BandeTabelaId, MovimTipo, Tipo);
+				document.getElementById('inputTermoReferenciaId').value = BandeTabelaId;
+
+				if (Tipo == 'imprimir') {
+					document.formBandeja.action = "trImprime.php";
+					document.formBandeja.setAttribute("target", "_blank");
+					document.formBandeja.submit();
+				} else {
+					if (Tipo == 'liberar') {
+						document.getElementById('inputTermoReferenciaStatus').value = 'LIBERADO'; //Liberado
+						document.formBandeja.action = "trMudaSituacao.php";
+						document.formBandeja.setAttribute("target", "_self");
+						document.formBandeja.submit();
+					} else if (Tipo == 'naoliberar') {
+						bootbox.prompt({
+							title: 'Informe o motivo da não liberação',
+							inputType: 'textarea',
+							buttons: {
+								confirm: {
+									label: 'Enviar',
+									className: 'btn-principal'
+								},
+								cancel: {
+									label: 'Cancelar',
+									className: 'btn-link'
+								}
+							},
+							callback: function(result) {
+
+								if (result === null) {
+									bootbox.alert({
+										title: 'Não Liberar',
+										message: 'A não liberação foi cancelada!'
+									});
+								} else {
+
+									document.getElementById('inputMotivo').value = result;
+									document.getElementById('inputTermoReferenciaStatus').value = 'NAOLIBERADO';
+									document.formBandeja.action = "trMudaSituacao.php";
+									document.formBandeja.setAttribute("target", "_self");
+									document.formBandeja.submit();
+
+									/*
+			                        bootbox.alert({
+			                            title: 'Hi <strong>' + result + '</strong>',
+			                            message: 'How are you doing today?'
+			                        });*/
+								}
+							}
+						});
+					}
+				}
+			}
+
 		}
 	</script>
 
@@ -829,6 +884,9 @@ if ($totalAcoes) {
 					<input type="hidden" id="inputMotivo" name="inputMotivo">
 					<input type="hidden" id="inputAditivoId" name="inputAditivoId">
 					<input type="hidden" id="inputAditivoStatus" name="inputAditivoStatus">
+
+					<input type="hidden" id="inputTermoReferenciaId" name="inputTermoReferenciaId">
+					<input type="hidden" id="inputTermoReferenciaStatus" name="inputTermoReferenciaStatus">
 				</form>
 
 			</div>
