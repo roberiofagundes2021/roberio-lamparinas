@@ -1,46 +1,73 @@
 <?php 
 
-include_once("sessao.php"); 
+	include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Lotacao';
+	$_SESSION['PaginaAtual'] = 'Lotacao';
 
-include('global_assets/php/conexao.php');
+	include('global_assets/php/conexao.php');
 
-if (isset($_POST['inputUsuarioId'])){
-	$_SESSION['UsuarioId'] = $_POST['inputUsuarioId'];
-	$_SESSION['UsuarioNome'] = $_POST['inputUsuarioNome'];
-	$_SESSION['UsuarioPerfil'] = $_POST['inputUsuarioPerfil'];
-	$_SESSION['EmpresaUsuarioPerfil'] = $_POST['inputEmpresaUsuarioPerfil'];
-}
+	if (isset($_POST['inputUsuarioId'])){
+		$_SESSION['UsuarioId'] = $_POST['inputUsuarioId'];
+		$_SESSION['UsuarioNome'] = $_POST['inputUsuarioNome'];
+		$_SESSION['UsuarioPerfil'] = $_POST['inputUsuarioPerfil'];
+		$_SESSION['EmpresaUsuarioPerfil'] = $_POST['inputEmpresaUsuarioPerfil'];
+	}
 
-if (!isset($_SESSION['UsuarioId'])){
-	irpara('usuario.php');
-}
+	if (!isset($_SESSION['UsuarioId'])){
+		irpara('usuario.php');
+	}
 
-if (isset($_SESSION['EmpresaId'])){	
-	$EmpresaId =   $_SESSION['EmpresaId'];
-	$EmpresaNome = $_SESSION['EmpresaNome'];
-} else {	
-	$EmpresaId = $_SESSION['EmpreId'];
-	$EmpresaNome = $_SESSION['EmpreNomeFantasia'];
-}
+	if (isset($_SESSION['EmpresaId'])){	
+		$EmpresaId =   $_SESSION['EmpresaId'];
+		$EmpresaNome = $_SESSION['EmpresaNome'];
+	} else {	
+		$EmpresaId = $_SESSION['EmpreId'];
+		$EmpresaNome = $_SESSION['EmpreNomeFantasia'];
+	}
 
-$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome
-		FROM UsuarioXUnidade
-		JOIN Unidade ON UnidaId = UsXUnUnidade
-		JOIN Setor ON SetorId = UsXUnSetor
-		LEFT JOIN LocalEstoque on LcEstId = UsXUnLocalEstoque
-		JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
-	    WHERE EXUXPEmpresa = ".$EmpresaId." and EXUXPUsuario = ". $_SESSION['UsuarioId'] ."
-		ORDER BY UsXUnUnidade";
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
-//echo $sql;die;
+	if (isset($_SESSION['EmpresaId'])){
 
+		//Essa consulta é para preencher a grid usando a coluna Unidade
+		$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome
+				FROM UsuarioXUnidade
+				JOIN Unidade ON UnidaId = UsXUnUnidade
+				JOIN Setor ON SetorId = UsXUnSetor
+				LEFT JOIN LocalEstoque on LcEstId = UsXUnLocalEstoque
+				JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
+				WHERE EXUXPEmpresa = ".$EmpresaId." 
+				ORDER BY UsXUnUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+		//$count = count($row);
+		//echo $sql;die;
 
-if(isset($_POST['cmbUnidade'])){
+	} else{
+			
+		//Essa consulta é para preencher a grid sem a coluna Unidade, já que aqui é a unidade do usuário logado
+		$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome
+				FROM UsuarioXUnidade
+				JOIN Unidade ON UnidaId = UsXUnUnidade
+				JOIN Setor ON SetorId = UsXUnSetor
+				LEFT JOIN LocalEstoque on LcEstId = UsXUnLocalEstoque
+				JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
+				WHERE EXUXPUsuario = ". $_SESSION['UsuarioId'] ."
+				ORDER BY UsXUnUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+		//$count = count($row);
+		//echo $sql;die;
+	}
+
+	//Se estiver gravando (inclusão)
+	if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5) == 'GRAVA'){
 		try{
+
+            if (isset($_SESSION['EmpresaId'])){
+				$iUnidade = $_POST['cmbUnidade'];
+			} else{
+				$iUnidade = $_SESSION['UnidadeId'];
+			}
+	
 			//echo $_POST['cmbUnidade'];die;
 			$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
 						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
@@ -48,7 +75,7 @@ if(isset($_POST['cmbUnidade'])){
 					
 			$result->execute(array(
 				':iEmpresaUsarioPerfil' => $_SESSION['EmpresaUsuarioPerfil'],
-				':iUnidade' => $_POST['cmbUnidade'],
+				':iUnidade' =>  $iUnidade,
 				':iSetor' => $_POST['cmbSetor'],
 				':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) ? $_POST['cmbLocalEstoque'] : null,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId']
@@ -84,10 +111,6 @@ if(isset($_POST['cmbUnidade'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-
-
-	
-
 
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
@@ -188,6 +211,35 @@ if(isset($_POST['cmbUnidade'])){
 						
 			/* Início: Tabela Personalizada */
 			$('#tblLotacao').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+				{ 
+					orderable: true,   //Setor
+					width: "65%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Local Estoque
+					width: "30%",
+					targets: [1]
+				},								
+				{ 
+					orderable: false,  //Ações
+					width: "5%",
+					targets: [2]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+
+			$('#tblLotacaoEmpresa').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
@@ -323,16 +375,23 @@ if(isset($_POST['cmbUnidade'])){
 							<div class="card-body">
 								
 								<form name="formLotacao" id="formLotacao" method="post" class="form-validate-jquery" action="usuarioLotacaoNovo.php">
-								<input type="hidden" id="inputEmpresaUsuarioPerfil" name="inputEmpresaUsuarioPerfil" >
-								<input type="hidden" id="inputUnidade" name="inputUnidade" >
+									
+									<input type="hidden" id="inputEmpresaUsuarioPerfil" name="inputEmpresaUsuarioPerfil" >
+									<input type="hidden" id="inputUnidade" name="inputUnidade" >
+									
 									<div class="card-body">
 										<div class="row">
+
+										<?php
+										if (isset($_SESSION['EmpresaId'])){
+											
+											print('
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
 													<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
-													<option value="">Informe uma unidade</option>
-													<?php
+													<option value="">Informe uma unidade</option>');
+													
 													$sql = "SELECT UnidaId, UnidaNome
 															FROM Unidade
 															JOIN Situacao on SituaId = UnidaStatus															     
@@ -345,11 +404,16 @@ if(isset($_POST['cmbUnidade'])){
 														print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
 													}
 
-													?>
+											print('		
 													</select>
 												</div>
 											</div>
+											');
 
+										} else{
+											print('<input type="hidden" id="cmbUnidade" value="0" >');
+										}
+									?>	
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
@@ -379,24 +443,39 @@ if(isset($_POST['cmbUnidade'])){
 											<div class="col-lg-3" style="margin-top: 20px;">
 												<div class="form-group">
 													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-													<a href="usuarioLotacao.php" class="btn btn-basic" role="button">Cancelar</a>
 												</div>
 											</div>
 										</div>
 									</div>	
 								</form>			
 							</div>
+
+							<?php 
 							
-							<table class="table" id="tblLotacao">
-								<thead>
-									<tr class="bg-slate">
-										<th >Unidade</th>
-										<th >Setor</th>
-										<th >Local de Estoque</th>
+								if (isset($_SESSION['EmpresaId'])){
+									print('<table id="tblLotacaoEmpresa" class="table">');
+								} else {
+									print('<table id="tblLotacao" class="table">');
+								}
+							?>	
+							<thead>
+								<tr class="bg-slate">
+                                     
+
+									<?php 
+										if (isset($_SESSION['EmpresaId'])){
+											print('<td>Unidade</td>');
+										}
+									?>
+									<th >Setor</th>
+									<th >Local de Estoque</th>
+
+									
+									
 										<th class="text-center">Ações</th>
-									</tr>
-								</thead>
-								<tbody>
+								</tr>
+							</thead>
+							<tbody>
 								<?php
 									foreach ($row as $item){
 										
@@ -404,13 +483,16 @@ if(isset($_POST['cmbUnidade'])){
 										
 										print('
 										<tr>
-											<td>'.$item['UnidaNome'].'</td>
+											');
+											if (isset($_SESSION['EmpresaId'])){
+										 	print('<td>'.$item['UnidaNome'].'</td>');
+												}
+											print('
 											<td>'.$item['SetorNome'].'</td>
 											<td>'.$item['LcEstNome'].'</td>
 											');
-										
-										
-										print('<td class="text-center">                             
+
+											print('<td class="text-center">                             
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
 													<a href="#" onclick="atualizaLotacao('.$item['UsXUnEmpresaUsuarioPerfil'].', '.$item['UsXUnUnidade'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>							
