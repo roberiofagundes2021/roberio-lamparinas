@@ -59,23 +59,25 @@
 	}
 
 	//Se estiver gravando (inclusão)
-	if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5) == 'GRAVA'){
+	if (isset($_POST['cmbSetor'])){
+
 		try{
 
-            if (isset($_SESSION['EmpresaId'])){
+			if (isset($_SESSION['EmpresaId'])){
 				$iUnidade = $_POST['cmbUnidade'];
 			} else{
 				$iUnidade = $_SESSION['UnidadeId'];
 			}
-	
+
 			//echo $_POST['cmbUnidade'];die;
 			$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
 						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
 			$result = $conn->prepare($sql);
-					
+			var_dump($_SESSION['EmpresaUsuarioPerfil'], $iUnidade, $_POST['cmbSetor'], $_POST['cmbLocalEstoque'], $_SESSION['UsuarId']);
+			echo $sql;die;		
 			$result->execute(array(
 				':iEmpresaUsarioPerfil' => $_SESSION['EmpresaUsuarioPerfil'],
-				':iUnidade' =>  $iUnidade,
+				':iUnidade' => $iUnidade,
 				':iSetor' => $_POST['cmbSetor'],
 				':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) ? $_POST['cmbLocalEstoque'] : null,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId']
@@ -96,8 +98,6 @@
 
 		irpara("usuarioLotacao.php");
 	}
-
-
 ?>
 
 <!DOCTYPE html>
@@ -143,9 +143,9 @@
 				var cmbSetor = $('#cmbSetor').val(); 
 					
 				if (cmbSetor == '') {
-				$("#formLotacao").submit();
+					$("#formLotacao").submit();
 				} else {
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
 					$.ajax({
 						type: "POST",
 						url: "usuarioLotacaoValida.php",
@@ -374,7 +374,7 @@
 
 							<div class="card-body">
 								
-								<form name="formLotacao" id="formLotacao" method="post" class="form-validate-jquery" action="usuarioLotacaoNovo.php">
+								<form name="formLotacao" id="formLotacao" method="post" class="form-validate-jquery">
 									
 									<input type="hidden" id="inputEmpresaUsuarioPerfil" name="inputEmpresaUsuarioPerfil" >
 									<input type="hidden" id="inputUnidade" name="inputUnidade" >
@@ -418,26 +418,58 @@
 												<div class="form-group">
 													<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
 													<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
-													<option value="">Sem setor</option>
+													<?php
+														if (!isset($_SESSION['EmpresaId'])){
+															$sql = "SELECT SetorId, SetorNome
+																	FROM Setor
+																	JOIN Situacao on SituaId = SetorStatus															     
+																	WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																	ORDER BY SetorNome ASC";
+															$result = $conn->query($sql);
+															$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+															
+															print('<option value="">Informe um setor</option>');
+															foreach ($rowSetor as $item) {
+																print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
+															}
+														} else{
+															print('<option value="">Sem setor</option>');
+														}	
+													?>
 													</select>
 												</div>
 											</div>	
 											
 											<?php 
-
 											if ($_SESSION['UsuarioPerfil'] == 'ALMOXARIFADO'){
-												print('
+											?>	
 												<div class="col-lg-3">
 													<div class="form-group">
 													<label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
 													<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
-														<option value="">Local de Estoque</option>
+													<?php
+													if (!isset($_SESSION['EmpresaId'])){
+														$sql = "SELECT LcEstId, LcEstNome
+																FROM LocalEstoque
+																JOIN Situacao on SituaId = LcEstStatus
+																WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY LcEstNome ASC";
+														$result = $conn->query($sql);
+														$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														print('<option value="">Informe um local de estoque</option>');
+														foreach ($rowSetor as $item) {
+															print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+														}
+													} else{
+														print('<option value="">Sem local de estoque</option>');
+													}	
+													?>
 													</select>
 													</div>
 												</div>
-												');
+											<?php
 											}
-
 											?>
 									
 											<div class="col-lg-3" style="margin-top: 20px;">
