@@ -25,38 +25,24 @@
 		$EmpresaNome = $_SESSION['EmpreNomeFantasia'];
 	}
 
-	if (isset($_SESSION['EmpresaId'])){
-
-		//Essa consulta é para preencher a grid usando a coluna Unidade
-		$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome
-				FROM UsuarioXUnidade
-				JOIN Unidade ON UnidaId = UsXUnUnidade
-				JOIN Setor ON SetorId = UsXUnSetor
-				LEFT JOIN LocalEstoque on LcEstId = UsXUnLocalEstoque
-				JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
-				WHERE EXUXPEmpresa = ".$EmpresaId." 
-				ORDER BY UsXUnUnidade";
-		$result = $conn->query($sql);
-		$row = $result->fetchAll(PDO::FETCH_ASSOC);
-		//$count = count($row);
-		//echo $sql;die;
-
-	} else{
-			
-		//Essa consulta é para preencher a grid sem a coluna Unidade, já que aqui é a unidade do usuário logado
-		$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome
-				FROM UsuarioXUnidade
-				JOIN Unidade ON UnidaId = UsXUnUnidade
-				JOIN Setor ON SetorId = UsXUnSetor
-				LEFT JOIN LocalEstoque on LcEstId = UsXUnLocalEstoque
-				JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
-				WHERE EXUXPUsuario = ". $_SESSION['UsuarioId'] ."
-				ORDER BY UsXUnUnidade";
-		$result = $conn->query($sql);
-		$row = $result->fetchAll(PDO::FETCH_ASSOC);
-		//$count = count($row);
-		//echo $sql;die;
+	//Essa consulta é para preencher a grid usando a coluna Unidade
+	$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome
+			FROM UsuarioXUnidade
+			JOIN Unidade ON UnidaId = UsXUnUnidade
+			JOIN Setor ON SetorId = UsXUnSetor
+			LEFT JOIN LocalEstoque on LcEstId = UsXUnLocalEstoque
+			JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
+			WHERE EXUXPUsuario = ".$_SESSION['UsuarioId'];
+	
+	if (!isset($_SESSION['EmpresaId'])){
+		$sql .= " and UsXUnUnidade = ".$_SESSION['UnidadeId'];
 	}
+	
+	$sql .=	"ORDER BY UsXUnUnidade";
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+	//$count = count($row);
+	//echo $sql;die;
 
 	//Se estiver gravando (inclusão)
 	if (isset($_POST['cmbSetor'])){
@@ -306,25 +292,19 @@
 			document.formLotacao.submit();
 		}		
 
-		
-		
-
 		function Filtrando() {
-				$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
-				$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
-			}
+			$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
+			$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
+		}
 
-			function ResetSetor() {
-				$('#cmbSetor').empty().append('<option value="">Sem setor</option>');
-			}
+		function ResetSetor() {
+			$('#cmbSetor').empty().append('<option value="">Sem setor</option>');
+		}
 
      	 function ResetLocalEstoque() {
 			$('#cmbLocalEstoque').empty().append('<option value="">Sem Local de Estoque</option>');
 		}	
 
-
-    	
-			
 	</script>
 
 </head>
@@ -376,44 +356,45 @@
 								
 								<form name="formLotacao" id="formLotacao" method="post" class="form-validate-jquery">
 									
-									<input type="hidden" id="inputEmpresaUsuarioPerfil" name="inputEmpresaUsuarioPerfil" >
+									<input type="hidden" id="inputEmpresaUsuarioPerfil" name="inputEmpresaUsuarioPerfil">
 									<input type="hidden" id="inputUnidade" name="inputUnidade" >
 									
 									<div class="card-body">
 										<div class="row">
 
-										<?php
-										if (isset($_SESSION['EmpresaId'])){
+											<?php
+											if (isset($_SESSION['EmpresaId'])){
 											
-											print('
-											<div class="col-lg-3">
-												<div class="form-group">
-													<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
-													<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
-													<option value="">Informe uma unidade</option>');
-													
-													$sql = "SELECT UnidaId, UnidaNome
-															FROM Unidade
-															JOIN Situacao on SituaId = UnidaStatus															     
-															WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
-															ORDER BY UnidaNome ASC";
-													$result = $conn->query($sql);
-													$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
+												print('
+												<div class="col-lg-3">
+													<div class="form-group">
+														<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
+														<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
+														<option value="">Informe uma unidade</option>');
+														
+														$sql = "SELECT UnidaId, UnidaNome
+																FROM Unidade
+																JOIN Situacao on SituaId = UnidaStatus															     
+																WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
+																ORDER BY UnidaNome ASC";
+														$result = $conn->query($sql);
+														$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowUnidade as $item) {
-														print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
-													}
+														foreach ($rowUnidade as $item) {
+															print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
+														}
 
-											print('		
-													</select>
+												print('		
+														</select>
+													</div>
 												</div>
-											</div>
-											');
+												');
 
-										} else{
-											print('<input type="hidden" id="cmbUnidade" value="0" >');
-										}
-									?>	
+											} else{
+												print('<input type="hidden" id="cmbUnidade" value="0" >');
+											}
+											?>
+
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
@@ -492,8 +473,6 @@
 							?>	
 							<thead>
 								<tr class="bg-slate">
-                                     
-
 									<?php 
 										if (isset($_SESSION['EmpresaId'])){
 											print('<td>Unidade</td>');
@@ -501,24 +480,20 @@
 									?>
 									<th >Setor</th>
 									<th >Local de Estoque</th>
-
-									
-									
-										<th class="text-center">Ações</th>
+									<th class="text-center">Ações</th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php
 									foreach ($row as $item){
 										
-										
-										
 										print('
 										<tr>
 											');
 											if (isset($_SESSION['EmpresaId'])){
-										 	print('<td>'.$item['UnidaNome'].'</td>');
-												}
+										 		print('<td>'.$item['UnidaNome'].'</td>');
+											}
+											
 											print('
 											<td>'.$item['SetorNome'].'</td>
 											<td>'.$item['LcEstNome'].'</td>

@@ -53,9 +53,9 @@
 
 											<div class="dropdown-menu dropdown-menu-right">');
 
-								print('<a href="usuario.php" class="dropdown-item"><i class="icon-users"></i> Usuários</a>
-									   <a href="localEstoque.php" class="dropdown-item"><i class="icon-home7"></i> Local de Estoque</a>
+								print('<a href="localEstoque.php" class="dropdown-item"><i class="icon-home7"></i> Local de Estoque</a>
 									   <a href="setor.php" class="dropdown-item"><i class="icon-cabinet"></i> Setor</a>
+									   <a href="usuario.php" class="dropdown-item"><i class="icon-users"></i> Usuários</a>  
 									   <a href="veiculo.php" class="dropdown-item"><i class="icon-car"></i> Veículo</a>');
 
 								if ($_SESSION['PerfiChave'] == "SUPER") {
