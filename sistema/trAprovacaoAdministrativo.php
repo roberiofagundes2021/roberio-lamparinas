@@ -34,8 +34,6 @@ if(isset($_POST['inputTRId'])){
 			$rowServico = $result->fetch(PDO::FETCH_ASSOC);
 
 			$countValidationServices = isset($rowServico['countProduto']) ? intval($rowServico['countProduto']) : 0;
-
-			var_dump($countValidationServices);
 			
 			if($countValidationServices > 0){
 				echo 'S';
