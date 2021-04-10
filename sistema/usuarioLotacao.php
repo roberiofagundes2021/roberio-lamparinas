@@ -139,7 +139,7 @@
 						success: function(resposta) {
 
 						if (resposta == 1) {
-							alerta('Atenção','Essa Unidade já existe!','error');
+							alerta('Atenção','Essa unidade já foi vinculada ao usuário!','error');
 							return false;
 						}
 
@@ -353,13 +353,15 @@
 							</div>
 
 							<div class="card-body">
+
+								A relação abaixo faz referência às unidades que o usuário <span style="color: #FF0000; font-weight: bold;"><?php echo $_SESSION['UsuarioNome']; ?></span> tem acesso, além de informar qual setor esse usuário está lotado em cada unidade.
 								
 								<form name="formLotacao" id="formLotacao" method="post" class="form-validate-jquery">
 									
 									<input type="hidden" id="inputEmpresaUsuarioPerfil" name="inputEmpresaUsuarioPerfil">
 									<input type="hidden" id="inputUnidade" name="inputUnidade" >
 									
-									<div class="card-body">
+									<div class="card-body" style="margin-top:10px;">
 										<div class="row">
 
 											<?php

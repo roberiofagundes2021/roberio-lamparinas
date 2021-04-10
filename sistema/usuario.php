@@ -266,9 +266,13 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 											
 										print('	<td class="text-center">
 												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'lotacao\')" class="list-icons-item"><i class="icon-users4" data-popup="tooltip" data-placement="bottom" title="Lotação"></i></a>
-														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+													<div class="list-icons list-icons-extended">');
+
+										if (isset($_SESSION['EmpresaId'])){
+											print('		<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'lotacao\')" class="list-icons-item"><i class="icon-users4" data-popup="tooltip" data-placement="bottom" title="Lotação"></i></a>');
+										}										
+										
+										print('			<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
 														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'exclui\')" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>

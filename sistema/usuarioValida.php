@@ -10,13 +10,10 @@ if (isset($_SESSION['EmpresaId'])){
 	$EmpresaId = $_SESSION['EmpreId'];
 }
 
-if(isset($_POST['nomeVelho'])){
-	$sql = "SELECT UsuarId
-			FROM Usuario
-			WHERE UsuarEmpresa = ".$_SESSION['EmpreId']." and UsuarNome = '". $_POST['nomeNovo']."' and UsuarNome <> '". $_POST['nomeVelho']."'";
-} else{
+if(isset($_GET['cpf'])){
+
 	$sql = "SELECT UsuarId, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, 
-				   EXUXPEmpresa, EXUXPPerfil, UsXUnUnidade, UsXUnSetor
+				   EXUXPEmpresa, EXUXPPerfil
 			FROM Usuario
 			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 			JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
@@ -42,6 +39,24 @@ if(isset($_POST['nomeVelho'])){
 	} else{
 		echo 0;
 	}			 
+} else {
+	
+	if ($_GET['loginNovo'] != $_GET['loginVelho']){
+
+		$sql = "SELECT UsuarId
+				FROM Usuario
+				WHERE UsuarEmpresa = ".$EmpresaId." and UsuarLogin = '". $_GET['loginNovo']."'";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+		$count = count($row);
+
+		if ($count){
+			echo 1;
+		}
+	} else {
+		echo 0;
+	}
+		
 }
 
 ?>

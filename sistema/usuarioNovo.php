@@ -21,6 +21,7 @@ if (isset($_POST['inputCpf'])) {
 		//Se for um novo usuário que ainda não estava cadastrado em nenhuma empresa
 		if ($_POST['inputId'] == 0) {
 
+			//Passo1: inserir na tabela Usuario
 			$sql = "INSERT INTO Usuario (UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular)
 					VALUES (:sCpf, :sNome, :sLogin, :sSenha, :sEmail, :sTelefone, :sCelular)";
 			$result = $conn->prepare($sql);
@@ -34,21 +35,37 @@ if (isset($_POST['inputCpf'])) {
 				':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
 				':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular']
 			));
-			$LAST_ID = $conn->lastInsertId();
+			$LAST_ID_USUARIO = $conn->lastInsertId();
 
-
+			//Passo2: inserir na tabela EmpresaXUsuarioXPerfil
 			$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPStatus, EXUXPUsuarioAtualizador)
 					VALUES (:iEmpresa, :iUsuario, :iPerfil, :bStatus, :iUsuarioAtualizador)";
 			$result = $conn->prepare($sql);
+
 			$result->execute(array(
 				':iEmpresa' => $EmpresaId,
-				':iUsuario' => $LAST_ID,
+				':iUsuario' => $LAST_ID_USUARIO,
 				':iPerfil' => $_POST['cmbPerfil'],
 				':bStatus' => 1,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId']
 			));
+			$LAST_ID_EXUXP = $conn->lastInsertId();
+
+			//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
+			$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
+					VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+				':iEmpresaUsarioPerfil' => $LAST_ID_EXUXP,
+				':iUnidade' => $_SESSION['UnidadeId'],
+				':iSetor' => $_POST['cmbSetor'],
+				':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) ? $_POST['cmbLocalEstoque'] : null,
+				':iUsuarioAtualizador' => $_SESSION['UsuarId']
+				));
 		} else {
 
+			//Passo1: atualizar o dados do usuário na tabela Usuario
 			$sql = "UPDATE Usuario SET UsuarNome = :sNome, usuarLogin = :sLogin, 
 						   UsuarSenha = :sSenha, UsuarEmail = :sEmail, UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
 					WHERE UsuarId = :iUsuario";
@@ -64,6 +81,7 @@ if (isset($_POST['inputCpf'])) {
 				':iUsuario' =>  $_POST['inputId']
 			));
 
+			//Passo2: inserir na tabela EmpresaXUsuarioXPerfil
 			$sql = "INSERT INTO EmpresaXUsuarioXPerfil (EXUXPEmpresa, EXUXPUsuario, EXUXPPerfil, EXUXPStatus, EXUXPUsuarioAtualizador)
 					VALUES (:iEmpresa, :iUsuario, :iPerfil, :bStatus, :iUsuarioAtualizador)";
 			$result = $conn->prepare($sql);
@@ -74,6 +92,20 @@ if (isset($_POST['inputCpf'])) {
 				':bStatus' => 1,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId']
 			));
+			$LAST_ID_EXUXP = $conn->lastInsertId();
+
+			//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
+			$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
+						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+				':iEmpresaUsarioPerfil' => $LAST_ID_EXUXP,
+				':iUnidade' => $_SESSION['UnidadeId'],
+				':iSetor' => $_POST['cmbSetor'],
+				':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) ? $_POST['cmbLocalEstoque'] : null,
+				':iUsuarioAtualizador' => $_SESSION['UsuarId']
+				));
 		}
 
 		$conn->commit();
@@ -158,6 +190,7 @@ if (isset($_POST['inputCpf'])) {
 						$.each(dados, function(i, obj) {
 							$('#inputId').val(obj.UsuarId);
 							$('#inputNome').val(obj.UsuarNome);
+							$('#inputLoginVelho').val(obj.UsuarLogin);
 							$('#inputLogin').val(obj.UsuarLogin);
 							$('#inputSenha').val(obj.UsuarSenha);
 							$('#inputConfirmaSenha').val(obj.UsuarSenha);
@@ -218,52 +251,6 @@ if (isset($_POST['inputCpf'])) {
 				})
 			})
 
-			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
-			$('#cmbUnidade').on('change', function(e) {
-
-				Filtrando();
-
-				var cmbUnidade = $('#cmbUnidade').val();
-
-				if (cmbUnidade == '') {
-					ResetSetor();
-					ResetLocalEstoque();
-				} else {
-
-					$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
-
-						var option = '<option value="">Selecione o Setor</option>';
-
-						if (dados.length) {
-
-							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.SetorId + '">' + obj.SetorNome + '</option>';
-							});
-
-							$('#cmbSetor').html(option).show();
-						} else {
-							ResetSetor();
-						}
-					});
-
-					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function(dados) {
-
-						var option = '<option value="">Selecione o Local de Estoque</option>';
-
-						if (dados.length) {
-
-							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.LcEstId + '">' + obj.LcEstNome + '</option>';
-							});
-
-							$('#cmbLocalEstoque').html(option).show();
-						} else {
-							ResetLocalEstoque();
-						}
-					});
-				}
-			});
-
 			$('#inputCpf').on('change', function(e) {
 				$('#buscar').trigger('click');
 			});
@@ -281,13 +268,14 @@ if (isset($_POST['inputCpf'])) {
 
 				var inputNome = $('#inputNome').val();
 				var cmbPerfil = $('#cmbPerfil').val();
-				var inputLogin = $('#inputLogin').val();
+				var inputLoginVelho = $('#inputLoginVelho').val();
+				var inputLoginNovo = $('#inputLogin').val();
 				var inputEmail = $('#inputEmail').val();
 				var inputSenha = $('#inputSenha').val();
 				var inputConfirmaSenha = $('#inputConfirmaSenha').val();
-				var cmbUnidade = $('#cmbUnidade').val();				
+				var cmbUnidade = $('#cmbUnidade').val();
 
-				if (inputNome != '' && inputLogin != '' && inputEmail != '' && cmbPerfil != '' && cmbUnidade != ''){
+				if (inputNome != '' && inputLoginNovo != '' && inputEmail != '' && cmbPerfil != '' && cmbUnidade != ''){
 					if (inputSenha != inputConfirmaSenha) {
 						alerta('Atenção', 'A confirmação de senha não confere!', 'error');
 						$('#inputConfirmaSenha').focus();
@@ -295,6 +283,14 @@ if (isset($_POST['inputCpf'])) {
 						return false;
 					}
 				}
+
+				$.getJSON('usuarioValida.php?loginVelho='+inputLoginVelho+'&loginNovo='+inputLoginNovo, function(dados) {
+					if (dados){
+						alerta('Atenção', 'Esse login já está em uso para outro usuário dessa empresa!', 'error');
+						$('#inputLogin').focus();
+						return false;
+					}
+				});	
 
 				$('#cmbEmpresa').prop("disabled", false);				
 
@@ -313,15 +309,7 @@ if (isset($_POST['inputCpf'])) {
 		function Filtrando() {
 			$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
 			$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
-		}
-
-		function ResetSetor() {
-			$('#cmbSetor').empty().append('<option value="">Sem setor</option>');
-		}
-
-		function ResetLocalEstoque() {
-			$('#cmbLocalEstoque').empty().append('<option value="">Sem Local de Estoque</option>');
-		}		
+		}	
 
 		function validaCPF(strCPF) {
 			var Soma;
@@ -396,6 +384,7 @@ include_once("topo.php");
 										<i class="icon-search4"></i>
 									</div>
 									<input type="hidden" id="inputId" name="inputId" value="0">
+									<input type="hidden" id="inputLoginVelho" name="inputVelho" value="">
 								</div>
 							</div>
 						</div>
@@ -490,6 +479,61 @@ include_once("topo.php");
 									</div>
 								</div>
 							</div>
+							
+							<?php if (!isset($_SESSION['EmpresaId'])){ ?>
+							<h5 class="mb-0 font-weight-semibold">Lotação</h5>
+							<br>
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="row">
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
+												<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
+													<option value="">Informe um setor</option>
+													<?php
+													$sql = "SELECT SetorId, SetorNome
+															FROM Setor
+															JOIN Situacao on SituaId = SetorStatus															     
+															WHERE SituaChave = 'ATIVO' and SetorUnidade = ".$_SESSION['UnidadeId']."
+															ORDER BY SetorNome ASC";
+													$result = $conn->query($sql);
+													$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowSetor as $item) {
+														print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
+													}
+													?>
+												</select>
+											</div>
+										</div>
+
+										<div class="col-lg-4" id="LocalEstoque" style="display: none">
+											<div class="form-group">
+												<label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
+												<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
+													<option value="">Informe um local de estoque</option>
+													<?php
+													$sql = "SELECT LcEstId, LcEstNome
+															FROM LocalEstoque
+															JOIN Situacao on SituaId = LcEstStatus
+															WHERE SituaChave = 'ATIVO' and LcEstUnidade = ".$_SESSION['UnidadeId']."
+															ORDER BY LcEstNome ASC";
+													$result = $conn->query($sql);
+													$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowLocal as $item) {
+														print('<option value="' . $item['LcEstId'] . '">' . $item['LcEstNome'] . '</option>');
+													}
+													?>
+												</select>
+											</div>
+										</div>
+
+									</div>
+								</div>
+							</div>
+							<?php } ?>
 						</div>
 
 						<div class="row" style="margin-top: 20px;">
