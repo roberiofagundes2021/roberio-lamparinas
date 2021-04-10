@@ -10,9 +10,11 @@ include('global_assets/php/conexao.php');
 if (isset($_POST['inputTRId'])) {
 	$iTR = $_POST['inputTRId'];
 	$iCategoria = $_POST['inputTRCategoria'];
+
 } else if (isset($_POST['inputIdTR'])) {
 	$iTR = $_POST['inputIdTR'];
 	$iCategoria = $_POST['inputIdCategoria'];
+
 } else {
 	irpara("tr.php");
 }
@@ -32,8 +34,26 @@ if (isset($_POST['inputIdTR'])) {
 
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
-		$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrUnidade)
-				VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
+		$sql = "
+			INSERT INTO 
+				TermoReferenciaXProduto (
+					TRXPrTermoReferencia, 
+					TRXPrProduto, 
+					TRXPrQuantidade, 
+					TRXPrValorUnitario, 
+					TRXPrTabela, 
+					TRXPrUsuarioAtualizador, 
+					TRXPrUnidade
+				)
+				VALUES (
+					:iTR, 
+					:iProduto, 
+					:iQuantidade, 
+					:fValorUnitario, 
+					:sTabela, 
+					:iUsuarioAtualizador, 
+					:iUnidade
+				)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -53,48 +73,61 @@ if (isset($_POST['inputIdTR'])) {
 }
 
 try {
-
-	$sql = "SELECT TrXOrId
+	$sql = "
+		SELECT TrXOrId
 			FROM TRXOrcamento
-			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrTermoReferencia = ".$iTR."
-			";
+		 WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " 
+		   AND TrXOrTermoReferencia = ".$iTR."
+	";
 	$result = $conn->query($sql);
 	$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
 
 
 	// Select para verificar o parametro ParamProdutoOrcamento.
-	$sql = "SELECT ParamProdutoOrcamento
+	$sql = "
+		SELECT ParamProdutoOrcamento
 			FROM Parametro
-			WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
-			";
+		 WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
+	";
 	$result = $conn->query($sql);
 	$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
 	// Select para o TR.
-	$sql = "SELECT *
+	$sql = "
+		SELECT *
 			FROM TermoReferencia
 			JOIN Categoria on CategId = TrRefCategoria
 			JOIN Situacao on SituaId = TrRefStatus
-			WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = " . $iTR ." and SituaChave = 'ATIVO'";
+		 WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " 
+		   AND TrRefId = " . $iTR ." 
+		   AND SituaChave = 'ATIVO'
+	";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
+	var_dump($sql);
 	var_dump($result);
+	var_dump($row);
 
-
-	$sql = " SELECT TRXSCSubcategoria
-		     FROM TRXSubcategoria
-		     WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCUnidade = " . $_SESSION['UnidadeId'] . "
-		";
+	$sql = " 
+		SELECT TRXSCSubcategoria
+			FROM TRXSubcategoria
+		 WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " 
+		   AND TRXSCUnidade = " . $_SESSION['UnidadeId'] . "
+	";
 	$result = $conn->query($sql);
 	$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
 	
 
 	//Select que verifica a tabela de origem dos produtos dessa TR.
-	$sql = "SELECT TRXPrProduto
+	$sql = "
+		SELECT TRXPrProduto
 			FROM TermoReferenciaXProduto
 			JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
-			WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
+		 WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " 
+		   AND TRXPrTermoReferencia = " . $iTR . " 
+			 AND TRXPrTabela = 'ProdutoOrcamento'
+	";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado1 = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado1 = count($rowProdutoUtilizado1);
@@ -108,10 +141,14 @@ try {
 	}
 
 
-	$sql = "SELECT TRXPrProduto
+	$sql = "
+		SELECT TRXPrProduto
 			FROM TermoReferenciaXProduto
 			JOIN Produto on ProduId = TRXPrProduto
-			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+		 WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+		   AND TRXPrTermoReferencia = " . $iTR . " 
+			 AND TRXPrTabela = 'Produto'
+	";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado2 = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado2 = count($rowProdutoUtilizado2);

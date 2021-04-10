@@ -420,8 +420,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<?php include_once("alerta.php"); ?>
 	
-	<?php $total1 = microtime(true) - $inicio1;
-	// echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; ?>
+	<!-- <?php $total1 = microtime(true) - $inicio1;
+	// echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; ?> -->
 </body>
 
 </html>
