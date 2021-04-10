@@ -19,6 +19,7 @@ if (isset($_POST['inputTRId'])) {
 
 //Se está alterando
 if (isset($_POST['inputIdTR'])) {
+	echo 'entrou';
 
 	$sql = "DELETE FROM TermoReferenciaXServico
 			WHERE TRXSrTermoReferencia = :iTR AND TRXSrUnidade = :iUnidade";
