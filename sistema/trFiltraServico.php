@@ -38,7 +38,7 @@ $iTR = $_POST['idTr'];
 $sql = "SELECT TRXSrServico
 		FROM TermoReferenciaXServico
 		JOIN ServicoOrcamento on SrOrcId = TRXSrServico
-		WHERE TRXSrEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'";
+		WHERE TRXSrUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'";
 $result = $conn->query($sql);
 $rowServicosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -46,7 +46,7 @@ $rowServicosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT TRXSrServico
 		FROM TermoReferenciaXServico
 		JOIN Servico on ServiId = TRXSrServico
-		WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
+		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
 $result = $conn->query($sql);
 $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 $countServicosTr2 = count($rowServicos);
@@ -58,7 +58,7 @@ if (count($rowServicosOrcamento) >= 1) {
 	$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento
 			FROM ServicoOrcamento
 			JOIN Categoria on CategId = SrOrcCategoria
-			WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and SrOrcId in (" . $lista . ")
+			WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and SrOrcId in (" . $lista . ")
 			";
 	//echo $sql;
 
