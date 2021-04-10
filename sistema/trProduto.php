@@ -82,7 +82,6 @@ try {
 	$result = $conn->query($sql);
 	$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
 
-
 	// Select para verificar o parametro ParamProdutoOrcamento.
 	$sql = "
 		SELECT ParamProdutoOrcamento
@@ -99,20 +98,18 @@ try {
 			JOIN Categoria on CategId = TrRefCategoria
 			JOIN Situacao on SituaId = TrRefStatus
 		 WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " 
-		   AND TrRefId = " . $iTR ." 
-		   AND SituaChave = 'ATIVO'
-	";
+		   AND TrRefId = " . $iTR;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
-	// var_dump($sql);
+	 //var_dump($sql);die;
 	// var_dump($result);
 	// var_dump($row);
 
 	$sql = " 
 		SELECT TRXSCSubcategoria
 			FROM TRXSubcategoria
-		 WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " 
+		 WHERE TRXSCTermoReferencia = " . $iTR . " 
 		   AND TRXSCUnidade = " . $_SESSION['UnidadeId'] . "
 	";
 	$result = $conn->query($sql);
@@ -139,7 +136,6 @@ try {
 	} else {
 		$aProdutos1 = [];
 	}
-
 
 	$sql = "
 		SELECT TRXPrProduto

@@ -76,14 +76,14 @@ try {
 			FROM TermoReferencia
 			JOIN Categoria on CategId = TrRefCategoria
 			JOIN Situacao on SituaId = TrRefStatus
-			WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = " . $iTR ." and SituaChave = 'ATIVO'";
+			WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = " . $iTR;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 
 	$sql = "SELECT TRXSCSubcategoria
 		    FROM TRXSubcategoria
-		    WHERE TRXSCTermoReferencia = " . $row['TrRefId'] . " and TRXSCUnidade = " . $_SESSION['UnidadeId'] . "";
+		    WHERE TRXSCTermoReferencia = " . $iTR . " and TRXSCUnidade = " . $_SESSION['UnidadeId'] . "";
 	$result = $conn->query($sql);
 	$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
 	
