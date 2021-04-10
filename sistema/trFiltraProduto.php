@@ -25,7 +25,7 @@ $iTR = $_POST['idTr'];
 $sql = "SELECT TRXPrProduto
 		FROM TermoReferenciaXProduto
 		JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
-		WHERE TRXPrEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
+		WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
 $result = $conn->query($sql);
 $rowProdutosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -33,7 +33,7 @@ $rowProdutosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT TRXPrProduto
 		FROM TermoReferenciaXProduto
 		JOIN Produto on ProduId = TRXPrProduto
-		WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
 $result = $conn->query($sql);
 $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 $countProdutosTr2 = count($rowProdutos);
