@@ -105,9 +105,9 @@ try {
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
-	var_dump($sql);
-	var_dump($result);
-	var_dump($row);
+	// var_dump($sql);
+	// var_dump($result);
+	// var_dump($row);
 
 	$sql = " 
 		SELECT TRXSCSubcategoria
