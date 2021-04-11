@@ -1,4 +1,5 @@
 <?php
+print_r($rowPendente);
 
 	print('
 	<tr class="table-active table-border-double">

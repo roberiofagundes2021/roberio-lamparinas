@@ -887,6 +887,7 @@ if ($totalAcoes) {
 
 					<input type="hidden" id="inputTermoReferenciaId" name="inputTermoReferenciaId">
 					<input type="hidden" id="inputTermoReferenciaStatus" name="inputTermoReferenciaStatus">
+					<input type="hidden" id="inputTipoTermoReferencia" name="inputTipoTermoReferencia">
 				</form>
 
 			</div>
