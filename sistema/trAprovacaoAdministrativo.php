@@ -16,7 +16,7 @@ if(isset($_POST['inputTRId'])){
 		$sql = "
 			SELECT TrRefTipo
 				FROM TermoReferencia
-			WHERE TrRefId = ".$iTrId."
+			 WHERE TrRefId = ".$iTrId."
 		";
 		$result = $conn->query($sql);
 		$rowTipoTr = $result->fetch(PDO::FETCH_ASSOC);
@@ -27,8 +27,8 @@ if(isset($_POST['inputTRId'])){
 			$sql = "
 				SELECT COUNT(TRXSrTermoReferencia) as countServico
 					FROM TermoReferenciaXServico
-				WHERE TRXSrTermoReferencia = ".$iTrId." 
-					AND TRXSrQuantidade <= 0
+				 WHERE TRXSrTermoReferencia = ".$iTrId." 
+					 AND TRXSrQuantidade <= 0
 			";
 			$result = $conn->query($sql);
 			$rowServico = $result->fetch(PDO::FETCH_ASSOC);
@@ -46,8 +46,8 @@ if(isset($_POST['inputTRId'])){
 			$sql = "
 				SELECT COUNT(TRXPrTermoReferencia) as countProduto
 					FROM TermoReferenciaXProduto
-				WHERE TRXPrTermoReferencia = ".$iTrId." 
-					AND TRXPrQuantidade <= 0
+				 WHERE TRXPrTermoReferencia = ".$iTrId." 
+					 AND TRXPrQuantidade <= 0
 			";
 			$result = $conn->query($sql);
 			$rowProduto = $result->fetch(PDO::FETCH_ASSOC);
@@ -67,8 +67,8 @@ if(isset($_POST['inputTRId'])){
 			$sql = "
 				SELECT COUNT(TRXPrTermoReferencia) as countProduto
 					FROM TermoReferenciaXProduto
-				WHERE TRXPrTermoReferencia = ".$iTrId." 
-					AND TRXPrQuantidade <= 0
+				 WHERE TRXPrTermoReferencia = ".$iTrId." 
+					 AND TRXPrQuantidade <= 0
 			";
 			$result = $conn->query($sql);
 			$rowProduto = $result->fetch(PDO::FETCH_ASSOC);
@@ -76,8 +76,8 @@ if(isset($_POST['inputTRId'])){
 			$sql = "
 				SELECT COUNT(TRXSrTermoReferencia) as countServico
 					FROM TermoReferenciaXServico
-				WHERE TRXSrTermoReferencia = ".$iTrId." 
-					AND TRXSrQuantidade <= 0
+				 WHERE TRXSrTermoReferencia = ".$iTrId." 
+					 AND TRXSrQuantidade <= 0
 			";
 			$result = $conn->query($sql);
 			$rowServico = $result->fetch(PDO::FETCH_ASSOC);
@@ -100,14 +100,19 @@ if(isset($_POST['inputTRId'])){
 			$conn->beginTransaction();
 
 			/* Atualiza o Status da Ordem de Compra para "Aguardando Liberação" */
-			$sql = "SELECT SituaId
+			$sql = "
+				SELECT SituaId
 					FROM Situacao
-					Where SituaChave = 'AGUARDANDOLIBERACAO' ";
+				 WHERE SituaChave = 'AGUARDANDOLIBERACAO' 
+			";
 			$result = $conn->query($sql);
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
-			$sql = "UPDATE TermoReferencia SET TrRefStatus = :iStatus
-								WHERE TrRefId = :iTrId";
+			$sql = "
+				UPDATE TermoReferencia 
+				   SET TrRefStatus = :iStatus
+				 WHERE TrRefId = :iTrId
+			";
 				$result = $conn->prepare($sql);
 
 				$result->execute(array(
@@ -149,32 +154,70 @@ if(isset($_POST['inputTRId'])){
 				/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
 				$sIdentificacao = 'Termo de Referência (Nº Termo: '.$rowTermoReferencia['TrRefNumero'].' | Data: '.$rowTermoReferencia['TrRefData'].' | Tipo: '.$tipo.')';
 			
-				$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
-									BandeSolicitanteSetor, BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
-						VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :iSolicitanteSetor, :sTabela, 
-								:iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+				$sql = "
+					INSERT INTO 
+						Bandeja (
+							BandeIdentificacao, 
+							BandeData, 
+							BandeDescricao, 
+							BandeURL, 
+							BandeSolicitante, 
+							BandeSolicitanteSetor, 
+							BandeTabela, 
+							BandeTabelaId, 
+							BandeStatus, 
+							BandeUsuarioAtualizador, 
+							BandeUnidade,
+							BandeTipo,
+						)
+						VALUES (
+							:sIdentificacao, 
+							:dData, 
+							:sDescricao, 
+							:sURL, 
+							:iSolicitante, 
+							:iSolicitanteSetor, 
+							:sTabela, 
+							:iTabelaId, 
+							:iStatus, 
+							:iUsuarioAtualizador, 
+							:iUnidade
+							:sTipoDaBandeja
+						)
+					";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
-								':sIdentificacao' => $sIdentificacao,
-								':dData' => date("Y-m-d"),
-								':sDescricao' => 'Liberar Termo de Referência',
-								':sURL' => '',
-								':iSolicitante' => $_SESSION['UsuarId'],
-								':iSolicitanteSetor' => null,
-								':sTabela' => 'TermoReferencia',
-								':iTabelaId' => $iTrId,
-								':iStatus' => $rowSituacao['SituaId'],
-								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iUnidade' => $_SESSION['UnidadeId']
-								));
+					':sIdentificacao' 			=> $sIdentificacao,
+					':dData' 								=> date("Y-m-d"),
+					':sDescricao' 					=> 'Liberar Termo de Referência',
+					':sURL' 								=> '',
+					':iSolicitante' 				=> $_SESSION['UsuarId'],
+					':iSolicitanteSetor' 		=> null,
+					':sTabela' 							=> 'TermoReferencia',
+					':iTabelaId' 						=> $iTrId,
+					':iStatus' 							=> $rowSituacao['SituaId'],
+					':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+					':iUnidade' 						=> $_SESSION['UnidadeId'],
+					':sTipoDaBandeja' 			=> 'CentroAdministrativo',
+				));
 
 				$insertId = $conn->lastInsertId();
 
 				foreach ($rowPerfil as $item){
 				
-					$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeUnidade)
-							VALUES (:iBandeja, :iPerfil, :iUnidade)";
+					$sql = "
+						INSERT INTO 
+							BandejaXPerfil (
+								BnXPeBandeja, 
+								BnXPePerfil, 
+								BnXPeUnidade
+							)
+							VALUES (
+								:iBandeja, 
+								:iPerfil, 
+								:iUnidade
+							)";
 					$result = $conn->prepare($sql);
 							
 					$result->execute(array(
@@ -186,23 +229,30 @@ if(isset($_POST['inputTRId'])){
 				/* Fim Insere Bandeja */
 
 			} else{
-
-				$sql = "UPDATE Bandeja SET BandeData = :dData, BandeSolicitante = :iSolicitante, BandeStatus = :iStatus, 
-						BandeUsuarioAtualizador = :iUsuarioAtualizador
-						WHERE BandeUnidade = :iUnidade and BandeId = :iIdBandeja";
+				$sql = "
+					UPDATE Bandeja 
+					   SET BandeData = :dData, 
+								 BandeSolicitante = :iSolicitante, 
+								 BandeStatus = :iStatus, 
+								 BandeUsuarioAtualizador = :iUsuarioAtualizador,
+								 BandeTipo = 'CentroAdministrativo'
+					 WHERE BandeUnidade = :iUnidade 
+					   AND BandeId = :iIdBandeja
+				";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
-								':dData' => date("Y-m-d"),
-								':iSolicitante' => $_SESSION['UsuarId'],
-								':iStatus' => $rowSituacao['SituaId'],
-								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iUnidade' => $_SESSION['UnidadeId'],
-								':iIdBandeja' => $rowBandeja['BandeId']														
-								));
+					':dData' => date("Y-m-d"),
+					':iSolicitante' => $_SESSION['UsuarId'],
+					':iStatus' => $rowSituacao['SituaId'],
+					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+					':iUnidade' => $_SESSION['UnidadeId'],
+					':iIdBandeja' => $rowBandeja['BandeId']														
+				));
+
 			}
 
-					$conn->commit();
+			$conn->commit();
 					
 			$_SESSION['msg']['titulo'] = "Sucesso";
 			$_SESSION['msg']['mensagem'] = "Termo de Referência enviado para aprovação!!!";
@@ -218,6 +268,7 @@ if(isset($_POST['inputTRId'])){
 
 			echo 'Error1: ' . $e->getMessage();
 		}
+	
 	} else if($validacaoTipo === 'P') {
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Existem produtos sem quantidade. Preencha todas as quantidades do termo de referência antes de enviar para aprovação!!!";
