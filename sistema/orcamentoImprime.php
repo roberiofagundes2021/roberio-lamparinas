@@ -13,7 +13,7 @@ $sNumero = $_POST['inputOrcamentoNumero'];
 
 $sql = "SELECT *
 		FROM Orcamento
-		JOIN Fornecedor on ForneId = OrcamFornecedor
+		LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
 		JOIN Categoria on CategId = OrcamCategoria
 		WHERE OrcamUnidade = " . $_SESSION['UnidadeId'] . " and OrcamId = " . $iOrcamento;
 $result = $conn->query($sql);
