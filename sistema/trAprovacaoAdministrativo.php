@@ -36,7 +36,7 @@ if(isset($_POST['inputTRId'])){
 			$countValidationServices = isset($rowServico['countProduto']) ? intval($rowServico['countProduto']) : 0;
 			
 			if($countValidationServices > 0){
-				echo 'S';
+				return 'S';
 			} else {
 				return true;
 			}
@@ -55,7 +55,7 @@ if(isset($_POST['inputTRId'])){
 			$countValidationProducts = isset($rowProduto['countProduto']) ? intval($rowProduto['countProduto']) : 0;
 
 			if($countValidationProducts > 0){
-				echo 'P';
+				return 'P';
 			} else {
 				return true;
 			}
@@ -86,7 +86,7 @@ if(isset($_POST['inputTRId'])){
 			$countValidationProducts = isset($rowProduto['countProduto']) ? intval($rowProduto['countProduto']) : 0;
 
 			if(($countValidationProducts > 0) || ($countValidationServices > 0)){
-				echo 'PS';
+				return 'PS';
 			} else {
 				return true;
 			}
@@ -121,38 +121,50 @@ if(isset($_POST['inputTRId'])){
 				));
 				/* Fim Atualiza */
 
-			$sql = "SELECT PerfiId
+			$sql = "
+				SELECT PerfiId
 					FROM Perfil
-					Where PerfiChave IN ('ADMINISTRADOR','CENTROADMINISTRATIVO') ";
+				 WHERE PerfiChave IN ('ADMINISTRADOR', 'CENTROADMINISTRATIVO');
+			";
 			$result = $conn->query($sql);
 			$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 
-			$sql = "SELECT TrRefNumero, TrRefTipo, TrRefData
+			$sql = "
+				SELECT TrRefNumero, TrRefTipo, TrRefData
 					FROM TermoReferencia
-					Where TrRefId = ".$iTrId;
+				 WHERE TrRefId = ".$iTrId;
 			$result = $conn->query($sql);
 			$rowTermoReferencia = $result->fetch(PDO::FETCH_ASSOC);
 
 			/* Verifica se a Bandeja já tem um registro com BandeTabela: OrdemCompra e BandeTabelaId: IdOrdemCompraAtual, evitando duplicação */
-			$sql = "SELECT COUNT(BandeId) as Count
+			$sql = "
+				SELECT COUNT(BandeId) as Count
 					FROM Bandeja
-					Where BandeTabela = 'TermoReferencia' and BandeTabelaId =  ".$iTrId;
+				 WHERE BandeTabela = 'TermoReferencia' 
+				   AND BandeTabelaId =  ".$iTrId;
 			$result = $conn->query($sql);
 			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 			$count = $rowBandeja['Count'];
 
-			$sql = "SELECT BandeId, SituaChave
+			$sql = "
+				SELECT BandeId, SituaChave
 					FROM Bandeja
 					JOIN Situacao on SituaId = BandeStatus
-					Where BandeTabela = 'TermoReferencia' and BandeTabelaId =  ".$iTrId;
+				 WHERE BandeTabela = 'TermoReferencia' 
+				   AND BandeTabelaId =  ".$iTrId;
 			$result = $conn->query($sql);
 			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 
 			if ($count == 0){
-				$tipo = $rowTermoReferencia['TrRefTipo'] == 'S' ? 'Serviços' : $rowTermoReferencia['TrRefTipo'] == 'P' ? 'Produtos' : $rowTermoReferencia['TrRefTipo'] == 'PS' && 'Produtos e Serviços';
+				$tipo = $rowTermoReferencia['TrRefTipo'] == 'S' 
+					? 'Serviços' : $rowTermoReferencia['TrRefTipo'] == 'P' 
+					? 'Produtos' : $rowTermoReferencia['TrRefTipo'] == 'PS' 
+				 && 'Produtos e Serviços';
 
 				/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
-				$sIdentificacao = 'Termo de Referência (Nº Termo: '.$rowTermoReferencia['TrRefNumero'].' | Data: '.$rowTermoReferencia['TrRefData'].' | Tipo: '.$tipo.')';
+				$sIdentificacao = '
+					Termo de Referência (Nº Termo: '.$rowTermoReferencia['TrRefNumero'].' | Data: '.mostradata($rowTermoReferencia['TrRefData']).' | Tipo: '.$tipo.')
+				';
 			
 				$sql = "
 					INSERT INTO 
@@ -168,23 +180,23 @@ if(isset($_POST['inputTRId'])){
 							BandeStatus, 
 							BandeUsuarioAtualizador, 
 							BandeUnidade,
-							BandeTipo,
+							BandePerfil
 						)
-						VALUES (
-							:sIdentificacao, 
-							:dData, 
-							:sDescricao, 
-							:sURL, 
-							:iSolicitante, 
-							:iSolicitanteSetor, 
-							:sTabela, 
-							:iTabelaId, 
-							:iStatus, 
-							:iUsuarioAtualizador, 
-							:iUnidade
-							:sTipoDaBandeja
-						)
-					";
+					VALUES (
+						:sIdentificacao, 
+						:dData, 
+						:sDescricao, 
+						:sURL, 
+						:iSolicitante, 
+						:iSolicitanteSetor, 
+						:sTabela, 
+						:iTabelaId, 
+						:iStatus, 
+						:iUsuarioAtualizador, 
+						:iUnidade,
+						:sPerfil
+					)
+				";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
@@ -199,8 +211,10 @@ if(isset($_POST['inputTRId'])){
 					':iStatus' 							=> $rowSituacao['SituaId'],
 					':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
 					':iUnidade' 						=> $_SESSION['UnidadeId'],
-					':sTipoDaBandeja' 			=> 'CentroAdministrativo',
+					':sPerfil' 							=> 'CENTROADMINISTRATIVO'
 				));
+
+				
 
 				$insertId = $conn->lastInsertId();
 
@@ -217,14 +231,15 @@ if(isset($_POST['inputTRId'])){
 								:iBandeja, 
 								:iPerfil, 
 								:iUnidade
-							)";
+							)
+					";
 					$result = $conn->prepare($sql);
 							
 					$result->execute(array(
-									':iBandeja' => $insertId,
-									':iPerfil' => $item['PerfiId'],
-									':iUnidade' => $_SESSION['UnidadeId']
-									));					
+						':iBandeja' => $insertId,
+						':iPerfil' 	=> $item['PerfiId'],
+						':iUnidade' => $_SESSION['UnidadeId']
+					));					
 				}
 				/* Fim Insere Bandeja */
 
@@ -235,54 +250,87 @@ if(isset($_POST['inputTRId'])){
 								 BandeSolicitante = :iSolicitante, 
 								 BandeStatus = :iStatus, 
 								 BandeUsuarioAtualizador = :iUsuarioAtualizador,
-								 BandeTipo = 'CentroAdministrativo'
+								 BandePerfil = 'CENTROADMINISTRATIVO'
 					 WHERE BandeUnidade = :iUnidade 
 					   AND BandeId = :iIdBandeja
 				";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
-					':dData' => date("Y-m-d"),
-					':iSolicitante' => $_SESSION['UsuarId'],
-					':iStatus' => $rowSituacao['SituaId'],
-					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-					':iUnidade' => $_SESSION['UnidadeId'],
-					':iIdBandeja' => $rowBandeja['BandeId']														
+					':dData' 								=> date("Y-m-d"),
+					':iSolicitante' 				=> $_SESSION['UsuarId'],
+					':iStatus' 							=> $rowSituacao['SituaId'],
+					':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+					':iUnidade' 						=> $_SESSION['UnidadeId'],
+					':iIdBandeja' 					=> $rowBandeja['BandeId']														
 				));
 
+				/* Deleta os perfis da bandeja */ 
+				$sql = "
+					DELETE FROM BandejaXPerfil
+								WHERE BnXPeBandeja = :iIdBandeja
+				";
+				$result = $conn->prepare($sql);
+				$result->execute(array(
+					':iIdBandeja' => $rowBandeja['BandeId']
+				));
+
+				/* Cria os perfis da bandeja */ 
+				foreach ($rowPerfil as $item){
+					$sql = "
+						INSERT INTO 
+							BandejaXPerfil (
+								BnXPeBandeja,
+								BnXPePerfil,
+								BnXPeUnidade
+							)
+						VALUES (
+							:iBandeja, 
+							:iPerfil, 
+							:iUnidade
+						)
+					";
+					$result = $conn->prepare($sql);
+							
+					$result->execute(array(
+						':iBandeja' => $rowBandeja['BandeId'],
+						':iPerfil' 	=> $item['PerfiId'],
+						':iUnidade' => $_SESSION['UnidadeId'],
+					));
+				}
 			}
 
 			$conn->commit();
 					
-			$_SESSION['msg']['titulo'] = "Sucesso";
-			$_SESSION['msg']['mensagem'] = "Termo de Referência enviado para aprovação!!!";
-			$_SESSION['msg']['tipo'] = "success";     
+			$_SESSION['msg']['titulo'] 		= "Sucesso";
+			$_SESSION['msg']['mensagem'] 	= "Termo de Referência enviado para aprovação!!!";
+			$_SESSION['msg']['tipo'] 			= "success";     
 
 		} catch(PDOException $e){
 
 			$conn->rollback();
 			
-			$_SESSION['msg']['titulo'] = "Erro";
-			$_SESSION['msg']['mensagem'] = "Erro ao enviar Termo de Referência para aprovação!!!";
-			$_SESSION['msg']['tipo'] = "error";	
+			$_SESSION['msg']['titulo'] 		= "Erro";
+			$_SESSION['msg']['mensagem'] 	= "Erro ao enviar Termo de Referência para aprovação!!!";
+			$_SESSION['msg']['tipo'] 			= "error";	
 
-			echo 'Error1: ' . $e->getMessage();
+			echo 'Error Message: ' . $e->getMessage().'| Line:  '.$e->getLine();
 		}
 	
 	} else if($validacaoTipo === 'P') {
-		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Existem produtos sem quantidade. Preencha todas as quantidades do termo de referência antes de enviar para aprovação!!!";
-		$_SESSION['msg']['tipo'] = "error";	
+		$_SESSION['msg']['titulo'] 		= "Erro";
+		$_SESSION['msg']['mensagem'] 	= "Existem produtos sem quantidade. Preencha todas as quantidades do termo de referência antes de enviar para aprovação!!!";
+		$_SESSION['msg']['tipo'] 			= "error";	
 
 	} else if($validacaoTipo === 'S') {
-		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Existem serviços sem quantidade. Preencha todas as quantidades do termo de referência antes de enviar para aprovação!!!";
-		$_SESSION['msg']['tipo'] = "error";	
+		$_SESSION['msg']['titulo'] 		= "Erro";
+		$_SESSION['msg']['mensagem'] 	= "Existem serviços sem quantidade. Preencha todas as quantidades do termo de referência antes de enviar para aprovação!!!";
+		$_SESSION['msg']['tipo'] 			= "error";	
 
 	} else if ($validacaoTipo === 'PS') {
-		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Existem produtos e serviços sem quantidade. Preencha todas as quantidades do termo de referência antes de enviar para aprovação!!!";
-		$_SESSION['msg']['tipo'] = "error";	
+		$_SESSION['msg']['titulo'] 		= "Erro";
+		$_SESSION['msg']['mensagem'] 	= "Existem produtos e serviços sem quantidade. Preencha todas as quantidades do termo de referência antes de enviar para aprovação!!!";
+		$_SESSION['msg']['tipo'] 			= "error";	
 	}
 }
 

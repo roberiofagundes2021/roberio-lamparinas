@@ -21,54 +21,113 @@ if (isset($_POST['inputTRId'])) {
 
 //Se está alterando
 if (isset($_POST['inputIdTR'])) {
-
-	$sql = "DELETE FROM TermoReferenciaXProduto
-			WHERE TRXPrTermoReferencia = :iTR AND TRXPrUnidade = :iUnidade";
-	$result = $conn->prepare($sql);
-
-	$result->execute(array(
-		':iTR' => $iTR,
-		':iUnidade' => $_SESSION['UnidadeId']
-	));
-
-
-	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+	try {
+		$conn->beginTransaction();
 
 		$sql = "
-			INSERT INTO 
-				TermoReferenciaXProduto (
-					TRXPrTermoReferencia, 
-					TRXPrProduto, 
-					TRXPrQuantidade, 
-					TRXPrValorUnitario, 
-					TRXPrTabela, 
-					TRXPrUsuarioAtualizador, 
-					TRXPrUnidade
-				)
-				VALUES (
-					:iTR, 
-					:iProduto, 
-					:iQuantidade, 
-					:fValorUnitario, 
-					:sTabela, 
-					:iUsuarioAtualizador, 
-					:iUnidade
-				)";
+			DELETE 
+				FROM TermoReferenciaXProduto
+			 WHERE TRXPrTermoReferencia = :iTR 
+				 AND TRXPrUnidade 				= :iUnidade
+		";
+		
 		$result = $conn->prepare($sql);
-
 		$result->execute(array(
-			':iTR' => $iTR,
-			':iProduto' => $_POST['inputIdProduto' . $i],
-			':iQuantidade' => $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
-			':fValorUnitario' => null,
-			':sTabela' => $_POST['inputTabelaProduto' . $i],
-			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+			':iTR' 			=> $iTR,
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "TR alterado!!!";
-		$_SESSION['msg']['tipo'] = "success";
+		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+			$sql = "
+				INSERT INTO 
+					TermoReferenciaXProduto (
+						TRXPrTermoReferencia, 
+						TRXPrProduto, 
+						TRXPrQuantidade, 
+						TRXPrValorUnitario, 
+						TRXPrTabela, 
+						TRXPrUsuarioAtualizador, 
+						TRXPrUnidade
+					)
+					VALUES (
+						:iTR, 
+						:iProduto, 
+						:iQuantidade, 
+						:fValorUnitario, 
+						:sTabela, 
+						:iUsuarioAtualizador, 
+						:iUnidade
+					)";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+				':iTR' 									=> $iTR,
+				':iProduto' 						=> $_POST['inputIdProduto' . $i],
+				':iQuantidade' 					=> $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
+				':fValorUnitario' 			=> null,
+				':sTabela' 							=> $_POST['inputTabelaProduto' . $i],
+				':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+				':iUnidade' 						=> $_SESSION['UnidadeId']
+			));
+		}
+
+		/* Verifica e remove dados da Bandeja */
+		$sql = "
+			DELETE 
+				FROM Bandeja
+			 WHERE BandeTabelaId = :iTR
+				 AND BandeUnidade  = :iUnidade
+		";
+		$result = $conn->prepare($sql);
+		$result->execute(array(
+			':iTR' 			=> $iTR,
+			':iUnidade' => $_SESSION['UnidadeId']
+		));
+
+		/* Verifica e remove dados da tabela Bandeja X Perfil */
+		$sql = "
+			DELETE 
+				FROM BandejaXPerfil
+			 WHERE BnXPeBandeja = :iTR
+				 AND BnXPeUnidade = :iUnidade
+		";
+		$result = $conn->prepare($sql);
+		$result->execute(array(
+			':iTR' 			=> $iTR,
+			':iUnidade' => $_SESSION['UnidadeId']
+		));
+
+		/* Atualiza o Status do Termo de Referência */
+		$sql = "
+			UPDATE TermoReferencia
+			   SET TrRefStatus = 
+				  		(SELECT SituaId 
+								 FROM Situacao
+								WHERE SituaChave = 'PENDENTE')
+			 WHERE TrRefId 				= :iTR
+			    AND TrRefUnidade 	= :iUnidade 
+		";
+		$result = $conn->prepare($sql);
+		$result->execute(array(
+			':iTR' 			=> $iTR,
+			':iUnidade' => $_SESSION['UnidadeId']
+		));
+
+		$conn->commit();
+						
+		$_SESSION['msg']['titulo'] 		= "Sucesso";
+		$_SESSION['msg']['mensagem'] 	= "TR alterada!!!";
+		$_SESSION['msg']['tipo'] 			= "success";
+
+	} catch(PDOException $e){
+
+		$conn->rollback();
+		
+		$_SESSION['msg']['titulo'] 		= "Erro";
+		$_SESSION['msg']['mensagem'] 	= "Erro ao alterar a TR!!!";
+		$_SESSION['msg']['tipo'] 			= "error";	
+
+		alerta('Error1: ' . $e->getMessage());
 	}
 }
 
@@ -101,10 +160,6 @@ try {
 		   AND TrRefId = " . $iTR;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
-
-	 //var_dump($sql);die;
-	// var_dump($result);
-	// var_dump($row);
 
 	$sql = " 
 		SELECT TRXSCSubcategoria
@@ -192,16 +247,13 @@ try {
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			$('#cmbProduto').on('change', function(e) {
 
-				var inputCategoria = $('#inputIdCategoria').val();
-				var inputSubCategoria = $('#inputSubCategoria').val();
-				var produtos = $(this).val();
-				console.log(produtos)
-				var tr = $('#inputIdTR').val();
-				//console.log(produtos);
-
-				var cont = 1;
-				var produtoId = [];
-				var produtoQuant = [];
+				let inputCategoria 		= $('#inputIdCategoria').val();
+				let inputSubCategoria = $('#inputSubCategoria').val();
+				let produtos 					= $(this).val();
+				let tr 								= $('#inputIdTR').val();
+				let cont 							= 1;
+				let produtoId 				= [];
+				let produtoQuant 			= [];
 
 				// Aqui é para cada "class" faça
 				$.each($(".idProduto"), function() {
@@ -212,8 +264,7 @@ try {
 				cont = 1;
 				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
 				$.each($(".Quantidade"), function() {
-					$id = produtoId[cont];
-
+					$id 							= produtoId[cont];
 					produtoQuant[$id] = $(this).val();
 					cont++;
 				});
@@ -230,12 +281,8 @@ try {
 						produtoQuant: produtoQuant
 					},
 					success: function(resposta) {
-						//alert(resposta);
-						console.log(resposta)
 						$("#tabelaProdutos").html(resposta).show();
-
 						return false;
-
 					}
 				});
 			});
@@ -245,12 +292,12 @@ try {
 				let selectProdutos = $('#ProdutoRow')
 
 				if(btnSubmit.attr('disabled')){
-                    selectProdutos.css('display', 'none')
+					selectProdutos.css('display', 'none')
 				}
 			}
 			disabledSelect()
 
-		}); //document.ready
+		});
 
 		//Mostra o "Filtrando..." na combo Produto
 		function FiltraProduto() {
@@ -304,16 +351,23 @@ try {
 												<label for="cmbSubCategoria">SubCategoria(as)</label>
 												<div class="d-flex flex-row" style="padding-top: 7px;">
 													<?php
-													$sql = "SELECT SbCatId, SbCatNome
-                                                            FROM SubCategoria
-                                                            JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-                                                            WHERE SBCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $iTR;
-													$result = $conn->query($sql);
+													$sql = "
+														SELECT SbCatId, SbCatNome
+															FROM SubCategoria
+															JOIN TRXSubcategoria 
+																ON TRXSCSubcategoria = SbCatId
+														 WHERE SBCatUnidade = " . $_SESSION['UnidadeId'] . " 
+														   AND TRXSCTermoReferencia = " . $iTR;
+													$result 	= $conn->query($sql);
 													$rowSbCat = $result->fetchAll(PDO::FETCH_ASSOC);
 
 													foreach ($rowSbCat as $subcategoria) {
-														print('<input type="text" class="form-control pb-0" value="' . $subcategoria['SbCatNome'] . '" readOnly>');
-														print('<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="' . $subcategoria['SbCatId'] . '">');
+														print('
+															<input type="text" class="form-control pb-0" value="' . $subcategoria['SbCatNome'] . '" readOnly>
+														');
+														print('
+															<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="' . $subcategoria['SbCatId'] . '">
+														');
 													}
 													?>
 												</div>
@@ -385,10 +439,14 @@ try {
 															foreach ($rowProduto as $item) {
 																if (in_array($item['ProduId'], $aProdutos2)) {
 																	$seleciona = "selected";
-																	print('<option value="' . $item['ProduId'] . '" ' . $seleciona . '>' . $item['ProduNome'] . '</option>');
+																	print('
+																		<option value="' . $item['ProduId'] . '" ' . $seleciona . '>' . $item['ProduNome'] . '</option>
+																	');
 																} else {
 																	$seleciona = "";
-																	print('<option value="' . $item['ProduId'] . '" ' . $seleciona . '>' . $item['ProduNome'] . '</option>');
+																	print('
+																		<option value="' . $item['ProduId'] . '" ' . $seleciona . '>' . $item['ProduNome'] . '</option>
+																	');
 																}
 															}
 														}
@@ -417,158 +475,198 @@ try {
 								<div class="card-body">
 									<p class="mb-3">Abaixo estão listados todos os produtos selecionadas acima. Para atualizar os valores, basta preencher a coluna <code>Quantidade</code> e depois clicar em <b>ALTERAR</b>.</p>
 
-									<!--<div class="hot-container">
-										<div id="example"></div>
-									</div>-->
-
 									<?php
-
 									if (count($aProdutos1) >= 1) {
 
-										$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, 
-												TRXPrQuantidade, TRXPrTabela, UnMedNome, UnMedSigla
-									            FROM ProdutoOrcamento
-									            JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
-									            JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-									            WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR  . " and TRXPrTabela = 'ProdutoOrcamento'";
+										$sql = "
+											SELECT PrOrcId, 
+														 PrOrcNome, 
+														 PrOrcDetalhamento, 
+														 PrOrcUnidadeMedida, 
+														 TRXPrQuantidade, 
+														 TRXPrTabela, 
+														 UnMedNome, 
+														 UnMedSigla
+												FROM ProdutoOrcamento
+												JOIN TermoReferenciaXProduto 
+													ON TRXPrProduto = PrOrcId
+												JOIN UnidadeMedida 
+												  ON UnMedId = PrOrcUnidadeMedida
+											 WHERE PrOrcUnidade 				= " . $_SESSION['UnidadeId'] . " 
+											   AND TRXPrTermoReferencia = " . $iTR  . " 
+												 AND TRXPrTabela 					= 'ProdutoOrcamento'
+										";
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-
 										$cont = 0;
 
 										print('
-							                    <div class="row" style="margin-bottom: -20px;">
-							                    	<div class="col-lg-9">
-							                    			<div class="row">
-							                    				<div class="col-lg-1">
-							                    					<label for="inputCodigo"><strong>Item</strong></label>
-							                    				</div>
-							                    				<div class="col-lg-11">
-							                    					<label for="inputProduto"><strong>Produto</strong></label>
-							                    				</div>
-							                    			</div>
-							                    		</div>												
-							                    	<div class="col-lg-1">
-							                    		<div class="form-group">
-							                    			<label for="inputUnidade"><strong>Unidade</strong></label>
-							                    		</div>
-							                    	</div>
-							                    	<div class="col-lg-2">
-							                    		<div class="form-group">
-							                    			<label for="inputQuantidade"><strong>Quantidade</strong></label>
-							                    		</div>
-							                    	</div>	
-							                    </div>');
+											<div class="row" style="margin-bottom: -20px;">
+												<div class="col-lg-9">
+														<div class="row">
+															<div class="col-lg-1">
+																<label for="inputCodigo"><strong>Item</strong></label>
+															</div>
+															<div class="col-lg-11">
+																<label for="inputProduto"><strong>Produto</strong></label>
+															</div>
+														</div>
+													</div>												
+												<div class="col-lg-1">
+													<div class="form-group">
+														<label for="inputUnidade"><strong>Unidade</strong></label>
+													</div>
+												</div>
+												<div class="col-lg-2">
+													<div class="form-group">
+														<label for="inputQuantidade"><strong>Quantidade</strong></label>
+													</div>
+												</div>	
+											</div>
+										');
 
 										print('<div id="tabelaProdutos">');
 
 										foreach ($rowProdutos as $item) {
-
 											$cont++;
 
 											$iQuantidade = isset($item['TRXPrQuantidade']) ? $item['TRXPrQuantidade'] : '';
 										
 											print('
-								                    <div class="row" style="margin-top: 8px;">
-								                    	<div class="col-lg-9">
-								                    		<div class="row">
-								                    			<div class="col-lg-1">
-								                    				<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
-																	<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['PrOrcId'] . '" class="idProduto">
-								                    			</div>
-								                    			<div class="col-lg-11">
-								                    				<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['PrOrcDetalhamento'] . '" value="' . $item['PrOrcNome'] . '" readOnly>
-								                    			</div>
-								                    		</div>
-								                    	</div>								
-								                    	<div class="col-lg-1">
-								                    		<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
-								                    	</div>
-								                    	<div class="col-lg-2">
-								                    		<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
-								                    	</div>	
-													</div>');
+												<div class="row" style="margin-top: 8px;">
+													<div class="col-lg-9">
+														<div class="row">
+															<div class="col-lg-1">
+																<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
+																<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['PrOrcId'] . '" class="idProduto">
+															</div>
+															<div class="col-lg-11">
+																<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['PrOrcDetalhamento'] . '" value="' . $item['PrOrcNome'] . '" readOnly>
+															</div>
+														</div>
+													</div>								
+													<div class="col-lg-1">
+														<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
+													</div>
+													<div class="col-lg-2">
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+													</div>	
+												</div>
+											');
 
-											print('<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . $item['TRXPrTabela'] . '">');
+											print('
+												<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . $item['TRXPrTabela'] . '">
+											');
 										}
 
-										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >');
+										print('
+											<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >
+										');
 
-										print('</div>');
+										print('
+											</div>
+										');
+
 									} else {
 
-										$sql = "SELECT TRXPrQuantidade, TRXPrTabela, ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, UnMedNome, UnMedSigla
-									            FROM TermoReferenciaXProduto
-									            JOIN Produto on ProduId = TRXPrProduto
-												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-									            WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
-										$result = $conn->query($sql);
-										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-										$count = count($rowProdutos);
-
-
+										$sql = "
+											SELECT TRXPrQuantidade, 
+														 TRXPrTabela, 
+														 ProduId, 
+														 ProduNome, 
+														 ProduDetalhamento, 
+														 ProduUnidadeMedida, 
+														 UnMedNome, 
+														 UnMedSigla
+												FROM TermoReferenciaXProduto
+												JOIN Produto 
+													ON ProduId = TRXPrProduto
+												LEFT 
+													JOIN UnidadeMedida 
+														ON UnMedId = ProduUnidadeMedida
+											 WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+											   AND TRXPrTermoReferencia = " . $iTR . " 
+												 AND TRXPrTabela = 'Produto'
+										";
+										$result 			= $conn->query($sql);
+										$rowProdutos 	= $result->fetchAll(PDO::FETCH_ASSOC);
+										$count 				= count($rowProdutos);
 										$cont = 0;
 
 										print('
-							                    <div class="row" style="margin-bottom: -20px;">
-							                    	<div class="col-lg-9">
-							                    			<div class="row">
-							                    				<div class="col-lg-1">
-							                    					<label for="inputCodigo"><strong>Item</strong></label>
-							                    				</div>
-							                    				<div class="col-lg-11">
-							                    					<label for="inputProduto"><strong>Produto</strong></label>
-							                    				</div>
-							                    			</div>
-							                    		</div>												
-							                    	<div class="col-lg-1">
-							                    		<div class="form-group">
-							                    			<label for="inputUnidade"><strong>Unidade</strong></label>
-							                    		</div>
-							                    	</div>
-							                    	<div class="col-lg-2">
-							                    		<div class="form-group">
-							                    			<label for="inputQuantidade"><strong>Quantidade</strong></label>
-							                    		</div>
-							                    	</div>	
-							                    </div>');
+											<div class="row" style="margin-bottom: -20px;">
+												<div class="col-lg-9">
+														<div class="row">
+															<div class="col-lg-1">
+																<label for="inputCodigo"><strong>Item</strong></label>
+															</div>
+															<div class="col-lg-11">
+																<label for="inputProduto"><strong>Produto</strong></label>
+															</div>
+														</div>
+													</div>												
+												<div class="col-lg-1">
+													<div class="form-group">
+														<label for="inputUnidade"><strong>Unidade</strong></label>
+													</div>
+												</div>
+												<div class="col-lg-2">
+													<div class="form-group">
+														<label for="inputQuantidade"><strong>Quantidade</strong></label>
+													</div>
+												</div>	
+											</div>
+										');
 
-										print('<div id="tabelaProdutos">');
+										print('
+											<div id="tabelaProdutos">
+										');
 
 										foreach ($rowProdutos as $item) {
-
 											$cont++;
-
 											$iQuantidade = isset($item['TRXPrQuantidade']) ? $item['TRXPrQuantidade'] : '';
 
 											print('
-								                    <div class="row" style="margin-top: 8px;">
-								                    	<div class="col-lg-9">
-								                    		<div class="row">
-								                    			<div class="col-lg-1">
-								                    				<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
-																	<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['ProduId'] . '" class="idProduto">
-																	<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . $item['TRXPrTabela'] . '">
-								                    			</div>
-								                    			<div class="col-lg-11">
-								                    				<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
-								                    			</div>
-								                    		</div>
-								                    	</div>								
-								                    	<div class="col-lg-1">
-								                    		<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
-								                    	</div>
-								                    	<div class="col-lg-2">
-								                    		<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
-								                    	</div>	
-													</div>');
+												<div class="row" style="margin-top: 8px;">
+													<div class="col-lg-9">
+														<div class="row">
+															<div class="col-lg-1">
+																<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
+																
+																<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['ProduId'] . '" class="idProduto">
+																
+																<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . $item['TRXPrTabela'] . '">
+															</div>
 
-											print('<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . $item['TRXPrTabela'] . '">');
+															<div class="col-lg-11">
+																<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+															</div>
+
+														</div>
+													</div>								
+													
+													<div class="col-lg-1">
+														<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
+													</div>
+
+													<div class="col-lg-2">
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+													</div>	
+												</div>
+											');
+
+											print('
+												<input type="hidden" id="inputTabelaProduto' . $cont . '" name="inputTabelaProduto' . $cont . '" value="' . $item['TRXPrTabela'] . '">
+											');
 										}
 
-										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >');
+										print('
+											<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >
+										');
 
-										print('</div>');
+										print('
+											</div>
+										');
 									}
 
 									?>
@@ -579,28 +677,31 @@ try {
 							
 							    if(count($rowOrcamentosTR) >= 1){
 									print('
-									<div class="row" style="margin-top: 10px;">
-								        <div class="row justify-content-center col-lg-12">
-									        <div class="form-group col-12 col-lg-6">
-										        <button id="btnsubmit" class="btn btn-lg btn-principal" disabled type="submit">Alterar</button>
-										        <a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
+										<div class="row" style="margin-top: 10px;">
+											<div class="row justify-content-center col-lg-12">
+												<div class="form-group col-12 col-lg-6">
+													<button id="btnsubmit" class="btn btn-lg btn-principal" disabled type="submit">Alterar</button>
+													<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
+												</div>
+												
+												<div class="row justify-content-end align-content-center col-12 col-lg-6">
+													<p style="color: red; margin: 0px"><i class="icon-info3"></i>A lista de produtos não pode ser alterada enquanto houver orçamentos para essa TR.</p>
+												</div>
 											</div>
-											<div class="row justify-content-end align-content-center col-12 col-lg-6">
-											    <p style="color: red; margin: 0px"><i class="icon-info3"></i>A lista de produtos não pode ser alterada enquanto houver orçamentos para essa TR.</p>
-										    </div>
-								        </div>
-							        </div>
+										</div>
 									');
+
 								} else {
+
 									print('
-									<div class="row" style="margin-top: 10px;">
-								        <div class="col-lg-12">
-									        <div class="form-group">
-										        <button class="btn btn-lg btn-principal" type="submit">Alterar</button>
-										        <a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
-									        </div>
-								        </div>
-							        </div>
+										<div class="row" style="margin-top: 10px;">
+											<div class="col-lg-12">
+												<div class="form-group">
+													<button class="btn btn-lg btn-principal" type="submit">Alterar</button>
+													<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
+												</div>
+											</div>
+										</div>
 									');
 								}
 							 

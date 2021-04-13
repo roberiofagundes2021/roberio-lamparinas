@@ -20,20 +20,48 @@ if (isset($_POST['cmbPerfil'])) {
 //echo $idPerfilLogado;die;
 
 /* AGUARDANDOLIBERACAO */
-$sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, 
-		SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, OrComNumero, OrComSituacao, OrComTipo, MovimTipo, 
-		UsXUnSetor as SetorAtual, BandeSolicitanteSetor as SetorQuandoSolicitou
+$sql = "
+	SELECT BandeId, 
+				 BandeIdentificacao, 
+				 BandeData, 
+				 BandeDescricao, 
+				 BandeURL, 
+				 UsuarNome, 
+				 BandeTabela, 
+				 BandeTabelaId,
+				 BandePerfil,
+				 SituaNome, 
+				 DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, 
+				 OrComNumero, 
+				 OrComSituacao, 
+				 OrComTipo, 
+				 MovimTipo, 
+				 UsXUnSetor as SetorAtual, 
+				 BandeSolicitanteSetor as SetorQuandoSolicitou
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
-		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
-		JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
-		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
-		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
-		LEFT JOIN Movimentacao on MovimId = BandeTabelaId		
-		JOIN Situacao on SituaId = BandeStatus
-		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-		WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and 
-		SituaChave = 'AGUARDANDOLIBERACAO' and BnXPePerfil in (" . $idPerfilLogado . ")
+		JOIN EmpresaXUsuarioXPerfil 
+		  ON EXUXPUsuario = UsuarId
+		JOIN UsuarioXUnidade 
+		  ON UsXUnEmpresaUsuarioPerfil = EXUXPId
+		LEFT 
+			JOIN OrdemCompra 
+				ON OrComId = BandeTabelaId
+		LEFT 
+			JOIN FluxoOperacional 
+			  ON FlOpeId = BandeTabelaId
+		LEFT 
+			JOIN Movimentacao 
+				ON MovimId = BandeTabelaId		
+		JOIN Situacao 
+		  ON SituaId = BandeStatus
+		LEFT 
+			JOIN BandejaXPerfil 
+				ON BnXPeBandeja = BandeId
+		WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
+		  AND UsXUnUnidade = " . $_SESSION['UnidadeId'] . " 
+			AND SituaChave = 'AGUARDANDOLIBERACAO' 
+			AND BnXPePerfil in (" . $idPerfilLogado . ")
 		ORDER BY BandeData DESC, BandeId DESC";
 //echo $sql;die;		
 $result = $conn->query($sql);
@@ -364,7 +392,7 @@ if ($totalAcoes) {
 		});
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaBandeja(BandeId, BandeTabela, BandeTabelaId, MovimTipo, Tipo) {
+		function atualizaBandeja(BandeId, BandeTabela, BandeTabelaId, MovimTipo, Tipo, BandePerfil) {
 
 			document.getElementById('inputBandejaId').value = BandeId;
 
@@ -652,20 +680,31 @@ if ($totalAcoes) {
 			}
 
 			if (BandeTabela == 'TermoReferencia') {
-				console.log(BandeId, BandeTabela, BandeTabelaId, MovimTipo, Tipo);
+				console.log(BandeId, BandeTabela, BandeTabelaId, MovimTipo, BandePerfil);
 				document.getElementById('inputTermoReferenciaId').value = BandeTabelaId;
+				// document.getElementById('inputTipoTermoReferencia').value = BandePerfil;
 
 				if (Tipo == 'imprimir') {
 					document.formBandeja.action = "trImprime.php";
 					document.formBandeja.setAttribute("target", "_blank");
 					document.formBandeja.submit();
 				} else {
-					if (Tipo == 'liberar') {
+					if (Tipo === 'liberarCentroAdministrativo') {
+						document.getElementById('inputTermoReferenciaStatus').value = 'LIBERADOPARCIAL'; //Liberado
+						document.formBandeja.action = "trMudaSituacao.php";
+						document.formBandeja.setAttribute("target", "_self");
+						document.formBandeja.submit();
+
+					} else if (Tipo === 'liberarContabilidade') {
+						alerta('direcionar para a tela de dotacao');
+						 
+					} else if (Tipo === 'liberar') {
 						document.getElementById('inputTermoReferenciaStatus').value = 'LIBERADO'; //Liberado
 						document.formBandeja.action = "trMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
-					} else if (Tipo == 'naoliberar') {
+
+					} else if (Tipo === 'naoliberar') {
 						bootbox.prompt({
 							title: 'Informe o motivo da não liberação',
 							inputType: 'textarea',

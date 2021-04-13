@@ -186,6 +186,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				} else if (Tipo == 'aprovacaoContabilidade') {
 					document.formTR.action = "trAprovacaoContabilidade.php";
 					document.formTR.submit();
+				} else if (Tipo == 'aprovacaoComissao') {
+					document.formTR.action = "trAprovacaoComissao.php";
+					document.formTR.submit();
 				}
 			}
 		}

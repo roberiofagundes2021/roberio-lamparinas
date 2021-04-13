@@ -14,13 +14,15 @@ if(isset($_POST['inputTermoReferenciaId'])){
 
 		$conn->beginTransaction();
 
-		$sql = "SELECT SituaId
+		$sql = "
+			SELECT SituaId
 				FROM Situacao	
-				WHERE SituaChave = '".$_POST['inputTermoReferenciaStatus']."'";
+			 WHERE SituaChave = '".$_POST['inputTermoReferenciaStatus']."'
+		";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);        	
 
-		if ($_POST['inputTermoReferenciaStatus'] == 'NAOLIBERADO'){
+		if ($_POST['inputTermoReferenciaStatus'] === 'NAOLIBERADO'){
 			$motivo = $_POST['inputMotivo'];
 		} else{
 			$motivo = NULL;

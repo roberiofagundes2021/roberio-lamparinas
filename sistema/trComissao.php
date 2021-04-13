@@ -7,46 +7,84 @@ $_SESSION['PaginaAtual'] = 'Comissão do Processo Licitatório';
 include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputTRId'])){
-	
-	$_SESSION['TRId'] = $_POST['inputTRId'];
+	$_SESSION['TRId'] 		= $_POST['inputTRId'];
 	$_SESSION['TRNumero'] = $_POST['inputTRNumero'];
 }
 
-$sql = "SELECT TRXEqTermoReferencia,TRXEqUsuario,TRXEqPresidente, TRXEqUnidade, UsuarLogin		
+$sql = "
+	SELECT TRXEqTermoReferencia,
+				 TRXEqUsuario,
+				 TRXEqPresidente, 
+				 TRXEqUnidade, 
+				 UsuarLogin		
 		FROM TRXEquipe
-		JOIN Usuario on UsuarId = TRXEqUsuario
-		WHERE TRXEqUnidade = ". $_SESSION['UnidadeId'] ." and TRXEqTermoReferencia = ".$_SESSION['TRId']."
-		ORDER BY UsuarLogin ASC";
+		JOIN Usuario 
+		  ON UsuarId = TRXEqUsuario
+	 WHERE TRXEqUnidade = ". $_SESSION['UnidadeId'] ." 
+	 	 AND TRXEqTermoReferencia = ".$_SESSION['TRId']."
+	 ORDER 
+	 		BY UsuarLogin ASC
+";
 $result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
+$row 		= $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
 if(isset($_POST['cmbUsuario'])){
-	
 	try{
-		
-		$sql = "INSERT INTO TRXEquipe (TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente, TRXEqUnidade)
-				VALUES (:iTermoReferencia, :iUsuario, :iPresidente, :iTRXEqUnidade)";
+		$sql = "
+			SELECT COUNT(TRXEqUsuario) as count
+				FROM TRXEquipe
+			 WHERE TRXEqTermoReferencia = ".$_POST['inputTRId']."
+			 	 AND TRXEqUnidade 		= ".$_SESSION['UnidadeId']."
+				 AND TRXEqPresidente 	= 1
+		";
+		$result 			= $conn->query($sql);
+		$rowTRXEquipe = $result->fetch(PDO::FETCH_ASSOC);
+		$count 				= $rowTRXEquipe['count'];
+
+		$sql = "
+			INSERT INTO 
+				TRXEquipe (
+					TRXEqTermoReferencia, 
+					TRXEqUsuario, 
+					TRXEqPresidente, 
+					TRXEqUnidade
+				)
+			VALUES (
+				:iTermoReferencia, 
+				:iUsuario, 
+				:iPresidente, 
+				:iTRXEqUnidade
+			)
+		";
 		$result = $conn->prepare($sql);
-				
-		$result->execute(array(
-						':iTermoReferencia' => $_POST['inputTRId'],
-						':iUsuario' => $_POST['cmbUsuario'],
-						':iPresidente' => false,
-						':iTRXEqUnidade' => $_SESSION['UnidadeId'],
-						));
+
+		if($count <= 0 ) {
+			$result->execute(array(
+				':iTermoReferencia' => $_POST['inputTRId'],
+				':iUsuario' => $_POST['cmbUsuario'],
+				':iPresidente' => true,
+				':iTRXEqUnidade' => $_SESSION['UnidadeId'],
+			));
+		} else {
+			$result->execute(array(
+				':iTermoReferencia' => $_POST['inputTRId'],
+				':iUsuario' => $_POST['cmbUsuario'],
+				':iPresidente' => false,
+				':iTRXEqUnidade' => $_SESSION['UnidadeId'],
+			));
+		}
 		
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Membro incluído!!!";
-		$_SESSION['msg']['tipo'] = "success";
+		$_SESSION['msg']['titulo'] 		= "Sucesso";
+		$_SESSION['msg']['mensagem'] 	= "Membro incluído!!!";
+		$_SESSION['msg']['tipo'] 			= "success";
 		
 	} catch(PDOException $e) {
-		
-		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir o Membro!!!";
-		$_SESSION['msg']['tipo'] = "error";	
-		
+		$_SESSION['msg']['titulo'] 		= "Erro";
+		$_SESSION['msg']['mensagem'] 	= "Erro ao incluir o Membro!!!";
+		$_SESSION['msg']['tipo'] 			= "error";	
 		echo 'Error: ' . $e->getMessage();
+		die;
 	}
 	
 	irpara("trComissao.php");
@@ -160,7 +198,6 @@ if(isset($_POST['cmbUsuario'])){
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaComissao(TRXEqTermoReferencia, TRXEqUsuario, Tipo){
-		
 			document.getElementById('inputTRId').value = TRXEqTermoReferencia;
 			document.getElementById('inputUsuarioId').value = TRXEqUsuario;
 					
