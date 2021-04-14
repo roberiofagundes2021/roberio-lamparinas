@@ -89,22 +89,38 @@ if(isset($_POST['inputNome'])){
   <script type="text/javascript">
   $(document).ready(function() {
 
+   	//Limpa o campo Nome quando for digitado só espaços em branco
+     $("#inputNome").on('blur', function(e){
+				
+				var inputNome = $('#inputNome').val();
+
+				inputNome = inputNome.trim();
+				
+				if (inputNome.length == 0){
+					$('#inputNome').val('');
+					//$("#formVeiculo").submit(); //Isso aqui é para submeter o formulário, validando os campos obrigatórios novamente
+				}	
+			});
+
     //Valida Registro Duplicado
     $('#enviar').on('click', function(e) {
 
       e.preventDefault();
       var inputNomeNovo = $('#inputPlaca').val();
       var inputNomeVelho = $('#inputVeicuPlaca').val();
-      var cmbUnidade = $('#cmbUnidade').val();
+      var cmbSetor = $('#cmbSetor').val(); 
 
-      //remove os espaços desnecessários antes e depois
+      if (inputNomeNovo.trim() == "" || cmbSetor == ""){
+        $("#formVeiculo").submit();
+      }
+
       inputNomeNovo = inputNomeNovo.trim();
 
       //Esse ajax está sendo usado para verificar no banco se o registro já existe
       $.ajax({
         type: "POST",
         url: "veiculoValida.php",
-        data: ('nomeNovo=' + inputNomeNovo + '&nomeVelho=' + inputNomeVelho + '&unidade=' + cmbUnidade),
+        data: ('nomeNovo=' + inputNomeNovo + '&nomeVelho=' + inputNomeVelho),
         success: function(resposta) {
 
           if (resposta == 1) {
@@ -174,7 +190,7 @@ if(isset($_POST['inputNome'])){
               <h5 class="mb-0 font-weight-semibold">Lotação</h5>
               <br>
               <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-4">
                   <div class="form-group">
                     <label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
                     <select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>

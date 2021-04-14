@@ -68,6 +68,20 @@ if(isset($_POST['inputNome'])){
 
     $(document).ready(function() {
 
+      
+			//Limpa o campo Nome quando for digitado só espaços em branco
+			$("#inputNome").on('blur', function(e){
+				
+				var inputNome = $('#inputNome').val();
+
+				inputNome = inputNome.trim();
+				
+				if (inputNome.length == 0){
+					$('#inputNome').val('');
+					//$("#formVeiculo").submit(); //Isso aqui é para submeter o formulário, validando os campos obrigatórios novamente
+				}	
+			});
+
     //Valida Registro Duplicado
     $('#enviar').on('click', function(e) {
 
@@ -77,7 +91,7 @@ if(isset($_POST['inputNome'])){
       var cmbSetor = $('#cmbSetor').val(); 
       var inputPlaca = $('#inputPlaca').val();
      
-      if (inputNome.trim() == "" || cmbUnidade == ""){
+      if (inputNome.trim() == "" || cmbSetor == ""){
         $("#formVeiculo").submit();
       }
      
