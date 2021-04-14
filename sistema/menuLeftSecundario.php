@@ -127,10 +127,7 @@
 									?>
 									</span>
 								</a>
-							</li>
-							<li class="nav-item">
-								<a href="veiculo.php" class="nav-link"><i class="icon-car"></i> Veículo</a>
-							</li>							
+							</li>						
 							<!--<li class="nav-item">
 								<a href="menu.php" class="nav-link">
 									<i class="icon-menu2"></i>

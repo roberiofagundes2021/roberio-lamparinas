@@ -73,12 +73,13 @@ if(isset($_POST['inputNome'])){
 
       e.preventDefault();
 
+      var inputNome = $('#inputNome').val(); 
+      var cmbSetor = $('#cmbSetor').val(); 
       var inputPlaca = $('#inputPlaca').val();
-      var cmbUnidade = $('#cmbUnidade').val(); 
-
-     //  !inputPlaca || !cmbUnidade && $("#formSetor").submit();
-
-      //remove os espaços desnecessários antes e depois
+     
+      if (inputNome.trim() == "" || cmbUnidade == ""){
+        $("#formVeiculo").submit();
+      }
      
       inputPlaca = inputPlaca.trim();
       
@@ -86,7 +87,7 @@ if(isset($_POST['inputNome'])){
       $.ajax({
         type: "POST",
         url: "veiculoValida.php",
-        data: ('nomeNovo=' + inputPlaca + '&unidade=' + cmbUnidade),
+        data: ('nomeNovo=' + inputPlaca),
         success: function(resposta) {
 
           if (resposta == 1) {
@@ -156,7 +157,7 @@ if(isset($_POST['inputNome'])){
               <br>
           
               <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-4">
                   <div class="form-group">
                     <label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
                     <select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
