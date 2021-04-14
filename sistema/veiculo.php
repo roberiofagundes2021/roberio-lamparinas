@@ -6,22 +6,12 @@ $_SESSION['PaginaAtual'] = 'Veiculo';
 
 include('global_assets/php/conexao.php');
 
-if (isset($_POST['inputEmpresaId'])){
-	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
-	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
-}
-
-if (!isset($_SESSION['EmpresaId'])) {
-	irpara("empresa.php");
-}
-
-$sql = "SELECT VeicuId, VeicuNome, VeicuPlaca, UnidaNome, SetorNome, VeicuStatus, SituaNome, SituaChave, SituaCor
+$sql = "SELECT VeicuId, VeicuNome, VeicuPlaca, SetorNome, VeicuStatus, SituaNome, SituaChave, SituaCor
 		FROM Veiculo
-		JOIN Unidade ON UnidaId = VeicuUnidade
 		JOIN Setor ON SetorId = VeicuSetor
 		JOIN Situacao on SituaId = VeicuStatus
-	    WHERE VeicuEmpresa = ". $_SESSION['EmpresaId'] ."
-		ORDER BY UnidaNome, VeicuNome ASC";
+		WHERE VeicuUnidade = ". $_SESSION['UnidadeId'] ."
+		ORDER BY VeicuNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -41,12 +31,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	
+
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	<script src="global_assets/js/demo_pages/form_select2.js"></script>
-	
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
@@ -74,24 +60,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //Unidade
-					width: "20%",
-					targets: [2]
-				},
-				{ 
 					orderable: true,   //Setor
 					width: "20%",
-					targets: [3]
+					targets: [2]
 				},				
 				{ 
 					orderable: true,   //Situação
 					width: "10%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: false,  //Ações
 					width: "10%",
-					targets: [5]
+					targets: [4]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -145,7 +126,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 </head>
 
-<body class="navbar-top sidebar-xs">
+<body class="navbar-top">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -154,7 +135,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		
 		<?php include_once("menu-left.php"); ?>
 		
-		<?php include_once("menuLeftSecundario.php"); ?>		
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -176,7 +156,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-9">
-										<p class="font-size-lg">A relação abaixo faz referência aos Veículos da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>
+									<p class="font-size-lg">A relação abaixo faz referência aos veículos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 									</div>	
 										<div class="col-lg-3">	
 										<div class="text-right"><a href="veiculoNovo.php" class="btn btn-principal" role="button">Novo Veículo</a></div>
@@ -189,7 +169,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<tr class="bg-slate">
 										<th >Veiculo</th>
 										<th >Placa</th>
-										<th >Unidade</th>
 										<th >Setor</th>
 										<th >Situação</th>
 										<th class="text-center">Ações</th>
@@ -208,7 +187,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<tr>
 											<td>'.$item['VeicuNome'].'</td>
 											<td>'.$item['VeicuPlaca'].'</td>
-											<td>'.$item['UnidaNome'].'</td>
 											<td>'.$item['SetorNome'].'</td>
 											');
 										

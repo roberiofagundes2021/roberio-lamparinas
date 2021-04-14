@@ -6,16 +6,11 @@ $_SESSION['PaginaAtual'] = 'Novo Veículo';
 
 include('global_assets/php/conexao.php');
 
-
-$EmpresaId = $_SESSION['EmpresaId'];
-
-
 if(isset($_POST['inputNome'])){
 
 	try{
-		//echo $_POST['cmbUnidade'];die;
-		$sql = "INSERT INTO Veiculo (VeicuNome, VeicuPlaca, VeicuRenavam, VeicuChassi, VeicuUnidade, VeicuSetor, VeicuStatus, VeicuUsuarioAtualizador, VeicuEmpresa)
-				    VALUES (:sNome, :sPlaca, :sRenavam, :sChassi, :iUnidade, :iSetor, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+		$sql = "INSERT INTO Veiculo (VeicuNome, VeicuPlaca, VeicuRenavam, VeicuChassi, VeicuUnidade, VeicuSetor, VeicuStatus, VeicuUsuarioAtualizador)
+				    VALUES (:sNome, :sPlaca, :sRenavam, :sChassi, :iUnidade, :iSetor, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -23,11 +18,10 @@ if(isset($_POST['inputNome'])){
             ':sPlaca' => $_POST['inputPlaca'],
             ':sRenavam' => $_POST['inputRenavam'],
             ':sChassi' => $_POST['inputChassi'],
-            ':iUnidade' => $_POST['cmbUnidade'],
+            ':iUnidade' => $_SESSION['UnidadeId'],
             ':iSetor' => $_POST['cmbSetor'],
             ':bStatus' => 1,
             ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-            ':iEmpresa' => $EmpresaId
             ));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -74,34 +68,6 @@ if(isset($_POST['inputNome'])){
 
     $(document).ready(function() {
 
-      $('#cmbUnidade').on('change', function(e) {
-
-        Filtrando();
-
-        var cmbUnidade = $('#cmbUnidade').val();
-
-        if (cmbUnidade == '') {
-          ResetSetor();
-        } else {
-
-          $.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
-
-            var option = '<option value="">Selecione o Setor</option>';
-
-            if (dados.length) {
-
-              $.each(dados, function(i, obj) {
-                option += '<option value="' + obj.SetorId + '">' + obj.SetorNome + '</option>';
-              });
-
-              $('#cmbSetor').html(option).show();
-            } else {
-              ResetSetor();
-            }
-          });	
-        }
-      });
-
     //Valida Registro Duplicado
     $('#enviar').on('click', function(e) {
 
@@ -134,20 +100,12 @@ if(isset($_POST['inputNome'])){
           
     })
 
-      function Filtrando() {
-				$('#cmbSetor').empty().append('<option value="#">Filtrando...</option>');
-				$('#cmbLocalEstoque').empty().append('<option value="#">Filtrando...</option>');
-			}
-
-			function ResetSetor() {
-				$('#cmbSetor').empty().append('<option value="#">Sem setor</option>');
-			}
   })
   </script>
 
 </head>
 
-<body class="navbar-top sidebar-xs">
+<body class="navbar-top">
 
   <?php include_once("topo.php"); ?>
 
@@ -155,8 +113,6 @@ if(isset($_POST['inputNome'])){
   <div class="page-content">
 
   <?php include_once("menu-left.php"); ?>
-  <?php include_once("menuLeftSecundario.php"); ?>
-
     <!-- Main content -->
     <div class="content-wrapper">
 
@@ -202,32 +158,22 @@ if(isset($_POST['inputNome'])){
               <div class="row">
                 <div class="col-lg-6">
                   <div class="form-group">
-                    <label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
-                    <select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
-                      <option value="">Informe uma unidade</option>
-                      <?php
-                      $sql = "SELECT UnidaId, UnidaNome
-                              FROM Unidade
-                              JOIN Situacao on SituaId = UnidaStatus															     
-                              WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
-                              ORDER BY UnidaNome ASC";
-                      $result = $conn->query($sql);
-                      $rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                      foreach ($rowUnidade as $item) {
-                        print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
-                      }
-
-                      ?>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="col-lg-6">
-                  <div class="form-group">
                     <label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
                     <select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
-                      <option value="">Sem setor</option>
+                      <option value="">Informe um setor</option>
+                      <?php
+													$sql = "SELECT SetorId, SetorNome
+															FROM Setor
+															JOIN Situacao on SituaId = SetorStatus															     
+															WHERE SituaChave = 'ATIVO' and SetorUnidade = ".$_SESSION['UnidadeId']."
+															ORDER BY SetorNome ASC";
+													$result = $conn->query($sql);
+													$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowSetor as $item) {
+														print('<option value="' . $item['SetorId'] . '">' . $item['SetorNome'] . '</option>');
+													}
+													?>
                     </select>
                   </div>
                 </div>									

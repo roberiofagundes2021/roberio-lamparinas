@@ -6,8 +6,6 @@ $_SESSION['PaginaAtual'] = 'Editar Veículo';
 
 include('global_assets/php/conexao.php');
 
-$EmpresaId = $_SESSION['EmpresaId'];
-
 if(isset($_POST['inputVeicuId'])){
 	
 	$iVeiculo = $_POST['inputVeicuId'];
@@ -16,7 +14,7 @@ if(isset($_POST['inputVeicuId'])){
 		
 		$sql = "SELECT VeicuId, VeicuNome, VeicuPlaca, VeicuRenavam, VeicuChassi, VeicuUnidade, VeicuSetor
 				FROM Veiculo
-				WHERE VeicuId = $iVeiculo and VeicuEmpresa = $EmpresaId ";
+				WHERE VeicuId = $iVeiculo ";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
@@ -34,7 +32,7 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE Veiculo SET VeicuNome = :sNome, VeicuPlaca = :sPlaca, VeicuRenavam = :sRenavam, VeicuChassi = :sChassi, VeicuUnidade = :iUnidade, VeicuSetor = :iSetor, VeicuUsuarioAtualizador = :iUsuarioAtualizador
+		$sql = "UPDATE Veiculo SET VeicuNome = :sNome, VeicuPlaca = :sPlaca, VeicuRenavam = :sRenavam, VeicuChassi = :sChassi, VeicuSetor = :iSetor, VeicuUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE VeicuId = :iVeiculo";
 		$result = $conn->prepare($sql);
 				
@@ -43,7 +41,6 @@ if(isset($_POST['inputNome'])){
             ':sPlaca' => $_POST['inputPlaca'],
             ':sRenavam' => $_POST['inputRenavam'],
             ':sChassi' => $_POST['inputChassi'],
-            ':iUnidade' => $_POST['cmbUnidade'],
             ':iSetor' => $_POST['cmbSetor'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iVeiculo' => $_POST['inputVeicuId']
@@ -92,60 +89,6 @@ if(isset($_POST['inputNome'])){
   <script type="text/javascript">
   $(document).ready(function() {
 
-    //Já realiza o filtro dos possíveis setores e seleciona o que está informado no banco		
-      var cmbUnidade = $('#cmbUnidade').val();
-			var cmbSetor = $('#cmbSetor').val();
-
-			$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
-
-				var option = '<option value="">Selecione o Setor</option>';
-
-				if (dados.length) {
-
-					$.each(dados, function(i, obj) {
-						if (obj.SetorId == cmbSetor) {
-							option += '<option value="' + obj.SetorId + '" selected="selected">' + obj.SetorNome + '</option>';
-						} else {
-							option += '<option value="' + obj.SetorId + '">' + obj.SetorNome + '</option>';
-						}
-					});
-
-					$('#cmbSetor').html(option).show();
-				}
-			});
-
-
-     //Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
-			$('#cmbUnidade').on('change', function(e) {
-
-        Filtrando();
-
-        var cmbUnidade = $('#cmbUnidade').val();
-
-        if (cmbUnidade == '') {
-          ResetSetor();
-        } else {
-
-          $.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
-
-            var option = '<option value="">Selecione o Setor</option>';
-
-            if (dados.length) {
-
-              $.each(dados, function(i, obj) {
-                option += '<option value="' + obj.SetorId + '">' + obj.SetorNome + '</option>';
-              });
-
-              $('#cmbSetor').html(option).show();
-            } else {
-              ResetSetor();
-            }
-          });
-
-        }
-      });
-
-
     //Valida Registro Duplicado
     $('#enviar').on('click', function(e) {
 
@@ -174,20 +117,12 @@ if(isset($_POST['inputNome'])){
       })
 
     })
-
-      function Filtrando() {
-        $('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
-      }
-
-      function ResetSetor() {
-        $('#cmbSetor').empty().append('<option value="">Sem setor</option>');
-      }
   })
   </script>
 
 </head>
 
-<body class="navbar-top sidebar-xs">
+<body class="navbar-top ">
 
   <?php include_once("topo.php"); ?>
 
@@ -195,8 +130,6 @@ if(isset($_POST['inputNome'])){
   <div class="page-content">
 
     <?php include_once("menu-left.php"); ?>
-
-    <?php include_once("menuLeftSecundario.php"); ?>
 
     <!-- Main content -->
     <div class="content-wrapper">
@@ -243,41 +176,14 @@ if(isset($_POST['inputNome'])){
               <div class="row">
                 <div class="col-lg-6">
                   <div class="form-group">
-                    <label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
-                    <select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
-                      <option value="">Informe uma unidade</option>
-                      <?php
-                      $sql = "SELECT UnidaId, UnidaNome
-                          FROM Unidade															     
-                          JOIN Situacao on SituaId = UnidaStatus															     
-                          WHERE UnidaEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
-                          ORDER BY UnidaNome ASC";
-                      $result = $conn->query($sql);
-                      $rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                      foreach ($rowUnidade as $item) {
-                        if ($item['UnidaId'] == $row['VeicuUnidade']) {
-                          print('<option value="' . $item['UnidaId'] . '" selected="selected">' . $item['UnidaNome'] . '</option>');
-                        } else {
-                          print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
-                        }
-                      }
-
-                      ?>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="col-lg-6">
-                  <div class="form-group">
                     <label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
                     <select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
                       <option value="">Informe um setor</option>
                       <?php
                       $sql = "SELECT SetorId, SetorNome
                           FROM Setor
-                          JOIN Situacao on SituaId = SetorStatus															     															     
-                          WHERE SetorEmpresa = " . $EmpresaId . " and SituaChave = 'ATIVO'
+                          JOIN Situacao on SituaId = SetorStatus															     
+                          WHERE SituaChave = 'ATIVO' and SetorUnidade = ".$_SESSION['UnidadeId']."
                           ORDER BY SetorNome ASC";
                       $result = $conn->query("$sql");
                       $rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
