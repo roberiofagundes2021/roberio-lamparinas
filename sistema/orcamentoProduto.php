@@ -261,30 +261,24 @@ try{
 										</div>
 									
 										<div class="col-lg-6">
-										    <div class="form-group">
-												<label for="cmbSubCategoria">SubCategoria(as)</label>
-												<div class="d-flex flex-row" style="padding-top: 7px;">
-													<!--<option value="#">Selecione uma subcategoria</option>-->
-													<?php
-												        if (isset($row['OrcamCategoria'])){
-													        $sql = "SELECT SbCatId, SbCatNome
-															    	FROM SubCategoria
-																	JOIN Situacao on SituaId = SbCatStatus	
-															     	WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SituaChave = 'ATIVO'
-															     	ORDER BY SbCatNome ASC";
-													        $result = $conn->query($sql);
-													        $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-													        $count = count($rowSubCategoria);
-
-													        
-														        foreach ($rowSubCategoria as $item){
-																	print('<input type="text" class="form-control pb-0" value="' . $item['SbCatNome'] . '" readOnly>');
-																	print('<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="' . $item['SbCatId'] . '">');
-														        }
-													        
-												        }
-											        ?>
-												</div>
+											<div class="form-group">
+												<label for="cmbSubCategoria">SubCategoria(s)</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+													<?php 
+														$sql = "SELECT SbCatId, SbCatNome
+																FROM SubCategoria
+																JOIN Situacao on SituaId = SbCatStatus	
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SituaChave = 'ATIVO'
+																ORDER BY SbCatNome ASC";
+														$result = $conn->query($sql);
+														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+														$count = count($rowSubCategoria);														
+																
+														foreach ( $rowSubCategoria as $item){	
+															print('<option value="'.$item['SbCatId,'].'"disabled selected>'.$item['SbCatNome'].'</option>');	
+														}                    
+													?>
+												</select>
 											</div>
 										</div>
 									</div>
