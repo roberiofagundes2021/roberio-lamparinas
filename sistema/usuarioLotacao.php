@@ -59,13 +59,12 @@
 			$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
 						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
 			$result = $conn->prepare($sql);
-			var_dump($_SESSION['EmpresaUsuarioPerfil'], $iUnidade, $_POST['cmbSetor'], $_POST['cmbLocalEstoque'], $_SESSION['UsuarId']);
-			echo $sql;die;		
+	
 			$result->execute(array(
 				':iEmpresaUsarioPerfil' => $_SESSION['EmpresaUsuarioPerfil'],
 				':iUnidade' => $iUnidade,
 				':iSetor' => $_POST['cmbSetor'],
-				':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) ? $_POST['cmbLocalEstoque'] : null,
+				':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) && $_POST['cmbLocalEstoque'] != '' ? $_POST['cmbLocalEstoque'] : null,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId']
 				));
 			
@@ -368,7 +367,7 @@
 											if (isset($_SESSION['EmpresaId'])){
 											
 												print('
-												<div class="col-lg-3">
+												<div class="col-lg-4">
 													<div class="form-group">
 														<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
 														<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
@@ -397,7 +396,7 @@
 											}
 											?>
 
-											<div class="col-lg-3">
+											<div class="col-lg-4">
 												<div class="form-group">
 													<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
 													<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>

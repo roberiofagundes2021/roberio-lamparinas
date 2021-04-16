@@ -24,13 +24,13 @@ if (isset($_POST['inputUsuarioId'])) {
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
-	$sql = "SELECT PerfiChave
-			FROM Perfil
-			JOIN Situacao on SituaId = PerfiStatus															     
-			WHERE SituaChave = 'ATIVO' and PerfiId = " . $row['EXUXPPerfil'] . "
-			ORDER BY PerfiNome ASC";
-	$result = $conn->query($sql);
-	$rowPerf = $result->fetch(PDO::FETCH_ASSOC);
+	if (!isset($_SESSION['EmpresaId'])) {
+		$sql = "SELECT UsXUnSetor, UsXUnLocalEstoque 
+				FROM UsuarioXUnidade
+				WHERE UsXUnEmpresaUsuarioPerfil = ".$row['EXUXPPerfil']." and UsXUnUnidade = " . $_SESSION['UnidadeId'];
+		$result = $conn->query($sql);
+		$rowSetorLocal = $result->fetch(PDO::FETCH_ASSOC);
+	}
 
 	$_SESSION['msg'] = array();
 }
@@ -349,11 +349,8 @@ include_once("topo.php");
 												$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 
 												foreach ($rowPerfil as $item) {
-													if ($item['PerfiId'] == $row['EXUXPPerfil']) {
-														print('<option value="' . $item['PerfiId'] . '" selected="selected" chavePerfil="' . $item['PerfiChave'] . '">' . $item['PerfiNome'] . '</option>');
-													} else {
-														print('<option value="' . $item['PerfiId'] . '" chavePerfil="' . $item['PerfiChave'] . '">' . $item['PerfiNome'] . '</option>');
-													}
+													$seleciona = $item['PerfiId'] == $row['EXUXPPerfil'] ? "selected" : "";
+													print('<option value="' . $item['PerfiId'] . '" '. $seleciona .' chavePerfil="' . $item['PerfiChave'] . '">' . $item['PerfiNome'] . '</option>');
 												}
 												?>
 											</select>
@@ -418,6 +415,63 @@ include_once("topo.php");
 								</div>
 							</div>
 						</div>
+
+						<?php if (!isset($_SESSION['EmpresaId'])){ ?>
+						<h5 class="mb-0 font-weight-semibold">Lotação</h5>
+						<br>
+						<div class="row">
+							<div class="col-lg-12">
+								<div class="row">
+									<div class="col-lg-4">
+										<div class="form-group">
+											<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
+											<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
+												<option value="">Informe um setor</option>
+												<?php
+												$sql = "SELECT SetorId, SetorNome
+														FROM Setor
+														JOIN Situacao on SituaId = SetorStatus															     
+														WHERE SituaChave = 'ATIVO' and SetorUnidade = ".$_SESSION['UnidadeId']."
+														ORDER BY SetorNome ASC";
+												$result = $conn->query($sql);
+												$rowSetor = $result->fetchAll(PDO::FETCH_ASSOC);
+
+												foreach ($rowSetor as $item) {
+													$seleciona = $item['SetorId'] == $rowSetorLocal['UsXUnSetor'] ? "selected" : "";
+													print('<option value="' . $item['SetorId'] . '" '. $seleciona .'>' . $item['SetorNome'] . '</option>');
+												}
+												?>
+											</select>
+										</div>
+									</div>
+
+									<div class="col-lg-4" id="LocalEstoque" style="display: none">
+										<div class="form-group">
+											<label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
+											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
+												<option value="">Informe um local de estoque</option>
+												<?php
+												$sql = "SELECT LcEstId, LcEstNome
+														FROM LocalEstoque
+														JOIN Situacao on SituaId = LcEstStatus
+														WHERE SituaChave = 'ATIVO' and LcEstUnidade = ".$_SESSION['UnidadeId']."
+														ORDER BY LcEstNome ASC";
+												$result = $conn->query($sql);
+												$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);
+
+												foreach ($rowLocal as $item) {
+													$seleciona = $item['LcEstId'] == $rowSetorLocal['UsXUnLocalEstoque'] ? "selected" : "";
+													print('<option value="' . $item['LcEstId'] . '" '. $seleciona .'>' . $item['LcEstNome'] . '</option>');
+												}
+												?>
+											</select>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+						<?php } ?>
 						
 						<div class="row" style="margin-top: 20px;">
 							<div class="col-lg-12">

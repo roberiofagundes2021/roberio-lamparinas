@@ -51,18 +51,22 @@ if (isset($_POST['inputCpf'])) {
 			));
 			$LAST_ID_EXUXP = $conn->lastInsertId();
 
-			//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
-			$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
-					VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
-			$result = $conn->prepare($sql);
+			if (!$_SESSION['EmpresaId']){
+				
+				//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
+				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
+						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
+				$result = $conn->prepare($sql);
 
-			$result->execute(array(
-				':iEmpresaUsarioPerfil' => $LAST_ID_EXUXP,
-				':iUnidade' => $_SESSION['UnidadeId'],
-				':iSetor' => $_POST['cmbSetor'],
-				':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) ? $_POST['cmbLocalEstoque'] : null,
-				':iUsuarioAtualizador' => $_SESSION['UsuarId']
-				));
+				$result->execute(array(
+					':iEmpresaUsarioPerfil' => $LAST_ID_EXUXP,
+					':iUnidade' => $_SESSION['UnidadeId'],
+					':iSetor' => $_POST['cmbSetor'],
+					':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) && $_POST['cmbLocalEstoque'] != '' ? $_POST['cmbLocalEstoque'] : null,
+					':iUsuarioAtualizador' => $_SESSION['UsuarId']
+					));
+			}
+
 		} else {
 
 			//Passo1: atualizar o dados do usuário na tabela Usuario
@@ -94,18 +98,21 @@ if (isset($_POST['inputCpf'])) {
 			));
 			$LAST_ID_EXUXP = $conn->lastInsertId();
 
-			//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
-			$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
-						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
-			$result = $conn->prepare($sql);
+			if (!$_SESSION['EmpresaId']){			
+				
+				//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
+				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
+							VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
+				$result = $conn->prepare($sql);
 
-			$result->execute(array(
-				':iEmpresaUsarioPerfil' => $LAST_ID_EXUXP,
-				':iUnidade' => $_SESSION['UnidadeId'],
-				':iSetor' => $_POST['cmbSetor'],
-				':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) ? $_POST['cmbLocalEstoque'] : null,
-				':iUsuarioAtualizador' => $_SESSION['UsuarId']
-				));
+				$result->execute(array(
+					':iEmpresaUsarioPerfil' => $LAST_ID_EXUXP,
+					':iUnidade' => $_SESSION['UnidadeId'],
+					':iSetor' => $_POST['cmbSetor'],
+					':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) && $_POST['cmbLocalEstoque'] != '' ? $_POST['cmbLocalEstoque'] : null,
+					':iUsuarioAtualizador' => $_SESSION['UsuarId']
+					));
+			}
 		}
 
 		$conn->commit();
