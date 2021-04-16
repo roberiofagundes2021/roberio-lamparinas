@@ -11,13 +11,16 @@ require_once 'global_assets/php/vendor/autoload.php';
 $iOrcamento = $_POST['inputOrcamentoId'];
 $sNumero = $_POST['inputOrcamentoNumero'];
 
-$sql = "SELECT *
+$sql ="SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamConteudo, OrcamCategoria, ForneNome, ForneCelular, ForneEmail, CategNome, OrcamStatus, 
+			  dbo.fnSubCategoriasOrcamento(OrcamUnidade, OrcamId) as SubCategorias
 		FROM Orcamento
 		LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
 		JOIN Categoria on CategId = OrcamCategoria
 		WHERE OrcamUnidade = " . $_SESSION['UnidadeId'] . " and OrcamId = " . $iOrcamento;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
+
+
 
 try {
 
@@ -86,12 +89,15 @@ try {
 	if ($tipo == "Produto") {
 		$html .= '		            
 		            <div style="font-weight: bold; position:relative; margin-top: 10px; background-color:#ccc; padding: 5px;">
-			            Fornecedor: <span style="font-weight:normal;">' . $row['ForneNome'] . '</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">' . $row['ForneCelular'] . '</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">' . $item['ForneEmail'] . '</span>
+			            Fornecedor: <span style="font-weight:normal;">' . $row['ForneNome'] . '</span> <span style="color:#aaa;"></span><br>Telefone: <span style="font-weight:normal;">' . $row['ForneCelular'] . '</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> E-mail: <span style="font-weight:normal;">' . $row['ForneEmail'] . '</span>
 		            </div>
 		            <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
 			            Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span>
 		            </div>
-		            <br>
+					<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
+						SubCategoria: <span style="font-weight:normal;">' . $row['SubCategorias'] . '</span>
+					</div>
+					<br>
 		            <div>' . $row['OrcamConteudo'] . '</div>';
 		            
 
@@ -177,6 +183,9 @@ try {
 		            <div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
 		            	Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span>
 		            </div>
+					<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
+						SubCategoria: <span style="font-weight:normal;">' . $row['SubCategorias'] . '</span>
+					</div>
 		            <br>
 		            <div>' . $row['OrcamConteudo'] . '</div>
 		            <br>
