@@ -81,9 +81,18 @@ try {
 	$result = $conn->query($sql);
 	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
 
+	$aSubCategorias = '';
+
 	foreach ($rowBD as $item) {
-		$aSubCategorias[] = $item['SbCatId'];
+		
+		if ($aSubCategorias == '') {
+			$aSubCategorias .= $item['SbCatId'];
+		} else {
+			$aSubCategorias .= ", ".$item['SbCatId'];
+		}
 	}
+
+	//echo $aSubCategorias; die;
 } catch (PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
 }
@@ -177,9 +186,8 @@ try {
 					success: function(resposta) {
 						//alert(resposta); 
 						$("#tabelaServicos").html(resposta).show();
-console.log(resposta)
-						return false;
 
+						return false;
 					}
 				});
 			});
@@ -286,7 +294,7 @@ console.log(resposta)
 														$sql = "SELECT SbCatId, SbCatNome
 																FROM SubCategoria
 																JOIN Situacao on SituaId = SbCatStatus	
-																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SituaChave = 'ATIVO'
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$aSubCategorias.")
 																ORDER BY SbCatNome ASC";
 														$result = $conn->query($sql);
 														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
