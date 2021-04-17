@@ -16,10 +16,11 @@ if (isset($_POST['inputUsuarioId'])) {
 
 	$iUsuario = $_POST['inputUsuarioId'];
 
-	$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, 
-			UsuarEmail, UsuarTelefone, UsuarCelular, EXUXPPerfil
+	$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, 
+			UsuarTelefone, UsuarCelular, EXUXPId, EXUXPPerfil, PerfiChave
 			FROM Usuario
 			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+			JOIN Perfil on PerfiId = EXUXPPerfil
 			WHERE UsuarId = $iUsuario and EXUXPEmpresa = $EmpresaId ";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -27,7 +28,7 @@ if (isset($_POST['inputUsuarioId'])) {
 	if (!isset($_SESSION['EmpresaId'])) {
 		$sql = "SELECT UsXUnSetor, UsXUnLocalEstoque 
 				FROM UsuarioXUnidade
-				WHERE UsXUnEmpresaUsuarioPerfil = ".$row['EXUXPPerfil']." and UsXUnUnidade = " . $_SESSION['UnidadeId'];
+				WHERE UsXUnEmpresaUsuarioPerfil = ".$row['EXUXPId']." and UsXUnUnidade = " . $_SESSION['UnidadeId'];
 		$result = $conn->query($sql);
 		$rowSetorLocal = $result->fetch(PDO::FETCH_ASSOC);
 	}
@@ -41,18 +42,13 @@ if (isset($_POST['inputCpf'])) {
 
 		$conn->beginTransaction();
 
-		$sql = "SELECT UsuarSenha
+		$sql = "SELECT EXUXPId, UsuarSenha
 				FROM Usuario
 				JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+				JOIN Perfil on PerfiId = EXUXPPerfil
 				WHERE UsuarId = $iUsuario and EXUXPEmpresa = $EmpresaId ";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
-
-		$sql = "SELECT PerfiId
-				FROM Perfil
-				WHERE PerfiChave = 'ALMOXARIFADO' ";
-		$result = $conn->query($sql);
-		$rowPerfilId = $result->fetch(PDO::FETCH_ASSOC);		
 
 		$senha = '';
 		$row['UsuarSenha'] == $_POST['inputSenha'] ? $senha = $_POST['inputSenha'] : $senha = md5($_POST['inputSenha']);
@@ -82,6 +78,34 @@ if (isset($_POST['inputCpf'])) {
 			':iUsuario' => $_POST['inputUsuarioId'],
 			':iEmpresa' => $EmpresaId
 		));
+
+		if (!isset($_SESSION['EmpresaId'])){
+				
+			$sql = "SELECT PerfiChave
+					FROM Perfil
+					WHERE PerfiId = ".$_POST['cmbPerfil'];
+			$result = $conn->query($sql);
+			$rowPerfilChave = $result->fetch(PDO::FETCH_ASSOC);
+
+			//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
+			$sql = "UPDATE UsuarioXUnidade SET UsXUnSetor = :iSetor, UsXUnLocalEstoque = :iLocalEstoque, UsXUnUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE UsXUnEmpresaUsuarioPerfil = :iEmpresaUsarioPerfil and UsXUnUnidade = :iUnidade";
+			$result = $conn->prepare($sql);
+
+			if ($rowPerfilChave['PerfiChave'] == 'ALMOXARIFADO'){
+				$localEstoque = $_POST['cmbLocalEstoque'];
+			} else {
+				$localEstoque = null;
+			}
+
+			$result->execute(array(
+				':iSetor' => $_POST['cmbSetor'],
+				':iLocalEstoque' => $localEstoque,
+				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+				':iEmpresaUsarioPerfil' => $row['EXUXPId'],
+				':iUnidade' => $_SESSION['UnidadeId']
+				));
+		}		
 
 		$conn->commit();
 
@@ -135,29 +159,7 @@ if (isset($_POST['inputCpf'])) {
 		$(document).ready(function() {
 
 			//Garantindo que ninguém mude a empresa na tela de edição
-			$('#cmbEmpresa').prop("disabled", true);
-
-			//Já realiza o filtro dos possíveis setores e seleciona o que está informado no banco		
-			var cmbUnidade = $('#cmbUnidade').val();
-			var cmbSetor = $('#cmbSetor').val();
-
-			$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
-
-				var option = '<option value="">Selecione o Setor</option>';
-
-				if (dados.length) {
-
-					$.each(dados, function(i, obj) {
-						if (obj.SetorId == cmbSetor) {
-							option += '<option value="' + obj.SetorId + '" selected="selected">' + obj.SetorNome + '</option>';
-						} else {
-							option += '<option value="' + obj.SetorId + '">' + obj.SetorNome + '</option>';
-						}
-					});
-
-					$('#cmbSetor').html(option).show();
-				}
-			});
+			//$('#cmbEmpresa').prop("disabled", true);
 
 			$('#cmbPerfil').on('change', function(e) {
 				let filhos = $('#cmbPerfil').children()
@@ -180,53 +182,7 @@ if (isset($_POST['inputCpf'])) {
 				})
 			})
 
-			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
-			$('#cmbUnidade').on('change', function(e) {
-
-				Filtrando();
-
-				var cmbUnidade = $('#cmbUnidade').val();
-
-				if (cmbUnidade == '') {
-					ResetSetor();
-					ResetLocalEstoque();
-				} else {
-
-					$.getJSON('filtraSetor.php?idUnidade=' + cmbUnidade, function(dados) {
-
-						var option = '<option value="">Selecione o Setor</option>';
-
-						if (dados.length) {
-
-							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.SetorId + '">' + obj.SetorNome + '</option>';
-							});
-
-							$('#cmbSetor').html(option).show();
-						} else {
-							ResetSetor();
-						}
-					});
-
-					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function(dados) {
-
-						var option = '<option value="">Selecione o Local de Estoque</option>';
-
-						if (dados.length) {
-
-							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.LcEstId + '">' + obj.LcEstNome + '</option>';
-							});
-
-							$('#cmbLocalEstoque').html(option).show();
-						} else {
-							ResetLocalEstoque();
-						}
-					});
-				}
-			});
-
-			//Valida Registro Duplicado
+			//Tela de usuário acessada pelo Configurador/Usuário
 			$('#enviar').on('click', function(e) {
 
 				e.preventDefault();
@@ -237,9 +193,9 @@ if (isset($_POST['inputCpf'])) {
 				var inputEmail = $('#inputEmail').val();
 				var inputSenha = $('#inputSenha').val();
 				var inputConfirmaSenha = $('#inputConfirmaSenha').val();
-				var cmbUnidade = $('#cmbUnidade').val();				
+				var cmbSetor = $('#cmbSetor').val();				
 
-				if (inputNome != '' && inputLogin != '' && inputEmail != '' && cmbPerfil != '' && cmbUnidade != ''){
+				if (inputNome != '' && inputLogin != '' && inputEmail != '' && cmbPerfil != '' && cmbSetor != ''){
 					if (inputSenha != inputConfirmaSenha) {
 						alerta('Atenção', 'A confirmação de senha não confere!', 'error');
 						$('#inputConfirmaSenha').focus();
@@ -248,30 +204,42 @@ if (isset($_POST['inputCpf'])) {
 					}
 				}
 
-				$('#cmbEmpresa').prop("disabled", false);
+				$("#formUsuario").submit();
+			})
+
+			//Tele de usuário acessada pelo Configurador/Empresa/Usuário
+			$('#enviarEmpresa').on('click', function(e) {
+
+				e.preventDefault();
+
+				var inputNome = $('#inputNome').val();
+				var cmbPerfil = $('#cmbPerfil').val();
+				var inputLogin = $('#inputLogin').val();
+				var inputEmail = $('#inputEmail').val();
+				var inputSenha = $('#inputSenha').val();
+				var inputConfirmaSenha = $('#inputConfirmaSenha').val();			
+
+				if (inputNome != '' && inputLogin != '' && inputEmail != '' && cmbPerfil != ''){
+					if (inputSenha != inputConfirmaSenha) {
+						alerta('Atenção', 'A confirmação de senha não confere!', 'error');
+						$('#inputConfirmaSenha').focus();
+						$("#formUsuario").submit();
+						return false;
+					}
+				}
+
+				//$('#cmbEmpresa').prop("disabled", false);
 
 				$("#formUsuario").submit();
 			})
 
 			$('#cancelar').on('click', function(e) {
 
-				$('#cmbEmpresa').prop("disabled", false);
+				//$('#cmbEmpresa').prop("disabled", false);
 
 				$(window.document.location).attr('href', "usuario.php");
 			});
 
-			function Filtrando() {
-				$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
-				$('#cmbLocalEstoque').empty().append('<option value="">Filtrando...</option>');
-			}
-
-			function ResetSetor() {
-				$('#cmbSetor').empty().append('<option value="">Sem setor</option>');
-			}
-
-			function ResetLocalEstoque() {
-				$('#cmbLocalEstoque').empty().append('<option value="">Sem Local de Estoque</option>');
-			}			
 		});
 	</script>
 
@@ -298,6 +266,7 @@ include_once("topo.php");
 	if (isset($_SESSION['EmpresaId'])) {
 		include_once("menuLeftSecundario.php");
 	}
+
 	?>
 
 	<!-- Main content -->
@@ -311,7 +280,7 @@ include_once("topo.php");
 			<!-- Info blocks -->
 			<div class="card">
 
-				<form name="formUsuario" id="formUsuario" method="post" class="form-validate-jquery">
+				<form name="formUsuario" id="formUsuario" method="post" class="form-validate-jquery" action="usuarioEdita.php">
 					<div class="card-header header-elements-inline">
 						<h5 class="text-uppercase font-weight-bold">Editar Usuário "<?php echo $row['UsuarNome']; ?>"</h5>
 					</div>
@@ -445,10 +414,10 @@ include_once("topo.php");
 										</div>
 									</div>
 
-									<div class="col-lg-4" id="LocalEstoque" style="display: none">
+									<div class="col-lg-4" id="LocalEstoque" <?php if ($row['PerfiChave'] != 'ALMOXARIFADO') { print('style="display: none"'); } ?>>
 										<div class="form-group">
 											<label for="cmbLocalEstoque">Local de Estoque<span class="text-danger"> *</span></label>
-											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" required>
+											<select name="cmbLocalEstoque" id="cmbLocalEstoque" class="form-control form-control-select2" <?php if ($row['PerfiChave'] == 'ALMOXARIFADO') { print('required'); } ?>>
 												<option value="">Informe um local de estoque</option>
 												<?php
 												$sql = "SELECT LcEstId, LcEstNome
@@ -476,7 +445,13 @@ include_once("topo.php");
 						<div class="row" style="margin-top: 20px;">
 							<div class="col-lg-12">
 								<div class="form-group">
-									<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>
+									<?php
+										if (isset($_SESSION['EmpresaId'])){
+											print('<button class="btn btn-lg btn-principal" id="enviarEmpresa">Alterar</button>');
+										} else{
+											print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+										}										
+									?>
 									<a href="usuario.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 								</div>
 							</div>
