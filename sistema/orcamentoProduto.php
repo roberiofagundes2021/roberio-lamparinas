@@ -80,9 +80,19 @@ try{
 			ORDER BY SbCatNome ASC";
 		$result = $conn->query($sql);
 		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($rowBD as $item){
-			$aSubCategorias[] = $item['SbCatId'];
+		
+		$aSubCategorias = '';
+
+	foreach ($rowBD as $item) {
+		
+		if ($aSubCategorias == '') {
+			$aSubCategorias .= $item['SbCatId'];
+		} else {
+			$aSubCategorias .= ", ".$item['SbCatId'];
 		}
+	}
+
+	//echo $aSubCategorias; die;
 	
 } catch(PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
@@ -268,7 +278,7 @@ try{
 														$sql = "SELECT SbCatId, SbCatNome
 																FROM SubCategoria
 																JOIN Situacao on SituaId = SbCatStatus	
-																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['OrcamCategoria']." and SituaChave = 'ATIVO'
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$aSubCategorias.")
 																ORDER BY SbCatNome ASC";
 														$result = $conn->query($sql);
 														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
