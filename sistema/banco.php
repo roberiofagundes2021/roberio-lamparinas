@@ -72,7 +72,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro reportado com o Banco!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao atualizar Banco!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
@@ -283,7 +283,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputCodigo">Código <span class="text-danger"> *</span></label>
-												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="<?php if (isset($_POST['inputBancoId'])) echo $rowBanco['BancoCodigo']; ?>" required autofocus>
+												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" maxlength="3" value="<?php if (isset($_POST['inputBancoId'])) echo $rowBanco['BancoCodigo']; ?>" required autofocus>
 											</div>
 										</div>
 										<div class="col-lg-6">
