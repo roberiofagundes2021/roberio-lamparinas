@@ -10,6 +10,8 @@ require_once 'global_assets/php/vendor/autoload.php';
 
 if (isset($_POST['inputTRId'])){
 	$iTR = $_POST['inputTRId'];
+} else if (isset($_POST['inputTermoReferenciaId'])) {
+	$iTR = $_POST['inputTermoReferenciaId'];
 } else{
 	print('<script>
 				window.close();
@@ -18,47 +20,76 @@ if (isset($_POST['inputTRId'])){
 
 try {
 
-	$sql = "SELECT TrRefNumero, TrRefConteudoInicio, TrRefConteudoFim, CategNome
+	$sql = "
+		SELECT TrRefNumero, 
+					 TrRefConteudoInicio, 
+					 TrRefConteudoFim, 
+					 CategNome
 			FROM TermoReferencia
-			JOIN Categoria on CategId = TrRefCategoria
-			WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = " . $iTR;
+			JOIN Categoria 
+				ON CategId = TrRefCategoria
+		 WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " 
+		   AND TrRefId = " . $iTR;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
-	$sql = "SELECT *
-			FROM TRXSubcategoria
-			JOIN SubCategoria on SbCatId = TRXSCSubcategoria
-			WHERE TRXSCUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $iTR;
+	$sql = "
+		SELECT *
+		  FROM TRXSubcategoria
+			JOIN SubCategoria 
+				ON SbCatId = TRXSCSubcategoria
+		 WHERE TRXSCUnidade = " . $_SESSION['UnidadeId'] . " 
+		 	 AND TRXSCTermoReferencia = " . $iTR;
 	$result = $conn->query($sql);
 	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	// Selects para identificar a a tabela de origem dos produtos da TR.
-	$sql = "SELECT COUNT(TRXPrProduto) as CONT
+	$sql = "
+		SELECT COUNT(TRXPrProduto) as CONT
 			FROM TermoReferenciaXProduto
-			JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
-			WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'";
+			JOIN ProdutoOrcamento 
+			  ON PrOrcId = TRXPrProduto
+		 WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " 
+			 AND TRXPrTermoReferencia = " . $iTR . " 
+			 AND TRXPrTabela = 'ProdutoOrcamento'
+	";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
 
-	$sql = "SELECT COUNT(TRXPrProduto) as CONT
+	$sql = "
+		SELECT COUNT(TRXPrProduto) as CONT
 			FROM TermoReferenciaXProduto
-			JOIN Produto on ProduId = TRXPrProduto
-			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+			JOIN Produto 
+				ON ProduId = TRXPrProduto
+		 WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+		   AND TRXPrTermoReferencia = " . $iTR . " 
+			 AND TRXPrTabela = 'Produto'
+	";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
 
 	// Selects para identificar a a tabela de origem dos serviços da TR.
-	$sql = "SELECT COUNT(TRXSrServico) as CONT
+	$sql = "
+		SELECT COUNT(TRXSrServico) as CONT
 			FROM TermoReferenciaXServico
-			JOIN ServicoOrcamento on SrOrcId = TRXSrServico
-			WHERE TRXSrUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'";
+			JOIN ServicoOrcamento 
+				ON SrOrcId = TRXSrServico
+		 WHERE TRXSrUnidade = " . $_SESSION['UnidadeId'] . " 
+		   AND TRXSrTermoReferencia = " . $iTR . " 
+			 AND TRXSrTabela = 'ServicoOrcamento'
+	";
 	$result = $conn->query($sql);
 	$rowServicoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
 
-	$sql = "SELECT COUNT(TRXSrServico) as CONT
+	$sql = "
+		SELECT COUNT(TRXSrServico) as CONT
 			FROM TermoReferenciaXServico
-			JOIN Servico on ServiId = TRXSrServico
-			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
+			JOIN Servico 
+				ON ServiId = TRXSrServico
+		 WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
+		   AND TRXSrTermoReferencia = " . $iTR . " 
+			 AND TRXSrTabela = 'Servico'
+	";
 	$result = $conn->query($sql);
 	$rowServicoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
 
