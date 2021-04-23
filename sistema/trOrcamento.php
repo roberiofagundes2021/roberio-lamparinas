@@ -13,15 +13,35 @@ if (isset($_POST['inputTRId'])){
 	$_SESSION['TRNumero'] = $_POST['inputTRNumero'];
 }
 
-$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrCategoria, TrXOrStatus, TrRefNumero, TrRefTipo, ForneNome, CategNome, 
-		SituaId, SituaCor, SituaChave, dbo.fnSubCategoriasTRXOrcamento(TrXOrUnidade, TrXOrId) as SubCategorias
-		FROM TRXOrcamento
-		JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
-		LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
-		JOIN Categoria on CategId = TrXOrCategoria
-		JOIN Situacao on SituaId = TrXOrStatus
-	    WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." and TrXOrTermoReferencia = ".$_SESSION['TRId']."
-		ORDER BY TrXOrData DESC";
+$sql = "
+	SELECT 
+		TrXOrId, 
+		TrXOrNumero, 
+		TrXOrData, 
+		TrXOrCategoria, 
+		TrXOrStatus, 
+		TrRefNumero, 
+		TrRefTipo, 
+		ForneNome, 
+		CategNome, 
+		SituaId, 
+		SituaCor, 
+		SituaChave, 
+		dbo.fnSubCategoriasTRXOrcamento(TrXOrUnidade, TrXOrId) as SubCategorias
+	  FROM TRXOrcamento
+		JOIN TermoReferencia 
+			ON TrRefId = TrXOrTermoReferencia
+		LEFT 
+			JOIN Fornecedor 
+				ON ForneId = TrXOrFornecedor
+		JOIN Categoria 
+			ON CategId = TrXOrCategoria
+		JOIN Situacao 
+			ON SituaId = TrXOrStatus
+	 WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." 
+	   AND TrXOrTermoReferencia = ".$_SESSION['TRId']."
+	 ORDER BY TrXOrData DESC
+";
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -187,7 +207,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h5 class="card-title">Relação de Orçamentos</h5>
+								<h5 class="card-title">Relação de Orçamentos do Termo de Referência</h5>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>

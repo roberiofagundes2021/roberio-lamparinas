@@ -14,67 +14,108 @@ if(isset($_POST['inputTRId'])){
 
 		/* Aqui não estou usando o Foreign Key on Cascade. Portanto, preciso excluir primeiro o TRXOrcamentoXProduto, TRXOrcamentoXServico e TRXOrcamentoXSubCategoria */
 
-		$sql = "SELECT TrXOrId
+		$sql = "
+			SELECT TrXOrId
 				FROM TRXOrcamento
-				WHERE TrXOrTermoReferencia = $iTR and TrXOrUnidade = $iUnidade";
+			 WHERE TrXOrTermoReferencia = $iTR 
+			   AND TrXOrUnidade = $iUnidade
+		";
 		$result = $conn->query($sql);
 		$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
 		
 		foreach ($rowOrcamentosTR as $item){
 		   
-		    $iOrcamento = $item['TrXOrId'];
+			$iOrcamento = $item['TrXOrId'];
 		   
-			$sql = "DELETE FROM TRXOrcamentoXSubCategoria
-					WHERE TXOXSCOrcamento = :iOrcamento and TXOXSCUnidade = :iUnidade";
+			$sql = "
+				DELETE 
+					FROM TRXOrcamentoXSubCategoria
+				 WHERE TXOXSCOrcamento = :iOrcamento 
+				   AND TXOXSCUnidade = :iUnidade
+			";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
 			$result->bindParam(':iUnidade', $iUnidade); 
 			$result->execute();
 			
-			$sql = "DELETE FROM TRXOrcamentoXProduto
-					WHERE TXOXPOrcamento = :iOrcamento and TXOXPUnidade = :iUnidade";
+			$sql = "
+				DELETE 
+					FROM TRXOrcamentoXProduto
+				 WHERE TXOXPOrcamento = :iOrcamento 
+				   AND TXOXPUnidade = :iUnidade
+			";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
 			$result->bindParam(':iUnidade', $iUnidade); 
 			$result->execute();	
 
-			$sql = "DELETE FROM TRXOrcamentoXServico
-					WHERE TXOXSOrcamento = :iOrcamento and TXOXSUnidade = :iUnidade";
+			$sql = "
+				DELETE 
+					FROM TRXOrcamentoXServico
+				 WHERE TXOXSOrcamento = :iOrcamento 
+				   AND TXOXSUnidade = :iUnidade
+			";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
 			$result->bindParam(':iUnidade', $iUnidade); 
 			$result->execute();				
 		}
 		   
-		$sql = "DELETE FROM TRXOrcamento
-				WHERE TrXOrTermoReferencia = :iTR and TrXOrUnidade = :iUnidade";
+		$sql = "
+			DELETE 
+				FROM TRXOrcamento
+			 WHERE TrXOrTermoReferencia = :iTR 
+			   AND TrXOrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
 		$result->bindParam(':iUnidade', $iUnidade); 
 		$result->execute();
 		
-		$sql = "DELETE FROM TermoReferenciaXProduto
-				WHERE TRXPrTermoReferencia = :iTR and TRXPrUnidade = :iUnidade";
+		$sql = "
+			DELETE 
+				FROM TermoReferenciaXProduto
+			 WHERE TRXPrTermoReferencia = :iTR 
+			   AND TRXPrUnidade = :iUnidade
+		";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
 		$result->bindParam(':iUnidade', $iUnidade); 
 		$result->execute();
 		
-		$sql = "DELETE FROM TermoReferenciaXServico
-				WHERE TRXSrTermoReferencia = :iTR and TRXSrUnidade = :iUnidade";
+		$sql = "
+			DELETE 
+				FROM TermoReferenciaXServico
+			 WHERE TRXSrTermoReferencia = :iTR 
+			   AND TRXSrUnidade = :iUnidade
+		";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
 		$result->bindParam(':iUnidade', $iUnidade); 
 		$result->execute();	
 	
-		$sql = "DELETE FROM TRXEquipe
-				WHERE TRXEqTermoReferencia = :id";
+		$sql = "
+			DELETE 
+				FROM TRXEquipe
+			 WHERE TRXEqTermoReferencia = :id
+		";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iTR);
 		$result->execute();
+
+		$sql = "
+			DELETE 
+				FROM TRXSubcategoria
+			WHERE TRXSCTermoReferencia = :id
+		";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iTR); 
+		$result->execute();
 		
-		$sql = "DELETE FROM TermoReferencia
-				WHERE TrRefId = :id";
+		$sql = "
+			DELETE 
+				FROM TermoReferencia
+			 WHERE TrRefId = :id
+		";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iTR); 
 		$result->execute();
@@ -93,7 +134,8 @@ if(isset($_POST['inputTRId'])){
 		
 		$conn->rollback();
 		
-		echo 'Error: ' . $e->getMessage();die;
+		echo 'Error: ' . $e->getMessage().$e->getLine();
+		die;
 	}
 }
 

@@ -21,7 +21,7 @@ if(isset($_POST['inputTRId'])){
 		$result = $conn->query($sql);
 		$rowTipoTr = $result->fetch(PDO::FETCH_ASSOC);
 
-		if (isset($rowTipoTr['TrRefTipo']) && $rowTipoTr['TrRefTipo'] === 'S') {
+		if (isset($rowTipoTr['TrRefTipo']) && $rowTipoTr['TrRefTipo'] == 'S') {
 			$countValidationServices = 0;
 
 			$sql = "
@@ -29,18 +29,21 @@ if(isset($_POST['inputTRId'])){
 					FROM TermoReferenciaXServico
 				 WHERE TRXSrTermoReferencia = ".$iTrId." 
 					 AND TRXSrQuantidade <= 0
+				 		OR TRXSrQuantidade = null
+						OR TRXSrQuantidade = ''
 			";
 			$result = $conn->query($sql);
 			$rowServico = $result->fetch(PDO::FETCH_ASSOC);
-
-			$countValidationServices = isset($rowServico['countProduto']) ? intval($rowServico['countProduto']) : 0;
 			
+			$countValidationServices = isset($rowServico['countServico']) ? intval($rowServico['countServico']) : 0;
+
 			if($countValidationServices > 0){
 				return 'S';
 			} else {
 				return true;
 			}
-		} else if (isset($rowTipoTr['TrRefTipo']) && $rowTipoTr['TrRefTipo'] === 'P') {
+
+		} else if (isset($rowTipoTr['TrRefTipo']) && $rowTipoTr['TrRefTipo'] == 'P') {
 			$countValidationProducts = 0;
 
 			$sql = "
@@ -48,6 +51,8 @@ if(isset($_POST['inputTRId'])){
 					FROM TermoReferenciaXProduto
 				 WHERE TRXPrTermoReferencia = ".$iTrId." 
 					 AND TRXPrQuantidade <= 0
+					 	OR TRXPrQuantidade = null
+					 	OR TRXPrQuantidade = ''
 			";
 			$result = $conn->query($sql);
 			$rowProduto = $result->fetch(PDO::FETCH_ASSOC);
@@ -59,7 +64,8 @@ if(isset($_POST['inputTRId'])){
 			} else {
 				return true;
 			}
-		} else if (isset($rowTipoTr['TrRefTipo']) && $rowTipoTr['TrRefTipo'] === 'PS') {
+
+		} else if (isset($rowTipoTr['TrRefTipo']) && $rowTipoTr['TrRefTipo'] == 'PS') {
 			$countValidationServices = 0;
 			$countValidationProducts = 0;
 			$rowProduto = '';
@@ -69,6 +75,8 @@ if(isset($_POST['inputTRId'])){
 					FROM TermoReferenciaXProduto
 				 WHERE TRXPrTermoReferencia = ".$iTrId." 
 					 AND TRXPrQuantidade <= 0
+					 	OR TRXPrQuantidade = null
+						OR TRXPrQuantidade = ''
 			";
 			$result = $conn->query($sql);
 			$rowProduto = $result->fetch(PDO::FETCH_ASSOC);
@@ -78,14 +86,16 @@ if(isset($_POST['inputTRId'])){
 					FROM TermoReferenciaXServico
 				 WHERE TRXSrTermoReferencia = ".$iTrId." 
 					 AND TRXSrQuantidade <= 0
+					 	OR TRXSrQuantidade = null
+						OR TRXSrQuantidade = ''
 			";
 			$result = $conn->query($sql);
 			$rowServico = $result->fetch(PDO::FETCH_ASSOC);
 
-			$countValidationServices = isset($rowServico['countProduto']) ? intval($rowServico['countProduto']) : 0;
+			$countValidationServices = isset($rowServico['countServico']) ? intval($rowServico['countServico']) : 0;
 			$countValidationProducts = isset($rowProduto['countProduto']) ? intval($rowProduto['countProduto']) : 0;
 
-			if(($countValidationProducts > 0) || ($countValidationServices > 0)){
+			if($countValidationProducts > 0 || $countValidationServices > 0){
 				return 'PS';
 			} else {
 				return true;
