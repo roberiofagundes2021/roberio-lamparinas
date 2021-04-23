@@ -62,11 +62,23 @@ try {
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	$sql = "SELECT SbCatId, SbCatNome
-        	FROM SubCategoria
-		    JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-			WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $row['TrXOrTermoReferencia'] . "";
+				 FROM SubCategoria
+				 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
+				 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $_SESSION['TRId'] . "
+				 ORDER BY SbCatNome ASC";
 	$result = $conn->query($sql);
-	$rowSC = $result->fetch(PDO::FETCH_ASSOC);
+	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+			
+			$aSubCategorias = '';
+
+		foreach ($rowSubCategoria as $item) {
+			
+			if ($aSubCategorias == '') {
+				$aSubCategorias .= $item['SbCatId'];
+			} else {
+				$aSubCategorias .= ", ".$item['SbCatId'];
+			}
+		}
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	$sql = "SELECT TXOXSServico
 			FROM  TRXOrcamentoXServico
@@ -262,9 +274,23 @@ try {
 
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputSubCategoria">Sub Categoria</label>
-												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo  $rowSC['SbCatNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['TrXOrSubCategoria']; ?>">
+												<label for="cmbSubCategoria">SubCategoria(s)</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+													<?php 
+														$sql = "SELECT SbCatId, SbCatNome
+																FROM SubCategoria
+																JOIN Situacao on SituaId = SbCatStatus	
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$aSubCategorias.")
+																ORDER BY SbCatNome ASC"; 
+														$result = $conn->query($sql);
+														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+														$count = count($rowSubCategoria);														
+																
+														foreach ( $rowSubCategoria as $item){	
+															print('<option value="'.$item['SbCatId,'].'"disabled selected>'.$item['SbCatNome'].'</option>');	
+														}                    
+													?>
+												</select>
 											</div>
 										</div>
 									</div>

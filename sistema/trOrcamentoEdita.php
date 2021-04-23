@@ -49,8 +49,16 @@ if(isset($_POST['inputOrcamentoId'])){
 			ORDER BY SbCatNome ASC";
 	$result = $conn->query($sql);
 	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-	foreach ($rowBD as $item){
-		$aSubCategorias[] = $item['SbCatId'];
+	
+	$aSubCategorias = '';
+
+	foreach ($rowBD as $item) {
+		
+		if ($aSubCategorias == '') {
+			$aSubCategorias .= $item['SbCatId'];
+		} else {
+			$aSubCategorias .= ", ".$item['SbCatId'];
+		}
 	}
 	
 	$_SESSION['msg'] = array();
@@ -162,6 +170,10 @@ if(isset($_POST['inputData'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
+
+	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>	
+
+	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
 
     <script type="text/javascript" >
 
@@ -364,19 +376,27 @@ if(isset($_POST['inputData'])){
 												</div>
 											</div>
 										</div>
-										<div class="col-lg-4">
+										<div class="col-lg-7">
 											<div class="form-group">
-												<label for="cmbSubCategoria">SubCategoria(as)</label>
-												<div class="d-flex flex-row" style="padding-top: 7px;">
+												<label for="cmbSubCategoria">SubCategoria(s)</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 													<?php 
-                                                        foreach ($rowSubCategoria as $itemSC) {
-                                                        	print('<input type="text" class="form-control pb-0" value="'.$itemSC['SbCatNome'].'" readOnly>');
-                                                        	print('<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="'.$itemSC['SbCatId'].'">');
-                                                        }
+														$sql = "SELECT SbCatId, SbCatNome
+																FROM SubCategoria
+																JOIN Situacao on SituaId = SbCatStatus	
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$aSubCategorias.")
+																ORDER BY SbCatNome ASC"; 
+														$result = $conn->query($sql);
+														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+														$count = count($rowSubCategoria);														
+																
+														foreach ( $rowSubCategoria as $item){	
+															print('<option value="'.$item['SbCatId,'].'"disabled selected>'.$item['SbCatNome'].'</option>');	
+														}                    
 													?>
-												</div>
+												</select>
 											</div>
-										</div>				
+										</div>			
 									</div>
 								</div>
 							</div>
