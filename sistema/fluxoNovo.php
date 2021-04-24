@@ -27,7 +27,7 @@ if (isset($_POST['inputDataInicio'])) {
 		$sql = "SELECT SituaId
 		FROM Situacao
 		Where SituaChave = 'PENDENTE' ";
-		$result = $conn->query("$sql");
+		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao,
@@ -346,7 +346,7 @@ if (isset($_POST['inputDataInicio'])) {
 									<div class="form-group">
 										<label for="cmbModalidadeLicitacao">Modalidade de Licitação</label>
 										<select id="cmbModalidadeLicitacao" name="cmbModalidadeLicitacao" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
+											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT MdLicId, MdLicNome
 													FROM ModalidadeLicitacao
