@@ -30,7 +30,7 @@ try {
 	$sql = "SELECT AditiId, AditiNumero, AditiDtInicio, AditiDtFim, AditiValor, AditiDtCelebracao
 			FROM Aditivo
 			JOIN Situacao on SituaId = AditiStatus
-			WHERE AditiUnidade = " . $_SESSION['UnidadeId'] . " and AditiFluxoOperacional = " . $iFluxoOperacional ." and SituaChave = 'ATIVO' ";
+			WHERE AditiUnidade = " . $_SESSION['UnidadeId'] . " and AditiFluxoOperacional = " . $iFluxoOperacional ." and SituaChave = 'LIBERADO' ";
 	$result = $conn->query($sql);
 	$rowAditivo = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countAditivos = count($rowAditivo);
@@ -105,9 +105,9 @@ try {
 
 
 			if (Tipo == 'novo') {
-				if (Situacao != 'ATIVO' && Situacao != 'FINALIZADO') {
+				if (Situacao != 'LIBERADO' && Situacao != 'FINALIZADO') {
 					alerta('Atenção',
-						'Aditivos só podem ser criados com o Fluxo Operacional com a situação ATIVO ou FINALIZADO.',
+						'Aditivos só podem ser criados com o Fluxo Operacional com a situação LIBERADO ou FINALIZADO.',
 						'error');
 					return false;
 				}

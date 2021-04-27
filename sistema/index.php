@@ -460,7 +460,7 @@ if ($totalAcoes) {
 					document.formBandeja.submit();
 				} else {
 					if (Tipo == 'liberar') {
-						document.getElementById('inputFluxoStatus').value = 'ATIVO'; //LIberado
+						document.getElementById('inputFluxoStatus').value = 'LIBERADO'; //LIberado
 						document.formBandeja.action = "fluxoBandejaMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
@@ -634,7 +634,7 @@ if ($totalAcoes) {
 					document.formBandeja.submit();
 				} else {
 					if (Tipo == 'liberar') {
-						document.getElementById('inputAditivoStatus').value = 'ATIVO';
+						document.getElementById('inputAditivoStatus').value = 'LIBERADO';
 						document.formBandeja.action = "fluxoAditivoBandejaMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();

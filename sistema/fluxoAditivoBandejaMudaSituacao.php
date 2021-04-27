@@ -89,7 +89,7 @@ if (isset($_POST['inputAditivoId'])) {
 		$fPrecoVenda = 0;
 
 		//Se o parâmetro diz que o Valor do Produto/Serviço será atualizado a partir do Fluxo, tais valores devem ser atualizados		
-		if ($rowParametro['ParamValorAtualizadoFluxo'] && $_POST['inputAditivoStatus'] == 'ATIVO') {
+		if ($rowParametro['ParamValorAtualizadoFluxo'] && $_POST['inputAditivoStatus'] == 'LIBERADO') {
 
 			$sql = "SELECT AdXPrProduto, AdXPrValorUnitario 
 					FROM AditivoXProduto

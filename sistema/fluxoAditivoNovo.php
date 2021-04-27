@@ -57,7 +57,7 @@ if ($TotalGeral == $TotalFluxo) {
 $sql = "SELECT Top 1 isnull(AditiNumero, 0) as Aditivo
         FROM Aditivo
 		JOIN Situacao on SituaId = AditiStatus
-        WHERE AditiFluxoOperacional = " . $iFluxoOperacional . " and SituaChave = 'ATIVO' 
+        WHERE AditiFluxoOperacional = " . $iFluxoOperacional . " and SituaChave = 'LIBERADO' 
         ORDER BY AditiNumero DESC
        ";
 $result = $conn->query($sql);
@@ -77,7 +77,7 @@ if ($rowNumero['Aditivo'] > 0) {
 	$sql = "SELECT Top 1 isnull(AditiDtFim, '1900-01-01') as ProxData
 	        FROM Aditivo
 			JOIN Situacao on SituaId = AditiStatus
-	        WHERE AditiFluxoOperacional = " . $iFluxoOperacional . " and SituaChave = 'ATIVO' 
+	        WHERE AditiFluxoOperacional = " . $iFluxoOperacional . " and SituaChave = 'LIBERADO' 
 	        ORDER BY AditiDtFim DESC
 	       ";
 	$result = $conn->query($sql);
@@ -92,7 +92,7 @@ if (isset($_POST['inputDataInicio'])) {
 
 	$sql = "SELECT SituaId
 		         FROM Situacao
-		         Where SituaChave = 'ATIVO' ";
+		         Where SituaChave = 'LIBERADO' ";
 	$result = $conn->query($sql);
 	$rowAditSitua = $result->fetch(PDO::FETCH_ASSOC);
 

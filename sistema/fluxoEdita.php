@@ -26,16 +26,16 @@ if (isset($_POST['inputFluxoOperacionalId'])) {
 		$sql = "SELECT *
 				FROM FluxoOperacional
 				WHERE FlOpeId = $iFluxoOperacional ";
-		$result = $conn->query("$sql");
+		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 
 		//SubCategorias para esse fornecedor
-		$sql = ("SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
-				 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
-				 ORDER BY SbCatNome ASC");
-		$result = $conn->query("$sql");
+		$sql = "SELECT SbCatId, SbCatNome
+				FROM SubCategoria
+				JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
+				WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
+				ORDER BY SbCatNome ASC";
+		$result = $conn->query($sql);
 		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
 		
 		foreach ($rowBD as $item){
@@ -197,13 +197,9 @@ if (isset($_POST['inputDataInicio'])) {
 
 				$.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
 
-					if (dados.length > 1) {
-						var option = '<option value="#" "selected">Selecione a SubCategoria</option>';
-					} else {
-						var option = '';
-					}
-
 					if (dados.length) {
+
+						var option = '';
 
 						$.each(dados, function(i, obj) {
 							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
@@ -345,7 +341,7 @@ if (isset($_POST['inputDataInicio'])) {
 								</div>
 
 								<div class="col-lg-4">
-								<div class="form-group" style="border-bottom:1px solid #ddd;">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSubCategoria">SubCategoria</label>
 										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
 											<!--<option value="#">Selecione uma subcategoria</option>-->
@@ -353,14 +349,16 @@ if (isset($_POST['inputDataInicio'])) {
 												
 												if (isset($row['FlOpeCategoria'])){
 													
-													$sql = ("SELECT SbCatId, SbCatNome
-															 FROM SubCategoria														 
-															 WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['FlOpeCategoria']."
-															 ORDER BY SbCatNome ASC");
-													$result = $conn->query("$sql");
+													$sql = "SELECT SbCatId, SbCatNome
+															FROM SubCategoria
+															JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId														 
+															WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['FlOpeCategoria']."
+															and FrXSCFornecedor = ". $row['FlOpeFornecedor']."
+															ORDER BY SbCatNome ASC";
+													$result = $conn->query($sql);
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 													$count = count($rowSubCategoria);
-
+													
 													if($count){
 														foreach ($rowSubCategoria as $item){
 															$seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
@@ -369,7 +367,7 @@ if (isset($_POST['inputDataInicio'])) {
 													} 
 												}
 											?>
-										</select>
+										</select>										
 									</div>
 								</div>
 							</div>

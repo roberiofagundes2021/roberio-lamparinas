@@ -12,7 +12,7 @@ if(isset($_POST['inputFornecedorId'])){
 		
 		$sql = "DELETE FROM Fornecedor
 				WHERE ForneId = :id";
-		$result = $conn->prepare("$sql");
+		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iFornecedor);
 		$result->execute();
 		

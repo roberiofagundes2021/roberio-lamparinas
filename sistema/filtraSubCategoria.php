@@ -9,13 +9,13 @@ if (isset($_GET['idOrcamento'])){
 			FROM SubCategoria
 			JOIN OrcamentoXSubCategoria on OrXSCSubcategoria = SbCatId
 			JOIN Situacao on SituaId = SbCatStatus
-			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and OrXSCOrcamento = '". $_GET['idOrcamento']."' and SituaChave = 'ATIVO' ";
+			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and OrXSCOrcamento = ". $_GET['idOrcamento']." and SituaChave = 'ATIVO' ";
 } else if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != -1){
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria
 			JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
 			JOIN Situacao on SituaId = SbCatStatus
-			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and FrXSCFornecedor = '". $_GET['idFornecedor']."' and SituaChave = 'ATIVO' ";
+			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and FrXSCFornecedor = ". $_GET['idFornecedor']." and SituaChave = 'ATIVO' ";
 } else if (isset($_GET['produtoServico'])){
 
 	if ($_GET['produtoServico'] == 'S'){
@@ -23,20 +23,20 @@ if (isset($_GET['idOrcamento'])){
 		FROM SubCategoria
 		JOIN Servico on ServiSubCategoria = SbCatId
 		JOIN Situacao on SituaId = SbCatStatus
-		WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = '". $_GET['idCategoria']."' and SituaChave = 'ATIVO' ";
+		WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = ". $_GET['idCategoria']." and SituaChave = 'ATIVO' ";
 	} else {
 		$sql = "SELECT DISTINCT SbCatId, SbCatNome
 		FROM SubCategoria
 		JOIN Produto on ProduSubCategoria = SbCatId
 		JOIN Situacao on SituaId = SbCatStatus
-		WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = '". $_GET['idCategoria']."' and SituaChave = 'ATIVO' ";
+		WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = ". $_GET['idCategoria']." and SituaChave = 'ATIVO' ";
 	}
 
 } else {
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria
 			JOIN Situacao on SituaId = SbCatStatus
-			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = '". $_GET['idCategoria']."' and SituaChave = 'ATIVO' ";
+			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = ". $_GET['idCategoria']." and SituaChave = 'ATIVO' ";
 }
 
 $result = $conn->query($sql);

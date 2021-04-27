@@ -602,7 +602,7 @@ if(isset($_POST['inputTipo'])){
 															JOIN Situacao on SituaId = SbCatStatus
 															WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['ForneCategoria']." and SituaChave = 'ATIVO'
 															ORDER BY SbCatNome ASC";
-													$result = $conn->query("$sql");
+													$result = $conn->query($sql);
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 													$count = count($rowSubCategoria);
 
