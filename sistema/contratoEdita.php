@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Novo Fluxo Operacional';
+$_SESSION['PaginaAtual'] = 'Editar Contrato';
 
 include('global_assets/php/conexao.php');
 
@@ -46,14 +46,14 @@ if (isset($_POST['inputFluxoOperacionalId'])) {
 
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
-	irpara("fluxo.php");
+	irpara("contrato.php");
 }
 
 if (isset($_POST['inputDataInicio'])) {
 
 	try {
 
-		$sql = "UPDATE FluxoOperacional SET FlOpeFornecedor = :iFornecedor, FlOpeCategoria = :iCategoria,
+		$sql = "UPDATE FluxoOperacional SET FlOpeTermoReferencia = :iTermoReferencia, FlOpeFornecedor = :iFornecedor, FlOpeCategoria = :iCategoria,
 										    FlOpeDataInicio = :dDataInicio, FlOpeDataFim = :dDataFim, FlOpeNumContrato = :iNumContrato, 
 										    FlOpeNumProcesso = :iNumProcesso, FlOpeModalidadeLicitacao = :iModalidadeLicitacao, FlOpeValor = :fValor,
 										    FlOpeConteudoInicio = :sConteudoInicio, FlOpeConteudoFim = :sConteudoFim,
@@ -65,6 +65,7 @@ if (isset($_POST['inputDataInicio'])) {
 		$conn->beginTransaction();				
 
 		$result->execute(array(
+			':iTermoReferencia' => $_POST['inputTermoReferencia'] == '' ? null : $_POST['inputTermoReferencia'],
 			':iFornecedor' => $_POST['cmbFornecedor'],
 			':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
 			//':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
@@ -115,20 +116,20 @@ if (isset($_POST['inputDataInicio'])) {
         $conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Fluxo Operacional alterado!!!";
+		$_SESSION['msg']['mensagem'] = "Contrato alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 	
 	} catch (PDOException $e) {
 
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar Fluxo Operacional!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar Contrato!!!";
 		$_SESSION['msg']['tipo'] = "error";
 
 		echo 'Error: ' . $e->getMessage();
 		die;
 	}
 
-	irpara("fluxo.php");
+	irpara("contrato.php");
 }
 
 ?>
@@ -140,7 +141,7 @@ if (isset($_POST['inputDataInicio'])) {
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Fluxo Operacional</title>
+	<title>Lamparinas | Contrato</title>
 
 	<?php include_once("head.php"); ?>
 
@@ -282,9 +283,9 @@ if (isset($_POST['inputDataInicio'])) {
 				<!-- Info blocks -->
 				<div class="card">
 
-					<form name="formFluxoOperacional" id="formFluxoOperacional" method="post" class="form-validate-jquery" action="fluxoEdita.php">
+					<form name="formFluxoOperacional" id="formFluxoOperacional" method="post" class="form-validate-jquery" action="contratoEdita.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Fluxo Operacional</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Contrato</h5>
 						</div>
 
 						<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" value="<?php echo $row['FlOpeId']; ?>">
@@ -293,6 +294,14 @@ if (isset($_POST['inputDataInicio'])) {
 
 							<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
 							<br>
+                            <div class="row">
+                                 <div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputTermoReferencia">Termo de Referência</label>
+										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" readOnly>
+									</div>
+								</div>
+                            </div>
 							<div class="row">
 								<div class="col-lg-4">
 									<div class="form-group">
@@ -320,8 +329,8 @@ if (isset($_POST['inputDataInicio'])) {
 
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+										<label for="cmbCategoria">Categoria <span class="text-danger">*</span> </label>
+										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" disabled>
 											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT CategId, CategNome
@@ -501,7 +510,7 @@ if (isset($_POST['inputDataInicio'])) {
 										}
 
 										?>
-										<a href="fluxo.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
+										<a href="contrato.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 									</div>
 								</div>
 							</div>

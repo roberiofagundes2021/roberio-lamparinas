@@ -30,16 +30,16 @@ if (isset($_POST['inputDataInicio'])) {
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
-		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao,
+		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao,
 											  FlOpeValor, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa, FlOpeUnidade)
-				VALUES (:iFornecedor, :iCategoria, :iSubCategoria, :dDataInicio, :dDataFim, :iNumContrato, :iNumProcesso, :iModalidadeLicitacao,
+				VALUES (:iFornecedor, :iCategoria, :dDataInicio, :dDataFim, :iNumContrato, :iNumProcesso, :iModalidadeLicitacao,
 						:fValor, :sFlOpeConteudoInicio, :sFlOpeConteudoFim, :bStatus, :iUsuarioAtualizador, :iEmpresa, :iUnidade)";
 		$result = $conn->prepare($sql);
-
+		
 		$result->execute(array(
 			':iFornecedor' => $_POST['cmbFornecedor'],
 			':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
-			':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
+			//':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
 			':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':iNumContrato' => $_POST['inputNumContrato'],
@@ -53,9 +53,29 @@ if (isset($_POST['inputDataInicio'])) {
 			':iEmpresa' => $_SESSION['EmpreId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
-		/*	
+			
 		$insertId = $conn->lastInsertId();	
 		
+		if ($_POST['cmbSubCategoria']){
+			
+			
+			$sql = "INSERT INTO FluxoOperacionalXSubCategoria 
+						(FOXSCFluxo, FOXSCSubCategoria, FOXSCUnidade)
+					VALUES 
+						(:iFluxo, :iSubCategoria, :iUnidade)";
+			$result = $conn->prepare($sql);
+
+			foreach ($_POST['cmbSubCategoria'] as $key => $value){
+
+				$result->execute(array(
+								':iFluxo' => $insertId,
+								':iSubCategoria' => $value,
+								':iUnidade' => $_SESSION['UnidadeId']
+								));
+			}
+		}
+		
+		/*
 		$sql = "SELECT *
 				FROM Produto
 				JOIN Categoria on CategId = ProduCategoria
@@ -112,7 +132,7 @@ if (isset($_POST['inputDataInicio'])) {
 	<title>Lamparinas | Fluxo Operacional</title>
 
 	<?php include_once("head.php"); ?>
-
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
@@ -299,10 +319,9 @@ if (isset($_POST['inputDataInicio'])) {
 								</div>
 
 								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="cmbSubCategoria">SubCategoria <span class="text-danger">*</span></label>
-										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
-											<option value="">Selecione</option>
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
+										<label for="cmbSubCategoria">SubCategoria</label>
+										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
 										</select>
 									</div>
 								</div>

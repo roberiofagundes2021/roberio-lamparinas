@@ -17,6 +17,13 @@ if(isset($_POST['inputFluxoOperacionalId'])){
 		$result->bindParam(':iFluxoOperacional', $iFluxoOperacional);
 		$result->bindParam(':iUnidade', $_SESSION['UnidadeId']); 
 		$result->execute();
+
+		$sql = "DELETE FROM FluxoOperacionalXSubCategoria
+				WHERE FOXSCFluxo = :iFluxo and FOXSCUnidade = :iUnidade";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':iFluxo', $iFluxoOperacional);
+		$result->bindParam(':iUnidade', $_SESSION['UnidadeId']); 
+		$result->execute();
 		
 		
 		$sql = "DELETE FROM FluxoOperacional

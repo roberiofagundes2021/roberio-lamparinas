@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Novo Fluxo Operacional';
+$_SESSION['PaginaAtual'] = 'Novo Contrato ';
 
 include('global_assets/php/conexao.php');
 
@@ -18,53 +18,26 @@ if ($row['ParamEmpresaPublica']) {
 	$bObrigatorio = "";
 }
 
-//Se veio do fluxo.php
-if (isset($_POST['inputFluxoOperacionalId'])) {
-
-		$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
-
-		$sql = "SELECT *
-				FROM FluxoOperacional
-				WHERE FlOpeId = $iFluxoOperacional ";
-		$result = $conn->query("$sql");
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-
-		//SubCategorias para esse fornecedor
-		$sql = ("SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
-				 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
-				 ORDER BY SbCatNome ASC");
-		$result = $conn->query("$sql");
-		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-		
-		foreach ($rowBD as $item){
-			$aSubCategorias[] = $item['SbCatId'];
-		}
-					
-		$_SESSION['msg'] = array();
-
-} else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
-
-	irpara("fluxo.php");
-}
-
 if (isset($_POST['inputDataInicio'])) {
 
 	try {
 
-		$sql = "UPDATE FluxoOperacional SET FlOpeFornecedor = :iFornecedor, FlOpeCategoria = :iCategoria,
-										    FlOpeDataInicio = :dDataInicio, FlOpeDataFim = :dDataFim, FlOpeNumContrato = :iNumContrato, 
-										    FlOpeNumProcesso = :iNumProcesso, FlOpeModalidadeLicitacao = :iModalidadeLicitacao, FlOpeValor = :fValor,
-										    FlOpeConteudoInicio = :sConteudoInicio, FlOpeConteudoFim = :sConteudoFim,
-											FlOpeUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE FlOpeId = " . $_POST['inputFluxoOperacionalId'] . "
-				";
+		$conn->beginTransaction();
+
+		$sql = "SELECT SituaId
+		FROM Situacao
+		Where SituaChave = 'PENDENTE' ";
+		$result = $conn->query($sql);
+		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+		$sql = "INSERT INTO FluxoOperacional (FlOpeTermoReferencia, FlOpeFornecedor, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao,
+											  FlOpeValor, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa, FlOpeUnidade)
+				VALUES (:iTermoReferencia, :iFornecedor, :iCategoria, :dDataInicio, :dDataFim, :iNumContrato, :iNumProcesso, :iModalidadeLicitacao,
+						:fValor, :sFlOpeConteudoInicio, :sFlOpeConteudoFim, :bStatus, :iUsuarioAtualizador, :iEmpresa, :iUnidade)";
 		$result = $conn->prepare($sql);
-
-		$conn->beginTransaction();				
-
+		
 		$result->execute(array(
+			':iTermoReferencia' => $_POST['inputTermoReferencia'] == '' ? null : $_POST['inputTermoReferencia'],
 			':iFornecedor' => $_POST['cmbFornecedor'],
 			':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
 			//':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
@@ -74,61 +47,78 @@ if (isset($_POST['inputDataInicio'])) {
 			':iNumProcesso' => $_POST['inputNumProcesso'],
 			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'] == '' ? null : $_POST['cmbModalidadeLicitacao'],
 			':fValor' => gravaValor($_POST['inputValor']),
-			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
-			':sConteudoFim' => $_POST['txtareaConteudoFim'],
-			':iUsuarioAtualizador' => $_SESSION['UsuarId']
+			':sFlOpeConteudoInicio' => $_POST['txtareaConteudoInicio'],
+			':sFlOpeConteudoFim' => $_POST['txtareaConteudoFim'],
+			':bStatus' => $rowSituacao['SituaId'],
+			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+			':iEmpresa' => $_SESSION['EmpreId'],
+			':iUnidade' => $_SESSION['UnidadeId']
 		));
-
-
-		$sql = "DELETE FROM FluxoOperacionalXSubCategoria
-				WHERE FOXSCFluxo = :iFluxo and FOXSCUnidade = :iUnidade";
-		$result = $conn->prepare($sql);	
+			
+		$insertId = $conn->lastInsertId();	
 		
-		$result->execute(array(
-							':iFluxo' => $_POST['inputFluxoOperacionalId'],
-							':iUnidade' => $_SESSION['UnidadeId']));
-						
 		if ($_POST['cmbSubCategoria']){
 			
-			try{
-				$sql = "INSERT INTO FluxoOperacionalXSubCategoria
-							(FOXSCFluxo, FOXSCSubCategoria, FOXSCUnidade)
-						VALUES 
-							(:iFluxo, :iSubCategoria, :iUnidade)";
-				$result = $conn->prepare($sql);
+			
+			$sql = "INSERT INTO FluxoOperacionalXSubCategoria 
+						(FOXSCFluxo, FOXSCSubCategoria, FOXSCUnidade)
+					VALUES 
+						(:iFluxo, :iSubCategoria, :iUnidade)";
+			$result = $conn->prepare($sql);
 
-				foreach ($_POST['cmbSubCategoria'] as $key => $value){
+			foreach ($_POST['cmbSubCategoria'] as $key => $value){
 
-					$result->execute(array(
-									':iFluxo' => $_POST['inputFluxoOperacionalId'],
-									':iSubCategoria' => $value,
-									':iUnidade' => $_SESSION['UnidadeId']
-									));
-				}
-				
-			} catch(PDOException $e) {
-				$conn->rollback();
-				echo 'Error: ' . $e->getMessage();exit;
+				$result->execute(array(
+								':iFluxo' => $insertId,
+								':iSubCategoria' => $value,
+								':iUnidade' => $_SESSION['UnidadeId']
+								));
 			}
 		}
-						
-        $conn->commit();
+		
+		/*
+		$sql = "SELECT *
+				FROM Produto
+				JOIN Categoria on CategId = ProduCategoria
+				JOIN SubCategoria on SbCatId = ProduSubCategoria
+				Where ProduEmpresa = ".$_SESSION['EmpreId']." and CategId = ".$_POST['cmbCategoria']." and SbCatId = ".$_POST['cmbSubCategoria'];
+		$result = $conn->query($sql);
+		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+		
+		foreach ($rowProdutos as $item){
+		
+			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario, FOXPrUsuarioAtualizador, FOXPrEmpresa)
+					VALUES (:iFluxoOperacional, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':iFluxoOperacional' => $insertId,
+							':iProduto' => $item['ProduId'],
+							':iQuantidade' => NULL,
+							':fValorUnitario' => NULL,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iEmpresa' => $_SESSION['EmpreId']
+							));		
+		} 
+		*/
+		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Fluxo Operacional alterado!!!";
+		$_SESSION['msg']['mensagem'] = " Contrato incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
-	
 	} catch (PDOException $e) {
 
+		$conn->rollback();
+
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar Fluxo Operacional!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao incluir o contrato!!!";
 		$_SESSION['msg']['tipo'] = "error";
 
 		echo 'Error: ' . $e->getMessage();
 		die;
 	}
 
-	irpara("fluxo.php");
+	irpara("contrato.php");
 }
 
 ?>
@@ -140,24 +130,19 @@ if (isset($_POST['inputDataInicio'])) {
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Fluxo Operacional</title>
+	<title>Lamparinas | Contrato</title>
 
 	<?php include_once("head.php"); ?>
-
-	<!-- Theme JS files -->
-	<script src="global_assets/js/demo_pages/form_select2.js"></script>	
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_checkboxes_radios.js"></script>
 
-	<script src="global_assets/js/demo_pages/picker_date.js"></script>
-
 	<!-- Validação -->
-	<script src="global_assets/js/plugins/notifications/pnotify.min.js"></script>
-	<script src="global_assets/js/demo_pages/extra_pnotify.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script> <!-- CV Documentacao: https://jqueryvalidation.org/ -->
@@ -170,13 +155,17 @@ if (isset($_POST['inputDataInicio'])) {
 			$('#summernoteInicio').summernote();
 			$('#summernoteFim').summernote();
 
-			//Ao mudar o Fornecedor, filtra a categoria e o Orçamento via ajax (retorno via JSON)
+
+			//Ao mudar o Fornecedor, filtra a categoria e a SubCategoria via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
 
 				FiltraCategoria();
 				FiltraSubCategoria();
 
 				var cmbFornecedor = $('#cmbFornecedor').val();
+				var validator = $("#formFluxoOperacional").validate();
+
+				validator.element("#cmbFornecedor"); //Valida apenas esse elemento nesse momento de alteração
 
 				$.getJSON('filtraCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
 
@@ -193,12 +182,14 @@ if (isset($_POST['inputDataInicio'])) {
 					} else {
 						ResetCategoria();
 					}
+
+					validator.element("#cmbCategoria"); //Valida apenas esse elemento nesse momento de alteração
 				});
 
 				$.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
 
 					if (dados.length > 1) {
-						var option = '<option value="#" "selected">Selecione a SubCategoria</option>';
+						var option = '<option value="">Selecione a SubCategoria</option>';
 					} else {
 						var option = '';
 					}
@@ -213,7 +204,11 @@ if (isset($_POST['inputDataInicio'])) {
 					} else {
 						ResetSubCategoria();
 					}
+
+					validator.element("#cmbSubCategoria"); //Valida apenas esse elemento nesse momento de alteração
 				});
+
+
 
 			});
 
@@ -282,17 +277,23 @@ if (isset($_POST['inputDataInicio'])) {
 				<!-- Info blocks -->
 				<div class="card">
 
-					<form name="formFluxoOperacional" id="formFluxoOperacional" method="post" class="form-validate-jquery" action="fluxoEdita.php">
+					<form name="formFluxoOperacional" id="formFluxoOperacional" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Fluxo Operacional</h5>
+							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Contrato</h5>
 						</div>
-
-						<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" value="<?php echo $row['FlOpeId']; ?>">
 
 						<div class="card-body">
 
 							<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
 							<br>
+							<div class="row">
+                                 <div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputTermoReferencia">Termo de Referência</label>
+										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" readOnly>
+									</div>
+								</div>
+                            </div>
 							<div class="row">
 								<div class="col-lg-4">
 									<div class="form-group">
@@ -309,8 +310,7 @@ if (isset($_POST['inputDataInicio'])) {
 											$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
 											foreach ($rowFornecedor as $item) {
-												$seleciona = $item['ForneId'] == $row['FlOpeFornecedor'] ? "selected" : "";
-												print('<option value="' . $item['ForneId'] . '" ' . $seleciona . '>' . $item['ForneNome'] . '</option>');
+												print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
 											}
 
 											?>
@@ -321,54 +321,16 @@ if (isset($_POST['inputDataInicio'])) {
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
-											<option value="">Selecione</option>
-											<?php
-											$sql = "SELECT CategId, CategNome
-													FROM Categoria
-													JOIN Fornecedor on ForneCategoria = CategId
-													JOIN Situacao on SituaId = CategStatus
-													WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and ForneId = " . $row['FlOpeFornecedor'] . "
-													and SituaChave = 'ATIVO'
-													ORDER BY CategNome ASC";
-											$result = $conn->query($sql);
-											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-
-											foreach ($rowCategoria as $item) {
-												$seleciona = $item['CategId'] == $row['FlOpeCategoria'] ? "selected" : "";
-												print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
-											}
-
-											?>
+										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required disabled>
+											<option value="">Categoria</option>
 										</select>
 									</div>
 								</div>
 
 								<div class="col-lg-4">
-								<div class="form-group" style="border-bottom:1px solid #ddd;">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSubCategoria">SubCategoria</label>
 										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
-											<!--<option value="#">Selecione uma subcategoria</option>-->
-											<?php
-												
-												if (isset($row['FlOpeCategoria'])){
-													
-													$sql = ("SELECT SbCatId, SbCatNome
-															 FROM SubCategoria														 
-															 WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['FlOpeCategoria']."
-															 ORDER BY SbCatNome ASC");
-													$result = $conn->query("$sql");
-													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-													$count = count($rowSubCategoria);
-
-													if($count){
-														foreach ($rowSubCategoria as $item){
-															$seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
-															print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
-														}
-													} 
-												}
-											?>
 										</select>
 									</div>
 								</div>
@@ -384,7 +346,7 @@ if (isset($_POST['inputDataInicio'])) {
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['FlOpeDataInicio']; ?>" required>
+											<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" required>
 										</div>
 									</div>
 								</div>
@@ -396,15 +358,15 @@ if (isset($_POST['inputDataInicio'])) {
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['FlOpeDataFim']; ?>" required>
+											<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" required>
 										</div>
 									</div>
 								</div>
 
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputNumContrato">Número do Contrato <?php if ($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
-										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>" <?php echo $bObrigatorio; ?>>
+										<label for="inputNumContrato">Nº Ata Registro <?php if ($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
+										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº Ata Registro" <?php echo $bObrigatorio; ?>>
 									</div>
 								</div>
 
@@ -420,14 +382,10 @@ if (isset($_POST['inputDataInicio'])) {
 													WHERE SituaChave = 'ATIVO'
 													ORDER BY MdLicNome ASC";
 											$result = $conn->query($sql);
-											$rowMdLic = $result->fetchAll(PDO::FETCH_ASSOC);
+											$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-											foreach ($rowMdLic as $item) {
-												if ($item['MdLicId'] == $row['FlOpeModalidadeLicitacao']) {
-													print('<option value="' . $item['MdLicId'] . '" selected>' . $item['MdLicNome'] . '</option>');
-												} else {
-													print('<option value="' . $item['MdLicId'] . '">' . $item['MdLicNome'] . '</option>');
-												}
+											foreach ($row as $item) {
+												print('<option value="' . $item['MdLicId'] . '">' . $item['MdLicNome'] . '</option>');
 											}
 											?>
 										</select>
@@ -437,71 +395,44 @@ if (isset($_POST['inputDataInicio'])) {
 								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputNumProcesso">Número do Processo <?php if ($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
-										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>" <?php echo $bObrigatorio; ?>>
+										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" <?php echo $bObrigatorio; ?>>
 									</div>
 								</div>
 
 								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputValor">Valor Total <span class="text-danger">*</span></label>
-										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" value="<?php echo mostraValor($row['FlOpeValor']); ?>" onKeyUp="moeda(this)" maxLength="12" required>
+										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" onKeyUp="moeda(this)" maxLength="12" required>
 									</div>
 								</div>
 							</div>
-
+							<br>
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudo">Conteúdo Personalizado - Introdução</label>
+										<!--<div id="summernote" name="txtareaConteudo"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do Contrato (informe aqui o texto que você queira que apareça no Contrato)"></textarea>
+									</div>
+								</div>
+							</div>
 							<br>
 
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaConteudoInicio">Conteúdo personalizado - Introdução</label>
-										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do TR (informe aqui o texto que você queira que apareça no TR)"><?php echo $row['FlOpeConteudoInicio']; ?></textarea>
+										<label for="txtareaConteudoFinalizacao">Conteúdo Personalizado - Finalização</label>
+										<!--<div id="summernote" name="txtareaConteudo"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Contrato (informe aqui o texto que você queira que apareça no término Contrato)"></textarea>
 									</div>
 								</div>
 							</div>
 							<br>
-
-							<div class="row">
-								<div class="col-lg-12">
-									<div class="form-group">
-										<label for="txtareaConteudoFim">Conteúdo personalizado - Finalização</label>
-										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais da TR (informe aqui o texto que você queira que apareça no término da TR)"><?php echo $row['FlOpeConteudoFim']; ?></textarea>
-									</div>
-								</div>
-							</div>
-							<br>
-
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<?php
-										$sql = "SELECT SUM(FOXPrQuantidade * FOXPrValorUnitario) as total
-												FROM FluxoOperacionalXProduto
-												WHERE FOXPrUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
-										$result = $conn->query($sql);
-										$rowTotal = $result->fetch(PDO::FETCH_ASSOC);
-										$count = count($rowTotal);
-
-										if ($count) {
-											if ($rowTotal['total'] == $row['FlOpeValor']) {
-												$bFechado = 1;
-											} else {
-												$bFechado = 0;
-											}
-										} else {
-											$bFechado = 0;
-										}
-
-										if ($bFechado) {
-											if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'ADMINISTRADOR' or $_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' or $_SESSION['PerfiChave'] == 'CONTROLADORIA') {
-												print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-											}
-										} else {
-											print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-										}
-
-										?>
-										<a href="fluxo.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
+										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+										<a href="contrato.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 									</div>
 								</div>
 							</div>
