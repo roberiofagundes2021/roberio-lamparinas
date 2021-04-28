@@ -29,9 +29,10 @@ if(isset($_POST['inputTermoReferenciaId'])){
 		}
 		
 		$sql = "
-			UPDATE TermoReferencia 
+			UPDATE TermoReferencia
 				 SET TrRefStatus = :bStatus, 
-				     TrRefUsuarioAtualizador = :iUsuario
+				     TrRefUsuarioAtualizador = :iUsuario,
+						 TrRefLiberaParcial = ".true."
 			 WHERE TrRefId = :iTermoReferenciaId";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $row['SituaId']);
@@ -39,8 +40,14 @@ if(isset($_POST['inputTermoReferenciaId'])){
 		$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
 		$result->execute();
 		
-		$sql = "UPDATE Bandeja SET BandeStatus = :bStatus, BandeMotivo = :sMotivo, BandeUsuarioAtualizador = :iUsuario
-				WHERE BandeId = :iBandeja";
+
+		$sql = "
+			UPDATE Bandeja 
+				 SET BandeStatus = :bStatus, 
+						 BandeMotivo = :sMotivo, 
+						 BandeUsuarioAtualizador = :iUsuario
+			 WHERE BandeId = :iBandeja
+		";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $row['SituaId']);
 		$result->bindParam(':sMotivo', $motivo);

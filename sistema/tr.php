@@ -6,13 +6,29 @@ $_SESSION['PaginaAtual'] = 'Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefStatus, 
-		SituaId, SituaCor, SituaChave, SituaNome, dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias
+$sql = "
+	SELECT TrRefId, 
+				 TrRefNumero,
+				 TrRefData,
+				 TrRefCategoria,
+				 TrRefTipo,
+				 CategNome,
+				 TrRefStatus,
+				 TrRefLiberaParcial,
+				 SituaId,
+				 SituaCor,
+				 SituaChave,
+				 SituaNome,
+				 dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) 
+				 	as SubCategorias
 		FROM TermoReferencia
-		JOIN Categoria on CategId = TrRefCategoria
-		JOIN Situacao on SituaId = TrRefStatus
-	    WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . "
-		ORDER BY TrRefData DESC";
+		JOIN Categoria 
+			ON CategId = TrRefCategoria
+		JOIN Situacao 
+			ON SituaId = TrRefStatus
+	 WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . "
+	 ORDER BY TrRefData DESC
+";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -125,7 +141,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaTR(TRId, TRNumero, TRCategoria, CategNome, TRStatus, Tipo) {
+		function atualizaTR(TRId, TRNumero, TRCategoria, CategNome, TRStatus, Tipo, liberaParcial) {
 
 			document.getElementById('inputTRId').value = TRId;
 			document.getElementById('inputTRNumero').value = TRNumero;
@@ -137,28 +153,40 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				document.formTR.action = "trImprime.php";
 				document.formTR.setAttribute("target", "_blank");
 				document.formTR.submit();
+
 			} else if (Tipo == 'imprimirComissao') {
 				document.formTR.action = "trImprimeComissao.php";
 				document.formTR.setAttribute("target", "_blank");
 				document.formTR.submit();
+
 			} else {
 				if (Tipo == 'edita') {
 					document.formTR.action = "trEdita.php";
 					document.formTR.submit();
+
 				} else if (Tipo == 'exclui') {
+					if (liberaParcial == 1) {
+						alerta('Essa TR já tem movimentações e não pode ser excluida!','');
+					} else {	
 					confirmaExclusao(document.formTR, "Tem certeza que deseja excluir essa TR?", "trExclui.php");
 					document.formTR.submit();
+					}
+
 				} else if (Tipo == 'mudaStatus') {
 					document.formTR.action = "trMudaSituacao.php";
 					document.formTR.submit();
+
 				} else if (Tipo == 'listarProdutos') {
 					document.formTR.action = "trProduto.php";
 					document.formTR.submit();
+
 				}else if (Tipo == 'listarServicos') {
 					document.formTR.action = "trServico.php";
 					document.formTR.submit();
+
 				} else if (Tipo == 'aprovacaoAdministrativo') {
 					confirmaExclusao(document.formTR, "Essa ação enviará todo o Termo de Referência (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "trAprovacaoAdministrativo.php");
+
 				} else if (Tipo == 'orcamento') {
 					
 					//Esse ajax está sendo usado para verificar no banco se há algum produto sem informar a quantidade. Caso tenha não deixar ir para o orçamento.
@@ -177,15 +205,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							}
 						}
 					})
+					
 				} else if (Tipo == 'comissaoProcessoLicitatorio') {
 					document.formTR.action = "trComissao.php";
 					document.formTR.submit();
-				} else if (Tipo == 'aprovacaoDotacao') {
-					document.formTR.action = "trAprovacaoDotacao.php";
+
+				} else if (Tipo == 'dotacaoOrcamentaria') {
+					document.formTR.action = "trDotacao.php";
 					document.formTR.submit();
+
 				} else if (Tipo == 'aprovacaoContabilidade') {
 					document.formTR.action = "trAprovacaoContabilidade.php";
 					document.formTR.submit();
+					
 				} else if (Tipo == 'aprovacaoComissao') {
 					document.formTR.action = "trAprovacaoComissao.php";
 					document.formTR.submit();
@@ -272,122 +304,206 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></td>');
 
 										if ($item['TrRefTipo'] == 'P') {
-											print('<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
+											if(isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == false) {
+												print('<td class="text-center">
+														<div class="list-icons">
+															<div class="list-icons list-icons-extended">
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
 
-														<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 
-														<div class="dropdown">													
-															<a href="#" class="list-icons-item" data-toggle="dropdown">
-																<i class="icon-menu9"></i>
-															</a>
+																<div class="dropdown">													
+																	<a href="#" class="list-icons-item" data-toggle="dropdown">
+																		<i class="icon-menu9"></i>
+																	</a>
 
-															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarProdutos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																	<div class="dropdown-menu dropdown-menu-right">
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarProdutos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'orcamento\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Orçamentos</a>
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoContabilidade\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Contabilidade"></i> Enviar para contabilidade</a>
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoDotacao\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Dotação Orçamentária</a>																
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'comissaoProcessoLicitatorio\');" class="dropdown-item"><i class="icon-stack2" title=" Comissão do Processo Licitatório "></i>  Comissão do Processo Licitatório </a>
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoComissao\');" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i> Enviar para comissão</a>
-
-																<div class="dropdown-divider"></div>
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirComissao\');" class="dropdown-item" title="Imprimir Comissão"><i class="icon-printer2"></i> Imprimir Comissão</a>
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirTr\');" class="dropdown-item" title="Imprimir TR"><i class="icon-printer2"></i> Imprimir TR</a>
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
+																	</div>
+																</div>
 															</div>
 														</div>
-													</div>
-												</div>
-											</td>
-										</tr>');
+													</td>
+												</tr>');
+
+											} else if (isset($item['TrRefTipo']) && $item['TrRefTipo'] == true) {
+												print('
+													<td class="text-center">
+														<div class="list-icons">
+															<div class="list-icons list-icons-extended">
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
+
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+
+																<div class="dropdown">													
+																	<a href="#" class="list-icons-item" data-toggle="dropdown">
+																		<i class="icon-menu9"></i>
+																	</a>
+
+																	<div class="dropdown-menu dropdown-menu-right">
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarProdutos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
+
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'orcamento\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Orçamentos</a>
+
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoContabilidade\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Contabilidade"></i> Enviar para contabilidade</a>
+
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'dotacaoOrcamentaria\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Dotação Orçamentária</a>																
+
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'comissaoProcessoLicitatorio\');" class="dropdown-item"><i class="icon-stack2" title=" Comissão do Processo Licitatório "></i>  Comissão do Processo Licitatório </a>
+
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoComissao\');" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i> Enviar para comissão</a>
+
+																		<div class="dropdown-divider"></div>
+
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirComissao\');" class="dropdown-item" title="Imprimir Comissão"><i class="icon-printer2"></i> Imprimir Comissão</a>
+
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirTr\');" class="dropdown-item" title="Imprimir TR"><i class="icon-printer2"></i> Imprimir TR</a>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</td>
+												</tr>');
+											}
+
 										} else if ($item['TrRefTipo'] == 'S') {
-											print('<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
-														<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
-														<div class="dropdown">													
-															<a href="#" class="list-icons-item" data-toggle="dropdown">
-																<i class="icon-menu9"></i>
-															</a>
+											if (isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == false) {
+												print('
+														<td class="text-center">
+															<div class="list-icons">
+																<div class="list-icons list-icons-extended">
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																	<div class="dropdown">													
+																		<a href="#" class="list-icons-item" data-toggle="dropdown">
+																			<i class="icon-menu9"></i>
+																		</a>
 
-															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarServicos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>
+																		<div class="dropdown-menu dropdown-menu-right">
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarServicos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</td>
+													</tr>'
+												);
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'orcamento\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Orçamentos</a>																
+											} else if (isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == true) {
+													print('<td class="text-center">
+														<div class="list-icons">
+															<div class="list-icons list-icons-extended">
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																<div class="dropdown">													
+																	<a href="#" class="list-icons-item" data-toggle="dropdown">
+																		<i class="icon-menu9"></i>
+																	</a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoContabilidade\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Contabilidade"></i> Enviar para contabilidade</a>
+																	<div class="dropdown-menu dropdown-menu-right">
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarServicos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoDotacao\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Dotação Orçamentária</a>																
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'comissaoProcessoLicitatorio\');" class="dropdown-item"><i class="icon-stack2" title=" Comissão do Processo Licitatório "></i>  Comissão do Processo Licitatório </a>
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'orcamento\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Orçamentos</a>																
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoComissao\');" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i> Enviar para comissão</a>																
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoContabilidade\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Contabilidade"></i> Enviar para contabilidade</a>
+
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'dotacaoOrcamentaria\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Dotação Orçamentária</a>																
+
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'comissaoProcessoLicitatorio\');" class="dropdown-item"><i class="icon-stack2" title=" Comissão do Processo Licitatório "></i>  Comissão do Processo Licitatório </a>
+
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoComissao\');" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i> Enviar para comissão</a>																
 
 
-																<div class="dropdown-divider"></div>
+																		<div class="dropdown-divider"></div>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirComissao\');" class="dropdown-item" title="Imprimir Comissão"><i class="icon-printer2"></i> Imprimir Comissão</a>
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirComissao\');" class="dropdown-item" title="Imprimir Comissão"><i class="icon-printer2"></i> Imprimir Comissão</a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirTr\');" class="dropdown-item" title="Imprimir TR"><i class="icon-printer2"></i> Imprimir TR</a>
+																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirTr\');" class="dropdown-item" title="Imprimir TR"><i class="icon-printer2"></i> Imprimir TR</a>
+																	</div>
+																</div>
 															</div>
 														</div>
-													</div>
-												</div>
-											</td>
-										</tr>');
+													</td>
+												</tr>');
+											}
 										} else {
-											print('<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
-														<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
-														<div class="dropdown">													
-															<a href="#" class="list-icons-item" data-toggle="dropdown">
-																<i class="icon-menu9"></i>
-															</a>
+											if(isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == false) {
+												print('
+														<td class="text-center">
+															<div class="list-icons">
+																<div class="list-icons list-icons-extended">
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																	<div class="dropdown">													
+																		<a href="#" class="list-icons-item" data-toggle="dropdown">
+																			<i class="icon-menu9"></i>
+																		</a>
 
-															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarProdutos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																		<div class="dropdown-menu dropdown-menu-right">
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarProdutos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarServicos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Servicos"></i> Listar Servicos</a>
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarServicos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Servicos"></i> Listar Servicos</a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'orcamento\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Orçamentos</a>																																
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoContabilidade\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Contabilidade"></i> Enviar para contabilidade</a>
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoDotacao\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Dotação Orçamentária</a>																
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'comissaoProcessoLicitatorio\');" class="dropdown-item"><i class="icon-stack2" title=" Comissão do Processo Licitatório "></i>  Comissão do Processo Licitatório </a>
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoComissao\');" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i> Enviar para comissão</a>																
-
-
-																<div class="dropdown-divider"></div>
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirComissao\');" class="dropdown-item" title="Imprimir Comissão"><i class="icon-printer2"></i> Imprimir Comissão</a>
-
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirTr\');" class="dropdown-item" title="Imprimir TR"><i class="icon-printer2"></i> Imprimir TR</a>
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
+																		</div>
+																	</div>
+																</div>
 															</div>
-														</div>
-													</div>
-												</div>
-											</td>
-										</tr>');
+														</td>
+													</tr>'
+												);
+
+											} else if (isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == true) {
+												print('
+														<td class="text-center">
+															<div class="list-icons">
+																<div class="list-icons list-icons-extended">
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																	<div class="dropdown">													
+																		<a href="#" class="list-icons-item" data-toggle="dropdown">
+																			<i class="icon-menu9"></i>
+																		</a>
+
+																		<div class="dropdown-menu dropdown-menu-right">
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarProdutos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarServicos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Servicos"></i> Listar Servicos</a>
+
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
+
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'orcamento\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Orçamentos</a>																																
+
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoContabilidade\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Contabilidade"></i> Enviar para contabilidade</a>
+
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'dotacaoOrcamentaria\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Dotação Orçamentária</a>																
+
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'comissaoProcessoLicitatorio\');" class="dropdown-item"><i class="icon-stack2" title=" Comissão do Processo Licitatório "></i>  Comissão do Processo Licitatório </a>
+
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoComissao\');" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i> Enviar para comissão</a>																
+
+
+																			<div class="dropdown-divider"></div>
+
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirComissao\');" class="dropdown-item" title="Imprimir Comissão"><i class="icon-printer2"></i> Imprimir Comissão</a>
+
+																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirTr\');" class="dropdown-item" title="Imprimir TR"><i class="icon-printer2"></i> Imprimir TR</a>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</td>
+													</tr>'
+												);
+											}
 										}
 									}
 									?>

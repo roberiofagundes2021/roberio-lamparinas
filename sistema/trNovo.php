@@ -6,10 +6,12 @@ $_SESSION['PaginaAtual'] = 'Novo Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ParamProdutoOrcamento, ParamServicoOrcamento
+$sql = "
+	SELECT ParamProdutoOrcamento, 
+				 ParamServicoOrcamento
 		FROM Parametro
-		WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
-		";
+	 WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
+";
 $result = $conn->query($sql);
 $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -33,19 +35,48 @@ if (isset($_POST['inputData'])) {
 		$conn->beginTransaction();
 
 		//Gera o novo Número (incremental)
-		$sql = "SELECT COUNT(isnull(TrRefNumero,0)) as Numero
-				FROM TermoReferencia
-				Where TrRefUnidade = " . $_SESSION['UnidadeId'] . "";
+		$sql = "
+			SELECT COUNT(isnull(TrRefNumero,0)) as Numero
+			  FROM TermoReferencia
+			 Where TrRefUnidade = " . $_SESSION['UnidadeId'] . "
+		";
 		$result = $conn->query($sql);
 		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sNumero = (int) $rowNumero['Numero'] + 1;
 		$sNumero = str_pad($sNumero, 6, "0", STR_PAD_LEFT);
 
-		$sql = "INSERT INTO TermoReferencia (TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio, TrRefConteudoFim, TrRefTipo,
-											 TrRefStatus, TrRefUsuarioAtualizador, TrRefUnidade, TrRefTabelaProduto, TrRefTabelaServico)
-				VALUES (:sNumero, :dData, :iCategoria, :sConteudoInicio, :sConteudoFim, :sTipo, 
-						:bStatus, :iUsuarioAtualizador, :iUnidade, :sTabelaProduto, :sTabelaServico)";
+		$sql = "
+			INSERT 
+				INTO TermoReferencia (
+							TrRefNumero, 
+							TrRefData, 
+							TrRefCategoria, 
+							TrRefConteudoInicio, 
+							TrRefConteudoFim, 
+							TrRefTipo,
+							TrRefStatus, 
+							TrRefUsuarioAtualizador, 
+							TrRefUnidade, 
+							TrRefTabelaProduto,
+							TrRefTabelaServico,
+							TrRefLiberaParcial
+						)
+			VALUES (
+				:sNumero, 
+				:dData, 
+				:iCategoria, 
+				:sConteudoInicio, 
+				:sConteudoFim, 
+				:sTipo, 
+				:bStatus, 
+				:iUsuarioAtualizador, 
+				:iUnidade, 
+				:sTabelaProduto, 
+				:sTabelaServico,
+				:bLiberaParcial
+			)
+		";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -59,7 +90,8 @@ if (isset($_POST['inputData'])) {
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iUnidade' => $_SESSION['UnidadeId'],
 			':sTabelaProduto' => $parametroProduto,
-			':sTabelaServico' => $parametroServico
+			':sTabelaServico' => $parametroServico,
+			':bLiberaParcial' => 0,
 		));
 
 		// Começo do cadastro de subcategorias da TR
@@ -71,7 +103,8 @@ if (isset($_POST['inputData'])) {
 
 			$possuiSubCategoria = 1;
 
-			$sql = "INSERT INTO TRXSubcategoria
+			$sql = "
+				INSERT INTO TRXSubcategoria
 						(TRXSCTermoReferencia, TRXSCSubCategoria, TRXSCUnidade)
 					VALUES 
 						(:iTermoReferencia, :iSubCategoria, :iUnidade)";

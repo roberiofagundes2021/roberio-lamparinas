@@ -28,9 +28,9 @@ if(isset($_POST['inputTRId'])){
 				SELECT COUNT(TRXSrTermoReferencia) as countServico
 					FROM TermoReferenciaXServico
 				 WHERE TRXSrTermoReferencia = ".$iTrId." 
-					 AND TRXSrQuantidade <= 0
-				 		OR TRXSrQuantidade = null
-						OR TRXSrQuantidade = ''
+				 	 AND ((TRXPrQuantidade <= 0) 
+						OR (TRXPrQuantidade is null) 
+						OR (TRXPrQuantidade = ''))
 			";
 			$result = $conn->query($sql);
 			$rowServico = $result->fetch(PDO::FETCH_ASSOC);
@@ -50,9 +50,9 @@ if(isset($_POST['inputTRId'])){
 				SELECT COUNT(TRXPrTermoReferencia) as countProduto
 					FROM TermoReferenciaXProduto
 				 WHERE TRXPrTermoReferencia = ".$iTrId." 
-					 AND TRXPrQuantidade <= 0
-					 	OR TRXPrQuantidade = null
-					 	OR TRXPrQuantidade = ''
+					 AND ((TRXPrQuantidade <= 0) 
+					  OR (TRXPrQuantidade is null) 
+					  OR (TRXPrQuantidade = ''))
 			";
 			$result = $conn->query($sql);
 			$rowProduto = $result->fetch(PDO::FETCH_ASSOC);
@@ -74,9 +74,9 @@ if(isset($_POST['inputTRId'])){
 				SELECT COUNT(TRXPrTermoReferencia) as countProduto
 					FROM TermoReferenciaXProduto
 				 WHERE TRXPrTermoReferencia = ".$iTrId." 
-					 AND TRXPrQuantidade <= 0
-					 	OR TRXPrQuantidade = null
-						OR TRXPrQuantidade = ''
+				   AND ((TRXPrQuantidade <= 0) 
+				    OR (TRXPrQuantidade is null) 
+				    OR (TRXPrQuantidade = ''))
 			";
 			$result = $conn->query($sql);
 			$rowProduto = $result->fetch(PDO::FETCH_ASSOC);
@@ -85,9 +85,9 @@ if(isset($_POST['inputTRId'])){
 				SELECT COUNT(TRXSrTermoReferencia) as countServico
 					FROM TermoReferenciaXServico
 				 WHERE TRXSrTermoReferencia = ".$iTrId." 
-					 AND TRXSrQuantidade <= 0
-					 	OR TRXSrQuantidade = null
-						OR TRXSrQuantidade = ''
+				   AND ((TRXPrQuantidade <= 0) 
+				    OR (TRXPrQuantidade is null) 
+				    OR (TRXPrQuantidade = ''))
 			";
 			$result = $conn->query($sql);
 			$rowServico = $result->fetch(PDO::FETCH_ASSOC);
@@ -104,7 +104,7 @@ if(isset($_POST['inputTRId'])){
 	}
 
 	$validacaoTipo = validTr();
-
+	
 	if ($validacaoTipo === true) {
 		try{
 			$conn->beginTransaction();
