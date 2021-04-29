@@ -7,8 +7,9 @@ $_SESSION['PaginaAtual'] = 'Fluxo Operacional';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT FlOpeId, ForneNome, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
-			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome, SituaChave, SituaNome, SituaCor
+			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome, SbCatNome, SituaChave, SituaNome, SituaCor
 		FROM FluxoOperacional
+		JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 		JOIN Categoria on CategId = FlOpeCategoria
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
 		JOIN Situacao on SituaId = FlOpeStatus
@@ -152,7 +153,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>
 
@@ -203,10 +204,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<tr class="bg-slate">
 										<th width="10%">Início</th>
 										<th width="10%">Fim</th>
-										<th width="12%">Nº Contrato</th>
-										<th width="12%">Nº Processo</th>
-										<th width="18%">Fornecedor</th>
-										<th width="18%">Categoria</th>
+										<th width="10%">Nº Contrato</th>
+										<th width="10%">Nº Processo</th>
+										<th width="14%">Fornecedor</th>
+										<th width="14%">Categoria</th>
+										<th width="12%">SubCategoria</th>
 										<th width="10%">Situação</th>
 										<th width="10%" class="text-center">Ações</th>
 									</tr>
@@ -246,6 +248,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['FlOpeNumProcesso'].'</td>
 											<td>'.$item['ForneNome'].'</td>
 											<td>'.$item['CategNome'].'</td>
+											<td>'. $item['SbCatNome'].'</td>
 											<td><span class="'.$situacaoClasse.'">'.$situacao.'</span>
 											');
 											$disabled = $item['SituaChave'] == 'PENDENTE' ? "disabled" : '';

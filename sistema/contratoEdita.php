@@ -198,13 +198,10 @@ if (isset($_POST['inputDataInicio'])) {
 
 				$.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
 
-					if (dados.length > 1) {
-						var option = '<option value="#" "selected">Selecione a SubCategoria</option>';
-					} else {
-						var option = '';
-					}
 
 					if (dados.length) {
+
+						var option = '';
 
 						$.each(dados, function(i, obj) {
 							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
@@ -363,8 +360,10 @@ if (isset($_POST['inputDataInicio'])) {
 												if (isset($row['FlOpeCategoria'])){
 													
 													$sql = ("SELECT SbCatId, SbCatNome
-															 FROM SubCategoria														 
+															 FROM SubCategoria	
+															 JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId														 													 
 															 WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['FlOpeCategoria']."
+													         and FrXSCFornecedor = ". $row['FlOpeFornecedor']."
 															 ORDER BY SbCatNome ASC");
 													$result = $conn->query("$sql");
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
