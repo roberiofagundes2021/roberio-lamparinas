@@ -164,23 +164,23 @@ if(isset($_POST['inputData'])){
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Anexo</h5>
 						</div>
-						
-						<div class="card-body">								
+					
+					<div class="card-body">								
 							<div class="row">
-                                <div class="col-lg-2">
-                                    <div class="form-group">
-                                        <label for="inputData">Data</label>
-                                        <input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
-                                    </div>
-							    </div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputData">Data</label>
+										<input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
+									</div>
+								</div>
 								<div class="col-lg-10">
 									<div class="form-group">
 										<label for="inputNome">Descrição<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Descrição" required autofocus>
 									</div>
 								</div>
-                            </div>	
-                            <div class="row">
+							</div>	
+							<div class="row">
 								<div class="col-lg-12">
 									<label for="inputArquivo">Arquivo<span class="text-danger"> *</span></label>
 									<input type="file" id="inputArquivo" name="inputArquivo" class="form-control" required>

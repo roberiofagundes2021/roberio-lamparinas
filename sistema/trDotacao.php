@@ -1,26 +1,26 @@
 <?php 
+	include_once("sessao.php"); 
+	include('global_assets/php/conexao.php');
 
-include_once("sessao.php"); 
+	$_SESSION['PaginaAtual'] = 'Dotação Orçamentária';
 
-$_SESSION['PaginaAtual'] = 'Dotação Orçamentária';
+	if (isset($_POST['inputTRId'])){
+		$_SESSION['inputTRIdDotacao'] = $_POST['inputTRId'];
+	}
 
-include('global_assets/php/conexao.php');
+	$sql = "
+		SELECT DtOrcId, 
+					 DtOrcData, 
+					 DtOrcNome, 
+					 DtOrcArquivo
+			FROM DotacaoOrcamentaria
+		 WHERE DtOrcUnidade = ". $_SESSION['UnidadeId'] ." 
+			 AND DtOrcTermoReferencia = ". $_SESSION['inputTRIdDotacao'] ."
+		 ORDER BY DtOrcNome ASC
+	";
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-if (isset($_POST['inputTRId'])){
-	$_SESSION['inputTRIdDotacao'] = $_POST['inputTRId'];
-	// $_SESSION['nomeCliente'] = $_POST['inputClienteNome']; 
-}
-
-$sql = "SELECT ClAneId, ClAneData, ClAneNome, ClAneArquivo
-        FROM ClienteAnexo
-        WHERE ClAneUnidade = ". $_SESSION['UnidadeId'] ." and ClAneCliente = ". $_SESSION['idCliente'] ."
-        ORDER BY ClAneNome ASC";
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
-
-// var_dump($_POST);
-// die;
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -109,18 +109,18 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaClienteAnexo(ClAneId, ClAneData, ClAneNome, ClAneArquivo, Tipo){
 
-				document.getElementById('inputClienteAnexoId').value = ClAneId;
-				document.getElementById('inputClienteAnexoNome').value = ClAneNome;
-				document.getElementById('inputClienteAnexoData').value = ClAneData;
-				document.getElementById('inputClienteAnexoArquivo').value = ClAneArquivo;	
+				document.getElementById('inputDotacaoID').value = ClAneId;
+				document.getElementById('inputDotacaoNome').value = ClAneNome;
+				document.getElementById('inputDotacaoData').value = ClAneData;
+				document.getElementById('inputDotacaoArquivo').value = ClAneArquivo;	
 
 				if (Tipo == 'edita'){	
-					document.formClienteAnexo.action = "clienteAnexoEdita.php";		
+					document.formDotacao.action = "trDotacaoEdita.php";		
 				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formClienteAnexo, "Tem certeza que deseja excluir esse Anexo", "clienteAnexoExclui.php");
+					confirmaExclusao(document.formDotacao, "Tem certeza que deseja excluir esse Anexo", "trDotacaoExclui.php");
 			}
 			
-			document.formClienteAnexo.submit();
+			document.formDotacao.submit();
 		}		
 			
 	</script>
@@ -154,36 +154,72 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="clienteAnexo.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
+										<a href="tr.php" class="list-icons-item" data-action="reload"></a>
 									</div>
 								</div>
 							</div>
 
 							<div class="card-body">
-                                 A relação abaixo faz referência as Dotações Orçamentárias do Termo de Referência <span style="color: #FF0000; font-weight: bold;"> <?php echo $_POST['inputTRNumero']; ?> </span>
-								<div class="text-right"><a href="cliente.php" role="button"><< Cliente</a>&nbsp;&nbsp;&nbsp;
-								<a href="clienteAnexoNovo.php" class="btn btn-principal" role="button">Novo Anexo</a></div>
+								<p>
+									A relação abaixo faz referência as Dotações Orçamentárias do Termo de Referência <span style="color: #FF0000; font-weight: bold;"> <?php echo $_POST['inputTRNumero']; ?> </span>
+								</p>
+
+								<form name="formDotacao" id="formDotacao" method="post" enctype="multipart/form-data" class="form-validate-jquery">
+									<div class="row">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputData">Data</label>
+												<input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
+											</div>
+										</div>
+										<div class="col-lg-10">
+											<div class="form-group">
+												<label for="inputNome">Descrição<span class="text-danger"> *</span></label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Descrição" required autofocus>
+											</div>
+										</div>
+									</div>	
+									<div class="row">
+										<div class="col-lg-12">
+											<label for="inputArquivo">Arquivo<span class="text-danger"> *</span></label>
+											<input type="file" id="inputArquivo" name="inputArquivo" class="form-control" required>
+										</div>
+									</div>	
+									<div class="row">	
+										<div class="col-lg-12">
+											<div class="form-group">										
+												Obs.: arquivos permitidos (.pdf, .doc, .docx, .odt, .jpg, .jpeg, .png) Tamanho máximo: 32MB
+											</div>
+										</div>									
+									</div>												
+									<div class="row" style="margin-top: 30px;">
+										<div class="col-lg-12">								
+											<div class="form-group">
+												<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+												<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
+											</div>
+										</div>
+									</div>
+								</form>
 							</div>
+
 							
 							<table class="table" id="tblClienteAnexo">
 								<thead>
 									<tr class="bg-slate">
-                                        <th>Data</th>
+										<th>Data</th>
 										<th>Descrição</th>
 										<th>Arquivo</th>										
 										<th class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
-								<?php
 
-									foreach ($row as $item){
-										
+									<?php foreach ($row as $item){
 										print('
 										<tr>
-										    <td>'.mostraData($item['ClAneData']).'</td>
-                                            <td>'.$item['ClAneNome'].'</td>
+												<td>'.mostraData($item['ClAneData']).'</td>
+																						<td>'.$item['ClAneNome'].'</td>
 											<td><a href="global_assets/anexos/cliente/'.$item['ClAneArquivo'].'" target="_blank">'.$item['ClAneArquivo'].'</a></td>
 											');
 																										
@@ -196,39 +232,34 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												</div>
 											</td>
 										</tr>');
-									}
-								?>
+										}
+									?>
 
 								</tbody>
 							</table>
 						</div>
 						<!-- /basic responsive configuration -->
-
 					</div>
 				</div>				
 				
 				<!-- /info blocks -->
-				
-				<form name="formClienteAnexo" method="post">
-					<input type="hidden" id="inputClienteAnexoId" name="inputClienteAnexoId">
-					<input type="hidden" id="inputClienteAnexoData" name="inputClienteAnexoData">
-                    <input type="hidden" id="inputClienteAnexoNome" name="inputClienteAnexoNome">
-					<input type="hidden" id="inputClienteAnexoArquivo" name="inputClienteAnexoArquivo">
+				<form name="formDotacao" method="post">
+					<input type="hidden" id="inputDotacaoID" name="inputDotacaoID">
+					<input type="hidden" id="inputDotacaoData" name="inputDotacaoData">
+					<input type="hidden" id="inputDotacaoNome" name="inputDotacaoNome">
+					<input type="hidden" id="inputDotacaoArquivo" name="inputDotacaoArquivo">
 				</form>
-
 			</div>
+
 			<!-- /content area -->
-			
 			<?php include_once("footer.php"); ?>
-
 		</div>
+
 		<!-- /main content -->
-
 	</div>
+
 	<!-- /page content -->
-
 	<?php include_once("alerta.php"); ?>
-
 </body>
 
 </html>
