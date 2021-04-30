@@ -6,14 +6,12 @@ $_SESSION['PaginaAtual'] = 'Editar Contrato';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT  TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefConteudoInicio, 
-				TrRefConteudoFim, TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome,
-				dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias
+$sql = "SELECT TrRefId, TrRefNumero, TrRefCategoria, CategNome, TrRefConteudoInicio, TrRefConteudoFim
 		FROM TermoReferencia
 		JOIN Categoria ON CategId = TrRefCategoria
-		JOIN Situacao ON SituaId = TrRefStatus
-		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . "  and TrRefId = 160
-		ORDER BY TrRefData DESC";
+		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = 160";	
+$result = $conn->query($sql);
+$rowTR = $result->fetch(PDO::FETCH_ASSOC);
 
 $sql = "SELECT ParamEmpresaPublica
 		FROM Parametro
@@ -304,7 +302,7 @@ if (isset($_POST['inputDataInicio'])) {
                                  <div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputTermoReferencia">Nº do Termo de Referência</label>
-										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $row['TrRefNumero']; ?>" readOnly>
+										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $rowTR['TrRefNumero']; ?>" readOnly>
 									</div>
 								</div>
                             </div>
