@@ -6,22 +6,20 @@ $_SESSION['PaginaAtual'] = 'Novo Contrato ';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefConteudoInicio, 
-				TrRefConteudoFim, TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome,
-			    dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias
+$sql = "SELECT TrRefId, TrRefNumero, TrRefCategoria, CategNome, TrRefConteudoInicio, TrRefConteudoFim
 		FROM TermoReferencia
 		JOIN Categoria ON CategId = TrRefCategoria
-		JOIN Situacao ON SituaId = TrRefStatus
-		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = 160
-		ORDER BY TrRefData DESC";
+		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = 160";	
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
 
 $sql = "SELECT ParamEmpresaPublica
 		FROM Parametro
 	    WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
 $result = $conn->query($sql);
-$row = $result->fetch(PDO::FETCH_ASSOC);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
-if ($row['ParamEmpresaPublica']) {
+if ($rowParametro['ParamEmpresaPublica']) {
 	$bObrigatorio = "required";
 } else {
 	$bObrigatorio = "";
@@ -393,9 +391,9 @@ if (isset($_POST['inputDataInicio'])) {
 													WHERE SituaChave = 'ATIVO'
 													ORDER BY MdLicNome ASC";
 											$result = $conn->query($sql);
-											$row = $result->fetchAll(PDO::FETCH_ASSOC);
+											$rowModalidade = $result->fetchAll(PDO::FETCH_ASSOC);
 
-											foreach ($row as $item) {
+											foreach ($rowModalidade as $item) {
 												print('<option value="' . $item['MdLicId'] . '">' . $item['MdLicNome'] . '</option>');
 											}
 											?>
@@ -423,7 +421,7 @@ if (isset($_POST['inputDataInicio'])) {
 									<div class="form-group">
 										<label for="txtareaConteudo">Conteúdo Personalizado - Introdução</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
-										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do Contrato (informe aqui o texto que você queira que apareça no Contrato)"></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do Contrato (informe aqui o texto que você queira que apareça no Contrato)"><?php echo $row['TrRefConteudoInicio']; ?></textarea>
 									</div>
 								</div>
 							</div>
@@ -434,7 +432,7 @@ if (isset($_POST['inputDataInicio'])) {
 									<div class="form-group">
 										<label for="txtareaConteudoFinalizacao">Conteúdo Personalizado - Finalização</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
-										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Contrato (informe aqui o texto que você queira que apareça no término Contrato)"></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Contrato (informe aqui o texto que você queira que apareça no término Contrato)"><?php echo $row['TrRefConteudoFim']; ?></textarea>
 									</div>
 								</div>
 							</div>
