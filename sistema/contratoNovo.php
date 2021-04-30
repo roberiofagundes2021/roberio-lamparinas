@@ -6,6 +6,15 @@ $_SESSION['PaginaAtual'] = 'Novo Contrato ';
 
 include('global_assets/php/conexao.php');
 
+$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome,
+			   TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome,
+			   dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias
+		FROM TermoReferencia
+		JOIN Categoria ON CategId = TrRefCategoria
+		JOIN Situacao ON SituaId = TrRefStatus
+		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = 160
+		ORDER BY TrRefData DESC";
+
 $sql = "SELECT ParamEmpresaPublica
 		FROM Parametro
 	    WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
@@ -284,16 +293,19 @@ if (isset($_POST['inputDataInicio'])) {
 
 						<div class="card-body">
 
-							<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
+							<h5 class="mb-0 font-weight-semibold">Termo de Referência</h5>
 							<br>
-							<div class="row">
-                                 <div class="col-lg-2">
+                            <div class="row">
+                                 <div class="col-lg-3">
 									<div class="form-group">
-										<label for="inputTermoReferencia">Termo de Referência</label>
-										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" readOnly>
+										<label for="inputTermoReferencia">Nº do Termo de Referência</label>
+										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $row['TrRefId']; ?>" readOnly>
 									</div>
 								</div>
                             </div>
+
+							<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
+							<br>
 							<div class="row">
 								<div class="col-lg-4">
 									<div class="form-group">

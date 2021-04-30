@@ -7,9 +7,9 @@ $_SESSION['PaginaAtual'] = 'Fluxo Operacional';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT FlOpeId, ForneNome, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
-			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome, SbCatNome, SituaChave, SituaNome, SituaCor
+			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome, SituaChave, SituaNome, SituaCor,
+			   dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias
 		FROM FluxoOperacional
-		JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 		JOIN Categoria on CategId = FlOpeCategoria
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
 		JOIN Situacao on SituaId = FlOpeStatus
@@ -248,7 +248,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['FlOpeNumProcesso'].'</td>
 											<td>'.$item['ForneNome'].'</td>
 											<td>'.$item['CategNome'].'</td>
-											<td>'. $item['SbCatNome'].'</td>
+											<td>'. $item['SubCategorias'].'</td>
 											<td><span class="'.$situacaoClasse.'">'.$situacao.'</span>
 											');
 											$disabled = $item['SituaChave'] == 'PENDENTE' ? "disabled" : '';
