@@ -330,9 +330,25 @@ if (isset($_POST['inputDataInicio'])) {
 
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required disabled>
-											<option value="">Categoria</option>
+										<label for="cmbCategoria">Categoria <span class="text-danger">*</span> </label>
+										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" disabled>
+											<option value="">Selecione</option>
+											<?php
+											$sql = "SELECT CategId, CategNome
+													FROM Categoria
+													JOIN TermoReferencia on TrRefCategoria = CategId
+													JOIN Situacao on SituaId = CategStatus
+													WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " 
+													ORDER BY CategNome ASC";
+											$result = $conn->query($sql);
+											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+
+											foreach ($rowCategoria as $item) {
+												$seleciona = $item['CategId'] == $row['TrRefCategoria'] ? "selected" : "";
+												print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
+											}
+
+											?>
 										</select>
 									</div>
 								</div>
@@ -356,6 +372,7 @@ if (isset($_POST['inputDataInicio'])) {
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
+											<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" required>
 										</div>
 									</div>
 								</div>
