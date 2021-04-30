@@ -4,30 +4,64 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputClienteAnexoId'])){
+if(isset($_POST['inputDotacaoID'])){
 	
-	$iClienteAnexo = $_POST['inputClienteAnexoId'];
-	$sArquivo = $_POST['inputClienteAnexoArquivo'];
-	$sPasta = 'global_assets/anexos/cliente/';
+	$iDotacaoID = $_POST['inputDotacaoID'];
+	$sArquivo = $_POST['inputDotacaoArquivo'];
+	$sPasta = 'global_assets/anexos/dotacaoOrcamentaria/';
 
 	try{
 		
-		$sql = "DELETE FROM ClienteAnexo
-				WHERE ClAneId = :id";
+		$conn->beginTransaction();
+
+		$sql = "
+			DELETE 
+				FROM DotacaoOrcamentaria
+			 WHERE DtOrcId = :id
+		";
 		$result = $conn->prepare("$sql");
-		$result->bindParam(':id', $iClienteAnexo);
+		$result->bindParam(':id', $iDotacaoID);
 		$result->execute();
 
 		if (file_exists($sPasta.$sArquivo) and $sArquivo <> ""){
 			unlink($sPasta.$sArquivo);
 		}
-		
+
+		/* Muda o status da TR*/
+		$sql = "
+		SELECT SituaId
+			FROM Situacao	
+		 WHERE SituaChave = 'LIBERADOPARCIAL'
+		";
+		$result = $conn->query($sql);
+		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+		/* Capturando dados para Update */
+		$bStatus = intval($rowSituacao['SituaId']);
+		$iUsuario = intval($_SESSION['UsuarId']);
+		$iTermoReferenciaId = intval($_SESSION['inputTRIdDotacao']);
+
+		/* Atualizando dado no BD */
+		$sql = "
+			UPDATE TermoReferencia
+				 SET TrRefStatus = :bStatus, 
+							TrRefUsuarioAtualizador = :iUsuario
+			WHERE TrRefId = :iTermoReferenciaId";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':bStatus', $bStatus);
+		$result->bindParam(':iUsuario', $iUsuario);
+		$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
+		$result->execute();
+
+
+		$conn->commit();
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Anexo excluído!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
 		
+		$conn->rollback();
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao excluir Anexo!!!";
 		$_SESSION['msg']['tipo'] = "error";			
@@ -36,6 +70,6 @@ if(isset($_POST['inputClienteAnexoId'])){
 	}
 }
 
-irpara("clienteAnexo.php");
+irpara("trDotacao.php");
 
 ?>

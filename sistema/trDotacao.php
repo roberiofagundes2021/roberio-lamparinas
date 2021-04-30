@@ -6,6 +6,7 @@
 
 	if (isset($_POST['inputTRId'])){
 		$_SESSION['inputTRIdDotacao'] = $_POST['inputTRId'];
+		$_SESSION['inputTRNumero'] = $_POST['inputTRNumero'];
 	}
 
 	$sql = "
@@ -20,6 +21,7 @@
 	";
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+	$count = count($row);
 
 ?>
 <!DOCTYPE html>
@@ -104,24 +106,68 @@
 			_componentSelect2();
 			
 			/* Fim: Tabela Personalizada */		
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+							
+				var inputFile = $('#inputArquivo').val();
+				var id = $("input:file").attr('id');
+				var tamanho =  1024 * 1024 * 32; //32MB
+								
+				//Verifica se o campo só possui espaços em branco
+				if (inputFile == ''){
+					alerta('Atenção','Selecione o arquivo!','error');
+					$("#formDotacaoFields").submit();
+					$('#inputArquivo').focus();
+					return false;
+				}
+								
+				//Verifica se a extensão é  diferente de PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!
+				if (ext(inputFile) != 'pdf' && ext(inputFile) != 'doc' && ext(inputFile) != 'docx' && ext(inputFile) != 'odt' && ext(inputFile) != 'jpg' && ext(inputFile) != 'jpeg' && ext(inputFile) != 'png'){
+					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!','error');
+					$("#formDotacaoFields").submit();
+					$('#inputArquivo').focus();
+					return false;	
+				}
+				
+				//Verifica o tamanho do arquivo
+				if ($('#'+id)[0].files[0].size > tamanho){
+					alerta('Atenção','O arquivo enviado é muito grande, envie arquivos de até 32MB.','error');
+					$("#formDotacaoFields").submit();
+					$('#inputArquivo').focus();
+					return false;
+				}
+				
+				document.formDotacaoFields.action = 'trDotacaoNovo.php';
+				document.formDotacaoFields.submit();
+			});
 		});
+
+		//Retorna a extenção do arquivo
+		function ext(path) {
+			var final = path.substr(path.lastIndexOf('/')+1);
+			var separador = final.lastIndexOf('.');
+			return separador <= 0 ? '' : final.substr(separador + 1);
+		}	
 			
+
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaClienteAnexo(ClAneId, ClAneData, ClAneNome, ClAneArquivo, Tipo){
+		function removeDotacao(DtOrcId, DtOrcData, DtOrcNome, DtOrcArquivo, Tipo){
 
-				document.getElementById('inputDotacaoID').value = ClAneId;
-				document.getElementById('inputDotacaoNome').value = ClAneNome;
-				document.getElementById('inputDotacaoData').value = ClAneData;
-				document.getElementById('inputDotacaoArquivo').value = ClAneArquivo;	
+			document.getElementById('inputDotacaoID').value = DtOrcId;
+			document.getElementById('inputDotacaoNome').value = DtOrcNome;
+			document.getElementById('inputDotacaoData').value = DtOrcData;
+			document.getElementById('inputDotacaoArquivo').value = DtOrcArquivo;	
 
-				if (Tipo == 'edita'){	
-					document.formDotacao.action = "trDotacaoEdita.php";		
-				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formDotacao, "Tem certeza que deseja excluir esse Anexo", "trDotacaoExclui.php");
+			if (Tipo == 'exclui'){
+					confirmaExclusao(document.formDotacaoExclui, "Tem certeza que deseja excluir esse Anexo", "trDotacaoExclui.php");
 			}
-			
-			document.formDotacao.submit();
-		}		
+		
+			document.formDotacaoExclui.action = 'trDotacaoNovo.php';
+			document.formDotacaoExclui.submit();
+		}	
 			
 	</script>
 
@@ -161,10 +207,10 @@
 
 							<div class="card-body">
 								<p>
-									A relação abaixo faz referência as Dotações Orçamentárias do Termo de Referência <span style="color: #FF0000; font-weight: bold;"> <?php echo $_POST['inputTRNumero']; ?> </span>
+									A relação abaixo faz referência as Dotações Orçamentárias do Termo de Referência <span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['inputTRNumero']; ?> </span>
 								</p>
 
-								<form name="formDotacao" id="formDotacao" method="post" enctype="multipart/form-data" class="form-validate-jquery">
+								<form name="formDotacaoFields" id="formDotacaoFields" method="post" enctype="multipart/form-data" class="form-validate-jquery">
 									<div class="row">
 										<div class="col-lg-2">
 											<div class="form-group">
@@ -191,15 +237,19 @@
 												Obs.: arquivos permitidos (.pdf, .doc, .docx, .odt, .jpg, .jpeg, .png) Tamanho máximo: 32MB
 											</div>
 										</div>									
-									</div>												
-									<div class="row" style="margin-top: 30px;">
-										<div class="col-lg-12">								
-											<div class="form-group">
-												<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-												<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
+									</div>
+
+									<?php if ($count <= 0) : ?>
+										<div class="row" style="margin-top: 30px;">
+											<div class="col-lg-12">								
+												<div class="form-group">
+													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+													<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
+												</div>
 											</div>
 										</div>
-									</div>
+									<?php endif; ?>
+
 								</form>
 							</div>
 
@@ -217,21 +267,27 @@
 
 									<?php foreach ($row as $item){
 										print('
-										<tr>
-												<td>'.mostraData($item['ClAneData']).'</td>
-																						<td>'.$item['ClAneNome'].'</td>
-											<td><a href="global_assets/anexos/cliente/'.$item['ClAneArquivo'].'" target="_blank">'.$item['ClAneArquivo'].'</a></td>
-											');
-																										
-										print('<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-															<a href="#" onclick="atualizaClienteAnexo('.$item['ClAneId'].', \''.$item['ClAneData'].'\',\''.$item['ClAneNome'].'\', \''.$item['ClAneArquivo'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-															<a href="#" onclick="atualizaClienteAnexo('.$item['ClAneId'].', \''.$item['ClAneData'].'\',\''.$item['ClAneNome'].'\', \''.$item['ClAneArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+											<tr>
+												<td>'.mostraData($item['DtOrcData']).'</td>
+
+												<td>'.$item['DtOrcNome'].'</td>
+
+												<td>
+													<a href="global_assets/anexos/cliente/'.$item['DtOrcArquivo'].'" target="_blank">'.$item['DtOrcArquivo'].'</a>
+												</td>
+												
+												<td class="text-center">
+													<div class="list-icons">
+														<div class="list-icons list-icons-extended">
+
+															<a href="#" onclick="removeDotacao('.$item['DtOrcId'].', \''.$item['DtOrcData'].'\',\''.$item['DtOrcNome'].'\', \''.$item['DtOrcArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>	
+
+														</div>
 													</div>
-												</div>
-											</td>
-										</tr>');
+												</td>
+
+											</tr>
+										');
 										}
 									?>
 
@@ -243,7 +299,7 @@
 				</div>				
 				
 				<!-- /info blocks -->
-				<form name="formDotacao" method="post">
+				<form name="formDotacaoExclui" method="post">
 					<input type="hidden" id="inputDotacaoID" name="inputDotacaoID">
 					<input type="hidden" id="inputDotacaoData" name="inputDotacaoData">
 					<input type="hidden" id="inputDotacaoNome" name="inputDotacaoNome">

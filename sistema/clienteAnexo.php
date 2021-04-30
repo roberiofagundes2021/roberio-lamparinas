@@ -158,7 +158,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="card-body">
-                                 A relação abaixo faz referência aos Anexos do cliente <span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['nomeCliente']; ?> </span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
+								A relação abaixo faz referência aos Anexos do cliente <span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['nomeCliente']; ?> </span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
+								
 								<div class="text-right"><a href="cliente.php" role="button"><< Cliente</a>&nbsp;&nbsp;&nbsp;
 								<a href="clienteAnexoNovo.php" class="btn btn-principal" role="button">Novo Anexo</a></div>
 							</div>
@@ -209,7 +210,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<form name="formClienteAnexo" method="post">
 					<input type="hidden" id="inputClienteAnexoId" name="inputClienteAnexoId">
 					<input type="hidden" id="inputClienteAnexoData" name="inputClienteAnexoData">
-                    <input type="hidden" id="inputClienteAnexoNome" name="inputClienteAnexoNome">
+					<input type="hidden" id="inputClienteAnexoNome" name="inputClienteAnexoNome">
 					<input type="hidden" id="inputClienteAnexoArquivo" name="inputClienteAnexoArquivo">
 				</form>
 
