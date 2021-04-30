@@ -6,9 +6,9 @@ $_SESSION['PaginaAtual'] = 'Editar Contrato';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome,
-			   TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome,
-			   dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias
+$sql = "SELECT  TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefConteudoInicio, 
+				TrRefConteudoFim, TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome,
+				dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias
 		FROM TermoReferencia
 		JOIN Categoria ON CategId = TrRefCategoria
 		JOIN Situacao ON SituaId = TrRefStatus
@@ -304,7 +304,7 @@ if (isset($_POST['inputDataInicio'])) {
                                  <div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputTermoReferencia">Nº do Termo de Referência</label>
-										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $row['TrRefId']; ?>" readOnly>
+										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $row['TrRefNumero']; ?>" readOnly>
 									</div>
 								</div>
                             </div>

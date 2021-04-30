@@ -6,9 +6,9 @@ $_SESSION['PaginaAtual'] = 'Novo Contrato ';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome,
-			   TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome,
-			   dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias
+$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefTipo, CategNome, TrRefConteudoInicio, 
+				TrRefConteudoFim, TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome,
+			    dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias
 		FROM TermoReferencia
 		JOIN Categoria ON CategId = TrRefCategoria
 		JOIN Situacao ON SituaId = TrRefStatus
@@ -299,7 +299,7 @@ if (isset($_POST['inputDataInicio'])) {
                                  <div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputTermoReferencia">Nº do Termo de Referência</label>
-										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $row['TrRefId']; ?>" readOnly>
+										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $row['TrRefNumero']; ?>" readOnly>
 									</div>
 								</div>
                             </div>
@@ -358,7 +358,6 @@ if (isset($_POST['inputDataInicio'])) {
 											<span class="input-group-prepend">
 												<span class="input-group-text"><i class="icon-calendar22"></i></span>
 											</span>
-											<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" required>
 										</div>
 									</div>
 								</div>
