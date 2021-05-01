@@ -6,10 +6,10 @@ $_SESSION['PaginaAtual'] = 'Editar Contrato';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT TrRefId, TrRefNumero, TrRefCategoria, CategNome, TrRefConteudoInicio, TrRefConteudoFim
+$sql = "SELECT TrRefId, TrRefNumero, TrRefCategoria, CategNome, CategId, TrRefConteudoInicio, TrRefConteudoFim
 		FROM TermoReferencia
 		JOIN Categoria ON CategId = TrRefCategoria
-		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = 160";	
+		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = 151";	
 $result = $conn->query($sql);
 $rowTR = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -181,27 +181,9 @@ if (isset($_POST['inputDataInicio'])) {
 			//Ao mudar o Fornecedor, filtra a categoria e o Orçamento via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
 
-				FiltraCategoria();
 				FiltraSubCategoria();
 
 				var cmbFornecedor = $('#cmbFornecedor').val();
-
-				$.getJSON('filtraCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
-
-					//var option = '<option value="#">Selecione a Categoria</option>';
-					var option = '';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.CategId + '">' + obj.CategNome + '</option>';
-						});
-
-						$('#cmbCategoria').html(option).show();
-					} else {
-						ResetCategoria();
-					}
-				});
 
 				$.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
 
@@ -222,18 +204,9 @@ if (isset($_POST['inputDataInicio'])) {
 
 			});
 
-			//Mostra o "Filtrando..." na combo Categoria
-			function FiltraCategoria() {
-				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
-			}
-
 			//Mostra o "Filtrando..." na combo SubCategoria
 			function FiltraSubCategoria() {
 				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-			}
-
-			function ResetCategoria() {
-				$('#cmbCategoria').empty().append('<option value="">Sem Categoria</option>');
 			}
 
 			function ResetSubCategoria() {
@@ -314,12 +287,11 @@ if (isset($_POST['inputDataInicio'])) {
 									<div class="form-group">
 										<label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
 										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
-											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 													FROM Fornecedor
 													JOIN Situacao on SituaId = ForneStatus
-													WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+													WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and ForneCategoria = " . $rowTR['CategId'] . " and SituaChave = 'ATIVO'
 													ORDER BY ForneNome ASC";
 											$result = $conn->query($sql);
 											$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
