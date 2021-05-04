@@ -306,9 +306,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<form name="formFluxoOperacional" method="post">
 					<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId">
 					<input type="hidden" id="inputFluxoOperacionalCategoria" name="inputFluxoOperacionalCategoria">
-					<input type="hidden" id="inputFluxoOperacionalSubCategoria"
-						name="inputFluxoOperacionalSubCategoria">
+					<input type="hidden" id="inputFluxoOperacionalSubCategoria"	name="inputFluxoOperacionalSubCategoria">
 					<input type="hidden" id="inputFluxoOperacionalStatus" name="inputFluxoOperacionalStatus">
+					<input type="hidden" id="inputOrigem" name="inputOrigem" value="fluxo.php">
 				</form>
 
 			</div>

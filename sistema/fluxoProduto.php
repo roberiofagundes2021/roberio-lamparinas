@@ -10,11 +10,11 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputFluxoOperacionalId'])){
 	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
 	$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
-	$iSubCategoria = $_POST['inputFluxoOperacionalSubCategoria'];
+	$iSubCategorias = $_POST['inputFluxoOperacionalSubCategoria'];
 } else if (isset($_POST['inputIdFluxoOperacional'])){
 	$iFluxoOperacional = $_POST['inputIdFluxoOperacional'];
 	$iCategoria = $_POST['inputIdCategoria'];
-	$iSubCategoria = $_POST['inputIdSubCategoria'];
+	$iSubCategorias = $_POST['inputIdSubCategoria'];
 } else {
 	irpara("fluxo.php");
 }
@@ -445,7 +445,7 @@ try{
 													JOIN Situacao on SituaId = ProduStatus
 													LEFT JOIN Marca on MarcaId = ProduMarca
 													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and 
-													ProduSubCategoria = ".$iSubCategoria." and SituaChave = 'ATIVO' ";
+													ProduSubCategoria in (".$iSubCategorias.") and SituaChave = 'ATIVO' ";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 											$countProduto = count($rowProdutos);

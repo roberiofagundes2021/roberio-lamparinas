@@ -4,30 +4,58 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['termoReferencia'])){
-	$sql = "SELECT FlOpeId
-		    FROM FluxoOperacional
-            JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
-		    WHERE FlOpeUnidade = ".$_SESSION['UnidadeId']." and FlOpeTermoReferencia = '".$_POST['termoReferencia']."' and FOXSCSubCategoria = '".$_POST['subCategoria']."'";
-}
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
+$count = 0;
 
-$count = count($row);
+if (isset($_POST['termoReferencia'])){
+
+	$subCategoriasNovas = '';
+
+	foreach ($_POST['subCategoriaNovas'] as $value) {
+		if ($subCategoriasNovas == ''){
+			$subCategoriasNovas .= $value;
+		} else {
+			$subCategoriasNovas .= ", ".$value;
+		}
+	} 
+
+	// Quando tiver editando o contrato/fluxo
+	if (isset($_POST['subCategoriasAntigas'])){
+		
+		$subCategoriasAntigas = '';
+		
+		foreach ($_POST['subCategoriaAntigas'] as $value) {
+			if ($subCategoriasAntigas == ''){
+				$subCategoriasAntigas .= $value;
+			} else {
+				$subCategoriasAntigas .= ", ".$value;
+			}
+		} 
+
+		$sql = "SELECT FlOpeId
+		FROM FluxoOperacional
+		JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
+		WHERE FlOpeUnidade = ".$_SESSION['UnidadeId']." and 
+		FlOpeTermoReferencia = ".$_POST['termoReferencia']." and FOXSCSubCategoria in (".$subCategoriasNovas.") 
+		and FOXSCSubCategoria not in (".$subCategoriasAntigas.")";
+
+	} else { //quando for um novo contrato/fluxo
+		
+		$sql = "SELECT FlOpeId
+		FROM FluxoOperacional
+		JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
+		WHERE FlOpeUnidade = ".$_SESSION['UnidadeId']." and 
+		FlOpeTermoReferencia = ".$_POST['termoReferencia']." and FOXSCSubCategoria in (".$subCategoriasNovas.")";
+	}	
+
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+	$count = count($row);			
+}
 
 //Verifica se já existe esse registro (se existir, retorna true )
 if($count){
-	if(isset($_POST['fluxoOperacionalId'])){
-        foreach ($row as $FluxoOperacinal) {
-	        if($FluxoOperacinal['FlOpeId'] == $_POST['fluxoOperacionalId']){
-		       echo 0;
-	        } else {
-               echo 1;
-	        }
-	    }
-	} else {
-		echo 1;
-	}
+	echo 1;
 } else{
 	echo 0;
 }

@@ -4,6 +4,8 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
+$sDestino = $_POST['inputOrigem'];
+
 if(isset($_POST['inputFluxoOperacionalId'])){
 	
 	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
@@ -50,6 +52,6 @@ if(isset($_POST['inputFluxoOperacionalId'])){
 	}
 }
 
-irpara("fluxo.php");
+irpara($sDestino);
 
 ?>
