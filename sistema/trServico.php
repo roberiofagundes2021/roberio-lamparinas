@@ -268,10 +268,13 @@ try {
 												<label for="cmbSubCategoria">SubCategoria(as)</label>
 												<div class="d-flex flex-row" style="padding-top: 7px;">
 													<?php
-													$sql = "SELECT SbCatId, SbCatNome
-                                                            FROM SubCategoria
-                                                            JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-                                                            WHERE SBCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $iTR;
+													$sql = "
+														SELECT SbCatId, SbCatNome
+															FROM SubCategoria
+															JOIN TRXSubcategoria 
+															  ON TRXSCSubcategoria = SbCatId
+														 WHERE SBCatUnidade = " . $_SESSION['UnidadeId'] . "
+														   AND TRXSCTermoReferencia = " . $iTR;
 													$result = $conn->query($sql);
 													$rowSbCat = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -293,10 +296,16 @@ try {
 													if (count($aServicos1) >= 1) {
 														if (count($rowSubCat) >= 1) {
 															foreach ($rowSubCat as $valueSubCat) {
-																$sql = "SELECT SrOrcId, SrOrcNome
-														                FROM ServicoOrcamento
-																		JOIN Situacao on SituaId = SrOrcSituacao				     
-																		WHERE SrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " and SituaChave = 'ATIVO' and SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and SrOrcCategoria = " . $iCategoria;
+																$sql = "
+																	SELECT SrOrcId, SrOrcNome
+														        FROM ServicoOrcamento
+																		JOIN Situacao 
+																		  ON SituaId = SrOrcSituacao				     
+																	 WHERE SrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " 
+																	   AND SituaChave = 'ATIVO' 
+																		 AND SrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
+																		 AND SrOrcCategoria = " . $iCategoria;
+
 																if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null) {
 																	$sql .= " and SrOrcSubCategoria = " . $row['TrRefSubCategoria'];
 																}
@@ -317,16 +326,22 @@ try {
 													} else {
 														if (count($rowSubCat) >= 1) {
 															foreach ($rowSubCat as $subcategoria) {
-																$sql = "SELECT ServiId, ServiNome
-																         FROM Servico
-																		 JOIN Situacao on SituaId = ServiStatus		
-																         WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria . "";
+																$sql = "
+																	SELECT ServiId, ServiNome
+																    FROM Servico
+																	  JOIN Situacao 
+																		  ON SituaId = ServiStatus		
+																   WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
+																	   AND SituaChave = 'ATIVO' 
+																		 AND ServiCategoria = " . $iCategoria . "
+																";
 																if ($subcategoria['TRXSCSubcategoria'] != '' and $subcategoria['TRXSCSubcategoria'] != null) {
 																	$sql .= " and ServiSubCategoria = " . $subcategoria['TRXSCSubcategoria'];
 																}
 																$sql .= " ORDER BY ServiNome ASC";
 																$result = $conn->query($sql);
 																$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
+
 																foreach ($rowServico as $item) {
 																	if (in_array($item['ServiId'], $aServicos2)) {
 																		$seleciona = "selected";
@@ -338,13 +353,19 @@ try {
 																}
 															}
 														} else{
-															$sql = "SELECT ServiId, ServiNome
-															         FROM Servico
-																	 JOIN Situacao on SituaId = ServiStatus		
-															         WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria . "";
+															$sql = "
+																SELECT ServiId, ServiNome
+															    FROM Servico
+																  JOIN Situacao 
+																	  ON SituaId = ServiStatus		
+															   WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
+																   AND SituaChave = 'ATIVO' 
+																	 AND ServiCategoria = " . $iCategoria . "
+															";
 															$sql .= " ORDER BY ServiNome ASC";
 															$result = $conn->query($sql);
 															$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
+
 															foreach ($rowServico as $item) {
 																if (in_array($item['ServiId'], $aServicos2)) {
 																	$seleciona = "selected";

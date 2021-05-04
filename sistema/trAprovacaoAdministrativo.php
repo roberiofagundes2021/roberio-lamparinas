@@ -28,9 +28,9 @@ if(isset($_POST['inputTRId'])){
 				SELECT COUNT(TRXSrTermoReferencia) as countServico
 					FROM TermoReferenciaXServico
 				 WHERE TRXSrTermoReferencia = ".$iTrId." 
-				 	 AND ((TRXPrQuantidade <= 0) 
-						OR (TRXPrQuantidade is null) 
-						OR (TRXPrQuantidade = ''))
+				 	 AND ((TRXSrQuantidade <= 0) 
+						OR (TRXSrQuantidade is null) 
+						OR (TRXSrQuantidade = ''))
 			";
 			$result = $conn->query($sql);
 			$rowServico = $result->fetch(PDO::FETCH_ASSOC);
@@ -85,9 +85,9 @@ if(isset($_POST['inputTRId'])){
 				SELECT COUNT(TRXSrTermoReferencia) as countServico
 					FROM TermoReferenciaXServico
 				 WHERE TRXSrTermoReferencia = ".$iTrId." 
-				   AND ((TRXPrQuantidade <= 0) 
-				    OR (TRXPrQuantidade is null) 
-				    OR (TRXPrQuantidade = ''))
+				   AND ((TRXSrQuantidade <= 0) 
+				    OR (TRXSrQuantidade is null) 
+				    OR (TRXSrQuantidade = ''))
 			";
 			$result = $conn->query($sql);
 			$rowServico = $result->fetch(PDO::FETCH_ASSOC);
@@ -165,17 +165,23 @@ if(isset($_POST['inputTRId'])){
 			$result = $conn->query($sql);
 			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 
-			if ($count == 0){
-				$tipo = $rowTermoReferencia['TrRefTipo'] == 'S' 
-					? 'Serviços' : $rowTermoReferencia['TrRefTipo'] == 'P' 
-					? 'Produtos' : $rowTermoReferencia['TrRefTipo'] == 'PS' 
-				 && 'Produtos e Serviços';
 
+			$tipo = '';
+			if ($rowTermoReferencia['TrRefTipo'] === "S") {
+				$tipo = 'Serviços';
+			} else if ($rowTermoReferencia['TrRefTipo'] === "P") {
+				$tipo = 'Produtos';
+			} else if ($rowTermoReferencia['TrRefTipo'] === "PS") {
+				$tipo = 'Produtos e Serviços';
+			} 
+
+
+			$sIdentificacao = '
+				Termo de Referência (Nº Termo: '.$rowTermoReferencia['TrRefNumero'].' | Data: '.mostradata($rowTermoReferencia['TrRefData']).' | Tipo: '.$tipo.')
+			';
+
+			if ($count == 0){
 				/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
-				$sIdentificacao = '
-					Termo de Referência (Nº Termo: '.$rowTermoReferencia['TrRefNumero'].' | Data: '.mostradata($rowTermoReferencia['TrRefData']).' | Tipo: '.$tipo.')
-				';
-			
 				$sql = "
 					INSERT INTO 
 						Bandeja (
@@ -257,6 +263,7 @@ if(isset($_POST['inputTRId'])){
 				$sql = "
 					UPDATE Bandeja 
 					   SET BandeData = :dData, 
+								 BandeIdentificacao = :sIdentificacao,
 								 BandeSolicitante = :iSolicitante, 
 								 BandeStatus = :iStatus, 
 								 BandeUsuarioAtualizador = :iUsuarioAtualizador,
@@ -272,7 +279,8 @@ if(isset($_POST['inputTRId'])){
 					':iStatus' 							=> $rowSituacao['SituaId'],
 					':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
 					':iUnidade' 						=> $_SESSION['UnidadeId'],
-					':iIdBandeja' 					=> $rowBandeja['BandeId']														
+					':iIdBandeja' 					=> $rowBandeja['BandeId'],
+					':sIdentificacao' 			=> $sIdentificacao,
 				));
 
 				/* Deleta os perfis da bandeja */ 

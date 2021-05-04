@@ -7,31 +7,40 @@ $_SESSION['PaginaAtual'] = 'Termo de Referência';
 include('global_assets/php/conexao.php');
 
 $sql = "
-	SELECT TrRefId, 
-				 TrRefNumero,
-				 TrRefData,
-				 TrRefCategoria,
-				 TrRefTipo,
-				 CategNome,
-				 TrRefStatus,
-				 TrRefLiberaParcial,
-				 SituaId,
-				 SituaCor,
-				 SituaChave,
-				 SituaNome,
-				 dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) 
-				 	as SubCategorias
-		FROM TermoReferencia
-		JOIN Categoria 
-			ON CategId = TrRefCategoria
-		JOIN Situacao 
-			ON SituaId = TrRefStatus
-	 WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . "
-	 ORDER BY TrRefData DESC
+		SELECT TrRefId, 
+					 TrRefNumero,
+					 TrRefData,
+					 TrRefCategoria,
+					 TrRefTipo,
+					 CategNome,
+					 TrRefStatus,
+					 TrRefLiberaParcial,
+					 SituaId,
+					 SituaCor,
+					 SituaChave,
+					 SituaNome,
+					 dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) 
+						as SubCategorias,
+					 BandeMotivo
+			FROM TermoReferencia
+			JOIN Categoria 
+				ON CategId = TrRefCategoria
+			JOIN Situacao 
+				ON SituaId = TrRefStatus
+		LEFT 
+			JOIN Bandeja 
+			  ON BandeTabelaId = TrRefId 
+			 AND BandeTabela = 'TermoReferencia' 
+			 AND BandeUnidade = " . $_SESSION['UnidadeId'] . "
+		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . "
+		ORDER BY TrRefData DESC
 ";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
+
+// var_dump($row);
+// die;
 
 ?>
 
@@ -61,6 +70,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
 	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
+
+	<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>		
 
 	<script type="text/javascript">
 	
@@ -141,7 +152,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaTR(TRId, TRNumero, TRCategoria, CategNome, TRStatus, Tipo, liberaParcial) {
+		function atualizaTR(TRId, TRNumero, TRCategoria, CategNome, TRStatus, Tipo, liberaParcial, Motivo) {
 
 			document.getElementById('inputTRId').value = TRId;
 			document.getElementById('inputTRNumero').value = TRNumero;
@@ -149,7 +160,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			document.getElementById('inputTRNomeCategoria').value = CategNome;
 			document.getElementById('inputTRStatus').value = TRStatus;
 
-			if (Tipo == 'imprimirTr') {
+			if (Tipo == 'motivo' && Motivo !== '' && Motivo !== null)  {				
+				bootbox.alert({
+					title: '<strong>Motivo da Não Liberação</strong>',
+						message: Motivo
+				});	
+				return false;
+
+			} else if (Tipo == 'imprimirTr') {
 				document.formTR.action = "trImprime.php";
 				document.formTR.setAttribute("target", "_blank");
 				document.formTR.submit();
@@ -362,12 +380,24 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirComissao\');" class="dropdown-item" title="Imprimir Comissão"><i class="icon-printer2"></i> Imprimir Comissão</a>
 
 																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirTr\');" class="dropdown-item" title="Imprimir TR"><i class="icon-printer2"></i> Imprimir TR</a>
+												');
+													
+												if (isset($item['BandeMotivo']) && $item['TrRefStatus'] == 6){
+													print('
+																		<div class="dropdown-divider"></div>
+																		
+																		<a href="#" onclick="atualizaTR('.$item['TrRefId'].', \''.$item['TrRefNumero'].'\', \''.$item['TrRefCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrRefStatus'].', \'motivo\', \'0\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>
+													');
+												}
+
+												print('
+																		</div>
 																	</div>
 																</div>
 															</div>
-														</div>
-													</td>
-												</tr>');
+														</td>
+													</tr>
+												');
 											}
 
 										} else if ($item['TrRefTipo'] == 'S') {
@@ -396,7 +426,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												);
 
 											} else if (isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == true) {
-													print('<td class="text-center">
+													print('
+														<td class="text-center">
 														<div class="list-icons">
 															<div class="list-icons list-icons-extended">
 																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
@@ -427,12 +458,24 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirComissao\');" class="dropdown-item" title="Imprimir Comissão"><i class="icon-printer2"></i> Imprimir Comissão</a>
 
 																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirTr\');" class="dropdown-item" title="Imprimir TR"><i class="icon-printer2"></i> Imprimir TR</a>
+													');
+
+													if (isset($item['BandeMotivo']) && $item['TrRefStatus'] == 6){
+														print('
+																			<div class="dropdown-divider"></div>
+
+																			<a href="#" onclick="atualizaTR('.$item['TrRefId'].', \''.$item['TrRefNumero'].'\', \''.$item['TrRefCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrRefStatus'].', \'motivo\', \'0\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>
+														');
+													}
+
+													print('
+																			</div>
+																		</div>
 																	</div>
 																</div>
-															</div>
-														</div>
-													</td>
-												</tr>');
+															</td>
+														</tr>
+													');
 											}
 										} else {
 											if(isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == false) {
@@ -496,13 +539,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirComissao\');" class="dropdown-item" title="Imprimir Comissão"><i class="icon-printer2"></i> Imprimir Comissão</a>
 
 																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirTr\');" class="dropdown-item" title="Imprimir TR"><i class="icon-printer2"></i> Imprimir TR</a>
+													');
+
+													
+													if (isset($item['BandeMotivo']) && $item['TrRefStatus'] == 6){
+														print('
+																			<div class="dropdown-divider"></div>
+																			
+																			<a href="#" onclick="atualizaTR('.$item['TrRefId'].', \''.$item['TrRefNumero'].'\', \''.$item['TrRefCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrRefStatus'].', \'motivo\', \'0\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>
+														');
+													}
+
+													print('
+																			</div>
 																		</div>
 																	</div>
 																</div>
-															</div>
-														</td>
-													</tr>'
-												);
+															</td>
+														</tr>
+													');
 											}
 										}
 									}

@@ -144,11 +144,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			document.getElementById('inputOrdemCompraTipo').value = OrComTipo;
 			
 			if (Tipo == 'motivo'){
-	            bootbox.alert({
-                    title: '<strong>Motivo da Não Liberação</strong>',
-                    message: Motivo
-                });
-                return false;
+				bootbox.alert({
+							title: '<strong>Motivo da Não Liberação</strong>',
+							message: Motivo
+					});
+
+				return false;
 			} else if (Tipo == 'imprimir'){
 				if (OrComSituacaoChave == 'AGUARDANDOLIBERACAO'){			
 					alerta('Atenção','Enquanto o status estiver AGUARDANDO LIBERAÇÃO a impressão não poderá ser realizada!','error');

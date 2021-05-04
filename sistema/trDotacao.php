@@ -239,16 +239,17 @@
 										</div>									
 									</div>
 
-									<?php if ($count <= 0) : ?>
-										<div class="row" style="margin-top: 30px;">
-											<div class="col-lg-12">								
-												<div class="form-group">
+									
+									<div class="row" style="margin-top: 30px;">
+										<div class="col-lg-12">								
+											<div class="form-group">
+												<?php if ($count <= 0) : ?>
 													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-													<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
-												</div>
+												<?php endif; ?>
+												<a href="tr.php" class="btn btn-basic" role="button"><< Termo de Referência</a>
 											</div>
 										</div>
-									<?php endif; ?>
+									</div>
 
 								</form>
 							</div>
