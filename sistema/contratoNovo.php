@@ -209,6 +209,8 @@ if (isset($_POST['inputDataInicio'])) {
 
 				e.preventDefault();
 
+                var inputTermoReferencia = $('#inputTermoReferencia').val();     
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				var cmbFornecedor = $('#cmbFornecedor').val();
 				var cmbCategoria = $('#cmbCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
@@ -221,6 +223,21 @@ if (isset($_POST['inputDataInicio'])) {
 					$('#inputDataFim').focus();
 					return false;
 				}
+
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "contratoValida.php",
+					data: {termoReferencia : inputTermoReferencia, subCategoria : cmbSubCategoria},
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Já exite TermoReferencia ligado a essa SubCategoria !','error');
+							return false;
+						}
+						console.log(resposta)
+					}
+				})
 
 				$("#formFluxoOperacional").submit();
 
@@ -299,7 +316,7 @@ if (isset($_POST['inputDataInicio'])) {
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbCategoria">Categoria <span class="text-danger">*</span> </label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" disabled>
+										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" readOnly>
 											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT CategId, CategNome

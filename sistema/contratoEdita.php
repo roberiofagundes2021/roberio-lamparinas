@@ -309,7 +309,7 @@ if (isset($_POST['inputDataInicio'])) {
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbCategoria">Categoria <span class="text-danger">*</span> </label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" disabled>
+										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" readOnly>
 											<option value="">Selecione</option>
 											<?php
 											$sql = "SELECT CategId, CategNome
