@@ -37,16 +37,24 @@ if (isset($_POST['inputFluxoOperacionalId'])) {
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 
 		//SubCategorias para esse fornecedor
-		$sql = ("SELECT SbCatId, SbCatNome,FOXSCSubCategoria
-				 FROM SubCategoria
-				 JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
-				 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
-				 ORDER BY SbCatNome ASC");
-		$result = $conn->query("$sql");
+		$sql = "SELECT SbCatId, SbCatNome,FOXSCSubCategoria
+				FROM SubCategoria
+				JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
+				WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
+				ORDER BY SbCatNome ASC";
+		$result = $conn->query($sql);
 		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
 		
+		$sSubCategorias = '';
+
 		foreach ($rowBD as $item){
 			$aSubCategorias[] = $item['SbCatId'];
+
+			if ($sSubCategorias == ''){
+				$sSubCategorias .= $item['SbCatId'];
+			} else {
+				$sSubCategorias .= ", ".$item['SbCatId'];
+			}
 		}
 					
 		$_SESSION['msg'] = array();
@@ -240,7 +248,7 @@ if (isset($_POST['inputDataInicio'])) {
 							alerta('Atenção','Já existe Contrato com a(s) SubCategoria(s) informada(s) vinculado a esse Termo de Referência "' + inputTRNumero + '"!','error');
 							return false;
 						}
-						//console.log(resposta)
+						console.log(resposta)
 
 						$("#formFluxoOperacional").submit();
 					}
@@ -279,7 +287,7 @@ if (isset($_POST['inputDataInicio'])) {
 						</div>
 
 						<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" value="<?php echo $row['FlOpeId']; ?>">
-						<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="<?php echo $rowBD['FOXSCSubCategoria']; ?>" >
+						<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="<?php echo $sSubCategorias; ?>" >
 
 						<div class="card-body">
 

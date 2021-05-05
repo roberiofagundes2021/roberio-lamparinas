@@ -20,23 +20,13 @@ if (isset($_POST['termoReferencia'])){
 
 	// Quando tiver editando o contrato/fluxo
 	if (isset($_POST['subCategoriasAntigas'])){
-		
-		$subCategoriasAntigas = '';
-		
-		foreach ($_POST['subCategoriaAntigas'] as $value) {
-			if ($subCategoriasAntigas == ''){
-				$subCategoriasAntigas .= $value;
-			} else {
-				$subCategoriasAntigas .= ", ".$value;
-			}
-		} 
 
 		$sql = "SELECT FlOpeId
 		FROM FluxoOperacional
 		JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
 		WHERE FlOpeUnidade = ".$_SESSION['UnidadeId']." and 
 		FlOpeTermoReferencia = ".$_POST['termoReferencia']." and FOXSCSubCategoria in (".$subCategoriasNovas.") 
-		and FOXSCSubCategoria not in (".$subCategoriasAntigas.")";
+		and FOXSCSubCategoria not in (".$_POST['subCategoriasAntigas'].")";
 
 	} else { //quando for um novo contrato/fluxo
 		
