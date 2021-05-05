@@ -103,10 +103,12 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 try{
 	
 	$sql = "SELECT FlOpeId, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
-				   SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, SituaNome
+				   SbCatNome, FOXSCSubCategoria, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, SituaNome,
+				    dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias
 			FROM FluxoOperacional
 			JOIN Fornecedor on ForneId = FlOpeFornecedor
 			JOIN Categoria on CategId = FlOpeCategoria
+			JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
 			JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 			JOIN Situacao on SituaId = FlOpeStatus
 			WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ".$iFluxoOperacional;
@@ -115,6 +117,7 @@ try{
 	
 	$sql = "SELECT FOXPrProduto
 			FROM FluxoOperacionalXProduto
+			JOIN TermoReferenciaXProduto on TRXPrProduto = FOXPrProduto
 			JOIN Produto on ProduId = FOXPrProduto
 			WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
@@ -347,7 +350,7 @@ try{
 											<div class="form-group">
 												<label for="inputCategoriaNome">SubCategoria</label>
 												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo $row['SbCatNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['FlOpeSubCategoria']; ?>">
+												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $row['FOXSCSubCategoria']; ?>">
 											</div>
 										</div>
 										<div class="col-lg-2">

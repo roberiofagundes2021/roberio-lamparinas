@@ -37,7 +37,7 @@ if (isset($_POST['inputFluxoOperacionalId'])) {
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 
 		//SubCategorias para esse fornecedor
-		$sql = ("SELECT SbCatId, SbCatNome
+		$sql = ("SELECT SbCatId, SbCatNome,FOXSCSubCategoria
 				 FROM SubCategoria
 				 JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
 				 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
@@ -72,10 +72,9 @@ if (isset($_POST['inputDataInicio'])) {
 		$conn->beginTransaction();				
 
 		$result->execute(array(
-			':iTermoReferencia' => $_POST['inputTermoReferencia'] == '' ? null : $_POST['inputTermoReferencia'],
+			':iTermoReferencia' => $_POST['inputTermoReferenciaId'] == '' ? null : $_POST['inputTermoReferenciaId'],
 			':iFornecedor' => $_POST['cmbFornecedor'],
-			':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
-			//':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
+			':iCategoria' => $_POST['inputCategoriaId'] == '' ? null : $_POST['inputCategoriaId'],
 			':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':iNumContrato' => $_POST['inputNumContrato'],
@@ -217,13 +216,12 @@ if (isset($_POST['inputDataInicio'])) {
 			$('#enviar').on('click', function(e) {
 
 				e.preventDefault();
-
-				var cmbFornecedor = $('#cmbFornecedor').val();
-				var cmbCategoria = $('#cmbCategoria').val();
+				var inputTRId = $('#inputTermoReferenciaId').val();
+				var inputTRNumero = $('#inputTermoReferencia').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
+				var inputSubCategoria = $('#inputSubCategoria').val();
 				var inputDataInicio = $('#inputDataInicio').val();
 				var inputDataFim = $('#inputDataFim').val();
-				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
 
 				if (inputDataFim < inputDataInicio) {
 					alerta('Atenção', 'A Data Fim deve ser maior que a Data Início!', 'error');
@@ -231,7 +229,22 @@ if (isset($_POST['inputDataInicio'])) {
 					return false;
 				}
 
-				$("#formFluxoOperacional").submit();
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "contratoValida.php",
+					data: {termoReferencia : inputTRId, subCategoriaNovas : cmbSubCategoria, subCategoriasAntigas: inputSubCategoria},
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Já existe Contrato com a(s) SubCategoria(s) informada(s) vinculado a esse Termo de Referência "' + inputTRNumero + '"!','error');
+							return false;
+						}
+						//console.log(resposta)
+
+						$("#formFluxoOperacional").submit();
+					}
+				});
 
 			});
 
@@ -266,6 +279,7 @@ if (isset($_POST['inputDataInicio'])) {
 						</div>
 
 						<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" value="<?php echo $row['FlOpeId']; ?>">
+						<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="<?php echo $rowBD['FOXSCSubCategoria']; ?>" >
 
 						<div class="card-body">
 
@@ -276,6 +290,7 @@ if (isset($_POST['inputDataInicio'])) {
 									<div class="form-group">
 										<label for="inputTermoReferencia">Nº do Termo de Referência</label>
 										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $rowTR['TrRefNumero']; ?>" readOnly>
+									    <input type="hidden" id="inputTermoReferenciaId" name="inputTermoReferenciaId" value="<?php echo $rowTR['TrRefId']; ?>">
 									</div>
 								</div>
                             </div>
@@ -308,27 +323,9 @@ if (isset($_POST['inputDataInicio'])) {
 
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="cmbCategoria">Categoria <span class="text-danger">*</span> </label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" readOnly>
-											<option value="">Selecione</option>
-											<?php
-											$sql = "SELECT CategId, CategNome
-													FROM Categoria
-													JOIN Fornecedor on ForneCategoria = CategId
-													JOIN Situacao on SituaId = CategStatus
-													WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and ForneId = " . $row['FlOpeFornecedor'] . "
-													and SituaChave = 'ATIVO'
-													ORDER BY CategNome ASC";
-											$result = $conn->query($sql);
-											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-
-											foreach ($rowCategoria as $item) {
-												$seleciona = $item['CategId'] == $row['FlOpeCategoria'] ? "selected" : "";
-												print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
-											}
-
-											?>
-										</select>
+									<label for="inputCategoria">Categoria <span class="text-danger">*</span></label>
+										<input type="text" id="inputCategoria" name="inputCategoria" class="form-control" value="<?php echo $rowTR['CategNome']; ?>" readOnly>
+										<input type="hidden" id="inputCategoriaId" name="inputCategoriaId" value="<?php echo $row['FlOpeCategoria']; ?>">
 									</div>
 								</div>
 
