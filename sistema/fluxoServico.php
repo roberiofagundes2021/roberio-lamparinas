@@ -17,36 +17,6 @@ if (isset($_POST['inputFluxoOperacionalId'])) {
 	irpara("fluxo.php");
 }
 
-$bFechado = 0;
-$countServico = 0;
-
-$sql = "SELECT FlOpeValor
-		FROM FluxoOperacional
-		Where FlOpeId = " . $iFluxoOperacional;
-$result = $conn->query($sql);
-$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
-$TotalFluxo = $rowFluxo['FlOpeValor'];
-
-$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
-		FROM FluxoOperacionalXProduto
-		Where FOXPrUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
-$result = $conn->query($sql);
-$rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
-$TotalProdutos = $rowProdutos['TotalProduto'];
-
-$sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
-		FROM FluxoOperacionalXServico
-		Where FOXSrUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
-$result = $conn->query($sql);
-$rowServicos = $result->fetch(PDO::FETCH_ASSOC);
-$TotalServicos = $rowServicos['TotalServico'];
-
-$TotalGeral = $TotalProdutos + $TotalServicos;
-
-if ($TotalGeral == $TotalFluxo) {
-	$bFechado = 1;
-}
-
 //Se está alterando
 if (isset($_POST['inputIdFluxoOperacional'])) {
 	$conn->beginTransaction();
@@ -94,6 +64,36 @@ if (isset($_POST['inputIdFluxoOperacional'])) {
 		$_SESSION['msg']['mensagem'] = "Erro ao alterar Fluxo Operacional!!!";
 		$_SESSION['msg']['tipo'] = "error";
 	}
+}
+
+$bFechado = 0;
+$countServico = 0;
+
+$sql = "SELECT FlOpeValor
+		FROM FluxoOperacional
+		Where FlOpeId = " . $iFluxoOperacional;
+$result = $conn->query($sql);
+$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
+$TotalFluxo = $rowFluxo['FlOpeValor'];
+
+$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
+		FROM FluxoOperacionalXProduto
+		Where FOXPrUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
+$result = $conn->query($sql);
+$rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
+$TotalProdutos = $rowProdutos['TotalProduto'];
+
+$sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
+		FROM FluxoOperacionalXServico
+		Where FOXSrUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
+$result = $conn->query($sql);
+$rowServicos = $result->fetch(PDO::FETCH_ASSOC);
+$TotalServicos = $rowServicos['TotalServico'];
+
+$TotalGeral = $TotalProdutos + $TotalServicos;
+
+if ($TotalGeral == $TotalFluxo) {
+	$bFechado = 1;
 }
 
 try {
@@ -335,6 +335,7 @@ try {
 
 						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional" class="form-control" value="<?php echo $row['FlOpeId']; ?>">
 						<input type="hidden" id="inputStatus" name="inputStatus" class="form-control" value="<?php echo $row['FlOpeStatus']; ?>">
+						<input type="hidden" id="inputOrigem" name="inputOrigem" class="form-control" value="<?php echo $_POST['inputOrigem']; ?>">
 
 						<div class="card-body">
 
@@ -418,8 +419,8 @@ try {
 																		FROM Servico
 																		JOIN Situacao on SituaId = ServiStatus
 																		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria;
-															if ($iSubCategoria) {
-																$sql .= " and ServiSubCategoria = " . $iSubCategoria;
+															if ($sSubCategorias != "") {
+																$sql .= " and ServiSubCategoria in (".$sSubCategorias.")";
 															}
 															$sql .=	" ORDER BY ServiNome ASC";
 															$result = $conn->query($sql);
@@ -624,20 +625,25 @@ try {
 									<div class="form-group">
 										<?php
 
-										if ($bFechado) {
-											print('
-												<button class="btn btn-lg btn-principal" id="enviar" style="margin-right:5px;">Alterar</button>
-												<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
-										} else {
-											if ($countServico) {
-												print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+											if ($bFechado) {
+												print('
+													<button class="btn btn-lg btn-principal" id="enviar" style="margin-right:5px;">Alterar</button>
+													<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
 											} else {
-												print('<button class="btn btn-lg btn-principal" id="enviar" disabled>Alterar</button>');
+												if ($countServico) {
+													print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+												} else {
+													print('<button class="btn btn-lg btn-principal" id="enviar" disabled>Alterar</button>');
+												}
 											}
-										}
+
+											if ($_POST['inputOrigem'] == 'fluxo.php'){
+												print('<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>');
+											} else {
+												print('<a href="contrato.php" class="btn btn-basic" role="button">Cancelar</a>');
+											}										
 
 										?>
-										<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 

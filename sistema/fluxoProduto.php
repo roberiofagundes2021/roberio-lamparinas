@@ -17,36 +17,6 @@ if(isset($_POST['inputFluxoOperacionalId'])){
 	irpara("fluxo.php");
 }
 
-$bFechado = 0;
-$countProduto = 0;
-
-$sql = "SELECT FlOpeValor
-		FROM FluxoOperacional
-		Where FlOpeId = ".$iFluxoOperacional;
-$result = $conn->query($sql);
-$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
-$TotalFluxo = $rowFluxo['FlOpeValor'];
-
-$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
-		FROM FluxoOperacionalXProduto
-		Where FOXPrUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
-$result = $conn->query($sql);
-$rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
-$TotalProdutos = $rowProdutos['TotalProduto'];
-
-$sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
-		FROM FluxoOperacionalXServico
-		Where FOXSrUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
-$result = $conn->query($sql);
-$rowServicos = $result->fetch(PDO::FETCH_ASSOC);
-$TotalServicos = $rowServicos['TotalServico'];
-
-$TotalGeral = $TotalProdutos + $TotalServicos;
-
-if($TotalGeral == $TotalFluxo){
-	$bFechado = 1;
-}
-
 //Se está alterando
 if(isset($_POST['inputIdFluxoOperacional'])){
 
@@ -97,6 +67,36 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 		$_SESSION['msg']['tipo'] = "error";	
     }
 }	
+
+$bFechado = 0;
+$countProduto = 0;
+
+$sql = "SELECT FlOpeValor
+		FROM FluxoOperacional
+		Where FlOpeId = ".$iFluxoOperacional;
+$result = $conn->query($sql);
+$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
+$TotalFluxo = $rowFluxo['FlOpeValor'];
+
+$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
+		FROM FluxoOperacionalXProduto
+		Where FOXPrUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+$result = $conn->query($sql);
+$rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
+$TotalProdutos = $rowProdutos['TotalProduto'];
+
+$sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
+		FROM FluxoOperacionalXServico
+		Where FOXSrUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
+$result = $conn->query($sql);
+$rowServicos = $result->fetch(PDO::FETCH_ASSOC);
+$TotalServicos = $rowServicos['TotalServico'];
+
+$TotalGeral = $TotalProdutos + $TotalServicos;
+
+if($TotalGeral == $TotalFluxo){
+	$bFechado = 1;
+}
 
 try{
 	
@@ -331,6 +331,7 @@ try{
 						
 						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional" class="form-control" value="<?php echo $row['FlOpeId']; ?>">
 						<input type="hidden" id="inputStatus" name="inputStatus" class="form-control" value="<?php echo $row['FlOpeStatus']; ?>">
+						<input type="hidden" id="inputOrigem" name="inputOrigem" class="form-control" value="<?php echo $_POST['inputOrigem']; ?>">
 						
 						<div class="card-body">		
 								
@@ -414,8 +415,8 @@ try{
 																	FROM Produto
 																	JOIN Situacao on SituaId = ProduStatus  
 																	WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
-															if ($iSubCategoria){
-																$sql .= " and ProduSubCategoria = ".$iSubCategoria;
+															if ($sSubCategorias != "") {
+																$sql .= " and ProduSubCategoria in (".$sSubCategorias.")";
 															}
 															$sql .=	" ORDER BY ProduNome ASC";
 															$result = $conn->query($sql);
@@ -657,8 +658,14 @@ try{
 												}
 											} 
 										
-										?>
-										<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>
+
+											if ($_POST['inputOrigem'] == 'fluxo.php'){
+												print('<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>');
+											} else {
+												print('<a href="contrato.php" class="btn btn-basic" role="button">Cancelar</a>');
+											}
+
+										?>										
 									</div>
 								</div>
 

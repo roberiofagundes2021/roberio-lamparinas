@@ -2,6 +2,8 @@
 
 include_once("sessao.php"); 
 
+$inicio = microtime(true);
+
 $_SESSION['PaginaAtual'] = 'Fluxo Operacional';
 
 include('global_assets/php/conexao.php');
@@ -323,7 +325,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- /page content -->
 
 	<?php include_once("alerta.php"); ?>
-
+	
+	<?php $total = microtime(true) - $inicio;
+	 echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total, 2).' segundos</span>'; ?>
 </body>
 
 </html>

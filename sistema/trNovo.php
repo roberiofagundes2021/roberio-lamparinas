@@ -36,9 +36,10 @@ if (isset($_POST['inputData'])) {
 
 		//Gera o novo Número (incremental)
 		$sql = "
-			SELECT COUNT(isnull(TrRefNumero,0)) as Numero
-			  FROM TermoReferencia
+			 SELECT TOP 1 isnull(TrRefNumero,0) as Numero
+			 FROM TermoReferencia
 			 Where TrRefUnidade = " . $_SESSION['UnidadeId'] . "
+			 Order By TrRefNumero desc
 		";
 		$result = $conn->query($sql);
 		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);

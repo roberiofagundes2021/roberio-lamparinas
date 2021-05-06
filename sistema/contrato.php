@@ -2,6 +2,8 @@
 
 include_once("sessao.php"); 
 
+$inicio = microtime(true);
+
 $_SESSION['PaginaAtual'] = 'Contrato';
 
 include('global_assets/php/conexao.php');
@@ -19,49 +21,6 @@ $sql = "SELECT FlOpeId, ForneNome, FlOpeCategoria, FOXSCSubCategoria, FlOpeDataI
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
-
-
-//Se veio do fluxo.php
-
-/* if(isset($_POST['inputFluxoOperacionalId'])){
-	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
-	$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
-} else if (isset($_POST['inputIdFluxoOperacional'])){
-	$iFluxoOperacional = $_POST['inputIdFluxoOperacional'];
-	$iCategoria = $_POST['inputIdCategoria'];
-} else {
-	irpara("fluxo.php");
-}
-
-$bFechado = 0;
-$countProduto = 0;
-
-$sql = "SELECT FlOpeValor
-		FROM FluxoOperacional
-		Where FlOpeId = ".$iFluxoOperacional;
-$result = $conn->query($sql);
-$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
-$TotalFluxo = $rowFluxo['FlOpeValor'];
-
-$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
-		FROM FluxoOperacionalXProduto
-		Where FOXPrUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
-$result = $conn->query($sql);
-$rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
-$TotalProdutos = $rowProdutos['TotalProduto'];
-
-$sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
-		FROM FluxoOperacionalXServico
-		Where FOXSrUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
-$result = $conn->query($sql);
-$rowServicos = $result->fetch(PDO::FETCH_ASSOC);
-$TotalServicos = $rowServicos['TotalServico'];
-
-$TotalGeral = $TotalProdutos + $TotalServicos;
-
-if($TotalGeral == $TotalFluxo){
-	$bFechado = 1;
-} */
 
 ?>
 
@@ -267,7 +226,8 @@ if($TotalGeral == $TotalFluxo){
 									<?php
 									$cont = 1; 
 									foreach ($row as $item){
-
+										
+										/* Retorna a DataFim de cada linha */
 										$sql = "SELECT Top 1 isnull(AditiDtFim, FlOpeDataFim) as DataFim
 												FROM FluxoOperacional
 												LEFT JOIN Aditivo on AditiFluxoOperacional = FlOpeId
@@ -280,6 +240,7 @@ if($TotalGeral == $TotalFluxo){
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 
+										/* Retorna o motivo para os fluxos que não foram Liberdados */
 										$sql = "SELECT BandeMotivo
 												FROM Bandeja
 												JOIN FluxoOperacional on FlOpeId = BandeTabelaId
@@ -289,6 +250,37 @@ if($TotalGeral == $TotalFluxo){
 										$result = $conn->query($sql);
 										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);
 										
+										/* Verifica se o Fluxo está fechado (total na lista de produtos e serviços bate com o total do fluxo) */
+										$bFechado = 0;
+										$countProduto = 0;
+										
+										$sql = "SELECT FlOpeValor
+												FROM FluxoOperacional
+												Where FlOpeId = ".$item['FlOpeId'];
+										$result = $conn->query($sql);
+										$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
+										$TotalFluxo = $rowFluxo['FlOpeValor'];
+										
+										$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
+												FROM FluxoOperacionalXProduto
+												Where FOXPrUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$item['FlOpeId'];
+										$result = $conn->query($sql);
+										$rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
+										$TotalProdutos = $rowProdutos['TotalProduto'];
+										
+										$sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
+												FROM FluxoOperacionalXServico
+												Where FOXSrUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$item['FlOpeId'];
+										$result = $conn->query($sql);
+										$rowServicos = $result->fetch(PDO::FETCH_ASSOC);
+										$TotalServicos = $rowServicos['TotalServico'];
+										
+										$TotalGeral = $TotalProdutos + $TotalServicos;
+										
+										if($TotalGeral == $TotalFluxo){
+											$bFechado = 1;
+										}										
+
 										print('
 										<tr>
 											<td>'.mostraData($item['FlOpeDataInicio']).'</td>
@@ -316,17 +308,15 @@ if($TotalGeral == $TotalFluxo){
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>');
-										if ($item['FlOpeStatus'] == 4){												
-											print('
-											
-												            <button class="dropdown-item" id="enviarAprovacao"><i class="icon-list2"></i>Enviar para Aprovação</button>');
+										if ($bFechado){												
+											print('<button class="dropdown-item" id="enviarAprovacao"><i class="icon-list2"></i>Enviar para Aprovação</button>');
 										}																
-										print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
+																print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
 																
 																<div class="dropdown-divider"></div>
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir Fluxo<"><i class="icon-printer2"></i> Imprimir Fluxo</a>');
 										
-										if ($item['FlOpeStatus'] == 4){
+										if ($item['SituaChave'] == 'LIBERADO'){
 										print('						
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'contrato\', \'\')" class="dropdown-item" title="Imprimir Contrato"><i class="icon-printer2"></i> Imprimir Contrato</a>');
 										}
@@ -381,6 +371,9 @@ if($TotalGeral == $TotalFluxo){
 	<!-- /page content -->
 
 	<?php include_once("alerta.php"); ?>
+
+	<?php $total = microtime(true) - $inicio;
+	 echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total, 2).' segundos</span>'; ?>
 
 </body>
 
