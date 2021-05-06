@@ -20,6 +20,49 @@ $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
+
+//Se veio do fluxo.php
+
+/* if(isset($_POST['inputFluxoOperacionalId'])){
+	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
+	$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
+} else if (isset($_POST['inputIdFluxoOperacional'])){
+	$iFluxoOperacional = $_POST['inputIdFluxoOperacional'];
+	$iCategoria = $_POST['inputIdCategoria'];
+} else {
+	irpara("fluxo.php");
+}
+
+$bFechado = 0;
+$countProduto = 0;
+
+$sql = "SELECT FlOpeValor
+		FROM FluxoOperacional
+		Where FlOpeId = ".$iFluxoOperacional;
+$result = $conn->query($sql);
+$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
+$TotalFluxo = $rowFluxo['FlOpeValor'];
+
+$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
+		FROM FluxoOperacionalXProduto
+		Where FOXPrUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+$result = $conn->query($sql);
+$rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
+$TotalProdutos = $rowProdutos['TotalProduto'];
+
+$sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
+		FROM FluxoOperacionalXServico
+		Where FOXSrUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
+$result = $conn->query($sql);
+$rowServicos = $result->fetch(PDO::FETCH_ASSOC);
+$TotalServicos = $rowServicos['TotalServico'];
+
+$TotalGeral = $TotalProdutos + $TotalServicos;
+
+if($TotalGeral == $TotalFluxo){
+	$bFechado = 1;
+} */
+
 ?>
 
 <!DOCTYPE html>
@@ -100,6 +143,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			_componentSelect2();
 
 			/* Fim: Tabela Personalizada */
+			
+
+			//Enviar para aprovação da Controladoria (via Bandeja)
+			$('#enviarAprovacao').on('click', function(e){
+					
+				e.preventDefault();		
+				
+				confirmaExclusao(document.formFluxoOperacionalProduto, "Essa ação enviará todo o Fluxo Operacional (com seus produtos e serviços) para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
+			});	
+
 		});
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -235,7 +288,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												BandeUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'NAOLIBERADO'";
 										$result = $conn->query($sql);
 										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);
-
 										
 										print('
 										<tr>
@@ -263,18 +315,27 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>																
-																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
-																<div class="dropdown-divider"></div>
-
-																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir Fluxo<"><i class="icon-printer2"></i> Imprimir Fluxo</a>
-																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'contrato\', \'\')" class="dropdown-item" title="Imprimir Contrato"><i class="icon-printer2"></i> Imprimir Contrato</a>
-																
-																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'realizado\', \'\');" class="dropdown-item"><i class="icon-statistics" data-popup="tooltip" data-placement="bottom" title="Fluxo Realizado"></i> Fluxo Realizado</a>');
-										
-										if (isset($rowMotivo['BandeMotivo'])){
-
+																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>');
+										if ($item['FlOpeStatus'] == 4){												
 											print('
+											
+												            <button class="dropdown-item" id="enviarAprovacao"><i class="icon-list2"></i>Enviar para Aprovação</button>');
+										}																
+										print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
+																
+																<div class="dropdown-divider"></div>
+																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir Fluxo<"><i class="icon-printer2"></i> Imprimir Fluxo</a>');
+										
+										if ($item['FlOpeStatus'] == 4){
+										print('						
+																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'contrato\', \'\')" class="dropdown-item" title="Imprimir Contrato"><i class="icon-printer2"></i> Imprimir Contrato</a>');
+										}
+										
+										print('
+																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'realizado\', \'\');" class="dropdown-item"><i class="icon-statistics" data-popup="tooltip" data-placement="bottom" title="Fluxo Realizado"></i> Fluxo Realizado</a>');
+
+										if (isset($rowMotivo['BandeMotivo'])){
+										print('
 																<div class="dropdown-divider"></div>
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'motivo\', \''.$rowMotivo['BandeMotivo'].'\');" class="dropdown-item"><i class="icon-question4" data-popup="tooltip" data-placement="bottom" title="Motivo da Não liberação"></i> Motivo</a>');
 										}
