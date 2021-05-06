@@ -68,41 +68,11 @@ if(isset($_POST['inputIdFluxoOperacional'])){
     }
 }	
 
-$bFechado = 0;
-$countProduto = 0;
-
-$sql = "SELECT FlOpeValor
-		FROM FluxoOperacional
-		Where FlOpeId = ".$iFluxoOperacional;
-$result = $conn->query($sql);
-$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
-$TotalFluxo = $rowFluxo['FlOpeValor'];
-
-$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
-		FROM FluxoOperacionalXProduto
-		Where FOXPrUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
-$result = $conn->query($sql);
-$rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
-$TotalProdutos = $rowProdutos['TotalProduto'];
-
-$sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
-		FROM FluxoOperacionalXServico
-		Where FOXSrUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
-$result = $conn->query($sql);
-$rowServicos = $result->fetch(PDO::FETCH_ASSOC);
-$TotalServicos = $rowServicos['TotalServico'];
-
-$TotalGeral = $TotalProdutos + $TotalServicos;
-
-if($TotalGeral == $TotalFluxo){
-	$bFechado = 1;
-}
-
 try{
 	
 	$sql = "SELECT FlOpeId, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
 				   FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, SituaNome,
-				   dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias
+				   dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado
 			FROM FluxoOperacional
 			JOIN Fornecedor on ForneId = FlOpeFornecedor
 			JOIN Categoria on CategId = FlOpeCategoria
@@ -646,7 +616,7 @@ try{
 								<div class="col-lg-6">
 									<div class="form-group">
 										<?php										
-											if ($bFechado){												
+											if ($row['FluxoFechado']){												
 												print('
 												<button class="btn btn-lg btn-principal" id="enviar" style="margin-right:5px;">Alterar</button>
 												<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
@@ -671,7 +641,7 @@ try{
 
 								<div class="col-lg-6" style="text-align: right; padding-right: 35px; color: red;">
 								<?php	
-									if ($bFechado){
+									if ($row['FluxoFechado']){
 										if($row['SituaNome'] == 'PENDENTE'){
 											print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído (ENVIE PARA APROVAÇÃO)');
 										} else {

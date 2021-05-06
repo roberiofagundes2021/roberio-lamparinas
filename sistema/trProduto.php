@@ -685,7 +685,7 @@ try {
 												</div>
 												
 												<div class="row justify-content-end align-content-center col-12 col-lg-6">
-													<p style="color: red; margin: 0px"><i class="icon-info3"></i>A lista de produtos não pode ser alterada enquanto houver orçamentos para essa TR.</p>
+													<p style="color: red; margin: 0px"><i class="icon-info3"></i>A lista de produtos não pode ser alterada enquanto houver orçamentos para esse Termo de Referência.</p>
 												</div>
 											</div>
 										</div>

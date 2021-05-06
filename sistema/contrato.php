@@ -10,7 +10,8 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT FlOpeId, ForneNome, FlOpeCategoria, FOXSCSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
 			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome, SituaChave, SituaNome, SituaCor,
-			   dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias
+			   dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado,
+			   dbo.fnFimContrato as FimContrato
 		FROM FluxoOperacional
 		JOIN Categoria on CategId = FlOpeCategoria
 		JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
@@ -226,17 +227,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<?php
 									$cont = 1; 
 									foreach ($row as $item){
-										
-										/* Retorna a DataFim de cada linha */
-										$sql = "SELECT Top 1 isnull(AditiDtFim, FlOpeDataFim) as DataFim
-												FROM FluxoOperacional
-												LEFT JOIN Aditivo on AditiFluxoOperacional = FlOpeId
-												WHERE FlOpeId = ".$item['FlOpeId']."
-												ORDER BY AditiDtFim DESC";
-										$result = $conn->query($sql);
-										$rowDataFim = $result->fetch(PDO::FETCH_ASSOC);
-										$dataFim = $rowDataFim['DataFim'];
-										
+															
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 
@@ -250,41 +241,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$result = $conn->query($sql);
 										$rowMotivo = $result->fetch(PDO::FETCH_ASSOC);
 										
-										/* Verifica se o Fluxo está fechado (total na lista de produtos e serviços bate com o total do fluxo) */
-										$bFechado = 0;
-										$countProduto = 0;
-										
-										$sql = "SELECT FlOpeValor
-												FROM FluxoOperacional
-												Where FlOpeId = ".$item['FlOpeId'];
-										$result = $conn->query($sql);
-										$rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
-										$TotalFluxo = $rowFluxo['FlOpeValor'];
-										
-										$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
-												FROM FluxoOperacionalXProduto
-												Where FOXPrUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$item['FlOpeId'];
-										$result = $conn->query($sql);
-										$rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
-										$TotalProdutos = $rowProdutos['TotalProduto'];
-										
-										$sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
-												FROM FluxoOperacionalXServico
-												Where FOXSrUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$item['FlOpeId'];
-										$result = $conn->query($sql);
-										$rowServicos = $result->fetch(PDO::FETCH_ASSOC);
-										$TotalServicos = $rowServicos['TotalServico'];
-										
-										$TotalGeral = $TotalProdutos + $TotalServicos;
-										
-										if($TotalGeral == $TotalFluxo){
-											$bFechado = 1;
-										}										
-
 										print('
 										<tr>
 											<td>'.mostraData($item['FlOpeDataInicio']).'</td>
-											<td>'.mostraData($dataFim).'</td>
+											<td>'.mostraData($item['FimContrato']).'</td>
 											<td>'.$item['FlOpeNumContrato'].'</td>
 											<td>'.$item['FlOpeNumProcesso'].'</td>
 											<td>'.$item['ForneNome'].'</td>
@@ -308,27 +268,26 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>');
-										if ($bFechado){												
-											print('<button class="dropdown-item" id="enviarAprovacao"><i class="icon-list2"></i>Enviar para Aprovação</button>');
-										}																
+																if ($item['FluxoFechado']){												
+																	print('<button class="dropdown-item" id="enviarAprovacao"><i class="icon-list2"></i>Enviar para Aprovação</button>');
+																}																
 																print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
 																
 																<div class="dropdown-divider"></div>
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir Fluxo<"><i class="icon-printer2"></i> Imprimir Fluxo</a>');
 										
-										if ($item['SituaChave'] == 'LIBERADO'){
-										print('						
-																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'contrato\', \'\')" class="dropdown-item" title="Imprimir Contrato"><i class="icon-printer2"></i> Imprimir Contrato</a>');
-										}
+																if ($item['SituaChave'] == 'LIBERADO'){
+																	print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'contrato\', \'\')" class="dropdown-item" title="Imprimir Contrato"><i class="icon-printer2"></i> Imprimir Contrato</a>');
+																}
 										
-										print('
-																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'realizado\', \'\');" class="dropdown-item"><i class="icon-statistics" data-popup="tooltip" data-placement="bottom" title="Fluxo Realizado"></i> Fluxo Realizado</a>');
+																print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'realizado\', \'\');" class="dropdown-item"><i class="icon-statistics" data-popup="tooltip" data-placement="bottom" title="Fluxo Realizado"></i> Fluxo Realizado</a>');
 
-										if (isset($rowMotivo['BandeMotivo'])){
-										print('
-																<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'motivo\', \''.$rowMotivo['BandeMotivo'].'\');" class="dropdown-item"><i class="icon-question4" data-popup="tooltip" data-placement="bottom" title="Motivo da Não liberação"></i> Motivo</a>');
-										}
+																if (isset($rowMotivo['BandeMotivo'])){
+																	print('
+																	<div class="dropdown-divider"></div>
+																	<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['FOXSCSubCategoria'].'\', \''.$item['SituaChave'].'\', \'motivo\', \''.$rowMotivo['BandeMotivo'].'\');" class="dropdown-item"><i class="icon-question4" data-popup="tooltip" data-placement="bottom" title="Motivo da Não liberação"></i> Motivo</a>
+																	');
+																}
 
 										print('				</div>
 														</div>

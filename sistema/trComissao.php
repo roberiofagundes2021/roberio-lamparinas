@@ -218,7 +218,7 @@ if(isset($_POST['cmbUsuario'])){
 			$('#inputIsPresident').val(isPresident);
 			$('#inputUnitId').val(unitId);
 
-			confirmaExclusao(document.formUpdatePresident, "Essa ação trocar o presidente da comissão. Tem certeza que deseja enviar?", "trComissaoPresidente.php");
+			confirmaExclusao(document.formUpdatePresident, "Essa ação irá trocar o presidente da comissão. Tem certeza disso?", "trComissaoPresidente.php");
 		}		
 			
 	</script>

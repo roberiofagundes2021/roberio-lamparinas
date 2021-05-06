@@ -184,10 +184,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				} else if (Tipo == 'exclui') {
 					if (liberaParcial == 1) {
-						alerta('Essa TR já tem movimentações e não pode ser excluida!','');
+						alerta('Esse Termo de Referência já está finalizado e não pode ser excluído!','');
 					} else {	
-					confirmaExclusao(document.formTR, "Tem certeza que deseja excluir essa TR?", "trExclui.php");
-					document.formTR.submit();
+						confirmaExclusao(document.formTR, "Tem certeza que deseja excluir essa TR?", "trExclui.php");
+						document.formTR.submit();
 					}
 
 				} else if (Tipo == 'mudaStatus') {
