@@ -72,7 +72,8 @@ try{
 	
 	$sql = "SELECT FlOpeId, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
 				   FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, SituaNome,
-				   dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado
+				   dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, 
+				   dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado
 			FROM FluxoOperacional
 			JOIN Fornecedor on ForneId = FlOpeFornecedor
 			JOIN Categoria on CategId = FlOpeCategoria
@@ -116,6 +117,24 @@ try{
 			$sSubCategoriasNome .= ", ".$item['SbCatNome'];
 		}
 	}	
+
+	$TotalFluxo = $row['FlOpeValor'];
+
+	$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
+			FROM FluxoOperacionalXProduto
+			WHERE FOXPrUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+	$result = $conn->query($sql);
+	$rowProdutos = $result->fetch(PDO::FETCH_ASSOC);
+	$TotalProdutos = $rowProdutos['TotalProduto'];
+
+	$sql = "SELECT isnull(SUM(FOXSrQuantidade * FOXSrValorUnitario),0) as TotalServico
+			FROM FluxoOperacionalXServico
+			WHERE FOXSrUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
+	$result = $conn->query($sql);
+	$rowServicos = $result->fetch(PDO::FETCH_ASSOC);
+	$TotalServicos = $rowServicos['TotalServico'];
+
+	$TotalGeral = $TotalProdutos + $TotalServicos;	
 	
 } catch(PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
@@ -610,8 +629,7 @@ try{
 								</div>
 							</div>
 							<!-- /custom header text -->
-							
-															
+													
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-6">
 									<div class="form-group">
@@ -628,7 +646,6 @@ try{
 												}
 											} 
 										
-
 											if ($_POST['inputOrigem'] == 'fluxo.php'){
 												print('<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>');
 											} else {

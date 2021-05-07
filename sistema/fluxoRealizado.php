@@ -7,7 +7,6 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 include('global_assets/php/conexao.php');
 
 $iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
-$iSubCategoria = $_POST['inputFluxoOperacionalSubCategoria'];
 
 $sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
 			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus
@@ -166,31 +165,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 				$('#cmbProduto').empty().append('<option>Sem produto</option>');
 			}
 
-		});
-			
-		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaFluxoOperacional(FlOpeId, FlOpeCategoria, FlOpeSubCategoria, FlOpeStatus, Tipo){
-
-			document.getElementById('inputFluxoOperacionalId').value = FlOpeId;
-			document.getElementById('inputFluxoOperacionalCategoria').value = FlOpeCategoria;
-			document.getElementById('inputFluxoOperacionalSubCategoria').value = FlOpeSubCategoria;
-			document.getElementById('inputFluxoOperacionalStatus').value = FlOpeStatus;
-					
-			if (Tipo == 'edita'){	
-				document.formFluxoOperacional.action = "fluxoEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formFluxoOperacional, "Tem certeza que deseja excluir esse fluxo?", "fluxoExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formFluxoOperacional.action = "fluxoMudaSituacao.php";
-			} else if (Tipo == 'produto'){
-				document.formFluxoOperacional.action = "fluxoProduto.php";
-			} else if (Tipo == 'imprime'){
-				document.formFluxoOperacional.action = "fluxoImprime.php";
-				document.formFluxoOperacional.setAttribute("target", "_blank");
-			}
-			
-			document.formFluxoOperacional.submit();
-		}		
+		});	
 			
 	</script>
 

@@ -8,11 +8,7 @@ include('global_assets/php/conexao.php');
 
 $iFluxoOperacional = $_POST['inputFluxoId'];
 
-if (isset($_POST['inputFluxoOperacionalId'])) {
-	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
-	$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
-	$iSubCategoria = $_POST['inputFluxoOperacionalSubCategoria'];
-} else if (isset($_POST['inputIdFluxoOperacional'])) {
+if (isset($_POST['inputIdFluxoOperacional'])) {
 	$iFluxoOperacional = $_POST['inputIdFluxoOperacional'];
 	$iCategoria = $_POST['inputIdCategoria'];
 	$iSubCategoria = $_POST['inputIdSubCategoria'];
