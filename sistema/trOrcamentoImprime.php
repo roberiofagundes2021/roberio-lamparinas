@@ -18,21 +18,46 @@ if (isset($_POST['inputOrcamentoId'])) {
 
 try {
 
-	$sql = "SELECT TrXOrNumero, TrRefData, TrXOrConteudo, TrXOrTabelaProduto, TrXOrTabelaServico, TrRefId, TrRefTabelaProduto, TrRefTabelaServico, TrRefNumero, TrRefTipo, ForneNome, CategNome
-			FROM TRXOrcamento
-            JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
-			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
-			JOIN Categoria on CategId = TrXOrCategoria
-            LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
-			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
+	$sql = "
+		SELECT TrXOrNumero, 
+					 TrRefData, 
+					 TrXOrConteudo, 
+					 TrXOrTabelaProduto, 
+					 TrXOrTabelaServico, 
+					 TrRefId, 
+					 TrRefTabelaProduto, 
+					 TrRefTabelaServico, 
+					 TrRefNumero, 
+					 TrRefTipo, 
+					 ForneNome, 
+					 CategNome
+		  FROM TRXOrcamento
+			JOIN TermoReferencia 
+				ON TrRefId = TrXOrTermoReferencia
+			LEFT 
+			JOIN Fornecedor 
+				ON ForneId = TrXOrFornecedor
+			JOIN Categoria 
+				ON CategId = TrXOrCategoria
+			LEFT 
+			JOIN SubCategoria 
+				ON SbCatId = TrXOrSubCategoria
+			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " 
+			  AND TrXOrId = " . $iOrcamento;
+
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 
-	$sql = "SELECT SbCatNome, TXOXSCSubcategoria
-    		FROM TRXOrcamentoXSubCategoria
-    		JOIN SubCategoria on SbCatId = TXOXSCSubcategoria
-    		WHERE TXOXSCUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSCOrcamento = " . $iOrcamento;
+	$sql = "
+		SELECT SbCatNome, 
+					 TXOXSCSubcategoria
+		  FROM TRXOrcamentoXSubCategoria
+			JOIN SubCategoria 
+				ON SbCatId = TXOXSCSubcategoria
+		 WHERE TXOXSCUnidade = " . $_SESSION['UnidadeId'] . " 
+		   AND TXOXSCOrcamento = " . $iOrcamento;
+
 	$result = $conn->query($sql);
 	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -335,10 +360,20 @@ try {
 			$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
 
 			
-			$sql = "SELECT ".$campoPrefix."Id as Id, ".$campoPrefix."Nome as Nome, ".$campoPrefix."Categoria as Categoria, ".$campoPrefix."SubCategoria as SubCategoria, TXOXSQuantidade, TXOXSValorUnitario
-    				FROM ".$tabelaOrigemServico."
-    				JOIN TRXOrcamentoXServico on TXOXSServico = ".$campoPrefix."Id
-    				WHERE ".$campoPrefix."Unidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " and ".$campoPrefix."SubCategoria = " . $sbcat['TXOXSCSubcategoria'];
+			$sql = "
+				SELECT ".$campoPrefix."Id as Id, 
+							 ".$campoPrefix."Nome as Nome, 
+							 ".$campoPrefix."Categoria as Categoria, 
+							 ".$campoPrefix."SubCategoria as SubCategoria, 
+							 TXOXSQuantidade, 
+							 TXOXSValorUnitario
+				  FROM ".$tabelaOrigemServico."
+					JOIN TRXOrcamentoXServico 
+						ON TXOXSServico = ".$campoPrefix."Id
+				 WHERE ".$campoPrefix."Unidade = " . $_SESSION['UnidadeId'] . " 
+				   AND TXOXSOrcamento = " . $iOrcamento . " 
+					 AND ".$campoPrefix."SubCategoria = " . $sbcat['TXOXSCSubcategoria'];
+
 			$result = $conn->query($sql);
 			$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 			$count = count($rowServicos);
@@ -423,10 +458,19 @@ try {
 			$tabelaOrigemServico = $row['TrRefTabelaServico'];
 			$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
 
-			$sql = "SELECT ".$campoPrefix ."Id as Id, ".$campoPrefix ."Nome as Nome, ".$campoPrefix ."Categoria as Categoria, ".$campoPrefix ."SubCategoria as SubCategoria, TRXSrQuantidade
-    				FROM ".$tabelaOrigemServico."
-    				JOIN TermoReferenciaXServico on TRXSrServico = ".$campoPrefix ."Id
-					WHERE ".$campoPrefix ."Unidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $row['TrRefId'] . "";
+			$sql = "
+				SELECT ".$campoPrefix ."Id as Id, 
+							 ".$campoPrefix ."Nome as Nome, 
+							 ".$campoPrefix ."Categoria as Categoria, 
+							 ".$campoPrefix ."SubCategoria as SubCategoria, 
+							 TRXSrQuantidade
+					FROM ".$tabelaOrigemServico."
+					JOIN TermoReferenciaXServico 
+						ON TRXSrServico = ".$campoPrefix ."Id
+				 WHERE ".$campoPrefix ."Unidade = " . $_SESSION['UnidadeId'] . " 
+				 	 AND TRXSrTermoReferencia = " . $row['TrRefId'] . "
+			";
+
 			$result = $conn->query($sql);
 			$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 			$count = count($rowServicos);
@@ -450,7 +494,12 @@ try {
 				</tr>
     			';
 
+					// var_dump($row['TrRefTabelaServico']);
+					// die;
+
+
 				foreach ($rowServicos as $itemServico) {
+
 
 					if ($sbcat['TXOXSCSubcategoria'] == $itemServico['SubCategoria']) {
 
@@ -465,7 +514,7 @@ try {
     					";
 
 						$cont++;
-						$totalServicos += $itemServico['TXOXSQuantidade'] * $itemServico['TXOXSValorUnitario'];
+						$totalServicos += $itemServico['TRXSrQuantidade'] * $itemServico['TXOXSValorUnitario'];
 					}
 				}
 

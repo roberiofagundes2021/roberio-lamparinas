@@ -695,8 +695,11 @@ if ($totalAcoes) {
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
 
-					} else if (Tipo === 'liberarContabilidade') {
-						alerta('direcionar para a tela de dotacao');
+					} else if (Tipo == 'liberarContabilidade') {
+						document.getElementById('inputTRIdIndex').value = BandeTabelaId;
+						document.formBandeja.action = "trDotacao.php";
+						document.formBandeja.setAttribute("target", "_self");
+						document.formBandeja.submit();
 						 
 					} else if (Tipo === 'liberar') {
 						document.getElementById('inputTermoReferenciaStatus').value = 'LIBERADO'; //Liberado
@@ -927,6 +930,8 @@ if ($totalAcoes) {
 					<input type="hidden" id="inputTermoReferenciaId" name="inputTermoReferenciaId">
 					<input type="hidden" id="inputTermoReferenciaStatus" name="inputTermoReferenciaStatus">
 					<input type="hidden" id="inputTipoTermoReferencia" name="inputTipoTermoReferencia">
+
+					<input type="hidden" id="inputTRIdIndex" name="inputTRIdIndex">
 				</form>
 
 			</div>

@@ -7,6 +7,20 @@
 	if (isset($_POST['inputTRId'])){
 		$_SESSION['inputTRIdDotacao'] = $_POST['inputTRId'];
 		$_SESSION['inputTRNumero'] = $_POST['inputTRNumero'];
+
+	} else if (isset($_POST['inputTRIdIndex'])) {
+		$_SESSION['inputTRIdDotacao'] = $_POST['inputTRIdIndex'];
+
+		$sql = "
+			SELECT TrRefNumero
+				FROM TermoReferencia
+			 WHERE TrRefUnidade = ". $_SESSION['UnidadeId'] ." 
+				 AND TrRefId = ".$_SESSION['inputTRIdDotacao']."
+		";
+		$result = $conn->query($sql);
+		$TrID = $result->fetch(PDO::FETCH_ASSOC);
+
+		$_SESSION['inputTRNumero'] = $TrID['TrRefNumero'];
 	}
 
 	$sql = "

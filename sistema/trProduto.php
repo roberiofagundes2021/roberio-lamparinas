@@ -351,24 +351,37 @@ try {
 												<label for="cmbSubCategoria">SubCategoria(as)</label>
 												<div class="d-flex flex-row" style="padding-top: 7px;">
 													<?php
-													$sql = "
-														SELECT SbCatId, SbCatNome
-															FROM SubCategoria
-															JOIN TRXSubcategoria 
-																ON TRXSCSubcategoria = SbCatId
-														 WHERE SBCatUnidade = " . $_SESSION['UnidadeId'] . " 
-														   AND TRXSCTermoReferencia = " . $iTR;
-													$result 	= $conn->query($sql);
-													$rowSbCat = $result->fetchAll(PDO::FETCH_ASSOC);
+														$sql = "
+															SELECT SbCatId, SbCatNome
+																FROM SubCategoria
+																JOIN TRXSubcategoria 
+																	ON TRXSCSubcategoria = SbCatId
+															WHERE SBCatUnidade = " . $_SESSION['UnidadeId'] . " 
+																AND TRXSCTermoReferencia = " . $iTR;
+														$result 	= $conn->query($sql);
+														$rowSbCat = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowSbCat as $subcategoria) {
+														$subCategName = '';
+														$max = count($rowSbCat); 
+														$count = 1;
+
+														foreach ($rowSbCat as $subcategoria) {
+															if($count == $max) {
+																$subCategName .= $subcategoria['SbCatNome'];
+															} else {
+																$subCategName .= $subcategoria['SbCatNome'].', ';
+															}
+
+															print('
+																<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="' . $subcategoria['SbCatId'] . '">
+															');
+
+															$count++;
+														}
+
 														print('
-															<input type="text" class="form-control pb-0" value="' . $subcategoria['SbCatNome'] . '" readOnly>
+															<input type="text" class="form-control pb-0" value="' . $subCategName . '" readOnly>
 														');
-														print('
-															<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="' . $subcategoria['SbCatId'] . '">
-														');
-													}
 													?>
 												</div>
 											</div>

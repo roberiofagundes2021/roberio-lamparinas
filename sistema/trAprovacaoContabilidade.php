@@ -42,7 +42,7 @@ try{
 		";
 		$result = $conn->query($sql);
 		$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
-		var_dump($rowPerfil);
+		// var_dump($rowPerfil);
 
 		$sql = "
 			SELECT TrRefNumero, TrRefTipo, TrRefData

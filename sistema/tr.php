@@ -183,7 +183,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					document.formTR.submit();
 
 				} else if (Tipo == 'exclui') {
-					if (liberaParcial == 1) {
+					if (TRStatus === "FASEINTERNAFINALIZADA") {
 						alerta('Esse Termo de Referência já está finalizado e não pode ser excluído!','');
 					} else {	
 						confirmaExclusao(document.formTR, "Tem certeza que deseja excluir essa TR?", "trExclui.php");
@@ -314,12 +314,22 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										    <tr>
 											    <td>' . mostraData($item['TrRefData']) . '</td>
 											    <td>' . $item['TrRefNumero'] . '</td>
-												<td>' . $item['CategNome'] . '</td>
-												<td>' . $item['SubCategorias'] . '</td>
+													<td>' . $item['CategNome'] . '</td>
+													<td>' . $item['SubCategorias'] . '</td>
 										');
 
 										// print('<td><a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
 										print('<td><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></td>');
+
+										/* Verifica Status */
+										$sql = "
+											SELECT SituaChave
+												FROM Situacao
+											WHERE SituaId = ".$item['TrRefStatus']."
+										";
+										$result = $conn->query($sql);
+										$rowSituaChave = $result->fetch(PDO::FETCH_ASSOC);
+
 
 										if ($item['TrRefTipo'] == 'P') {
 											if(isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == false) {
@@ -328,7 +338,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="list-icons list-icons-extended">
 																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\', \'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 
 																<div class="dropdown">													
 																	<a href="#" class="list-icons-item" data-toggle="dropdown">
@@ -339,12 +349,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarProdutos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 
 																		<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
+
+													');
+
+													if (isset($item['BandeMotivo']) && $item['TrRefStatus'] == 6){
+														print('
+																			<div class="dropdown-divider"></div>
+
+																			<a href="#" onclick="atualizaTR('.$item['TrRefId'].', \''.$item['TrRefNumero'].'\', \''.$item['TrRefCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrRefStatus'].', \'motivo\', \'0\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>
+														');
+													}
+
+													print('
+																			</div>
+																		</div>
 																	</div>
 																</div>
-															</div>
-														</div>
-													</td>
-												</tr>');
+															</td>
+														</tr>
+													');
 
 											} else if (isset($item['TrRefTipo']) && $item['TrRefTipo'] == true) {
 												print('
@@ -353,7 +376,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="list-icons list-icons-extended">
 																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 
 																<div class="dropdown">													
 																	<a href="#" class="list-icons-item" data-toggle="dropdown">
@@ -407,7 +430,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="list-icons">
 																<div class="list-icons list-icons-extended">
 																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
-																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 																	<div class="dropdown">													
 																		<a href="#" class="list-icons-item" data-toggle="dropdown">
 																			<i class="icon-menu9"></i>
@@ -418,12 +441,23 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
 																		</div>
+														');
+
+														if (isset($item['BandeMotivo']) && $item['TrRefStatus'] == 6){
+															print('
+																				<div class="dropdown-divider"></div>
+	
+																				<a href="#" onclick="atualizaTR('.$item['TrRefId'].', \''.$item['TrRefNumero'].'\', \''.$item['TrRefCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrRefStatus'].', \'motivo\', \'0\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>
+															');
+														}
+
+														print('
+																			</div>
+																		</div>
 																	</div>
-																</div>
-															</div>
-														</td>
-													</tr>'
-												);
+																</td>
+															</tr>
+														');
 
 											} else if (isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == true) {
 													print('
@@ -431,7 +465,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														<div class="list-icons">
 															<div class="list-icons list-icons-extended">
 																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 																<div class="dropdown">													
 																	<a href="#" class="list-icons-item" data-toggle="dropdown">
 																		<i class="icon-menu9"></i>
@@ -484,7 +518,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="list-icons">
 																<div class="list-icons list-icons-extended">
 																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
-																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 																	<div class="dropdown">													
 																		<a href="#" class="list-icons-item" data-toggle="dropdown">
 																			<i class="icon-menu9"></i>
@@ -496,13 +530,24 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarServicos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Servicos"></i> Listar Servicos</a>
 
 																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
+														');
+
+														if (isset($item['BandeMotivo']) && $item['TrRefStatus'] == 6){
+															print('
+																				<div class="dropdown-divider"></div>
+	
+																				<a href="#" onclick="atualizaTR('.$item['TrRefId'].', \''.$item['TrRefNumero'].'\', \''.$item['TrRefCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrRefStatus'].', \'motivo\', \'0\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>
+															');
+														}
+
+														print('
+																				</div>
+																			</div>
 																		</div>
 																	</div>
-																</div>
-															</div>
-														</td>
-													</tr>'
-												);
+																</td>
+															</tr>
+														');
 
 											} else if (isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == true) {
 												print('
@@ -510,7 +555,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="list-icons">
 																<div class="list-icons list-icons-extended">
 																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
-																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 																	<div class="dropdown">													
 																		<a href="#" class="list-icons-item" data-toggle="dropdown">
 																			<i class="icon-menu9"></i>

@@ -28,17 +28,31 @@ if(isset($_POST['inputTermoReferenciaId'])){
 			$motivo = NULL;
 		}
 		
-		$sql = "
-			UPDATE TermoReferencia
-				 SET TrRefStatus = :bStatus, 
-				     TrRefUsuarioAtualizador = :iUsuario,
-						 TrRefLiberaParcial = ".true."
-			 WHERE TrRefId = :iTermoReferenciaId";
-		$result = $conn->prepare($sql);
-		$result->bindParam(':bStatus', $row['SituaId']);
-		$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
-		$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
-		$result->execute();
+		if ($motivo === null) {
+			$sql = "
+				UPDATE TermoReferencia
+					SET TrRefStatus = :bStatus, 
+							TrRefUsuarioAtualizador = :iUsuario,
+							TrRefLiberaParcial = ".true."
+				WHERE TrRefId = :iTermoReferenciaId";
+			$result = $conn->prepare($sql);
+			$result->bindParam(':bStatus', $row['SituaId']);
+			$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
+			$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
+			$result->execute();
+
+		} else if ($motivo !== null) {
+			$sql = "
+				UPDATE TermoReferencia
+					SET TrRefStatus = :bStatus, 
+							TrRefUsuarioAtualizador = :iUsuario
+				WHERE TrRefId = :iTermoReferenciaId";
+			$result = $conn->prepare($sql);
+			$result->bindParam(':bStatus', $row['SituaId']);
+			$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
+			$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
+			$result->execute();
+		}
 		
 
 		$sql = "
