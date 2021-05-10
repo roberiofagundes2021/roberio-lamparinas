@@ -423,11 +423,24 @@ try {
 
 									if (count($aServicos1) >= 1) {
 
-										$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, SrOrcUnidadeMedida, TRXSrQuantidade, TRXSrTabela, UnMedNome, UnMedSigla
-									            FROM ServicoOrcamento
-									            JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
-									            LEFT JOIN UnidadeMedida on UnMedId = SrOrcUnidadeMedida
-									            WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR  . " and TRXSrTabela = 'ServicoOrcamento'";
+										$sql = "
+											SELECT SrOrcId, 
+														 SrOrcNome, 
+														 SrOrcDetalhamento, 
+														 SrOrcUnidadeMedida, 
+														 TRXSrQuantidade, 
+														 TRXSrTabela, 
+														 UnMedNome, 
+														 UnMedSigla
+												FROM ServicoOrcamento
+												JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
+												LEFT 
+												JOIN UnidadeMedida 
+													ON UnMedId = SrOrcUnidadeMedida
+											 WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
+											   AND TRXSrTermoReferencia = " . $iTR  . " 
+												 AND TRXSrTabela = 'ServicoOrcamento'
+										";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -466,25 +479,43 @@ try {
 											$iQuantidade = isset($item['TRXSrQuantidade']) ? $item['TRXSrQuantidade'] : '';
 										
 											print('
-								                    <div class="row" style="margin-top: 8px;">
-								                    	<div class="col-lg-9">
-								                    		<div class="row">
-								                    			<div class="col-lg-1">
-								                    				<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
+													<div class="row" style="margin-top: 8px;">
+														<div class="col-lg-9">
+															<div class="row">
+
+																<div class="col-lg-1">
+																	<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
+																	
 																	<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['SrOrcId'] . '" class="idServico">
-								                    			</div>
-								                    			<div class="col-lg-11">
-								                    				<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['SrOrcDetalhamento'] . '" value="' . $item['SrOrcNome'] . '" readOnly>
-								                    			</div>
-								                    		</div>
-								                    	</div>								
-								                    	<div class="col-lg-1">
-								                    		<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
-								                    	</div>
-								                    	<div class="col-lg-2">
-								                    		<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
-								                    	</div>	
-													</div>');
+																</div>
+
+																<div class="col-lg-11">
+																	<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['SrOrcDetalhamento'] . '" value="' . $item['SrOrcNome'] . '" readOnly>
+																</div>
+															</div>
+														</div>		
+
+														<div class="col-lg-1">
+															<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
+														</div>
+											');
+
+											if(intval($iQuantidade) > 0) {
+												print('
+														<div class="col-lg-2">
+															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
+														</div>	
+												');
+											} else {
+												print('
+														<div class="col-lg-2">
+															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+														</div>	
+												');
+											}
+											print('
+													</div>
+											');
 
 											print('<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . $item['TRXSrTabela'] . '">');
 										}
@@ -494,10 +525,19 @@ try {
 										print('</div>');
 									} else {
 
-										$sql = "SELECT TRXSrQuantidade, TRXSrTabela, ServiId, ServiNome, ServiDetalhamento
-									            FROM TermoReferenciaXServico
-									            JOIN Servico on ServiId = TRXSrServico
-									            WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
+										$sql = "
+											SELECT TRXSrQuantidade, 
+														 TRXSrTabela, 
+														 ServiId, 
+														 ServiNome, 
+														 ServiDetalhamento
+												FROM TermoReferenciaXServico
+												JOIN Servico 
+													ON ServiId = TRXSrServico
+											 WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
+											 	 AND TRXSrTermoReferencia = " . $iTR . " 
+												 AND TRXSrTabela = 'Servico'
+										";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowServicos);
@@ -533,23 +573,40 @@ try {
 											$iQuantidade = isset($item['TRXSrQuantidade']) ? $item['TRXSrQuantidade'] : '';
 
 											print('
-								                    <div class="row" style="margin-top: 8px;">
-								                    	<div class="col-lg-10">
-								                    		<div class="row">
-								                    			<div class="col-lg-1">
-								                    				<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
+													<div class="row" style="margin-top: 8px;">
+														<div class="col-lg-10">
+															<div class="row">
+																<div class="col-lg-1">
+																	<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
+																	
 																	<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
+																	
 																	<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . $item['TRXSrTabela'] . '">
-								                    			</div>
-								                    			<div class="col-lg-11">
-								                    				<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
-								                    			</div>
-								                    		</div>
-								                    	</div>								
-								                    	<div class="col-lg-2">
-								                    		<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
-								                    	</div>	
-													</div>');
+																</div>
+
+																<div class="col-lg-11">
+																	<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+																</div>
+															</div>
+														</div>	
+											');
+
+											if(intval($iQuantidade) > 0) {
+												print('
+														<div class="col-lg-2">
+															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
+														</div>	
+												');
+											} else {
+												print('
+														<div class="col-lg-2">
+															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+														</div>	
+												');
+											}
+											print('
+													</div>
+											');
 
 											print('<input type="hidden" id="inputTabelaServico' . $cont . '" name="inputTabelaServico' . $cont . '" value="' . $item['TRXSrTabela'] . '">');
 										}
