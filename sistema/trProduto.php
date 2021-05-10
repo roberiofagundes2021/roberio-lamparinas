@@ -578,7 +578,7 @@ try {
 													</div>
 											');
 
-											if(intval($iQuantidade) > 0) {
+											if(count($rowOrcamentosTR) >= 1) {
 												print('
 													<div class="col-lg-2">
 														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
@@ -691,7 +691,7 @@ try {
 													</div>
 											');
 
-											if(intval($iQuantidade) > 0) {
+											if(count($rowOrcamentosTR) >= 1) {
 												print('
 													<div class="col-lg-2">
 														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
