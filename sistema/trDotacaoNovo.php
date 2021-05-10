@@ -4,6 +4,9 @@
 
 	$_SESSION['PaginaAtual'] = 'Dotação Orçamentária';
 
+	// var_dump($_SESSION['inputTRIdDotacao']);
+	// die;
+
 	try{	
 		
 		$_UP['pasta'] = 'global_assets/anexos/dotacaoOrcamentaria/';
@@ -64,9 +67,9 @@
 
 			/* Muda o status da TR*/
 			$sql = "
-			SELECT SituaId
-				FROM Situacao	
-			 WHERE SituaChave = 'LIBERADO'
+				SELECT SituaId
+					FROM Situacao	
+				WHERE SituaChave = 'LIBERADO'
 			";
 			$result = $conn->query($sql);
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -85,6 +88,19 @@
 			$result = $conn->prepare($sql);
 			$result->bindParam(':bStatus', $bStatus);
 			$result->bindParam(':iUsuario', $iUsuario);
+			$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
+			$result->execute();
+
+			/* Atualiza status bandeja */
+			$sql = "
+				UPDATE Bandeja 
+					 SET BandeStatus = :bStatus
+				 WHERE BandeUnidade = :iUnidade 
+					 AND BandeId in (SELECT BANDEID FROM BANDEJA WHERE BANDETABELAID = :iTermoReferenciaId)
+			";
+			$result = $conn->prepare($sql);
+			$result->bindParam(':bStatus', $bStatus);
+			$result->bindParam(':iUnidade', $_SESSION['UnidadeId']);
 			$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
 			$result->execute();
 

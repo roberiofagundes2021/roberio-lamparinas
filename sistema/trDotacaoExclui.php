@@ -29,9 +29,9 @@ if(isset($_POST['inputDotacaoID'])){
 
 		/* Muda o status da TR*/
 		$sql = "
-		SELECT SituaId
-			FROM Situacao	
-		 WHERE SituaChave = 'LIBERADOPARCIAL'
+			SELECT SituaId
+				FROM Situacao	
+			WHERE SituaChave = 'LIBERADOPARCIAL'
 		";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -46,10 +46,24 @@ if(isset($_POST['inputDotacaoID'])){
 			UPDATE TermoReferencia
 				 SET TrRefStatus = :bStatus, 
 							TrRefUsuarioAtualizador = :iUsuario
-			WHERE TrRefId = :iTermoReferenciaId";
+			WHERE TrRefId = :iTermoReferenciaId
+		";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $bStatus);
 		$result->bindParam(':iUsuario', $iUsuario);
+		$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
+		$result->execute();
+
+		/* Atualiza status bandeja */
+		$sql = "
+			UPDATE Bandeja 
+					SET BandeStatus = :bStatus
+				WHERE BandeUnidade = :iUnidade 
+					AND BandeId in (SELECT BANDEID FROM BANDEJA WHERE BANDETABELAID = :iTermoReferenciaId)
+		";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':bStatus', $bStatus);
+		$result->bindParam(':iUnidade', $_SESSION['UnidadeId']);
 		$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
 		$result->execute();
 

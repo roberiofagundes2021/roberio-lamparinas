@@ -432,7 +432,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarServicos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>
 
 																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
-																		</div>
 														');
 
 														if (isset($item['BandeMotivo']) && $item['TrRefStatus'] == 6){
@@ -444,6 +443,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														}
 
 														print('
+																				</div>
 																			</div>
 																		</div>
 																	</div>
