@@ -25,6 +25,25 @@ $Y = date("Y");
 $dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
 $dataFim = date("Y-m-d");
 
+
+/*
+$sql = "INSERT INTO Patrimonio ( PatriNumero, PatriNumSerie, PatriEstadoConservacao, PatriProduto,
+                                PatriStatus, PatriUsuarioAtualizador,PatriUnidade)
+
+        VALUES ( :sPatriNumero, :sPatriNumSerie,:sPatriEstadoConservacao, :iPatriProduto,
+                :iPatriStatus,:iPatriUsuarioAtualizador, :iPatriUnidade)";
+
+$result = $conn->prepare($sql);
+$result->execute(array(
+                ':sPatriNumero'             => isset($_POST['inputNumero']) ? $_POST['inputNumero'] : null,
+                ':sPatriNumSerie'          => isset($_POST['inputNumSerie']) ? $_POST['inputNumSerie'] : null,
+                ':sPatriEstadoConservacao'  => isset($_POST['cmbEstadoConservacao']) ? $_POST['cmbEstadoConservacao'] : null,
+                ':iPatriProduto'            => isset($_POST['inputProduto']) ? $_POST['inputProduto'] : null,
+                ':iStatus'                  => intval($situacao['SituaId']),
+                ':iUsuarioAtualizador'      => intval($_SESSION['UsuarId']),
+                ':iUnidade'                 => intval($_SESSION['UnidadeId'])
+                )); 
+*/
 ?>
 
 <!DOCTYPE html>
@@ -48,6 +67,27 @@ $dataFim = date("Y-m-d");
 
     <script type="text/javascript">
         const selectEstCo = $('#selectSetadoConservacao').html()
+
+        function modalPatrimonio() {
+
+            $('#btnPatrimonio').on('click', (e) => {
+                e.preventDefault()
+                $('#pageModalPatrimonio').fadeIn(200);
+
+            })
+
+            $('#modalClosePatrimonio').on('click', function() {
+                $('#pageModalPatrimonio').fadeOut(200);
+                $('body').css('overflow', 'scroll');
+                $("#patrimonioContainer").html("")
+            })
+
+            $("#salvarPatrimonio").on('click', function() {
+                $('#pageModalPatrimonio').fadeOut(200);
+                $('body').css('overflow', 'scroll');
+            })
+        }
+            modalPatrimonio()
 
         function modalAcoes() {
 
@@ -625,6 +665,8 @@ $dataFim = date("Y-m-d");
                                                 class="icon-search">Consultar</i></button>
                                         <button id="imprimir" class="btn btn-secondary btn-icon" disabled>
                                             <i class="icon-printer2"> Imprimir</i>
+                                         <button id="btnPatrimonio" class="btn btn-principal"><i
+                                                class="icon-search">Atualização de Patrimônio Existente</i></button>
                                         </button>
                                     </div>
                                 </div>
@@ -657,7 +699,158 @@ $dataFim = date("Y-m-d");
                 </div>
                 <!-- /info blocks -->
 
-                <!--Modal ditar-->
+                 <!--Modal Incluir-->
+
+                 <div id="pageModalPatrimonio" class="custon-modal">
+                    <div class="custon-modal-container">
+                        <div class="card custon-modal-content">
+                            <div class="custon-modal-title">
+                                <i class=""></i>
+                                <p class="h3">Dados Produto</p>
+                                <i class=""></i>
+                            </div>
+                            <form id="editarProduto" method="POST">
+                                <div class="dados-produto p-3"></div>
+                                <div class="d-flex flex-row p-2">
+                                      
+                                <div class='row'>
+                                         <div class='col-lg-2'>
+                                             <div class="form-group">
+                                                 <label for="inputNumero">Patrimônio</label>
+                                                 <div class="input-group">
+                                                 <input type="text" id="inputNumero" name="inputNumero" class="form-control">
+                                                 </div>
+                                            </div>
+                                         </div>                                    
+                                         <div class='col-lg-10'>
+                                             <div class="form-group">
+                                                 <label for="inputProduto">Produto</label>
+                                                 <div class="input-group">
+                                                 <input type="text" id="inputProduto" name="inputProduto" class="form-control">
+                                                 </div>
+                                            </div>
+                                         </div>
+                                    </div>
+                                    <div class='row'>
+                                         <div class='col-lg-6'>
+                                              <div class="form-group">
+                                                  <label for="inputorigem">Origem</label>
+                                                  <div class="input-group">
+                                                  <input type="text" id="inputorigem" name="inputorigem" class="form-control">
+                                                  </div>
+                                             </div>
+                                          </div>
+                                          <div class='col-lg-6'>
+                                              <div class="form-group">
+                                                  <label for="inputdestino">Destino</label>
+                                                  <div class="input-group">
+                                                  <input type="text" id="inputdestino" name="inputdestino" class="form-control">
+                                                  </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                     
+                                    <div class='row'>
+                                         <div class='col-lg-3'>
+                                             <div class="form-group">
+                                                 <label for="inputnotaFiscal">Nota Fiscal</label>
+                                                 <div class="input-group">
+                                                 <input type="text" id="inputnotaFiscal" name="inputnotaFiscal" class="form-control">
+                                                 </div>
+                                            </div>
+                                         </div>
+                                         <div class='col-lg-3'>
+                                             <div class="form-group">
+                                                 <label for="inputdataCompra">Data da Compra</label>
+                                                 <div class="input-group">
+                                                 <input type="text" id="inputdataCompra" name="inputdataCompra" class="form-control">
+                                                 </div>
+                                            </div>
+                                         </div>
+                                         <div class='col-lg-3'>
+                                             <div class="form-group">
+                                                 <label for="inputaquisicao">(R$) Aquisição</label>
+                                                 <div class="input-group">
+                                                 <input type="text" id="inputaquisicao" name="inputaquisicao" class="form-control">
+                                                 </div>
+                                            </div>
+                                         </div>
+                                         <div class='col-lg-3'>
+                                             <div class="form-group">
+                                                 <label for="inputdepreciacao">(R$) Depreciação</label>
+                                                 <div class="input-group">
+                                                 <input type="text" id="inputdepreciacao" name="inputdepreciacao" class="form-control">
+                                                 </div>
+                                            </div>
+                                         </div>
+                                     </div>
+                                     <div class='row'>
+                                         <div class='col-lg-6'>
+                                             <div class="form-group">
+                                                 <label for="inputmarca">Marca</label>
+                                                 <div class="input-group">
+                                                 <input type="text" id="inputmarca" name="inputmarca" class="form-control">
+                                                 </div>
+                                            </div>
+                                         </div>
+                                         <div class='col-lg-6'>
+                                             <div class="form-group">
+                                                 <label for="inputfabricante">Fabricante</label>
+                                                 <div class="input-group">
+                                                 <input type="text" id="inputfabricante" name="inputfabricante" class="form-control">
+                                                 </div>
+                                            </div>
+                                         </div>
+                                    </div>
+
+                                    <div class='col-lg-6'>
+                                        <div class="form-group">
+                                            <label for="inputNumSerie">Nº Série/Chassi <span class="text-danger">(Editável)</span></label>
+                                            <div class="input-group">
+                                                <input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label for="cmbEstadoConservacao">Estado de Conservação <span
+                                                class="text-danger">(Editável)</span></label>
+                                        <div class="form-group">
+                                            <select id="cmbEstadoConservacao" name="cmbEstadoConservacao"
+                                                class="form-control form-control-select2">
+                                                <option value="">Selecionar</option>
+                                                <?php
+                                                $sql = "SELECT EstCoId, EstCoNome
+                                                        FROM EstadoConservacao
+                                                        JOIN Situacao on SituaId = EstCoStatus
+                                                        WHERE SituaChave = 'ATIVO'
+                                                        ORDER BY EstCoNome ASC";
+                                                $result = $conn->query($sql);
+                                                $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                foreach ($rowEstCo as $item) {
+                                                    print('<option value="' . $item['EstCoId'] . '">' . $item['EstCoNome'] . '</option>');
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="card-footer mt-2 d-flex flex-column">
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <button class="btn btn-lg btn-principal" id="salvarPatrimonio">Salvar</button>
+                                            <a id="modalClosePatrimonio" class="btn btn-basic" role="button">Cancelar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Modal Editar-->
                 <div id="page-modal" class="custon-modal">
                     <div class="custon-modal-container">
                         <div class="card custon-modal-content">
