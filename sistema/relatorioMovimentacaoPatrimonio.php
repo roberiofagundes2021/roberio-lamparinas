@@ -25,25 +25,28 @@ $Y = date("Y");
 $dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
 $dataFim = date("Y-m-d");
 
-
 /*
-$sql = "INSERT INTO Patrimonio ( PatriNumero, PatriNumSerie, PatriEstadoConservacao, PatriProduto,
-                                PatriStatus, PatriUsuarioAtualizador,PatriUnidade)
+if (isset($_POST['inputNumero'])){
 
-        VALUES ( :sPatriNumero, :sPatriNumSerie,:sPatriEstadoConservacao, :iPatriProduto,
-                :iPatriStatus,:iPatriUsuarioAtualizador, :iPatriUnidade)";
+    $sql = "INSERT INTO Patrimonio ( PatriNumero, PatriNumSerie, PatriEstadoConservacao, PatriProduto,
+                                    PatriStatus, PatriUsuarioAtualizador,PatriUnidade)
 
-$result = $conn->prepare($sql);
-$result->execute(array(
-                ':sPatriNumero'             => isset($_POST['inputNumero']) ? $_POST['inputNumero'] : null,
-                ':sPatriNumSerie'          => isset($_POST['inputNumSerie']) ? $_POST['inputNumSerie'] : null,
-                ':sPatriEstadoConservacao'  => isset($_POST['cmbEstadoConservacao']) ? $_POST['cmbEstadoConservacao'] : null,
-                ':iPatriProduto'            => isset($_POST['inputProduto']) ? $_POST['inputProduto'] : null,
-                ':iStatus'                  => intval($situacao['SituaId']),
-                ':iUsuarioAtualizador'      => intval($_SESSION['UsuarId']),
-                ':iUnidade'                 => intval($_SESSION['UnidadeId'])
-                )); 
+            VALUES ( :sPatriNumero, :sPatriNumSerie,:sPatriEstadoConservacao, :iPatriProduto,
+                    :iPatriStatus,:iPatriUsuarioAtualizador, :iPatriUnidade)";
+
+    $result = $conn->prepare($sql);
+    $result->execute(array(
+                    ':sPatriNumero'             => isset($_POST['inputNumero']) ? $_POST['inputNumero'] : null,
+                    ':sPatriNumSerie'          => isset($_POST['inputNumSerie']) ? $_POST['inputNumSerie'] : null,
+                    ':sPatriEstadoConservacao'  => isset($_POST['cmbEstadoConservacao']) ? $_POST['cmbEstadoConservacao'] : null,
+                    ':iPatriProduto'            => isset($_POST['inputProduto']) ? $_POST['inputProduto'] : null,
+                    ':iStatus'                  => 1,
+                    ':iUsuarioAtualizador'      => $_SESSION['UsuarId'],
+                    ':iUnidade'                 => $_SESSION['UnidadeId']
+                    )); 
+}
 */
+
 ?>
 
 <!DOCTYPE html>
@@ -86,8 +89,7 @@ $result->execute(array(
                 $('#pageModalPatrimonio').fadeOut(200);
                 $('body').css('overflow', 'scroll');
             })
-        }
-            modalPatrimonio()
+        }        
 
         function modalAcoes() {
 
@@ -249,6 +251,8 @@ $result->execute(array(
         }
 
         $(document).ready(function () {
+
+            modalPatrimonio()
 
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
@@ -665,7 +669,7 @@ $result->execute(array(
                                                 class="icon-search">Consultar</i></button>
                                         <button id="imprimir" class="btn btn-secondary btn-icon" disabled>
                                             <i class="icon-printer2"> Imprimir</i>
-                                         <button id="btnPatrimonio" class="btn btn-principal"><i
+                                         <button id="btnPatrimonio" class="btn btn-secondary" style="margin-left: 5px;"><i
                                                 class="icon-search">Atualização de Patrimônio Existente</i></button>
                                         </button>
                                     </div>
@@ -711,26 +715,26 @@ $result->execute(array(
                             </div>
                             <form id="editarProduto" method="POST">
                                 <div class="dados-produto p-3"></div>
-                                <div class="d-flex flex-row p-2">
-                                      
-                                <div class='row'>
-                                         <div class='col-lg-2'>
-                                             <div class="form-group">
-                                                 <label for="inputNumero">Patrimônio</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputNumero" name="inputNumero" class="form-control">
-                                                 </div>
+                                    <div class="d-flex flex-row p-2">                                      
+                                        <div class='row'>
+                                            <div class='col-lg-2'>
+                                                <div class="form-group">
+                                                    <label for="inputNumero">Patrimônio</label>
+                                                    <div class="input-group">
+                                                    <input type="text" id="inputNumero" name="inputNumero" class="form-control">
+                                                    </div>
                                             </div>
-                                         </div>                                    
-                                         <div class='col-lg-10'>
-                                             <div class="form-group">
-                                                 <label for="inputProduto">Produto</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputProduto" name="inputProduto" class="form-control">
-                                                 </div>
+                                            </div>                                    
+                                            <div class='col-lg-10'>
+                                                <div class="form-group">
+                                                    <label for="inputProduto">Produto</label>
+                                                    <div class="input-group">
+                                                    <input type="text" id="inputProduto" name="inputProduto" class="form-control">
+                                                    </div>
                                             </div>
-                                         </div>
+                                        </div>
                                     </div>
+
                                     <div class='row'>
                                          <div class='col-lg-6'>
                                               <div class="form-group">
@@ -798,9 +802,9 @@ $result->execute(array(
                                                  <label for="inputfabricante">Fabricante</label>
                                                  <div class="input-group">
                                                  <input type="text" id="inputfabricante" name="inputfabricante" class="form-control">
-                                                 </div>
-                                            </div>
+                                              </div>
                                          </div>
+                                        </div>
                                     </div>
 
                                     <div class='col-lg-6'>
