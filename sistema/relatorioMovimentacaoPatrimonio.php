@@ -713,8 +713,8 @@ if (isset($_POST['inputNumero'])){
                                 <p class="h3">Dados Produto</p>
                                 <i class=""></i>
                             </div>
-                            <form id="editarProduto" method="POST">
-                                <div class="dados-produto p-3"></div>
+                            <form id="incluirProduto" method="POST">
+                                <div class="p-3"></div>
                                     <div class="d-flex flex-row p-2">                                      
                                         <div class='row'>
                                             <div class='col-lg-2'>
@@ -722,15 +722,14 @@ if (isset($_POST['inputNumero'])){
                                                     <label for="inputNumero">Patrimônio</label>
                                                     <div class="input-group">
                                                     <input type="text" id="inputNumero" name="inputNumero" class="form-control">
-                                                    </div>
-                                            </div>
-                                            </div>                                    
+                                                </div>
+                                            </div>                                   
                                             <div class='col-lg-10'>
                                                 <div class="form-group">
                                                     <label for="inputProduto">Produto</label>
                                                     <div class="input-group">
                                                     <input type="text" id="inputProduto" name="inputProduto" class="form-control">
-                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
