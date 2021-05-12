@@ -7,11 +7,11 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['nomeVelho'])){
 	$sql = "SELECT FabriId
 			FROM Fabricante
-			WHERE FabriUnidade = ".$_SESSION['UnidadeId']." and FabriNome = '". $_POST['nomeNovo']."' and FabriNome <> '". $_POST['nomeVelho']."'";
+			WHERE FabriUnidade = ".$_SESSION['UnidadeId']." and FabriNome = '". mssql_escape($_POST['nomeNovo'])."' and FabriNome <> '". mssql_escape($_POST['nomeVelho'])."'";
 } else{
 	$sql = "SELECT FabriId
 			FROM Fabricante
-			WHERE FabriUnidade = ".$_SESSION['UnidadeId']." and FabriNome = '". $_POST['nome']."'";
+			WHERE FabriUnidade = ".$_SESSION['UnidadeId']." and FabriNome = '". mssql_escape($_POST['nome'])."'";
 }
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

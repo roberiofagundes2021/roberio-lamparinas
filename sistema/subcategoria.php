@@ -20,7 +20,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //Se estiver editando
 if(isset($_POST['inputSubCategoriaId']) && $_POST['inputSubCategoriaId']){
 
-	//Essa consulta é para preencher o campo Nome com a SubCategoria a ser editar
+	//Essa consulta é para preencher o campo Nome com a SubCategoria a ser editada
 	$sql = "SELECT SbCatId, SbCatNome, SbCatCategoria
 			FROM SubCategoria
 			WHERE SbCatId = " . $_POST['inputSubCategoriaId'];
@@ -210,7 +210,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							if(data == 1){
 								alerta('Atenção','Esse registro já existe!','error');
 								return false;
-							}							
+							}						
 
 							if (data == 'EDITA'){
 								document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
@@ -358,13 +358,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['CategNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.$item['SbCatNome'].'\', '.$item['SbCatCategoria'].', '.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].', '.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.$item['SbCatNome'].'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.$item['SbCatNome'].'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														<a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
 											</td>

@@ -7,11 +7,11 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['nomeVelho'])){
 	$sql = "SELECT ModelId
 			FROM Modelo
-			WHERE ModelUnidade = ".$_SESSION['UnidadeId']." and ModelNome = '". $_POST['nomeNovo']."' and ModelNome <> '". $_POST['nomeVelho']."'";
+			WHERE ModelUnidade = ".$_SESSION['UnidadeId']." and ModelNome = '". mssql_escape($_POST['nomeNovo'])."' and ModelNome <> '". mssql_escape($_POST['nomeVelho'])."'";
 } else{
 	$sql = "SELECT ModelId
 			FROM Modelo
-			WHERE ModelUnidade = ".$_SESSION['UnidadeId']." and ModelNome = '". $_POST['nome']."'";
+			WHERE ModelUnidade = ".$_SESSION['UnidadeId']." and ModelNome = '". mssql_escape($_POST['nome'])."'";
 }
 
 $result = $conn->query($sql);

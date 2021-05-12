@@ -7,12 +7,12 @@ $_SESSION['PaginaAtual'] = 'Editar Produto de Orçamento';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT TRXPrTermoReferencia
-	            FROM TermoReferenciaXProduto
-				JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
-	            JOIN TermoReferencia on TrRefId = TRXPrTermoReferencia
-				JOIN Situacao on Situaid = TrRefStatus
-	            WHERE TRXPrProduto = " . $_POST['inputPrOrcId']. " and (SituaChave = 'ATIVO' or SituaChave = 'AGUARDANDOLIBERACAO' or SituaChave = 'FINALIZADO')  and TRXPrUnidade = " . $_SESSION['UnidadeId'] . "
-	            ";
+		FROM TermoReferenciaXProduto
+		JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
+		JOIN TermoReferencia on TrRefId = TRXPrTermoReferencia
+		JOIN Situacao on Situaid = TrRefStatus
+		WHERE TRXPrProduto = " . $_POST['inputPrOrcId']. " and (SituaChave = 'ATIVO' or SituaChave = 'AGUARDANDOLIBERACAO' or SituaChave = 'FINALIZADO')  and TRXPrUnidade = " . $_SESSION['UnidadeId'] . "
+		";
 $result = $conn->query($sql);
 $rowTrs = $result->fetchAll(PDO::FETCH_ASSOC);
 $contTRs = count($rowTrs);
