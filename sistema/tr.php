@@ -1,7 +1,9 @@
 <?php
 
 include_once("sessao.php");
-$inicio1 = microtime(true);
+
+//$inicio1 = microtime(true);
+
 $_SESSION['PaginaAtual'] = 'Termo de Referência';
 
 include('global_assets/php/conexao.php');
@@ -321,16 +323,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										// print('<td><a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
 										print('<td><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></td>');
 
-										/* Verifica Status */
-										$sql = "
-											SELECT SituaChave
-												FROM Situacao
-											WHERE SituaId = ".$item['TrRefStatus']."
-										";
-										$result = $conn->query($sql);
-										$rowSituaChave = $result->fetch(PDO::FETCH_ASSOC);
-
-
 										if ($item['TrRefTipo'] == 'P') {
 											if(isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == false) {
 												print('<td class="text-center">
@@ -338,7 +330,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="list-icons list-icons-extended">
 																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\', \'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\', \'' . $item['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 
 																<div class="dropdown">													
 																	<a href="#" class="list-icons-item" data-toggle="dropdown">
@@ -376,7 +368,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="list-icons list-icons-extended">
 																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
 
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $item['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 
 																<div class="dropdown">													
 																	<a href="#" class="list-icons-item" data-toggle="dropdown">
@@ -430,7 +422,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="list-icons">
 																<div class="list-icons list-icons-extended">
 																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
-																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $item['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 																	<div class="dropdown">													
 																		<a href="#" class="list-icons-item" data-toggle="dropdown">
 																			<i class="icon-menu9"></i>
@@ -440,7 +432,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarServicos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>
 
 																			<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>
-																		</div>
 														');
 
 														if (isset($item['BandeMotivo']) && $item['TrRefStatus'] == 6){
@@ -452,6 +443,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														}
 
 														print('
+																				</div>
 																			</div>
 																		</div>
 																	</div>
@@ -465,7 +457,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														<div class="list-icons">
 															<div class="list-icons list-icons-extended">
 																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
-																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $item['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 																<div class="dropdown">													
 																	<a href="#" class="list-icons-item" data-toggle="dropdown">
 																		<i class="icon-menu9"></i>
@@ -518,7 +510,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="list-icons">
 																<div class="list-icons list-icons-extended">
 																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
-																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $item['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 																	<div class="dropdown">													
 																		<a href="#" class="list-icons-item" data-toggle="dropdown">
 																			<i class="icon-menu9"></i>
@@ -555,7 +547,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="list-icons">
 																<div class="list-icons list-icons-extended">
 																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
-																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $rowSituaChave['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																	<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',\'' . $item['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 																	<div class="dropdown">													
 																		<a href="#" class="list-icons-item" data-toggle="dropdown">
 																			<i class="icon-menu9"></i>
@@ -639,8 +631,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<?php include_once("alerta.php"); ?>
 	
-	<!-- <?php $total1 = microtime(true) - $inicio1;
-	// echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; ?> -->
+	<?php /* $total1 = microtime(true) - $inicio1;
+		 echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; */ ?>
 </body>
 
 </html>

@@ -312,13 +312,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['MarcaNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaMarca('.$item['MarcaId'].', \''.$item['MarcaNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaMarca('.$item['MarcaId'].', \''.addslashes($item['MarcaNome']).'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaMarca('.$item['MarcaId'].', \''.$item['MarcaNome'].'\','.$item['MarcaStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaMarca('.$item['MarcaId'].', \''.$item['MarcaNome'].'\','.$item['MarcaStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaMarca('.$item['MarcaId'].', \''.addslashes($item['MarcaNome']).'\','.$item['MarcaStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaMarca('.$item['MarcaId'].', \''.addslashes($item['MarcaNome']).'\','.$item['MarcaStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>

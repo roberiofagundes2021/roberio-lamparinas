@@ -728,9 +728,8 @@ if (isset($_POST['inputTipo'])) {
 											       print('<input type="hidden" name="cmbUnidade" value="'.$row['OrComUnidade'].'" />');
 											    }
 											?>
-											<select id="cmbUnidade" name="cmbUnidade"
-												class="form-control form-control-select2"
-												<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
+											<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2"
+												<?php $movimentacoes >= 1 ? print('disabled') : '' ?> required>
 												<option value="">Selecione</option>
 												<?php
 												$sql = "SELECT UnidaId, UnidaNome
@@ -756,8 +755,7 @@ if (isset($_POST['inputTipo'])) {
 												    }
 												?>
 												<label for="cmbLocalEstoque">Local / Almoxarifado</label>
-												<select id="cmbLocalEstoque" name="cmbLocalEstoque"
-													class="form-control form-control-select2"
+												<select id="cmbLocalEstoque" name="cmbLocalEstoque" class="form-control form-control-select2"
 													<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
 													<option value="">Selecione</option>
 													<?php

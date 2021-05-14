@@ -7,11 +7,11 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['nomeVelho'])){
 	$sql = "SELECT CategId
 			FROM Categoria
-			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and CategNome = '". $_POST['nomeNovo']."' and CategNome <> '". $_POST['nomeVelho']."'";
+			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and CategNome = '". mssql_escape($_POST['nomeNovo'])."' and CategNome <> '". mssql_escape($_POST['nomeVelho'])."'";
 } else{
 	$sql = "SELECT CategId
 			FROM Categoria
-			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and CategNome = '". $_POST['nome']."'";
+			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and CategNome = '". mssql_escape($_POST['nome'])."'";
 }
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

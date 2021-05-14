@@ -396,16 +396,22 @@ try {
 													if (count($aProdutos1) >= 1) {
 														if (count($rowSubCat) >= 1) {
 															foreach ($rowSubCat as $valueSubCat) {
-																$sql = "SELECT PrOrcId, PrOrcNome
-														                FROM ProdutoOrcamento
+																$sql = "
+																	SELECT PrOrcId, PrOrcNome
+																		FROM ProdutoOrcamento
 																		JOIN Situacao on SituaId = PrOrcSituacao				     
-																		WHERE PrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " and SituaChave = 'ATIVO' and PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and PrOrcCategoria = " . $iCategoria;
+																	 WHERE PrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " 
+																	   AND SituaChave = 'ATIVO' and PrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
+																		 AND PrOrcCategoria = " . $iCategoria;
+
 																if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null) {
 																	$sql .= " and PrOrcSubCategoria = " . $row['TrRefSubCategoria'];
 																}
+
 																$sql .= " ORDER BY PrOrcNome ASC";
 																$result = $conn->query($sql);
 																$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+
 																foreach ($rowProduto as $item) {
 																	if (in_array($item['PrOrcId'], $aProdutos1) or $countProdutoUtilizado1 == 0) {
 																		$seleciona = "selected";
@@ -420,16 +426,21 @@ try {
 													} else {
 														if (count($rowSubCat) >= 1) {
 															foreach ($rowSubCat as $subcategoria) {
-																$sql = "SELECT ProduId, ProduNome
-																         FROM Produto
-																		 JOIN Situacao on SituaId = ProduStatus		
-																         WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ProduCategoria = " . $iCategoria . "";
+																$sql = "
+																	SELECT ProduId, ProduNome
+																		FROM Produto
+																		JOIN Situacao on SituaId = ProduStatus		
+																	 WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+																	   AND SituaChave = 'ATIVO' and ProduCategoria = " . $iCategoria . "";
+
 																if ($subcategoria['TRXSCSubcategoria'] != '' and $subcategoria['TRXSCSubcategoria'] != null) {
 																	$sql .= " and ProduSubCategoria = " . $subcategoria['TRXSCSubcategoria'];
 																}
+
 																$sql .= " ORDER BY ProduNome ASC";
 																$result = $conn->query($sql);
 																$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+
 																foreach ($rowProduto as $item) {
 																	if (in_array($item['ProduId'], $aProdutos2)) {
 																		$seleciona = "selected";
@@ -441,14 +452,18 @@ try {
 																}
 															}
 														} else {
-															$sql = "SELECT ProduId, ProduNome
-															        FROM Produto
+															$sql = "
+																SELECT ProduId, ProduNome
+																	FROM Produto
 																	JOIN Situacao on SituaId = ProduStatus		
-															        WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and 
-															        ProduCategoria = " . $iCategoria . "";
+																 WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+																   AND SituaChave = 'ATIVO' 
+																	 AND ProduCategoria = " . $iCategoria . "";
+
 															$sql .= " ORDER BY ProduNome ASC";
 															$result = $conn->query($sql);
 															$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+
 															foreach ($rowProduto as $item) {
 																if (in_array($item['ProduId'], $aProdutos2)) {
 																	$seleciona = "selected";
@@ -561,9 +576,22 @@ try {
 													<div class="col-lg-1">
 														<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
 													</div>
+											');
+
+											if(count($rowOrcamentosTR) >= 1) {
+												print('
+													<div class="col-lg-2">
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
+													</div>	
+												');
+											} else {
+												print('
 													<div class="col-lg-2">
 														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
 													</div>	
+												');
+											}
+											print('
 												</div>
 											');
 
@@ -661,10 +689,22 @@ try {
 													<div class="col-lg-1">
 														<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
 													</div>
+											');
 
+											if(count($rowOrcamentosTR) >= 1) {
+												print('
+													<div class="col-lg-2">
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
+													</div>	
+												');
+											} else {
+												print('
 													<div class="col-lg-2">
 														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
 													</div>	
+												');
+											}
+											print('
 												</div>
 											');
 

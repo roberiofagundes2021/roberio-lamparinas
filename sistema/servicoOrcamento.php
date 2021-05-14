@@ -106,7 +106,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			/* Fim: Tabela Personalizada */			
 		});
 			
-		function atualizaModelo(SrOrcId, SrOrcNome, SrOrcStatus, Tipo){
+		function atualizaOrcamento(SrOrcId, SrOrcNome, SrOrcStatus, Tipo){
 
 			document.getElementById('inputSrOrcId').value = SrOrcId;
 			document.getElementById('inputSrOrcNome').value = SrOrcNome;
@@ -195,13 +195,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['SbCatNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaModelo('.$item['SrOrcId'].', \''.$item['SrOrcNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaOrcamento('.$item['SrOrcId'].', \''.htmlentities(addslashes($item['SrOrcNome']), ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaModelo('.$item['SrOrcId'].', \''.$item['SrOrcNome'].'\','.$item['SrOrcSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar Serviço"></i></a>
-														<a href="#" onclick="atualizaModelo('.$item['SrOrcId'].', \''.$item['SrOrcNome'].'\','.$item['SrOrcSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir Serviço"></i></a>							
+														<a href="#" onclick="atualizaOrcamento('.$item['SrOrcId'].', \''.htmlentities(addslashes($item['SrOrcNome']), ENT_QUOTES).'\','.$item['SrOrcSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar Serviço"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$item['SrOrcId'].', \''.htmlentities(addslashes($item['SrOrcNome']), ENT_QUOTES).'\','.$item['SrOrcSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir Serviço"></i></a>							
 													</div>
 												</div>
 											</td>

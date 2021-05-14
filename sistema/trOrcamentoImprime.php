@@ -57,7 +57,6 @@ try {
 				ON SbCatId = TXOXSCSubcategoria
 		 WHERE TXOXSCUnidade = " . $_SESSION['UnidadeId'] . " 
 		   AND TXOXSCOrcamento = " . $iOrcamento;
-
 	$result = $conn->query($sql);
 	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -470,7 +469,7 @@ try {
 				 WHERE ".$campoPrefix ."Unidade = " . $_SESSION['UnidadeId'] . " 
 				 	 AND TRXSrTermoReferencia = " . $row['TrRefId'] . "
 			";
-
+		
 			$result = $conn->query($sql);
 			$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 			$count = count($rowServicos);
@@ -514,11 +513,11 @@ try {
     					";
 
 						$cont++;
-						$totalServicos += $itemServico['TRXSrQuantidade'] * $itemServico['TXOXSValorUnitario'];
+						//$totalServicos += $itemServico['TRXSrQuantidade'] * $itemServico['TXOXSValorUnitario'];
 					}
 				}
 
-				$totalGeralServicos += $totalServicos;
+				//$totalGeralServicos += $totalServicos;
 
 				$html .= "<br>";
 

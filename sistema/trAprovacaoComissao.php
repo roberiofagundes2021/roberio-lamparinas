@@ -21,7 +21,7 @@ if(isset($_POST['inputTRId'])){
 
 	if (intval($rowPresidente) <= 0) {
 		$_SESSION['msg']['titulo'] 		= "Atenção";
-		$_SESSION['msg']['mensagem'] 	= "Só é permitido enviar após criar a comissão.!!!";
+		$_SESSION['msg']['mensagem'] 	= "Só é permitido enviar após criar a comissão!!!";
 		$_SESSION['msg']['tipo'] 			= "error";
 
 	} else {

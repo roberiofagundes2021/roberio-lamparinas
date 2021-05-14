@@ -478,8 +478,8 @@ if(isset($_POST['inputData'])){
 									<br>
 									<div class="row">
 										<div class="col-lg-6">
-											<label for="cmbUnidade">Unidade</label>
-											<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
+											<label for="cmbUnidade">Unidade <span class="text-danger">*</span></label>
+											<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2" required>
 												<option value="">Selecione</option>
 												<?php 
 													$sql = "SELECT UnidaId, UnidaNome

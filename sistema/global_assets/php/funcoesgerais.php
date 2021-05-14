@@ -275,3 +275,13 @@ function formatarNumero($numero)
 	$numero = str_pad($numero, 6, '0', STR_PAD_LEFT);
 	return $numero;
 }
+
+/* Essa função foi criada para corrigir os nomes com apóstrofo, como por exemplo EPI's. No SQL Server para corrigir isso,
+basta colocar mais uma aspa simples. Ex.: EPI''s, portanto, essa função faz isso, acrescenta mais uma aspa simples para
+esses casos de apóstrofes. */
+function mssql_escape($str) { 
+	if(get_magic_quotes_gpc()) { 
+		$str= stripslashes($str); 
+	} 
+	return str_replace("'", "''", $str); 
+}

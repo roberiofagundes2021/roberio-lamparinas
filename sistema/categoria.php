@@ -5,6 +5,7 @@ include_once("sessao.php");
 $_SESSION['PaginaAtual'] = 'Categoria';
 
 include('global_assets/php/conexao.php');
+
 //Essa consulta é para preencher a grid
 //O ALTERAR é usado na importação de Produtos (eles não devem aparecer aqui)
 $sql = "SELECT CategId, CategNome, CategStatus, SituaNome, SituaChave, SituaCor
@@ -14,13 +15,13 @@ $sql = "SELECT CategId, CategNome, CategStatus, SituaNome, SituaChave, SituaCor
 		ORDER BY CategNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
-$count = count($row);
+//$count = count($row);
 //var_dump($count);die;
 
 //Se estiver editando
 if(isset($_POST['inputCategoriaId']) && $_POST['inputCategoriaId']){
 
-	//Essa consulta é para preencher o campo Nome com a categoria a ser editar
+	//Essa consulta é para preencher o campo Nome com a categoria a ser editada
 	$sql = "SELECT CategId, CategNome
 			FROM Categoria
 			WHERE CategId = " . $_POST['inputCategoriaId'];
@@ -316,13 +317,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['CategNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.addslashes($item['CategNome']).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.addslashes($item['CategNome']).'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.addslashes($item['CategNome']).'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>
