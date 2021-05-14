@@ -1,301 +1,239 @@
-		<!-- Main sidebar -->
-		<div class="sidebar sidebar-light sidebar-main sidebar-expand-md align-self-start">
+<?php
 
-			<!-- Sidebar mobile toggler -->
-			<div class="sidebar-mobile-toggler text-center">
-				<a href="#" class="sidebar-mobile-main-toggle">
-					<i class="icon-arrow-left8"></i>
-				</a>
-				<span class="font-weight-semibold">Menu</span>
-				<a href="#" class="sidebar-mobile-expand">
-					<i class="icon-screen-full"></i>
-					<i class="icon-screen-normal"></i>
-				</a>
-			</div>
-			<!-- /sidebar mobile toggler -->
+			$arquivosFornecedor = array(
+				'fornecedor.php', 'fornecedorNovo.php', 'fornecedorEdita.php', 'fornecedorExclui.php', 'fornecedorMudaSituacao.php'
+			);
+
+			$arquivosProduto = array(
+				'produto.php', 'produtoNovo.php', 'produtoEdita.php', 'produtoExclui.php', 'produtoMudaSituacao.php'
+			);			
+
+			$arquivosServico = array(
+				'servico.php', 'servicoNovo.php', 'servicoEdita.php', 'servicoExclui.php', 'servicoMudaSituacao.php'
+			);			
+
+			$arquivosInventario = array(
+				'inventario.php', 'inventarioNovo.php', 'inventarioEdita.php', 'inventarioExclui.php', 'inventarioMudaSituacao.php'
+			);			
+		
+		?>
+
+<!-- Main sidebar -->
+<div class="sidebar sidebar-dark sidebar-main sidebar-expand-md">
+
+  <!-- Sidebar mobile toggler -->
+  <div class="sidebar-mobile-toggler text-center">
+    <a href="#" class="sidebar-mobile-main-toggle">
+      <i class="icon-arrow-left8"></i>
+    </a>
+    <span class="font-weight-semibold">Navigation</span>
+    <a href="#" class="sidebar-mobile-expand">
+      <i class="icon-screen-full"></i>
+      <i class="icon-screen-normal"></i>
+    </a>
+  </div>
+  <!-- /sidebar mobile toggler -->
 
 
-			<!-- Sidebar content -->
-			<div class="sidebar-content">
-				<div class="card card-sidebar-mobile">
+  <!-- Sidebar content -->
+  <div class="sidebar-content">
 
-					<!-- Header -->
-					<!--<div class="card-header header-elements-inline">
-						<h6 class="card-title">Navigation</h6>
-						<div class="header-elements">
-							<div class="list-icons">
-								<a class="list-icons-item" data-action="collapse"></a>
-							</div>
-						</div>
-					</div> -->
-					
-					<!-- User menu -->
-					<div class="sidebar-user">
-						<div class="card-body">
-							<div class="media">
-								<a href="index.php"><img src="global_assets/images/lamparinas/logo-lamparinas.jpg" width="220" height="220" alt=""></a>
-								<!--<div class="mr-3">
-									<a href="#"><img src="global_assets/images/placeholders/placeholder.jpg" width="38" height="38" class="rounded-circle" alt=""></a>
-								</div>
+    <!-- User menu -->
+    <div class="sidebar-user-material">
+      <div class="sidebar-user-material-body">
+        <div class="card-body text-center">
+          <a href="index.php">
+            <!-- src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle shadow-1 -->
+            <img src="global_assets/images/lamparinas/logo-lamparinas_200x200.jpg" class="img-fluid shadow-5 mb-3" width="100" height="100" alt="" style="padding-top:8px;visibility:hidden">
+          </a>
+          <h6 class="mb-0 text-white text-shadow-dark"><?php //echo nomeSobrenome($_SESSION['UsuarNome'],2); ?></h6>
+          <span class="font-size-sm text-white text-shadow-dark"><?php //echo $_SESSION['UnidadeNome']; ?></span>
+        </div>
 
-								<div class="media-body">
-									<div class="media-title font-weight-semibold">Victoria Baker</div>
-									<div class="font-size-xs opacity-50">
-										<i class="icon-pin font-size-sm"></i> &nbsp;Santa Ana, CA
-									</div>
-								</div>
+        <div class="sidebar-user-material-footer" style="margin-top:40px;">
+          <a href="#user-nav" class="d-flex justify-content-between align-items-center text-shadow-dark dropdown-toggle" data-toggle="collapse"><span>Minha Conta</span></a>
+        </div>
+      </div>
 
-								<div class="ml-3 align-self-center">
-									<a href="#" class="text-white"><i class="icon-cog3"></i></a>
-								</div> -->
-							</div>
-						</div>
-					</div>
-					<!-- /user menu -->
-
-					
-					<!-- Main navigation -->
-					<div class="card-body p-0">
-						<ul class="nav nav-sidebar" data-nav-type="accordion">
-
-							<!-- Main -->
-							<li class="nav-item-header mt-0"><div class="text-uppercase font-size-xs line-height-xs">Main</div> <i class="icon-menu" title="Main"></i></li>
-							<li class="nav-item">
-								<a href="index.html" class="nav-link">
-									<i class="icon-home4"></i>
-									<span>
-										Dashboard
-										<span class="d-block font-weight-normal opacity-50">No active orders</span>
-									</span>
+      <div class="collapse" id="user-nav">
+        <ul class="nav nav-sidebar">
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="icon-user-plus"></i>
+              <span>Meu Perfil</span>
+            </a>
+          </li>
+          <!--<li class="nav-item">
+								<a href="#" class="nav-link">
+									<i class="icon-coins"></i>
+									<span>Minha bandeja</span>
 								</a>
-							</li>
-							<li class="nav-item nav-item-submenu">
-								<a href="#" class="nav-link"><i class="icon-copy"></i> <span>Layouts</span></a>
+							</li>-->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="icon-comment-discussion"></i>
+              <span>Minha bandeja</span>
+              <span class="badge bg-teal-400 badge-pill align-self-center ml-auto">5</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="icon-cog5"></i>
+              <span>Configurar Conta</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="sair.php" class="nav-link">
+              <i class="icon-switch2"></i>
+              <span>Sair</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- /user menu -->
 
-								<ul class="nav nav-group-sub" data-submenu-title="Layouts">
-									<li class="nav-item"><a href="../../../../layout_1/LTR/default/full/index.html" class="nav-link">Default layout</a></li>
-									<li class="nav-item"><a href="../../../../layout_2/LTR/default/full/index.html" class="nav-link">Layout 2</a></li>
-									<li class="nav-item"><a href="index.html" class="nav-link active">Layout 3</a></li>
-									<li class="nav-item"><a href="../../../../layout_4/LTR/default/full/index.html" class="nav-link">Layout 4</a></li>
-									<li class="nav-item"><a href="../../../../layout_5/LTR/default/full/index.html" class="nav-link">Layout 5</a></li>
-									<li class="nav-item"><a href="../../../../layout_6/LTR/default/full/index.html" class="nav-link disabled">Layout 6 <span class="badge bg-transparent align-self-center ml-auto">Coming soon</span></a></li>
-								</ul>
-							</li>
-							<li class="nav-item nav-item-submenu">
-								<a href="#" class="nav-link"><i class="icon-color-sampler"></i> <span>Themes</span></a>
 
-								<ul class="nav nav-group-sub" data-submenu-title="Themes">
-									<li class="nav-item"><a href="index.html" class="nav-link active">Default</a></li>
-									<li class="nav-item"><a href="../../../LTR/material/full/index.html" class="nav-link">Material</a></li>
-									<li class="nav-item"><a href="../../../LTR/dark/full/index.html" class="nav-link disabled">Dark <span class="badge bg-transparent align-self-center ml-auto">Coming soon</span></a></li>
-									<li class="nav-item"><a href="../../../LTR/clean/full/index.html" class="nav-link disabled">Clean <span class="badge bg-transparent align-self-center ml-auto">Coming soon</span></a></li>
-								</ul>
-							</li>
-							<li class="nav-item nav-item-submenu">
-								<a href="#" class="nav-link"><i class="icon-stack"></i> <span>Starter kit</span></a>
+    <!-- Main navigation -->
+    <div class="card card-sidebar-mobile">
+      <ul class="nav nav-sidebar" data-nav-type="accordion">
 
-								<ul class="nav nav-group-sub" data-submenu-title="Starter kit">
-									<li class="nav-item"><a href="../seed/layout_nav_horizontal.html" class="nav-link">Horizontal navigation</a></li>
-									<li class="nav-item"><a href="../seed/sidebar_none.html" class="nav-link">No sidebar</a></li>
-									<li class="nav-item"><a href="../seed/sidebar_main.html" class="nav-link">1 sidebar</a></li>
-									<li class="nav-item nav-item-submenu">
-										<a href="#" class="nav-link">2 sidebars</a>
-										<ul class="nav nav-group-sub">
-											<li class="nav-item"><a href="../seed/sidebar_secondary.html" class="nav-link">Secondary sidebar</a></li>
-											<li class="nav-item"><a href="../seed/sidebar_right.html" class="nav-link">Right sidebar</a></li>
-										</ul>
-									</li>
-									<li class="nav-item nav-item-submenu">
-										<a href="#" class="nav-link">3 sidebars</a>
-										<ul class="nav nav-group-sub">
-											<li class="nav-item"><a href="../seed/sidebar_right_hidden.html" class="nav-link">Right sidebar hidden</a></li>
-											<li class="nav-item"><a href="../seed/sidebar_right_visible.html" class="nav-link">Right sidebar visible</a></li>
-										</ul>
-									</li>
-									<li class="nav-item"><a href="../seed/sidebar_sections.html" class="nav-link">Sectioned sidebar</a></li>
-									<li class="nav-item"><a href="../seed/sidebar_stretched.html" class="nav-link">Stretched sidebar</a></li>
-									<li class="nav-item-divider"></li>
-									<li class="nav-item"><a href="../seed/navbar_fixed_main.html" class="nav-link">Fixed main navbar</a></li>
-									<li class="nav-item"><a href="../seed/navbar_fixed_secondary.html" class="nav-link">Fixed secondary navbar</a></li>
-									<li class="nav-item"><a href="../seed/navbar_fixed_both.html" class="nav-link">Both navbars fixed</a></li>
-									<li class="nav-item"><a href="../seed/layout_boxed.html" class="nav-link">Boxed layout</a></li>
-								</ul>
-							</li>
-							<li class="nav-item"><a href="../../../RTL/default/full/index.html" class="nav-link"><i class="icon-width"></i> <span>RTL version</span></a></li>
-							<!-- /main -->
+        <!-- Main -->
+        <li class="nav-item-header">
+          <div class="text-uppercase font-size-xs line-height-xs">Principal</div> <i class="icon-menu" title="Main"></i>
+        </li>
+        <li class="nav-item">
+          <a href="index.php" <?php if (basename($_SERVER['PHP_SELF']) == 'index.php') { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
+            <i class="icon-home4"></i>
+            <span>
+              Página Inicial
+            </span>
+          </a>
+        </li>
+        <!-- /main -->
 
-							<!-- Layout -->
-							<li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Layout</div> <i class="icon-menu" title="Layout options"></i></li>
-							<li class="nav-item nav-item-submenu nav-item-expanded nav-item-open">
-								<a href="#" class="nav-link"><i class="icon-stack2"></i> <span>Page layouts</span></a>
+        <!-- Forms -->
+        <li class="nav-item-header">
+          <div class="text-uppercase font-size-xs line-height-xs">Controle de Estoque</div> <i class="icon-menu" title="Forms"></i>
+        </li>
 
-								<ul class="nav nav-group-sub" data-submenu-title="Page layouts">
-									<li class="nav-item"><a href="layout_navbar_fixed_main.html" class="nav-link active">Fixed main navbar</a></li>
-									<li class="nav-item"><a href="layout_navbar_sticky_secondary.html" class="nav-link">Sticky secondary navbar</a></li>
-									<li class="nav-item"><a href="layout_navbar_hideable_main.html" class="nav-link">Hideable main navbar</a></li>
-									<li class="nav-item"><a href="layout_navbar_hideable_secondary.html" class="nav-link">Hideable secondary navbar</a></li>
-									<li class="nav-item"><a href="layout_footer_fixed.html" class="nav-link">Fixed footer</a></li>
-									<li class="nav-item"><a href="layout_footer_hideable.html" class="nav-link">Hideable footer</a></li>
-									<li class="nav-item"><a href="layout_sidebar_stretched.html" class="nav-link">Stretched sidebar</a></li>
-									<li class="nav-item"><a href="layout_without_header.html" class="nav-link">Without page header</a></li>
-									<li class="nav-item-divider"></li>
-									<li class="nav-item"><a href="layout_boxed_default.html" class="nav-link">Boxed with default sidebar</a></li>
-									<li class="nav-item"><a href="layout_boxed_mini.html" class="nav-link">Boxed with mini sidebar</a></li>
-									<li class="nav-item"><a href="layout_boxed_full.html" class="nav-link">Boxed full width</a></li>
-									<li class="nav-item"><a href="layout_boxed_content.html" class="nav-link">Boxed content</a></li>
-								</ul>
-							</li>
-							<li class="nav-item nav-item-submenu">
-								<a href="#" class="nav-link"><i class="icon-page-break2"></i> <span>Headers &amp; footers</span></a>
-								<ul class="nav nav-group-sub" data-submenu-title="Content styling">
-									<li class="nav-item"><a href="content_page_header.html" class="nav-link">Page header</a></li>
-									<li class="nav-item"><a href="content_page_footer.html" class="nav-link disabled">Page footer <span class="badge bg-transparent align-self-center ml-auto">Coming soon</span></a></li>
-								</ul>
-							</li>
-							<li class="nav-item nav-item-submenu">
-								<a href="#" class="nav-link"><i class="icon-indent-decrease2"></i> <span>Sidebars</span></a>
-								<ul class="nav nav-group-sub" data-submenu-title="Sidebars">
-									<li class="nav-item nav-item-submenu">
-										<a href="#" class="nav-link">Main sidebar</a>
-										<ul class="nav nav-group-sub">
-											<li class="nav-item"><a href="sidebar_default_collapse.html" class="nav-link">Default collapsible</a></li>
-											<li class="nav-item"><a href="sidebar_default_hide.html" class="nav-link">Default hideable</a></li>
-											<li class="nav-item"><a href="sidebar_default_hidden.html" class="nav-link">Default hidden</a></li>
-											<li class="nav-item"><a href="sidebar_mini_collapse.html" class="nav-link">Mini collapsible</a></li>
-											<li class="nav-item"><a href="sidebar_mini_hide.html" class="nav-link">Mini hideable</a></li>
-											<li class="nav-item"><a href="sidebar_mini_hidden.html" class="nav-link">Mini hidden</a></li>
-											<li class="nav-item-divider"></li>
-											<li class="nav-item"><a href="sidebar_default_sections.html" class="nav-link">Sectioned sidebar</a></li>
-											<li class="nav-item"><a href="sidebar_default_stretched.html" class="nav-link">Stretched sidebar</a></li>
-											<li class="nav-item"><a href="sidebar_default_color_dark.html" class="nav-link">Dark color</a></li>
-											<li class="nav-item"><a href="sidebar_default_color_custom.html" class="nav-link">Custom color</a></li>
-											<li class="nav-item"><a href="sidebar_default_color_sections_custom.html" class="nav-link">Custom sections color</a></li>
-										</ul>
-									</li>
-									<li class="nav-item nav-item-submenu">
-										<a href="#" class="nav-link">Secondary sidebar</a>
-										<ul class="nav nav-group-sub">
-											<li class="nav-item"><a href="sidebar_secondary_after.html" class="nav-link">After default</a></li>
-											<li class="nav-item"><a href="sidebar_secondary_before.html" class="nav-link">Before default</a></li>
-											<li class="nav-item"><a href="sidebar_secondary_hidden.html" class="nav-link">Hidden by default</a></li>
-											<li class="nav-item-divider"></li>
-											<li class="nav-item"><a href="sidebar_secondary_sections.html" class="nav-link">Sectioned sidebar</a></li>
-											<li class="nav-item"><a href="sidebar_secondary_stretched.html" class="nav-link">Stretched sidebar</a></li>
-											<li class="nav-item"><a href="sidebar_secondary_color_dark.html" class="nav-link">Dark color</a></li>
-											<li class="nav-item"><a href="sidebar_secondary_color_custom.html" class="nav-link">Custom color</a></li>
-											<li class="nav-item"><a href="sidebar_secondary_color_sections_custom.html" class="nav-link">Custom sections color</a></li>
-										</ul>
-									</li>
-									<li class="nav-item nav-item-submenu">
-										<a href="#" class="nav-link">Right sidebar</a>
-										<ul class="nav nav-group-sub">
-											<li class="nav-item"><a href="sidebar_right_default_collapse.html" class="nav-link">Show - collapse main</a></li>
-											<li class="nav-item"><a href="sidebar_right_default_hide.html" class="nav-link">Show - hide main</a></li>
-											<li class="nav-item"><a href="sidebar_right_default_toggle.html" class="nav-link">Show - fix default width</a></li>
-											<li class="nav-item"><a href="sidebar_right_mini_toggle.html" class="nav-link">Show - fix mini width</a></li>
-											<li class="nav-item"><a href="sidebar_right_secondary_hide.html" class="nav-link">Show - hide secondary</a></li>
-											<li class="nav-item"><a href="sidebar_right_visible.html" class="nav-link">Visible by default</a></li>
-											<li class="nav-item-divider"></li>
-											<li class="nav-item"><a href="sidebar_right_sections.html" class="nav-link">Sectioned sidebar</a></li>
-											<li class="nav-item"><a href="sidebar_right_stretched.html" class="nav-link">Stretched sidebar</a></li>
-											<li class="nav-item"><a href="sidebar_right_color_dark.html" class="nav-link">Dark color</a></li>
-											<li class="nav-item"><a href="sidebar_right_color_custom.html" class="nav-link">Custom color</a></li>
-											<li class="nav-item"><a href="sidebar_right_color_sections_custom.html" class="nav-link">Custom sections color</a></li>
-										</ul>
-									</li>
-									<li class="nav-item-divider"></li>
-									<li class="nav-item"><a href="sidebar_components.html" class="nav-link">Sidebar components</a></li>
-								</ul>
-							</li>
-							<li class="nav-item nav-item-submenu">
-								<a href="#" class="nav-link"><i class="icon-menu3"></i> <span>Navbars</span></a>
-								<ul class="nav nav-group-sub" data-submenu-title="Navbars">
-									<li class="nav-item nav-item-submenu">
-										<a href="#" class="nav-link">Single navbar</a>
-										<ul class="nav nav-group-sub">
-											<li class="nav-item"><a href="navbar_single_top_static.html" class="nav-link">Single top static</a></li>
-											<li class="nav-item"><a href="navbar_single_top_fixed.html" class="nav-link">Single top fixed</a></li>
-											<li class="nav-item"><a href="navbar_single_bottom_static.html" class="nav-link">Single bottom static</a></li>
-											<li class="nav-item"><a href="navbar_single_bottom_fixed.html" class="nav-link">Single bottom fixed</a></li>
-										</ul>
-									</li>
-									<li class="nav-item nav-item-submenu">
-										<a href="#" class="nav-link">Multiple navbars</a>
-										<ul class="nav nav-group-sub">
-											<li class="nav-item"><a href="navbar_multiple_top_static.html" class="nav-link">Multiple top static</a></li>
-											<li class="nav-item"><a href="navbar_multiple_top_fixed.html" class="nav-link">Multiple top fixed</a></li>
-											<li class="nav-item"><a href="navbar_multiple_bottom_static.html" class="nav-link">Multiple bottom static</a></li>
-											<li class="nav-item"><a href="navbar_multiple_bottom_fixed.html" class="nav-link">Multiple bottom fixed</a></li>
-											<li class="nav-item"><a href="navbar_multiple_top_bottom.html" class="nav-link">Multiple - top and bottom</a></li>
-											<li class="nav-item"><a href="navbar_multiple_secondary_sticky.html" class="nav-link">Multiple - secondary sticky</a></li>
-										</ul>
-									</li>
-									<li class="nav-item nav-item-submenu">
-										<a href="#" class="nav-link">Content navbar</a>
-										<ul class="nav nav-group-sub">
-											<li class="nav-item"><a href="navbar_component_single.html" class="nav-link">Single navbar</a></li>
-											<li class="nav-item"><a href="navbar_component_multiple.html" class="nav-link">Multiple navbars</a></li>
-										</ul>
-									</li>
-									<li class="nav-item-divider"></li>
-									<li class="nav-item"><a href="navbar_colors.html" class="nav-link">Color options</a></li>
-									<li class="nav-item"><a href="navbar_sizes.html" class="nav-link">Sizing options</a></li>
-									<li class="nav-item"><a href="navbar_hideable.html" class="nav-link">Hide on scroll</a></li>
-									<li class="nav-item"><a href="navbar_components.html" class="nav-link">Navbar components</a></li>
-								</ul>
-							</li>
-							<li class="nav-item nav-item-submenu">
-								<a href="#" class="nav-link"><i class="icon-sort"></i> <span>Vertical navigation</span></a>
-								<ul class="nav nav-group-sub" data-submenu-title="Vertical navigation">
-									<li class="nav-item"><a href="navigation_vertical_collapsible.html" class="nav-link">Collapsible menu</a></li>
-									<li class="nav-item"><a href="navigation_vertical_accordion.html" class="nav-link">Accordion menu</a></li>
-									<li class="nav-item"><a href="navigation_vertical_bordered.html" class="nav-link">Bordered navigation</a></li>
-									<li class="nav-item"><a href="navigation_vertical_right_icons.html" class="nav-link">Right icons</a></li>
-									<li class="nav-item"><a href="navigation_vertical_badges.html" class="nav-link">Badges</a></li>
-									<li class="nav-item"><a href="navigation_vertical_disabled.html" class="nav-link">Disabled items</a></li>
-								</ul>
-							</li>
-							<li class="nav-item nav-item-submenu">
-								<a href="#" class="nav-link"><i class="icon-transmission"></i> <span>Horizontal navigation</span></a>
-								<ul class="nav nav-group-sub" data-submenu-title="Horizontal navigation">
-									<li class="nav-item"><a href="navigation_horizontal_click.html" class="nav-link">Submenu on click</a></li>
-									<li class="nav-item"><a href="navigation_horizontal_hover.html" class="nav-link">Submenu on hover</a></li>
-									<li class="nav-item"><a href="navigation_horizontal_elements.html" class="nav-link">With custom elements</a></li>
-									<li class="nav-item"><a href="navigation_horizontal_tabs.html" class="nav-link">Tabbed navigation</a></li>
-									<li class="nav-item"><a href="navigation_horizontal_disabled.html" class="nav-link">Disabled navigation links</a></li>
-									<li class="nav-item"><a href="navigation_horizontal_mega.html" class="nav-link">Horizontal mega menu</a></li>
-								</ul>
-							</li>
-							<li class="nav-item nav-item-submenu">
-								<a href="#" class="nav-link"><i class="icon-tree5"></i> <span>Menu levels</span></a>
-								<ul class="nav nav-group-sub" data-submenu-title="Menu levels">
-									<li class="nav-item"><a href="#" class="nav-link"><i class="icon-IE"></i> Second level</a></li>
-									<li class="nav-item nav-item-submenu">
-										<a href="#" class="nav-link"><i class="icon-firefox"></i> Second level with child</a>
-										<ul class="nav nav-group-sub">
-											<li class="nav-item"><a href="#" class="nav-link"><i class="icon-android"></i> Third level</a></li>
-											<li class="nav-item nav-item-submenu">
-												<a href="#" class="nav-link"><i class="icon-apple2"></i> Third level with child</a>
-												<ul class="nav nav-group-sub">
-													<li class="nav-item"><a href="#" class="nav-link"><i class="icon-html5"></i> Fourth level</a></li>
-													<li class="nav-item"><a href="#" class="nav-link"><i class="icon-css3"></i> Fourth level</a></li>
-												</ul>
-											</li>
-											<li class="nav-item"><a href="#" class="nav-link"><i class="icon-windows"></i> Third level</a></li>
-										</ul>
-									</li>
-									<li class="nav-item"><a href="#" class="nav-link"><i class="icon-chrome"></i> Second level</a></li>
-								</ul>
-							</li>
-							<!-- /layout -->
-								
-						</ul>
-					</div>
-					<!-- /main navigation -->
+        <li class="nav-item nav-item-submenu">
+          <a href="#" class="nav-link"> <span>Apoio</span></a>
+          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
+            <li class="nav-item"><a href="categoria.php" class="nav-link">Categoria</a></li>
+            <li class="nav-item"><a href="subcategoria.php" class="nav-link">SubCategoria</a></li>
+            <li class="nav-item"><a href="marca.php" class="nav-link">Marca</a></li>
+            <li class="nav-item"><a href="modelo.php" class="nav-link">Modelo</a></li>
+            <li class="nav-item"><a href="fabricante.php" class="nav-link">Fabricante</a></li>
+            <li class="nav-item"><a href="unidademedida.php" class="nav-link">Unidade de Medida</a></li>
+            <li class="nav-item"><a href="produtoOrcamento.php" class="nav-link">Produtos para Orçamento</a></li>
+            <li class="nav-item"><a href="servicoOrcamento.php" class="nav-link">Serviços para Orçamento</a></li>
+          </ul>
+        </li>
 
-				</div>
-			</div>
-			<!-- /sidebar content -->
-			
-		</div>
-		<!-- /main sidebar -->
+        <li class="nav-item">
+          <a href="fornecedor.php" <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosFornecedor)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
+            <i class="icon-users2"></i> <span>Fornecedor</span></a>
+        </li>
+        <li class="nav-item">
+          <a href="produto.php" <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosProduto)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
+            <i class="icon-gift"></i> <span>Produto</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="servico.php" <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosServico)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
+            <i class="icon-cogs"></i><span>Serviços</span>
+          </a>
+        </li>
+        <li class="nav-item nav-item-submenu">
+          <a href="#" class="nav-link"><i class="icon-drawer3"></i> <span>Processo Licitatório</span></a>
+          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
+            <li class="nav-item"><a href="tr.php" class="nav-link">Termo de Referência</a></li>
+            <li class="nav-item"><a href="relatorioLicitacao.php" class="nav-link">Rol de Licitações</a></li>
+          </ul>
+        </li>        
+        <li class="nav-item nav-item-submenu">
+          <a href="#" class="nav-link"><i class="icon-bag"></i> <span>Compras</span></a>
+          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
+            <li class="nav-item"><a href="orcamento.php" class="nav-link">Orçamento</a></li>
+            <li class="nav-item"><a href="solicitacao.php" class="nav-link">Solicitação</a></li>
+            <li class="nav-item"><a href="ordemcompra.php" class="nav-link">Ordem de Compra</a></li>
+          </ul>
+        </li>
+        <li class="nav-item nav-item-submenu">
+          <a href="#" class="nav-link"><i class="icon-stack2"></i> <span>Gerenciamento do Estoque</span></a>
+          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
+            <li class="nav-item"><a href="movimentacao.php" class="nav-link">Movimentação</a></li>
+            <li class="nav-item"><a href="fluxo.php" class="nav-link">Fluxo Operacional</a></li>
+            <li class="nav-item"><a href="estoqueMinimoImprime.php" class="nav-link" target="_blank">Estoque Minimo</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a href="inventario.php" <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosInventario)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
+            <i class="icon-paste2"></i> <span>Inventário</span>
+          </a>
+        </li>
+        <li class="nav-item nav-item-submenu">
+          <a href="#" class="nav-link"><i class="icon-stack-text"></i> <span>Relatórios</span></a>
+          <ul class="nav nav-group-sub" data-submenu-title="Form layouts">
+            <li class="nav-item"><a href="relatorioMovimentacao.php" class="nav-link">Movimentação</a></li>
+            <li class="nav-item"><a href="relatorioMovimentacaoPatrimonio.php" class="nav-link">Movimentação do Patrimônio</a></li>
+            <li class="nav-item"><a href="relatorioCurvaABC.php" class="nav-link">Curva ABC</a></li>
+          </ul>
+        </li>
+        <!-- /Controle de Estoque -->
+
+        <!-- Financeiro -->
+        <li class="nav-item-header">
+          <div class="text-uppercase font-size-xs line-height-xs">Financeiro</div> <i class="icon-menu" title="Forms"></i>
+        </li>
+
+        <li class="nav-item nav-item-submenu">
+          <a href="#" class="nav-link"> <span>Apoio</span></a>
+          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
+            <li class="nav-item"><a href="caixa.php" class="nav-link">Caixa</a></li>
+            <li class="nav-item"><a href="centroCusto.php" class="nav-link">Centro de Custo</a></li>            
+            <li class="nav-item"><a href="contaBanco.php" class="nav-link">Conta</a></li>
+            <li class="nav-item"><a href="formaPagamento.php" class="nav-link">Forma de Pagamento</a></li>            
+            <li class="nav-item"><a href="grupo.php" class="nav-link">Grupos</a></li>
+            <li class="nav-item"><a href="planoContas.php" class="nav-link">Plano de Contas</a></li>            
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="contasAPagar.php" class="nav-link"><i class="icon-cash"></i> <span>Contas à Pagar</span></a>
+          <a href="contasAReceber.php" class="nav-link"><i class="icon-cash2"></i> <span>Contas à Receber</span></a>
+          <a href="movimentacaoFinanceira.php" class="nav-link"><i class="icon-coins"></i> <span>Movimentação</span></a>
+          <a href="movimentacaoFinanceiraConciliacao.php" class="nav-link"><i class="icon-coins"></i> <span>Conciliação</span></a>
+          <a href="fluxoDeCaixa.php" class="nav-link"><i class="icon-calendar"></i> <span>Fluxo de caixa</span></a>
+        </li>
+        <li class="nav-item nav-item-submenu">
+          <a href="#" class="nav-link"> <span>Relatórios</span></a>
+          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
+            <li class="nav-item"><a href="#" class="nav-link">Cheques Emitidos</a></li>
+          </ul>
+        </li>
+
+        <!-- /Financeiro -->
+
+        <!-- Vendas -->
+        <li class="nav-item-header">
+          <div class="text-uppercase font-size-xs line-height-xs">Vendas</div> <i class="icon-menu" title="Forms"></i>
+        </li>
+
+        <li class="nav-item nav-item-submenu">
+          <a href="#" class="nav-link"> <span>Apoio</span></a>
+          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
+            <li class="nav-item"><a href="cliente.php" class="nav-link">Cliente</a></li>
+          </ul>
+        </li>
+        <!-- /Vendas -->
+      </ul>
+    </div>
+    <!-- /main navigation -->
+
+  </div>
+  <!-- /sidebar content -->
+
+</div>
+<!-- /main sidebar -->
