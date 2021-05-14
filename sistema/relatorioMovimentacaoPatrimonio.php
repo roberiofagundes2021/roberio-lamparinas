@@ -25,93 +25,109 @@ $Y = date("Y");
 $dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
 $dataFim = date("Y-m-d");
 
-/*
 if (isset($_POST['inputNumero'])) {
-
 
 	try {
 
 		$conn->beginTransaction();
 
+        $produto = explode('#', $_POST['cmbPatriProduto']);
+        $idProduto = $produto[0];
 		
 		$sql = "INSERT INTO Patrimonio ( PatriNumero, PatriNumSerie, PatriEstadoConservacao, PatriProduto,
-		PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
-
+		        PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
 				VALUES (:sPatriNumero,:sPatriNumSerie,:sPatriEstadoConservacao,:iPatriProduto,
 				:iPatriStatus,:iPatriUsuarioAtualizador,:iPatriUnidade)";
 
-				$result = $conn->prepare($sql);
-				$result->execute(array(
-				':sPatriNumero'             => isset($_POST['inputPatriNumero']) ? $_POST['inputPatriNumero'] : null,
-				':sPatriNumSerie'           => isset($_POST['inputPatriNumSerie']) ? $_POST['inputPatriNumSerie'] : null,
-				':sPatriEstadoConservacao'  => isset($_POST['cmbPatriEstadoConservacao']) ? $_POST['cmbPatriEstadoConservacao'] : null,
-				':iPatriProduto'            => isset($_POST['cmbPatriProduto']) ? $_POST['cmbPatriProduto'] : null,
-				':iStatus'                  => 1,
-				':iUsuarioAtualizador'      => $_SESSION['UsuarId'],
-				':iUnidade'                 => $_SESSION['UnidadeId']
-				)); 
+        $result = $conn->prepare($sql);
+        $result->execute(array(
+        ':sPatriNumero'             => isset($_POST['inputPatriNumero']) ? $_POST['inputPatriNumero'] : null,
+        ':sPatriNumSerie'           => isset($_POST['inputPatriNumSerie']) ? $_POST['inputPatriNumSerie'] : null,
+        ':sPatriEstadoConservacao'  => isset($_POST['cmbPatriEstadoConservacao']) ? $_POST['cmbPatriEstadoConservacao'] : null,
+        ':iPatriProduto'            => $idProduto,
+        ':iStatus'                  => 1,
+        ':iUsuarioAtualizador'      => $_SESSION['UsuarId'],
+        ':iUnidade'                 => $_SESSION['UnidadeId']
+        )); 
 		
-		$insertId = $conn->lastInsertId();
+		$insertIdPatrimonio = $conn->lastInsertId();
+
+        $sql = "SELECT MotivId
+                FROM Motivo
+                JOIN Situacao on SituaId = MotivStatus
+                WHERE SituaChave = 'ATIVO' and MotivChave = 'TRANSFERENCIA'";
+        $result = $conn->query($sql);
+        $rowMotivo = $result->fetch(PDO::FETCH_ASSOC);   
+        
+        $destino = explode('#', $_POST['cmbPatriDestino']);        
+        $referencia = $destino[2];
+
+        if ($referencia == 'Local'){
+            $destinoLocal = $destino[0];
+            $destinoSetor = null;
+        } else {
+            $destinoLocal = null;
+            $destinoSetor = $destino[0];
+        }
 
 		$sql = "INSERT INTO Movimentacao ( MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 							MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
 							MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimUnidade)
-
 				VALUES (:sTipo, :iMotivo, :dData, :iFinalidade, :iOrigemLocal, :iOrigemSetor, :iDestinoLocal, :iDestinoSetor, :sDestinoManual, 
 				:sObservacao, :iFornecedor, :iOrdemCompra, :sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, 
 				:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
 
-				$result = $conn->prepare($sql);
+        $result = $conn->prepare($sql);
 
-				$conn->beginTransaction();
-
-				$result->execute(array(
-				':sTipo'               => $_POST['inputTipo'],
-				':iMotivo'             => null,
-				':dData'               => gravaData($_POST['inputPatriDataCompra']),
-				':iFinalidade'         => null,
-				':iOrigemLocal'        => $_POST['inputOrigemLocal'],
-				':iOrigemSetor'        => $_POST['inputOrigemSetor'],
-				':iDestinoLocal'       => $_POST['inputDestinoLocal'],
-				':iDestinoSetor'       => $_POST['inputDestinoSetor'],
-				':sDestinoManual'      => null,
-				':sObservacao'         => null,
-				':iFornecedor'         => null,
-				':iOrdemCompra'        => null,
-				':sNotaFiscal'         => $_POST['inputPatriNotaFiscal'] == '' ? null : $_POST['inputPatriNotaFiscal'],
-				':dDataEmissao'        => $_null,
-				':sNumSerie'           => $_POST['inputPatriNumSerie'] == '' ? null : $_POST['inputPatriNumSerie'],
-				':fValorTotal'         => null,
-				':sChaveAcesso'        => null,
-				':iSituacao'           => 1,
-				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-				':iUnidade'            => $_SESSION['UnidadeId']
-				));
+        $result->execute(array(
+        ':sTipo'               => 'T',
+        ':iMotivo'             => $rowMotivo['MotivId'],
+        ':dData'               => date("Y-m-d"),
+        ':iFinalidade'         => null,
+        ':iOrigemLocal'        => $_POST['inputPatriOrigemId'],
+        ':iOrigemSetor'        => null,
+        ':iDestinoLocal'       => $destinoLocal,
+        ':iDestinoSetor'       => $destinoSetor,
+        ':sDestinoManual'      => null,
+        ':sObservacao'         => null,
+        ':iFornecedor'         => null,
+        ':iOrdemCompra'        => null,
+        ':sNotaFiscal'         => $_POST['inputPatriNotaFiscal'] == '' ? null : $_POST['inputPatriNotaFiscal'],
+        ':dDataEmissao'        => $_POST['inputPatriDataCompra'] == '' ? null : gravaData($_POST['inputPatriDataCompra']),
+        ':sNumSerie'           => $_POST['inputPatriNumSerie'] == '' ? null : $_POST['inputPatriNumSerie'],
+        ':fValorTotal'         => $_POST['inputPatriAquisicao'] == '' ? null: gravaValor($_POST['inputPatriAquisicao']),
+        ':sChaveAcesso'        => null,
+        ':iSituacao'           => 1,
+        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+        ':iUnidade'            => $_SESSION['UnidadeId']
+        ));
            
-        $insertId = $conn->lastInsertId();
+        $insertIdMovimentacao = $conn->lastInsertId();
+
+        $sql = "SELECT ClassId
+                FROM Classificacao
+                JOIN Situacao on SituaId = ClassStatus
+                WHERE SituaChave = 'ATIVO' and ClassChave = 'PERMANENTE'";
+        $result = $conn->query($sql);
+        $rowClassificacao = $result->fetch(PDO::FETCH_ASSOC);        
 
         $sql = "INSERT INTO MovimentacaoXProduto
                         (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
                         VALUES 
                         (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
-                $result = $conn->prepare($sql);
-
-                $conn->beginTransaction();
-
-                $result->execute(array(
-                    ':iMovimentacao' => $insertId,
-                    ':iProduto' => $_POST['cmbPatriProduto'],
-                    ':iQuantidade' => 1,
-                    ':fValorUnitario' => null,
-                    ':sLote' => null,
-                    ':dValidade' =>  null,
-                    ':iClassificacao' =>  null,
-                    ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-                    ':iUnidade' => $_SESSION['UnidadeId'],
-                    ':iPatrimonio' => $insertIdPatrimonio
-                ));
-			
-		}
+        $result = $conn->prepare($sql);
+        $result->execute(array(
+            ':iMovimentacao' => $insertIdMovimentacao,
+            ':iProduto' => $idProduto,
+            ':iQuantidade' => 1,
+            ':fValorUnitario' => $_POST['inputPatriAquisicao'] == '' ? null: gravaValor($_POST['inputPatriAquisicao']),
+            ':sLote' => null,
+            ':dValidade' =>  null,
+            ':iClassificacao' => $rowClassificacao['ClassId'],
+            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+            ':iUnidade' => $_SESSION['UnidadeId'],
+            ':iPatrimonio' => $insertIdPatrimonio
+        ));
 
 		$conn->commit();
 
@@ -133,7 +149,7 @@ if (isset($_POST['inputNumero'])) {
 	}
 
 	irpara("relatorioMovimentacaoPatrimonio.php");
-} */
+} 
 
 ?>
 
@@ -347,34 +363,12 @@ if (isset($_POST['inputNumero'])) {
             
             $('#cmbPatriProduto').on('change', function(e){				
                 
-                var Patrimonio = $('#cmbPatriProduto').val();
-                var Patri = Patrimonio.split('#');
+                var Produto = $('#cmbPatriProduto').val();
+                var Patri = Produto.split('#');
                 
                 $('#inputPatriMarca').val(Patri[1]);
                 $('#inputPatriFabricante').val(Patri[2]);		
             });
-
-            $('#cmbPatriProduto').on('change', function(e){
-                
-                
-                $.getJSON('filtraProdutoPatrimonio.php?idPatriProduto='+cmbPatriProduto, function (dados){
-                    
-                    var option = '<option value="">Selecione o Produto</option>';
-                    
-                    if (dados.length){						
-                        
-                        $.each(dados, function(i, obj){
-                            option += '<option value="'+obj.ProduId+'#'+obj.ProduMarca+'#'+obj.ProduFabricante+'">'+obj.ProduNome+'</option>';
-                        });						
-                        
-                        $('#cmbPatriProduto').html(option).show();
-                    } else {
-                        ResetProduto();
-                    }					
-                });					
-                
-            });
-
 
             $("#enviar").on('click', function(e){
                 
@@ -865,16 +859,18 @@ if (isset($_POST['inputNumero'])) {
                                                 <select id="cmbPatriProduto" name="cmbPatriProduto" class="form-control form-control-select2">
                                                     <option value="">Selecionar</option>
                                                     <?php
-                                                    $sql = "SELECT  ProduId, ProduNome, ProduMarca, ProduFabricante
+                                                    $sql = "SELECT  ProduId, ProduNome, MarcaNome, FabriNome
                                                             FROM Produto
                                                             JOIN Situacao on SituaId = ProduStatus 
+                                                            LEFT JOIN Marca on MarcaId = ProduMarca
+                                                            LEFT JOIN Fabricante on FabriId = ProduFabricante
                                                             WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
                                                             ORDER BY ProduNome ASC";
                                                     $result = $conn->query($sql);
                                                     $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                     foreach ($rowEstCo as $item) {
-                                                        print('<option value="' . $item['ProduId'] . '">' . $item['ProduNome'] . '</option>');
+                                                        print('<option value="' . $item['ProduId'] . '#' . $item['MarcaNome'] . '#' . $item['FabriNome'] . '">' . $item['ProduNome'] . '</option>');
                                                     }
                                                     ?>
                                                 </select>
@@ -887,16 +883,30 @@ if (isset($_POST['inputNumero'])) {
                                     <div class="d-flex flex-row p-1">
                                         <div class='col-lg-6'>
                                             <div class="form-group">
-                                                    <label for="inputPatriOrigem">Origem</label>
+                                                <label for="inputPatriOrigem">Origem</label>
                                                 <div class="input-group">
-                                                    <input type="text" id="inputPatriOrigem" name="inputPatriOrigem" class="form-control">
+
+                                                    <?php
+                                                        $sql = "SELECT LcEstId, LcEstNome
+                                                                FROM LocalEstoque
+                                                                JOIN Situacao on SituaId = LcEstStatus
+                                                                WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and LcEstChave = 'GESTAOANTERIOR'
+                                                               ";
+
+                                                        $result = $conn->query($sql);
+                                                        $rowOrigem = $result->fetch(PDO::FETCH_ASSOC);
+
+                                                    ?>
+
+                                                    <input type="hidden" id="inputPatriOrigemId" name="inputPatriOrigemId" value="<?php echo $rowOrigem['LcEstId']; ?>">
+                                                    <input type="text" id="inputPatriOrigem" name="inputPatriOrigem" class="form-control" value="<?php echo $rowOrigem['LcEstNome']; ?>" readOnly>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class='col-lg-6'>
                                             <div class="form-group">
-                                                <label for="inputPatriDestino">Destino</label>
-                                                <select id="inputPatriDestino" name="inputPatriDestino" class="form-control form-control-select2">
+                                                <label for="cmbPatriDestino">Destino</label>
+                                                <select id="cmbPatriDestino" name="cmbPatriDestino" class="form-control form-control-select2">
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
@@ -911,9 +921,9 @@ if (isset($_POST['inputNumero'])) {
                                                             Order By Nome";
 
                                                     $result = $conn->query($sql);
-                                                    $row = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                    $rowDestino = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    foreach ($row as $item) {
+                                                    foreach ($rowDestino as $item) {
                                                         print('<option value="' . $item['Id'] . '#' . $item['Nome'] . '#' . $item['Referencia'] . '">' . $item['Nome'] . '</option>');
                                                     }
 
@@ -938,7 +948,7 @@ if (isset($_POST['inputNumero'])) {
                                             <div class="form-group">
                                                     <label for="inputPatriDataCompra">Data da Compra</label>
                                                 <div class="input-group">
-                                                    <input type="text" id="inputPatriDataCompra" name="inputPatriDataCompra" class="form-control" value="<?php echo date('d/m/Y'); ?>" readOnly>
+                                                    <input type="date" id="inputPatriDataCompra" name="inputPatriDataCompra" class="form-control">
                                                 </div>
                                             </div>
                                         </div>
@@ -967,7 +977,7 @@ if (isset($_POST['inputNumero'])) {
                                             <div class="form-group">
                                                     <label for="inputPatriMarca">Marca</label>
                                                 <div class="input-group">
-                                                    <input type="text" id="inputPatriMarca" name="inputPatriMarca" class="form-control">
+                                                    <input type="text" id="inputPatriMarca" name="inputPatriMarca" class="form-control" readOnly>
                                                 </div>
                                             </div>
                                         </div>
@@ -975,7 +985,7 @@ if (isset($_POST['inputNumero'])) {
                                             <div class="form-group">
                                                     <label for="inputPatriFabricante">Fabricante</label>
                                                 <div class="input-group">
-                                                    <input type="text" id="inputPatriFabricante" name="inputPatriFabricante" class="form-control">
+                                                    <input type="text" id="inputPatriFabricante" name="inputPatriFabricante" class="form-control" readOnly>
                                                 </div>
                                             </div>
                                         </div>
