@@ -26,26 +26,114 @@ $dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
 $dataFim = date("Y-m-d");
 
 /*
-if (isset($_POST['inputNumero'])){
+if (isset($_POST['inputNumero'])) {
 
-    $sql = "INSERT INTO Patrimonio ( PatriNumero, PatriNumSerie, PatriEstadoConservacao, PatriProduto,
-                                    PatriStatus, PatriUsuarioAtualizador,PatriUnidade)
 
-            VALUES ( :sPatriNumero, :sPatriNumSerie,:sPatriEstadoConservacao, :iPatriProduto,
-                    :iPatriStatus,:iPatriUsuarioAtualizador, :iPatriUnidade)";
+	try {
 
-    $result = $conn->prepare($sql);
-    $result->execute(array(
-                    ':sPatriNumero'             => isset($_POST['inputNumero']) ? $_POST['inputNumero'] : null,
-                    ':sPatriNumSerie'          => isset($_POST['inputNumSerie']) ? $_POST['inputNumSerie'] : null,
-                    ':sPatriEstadoConservacao'  => isset($_POST['cmbEstadoConservacao']) ? $_POST['cmbEstadoConservacao'] : null,
-                    ':iPatriProduto'            => isset($_POST['inputProduto']) ? $_POST['inputProduto'] : null,
-                    ':iStatus'                  => 1,
-                    ':iUsuarioAtualizador'      => $_SESSION['UsuarId'],
-                    ':iUnidade'                 => $_SESSION['UnidadeId']
-                    )); 
-}
-*/
+		$conn->beginTransaction();
+
+		
+		$sql = "INSERT INTO Patrimonio ( PatriNumero, PatriNumSerie, PatriEstadoConservacao, PatriProduto,
+		PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
+
+				VALUES (:sPatriNumero,:sPatriNumSerie,:sPatriEstadoConservacao,:iPatriProduto,
+				:iPatriStatus,:iPatriUsuarioAtualizador,:iPatriUnidade)";
+
+				$result = $conn->prepare($sql);
+				$result->execute(array(
+				':sPatriNumero'             => isset($_POST['inputPatriNumero']) ? $_POST['inputPatriNumero'] : null,
+				':sPatriNumSerie'           => isset($_POST['inputPatriNumSerie']) ? $_POST['inputPatriNumSerie'] : null,
+				':sPatriEstadoConservacao'  => isset($_POST['cmbPatriEstadoConservacao']) ? $_POST['cmbPatriEstadoConservacao'] : null,
+				':iPatriProduto'            => isset($_POST['cmbPatriProduto']) ? $_POST['cmbPatriProduto'] : null,
+				':iStatus'                  => 1,
+				':iUsuarioAtualizador'      => $_SESSION['UsuarId'],
+				':iUnidade'                 => $_SESSION['UnidadeId']
+				)); 
+		
+		$insertId = $conn->lastInsertId();
+
+		$sql = "INSERT INTO Movimentacao ( MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
+							MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
+							MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimUnidade)
+
+				VALUES (:sTipo, :iMotivo, :dData, :iFinalidade, :iOrigemLocal, :iOrigemSetor, :iDestinoLocal, :iDestinoSetor, :sDestinoManual, 
+				:sObservacao, :iFornecedor, :iOrdemCompra, :sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, 
+				:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
+
+				$result = $conn->prepare($sql);
+
+				$conn->beginTransaction();
+
+				$result->execute(array(
+				':sTipo'               => $_POST['inputTipo'],
+				':iMotivo'             => null,
+				':dData'               => gravaData($_POST['inputPatriDataCompra']),
+				':iFinalidade'         => null,
+				':iOrigemLocal'        => $_POST['inputOrigemLocal'],
+				':iOrigemSetor'        => $_POST['inputOrigemSetor'],
+				':iDestinoLocal'       => $_POST['inputDestinoLocal'],
+				':iDestinoSetor'       => $_POST['inputDestinoSetor'],
+				':sDestinoManual'      => null,
+				':sObservacao'         => null,
+				':iFornecedor'         => null,
+				':iOrdemCompra'        => null,
+				':sNotaFiscal'         => $_POST['inputPatriNotaFiscal'] == '' ? null : $_POST['inputPatriNotaFiscal'],
+				':dDataEmissao'        => $_null,
+				':sNumSerie'           => $_POST['inputPatriNumSerie'] == '' ? null : $_POST['inputPatriNumSerie'],
+				':fValorTotal'         => null,
+				':sChaveAcesso'        => null,
+				':iSituacao'           => 1,
+				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+				':iUnidade'            => $_SESSION['UnidadeId']
+				));
+           
+        $insertId = $conn->lastInsertId();
+
+        $sql = "INSERT INTO MovimentacaoXProduto
+                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+                        VALUES 
+                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
+                $result = $conn->prepare($sql);
+
+                $conn->beginTransaction();
+
+                $result->execute(array(
+                    ':iMovimentacao' => $insertId,
+                    ':iProduto' => $_POST['cmbPatriProduto'],
+                    ':iQuantidade' => 1,
+                    ':fValorUnitario' => null,
+                    ':sLote' => null,
+                    ':dValidade' =>  null,
+                    ':iClassificacao' =>  null,
+                    ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                    ':iUnidade' => $_SESSION['UnidadeId'],
+                    ':iPatrimonio' => $insertIdPatrimonio
+                ));
+			
+		}
+
+		$conn->commit();
+
+		// Fim de cadastro
+
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Patrimonio incluído!!!";
+		$_SESSION['msg']['tipo'] = "success";
+	} catch (PDOException $e) {
+
+		$conn->rollback();
+
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao incluir Patrimonio!!!";
+		$_SESSION['msg']['tipo'] = "error";
+
+		echo 'Error1: ' . $e->getMessage();
+		die;
+	}
+
+	irpara("relatorioMovimentacaoPatrimonio.php");
+} */
 
 ?>
 
@@ -253,6 +341,52 @@ if (isset($_POST['inputNumero'])){
         $(document).ready(function () {
 
             modalPatrimonio()
+
+
+            //Ao informar o Patrimonio, trazer os demais dados dele (marca e fabricante)
+            
+            $('#cmbPatriProduto').on('change', function(e){				
+                
+                var Patrimonio = $('#cmbPatriProduto').val();
+                var Patri = Patrimonio.split('#');
+                
+                $('#inputPatriMarca').val(Patri[1]);
+                $('#inputPatriFabricante').val(Patri[2]);		
+            });
+
+            $('#cmbPatriProduto').on('change', function(e){
+                
+                
+                $.getJSON('filtraProdutoPatrimonio.php?idPatriProduto='+cmbPatriProduto, function (dados){
+                    
+                    var option = '<option value="">Selecione o Produto</option>';
+                    
+                    if (dados.length){						
+                        
+                        $.each(dados, function(i, obj){
+                            option += '<option value="'+obj.ProduId+'#'+obj.ProduMarca+'#'+obj.ProduFabricante+'">'+obj.ProduNome+'</option>';
+                        });						
+                        
+                        $('#cmbPatriProduto').html(option).show();
+                    } else {
+                        ResetProduto();
+                    }					
+                });					
+                
+            });
+
+
+            $("#enviar").on('click', function(e){
+                
+                e.preventDefault();	
+                
+                var cmbPatriProduto = $('#cmbPatriProduto').val();
+
+                $("#incluirProduto").submit();
+            });
+
+            
+
 
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
@@ -714,130 +848,173 @@ if (isset($_POST['inputNumero'])){
                                 <i class=""></i>
                             </div>
                             <form id="incluirProduto" method="POST">
-                                <div class="p-3"></div>
-                                    <div class="d-flex flex-row p-2">                                      
-                                        <div class='row'>
-                                            <div class='col-lg-2'>
-                                                <div class="form-group">
-                                                    <label for="inputNumero">Patrimônio</label>
-                                                    <div class="input-group">
-                                                    <input type="text" id="inputNumero" name="inputNumero" class="form-control">
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class='col-lg-2'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriNumero">Patrimônio</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriNumero" name="inputPatriNumero" class="form-control">
                                                 </div>
-                                            </div>                                   
-                                            <div class='col-lg-10'>
-                                                <div class="form-group">
-                                                    <label for="inputProduto">Produto</label>
-                                                    <div class="input-group">
-                                                    <input type="text" id="inputProduto" name="inputProduto" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                            </div> 
+                                        </div> 
 
-                                    <div class='row'>
-                                         <div class='col-lg-6'>
-                                              <div class="form-group">
-                                                  <label for="inputorigem">Origem</label>
-                                                  <div class="input-group">
-                                                  <input type="text" id="inputorigem" name="inputorigem" class="form-control">
-                                                  </div>
-                                             </div>
-                                          </div>
-                                          <div class='col-lg-6'>
-                                              <div class="form-group">
-                                                  <label for="inputdestino">Destino</label>
-                                                  <div class="input-group">
-                                                  <input type="text" id="inputdestino" name="inputdestino" class="form-control">
-                                                  </div>
-                                             </div>
-                                         </div>
-                                     </div>
-                                     
-                                    <div class='row'>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="inputnotaFiscal">Nota Fiscal</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputnotaFiscal" name="inputnotaFiscal" class="form-control">
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="inputdataCompra">Data da Compra</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputdataCompra" name="inputdataCompra" class="form-control">
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="inputaquisicao">(R$) Aquisição</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputaquisicao" name="inputaquisicao" class="form-control">
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="inputdepreciacao">(R$) Depreciação</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputdepreciacao" name="inputdepreciacao" class="form-control">
-                                                 </div>
-                                            </div>
-                                         </div>
-                                     </div>
-                                     <div class='row'>
-                                         <div class='col-lg-6'>
-                                             <div class="form-group">
-                                                 <label for="inputmarca">Marca</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputmarca" name="inputmarca" class="form-control">
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-6'>
-                                             <div class="form-group">
-                                                 <label for="inputfabricante">Fabricante</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputfabricante" name="inputfabricante" class="form-control">
-                                              </div>
-                                         </div>
-                                        </div>
-                                    </div>
+                                        <div class="col-lg-10">
+                                            <label for="cmbPatriProduto">Produto</label>
+                                            <div class="form-group">
+                                                <select id="cmbPatriProduto" name="cmbPatriProduto" class="form-control form-control-select2">
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+                                                    $sql = "SELECT  ProduId, ProduNome, ProduMarca, ProduFabricante
+                                                            FROM Produto
+                                                            JOIN Situacao on SituaId = ProduStatus 
+                                                            WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                            ORDER BY ProduNome ASC";
+                                                    $result = $conn->query($sql);
+                                                    $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                    <div class='col-lg-6'>
-                                        <div class="form-group">
-                                            <label for="inputNumSerie">Nº Série/Chassi <span class="text-danger">(Editável)</span></label>
-                                            <div class="input-group">
-                                                <input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control">
+                                                    foreach ($rowEstCo as $item) {
+                                                        print('<option value="' . $item['ProduId'] . '">' . $item['ProduNome'] . '</option>');
+                                                    }
+                                                    ?>
+                                                </select>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <label for="cmbEstadoConservacao">Estado de Conservação <span
-                                                class="text-danger">(Editável)</span></label>
-                                        <div class="form-group">
-                                            <select id="cmbEstadoConservacao" name="cmbEstadoConservacao"
-                                                class="form-control form-control-select2">
-                                                <option value="">Selecionar</option>
-                                                <?php
-                                                $sql = "SELECT EstCoId, EstCoNome
-                                                        FROM EstadoConservacao
-                                                        JOIN Situacao on SituaId = EstCoStatus
-                                                        WHERE SituaChave = 'ATIVO'
-                                                        ORDER BY EstCoNome ASC";
-                                                $result = $conn->query($sql);
-                                                $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                foreach ($rowEstCo as $item) {
-                                                    print('<option value="' . $item['EstCoId'] . '">' . $item['EstCoNome'] . '</option>');
-                                                }
-                                                ?>
-                                            </select>
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class='col-lg-6'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriOrigem">Origem</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriOrigem" name="inputPatriOrigem" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-6'>
+                                            <div class="form-group">
+                                                <label for="inputPatriDestino">Destino</label>
+                                                <select id="inputPatriDestino" name="inputPatriDestino" class="form-control form-control-select2">
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+                                                    $sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
+                                                            FROM LocalEstoque
+                                                            JOIN Situacao on SituaId = LcEstStatus
+                                                            WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                            UNION
+                                                            SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
+                                                            FROM Setor
+                                                            JOIN Situacao on SituaId = SetorStatus
+                                                            WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                            Order By Nome";
+
+                                                    $result = $conn->query($sql);
+                                                    $row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                    foreach ($row as $item) {
+                                                        print('<option value="' . $item['Id'] . '#' . $item['Nome'] . '#' . $item['Referencia'] . '">' . $item['Nome'] . '</option>');
+                                                    }
+
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class='col-lg-3'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriNotaFiscal">Nota Fiscal</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriNotaFiscal" name="inputPatriNotaFiscal" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-3'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriDataCompra">Data da Compra</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriDataCompra" name="inputPatriDataCompra" class="form-control" value="<?php echo date('d/m/Y'); ?>" readOnly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-3'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriAquisicao">(R$) Aquisição</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriAquisicao" name="inputPatriAquisicao" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-3'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriDepreciacao">(R$) Depreciação</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriDepreciacao" name="inputPatriDepreciacao" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class='col-lg-6'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriMarca">Marca</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriMarca" name="inputPatriMarca" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-6'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriFabricante">Fabricante</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriFabricante" name="inputPatriFabricante" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class='col-lg-6'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriNumSerie">Nº Série/Chassi <span class="text-danger">(Editável)</span></label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriNumSerie" name="inputPatriNumSerie" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <label for="cmbPatriEstadoConservacao">Estado de Conservação <span class="text-danger">(Editável)</span></label>
+                                            <div class="form-group">
+                                                <select id="cmbPatriEstadoConservacao" name="cmbPatriEstadoConservacao" class="form-control form-control-select2">
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+                                                    $sql = "SELECT  ProduId, ProduNome
+                                                            FROM Produto
+                                                            JOIN Situacao on SituaId = ProduStatus 
+                                                            WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                            ORDER BY ProduNome ASC";
+                                                    $result = $conn->query($sql);
+                                                    $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                    foreach ($rowEstCo as $item) {
+                                                        print('<option value="' . $item['ProduId'] . '">' . $item['ProduNome'] . '</option>');
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>    
                             </form>
                             <div class="card-footer mt-2 d-flex flex-column">
                                 <div class="row" style="margin-top: 10px;">
