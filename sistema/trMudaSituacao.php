@@ -16,11 +16,10 @@ if(isset($_POST['inputTermoReferenciaId'])){
 
 		$sql = "
 			SELECT SituaId
-				FROM Situacao	
-			 WHERE SituaChave = '".$_POST['inputTermoReferenciaStatus']."'
-		";
+			FROM Situacao	
+			WHERE SituaChave = '".$_POST['inputTermoReferenciaStatus']."'";
 		$result = $conn->query($sql);
-		$row = $result->fetch(PDO::FETCH_ASSOC);        	
+		$row = $result->fetch(PDO::FETCH_ASSOC);
 
 		if ($_POST['inputTermoReferenciaStatus'] === 'NAOLIBERADO'){
 			$motivo = $_POST['inputMotivo'];
@@ -32,8 +31,8 @@ if(isset($_POST['inputTermoReferenciaId'])){
 			$sql = "
 				UPDATE TermoReferencia
 					SET TrRefStatus = :bStatus, 
-							TrRefUsuarioAtualizador = :iUsuario,
-							TrRefLiberaParcial = ".true."
+						TrRefUsuarioAtualizador = :iUsuario,
+						TrRefLiberaParcial = ".true."
 				WHERE TrRefId = :iTermoReferenciaId";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':bStatus', $row['SituaId']);
@@ -45,7 +44,7 @@ if(isset($_POST['inputTermoReferenciaId'])){
 			$sql = "
 				UPDATE TermoReferencia
 					SET TrRefStatus = :bStatus, 
-							TrRefUsuarioAtualizador = :iUsuario
+						TrRefUsuarioAtualizador = :iUsuario
 				WHERE TrRefId = :iTermoReferenciaId";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':bStatus', $row['SituaId']);
@@ -54,16 +53,15 @@ if(isset($_POST['inputTermoReferenciaId'])){
 			$result->execute();
 		}
 		
-
 		$sql = "
 			UPDATE Bandeja 
-				 SET BandeStatus = :bStatus, 
-						 BandeMotivo = :sMotivo, 
-						 BandeUsuarioAtualizador = :iUsuario
+				 SET BandeStatus = :iStatus, 
+					 BandeMotivo = :sMotivo, 
+					 BandeUsuarioAtualizador = :iUsuario
 			 WHERE BandeId = :iBandeja
 		";
 		$result = $conn->prepare($sql);
-		$result->bindParam(':bStatus', $row['SituaId']);
+		$result->bindParam(':iStatus', $row['SituaId']);
 		$result->bindParam(':sMotivo', $motivo);
 		$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
 		$result->bindParam(':iBandeja', $_POST['inputBandejaId']);

@@ -6,10 +6,16 @@ $_SESSION['PaginaAtual'] = 'Novo Contrato ';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputTRId'])){
+	$iTR = $_POST['inputTRId'];
+} else {
+	irpara('tr.php');
+}
+
 $sql = "SELECT TrRefId, TrRefNumero, TrRefCategoria, CategNome, CategId, TrRefConteudoInicio, TrRefConteudoFim
 		FROM TermoReferencia
 		JOIN Categoria ON CategId = TrRefCategoria
-		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = 151";	
+		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = ".$iTR;	
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 

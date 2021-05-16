@@ -21,24 +21,10 @@ if (isset($_POST['cmbPerfil'])) {
 
 /* AGUARDANDOLIBERACAO */
 $sql = "
-	SELECT BandeId, 
-				 BandeIdentificacao, 
-				 BandeData, 
-				 BandeDescricao, 
-				 BandeURL, 
-				 UsuarNome, 
-				 BandeTabela, 
-				 BandeTabelaId,
-				 BandePerfil,
-				 SituaNome, 
-				 DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, 
-				 OrComNumero, 
-				 OrComSituacao, 
-				 OrComTipo, 
-				 MovimTipo, 
-				 UsXUnSetor as SetorAtual, 
-				 BandeSolicitanteSetor as SetorQuandoSolicitou
-		FROM Bandeja
+	SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, 
+	BandeTabela, BandeTabelaId, BandePerfil, BandeUsuario, SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, 
+	OrComNumero, OrComSituacao, OrComTipo, MovimTipo, UsXUnSetor as SetorAtual, BandeSolicitanteSetor as SetorQuandoSolicitou
+	FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil 
 		  ON EXUXPUsuario = UsuarId
@@ -61,25 +47,25 @@ $sql = "
 		WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
 		  AND UsXUnUnidade = " . $_SESSION['UnidadeId'] . " 
 			AND SituaChave = 'AGUARDANDOLIBERACAO' 
-			AND BnXPePerfil in (" . $idPerfilLogado . ")
+			AND (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ") 
 		ORDER BY BandeData DESC, BandeId DESC";
 //echo $sql;die;		
 $result = $conn->query($sql);
 $rowPendente = $result->fetchAll(PDO::FETCH_ASSOC);
 
-$sql = "SELECT COUNT(BandeId) as TotalPendente
+$sql = "SELECT COUNT(DISTINCT BandeId) as TotalPendente
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
 		JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'AGUARDANDOLIBERACAO' and BnXPePerfil in (" . $idPerfilLogado . ")";
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'AGUARDANDOLIBERACAO' and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")";
 $result = $conn->query($sql);
 $rowTotalPendente = $result->fetch(PDO::FETCH_ASSOC);
 $totalPendente = $rowTotalPendente['TotalPendente'];
 
 /* LIBERADAS */
-$sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, 
+$sql = "SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, 
 		SituaNome, OrComNumero, OrComTipo, MovimTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
@@ -90,18 +76,20 @@ $sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL,
 		LEFT JOIN Movimentacao on MovimId = BandeTabelaId		
 		JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADO' and BnXPePerfil in (" . $idPerfilLogado . ")
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and 
+		SituaChave in ('LIBERADO', 'FASEINTERNAFINALIZADA') and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
 
-$sql = "SELECT COUNT(BandeId) as TotalLiberado
+$sql = "SELECT COUNT(DISTINCT BandeId) as TotalLiberado
 		FROM Bandeja
 		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADO' and BnXPePerfil in (" . $idPerfilLogado . ")";
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave  in ('LIBERADO', 'FASEINTERNAFINALIZADA') and 
+		(BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")";
 $result = $conn->query($sql);
 $rowTotalLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalLiberado = $rowTotalLiberado['TotalLiberado'];
@@ -392,7 +380,7 @@ if ($totalAcoes) {
 		});
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaBandeja(BandeId, BandeTabela, BandeTabelaId, MovimTipo, Tipo, BandePerfil) {
+		function atualizaBandeja(BandeId, BandeTabela, BandeTabelaId, MovimTipo, Tipo, BandeUsuario) {
 
 			document.getElementById('inputBandejaId').value = BandeId;
 
@@ -680,9 +668,8 @@ if ($totalAcoes) {
 			}
 
 			if (BandeTabela == 'TermoReferencia') {
-				console.log(BandeId, BandeTabela, BandeTabelaId, MovimTipo, BandePerfil);
+
 				document.getElementById('inputTermoReferenciaId').value = BandeTabelaId;
-				// document.getElementById('inputTipoTermoReferencia').value = BandePerfil;
 
 				if (Tipo == 'imprimir') {
 					document.formBandeja.action = "trImprime.php";
@@ -690,7 +677,7 @@ if ($totalAcoes) {
 					document.formBandeja.submit();
 				} else {
 					if (Tipo === 'liberarCentroAdministrativo') {
-						document.getElementById('inputTermoReferenciaStatus').value = 'LIBERADOPARCIAL'; //Liberado
+						document.getElementById('inputTermoReferenciaStatus').value = 'LIBERADOPARCIAL'; //Liberado Parcial
 						document.formBandeja.action = "trMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
@@ -700,6 +687,18 @@ if ($totalAcoes) {
 						document.formBandeja.action = "trDotacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
+						 
+					} else if (Tipo == 'liberarComissao') {
+						
+						bootbox.confirm("Tem certeza que deseja finalizar o TR?", function(result){ 
+							
+							if (result) {
+								document.getElementById('inputTermoReferenciaStatus').value = 'FASEINTERNAFINALIZADA'; //Fase Interna Finalizada
+								document.formBandeja.action = "trMudaSituacao.php";
+								document.formBandeja.setAttribute("target", "_self");
+								document.formBandeja.submit();
+							}
+						});
 						 
 					} else if (Tipo === 'liberar') {
 						document.getElementById('inputTermoReferenciaStatus').value = 'LIBERADO'; //Liberado
@@ -815,9 +814,9 @@ if ($totalAcoes) {
 										<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2">');
 
 							$sql = "SELECT SituaId, SituaNome, SituaChave
-													FROM Situacao
-													WHERE SituaStatus = 1 and SituaChave in ('AGUARDANDOLIBERACAO', 'LIBERADO', 'NAOLIBERADO')
-													ORDER BY SituaNome ASC";
+									FROM Situacao
+									WHERE SituaStatus = 1 and SituaChave in ('AGUARDANDOLIBERACAO', 'LIBERADO', 'NAOLIBERADO')
+									ORDER BY SituaNome ASC";
 							$result = $conn->query($sql);
 							$rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -831,7 +830,15 @@ if ($totalAcoes) {
 									$seleciona = $item['SituaChave'] == 'AGUARDANDOLIBERACAO' ? "selected" : "";
 								}
 
-								print('<option value="' . $item['SituaChave'] . '" ' . $seleciona . '>' . $item['SituaNome'] . '</option>');
+								if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO'){
+									$nome = $item['SituaNome']."/Finalização";
+								} else if ($item['SituaChave'] == 'LIBERADO'){
+									$nome = $item['SituaNome']."/Finalizado"; 
+								} else {
+									$nome = $item['SituaNome'];
+								}
+
+								print('<option value="' . $item['SituaChave'] . '" ' . $seleciona . '>' . $nome . '</option>');
 							}
 
 							print('	
@@ -848,10 +855,10 @@ if ($totalAcoes) {
 											<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2">');
 
 								$sql = "SELECT PerfiId, PerfiNome
-														FROM Perfil
-														JOIN Situacao on SituaId = PerfiStatus
-														WHERE SituaChave = 'ATIVO'
-														ORDER BY PerfiNome ASC";
+										FROM Perfil
+										JOIN Situacao on SituaId = PerfiStatus
+										WHERE SituaChave = 'ATIVO'
+										ORDER BY PerfiNome ASC";
 								$result = $conn->query($sql);
 								$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 
