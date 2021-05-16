@@ -6,8 +6,10 @@
   $resultModulo = $conn->query($sqlModulo);
   $modulo = $resultModulo->fetchAll(PDO::FETCH_ASSOC);
 
-  $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuPai, MenuLevel, MenuOrdem, MenuStatus
-  FROM menu order by MenuOrdem asc";
+  $sqlMenu = "SELECT M.MenuId, M.MenuNome, M.MenuUrl, M.MenuIco, M.MenuSubMenu, M.MenuModulo,
+  M.MenuPai, M.MenuLevel, M.MenuOrdem, M.MenuStatus, S.SituaChave
+  FROM menu M join situacao S on M.MenuStatus = S.SituaId
+  order by MenuOrdem asc";
   $resultMenu = $conn->query($sqlMenu);
   $menu = $resultMenu->fetchAll(PDO::FETCH_ASSOC);
 
@@ -103,7 +105,7 @@
                       <div class="text-uppercase font-size-xs line-height-xs">'.$mod['ModulNome'].'</div>
                     </li>';
               foreach($menu as $men){
-                if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0){
+                if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo")){
                   echo  ($men['MenuSubMenu'] == 1? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
                             '<a href="'.$men['MenuUrl'].'"';
                             if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
