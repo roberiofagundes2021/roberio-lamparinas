@@ -25,7 +25,7 @@ $Y = date("Y");
 $dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
 $dataFim = date("Y-m-d");
 
-if (isset($_POST['inputNumero'])) {
+if (isset($_POST['inputPatriNumero'])) {
 
 	try {
 
@@ -171,28 +171,96 @@ if (isset($_POST['inputNumero'])) {
     <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
     <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
     <script src="global_assets/js/demo_pages/form_layouts.js"></script>
+    <script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+    
+    <!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
     <script type="text/javascript">
+
+    $(document).ready(function() {
+
+        //Valida Registro Duplicado
+        $('#salvarPatrimonio').on('click', function(e) {
+
+            e.preventDefault();
+
+            var inputPatriNumero = $('#inputPatriNumero').val();
+
+            //remove os espaços desnecessários antes e depois
+            inputPatriNumero = inputPatriNumero.trim();
+
+            //Esse ajax está sendo usado para verificar no banco se o registro já existe
+            $.ajax({
+                type: "POST",
+                url: "patrimoniolValida.php",
+                data: ('numero=' + inputPatriNumero),
+                success: function(resposta) {
+
+                if (resposta == 1) {
+                    alerta('Atenção', 'Esse registro já existe!', 'error');
+                    return false;
+                }
+
+                $("#incluirProduto").submit();
+                }
+            })
+        })
+    })
+
         const selectEstCo = $('#selectSetadoConservacao').html()
 
+        function limparPatrimonio() {
+            $("#inputPatriNumero").val("");
+            $("#cmbPatriProduto").val("");
+            $("#cmbPatriDestino").val("");
+            $("#inputPatriNotaFiscal").val("");
+            $("#inputPatriDataCompra").val("");
+            $("#inputPatriAquisicao").val("");
+            $("#inputPatriDepreciacao").val("");
+            $("#inputPatriMarca").val("");
+            $("#inputPatriFabricante").val("");
+            $("#inputPatriNumSerie").val("");
+            $("#cmbPatriEstadoConservacao").val("");
+        }
+       
         function modalPatrimonio() {
 
             $('#btnPatrimonio').on('click', (e) => {
                 e.preventDefault()
                 $('#pageModalPatrimonio').fadeIn(200);
-
-            })
+            });
 
             $('#modalClosePatrimonio').on('click', function() {
                 $('#pageModalPatrimonio').fadeOut(200);
+                $('#select2-cmbPatriProduto-container').prop('title','Todos').html('Todos');
+                $('#select2-cmbPatriDestino-container').prop('title','Todos').html('Todos');
+                $('#select2-cmbPatriEstadoConservacao-container').prop('title','Todos').html('Todos');
                 $('body').css('overflow', 'scroll');
                 $("#patrimonioContainer").html("")
-            })
+                limparPatrimonio();
+                
+            });
+
+            $('#modalClosePatri').on('click', function() {
+                $('#pageModalPatrimonio').fadeOut(200);
+                $('#select2-cmbPatriProduto-container').prop('title','Todos').html('Todos');
+                $('#select2-cmbPatriDestino-container').prop('title','Todos').html('Todos');
+                $('#select2-cmbPatriEstadoConservacao-container').prop('title','Todos').html('Todos');
+                $('body').css('overflow', 'scroll');
+                $("#patrimonioContainer").html("")
+                limparPatrimonio();
+               
+            });
 
             $("#salvarPatrimonio").on('click', function() {
-                $('#pageModalPatrimonio').fadeOut(200);
+                $('#pageModalCheque').fadeOut(200);
                 $('body').css('overflow', 'scroll');
-            })
+                
+            });
+            
         }        
 
         function modalAcoes() {
@@ -839,24 +907,24 @@ if (isset($_POST['inputNumero'])) {
                             <div class="custon-modal-title">
                                 <i class=""></i>
                                 <p class="h3">Dados Produto</p>
-                                <i class=""></i>
+                                <i id="modalClosePatri" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
                             </div>
                             <form id="incluirProduto" method="POST">
                                 <div class="px-3 pt-3">
                                     <div class="d-flex flex-row p-1">
                                         <div class='col-lg-2'>
                                             <div class="form-group">
-                                                    <label for="inputPatriNumero">Patrimônio</label>
+                                                    <label for="inputPatriNumero">Patrimônio <span class="text-danger">*</span></label>
                                                 <div class="input-group">
-                                                    <input type="text" id="inputPatriNumero" name="inputPatriNumero" class="form-control">
+                                                    <input type="text" id="inputPatriNumero" name="inputPatriNumero" class="form-control" required autofocus>
                                                 </div>
                                             </div> 
                                         </div> 
 
                                         <div class="col-lg-10">
-                                            <label for="cmbPatriProduto">Produto</label>
+                                            <label for="cmbPatriProduto">Produto <span class="text-danger">*</span></label>
                                             <div class="form-group">
-                                                <select id="cmbPatriProduto" name="cmbPatriProduto" class="form-control form-control-select2">
+                                                <select id="cmbPatriProduto" name="cmbPatriProduto" class="form-control form-control-select2" required>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT  ProduId, ProduNome, MarcaNome, FabriNome
@@ -883,7 +951,7 @@ if (isset($_POST['inputNumero'])) {
                                     <div class="d-flex flex-row p-1">
                                         <div class='col-lg-6'>
                                             <div class="form-group">
-                                                <label for="inputPatriOrigem">Origem</label>
+                                                <label for="inputPatriOrigem">Origem <span class="text-danger">*</span></label>
                                                 <div class="input-group">
 
                                                     <?php
@@ -905,8 +973,8 @@ if (isset($_POST['inputNumero'])) {
                                         </div>
                                         <div class='col-lg-6'>
                                             <div class="form-group">
-                                                <label for="cmbPatriDestino">Destino</label>
-                                                <select id="cmbPatriDestino" name="cmbPatriDestino" class="form-control form-control-select2">
+                                                <label for="cmbPatriDestino">Destino <span class="text-danger">*</span></label>
+                                                <select id="cmbPatriDestino" name="cmbPatriDestino" class="form-control form-control-select2" required>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
@@ -956,7 +1024,7 @@ if (isset($_POST['inputNumero'])) {
                                             <div class="form-group">
                                                     <label for="inputPatriAquisicao">(R$) Aquisição</label>
                                                 <div class="input-group">
-                                                    <input type="text" id="inputPatriAquisicao" name="inputPatriAquisicao" class="form-control">
+                                                    <input type="text" id="inputPatriAquisicao" name="inputPatriAquisicao" class="form-control" onKeyUp="moeda(this)" maxLength="12">
                                                 </div>
                                             </div>
                                         </div>
@@ -964,7 +1032,7 @@ if (isset($_POST['inputNumero'])) {
                                             <div class="form-group">
                                                     <label for="inputPatriDepreciacao">(R$) Depreciação</label>
                                                 <div class="input-group">
-                                                    <input type="text" id="inputPatriDepreciacao" name="inputPatriDepreciacao" class="form-control">
+                                                    <input type="text" id="inputPatriDepreciacao" name="inputPatriDepreciacao" class="form-control" onKeyUp="moeda(this)" maxLength="12">
                                                 </div>
                                             </div>
                                         </div>
@@ -996,30 +1064,30 @@ if (isset($_POST['inputNumero'])) {
                                     <div class="d-flex flex-row p-1">
                                         <div class='col-lg-6'>
                                             <div class="form-group">
-                                                    <label for="inputPatriNumSerie">Nº Série/Chassi <span class="text-danger">(Editável)</span></label>
+                                                    <label for="inputPatriNumSerie">Nº Série/Chassi</label>
                                                 <div class="input-group">
                                                     <input type="text" id="inputPatriNumSerie" name="inputPatriNumSerie" class="form-control">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
-                                            <label for="cmbPatriEstadoConservacao">Estado de Conservação <span class="text-danger">(Editável)</span></label>
+                                            <label for="cmbPatriEstadoConservacao">Estado de Conservação</label>
                                             <div class="form-group">
                                                 <select id="cmbPatriEstadoConservacao" name="cmbPatriEstadoConservacao" class="form-control form-control-select2">
                                                     <option value="">Selecionar</option>
-                                                    <?php
-                                                    $sql = "SELECT  ProduId, ProduNome
-                                                            FROM Produto
-                                                            JOIN Situacao on SituaId = ProduStatus 
-                                                            WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-                                                            ORDER BY ProduNome ASC";
+                                                        <?php
+                                                    $sql = "SELECT EstCoId, EstCoNome
+                                                            FROM EstadoConservacao
+                                                            JOIN Situacao on SituaId = EstCoStatus
+                                                            WHERE SituaChave = 'ATIVO'
+                                                            ORDER BY EstCoNome ASC";
                                                     $result = $conn->query($sql);
                                                     $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                     foreach ($rowEstCo as $item) {
-                                                        print('<option value="' . $item['ProduId'] . '">' . $item['ProduNome'] . '</option>');
+                                                        print('<option value="' . $item['EstCoId'] . '">' . $item['EstCoNome'] . '</option>');
                                                     }
-                                                    ?>
+                                                ?>
                                                 </select>
                                             </div>
                                         </div>
