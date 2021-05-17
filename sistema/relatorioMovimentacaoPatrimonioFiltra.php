@@ -47,7 +47,9 @@ function queryPesquisa(){
                 $string .= ' and ';
             }
 
-            $sql = "SELECT PatriId ,PatriNumero, PatriNumSerie, PatriEstadoConservacao, MvXPrId, MovimId, MvXPrValorUnitario, MovimData, MovimNotaFiscal, MovimOrigemLocal, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, MarcaNome, FabriNome, SetorNome
+            $sql = "SELECT PatriId ,PatriNumero, PatriNumSerie, PatriEstadoConservacao, MvXPrId, MovimId, 
+                    MovimData, MovimNotaFiscal, MovimOrigemLocal, LcEstNome, MovimDestinoSetor, 
+                    MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, MarcaNome, FabriNome, SetorNome
                     FROM Patrimonio
                     JOIN MovimentacaoXProduto on MvXPrPatrimonio = PatriId
                     JOIN Movimentacao on MovimId = MvXPrMovimentacao
@@ -86,6 +88,7 @@ function queryPesquisa(){
                    <td class='even'>" . $item['SetorNome'] . "</td>
                    <td class='even' style='display: none'>" . $item['MarcaNome'] . "</td>
                    <td class='even' style='display: none'>" . $item['FabriNome'] . "</td>
+                   <td class='even' style='display: none'>" . mostraData($item['MovimData']) . "</td>
                    <td style='text-align: center'>
                          <i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>
                    </td>
@@ -94,7 +97,7 @@ function queryPesquisa(){
                    </td>
                    <td style='display: none' id='inputEstadoConservacao'>
                         <input type='text' value='" . $item['PatriEstadoConservacao'] . "'>
-                   </td>
+                   </td>                   
                 </tr>
              ");
         }

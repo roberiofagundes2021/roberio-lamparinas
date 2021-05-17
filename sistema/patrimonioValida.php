@@ -4,11 +4,11 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-	$sql = ("SELECT PatriId, PatriNumero
-			 FROM Patrimonio
-			 WHERE PatriNumero = '". $_POST['numero']."'");
+	$sql = "SELECT PatriId, PatriNumero
+			FROM Patrimonio
+			WHERE PatriNumero = '". $_POST['numero']."'";
 
-$result = $conn->query("$sql");
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 
