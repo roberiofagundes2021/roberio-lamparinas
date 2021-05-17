@@ -12,7 +12,7 @@
 			
 				$sql = "SELECT PrOrcId
 						FROM ProdutoOrcamento
-						JOIN Situacao on SituaId = PrOrcStatus
+						JOIN Situacao on SituaId = PrOrcSituacao
 						WHERE PrOrcSubcategoria = " . $value . " and SituaChave = 'ATIVO'";
 			} else{
 			
@@ -54,7 +54,7 @@
 		
 			$sql = "SELECT PrOrcId
 					FROM ProdutoOrcamento
-					JOIN Situacao on SituaId = PrOrcStatus
+					JOIN Situacao on SituaId = PrOrcSituacao
 					WHERE PrOrcCategoria = " . $value . " and SituaChave = 'ATIVO'";
 		} else {
 		
