@@ -23,43 +23,39 @@ if(isset($_POST['inputTermoReferenciaId'])){
 
 		if ($_POST['inputTermoReferenciaStatus'] === 'NAOLIBERADO'){
 			$motivo = $_POST['inputMotivo'];
+
+			$sql = "
+				UPDATE TermoReferencia
+					SET TrRefStatus = :bStatus, 
+						TrRefUsuarioAtualizador = :iUsuario
+				WHERE TrRefId = :iTermoReferenciaId";			
 		} else{
 			$motivo = NULL;
-		}
-		
-		if ($motivo === null) {
+
 			$sql = "
 				UPDATE TermoReferencia
 					SET TrRefStatus = :bStatus, 
 						TrRefUsuarioAtualizador = :iUsuario,
 						TrRefLiberaParcial = ".true."
-				WHERE TrRefId = :iTermoReferenciaId";
-			$result = $conn->prepare($sql);
-			$result->bindParam(':bStatus', $row['SituaId']);
-			$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
-			$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
-			$result->execute();
-
-		} else if ($motivo !== null) {
-			$sql = "
-				UPDATE TermoReferencia
-					SET TrRefStatus = :bStatus, 
-						TrRefUsuarioAtualizador = :iUsuario
-				WHERE TrRefId = :iTermoReferenciaId";
-			$result = $conn->prepare($sql);
-			$result->bindParam(':bStatus', $row['SituaId']);
-			$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
-			$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
-			$result->execute();
+				WHERE TrRefId = :iTermoReferenciaId";			
 		}
+		$result = $conn->prepare($sql);
+		$result->bindParam(':bStatus', $row['SituaId']);
+		$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
+		$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
+		$result->execute();		
 		
 		$sql = "
 			UPDATE Bandeja 
 				 SET BandeStatus = :iStatus, 
 					 BandeMotivo = :sMotivo, 
-					 BandeUsuarioAtualizador = :iUsuario
-			 WHERE BandeId = :iBandeja
-		";
+					 BandeUsuarioAtualizador = :iUsuario ";
+		
+		if ($_POST['inputTermoReferenciaStatus'] === 'FASEINTERNAFINALIZADA'){
+			$sql .= ", BandeDescricao = 'CONCLUÍDO'";
+		}	
+		$sql .= "WHERE BandeId = :iBandeja";
+
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iStatus', $row['SituaId']);
 		$result->bindParam(':sMotivo', $motivo);

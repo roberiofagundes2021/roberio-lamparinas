@@ -77,7 +77,7 @@ $sql = "SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, 
 		JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
 	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and 
-		SituaChave in ('LIBERADO', 'FASEINTERNAFINALIZADA') and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")
+		SituaChave in ('LIBERADO', 'LIBERADOPARCIAL') and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -88,7 +88,7 @@ $sql = "SELECT COUNT(DISTINCT BandeId) as TotalLiberado
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave  in ('LIBERADO', 'FASEINTERNAFINALIZADA') and 
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave  in ('LIBERADO', 'LIBERADOPARCIAL') and 
 		(BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")";
 $result = $conn->query($sql);
 $rowTotalLiberado = $result->fetch(PDO::FETCH_ASSOC);
@@ -121,9 +121,39 @@ $result = $conn->query($sql);
 $rowTotalNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 
+/* FINALIZADAS */
+$sql = "SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, 
+		SituaNome, OrComNumero, OrComTipo, MovimTipo
+		FROM Bandeja
+		JOIN Usuario on UsuarId = BandeSolicitante
+		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+		JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
+		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
+		LEFT JOIN Movimentacao on MovimId = BandeTabelaId		
+		JOIN Situacao on SituaId = BandeStatus
+		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and 
+		SituaChave in ('FASEINTERNAFINALIZADA') and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")
+		ORDER BY BandeData DESC";
+$result = $conn->query($sql);
+$rowFinalizado = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT COUNT(DISTINCT BandeId) as TotalFinalizado
+		FROM Bandeja
+		LEFT JOIN OrdemCompra on OrComId = BandeTabelaId
+		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
+		LEFT JOIN Situacao on SituaId = BandeStatus
+		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave  in ('FASEINTERNAFINALIZADA') and 
+		(BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")";
+$result = $conn->query($sql);
+$rowTotalFinalizado = $result->fetch(PDO::FETCH_ASSOC);
+$totalFinalizado = $rowTotalFinalizado['TotalFinalizado'];
+
 $totalPorcentagem = 0;
 $todos = 0;
-$totalTodasAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
+$totalTodasAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado + $totalFinalizado;
 
 if (isset($_POST['cmbSituacao'])) {
 
@@ -139,9 +169,13 @@ if (isset($_POST['cmbSituacao'])) {
 
 		$totalAcoes = $totalNaoLiberado;
 		$situacaoPorcentagem = "Não Liberado";
+	} else if ($_POST['cmbSituacao'] == 'FASEINTERNAFINALIZADA') {
+
+		$totalAcoes = $totalFinalizado;
+		$situacaoPorcentagem = "Finalizado";
 	} else { //Todos
 
-		$totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado;
+		$totalAcoes = $totalPendente + $totalLiberado + $totalNaoLiberado + $totalFinalizado;
 		$situacaoPorcentagem = "Aguardando Liberação";
 		$todos = 1;
 	}
@@ -208,7 +242,7 @@ if ($totalAcoes) {
 
 
 			/* Gráfico na Bandeja */
-			var _bandeja = function(element, size, pendente, liberado, naoliberado) {
+			var _bandeja = function(element, size, pendente, liberado, naoliberado, finalizado) {
 
 				if (typeof d3 == 'undefined') {
 					console.warn('Warning - d3.min.js is not loaded.');
@@ -237,6 +271,11 @@ if ($totalAcoes) {
 						"icon": "<i class='status-mark border-danger-300 mr-2'></i>",
 						"value": naoliberado,
 						"color": "#EF5350"
+					}, {
+						"status": "Finalizados",
+						"icon": "<i class='status-mark border-brown-300 mr-2'></i>",
+						"value": finalizado,
+						"color": "#4E342E"
 					}];
 
 					// Main variables
@@ -371,10 +410,11 @@ if ($totalAcoes) {
 			var pendente = $('#inputTotalPendente').val();
 			var liberado = $('#inputTotalLiberado').val();
 			var naoliberado = $('#inputTotalNaoLiberado').val();
+			var finalizado = $('#inputTotalFinalizado').val();
 
 			//O if é apenas para corrigir um bug que fica quando se tem todos os valores zerados no gráfico. Tipo fica piscando e não aparece nada.
-			if (pendente != 0 || liberado != 0 || naoliberado != 0) {
-				_bandeja('#grafico', 52, pendente, liberado, naoliberado);
+			if (pendente != 0 || liberado != 0 || naoliberado != 0 || finalizado != 0) {
+				_bandeja('#grafico', 52, pendente, liberado, naoliberado, finalizado);
 			}
 
 		});
@@ -785,6 +825,7 @@ if ($totalAcoes) {
 							<input type="hidden" id="inputTotalPendente" class="form-control" value="<?php echo $totalPendente; ?>">
 							<input type="hidden" id="inputTotalLiberado" class="form-control" value="<?php echo $totalLiberado; ?>">
 							<input type="hidden" id="inputTotalNaoLiberado" class="form-control" value="<?php echo $totalNaoLiberado; ?>">
+							<input type="hidden" id="inputTotalFinalizado" class="form-control" value="<?php echo $totalFinalizado; ?>">
 						</div>
 
 						<div class="card-body d-md-flex align-items-md-center justify-content-md-between flex-md-wrap">
@@ -815,7 +856,7 @@ if ($totalAcoes) {
 
 							$sql = "SELECT SituaId, SituaNome, SituaChave
 									FROM Situacao
-									WHERE SituaStatus = 1 and SituaChave in ('AGUARDANDOLIBERACAO', 'LIBERADO', 'NAOLIBERADO')
+									WHERE SituaStatus = 1 and SituaChave in ('AGUARDANDOLIBERACAO', 'LIBERADO', 'NAOLIBERADO', 'FASEINTERNAFINALIZADA')
 									ORDER BY SituaNome ASC";
 							$result = $conn->query($sql);
 							$rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -832,8 +873,8 @@ if ($totalAcoes) {
 
 								if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO'){
 									$nome = $item['SituaNome']."/Finalização";
-								} else if ($item['SituaChave'] == 'LIBERADO'){
-									$nome = $item['SituaNome']."/Finalizado"; 
+								} else if ($item['SituaChave'] == 'FASEINTERNAFINALIZADA'){
+									$nome = "Finalizado"; 
 								} else {
 									$nome = $item['SituaNome'];
 								}
@@ -891,26 +932,35 @@ if ($totalAcoes) {
 
 									<?php
 
-									if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'TODOS') {
+										if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'TODOS') {
 
-										include('bandejaPendente.php');
-										include('bandejaLiberado.php');
-										include('bandejaNaoLiberado.php');
-									} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'AGUARDANDOLIBERACAO') {
+											include('bandejaPendente.php');
+											include('bandejaLiberado.php');
+											include('bandejaNaoLiberado.php');
+											include('bandejaFinalizado.php');
 
-										include('bandejaPendente.php');
-									} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'LIBERADO') {
+										} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'AGUARDANDOLIBERACAO') {
 
-										include('bandejaLiberado.php');
-									} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'NAOLIBERADO') {
+											include('bandejaPendente.php');
 
-										include('bandejaNaoLiberado.php');
-									} else { // quando não tiver POST e vier do menu index.php
+										} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'LIBERADO') {
 
-										include('bandejaPendente.php');
-										//include('bandejaLiberado.php');
-										//include('bandejaNaoLiberado.php');
-									}
+											include('bandejaLiberado.php');
+
+										} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'NAOLIBERADO') {
+
+											include('bandejaNaoLiberado.php');
+
+										} else if (isset($_POST['cmbSituacao']) and $_POST['cmbSituacao'] == 'FASEINTERNAFINALIZADA') {
+
+											include('bandejaFinalizado.php');
+											
+										} else { // quando não tiver POST e vier do menu index.php
+
+											include('bandejaPendente.php');
+											//include('bandejaLiberado.php');
+											//include('bandejaNaoLiberado.php');
+										}
 									?>
 
 								</tbody>
