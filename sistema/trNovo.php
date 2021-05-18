@@ -7,10 +7,9 @@ $_SESSION['PaginaAtual'] = 'Novo Termo de Referência';
 include('global_assets/php/conexao.php');
 
 $sql = "
-	SELECT ParamProdutoOrcamento, 
-				 ParamServicoOrcamento
-		FROM Parametro
-	 WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
+	SELECT ParamProdutoOrcamento, ParamServicoOrcamento
+	FROM Parametro
+	WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
 ";
 $result = $conn->query($sql);
 $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
