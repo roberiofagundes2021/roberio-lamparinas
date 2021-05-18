@@ -18,15 +18,14 @@ if(isset($_POST['inputOrcamentoId'])){
 		$result->bindParam(':iUnidade', $_SESSION['UnidadeId']); 
 		$result->execute();
 		
+		$sql = "DELETE FROM TRXOrcamentoXSubcategoria
+				WHERE TXOXSCOrcamento = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iOrcamento); 
+		$result->execute();		
 		
 		$sql = "DELETE FROM TRXOrcamento
 				WHERE TrXOrId = :id";
-		$result = $conn->prepare($sql);
-		$result->bindParam(':id', $iOrcamento); 
-		$result->execute();
-
-		$sql = "DELETE FROM TRXOrcamentoXSubcategoria
-				WHERE TXOXSCOrcamento = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iOrcamento); 
 		$result->execute();

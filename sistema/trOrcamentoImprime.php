@@ -23,12 +23,13 @@ try {
 					 TrRefData, 
 					 TrXOrConteudo, 
 					 TrXOrTabelaProduto, 
-					 TrXOrTabelaServico, 
+					 TrXOrTabelaServico,
+					 TrXOrSolicitante, 
 					 TrRefId, 
 					 TrRefTabelaProduto, 
 					 TrRefTabelaServico, 
 					 TrRefNumero, 
-					 TrRefTipo, 
+					 TrRefTipo, 					 
 					 ForneNome, 
 					 CategNome
 		  FROM TRXOrcamento
@@ -548,6 +549,30 @@ try {
 				</table>
 		";
 	}
+
+	$sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
+			FROM Usuario
+			Where UsuarId = " . $row['TrXOrSolicitante'] . "
+			ORDER BY UsuarNome ASC";
+	$result = $conn->query($sql);
+	$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
+
+	$html .= '			
+		<br><br>
+		<div style="width: 100%; margin-top: 100px;">
+			<div style="position: relative; float: left; text-align: center;">
+				Solicitante: ' . $rowUsuario['UsuarNome'] . '<br>
+				<div style="margin-top:3px;">';
+	
+	if ($rowUsuario['UsuarTelefone'] != ''){
+		$html .= 'Telefone: ' . $rowUsuario['UsuarTelefone'] . ' <br>';
+	}
+	
+	$html .= '		E-mail: ' . $rowUsuario['UsuarEmail'] . '
+				</div>
+			</div>
+		</div>
+	';	
 
 	$rodape = "<hr/>
     <div style='width:100%'>

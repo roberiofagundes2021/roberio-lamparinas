@@ -11,7 +11,8 @@ require_once 'global_assets/php/vendor/autoload.php';
 $iOrcamento = $_POST['inputOrcamentoId'];
 $sNumero = $_POST['inputOrcamentoNumero'];
 
-$sql ="SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamConteudo, OrcamCategoria, ForneNome, ForneCelular, ForneEmail, CategNome, OrcamStatus, 
+$sql ="SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamConteudo, OrcamCategoria, OrcamSolicitante,
+			  ForneNome, ForneCelular, ForneEmail, CategNome, OrcamStatus, 
 			  dbo.fnSubCategoriasOrcamento(OrcamUnidade, OrcamId) as SubCategorias
 		FROM Orcamento
 		LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
@@ -265,7 +266,7 @@ try {
 
 	$sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
 			FROM Usuario
-			Where UsuarId = " . $_SESSION['UsuarId'] . "
+			Where UsuarId = " . $row['OrcamSolicitante'] . "
 			ORDER BY UsuarNome ASC";
 	$result = $conn->query($sql);
 	$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
@@ -275,9 +276,13 @@ try {
 		<div style="width: 100%; margin-top: 100px;">
 			<div style="position: relative; float: left; text-align: center;">
 				Solicitante: ' . $rowUsuario['UsuarNome'] . '<br>
-				<div style="margin-top:3px;">
-					Telefone: ' . $rowUsuario['UsuarTelefone'] . ' <br>
-					E-mail: ' . $rowUsuario['UsuarEmail'] . '
+				<div style="margin-top:3px;">';
+	
+	if ($rowUsuario['UsuarTelefone'] != ''){
+		$html .= 'Telefone: ' . $rowUsuario['UsuarTelefone'] . ' <br>';
+	}
+	
+	$html .= '		E-mail: ' . $rowUsuario['UsuarEmail'] . '
 				</div>
 			</div>
 		</div>
