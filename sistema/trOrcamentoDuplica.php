@@ -15,9 +15,9 @@ if (isset($_POST['inputOrcamentoId'])){
 	$rowOrcamento = $result->fetch(PDO::FETCH_ASSOC);
 	//$count = count($rowOrcamento);
 	
-	$sql = "SELECT COUNT(isnull(TrXOrNumero,0)) as Numero
-			 FROM TRXOrcamento
-			 Where TrXOrUnidade = ".$_SESSION['UnidadeId']."";
+	$sql = "SELECT max(TrXOrNumero) as Numero
+			FROM TRXOrcamento
+			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrTermoReferencia = ".$_SESSION['TRId'];
 	$result = $conn->query($sql);
 	$rowNumero = $result->fetch(PDO::FETCH_ASSOC);		
 	
