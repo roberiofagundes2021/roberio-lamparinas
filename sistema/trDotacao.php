@@ -288,7 +288,7 @@
 												<td>'.$item['DtOrcNome'].'</td>
 
 												<td>
-													<a href="global_assets/anexos/cliente/'.$item['DtOrcArquivo'].'" target="_blank">'.$item['DtOrcArquivo'].'</a>
+													<a href="global_assets/anexos/dotacaoOrcamentaria/'.$item['DtOrcArquivo'].'" target="_blank">'.$item['DtOrcArquivo'].'</a>
 												</td>
 												
 												<td class="text-center">
