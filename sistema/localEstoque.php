@@ -14,7 +14,7 @@ if (isset($_POST['inputEmpresaId'])){
 if (isset($_SESSION['EmpresaId'])){
 	
 	//Essa consulta é para preencher a grid usando a coluna Unidade
-	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, UnidaNome, SituaNome, SituaCor, SituaChave
+	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, LcEstChave, UnidaNome, SituaNome, SituaCor, SituaChave
 			FROM LocalEstoque
 			JOIN Situacao on SituaId = LcEstStatus
 			JOIN Unidade on UnidaId = LcEstUnidade
@@ -27,7 +27,7 @@ if (isset($_SESSION['EmpresaId'])){
 } else{
 	
 	//Essa consulta é para preencher a grid sem a coluna Unidade, já que aqui é a unidade do usuário logado
-	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, SituaNome, SituaCor, SituaChave
+	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, LcEstChave, SituaNome, SituaCor, SituaChave
 			FROM LocalEstoque
 			JOIN Situacao on SituaId = LcEstStatus
 			WHERE LcEstUnidade = ". $_SESSION['UnidadeId'] ."
@@ -446,13 +446,21 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 										print('<td><a href="#" onclick="atualizaLocalEstoque('.$item['LcEstId'].', \''.$item['LcEstNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
-										print('<td class="text-center">
-												<div class="list-icons">
+										print('<td class="text-center">');
+
+										if ($item['LcEstChave'] != 'GESTAOANTERIOR') {
+											
+											print('
+											<div class="list-icons">
 													<div class="list-icons list-icons-extended">
 														<a href="#" onclick="atualizaLocalEstoque('.$item['LcEstId'].', \''.$item['LcEstNome'].'\','.$item['LcEstStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
 														<a href="#" onclick="atualizaLocalEstoque('.$item['LcEstId'].', \''.$item['LcEstNome'].'\','.$item['LcEstStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
+												');
+										}
+									
+										print('
 											</td>
 										</tr>');
 									}

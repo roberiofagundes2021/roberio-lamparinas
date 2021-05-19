@@ -190,12 +190,25 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                 e.preventDefault();
 
                 var inputPatriNumero = $('#inputPatriNumero').val();
+                var cmbPatriProduto = $('#cmbPatriProduto').val();
+                var cmbPatriDestino = $('#cmbPatriDestino').val();
 
                 //remove os espaços desnecessários antes e depois
                 inputPatriNumero = inputPatriNumero.trim();
 
                 if (inputPatriNumero == ""){
                     alerta('Atenção', 'O número do patrimônio é obrigatório!', 'error');
+                    $('#inputPatriNumero').focus();
+                    return false;
+                }
+                if (cmbPatriProduto== ""){
+                    alerta('Atenção', 'O produto é obrigatório!', 'error');
+                    $('#inputPatriNumero').focus();
+                    return false;
+                }
+
+                if (cmbPatriDestino== ""){
+                    alerta('Atenção', 'O destino é obrigatório!', 'error');
                     $('#inputPatriNumero').focus();
                     return false;
                 }
@@ -254,12 +267,6 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                 $('#modalClosePatri').on('click', function() {
                     limparPatrimonio();
                 });
-/*
-                $("#salvarPatrimonio").on('click', function() {
-                    $('#pageModalCheque').fadeOut(200);
-                    $('body').css('overflow', 'scroll');
-                    
-                }); */
                 
             }        
 
@@ -285,8 +292,8 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         let marca = $(tds[9]).html();
                         let fabricante = $(tds[10]).html();
                         let data = $(tds[11]).html();
-                        let numeroSerie = $(tds[13]).children().first().val()
-                        let estadoConservacao = $(tds[14]).children().first().val()
+                        let numeroSerie = $(tds[13]).children().first().val();
+                        let estadoConservacao = $(tds[14]).children().first().val();
                         //console.log(numeroSerie)
 
                         const fonte1 = 'style="font-size: 1.1rem"'
@@ -416,7 +423,10 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         $('.dados-produto').html(formModal)
                     })
                 })
-
+                $('#modal-close-x').on('click', function () {
+                    $('#page-modal').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                })
                 $('#modal-close').on('click', function () {
                     $('#page-modal').fadeOut(200);
                     $('body').css('overflow', 'scroll');
@@ -570,53 +580,60 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
             let resultadosConsulta = '';
             let inputsValues = {};
 
-            (function Filtrar() {
+            function Filtrar() {
                 let cont = false;
 
-                $('#submitFiltro').on('click', (e) => {
-                    e.preventDefault()
 
-                    const msg = $(
-                        '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-                        )
+                const msg = $(
+                    '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+                )
 
-                    let dataDe = $('#inputDataDe').val()
-                    let dataAte = $('#inputDataAte').val()
-                    let localEstoque = $('#cmbLocalEstoque').val()
-                    let setor = $('#cmbSetor').val()
-                    let categoria = $('#cmbCategoria').val()
-                    let subCategoria = $('#cmbSubCategoria').val()
-                    let inputProduto = $('#inputProduto').val()
-                    let url = "relatorioMovimentacaoPatrimonioFiltra.php";
+                $('tbody').html(msg)
 
-                    inputsValues = {
-                        inputDataDe: dataDe,
-                        inputDataAte: dataAte,
-                        inputLocalEstoque: localEstoque,
-                        inputSetor: setor,
-                        inputCategoria: categoria,
-                        inputSubCategoria: subCategoria,
-                        inputProduto: inputProduto
-                    };
+                let dataDe = $('#inputDataDe').val()
+                let dataAte = $('#inputDataAte').val()
+                let localEstoque = $('#cmbLocalEstoque').val()
+                let setor = $('#cmbSetor').val()
+                let categoria = $('#cmbCategoria').val()
+                let subCategoria = $('#cmbSubCategoria').val()
+                let inputProduto = $('#inputProduto').val()
+                let url = "relatorioMovimentacaoPatrimonioFiltra.php";
+                
+                inputsValues = {
+                    inputDataDe: dataDe,
+                    inputDataAte: dataAte,
+                    inputLocalEstoque: localEstoque,
+                    inputSetor: setor,
+                    inputCategoria: categoria,
+                    inputSubCategoria: subCategoria,
+                    inputProduto: inputProduto
+                    
+                };
 
-                    $.post(
-                        url,
-                        inputsValues,
-                        (data) => {
+                $.post(
+                    url,
+                    inputsValues,
+                    (data) => {
 
-                            if (data) {
-                                $('tbody').html(data)
-                                $('#imprimir').removeAttr('disabled')
-                                resultadosConsulta = data
-                                modalAcoes()
-                            } else {
-                                $('tbody').html(msg)
-                                $('#imprimir').attr('disabled', '')
-                            }
+                        if (data) {
+                            $('tbody').html(data)
+                            $('#imprimir').removeAttr('disabled')
+                            resultadosConsulta = data
+                            modalAcoes()
+                        } else {
+                            $('tbody').html(msg)
+                            $('#imprimir').attr('disabled', '')
                         }
-                    );
-                })
-            })()
+                    }
+                );    
+            }
+                
+            $('#submitFiltro').on('click', (e) => {
+                e.preventDefault()
+                Filtrar(false)
+            })
+
+            Filtrar(true)
 
             $('#salvar').on('click', function (e) {
                 let numeroSerie = $('#numeroSerie').val()
@@ -642,8 +659,8 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                             $('[idpatrimonio]').each((i, elem) => {
                                 let tds = $(elem).children()
                                 if ($(elem).attr('idpatrimonio') == id) {
-                                    $(tds[12]).children().first().val(numeroSerie)
-                                    $(tds[13]).children().first().val(estadoConservacao)
+                                    $(tds[13]).children().first().val(numeroSerie)
+                                    $(tds[14]).children().first().val(estadoConservacao)
                                     // $(elem).append(inputNumeroSerie).append(inputEstadoConservacao)
                                 }
                             })
@@ -1102,7 +1119,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                             <div class="custon-modal-title">
                                 <i class=""></i>
                                 <p class="h3">Dados Produto</p>
-                                <i class=""></i>
+                                <i id="modal-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
                             </div>
                             <form id="editarProduto" method="POST">
                                 <div class="dados-produto p-3">

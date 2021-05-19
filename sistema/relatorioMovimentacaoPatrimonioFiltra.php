@@ -47,6 +47,31 @@ function queryPesquisa(){
                 $string .= ' and ';
             }
 
+                  $sql = "SELECT 
+                            CASE 
+                            WHEN MovimOrigemLocal IS NULL THEN SetorO.SetorNome
+                            ELSE LocalO.LcEstNome 
+                                END as Origem,
+                            CASE 
+                            WHEN MovimDestinoLocal IS NULL THEN SetorD.SetorNome
+                            ELSE LocalD.LcEstNome
+                                 END as Destino, 
+                        MovimDestinoLocal 
+                        FROM Movimentacao   
+                        LEFT JOIN LocalEstoque LocalO on LocalO.LcEstId = MovimOrigemLocal 
+                        LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
+                        LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
+                        LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
+                        WHERE ".$string." MovimUnidade = " . $_SESSION['UnidadeId'] . " 
+                            ";
+                
+                    $result = $conn->query($sql);
+                    $rowMv = $result->fetch(PDO::FETCH_ASSOC);
+
+                    $Destino = $rowMv['Destino'];
+              
+
+
             $sql = "SELECT PatriId ,PatriNumero, PatriNumSerie, PatriEstadoConservacao, MvXPrId, MovimId, 
                     MovimData, MovimNotaFiscal, MovimOrigemLocal, LcEstNome, MovimDestinoSetor, 
                     MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, MarcaNome, FabriNome, SetorNome
@@ -56,7 +81,7 @@ function queryPesquisa(){
                     JOIN Produto on ProduId = MvXPrProduto
                     LEFT JOIN Marca on MarcaId = ProduMarca
                     LEFT JOIN Fabricante on FabriId = ProduFabricante 
-                    LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+                    LEFT JOIN LocalEstoque on LcEstId = MovimOrigemLocal
                     LEFT JOIN Setor on SetorId = MovimDestinoSetor
                     WHERE ".$string." ProduUnidade = ".$_SESSION['UnidadeId']."
                     ";
@@ -85,7 +110,7 @@ function queryPesquisa(){
                    <td class='odd'></td>
                    <td class='even'>".mostraData($item['MvXPrValidade'])."</td>
                    <td class='odd'>" . $item['LcEstNome'] . "</td>
-                   <td class='even'>" . $item['SetorNome'] . "</td>
+                   <td class='even'>" . $Destino . "</td>
                    <td class='even' style='display: none'>" . $item['MarcaNome'] . "</td>
                    <td class='even' style='display: none'>" . $item['FabriNome'] . "</td>
                    <td class='even' style='display: none'>" . mostraData($item['MovimData']) . "</td>
