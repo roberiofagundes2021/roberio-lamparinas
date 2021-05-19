@@ -205,7 +205,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					document.formTR.submit();
 
 				} else if (Tipo == 'aprovacaoAdministrativo') {
-					confirmaExclusao(document.formTR, "Essa ação enviará todo o Termo de Referência (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "trAprovacaoAdministrativo.php");
+					confirmaExclusao(document.formTR, "Essa ação enviará todo o Termo de Referência (com seus produtos e/ou serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "trAprovacaoAdministrativo.php");
 
 				} else if (Tipo == 'orcamento') {
 					
