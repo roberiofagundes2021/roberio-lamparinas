@@ -18,7 +18,7 @@ if (isset($_SESSION['EmpresaId'])){
 			FROM LocalEstoque
 			JOIN Situacao on SituaId = LcEstStatus
 			JOIN Unidade on UnidaId = LcEstUnidade
-			WHERE UnidaEmpresa = ". $_SESSION['EmpresaId'] ."
+			WHERE UnidaEmpresa = ". $_SESSION['EmpresaId'] ." and LcEstChave != 'GESTAOANTERIOR'
 			ORDER BY LcEstNome ASC";
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -30,7 +30,7 @@ if (isset($_SESSION['EmpresaId'])){
 	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, LcEstChave, SituaNome, SituaCor, SituaChave
 			FROM LocalEstoque
 			JOIN Situacao on SituaId = LcEstStatus
-			WHERE LcEstUnidade = ". $_SESSION['UnidadeId'] ."
+			WHERE LcEstUnidade = ". $_SESSION['UnidadeId'] ." and LcEstChave != 'GESTAOANTERIOR'
 			ORDER BY LcEstNome ASC";
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -64,12 +64,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
-			$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstUnidade = :iUnidade, LcEstUsuarioAtualizador = :iUsuarioAtualizador
+			$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstChave = :sChave, LcEstUnidade = :iUnidade, LcEstUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE LcEstId = :iLocalEstoque";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sChave' => formatarChave($_POST['inputNome']),
 							':iUnidade' => $iUnidade,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iLocalEstoque' => $_POST['inputLocalEstoqueId']
@@ -79,12 +80,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstStatus, LcEstUsuarioAtualizador, LcEstUnidade)
-					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstChave, LcEstStatus, LcEstUsuarioAtualizador, LcEstUnidade)
+					VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sChave' => formatarChave($_POST['inputNome']),
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $iUnidade,
@@ -446,21 +448,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 										print('<td><a href="#" onclick="atualizaLocalEstoque('.$item['LcEstId'].', \''.$item['LcEstNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
-										print('<td class="text-center">');
-
-										if ($item['LcEstChave'] != 'GESTAOANTERIOR') {
-											
-											print('
-											<div class="list-icons">
+										print('<td class="text-center">
+												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
 														<a href="#" onclick="atualizaLocalEstoque('.$item['LcEstId'].', \''.$item['LcEstNome'].'\','.$item['LcEstStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
 														<a href="#" onclick="atualizaLocalEstoque('.$item['LcEstId'].', \''.$item['LcEstNome'].'\','.$item['LcEstStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
-												');
-										}
-									
-										print('
 											</td>
 										</tr>');
 									}
