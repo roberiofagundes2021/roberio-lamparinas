@@ -867,7 +867,8 @@ if ($totalAcoes) {
 
 							$sql = "SELECT SituaId, SituaNome, SituaChave
 									FROM Situacao
-									WHERE SituaStatus = 1 and SituaChave in ('AGUARDANDOLIBERACAO', 'LIBERADO', 'NAOLIBERADO', 'FASEINTERNAFINALIZADA')
+									WHERE SituaStatus = 1 
+									and SituaChave in ('AGUARDANDOLIBERACAO', 'LIBERADO', 'NAOLIBERADO', 'FASEINTERNAFINALIZADA')
 									ORDER BY SituaNome ASC";
 							$result = $conn->query($sql);
 							$rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
