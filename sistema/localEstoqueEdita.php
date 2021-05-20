@@ -28,24 +28,26 @@ if(isset($_POST['inputNome'])){
 
 		if (isset($_SESSION['EmpresaId'])){
 
-			$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstUnidade = :iUnidade, LcEstUsuarioAtualizador = :iUsuarioAtualizador
+			$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstChave = :sChave, LcEstUnidade = :iUnidade, LcEstUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE LcEstId = :iLocalEstoque";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sChave' => formatarChave($_POST['inputNome']),
 							':iUnidade' => $_POST['cmbUnidade'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iLocalEstoque' => $_POST['inputLocalEstoqueId']
 							));
 
 		} else {
-			$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstUsuarioAtualizador = :iUsuarioAtualizador
+			$sql = "UPDATE LocalEstoque SET LcEstNome = :sNome, LcEstChave = :sChave, LcEstUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE LcEstId = :iLocalEstoque";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sChave' => formatarChave($_POST['inputNome']),
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iLocalEstoque' => $_POST['inputLocalEstoqueId']
 							));
