@@ -256,9 +256,14 @@ if(isset($_POST['cmbUsuario'])){
 								</div>
 								<div class="card-body">
 									<div class="row">
-										<div class="col-lg-12" class="card-body">	
-												A relação abaixo faz referência a Comissão do Processo Licitatório da <span style="color: #FF0000; font-weight: bold;">TR nº <?php echo $_SESSION['TRNumero']; ?></span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>	
-										</div>		
+										<div class="col-lg-9">
+											A relação abaixo faz referência a Comissão do Processo Licitatório da <span style="color: #FF0000; font-weight: bold;">TR nº <?php echo $_SESSION['TRNumero']; ?></span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>	
+										</div>	
+										<div class="col-lg-3">	
+											<div class="text-right">
+												<a href="tr.php" class="btn btn-basic" role="button"><< Termo de Referência</a>
+											</div>
+										</div>											
 									</div>
 									<br>
 									<div class="row">
@@ -288,10 +293,6 @@ if(isset($_POST['cmbUsuario'])){
 										</div>
 										<div class="col-lg-3">
 											<button class="btn btn-lg btn-principal" style="margin-top: 25px;" id="adicionar">Adicionar</button>
-										</div>
-										<div class="col-lg-3">
-											<div class="text-right" style="margin-top: 40px;"><a href="tr.php" role="button"><< Termo de Referência</a>&nbsp;&nbsp;&nbsp;
-											</div>
 										</div>
 									</div>										
 								</div>	

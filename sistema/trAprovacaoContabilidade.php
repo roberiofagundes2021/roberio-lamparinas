@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Enviar para Aprovação - Centro Administrativo';
+$_SESSION['PaginaAtual'] = 'Enviar para Aprovação - Contabilidade';
 
 include('global_assets/php/conexao.php');
 
@@ -13,19 +13,19 @@ try{
 		
 		$iTrId = $_POST['inputTRId'];
 
-		/* Atualiza o Status da Ordem de Compra para "Aguardando Liberação" */
+		/* Atualiza o Status da TR para "Aguardando Liberação" */
 		$sql = "
 			SELECT SituaId
-				FROM Situacao
-			 WHERE SituaChave = 'AGUARDANDOLIBERACAO' 
+			FROM Situacao
+			WHERE SituaChave = 'AGUARDANDOLIBERACAOCONTABILIDADE' 
 		";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "
 			UPDATE TermoReferencia 
-			   SET TrRefStatus = :iStatus
-			 WHERE TrRefId = :iTrId
+			SET TrRefStatus = :iStatus
+			WHERE TrRefId = :iTrId
 		";
 		$result = $conn->prepare($sql);
 
@@ -37,8 +37,8 @@ try{
 
 		$sql = "
 			SELECT PerfiId
-			  FROM Perfil
-			 WHERE PerfiChave = 'CONTABILIDADE'
+			FROM Perfil
+			WHERE PerfiChave = 'CONTABILIDADE'
 		";
 		$result = $conn->query($sql);
 		$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -46,27 +46,25 @@ try{
 
 		$sql = "
 			SELECT TrRefNumero, TrRefTipo, TrRefData
-				FROM TermoReferencia
-			 WHERE TrRefId = ".$iTrId;
+			FROM TermoReferencia
+			WHERE TrRefId = ".$iTrId;
 		$result = $conn->query($sql);
 		$rowTermoReferencia = $result->fetch(PDO::FETCH_ASSOC);
 
-		/* Verifica se a Bandeja já tem um registro com BandeTabela: OrdemCompra e BandeTabelaId: IdOrdemCompraAtual, evitando duplicação */
+		/* Verifica se a Bandeja já tem um registro com BandeTabela: TR e BandeTabelaId: IdTRAtual, evitando duplicação */
 		$sql = "
 			SELECT COUNT(BandeId) as Count
-				FROM Bandeja
-			 WHERE BandeTabela = 'TermoReferencia' 
-			   AND BandeTabelaId =  ".$iTrId;
+			FROM Bandeja
+			WHERE BandeTabela = 'TermoReferencia' AND BandeTabelaId =  ".$iTrId;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 		$count = $rowBandeja['Count'];
 
 		$sql = "
 			SELECT BandeId, SituaChave
-				FROM Bandeja
-				JOIN Situacao on SituaId = BandeStatus
-			 WHERE BandeTabela = 'TermoReferencia' 
-			   AND BandeTabelaId =  ".$iTrId;
+			FROM Bandeja
+			JOIN Situacao on SituaId = BandeStatus
+			WHERE BandeTabela = 'TermoReferencia' AND BandeTabelaId =  ".$iTrId;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -109,18 +107,18 @@ try{
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
-				':sIdentificacao' 			=> $sIdentificacao,
-				':dData' 								=> date("Y-m-d"),
-				':sDescricao' 					=> 'Liberar Termo de Referência',
-				':sURL' 								=> '',
-				':iSolicitante' 				=> $_SESSION['UsuarId'],
-				':iSolicitanteSetor' 		=> null,
-				':sTabela' 							=> 'TermoReferencia',
-				':iTabelaId' 						=> $iTrId,
-				':iStatus' 							=> $rowSituacao['SituaId'],
+				':sIdentificacao' 		=> $sIdentificacao,
+				':dData' 				=> date("Y-m-d"),
+				':sDescricao' 			=> 'Liberar Termo de Referência',
+				':sURL' 				=> '',
+				':iSolicitante' 		=> $_SESSION['UsuarId'],
+				':iSolicitanteSetor' 	=> null,
+				':sTabela' 				=> 'TermoReferencia',
+				':iTabelaId' 			=> $iTrId,
+				':iStatus' 				=> $rowSituacao['SituaId'],
 				':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
-				':iUnidade' 						=> $_SESSION['UnidadeId'],
-				':sPerfil' 							=> 'CONTABILIDADE',
+				':iUnidade' 			=> $_SESSION['UnidadeId'],
+				':sPerfil' 				=> 'CONTABILIDADE',
 			));
 
 			$insertId = $conn->lastInsertId();
@@ -154,28 +152,27 @@ try{
 			$sql = "
 				UPDATE Bandeja 
 				  SET BandeData = :dData, 
-						  BandeSolicitante = :iSolicitante, 
-							BandeStatus = :iStatus, 
-							BandeUsuarioAtualizador = :iUsuarioAtualizador,
-							BandePerfil = 'CONTABILIDADE'
-				WHERE BandeUnidade = :iUnidade 
-					AND BandeId = :iIdBandeja
+					  BandeSolicitante = :iSolicitante, 
+					  BandeStatus = :iStatus, 
+					  BandeUsuarioAtualizador = :iUsuarioAtualizador,
+					  BandePerfil = 'CONTABILIDADE'
+				WHERE BandeUnidade = :iUnidade AND BandeId = :iIdBandeja
 			";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
-				':dData' 								=> date("Y-m-d"),
-				':iSolicitante' 				=> $_SESSION['UsuarId'],
-				':iStatus' 							=> $rowSituacao['SituaId'],
+				':dData' 				=> date("Y-m-d"),
+				':iSolicitante' 		=> $_SESSION['UsuarId'],
+				':iStatus' 				=> $rowSituacao['SituaId'],
 				':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
-				':iUnidade' 						=> $_SESSION['UnidadeId'],
-				':iIdBandeja' 					=> $rowBandeja['BandeId']
+				':iUnidade' 			=> $_SESSION['UnidadeId'],
+				':iIdBandeja' 			=> $rowBandeja['BandeId']
 			));
 
 			/* Deleta os perfis da bandeja */ 
 			$sql = "
 				DELETE FROM BandejaXPerfil
-							WHERE BnXPeBandeja = :iIdBandeja
+				WHERE BnXPeBandeja = :iIdBandeja
 			";
 			$result = $conn->prepare($sql);
 			$result->execute(array(
@@ -211,7 +208,7 @@ try{
         
 		$_SESSION['msg']['titulo'] 		= "Sucesso";
 		$_SESSION['msg']['mensagem'] 	= "Termo de Referência enviado para aprovação!!!";
-		$_SESSION['msg']['tipo'] 			= "success";      		
+		$_SESSION['msg']['tipo'] 		= "success";      		
 	}
 
 } catch(PDOException $e){
@@ -220,7 +217,7 @@ try{
 		
     $_SESSION['msg']['titulo'] 		= "Erro";
     $_SESSION['msg']['mensagem'] 	= "Erro ao enviar Termo de Referência para aprovação!!!";
-    $_SESSION['msg']['tipo'] 			= "error";	
+    $_SESSION['msg']['tipo'] 		= "error";	
 
     echo 'Error1: ' . $e->getMessage();
 }

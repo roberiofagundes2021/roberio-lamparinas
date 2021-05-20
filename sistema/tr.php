@@ -9,40 +9,20 @@ $_SESSION['PaginaAtual'] = 'Termo de Referência';
 include('global_assets/php/conexao.php');
 
 $sql = "
-		SELECT TrRefId, 
-					 TrRefNumero,
-					 TrRefData,
-					 TrRefCategoria,
-					 TrRefTipo,
-					 CategNome,
-					 TrRefStatus,
-					 TrRefLiberaParcial,
-					 SituaId,
-					 SituaCor,
-					 SituaChave,
-					 SituaNome,
-					 dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) 
-						as SubCategorias,
-					 BandeMotivo
-			FROM TermoReferencia
-			JOIN Categoria 
-				ON CategId = TrRefCategoria
-			JOIN Situacao 
-				ON SituaId = TrRefStatus
-		LEFT 
-			JOIN Bandeja 
-			  ON BandeTabelaId = TrRefId 
-			 AND BandeTabela = 'TermoReferencia' 
-			 AND BandeUnidade = " . $_SESSION['UnidadeId'] . "
+		SELECT TrRefId, TrRefNumero, TrRefData,	TrRefCategoria,	TrRefTipo, CategNome, 
+		TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome, 
+		dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias, BandeMotivo, TRXEqUsuario
+		FROM TermoReferencia
+		JOIN Categoria ON CategId = TrRefCategoria
+		JOIN Situacao  ON SituaId = TrRefStatus
+		LEFT JOIN Bandeja ON BandeTabelaId = TrRefId AND BandeTabela = 'TermoReferencia' AND BandeUnidade = " . $_SESSION['UnidadeId'] . "
+		LEFT JOIN TRXEquipe ON TRXEqTermoReferencia = TrRefId and TRXEqPresidente = 1
 		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . "
 		ORDER BY TrRefData DESC
 ";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
-
-// var_dump($row);
-// die;
 
 ?>
 
@@ -244,6 +224,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				} else if (Tipo == 'gerarContrato'){
 					document.formTR.action = "contratoNovo.php";
 					document.formTR.submit();
+				} else if (Tipo == 'finalizarTR') {
+						
+					bootbox.confirm("Tem certeza que deseja finalizar o TR?", function(result){ 
+						
+						if (result) {
+							document.formTR.action = "trMudaSituacao.php";
+							document.formTR.submit();
+						}
+					});
+						
 				}
 			}
 		}
@@ -360,6 +350,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															}
 
 															if(isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == true) {
+																
 																print('
 
 																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'orcamento\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Orçamentos</a>
@@ -372,6 +363,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoComissao\');" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i> Enviar para comissão</a>
 
+																');
+
+																//Se o TR estiver LIBERADO e o Presidente da Comissão for o usuário Logado mostra a opção para ele "Finalizar TR"
+																if ($item['SituaChave'] == 'LIBERADO' && $item['TRXEqUsuario'] == $_SESSION['UsuarId']){
+																	print('<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'finalizarTR\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Finalizar TR</a>');
+																}
+
+																print('
+																
 																<div class="dropdown-divider"></div>
 
 																<a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirComissao\');" class="dropdown-item" title="Imprimir Comissão"><i class="icon-printer2"></i> Imprimir Comissão</a>
@@ -416,6 +416,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					<input type="hidden" id="inputTRCategoria" name="inputTRCategoria">
 					<input type="hidden" id="inputTRNomeCategoria" name="inputTRNomeCategoria">
 					<input type="hidden" id="inputTRStatus" name="inputTRStatus">
+					<input type="hidden" id="inputTermoReferenciaStatus" name="inputTermoReferenciaStatus" value="FASEINTERNAFINALIZADA"> <!-- esse aqui é por causa do FinalizarTR -->
 				</form>
 				
 			</div>

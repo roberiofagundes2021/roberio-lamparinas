@@ -46,7 +46,7 @@ $sql = "
 				ON BnXPeBandeja = BandeId
 		WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
 		  AND UsXUnUnidade = " . $_SESSION['UnidadeId'] . " 
-			AND SituaChave = 'AGUARDANDOLIBERACAO' 
+			AND SituaChave in ('AGUARDANDOLIBERACAO', 'AGUARDANDOLIBERACAOCENTRO' , 'AGUARDANDOLIBERACAOCONTABILIDADE') 
 			AND (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ") 
 		ORDER BY BandeData DESC, BandeId DESC";
 //echo $sql;die;		
@@ -59,14 +59,16 @@ $sql = "SELECT COUNT(DISTINCT BandeId) as TotalPendente
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
 		JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'AGUARDANDOLIBERACAO' and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")";
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
+		and SituaChave in ('AGUARDANDOLIBERACAO', 'AGUARDANDOLIBERACAOCENTRO' , 'AGUARDANDOLIBERACAOCONTABILIDADE')  
+		and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")";
 $result = $conn->query($sql);
 $rowTotalPendente = $result->fetch(PDO::FETCH_ASSOC);
 $totalPendente = $rowTotalPendente['TotalPendente'];
 
 /* LIBERADAS */
-$sql = "SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, 
-		SituaNome, OrComNumero, OrComTipo, MovimTipo
+$sql = "SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, 
+		BandeTabelaId, SituaNome, OrComNumero, OrComTipo, MovimTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
@@ -76,8 +78,9 @@ $sql = "SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, 
 		LEFT JOIN Movimentacao on MovimId = BandeTabelaId		
 		JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and 
-		SituaChave in ('LIBERADO', 'LIBERADOPARCIAL') and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " 
+		and SituaChave in ('LIBERADO', 'LIBERADOPARCIAL') 
+		and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -88,14 +91,16 @@ $sql = "SELECT COUNT(DISTINCT BandeId) as TotalLiberado
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave  in ('LIBERADO', 'LIBERADOPARCIAL') and 
-		(BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")";
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
+		and SituaChave  in ('LIBERADO', 'LIBERADOPARCIAL') 
+		and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")";
 $result = $conn->query($sql);
 $rowTotalLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalLiberado = $rowTotalLiberado['TotalLiberado'];
 
 /* NÃO LIBERADAS */
-$sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, SituaNome, MovimTipo
+$sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, 
+		BandeTabelaId, SituaNome, MovimTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
@@ -105,7 +110,9 @@ $sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL,
 		LEFT JOIN Movimentacao on MovimId = BandeTabelaId		
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'NAOLIBERADO' and BnXPePerfil in (" . $idPerfilLogado . ")
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " 
+		and SituaChave = 'NAOLIBERADO' 
+		and BnXPePerfil in (" . $idPerfilLogado . ")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowNaoLiberado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -116,14 +123,16 @@ $sql = "SELECT COUNT(BandeId) as TotalNaoLiberado
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'NAOLIBERADO' and BnXPePerfil in (" . $idPerfilLogado . ")";
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
+		and SituaChave = 'NAOLIBERADO' 
+		and BnXPePerfil in (" . $idPerfilLogado . ")";
 $result = $conn->query($sql);
 $rowTotalNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);
 $totalNaoLiberado = $rowTotalNaoLiberado['TotalNaoLiberado'];
 
 /* FINALIZADAS */
-$sql = "SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, BandeTabelaId, 
-		SituaNome, OrComNumero, OrComTipo, MovimTipo
+$sql = "SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, BandeTabela, 
+		BandeTabelaId, SituaNome, OrComNumero, OrComTipo, MovimTipo
 		FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
@@ -134,7 +143,8 @@ $sql = "SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, 
 		JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
 	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and 
-		SituaChave in ('FASEINTERNAFINALIZADA') and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")
+		SituaChave in ('FASEINTERNAFINALIZADA') 
+		and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
 $rowFinalizado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -145,8 +155,9 @@ $sql = "SELECT COUNT(DISTINCT BandeId) as TotalFinalizado
 		LEFT JOIN FluxoOperacional on FlOpeId = BandeTabelaId
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
-	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave  in ('FASEINTERNAFINALIZADA') and 
-		(BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")";
+	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
+		and SituaChave  in ('FASEINTERNAFINALIZADA') 
+		and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")";
 $result = $conn->query($sql);
 $rowTotalFinalizado = $result->fetch(PDO::FETCH_ASSOC);
 $totalFinalizado = $rowTotalFinalizado['TotalFinalizado'];
@@ -728,7 +739,7 @@ if ($totalAcoes) {
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
 						 
-					} else if (Tipo == 'liberarComissao') {
+					} else if (Tipo == 'finalizarTR') {
 						
 						bootbox.confirm("Tem certeza que deseja finalizar o TR?", function(result){ 
 							
