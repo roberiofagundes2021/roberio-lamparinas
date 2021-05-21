@@ -25,9 +25,9 @@
 
 	$sql = "
 		SELECT DtOrcId, 
-					 DtOrcData, 
-					 DtOrcNome, 
-					 DtOrcArquivo
+				DtOrcData, 
+				DtOrcNome, 
+				DtOrcArquivo
 			FROM DotacaoOrcamentaria
 		 WHERE DtOrcUnidade = ". $_SESSION['UnidadeId'] ." 
 			 AND DtOrcTermoReferencia = ". $_SESSION['inputTRIdDotacao'] ."

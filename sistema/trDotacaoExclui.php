@@ -59,7 +59,8 @@ if(isset($_POST['inputDotacaoID'])){
 			UPDATE Bandeja 
 					SET BandeStatus = :bStatus
 				WHERE BandeUnidade = :iUnidade 
-					AND BandeId in (SELECT BANDEID FROM BANDEJA WHERE BANDETABELAID = :iTermoReferenciaId)
+					AND BandeId in (Select BandeId FROM Bandeja WHERE BandeTabelaId = :iTermoReferenciaId and 
+					BandePerfil = 'CONTABILIDADE')
 		";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $bStatus);

@@ -83,10 +83,13 @@
 		//Aqui verifica se o BandeUsuario está preenchido e se é TR, se sim, significa que é um presidente de Comissão
 		if ($item['BandeUsuario'] == $_SESSION['UsuarId'] && $item['BandeTabela'] == 'TermoReferencia'){
 
-			print('
-				<a href="tr.php" class="dropdown-item"><i class="icon-circle-right2"></i> Acessar TR</a>
-				<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'finalizarTR\', '.$item['BandeUsuario'].');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Finalizar TR</a>
+			print('<a href="tr.php" class="dropdown-item"><i class="icon-circle-right2"></i> Acessar TR</a>');
+			
+			if ($item['SituaChaveTR'] == 'LIBERADO'){
+				print('<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'finalizarTR\', '.$item['BandeUsuario'].');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Finalizar TR</a>');
+			}			
 
+			print('
 								</div>
 							</div>
 						</div>

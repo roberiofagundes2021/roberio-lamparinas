@@ -146,11 +146,12 @@ if(isset($_POST['inputTRId'])){
 			$result = $conn->query($sql);
 			$rowTermoReferencia = $result->fetch(PDO::FETCH_ASSOC);
 
-			/* Verifica se a Bandeja já tem um registro com BandeTabela: TR e BandeTabelaId: IdTRAtual, evitando duplicação */
+			/* Verifica se a Bandeja já tem um registro com BandeTabela: TR, Perfil: CENTROADMINISTRATIVO e BandeTabelaId: IdTRAtual, evitando duplicação */
 			$sql = "
 				SELECT COUNT(BandeId) as Count
 				FROM Bandeja
-				WHERE BandeTabela = 'TermoReferencia' AND BandeTabelaId =  ".$iTrId;
+				WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CENTROADMINISTRATIVO'
+				AND BandeTabelaId =  ".$iTrId;
 			$result = $conn->query($sql);
 			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 			$count = $rowBandeja['Count'];
@@ -159,7 +160,7 @@ if(isset($_POST['inputTRId'])){
 				SELECT BandeId, SituaChave
 				FROM Bandeja
 				JOIN Situacao on SituaId = BandeStatus
-				WHERE BandeTabela = 'TermoReferencia' 
+				WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CENTROADMINISTRATIVO'
 				AND BandeTabelaId =  ".$iTrId;
 			$result = $conn->query($sql);
 			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);

@@ -51,11 +51,12 @@ try{
 		$result = $conn->query($sql);
 		$rowTermoReferencia = $result->fetch(PDO::FETCH_ASSOC);
 
-		/* Verifica se a Bandeja já tem um registro com BandeTabela: TR e BandeTabelaId: IdTRAtual, evitando duplicação */
+		/* Verifica se a Bandeja já tem um registro com BandeTabela: TR, Perfil: CONTABILIDADE e e BandeTabelaId: IdTRAtual, evitando duplicação */
 		$sql = "
 			SELECT COUNT(BandeId) as Count
 			FROM Bandeja
-			WHERE BandeTabela = 'TermoReferencia' AND BandeTabelaId =  ".$iTrId;
+			WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CONTABILIDADE'
+			AND BandeTabelaId =  ".$iTrId;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 		$count = $rowBandeja['Count'];
@@ -64,14 +65,24 @@ try{
 			SELECT BandeId, SituaChave
 			FROM Bandeja
 			JOIN Situacao on SituaId = BandeStatus
-			WHERE BandeTabela = 'TermoReferencia' AND BandeTabelaId =  ".$iTrId;
+			WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CONTABILIDADE'
+			AND BandeTabelaId =  ".$iTrId;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 
-		if ($count == 0){
+		$tipo = '';
+		if ($rowTermoReferencia['TrRefTipo'] === "S") {
+			$tipo = 'Serviços';
+		} else if ($rowTermoReferencia['TrRefTipo'] === "P") {
+			$tipo = 'Produtos';
+		} else if ($rowTermoReferencia['TrRefTipo'] === "PS") {
+			$tipo = 'Produtos e Serviços';
+		} 
 
-			/* Insere na Bandeja para Aprovação do perfil ADMINISTRADOR ou CONTROLADORIA */
-			$sIdentificacao = 'Termo de Referência (Nº Termo: '.$rowTermoReferencia['TrRefNumero'].' | Data: '.$rowTermoReferencia['TrRefData'].' | Tipo: '.$rowTermoReferencia['TrRefTipo'] == 'S' ? 'Serviços' : $rowTermoReferencia['TrRefTipo'] == 'P' ? 'Produtos' : $rowTermoReferencia['TrRefTipo'] == 'PS' && 'Produtos e Serviços'.')';
+		/* Insere na Bandeja para Aprovação do perfil CONTABILIDADE */
+		$sIdentificacao = 'Termo de Referência (Nº Termo: '.$rowTermoReferencia['TrRefNumero'].' | Data: '.$rowTermoReferencia['TrRefData'].' | Tipo: '.$tipo.')';
+
+		if ($count == 0){
 		
 			$sql = "
 				INSERT INTO 

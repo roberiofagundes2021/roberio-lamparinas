@@ -14,7 +14,7 @@ if(isset($_POST['inputTRId'])){
 		SELECT TRXEqPresidente, TRXEqUsuario, TrRefNumero, TrRefTipo, TrRefData, TrRefStatus
   		FROM TRXEquipe
 		JOIN TermoReferencia on TrRefId = TRXEqTermoReferencia
- 	 	WHERE TRXEqUnidade = ".$_SESSION['UnidadeId']." AND TRXEqTermoReferencia = ".$_POST['inputTRId']."
+ 	 	WHERE TRXEqUnidade = ".$_SESSION['UnidadeId']." AND TRXEqTermoReferencia = ".$iTrId."
    		AND TRXEqPresidente > 0
 	";
 	$result = $conn->query($sql);
@@ -34,12 +34,13 @@ if(isset($_POST['inputTRId'])){
 					FROM Situacao
 					WHERE SituaChave = 'AGUARDANDOLIBERACAO' ";
 			$result = $conn->query($sql);
-			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);	
 
-			/* Verifica se a Bandeja já tem um registro com BandeTabela: TermoReferencia e BandeTabelaId: $iTrId, evitando duplicação */
+			/* Verifica se a Bandeja já tem um registro com BandeTabela: TermoReferencia, Perfil: COMISSAO e e BandeTabelaId: $iTrId, evitando duplicação */
 			$sql = "SELECT COUNT(BandeId) as Count
 					FROM Bandeja
-					WHERE BandeTabela = 'TermoReferencia' AND BandeTabelaId =  " . $iTrId;
+					WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'COMISSAO'
+					AND BandeTabelaId =  " . $iTrId;
 			$result = $conn->query($sql);
 			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 			$count = $rowBandeja['Count'];
@@ -47,14 +48,19 @@ if(isset($_POST['inputTRId'])){
 			$sql = "SELECT BandeId, SituaChave
 					FROM Bandeja
 					JOIN Situacao on SituaId = BandeStatus
-					WHERE BandeTabela = 'TermoReferencia' AND BandeTabelaId =  ".$iTrId;
+					WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'COMISSAO'
+					AND BandeTabelaId =  ".$iTrId;
 			$result = $conn->query($sql);
 			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 
-			$tipo = $rowTRPresidente['TrRefTipo'] == 'S' 
-			? 'Serviços' : $rowTRPresidente['TrRefTipo'] == 'P' 
-			? 'Produtos' : $rowTRPresidente['TrRefTipo'] == 'PS' 
-			&& 'Produtos e Serviços';
+			$tipo = '';
+			if ($rowTRPresidente['TrRefTipo'] === "S") {
+				$tipo = 'Serviços';
+			} else if ($rowTRPresidente['TrRefTipo'] === "P") {
+				$tipo = 'Produtos';
+			} else if ($rowTRPresidente['TrRefTipo'] === "PS") {
+				$tipo = 'Produtos e Serviços';
+			}
 
 			/* Insere na Bandeja para Aprovação do presidente da Comissão */
 			$sIdentificacao = 'Termo de Referência (Nº Termo: '.$rowTRPresidente['TrRefNumero'].' | Data: '.mostradata($rowTRPresidente['TrRefData']).' | Tipo: '.$tipo.')';
@@ -84,7 +90,7 @@ if(isset($_POST['inputTRId'])){
 					':iStatus' 					=> $rowSituacao['SituaId'],
 					':iUsuarioAtualizador' 		=> $_SESSION['UsuarId'],
 					':iUnidade' 				=> $_SESSION['UnidadeId'],
-					':sPerfil' 					=> null,
+					':sPerfil' 					=> 'COMISSAO',
 					':iPresidente' 				=> $rowTRPresidente['TRXEqUsuario']
 				));
 				/* Fim Insere Bandeja */
@@ -105,7 +111,7 @@ if(isset($_POST['inputTRId'])){
 					':iSolicitante' 		=> $_SESSION['UsuarId'],
 					':iStatus' 				=> $rowSituacao['SituaId'],
 					':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
-					':sPerfil' 				=> null,
+					':sPerfil' 				=> 'COMISSAO',
 					':iPresidente' 			=> $rowTRPresidente['TRXEqUsuario'],
 					':iUnidade' 			=> $_SESSION['UnidadeId'],
 					':iIdBandeja' 			=> $rowBandeja['BandeId']														

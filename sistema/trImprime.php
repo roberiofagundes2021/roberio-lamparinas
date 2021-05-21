@@ -79,7 +79,7 @@ try {
 			 AND TRXSrTabela = 'ServicoOrcamento'
 	";
 	$result = $conn->query($sql);
-	$rowServicoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
+	$rowServicoOrcamentoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
 
 	$sql = "
 		SELECT COUNT(TRXSrServico) as CONT
@@ -91,7 +91,7 @@ try {
 			 AND TRXSrTabela = 'Servico'
 	";
 	$result = $conn->query($sql);
-	$rowServicoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
+	$rowServicoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
 
 	$totalProdutos = 0;
 	$totalServicos = 0;
@@ -233,7 +233,7 @@ try {
 		} 
 	}
 
-	if ($rowServicoUtilizado1['CONT'] > 0 || $rowServicoUtilizado2['CONT'] > 0){
+	if ($rowServicoOrcamentoUtilizado['CONT'] > 0 || $rowServicoUtilizado['CONT'] > 0){
 
 		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
 
@@ -249,8 +249,8 @@ try {
 		foreach ($rowSubCategoria as $sbcat) {
 
 			//Se foi utilizado ServicoOrcamento
-			if($rowServicoUtilizado1['CONT'] > 0){
-				$sql = "SELECT SrOrcId as Id, SrOrcNome as Nome, SrOrcCategoria as Categoria, SrOrcSubCategoria as SubCategoria
+			if($rowServicoOrcamentoUtilizado['CONT'] > 0){
+				$sql = "SELECT SrOrcId as Id, SrOrcNome as Nome, SrOrcCategoria as Categoria, SrOrcSubCategoria as SubCategoria,
 						SrOrcDetalhamento as Detalhamento, TRXSrQuantidade
 						FROM ServicoOrcamento
 						JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId

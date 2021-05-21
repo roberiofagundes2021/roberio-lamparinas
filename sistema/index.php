@@ -22,31 +22,29 @@ if (isset($_POST['cmbPerfil'])) {
 /* AGUARDANDOLIBERACAO */
 $sql = "
 	SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL, UsuarNome, 
-	BandeTabela, BandeTabelaId, BandePerfil, BandeUsuario, SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, 
-	OrComNumero, OrComSituacao, OrComTipo, MovimTipo, UsXUnSetor as SetorAtual, BandeSolicitanteSetor as SetorQuandoSolicitou
+	BandeTabela, BandeTabelaId, BandePerfil, BandeUsuario, B.SituaNome as SituaNome, DATEDIFF (DAY, BandeData, GETDATE ( )) as Intervalo, 
+	OrComNumero, OrComSituacao, OrComTipo, MovimTipo, UsXUnSetor as SetorAtual, 
+	BandeSolicitanteSetor as SetorQuandoSolicitou, STR.SituaChave as SituaChaveTR
 	FROM Bandeja
 		JOIN Usuario on UsuarId = BandeSolicitante
 		JOIN EmpresaXUsuarioXPerfil 
 		  ON EXUXPUsuario = UsuarId
 		JOIN UsuarioXUnidade 
 		  ON UsXUnEmpresaUsuarioPerfil = EXUXPId
-		LEFT 
-			JOIN OrdemCompra 
-				ON OrComId = BandeTabelaId
-		LEFT 
-			JOIN FluxoOperacional 
-			  ON FlOpeId = BandeTabelaId
-		LEFT 
-			JOIN Movimentacao 
-				ON MovimId = BandeTabelaId		
-		JOIN Situacao 
-		  ON SituaId = BandeStatus
+		LEFT JOIN OrdemCompra ON OrComId = BandeTabelaId
+		LEFT JOIN FluxoOperacional ON FlOpeId = BandeTabelaId
+		LEFT JOIN Movimentacao ON MovimId = BandeTabelaId
+		LEFT JOIN TermoReferencia ON TrRefId = BandeTabelaId
+		LEFT JOIN Situacao STR 
+			ON STR.SituaId = TrRefStatus
+		JOIN Situacao B 
+		  ON B.SituaId = BandeStatus
 		LEFT 
 			JOIN BandejaXPerfil 
 				ON BnXPeBandeja = BandeId
 		WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
 		  AND UsXUnUnidade = " . $_SESSION['UnidadeId'] . " 
-			AND SituaChave in ('AGUARDANDOLIBERACAO', 'AGUARDANDOLIBERACAOCENTRO' , 'AGUARDANDOLIBERACAOCONTABILIDADE') 
+			AND B.SituaChave in ('AGUARDANDOLIBERACAO', 'AGUARDANDOLIBERACAOCENTRO' , 'AGUARDANDOLIBERACAOCONTABILIDADE') 
 			AND (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ") 
 		ORDER BY BandeData DESC, BandeId DESC";
 //echo $sql;die;		
