@@ -426,17 +426,11 @@ try {
 										$sql = "
 											SELECT SrOrcId, 
 														 SrOrcNome, 
-														 SrOrcDetalhamento, 
-														 SrOrcUnidadeMedida, 
+														 SrOrcDetalhamento,
 														 TRXSrQuantidade, 
-														 TRXSrTabela, 
-														 UnMedNome, 
-														 UnMedSigla
+														 TRXSrTabela
 												FROM ServicoOrcamento
 												JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
-												LEFT 
-												JOIN UnidadeMedida 
-													ON UnMedId = SrOrcUnidadeMedida
 											 WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
 											   AND TRXSrTermoReferencia = " . $iTR  . " 
 												 AND TRXSrTabela = 'ServicoOrcamento'
@@ -480,7 +474,7 @@ try {
 										
 											print('
 													<div class="row" style="margin-top: 8px;">
-														<div class="col-lg-9">
+														<div class="col-lg-10">
 															<div class="row">
 
 																<div class="col-lg-1">
@@ -493,10 +487,6 @@ try {
 																	<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['SrOrcDetalhamento'] . '" value="' . $item['SrOrcNome'] . '" readOnly>
 																</div>
 															</div>
-														</div>		
-
-														<div class="col-lg-1">
-															<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
 														</div>
 											');
 
