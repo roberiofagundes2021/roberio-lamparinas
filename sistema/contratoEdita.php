@@ -8,8 +8,9 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT TrRefId, TrRefNumero, TrRefCategoria, CategNome, CategId, TrRefConteudoInicio, TrRefConteudoFim
 		FROM TermoReferencia
+		JOIN FluxoOperacional on FlOpeTermoReferencia = TrRefId
 		JOIN Categoria ON CategId = TrRefCategoria
-		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = 151";	
+		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = ".$_POST['inputFluxoOperacionalId'];
 $result = $conn->query($sql);
 $rowTR = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -288,7 +289,7 @@ if (isset($_POST['inputDataInicio'])) {
 
 						<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" value="<?php echo $row['FlOpeId']; ?>">
 						<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="<?php echo $sSubCategorias; ?>" >
-
+						
 						<div class="card-body">
 
 							<h5 class="mb-0 font-weight-semibold">Termo de Referência</h5>
@@ -302,7 +303,7 @@ if (isset($_POST['inputDataInicio'])) {
 									</div>
 								</div>
                             </div>
-
+							
 							<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
 							<br>
 							<div class="row">
@@ -318,7 +319,7 @@ if (isset($_POST['inputDataInicio'])) {
 													ORDER BY ForneNome ASC";
 											$result = $conn->query($sql);
 											$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-
+											
 											foreach ($rowFornecedor as $item) {
 												$seleciona = $item['ForneId'] == $row['FlOpeFornecedor'] ? "selected" : "";
 												print('<option value="' . $item['ForneId'] . '" ' . $seleciona . '>' . $item['ForneNome'] . '</option>');
@@ -328,7 +329,7 @@ if (isset($_POST['inputDataInicio'])) {
 										</select>
 									</div>
 								</div>
-
+		
 								<div class="col-lg-4">
 									<div class="form-group">
 									<label for="inputCategoria">Categoria <span class="text-danger">*</span></label>
@@ -338,7 +339,7 @@ if (isset($_POST['inputDataInicio'])) {
 								</div>
 
 								<div class="col-lg-4">
-								<div class="form-group" style="border-bottom:1px solid #ddd;">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSubCategoria">SubCategoria</label>
 										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
 											<!--<option value="#">Selecione uma subcategoria</option>-->
