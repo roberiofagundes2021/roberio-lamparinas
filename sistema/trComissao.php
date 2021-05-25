@@ -6,24 +6,20 @@ $_SESSION['PaginaAtual'] = 'Comissão do Processo Licitatório';
 
 include('global_assets/php/conexao.php');
 
-	
-
-if (isset($_POST['inputTRId'])){
-	$_SESSION['TRId'] 		= $_POST['inputTRId'];
+if (!isset($_SESSION['TRId'])){	
+	$_SESSION['TRId'] 	  = $_POST['inputTRId'];
 	$_SESSION['TRNumero'] = $_POST['inputTRNumero'];
-
-
-} 
+}
 
 $sql = "
-			SELECT TRXCoId, TRXCoData, TRXCoNome, TRXCoArquivo
-			FROM TRXComissao
-			WHERE TRXCoUnidade = ". $_SESSION['UnidadeId'] ." AND TRXCoTermoReferencia = ".$_SESSION['TRId']."	
-			ORDER BY TRXCoNome ASC	
-		";
-		$result = $conn->query($sql);
-		$rowAnexo = $result->fetchAll(PDO::FETCH_ASSOC);
-		//$count = count($row);
+	SELECT TRXCoId, TRXCoData, TRXCoNome, TRXCoArquivo
+	FROM TRXComissao
+	WHERE TRXCoUnidade = ". $_SESSION['UnidadeId'] ." AND TRXCoTermoReferencia = ".$_SESSION['TRId']."	
+	ORDER BY TRXCoNome ASC	
+";
+$result = $conn->query($sql);
+$rowAnexo = $result->fetchAll(PDO::FETCH_ASSOC);
+//$count = count($row);
 
 $sql = "
 	SELECT TRXEqTermoReferencia,
@@ -43,6 +39,7 @@ $result = $conn->query($sql);
 $row 		= $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
+//Grava a equipe e presidente
 if(isset($_POST['cmbUsuario'])){
 	try{
 		$sql = "
@@ -261,7 +258,10 @@ if(isset($_POST['cmbUsuario'])){
 				var id = $("input:file").attr('id');
 				var tamanho =  1024 * 1024 * 32; //32MB
 
+				inputDescricao = inputDescricao.trim();
+
 				if (inputDescricao == ''){
+					$('#inputNome').val('');
 					$("#formAnexoComissao").submit();
 					$('#inputNome').focus();
 					return false;
@@ -278,6 +278,7 @@ if(isset($_POST['cmbUsuario'])){
 				//Verifica se a extensão é  diferente de PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!
 				if (ext(inputFile) != 'pdf' && ext(inputFile) != 'doc' && ext(inputFile) != 'docx' && ext(inputFile) != 'odt' && ext(inputFile) != 'jpg' && ext(inputFile) != 'jpeg' && ext(inputFile) != 'png'){
 					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!','error');
+					$('#inputArquivo').val('');
 					$("#formAnexoComissao").submit();
 					$('#inputArquivo').focus();
 					return false;	
@@ -286,6 +287,7 @@ if(isset($_POST['cmbUsuario'])){
 				//Verifica o tamanho do arquivo
 				if ($('#'+id)[0].files[0].size > tamanho){
 					alerta('Atenção','O arquivo enviado é muito grande, envie arquivos de até 32MB.','error');
+					$('#inputArquivo').val('');
 					$("#formAnexoComissao").submit();
 					$('#inputArquivo').focus();
 					return false;
@@ -482,7 +484,7 @@ if(isset($_POST['cmbUsuario'])){
 							<div class="card-body">							
 
 								<form name="formAnexoComissao" id="formAnexoComissao" method="post" enctype="multipart/form-data" class="form-validate-jquery">
-								 <input type="hidden" id="inputTRId" name="inputTRId" value="<?php echo $_SESSION['TRId']; ?>">
+								 
 									<div class="row">
 										<div class="col-lg-2">
 											<div class="form-group">

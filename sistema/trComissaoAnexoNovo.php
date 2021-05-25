@@ -4,9 +4,6 @@
 
 	$_SESSION['PaginaAtual'] = 'Comissão Anexo';
 
-	// var_dump($_SESSION['inputTRIdDotacao']);
-	// die;
-
 	try{	
 		
 		$_UP['pasta'] = 'global_assets/anexos/comissao/';
@@ -56,7 +53,7 @@
 					':iData' 				=> gravaData($_POST['inputData']),
 					':sNome' 				=> $_POST['inputNome'],
 					':iArquivo' 			=> $nome_final,
-					':iTermoReferencia' 	=> $_POST['inputTRId'],
+					':iTermoReferencia' 	=> $_SESSION['TRId'],
 					':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
 					':iUnidade' 			=> $_SESSION['UnidadeId'],
 				)
@@ -75,7 +72,7 @@
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir Anexo!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage().$e->getLine();
+		echo 'Error: ' . $e->getMessage().$e->getLine();die;
 	}
 
 	irpara('trComissao.php');
