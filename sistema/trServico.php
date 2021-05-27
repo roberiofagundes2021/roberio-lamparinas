@@ -82,7 +82,9 @@ try {
 
 	$sql = "SELECT TRXSCSubcategoria
 		    FROM TRXSubcategoria
-		    WHERE TRXSCTermoReferencia = " . $iTR . " and TRXSCUnidade = " . $_SESSION['UnidadeId'] . "";
+			JOIN SubCategoria on SbCatId = TRXSCSubcategoria
+		    WHERE TRXSCTermoReferencia = " . $iTR . " and TRXSCUnidade = " . $_SESSION['UnidadeId'] . "
+			ORDER BY SbCatNome ASC";
 	$result = $conn->query($sql);
 	$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
 	
