@@ -21,219 +21,118 @@ if (isset($_POST['inputTRId'])) {
 
 //Se está alterando
 if (isset($_POST['inputIdTR'])) {
+	
 	try {
 		$conn->beginTransaction();
 
-		$sql = "
-			DELETE 
-				FROM TermoReferenciaXProduto
-			 WHERE TRXPrTermoReferencia = :iTR 
-				 AND TRXPrUnidade 				= :iUnidade
-		";
-		
+		$sql = "DELETE FROM TermoReferenciaXProduto
+			 	WHERE TRXPrTermoReferencia = :iTR AND TRXPrUnidade = :iUnidade ";
 		$result = $conn->prepare($sql);
 		$result->execute(array(
-			':iTR' 			=> $iTR,
+			':iTR' 		=> $iTR,
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
-			$sql = "
-				INSERT INTO 
-					TermoReferenciaXProduto (
-						TRXPrTermoReferencia, 
-						TRXPrProduto, 
-						TRXPrQuantidade, 
-						TRXPrValorUnitario, 
-						TRXPrTabela, 
-						TRXPrUsuarioAtualizador, 
-						TRXPrUnidade
-					)
-					VALUES (
-						:iTR, 
-						:iProduto, 
-						:iQuantidade, 
-						:fValorUnitario, 
-						:sTabela, 
-						:iUsuarioAtualizador, 
-						:iUnidade
-					)";
+			
+			$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, 
+					TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrUnidade)
+					VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
-				':iTR' 									=> $iTR,
-				':iProduto' 						=> $_POST['inputIdProduto' . $i],
-				':iQuantidade' 					=> $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
-				':fValorUnitario' 			=> null,
-				':sTabela' 							=> $_POST['inputTabelaProduto' . $i],
-				':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
-				':iUnidade' 						=> $_SESSION['UnidadeId']
+				':iTR' 				   => $iTR,
+				':iProduto' 		   => $_POST['inputIdProduto' . $i],
+				':iQuantidade' 	 	   => $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
+				':fValorUnitario' 	   => null,
+				':sTabela' 			   => $_POST['inputTabelaProduto' . $i],
+				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+				':iUnidade' 		   => $_SESSION['UnidadeId']
 			));
 		}
 
 		/* Verifica e remove dados da Bandeja */
-		$sql = "
-			DELETE 
-				FROM Bandeja
-			 WHERE BandeTabelaId = :iTR
-				 AND BandeUnidade  = :iUnidade
-		";
+		$sql = "DELETE FROM Bandeja
+			 	WHERE BandeTabelaId = :iTR AND BandeUnidade = :iUnidade and BandePerfil = 'CENTROADMINISTRATIVO' ";
 		$result = $conn->prepare($sql);
 		$result->execute(array(
-			':iTR' 			=> $iTR,
+			':iTR' 		=> $iTR,
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
-		/* Verifica e remove dados da tabela Bandeja X Perfil */
-		$sql = "
-			DELETE 
-				FROM BandejaXPerfil
-			 WHERE BnXPeBandeja = :iTR
-				 AND BnXPeUnidade = :iUnidade
-		";
+		/* Verifica e remove dados da tabela BandejaXPerfil */
+		$sql = "DELETE FROM BandejaXPerfil
+			 	WHERE BnXPeBandeja = :iTR AND BnXPeUnidade = :iUnidade ";
 		$result = $conn->prepare($sql);
 		$result->execute(array(
-			':iTR' 			=> $iTR,
+			':iTR' 		=> $iTR,
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		/* Atualiza o Status do Termo de Referência */
-		$sql = "
-			UPDATE TermoReferencia
-			   SET TrRefStatus = 
-				  		(SELECT SituaId 
-								 FROM Situacao
-								WHERE SituaChave = 'PENDENTE')
-			 WHERE TrRefId 				= :iTR
-			    AND TrRefUnidade 	= :iUnidade 
-		";
+		$sql = "UPDATE TermoReferencia
+			   	SET TrRefStatus = (SELECT SituaId 
+								   FROM Situacao
+								   WHERE SituaChave = 'PENDENTE')
+				WHERE TrRefId = :iTR AND TrRefUnidade = :iUnidade ";
 		$result = $conn->prepare($sql);
 		$result->execute(array(
-			':iTR' 			=> $iTR,
+			':iTR' 		=> $iTR,
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
 
 		$conn->commit();
 						
-		$_SESSION['msg']['titulo'] 		= "Sucesso";
-		$_SESSION['msg']['mensagem'] 	= "TR alterada!!!";
-		$_SESSION['msg']['tipo'] 			= "success";
+		$_SESSION['msg']['titulo'] 	 = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "TR alterada!!!";
+		$_SESSION['msg']['tipo'] 	 = "success";
 
 	} catch(PDOException $e){
 
 		$conn->rollback();
 		
-		$_SESSION['msg']['titulo'] 		= "Erro";
-		$_SESSION['msg']['mensagem'] 	= "Erro ao alterar a TR!!!";
-		$_SESSION['msg']['tipo'] 			= "error";	
+		$_SESSION['msg']['titulo'] 	 = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar o TR!!!";
+		$_SESSION['msg']['tipo'] 	 = "error";	
 
-		alerta('Error1: ' . $e->getMessage());
+		//alerta('Error1: ' . $e->getMessage());
 	}
 }
 
-try {
-	$sql = "
-		SELECT TrXOrId
-			FROM TRXOrcamento
-		 WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " 
-		   AND TrXOrTermoReferencia = ".$iTR."
-	";
-	$result = $conn->query($sql);
-	$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
+//Verifica se o TR já possui Orçamentos para travar a edição dos campos	
+$sql = "SELECT TrXOrId
+		FROM TRXOrcamento
+		WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " AND TrXOrTermoReferencia = ".$iTR;
+$result = $conn->query($sql);
+$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
 
-	// Select para verificar o parametro ParamProdutoOrcamento.
-	$sql = "
-		SELECT ParamProdutoOrcamento
-			FROM Parametro
-		 WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
-	";
-	$result = $conn->query($sql);
-	$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
+// Select para o TR.
+$sql = "SELECT *
+		FROM TermoReferencia
+		JOIN Categoria on CategId = TrRefCategoria
+		JOIN Situacao on SituaId = TrRefStatus
+		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " AND TrRefId = " . $iTR;
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
 
-	// Select para o TR.
-	$sql = "
-		SELECT *
-			FROM TermoReferencia
-			JOIN Categoria on CategId = TrRefCategoria
-			JOIN Situacao on SituaId = TrRefStatus
-		 WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " 
-		   AND TrRefId = " . $iTR;
-	$result = $conn->query($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
-
-	$sql = " 
-		SELECT TRXSCSubcategoria
-			FROM TRXSubcategoria
-		 WHERE TRXSCTermoReferencia = " . $iTR . " 
-		   AND TRXSCUnidade = " . $_SESSION['UnidadeId'] . "
-	";
-	$result = $conn->query($sql);
-	$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
+//Retorna todas as Subcategorias do TR, se houver
+$sql = "SELECT TRXSCSubcategoria, SbCatId, SbCatNome
+		FROM TRXSubcategoria
+		JOIN SubCategoria on SbCatId = TRXSCSubcategoria
+		WHERE TRXSCTermoReferencia = " . $iTR . " AND TRXSCUnidade = " . $_SESSION['UnidadeId']."
+		ORDER BY SbCatNome ASC";
+$result = $conn->query($sql);
+$rowSubCat = $result->fetchAll(PDO::FETCH_ASSOC);
 	
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	$sql = "SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-				 WHERE SBCatUnidade = " . $_SESSION['UnidadeId'] . " AND TRXSCTermoReferencia = " . $iTR;
-	$result = $conn->query($sql);
-	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-		
-		$aSubCategorias = '';
+$aSubCategorias = '';
 
-	foreach ($rowSubCategoria as $item) {
-		
-		if ($aSubCategorias == '') {
-			$aSubCategorias .= $item['SbCatId'];
-		} else {
-			$aSubCategorias .= ", ".$item['SbCatId'];
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	//Select que verifica a tabela de origem dos produtos dessa TR.
-	$sql = "
-		SELECT TRXPrProduto
-			FROM TermoReferenciaXProduto
-			JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
-		 WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " 
-		   AND TRXPrTermoReferencia = " . $iTR . " 
-			 AND TRXPrTabela = 'ProdutoOrcamento'
-	";
-	$result = $conn->query($sql);
-	$rowProdutoUtilizado1 = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countProdutoUtilizado1 = count($rowProdutoUtilizado1);
-
-	if (count($rowProdutoUtilizado1) >= 1) {
-		foreach ($rowProdutoUtilizado1 as $itemProdutoUtilizado) {
-			$aProdutos1[] = $itemProdutoUtilizado['TRXPrProduto'];
-		}
-	} else {
-		$aProdutos1 = [];
-	}
-
-	$sql = "
-		SELECT TRXPrProduto
-			FROM TermoReferenciaXProduto
-			JOIN Produto on ProduId = TRXPrProduto
-		 WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
-		   AND TRXPrTermoReferencia = " . $iTR . " 
-			 AND TRXPrTabela = 'Produto'
-	";
-	$result = $conn->query($sql);
-	$rowProdutoUtilizado2 = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countProdutoUtilizado2 = count($rowProdutoUtilizado2);
+foreach ($rowSubCat as $item) {
 	
-	if (count($rowProdutoUtilizado2) >= 1) {
-		foreach ($rowProdutoUtilizado2 as $itemProdutoUtilizado) {
-			$aProdutos2[] = $itemProdutoUtilizado['TRXPrProduto'];
-		}
+	if ($aSubCategorias == '') {
+		$aSubCategorias .= $item['SbCatId'];
 	} else {
-		$aProdutos2[] = [];
+		$aSubCategorias .= ", ".$item['SbCatId'];
 	}
-
-} catch (PDOException $e) {
-	echo 'Error: ' . $e->getMessage();
 }
 
 ?>
@@ -267,13 +166,13 @@ try {
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			$('#cmbProduto').on('change', function(e) {
 
-				let inputCategoria 		= $('#inputIdCategoria').val();
+				let inputCategoria 	  = $('#inputIdCategoria').val();
 				let inputSubCategoria = $('#inputSubCategoria').val();
-				let produtos 					= $(this).val();
-				let tr 								= $('#inputIdTR').val();
-				let cont 							= 1;
-				let produtoId 				= [];
-				let produtoQuant 			= [];
+				let produtos 		  = $(this).val();
+				let tr 				  = $('#inputIdTR').val();
+				let cont 			  = 1;
+				let produtoId 		  = [];
+				let produtoQuant 	  = [];
 
 				// Aqui é para cada "class" faça
 				$.each($(".idProduto"), function() {
@@ -394,16 +293,15 @@ try {
 												<label for="cmbProduto">Produto</label>
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 													<?php
-													if (count($aProdutos1) >= 1) {
+													if ($row['TrRefTabelaProduto'] == 'ProdutoOrcamento') {
 														if (count($rowSubCat) >= 1) {
 															foreach ($rowSubCat as $valueSubCat) {
-																$sql = "
-																	SELECT PrOrcId, PrOrcNome
+																$sql = "SELECT PrOrcId, PrOrcNome
 																		FROM ProdutoOrcamento
 																		JOIN Situacao on SituaId = PrOrcSituacao				     
-																	 WHERE PrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " 
-																	   AND SituaChave = 'ATIVO' and PrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
-																		 AND PrOrcCategoria = " . $iCategoria;
+																	 	WHERE PrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " 
+																	   	AND SituaChave = 'ATIVO' and PrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
+																		AND PrOrcCategoria = " . $iCategoria;
 
 																if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null) {
 																	$sql .= " and PrOrcSubCategoria = " . $row['TrRefSubCategoria'];
@@ -427,12 +325,11 @@ try {
 													} else {
 														if (count($rowSubCat) >= 1) {
 															foreach ($rowSubCat as $subcategoria) {
-																$sql = "
-																	SELECT ProduId, ProduNome
+																$sql = "SELECT ProduId, ProduNome
 																		FROM Produto
 																		JOIN Situacao on SituaId = ProduStatus		
-																	 WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
-																	   AND SituaChave = 'ATIVO' and ProduCategoria = " . $iCategoria . "";
+																	 	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+																	   	AND SituaChave = 'ATIVO' and ProduCategoria = " . $iCategoria . "";
 
 																if ($subcategoria['TRXSCSubcategoria'] != '' and $subcategoria['TRXSCSubcategoria'] != null) {
 																	$sql .= " and ProduSubCategoria = " . $subcategoria['TRXSCSubcategoria'];
@@ -453,13 +350,12 @@ try {
 																}
 															}
 														} else {
-															$sql = "
-																SELECT ProduId, ProduNome
+															$sql = "SELECT ProduId, ProduNome
 																	FROM Produto
 																	JOIN Situacao on SituaId = ProduStatus		
-																 WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
-																   AND SituaChave = 'ATIVO' 
-																	 AND ProduCategoria = " . $iCategoria . "";
+																 	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+																   	AND SituaChave = 'ATIVO' 
+																	AND ProduCategoria = " . $iCategoria . "";
 
 															$sql .= " ORDER BY ProduNome ASC";
 															$result = $conn->query($sql);
@@ -505,26 +401,16 @@ try {
 									<p class="mb-3">Abaixo estão listados todos os produtos selecionadas acima. Para atualizar os valores, basta preencher a coluna <code>Quantidade</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<?php
-									if (count($aProdutos1) >= 1) {
+									if ($row['TrRefTabelaProduto'] == 'ProdutoOrcamento') {
 
-										$sql = "
-											SELECT PrOrcId, 
-														 PrOrcNome, 
-														 PrOrcDetalhamento, 
-														 PrOrcUnidadeMedida, 
-														 TRXPrQuantidade, 
-														 TRXPrTabela, 
-														 UnMedNome, 
-														 UnMedSigla
+										$sql = "SELECT PrOrcId,	PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, 
+													   TRXPrQuantidade, TRXPrTabela, UnMedNome, UnMedSigla
 												FROM ProdutoOrcamento
-												JOIN TermoReferenciaXProduto 
-													ON TRXPrProduto = PrOrcId
-												JOIN UnidadeMedida 
-												  ON UnMedId = PrOrcUnidadeMedida
-											 WHERE PrOrcUnidade 				= " . $_SESSION['UnidadeId'] . " 
-											   AND TRXPrTermoReferencia = " . $iTR  . " 
-												 AND TRXPrTabela 					= 'ProdutoOrcamento'
-										";
+												JOIN TermoReferenciaXProduto ON TRXPrProduto = PrOrcId
+												JOIN UnidadeMedida ON UnMedId = PrOrcUnidadeMedida
+											 	WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
+											   	AND TRXPrTermoReferencia = " . $iTR  . " 
+												AND TRXPrTabela	= 'ProdutoOrcamento' ";
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$cont = 0;
@@ -611,28 +497,17 @@ try {
 
 									} else {
 
-										$sql = "
-											SELECT TRXPrQuantidade, 
-														 TRXPrTabela, 
-														 ProduId, 
-														 ProduNome, 
-														 ProduDetalhamento, 
-														 ProduUnidadeMedida, 
-														 UnMedNome, 
-														 UnMedSigla
+										$sql = "SELECT TRXPrQuantidade, TRXPrTabela, ProduId, ProduNome, ProduDetalhamento, 
+													   ProduUnidadeMedida, UnMedNome, UnMedSigla
 												FROM TermoReferenciaXProduto
-												JOIN Produto 
-													ON ProduId = TRXPrProduto
-												LEFT 
-													JOIN UnidadeMedida 
-														ON UnMedId = ProduUnidadeMedida
-											 WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
-											   AND TRXPrTermoReferencia = " . $iTR . " 
-												 AND TRXPrTabela = 'Produto'
-										";
-										$result 			= $conn->query($sql);
-										$rowProdutos 	= $result->fetchAll(PDO::FETCH_ASSOC);
-										$count 				= count($rowProdutos);
+												JOIN Produto ON ProduId = TRXPrProduto
+												JOIN UnidadeMedida ON UnMedId = ProduUnidadeMedida
+											 	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+											   	AND TRXPrTermoReferencia = " . $iTR . " 
+												AND TRXPrTabela = 'Produto' ";
+										$result = $conn->query($sql);
+										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+										$count = count($rowProdutos);
 										$cont = 0;
 
 										print('

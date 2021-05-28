@@ -8,7 +8,7 @@
 
 		foreach ($_POST['cmbSubCategoria'] as $value) {					
 			
-			if ($rowParametro['ParamProdutoOrcamento']) {
+			if ($parametroProduto = 'ProdutoOrcamento') {
 			
 				$sql = "SELECT PrOrcId as idProduto
 						FROM ProdutoOrcamento
@@ -50,7 +50,7 @@
 		
 		$value = $_POST['cmbCategoria'];
 			
-		if ($rowParametro['ParamProdutoOrcamento']) {
+		if ($parametroProduto = 'ProdutoOrcamento') {
 		
 			$sql = "SELECT PrOrcId as idProduto
 					FROM ProdutoOrcamento
