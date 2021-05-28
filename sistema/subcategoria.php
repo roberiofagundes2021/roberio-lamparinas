@@ -102,6 +102,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
@@ -296,7 +297,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										</div>
 										<div class="col-lg-4">
 											<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
-											<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+											<select id="cmbCategoria" name="cmbCategoria" class="form-control select-search" required>
 												<option value="">Selecione</option>
 												<?php 
 													$sql = "SELECT CategId, CategNome
