@@ -1,22 +1,32 @@
 <?php
   include('global_assets/php/conexao.php');
 
+  //Recupera todos os módulos do sistema
   $sqlModulo = "SELECT M.ModulId, M.ModulOrdem, M.ModulNome, M.ModulStatus, S.SituaChave, S.SituaCor
-  FROM modulo M join situacao S on M.ModulStatus = S.SituaId order by M.ModulOrdem asc";
+                FROM Modulo M 
+                JOIN Situacao S on M.ModulStatus = S.SituaId 
+                ORDER BY M.ModulOrdem ASC";
   $resultModulo = $conn->query($sqlModulo);
   $modulo = $resultModulo->fetchAll(PDO::FETCH_ASSOC);
 
+  //Recupera todos os menus do sistema
   $sqlMenu = "SELECT M.MenuId, M.MenuNome, M.MenuUrl, M.MenuIco, M.MenuSubMenu, M.MenuModulo,
-  M.MenuPai, M.MenuLevel, M.MenuOrdem, M.MenuStatus, S.SituaChave
-  FROM menu M join situacao S on M.MenuStatus = S.SituaId
-  order by MenuOrdem asc";
+                     M.MenuPai, M.MenuLevel, M.MenuOrdem, M.MenuSetorPublico, M.MenuSetorPrivado, M.MenuStatus, S.SituaChave
+              FROM Menu M 
+              JOIN Situacao S on M.MenuStatus = S.SituaId
+              ORDER BY MenuOrdem ASC";
   $resultMenu = $conn->query($sqlMenu);
   $menu = $resultMenu->fetchAll(PDO::FETCH_ASSOC);
 
-  $sqlSituacao = "SELECT SituaId, SituaNome, SituaChave, SituaStatus, SituaCor FROM situacao";
-  $resultSituacao = $conn->query($sqlSituacao);
-  $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);		
-		
+  //Recupera o parâmetro pra saber se a empresa é pública ou privada
+  $sqlParametro = "SELECT ParamEmpresaPublica 
+                   FROM Parametro
+                   WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+  $resultParametro = $conn->query($sqlParametro);
+  $parametro = $resultParametro->fetch(PDO::FETCH_ASSOC);	
+  
+  $empresa = $parametro['ParamEmpresaPublica'] ? 'Publica' : 'Privada';
+
 ?>
 
 <!-- Main sidebar -->
@@ -105,25 +115,35 @@
                       <div class="text-uppercase font-size-xs line-height-xs">'.$mod['ModulNome'].'</div>
                     </li>';
               foreach($menu as $men){
-                if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo")){
-                  echo  ($men['MenuSubMenu'] == 1? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
-                            '<a href="'.$men['MenuUrl'].'"';
-                            if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
-                              {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
-                            echo '<i class="'.$men['MenuIco'].'"></i>
-                            <span>'.
-                              $men['MenuNome']
-                            .'</span>
-                          </a>';
-                    if ($men['MenuSubMenu'] == 1){
-                      echo '<ul class="nav nav-group-sub" data-submenu-title="Text editors">';
-                      foreach($menu as $men_f){
-                        if($men_f['MenuPai'] == $men['MenuId']){
-                          echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link">'.$men_f['MenuNome'].'</a></li>';
-                        }
+                
+                if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo")){  
+                  
+                  //Empresa pública e o menu visível para o Setor Público ou Empresa Privada e o menu visível para o Setor Privado
+                  if (($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado'])){
+                      echo  ($men['MenuSubMenu'] == 1? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
+                        '<a href="'.$men['MenuUrl'].'"';
+                        if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
+                          {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
+                        echo '<i class="'.$men['MenuIco'].'"></i>
+                        <span>'.
+                          $men['MenuNome']
+                        .'</span>
+                      </a>';
+                  }
+                  
+                  echo '<ul class="nav nav-group-sub" data-submenu-title="Text editors">';
+                  
+                  foreach($menu as $men_f){
+                    
+                    if($men_f['MenuPai'] == $men['MenuId']){
+                      
+                      if ($men['MenuSubMenu'] == 1 && (($empresa == 'Publica' && $men_f['MenuSetorPublico']) || ($empresa == 'Privada' && $men_f['MenuSetorPrivado']))){
+                        echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link">'.$men_f['MenuNome'].'</a></li>';
                       }
-                      echo '</ul>';
                     }
+                  }
+                  echo '</ul>';
+
                   echo '</li>';
                 }
               }
