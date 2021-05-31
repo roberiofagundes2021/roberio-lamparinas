@@ -8,15 +8,15 @@
 
 		foreach ($_POST['cmbSubCategoria'] as $value) {
 		
-			if ($rowParametro['ParamServicoOrcamento']) {
+			if ($parametroServico == 'ServicoOrcamento') {
 
-				$sql = "SELECT SrOrcId
+				$sql = "SELECT SrOrcId as idServico
 						FROM ServicoOrcamento
-						JOIN Situacao on SituaId = SrOrcStatus
+						JOIN Situacao on SituaId = SrOrcSituacao
 						WHERE SrOrcSubcategoria = " . $value . " and SituaChave = 'ATIVO'";
 			} else{
 				
-				$sql = "SELECT ServiId
+				$sql = "SELECT ServiId as idServico
 						FROM Servico
 						JOIN Situacao on SituaId = ServiStatus
 						WHERE ServiSubCategoria = " . $value . " and SituaChave = 'ATIVO'";						
@@ -35,7 +35,7 @@
 
 					$result->execute(array(
 						':iTR' => $insertId,
-						':iServico' => $rowParametro['ParamServicoOrcamento'] ? $servico['SrOrcId'] : $servico['ServiId'],
+						':iServico' => $servico['idServico'],
 						':iQuantidade' => null,
 						':fValorUnitario' => null,
 						':sTabela' => $parametroServico,
@@ -50,15 +50,15 @@
 
 		$value = $_POST['cmbCategoria'];
 	
-		if ($rowParametro['ParamServicoOrcamento']) {
+		if ($parametroServico == 'ServicoOrcamento') {
 
-			$sql = "SELECT SrOrcId
+			$sql = "SELECT SrOrcId as idServico
 					FROM ServicoOrcamento
-					JOIN Situacao on SituaId = SrOrcStatus
+					JOIN Situacao on SituaId = SrOrcSituacao
 					WHERE SrOrcCategoria = " . $value . " and SituaChave = 'ATIVO'";
 		} else{
 			
-			$sql = "SELECT ServiId
+			$sql = "SELECT ServiId as idServico
 					FROM Servico
 					JOIN Situacao on SituaId = ServiStatus
 					WHERE ServiCategoria = " . $value . " and SituaChave = 'ATIVO'";						
@@ -77,7 +77,7 @@
 
 				$result->execute(array(
 					':iTR' => $insertId,
-					':iServico' => $rowParametro['ParamServicoOrcamento'] ? $servico['SrOrcId'] : $servico['ServiId'],
+					':iServico' => $servico['idServico'],
 					':iQuantidade' => null,
 					':fValorUnitario' => null,
 					':sTabela' => $parametroServico,

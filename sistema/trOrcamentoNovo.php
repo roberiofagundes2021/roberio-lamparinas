@@ -7,33 +7,33 @@ $_SESSION['PaginaAtual'] = 'Novo Orçamento';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
-		 FROM Usuario
-		 Where UsuarId = " . $_SESSION['UsuarId'] . "
-		 ORDER BY UsuarNome ASC";
+		FROM Usuario
+		Where UsuarId = " . $_SESSION['UsuarId'] . "
+		ORDER BY UsuarNome ASC";
 $result = $conn->query($sql);
 $rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
 
 //////////////////////////////////////////////////////////////
 
 $sql = "SELECT TrRefCategoria
-		       FROM TermoReferencia
-		       JOIN Categoria on CategId = TrRefCategoria
-	           WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = " . $_SESSION['TRId'] . "";
+		FROM TermoReferencia
+		JOIN Categoria on CategId = TrRefCategoria
+		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = " . $_SESSION['TRId'] . "";
 $result = $conn->query($sql);
 $categoriaId = $result->fetch(PDO::FETCH_ASSOC);
 
 $sql = "SELECT CategId, CategNome
-				FROM Categoria															     
-				WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and CategId = " . $categoriaId['TrRefCategoria'] . " and CategStatus = 1";
+		FROM Categoria															     
+		WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and CategId = " . $categoriaId['TrRefCategoria'] . " and CategStatus = 1";
 $result = $conn->query($sql);
 $rowCategoria = $result->fetch(PDO::FETCH_ASSOC);
 
 
 $sql = "SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-				 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $_SESSION['TRId'] . "
-				 ORDER BY SbCatNome ASC";
+		FROM SubCategoria
+		JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
+		WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $_SESSION['TRId'] . "
+		ORDER BY SbCatNome ASC";
 $result = $conn->query($sql);
 $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 		
@@ -54,15 +54,15 @@ if (isset($_POST['inputData'])) {
 
 	try {
 
-		$sql = "SELECT COUNT(isnull(TrXOrNumero,0)) as Numero
-				 FROM TRXOrcamento
-				 Where TrXOrUnidade = " . $_SESSION['UnidadeId'] . "";
+		$sql = "SELECT max(TrXOrNumero) as Numero
+				FROM TRXOrcamento
+				Where TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrTermoReferencia = ".$_SESSION['TRId'];
 		$result = $conn->query($sql);
 		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "SELECT ParamProdutoOrcamento, ParamServicoOrcamento
-		            FROM Parametro
-		            WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . "";
+				FROM Parametro
+				WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . "";
 		$result = $conn->query($sql);
 		$rowParam = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -73,7 +73,7 @@ if (isset($_POST['inputData'])) {
 		$sNumero = str_pad($sNumero, 6, "0", STR_PAD_LEFT);
 
 		$sql = "INSERT INTO TRXOrcamento (TrXOrTermoReferencia, TrXOrNumero, TrXOrData, TrXOrCategoria, TrXOrConteudo, TrXOrFornecedor,
-									   TrXOrSolicitante, TrXOrTabelaProduto, TrXOrTabelaServico, TrXOrStatus, TrXOrUsuarioAtualizador, TrXOrUnidade)
+					   TrXOrSolicitante, TrXOrTabelaProduto, TrXOrTabelaServico, TrXOrStatus, TrXOrUsuarioAtualizador, TrXOrUnidade)
 				VALUES (:iTR, :sNumero, :dData, :iCategoria, :sConteudo, :iFornecedor, :iSolicitante, :sTabelaProduto, :sTabelaServico,
 						:bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
@@ -158,6 +158,11 @@ if (isset($_POST['inputData'])) {
 	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>	
 
 	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
@@ -310,7 +315,7 @@ if (isset($_POST['inputData'])) {
 				<!-- Info blocks -->
 				<div class="card">
 
-					<form name="formTRXOrcamento" id="formTRXOrcamento" method="post" class="form-validate" action="trOrcamentoNovo.php">
+					<form name="formTRXOrcamento" id="formTRXOrcamento" method="post" class="form-validate-jquery" action="trOrcamentoNovo.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Orçamento</h5>
 						</div>
@@ -323,14 +328,14 @@ if (isset($_POST['inputData'])) {
 
 										<div class="col-lg-1">
 											<div class="form-group">
-												<label for="inputData">Data</label>
+												<label for="inputData">Data <span class="text-danger"> *</span></label>
 												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" readOnly>
 											</div>
 										</div>
 
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
+												<label for="cmbCategoria">Categoria <span class="text-danger"> *</span></label>
 												<div class="d-flex flex-row" style="padding-top: 7px;">
 													<input type="text" class="form-control pb-0" value="<?php echo $rowCategoria['CategNome'] ?>" readOnly>
 													<input type="hidden" id="inputCategoria" name="inputCategoria" class="form-control pb-0" value="<?php echo $rowCategoria['CategId'] ?>">
@@ -377,14 +382,14 @@ if (isset($_POST['inputData'])) {
 
 							<div class="row">
 								<div class="col-lg-12">
-									<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
+									<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor <span class="text-danger"> *</span></h5>
 									<br>
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor</label>
-												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular, ForneCategoria
 															FROM Fornecedor
@@ -436,14 +441,14 @@ if (isset($_POST['inputData'])) {
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNomeSolicitante">Solicitante</label>
+												<label for="inputNomeSolicitante">Solicitante <span class="text-danger"> *</span></label>
 												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarNome']; ?>" readOnly>
 											</div>
 										</div>
 
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputEmailSolicitante">E-mail</label>
+												<label for="inputEmailSolicitante">E-mail <span class="text-danger"> *</span></label>
 												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $rowUsuario['UsuarEmail']; ?>" readOnly>
 											</div>
 										</div>

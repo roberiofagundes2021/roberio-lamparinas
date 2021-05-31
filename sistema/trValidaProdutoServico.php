@@ -17,7 +17,7 @@ if ($bProduto) {
 	if ($parametroProduto) {
 		$sql = "SELECT PrOrcId
 				FROM ProdutoOrcamento
-				JOIN Situacao on SituaId = PrOrcStatus
+				JOIN Situacao on SituaId = PrOrcSituacao
 				WHERE PrOrcCategoria = " . $iCategoria . " and SituaChave = 'ATIVO' ";
 		if ($iSubCatgoria) {
 			$sql .= " and PrOrcSubCategoria in (" . $iSubCategoria . ")";
@@ -50,7 +50,7 @@ if ($bServico) {
 	if ($parametroServico) {
 		$sql = "SELECT SrOrcId
 				FROM ServicoOrcamento
-				JOIN Situacao on SituaId = SrOrcStatus
+				JOIN Situacao on SituaId = SrOrcSituacao
 				WHERE SrOrcCategoria = " . $iCategoria . " and SituaChave = 'ATIVO' ";
 		if ($iSubCatgoria) {
 			$sql .= " and SrOrcSubCategoria in (" . $iSubCategoria . ")";

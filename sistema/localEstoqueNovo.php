@@ -16,12 +16,13 @@ if(isset($_POST['inputNome'])){
 			$iUnidade = $_SESSION['UnidadeId'];
 		}
 		
-		$sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstUnidade, LcEstStatus, LcEstUsuarioAtualizador)
-				VALUES (:sNome, :iUnidade, :bStatus, :iUsuarioAtualizador)";
+		$sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstChave, LcEstUnidade, LcEstStatus, LcEstUsuarioAtualizador)
+				VALUES (:sNome, :sChave, :iUnidade, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
+						':sChave' => formatarChave($_POST['inputNome']),
 						':iUnidade' => $iUnidade,
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId']

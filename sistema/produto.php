@@ -26,7 +26,7 @@ $sql = "SELECT ParamPrecoGridProduto
 		WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . "
 	   ";
 $result = $conn->query($sql);
-$parametro = $result->fetch(PDO::FETCH_ASSOC);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -315,9 +315,9 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 										<th>Categoria</th>
 										<th>SubCategoria</th>
 										<?php
-										if ($parametro['ParamPrecoGridProduto'] == 'PRECOCUSTOFINAL') print('<th>Preço Custo Final</th>');
-										else if ($parametro['ParamPrecoGridProduto'] == 'PRECOCUSTO') print('<th>Preço Custo</th>');
-										else if ($parametro['ParamPrecoGridProduto'] == 'PRECOVENDA') print('<th>Preço Venda</th>');
+										if (isset($rowParametro['ParamPrecoGridProduto']) && $rowParametro['ParamPrecoGridProduto'] == 'PRECOCUSTOFINAL') print('<th>Preço Custo Final</th>');
+										else if (isset($rowParametro['ParamPrecoGridProduto']) && $rowParametro['ParamPrecoGridProduto'] == 'PRECOCUSTO') print('<th>Preço Custo</th>');
+										else if (isset($rowParametro['ParamPrecoGridProduto']) && $rowParametro['ParamPrecoGridProduto'] == 'PRECOVENDA') print('<th>Preço Venda</th>');
 										else print('<th>Preço Venda</th>');
 										?>
 										<th>Situação</th>
@@ -330,9 +330,9 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 
 										$tipoValorProduto = '';										
 
-										if ($parametro['ParamPrecoGridProduto'] == 'PRECOCUSTOFINAL') $tipoValorProduto = '<td>' . formataMoeda($item['ProduCustoFinal']) . '</td>';
-										else if ($parametro['ParamPrecoGridProduto'] == 'PRECOCUSTO') $tipoValorProduto = '<td>' . formataMoeda($item['ProduValorCusto']) . '</td>';
-										else if ($parametro['ParamPrecoGridProduto'] == 'PRECOVENDA') $tipoValorProduto = '<td>' . formataMoeda($item['ProduValorVenda']) . '</td>';
+										if (isset($rowParametro['ParamPrecoGridProduto']) && $rowParametro['ParamPrecoGridProduto'] == 'PRECOCUSTOFINAL') $tipoValorProduto = '<td>' . formataMoeda($item['ProduCustoFinal']) . '</td>';
+										else if (isset($rowParametro['ParamPrecoGridProduto']) && $rowParametro['ParamPrecoGridProduto'] == 'PRECOCUSTO') $tipoValorProduto = '<td>' . formataMoeda($item['ProduValorCusto']) . '</td>';
+										else if (isset($rowParametro['ParamPrecoGridProduto']) && $rowParametro['ParamPrecoGridProduto'] == 'PRECOVENDA') $tipoValorProduto = '<td>' . formataMoeda($item['ProduValorVenda']) . '</td>';
 										else $tipoValorProduto = '<td>' . formataMoeda($item['ProduValorVenda']) . '</td>';
 
 										$situacao = $item['SituaNome'];

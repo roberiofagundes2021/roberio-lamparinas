@@ -2104,7 +2104,7 @@ if (isset($_POST['inputData'])) {
 											$sql = "SELECT MotivId, MotivNome, MotivChave
 													FROM Motivo
 													JOIN Situacao on SituaId = MotivStatus
-													WHERE MotivEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+													WHERE SituaChave = 'ATIVO'
 													ORDER BY MotivNome ASC";
 											$result = $conn->query($sql);
 											$rowMotivo = $result->fetchAll(PDO::FETCH_ASSOC);

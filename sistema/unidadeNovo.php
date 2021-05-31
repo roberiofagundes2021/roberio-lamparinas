@@ -32,8 +32,23 @@ if(isset($_POST['inputNome'])){
 						':iEmpresa' => $_SESSION['EmpresaId'],
 						));
 
-		$insertId = $conn->lastInsertId();				
-		
+		$insertId = $conn->lastInsertId();
+    
+    /* Após criar a Unidade deve se cadastrar o Local de Estoque Padrão para essa Unidade nova criada */
+    $sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstChave, LcEstStatus, LcEstUsuarioAtualizador, LcEstUnidade)
+					VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => 'GESTAO ANTERIOR',
+              ':sChave' => 'GESTAOANTERIOR',
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $insertId
+							));
+
+     $insertId = $conn->lastInsertId();
+
 		/* Após criar a Unidade deve se cadastrar as Formas de Pagamento Padrão para essa Unidade nova criada */
 		$sql = "INSERT INTO FormaPagamento (FrPagNome, FrPagChave, FrPagStatus, FrPagUsuarioAtualizador, FrPagUnidade)
 				VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";

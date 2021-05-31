@@ -20,6 +20,23 @@ if (array_key_exists('EmpresaId', $_SESSION) and !in_array(basename($_SERVER['PH
 	unset($_SESSION['EmpresaNome']);
 }
 
+$arquivosTermoReferencia = array(
+	'trAprovacaoAdministrativo.php', 'trAprovacaoComissao.php', 'trAprovacaoContabilidade.php', 
+	'trComissao.php', 'trComissaoExclui.php', 'trComissaoPresidente.php', 'trComissaoValida.php', 
+	'trDotacao.php', 'trDotacaoExclui.php', 'trDotacaoNovo.php', 'trEdita.php', 'trExclui.php', 
+	'trFiltraProduto.php', 'trFiltraServico.php', 'trGravaProduto.php', 'trGravaServico.php',
+ 	'trImprime.php', 'trMudaSituacao.php', 'trMudaSituacaoContabilidade', 'trNovo.php', 'trOrcamento.php',
+	'trOrcamentoDuplica.php', 'trOrcamentoEdita.php', 'trOrcamentoExclui.php', 'trOrcamentoImprime.php',
+	'trOrcamentoNovo.php', 'trOrcamentoProduto.php', 'trOrcamentoServico.php', 'trProduto.php', 'trServico.php',
+	'trValidaProdutoServico.php', 'trValidaQuantidade.php', 'trVerificaProdutoServico.php', 'trComissaoAnexoNovo.php',
+	'trComissaoAnexoExclui.php');
+
+if ((array_key_exists('TRId', $_SESSION) || array_key_exists('TRNumero', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosTermoReferencia)) {
+	
+	unset($_SESSION['TRId']);
+	unset($_SESSION['TRNumero']);
+}
+
 $arquivosAditivo = array('fluxoAditivo.php', 'fluxoAditivoNovo.php', 'fluxoAditivoEdita.php', 'fluxoAditivoExclui.php');
 
 //Se existe a sessão $_SESSION['FluxoId'] e a página que está sendo acessada não é nenhuma das sitadas acima, limpa essa sessão.	  

@@ -50,49 +50,49 @@ if (isset($_POST['inputIdOrcamento'])) {
 	}
 }
 
-try {
+$sql = "SELECT *
+		FROM TRXOrcamento
+		LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
+		JOIN Categoria on CategId = TrXOrCategoria
+		LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
+		WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+$iTR = $row['TrXOrTermoReferencia'];
 
-	$sql = "SELECT *
-			FROM TRXOrcamento
-			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
-			JOIN Categoria on CategId = TrXOrCategoria
-			LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
-			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
-	$result = $conn->query($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
-	//////////////////////////////////////////////////////////////////////////////////////////////////
-	$sql = "SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-				 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $_SESSION['TRId'] . "
-				 ORDER BY SbCatNome ASC";
-	$result = $conn->query($sql);
-	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-			
-			$aSubCategorias = '';
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
-		foreach ($rowSubCategoria as $item) {
-			
-			if ($aSubCategorias == '') {
-				$aSubCategorias .= $item['SbCatId'];
-			} else {
-				$aSubCategorias .= ", ".$item['SbCatId'];
-			}
-		}
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	$sql = "SELECT TXOXSServico
-			FROM  TRXOrcamentoXServico
-			JOIN Servico on ServiId = TXOXSServico
-			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento;
-	$result = $conn->query($sql);
-	$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countServicoUtilizado = count($rowServicoUtilizado);
+$sql = "SELECT SbCatId, SbCatNome
+		FROM SubCategoria
+		JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
+		WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $_SESSION['TRId'] . "
+		ORDER BY SbCatNome ASC";
+$result = $conn->query($sql);
+$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+		
+$aSubCategorias = '';
 
-	foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
-		$aServico[] = $itemServicoUtilizado['TXOXSServico'];
+foreach ($rowSubCategoria as $item) {
+	
+	if ($aSubCategorias == '') {
+		$aSubCategorias .= $item['SbCatId'];
+	} else {
+		$aSubCategorias .= ", ".$item['SbCatId'];
 	}
-} catch (PDOException $e) {
-	echo 'Error: ' . $e->getMessage();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+$sql = "SELECT TXOXSServico
+		FROM  TRXOrcamentoXServico
+		JOIN Servico on ServiId = TXOXSServico
+		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento;
+$result = $conn->query($sql);
+$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+$countServicoUtilizado = count($rowServicoUtilizado);
+
+foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
+	$aServico[] = $itemServicoUtilizado['TXOXSServico'];
 }
 
 ?>
@@ -121,75 +121,6 @@ try {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		$(document).ready(function() {
-
-			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
-			$('#cmbServico').on('change', function(e) {
-
-				var inputCategoria = $('#inputIdCategoria').val();
-				var inputSubCategoria = $('#inputIdSubCategoria').val();
-				var servicos = $(this).val();
-				//console.log(servicos);
-
-				var cont = 1;
-				var servicoId = [];
-				var servicoQuant = [];
-				var servicoValor = [];
-
-				// Aqui é para cada "class" faça
-				$.each($(".idServico"), function() {
-					servicoId[cont] = $(this).val();
-					cont++;
-				});
-
-				cont = 1;
-				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
-				$.each($(".Quantidade"), function() {
-					$id = servicoId[cont];
-
-					servicoQuant[$id] = $(this).val();
-					cont++;
-				});
-
-				cont = 1;
-				$.each($(".ValorUnitario"), function() {
-					$id = servicoId[cont];
-
-					servicoValor[$id] = $(this).val();
-					cont++;
-				});
-
-				$.ajax({
-					type: "POST",
-					url: "orcamentoFiltraServico.php",
-					data: {
-						idCategoria: inputCategoria,
-						idSubCategoria: inputSubCategoria,
-						servicos: servicos,
-						servicoId: servicoId,
-						servicoQuant: servicoQuant,
-						servicoValor: servicoValor
-					},
-					success: function(resposta) {
-						//alert(resposta);
-						$("#tabelaServicos").html(resposta).show();
-
-						return false;
-
-					}
-				});
-			});
-
-		}); //document.ready
-
-		//Mostra o "Filtrando..." na combo Servico
-		function FiltraServico() {
-			$('#cmbServico').empty().append('<option>Filtrando...</option>');
-		}
-
-		function ResetServico() {
-			$('#cmbServico').empty().append('<option>Sem produto</option>');
-		}
 
 		function calculaValorTotal(id) {
 
@@ -294,40 +225,6 @@ try {
 											</div>
 										</div>
 									</div>
-									<!--<div class="row">	
-										<div class="col-lg-12">
-											<div class="form-group">
-												<label for="cmbServico">Servico</label>
-												<select id="cmbServico" name="cmbServico" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
-													<? php/* 
-														$sql = "SELECT ServiId, ServiNome
-																FROM Servico										     
-																WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and ServiStatus = 1 and ServiCategoria = ".$iCategoria;
-														
-														if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-															$sql .= " and ServiSubCategoria = ".$row['OrcamSubCategoria'];
-														}
-														
-														$sql .= " ORDER BY ServiNome ASC";
-														$result = $conn->query($sql);
-														$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);														
-														
-														foreach ($rowServico as $item){	
-															
-															if (in_array($item['ServiId'], $aServicos) or $countServicoUtilizado == 0) {
-																$seleciona = "selected";
-															} else {
-																$seleciona = "";
-															}													
-															
-															print('<option value="'.$item['ServiId'].'" '.$seleciona.'>'.$item['ServiNome'].'</option>');
-														}
-													
-													*/ ?>
-												</select>
-											</div>
-										</div>
-									</div>-->
 								</div>
 							</div>
 
@@ -353,16 +250,6 @@ try {
 
 									<?php
 
-									$sql = "SELECT *
-			                                    FROM TRXOrcamento
-			                                    LEFT JOIN Fornecedor on ForneId = TRXOrFornecedor
-			                                    JOIN Categoria on CategId = TRXOrCategoria
-			                                    LEFT JOIN SubCategoria on SbCatId = TRXOrSubCategoria
-			                                    WHERE TRXOrUnidade = " . $_SESSION['UnidadeId'] . " and TRXOrId = " . $iOrcamento;
-									$result = $conn->query($sql);
-									$row = $result->fetch(PDO::FETCH_ASSOC);
-									$iTR = $row['TrXOrTermoReferencia'];
-
 									// Selects para identificar quais servicos de TermoReferenciaXServico pertencem a TR deste Orçamento e a qual tabela eles pertencem
 									$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, TRXSrQuantidade
 											FROM ServicoOrcamento
@@ -377,21 +264,6 @@ try {
 											WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
 									$result = $conn->query($sql);
 									$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-
-									/*if (!$count){
-											$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, SrOrcUnidadeMedida
-													FROM ServicoOrcamento
-													LEFT JOIN UnidadeMedida on UnMedId = SrOrcUnidadeMedida
-													WHERE SrOrcEmpresa = ".$_SESSION['EmpreId']." and SrOrcSubcategoria = ".$iCategoria." and SrOrcSituacao = 1 ";
-													
-											if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-												$sql .= " and SrOrcSubcategoria = ".$row['OrcamSubCategoria'];
-											}
-											$result = $conn->query($sql);
-											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-										} */
 
 									$cont = 0;
 
@@ -436,7 +308,7 @@ try {
 											    WHERE TXOXSUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento;
 										$result = $conn->query($sql);
 										$rowServicosOrc = $result->fetchAll(PDO::FETCH_ASSOC);
-										$countServicoOrc = count($rowServicos);
+										$countServicoOrc = count($rowServicosOrc);
 
 										if ($countServicoOrc >= 1) {
 

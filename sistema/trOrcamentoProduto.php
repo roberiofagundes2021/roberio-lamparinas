@@ -50,49 +50,49 @@ if (isset($_POST['inputIdOrcamento'])) {
 	}
 }
 
-try {
+$sql = "SELECT *
+		FROM TRXOrcamento
+		LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
+		JOIN Categoria on CategId = TrXOrCategoria
+		LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
+		WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+$iTR = $row['TrXOrTermoReferencia'];
 
-	$sql = "SELECT *
-			FROM TRXOrcamento
-			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
-			JOIN Categoria on CategId = TrXOrCategoria
-			LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
-			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
-	$result = $conn->query($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
-	//////////////////////////////////////////////////////////////////////////////////////////////////
-	$sql = "SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-				 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $_SESSION['TRId'] . "
-				 ORDER BY SbCatNome ASC";
-	$result = $conn->query($sql);
-	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-			
-			$aSubCategorias = '';
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
-		foreach ($rowSubCategoria as $item) {
-			
-			if ($aSubCategorias == '') {
-				$aSubCategorias .= $item['SbCatId'];
-			} else {
-				$aSubCategorias .= ", ".$item['SbCatId'];
-			}
-		}
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	$sql = "SELECT TXOXPProduto
-			FROM TRXOrcamentoXProduto
-			JOIN Produto on ProduId = TXOXPProduto
-			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
-	$result = $conn->query($sql);
-	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countProdutoUtilizado = count($rowProdutoUtilizado);
+$sql = "SELECT SbCatId, SbCatNome
+		FROM SubCategoria
+		JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
+		WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $_SESSION['TRId'] . "
+		ORDER BY SbCatNome ASC";
+$result = $conn->query($sql);
+$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+		
+$aSubCategorias = '';
 
-	foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
-		$aProdutos[] = $itemProdutoUtilizado['TXOXPProduto'];
+foreach ($rowSubCategoria as $item) {
+	
+	if ($aSubCategorias == '') {
+		$aSubCategorias .= $item['SbCatId'];
+	} else {
+		$aSubCategorias .= ", ".$item['SbCatId'];
 	}
-} catch (PDOException $e) {
-	echo 'Error: ' . $e->getMessage();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+$sql = "SELECT TXOXPProduto
+		FROM TRXOrcamentoXProduto
+		JOIN Produto on ProduId = TXOXPProduto
+		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
+$result = $conn->query($sql);
+$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+$countProdutoUtilizado = count($rowProdutoUtilizado);
+
+foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
+	$aProdutos[] = $itemProdutoUtilizado['TXOXPProduto'];
 }
 
 ?>
@@ -121,75 +121,6 @@ try {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		$(document).ready(function() {
-
-			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
-			$('#cmbProduto').on('change', function(e) {
-
-				var inputCategoria = $('#inputIdCategoria').val();
-				var inputSubCategoria = $('#inputIdSubCategoria').val();
-				var produtos = $(this).val();
-				//console.log(produtos);
-
-				var cont = 1;
-				var produtoId = [];
-				var produtoQuant = [];
-				var produtoValor = [];
-
-				// Aqui é para cada "class" faça
-				$.each($(".idProduto"), function() {
-					produtoId[cont] = $(this).val();
-					cont++;
-				});
-
-				cont = 1;
-				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
-				$.each($(".Quantidade"), function() {
-					$id = produtoId[cont];
-
-					produtoQuant[$id] = $(this).val();
-					cont++;
-				});
-
-				cont = 1;
-				$.each($(".ValorUnitario"), function() {
-					$id = produtoId[cont];
-
-					produtoValor[$id] = $(this).val();
-					cont++;
-				});
-
-				$.ajax({
-					type: "POST",
-					url: "orcamentoFiltraProduto.php",
-					data: {
-						idCategoria: inputCategoria,
-						idSubCategoria: inputSubCategoria,
-						produtos: produtos,
-						produtoId: produtoId,
-						produtoQuant: produtoQuant,
-						produtoValor: produtoValor
-					},
-					success: function(resposta) {
-						//alert(resposta);
-						$("#tabelaProdutos").html(resposta).show();
-
-						return false;
-
-					}
-				});
-			});
-
-		}); //document.ready
-
-		//Mostra o "Filtrando..." na combo Produto
-		function FiltraProduto() {
-			$('#cmbProduto').empty().append('<option>Filtrando...</option>');
-		}
-
-		function ResetProduto() {
-			$('#cmbProduto').empty().append('<option>Sem produto</option>');
-		}
 
 		function calculaValorTotal(id) {
 
@@ -294,40 +225,6 @@ try {
 											</div>
 										</div>
 									</div>
-									<!--<div class="row">	
-										<div class="col-lg-12">
-											<div class="form-group">
-												<label for="cmbProduto">Produto</label>
-												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
-													<? php/* 
-														$sql = "SELECT ProduId, ProduNome
-																FROM Produto										     
-																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduStatus = 1 and ProduCategoria = ".$iCategoria;
-														
-														if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-															$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
-														}
-														
-														$sql .= " ORDER BY ProduNome ASC";
-														$result = $conn->query($sql);
-														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
-														
-														foreach ($rowProduto as $item){	
-															
-															if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
-																$seleciona = "selected";
-															} else {
-																$seleciona = "";
-															}													
-															
-															print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
-														}
-													
-													*/ ?>
-												</select>
-											</div>
-										</div>
-									</div>-->
 								</div>
 							</div>
 
@@ -353,16 +250,6 @@ try {
 
 									<?php
 
-									$sql = "SELECT *
-			                                    FROM TRXOrcamento
-			                                    LEFT JOIN Fornecedor on ForneId = TRXOrFornecedor
-			                                    JOIN Categoria on CategId = TRXOrCategoria
-			                                    LEFT JOIN SubCategoria on SbCatId = TRXOrSubCategoria
-			                                    WHERE TRXOrUnidade = " . $_SESSION['UnidadeId'] . " and TRXOrId = " . $iOrcamento;
-									$result = $conn->query($sql);
-									$row = $result->fetch(PDO::FETCH_ASSOC);
-									$iTR = $row['TrXOrTermoReferencia'];
-
 									// Selects para identificar quais produtos de TermoReferenciaXProduto pertencem a TR deste Orçamento e a qual tabela eles pertencem
 									$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, UnMedNome
 											FROM ProdutoOrcamento
@@ -379,21 +266,6 @@ try {
 											WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
 									$result = $conn->query($sql);
 									$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-
-									/*if (!$count){
-											$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida
-													FROM ProdutoOrcamento
-													LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-													WHERE PrOrcEmpresa = ".$_SESSION['EmpreId']." and PrOrcSubcategoria = ".$iCategoria." and PrOrcSituacao = 1 ";
-													
-											if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-												$sql .= " and PrOrcSubcategoria = ".$row['OrcamSubCategoria'];
-											}
-											$result = $conn->query($sql);
-											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-										} */
 
 									$cont = 0;
 
@@ -434,7 +306,8 @@ try {
 									print('<div id="tabelaProdutos">');
 
 									$fTotalGeral = 0;
-
+									
+									//Verifica se o TR tem produtos usando a tabela ProdutoOrcamento
 									if (count($rowProdutosOrcamento) >= 1) {
 
 										$sql = "SELECT *
@@ -444,8 +317,10 @@ try {
 											    WHERE TXOXPUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
 										$result = $conn->query($sql);
 										$rowProdutosOrc = $result->fetchAll(PDO::FETCH_ASSOC);
-										$countProdutoOrc = count($rowProdutos);
+										$countProdutoOrc = count($rowProdutosOrc);
 
+										//Verifica se a tabela de TRXOrcamentoXProduto já tem algum registro referente a esse Orçamento, se sim, preenche os dados com as informações dessa tabela,
+										//do contrário os dados devem vir do TR (já que o Orçamento deve refletir o TR), ou seja, no caso de ser um Orçamento novo que ainda não foi gravado.
 										if ($countProdutoOrc >= 1) {
 
 											foreach ($rowProdutosOrc as  $item) {
@@ -485,7 +360,7 @@ try {
 												        </div>											
 													</div>');
 											}
-										} else {
+										} else { 
 
 											foreach ($rowProdutosOrcamento as $item) {
 

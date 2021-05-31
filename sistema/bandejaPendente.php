@@ -3,7 +3,7 @@
 
 	print('
 	<tr class="table-active table-border-double">
-		<td colspan="3">Ações Aguardando Liberação</td>
+		<td colspan="3">Ações Aguardando Liberação/Finalização</td>
 		<td class="text-right">
 			<span class="badge bg-blue badge-pill">'.$totalPendente.'</span>
 		</td>
@@ -31,7 +31,7 @@
 						</a>
 					</div>
 					<div>
-						<a href="#" class="text-default font-weight-semibold letter-icon-title">'.nomeSobrenome($item['UsuarNome'], 2).'</a>
+						<span class="text-default font-weight-semibold letter-icon-title">'.nomeSobrenome($item['UsuarNome'], 2).'</span>
 						<div class="text-muted font-size-sm"><span class="badge badge-mark border-blue mr-1"></span> '.$item['SituaNome'].'</div>
 					</div>
 				</div>
@@ -80,42 +80,56 @@
 							<div class="dropdown-divider"></div>
 		');
 
-			//Verifica se for Solicitação e se o Setor atual de quem solicitou não houve alteração, já que não faz sentido aprovar uma solicitação para um setor antigo de quem solicitou
-			if(isset($item['BandePerfil']) && $item['BandePerfil'] !== null && $item['BandePerfil'] !== '' && $item['BandePerfil'] === 'CENTROADMINISTRATIVO'){
-					print('
-						<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberarCentroAdministrativo\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
-										
-						<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'naoliberar\');" class="dropdown-item" id="motivo"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
+		//Aqui verifica se o BandeUsuario está preenchido e se é TR, se sim, significa que é um presidente de Comissão
+		if ($item['BandeUsuario'] == $_SESSION['UsuarId'] && $item['BandeTabela'] == 'TermoReferencia'){
 
-									</div>
+			print('<a href="tr.php" class="dropdown-item"><i class="icon-circle-right2"></i> Acessar TR</a>');
+			
+			if ($item['SituaChaveTR'] == 'LIBERADO'){
+				print('<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'finalizarTR\', '.$item['BandeUsuario'].');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Finalizar TR</a>');
+			}			
+
+			print('
 								</div>
 							</div>
-						</td>
-					</tr>
-					'); 
-			} else if(isset($item['BandePerfil']) && $item['BandePerfil'] !== null && $item['BandePerfil'] !== '' && $item['BandePerfil'] === 'CONTABILIDADE'){
-				print('
-					<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberarContabilidade\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
+						</div>
+					</td>
+				</tr>
+			'); 			
 
-									</div>
+		} else if (isset($item['BandePerfil']) && $item['BandePerfil'] !== null && $item['BandePerfil'] !== '' && $item['BandePerfil'] === 'CENTROADMINISTRATIVO'){
+			print('
+				<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberarCentroAdministrativo\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
+								
+				<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'naoliberar\');" class="dropdown-item" id="motivo"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
+
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+			'); 
+		} else if(isset($item['BandePerfil']) && $item['BandePerfil'] !== null && $item['BandePerfil'] !== '' && $item['BandePerfil'] === 'CONTABILIDADE'){
+			print('
+				<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberarContabilidade\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
+
 								</div>
 							</div>
-						</td>
-					</tr>
-				'); 
-
-			} else {
-				print('
-					<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberar\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
-				
-					<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'naoliberar\');" class="dropdown-item" id="motivo"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
-									</div>
+						</div>
+					</td>
+				</tr>
+			'); 
+		} else {
+			print('
+				<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberar\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>
+				<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'naoliberar\');" class="dropdown-item" id="motivo"><i class="icon-cross2 text-danger"></i> Não Liberar</a>
 								</div>
 							</div>
-						</td>
-					</tr>
-				');
-			}
+						</div>
+					</td>
+				</tr>
+			');
+		}
 	}
 
 ?>

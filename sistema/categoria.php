@@ -255,8 +255,6 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação de Categorias</h3>
-								
-
 							</div>
 
 							<div class="card-body">

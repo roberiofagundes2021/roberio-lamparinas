@@ -20,78 +20,60 @@ if (isset($_POST['inputTRId'])){
 
 try {
 
-	$sql = "
-		SELECT TrRefNumero, 
-					 TrRefConteudoInicio, 
-					 TrRefConteudoFim, 
-					 CategNome
+	$sql = "SELECT TrRefNumero, TrRefConteudoInicio, TrRefConteudoFim, CategNome
 			FROM TermoReferencia
-			JOIN Categoria 
-				ON CategId = TrRefCategoria
-		 WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " 
-		   AND TrRefId = " . $iTR;
+			JOIN Categoria ON CategId = TrRefCategoria
+		 	WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " 
+		   	AND TrRefId = " . $iTR;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
-	$sql = "
-		SELECT *
-		  FROM TRXSubcategoria
-			JOIN SubCategoria 
-				ON SbCatId = TRXSCSubcategoria
-		 WHERE TRXSCUnidade = " . $_SESSION['UnidadeId'] . " 
-		 	 AND TRXSCTermoReferencia = " . $iTR;
+	$sql = "SELECT *
+		  	FROM TRXSubcategoria
+			JOIN SubCategoria ON SbCatId = TRXSCSubcategoria
+		 	WHERE TRXSCUnidade = " . $_SESSION['UnidadeId'] . " 
+		 	AND TRXSCTermoReferencia = " . $iTR."
+			ORDER BY SbCatNome ASC";
 	$result = $conn->query($sql);
 	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	// Selects para identificar a a tabela de origem dos produtos da TR.
-	$sql = "
-		SELECT COUNT(TRXPrProduto) as CONT
+	$sql = "SELECT COUNT(TRXPrProduto) as CONT
 			FROM TermoReferenciaXProduto
-			JOIN ProdutoOrcamento 
-			  ON PrOrcId = TRXPrProduto
-		 WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " 
-			 AND TRXPrTermoReferencia = " . $iTR . " 
-			 AND TRXPrTabela = 'ProdutoOrcamento'
-	";
+			JOIN ProdutoOrcamento ON PrOrcId = TRXPrProduto
+		 	WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " 
+			AND TRXPrTermoReferencia = " . $iTR . " 
+			AND TRXPrTabela = 'ProdutoOrcamento' ";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
 
-	$sql = "
-		SELECT COUNT(TRXPrProduto) as CONT
+	$sql = "SELECT COUNT(TRXPrProduto) as CONT
 			FROM TermoReferenciaXProduto
-			JOIN Produto 
-				ON ProduId = TRXPrProduto
-		 WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
-		   AND TRXPrTermoReferencia = " . $iTR . " 
-			 AND TRXPrTabela = 'Produto'
-	";
+			JOIN Produto ON ProduId = TRXPrProduto
+		 	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+		   	AND TRXPrTermoReferencia = " . $iTR . " 
+			AND TRXPrTabela = 'Produto'	";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
 
 	// Selects para identificar a a tabela de origem dos serviços da TR.
-	$sql = "
-		SELECT COUNT(TRXSrServico) as CONT
+	$sql = "SELECT COUNT(TRXSrServico) as CONT
 			FROM TermoReferenciaXServico
-			JOIN ServicoOrcamento 
-				ON SrOrcId = TRXSrServico
-		 WHERE TRXSrUnidade = " . $_SESSION['UnidadeId'] . " 
-		   AND TRXSrTermoReferencia = " . $iTR . " 
-			 AND TRXSrTabela = 'ServicoOrcamento'
-	";
+			JOIN ServicoOrcamento ON SrOrcId = TRXSrServico
+		 	WHERE TRXSrUnidade = " . $_SESSION['UnidadeId'] . " 
+		   	AND TRXSrTermoReferencia = " . $iTR . " 
+			AND TRXSrTabela = 'ServicoOrcamento' ";
 	$result = $conn->query($sql);
-	$rowServicoUtilizado1 = $result->fetch(PDO::FETCH_ASSOC);
+	$rowServicoOrcamentoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
 
-	$sql = "
-		SELECT COUNT(TRXSrServico) as CONT
+	$sql = "SELECT COUNT(TRXSrServico) as CONT
 			FROM TermoReferenciaXServico
-			JOIN Servico 
-				ON ServiId = TRXSrServico
-		 WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
-		   AND TRXSrTermoReferencia = " . $iTR . " 
-			 AND TRXSrTabela = 'Servico'
-	";
+			JOIN Servico ON ServiId = TRXSrServico
+		 	WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
+		   	AND TRXSrTermoReferencia = " . $iTR . " 
+			AND TRXSrTabela = 'Servico'	";
 	$result = $conn->query($sql);
-	$rowServicoUtilizado2 = $result->fetch(PDO::FETCH_ASSOC);
+	$rowServicoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
 
 	$totalProdutos = 0;
 	$totalServicos = 0;
@@ -141,7 +123,7 @@ try {
 
 			<div style='text-align:center; margin-top: 20px;'><h1>TERMO DE REFERÊNCIA</h1></div>
 	";
-
+	$html .= " Testes ".$iTR;
 	$html .= '
 	<div>' . $row['TrRefConteudoInicio'] . '</div>
 	<br>';
@@ -159,7 +141,9 @@ try {
 
 		$cont = 1;
 
-		foreach ($rowSubCategoria as $sbcat) {			
+		foreach ($rowSubCategoria as $sbcat) {
+			
+			$totalProdutos = 0;
 
 			//Se foi utilizado ProdutoOrcamento
 			if($rowProdutoUtilizado1['CONT'] > 0){
@@ -233,7 +217,7 @@ try {
 		} 
 	}
 
-	if ($rowServicoUtilizado1['CONT'] > 0 || $rowServicoUtilizado2['CONT'] > 0){
+	if ($rowServicoOrcamentoUtilizado['CONT'] > 0 || $rowServicoUtilizado['CONT'] > 0){
 
 		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
 
@@ -247,10 +231,12 @@ try {
 		$cont = 1;
 
 		foreach ($rowSubCategoria as $sbcat) {
+			
+			$totalServicos = 0;
 
 			//Se foi utilizado ServicoOrcamento
-			if($rowServicoUtilizado1['CONT'] > 0){
-				$sql = "SELECT SrOrcId as Id, SrOrcNome as Nome, SrOrcCategoria as Categoria, SrOrcSubCategoria as SubCategoria
+			if($rowServicoOrcamentoUtilizado['CONT'] > 0){
+				$sql = "SELECT SrOrcId as Id, SrOrcNome as Nome, SrOrcCategoria as Categoria, SrOrcSubCategoria as SubCategoria,
 						SrOrcDetalhamento as Detalhamento, TRXSrQuantidade
 						FROM ServicoOrcamento
 						JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId

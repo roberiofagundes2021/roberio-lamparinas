@@ -25,9 +25,9 @@
 
 	$sql = "
 		SELECT DtOrcId, 
-					 DtOrcData, 
-					 DtOrcNome, 
-					 DtOrcArquivo
+				DtOrcData, 
+				DtOrcNome, 
+				DtOrcArquivo
 			FROM DotacaoOrcamentaria
 		 WHERE DtOrcUnidade = ". $_SESSION['UnidadeId'] ." 
 			 AND DtOrcTermoReferencia = ". $_SESSION['inputTRIdDotacao'] ."
@@ -61,6 +61,11 @@
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<script src="global_assets/js/lamparinas/stop-back.js"></script>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	
 	<!-- /theme JS files -->	
 	
@@ -125,11 +130,18 @@
 			$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
-							
+
+				var inputDescricao = $('#inputNome').val();			
 				var inputFile = $('#inputArquivo').val();
 				var id = $("input:file").attr('id');
 				var tamanho =  1024 * 1024 * 32; //32MB
-								
+
+				if (inputDescricao == ''){
+					$("#formDotacaoFields").submit();
+					$('#inputNome').focus();
+					return false;
+				}
+
 				//Verifica se o campo só possui espaços em branco
 				if (inputFile == ''){
 					alerta('Atenção','Selecione o arquivo!','error');
@@ -220,9 +232,16 @@
 							</div>
 
 							<div class="card-body">
-								<p>
-									A relação abaixo faz referência as Dotações Orçamentárias do Termo de Referência <span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['inputTRNumero']; ?> </span>
-								</p>
+								<div class="row">
+									<div class="col-lg-7">
+										A relação abaixo faz referência as Dotações Orçamentárias do Termo de Referência <span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['inputTRNumero']; ?> </span>
+									</div>
+									<div class="col-lg-5">	
+										<div class="text-right">
+											<a href="tr.php" class="btn btn-basic" role="button"><< Termo de Referência</a>
+										</div>
+									</div>
+								</div>								
 
 								<form name="formDotacaoFields" id="formDotacaoFields" method="post" enctype="multipart/form-data" class="form-validate-jquery">
 									<div class="row">
@@ -253,14 +272,12 @@
 										</div>									
 									</div>
 
-									
-									<div class="row" style="margin-top: 30px;">
+									<div class="row" style="margin-top: 10px;">
 										<div class="col-lg-12">								
 											<div class="form-group">
 												<?php if ($count <= 0) : ?>
 													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-												<?php endif; ?>
-												<a href="tr.php" class="btn btn-basic" role="button"><< Termo de Referência</a>
+												<?php endif; ?>												
 											</div>
 										</div>
 									</div>
@@ -288,7 +305,7 @@
 												<td>'.$item['DtOrcNome'].'</td>
 
 												<td>
-													<a href="global_assets/anexos/cliente/'.$item['DtOrcArquivo'].'" target="_blank">'.$item['DtOrcArquivo'].'</a>
+													<a href="global_assets/anexos/dotacaoOrcamentaria/'.$item['DtOrcArquivo'].'" target="_blank">'.$item['DtOrcArquivo'].'</a>
 												</td>
 												
 												<td class="text-center">

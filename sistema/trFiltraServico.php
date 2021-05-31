@@ -81,7 +81,7 @@ if (count($rowServicosOrcamento) >= 1) {
 		$quantidade = isset($_POST['servicoQuant'][$id]) ? $_POST['servicoQuant'][$id] : '';
 
 		$output .= ' <div class="row" style="margin-top: 8px;">
-					<div class="col-lg-9">
+					<div class="col-lg-10">
 						<div class="row">
 							<div class="col-lg-1">
 								<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>

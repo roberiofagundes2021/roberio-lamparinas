@@ -6,10 +6,14 @@ $_SESSION['PaginaAtual'] = 'Novo Contrato ';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputTRId'])){
+	$iTR = $_POST['inputTRId'];
+}
+
 $sql = "SELECT TrRefId, TrRefNumero, TrRefCategoria, CategNome, CategId, TrRefConteudoInicio, TrRefConteudoFim
 		FROM TermoReferencia
 		JOIN Categoria ON CategId = TrRefCategoria
-		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = 151";	
+		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = ".$iTR;	
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -277,6 +281,7 @@ if (isset($_POST['inputDataInicio'])) {
 										<label for="inputTermoReferencia">Nº do Termo de Referência</label>
 										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $row['TrRefNumero']; ?>" readOnly>
 										<input type="hidden" id="inputTermoReferenciaId" name="inputTermoReferenciaId" value="<?php echo $row['TrRefId']; ?>">
+										<input type="hidden" id="inputTRId" name="inputTRId" value="<?php echo $row['TrRefId']; ?>">										
 									</div>
 								</div>
                             </div>

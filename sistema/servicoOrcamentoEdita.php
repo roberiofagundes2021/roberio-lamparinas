@@ -7,12 +7,13 @@ $_SESSION['PaginaAtual'] = 'Editar Serviço de Orçamento';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT TRXSrTermoReferencia
-	            FROM TermoReferenciaXServico
-				JOIN ServicoOrcamento on SrOrcId =TRXSrServico
-	            JOIN TermoReferencia on TrRefId =TRXSrTermoReferencia
-				JOIN Situacao on Situaid = TrRefStatus
-	            WHERE TRXSrServico = " . $_POST['inputSrOrcId'] . " and (SituaChave = 'ATIVO' or SituaChave = 'AGUARDANDOLIBERACAO' or SituaChave = 'FINALIZADO')  and TRXSrUnidade = " . $_SESSION['UnidadeId'] . "
-	            ";
+		FROM TermoReferenciaXServico
+		JOIN ServicoOrcamento on SrOrcId =TRXSrServico
+		JOIN TermoReferencia on TrRefId =TRXSrTermoReferencia
+		JOIN Situacao on Situaid = TrRefStatus
+		WHERE TRXSrServico = " . $_POST['inputSrOrcId'] . " and 
+		SituaChave in ('LIBERADO', 'LIBERADOPARCIAL', 'FASEINTERNAFINALIZADA') and 
+		TRXSrUnidade = " . $_SESSION['UnidadeId'];
 $result = $conn->query($sql);
 $rowTrs = $result->fetchAll(PDO::FETCH_ASSOC);
 $contTRs = count($rowTrs);
@@ -23,7 +24,7 @@ $sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubCa
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 //$count = count($row);
-
+//echo $sql;die;
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +57,6 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				Filtrando();
 				let option = null; //'<option>Selecione a SubCategoria</option>';
 				const categId = $('#cmbCategoria').val();
-				const selectedId = $('#cmbSubCategoria').attr('valId');
 
 				$.getJSON('filtraSubCategoria.php?idCategoria=' + categId, function(dados) {
 					//let option = '<option>Selecione a SubCategoria</option>';
@@ -64,11 +64,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 					if (dados.length) {
 
 						$.each(dados, function(i, obj) {
-							if (obj.SbCatId == selectedId) {
-								option += '<option value="' + obj.SbCatId + '" selected>' + obj.SbCatNome + '</option>';
-							} else {
-								option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
-							}
+							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
 						});
 
 						$('#cmbSubCategoria').html(option).show();
@@ -83,14 +79,14 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				Filtrando();
 				let option = null; //'<option>Selecione a SubCategoria</option>';
 				const categId = $('#cmbCategoria').val();
-				const selectedId = $('#cmbSubCategoria').attr('valId');
+				const subCategId = $('#cmbSubCategoria').val();
 
 				$.getJSON('filtraSubCategoria.php?idCategoria=' + categId, function(dados) {
 
 					if (dados.length) {
 
 						$.each(dados, function(i, obj) {
-							if (obj.SbCatId == selectedId) {
+							if (obj.SbCatId == subCategId) {
 								option += '<option value="' + obj.SbCatId + '" selected>' + obj.SbCatNome + '</option>';
 							} else {
 								option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
@@ -155,6 +151,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 					<form id="formServico" name="formServico" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Serviço</h5>
+							<input id="inputSubCategoria" name="inputSubCategoria" type="hidden" value="<?php echo $row['SrOrcSubCategoria'] ?>">
 						</div>
 						<div class="card-body">
 							<div class="media">
@@ -188,19 +185,18 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required <?php $contTRs >= 1 ? print('disabled') : ''?>>
 													<?php
-													$sql = "SELECT CategId, CategNome
-															FROM Categoria
-															JOIN Situacao on SituaId = CategStatus
-															WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															ORDER BY CategNome ASC";
-													$result = $conn->query($sql);
-													$rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);
+														$sql = "SELECT CategId, CategNome
+																FROM Categoria
+																JOIN Situacao on SituaId = CategStatus
+																WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY CategNome ASC";
+														$result = $conn->query($sql);
+														$rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowCateg as $item) {
-														$seleciona = $item['CategId'] == $row['SrOrcCategoria'] ? "selected" : "";
-														print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
-													}
-
+														foreach ($rowCateg as $item) {
+															$seleciona = $item['CategId'] == $row['SrOrcCategoria'] ? "selected" : "";
+															print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
+														}
 													?>
 												</select>
 											</div>
@@ -208,7 +204,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" valId="<?php echo $row['SrOrcSubcategoria']; ?>" <?php $contTRs >= 1 ? print('disabled') : ''?>>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" <?php $contTRs >= 1 ? print('disabled') : ''?>>
 													<option id="selec" required></option>
 												</select>
 											</div>

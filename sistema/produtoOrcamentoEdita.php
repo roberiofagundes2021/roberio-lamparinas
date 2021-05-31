@@ -11,13 +11,14 @@ $sql = "SELECT TRXPrTermoReferencia
 		JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
 		JOIN TermoReferencia on TrRefId = TRXPrTermoReferencia
 		JOIN Situacao on Situaid = TrRefStatus
-		WHERE TRXPrProduto = " . $_POST['inputPrOrcId']. " and (SituaChave = 'ATIVO' or SituaChave = 'AGUARDANDOLIBERACAO' or SituaChave = 'FINALIZADO')  and TRXPrUnidade = " . $_SESSION['UnidadeId'] . "
-		";
+		WHERE TRXPrProduto = " . $_POST['inputPrOrcId']. " and 
+		SituaChave in ('LIBERADO', 'LIBERADOPARCIAL', 'FASEINTERNAFINALIZADA') and 
+		TRXPrUnidade = " . $_SESSION['UnidadeId'];
 $result = $conn->query($sql);
 $rowTrs = $result->fetchAll(PDO::FETCH_ASSOC);
 $contTRs = count($rowTrs);
 
-$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubcategoria, PrOrcUnidadeMedida 
+$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubCategoria, PrOrcUnidadeMedida 
 		FROM ProdutoOrcamento
 		WHERE PrOrcId = " . $_POST['inputPrOrcId'] . " and PrOrcUnidade = " . $_SESSION['UnidadeId'];
 $result = $conn->query($sql);
@@ -56,18 +57,13 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				Filtrando();
 				let option = null; //'<option>Selecione a SubCategoria</option>';
 				const categId = $('#cmbCategoria').val();
-				const selectedId = $('#cmbSubCategoria').attr('valId');
 
 				$.getJSON('filtraSubCategoria.php?idCategoria=' + categId, function(dados) {
 
 					if (dados.length) {
 
 						$.each(dados, function(i, obj) {
-							if (obj.SbCatId == selectedId) {
-								option += '<option value="' + obj.SbCatId + '" selected>' + obj.SbCatNome + '</option>';
-							} else {
-								option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
-							}
+							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
 						});
 
 						$('#cmbSubCategoria').html(option).show();
@@ -82,8 +78,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				Filtrando();
 				let option = null; //'<option>Selecione a SubCategoria</option>';
 				const categId = $('#cmbCategoria').val()
-				const selectedId = $('#cmbSubCategoria').attr('valId')
-				console.log(selectedId)
+				const subCategId = $('#inputSubCategoria').val();
 
 				$.getJSON('filtraSubCategoria.php?idCategoria=' + categId, function(dados) {
 					//let option = '<option>Selecione a SubCategoria</option>';
@@ -91,7 +86,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 					if (dados.length) {
 
 						$.each(dados, function(i, obj) {
-							if (obj.SbCatId == selectedId) {
+							if (obj.SbCatId == subCategId) {
 								option += '<option value="' + obj.SbCatId + '" selected>' + obj.SbCatNome + '</option>';
 							} else {
 								option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
@@ -123,8 +118,8 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
 
-				$('#cmbCategoria').removeAttr('disabled')
-				$('#cmbSubCategoria').removeAttr('disabled')
+				//$('#cmbCategoria').removeAttr('disabled')
+				//$('#cmbSubCategoria').removeAttr('disabled')
 
 				$("#formProduto").attr('action', 'produtoOrcamentoEditaAction.php').submit();
 			});
@@ -155,6 +150,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 					<form id="formProduto" name="formProduto" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Produto</h5>
+							<input id="inputSubCategoria" name="inputSubCategoria" type="hidden" value="<?php echo $row['PrOrcSubCategoria'] ?>">
 						</div>
 						<div class="card-body">
 							<div class="media">
@@ -208,7 +204,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required <?php $contTRs >= 1 ? print('disabled') : ''?>>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required <?php $contTRs >= 1 ? print('readOnly') : ''?>>
 													<?php
 													$sql = "SELECT CategId, CategNome
 															FROM Categoria
@@ -230,7 +226,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" valId="<?php echo $row['PrOrcSubcategoria']; ?>" <?php $contTRs >= 1 ? print('disabled') : ''?>>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" <?php $contTRs >= 1 ? print('readOnly') : ''?>>
 													<option id="selec" required></option>
 												</select>
 											</div>
