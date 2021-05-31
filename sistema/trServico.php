@@ -132,6 +132,39 @@ foreach ($rowSubCat as $item) {
 	}
 }
 
+//Select que verifica a tabela de origem dos servicos dessa TR.
+$sql = "SELECT TRXSrServico
+		FROM TermoReferenciaXServico
+		JOIN ServicoOrcamento on SrOrcId = TRXSrServico
+		WHERE TRXSrUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'";
+$result = $conn->query($sql);
+$rowServicoOrcamentoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+$countServicoOrcamentoUtilizado = count($rowServicoOrcamentoUtilizado);
+
+if (count($rowServicoOrcamentoUtilizado) >= 1) {
+	foreach ($rowServicoOrcamentoUtilizado as $itemServicoOrcamentoUtilizado) {
+		$aServicosOrcamento[] = $itemServicoOrcamentoUtilizado['TRXSrServico'];
+	}
+} else {
+	$aServicosOrcamento = [];
+}
+
+$sql = "SELECT TRXSrServico
+		FROM TermoReferenciaXServico
+		JOIN Servico on ServiId = TRXSrServico
+		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
+$result = $conn->query($sql);
+$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+$countServicoUtilizado = count($rowServicoUtilizado);
+
+if (count($rowServicoUtilizado) >= 1) {
+	foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
+		$aServicos[] = $itemServicoUtilizado['TRXSrServico'];
+	}
+} else {
+	$aServicos[] = [];
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -309,10 +342,10 @@ foreach ($rowSubCat as $item) {
 																	AND SituaChave = 'ATIVO' 
 																	AND SrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
 																	AND SrOrcCategoria = " . $iCategoria;
-
+																/*	
 																if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null) {
 																	$sql .= " and SrOrcSubCategoria = " . $row['TrRefSubCategoria'];
-																}
+																}*/
 																$sql .= " ORDER BY SrOrcNome ASC";
 																$result = $conn->query($sql);
 																$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -430,12 +463,14 @@ foreach ($rowSubCat as $item) {
 												TRXSrQuantidade, TRXSrTabela
 												FROM ServicoOrcamento
 												JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
+												JOIN SubCategoria on SbCatId = SrOrcSubCategoria
 												WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
 												AND TRXSrTermoReferencia = " . $iTR  . " 
-												AND TRXSrTabela = 'ServicoOrcamento' ";
+												AND TRXSrTabela = 'ServicoOrcamento' 
+												Order By SbCatNome ASC";
 										$result = $conn->query($sql);
 										$rowServicosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
-
+										//echo $sql;die;
 										$cont = 0;
 
 										print('

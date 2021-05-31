@@ -135,6 +135,43 @@ foreach ($rowSubCat as $item) {
 	}
 }
 
+//Select que verifica a tabela de origem dos produtos dessa TR.
+$sql = "SELECT TRXPrProduto
+		FROM TermoReferenciaXProduto
+		JOIN ProdutoOrcamento on PrOrcId = TRXPrProduto
+ 		WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " 
+   		AND TRXPrTermoReferencia = " . $iTR . " 
+	 	AND TRXPrTabela = 'ProdutoOrcamento' ";
+$result = $conn->query($sql);
+$rowProdutoOrcamentoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+$countProdutoOrcamentoUtilizado = count($rowProdutoOrcamentoUtilizado);
+
+if (count($rowProdutoOrcamentoUtilizado) >= 1) {
+	foreach ($rowProdutoOrcamentoUtilizado as $itemProdutoOrcamentoUtilizado) {
+		$aProdutosOrcamento[] = $itemProdutoOrcamentoUtilizado['TRXPrProduto'];
+	}
+} else {
+	$aProdutosOrcamento = [];
+}
+
+$sql = "SELECT TRXPrProduto
+		FROM TermoReferenciaXProduto
+		JOIN Produto on ProduId = TRXPrProduto
+ 		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+   		AND TRXPrTermoReferencia = " . $iTR . " 
+	 	AND TRXPrTabela = 'Produto' ";
+$result = $conn->query($sql);
+$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+$countProdutoUtilizado = count($rowProdutoUtilizado);
+
+if (count($rowProdutoUtilizado) >= 1) {
+	foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
+		$aProdutos[] = $itemProdutoUtilizado['TRXPrProduto'];
+	}
+} else {
+	$aProdutos[] = [];
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -312,7 +349,7 @@ foreach ($rowSubCat as $item) {
 																$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 
 																foreach ($rowProduto as $item) {
-																	if (in_array($item['PrOrcId'], $aProdutos1) or $countProdutoUtilizado1 == 0) {
+																	if (in_array($item['PrOrcId'], $aProdutosOrcamento) or $countProdutoOrcamentoUtilizado == 0) {
 																		$seleciona = "selected";
 																		print('<option value="' . $item['PrOrcId'] . '" ' . $seleciona . '>' . $item['PrOrcNome'] . '</option>');
 																	} else {
@@ -340,7 +377,7 @@ foreach ($rowSubCat as $item) {
 																$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 
 																foreach ($rowProduto as $item) {
-																	if (in_array($item['ProduId'], $aProdutos2)) {
+																	if (in_array($item['ProduId'], $aProdutos)) {
 																		$seleciona = "selected";
 																		print('<option value="' . $item['ProduId'] . '" ' . $seleciona . '>' . $item['ProduNome'] . '</option>');
 																	} else {
@@ -362,7 +399,7 @@ foreach ($rowSubCat as $item) {
 															$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 
 															foreach ($rowProduto as $item) {
-																if (in_array($item['ProduId'], $aProdutos2)) {
+																if (in_array($item['ProduId'], $aProdutos)) {
 																	$seleciona = "selected";
 																	print('
 																		<option value="' . $item['ProduId'] . '" ' . $seleciona . '>' . $item['ProduNome'] . '</option>
@@ -408,9 +445,11 @@ foreach ($rowSubCat as $item) {
 												FROM ProdutoOrcamento
 												JOIN TermoReferenciaXProduto ON TRXPrProduto = PrOrcId
 												JOIN UnidadeMedida ON UnMedId = PrOrcUnidadeMedida
+												JOIN SubCategoria on SbCatId = PrOrcSubCategoria
 											 	WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
 											   	AND TRXPrTermoReferencia = " . $iTR  . " 
-												AND TRXPrTabela	= 'ProdutoOrcamento' ";
+												AND TRXPrTabela	= 'ProdutoOrcamento' 
+												Order By SbCatNome ASC";
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$cont = 0;
