@@ -120,7 +120,7 @@
                   
                   //Empresa pública e o menu visível para o Setor Público ou Empresa Privada e o menu visível para o Setor Privado
                   if (($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado'])){
-                      echo  ($men['MenuSubMenu'] == 1? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
+                      echo  ($men['MenuSubMenu'] == 1 ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
                         '<a href="'.$men['MenuUrl'].'"';
                         if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
                           {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
@@ -130,19 +130,23 @@
                         .'</span>
                       </a>';
                   }
-                  
-                  echo '<ul class="nav nav-group-sub" data-submenu-title="Text editors">';
-                  
-                  foreach($menu as $men_f){
+
+                  if($men['MenuSubMenu'] == 1) {
+
+                    echo '<ul class="nav nav-group-sub" data-submenu-title="Text editors">';
+
+                    foreach($menu as $men_f){
+                   
+                      if($men_f['MenuPai'] == $men['MenuId']){
+                          
+                        if (($empresa == 'Publica' && $men_f['MenuSetorPublico']) || ($empresa == 'Privada' && $men_f['MenuSetorPrivado'])){
+                          echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link">'.$men_f['MenuNome'].'</a></li>';
+                        }
+                      } 
+                    } 
                     
-                    if($men_f['MenuPai'] == $men['MenuId']){
-                      
-                      if ($men['MenuSubMenu'] == 1 && (($empresa == 'Publica' && $men_f['MenuSetorPublico']) || ($empresa == 'Privada' && $men_f['MenuSetorPrivado']))){
-                        echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link">'.$men_f['MenuNome'].'</a></li>';
-                      }
-                    }
+                    echo '</ul>';
                   }
-                  echo '</ul>';
 
                   echo '</li>';
                 }

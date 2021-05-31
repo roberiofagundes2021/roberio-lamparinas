@@ -18,8 +18,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 $sql = "SELECT ParamPrecoGridServico
 	    FROM Parametro
-		WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . "
-	   ";
+		WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
 $result = $conn->query($sql);
 $parametro = $result->fetch(PDO::FETCH_ASSOC);
 
