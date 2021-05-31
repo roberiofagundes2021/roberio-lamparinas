@@ -20,7 +20,7 @@ $sql = "SELECT ParamPrecoGridServico
 	    FROM Parametro
 		WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
 $result = $conn->query($sql);
-$par = $result->fetch(PDO::FETCH_ASSOC);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -302,15 +302,9 @@ $par = $result->fetch(PDO::FETCH_ASSOC);
 										<th>Categoria</th>
 										<th>SubCategoria</th>
 										<?php
-<<<<<<< HEAD
-										if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') print('<th>Preço Custo Final</th>');
-										else if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOCUSTO') print('<th>Preço Custo</th>');
-										else if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOVENDA') print('<th>Preço Venda</th>');
-=======
-										if ($par['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') print('<th>Preço Custo Final</th>');
-										else if ($par['ParamPrecoGridServico'] == 'PRECOCUSTO') print('<th>Preço Custo</th>');
-										else if ($par['ParamPrecoGridServico'] == 'PRECOVENDA') print('<th>Preço Venda</th>');
->>>>>>> 63abbe4dce88679d854fb3f06c9159e7d5a924f9
+										if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') print('<th>Preço Custo Final</th>');
+										else if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOCUSTO') print('<th>Preço Custo</th>');
+										else if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOVENDA') print('<th>Preço Venda</th>');
 										else print('<th>Preço Venda</th>');
 										?>
 										<th>Situação</th>
@@ -323,15 +317,9 @@ $par = $result->fetch(PDO::FETCH_ASSOC);
 
 										$tipoValorServico = '';										
 
-<<<<<<< HEAD
-										if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') $tipoValorServico = '<td>' . formataMoeda($item['ServiCustoFinal']) . '</td>';
-										else if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOCUSTO') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorCusto']) . '</td>';
-										else if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOVENDA') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
-=======
-										if ($par['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') $tipoValorServico = '<td>' . formataMoeda($item['ServiCustoFinal']) . '</td>';
-										else if ($par['ParamPrecoGridServico'] == 'PRECOCUSTO') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorCusto']) . '</td>';
-										else if ($par['ParamPrecoGridServico'] == 'PRECOVENDA') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
->>>>>>> 63abbe4dce88679d854fb3f06c9159e7d5a924f9
+										if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') $tipoValorServico = '<td>' . formataMoeda($item['ServiCustoFinal']) . '</td>';
+										else if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOCUSTO') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorCusto']) . '</td>';
+										else if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOVENDA') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
 										else $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
 	
 										$situacao = $item['SituaNome'];
