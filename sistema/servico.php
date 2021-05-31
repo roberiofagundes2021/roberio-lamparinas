@@ -302,9 +302,9 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 										<th>Categoria</th>
 										<th>SubCategoria</th>
 										<?php
-										if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') print('<th>Preço Custo Final</th>');
-										else if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTO') print('<th>Preço Custo</th>');
-										else if ($parametro['ParamPrecoGridServico'] == 'PRECOVENDA') print('<th>Preço Venda</th>');
+										if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') print('<th>Preço Custo Final</th>');
+										else if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOCUSTO') print('<th>Preço Custo</th>');
+										else if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOVENDA') print('<th>Preço Venda</th>');
 										else print('<th>Preço Venda</th>');
 										?>
 										<th>Situação</th>
@@ -317,9 +317,9 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 
 										$tipoValorServico = '';										
 
-										if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') $tipoValorServico = '<td>' . formataMoeda($item['ServiCustoFinal']) . '</td>';
-										else if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTO') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorCusto']) . '</td>';
-										else if ($parametro['ParamPrecoGridServico'] == 'PRECOVENDA') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
+										if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') $tipoValorServico = '<td>' . formataMoeda($item['ServiCustoFinal']) . '</td>';
+										else if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOCUSTO') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorCusto']) . '</td>';
+										else if (isset($parametro['ParamPrecoGridServico']) && $parametro['ParamPrecoGridServico'] == 'PRECOVENDA') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
 										else $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
 	
 										$situacao = $item['SituaNome'];
