@@ -160,7 +160,7 @@ if(isset($_POST['usuario'])){
 						$_SESSION['EmpreFoto'] = $row['EmpreFoto'];
 						$_SESSION['UnidadeId'] = $rowUnidade[0]['UnidaId'];
 						$_SESSION['UnidadeNome'] = $rowUnidade[0]['UnidaNome'];
-						$_SESSION['PerfiChave'] = $row['PerfiChave'];					
+						$_SESSION['PerfiChave'] = $row['PerfiChave'];
 						//$_SESSION['UsuarLogado'] = 1;
 						
 						unset($_SESSION['UsuarSenha']);

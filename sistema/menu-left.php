@@ -1,21 +1,36 @@
 <?php
   include('global_assets/php/conexao.php');
+  $unidade = $_SESSION['UnidadeId'];
+  $perfil = 1;
+  // $perfil = $_SESSION['PerfiChave'];
 
-  $sqlModulo = "SELECT M.ModulId, M.ModulOrdem, M.ModulNome, M.ModulStatus, S.SituaChave, S.SituaCor
-  FROM modulo M join situacao S on M.ModulStatus = S.SituaId order by M.ModulOrdem asc";
+  // $sqlPerfil = "SELECT PerfiId FROM Perfil
+  // WHERE PerfiChave = '$perfil'";
+
+  // $resultPerfilId = $conn->query($sqlPerfil);
+  // $perfilId = $resultPerfilId->fetchAll(PDO::FETCH_ASSOC);
+  // $perfilId = $perfilId[0]['PerfiId'];
+
+  $sqlModulo = "SELECT ModulId, ModulOrdem, ModulNome, ModulStatus, SituaChave, SituaCor
+  FROM modulo join situacao on ModulStatus = SituaId order by ModulOrdem asc";
   $resultModulo = $conn->query($sqlModulo);
   $modulo = $resultModulo->fetchAll(PDO::FETCH_ASSOC);
 
-  $sqlMenu = "SELECT M.MenuId, M.MenuNome, M.MenuUrl, M.MenuIco, M.MenuSubMenu, M.MenuModulo,
-  M.MenuPai, M.MenuLevel, M.MenuOrdem, M.MenuStatus, S.SituaChave
-  FROM menu M join situacao S on M.MenuStatus = S.SituaId
+  $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo,
+  MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, 
+  PrXPeId, PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, 
+  PrXPeUnidade
+  FROM menu
+  join situacao on MenuStatus = SituaId
+  join PerfilXPermissao on MenuId=PrXPeMenu and PrXPeUnidade='$unidade' and PrXPePerfil='$perfil'
   order by MenuOrdem asc";
+
   $resultMenu = $conn->query($sqlMenu);
   $menu = $resultMenu->fetchAll(PDO::FETCH_ASSOC);
 
   $sqlSituacao = "SELECT SituaId, SituaNome, SituaChave, SituaStatus, SituaCor FROM situacao";
   $resultSituacao = $conn->query($sqlSituacao);
-  $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);		
+  $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 		
 ?>
 

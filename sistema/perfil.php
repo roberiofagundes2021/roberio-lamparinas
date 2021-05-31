@@ -220,8 +220,11 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				confirmaExclusao(document.formPerfil, "Tem certeza que deseja excluir esse perfil?", "perfilExclui.php");
 			} else if (Tipo == 'mudaStatus'){
 				document.formPerfil.action = "perfilMudaSituacao.php";
-			}		
-			
+			}
+			else if (Tipo == 'permicao'){
+				document.formPerfil.action = "perfilPermissao.php";
+			}
+
 			document.formPerfil.submit();
 		}		
 			
@@ -241,7 +244,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		<!-- Main content -->
 		<div class="content-wrapper">
 
-			<?php include_once("cabecalho.php"); ?>	
+			<?php include_once("cabecalho.php"); ?>
 
 			<!-- Content area -->
 			<div class="content">
@@ -252,7 +255,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h5 class="card-title">Relação de Perfis</h5>	
+								<h5 class="card-title">Relação de Perfis</h5>
 							</div>
 
 							<div class="card-body">
@@ -317,6 +320,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 													<div class="list-icons list-icons-extended">
 														<a href="#" onclick="atualizaPerfil('.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
 														<a href="#" onclick="atualizaPerfil('.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaPerfil('.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'permicao\');" class="list-icons-item"><i class="icon-lock2"></i></a>
 													</div>
 												</div>
 											</td>
