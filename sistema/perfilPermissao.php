@@ -5,8 +5,7 @@ include_once("sessao.php");
 $_SESSION['PaginaAtual'] = 'Permissões';
 
 $unidade = $_SESSION['UnidadeId'];
-$_SESSION['PerfilId'] = $_POST['inputPerfilId'];
-$perfilId = $_SESSION['PerfilId'];
+$allPerfilId = $_POST['inputPerfilId'];
 
 // ao recarregar fica sumindo o valor atribuido à $perfilId;
 
@@ -21,7 +20,7 @@ PrXPeId, PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir,
 PrXPeUnidade
 FROM menu
 join situacao on MenuStatus = SituaId
-join PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$perfilId'
+join PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$allPerfilId' and PrXPeUnidade = $unidade
 order by MenuOrdem asc";
 
 $resultMenuPxP = $conn->query($sqlMenuPxP);
@@ -211,7 +210,6 @@ td{
 								<tbody class="full-width">
 									<form id="form_id" method="POST">
 										<?php
-										echo "<input name='PerfId' value='".$perfil."' type='hidden'>";
 											foreach($moduloPxP as $mod){
 												if($mod['SituaChave'] == strtoupper("ativo")){
 													echo '<tr class="nav-item-header full-width">
@@ -220,7 +218,7 @@ td{
 																	</td>
 																</tr>';
 													foreach($menuPxP as $men){
-														if ($men["MenuModulo"] == $mod["ModulId"] && $men['MenuSubMenu'] == 0 && $men['SituaChave'] == strtoupper("ativo")){
+														if ($men["MenuModulo"] == $mod["ModulId"] && $men['MenuSubMenu'] == 0 && $men['MenuPai'] == 0 && $men['SituaChave'] == strtoupper("ativo")){
 															echo '<input name="MenuId" value='.$men['MenuId'].' type="hidden">';
 															echo '<input name="'.$men['PrXPeId'].'-PrXPeId" value='.$men['PrXPeId'].' type="hidden">';
 															echo '<tr>
@@ -253,6 +251,44 @@ td{
 																	echo '</div>
 																</td>
 															</tr>';
+														}
+														if($men['MenuSubMenu'] == 1  && $men["MenuModulo"] == $mod["ModulId"]){
+															foreach($menuPxP as $men_f){
+																if ($men_f["MenuPai"] == $men["MenuId"] && $men_f['SituaChave'] == strtoupper("ativo")){
+																	echo '<input name="MenuId" value='.$men_f['MenuId'].' type="hidden">';
+																	echo '<input name="'.$men_f['PrXPeId'].'-PrXPeId" value='.$men_f['PrXPeId'].' type="hidden">';
+																	echo '<tr>
+																		<td><h5>('.$men['MenuNome'].') - '.$men_f['MenuNome'].'</h5></td>
+																		<td class="text-center">
+																			<div class="list-icons">';
+																			if($men_f['PrXPeVisualizar']==0){
+																				echo '<input name="'.$men_f['PrXPeId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"/>';
+																			}else{
+																				echo '<input name="'.$men_f['PrXPeId'].'-view'.'" onclick="needSave()" value="view" type="checkbox" checked/>';
+																			}
+																			echo '</div>
+																		</td>
+																		<td class="text-center">
+																			<div class="list-icons">';
+																			if($men_f['PrXPeAtualizar']==0){
+																				echo '<input name="'.$men_f['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"/>';
+																			}else{
+																				echo '<input name="'.$men_f['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox" checked/>';
+																			}
+																			echo '</div>
+																		</td>
+																		<td class="text-center">
+																			<div class="list-icons">';
+																			if($men_f['PrXPeExcluir']==0){
+																				echo '<input name="'.$men_f['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"/>';
+																			}else{
+																				echo '<input name="'.$men_f['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox" checked/>';
+																			}
+																			echo '</div>
+																		</td>
+																	</tr>';
+																}
+															}
 														}
 													}
 												}

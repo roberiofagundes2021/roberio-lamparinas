@@ -6,7 +6,6 @@ $_SESSION['PaginaAtual'] = 'Permissões';
 
 include('global_assets/php/conexao.php');
 $MenuId = $_POST['MenuId'];
-$PerfId = $_POST['PerfId'];
 
 unset($_POST['MenuId']);
 unset($_POST['PerfId']);
@@ -15,15 +14,15 @@ try{
 			$id = explode("-", $key);
 
 			$sqlView = "UPDATE PerfilXPermissao set PrXPeVisualizar =".(array_key_exists($id[0]."-view", $_POST)? 1:0)."
-			where PrXPeId = '$id[0]' and PrXPePerfil = '$PerfId'";
+			where PrXPeId = '$id[0]'";
 			$conn->query($sqlView);
 
 			$sqlEdit = "UPDATE PerfilXPermissao set PrXPeAtualizar = ".(array_key_exists($id[0]."-edit", $_POST)? 1:0)."
-			where PrXPeId = '$id[0]' and PrXPePerfil = '$PerfId'";
+			where PrXPeId = '$id[0]'";
 			$conn->query($sqlEdit);
 
 			$sqlDelet = "UPDATE PerfilXPermissao set PrXPeExcluir = ".(array_key_exists($id[0]."-delet", $_POST)? 1:0)."
-			where PrXPeId = '$id[0]' and PrXPePerfil = '$PerfId'";
+			where PrXPeId = '$id[0]'";
 			$conn->query($sqlDelet);
 		}
 	$_SESSION['msg']['titulo'] = "Sucesso";
@@ -32,10 +31,10 @@ try{
 
 	irpara("perfil.php");
 } catch(PDOException $e) {
-	irpara("perfil.php");
 	$_SESSION['msg']['titulo'] = "Erro";
 	$_SESSION['msg']['mensagem'] = "Erro ao atualizar Premissão!!!";
-	$_SESSION['msg']['tipo'] = "error";				
+	$_SESSION['msg']['tipo'] = "error";
+	irpara("perfil.php");
 	
 	// echo 'Error: ' . $e->getMessage();
 }

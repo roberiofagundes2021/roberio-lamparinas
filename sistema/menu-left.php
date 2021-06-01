@@ -11,19 +11,23 @@
   $perfilId = $perfilId[0]['PerfiId'];
 
   //Recupera todos os módulos do sistema
-  $sqlModulo = "SELECT M.ModulId, M.ModulOrdem, M.ModulNome, M.ModulStatus, S.SituaChave, S.SituaCor
-                FROM Modulo M 
-                JOIN Situacao S on M.ModulStatus = S.SituaId 
-                ORDER BY M.ModulOrdem ASC";
+  $sqlModulo = "SELECT ModulId, ModulOrdem, ModulNome, ModulStatus, SituaChave, SituaCor
+                FROM Modulo 
+                JOIN Situacao on ModulStatus = SituaId 
+                ORDER BY ModulOrdem ASC";
+
   $resultModulo = $conn->query($sqlModulo);
   $modulo = $resultModulo->fetchAll(PDO::FETCH_ASSOC);
 
   //Recupera todos os menus do sistema
-  $sqlMenu = "SELECT M.MenuId, M.MenuNome, M.MenuUrl, M.MenuIco, M.MenuSubMenu, M.MenuModulo,
-                     M.MenuPai, M.MenuLevel, M.MenuOrdem, M.MenuSetorPublico, M.MenuSetorPrivado, M.MenuStatus, S.SituaChave
-              FROM Menu M 
-              JOIN Situacao S on M.MenuStatus = S.SituaId
-              ORDER BY MenuOrdem ASC";
+  $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico,
+              MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, PrXPeId, PrXPePerfil, MenuSetorPrivado
+              PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeUnidade
+              FROM menu
+              join situacao on MenuStatus = SituaId
+              join PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$perfilId' and PrXPeUnidade  = '$unidade'
+              order by MenuOrdem asc";
+
   $resultMenu = $conn->query($sqlMenu);
   $menu = $resultMenu->fetchAll(PDO::FETCH_ASSOC);
 
@@ -123,12 +127,11 @@
                       <div class="text-uppercase font-size-xs line-height-xs">'.$mod['ModulNome'].'</div>
                     </li>';
               foreach($menu as $men){
-                
                 if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo")){  
                   
                   //Empresa pública e o menu visível para o Setor Público ou Empresa Privada e o menu visível para o Setor Privado
-                  if (($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado'])){
-                      echo  ($men['MenuSubMenu'] == 1 ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
+                  if (($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado'])  && $men['PrXPeVisualizar'] == 1){
+                      echo  (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
                         '<a href="'.$men['MenuUrl'].'"';
                         if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
                           {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
@@ -144,8 +147,8 @@
                     echo '<ul class="nav nav-group-sub" data-submenu-title="Text editors">';
 
                     foreach($menu as $men_f){
-                   
-                      if($men_f['MenuPai'] == $men['MenuId']){
+                  
+                      if($men_f['MenuPai'] == $men['MenuId'] && $men_f['PrXPeVisualizar'] == 1){
                           
                         if (($empresa == 'Publica' && $men_f['MenuSetorPublico']) || ($empresa == 'Privada' && $men_f['MenuSetorPrivado'])){
                           echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link">'.$men_f['MenuNome'].'</a></li>';
