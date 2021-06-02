@@ -12,12 +12,13 @@ $sql = "SELECT DISTINCT FlOpeId, ForneNome, FlOpeCategoria, FlOpeDataInicio, FlO
 		FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome, SituaChave, 
 		SituaNome, SituaCor, dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, 
 		dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado, BandeMotivo,
-		dbo.fnFimContrato(FlOpeId) as FimContrato
+		dbo.fnFimContrato(FlOpeId) as FimContrato, TrRefTipo
 		FROM FluxoOperacional
 		JOIN Categoria on CategId = FlOpeCategoria
 		JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
 		JOIN Situacao on SituaId = FlOpeStatus
+		JOIN TermoReferencia on TrRefId = FlOpeTermoReferencia
 		LEFT JOIN Bandeja on BandeTabelaId = FlOpeId and BandeTabela = 'FluxoOperacional' and 
 							 BandeUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'NAOLIBERADO'
 	    WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ."
@@ -257,9 +258,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																<i class="icon-menu9"></i>
 															</a>
 															
-															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>');
+															<div class="dropdown-menu dropdown-menu-right">');
+																
+																if ($item['TrRefTipo'] == 'P' || $item['TrRefTipo'] == 'PS'){
+																	print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>');
+																}
+																
+																if ($item['TrRefTipo'] == 'S' || $item['TrRefTipo'] == 'PS'){
+																	print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>');
+																}																
+
 																if ($item['FluxoFechado']){												
 																	print('<button class="dropdown-item" id="enviarAprovacao"><i class="icon-list2"></i>Enviar para Aprovação</button>');
 																}																

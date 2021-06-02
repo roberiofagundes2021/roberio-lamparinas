@@ -18,46 +18,26 @@ if (isset($_POST['inputOrcamentoId'])) {
 
 try {
 
-	$sql = "
-		SELECT TrXOrNumero, 
-					 TrRefData, 
-					 TrXOrConteudo, 
-					 TrXOrTabelaProduto, 
-					 TrXOrTabelaServico,
-					 TrXOrSolicitante, 
-					 TrRefId, 
-					 TrRefTabelaProduto, 
-					 TrRefTabelaServico, 
-					 TrRefNumero, 
-					 TrRefTipo, 					 
-					 ForneNome, 
-					 CategNome
-		  FROM TRXOrcamento
-			JOIN TermoReferencia 
-				ON TrRefId = TrXOrTermoReferencia
-			LEFT 
-			JOIN Fornecedor 
-				ON ForneId = TrXOrFornecedor
-			JOIN Categoria 
-				ON CategId = TrXOrCategoria
-			LEFT 
-			JOIN SubCategoria 
-				ON SbCatId = TrXOrSubCategoria
+	$sql = "SELECT TrXOrNumero, TrRefData, TrXOrConteudo, TrXOrTabelaProduto, TrXOrTabelaServico,
+				   TrXOrSolicitante, TrRefId, TrRefTabelaProduto, TrRefTabelaServico, TrRefNumero, 
+				   TrRefTipo, ForneNome, CategNome 
+			FROM TRXOrcamento
+			JOIN TermoReferencia ON TrRefId = TrXOrTermoReferencia
+			LEFT JOIN Fornecedor ON ForneId = TrXOrFornecedor
+			JOIN Categoria ON CategId = TrXOrCategoria
+			LEFT JOIN SubCategoria ON SbCatId = TrXOrSubCategoria
 			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " 
-			  AND TrXOrId = " . $iOrcamento;
+			AND TrXOrId = " . $iOrcamento;
 
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
-
-	$sql = "
-		SELECT SbCatNome, 
-					 TXOXSCSubcategoria
-		  FROM TRXOrcamentoXSubCategoria
-			JOIN SubCategoria 
-				ON SbCatId = TXOXSCSubcategoria
-		 WHERE TXOXSCUnidade = " . $_SESSION['UnidadeId'] . " 
-		   AND TXOXSCOrcamento = " . $iOrcamento;
+	$sql = "SELECT SbCatNome, TXOXSCSubcategoria
+		  	FROM TRXOrcamentoXSubCategoria
+			JOIN SubCategoria ON SbCatId = TXOXSCSubcategoria
+		 	WHERE TXOXSCUnidade = " . $_SESSION['UnidadeId'] . " 
+		   	AND TXOXSCOrcamento = " . $iOrcamento."
+			ORDER BY SbCatNome ASC";
 	$result = $conn->query($sql);
 	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -72,7 +52,6 @@ try {
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
 
-
 	// Selects para identificar se o orçamento já possue serviços.
 	$tabelaOrigemServico = $row['TrRefTabelaServico'];
 	$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
@@ -83,7 +62,6 @@ try {
     		WHERE " . $campoPrefix . "Unidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento . " ";
 	$result = $conn->query($sql);
 	$rowServicoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
-
 
 	$totalProdutos = 0;
 	$totalServicos = 0;
@@ -172,6 +150,8 @@ try {
 		$cont = 1;
 
 		foreach ($rowSubCategoria as $sbcat) {
+
+			$totalProdutos = 0;
 
             $tabelaOrigemProduto = $row['TrRefTabelaProduto'];
 			$campoPrefix =  $row['TrRefTabelaProduto'] == 'Produto' ? 'Produ' : 'PrOrc';
@@ -269,6 +249,8 @@ try {
 
 		foreach ($rowSubCategoria as $sbcat) {
 
+			$totalProdutos = 0;
+
 			$tabelaOrigemProduto = $row['TrRefTabelaProduto'];
 			$campoPrefix =  $row['TrRefTabelaProduto'] == 'Produto' ? 'Produ' : 'PrOrc';
 
@@ -356,6 +338,8 @@ try {
 
 		foreach ($rowSubCategoria as $sbcat) {
 
+			$totalServicos = 0;
+
 			$tabelaOrigemServico = $row['TrRefTabelaServico'];
 			$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
 
@@ -432,7 +416,7 @@ try {
     							<td colspan='4' height='50' valign='middle'>
     								<strong>Total Serviços</strong>
     							</td>
-    							<td style='text-align: center' colspan='1'>
+    							<td style='text-align: right' colspan='1'>
     								" . mostraValor($totalServicos) . "
     							</td>
     						</tr>";
@@ -454,6 +438,8 @@ try {
 		$cont = 1;
 
 		foreach ($rowSubCategoria as $sbcat) {
+
+			$totalServicos = 0;
 
 			$tabelaOrigemServico = $row['TrRefTabelaServico'];
 			$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
