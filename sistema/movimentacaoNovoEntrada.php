@@ -436,6 +436,7 @@ if (isset($_POST['inputData'])) {
 
 							// O input itemEditadoquantidade recebe como valor a ultima quantidade editada, para garantir que pelo menos uma quantidade de produtos ou serviços foi editada 
 							$('#itemEditadoquantidade').val(novaQuantidade)
+							$('#validadeNaoInformada').val(validade)
 
 						}
 					})
@@ -608,7 +609,7 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
-				if (validadeNaoInformada > 0) {
+				if (validadeNaoInformada == '') {
 					alerta('Atenção', 'Tem itens sem validade!', 'error');
 					return false;
 				}				
@@ -902,7 +903,7 @@ if (isset($_POST['inputData'])) {
 							<div id="inputProdutos">
 								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
 								<input type="hidden" id="itemEditadoquantidade" name="itemEditadoquantidade" value="0">
-								<input type="text" id="validadeNaoInformada" name="validadeNaoInformada" value="0">
+								<input type="hidden" id="validadeNaoInformada" name="validadeNaoInformada" value="0">
 								<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">
 								<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
 								<input type="hidden" id="inputTotal" name="inputTotal" value="0">
