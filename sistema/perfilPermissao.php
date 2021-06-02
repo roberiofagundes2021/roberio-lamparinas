@@ -40,13 +40,11 @@ $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 // $resultPerfil = $conn->query($sqlPerfil);
 // $perfis = $resultPerfil->fetchAll(PDO::FETCH_ASSOC);
 
-// if($perfil != null && $unidade != null){
-// 	foreach($perfis as $perf){
-// 		foreach($menu as $men){
-// 			$sqlPerd = "INSERT INTO PerfilXPermissao (PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,
-// 			PrXPeExcluir, PrXPeUnidade) VALUES ('$perf[PerfiId]', '$men[MenuId]', 0, 0, 0, '$unidade')";
-// 			$resultSetPerf = $conn->query($sqlPerd);
-// 		}
+// foreach($perfis as $perf){
+// 	foreach($menu as $men){
+// 		$sqlPerd = "INSERT INTO PerfilXPermissao (PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,
+// 		PrXPeExcluir, PrXPeUnidade) VALUES ('$perf[PerfiId]', '$men[MenuId]', 0, 0, 0, '$unidade')";
+// 		$resultSetPerf = $conn->query($sqlPerd);
 // 	}
 // }
 
@@ -193,7 +191,7 @@ td{
 									<h5 class="card-title">Relação de Permissões (<?php echo $_POST['inputPerfilNome']; ?>)</h5>	
 								</div>
 								<div style="position:absolute; right: 0px;" class="pt-4 pr-3">
-									<div><a href="perfil.php" role="button"><< Termo de Referência</a></div>
+									<div><a href="perfil.php" role="button"><< Relação de Perfis</a></div>
 								</div>
 							</div>
 							

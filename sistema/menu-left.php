@@ -130,16 +130,18 @@
                 if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo")){  
                   
                   //Empresa pública e o menu visível para o Setor Público ou Empresa Privada e o menu visível para o Setor Privado
-                  if (($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado'])  && $men['PrXPeVisualizar'] == 1){
-                      echo  (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
-                        '<a href="'.$men['MenuUrl'].'"';
-                        if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
-                          {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
-                        echo '<i class="'.$men['MenuIco'].'"></i>
-                        <span>'.
-                          $men['MenuNome']
-                        .'</span>
-                      </a>';
+                  if($men['PrXPeVisualizar'] == 1 || ($men['MenuSubMenu'] == 1 && $men['PrXPeVisualizar'] == 0)){
+                    if ((($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado']))){
+                        echo  (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
+                          '<a href="'.$men['MenuUrl'].'"';
+                          if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
+                            {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
+                          echo '<i class="'.$men['MenuIco'].'"></i>
+                          <span>'.
+                            $men['MenuNome']
+                          .'</span>
+                        </a>';
+                    }
                   }
 
                   if($men['MenuSubMenu'] == 1) {
