@@ -498,6 +498,10 @@ if (isset($_POST['inputData'])) {
 			if (calcSaldoAtual < 0) {
 				alerta('Atenção', 'O valor total da Ordem de Compra foi ultrapaçado.', 'error');
 				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
+				$('#calcSaldoAtual').focus();
+				$("#formMovimentacao").submit((e) => {
+					e.preventDefault()
+				})
 				return
 			} else {
 				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
@@ -642,6 +646,8 @@ if (isset($_POST['inputData'])) {
 				$("#formMovimentacao").submit();
 
 				//console.log(inputTipo)
+
+				calcSaldoOrdemCompra()
 			});
 
 			function FiltraOrdensCompra() {
