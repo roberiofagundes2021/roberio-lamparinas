@@ -468,8 +468,10 @@ try {
 											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
 													FROM Servico
 													JOIN Situacao on SituaId = ServiStatus
+													JOIN SubCategoria on SbCatId = ServiSubCategoria
 													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-													ServiSubCategoria in (" .$sSubCategorias. ") and SituaChave = 'ATIVO' ";
+													ServiSubCategoria in (" .$sSubCategorias. ") and SituaChave = 'ATIVO' 
+													ORDER BY SbCatNome ASC";
 											$result = $conn->query($sql);
 											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 											$countServico = count($rowServicos);

@@ -18,6 +18,11 @@ if (isset($_GET['idOrcamento'])){
 			JOIN Situacao on SituaId = CategStatus
 			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and ForneId = '". $_GET['idFornecedor']."' and SituaChave = 'ATIVO'
 			ORDER BY CategNome ASC";
+} else if (isset($_GET['idServico']) && $_GET['idServico'] != -1){
+	$sql = "SELECT CategId, CategNome
+			FROM Categoria 
+			JOIN Servico on ServiCategoria = CategId
+			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and ServiId = ". $_GET['idServico'];
 } else{
 	$sql = "SELECT CategId, CategNome
 			FROM Categoria

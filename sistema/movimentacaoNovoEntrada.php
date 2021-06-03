@@ -486,47 +486,41 @@ if (isset($_POST['inputData'])) {
 			$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`).attr('valor', novoTotalGeral)
 		}
 
-		function calcSaldoOrdemCompra() {
-			let valorTotal = $('#total').attr('valor')
-			let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial') ///??????????????????? undefined
-
-			//console.log(valorTotal)
-			//console.log(valorSaldoOrdemCompra)
-
-			let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
-
-			if (calcSaldoAtual < 0) {
-				alerta('Atenção', 'O valor total da Ordem de Compra foi ultrapaçado.', 'error');
-				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
-				$('#calcSaldoAtual').focus();
-				$("#formMovimentacao").submit((e) => {
-					e.preventDefault()
-				})
-				return
-			} else {
-				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
-			}
-		}
-
 		function inputsModal() {
 			$('#tbody-modal')
 		}
 
-		function verificaTotalNotaFiscal() {
-			let valorTotalNotaFiscal = $('#inputValorTotal').val().replace('.', '').replace(',', '.')
-			let valorTotalNotaFiscalGrid = $('#total').attr('valor')
-
-			if (parseFloat(valorTotalNotaFiscalGrid) != parseFloat(valorTotalNotaFiscal)) {
-				alerta('Atenção', 'O valor total da Nota Fiscal informado não corresponde ao total da entrada.', 'error');
-				$('#inputValorTotal').focus();
-				$("#formMovimentacao").submit((e) => {
-					e.preventDefault()
-				})
-				return false
-			}
-		}
-
 		$(document).ready(function() {
+
+			function verificaTotalNotaFiscal() {
+				let valorTotalNotaFiscal = $('#inputValorTotal').val().replace('.', '').replace(',', '.')
+				let valorTotalNotaFiscalGrid = $('#total').attr('valor')
+
+				if (parseFloat(valorTotalNotaFiscalGrid) != parseFloat(valorTotalNotaFiscal)) {
+					alerta('Atenção', 'O valor total da Nota Fiscal informado não corresponde ao total da entrada.', 'error');
+					$('#inputValorTotal').focus();
+					return false;
+				}
+
+				return true;
+			}
+
+			function calcSaldoOrdemCompra() {
+				let valorTotal = $('#total').attr('valor')
+				let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial')
+				let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
+
+				if (calcSaldoAtual < 0) {
+					alerta('Atenção', 'O valor total da Ordem de Compra foi ultrapassado.', 'error');
+					$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
+					$('#inputValorTotal').focus();
+					return false;
+				} 
+				
+				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
+
+				return true;
+			}			
 
 			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
@@ -623,7 +617,9 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
-				verificaTotalNotaFiscal();
+				if (!verificaTotalNotaFiscal()){
+					return false;
+				}
 
 				//Verifica se tem algum produto na Grid
 				if (inputTotal == '' || inputTotal == 0) {
@@ -639,6 +635,10 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
+				if (!calcSaldoOrdemCompra()){
+					return false;
+				}
+
 				//desabilita as combos "Fornecedor" e "Situacao" na hora de gravar, senão o POST não o encontra
 				//$('#cmbFornecedor').prop('disabled', false);
 				$('#cmbSituacao').prop('disabled', false);
@@ -646,8 +646,6 @@ if (isset($_POST['inputData'])) {
 				$("#formMovimentacao").submit();
 
 				//console.log(inputTipo)
-
-				calcSaldoOrdemCompra()
 			});
 
 			function FiltraOrdensCompra() {
