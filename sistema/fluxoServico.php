@@ -95,10 +95,10 @@ try {
 
 	//SubCategorias para esse fornecedor
 	$sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
-		FROM SubCategoria
-		JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
-		WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
-		ORDER BY SbCatNome ASC";
+			FROM SubCategoria
+			JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
+			WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
+			ORDER BY SbCatNome ASC";
 	$result = $conn->query($sql);
 	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -386,7 +386,7 @@ try {
 
 									<?php
 
-										if ($_POST['inputOrigem'] == 'fluxo.php'){
+									//	if ($_POST['inputOrigem'] == 'fluxo.php'){
 
 											if ($countServicoUtilizado and $_SESSION['PerfiChave'] != 'SUPER' and $_SESSION['PerfiChave'] != 'ADMINISTRADOR' and 
 												$_SESSION['PerfiChave'] != 'CONTROLADORIA' and $_SESSION['PerfiChave'] != 'CENTROADMINISTRATIVO') {
@@ -404,9 +404,9 @@ try {
 														<select id="cmbServico" name="cmbServico" class="form-control multiselect-filtering" multiple="multiple" data-fouc '.$disable.'>');
 															
 															$sql = "SELECT ServiId, ServiNome
-																		FROM Servico
-																		JOIN Situacao on SituaId = ServiStatus
-																		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria;
+																	FROM Servico
+																	JOIN Situacao on SituaId = ServiStatus
+																	WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria;
 															if ($sSubCategorias != "") {
 																$sql .= " and ServiSubCategoria in (".$sSubCategorias.")";
 															}
@@ -430,7 +430,7 @@ try {
 													</div>
 												</div>
 											</div>');
-										}	
+									//	}	
 									?>		
 								</div>
 							</div>
@@ -453,54 +453,54 @@ try {
 
 									<?php
 
-								if ($_POST['inputOrigem'] == 'fluxo.php'){         
+								//	if ($_POST['inputOrigem'] == 'fluxo.php'){         
 
-									$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
+										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
 												FROM Servico
 												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 												LEFT JOIN Marca on MarcaId = ServiMarca
 												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
-									$result = $conn->query($sql);
-									$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-									$countServico = count($rowServicos);
-
-									if (!$countServico) {
-										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
-													FROM Servico
-													JOIN Situacao on SituaId = ServiStatus
-													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-													ServiSubCategoria = " .$sSubCategorias. " and SituaChave = 'ATIVO' ";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countServico = count($rowServicos);
-									}
 
-								} else{
+										if (!$countServico) {
+											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
+													FROM Servico
+													JOIN Situacao on SituaId = ServiStatus
+													JOIN SubCategoria on SbCatId = ServiSubCategoria
+													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
+													ServiSubCategoria in (" .$sSubCategorias. ") and SituaChave = 'ATIVO' 
+													ORDER BY SbCatNome ASC";
+											$result = $conn->query($sql);
+											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+											$countServico = count($rowServicos);
+										}
 
-									$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
+							/*		} else{
+
+										$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
 												FROM Servico
 												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 												JOIN TermoReferenciaXServico on TRXSrServico = FOXSrServico
 												LEFT JOIN Marca on MarcaId = ServiMarca
 												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
-									$result = $conn->query($sql);
-									$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-									$countServico = count($rowServicos);
-
-									if (!$countServico) {
-										$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento
-													FROM Servico
-													JOIN TermoReferenciaXServico on TRXSrServico = ServiId
-													JOIN Situacao on SituaId = ServiStatus
-													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-													ServiSubCategoria = " .$sSubCategorias. " and SituaChave = 'ATIVO' ";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countServico = count($rowServicos);
 
-
-									}
-								}
+										if (!$countServico) {
+											$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento
+													FROM Servico
+													JOIN TermoReferenciaXServico on TRXSrServico = ServiId
+													JOIN Situacao on SituaId = ServiStatus
+													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
+													ServiSubCategoria in (" .$sSubCategorias. ") and SituaChave = 'ATIVO' ";
+											$result = $conn->query($sql);
+											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+											$countServico = count($rowServicos);
+										}
+									}		*/							
 
 									$cont = 0;
 

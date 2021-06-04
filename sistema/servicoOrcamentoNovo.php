@@ -10,17 +10,18 @@ if(isset($_POST['inputNome'])){
 
 	try{
 
-		$sql = "INSERT INTO ServicoOrcamento (SrOrcNome, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubcategoria, SrOrcSituacao, SrOrcUsuarioAtualizador, 
+		$sql = "INSERT INTO ServicoOrcamento (SrOrcNome, SrOrcServico, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubcategoria, SrOrcSituacao, SrOrcUsuarioAtualizador, 
 				SrOrcUnidade) 
-				VALUES (:sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
+				VALUES (:sNome, :iServico, :sDetalhamento, :iCategoria, :iSubCategoria, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 						
 						':sNome' => $_POST['inputNome'],
+						':iServico' => $_POST['cmbServico'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
-						':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
+						':iCategoria' => $_POST['inputCategoriaId'],
+						':iSubCategoria' => $_POST['inputSubCategoriaId'],
 						':iSituacao' => $_POST['inputSituacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
@@ -58,7 +59,9 @@ if(isset($_POST['inputNome'])){
 	<!---------------------------------Scripts Universais------------------------------------>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>	
 	
 	<!-- Validação -->
     <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
@@ -69,35 +72,44 @@ if(isset($_POST['inputNome'])){
 	    
 		$(document).ready(()=>{
         
-			$("#cmbCategoria").change((e)=>{
-               
-                Filtrando()
+			$("#cmbServico").change((e)=>{
 
-                const categId = $(e.target).val()
-
-                $.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
-				
-					let option = '<option value="">Selecione a SubCategoria</option>';
+                const servicoId = $(e.target).val()
+			
+                $.getJSON('filtraCategoria.php?idServico='+servicoId, function (dados){
 					
 					if (dados.length){
 						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						});						
+						$.each(dados, function(i, obj){					
+							$('#inputCategoriaId').val(obj.CategId);
+							$('#inputCategoriaNome').val(obj.CategNome);
+						});
+
+					} else {
+						Reset();
+					}
+				});
+
+                $.getJSON('filtraSubCategoria.php?idServico='+servicoId, function (dados){
+					
+					if (dados.length){						
 						
-						$('#cmbSubCategoria').html(option).show();
+						$.each(dados, function(i, obj){
+							$('#inputSubCategoriaId').val(obj.SbCatId);
+							$('#inputSubCategoriaNome').val(obj.SbCatNome);
+						});
+
 					} else {
 						Reset();
 					}					
 				});
-            })
+            });
 
-            function Filtrando(){
-				$('#cmbSubCategoria').empty().append('<option value="">Filtrando...</option>');
-			}
-			
 			function Reset(){
-				$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
+				$('#inputCategoriaId').val("");
+				$('#inputCategoriaNome').val("");
+				$('#inputSubCategoriaId').val("");
+				$('#inputSubCategoriaNome').val("");
 			}
 	    
 			//Valida Registro Duplicado
@@ -105,26 +117,23 @@ if(isset($_POST['inputNome'])){
 		
 				e.preventDefault();
 				
-				let inputNome = $('#inputNome').val();
-
-				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
+				let cmbServico = $('#cmbServico').val();
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
 					url: "servicoOrcamentoValida.php",
-					data: ('nome='+inputNome),
+					data: ('IdServico='+cmbServico),
 					success: function(resposta){
 						
 						if(resposta == 1){
-							alerta('Atenção','Já existe um serviço com esse nome!','error');
+							alerta('Atenção','Esse serviço de referência já foi utilizado!','error');
 							return false;
-						}						
-					}
-				})
+						}
 
-				$( "#formServico" ).submit();
+						$("#formServico").submit();				
+					}
+				})				
 			})
 
 			$('#cancelar').on('click', function(e){
@@ -167,12 +176,34 @@ if(isset($_POST['inputNome'])){
 							<div class="media">
 								<div class="media-body">
 									<div class="row">
-										<div class="col-lg-12">
+										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
 										</div>
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbServico">Serviço de Referência <span class="text-danger">*</span></label>
+												<select id="cmbServico" name="cmbServico" class="form-control select-search" required>
+													<option value="">Selecione</option>
+													<?php 
+													$sql = "SELECT ServiId, ServiNome
+															FROM Servico
+															JOIN Situacao on SituaId = ServiStatus
+															WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+															ORDER BY ServiNome ASC";
+													$result = $conn->query($sql);
+													$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowServico as $item){
+														print('<option value="'.$item['ServiId'].'">'.$item['ServiNome'].'</option>');
+													}
+													
+													?>
+												</select>
+											</div>
+										</div>										
 									</div>
 									<div class="row">
 										<div class="col-lg-12">
@@ -183,41 +214,23 @@ if(isset($_POST['inputNome'])){
 										</div>
 									</div>
 								</div>
-							</div> 
+							</div>
+							<br /> 
 							<div class="row">
 								<div class="col-lg-12">
-									<h5 class="mb-0 font-weight-semibold">Classificação</h5>
-									<br>
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
-													<option value="">Selecione</option>
-													<?php 
-													$sql = "SELECT CategId, CategNome
-															FROM Categoria
-															JOIN Situacao on SituaId = CategStatus
-															WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-															ORDER BY CategNome ASC";
-													$result = $conn->query($sql);
-													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowCategoria as $item){
-														print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-													}
-													
-													?>
-												</select>
+												<label for="cmbCategoria">Categoria</label>
+												<input type="hidden" id="inputCategoriaId" name="inputCategoriaId">
+												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" readOnly>
 											</div>
 										</div>
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="">Selecione</option>
-													</select>
-												</div>
+												<input type="hidden" id="inputSubCategoriaId" name="inputSubCategoriaId">
+												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" readOnly>
 											</div>
 										</div>
 									</div>
@@ -232,23 +245,26 @@ if(isset($_POST['inputNome'])){
 									</div>
 								</div>
 							</div>
-							<!-- /card-body -->
-						</form>
-					</div>
+						</div>
+						<!-- /card-body -->
+					</form>
 					<!-------------------------------------------------------------------------------------------------------------------------------->
 				</div>
 				<!-- /content area -->
 
-				<?php include_once("footer.php"); ?>
-
 			</div>
-			<!-- /main content -->
+			<!-- /Content content -->
+
+			<?php include_once("footer.php"); ?>
 
 		</div>
-		<!-- /page content -->
+		<!-- /main content -->
+	
+	</div>
+	<!-- /page content -->
 
-		<?php include_once("alerta.php"); ?>
+	<?php include_once("alerta.php"); ?>
 
-	</body>
+</body>
 
-	</html>
+</html>

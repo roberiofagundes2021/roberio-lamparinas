@@ -9,12 +9,13 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputServicoId'])){
 
 	$sql = "SELECT TRXSrTermoReferencia
-	            FROM TermoReferenciaXServico
-				JOIN Servico on ServiId =TRXSrServico
-	            JOIN TermoReferencia on TrRefId =TRXSrTermoReferencia
-				JOIN Situacao on Situaid = TrRefStatus
-	            WHERE TRXSrServico = ".$_POST['inputServicoId']." and (SituaChave = 'ATIVO' or SituaChave = 'AGUARDANDOLIBERACAO' or SituaChave = 'FINALIZADO')  and TRXSrUnidade = ".$_SESSION['UnidadeId']."
-	            ";
+			FROM TermoReferenciaXServico
+			JOIN Servico on ServiId =TRXSrServico
+			JOIN TermoReferencia on TrRefId =TRXSrTermoReferencia
+			JOIN Situacao on Situaid = TrRefStatus
+			WHERE TRXSrServico = ".$_POST['inputServicoId']." and 
+			(SituaChave = 'LIBERADOPARCIAL' or SituaChave = 'LIBERADO' or SituaChave = 'FASEINTERNAFINALIZADA') and 
+			TRXSrUnidade = ".$_SESSION['UnidadeId'];
 	$result = $conn->query($sql);
 	$rowTrs = $result->fetchAll(PDO::FETCH_ASSOC);
 	$contTRs = count($rowTrs);

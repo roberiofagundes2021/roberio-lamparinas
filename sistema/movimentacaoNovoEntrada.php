@@ -436,6 +436,7 @@ if (isset($_POST['inputData'])) {
 
 							// O input itemEditadoquantidade recebe como valor a ultima quantidade editada, para garantir que pelo menos uma quantidade de produtos ou serviços foi editada 
 							$('#itemEditadoquantidade').val(novaQuantidade)
+							$('#validadeNaoInformada').val(validade)
 
 						}
 					})
@@ -485,43 +486,41 @@ if (isset($_POST['inputData'])) {
 			$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`).attr('valor', novoTotalGeral)
 		}
 
-		function calcSaldoOrdemCompra() {
-			let valorTotal = $('#total').attr('valor')
-			let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial') ///??????????????????? undefined
-
-			//console.log(valorTotal)
-			//console.log(valorSaldoOrdemCompra)
-
-			let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
-
-			if (calcSaldoAtual < 0) {
-				alerta('Atenção', 'O valor total da Ordem de Compra foi ultrapaçado.', 'error');
-				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
-				return
-			} else {
-				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
-			}
-		}
-
 		function inputsModal() {
 			$('#tbody-modal')
 		}
 
-		function verificaTotalNotaFiscal() {
-			let valorTotalNotaFiscal = $('#inputValorTotal').val().replace('.', '').replace(',', '.')
-			let valorTotalNotaFiscalGrid = $('#total').attr('valor')
-
-			if (parseFloat(valorTotalNotaFiscalGrid) != parseFloat(valorTotalNotaFiscal)) {
-				alerta('Atenção', 'O valor total da Nota Fiscal informado não corresponde ao total da entrada.', 'error');
-				$('#inputValorTotal').focus();
-				$("#formMovimentacao").submit((e) => {
-					e.preventDefault()
-				})
-				return false
-			}
-		}
-
 		$(document).ready(function() {
+
+			function verificaTotalNotaFiscal() {
+				let valorTotalNotaFiscal = $('#inputValorTotal').val().replace('.', '').replace(',', '.')
+				let valorTotalNotaFiscalGrid = $('#total').attr('valor')
+
+				if (parseFloat(valorTotalNotaFiscalGrid) != parseFloat(valorTotalNotaFiscal)) {
+					alerta('Atenção', 'O valor total da Nota Fiscal informado não corresponde ao total da entrada.', 'error');
+					$('#inputValorTotal').focus();
+					return false;
+				}
+
+				return true;
+			}
+
+			function calcSaldoOrdemCompra() {
+				let valorTotal = $('#total').attr('valor')
+				let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial')
+				let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
+
+				if (calcSaldoAtual < 0) {
+					alerta('Atenção', 'O valor total da Ordem de Compra foi ultrapassado.', 'error');
+					$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
+					$('#inputValorTotal').focus();
+					return false;
+				} 
+				
+				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
+
+				return true;
+			}			
 
 			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
@@ -608,7 +607,7 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
-				if (validadeNaoInformada > 0) {
+				if (validadeNaoInformada == '') {
 					alerta('Atenção', 'Tem itens sem validade!', 'error');
 					return false;
 				}				
@@ -618,7 +617,9 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
-				verificaTotalNotaFiscal();
+				if (!verificaTotalNotaFiscal()){
+					return false;
+				}
 
 				//Verifica se tem algum produto na Grid
 				if (inputTotal == '' || inputTotal == 0) {
@@ -631,6 +632,10 @@ if (isset($_POST['inputData'])) {
 					alerta('Atenção', 'Informe a Situacao!', 'error');
 					$('#cmbSituacao').focus();
 					$("#formMovimentacao").submit();
+					return false;
+				}
+
+				if (!calcSaldoOrdemCompra()){
 					return false;
 				}
 
@@ -902,7 +907,7 @@ if (isset($_POST['inputData'])) {
 							<div id="inputProdutos">
 								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
 								<input type="hidden" id="itemEditadoquantidade" name="itemEditadoquantidade" value="0">
-								<input type="text" id="validadeNaoInformada" name="validadeNaoInformada" value="0">
+								<input type="hidden" id="validadeNaoInformada" name="validadeNaoInformada" value="0">
 								<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">
 								<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
 								<input type="hidden" id="inputTotal" name="inputTotal" value="0">
