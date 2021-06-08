@@ -12,18 +12,61 @@ $sql = "SELECT TRXPrTermoReferencia
 		JOIN TermoReferencia on TrRefId = TRXPrTermoReferencia
 		JOIN Situacao on Situaid = TrRefStatus
 		WHERE TRXPrProduto = " . $_POST['inputPrOrcId']. " and 
-		SituaChave in ('LIBERADO', 'LIBERADOPARCIAL', 'FASEINTERNAFINALIZADA') and 
+		(SituaChave = 'LIBERADOPARCIAL' or SituaChave = 'LIBERADO' or SituaChave = 'FASEINTERNAFINALIZADA') and
 		TRXPrUnidade = " . $_SESSION['UnidadeId'];
 $result = $conn->query($sql);
 $rowTrs = $result->fetchAll(PDO::FETCH_ASSOC);
 $contTRs = count($rowTrs);
 
-$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubCategoria, PrOrcUnidadeMedida 
+$sql = "SELECT PrOrcId, PrOrcNome, PrOrcProduto, PrOrcDetalhamento, PrOrcCategoria, CategNome, PrOrcSubCategoria, SbCatNome, PrOrcUnidadeMedida 
 		FROM ProdutoOrcamento
+		JOIN Categoria on CategId = PrOrcCategoria
+		JOIN SubCategoria on SbCatId = PrOrcSubCategoria
 		WHERE PrOrcId = " . $_POST['inputPrOrcId'] . " and PrOrcUnidade = " . $_SESSION['UnidadeId'];
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 //$count = count($row);
+
+//Se estiver editando
+if(isset($_POST['inputNome'])){
+
+	try{
+		
+		$sql = "UPDATE ProdutoOrcamento SET PrOrcNome = :sNome, PrOrcProduto = :iProduto, 
+		        PrOrcDetalhamento = :sDetalhamento, PrOrcCategoria = :iCategoria, PrOrcSubcategoria = :iSubCategoria, PrOrcUnidadeMedida = :iUnidadeMedida, 
+				PrOrcUsuarioAtualizador = :iUsuarioAtualizador, PrOrcUnidade = :iUnidade 
+				WHERE PrOrcId = :sId ";
+		$result = $conn->prepare($sql);
+
+		$result->execute(array(
+						':sId' => $_POST['inputId'],
+						':sNome' => $_POST['inputNome'],
+						':iProduto' => $_POST['cmbProduto'],
+						':sDetalhamento' => $_POST['txtDetalhamento'],
+						':iCategoria' => $_POST['inputCategoriaId'],
+						':iSubCategoria' => $_POST['inputSubCategoriaId'],
+						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iUnidade' => $_SESSION['UnidadeId']
+						));
+		
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Produto alterado!!!";
+		$_SESSION['msg']['tipo'] = "success";
+		
+	} catch(PDOException $e) {		
+		
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar produto!!!";
+		$_SESSION['msg']['tipo'] = "error";	
+		
+		echo 'Error2: ' . $e->getMessage();die;
+		
+	}
+	
+	irpara("produtoOrcamento.php");
+} 
+
 
 ?>
 
@@ -41,71 +84,58 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 	<!---------------------------------Scripts Universais------------------------------------>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>	
+	
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 	<script type="text/javascript">
+
+	// No carregamento da pagina é regatada a opção já cadastrada no banco
 		$(document).ready(() => {
 
-			// No evento de selecionar a categoria as subcategorias são carregadas altomaticamente
-			$("#cmbCategoria").change((e) => {
+			$("#cmbProduto").change((e) =>{
 
-				Filtrando();
-				let option = null; //'<option>Selecione a SubCategoria</option>';
-				const categId = $('#cmbCategoria').val();
+				const produtoId = $(e.target).val()
 
-				$.getJSON('filtraSubCategoria.php?idCategoria=' + categId, function(dados) {
+
+				$.getJSON('filtraCategoria.php?idProduto=' +produtoId, function (dados){
 
 					if (dados.length) {
 
 						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
+							$('#inputCategoriaId').val(obj.CategId);
+							$('#inputCategoriaNome').val(obj.CategNome);
 						});
 
-						$('#cmbSubCategoria').html(option).show();
 					} else {
 						Reset();
 					}
+				});
+
+				$.getJSON('filtraSubCategoria.php?idProduto='+produtoId, function (dados){
+			
+					if (dados.length){						
+						
+						$.each(dados, function(i, obj){
+							$('#inputSubCategoriaId').val(obj.SbCatId);
+							$('#inputSubCategoriaNome').val(obj.SbCatNome);
+						});
+					} else {
+						Reset();
+					}					
 				});
 			});
 
-			// No carregamento da pagina é regatada a opção já cadastrada no banco
-			$(document).ready(() => {
-				Filtrando();
-				let option = null; //'<option>Selecione a SubCategoria</option>';
-				const categId = $('#cmbCategoria').val()
-				const subCategId = $('#inputSubCategoria').val();
-
-				$.getJSON('filtraSubCategoria.php?idCategoria=' + categId, function(dados) {
-					//let option = '<option>Selecione a SubCategoria</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							if (obj.SbCatId == subCategId) {
-								option += '<option value="' + obj.SbCatId + '" selected>' + obj.SbCatNome + '</option>';
-							} else {
-								option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
-							}
-						});
-
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						Reset();
-					}
-				});
-			})
-
-			function Filtrando() {
-				$('#cmbSubCategoria').empty().append('<option value="">Filtrando...</option>');
-			}
-
-			function Reset() {
-				$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
+			function Reset(){
+				$('#inputCategoriaId').val("");
+				$('#inputCategoriaNome').val("");
+				$('#inputSubCategoriaId').val("");
+				$('#inputSubCategoriaNome').val("");
 			}
 
 			//Valida Registro Duplicado
@@ -113,17 +143,32 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 				e.preventDefault();
 
-				let inputNome = $('#inputNome').val();
+				let inputProduto = $('#inputProduto').val();
+				let cmbProduto = $('#cmbProduto').val();
+				
+				if (inputProduto != cmbProduto){
 
-				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "produtoOrcamentoValida.php",
+						data: ('IdProdutoAntigo='+inputProduto+'&IdProdutoNovo='+cmbProduto),
+						success: function(resposta){
+							
+							if(resposta == 1){
+								alerta('Atenção','Esse produto de referência já foi utilizado!','error');
+								return false;
+							}
 
-				//$('#cmbCategoria').removeAttr('disabled')
-				//$('#cmbSubCategoria').removeAttr('disabled')
-
-				$("#formProduto").attr('action', 'produtoOrcamentoEditaAction.php').submit();
-			});
+							$("#formProduto").submit();
+						}
+					})
+				} else {
+					$("#formProduto").submit();
+				}
+			});			
 		});
+
 	</script>
 
 </head>
@@ -144,26 +189,26 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 			<!-- Content area -->
 			<div class="content">
-				<!-------------------------------------------------------------------------------------------------------------------------------->
+				
 				<div class="card">
 
 					<form id="formProduto" name="formProduto" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Produto</h5>
-							<input id="inputSubCategoria" name="inputSubCategoria" type="hidden" value="<?php echo $row['PrOrcSubCategoria'] ?>">
+							<input type="hidden" id="inputPrOrcId" name="inputPrOrcId" value="<?php echo $_POST['inputPrOrcId']; ?>">
 						</div>
 						<div class="card-body">
 							<div class="media">
 								<div class="media-body">
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['PrOrcNome']; ?>" required>
-												<input id="inputId" type="hidden" value="<?php echo $row['PrOrcId'] ?>" name="inputId">
+												<input type="hidden" id="inputId" name="inputId" value="<?php echo $row['PrOrcId'] ?>">
 											</div>
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputUnidadeMedida">Unidade de Medida <span class="text-danger">*</span></label>
 												<select id="cmbUnidadeMedida" class="form-control form-control-select2" name="cmbUnidadeMedida" required>
@@ -185,6 +230,30 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 												</select>
 											</div>
 										</div>
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbProduto">Produto de Referência <span class="text-danger">*</span></label>
+												<input type="hidden" id="inputProduto" name="inputProduto" value="<?php echo $row['PrOrcProduto'] ?>">
+												<select id="cmbProduto" name="cmbProduto" class="form-control select-search" required <?php $contTRs > 1 ? print('disabled') : ''; ?>>
+													<option value="">Selecione</option>
+													<?php 
+													$sql = "SELECT ProduId, ProduNome
+															FROM Produto
+															JOIN Situacao on SituaId = ProduStatus
+															WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+															ORDER BY ProduNome ASC";
+													$result = $conn->query($sql);
+													$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowProduto as $item){
+														$seleciona = $item['ProduId'] == $row['PrOrcProduto'] ? "selected" : "";
+														print('<option value="'.$item['ProduId'] . '" ' . $seleciona . '>'.$item['ProduNome'].'</option>');
+													}
+													
+													?>
+												</select>
+											</div>
+										</div>				
 									</div>
 									<div class="row">
 										<div class="col-lg-12">
@@ -198,37 +267,20 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 							</div>
 							<div class="row">
 								<div class="col-lg-12">
-									<h5 class="mb-0 font-weight-semibold">Classificação</h5>
 									<br>
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required <?php $contTRs >= 1 ? print('readOnly') : ''?>>
-													<?php
-													$sql = "SELECT CategId, CategNome
-															FROM Categoria
-															JOIN Situacao on SituaId = CategStatus
-															WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															ORDER BY CategNome ASC";
-													$result = $conn->query($sql);
-													$rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowCateg as $item) {
-														$seleciona = $item['CategId'] == $row['PrOrcCategoria'] ? "selected" : "";
-														print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
-													}
-
-													?>
-												</select>
+												<input type="hidden" id="inputCategoriaId" name="inputCategoriaId" value="<?php echo $row['PrOrcCategoria']; ?>">
+												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" readOnly  value="<?php echo $row['CategNome']; ?>">
 											</div>
 										</div>
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" <?php $contTRs >= 1 ? print('readOnly') : ''?>>
-													<option id="selec" required></option>
-												</select>
+												<input type="hidden" id="inputSubCategoriaId" name="inputSubCategoriaId" value="<?php echo $row['PrOrcSubCategoria']; ?>">
+												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" readOnly value="<?php echo $row['SbCatNome']; ?>">
 											</div>
 										</div>
 									</div>
@@ -244,10 +296,10 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 								</div>
 							</div>
 						</div>
-						<!-- /card-body -->
+						
 					</form>
 				</div>
-				<!-------------------------------------------------------------------------------------------------------------------------------->
+				<!-- /card-body -->
 			</div>
 			<!-- /content area -->
 

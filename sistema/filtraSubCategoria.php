@@ -32,11 +32,19 @@ if (isset($_GET['idOrcamento'])){
 		WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = ". $_GET['idCategoria']." and SituaChave = 'ATIVO' ";
 	}
 
+
 } else if (isset($_GET['idServico']) && $_GET['idServico'] != -1){
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria 
 			JOIN Servico on ServiSubCategoria = SbCatId
 			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and ServiId = ". $_GET['idServico'];
+
+} else if (isset($_GET['idProduto']) && $_GET['idProduto'] != -1){
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria 
+			JOIN Produto on ProduSubCategoria = SbCatId
+			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and ProduId = ". $_GET['idProduto'];
+
 } else {
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria
