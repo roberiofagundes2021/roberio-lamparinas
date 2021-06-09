@@ -156,7 +156,7 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 					document.formUsuario.action = "usuarioNovo.php";
 				}	
 
-            } else if (Tipo == 'lotacao'){
+      } else if (Tipo == 'lotacao'){
 			document.formUsuario.action = "usuarioLotacao.php";		
 			} else if (Tipo == 'edita'){
 				document.formUsuario.action = "usuarioEdita.php";
@@ -164,6 +164,8 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 				confirmaExclusao(document.formUsuario, "Tem certeza que deseja excluir esse usuário?", "usuarioExclui.php");
 			} else if (Tipo == 'mudaStatus'){
 				document.formUsuario.action = "usuarioMudaSituacao.php";
+			} else if (Tipo == 'permissao'){
+				document.formUsuario.action = "usuarioPermissao.php";
 			}
 			
 			document.formUsuario.submit();
@@ -267,15 +269,15 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 											print('		<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'lotacao\')" class="list-icons-item"><i class="icon-users4" data-popup="tooltip" data-placement="bottom" title="Lotação"></i></a>');
 										}										
 										
-										print('			<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'exclui\')" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
-													</div>
+										print('	<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'exclui\')" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>'.
+														(!isset($_SESSION['EmpresaId'])?'<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'permissao\')" class="list-icons-item"><i class="icon-lock2" data-popup="tooltip" data-placement="bottom" title="permissao"></i></a>':'')
+													.'</div>
 												</div>
 											</td>
 										</tr>');
 									}
 								?>
-
 								</tbody>
 							</table>
 						</div>
