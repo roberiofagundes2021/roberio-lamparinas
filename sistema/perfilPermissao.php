@@ -43,7 +43,7 @@ $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 // foreach($perfis as $perf){
 // 	foreach($menu as $men){
 // 		$sqlPerd = "INSERT INTO PerfilXPermissao (PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,
-// 		PrXPeExcluir, PrXPeUnidade) VALUES ('$perf[PerfiId]', '$men[MenuId]', 0, 0, 0, '$unidade')";
+// 		PrXPeExcluir, PrXPeUnidade) VALUES ('$perf[PerfiId]', '$men[MenuId]', 1, 0, 0, '$unidade')";
 // 		$resultSetPerf = $conn->query($sqlPerd);
 // 	}
 // }
@@ -217,7 +217,6 @@ td{
 																</tr>';
 													foreach($menuPxP as $men){
 														if ($men["MenuModulo"] == $mod["ModulId"] && $men['MenuSubMenu'] == 0 && $men['MenuPai'] == 0 && $men['SituaChave'] == strtoupper("ativo")){
-															echo '<input name="MenuId" value='.$men['MenuId'].' type="hidden">';
 															echo '<input name="'.$men['PrXPeId'].'-PrXPeId" value='.$men['PrXPeId'].' type="hidden">';
 															echo '<tr>
 																<td><h5>'.$men['MenuNome'].'</h5></td>
