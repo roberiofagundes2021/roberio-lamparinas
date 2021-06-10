@@ -275,20 +275,32 @@ try {
 			$('#cmbServico').empty().append('<option>Sem servico</option>');
 		}
 
-		function calculaValorTotal(id) {
+		function calculaValorTotal() {
+			
+			let n = 1;
+			let totalRegistros = $('#totalRegistros').val();
+			let Quantidade = 0
+			let ValorUnitario = 0;
+			let ValorTotal = 0;
+			let ValorTotalMoeda = 0;
+			let TotalGeral = 0;
 
-			var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : $('#inputValorTotal' + id + '').val().replace('.', '').replace(',', '.');
-			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+			while (n <= totalRegistros) {
+				
+				Quantidade = $('#inputQuantidade' + n + '').val().trim() == '' ? 0 : $('#inputQuantidade' + n + '').val();
+				ValorUnitario = $('#inputValorUnitario' + n + '').val() == '' ? 0 : $('#inputValorUnitario' + n + '').val().replace('.', '').replace(',', '.');
 
-			var Quantidade = $('#inputQuantidade' + id + '').val().trim() == '' ? 0 : $('#inputQuantidade' + id + '').val();
-			var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : $('#inputValorUnitario' + id + '').val().replace('.', '').replace(',', '.');
-			var ValorTotal = 0;
+				ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
+				TotalGeral += ValorTotal;
 
-			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
-			var TotalGeral = float2moeda(parseFloat(TotalGeralAnterior) - parseFloat(ValorTotalAnterior) + ValorTotal).toString();
-			ValorTotal = float2moeda(ValorTotal).toString();
+				ValorTotalMoeda = float2moeda(ValorTotal).toString();
 
-			$('#inputValorTotal' + id + '').val(ValorTotal);
+				$('#inputValorTotal' + n + '').val(ValorTotalMoeda);
+
+				n++;
+			}
+			
+			TotalGeral = float2moeda(TotalGeral).toString();
 
 			$('#inputTotalGeral').val(TotalGeral);
 		}
@@ -406,11 +418,12 @@ try {
 															$sql = "SELECT ServiId, ServiNome
 																	FROM Servico
 																	JOIN Situacao on SituaId = ServiStatus
+																	JOIN SubCategoria on SbCatId = ServiSubCategoria
 																	WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria;
 															if ($sSubCategorias != "") {
 																$sql .= " and ServiSubCategoria in (".$sSubCategorias.")";
 															}
-															$sql .=	" ORDER BY ServiNome ASC";
+															$sql .=	" ORDER BY SbCatNome ASC";
 															$result = $conn->query($sql);
 															$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -451,15 +464,15 @@ try {
 								<div class="card-body">
 									<p class="mb-3">Abaixo estão listados todos os servicos selecionados acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
 
-									<?php
-
-								//	if ($_POST['inputOrigem'] == 'fluxo.php'){         
+									<?php       
 
 										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
 												FROM Servico
 												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 												LEFT JOIN Marca on MarcaId = ServiMarca
-												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
+												JOIN SubCategoria on SbCatId = ServiSubCategoria
+												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
+												ORDER BY SbCatNome ASC";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countServico = count($rowServicos);
@@ -477,41 +490,14 @@ try {
 											$countServico = count($rowServicos);
 										}
 
-							/*		} else{
-
-										$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
-												FROM Servico
-												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-												JOIN TermoReferenciaXServico on TRXSrServico = FOXSrServico
-												LEFT JOIN Marca on MarcaId = ServiMarca
-												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
-										$result = $conn->query($sql);
-										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-										$countServico = count($rowServicos);
-
-										if (!$countServico) {
-											$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento
-													FROM Servico
-													JOIN TermoReferenciaXServico on TRXSrServico = ServiId
-													JOIN Situacao on SituaId = ServiStatus
-													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-													ServiSubCategoria in (" .$sSubCategorias. ") and SituaChave = 'ATIVO' ";
-											$result = $conn->query($sql);
-											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-											$countServico = count($rowServicos);
-										}
-									}		*/							
-
-									$cont = 0;
-
-									print('
+										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-9">
+											<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
 														</div>
-														<div class="col-lg-8">
+														<div class="col-lg-11">
 															<label for="inputServico"><strong>Servico</strong></label>
 														</div>
 													</div>
@@ -526,81 +512,82 @@ try {
 													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-1">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
 											</div>											
 										</div>');
 
-									print('<div id="tabelaServicos">');
+										print('<div id="tabelaServicos">');
 
-									$fTotalGeral = 0;
+										$cont = 0;
+										$fTotalGeral = 0;
 
-									foreach ($rowServicos as $item) {
+										foreach ($rowServicos as $item) {
 
-										$cont++;
+											$cont++;
 
-										$iQuantidade = isset($item['FOXSrQuantidade']) ? $item['FOXSrQuantidade'] : '';
-										$fValorUnitario = isset($item['FOXSrValorUnitario']) ? mostraValor($item['FOXSrValorUnitario']) : '';
-										$fValorTotal = (isset($item['FOXSrQuantidade']) and isset($item['FOXSrValorUnitario'])) ? mostraValor($item['FOXSrQuantidade'] * $item['FOXSrValorUnitario']) : '';
+											$iQuantidade = isset($item['FOXSrQuantidade']) ? $item['FOXSrQuantidade'] : '';
+											$fValorUnitario = isset($item['FOXSrValorUnitario']) ? mostraValor($item['FOXSrValorUnitario']) : '';
+											$fValorTotal = (isset($item['FOXSrQuantidade']) and isset($item['FOXSrValorUnitario'])) ? mostraValor($item['FOXSrQuantidade'] * $item['FOXSrValorUnitario']) : '';
 
-										$fTotalGeral += (isset($item['FOXSrQuantidade']) and isset($item['FOXSrValorUnitario'])) ? $item['FOXSrQuantidade'] * $item['FOXSrValorUnitario'] : 0;
+											$fTotalGeral += (isset($item['FOXSrQuantidade']) and isset($item['FOXSrValorUnitario'])) ? $item['FOXSrQuantidade'] * $item['FOXSrValorUnitario'] : 0;
+
+											print('
+												<div class="row" style="margin-top: 8px;">
+													<div class="col-lg-8">
+														<div class="row">
+															<div class="col-lg-1">
+																<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
+																<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
+															</div>
+															<div class="col-lg-11">
+																<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+															</div>
+														</div>
+													</div>
+													<div class="col-lg-1">
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade text-right" onChange="calculaValorTotal()" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+													</div>	
+													<div class="col-lg-1">
+														<input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario text-right" onChange="calculaValorTotal()" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
+													</div>	
+													<div class="col-lg-2">
+														<input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off text-right" value="' . $fValorTotal . '" readOnly>
+													</div>											
+												</div>');
+										}
 
 										print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-9">
-													<div class="row">
-														<div class="col-lg-1">
-															<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
-															<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
-														</div>
-														<div class="col-lg-11">
-															<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
-														</div>
-													</div>
-												</div>
-												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
-												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
-												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" value="' . $fValorTotal . '" readOnly>
-												</div>											
-											</div>');
-									}
-
-									print('
-										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-9">
-													<div class="row">
-														<div class="col-lg-1">
-															
-														</div>
-														<div class="col-lg-8">
-															
-														</div>
-														<div class="col-lg-3">
-															
+													<div class="col-lg-8">
+														<div class="row">
+															<div class="col-lg-1">
+																
+															</div>
+															<div class="col-lg-8">
+																
+															</div>
+															<div class="col-lg-3">
+																
+															</div>
 														</div>
 													</div>
-												</div>
-												<div class="col-lg-1">
-													
-												</div>	
-												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
-													<h5><b>Total:</b></h5>
-												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="' . mostraValor($fTotalGeral) . '" readOnly>
-												</div>											
-											</div>');
+													<div class="col-lg-1">
+														
+													</div>	
+													<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+														<h5><b>Total:</b></h5>
+													</div>	
+													<div class="col-lg-2">
+														<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="' . mostraValor($fTotalGeral) . '" readOnly>
+													</div>											
+												</div>');
 
-									print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >');
+										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >');
 
-									print('</div>');
+										print('</div>');
 
 									?>
 
