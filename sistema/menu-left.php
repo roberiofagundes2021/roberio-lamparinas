@@ -2,6 +2,17 @@
   include('global_assets/php/conexao.php');
   $unidade = $_SESSION['UnidadeId'];
   $perfil = $_SESSION['PerfiChave'];
+  $userId = $_SESSION['UsuarId'];
+
+
+  $sqlUser = "SELECT UsuarPermissaoPerfil
+  FROM Usuario
+  Where UsuarId = '$userId'";
+
+  $resultUserId = $conn->query($sqlUser);
+  $usuaXPerm = $resultUserId->fetch(PDO::FETCH_ASSOC);
+
+  $userPermission = (isset($usuaXPerm['UsuarPermissaoPerfil'])?$usuaXPerm['UsuarPermissaoPerfil']:0);
 
   $sqlPerfil = "SELECT PerfiId FROM Perfil
   WHERE PerfiChave = '$perfil'";
@@ -19,15 +30,25 @@
   $resultModulo = $conn->query($sqlModulo);
   $modulo = $resultModulo->fetchAll(PDO::FETCH_ASSOC);
 
-  //Recupera todos os menus do sistema
-  $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico,
+  //Recupera todos os menus do sistema caso esteja usando permissao personalizada
+
+  if($usuaXPerm['UsuarPermissaoPerfil'] == 0){
+    $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico,
+                MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, MenuSetorPrivado,
+                UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeUnidade
+                FROM menu
+                join situacao on MenuStatus = SituaId
+                join UsuarioXPermissao on UsXPeUsuario = '$userId' and UsXPeUnidade = '$unidade' and UsXPeMenu = MenuId
+                order by MenuOrdem asc";
+  } else {
+    $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico,
               MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, PrXPeId, PrXPePerfil, MenuSetorPrivado
               PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeUnidade
               FROM menu
               join situacao on MenuStatus = SituaId
               join PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$perfilId' and PrXPeUnidade  = '$unidade'
               order by MenuOrdem asc";
-
+  }
   $resultMenu = $conn->query($sqlMenu);
   $menu = $resultMenu->fetchAll(PDO::FETCH_ASSOC);
 
@@ -83,7 +104,7 @@
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="icon-user-plus"></i>
-              <span>Meu Perfil</span>
+              <span>Meu Perfil</span><?php echo $userId; ?>
             </a>
           </li>
           <!--<li class="nav-item">
@@ -127,10 +148,11 @@
                       <div class="text-uppercase font-size-xs line-height-xs">'.$mod['ModulNome'].'</div>
                     </li>';
               foreach($menu as $men){
+                $visualizar = (isset($men['UsXPeVisualizar'])?$men['UsXPeVisualizar']:$men['PrXPeVisualizar']);
                 if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo")){  
                   
                   //Empresa pública e o menu visível para o Setor Público ou Empresa Privada e o menu visível para o Setor Privado
-                  if($men['PrXPeVisualizar'] == 1 || ($men['MenuSubMenu'] == 1 && $men['PrXPeVisualizar'] == 0)){
+                  if($visualizar == 1 || ($men['MenuSubMenu'] == 1)){
                     if ((($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado']))){
                         echo  (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
                           '<a href="'.$men['MenuUrl'].'"';
@@ -145,12 +167,12 @@
                   }
 
                   if($men['MenuSubMenu'] == 1) {
-
                     echo '<ul class="nav nav-group-sub" data-submenu-title="Text editors">';
 
                     foreach($menu as $men_f){
+                      $visualizar_f = (isset($men_f['UsXPeVisualizar'])?$men_f['UsXPeVisualizar']:$men_f['PrXPeVisualizar']);
                   
-                      if($men_f['MenuPai'] == $men['MenuId'] && $men_f['PrXPeVisualizar'] == 1){
+                      if($men_f['MenuPai'] == $men['MenuId'] && $visualizar_f == 1){
                           
                         if (($empresa == 'Publica' && $men_f['MenuSetorPublico']) || ($empresa == 'Privada' && $men_f['MenuSetorPrivado'])){
                           echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link">'.$men_f['MenuNome'].'</a></li>';
