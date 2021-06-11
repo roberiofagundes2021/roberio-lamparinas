@@ -160,40 +160,63 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 			return separador <= 0 ? '' : final.substr(separador + 1);
 		}			
 			
-		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaServico(ServicoId, ServicoNome, ServicoStatus, Tipo){
-		
-			if (Tipo == 'exportar'){	
-				document.formServico.action = "servicoExportar.php";
-				document.formServico.setAttribute("target", "_blank");	
-			} else {
+			//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
+			function atualizaServico(ServicoId, ServicoNome, ServicoStatus, Tipo){
+
 				document.getElementById('inputServicoId').value = ServicoId;
 				document.getElementById('inputServicoNome').value = ServicoNome;
 				document.getElementById('inputServicoStatus').value = ServicoStatus;
-						
-				if (Tipo == 'edita'){	
-					document.formServico.action = "servicoEdita.php";		
-				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formServico, "Tem certeza que deseja excluir esse serviço?", "servicoExclui.php");
-				} else if (Tipo == 'mudaStatus'){
-					if(ServicoStatus != 'ALTERAR'){
-						document.formServico.action = "servicoMudaSituacao.php";
+
+				if(Tipo == 'exporta') {
+
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+
+						type: "POST",
+						url: "servicoOrcamentoValida.php",
+						data: ('IdServico='+ServicoId),
+						success: function(resposta){
+							
+							if(resposta == 1){
+								alerta('Atenção','Esse serviço já foi exportado !','error');
+								return false;
+							}
+							
+							if(ServicoStatus != 'ALTERAR'){
+								document.formServico.action = "servicoExportaServicoOrcamento.php";
+							} else {
+								alerta('Atenção','Edite o serviço e altere a categoria para a situação ficar "ATIVO".','error');
+								return false;
+							}
+
+							document.formServico.submit();
+						}
+					})
+
+				} else{
+
+					if (Tipo == 'exportar'){	
+						document.formServico.action = "servicoExportar.php";
+						document.formServico.setAttribute("target", "_blank");	
 					} else {
-						alerta('Atenção','Edite o serviço e altere a categoria para a situação ficar "ATIVO".','error');
-						return false;
+
+						if (Tipo == 'edita'){	
+							document.formServico.action = "servicoEdita.php";
+						} else if (Tipo == 'exclui'){
+							confirmaExclusao(document.formServico, "Tem certeza que deseja excluir esse serviço?", "servicoExclui.php");
+						} else if (Tipo == 'mudaStatus'){
+							if(ServicoStatus != 'ALTERAR'){
+								document.formServico.action = "servicoMudaSituacao.php";
+							} else {
+								alerta('Atenção','Edite o serviço e altere a categoria para a situação ficar "ATIVO".','error');
+								return false;
+							}
+						}  
 					}
-				} else if(Tipo == 'exporta') {
-					if(ServicoStatus != 'ALTERAR'){
-                    	document.formServico.action = "servicoExportaServicoOrcamento.php";
-                    } else{
-                    	alerta('Atenção','Edite o serviço e altere a categoria antes de realizar a exportação.','error');
-                    	return false;
-                    }
+
+					document.formServico.submit();
 				}
-			}
-			
-			document.formServico.submit();
-		}		
+			}	
 			
 	</script>
 
