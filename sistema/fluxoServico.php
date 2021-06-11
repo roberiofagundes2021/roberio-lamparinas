@@ -370,12 +370,31 @@ try {
 												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['FlOpeCategoria']; ?>">
 											</div>
 										</div>
-										<div class="col-lg-3">
+										
+                                        <div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputCategoriaNome">SubCategorias</label>
-												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo $sSubCategoriasNome; ?>" readOnly>
+												<label for="inputSubCategoriaNome">SubCategoria(s)</label>
+												<select id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+													<?php 
+														$sql = "SELECT SbCatId, SbCatNome
+																FROM SubCategoria
+																JOIN Situacao on SituaId = SbCatStatus	
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+																ORDER BY SbCatNome ASC"; 
+														$result = $conn->query($sql);
+														$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+														$count = count($rowBD);														
+																
+														foreach ( $rowBD as $item){	
+															print('<option value="'.$item['SbCatId,'].'"disabled selected>'.$item['SbCatNome'].'</option>');	
+														}                    
+													?>
+												</select>
 											</div>
 										</div>
+
+
+
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputContrato">Contrato</label>
