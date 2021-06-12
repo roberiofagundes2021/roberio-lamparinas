@@ -371,7 +371,7 @@ try {
 											</div>
 										</div>
 										
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputSubCategoriaNome">SubCategoria(s)</label>
 												<select id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
@@ -393,21 +393,19 @@ try {
 											</div>
 										</div>
 
-
-
-										<div class="col-lg-2">
+										<div class="col-lg-1 fluxoContrato">
 											<div class="form-group">
 												<label for="inputContrato">Contrato</label>
 												<input type="text" id="inputContrato" name="inputContrato" class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly>
 											</div>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-2 fluxoProcesso">
 											<div class="form-group">
 												<label for="inputProcesso">Processo</label>
 												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
 											</div>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-2 fluxoProcesso">
 											<div class="form-group">
 												<label for="inputValor">Valor Total</label>
 												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
