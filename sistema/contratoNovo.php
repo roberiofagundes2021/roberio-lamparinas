@@ -29,6 +29,14 @@ if ($rowParametro['ParamEmpresaPublica']) {
 	$bObrigatorio = "";
 }
 
+//Verifica se o TR tem SubCategoria
+$sql = "SELECT COUNT(TRXSCSubcategoria) as CountSubCategoria
+		FROM TRXSubcategoria
+		WHERE TRXSCUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = ".$iTR;	
+$result = $conn->query($sql);
+$rowSubCategoria = $result->fetch(PDO::FETCH_ASSOC);
+
+//Se estiver gravando
 if (isset($_POST['inputDataInicio'])) {
 
 	try {
@@ -172,13 +180,14 @@ if (isset($_POST['inputDataInicio'])) {
 				FiltraSubCategoria();
 
 				var cmbFornecedor = $('#cmbFornecedor').val();
+				var idTR = $('#inputTermoReferenciaId').val();
 				var validator = $("#formFluxoOperacional").validate();
 
 				validator.element("#cmbFornecedor"); //Valida apenas esse elemento nesse momento de alteração
 
-				$.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
+				$.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor + '&idTR=' + idTR, function(dados) {
 
-						var option = '';
+					var option = '';
 
 					if (dados.length) {
 
@@ -295,18 +304,27 @@ if (isset($_POST['inputDataInicio'])) {
 										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
 											<option value="">Selecione</option>
 											<?php
-											$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-													FROM Fornecedor
-													JOIN Categoria on CategId = ForneCategoria
-													JOIN Situacao on SituaId = ForneStatus
-													WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and ForneCategoria = " . $row['CategId'] . " and SituaChave = 'ATIVO'
-													ORDER BY ForneNome ASC";
-											$result = $conn->query($sql);
-											$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+												$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+														FROM Fornecedor
+														JOIN Categoria on CategId = ForneCategoria
+														JOIN Situacao on SituaId = ForneStatus ";
+												
+												//Se tiver SubCategoria deve-se filtrar os fornecedores que possuem as SubCategorias do TR, evitando de trazer fornecedores desnecessários
+												if ($rowSubCategoria['CountSubCategoria']){
+													$sql .=	" JOIN FornecedorXSubCategoria on FrXSCFornecedor = ForneId
+															  JOIN TRXSubcategoria on TRXSCSubcategoria = FrXSCSubCategoria ";
+												}		
 
-											foreach ($rowFornecedor as $item) {
-												print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
-											}
+												$sql .=	"WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and 
+														 ForneCategoria = " . $row['CategId'] . " and SituaChave = 'ATIVO'
+														 ORDER BY ForneNome ASC";
+												$result = $conn->query($sql);
+												$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+
+												foreach ($rowFornecedor as $item) {
+													print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+												}
 
 											?>
 										</select>

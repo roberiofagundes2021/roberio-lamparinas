@@ -234,7 +234,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbProduto">Produto de Referência <span class="text-danger">*</span></label>
 												<input type="hidden" id="inputProduto" name="inputProduto" value="<?php echo $row['PrOrcProduto'] ?>">
-												<select id="cmbProduto" name="cmbProduto" class="form-control select-search" required <?php $contTRs > 1 ? print('disabled') : ''; ?>>
+												<select id="cmbProduto" name="cmbProduto" class="form-control select-search" required <?php //$contTRs > 1 ? print('disabled') : ''; ?>>
 													<option value="">Selecione</option>
 													<?php 
 													$sql = "SELECT ProduId, ProduNome

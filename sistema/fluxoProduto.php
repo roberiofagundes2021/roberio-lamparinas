@@ -70,8 +70,9 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 
 try{
 	
-	$sql = "SELECT FlOpeId, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
-				   FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, SituaNome,
+	$sql = "SELECT FlOpeId, FlOpeTermoReferencia, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, 
+				   CategNome, FlOpeCategoria, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, 
+				   SituaNome, TrRefTabelaProduto,
 				   dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, 
 				   dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado
 			FROM FluxoOperacional
@@ -79,6 +80,7 @@ try{
 			JOIN Categoria on CategId = FlOpeCategoria
 			JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
 			JOIN Situacao on SituaId = FlOpeStatus
+			LEFT JOIN TermoReferencia on TrRefId = FlOpeTermoReferencia
 			WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -225,20 +227,30 @@ try{
 				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
 				var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
 				var totalProdutos = $('#totalRegistros').val();
+				var inputOrigem = $('#inputOrigem').val();
 
                 var cont = 1;
 
 				for(i = 0; i <= totalProdutos; i++){
-                       var valorTotal = $(`#inputValorTotal${i}`).val()
-                       cont = valorTotal == '' ? 0 : 1;
-					   if ($(`#inputValorTotal${i}`).val() == '0,00') {
-						alerta('Atenção', 'Preencha todas as quantidades e valores dos produtos selecionados ou retire da lista', 'error');
+                    var valorTotal = $(`#inputValorTotal${i}`).val()
+                    cont = valorTotal == '' ? 0 : 1;
+					if ($(`#inputValorTotal${i}`).val() == '0,00') {
+						if (inputOrigem == 'fluxo.php'){
+							alerta('Atenção', 'Preencha todas as quantidades e valores dos produtos selecionados ou retire da lista', 'error');
+						} else {
+							alerta('Atenção', 'Preencha todas as quantidades e valores dos produtos', 'error');
+						}
+						
 						return false;
 					}
 				}
 
 				if(cont == 0){
-					alerta('Atenção','Preencha todas as quantidades e valores dos produtos selecionados, ou retire da lista','error');
+					if (inputOrigem == 'fluxo.php'){
+						alerta('Atenção','Preencha todas as quantidades e valores dos produtos selecionados, ou retire da lista','error');
+					} else {
+						alerta('Atenção','Preencha todas as quantidades e valores dos produtos','error');
+					}
 					return false;
 				}
 				
@@ -482,34 +494,79 @@ try{
 									
 									<?php
 
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
-												FROM Produto
-												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												LEFT JOIN Marca on MarcaId = ProduMarca
-												JOIN SubCategoria on SbCatId = ProduSubCategoria
-												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
-												ORDER BY SbCatNome ASC";
-										$result = $conn->query($sql);
-										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-										$countProduto = count($rowProdutos);
-										
-										if (!$countProduto){
-											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+										if ($_POST['inputOrigem'] == 'fluxo.php'){
+											
+											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 													FROM Produto
+													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-													JOIN Situacao on SituaId = ProduStatus
 													LEFT JOIN Marca on MarcaId = ProduMarca
 													JOIN SubCategoria on SbCatId = ProduSubCategoria
-													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and 
-													ProduSubCategoria in (".$sSubCategorias.") and SituaChave = 'ATIVO' 
+													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
 													ORDER BY SbCatNome ASC";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 											$countProduto = count($rowProdutos);
-										} 
+											
+											if (!$countProduto){
+												$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+														FROM Produto
+														JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+														JOIN Situacao on SituaId = ProduStatus
+														LEFT JOIN Marca on MarcaId = ProduMarca
+														JOIN SubCategoria on SbCatId = ProduSubCategoria
+														WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and 
+														ProduSubCategoria in (".$sSubCategorias.") and SituaChave = 'ATIVO' 
+														ORDER BY SbCatNome ASC";
+												$result = $conn->query($sql);
+												$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+												$countProduto = count($rowProdutos);
+											} 
 
-										$cont = 0;
+										} else{
+
+											$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, UnMedSigla, 
+													FOXPrQuantidade, FOXPrValorUnitario, SbCatNome, MarcaNome
+													FROM Produto
+													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId 
+													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+													LEFT JOIN Marca on MarcaId = ProduMarca
+													JOIN SubCategoria on SbCatId = ProduSubCategoria
+													WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+													and FOXPrFluxoOperacional = " . $iFluxoOperacional."
+													ORDER BY SbCatNome ASC";
+											$result = $conn->query($sql);
+											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+											$countProduto = count($rowProdutos);
+
+											if (!$countProduto) {
+
+												if ($row['TrRefTabelaProduto'] == 'Produto'){
+													$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, MarcaNome, UnMedSigla, SbCatNome
+															FROM Produto															
+															JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
+															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+															LEFT JOIN Marca on MarcaId = ProduMarca
+															JOIN SubCategoria on SbCatId = ProduSubCategoria
+															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
+															ORDER BY SbCatNome ASC";													
+												} else { //Se $row['TrRefTabelaProduto'] == ProdutoOrcamento
+													$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, MarcaNome, UnMedSigla, SbCatNome
+															FROM Produto
+															JOIN ProdutoOrcamento on PrOrcProduto = ProduId
+															JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
+															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+															LEFT JOIN Marca on MarcaId = ProduMarca
+															JOIN SubCategoria on SbCatId = ProduSubCategoria
+															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
+															ORDER BY SbCatNome ASC";
+												}
+
+												$result = $conn->query($sql);
+												$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+												$countProduto = count($rowProdutos);
+											}
+										}
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
@@ -550,6 +607,7 @@ try{
 										
 										print('<div id="tabelaProdutos">');
 										
+										$cont = 0;
 										$fTotalGeral = 0;
 										
 										foreach ($rowProdutos as $item){
