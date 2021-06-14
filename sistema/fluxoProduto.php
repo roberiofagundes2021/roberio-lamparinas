@@ -496,7 +496,7 @@ try{
 
 										if ($_POST['inputOrigem'] == 'fluxo.php'){
 											
-											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 													FROM Produto
 													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -509,7 +509,7 @@ try{
 											$countProduto = count($rowProdutos);
 											
 											if (!$countProduto){
-												$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+												$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, MarcaNome
 														FROM Produto
 														JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 														JOIN Situacao on SituaId = ProduStatus
@@ -525,9 +525,10 @@ try{
 
 										} else{
 
-											$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, UnMedSigla, 
+											$sql = "SELECT Distinct ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, UnMedSigla, 
 													FOXPrQuantidade, FOXPrValorUnitario, SbCatNome, MarcaNome
 													FROM Produto
+													JOIN ProdutoOrcamento on PrOrProduto = ProduId
 													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId 
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													LEFT JOIN Marca on MarcaId = ProduMarca
@@ -542,7 +543,7 @@ try{
 											if (!$countProduto) {
 
 												if ($row['TrRefTabelaProduto'] == 'Produto'){
-													$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, MarcaNome, UnMedSigla, SbCatNome
+													$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
 															FROM Produto															
 															JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -551,7 +552,7 @@ try{
 															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
 															ORDER BY SbCatNome ASC";													
 												} else { //Se $row['TrRefTabelaProduto'] == ProdutoOrcamento
-													$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, MarcaNome, UnMedSigla, SbCatNome
+													$sql = "SELECT Distinct ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
 															FROM Produto
 															JOIN ProdutoOrcamento on PrOrcProduto = ProduId
 															JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId

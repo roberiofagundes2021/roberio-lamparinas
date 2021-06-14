@@ -496,7 +496,7 @@ try {
 
 										if ($_POST['inputOrigem'] == 'fluxo.php'){
 
-											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario
+											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
 													FROM Servico
 													JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 													JOIN SubCategoria on SbCatId = ServiSubCategoria
@@ -507,7 +507,7 @@ try {
 											$countServico = count($rowServicos);
 
 											if (!$countServico) {
-												$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
+												$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento
 														FROM Servico
 														JOIN Situacao on SituaId = ServiStatus
 														JOIN SubCategoria on SbCatId = ServiSubCategoria
@@ -521,8 +521,9 @@ try {
 
 										} else{
 
-											$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, SbCatNome
-													FROM Servico													
+											$sql = "SELECT Distinct ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario, SbCatNome
+													FROM Servico
+													JOIN ServicoOrcamento on SrOrcServico = ServiId
 													JOIN FluxoOperacionalXServico on FOXSrServico = ServiId 
 													JOIN SubCategoria on SbCatId = ServiSubCategoria
 													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
@@ -535,14 +536,14 @@ try {
 											if (!$countServico) {
 
 												if ($row['TrRefTabelaServico'] == 'Servico'){
-													$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento, SbCatNome
+													$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento as Detalhamento, SbCatNome
 															FROM Servico
 															JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = ServiId
 															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia']."
 															ORDER BY SbCatNome ASC";
 												} else { //Se $row['TrRefTabelaServico'] == ServicoOrcamento
-													$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento, SbCatNome
+													$sql = "SELECT Distinct ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, SbCatNome
 															FROM Servico
 															JOIN ServicoOrcamento on SrOrcServico = ServiId
 															JOIN SubCategoria on SbCatId = ServiSubCategoria
@@ -610,7 +611,7 @@ try {
 																<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
 															</div>
 															<div class="col-lg-11">
-																<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+																<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['Detalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
 															</div>
 														</div>
 													</div>
