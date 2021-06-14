@@ -270,31 +270,28 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="cmbProduto">Produto</label>
+												<label for="cmbProduto">Produto/Serviço</label>
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc >
 													<?php 
 														$sql = "SELECT ProduId, ProduNome
-																	FROM Produto
-																	JOIN Situacao on SituaId = ProduStatus
-																	JOIN SubCategoria on SbCatId = ProduSubCategoria
-																	WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
-															if ($sSubCategorias != "") {
-																$sql .= " and ProduSubCategoria in (".$sSubCategorias.")";
-															}
-															$sql .=	" ORDER BY SbCatNome ASC";
-															$result = $conn->query($sql);
-															$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
+																FROM Produto
+																JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId 
+																JOIN SubCategoria on SbCatId = ProduSubCategoria
+																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
+															 	ORDER BY SbCatNome ASC";
+														$result = $conn->query($sql);
+														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 															
-															foreach ($rowProduto as $item){	
-																
-																if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
-																	$seleciona = "disabled selected";
-																} else {
-																	$seleciona = "";
-																}													
-																
-																print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
-															}
+														foreach ($rowProduto as $item){	
+															
+															if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
+																$seleciona = "disabled selected";
+															} else {
+																$seleciona = "";
+															}													
+															
+															print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
+														}
 													
 													?>
 												</select>
@@ -391,7 +388,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 									<thead>
 										<tr class="bg-slate">
 											<th width="4%">Item</th>
-											<th width="26%">Produto</th>
+											<th width="26%">Produto/Serviço</th>
 											<th width="15%">Marca</th>
 											<th width="9%">Unidade</th>
 											<th width="9%">Quant.</th>									
@@ -474,12 +471,17 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 
 								<?php
 									
-									$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca
 											FROM Produto
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 											JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 											LEFT JOIN Marca on MarcaId = ProduMarca
-											WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+											UNION
+											SELECT ServiId as Id, ServiNome as Nome, ServiDetalhamento as Detalhamento, '' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca
+											FROM Servico
+											JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+											LEFT JOIN Marca on MarcaId = ServiMarca
+											WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
 									$result = $conn->query($sql);
 									$rowRealizado = $result->fetchAll(PDO::FETCH_ASSOC);
 									
@@ -491,7 +493,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 									<thead>
 										<tr class="bg-slate">
 											<th width="4%">Item</th>
-											<th width="26%">Produto</th>
+											<th width="26%">Produto/Serviço</th>
 											<th width="15%">Marca</th>
 											<th width="9%">Unidade</th>
 											<th width="9%">Quant.</th>									
@@ -508,7 +510,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 
 											foreach ($rowRealizado as $item){
 
-												$iQuantidadePrevista = isset($item['FOXPrQuantidade']) ? $item['FOXPrQuantidade'] : 0;
+												$iQuantidadePrevista = isset($item['Quantidade']) ? $item['Quantidade'] : 0;
 												$fValorUnitarioPrevisto = isset($item['FOXPrValorUnitario']) ? mostraValor($item['FOXPrValorUnitario']) : '0.00';
 												$fValorTotalPrevisto = (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? $item['FOXPrQuantidade'] * $item['FOXPrValorUnitario']: 0.00;
 

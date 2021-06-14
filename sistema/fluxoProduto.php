@@ -528,7 +528,7 @@ try{
 											$sql = "SELECT Distinct ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, UnMedSigla, 
 													FOXPrQuantidade, FOXPrValorUnitario, SbCatNome, MarcaNome
 													FROM Produto
-													JOIN ProdutoOrcamento on PrOrProduto = ProduId
+													JOIN ProdutoOrcamento on PrOrcProduto = ProduId
 													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId 
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													LEFT JOIN Marca on MarcaId = ProduMarca
@@ -630,7 +630,7 @@ try{
 															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
 														</div>
 														<div class="col-lg-8">
-															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['Detalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
 														</div>
 														<div class="col-lg-3">
 															<input type="text" id="inputMarca'.$cont.'" name="inputMarca'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['MarcaNome'].'" value="'.$item['MarcaNome'].'" readOnly>
