@@ -7,10 +7,13 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 include('global_assets/php/conexao.php');
 
 $iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
+$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
 
 $sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
-			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus
+			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, ForneNome, CategNome 
 		FROM FluxoOperacional
+		JOIN Fornecedor ON ForneId = FlOpeFornecedor
+		JOIN Categoria ON CategId = FlOpeCategoria	 
 	    WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ". $iFluxoOperacional . "";
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -24,7 +27,7 @@ if ($row['FlOpeDataFim'] > date("Y-m-d")){
 
 $sql = "SELECT FOXPrProduto
 		FROM FluxoOperacionalXProduto
-		JOIN Produto on ProduId = FOXPrProduto
+		LEFT JOIN Produto on ProduId = FOXPrProduto
 		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 $result = $conn->query($sql);
 $rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -32,6 +35,26 @@ $countProdutoUtilizado = count($rowProdutoUtilizado);
 
 foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 	$aProdutos[] = $itemProdutoUtilizado['FOXPrProduto'];
+}
+
+//SubCategorias para esse fornecedor
+$sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
+		FROM SubCategoria
+		LEFT JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
+		WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
+		ORDER BY SbCatNome ASC";
+	$result = $conn->query($sql);
+	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+
+	$sSubCategorias = '';
+
+	foreach ($rowBD as $item){
+
+	if ($sSubCategorias == ''){
+		$sSubCategorias .= $item['SbCatId'];	
+	} else {
+		$sSubCategorias .= ", ".$item['SbCatId'];
+	}
 }
 
 ?>
@@ -171,7 +194,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top  sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -211,72 +234,34 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor</label>
-												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
-													<option value="">Selecione</option>
-													<?php 
-														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-																FROM Fornecedor
-																JOIN Situacao on SituaId = ForneStatus
-																WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																ORDER BY ForneNome ASC";
-														$result = $conn->query($sql);
-														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowFornecedor as $item){
-															$seleciona = $item['ForneId'] == $row['FlOpeFornecedor'] ? "selected" : "";												
-															print('<option value="'.$item['ForneId'].'" '. $seleciona .'>'.$item['ForneNome'].'</option>');
-														}
-													
-													?>
-												</select>
+												<input type="text" id="cmbFornecedor" name="cmbFornecedor" class="form-control"  value="<?php echo $row['ForneNome']; ?>" readOnly >
 											</div>
 										</div>
 										
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
-													<option value="">Selecione</option>
-													<?php 
-														$sql = "SELECT CategId, CategNome
-																FROM Categoria
-																JOIN Fornecedor on ForneCategoria = CategId
-																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and ForneId = ".$row['FlOpeFornecedor']."
-																ORDER BY CategNome ASC";
-														$result = $conn->query($sql);
-														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowCategoria as $item){			
-															$seleciona = $item['CategId'] == $row['FlOpeCategoria'] ? "selected" : "";
-															print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
-														}
-													
-													?>											
-												</select>
+												<input type="text" id="cmbCategoria" name="cmbCategoria" class="form-control"  value="<?php echo $row['CategNome']; ?>" readOnly >
 											</div>
 										</div>
 										
 										<div class="col-lg-4">
-											<label for="cmbSubCategoria">SubCategoria</label>
-											<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
-												<option value="">Selecione</option>
+											<label for="inputSubCategoriaNome">SubCategoria(s)</label>
+											<select id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 												<?php 
-												 
 													$sql = "SELECT SbCatId, SbCatNome
 															FROM SubCategoria
-															LEFT JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
-															JOIN Situacao on SituaId = SbCatStatus
-															WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and FrXSCFornecedor = '". $row['FlOpeFornecedor']."' and SituaChave = 'ATIVO'
-															Order By SbCatNome ASC";
+															JOIN Situacao on SituaId = SbCatStatus	
+															WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+															ORDER BY SbCatNome ASC"; 
 													$result = $conn->query($sql);
-													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($rowSubCategoria as $item){			
-														$seleciona = $item['SbCatId'] == $row['FlOpeSubCategoria'] ? "selected" : "";
-														print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
-													}
-												
-												?>										
+													$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+													$count = count($rowBD);														
+															
+													foreach ( $rowBD as $item){	
+														print('<option value="'.$item['SbCatId,'].'"disabled selected>'.$item['SbCatNome'].'</option>');	
+													}                    
+												?>
 											</select>
 										</div>	
 									</div>
@@ -289,23 +274,27 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc >
 													<?php 
 														$sql = "SELECT ProduId, ProduNome
-																FROM Produto
-																JOIN Situacao on SituaId = ProduStatus
-																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' 
-																ORDER BY ProduNome ASC";
-														$result = $conn->query($sql);
-														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
-														
-														foreach ($rowProduto as $item){	
+																	FROM Produto
+																	JOIN Situacao on SituaId = ProduStatus
+																	JOIN SubCategoria on SbCatId = ProduSubCategoria
+																	WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
+															if ($sSubCategorias != "") {
+																$sql .= " and ProduSubCategoria in (".$sSubCategorias.")";
+															}
+															$sql .=	" ORDER BY SbCatNome ASC";
+															$result = $conn->query($sql);
+															$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 															
-															if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
-																$seleciona = "selected";
-															} else {
-																$seleciona = "";
-															}													
-															
-															print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
-														}
+															foreach ($rowProduto as $item){	
+																
+																if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
+																	$seleciona = "disabled selected";
+																} else {
+																	$seleciona = "";
+																}													
+																
+																print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
+															}
 													
 													?>
 												</select>
@@ -319,7 +308,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 													<span class="input-group-prepend">
 														<span class="input-group-text"><i class="icon-calendar22"></i></span>
 													</span>
-													<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['FlOpeDataInicio']; ?>" >
+													<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['FlOpeDataInicio']; ?>" readOnly >
 												</div>
 											</div>
 										</div>
@@ -331,7 +320,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 													<span class="input-group-prepend">
 														<span class="input-group-text"><i class="icon-calendar22"></i></span>
 													</span>
-													<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $dataFim; ?>" >
+													<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $dataFim; ?>" readOnly >
 												</div>
 											</div>
 										</div>								
@@ -339,20 +328,24 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputNumContrato">Número do Contrato</label>
-												<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>" >
+												<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly >
 											</div>
 										</div>
 												
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputNumProcesso">Número do Processo</label>
-												<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>" >
+												<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
 											</div>
 										</div>
 
 									</div>
-
-									<div class="text-right"><a href="fluxoRealizado.php" class="btn btn-principal" role="button">Filtrar</a></div>
+									<div class="col-lg-12">	
+											<div class="text-right">
+												<a href="contrato.php" class="btn btn-basic" role="button"><< Fluxo Operacional/Contrato</a>
+											</div>
+									</div>
+									<!-- <div class="text-right"><a href="fluxoRealizado.php" class="btn btn-principal" role="button">Filtrar</a></div> -->
 								</form>
 							</div>
 						</div>
