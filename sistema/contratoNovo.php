@@ -290,7 +290,7 @@ if (isset($_POST['inputDataInicio'])) {
 										<label for="inputTermoReferencia">Nº do Termo de Referência</label>
 										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $row['TrRefNumero']; ?>" readOnly>
 										<input type="hidden" id="inputTermoReferenciaId" name="inputTermoReferenciaId" value="<?php echo $row['TrRefId']; ?>">
-										<input type="hidden" id="inputTRId" name="inputTRId" value="<?php echo $row['TrRefId']; ?>">										
+										<input type="hidden" id="inputTRId" name="inputTRId" value="<?php echo $row['TrRefId']; ?>">
 									</div>
 								</div>
                             </div>
