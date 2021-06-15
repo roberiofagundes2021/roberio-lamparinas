@@ -14,12 +14,11 @@ if (isset($_POST['inputFluxoId'])) {
 	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
 }
 
-$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, CategNome, SbCatNome,
-		ForneNome, ForneCelular, ForneEmail
+$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, CategNome, 
+		dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, ForneNome, ForneCelular, ForneEmail
 		FROM FluxoOperacional
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
 		JOIN Categoria on CategId = FlOpeCategoria
-		JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 		WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -106,21 +105,24 @@ try {
 	$html .= '
     <table style="width:100%; border-collapse: collapse;">
         <tr style="background-color:#F1F1F1;">
-            <td style="width:28%; font-size:14px;">Início: ' . mostraData($row['FlOpeDataInicio']) . '</td>
-            <td style="width:22%; font-size:14px;">Fim: ' . mostraData($row['FlOpeDataFim']) . '</td>
-            <td style="width:30%; font-size:14px;">Nº Ata Registro: ' . $row['FlOpeNumContrato'] . '</td>
-			<td style="width:5%; font-size:14px;">Nº Processo: ' . $row['FlOpeNumProcesso'] . '</td>
-			<td style="width:5%; font-size:14px; border-right: none;">Valor:</td>			
-			<td style="width:10%; font-size:14px; border-left: none; text-align:right;">' . mostraValor($row['FlOpeValor']) . '</td>
+            <td style="width:20%; font-size:14px;">Início:<br>' . mostraData($row['FlOpeDataInicio']) . '</td>
+            <td style="width:20%; font-size:14px;">Fim:<br>' . mostraData($row['FlOpeDataFim']) . '</td>
+            <td style="width:20%; font-size:14px;">Nº Ata Registro:<br>' . $row['FlOpeNumContrato'] . '</td>
+			<td style="width:20%; font-size:14px;">Nº Processo:<br>' . $row['FlOpeNumProcesso'] . '</td>
+			<td style="width:20%; font-size:14px; border-left: none; text-align:right;">Valor:<br>' . mostraValor($row['FlOpeValor']) . '</td>
         </tr>
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
         <tr>
-            <td colspan="2" style="font-size:14px;">Categoria: ' . $row['CategNome'] . '</td>
-            <td colspan="4" style="font-size:14px;">Sub Categoria: ' . $row['SbCatNome'] . '</td>
+            <td style="width:40%; font-size:14px;">Categoria:<br>' . $row['CategNome'] . '</td>
+            <td style="width:60%; font-size:14px;">Sub Categoria:<br>' . $row['SubCategorias'] . '</td>
         </tr>
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
         <tr>
-            <td colspan="3" style="width:36%; font-size:14px;">Fornecedor: ' . $row['ForneNome'] . '</td>
-            <td colspan="1" style="width:29%; font-size:14px;">E-mail: ' . $row['ForneEmail'] . '</td>
-            <td colspan="2" style="width:35%; font-size:14px;"> Telefone: ' . $row['ForneCelular'] . '</td>
+            <td style="width:40%; font-size:14px;">Fornecedor:<br>' . $row['ForneNome'] . '</td>
+            <td style="width:40%; font-size:14px;">E-mail:<br>' . $row['ForneEmail'] . '</td>
+            <td style="width:20%; font-size:14px;">Telefone:<br>' . $row['ForneCelular'] . '</td>
         </tr>
     </table>
 	<br>';
