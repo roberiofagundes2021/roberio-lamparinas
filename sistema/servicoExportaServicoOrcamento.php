@@ -9,20 +9,20 @@ $_SESSION['msg'] = array();
 if (isset($_POST['inputServicoId'])) {
     $sql = "SELECT ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, ServiStatus
             FROM Servico
-            WHERE ServiId = " . $_POST['inputServicoId'] . " and ServiUnidade = " . $_SESSION['UnidadeId'] . "
-           ";
+            WHERE ServiId = " . $_POST['inputServicoId'] . " and ServiUnidade = " . $_SESSION['UnidadeId'];
     $result = $conn->query($sql);
     $servico = $result->fetch(PDO::FETCH_ASSOC);
 
     if ($servico) {
         try {
-            $sql = "INSERT INTO ServicoOrcamento (SrOrcNome, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubCategoria, SrOrcSituacao, 
+            $sql = "INSERT INTO ServicoOrcamento (SrOrcNome, SrOrcServico, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubCategoria, SrOrcSituacao, 
                 SrOrcUsuarioAtualizador, SrOrcUnidade) 
-				VALUES (:sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
+				VALUES (:sNome, :iServico, :sDetalhamento, :iCategoria, :iSubCategoria, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
             $result = $conn->prepare($sql);
 
             $result->execute(array(
                 ':sNome' => $servico['ServiNome'],
+                ':iServico' => $_POST['inputServicoId'],
                 ':sDetalhamento' => $servico['ServiDetalhamento'],
                 ':iCategoria' => $servico['ServiCategoria'],
                 ':iSubCategoria' => $servico['ServiSubCategoria'],

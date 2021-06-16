@@ -18,16 +18,17 @@ if(isset($_POST['inputNome'])){
 
 	try{
 
-		$sql = "INSERT INTO ProdutoOrcamento (PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubcategoria, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcUsuarioAtualizador, PrOrcUnidade) 
-				VALUES (:sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :iUnidadeMedida, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
+		$sql = "INSERT INTO ProdutoOrcamento (PrOrcNome, PrOrcProduto, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubcategoria, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcUsuarioAtualizador, PrOrcUnidade) 
+				VALUES (:sNome, :iProduto, :sDetalhamento, :iCategoria, :iSubCategoria, :iUnidadeMedida, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 						
 						':sNome' => $_POST['inputNome'],
+						':iProduto' => $_POST['cmbProduto'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
-						':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
+						':iCategoria' => $_POST['inputCategoriaId'],
+						':iSubCategoria' => $_POST['inputSubCategoriaId'],
 						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '' ? null : $_POST['cmbUnidadeMedida'],
 						':iSituacao' => $_POST['inputSituacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -66,7 +67,9 @@ if(isset($_POST['inputNome'])){
 	<!---------------------------------Scripts Universais------------------------------------>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>	
 	
 	<!-- Validação -->
     <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
@@ -77,35 +80,44 @@ if(isset($_POST['inputNome'])){
 	    
 		$(document).ready(()=>{
         
-			$("#cmbCategoria").change((e)=>{
-               
-                Filtrando()
-
-                const categId = $(e.target).val()
-
-                $.getJSON('filtraSubCategoria.php?idCategoria='+categId, function (dados){
+			$("#cmbProduto").change((e)=>{
+            
+				const produtoId = $(e.target).val()
 				
-					let option = '<option value="">Selecione a SubCategoria</option>';
+				$.getJSON('filtraCategoria.php?idProduto='+produtoId, function (dados){
+
+                if (dados.length){
+						
+						$.each(dados, function(i, obj){					
+							$('#inputCategoriaId').val(obj.CategId);
+							$('#inputCategoriaNome').val(obj.CategNome);
+						});
+
+					} else {
+						Reset();
+					}
+				});
+
+				$.getJSON('filtraSubCategoria.php?idProduto='+produtoId, function (dados){
 					
-					if (dados.length){
+					if (dados.length){						
 						
 						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						});						
-						
-						$('#cmbSubCategoria').html(option).show();
+							$('#inputSubCategoriaId').val(obj.SbCatId);
+							$('#inputSubCategoriaNome').val(obj.SbCatNome);
+						});
+
 					} else {
 						Reset();
 					}					
 				});
-            })
+            });
 
-            function Filtrando(){
-				$('#cmbSubCategoria').empty().append('<option value="">Filtrando...</option>');
-			}
-			
 			function Reset(){
-				$('#cmbSubCategoria').empty().append('<option value="">Sem Subcategoria</option>');
+				$('#inputCategoriaId').val("");
+				$('#inputCategoriaNome').val("");
+				$('#inputSubCategoriaId').val("");
+				$('#inputSubCategoriaNome').val("");
 			}
 	    
 			//Valida Registro Duplicado
@@ -113,26 +125,24 @@ if(isset($_POST['inputNome'])){
 
 				e.preventDefault();
 				
-				let inputNome = $('#inputNome').val();
-
-				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
+				let cmbProduto = $('#cmbProduto').val();
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
 					url: "produtoOrcamentoValida.php",
-					data: ('nome='+inputNome),
+					data: ('IdProduto='+cmbProduto),
 					success: function(resposta){
 						
 						if(resposta == 1){
-							alerta('Atenção','Já existe um produto com esse nome!','error');
+							alerta('Atenção','Esse produto de referência já foi utilizado!','error');
 							return false;
-						}						
+						}
+						
+						$("#formProduto").submit();				
 					}
 				})
 
-				$( "#formProduto" ).submit();
 			})
 
 			$('#cancelar').on('click', function(e){
@@ -175,13 +185,13 @@ if(isset($_POST['inputNome'])){
 							<div class="media">
 								<div class="media-body">
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputUnidadeMedida">Unidade de Medida <span class="text-danger">*</span></label>
 												<select id="cmbUnidadeMedida" class="form-control form-control-select2" name="cmbUnidadeMedida" required>
@@ -202,6 +212,28 @@ if(isset($_POST['inputNome'])){
 												</select>
 											</div>
 										</div>
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbProduto">Produto de Referência <span class="text-danger">*</span></label>
+												<select id="cmbProduto" name="cmbProduto" class="form-control select-search" required>
+													<option value="">Selecione</option>
+													<?php 
+													$sql = "SELECT ProduId, ProduNome
+															FROM Produto
+															JOIN Situacao on SituaId = ProduStatus
+															WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+															ORDER BY ProduNome ASC";
+													$result = $conn->query($sql);
+													$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowProduto as $item){
+														print('<option value="'.$item['ProduId'].'">'.$item['ProduNome'].'</option>');
+													}
+													
+													?>
+												</select>
+											</div>
+										</div>				
 									</div>
 									<div class="row">
 										<div class="col-lg-12">
@@ -213,40 +245,24 @@ if(isset($_POST['inputNome'])){
 									</div>
 								</div>
 							</div> 
+							<br />
 							<div class="row">
 								<div class="col-lg-12">
-									<h5 class="mb-0 font-weight-semibold">Classificação</h5>
-									<br>
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
-													<option value="">Selecione</option>
-													<?php 
-													$sql = "SELECT CategId, CategNome
-															FROM Categoria
-															JOIN Situacao on SituaId = CategStatus
-															WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-															ORDER BY CategNome ASC";
-													$result = $conn->query($sql);
-													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowCategoria as $item){
-														print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-													}
-													
-													?>
-												</select>
+												<label for="cmbCategoria">Categoria</label>
+												<input type="hidden" id="inputCategoriaId" name="inputCategoriaId">
+												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" readOnly>
+												
 											</div>
 										</div>
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="">Selecione</option>
-													</select>
-												</div>
+												<input type="hidden" id="inputSubCategoriaId" name="inputSubCategoriaId">
+												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" readOnly>
+
 											</div>
 										</div>
 									</div>
@@ -261,23 +277,26 @@ if(isset($_POST['inputNome'])){
 									</div>
 								</div>
 							</div>
+						</div>	
 							<!-- /card-body -->
-						</form>
-					</div>
+					</form>
 					<!-------------------------------------------------------------------------------------------------------------------------------->
 				</div>
 				<!-- /content area -->
-
-				<?php include_once("footer.php"); ?>
-
+			
 			</div>
-			<!-- /main content -->
+			<!-- /Content content -->
+
+			<?php include_once("footer.php"); ?>
 
 		</div>
-		<!-- /page content -->
+		<!-- /main content -->
 
-		<?php include_once("alerta.php"); ?>
+	</div>
+	<!-- /page content -->
 
-	</body>
+	<?php include_once("alerta.php"); ?>
 
-	</html>
+</body>
+
+</html>

@@ -222,8 +222,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					document.formTR.action = "trAprovacaoComissao.php";
 					document.formTR.submit();
 				} else if (Tipo == 'gerarContrato'){
-					document.formTR.action = "contratoNovo.php";
-					document.formTR.submit();
+
+					//Esse ajax está sendo usado para verificar se já foi gerado contrato para todas as SubCategorias
+					$.ajax({
+
+						type: "POST",
+						url: "trContratoValida.php",
+						data: ('IdTR='+TRId),
+						success: function(resposta){
+							
+							if(resposta == 1){
+								alerta('Atenção','Mais nenhum contrato pode ser gerado para o TR ' + TRNumero + '. Todas as SubCategorias já possuem contrato!','error');
+								return false;
+							}
+		
+							document.formTR.action = "contratoNovo.php";
+							document.formTR.submit();
+						}
+					});
+
 				} else if (Tipo == 'finalizarTR') {
 						
 					bootbox.confirm("Tem certeza que deseja finalizar o TR?", function(result){ 

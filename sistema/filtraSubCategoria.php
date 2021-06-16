@@ -10,6 +10,17 @@ if (isset($_GET['idOrcamento'])){
 			JOIN OrcamentoXSubCategoria on OrXSCSubcategoria = SbCatId
 			JOIN Situacao on SituaId = SbCatStatus
 			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and OrXSCOrcamento = ". $_GET['idOrcamento']." and SituaChave = 'ATIVO' ";
+} else if (isset($_GET['idFornecedor']) && isset($_GET['idTR'])){
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria
+			JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
+			JOIN Situacao on SituaId = SbCatStatus
+			JOIN TRXSubcategoria on TRXSCSubcategoria = FrXSCSubCategoria
+			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and FrXSCFornecedor = ". $_GET['idFornecedor']." and 
+			SituaChave = 'ATIVO' and SbCatId not in (Select FOXSCSubCategoria From FluxoOperacional
+			JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
+			where FlOpeTermoReferencia = ".$_GET['idTR'].") ";
+
 } else if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != -1){
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria
@@ -37,6 +48,13 @@ if (isset($_GET['idOrcamento'])){
 			FROM SubCategoria 
 			JOIN Servico on ServiSubCategoria = SbCatId
 			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and ServiId = ". $_GET['idServico'];
+
+} else if (isset($_GET['idProduto']) && $_GET['idProduto'] != -1){
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria 
+			JOIN Produto on ProduSubCategoria = SbCatId
+			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and ProduId = ". $_GET['idProduto'];
+
 } else {
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria

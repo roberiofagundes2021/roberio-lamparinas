@@ -174,36 +174,59 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaProduto(ProduId, ProduNome, ProduStatus, Tipo) {
 
-			if (Tipo == 'exportar') {
-				document.formProduto.action = "produtoExportar.php";
-				document.formProduto.setAttribute("target", "_blank");
-			} else {
-				document.getElementById('inputProdutoId').value = ProduId;
-				document.getElementById('inputProdutoNome').value = ProduNome;
-				document.getElementById('inputProdutoStatus').value = ProduStatus;
+			document.getElementById('inputProdutoId').value = ProduId;
+			document.getElementById('inputProdutoNome').value = ProduNome;
+			document.getElementById('inputProdutoStatus').value = ProduStatus;
 
-				if (Tipo == 'edita') {
-					document.formProduto.action = "produtoEdita.php";
-				} else if (Tipo == 'exclui') {
-					confirmaExclusao(document.formProduto, "Tem certeza que deseja excluir esse produto?", "produtoExclui.php");
-				} else if (Tipo == 'mudaStatus') {
-					if(ProduStatus != 'ALTERAR'){
-						document.formProduto.action = "produtoMudaSituacao.php";
-					} else {
-						alerta('Atenção','Edite o produto e altere a categoria para a situação ficar "ATIVO".','error');
-						return false;
+			if(Tipo == 'exporta') {
+
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+
+					type: "POST",
+					url: "produtoOrcamentoValida.php",
+					data: ('IdProduto='+ProduId),
+					success: function(resposta){
+						
+						if(resposta == 1){
+							alerta('Atenção','Esse produto já foi exportado !','error');
+							return false;
+						}
+						
+						if(ProduStatus != 'ALTERAR'){
+							document.formProduto.action = "produtoExportaProdutoOrcamento.php";
+						} else{
+							alerta('Atenção','Edite o produto e altere a categoria antes de realizar a exportação.','error');
+							return false;
+						}
+
+						document.formProduto.submit();
 					}
-				} else if(Tipo == 'exporta') {
-					if(ProduStatus != 'ALTERAR'){
-                    	document.formProduto.action = "produtoExportaProdutoOrcamento.php";
-                    } else{
-                    	alerta('Atenção','Edite o produto e altere a categoria antes de realizar a exportação.','error');
-                    	return false;
-                    }
-				}
-			}
+				})
 
-			document.formProduto.submit();
+			} else{
+            
+				if (Tipo == 'exportar') {
+					document.formProduto.action = "produtoExportar.php";
+					document.formProduto.setAttribute("target", "_blank");
+				} else {
+
+					if (Tipo == 'edita') {
+						document.formProduto.action = "produtoEdita.php";
+					} else if (Tipo == 'exclui') {
+						confirmaExclusao(document.formProduto, "Tem certeza que deseja excluir esse produto?", "produtoExclui.php");
+					} else if (Tipo == 'mudaStatus') {
+						if(ProduStatus != 'ALTERAR'){
+							document.formProduto.action = "produtoMudaSituacao.php";
+						} else {
+							alerta('Atenção','Edite o produto e altere a categoria para a situação ficar "ATIVO".','error');
+							return false;
+						}
+					}  
+				}
+
+				document.formProduto.submit();
+			}
 		}
 		
 	</script>

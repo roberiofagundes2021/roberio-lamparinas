@@ -9,19 +9,19 @@ $_SESSION['msg'] = array();
 if (isset($_POST['inputProdutoId'])) {
     $sql = "SELECT ProduNome, ProduDetalhamento, ProduCategoria, ProduSubCategoria, ProduUnidadeMedida, ProduStatus
             FROM Produto
-            WHERE ProduId = " . $_POST['inputProdutoId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . "
-           ";
+            WHERE ProduId = " . $_POST['inputProdutoId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'];
     $result = $conn->query($sql);
     $Produto = $result->fetch(PDO::FETCH_ASSOC);
 
     if ($Produto) {
         try {
-            $sql = "INSERT INTO ProdutoOrcamento (PrOrcNome, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubCategoria, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcUsuarioAtualizador, PrOrcUnidade) 
-				VALUES (:sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :iUnidadeMedida, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
+            $sql = "INSERT INTO ProdutoOrcamento (PrOrcNome, PrOrcProduto, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubCategoria, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcUsuarioAtualizador, PrOrcUnidade) 
+				VALUES (:sNome, :iProduto, :sDetalhamento, :iCategoria, :iSubCategoria, :iUnidadeMedida, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
             $result = $conn->prepare($sql);
 
             $result->execute(array(
                 ':sNome' => $Produto['ProduNome'],
+                ':iProduto' => $_POST['inputProdutoId'],
                 ':sDetalhamento' => $Produto['ProduDetalhamento'],
                 ':iCategoria' => $Produto['ProduCategoria'],
                 ':iSubCategoria' => $Produto['ProduSubCategoria'],

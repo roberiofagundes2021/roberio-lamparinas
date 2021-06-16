@@ -154,6 +154,17 @@ Copyright (c) 2018 Carlos Victor
     font-weight: bold;
 }
 
+/* Utilizado no fluxoProduto.php e fluxoServico.php */
+.fluxoContrato{
+    min-width: 180px;
+}
+
+/* Utilizado no fluxoProduto.php e fluxoServico.php */
+.fluxoProcesso{
+    max-width: 185px;
+}
+
+
 @media (max-width: 1300px){
     .btn-produtos{
         font-size: 0.65rem;
@@ -211,8 +222,17 @@ Copyright (c) 2018 Carlos Victor
 
     .custon-modal-produTitle{
         align-items: center;
-
         text-align: center!important;
+    }
+
+    /* Utilizado no fluxoProduto.php e fluxoServico.php */
+    .fluxoContrato{
+        min-width: none;
+    }
+
+    /* Utilizado no fluxoProduto.php e fluxoServico.php */
+    .fluxoProcesso{
+        max-width: none;
     }
 }
 

@@ -430,7 +430,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtDetalhamento">Detalhamento</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do produto"><?php echo $row['ServiDetalhamento']; ?></textarea>
+												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do serviço"><?php echo $row['ServiDetalhamento']; ?></textarea>
 											</div>
 										</div>
 									</div>
