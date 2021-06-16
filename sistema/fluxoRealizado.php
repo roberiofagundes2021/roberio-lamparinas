@@ -273,18 +273,21 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 												<label for="cmbProduto">Produto/Serviço</label>
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc >
 													<?php 
-														$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca
+														$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 																FROM Produto
 																JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 																JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 																LEFT JOIN Marca on MarcaId = ProduMarca
+																JOIN SubCategoria on SbCatId = ProduSubCategoria
 																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
 																UNION
-																SELECT ServiId as Id, ServiNome as Nome, ServiDetalhamento as Detalhamento, '' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca
+																SELECT ServiId as Id, ServiNome as Nome, ServiDetalhamento as Detalhamento, '' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 																FROM Servico
 																JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 																LEFT JOIN Marca on MarcaId = ServiMarca
-																WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
+																JOIN SubCategoria on SbCatId = ServiSubCategoria
+																WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional."
+																ORDER BY SubCategoria";
 														$result = $conn->query($sql);
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 															
@@ -377,18 +380,21 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 
 								<?php
 									
-									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca
+									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Produto
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 											JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 											LEFT JOIN Marca on MarcaId = ProduMarca
+											JOIN SubCategoria on SbCatId = ProduSubCategoria
 											WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
 											UNION
-											SELECT ServiId as Id, ServiNome as Nome, ServiDetalhamento as Detalhamento, '' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca
+											SELECT ServiId as Id, ServiNome as Nome, ServiDetalhamento as Detalhamento, '' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Servico
 											JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 											LEFT JOIN Marca on MarcaId = ServiMarca
-											WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
+											JOIN SubCategoria on SbCatId = ServiSubCategoria
+											WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional."
+											ORDER BY SubCategoria ASC";
 									$result = $conn->query($sql);
 									$rowPrevisto = $result->fetchAll(PDO::FETCH_ASSOC);
 									
@@ -483,18 +489,21 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 
 								<?php
 									
-									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca
+									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Produto
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 											JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 											LEFT JOIN Marca on MarcaId = ProduMarca
-											WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
+											JOIN SubCategoria on SbCatId = ProduSubCategoria
+											WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional."											
 											UNION
-											SELECT ServiId as Id, ServiNome as Nome, ServiDetalhamento as Detalhamento, '' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca
+											SELECT ServiId as Id, ServiNome as Nome, ServiDetalhamento as Detalhamento, '' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Servico
 											JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 											LEFT JOIN Marca on MarcaId = ServiMarca
-											WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional;
+											JOIN SubCategoria on SbCatId = ServiSubCategoria
+											WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional."
+											ORDER BY SubCategoria ASC";
 									$result = $conn->query($sql);
 									$rowRealizado = $result->fetchAll(PDO::FETCH_ASSOC);
 									
