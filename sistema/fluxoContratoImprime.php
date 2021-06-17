@@ -14,29 +14,55 @@ if (isset($_POST['inputFluxoId'])) {
 	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
 }
 
-$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim,FlOpeConteudoInicio, FlOpeConteudoFim, CategNome, SbCatNome,
-		ForneNome, ForneCelular, ForneEmail
+$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim,FlOpeConteudoInicio, 
+		FlOpeConteudoFim, CategNome, dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, 
+		ForneNome, ForneCelular, ForneEmail, FlOpeTermoReferencia, TrRefTabelaProduto, TrRefTabelaServico
 		FROM FluxoOperacional
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
 		JOIN Categoria on CategId = FlOpeCategoria
-		JOIN SubCategoria on SbCatId = FlOpeSubCategoria
+		LEFT JOIN TermoReferencia on TrRefId = FlOpeTermoReferencia
 		WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
-$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
-		FROM Produto
-		JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
+if ($row['FlOpeTermoReferencia'] && $row['TrRefTabelaProduto'] != null && $row['TrRefTabelaProduto'] == 'ProdutoOrcamento'){
+	$sql = "SELECT ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
+			FROM Produto
+			JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			JOIN ProdutoOrcamento on PrOrcProduto = ProduId
+			JOIN SubCategoria on SbCatId = ProduSubCategoria
+			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
+			ORDER BY SbCatNome ASC";	
+} else {
+	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
+			FROM Produto
+			JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			JOIN SubCategoria on SbCatId = ProduSubCategoria
+			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
+			ORDER BY SbCatNome ASC";
+}
 $result = $conn->query($sql);
 $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 $totalProdutos = count($rowProdutos);
 
-$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario
-		FROM Servico
-		JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
+if ($row['FlOpeTermoReferencia'] && $row['TrRefTabelaServico'] != null && $row['TrRefTabelaServico'] == 'ServicoOrcamento'){
+	$sql = "SELECT ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
+			FROM Servico
+			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+			JOIN ServicoOrcamento on SrOrcServico = ServiId
+			JOIN SubCategoria on SbCatId = ServiSubCategoria
+			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
+			ORDER BY SbCatNome ASC";	
+} else {
+	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
+			FROM Servico
+			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+			JOIN SubCategoria on SbCatId = ServiSubCategoria
+			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
+			ORDER BY SbCatNome ASC";
+}	
 $result = $conn->query($sql);
 $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 $totalServicos = count($rowServicos);
@@ -73,7 +99,7 @@ try {
 	</style>
 
 	<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
-		<div style='width:300px; float:left; display: inline;'>
+		<div style='width:400px; float:left; display: inline;'>
 			<img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
 			<span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
 			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: " . $_SESSION['UnidadeNome'] . "</div>
@@ -91,6 +117,8 @@ try {
 	<div>' . $row['FlOpeConteudoInicio'] . '</div>
 	<br>';
 
+	$totalGeralProdutos = 0;
+
 	if ($totalProdutos > 0) {		
 
         $html .= "<div style='text-align:center; margin-top: 20px;'><h2>PRODUTOS</h2></div>";
@@ -104,7 +132,7 @@ try {
 
 		$html .= '
 				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
-					SubCategoria: <span style="font-weight:normal;">' . $row['SbCatNome'] . '</span>
+					SubCategoria: <span style="font-weight:normal;">' . $row['SubCategorias'] . '</span>
 				</div>
 				<br> ';	
 
@@ -126,7 +154,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['ProduDetalhamento'] . "</td>
+					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'] . "</td>
 					<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
 					<td style='text-align: center;'>" . $rowProduto['FOXPrQuantidade'] . "</td>		
 			";
@@ -134,7 +162,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['ProduDetalhamento'] . "</td>
+					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'] . "</td>
 					<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
 					<td style='text-align: center;'>" . $rowProduto['FOXPrQuantidade'] . "</td>
 				</tr>
@@ -173,7 +201,7 @@ try {
 
 		$html .= '
 				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
-					SubCategoria: <span style="font-weight:normal;">' . $row['SbCatNome'] . '</span>
+					SubCategoria: <span style="font-weight:normal;">' . $row['SubCategorias'] . '</span>
 				</div>
 				<br> ';	
 
@@ -194,7 +222,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['ServiDetalhamento'] . "</td>	
+					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'] . "</td>	
 					<td style='text-align: center;'>" . $rowServico['FOXSrQuantidade'] . "</td>			
 				</tr>
 			";
@@ -202,7 +230,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['ServiDetalhamento'] . "</td>
+					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'] . "</td>
 					<td style='text-align: center;'>" . $rowServico['FOXSrQuantidade'] . "</td>
 					
 				</tr>
@@ -223,7 +251,7 @@ try {
 					        " . $totalGeralServicos . "
 					    </td>
 				    </tr>";
-		$html .= "</table>";
+		$html .= "</table>"; 
 	}
 
 	$totalGeral = $totalGeralProdutos + $totalGeralServicos;
@@ -239,9 +267,7 @@ try {
 			    </tr>
 			  </table>
 	";
-
-	
-    
+   
     $html .= '
 	<br><br>
 	<div>' . $row['FlOpeConteudoFim'] . '</div>
