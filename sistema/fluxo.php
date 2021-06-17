@@ -108,8 +108,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaFluxoOperacional(linkAditivo, FlOpeId, FlOpeCategoria, FlOpeStatus, Tipo,
-		Motivo) {
+		function atualizaFluxoOperacional(linkAditivo, FlOpeId, FlOpeCategoria, FlOpeStatus, Tipo, Motivo) {
 			
 			document.getElementById('inputFluxoOperacionalId').value = FlOpeId;
 			document.getElementById('inputFluxoOperacionalCategoria').value = FlOpeCategoria;
@@ -151,7 +150,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				});
 				return false;
 			} else if (Tipo == 'enviarAprovacao') {
-				confirmaExclusao(document.formFluxoOperacional, "Essa ação enviará  o Fluxo Operacional para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
+				confirmaExclusao(document.formFluxoOperacional, "Essa ação enviará o Fluxo Operacional para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
 				return false;	
 			}
 
