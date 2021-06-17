@@ -52,6 +52,45 @@
   $resultMenu = $conn->query($sqlMenu);
   $menu = $resultMenu->fetchAll(PDO::FETCH_ASSOC);
 
+  // primeiramente faz a varredura das visibilidade dos subMenu para setar a visibilidade do menuPai
+  foreach($menu as $menuPai){
+    $position = array_search($menuPai, $menu);
+    $menuContente = 0;
+    // verifica em cada menuPai se existe algum submenu com visibilidade true, se sim ele o menuPai será visivel
+    foreach($menu as $subMenu){
+      if ($menuPai['MenuId'] == $subMenu['MenuPai']){
+        $visualizar = (isset($subMenu['UsXPeVisualizar'])?$subMenu['UsXPeVisualizar']:$subMenu['PrXPeVisualizar']);
+
+        // altera a o valor do visualizar modulo para 1 caso tenha algo para exibir ou 0 se não houver
+        if($visualizar == 1){
+          $menuContente = 1;
+        }
+        // seta a visibilidade do menuPai em 0 ou 1 de acordo com a visibilidae dos subMenus
+        if(isset($menuPai['UsXPeVisualizar'])){$menu[$position]['UsXPeVisualizar'] = $menuContente;}
+        else{$menu[$position]['PrXPeVisualizar'] = $menuContente;}
+      }
+    }
+  }
+  // Faz uma varredura para identificar quais modulos irão aparecer de
+  // acordo com a visibilidade dos menus já atualizadas
+  foreach($modulo as $mod){
+    $menuCont = 0;
+    if($mod['SituaChave'] == strtoupper("ativo")){
+      // percorre os menus para verificar se existe algum menu pertencente ao modulo que tenha visibilidade true
+      foreach($menu as $men){
+        if($men["SituaChave"] == strtoupper("ativo") && $men["MenuModulo"] == $mod["ModulId"] && $men['MenuPai']==0){
+          $visualizar = (isset($men['UsXPeVisualizar'])?$men['UsXPeVisualizar']:$men['PrXPeVisualizar']);
+          if($visualizar == 1){
+            $menuCont = 1;
+          }
+        }
+      }
+      // seta o valor conteudo no modulo em 0 ou 1 de acordo com a visibilidade dos menus 
+      $positionMenu = array_search($mod, $modulo);
+      $modulo[$positionMenu]['conteudo'] = $menuCont;
+    }
+  }
+
   //Recupera o parâmetro pra saber se a empresa é pública ou privada
   $sqlParametro = "SELECT ParamEmpresaPublica 
                    FROM Parametro
@@ -143,7 +182,7 @@
       <ul class="nav nav-sidebar" data-nav-type="accordion">
       <?php
           foreach($modulo as $mod){
-            if($mod['SituaChave'] == strtoupper("ativo")){
+            if($mod['SituaChave'] == strtoupper("ativo")  && $mod['conteudo'] == 1){
               echo '<li class="nav-item-header">
                       <div class="text-uppercase font-size-xs line-height-xs">'.$mod['ModulNome'].'</div>
                     </li>';
@@ -152,7 +191,7 @@
                 if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo")){  
                   
                   //Empresa pública e o menu visível para o Setor Público ou Empresa Privada e o menu visível para o Setor Privado
-                  if($visualizar == 1 || ($men['MenuSubMenu'] == 1)){
+                  if($visualizar == 1){
                     if ((($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado']))){
                         echo  (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
                           '<a href="'.$men['MenuUrl'].'"';
