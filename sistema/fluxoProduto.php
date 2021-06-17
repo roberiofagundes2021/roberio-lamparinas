@@ -511,7 +511,7 @@ try{
 													LEFT JOIN Marca on MarcaId = ProduMarca
 													JOIN SubCategoria on SbCatId = ProduSubCategoria
 													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
-													ORDER BY SbCatNome ASC";
+													ORDER BY SbCatNome, ProduNome ASC";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 											$countProduto = count($rowProdutos);
@@ -525,7 +525,7 @@ try{
 														JOIN SubCategoria on SbCatId = ProduSubCategoria
 														WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and 
 														ProduSubCategoria in (".$sSubCategorias.") and SituaChave = 'ATIVO' 
-														ORDER BY SbCatNome ASC";
+														ORDER BY SbCatNome, ProduNome ASC";
 												$result = $conn->query($sql);
 												$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 												$countProduto = count($rowProdutos);
@@ -543,7 +543,7 @@ try{
 													JOIN SubCategoria on SbCatId = ProduSubCategoria
 													WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
 													and FOXPrFluxoOperacional = " . $iFluxoOperacional."
-													ORDER BY SbCatNome ASC";
+													ORDER BY SbCatNome, ProduNome ASC";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 											$countProduto = count($rowProdutos);
@@ -558,7 +558,7 @@ try{
 															LEFT JOIN Marca on MarcaId = ProduMarca
 															JOIN SubCategoria on SbCatId = ProduSubCategoria
 															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
-															ORDER BY SbCatNome ASC";													
+															ORDER BY SbCatNome, ProduNome ASC";													
 												} else { //Se $row['TrRefTabelaProduto'] == ProdutoOrcamento
 													$sql = "SELECT Distinct ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
 															FROM Produto
@@ -568,7 +568,7 @@ try{
 															LEFT JOIN Marca on MarcaId = ProduMarca
 															JOIN SubCategoria on SbCatId = ProduSubCategoria
 															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
-															ORDER BY SbCatNome ASC";
+															ORDER BY SbCatNome, ProduNome ASC";
 												}
 
 												$result = $conn->query($sql);

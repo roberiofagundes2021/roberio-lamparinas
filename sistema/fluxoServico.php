@@ -509,7 +509,7 @@ try {
 													JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 													JOIN SubCategoria on SbCatId = ServiSubCategoria
 													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
-													ORDER BY SbCatNome ASC";
+													ORDER BY SbCatNome, ServiNome ASC";
 											$result = $conn->query($sql);
 											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 											$countServico = count($rowServicos);
@@ -521,7 +521,7 @@ try {
 														JOIN SubCategoria on SbCatId = ServiSubCategoria
 														WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
 														ServiSubCategoria in (" .$sSubCategorias. ") and SituaChave = 'ATIVO' 
-														ORDER BY SbCatNome ASC";
+														ORDER BY SbCatNome, ServiNome ASC";
 												$result = $conn->query($sql);
 												$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 												$countServico = count($rowServicos);
@@ -536,7 +536,7 @@ try {
 													JOIN SubCategoria on SbCatId = ServiSubCategoria
 													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
 													and FOXSrFluxoOperacional = " . $iFluxoOperacional."
-													ORDER BY SbCatNome ASC";
+													ORDER BY SbCatNome, ServiNome ASC";
 											$result = $conn->query($sql);
 											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 											$countServico = count($rowServicos);
@@ -549,7 +549,7 @@ try {
 															JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = ServiId
 															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia']."
-															ORDER BY SbCatNome ASC";
+															ORDER BY SbCatNome, ServiNome ASC";
 												} else { //Se $row['TrRefTabelaServico'] == ServicoOrcamento
 													$sql = "SELECT Distinct ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, SbCatNome
 															FROM Servico
@@ -557,7 +557,7 @@ try {
 															JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia']."
-															ORDER BY SbCatNome ASC";
+															ORDER BY SbCatNome, ServiNome ASC";
 												}
 
 												$result = $conn->query($sql);

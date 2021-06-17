@@ -449,7 +449,7 @@ if (count($rowProdutoUtilizado) >= 1) {
 											 	WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
 											   	AND TRXPrTermoReferencia = " . $iTR  . " 
 												AND TRXPrTabela	= 'ProdutoOrcamento' 
-												Order By SbCatNome ASC";
+												Order By SbCatNome, PrOrcNome ASC";
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$cont = 0;
@@ -541,9 +541,11 @@ if (count($rowProdutoUtilizado) >= 1) {
 												FROM TermoReferenciaXProduto
 												JOIN Produto ON ProduId = TRXPrProduto
 												JOIN UnidadeMedida ON UnMedId = ProduUnidadeMedida
+												JOIN SubCategoria on SbCatId = ProduSubCategoria
 											 	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
 											   	AND TRXPrTermoReferencia = " . $iTR . " 
-												AND TRXPrTabela = 'Produto' ";
+												AND TRXPrTabela = 'Produto' 
+												Order By SbCatNome, ProduNome ASC";
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
