@@ -270,10 +270,18 @@ try {
 			//Enviar para aprovação da Controladoria (via Bandeja)
 			$('#enviarAprovacao').on('click', function(e) {
 
+				var inputOrigem = $('#inputOrigem').val();
+
 				e.preventDefault();
 
-				confirmaExclusao(document.formFluxoOperacionalServico, "Essa ação enviará todo o Fluxo Operacional (com seus produtos e serviços) para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
-			});
+				if (inputOrigem == 'fluxo.php') {
+					confirmaExclusao(document.formFluxoOperacionalServico, "Essa ação enviará  o Fluxo Operacional  para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
+				}  else {
+					confirmaExclusao(document.formFluxoOperacionalServico, "Essa ação enviará o Contrato formalizado para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
+				}
+
+				return false;
+			});		
 
 		}); //document.ready
 

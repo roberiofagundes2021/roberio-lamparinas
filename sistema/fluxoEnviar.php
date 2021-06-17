@@ -4,6 +4,8 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
+$sDestino = $_POST['inputOrigem'];
+
 try{
 	if(isset($_POST['inputIdFluxoOperacional'])){
 
@@ -131,6 +133,6 @@ try{
     echo 'Error1: ' . $e->getMessage();
 }
 
-irpara("fluxo.php");
+irpara($sDestino);
 
 ?>
