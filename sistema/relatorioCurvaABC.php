@@ -728,7 +728,7 @@ $dataFim = date('Y-m-d');
 														$sql = "SELECT CategId, CategNome
 																FROM Categoria
 																JOIN Situacao on SituaId = CategStatus
-																WHERE CategEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
+																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
 																ORDER BY CategNome ASC";
 														$result = $conn->query($sql);
 														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -752,7 +752,7 @@ $dataFim = date('Y-m-d');
 													$sql = "SELECT SbCatId, SbCatNome
 															FROM SubCategoria
 															JOIN Situacao on SituaId = SbCatStatus
-															WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
+															WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
 															Order By SbCatNome ASC";
 													$result = $conn->query($sql);
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

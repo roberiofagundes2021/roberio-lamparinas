@@ -4,9 +4,6 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
-date_default_timezone_set('America/Sao_Paulo');
-
 use Mpdf\Mpdf;
 
 require_once 'global_assets/php/vendor/autoload.php';

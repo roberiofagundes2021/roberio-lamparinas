@@ -3,6 +3,9 @@
 session_start();
 include('global_assets/php/conexao.php');
 
+setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
+date_default_timezone_set('America/Sao_Paulo');
+
 $arquivosEmpresa = array(
 	'usuario.php', 'usuarioNovo.php', 'usuarioEdita.php', 'usuarioExclui.php', 'usuarioMudaSituacao.php', 'usuarioValida.php',
 	'licenca.php', 'licencaNovo.php', 'licencaEdita.php', 'licencaExclui.php', 'licencaMudaSituacao.php',
