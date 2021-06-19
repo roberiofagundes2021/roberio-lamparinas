@@ -3,6 +3,7 @@
 session_start();
 include('global_assets/php/conexao.php');
 
+//Isso aqui é para resolver o problema da data nos relatórios, já que a função date() do PHP pega a data do servidor. E na Azure o servidor não deve está no Brasil, já que apresenta data/hora com 3h de diferença
 setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
 date_default_timezone_set('America/Sao_Paulo');
 
