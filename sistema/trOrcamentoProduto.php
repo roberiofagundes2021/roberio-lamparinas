@@ -257,7 +257,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 											LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
 											JOIN SubCategoria on SbCatId = PrOrcSubCategoria
 											WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'
-											ORDER BY SbCatNome ASC";
+											ORDER BY SbCatNome, PrOrcNome ASC";
 									$result = $conn->query($sql);
 									$rowProdutosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -267,7 +267,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 											LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 											JOIN SubCategoria on SbCatId = ProduSubCategoria
 											WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'
-											ORDER BY SbCatNome ASC";
+											ORDER BY SbCatNome, ProduNome ASC";
 									$result = $conn->query($sql);
 									$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -320,7 +320,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 												LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
 												JOIN SubCategoria on SbCatId = PrOrcSubCategoria
 											    WHERE TXOXPUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento."
-												ORDER BY SbCatNome ASC";
+												ORDER BY SbCatNome, PrOrcNome ASC";
 										$result = $conn->query($sql);
 										$rowProdutosOrc = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countProdutoOrc = count($rowProdutosOrc);
@@ -414,7 +414,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 												JOIN SubCategoria on SbCatId = ProduSubCategoria
 											    WHERE TXOXPUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento."
-												ORDER BY SbCatNome ASC";
+												ORDER BY SbCatNome, ProduNome ASC";
 										$result = $conn->query($sql);
 										$rowTRProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countProdutos = count($rowTRProdutos);

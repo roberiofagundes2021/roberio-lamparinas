@@ -163,7 +163,8 @@ try {
                     JOIN TRXOrcamento on TrXOrId = TXOXPOrcamento
                     JOIN TRXOrcamentoXSubcategoria on TXOXSCOrcamento = TXOXPOrcamento
 					JOIN UnidadeMedida on UnMedId = ".$campoPrefix."UnidadeMedida
-                    WHERE ".$campoPrefix."Unidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
+                    WHERE ".$campoPrefix."Unidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento."
+					ORDER BY SbCatNome, ".$campoPrefix."Nome ASC";
 			$result = $conn->query($sql);
 			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -192,11 +193,11 @@ try {
 					if ($sbcat['TXOXSCSubcategoria'] == $itemProduto['SubCategoria']) {
 
 						if ($itemProduto['TXOXPValorUnitario'] != '' and $itemProduto['TXOXPValorUnitario'] != null) {
-							$valorUnitario = $itemProduto['TXOXPValorUnitario'];
-							$valorTotal = $itemProduto['TXOXPQuantidade'] * $itemProduto['TXOXPValorUnitario'];
+							$valorUnitario = mostraValor($itemProduto['TXOXPValorUnitario']);
+							$valorTotal = mostraValor($itemProduto['TXOXPQuantidade'] * $itemProduto['TXOXPValorUnitario']);
 						} else {
-							$valorUnitario = 0;
-							$valorTotal = 0;
+							$valorUnitario = '';
+							$valorTotal = '';
 						}
 
 						$html .= "
@@ -206,8 +207,8 @@ try {
 					            <td style='text-align: left;'>" . $itemProduto['Nome'] . "</td>
 					            <td style='text-align: center;'>" . $itemProduto['UnMedSigla'] . "</td>					
 					            <td style='text-align: center;'>" . $itemProduto['TXOXPQuantidade'] . "</td>
-					            <td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
-					            <td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>
+					            <td style='text-align: right;'>" . $valorUnitario . "</td>
+					            <td style='text-align: right;'>" . $valorTotal . "</td>
 				            </tr>
                 		";
 
@@ -254,7 +255,7 @@ try {
 			$tabelaOrigemProduto = $row['TrRefTabelaProduto'];
 			$campoPrefix =  $row['TrRefTabelaProduto'] == 'Produto' ? 'Produ' : 'PrOrc';
 
-			$sql = "SELECT " . $campoPrefix . "Id as Id, " . $campoPrefix . "Nome as Nome, " . $campoPrefix . "Categoria as Categoria, " . $campoPrefix . "SubCategoria as SubCategoria,
+			$sql = "SELECT DISTINCT " . $campoPrefix . "Id as Id, " . $campoPrefix . "Nome as Nome, " . $campoPrefix . "Categoria as Categoria, " . $campoPrefix . "SubCategoria as SubCategoria,
 		            " . $campoPrefix . "Detalhamento as Detalhamento, UnMedSigla, TRXPrQuantidade
 		    		FROM " . $tabelaOrigemProduto . "
 		    		JOIN TermoReferenciaXProduto on TRXPrProduto = " . $campoPrefix . "Id
@@ -344,8 +345,7 @@ try {
 			$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
 
 			
-			$sql = "
-				SELECT ".$campoPrefix."Id as Id, 
+			$sql = "SELECT DISTINCT ".$campoPrefix."Id as Id, 
 							 ".$campoPrefix."Nome as Nome, 
 							 ".$campoPrefix."Categoria as Categoria, 
 							 ".$campoPrefix."SubCategoria as SubCategoria, 
@@ -386,11 +386,11 @@ try {
 					if ($sbcat['TXOXSCSubcategoria'] == $itemServico['SubCategoria']) {
 
 						if ($itemServico['TXOXSValorUnitario'] != '' and $itemServico['TXOXSValorUnitario'] != null) {
-							$valorUnitario = $itemServico['TXOXSValorUnitario'];
-							$valorTotal = $itemServico['TXOXSQuantidade'] * $itemServico['TXOXSValorUnitario'];
+							$valorUnitario = mostraValor($itemServico['TXOXSValorUnitario']);
+							$valorTotal = mostraValor($itemServico['TXOXSQuantidade'] * $itemServico['TXOXSValorUnitario']);
 						} else {
-							$valorUnitario = 0;
-							$valorTotal = 0;
+							$valorUnitario = '';
+							$valorTotal = '';
 						}
 
 						$html .= "
@@ -398,8 +398,8 @@ try {
     							<td style='text-align: center;'>" . $cont . "</td>
     							<td style='text-align: left;'>" . $itemServico['Nome'] . "</td>
                                 <td style='text-align: center;'>" . $itemServico['TXOXSQuantidade'] . "</td>
-                                <td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
-					            <td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>
+                                <td style='text-align: right;'>" . $valorUnitario . "</td>
+					            <td style='text-align: right;'>" . $valorTotal . "</td>
     						</tr>
     					";
 
@@ -444,8 +444,7 @@ try {
 			$tabelaOrigemServico = $row['TrRefTabelaServico'];
 			$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
 
-			$sql = "
-				SELECT ".$campoPrefix ."Id as Id, 
+			$sql = "SELECT DISTINCT ".$campoPrefix ."Id as Id, 
 							 ".$campoPrefix ."Nome as Nome, 
 							 ".$campoPrefix ."Categoria as Categoria, 
 							 ".$campoPrefix ."SubCategoria as SubCategoria, 

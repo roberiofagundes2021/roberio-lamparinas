@@ -256,7 +256,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 											JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 											JOIN SubCategoria on SbCatId = SrOrcSubCategoria
 											WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'
-											ORDER BY SbCatNome ASC";
+											ORDER BY SbCatNome, SrOrcNome ASC";
 									$result = $conn->query($sql);
 									$rowServicosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -265,7 +265,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 											JOIN TermoReferenciaXServico on TRXSrServico = ServiId
 											JOIN SubCategoria on SbCatId = ServiSubCategoria
 											WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'
-											ORDER BY SbCatNome ASC";
+											ORDER BY SbCatNome, ServiNome ASC";
 									$result = $conn->query($sql);
 									$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -311,7 +311,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 												JOIN ServicoOrcamento on SrOrcId = TXOXSServico
 												JOIN SubCategoria on SbCatId = SrOrcSubCategoria
 											    WHERE TXOXSUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento."
-												ORDER BY SbCatNome ASC";
+												ORDER BY SbCatNome, SrOrcNome ASC";
 										$result = $conn->query($sql);
 										$rowServicosOrc = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countServicoOrc = count($rowServicosOrc);
@@ -396,7 +396,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 												JOIN Servico on ServiId = TXOXSServico
 												JOIN SubCategoria on SbCatId = ServiSubCategoria
 											    WHERE TXOXSUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento."
-												ORDER BY SbCatNome ASC";
+												ORDER BY SbCatNome, ServiNome ASC";
 										$result = $conn->query($sql);
 										$rowTRServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countServicos = count($rowTRServicos);
