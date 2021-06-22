@@ -492,7 +492,7 @@ if ($totalAcoes) {
 				document.getElementById('inputFluxoId').value = BandeTabelaId;
 
 				if (Tipo == 'imprimir') {
-					document.formBandeja.action = "fluxoImprime.php";
+					document.formBandeja.action = "fluxoContratoImprime.php";
 					document.formBandeja.setAttribute("target", "_blank");
 					document.formBandeja.submit();
 				} else {
