@@ -6,9 +6,13 @@ include('global_assets/php/conexao.php');
 
 $_SESSION['msg'] = array();
 
-if(isset($_POST['inputTermoReferenciaId'])){
+if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 	
-	$iTermoReferenciaId = $_POST['inputTermoReferenciaId'];
+	if (isset($_POST['inputTermoReferenciaId'])){
+		$iTermoReferenciaId = $_POST['inputTermoReferenciaId'];
+	} else {
+		$iTermoReferenciaId = $_POST['inputTRId'];
+	}	
 	
 	try{
 
@@ -81,6 +85,6 @@ if(isset($_POST['inputTermoReferenciaId'])){
 	}
 }
 
-irpara("index.php");
+irpara("tr.php");
 
 ?>
