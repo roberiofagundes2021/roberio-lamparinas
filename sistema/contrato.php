@@ -8,7 +8,7 @@ $_SESSION['PaginaAtual'] = 'Contrato';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT DISTINCT FlOpeId, ForneNome, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, 
+$sql = "SELECT DISTINCT FlOpeId, ForneRazaoSocial, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, 
 		FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome, SituaChave, 
 		SituaNome, SituaCor, dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, 
 		dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado, BandeMotivo,
@@ -234,7 +234,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.mostraData($item['FimContrato']).'</td>
 											<td>'.$item['FlOpeNumContrato'].'</td>
 											<td>'.$item['FlOpeNumProcesso'].'</td>
-											<td>'.$item['ForneNome'].'</td>
+											<td>'.$item['ForneRazaoSocial'].'</td>
 											<td>'.$item['CategNome'].'</td>
 											<td>'.$item['SubCategorias'].'</td>
 											<td><span class="'.$situacaoClasse.'">'.$situacao.'</span>
