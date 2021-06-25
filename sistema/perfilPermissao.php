@@ -30,22 +30,29 @@ $sqlSituacao = "SELECT SituaId, SituaNome, SituaChave, SituaStatus, SituaCor FRO
 $resultSituacao = $conn->query($sqlSituacao);
 $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 
-// cadastrar todos os menus para todos os perfis com permições padrão
+// cadastrar todos os menus para todos os perfis de todas as unidades com permições padrão
 
-// $sqlMenu = "SELECT MenuId FROM menu";
+// $sqlMenu = "SELECT MenuId FROM menu WHERE MenuPosicao = 'CONFIGURADOR'";
 // $resultMenu = $conn->query($sqlMenu);
-// $menu = $resultMenu->fetchAll(PDO::FETCH_ASSOC);
+// $menus = $resultMenu->fetchAll(PDO::FETCH_ASSOC);
 
 // $sqlPerfil = "SELECT PerfiId FROM Perfil";
 // $resultPerfil = $conn->query($sqlPerfil);
 // $perfis = $resultPerfil->fetchAll(PDO::FETCH_ASSOC);
 
-// foreach($perfis as $perf){
-// 	foreach($menu as $men){
-// 		$sqlPerd = "INSERT INTO PerfilXPermissao (PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,
-// 		PrXPeExcluir, PrXPeUnidade) VALUES ('$perf[PerfiId]', '$men[MenuId]', 1, 0, 0, '$unidade')";
-// 		$resultSetPerf = $conn->query($sqlPerd);
-// 	}
+// $sqlUnidade = "SELECT UnidaId FROM unidade";
+// $resultUnidade = $conn->query($sqlUnidade);
+// $unidades = $resultUnidade->fetchAll(PDO::FETCH_ASSOC);
+// // var_dump($unidades);
+
+// foreach($unidades as $unidade){
+//   foreach($perfis as $perf){
+//     foreach($menus as $men){
+//       $sqlPerd = "INSERT INTO PerfilXPermissao (PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,
+//       PrXPeExcluir, PrXPeUnidade) VALUES ('$perf[PerfiId]', '$men[MenuId]', 1, 0, 0, '$unidade')";
+//       $resultSetPerf = $conn->query($sqlPerd);
+//     }
+//   }
 // }
 
 ?>

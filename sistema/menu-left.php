@@ -33,7 +33,7 @@
   //Recupera todos os menus do sistema caso esteja usando permissao personalizada
 
   if($usuaXPerm['UsuarPermissaoPerfil'] == 0){
-    $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico,
+    $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
                 MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, MenuSetorPrivado,
                 UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeUnidade
                 FROM menu
@@ -41,7 +41,7 @@
                 join UsuarioXPermissao on UsXPeUsuario = '$userId' and UsXPeUnidade = '$unidade' and UsXPeMenu = MenuId
                 order by MenuOrdem asc";
   } else {
-    $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico,
+    $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
               MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, PrXPeId, PrXPePerfil, MenuSetorPrivado
               PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeUnidade
               FROM menu
@@ -51,9 +51,18 @@
   }
   $resultMenu = $conn->query($sqlMenu);
   $menu = $resultMenu->fetchAll(PDO::FETCH_ASSOC);
-
+  $arrayPermissao= Array();
   // primeiramente faz a varredura das visibilidade dos subMenu para setar a visibilidade do menuPai
   foreach($menu as $menuPai){
+    // adiciona as paginas e suas permissões em um array
+    if($menuPai['SituaChave'] == strtoupper("ativo")){
+      array_push($arrayPermissao, Array(
+        'url'=>$menuPai['MenuUrl'],
+        'visualizar'=>(isset($menuPai['UsXPeVisualizar'])?$menuPai['UsXPeVisualizar']:$menuPai['PrXPeVisualizar']),
+        'atualizar'=>(isset($menuPai['PrXPeAtualizar'])?$menuPai['PrXPeAtualizar']:$menuPai['UsXPeAtualizar']),
+        'excluir'=>(isset($menuPai['PrXPeExcluir'])?$menuPai['PrXPeExcluir']:$menuPai['UsXPeExcluir']),
+      ));
+    }
     $position = array_search($menuPai, $menu);
     $menuContente = 0;
     // verifica em cada menuPai se existe algum submenu com visibilidade true, se sim ele o menuPai será visivel
@@ -62,7 +71,7 @@
         $visualizar = (isset($subMenu['UsXPeVisualizar'])?$subMenu['UsXPeVisualizar']:$subMenu['PrXPeVisualizar']);
 
         // altera a o valor do visualizar modulo para 1 caso tenha algo para exibir ou 0 se não houver
-        if($visualizar == 1){
+        if($visualizar == 1 && $subMenu['MenuPosicao']=='PRINCIPAL'){
           $menuContente = 1;
         }
         // seta a visibilidade do menuPai em 0 ou 1 de acordo com a visibilidae dos subMenus
@@ -71,6 +80,8 @@
       }
     }
   }
+  // adiciona o arry em uma session para ser acessado em outras páginas
+  $_SESSION['Permissoes'] = $arrayPermissao;
   // Faz uma varredura para identificar quais modulos irão aparecer de
   // acordo com a visibilidade dos menus já atualizadas
   foreach($modulo as $mod){
@@ -80,7 +91,7 @@
       foreach($menu as $men){
         if($men["SituaChave"] == strtoupper("ativo") && $men["MenuModulo"] == $mod["ModulId"] && $men['MenuPai']==0){
           $visualizar = (isset($men['UsXPeVisualizar'])?$men['UsXPeVisualizar']:$men['PrXPeVisualizar']);
-          if($visualizar == 1){
+          if($visualizar == 1 && $men['MenuPosicao'] == 'PRINCIPAL'){
             $menuCont = 1;
           }
         }

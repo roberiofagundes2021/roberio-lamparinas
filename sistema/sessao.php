@@ -2,6 +2,22 @@
 
 session_start();
 include('global_assets/php/conexao.php');
+$visualizar = true;
+$atualizar = 0;
+$excluir = 0;
+
+// faz o controle de acesso às paginas de acordo à permissão
+
+foreach($_SESSION['Permissoes'] as $key => $permissao){
+	if($permissao['url'] == basename($_SERVER['REQUEST_URI'])){
+		$atualizar = $permissao['atualizar'];
+		$excluir = $permissao['excluir'];
+		if($permissao['visualizar'] == 0){
+			$visualizar = false;
+		}
+	}
+}
+if(!$visualizar){header("location:javascript://history.go(-1)");}
 
 $arquivosEmpresa = array(
 	'usuario.php', 'usuarioNovo.php', 'usuarioEdita.php', 'usuarioExclui.php', 'usuarioMudaSituacao.php', 'usuarioValida.php',

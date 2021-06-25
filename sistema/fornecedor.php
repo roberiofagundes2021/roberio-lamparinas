@@ -115,6 +115,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		function atualizaFornecedor(ForneId, ForneNome, ForneStatus, Tipo){
 			
 			if (Tipo == 'imprime'){
+				// alerta('Esse Termo de Referência já está finalizado e não pode ser excluído!','');
 				
 				document.getElementById('inputFornecedorCategoria').value = document.getElementById('cmbCategoria').value;
 				
@@ -258,10 +259,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										print('<td class="text-center">
 												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
-													</div>
+													<div class="list-icons list-icons-extended">'.
+													($atualizar==1?'<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>':
+													'<a href="#" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>').
+														
+														($excluir==1?'<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>':
+														'<a href="#" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>').
+													'</div>
 												</div>
 											</td>
 										</tr>');

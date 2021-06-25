@@ -6,6 +6,11 @@ $_SESSION['PaginaAtual'] = 'Permissões';
 
 $unidade = $_SESSION['UnidadeId'];
 $user = $_POST['inputUsuarioId'];
+$perfilId = $_POST['inputUsuarioPerfil'];
+
+$sqlUserPerfil = "SELECT PerfiId FROM perfil WHERE PerfiChave = '$perfilId'";
+$resultUserPerfil = $conn->query($sqlUserPerfil);
+$perfilId = $resultUserPerfil->fetch(PDO::FETCH_ASSOC);
 
 $userPxP = "SELECT UsuarPermissaoPerfil
 		FROM Usuario
@@ -33,9 +38,12 @@ $menuUxP = $resultMenuUxP->fetchAll(PDO::FETCH_ASSOC);
 
 if(!isset($menuUxP[0]['UsXPeVisualizar'])){
 	$sqlMenuUxP = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo,
-	MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave
+	MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, 
+	PrXPeId, PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, 
+	PrXPeUnidade
 	FROM menu
 	join situacao on MenuStatus = SituaId
+	join PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$perfilId[PerfiId]' and PrXPeUnidade = $unidade
 	order by MenuOrdem asc";
 	
 	$resultMenuUxP = $conn->query($sqlMenuUxP);
@@ -245,7 +253,8 @@ td{
 																			echo '<input name="'.$men['MenuId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"'.
 																			($men['UsXPeVisualizar'] == 1?'checked/>':'/>');
 																		}else{
-																			echo '<input name="'.$men['MenuId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"/>';
+																			echo '<input name="'.$men['MenuId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"'.
+																			($men['PrXPeVisualizar'] == 1?'checked/>':'/>');
 																		}
 																	echo '</div>
 																</td>
@@ -255,7 +264,8 @@ td{
 																		echo '<input name="'.$men['MenuId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"'.
 																		($men['UsXPeAtualizar'] == 1?'checked/>':'/>');
 																	}else{
-																		echo '<input name="'.$men['MenuId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"/>';
+																		echo '<input name="'.$men['MenuId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"'.
+																		($men['PrXPeAtualizar'] == 1?'checked/>':'/>');
 																	}
 																	echo'</div>
 																</td>
@@ -265,7 +275,8 @@ td{
 																		echo '<input name="'.$men['MenuId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"'.
 																		($men['UsXPeExcluir'] == 1?'checked/>':'/>');
 																	}else{
-																		echo '<input name="'.$men['MenuId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"/>';
+																		echo '<input name="'.$men['MenuId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"'.
+																		($men['PrXPeExcluir'] == 1?'checked/>':'/>');
 																	}
 																	echo '</div>
 																</td>
@@ -283,7 +294,8 @@ td{
 																					echo '<input name="'.$men_f['MenuId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"'.
 																					($men_f['UsXPeVisualizar'] == 1?'checked/>':'/>');
 																				}else{
-																					echo '<input name="'.$men_f['MenuId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"/>';
+																					echo '<input name="'.$men_f['MenuId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"'.
+																					($men_f['PrXPeVisualizar'] == 1?'checked/>':'/>');
 																				}
 																			echo '</div>
 																		</td>
@@ -293,7 +305,8 @@ td{
 																				echo '<input name="'.$men_f['MenuId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"'.
 																				($men_f['UsXPeAtualizar'] == 1?'checked/>':'/>');
 																			}else{
-																				echo '<input name="'.$men_f['MenuId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"/>';
+																				echo '<input name="'.$men_f['MenuId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"'.
+																				($men_f['PrXPeAtualizar'] == 1?'checked/>':'/>');
 																			}
 																			echo'</div>
 																		</td>
@@ -303,7 +316,8 @@ td{
 																				echo '<input name="'.$men_f['MenuId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"'.
 																				($men_f['UsXPeExcluir'] == 1?'checked/>':'/>');
 																			}else{
-																				echo '<input name="'.$men_f['MenuId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"/>';
+																				echo '<input name="'.$men_f['MenuId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"'.
+																				($men_f['PrXPeExcluir'] == 1?'checked/>':'/>');
 																			}
 																			echo '</div>
 																		</td>

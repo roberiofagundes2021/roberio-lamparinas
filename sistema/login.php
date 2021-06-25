@@ -13,6 +13,7 @@ $erro = array();
 $empresas = array();
 $piEmpresa = 0;
 $piUnidade = 0;
+$_SESSION['Permissoes'] = Array();
 
 // Se a pessoa preencheu o login
 if(isset($_POST['usuario'])){
