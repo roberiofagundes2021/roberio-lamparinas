@@ -352,15 +352,12 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
             let resultadosConsulta = '';
             let inputsValues = {};
 
-            (function Filtrar() {
+            function Filtrar() {
                 let cont = false;
-
-                $('#submitFiltro').on('click', (e) => {
-                    e.preventDefault()
 
                     const msg = $('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%; text-align: center">Nenhum registro encontrado...</td></tr>')
 
-                    $('tbody').html('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%; text-align: center"><i class="icon-spinner2 spinner"></i></td></tr>')
+                    $('tbody').html(msg)
 
                     let dataDe = $('#inputDataDe').val()
                     let dataAte = $('#inputDataAte').val()
@@ -401,8 +398,15 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                             }
                         }
                     );
-                })
-            })()
+                }
+
+                $('#submitFiltro').on('click', (e) => {
+                    e.preventDefault()
+                    Filtrar(false)
+            })
+
+            Filtrar(true)
+            
 
             $('#salvar').on('click', function(e) {
                 let prioridade = $('#cmbPrioridadeEdit').val()
@@ -565,7 +569,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                                 $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                 foreach ($rowSituacao as $item) {
-                                                    if ($item['SituaChave'] == 'ATIVO') {
+                                                    if ($item['SituaChave'] == 'PENDENTE') {
                                                         print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
                                                     } else if ($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "NAOLIBERADO") {
                                                         print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');

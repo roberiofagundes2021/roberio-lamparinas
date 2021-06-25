@@ -8,7 +8,7 @@ $_SESSION['PaginaAtual'] = 'Contrato';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT DISTINCT FlOpeId, ForneNome, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, 
+$sql = "SELECT DISTINCT FlOpeId, ForneRazaoSocial, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, 
 		FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome, SituaChave, 
 		SituaNome, SituaCor, dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, 
 		dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado, BandeMotivo,
@@ -107,16 +107,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			_componentSelect2();
 
 			/* Fim: Tabela Personalizada */
-			
-
-			//Enviar para aprovação da Controladoria (via Bandeja)
-			$('#enviarAprovacao').on('click', function(e){
-					
-				e.preventDefault();		
-				
-				confirmaExclusao(document.formFluxoOperacionalProduto, "Essa ação enviará todo o Fluxo Operacional (com seus produtos e serviços) para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
-			});	
-
 		});
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -162,9 +152,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					message: Motivo
 				});
 				return false;
+			} else if (Tipo == 'enviarAprovacao') {
+				confirmaExclusao(document.formFluxoOperacional, "Essa ação enviará  o Contrato formalizado para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
+				return false;	
 			}
 
 			document.formFluxoOperacional.submit();
+			
 		}
 	</script>
 
@@ -240,7 +234,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.mostraData($item['FimContrato']).'</td>
 											<td>'.$item['FlOpeNumContrato'].'</td>
 											<td>'.$item['FlOpeNumProcesso'].'</td>
-											<td>'.$item['ForneNome'].'</td>
+											<td>'.$item['ForneRazaoSocial'].'</td>
 											<td>'.$item['CategNome'].'</td>
 											<td>'.$item['SubCategorias'].'</td>
 											<td><span class="'.$situacaoClasse.'">'.$situacao.'</span>
@@ -269,8 +263,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																}																
 
 																if ($item['FluxoFechado']){												
-																	print('<button class="dropdown-item" id="enviarAprovacao"><i class="icon-list2"></i>Enviar para Aprovação</button>');
-																}																
+																	print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', '.$item['TrRefId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'enviarAprovacao\', \'\')" class="dropdown-item" title="Enviar para Aprovação"><i class="icon-printer2"></i> Enviar para Aprovação</a>');
+																}																	
 																print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', '.$item['TrRefId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
 																
 																<div class="dropdown-divider"></div>

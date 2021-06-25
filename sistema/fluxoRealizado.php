@@ -10,7 +10,7 @@ $iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
 $iCategoria = $_POST['inputFluxoOperacionalCategoria'];
 
 $sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
-			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, ForneNome, CategNome 
+			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, ForneRazaoSocial, CategNome 
 		FROM FluxoOperacional
 		JOIN Fornecedor ON ForneId = FlOpeFornecedor
 		JOIN Categoria ON CategId = FlOpeCategoria	 
@@ -234,7 +234,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor</label>
-												<input type="text" id="cmbFornecedor" name="cmbFornecedor" class="form-control"  value="<?php echo $row['ForneNome']; ?>" readOnly >
+												<input type="text" id="cmbFornecedor" name="cmbFornecedor" class="form-control"  value="<?php echo $row['ForneRazaoSocial']; ?>" readOnly >
 											</div>
 										</div>
 										
@@ -268,7 +268,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 
 									
 									<div class="row">
-										<div class="col-lg-4">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="cmbProduto">Produto/Serviço</label>
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc >
@@ -344,6 +344,13 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 												<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
 											</div>
 										</div>
+
+										<div class="col-lg-2 fluxoProcesso">
+											<div class="form-group">
+												<label for="inputValor">Valor Total</label>
+												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
+											</div>
+										</div>	
 
 									</div>
 									<div class="col-lg-12">	

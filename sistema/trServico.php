@@ -244,6 +244,35 @@ if (count($rowServicoUtilizado) >= 1) {
 				});
 			});
 
+			/* ao pressionar uma tecla em um campo que seja de class="pula" */
+			$('.pula').keypress(function(e){
+				/*
+					* verifica se o evento é Keycode (para IE e outros browsers)
+					* se não for pega o evento Which (Firefox)
+				*/
+				var tecla = (e.keyCode?e.keyCode:e.which);
+
+				/* verifica se a tecla pressionada foi o ENTER */
+				if(tecla == 13){
+					/* guarda o seletor do campo que foi pressionado Enter */
+					campo =  $('.pula');
+					/* pega o indice do elemento*/
+					indice = campo.index(this);
+					/*soma mais um ao indice e verifica se não é null
+					*se não for é porque existe outro elemento
+					*/
+					if(campo[indice+1] != null){
+						/* adiciona mais 1 no valor do indice */
+						proximo = campo[indice + 1];
+						/* passa o foco para o proximo elemento */
+						proximo.focus();
+					}
+				}
+				/* impede o sumbit caso esteja dentro de um form */
+				e.preventDefault(e);
+				return false;
+            });				
+
 			function disabledSelect(){
 				let btnSubmit = $('#btnsubmit')
 				let selectServicos = $('#ServicoRow')
@@ -467,7 +496,7 @@ if (count($rowServicoUtilizado) >= 1) {
 												WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
 												AND TRXSrTermoReferencia = " . $iTR  . " 
 												AND TRXSrTabela = 'ServicoOrcamento' 
-												Order By SbCatNome ASC";
+												Order By SbCatNome, SrOrcNome ASC";
 										$result = $conn->query($sql);
 										$rowServicosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 										//echo $sql;die;
@@ -519,13 +548,13 @@ if (count($rowServicoUtilizado) >= 1) {
 											if(count($rowOrcamentosTR) >= 1) {
 												print('
 														<div class="col-lg-2">
-															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
+															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
 														</div>	
 												');
 											} else {
 												print('
 														<div class="col-lg-2">
-															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
 														</div>	
 												');
 											}
@@ -546,9 +575,11 @@ if (count($rowServicoUtilizado) >= 1) {
 												ServiNome, ServiDetalhamento
 												FROM TermoReferenciaXServico
 												JOIN Servico ON ServiId = TRXSrServico
+												JOIN SubCategoria on SbCatId = ServiSubCategoria
 												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
 												AND TRXSrTermoReferencia = " . $iTR . " 
-												AND TRXSrTabela = 'Servico'	";
+												AND TRXSrTabela = 'Servico'	
+												Order By SbCatNome, ServiNome ASC";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowServicos);
@@ -602,13 +633,13 @@ if (count($rowServicoUtilizado) >= 1) {
 											if(count($rowOrcamentosTR) >= 1) {
 												print('
 														<div class="col-lg-2">
-															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
+															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
 														</div>	
 												');
 											} else {
 												print('
 														<div class="col-lg-2">
-															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+															<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
 														</div>	
 												');
 											}
