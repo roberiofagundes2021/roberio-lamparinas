@@ -571,7 +571,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                                 foreach ($rowSituacao as $item) {
                                                     if ($item['SituaChave'] == 'PENDENTE') {
                                                         print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-                                                    } else if ($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "NAOLIBERADO") {
+                                                    } else if ($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "LIBERADO"|| $item['SituaChave'] == "NAOLIBERADO") {
                                                         print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
                                                     }
                                                 }

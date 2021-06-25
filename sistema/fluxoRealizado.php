@@ -268,7 +268,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 
 									
 									<div class="row">
-										<div class="col-lg-2">
+										<div class="col-lg-5">
 											<div class="form-group">
 												<label for="cmbProduto">Produto/Serviço</label>
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc >
@@ -296,7 +296,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 															if (in_array($item['Id'], $aProdutos) or $countProdutoUtilizado == 0) {
 																$seleciona = "disabled selected";
 															} else {
-																$seleciona = "";
+																$seleciona = "disabled selected";
 															}													
 															
 															print('<option value="'.$item['Id'].'" '.$seleciona.'>'.$item['Nome'].'</option>');
@@ -331,21 +331,21 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 											</div>
 										</div>								
 										
-										<div class="col-lg-2">
+										<div class="col-lg-1">
 											<div class="form-group">
-												<label for="inputNumContrato">Número do Contrato</label>
+												<label for="inputNumContrato">Nº Contrato</label>
 												<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly >
 											</div>
 										</div>
 												
-										<div class="col-lg-2">
+										<div class="col-lg-1">
 											<div class="form-group">
-												<label for="inputNumProcesso">Número do Processo</label>
+												<label for="inputNumProcesso">Nº Processo</label>
 												<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
 											</div>
 										</div>
 
-										<div class="col-lg-2 fluxoProcesso">
+										<div class="col-lg-1 fluxoProcesso">
 											<div class="form-group">
 												<label for="inputValor">Valor Total</label>
 												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
