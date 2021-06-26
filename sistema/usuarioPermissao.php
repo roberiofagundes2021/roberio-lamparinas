@@ -141,7 +141,11 @@ $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 			
 			/* Fim: Tabela Personalizada */
 		});
+		function needSaveCheck(){
+			document.getElementById("btnSave").style.display="block"
+		}
 		function needSave(){
+			document.getElementById("permissaoCheck").checked=false
 			document.getElementById("btnSave").style.display="block"
 		}
 		function save(){
@@ -209,7 +213,7 @@ td{
 										<div class="p-1">
 											<?php echo '
 											<label class="form-check-label d-flex align-items-center">
-												<input onchange="needSave()" type="checkbox" name="permissao_usuario" data-on-text="Sim" data-off-text="Não" class="form-input-switch"'
+												<input id="permissaoCheck" onchange="needSaveCheck()" type="checkbox" name="permissao_usuario" data-on-text="Sim" data-off-text="Não" class="form-input-switch"'
 												.($UxPxP['UsuarPermissaoPerfil']==0? ' />':' checked/>').
 											'</label>';
 											?>
