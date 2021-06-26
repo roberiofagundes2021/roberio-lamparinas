@@ -112,31 +112,35 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaFornecedor(ForneId, ForneNome, ForneStatus, Tipo){
+		function atualizaFornecedor(Permission, ForneId, ForneNome, ForneStatus, Tipo){
 			
-			if (Tipo == 'imprime'){
-				// alerta('Esse Termo de Referência já está finalizado e não pode ser excluído!','');
+			if(Permission == 1){
+				if (Tipo == 'imprime'){
+					// alerta('Esse Termo de Referência já está finalizado e não pode ser excluído!','');
+
+					document.getElementById('inputFornecedorCategoria').value = document.getElementById('cmbCategoria').value;
+					
+					document.formFornecedor.action = "fornecedorImprime.php";
+					document.formFornecedor.setAttribute("target", "_blank");
+				} else {
+					document.getElementById('inputFornecedorId').value = ForneId;
+					document.getElementById('inputFornecedorNome').value = ForneNome;
+					document.getElementById('inputFornecedorStatus').value = ForneStatus;
+					console.log(ForneId, ForneNome, ForneStatus, Tipo)
+							
+					if (Tipo == 'edita'){	
+						document.formFornecedor.action = "fornecedorEdita.php";		
+					} else if (Tipo == 'exclui'){
+						confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir esse fornecedor?", "fornecedorExclui.php");
+					} else if (Tipo == 'mudaStatus'){
+						document.formFornecedor.action = "fornecedorMudaSituacao.php";
+					} 
+				}
 				
-				document.getElementById('inputFornecedorCategoria').value = document.getElementById('cmbCategoria').value;
-				
-				document.formFornecedor.action = "fornecedorImprime.php";
-				document.formFornecedor.setAttribute("target", "_blank");
-			} else {
-				document.getElementById('inputFornecedorId').value = ForneId;
-				document.getElementById('inputFornecedorNome').value = ForneNome;
-				document.getElementById('inputFornecedorStatus').value = ForneStatus;
-				console.log(ForneId, ForneNome, ForneStatus, Tipo)
-						
-				if (Tipo == 'edita'){	
-					document.formFornecedor.action = "fornecedorEdita.php";		
-				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir esse fornecedor?", "fornecedorExclui.php");
-				} else if (Tipo == 'mudaStatus'){
-					document.formFornecedor.action = "fornecedorMudaSituacao.php";
-				} 
+				document.formFornecedor.submit();
+			}else{
+				alerta('Permissão Negada!','');
 			}
-			
-			document.formFornecedor.submit();
 		}		
 			
 	</script>
@@ -260,12 +264,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">'.
-													($atualizar==1?'<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>':
-													'<a href="#" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>').
-														
-														($excluir==1?'<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>':
-														'<a href="#" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>').
-													'</div>
+													'<a href="#" onclick="atualizaFornecedor('.$atualizar.','.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaFornecedor('.$excluir.','.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+													</div>
 												</div>
 											</td>
 										</tr>');
