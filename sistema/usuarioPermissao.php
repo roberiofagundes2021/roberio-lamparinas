@@ -363,10 +363,10 @@ $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 
 			</div>
 			
-			<?php include_once("footer.php"); ?>
-
 		</div>
 		<!-- /main content -->
+
+		<?php include_once("footer.php"); ?>
 
 	</div>
 	<!-- /page content -->
