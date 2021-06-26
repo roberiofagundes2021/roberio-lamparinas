@@ -20,7 +20,7 @@ try {
 
 	$sql = "SELECT TrXOrNumero, TrRefData, TrXOrConteudo, TrXOrTabelaProduto, TrXOrTabelaServico,
 				   TrXOrSolicitante, TrRefId, TrRefTabelaProduto, TrRefTabelaServico, TrRefNumero, 
-				   TrRefTipo, ForneNome, CategNome 
+				   TrRefTipo, ForneNome, ForneRazaoSocial, CategNome 
 			FROM TRXOrcamento
 			JOIN TermoReferencia ON TrRefId = TrXOrTermoReferencia
 			LEFT JOIN Fornecedor ON ForneId = TrXOrFornecedor
@@ -126,7 +126,7 @@ try {
 
 	if ($row['ForneNome'] <> ""){
 		$html .= "<div style='text-align:center;'><h2>FORNECEDOR</h2></div>";
-		$html .= '<div style="text-align:center; margin-top: -20px"><p style="font-size:18px;">' . $row['ForneNome'] . '</p></div>';	
+		$html .= '<div style="text-align:center; margin-top: -20px"><p style="font-size:18px;">' . $row['ForneRazaoSocial'] . '</p></div>';	
 	}
 
 	$html .= '
@@ -163,6 +163,7 @@ try {
                     JOIN TRXOrcamento on TrXOrId = TXOXPOrcamento
                     JOIN TRXOrcamentoXSubcategoria on TXOXSCOrcamento = TXOXPOrcamento
 					JOIN UnidadeMedida on UnMedId = ".$campoPrefix."UnidadeMedida
+					JOIN SubCategoria on SbCatId = ".$campoPrefix."SubCategoria
                     WHERE ".$campoPrefix."Unidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento."
 					ORDER BY SbCatNome, ".$campoPrefix."Nome ASC";
 			$result = $conn->query($sql);
@@ -170,7 +171,7 @@ try {
 
 			if (isset($rowProdutos) && $exibirProduto) {
 
-				$html .= '
+				$html .= $sql.'
 				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
 					SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
 				</div>
@@ -255,14 +256,16 @@ try {
 			$tabelaOrigemProduto = $row['TrRefTabelaProduto'];
 			$campoPrefix =  $row['TrRefTabelaProduto'] == 'Produto' ? 'Produ' : 'PrOrc';
 
-			$sql = "SELECT DISTINCT " . $campoPrefix . "Id as Id, " . $campoPrefix . "Nome as Nome, " . $campoPrefix . "Categoria as Categoria, " . $campoPrefix . "SubCategoria as SubCategoria,
+			$sql = "SELECT " . $campoPrefix . "Id as Id, " . $campoPrefix . "Nome as Nome, " . $campoPrefix . "Categoria as Categoria, " . $campoPrefix . "SubCategoria as SubCategoria,
 		            " . $campoPrefix . "Detalhamento as Detalhamento, UnMedSigla, TRXPrQuantidade
 		    		FROM " . $tabelaOrigemProduto . "
 		    		JOIN TermoReferenciaXProduto on TRXPrProduto = " . $campoPrefix . "Id
                     JOIN TermoReferencia on TrRefId = TRXPrTermoReferencia
                     JOIN TRXSubcategoria on TRXSCTermoReferencia = TRXPrTermoReferencia
 		    		JOIN UnidadeMedida on UnMedId = " . $campoPrefix . "UnidadeMedida
-                    WHERE " . $campoPrefix . "Unidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $row['TrRefId'];
+					JOIN SubCategoria on SbCatId = ".$campoPrefix."SubCategoria
+                    WHERE " . $campoPrefix . "Unidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $row['TrRefId']."
+					ORDER BY SbCatNome, ".$campoPrefix."Nome ASC";
 			$result = $conn->query($sql);
 			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -344,19 +347,15 @@ try {
 			$tabelaOrigemServico = $row['TrRefTabelaServico'];
 			$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
 
-			
-			$sql = "SELECT DISTINCT ".$campoPrefix."Id as Id, 
-							 ".$campoPrefix."Nome as Nome, 
-							 ".$campoPrefix."Categoria as Categoria, 
-							 ".$campoPrefix."SubCategoria as SubCategoria, 
-							 TXOXSQuantidade, 
-							 TXOXSValorUnitario
-				  FROM ".$tabelaOrigemServico."
-					JOIN TRXOrcamentoXServico 
-						ON TXOXSServico = ".$campoPrefix."Id
-				 WHERE ".$campoPrefix."Unidade = " . $_SESSION['UnidadeId'] . " 
-				   AND TXOXSOrcamento = " . $iOrcamento . " 
-					 AND ".$campoPrefix."SubCategoria = " . $sbcat['TXOXSCSubcategoria'];
+			$sql = "SELECT ".$campoPrefix."Id as Id, ".$campoPrefix."Nome as Nome, ".$campoPrefix."Categoria as Categoria, 
+					".$campoPrefix."SubCategoria as SubCategoria, TXOXSQuantidade, TXOXSValorUnitario
+				  	FROM ".$tabelaOrigemServico."
+					JOIN TRXOrcamentoXServico ON TXOXSServico = ".$campoPrefix."Id
+					JOIN SubCategoria on SbCatId = ".$campoPrefix."SubCategoria
+				 	WHERE ".$campoPrefix."Unidade = " . $_SESSION['UnidadeId'] . " 
+				   	AND TXOXSOrcamento = " . $iOrcamento . " 
+					AND ".$campoPrefix."SubCategoria = " . $sbcat['TXOXSCSubcategoria']."
+					ORDER BY SbCatNome, ".$campoPrefix."Nome ASC";
 
 			$result = $conn->query($sql);
 			$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);

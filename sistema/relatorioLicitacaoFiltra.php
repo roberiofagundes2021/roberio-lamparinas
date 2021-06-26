@@ -20,10 +20,10 @@ function queryPesquisa()
     
     $args[]  = $inputDataAte;
 
-
-
     if (!empty($_POST['cmbUnidade']) && $_POST['cmbUnidade'] != "") {
         $args[]  = "FlOpeUnidade = " . $_POST['cmbUnidade'] . " ";
+    } else{
+        $args[]  = "FlOpeUnidade = " . $_SESSION['UnidadeId'] . " ";
     }
 
     if (!empty($_POST['cmbEmpresaContratada']) && $_POST['cmbEmpresaContratada'] != "") {
@@ -62,8 +62,8 @@ function queryPesquisa()
             $sql = "SELECT FlOpeId,  FlOpeDataInicio,  FlOpeDataFim,  FlOpeObservacao, FlOpePrioridade, UnidaNome, ForneNome, CategNome, MdLicNome, PriorNome, SituaNome
                     FROM FluxoOperacional
                     JOIN Unidade on UnidaId = FlOpeUnidade
-                    LEFT JOIN Fornecedor on ForneId = FlOpeFornecedor
-                    LEFT JOIN Categoria  on CategId = FlOpeCategoria
+                    JOIN Fornecedor on ForneId = FlOpeFornecedor
+                    JOIN Categoria  on CategId = FlOpeCategoria
                     LEFT JOIN ModalidadeLicitacao on MdLicId = FlOpeModalidadeLicitacao
                     LEFT JOIN Prioridade on PriorId = FlOpePrioridade 
                     JOIN Situacao on SituaId = FlOpeStatus

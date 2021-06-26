@@ -26,7 +26,7 @@ $dataInicio = date('Y')."-01-01";  //date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, 
 $dataFim = date('Y')."-12-31"; //date("Y-m-d");
 
 
-$sql = "SELECT PerfiNome
+$sql = "SELECT PerfiChave
         FROM Usuario
         JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
         JOIN Perfil on PerfiId = EXUXPPerfil
@@ -571,7 +571,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                                 foreach ($rowSituacao as $item) {
                                                     if ($item['SituaChave'] == 'PENDENTE') {
                                                         print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-                                                    } else if ($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "NAOLIBERADO") {
+                                                    } else if ($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "LIBERADO"|| $item['SituaChave'] == "NAOLIBERADO") {
                                                         print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
                                                     }
                                                 }
@@ -676,7 +676,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3" style="display:<?php if($rowPerfil['PerfiNome'] != 'Controladoria') echo 'none' ?>">
+                                    <div class="col-lg-3" style="display:<?php if($rowPerfil['PerfiChave'] != 'CONTROLADORIA') echo 'none' ?>">
                                         <div class="form-group">
                                             <label for="cmbUnidade">Local</label>
                                             <select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
