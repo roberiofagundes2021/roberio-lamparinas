@@ -64,15 +64,14 @@ try{
 	// medir velocidade do código
 	// $total1 = microtime(true) - $inicio1;
 	// echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>';
-
-	irpara("usuario.php");
+	
 } catch(PDOException $e) {
 	// var_dump($e);
 	$_SESSION['msg']['titulo'] = "Erro";
-	$_SESSION['msg']['mensagem'] = "Erro ao atualizar Premissão!!!";
+	$_SESSION['msg']['mensagem'] = "Erro ao atualizar Permissão!!!";
 	$_SESSION['msg']['tipo'] = "error";
-	irpara("usuario.php");
 	
-	// echo 'Error: ' . $e->getMessage();
+	 echo 'Error: ' . $e->getMessage();die;
 }
+irpara("usuario.php");
 ?>
