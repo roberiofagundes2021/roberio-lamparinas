@@ -5,7 +5,7 @@ include_once("sessao.php");
 $_SESSION['PaginaAtual'] = 'Permissões';
 
 $unidade = $_SESSION['UnidadeId'];
-$allPerfilId = $_POST['inputPerfilId'];
+$PerfilId = $_POST['inputPerfilId'];
 
 // ao recarregar fica sumindo o valor atribuido à $perfilId;
 
@@ -20,7 +20,7 @@ PrXPeId, PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir,
 PrXPeUnidade
 FROM menu
 join situacao on MenuStatus = SituaId
-join PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$allPerfilId' and PrXPeUnidade = $unidade
+join PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$PerfilId' and PrXPeUnidade = $unidade
 order by MenuOrdem asc";
 
 $resultMenuPxP = $conn->query($sqlMenuPxP);
@@ -181,138 +181,228 @@ td{
 	<div class="page-content">
 		
 		<?php include_once("menu-left.php"); ?>
+		
 		<div class="content-wrapper">
 
 			<?php include_once("cabecalho.php"); ?>	
 
-		<button id="btnSave" type="submit" onClick="save()" class="btn-group-fab btn btn-lg btn-principal">salvar</button>
-		<div class="content">
+			<button id="btnSave" type="submit" onClick="save()" class="btn-group-fab btn btn-lg btn-principal">salvar</button>
+			
+			<div class="content">
 
 				<!-- Info blocks -->		
 				<div class="row">
 					<div class="col-lg-12">
-						<!-- Basic responsive configuration -->
-						<div class="card">
-							<div  class="row">
-								<div class="card-header header-elements-inline">
-									<h5 class="card-title">Relação de Permissões (<?php echo $_POST['inputPerfilNome']; ?>)</h5>	
-								</div>
-								<div style="position:absolute; right: 0px;" class="pt-4 pr-3">
-									<div><a href="perfil.php" role="button"><< Relação de Perfis</a></div>
+							<div class="card">							
+								<div class="card-header">
+									<div class="header-elements-inline">
+										<h3 class="card-title">Relação de Permissões (<?php echo $_POST['inputPerfilNome']; ?>)</h3>
+										<div class="header-elements">
+											<div><a href="perfil.php" role="button"><< Relação de Perfis</a></div>
+										</div>
+									</div>								
 								</div>
 							</div>
-							
-							<table id="tblPermissao" class="table pt-3 full-width">
+						<form id="form_id" method="POST">
+						
+
+							<?php
+								echo '<input name="unidade" type="hidden" value="'.$unidade.'" />';
+								echo '<input name="PerfilId" type="hidden" value="'.$PerfilId.'" />';
+								$minimizar = '';
+
+								foreach($moduloPxP as $mod){
+
+									if($mod['SituaChave'] == strtoupper("ativo")){
+
+										$minimizar = $mod['ModulNome'] != 'Controle de Estoque' ? 'card-collapsed' : '';
+
+										print('<div class="card '.$minimizar.'">
+												<div class="card-header header-elements-inline">
+													<h3 class="card-title">'.$mod['ModulNome'].'</h3>
+													<div class="header-elements">
+														<div class="list-icons">
+															<a class="list-icons-item" data-action="collapse"></a>
+														</div>
+													</div>
+												</div>
+												<div class="card-body">
+												');
+																	
+							?>
+
+							<script type="text/javascript">
+								
+								$(document).ready(function (){	
+
+									$('#tblPermissao<?php echo $mod['ModulId']; ?>').DataTable( {
+										"order": [[ 0, "asc" ]],
+										autoWidth: false,
+										responsive: true,
+										columnDefs: [
+										{
+											orderable: true,   //permissao
+											width: "70%",
+											targets: [0]
+										},
+										{ 
+											orderable: false,   //visualizar
+											width: "10%",
+											targets: [1]
+										},
+										{ 
+											orderable: false,   //atualizar
+											width: "10%",
+											targets: [2]
+										},
+										{ 
+											orderable: false,   //excluir
+											width: "10%",
+											targets: [3]
+										}],
+										dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+										language: {
+											search: '<span>Filtro:</span> _INPUT_',
+											searchPlaceholder: 'filtra qualquer coluna...',
+											lengthMenu: '<span>Mostrar:</span> _MENU_',
+											paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+										}
+									});
+									
+									// Select2 for length menu styling
+									var _componentSelect2 = function() {
+										if (!$().select2) {
+											console.warn('Warning - select2.min.js is not loaded.');
+											return;
+										}
+
+										// Initialize
+										$('.dataTables_length select').select2({
+											minimumResultsForSearch: Infinity,
+											dropdownAutoWidth: true,
+											width: 'auto'
+										});
+									};	
+
+									_componentSelect2();
+									
+									/* Fim: Tabela Personalizada */
+								});
+							</script>
+
+							<table id="tblPermissao<?php echo $mod['ModulId']; ?>" class="table pt-3">
 								<thead>
-									<tr class="bg-slate full-width">
-										<th class="full-width">Permissão</th>
-										<th>Visualizar</th>
-										<th>Atualizar</th>
-										<th>Excluir</th>
+									<tr class="bg-slate">
+										<th>Permissão</th>
+										<th style="text-align: center">Visualizar</th>
+										<th style="text-align: center">Atualizar</th>
+										<th style="text-align: center">Excluir</th>
 									</tr>
 								</thead>
 								<div class="separate"></div>
-								<tbody class="full-width">
-									<form id="form_id" method="POST">
+									<tbody>
 										<?php
-											foreach($moduloPxP as $mod){
-												if($mod['SituaChave'] == strtoupper("ativo")){
-													echo '<tr class="nav-item-header full-width">
-																	<td class="nav-item-header full-width">
-																		<h3 class="text-uppercase text-dark full-width">'.$mod['ModulNome'].'</h3>
-																	</td>
-																</tr>';
-													foreach($menuPxP as $men){
-														if ($men["MenuModulo"] == $mod["ModulId"] && $men['MenuSubMenu'] == 0 && $men['MenuPai'] == 0 && $men['SituaChave'] == strtoupper("ativo")){
-															echo '<input name="'.$men['PrXPeId'].'-PrXPeId" value='.$men['PrXPeId'].' type="hidden">';
+
+											foreach($menuPxP as $men){
+												if ($men["MenuModulo"] == $mod["ModulId"] && $men['MenuSubMenu'] == 0 && $men['MenuPai'] == 0 && $men['SituaChave'] == strtoupper("ativo")){
+													echo '<input name="'.$men['PrXPeId'].'-PrXPeId" value='.$men['PrXPeId'].' type="hidden">';
+													echo '<tr>
+														<td><h5>'.$men['MenuNome'].'</h5></td>
+														<td class="text-center">
+															';
+																if(isset($men['UsXPeVisualizar'])){
+																	echo '<input name="'.$men['PrXPeId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"'.
+																	($men['UsXPeVisualizar'] == 1?'checked/>':'/>');
+																}else{
+																	echo '<input name="'.$men['PrXPeId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"'.
+																	($men['PrXPeVisualizar'] == 1?'checked/>':'/>');
+																}
+															echo '
+														</td>
+														<td class="text-center">';
+															if(isset($men['UsXPeAtualizar'])){
+																echo '<input name="'.$men['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"'.
+																($men['UsXPeAtualizar'] == 1?'checked/>':'/>');
+															}else{
+																echo '<input name="'.$men['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"'.
+																($men['PrXPeAtualizar'] == 1?'checked/>':'/>');
+															}
+															echo'
+														</td>
+														<td class="text-center">';
+															if(isset($men['UsXPeExcluir'])){
+																echo '<input name="'.$men['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"'.
+																($men['UsXPeExcluir'] == 1?'checked/>':'/>');
+															}else{
+																echo '<input name="'.$men['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"'.
+																($men['PrXPeExcluir'] == 1?'checked/>':'/>');
+															}
+															echo '
+														</td>
+													</tr>';
+												}
+												if($men['MenuSubMenu'] == 1  && $men["MenuModulo"] == $mod["ModulId"]){
+													foreach($menuPxP as $men_f){
+														if ($men_f["MenuPai"] == $men["MenuId"] && $men_f['SituaChave'] == strtoupper("ativo")){
+															echo '<input name="MenuId" value='.$men_f['MenuId'].' type="hidden">';
+															echo '<input name="'.$men_f['PrXPeId'].'-PrXPeId" value='.$men_f['PrXPeId'].' type="hidden">';
 															echo '<tr>
-																<td><h5>'.$men['MenuNome'].'</h5></td>
-																<td class="text-center">
-																	<div class="list-icons">';
-																	if($men['PrXPeVisualizar']==0){
-																		echo '<input name="'.$men['PrXPeId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"/>';
-																	}else{
-																		echo '<input name="'.$men['PrXPeId'].'-view'.'" onclick="needSave()" value="view" type="checkbox" checked/>';
-																	}
-																	echo '</div>
+																<td><h5>('.$men['MenuNome'].') - '.$men_f['MenuNome'].'</h5></td>
+																<td class="text-center">';
+																		if(isset($men_f['UsXPeVisualizar'])){
+																			echo '<input name="'.$men_f['PrXPeId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"'.
+																			($men_f['UsXPeVisualizar'] == 1?'checked/>':'/>');
+																		}else{
+																			echo '<input name="'.$men_f['PrXPeId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"'.
+																			($men_f['PrXPeVisualizar'] == 1?'checked/>':'/>');
+																		}
+																	echo '
 																</td>
-																<td class="text-center">
-																	<div class="list-icons">';
-																	if($men['PrXPeAtualizar']==0){
-																		echo '<input name="'.$men['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"/>';
+																<td class="text-center">';
+																	if(isset($men_f['UsXPeAtualizar'])){
+																		echo '<input name="'.$men_f['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"'.
+																		($men_f['UsXPeAtualizar'] == 1?'checked/>':'/>');
 																	}else{
-																		echo '<input name="'.$men['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox" checked/>';
+																		echo '<input name="'.$men_f['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"'.
+																		($men_f['PrXPeAtualizar'] == 1?'checked/>':'/>');
 																	}
-																	echo '</div>
+																	echo'
 																</td>
-																<td class="text-center">
-																	<div class="list-icons">';
-																	if($men['PrXPeExcluir']==0){
-																		echo '<input name="'.$men['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"/>';
+																<td class="text-center">';
+																	if(isset($men_f['UsXPeExcluir'])){
+																		echo '<input name="'.$men_f['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"'.
+																		($men_f['UsXPeExcluir'] == 1?'checked/>':'/>');
 																	}else{
-																		echo '<input name="'.$men['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox" checked/>';
+																		echo '<input name="'.$men_f['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"'.
+																		($men_f['PrXPeExcluir'] == 1?'checked/>':'/>');
 																	}
-																	echo '</div>
+																	echo '
 																</td>
 															</tr>';
 														}
-														if($men['MenuSubMenu'] == 1  && $men["MenuModulo"] == $mod["ModulId"]){
-															foreach($menuPxP as $men_f){
-																if ($men_f["MenuPai"] == $men["MenuId"] && $men_f['SituaChave'] == strtoupper("ativo")){
-																	echo '<input name="MenuId" value='.$men_f['MenuId'].' type="hidden">';
-																	echo '<input name="'.$men_f['PrXPeId'].'-PrXPeId" value='.$men_f['PrXPeId'].' type="hidden">';
-																	echo '<tr>
-																		<td><h5>('.$men['MenuNome'].') - '.$men_f['MenuNome'].'</h5></td>
-																		<td class="text-center">
-																			<div class="list-icons">';
-																			if($men_f['PrXPeVisualizar']==0){
-																				echo '<input name="'.$men_f['PrXPeId'].'-view'.'" onclick="needSave()" value="view" type="checkbox"/>';
-																			}else{
-																				echo '<input name="'.$men_f['PrXPeId'].'-view'.'" onclick="needSave()" value="view" type="checkbox" checked/>';
-																			}
-																			echo '</div>
-																		</td>
-																		<td class="text-center">
-																			<div class="list-icons">';
-																			if($men_f['PrXPeAtualizar']==0){
-																				echo '<input name="'.$men_f['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"/>';
-																			}else{
-																				echo '<input name="'.$men_f['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox" checked/>';
-																			}
-																			echo '</div>
-																		</td>
-																		<td class="text-center">
-																			<div class="list-icons">';
-																			if($men_f['PrXPeExcluir']==0){
-																				echo '<input name="'.$men_f['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"/>';
-																			}else{
-																				echo '<input name="'.$men_f['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox" checked/>';
-																			}
-																			echo '</div>
-																		</td>
-																	</tr>';
-																}
-															}
-														}
 													}
 												}
-											}?>
-									</form>
-								</tbody>
+											}
+												//} //*
+											//} //*
+										?>									
+									</tbody>
 							</table>
-						</div>
-						<!-- /basic responsive configuration -->
-
-					</div>
-				</div>				
-				
+							</div> <!-- card-body -->
+							</div> <!-- -->
+							<?php  }
+								}
+							?>
+						</form>	
+				</div>
 				<!-- /info blocks -->
 
 			</div>
-			<?php include_once("footer.php"); ?>
-
+			
 		</div>
 		<!-- /main content -->
+
+		<?php include_once("footer.php"); ?>
 
 	</div>
 	<!-- /page content -->
