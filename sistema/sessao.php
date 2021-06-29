@@ -7,15 +7,16 @@ $atualizar = 0;
 $excluir = 0;
 
 // faz o controle de acesso às paginas de acordo à permissão
-
-foreach($_SESSION['Permissoes'] as $key => $permissao){
-	if($permissao['url'] == basename($_SERVER['REQUEST_URI'])){
-		$atualizar = $permissao['atualizar'];
-		$excluir = $permissao['excluir'];
-		if($permissao['visualizar'] == 0){
-			$visualizar = false;
+if (isset($_SESSION['Permissoes'])){
+	foreach($_SESSION['Permissoes'] as $key => $permissao){
+		if($permissao['url'] == basename($_SERVER['REQUEST_URI'])){
+			$atualizar = $permissao['atualizar'];
+			$excluir = $permissao['excluir'];
+			if($permissao['visualizar'] == 0){
+				$visualizar = false;
+			}
 		}
-	}
+	}	
 }
 if(!$visualizar){header("location:javascript://history.go(-1)");}
 
