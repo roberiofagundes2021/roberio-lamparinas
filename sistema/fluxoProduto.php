@@ -72,7 +72,7 @@ try{
 	
 	$sql = "SELECT FlOpeId, FlOpeTermoReferencia, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, 
 				   CategNome, FlOpeCategoria, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, 
-				   SituaNome, TrRefTabelaProduto,
+				   SituaNome, SituaChave,  TrRefTabelaProduto,
 				   dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, 
 				   dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado
 			FROM FluxoOperacional
@@ -734,7 +734,7 @@ try{
 								<div class="col-lg-6">
 									<div class="form-group">
 										<?php										
-											if ($row['FluxoFechado']){												
+											if ($row['FluxoFechado'] && $row['SituaChave'] != 'LIBERADO'){												
 												print('
 												<button class="btn btn-lg btn-principal" id="enviar" style="margin-right:5px;">Alterar</button>
 												<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
@@ -758,7 +758,7 @@ try{
 
 								<div class="col-lg-6" style="text-align: right; padding-right: 35px; color: red;">
 								<?php	
-									if ($row['FluxoFechado']){
+									if ($row['FluxoFechado' ] && $row['SituaChave'] != 'LIBERADO'){
 										if($row['SituaNome'] == 'PENDENTE'){
 											print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído (ENVIE PARA APROVAÇÃO)');
 										} else {

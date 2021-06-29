@@ -262,7 +262,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																	print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', '.$item['TrRefId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>');
 																}																
 
-																if ($item['FluxoFechado']){												
+																if ($item['FluxoFechado'] && $item['SituaChave'] != 'LIBERADO'){												
 																	print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', '.$item['TrRefId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'enviarAprovacao\', \'\')" class="dropdown-item" title="Enviar para Aprovação"><i class="icon-printer2"></i> Enviar para Aprovação</a>');
 																}																	
 																print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', '.$item['TrRefId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>

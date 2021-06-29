@@ -256,7 +256,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
 																<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>');
 																
-																if ($item['FluxoFechado']){												
+																if ($item['FluxoFechado'] && $item['SituaChave'] != 'LIBERADO'){												
 																	print('<a href="#" onclick="atualizaFluxoOperacional(\''.$disabled.'\','.$item['FlOpeId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'enviarAprovacao\', \'\')" class="dropdown-item" title="Enviar para Aprovação"><i class="icon-printer2"></i> Enviar para Aprovação</a>');
 																}																					
 

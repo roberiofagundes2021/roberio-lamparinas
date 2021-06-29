@@ -140,15 +140,25 @@ try {
 		<table style="width:100%; border-collapse: collapse;">
 			<tr>
 				<th style="text-align: center; width:8%">Item</th>
-				<th style="text-align: left; width:65%">Produto</th>
-				<th style="text-align: center; width:12%">Unidade</th>				
-				<th style="text-align: center; width:15%">Quant.</th>
+				<th style="text-align: left; width:43%">Produto</th>
+				<th style="text-align: center; width:10%">Unidade</th>				
+				<th style="text-align: center; width:12%">Quant.</th>
+				<th style="text-align: center; width:12%">V. Unit.</th>
+				<th style="text-align: center; width:15%">V. Total</th>
 			</tr>
 		';
 
 		$cont = 1;
 
 		foreach ($rowProdutos as $rowProduto) {
+
+			if ($rowProduto['FOXPrValorUnitario'] != '' and $rowProduto['FOXPrValorUnitario'] != null) {
+				$valorUnitario = $rowProduto['FOXPrValorUnitario'];
+				$valorTotal = $rowProduto['FOXPrQuantidade'] * $rowProduto['FOXPrValorUnitario'];
+			} else {
+				$valorUnitario = 0;
+				$valorTotal = 0;
+			}
 			
 			if ($totalProdutos == ($cont)) {
 				$html .= "
@@ -156,7 +166,9 @@ try {
 					<td style='text-align: center;'>" . $cont . "</td>
 					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'] . "</td>
 					<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
-					<td style='text-align: center;'>" . $rowProduto['FOXPrQuantidade'] . "</td>		
+					<td style='text-align: center;'>" . $rowProduto['FOXPrQuantidade'] . "</td>	
+					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
+					<td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>	
 			";
 			} else {
 				$html .= "
@@ -165,24 +177,26 @@ try {
 					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'] . "</td>
 					<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
 					<td style='text-align: center;'>" . $rowProduto['FOXPrQuantidade'] . "</td>
+					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
+					<td style='text-align: right'>" . mostraValor($valorTotal) . "</td>
 				</tr>
 			";
 			}
 
 			$cont++;
-			$totalGeralProdutos += $rowProduto['FOXPrQuantidade'];
+			$totalGeralProdutos += $valorTotal;
 		}
 
 		$html .= "<br>";
 
 		$html .= "  <tr>
-	                	<td colspan='3' height='50' valign='middle'>
-		                    <strong>Total Produtos</strong>
-	                    </td>
-					    <td style='text-align: center' colspan='1'>
-					        " . $totalGeralProdutos . "
-					    </td>
-				    </tr>";
+						<td colspan='5' height='50' valign='middle'>
+							<strong>Total Produtos</strong>
+						</td>
+						<td style='text-align: right' colspan='2'>
+							" . mostraValor($totalGeralProdutos) . "
+						</td>
+					</tr>";
 		$html .= "</table>";
 	}
 
@@ -209,8 +223,10 @@ try {
 		<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
 			<tr>
 				<th style="text-align: center; width:8%">Item</th>
-				<th style="text-align: left; width:77%">Serviço</th>
-				<th style="text-align: center; width:15%">Quant.</th>
+				<th style="text-align: left; width:53%">Serviço</th>
+				<th style="text-align: center; width:12%">Quant.</th>
+				<th style="text-align: center; width:12%">V. Unit.</th>
+				<th style="text-align: center; width:15%">V. Total</th>
 			</tr>
 		';
 
@@ -218,12 +234,22 @@ try {
 
 		foreach ($rowServicos as $rowServico) {
 
+			if ($rowServico['FOXSrValorUnitario'] != '' and $rowServico['FOXSrValorUnitario'] != null) {
+				$valorUnitario = $rowServico['FOXSrValorUnitario'];
+				$valorTotal = $rowServico['FOXSrQuantidade'] * $rowServico['FOXSrValorUnitario'];
+			} else {
+				$valorUnitario = "";
+				$valorTotal = "";
+			}
+			
 			if ($totalServicos == ($cont)) {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
 					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'] . "</td>	
-					<td style='text-align: center;'>" . $rowServico['FOXSrQuantidade'] . "</td>			
+					<td style='text-align: center;'>" . $rowServico['FOXSrQuantidade'] . "</td>	
+					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
+					<td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>		
 				</tr>
 			";
 			} else {
@@ -232,25 +258,26 @@ try {
 					<td style='text-align: center;'>" . $cont . "</td>
 					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'] . "</td>
 					<td style='text-align: center;'>" . $rowServico['FOXSrQuantidade'] . "</td>
-					
+					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
+					<td style='text-align: right'>" . mostraValor($valorTotal) . "</td>
 				</tr>
 			";
 			}
 
 			$cont++;
-			$totalGeralServicos += $rowServico['FOXSrQuantidade'];
+			$totalGeralServicos += $valorTotal;
 		}
 
 		$html .= "<br>";
 
-		$html .= "  <tr>
-	                	<td colspan='2' height='50' valign='middle'>
-		                    <strong>Total Serviços</strong>
-	                    </td>
-					    <td style='text-align: center' colspan='1'>
-					        " . $totalGeralServicos . "
-					    </td>
-				    </tr>";
+		$html .= " <tr>
+						<td colspan='4' height='50' valign='middle'>
+							<strong>Total Serviços</strong>
+						</td>
+						<td style='text-align: right' colspan='2'>
+							" . mostraValor($totalGeralServicos) . "
+						</td>
+					</tr>";
 		$html .= "</table>"; 
 	}
 
@@ -262,7 +289,7 @@ try {
 	                    <strong>TOTAL DE ITENS GERAIS</strong>
                     </td>
 				    <td style='text-align: center; width:15%'>
-				        " . $totalGeral . "
+				        " . mostraValor($totalGeral) . "
 				    </td>
 			    </tr>
 			  </table>
