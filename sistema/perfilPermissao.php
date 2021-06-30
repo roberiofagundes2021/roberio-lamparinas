@@ -5,6 +5,9 @@ include_once("sessao.php");
 $_SESSION['PaginaAtual'] = 'Permissões';
 
 $unidade = $_SESSION['UnidadeId'];
+if(!isset($_POST['inputPerfilId'])){
+	header("location:javascript://history.go(-1)");
+}
 $PerfilId = $_POST['inputPerfilId'];
 
 // ao recarregar fica sumindo o valor atribuido à $perfilId;
@@ -239,6 +242,7 @@ td{
 										"order": [[ 0, "asc" ]],
 										autoWidth: false,
 										responsive: true,
+										bPaginate: false,
 										columnDefs: [
 										{
 											orderable: true,   //permissao

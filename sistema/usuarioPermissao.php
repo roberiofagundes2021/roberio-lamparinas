@@ -5,6 +5,9 @@ include_once("sessao.php");
 $_SESSION['PaginaAtual'] = 'Permissões';
 
 $unidade = $_SESSION['UnidadeId'];
+if(!isset($_POST['inputUsuarioId']) || !isset($_POST['inputUsuarioPerfil'])){
+	header("location:javascript://history.go(-1)");
+}
 $user = $_POST['inputUsuarioId'];
 $perfilId = $_POST['inputUsuarioPerfil'];
 
@@ -260,6 +263,7 @@ $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 										"order": [[ 0, "asc" ]],
 										autoWidth: false,
 										responsive: true,
+										bPaginate: false,
 										columnDefs: [
 										{
 											orderable: true,   //permissao
