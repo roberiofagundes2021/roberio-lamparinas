@@ -854,7 +854,11 @@ if(isset($_POST['inputTipo'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>
+										<?php 
+											if ($atualizar) {
+												echo '<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>';
+											}   
+										?>
 										<a href="fornecedor.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

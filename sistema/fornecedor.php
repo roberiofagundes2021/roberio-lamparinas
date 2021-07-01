@@ -114,7 +114,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaFornecedor(Permission, ForneId, ForneNome, ForneStatus, Tipo){
 			
-			if(Permission == 1){
+			if (Permission){
 				if (Tipo == 'imprime'){
 					// alerta('Esse Termo de Referência já está finalizado e não pode ser excluído!','');
 
@@ -138,7 +138,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				}
 				
 				document.formFornecedor.submit();
-			}else{
+			} else{
 				alerta('Permissão Negada!','');
 			}
 		}		
@@ -264,7 +264,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">'.
-													'<a href="#" onclick="atualizaFornecedor('.$atualizar.','.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+													'<a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
 														<a href="#" onclick="atualizaFornecedor('.$excluir.','.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
