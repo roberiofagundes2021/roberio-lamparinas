@@ -103,21 +103,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaPlanoContas(PlConId, PlConNome, PlConStatus, Tipo){
+		function atualizaPlanoContas(Permission, PlConId, PlConNome, PlConStatus, Tipo){
 		
-			document.getElementById('inputPlanoContasId').value = PlConId;
-			document.getElementById('inputPlanoContasNome').value = PlConNome;
-			document.getElementById('inputPlanoContasStatus').value = PlConStatus;
-					
-			if (Tipo == 'edita'){	
-				document.formPlanoContas.action = "planoContasEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formPlanoContas, "Tem certeza que deseja excluir esse Plano de Contas?", "planoContasExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formPlanoContas.action = "planoContasMudaSituacao.php";
+			if (Permission == 1){
+				document.getElementById('inputPlanoContasId').value = PlConId;
+				document.getElementById('inputPlanoContasNome').value = PlConNome;
+				document.getElementById('inputPlanoContasStatus').value = PlConStatus;
+						
+				if (Tipo == 'edita'){	
+					document.formPlanoContas.action = "planoContasEdita.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formPlanoContas, "Tem certeza que deseja excluir esse Plano de Contas?", "planoContasExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formPlanoContas.action = "planoContasMudaSituacao.php";
+				}
+				
+				document.formPlanoContas.submit();
+			} else{
+				alerta('Permissão Negada!','');
 			}
-			
-			document.formPlanoContas.submit();
 		}		
 			
 	</script>
@@ -193,13 +197,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['CnCusNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaPlanoContas('.$item['PlConId'].', \''.$item['PlConNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaPlanoContas(1,'.$item['PlConId'].', \''.$item['PlConNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaPlanoContas('.$item['PlConId'].', \''.$item['PlConNome'].'\','.$item['PlConStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaPlanoContas('.$item['PlConId'].', \''.$item['PlConNome'].'\','.$item['PlConStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														<a href="#" onclick="atualizaPlanoContas('.$atualizar.','.$item['PlConId'].', \''.$item['PlConNome'].'\','.$item['PlConStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaPlanoContas('.$excluir.','.$item['PlConId'].', \''.$item['PlConNome'].'\','.$item['PlConStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
 											</td>

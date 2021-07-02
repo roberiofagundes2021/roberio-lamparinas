@@ -205,25 +205,30 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaMarca(MarcaId, MarcaNome, MarcaStatus, Tipo){
+		function atualizaMarca(Permission, MarcaId, MarcaNome, MarcaStatus, Tipo){
 		
-			document.getElementById('inputMarcaId').value = MarcaId;
-			document.getElementById('inputMarcaNome').value = MarcaNome;
-			document.getElementById('inputMarcaStatus').value = MarcaStatus;
-					
-			if (Tipo == 'edita'){	
-				document.getElementById('inputEstadoAtual').value = "EDITA";
-				document.formMarca.action = "marca.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formMarca, "Tem certeza que deseja excluir essa marca?", "marcaExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formMarca.action = "marcaMudaSituacao.php";
-			} else if (Tipo == 'imprime'){
-				document.formMarca.action = "marcaImprime.php";
-				document.formMarca.setAttribute("target", "_blank");
-			}
+			if (Permission == 1){
+				document.getElementById('inputMarcaId').value = MarcaId;
+				document.getElementById('inputMarcaNome').value = MarcaNome;
+				document.getElementById('inputMarcaStatus').value = MarcaStatus;
+						
+				if (Tipo == 'edita'){	
+					document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formMarca.action = "marca.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formMarca, "Tem certeza que deseja excluir essa marca?", "marcaExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formMarca.action = "marcaMudaSituacao.php";
+				} else if (Tipo == 'imprime'){
+					document.formMarca.action = "marcaImprime.php";
+					document.formMarca.setAttribute("target", "_blank");
+				}
 			
-			document.formMarca.submit();
+				document.formMarca.submit();
+			} else{
+				alerta('Permissão Negada!','');
+			}
+		
 		}		
 			
 	</script>
@@ -312,13 +317,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['MarcaNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaMarca('.$item['MarcaId'].', \''.addslashes($item['MarcaNome']).'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaMarca(1,'.$item['MarcaId'].', \''.addslashes($item['MarcaNome']).'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaMarca('.$item['MarcaId'].', \''.addslashes($item['MarcaNome']).'\','.$item['MarcaStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaMarca('.$item['MarcaId'].', \''.addslashes($item['MarcaNome']).'\','.$item['MarcaStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaMarca('.$atualizar.','.$item['MarcaId'].', \''.addslashes($item['MarcaNome']).'\','.$item['MarcaStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaMarca('.$excluir.','.$item['MarcaId'].', \''.addslashes($item['MarcaNome']).'\','.$item['MarcaStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>

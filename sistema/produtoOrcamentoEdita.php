@@ -290,7 +290,11 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<button class="btn btn-lg btn-principal" id="enviar">Editar</button>
+										<?php 
+											if ($_POST['inputPermission']) {
+												echo '<button class="btn btn-lg btn-principal" id="enviar">Editar</button>';
+											}
+										?>
 										<a href="produtoOrcamento.php" class="btn btn-basic" id="cancelar">Cancelar</a>
 									</div>
 								</div>

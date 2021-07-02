@@ -112,21 +112,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		})
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaCategoria(contaBancoId, contaBancoNome, contaBancoStatus, Tipo){
+		function atualizaCategoria(Permission, contaBancoId, contaBancoNome, contaBancoStatus, Tipo){
 		
-			document.getElementById('inputContaBancoId').value = contaBancoId;
-			document.getElementById('inputContaBancoNome').value = contaBancoNome;
-			document.getElementById('inputContaBancoStatus').value = contaBancoStatus;
-					
-			if (Tipo == 'edita'){	
-				document.formContaBanco.action = "contaBancoEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formContaBanco, "Tem certeza que deseja excluir essa Conta/Banco?", "contaBancoExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formContaBanco.action = "contaBancoMudaSituacao.php";
-			} 
-			
-			document.formContaBanco.submit();
+			if (Permission == 1){
+				document.getElementById('inputContaBancoId').value = contaBancoId;
+				document.getElementById('inputContaBancoNome').value = contaBancoNome;
+				document.getElementById('inputContaBancoStatus').value = contaBancoStatus;
+						
+				if (Tipo == 'edita'){	
+					document.formContaBanco.action = "contaBancoEdita.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formContaBanco, "Tem certeza que deseja excluir essa Conta/Banco?", "contaBancoExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formContaBanco.action = "contaBancoMudaSituacao.php";
+				} 
+				
+				document.formContaBanco.submit();
+			} else{
+				alerta('Permissão Negada!','');
+			}
 		}		
 			
 	</script>
@@ -204,13 +208,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                             <td>'.$item['CnBanConta'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaCategoria('.$item['CnBanId'].', \''.$item['CnBanNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaCategoria(1,'.$item['CnBanId'].', \''.$item['CnBanNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCategoria('.$item['CnBanId'].', \''.$item['CnBanNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCategoria('.$item['CnBanId'].', \''.$item['CnBanNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaCategoria('.$atualizar.','.$item['CnBanId'].', \''.$item['CnBanNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaCategoria('.$excluir.','.$item['CnBanId'].', \''.$item['CnBanNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>

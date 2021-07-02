@@ -206,23 +206,27 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaFormaPagamento(FrPagId, FrPagNome, FrPagChave, FrPagStatus, Tipo){
+		function atualizaFormaPagamento(Permission, FrPagId, FrPagNome, FrPagChave, FrPagStatus, Tipo){
 		
-			document.getElementById('inputFormaPagamentoId').value = FrPagId;
-			document.getElementById('inputFormaPagamentoNome').value = FrPagNome;
-			document.getElementById('inputFormaPagamentoChave').value = FrPagChave;
-			document.getElementById('inputFormaPagamentoStatus').value = FrPagStatus;
-					
-			if (Tipo == 'edita'){	
-				document.getElementById('inputEstadoAtual').value = "EDITA";
-				document.formFormaPagamento.action = "formaPagamento.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formFormaPagamento, "Tem certeza que deseja excluir essa Forma de Pagamento?", "formaPagamentoExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formFormaPagamento.action = "formaPagamentoMudaSituacao.php";
-			} 
-			
-			document.formFormaPagamento.submit();
+			if (Permission == 1){
+				document.getElementById('inputFormaPagamentoId').value = FrPagId;
+				document.getElementById('inputFormaPagamentoNome').value = FrPagNome;
+				document.getElementById('inputFormaPagamentoChave').value = FrPagChave;
+				document.getElementById('inputFormaPagamentoStatus').value = FrPagStatus;
+						
+				if (Tipo == 'edita'){	
+					document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formFormaPagamento.action = "formaPagamento.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formFormaPagamento, "Tem certeza que deseja excluir essa Forma de Pagamento?", "formaPagamentoExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formFormaPagamento.action = "formaPagamentoMudaSituacao.php";
+				} 
+				
+				document.formFormaPagamento.submit();
+			} else{
+				alerta('Permissão Negada!','');
+			}
 		}		
 			
 	</script>
@@ -312,7 +316,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['FrPagNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaFormaPagamento(1,'.$item['FrPagId'].', \''.$item['FrPagNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">');
 
@@ -321,8 +325,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											print('
 											<div class="list-icons">
 												<div class="list-icons list-icons-extended">
-													<a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\', \''.$item['FrPagChave'].'\', '.$item['FrPagStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar" ></i></a>
-													<a href="#" onclick="atualizaFormaPagamento('.$item['FrPagId'].', \''.$item['FrPagNome'].'\', \''.$item['FrPagChave'].'\', '.$item['FrPagStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+													<a href="#" onclick="atualizaFormaPagamento('.$atualizar.','.$item['FrPagId'].', \''.$item['FrPagNome'].'\', \''.$item['FrPagChave'].'\', '.$item['FrPagStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar" ></i></a>
+													<a href="#" onclick="atualizaFormaPagamento('.$excluir.','.$item['FrPagId'].', \''.$item['FrPagNome'].'\', \''.$item['FrPagChave'].'\', '.$item['FrPagStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 												</div>
 											</div>								
 											');            
