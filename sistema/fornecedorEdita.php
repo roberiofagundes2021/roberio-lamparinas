@@ -855,7 +855,7 @@ if(isset($_POST['inputTipo'])){
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<?php 
-											if ($atualizar) {
+											if ($_POST['inputPermission']) {
 												echo '<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>';
 											}   
 										?>

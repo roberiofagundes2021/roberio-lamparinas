@@ -114,7 +114,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaFornecedor(Permission, ForneId, ForneNome, ForneStatus, Tipo){
 			
-			if (Permission){
 				if (Tipo == 'imprime'){
 					// alerta('Esse Termo de Referência já está finalizado e não pode ser excluído!','');
 
@@ -123,6 +122,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					document.formFornecedor.action = "fornecedorImprime.php";
 					document.formFornecedor.setAttribute("target", "_blank");
 				} else {
+					document.getElementById('inputPermission').value = Permission;
 					document.getElementById('inputFornecedorId').value = ForneId;
 					document.getElementById('inputFornecedorNome').value = ForneNome;
 					document.getElementById('inputFornecedorStatus').value = ForneStatus;
@@ -130,17 +130,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							
 					if (Tipo == 'edita'){	
 						document.formFornecedor.action = "fornecedorEdita.php";		
-					} else if (Tipo == 'exclui'){
-						confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir esse fornecedor?", "fornecedorExclui.php");
 					} else if (Tipo == 'mudaStatus'){
 						document.formFornecedor.action = "fornecedorMudaSituacao.php";
-					} 
+					}else if (Tipo == 'exclui'){
+						if(Permission){
+							confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir esse fornecedor?", "fornecedorExclui.php");
+						}else{
+							alerta('Permissão Negada!','');
+							return false;
+						}
+					}
 				}
 				
 				document.formFornecedor.submit();
-			} else{
-				alerta('Permissão Negada!','');
-			}
 		}		
 			
 	</script>
@@ -264,7 +266,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">'.
-													'<a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+													'<a href="#" onclick="atualizaFornecedor('.$atualizar.','.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
 														<a href="#" onclick="atualizaFornecedor('.$excluir.','.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
@@ -284,6 +286,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<!-- /info blocks -->
 				
 				<form name="formFornecedor" method="post">
+					<input type="hidden" id="inputPermission" name="inputPermission" >
 					<input type="hidden" id="inputFornecedorId" name="inputFornecedorId" >
 					<input type="hidden" id="inputFornecedorNome" name="inputFornecedorNome" >
 					<input type="hidden" id="inputFornecedorStatus" name="inputFornecedorStatus" >
