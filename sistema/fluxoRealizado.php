@@ -25,6 +25,7 @@ if ($row['FlOpeDataFim'] > date("Y-m-d")){
 	$dataFim = $row['FlOpeDataFim'];
 }
 
+/*
 $sql = "SELECT FOXPrProduto
 		FROM FluxoOperacionalXProduto
 		LEFT JOIN Produto on ProduId = FOXPrProduto
@@ -36,6 +37,7 @@ $countProdutoUtilizado = count($rowProdutoUtilizado);
 foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 	$aProdutos[] = $itemProdutoUtilizado['FOXPrProduto'];
 }
+*/
 
 //SubCategorias para esse fornecedor
 $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
@@ -85,112 +87,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>		
 	
-	<!-- /theme JS files -->	
-	
-	<script type="text/javascript">
-		
-		$(document).ready(function() {
-			//Ao mudar o Fornecedor, filtra a categoria e a SubCategoria via ajax (retorno via JSON)
-			$('#cmbFornecedor').on('change', function(e){
-				
-				FiltraCategoria();
-				FiltraSubCategoria();
-				FiltraProduto();
-				
-				var cmbFornecedor = $('#cmbFornecedor').val();
-				
-				$.getJSON('filtraCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
-					
-					//var option = '<option value="#">Selecione a Categoria</option>';
-					var option = '';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
-						});						
-						
-						$('#cmbCategoria').html(option).show();
-					} else {
-						ResetCategoria();
-					}					
-				});
-				
-				$.getJSON('filtraSubCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
-					
-					if (dados.length > 1){
-						var option = '<option value="#" "selected">Selecione a SubCategoria</option>';
-					} else {
-						var option = '';
-					}
-					
-					if (dados.length){
-						
-						$.each(dados, function(i, obj){							
-							option += '<option value="'+obj.SbCatId+'">' + obj.SbCatNome + '</option>';
-						});						
-						
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}					
-				});
-
-				$.getJSON('filtraProduto.php?idFornecedor='+cmbFornecedor, function (dados){
-
-					if (dados.length){
-
-						var option = '';
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
-						});	
-
-						//alert(option);
-
-						//$('#cmbProduto').removeClass('form-control multiselect-filtering').addClass('form-control form-control-select2');
-						
-						$('#cmbProduto').html(option).show();
-					} else {
-						ResetProduto();
-					}					
-				});
-
-
-				$('#inputNumContrato').val('');
-				$('#inputNumProcesso').val('');
-			});	
-						
-			//Mostra o "Filtrando..." na combo Categoria
-			function FiltraCategoria(){
-				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
-			}
-			
-			//Mostra o "Filtrando..." na combo SubCategoria
-			function FiltraSubCategoria(){
-				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-			}
-
-			//Mostra o "Filtrando..." na combo Produto
-			function FiltraProduto(){
-				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
-			}			
-			
-			function ResetCategoria(){
-				$('#cmbCategoria').empty().append('<option value="">Sem Categoria</option>');
-			}
-
-			function ResetSubCategoria(){
-				$('#cmbSubCategoria').empty().append('<option value="">Sem SubCategoria</option>');
-			}
-
-			function ResetProduto(){
-				$('#cmbProduto').empty().append('<option>Sem produto</option>');
-			}
-
-		});	
-			
-	</script>
+	<!-- /theme JS files -->
 
 </head>
 
@@ -221,14 +118,14 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="fluxo.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
 							</div>
 
 							<div class="card-body">
 								<form name="formFluxoOperacional" method="post">
+
+									<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" value="<?php echo $_POST['inputFluxoOperacionalId']; ?>" />
 
 									<div class="row">
 										<div class="col-lg-4">
@@ -293,11 +190,11 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 															
 														foreach ($rowProduto as $item){	
 															
-															if (in_array($item['Id'], $aProdutos) or $countProdutoUtilizado == 0) {
-																$seleciona = "disabled selected";
-															} else {
-																$seleciona = "disabled selected";
-															}													
+														/*	if (in_array($item['Id'], $aProdutos) or $countProdutoUtilizado == 0) {
+																$seleciona = "selected";
+															} else {*/
+																$seleciona = "selected";
+														//	}													
 															
 															print('<option value="'.$item['Id'].'" '.$seleciona.'>'.$item['Nome'].'</option>');
 														}
@@ -356,9 +253,9 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 									<div class="col-lg-12">	
 											<div class="text-right">
 												<a href="contrato.php" class="btn btn-basic" role="button"><< Fluxo Operacional/Contrato</a>
+												<button type="submit" class="btn btn-principal">Filtrar</button>
 											</div>
 									</div>
-									<!-- <div class="text-right"><a href="fluxoRealizado.php" class="btn btn-principal" role="button">Filtrar</a></div> -->
 								</form>
 							</div>
 						</div>
@@ -377,8 +274,6 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="fluxo.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
 							</div>
@@ -401,7 +296,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 											LEFT JOIN Marca on MarcaId = ServiMarca
 											JOIN SubCategoria on SbCatId = ServiSubCategoria
 											WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional."
-											ORDER BY SubCategoria ASC";
+											ORDER BY SubCategoria, Nome ASC";
 									$result = $conn->query($sql);
 									$rowPrevisto = $result->fetchAll(PDO::FETCH_ASSOC);
 									
@@ -415,13 +310,13 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 											<th width="4%">Item</th>
 											<th width="26%">Produto/Serviço</th>
 											<th width="15%">Marca</th>
-											<th width="9%">Unidade</th>
-											<th width="9%">Quant.</th>									
-											<th width="9%">Valor Unit.</th>										
-											<th width="9%">Valor Total</th>
-											<th width="7%" style="background-color: #ccc; color:#333;">Saldo (Qt)</th>
-											<th width="7%" style="background-color: #ccc; color:#333;">Saldo (R$)</th>
-											<th width="5%" style="background-color: #ccc; color:#333;">%</th>
+											<th width="9%" style="text-align:center;">Unidade</th>
+											<th width="9%" style="text-align:center;">Quant.</th>									
+											<th width="9%" style="text-align:right;">Valor Unit.</th>										
+											<th width="9%" style="text-align:right;">Valor Total</th>
+											<th width="7%" style="background-color: #ccc; color:#333; text-align:right;">Saldo (Qt)</th>
+											<th width="7%" style="background-color: #ccc; color:#333; text-align:right;">Saldo (R$)</th>
+											<th width="5%" style="background-color: #ccc; color:#333; text-align:center;">%</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -456,13 +351,13 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 													<td>'.$cont.'</td>
 													<td>'.$item['Nome'].'</td>
 													<td>'.$item['Marca'].'</td>
-													<td>'.$item['UnidadeMedida'].'</td>
-													<td>'.$iQuantidadePrevista.'</td>
-													<td>'.$fValorUnitarioPrevisto.'</td>											
-													<td>'.mostraValor($fValorTotalPrevisto).'</td>
-													<td style="background-color: #eee; color:#333;">'.$controle.'</td>
-													<td style="background-color: #eee; color:#333;">'.$saldo.'</td>
-													<td style="background-color: #eee; color:#333;">'.$porcentagem.'%</td>
+													<td style="text-align:center;">'.$item['UnidadeMedida'].'</td>
+													<td style="text-align:center;">'.$iQuantidadePrevista.'</td>
+													<td style="text-align:right;">'.$fValorUnitarioPrevisto.'</td>											
+													<td style="text-align:right;">'.mostraValor($fValorTotalPrevisto).'</td>
+													<td style="background-color: #eee; color:#333; text-align:center;">'.$controle.'</td>
+													<td style="background-color: #eee; color:#333; text-align:right;">'.$saldo.'</td>
+													<td style="background-color: #eee; color:#333; text-align:center;">'.$porcentagem.'%</td>
 												</tr>');
 
 												$cont++;
@@ -486,8 +381,6 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="fluxo.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
 							</div>
@@ -510,7 +403,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 											LEFT JOIN Marca on MarcaId = ServiMarca
 											JOIN SubCategoria on SbCatId = ServiSubCategoria
 											WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional."
-											ORDER BY SubCategoria ASC";
+											ORDER BY SubCategoria, Nome ASC";
 									$result = $conn->query($sql);
 									$rowRealizado = $result->fetchAll(PDO::FETCH_ASSOC);
 									
@@ -524,13 +417,13 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 											<th width="4%">Item</th>
 											<th width="26%">Produto/Serviço</th>
 											<th width="15%">Marca</th>
-											<th width="9%">Unidade</th>
-											<th width="9%">Quant.</th>									
-											<th width="9%">Valor Unit.</th>										
-											<th width="9%">Valor Total</th>
-											<th width="7%" style="background-color: #ccc; color:#333;">Total (Qt)</th>
-											<th width="7%" style="background-color: #ccc; color:#333;">Total (R$)</th>
-											<th width="5%" style="background-color: #ccc; color:#333;">%</th>
+											<th width="9%" style="text-align:center;">Unidade</th>
+											<th width="9%" style="text-align:center;">Quant.</th>									
+											<th width="9%" style="text-align:right;">Valor Unit.</th>										
+											<th width="9%" style="text-align:right;">Valor Total</th>
+											<th width="7%" style="background-color: #ccc; color:#333; text-align:right;">Total (Qt)</th>
+											<th width="7%" style="background-color: #ccc; color:#333; text-align:right;">Total (R$)</th>
+											<th width="5%" style="background-color: #ccc; color:#333; text-align:center;">%</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -564,13 +457,13 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 													<td>'.$cont.'</td>
 													<td>'.$item['Nome'].'</td>
 													<td>'.$item['Marca'].'</td>
-													<td>'.$item['UnidadeMedida'].'</td>
-													<td>'.$iQuantidadeRealizada.'</td>
-													<td>'.$fValorUnitarioRealizado.'</td>											
-													<td>'.mostraValor($fValorTotalRealizado).'</td>
-													<td style="background-color: #eee; color:#333;">'.$iQuantidadeRealizada.'</td>
-													<td style="background-color: #eee; color:#333;">'.mostraValor($fValorTotalRealizado).'</td>
-													<td style="background-color: #eee; color:#333;">'.$porcentagem.'%</td>
+													<td style="text-align:center;">'.$item['UnidadeMedida'].'</td>
+													<td style="text-align:center;">'.$iQuantidadeRealizada.'</td>
+													<td style="text-align:right;">'.mostraValor($fValorUnitarioRealizado).'</td>
+													<td style="text-align:right;">'.mostraValor($fValorTotalRealizado).'</td>
+													<td style="background-color: #eee; color:#333; text-align:center;">'.$iQuantidadeRealizada.'</td>
+													<td style="background-color: #eee; color:#333; text-align:right;">'.mostraValor($fValorTotalRealizado).'</td>
+													<td style="background-color: #eee; color:#333; text-align:center;">'.$porcentagem.'%</td>
 												</tr>');
 
 												$cont++;
