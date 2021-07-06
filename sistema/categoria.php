@@ -209,22 +209,26 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		})
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaCategoria(CategId, CategNome, CategStatus, Tipo){
-		
-			document.getElementById('inputCategoriaId').value = CategId;
-			document.getElementById('inputCategoriaNome').value = CategNome;
-			document.getElementById('inputCategoriaStatus').value = CategStatus;
-					
-			if (Tipo == 'edita'){	
-				document.getElementById('inputEstadoAtual').value = "EDITA";
-				document.formCategoria.action = "categoria.php";				
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formCategoria, "Tem certeza que deseja excluir essa categoria?", "categoriaExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formCategoria.action = "categoriaMudaSituacao.php";
-			} 
-			
-			document.formCategoria.submit();
+		function atualizaCategoria(Permission, CategId, CategNome, CategStatus, Tipo){
+		 
+			if (Permission == 1){
+				document.getElementById('inputCategoriaId').value = CategId;
+				document.getElementById('inputCategoriaNome').value = CategNome;
+				document.getElementById('inputCategoriaStatus').value = CategStatus;
+						
+				if (Tipo == 'edita'){	
+					document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formCategoria.action = "categoria.php";				
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formCategoria, "Tem certeza que deseja excluir essa categoria?", "categoriaExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formCategoria.action = "categoriaMudaSituacao.php";
+				} 
+				
+				document.formCategoria.submit();
+		    } else{
+				alerta('Permissão Negada!','');
+			}
 		}		
 			
 	</script>
@@ -315,13 +319,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['CategNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.addslashes($item['CategNome']).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaCategoria(1,'.$item['CategId'].', \''.addslashes($item['CategNome']).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.addslashes($item['CategNome']).'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCategoria('.$item['CategId'].', \''.addslashes($item['CategNome']).'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaCategoria('.$atualizar.','.$item['CategId'].', \''.addslashes($item['CategNome']).'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaCategoria('.$excluir.','.$item['CategId'].', \''.addslashes($item['CategNome']).'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>

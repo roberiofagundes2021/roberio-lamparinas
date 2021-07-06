@@ -104,21 +104,27 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			/* Fim: Tabela Personalizada */			
 		});
 			
-		function atualizaOrcamento(PrOrcId, PrOrcNome, PrOrcStatus, Tipo){
+		function atualizaOrcamento(Permission, PrOrcId, PrOrcNome, PrOrcStatus, Tipo){
 
+			document.getElementById('inputPermission').value = Permission;
 			document.getElementById('inputPrOrcId').value = PrOrcId;
 			document.getElementById('inputPrOrcNome').value = PrOrcNome;
 			document.getElementById('inputPrOrcStatus').value = PrOrcStatus;
 					
 			if (Tipo == 'edita'){	
 				document.formPrOrc.action = "produtoOrcamentoEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formPrOrc, "Tem certeza que deseja excluir esse Produto?", "produtoOrcamentoExclui.php");
 			} else if (Tipo == 'mudaStatus'){
 				document.formPrOrc.action = "produtoOrcamentoMudaStatus.php";
+			} else if (Tipo == 'exclui'){
+				if(Permission){
+					confirmaExclusao(document.formPrOrc, "Tem certeza que deseja excluir esse Produto?", "produtoOrcamentoExclui.php");
+				} else{
+					alerta('Permissão Negada!','');
+					return false;
+				}
 			}
 
-			document.formPrOrc.submit();
+			document.formPrOrc.submit();			
 		}
 			
 	</script>
@@ -193,13 +199,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['SbCatNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaOrcamento('.$item['PrOrcId'].', \''.htmlentities(addslashes($item['PrOrcNome']), ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaOrcamento(1,'.$item['PrOrcId'].', \''.htmlentities(addslashes($item['PrOrcNome']), ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaOrcamento('.$item['PrOrcId'].', \''.htmlentities(addslashes($item['PrOrcNome']), ENT_QUOTES).'\','.$item['PrOrcSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar Produto"></i></a>
-														<a href="#" onclick="atualizaOrcamento('.$item['PrOrcId'].', \''.htmlentities(addslashes($item['PrOrcNome']), ENT_QUOTES).'\','.$item['PrOrcSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir Produto"></i></a>							
+														<a href="#" onclick="atualizaOrcamento('.$atualizar.','.$item['PrOrcId'].', \''.htmlentities(addslashes($item['PrOrcNome']), ENT_QUOTES).'\','.$item['PrOrcSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar Produto"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$excluir.','.$item['PrOrcId'].', \''.htmlentities(addslashes($item['PrOrcNome']), ENT_QUOTES).'\','.$item['PrOrcSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir Produto"></i></a>							
 													</div>
 												</div>
 											</td>
@@ -212,6 +218,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					</div>
 				</div>				
 				<form name="formPrOrc" method="post">
+				 	<input type="hidden" id="inputPermission" name="inputPermission" >
 					<input type="hidden" id="inputPrOrcId" name="inputPrOrcId" >
 					<input type="hidden" id="inputPrOrcNome" name="inputPrOrcNome" >
 					<input type="hidden" id="inputPrOrcStatus" name="inputPrOrcStatus" >

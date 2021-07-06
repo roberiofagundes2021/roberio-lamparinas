@@ -33,7 +33,7 @@ if ($row['FlOpeTermoReferencia'] && $row['TrRefTabelaProduto'] != null && $row['
 			JOIN ProdutoOrcamento on PrOrcProduto = ProduId
 			JOIN SubCategoria on SbCatId = ProduSubCategoria
 			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
-			ORDER BY SbCatNome ASC";	
+			ORDER BY SbCatNome, ProduNome ASC";	
 } else {
 	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
 			FROM Produto
@@ -41,7 +41,7 @@ if ($row['FlOpeTermoReferencia'] && $row['TrRefTabelaProduto'] != null && $row['
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 			JOIN SubCategoria on SbCatId = ProduSubCategoria
 			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
-			ORDER BY SbCatNome ASC";
+			ORDER BY SbCatNome, ProduNome ASC";
 }
 $result = $conn->query($sql);
 $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -54,14 +54,14 @@ if ($row['FlOpeTermoReferencia'] && $row['TrRefTabelaServico'] != null && $row['
 			JOIN ServicoOrcamento on SrOrcServico = ServiId
 			JOIN SubCategoria on SbCatId = ServiSubCategoria
 			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
-			ORDER BY SbCatNome ASC";	
+			ORDER BY SbCatNome, ServiNome ASC";	
 } else {
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
 			FROM Servico
 			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 			JOIN SubCategoria on SbCatId = ServiSubCategoria
 			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
-			ORDER BY SbCatNome ASC";
+			ORDER BY SbCatNome, ServiNome ASC";
 }	
 $result = $conn->query($sql);
 $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);

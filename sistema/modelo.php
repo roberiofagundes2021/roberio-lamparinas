@@ -214,25 +214,29 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		});
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaModelo(ModelId, ModelNome, ModelStatus, Tipo) {
+		function atualizaModelo(Permission, ModelId, ModelNome, ModelStatus, Tipo) {
 
-			document.getElementById('inputModeloId').value = ModelId;
-			document.getElementById('inputModeloNome').value = ModelNome;
-			document.getElementById('inputModeloStatus').value = ModelStatus;
+			if (Permission == 1){
+				document.getElementById('inputModeloId').value = ModelId;
+				document.getElementById('inputModeloNome').value = ModelNome;
+				document.getElementById('inputModeloStatus').value = ModelStatus;
 
-			if (Tipo == 'edita') {
-				document.getElementById('inputEstadoAtual').value = "EDITA";
-				document.formModelo.action = "modelo.php";		
-			} else if (Tipo == 'exclui') {
-				confirmaExclusao(document.formModelo, "Tem certeza que deseja excluir esse modelo?", "modeloExclui.php");
-			} else if (Tipo == 'mudaStatus') {
-				document.formModelo.action = "modeloMudaSituacao.php";
-			} else if (Tipo == 'imprime') {
-				document.formModelo.action = "modeloImprime.php";
-				document.formModelo.setAttribute("target", "_blank");
+				if (Tipo == 'edita') {
+					document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formModelo.action = "modelo.php";		
+				} else if (Tipo == 'exclui') {
+					confirmaExclusao(document.formModelo, "Tem certeza que deseja excluir esse modelo?", "modeloExclui.php");
+				} else if (Tipo == 'mudaStatus') {
+					document.formModelo.action = "modeloMudaSituacao.php";
+				} else if (Tipo == 'imprime') {
+					document.formModelo.action = "modeloImprime.php";
+					document.formModelo.setAttribute("target", "_blank");
+				}
+
+				document.formModelo.submit();
+			} else{
+				alerta('Permissão Negada!','');
 			}
-
-			document.formModelo.submit();
 		}
 	</script>
 
@@ -322,13 +326,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>' . $item['ModelNome'] . '</td>
 											');
 
-										print('<td><a href="#" onclick="atualizaModelo(' . $item['ModelId'] . ', \'' . htmlentities(addslashes($item['ModelNome']), ENT_QUOTES) . '\',\'' . $item['SituaChave'] . '\', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
+										print('<td><a href="#" onclick="atualizaModelo(1,' . $item['ModelId'] . ', \'' . htmlentities(addslashes($item['ModelNome']), ENT_QUOTES) . '\',\'' . $item['SituaChave'] . '\', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
 
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaModelo(' . $item['ModelId'] . ', \'' . addslashes($item['ModelNome']) . '\',' . $item['ModelStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaModelo(' . $item['ModelId'] . ', \'' . addslashes($item['ModelNome']) . '\',' . $item['ModelStatus'] . ', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>							
+														<a href="#" onclick="atualizaModelo('.$atualizar.',' . $item['ModelId'] . ', \'' . addslashes($item['ModelNome']) . '\',' . $item['ModelStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaModelo('.$atualizar.',' . $item['ModelId'] . ', \'' . addslashes($item['ModelNome']) . '\',' . $item['ModelStatus'] . ', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>							
 													</div>
 												</div>
 											</td>

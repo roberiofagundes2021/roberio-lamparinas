@@ -101,21 +101,25 @@ $count = count($row);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaCentroCusto(CnCusId, CnCusNome, CnCusStatus, Tipo){
+		function atualizaCentroCusto(Permission, CnCusId, CnCusNome, CnCusStatus, Tipo){
 		
 			document.getElementById('inputCentroCustoId').value = CnCusId;
 			document.getElementById('inputCentroCustoNome').value = CnCusNome;
 			document.getElementById('inputCentroCustoStatus').value = CnCusStatus;
 					
-			if (Tipo == 'edita'){	
-				document.formCentroCusto.action = "centroCustoEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formCentroCusto, "Tem certeza que deseja excluir esse Centro de Custo?", "centroCustoExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formCentroCusto.action = "centroCustoMudaSituacao.php";
-			} 
+			if (Permission == 1){
+				if (Tipo == 'edita'){	
+					document.formCentroCusto.action = "centroCustoEdita.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formCentroCusto, "Tem certeza que deseja excluir esse Centro de Custo?", "centroCustoExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formCentroCusto.action = "centroCustoMudaSituacao.php";
+				} 
 			
-			document.formCentroCusto.submit();
+				document.formCentroCusto.submit();
+			} else{
+				alerta('Permissão Negada!','');
+			}
 		}		
 			
 	</script>
@@ -194,13 +198,13 @@ $count = count($row);
 											<td>'.$tipo.'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaCentroCusto('.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$situacaoChave .', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaCentroCusto(1,'.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$situacaoChave .', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCentroCusto('.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$item['CnCusStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCentroCusto('.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$item['CnCusStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaCentroCusto('.$atualizar.','.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$item['CnCusStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaCentroCusto('.$excluir.','.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$item['CnCusStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>

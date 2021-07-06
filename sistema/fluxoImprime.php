@@ -15,8 +15,8 @@ if (isset($_POST['inputFluxoId'])) {
 }
 
 $sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, CategNome, 
-		dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, ForneNome, ForneCelular, ForneEmail,
-		FlOpeTermoReferencia, TrRefTabelaProduto, TrRefTabelaServico
+		dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, ForneNome, ForneRazaoSocial, ForneCelular, 
+		ForneEmail, FlOpeTermoReferencia, TrRefTabelaProduto, TrRefTabelaServico
 		FROM FluxoOperacional
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
 		JOIN Categoria on CategId = FlOpeCategoria
@@ -25,8 +25,9 @@ $sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, 
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
-$sql = "SELECT AditiId, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, AditiValor, FlOpeId, FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, CategNome, SbCatNome,
-		ForneNome, ForneCelular, ForneEmail
+$sql = "SELECT AditiId, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, AditiValor, FlOpeId, 
+		FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, CategNome, SbCatNome,
+		ForneNome, ForneRazaoSocial, ForneCelular, ForneEmail
 		FROM Aditivo
 		JOIN FluxoOperacional on FlOpeId = AditiFluxoOperacional
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
@@ -147,7 +148,7 @@ try {
 	</table>
 	<table style="width:100%; border-collapse: collapse;">
         <tr>
-            <td style="width:40%; font-size:14px;">Fornecedor:<br>' . $row['ForneNome'] . '</td>
+            <td style="width:40%; font-size:14px;">Fornecedor:<br>' . $row['ForneRazaoSocial'] . '</td>
             <td style="width:40%; font-size:14px;">E-mail:<br>' . $row['ForneEmail'] . '</td>
             <td style="width:20%; font-size:14px;">Telefone:<br>' . $row['ForneCelular'] . '</td>
         </tr>

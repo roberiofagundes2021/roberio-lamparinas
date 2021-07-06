@@ -105,21 +105,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaCaixa(CaixaId,CaixaNome, CaixaStatus, Tipo){
+		function atualizaCaixa(Permission, CaixaId,CaixaNome, CaixaStatus, Tipo){
 		
-			document.getElementById('inputCaixaId').value = CaixaId;
-			document.getElementById('inputCaixaNome').value = CaixaNome;
-			document.getElementById('inputCaixaStatus').value = CaixaStatus;
-					
-			if (Tipo == 'edita'){	
-				document.formCaixa.action = "caixaEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formCaixa, "Tem certeza que deseja excluir esse Caixa?", "caixaExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formCaixa.action = "caixaMudaSituacao.php";
+			if (Permission == 1){
+				document.getElementById('inputCaixaId').value = CaixaId;
+				document.getElementById('inputCaixaNome').value = CaixaNome;
+				document.getElementById('inputCaixaStatus').value = CaixaStatus;
+						
+				if (Tipo == 'edita'){	
+					document.formCaixa.action = "caixaEdita.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formCaixa, "Tem certeza que deseja excluir esse Caixa?", "caixaExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formCaixa.action = "caixaMudaSituacao.php";
+				}
+				
+				document.formCaixa.submit();
+			} else{
+				alerta('Permissão Negada!','');
 			}
-			
-			document.formCaixa.submit();
 		}		
 			
 	</script>
@@ -195,13 +199,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['UsuarNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaCaixa('.$item['CaixaId'].', \''.$item['CaixaNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaCaixa(1,'.$item['CaixaId'].', \''.$item['CaixaNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCaixa('.$item['CaixaId'].', \''.$item['CaixaNome'].'\','.$item['CaixaStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCaixa('.$item['CaixaId'].', \''.$item['CaixaNome'].'\','.$item['CaixaStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														<a href="#" onclick="atualizaCaixa('.$atualizar.','.$item['CaixaId'].', \''.$item['CaixaNome'].'\','.$item['CaixaStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaCaixa('.$excluir.','.$item['CaixaId'].', \''.$item['CaixaNome'].'\','.$item['CaixaStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
 											</td>

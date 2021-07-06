@@ -225,25 +225,29 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaUnidadeMedida(UnMedId, UnMedNome, UnMedStatus, Tipo){
+		function atualizaUnidadeMedida(Permission, UnMedId, UnMedNome, UnMedStatus, Tipo){
 		
-			document.getElementById('inputUnidadeMedidaId').value = UnMedId;
-			document.getElementById('inputUnidadeMedidaNome').value = UnMedNome;
-			document.getElementById('inputUnidadeMedidaStatus').value = UnMedStatus;
-					
-			if (Tipo == 'edita'){	
-				document.getElementById('inputEstadoAtual').value = "EDITA";
-				document.formUnidadeMedida.action = "unidadeMedida.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formUnidadeMedida, "Tem certeza que deseja excluir essa unidade de medida?", "unidademedidaExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formUnidadeMedida.action = "unidademedidaMudaSituacao.php";
-			} else if (Tipo == 'imprime'){
-				document.formUnidadeMedida.action = "unidademedidaImprime.php";
-				document.formUnidadeMedida.setAttribute("target", "_blank");
+			if (Permission == 1){
+				document.getElementById('inputUnidadeMedidaId').value = UnMedId;
+				document.getElementById('inputUnidadeMedidaNome').value = UnMedNome;
+				document.getElementById('inputUnidadeMedidaStatus').value = UnMedStatus;
+						
+				if (Tipo == 'edita'){	
+					document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formUnidadeMedida.action = "unidadeMedida.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formUnidadeMedida, "Tem certeza que deseja excluir essa unidade de medida?", "unidademedidaExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formUnidadeMedida.action = "unidademedidaMudaSituacao.php";
+				} else if (Tipo == 'imprime'){
+					document.formUnidadeMedida.action = "unidademedidaImprime.php";
+					document.formUnidadeMedida.setAttribute("target", "_blank");
+				}
+				
+				document.formUnidadeMedida.submit();
+			} else{
+				alerta('Permissão Negada!','');
 			}
-			
-			document.formUnidadeMedida.submit();
 		}		
 			
 	</script>
@@ -339,13 +343,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['UnMedSigla'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaUnidadeMedida('.$item['UnMedId'].', \''.$item['UnMedNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaUnidadeMedida(1,'.$item['UnMedId'].', \''.$item['UnMedNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaUnidadeMedida('.$item['UnMedId'].', \''.$item['UnMedNome'].'\','.$item['UnMedStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaUnidadeMedida('.$item['UnMedId'].', \''.$item['UnMedNome'].'\','.$item['UnMedStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaUnidadeMedida('.$atualizar.','.$item['UnMedId'].', \''.$item['UnMedNome'].'\','.$item['UnMedStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaUnidadeMedida('.$excluir.','.$item['UnMedId'].', \''.$item['UnMedNome'].'\','.$item['UnMedStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>
