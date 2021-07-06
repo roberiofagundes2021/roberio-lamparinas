@@ -1,6 +1,10 @@
 <?php 
 
-include_once("sessao.php"); 
+include_once("sessao.php");
+
+if(!$_SESSION['PerfiChave'] == "SUPER"){
+	header("location:javascript://history.go(-1)");
+}
 
 $_SESSION['PaginaAtual'] = 'Banco';
 
