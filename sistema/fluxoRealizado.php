@@ -349,7 +349,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 												print('
 												<tr>
 													<td>'.$cont.'</td>
-													<td>'.$item['Nome'].'</td>
+													<td data-popup="tooltip" title="'.$item['Detalhamento'].'">'.$item['Nome'].'</td>
 													<td>'.$item['Marca'].'</td>
 													<td style="text-align:center;">'.$item['UnidadeMedida'].'</td>
 													<td style="text-align:center;">'.$iQuantidadePrevista.'</td>
