@@ -1165,7 +1165,11 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                 <div class="row" style="margin-top: 10px;">
                                     <div class="col-lg-12">
                                         <div class="form-group">
-                                            <button class="btn btn-lg btn-principal" id="salvar">Salvar</button>
+                                            <?php 
+                                                if ($atualizar) {
+                                                 echo' <button class="btn btn-lg btn-principal" id="salvar">Salvar</button>';
+                                                }
+                                            ?>
                                             <a id="modal-close" class="btn btn-basic" role="button">Cancelar</a>
                                         </div>
                                     </div>

@@ -786,7 +786,11 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                 <div class="row" style="margin-top: 10px;">
                                     <div class="col-lg-12">
                                         <div class="form-group">
-                                            <button class="btn btn-lg btn-principal" id="salvar">Salvar</button>
+                                            <?php 
+                                               if ($atualizar) {
+                                                echo' <button class="btn btn-lg btn-principal" id="salvar">Salvar</button>';
+                                                }
+                                            ?>
                                             <a class="btn btn-basic modal-close" role="button">Cancelar</a>
                                         </div>
                                     </div>

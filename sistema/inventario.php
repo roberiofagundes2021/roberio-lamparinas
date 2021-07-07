@@ -90,8 +90,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			/* Fim: Tabela Personalizada */
 		});
 
-		function atualizaInventario(InvenId, InvenNumero, Situacao, Tipo) {
+		function atualizaInventario(Permission, InvenId, InvenNumero, Situacao, Tipo) {
 
+			document.getElementById('inputPermission').value = Permission;
 			document.getElementById('inputInventarioId').value = InvenId;
 			document.getElementById('inputInventarioNumero').value = InvenNumero;
 			document.getElementById('inputInventarioStatus').value = Situacao;
@@ -99,7 +100,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			if (Tipo == 'edita') {
 				document.formInventario.action = "inventarioEdita.php";
 			} else if (Tipo == 'exclui') {
-				confirmaExclusao(document.formInventario, "Tem certeza que deseja excluir esse inventário?", "inventarioExclui.php");
+				if(Permission){
+					confirmaExclusao(document.formInventario, "Tem certeza que deseja excluir esse inventário?", "inventarioExclui.php");
+				} else{
+					alerta('Permissão Negada!','');
+					return false;
+				}
 			} else if (Tipo == 'mudaStatus') {
 
 				if (Situacao == 'PENDENTE') {
@@ -197,21 +203,21 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>' . $item['UnidaNome'] . '</td>
 											<td>' . $item['CategNome'] . '</td>');
 
-										print('<td><a href="#" onclick="atualizaInventario(' . $item['InvenId'] . ', ' . $item['InvenNumero'] . ', \'' . $item['SituaChave'] . '\', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
+										print('<td><a href="#" onclick="atualizaInventario(1,' . $item['InvenId'] . ', ' . $item['InvenNumero'] . ', \'' . $item['SituaChave'] . '\', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
 
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaInventario(' . $item['InvenId'] . ', ' . $item['InvenNumero'] . ', \'' . $item['SituaChave'] . '\', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaInventario(' . $item['InvenId'] . ', ' . $item['InvenNumero'] . ', \'' . $item['SituaChave'] . '\',  \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaInventario('.$atualizar.',' . $item['InvenId'] . ', ' . $item['InvenNumero'] . ', \'' . $item['SituaChave'] . '\', \'edita\')" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaInventario('.$excluir.',' . $item['InvenId'] . ', ' . $item['InvenNumero'] . ', \'' . $item['SituaChave'] . '\',  \'exclui\')" class="list-icons-item"><i class="icon-bin"></i></a>
 														<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaInventario(' . $item['InvenId'] . ', ' . $item['InvenNumero'] . ', \'' . $item['SituaChave'] . '\', \'imprimir-lista\')"  class="dropdown-item" title="Imprimir Lista"><i class="icon-printer"></i> Imprimir Lista</a>
-																<a href="#" onclick="atualizaInventario(' . $item['InvenId'] . ', ' . $item['InvenNumero'] . ', \'' . $item['SituaChave'] . '\', \'imprimir-inventario\')"  class="dropdown-item" title="Imprimir Inventário"><i class="icon-printer2"></i> Imprimir Inventário</a>
+																<a href="#" onclick="atualizaInventario(1,' . $item['InvenId'] . ', ' . $item['InvenNumero'] . ', \'' . $item['SituaChave'] . '\', \'imprimir-lista\')"  class="dropdown-item" title="Imprimir Lista"><i class="icon-printer"></i> Imprimir Lista</a>
+																<a href="#" onclick="atualizaInventario(1,' . $item['InvenId'] . ', ' . $item['InvenNumero'] . ', \'' . $item['SituaChave'] . '\', \'imprimir-inventario\')"  class="dropdown-item" title="Imprimir Inventário"><i class="icon-printer2"></i> Imprimir Inventário</a>
 															</div>
 														</div>
 													</div>
@@ -232,6 +238,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<!-- /info blocks -->
 
 				<form name="formInventario" method="post" action="inventarioEdita.php">
+					<input type="hidden" id="inputPermission" name="inputPermission" >
 					<input type="hidden" id="inputInventarioId" name="inputInventarioId">
 					<input type="hidden" id="inputInventarioNumero" name="inputInventarioNumero">
 					<input type="hidden" id="inputInventarioStatus" name="inputInventarioStatus">

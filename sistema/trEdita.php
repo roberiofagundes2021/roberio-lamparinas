@@ -593,9 +593,11 @@ if (isset($_POST['inputTRData'])) {
 								<div class="col-lg-12">
 									<div class="form-group">
 										<?php 
-											if ($row['SituaChave'] != 'FASEINTERNAFINALIZADA'){
-												print('<button type="submit" class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-											}											
+											if ($_POST['inputPermission']) {
+												if ($row['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+													print('<button type="submit" class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+												}											
+											}
 										?>
 										<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>

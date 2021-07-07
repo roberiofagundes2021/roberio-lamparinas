@@ -172,8 +172,9 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 		}
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaProduto(ProduId, ProduNome, ProduStatus, Tipo) {
+		function atualizaProduto(Permission, ProduId, ProduNome, ProduStatus, Tipo) {
 
+			document.getElementById('inputPermission').value = Permission;
 			document.getElementById('inputProdutoId').value = ProduId;
 			document.getElementById('inputProdutoNome').value = ProduNome;
 			document.getElementById('inputProdutoStatus').value = ProduStatus;
@@ -213,13 +214,18 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
 					if (Tipo == 'edita') {
 						document.formProduto.action = "produtoEdita.php";
-					} else if (Tipo == 'exclui') {
-						confirmaExclusao(document.formProduto, "Tem certeza que deseja excluir esse produto?", "produtoExclui.php");
 					} else if (Tipo == 'mudaStatus') {
 						if(ProduStatus != 'ALTERAR'){
 							document.formProduto.action = "produtoMudaSituacao.php";
 						} else {
 							alerta('Atenção','Edite o produto e altere a categoria para a situação ficar "ATIVO".','error');
+							return false;
+						}
+					}	else if (Tipo == 'exclui'){
+						if(Permission){
+							confirmaExclusao(document.formProduto, "Tem certeza que deseja excluir esse produto?", "produtoExclui.php");	
+						}	else{
+							alerta('Permissão Negada!','');
 							return false;
 						}
 					}  
@@ -370,14 +376,14 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 											' . $tipoValorProduto . '
 											');
 
-										print('<td><a href="#" onclick="atualizaProduto(' . $item['ProduId'] . ', \'' . htmlentities(addslashes($item['ProduNome']), ENT_QUOTES) . '\',\''.$item['SituaChave'].'\', \'mudaStatus\');"  data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
+										print('<td><a href="#" onclick="atualizaProduto(1,' . $item['ProduId'] . ', \'' . htmlentities(addslashes($item['ProduNome']), ENT_QUOTES) . '\',\''.$item['SituaChave'].'\', \'mudaStatus\');"  data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
 
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-													<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'exporta\');"  class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Exportar para Produto Orçamento" class="list-icons-item"><i class="icon-drawer-out"></i></a>
-														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Produto"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaProduto('.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Produto"><i class="icon-bin"></i></a>
+													<a href="#" onclick="atualizaProduto(1,'.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'exporta\');"  class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Exportar para Produto Orçamento" class="list-icons-item"><i class="icon-drawer-out"></i></a>
+														<a href="#" onclick="atualizaProduto('.$atualizar.','.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Produto"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaProduto('.$excluir.','.$item['ProduId'].', \''.htmlentities(addslashes($item['ProduNome']),ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Produto"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
@@ -396,6 +402,7 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 				<!-- /info blocks -->
 
 				<form name="formProduto" method="post">
+					<input type="hidden" id="inputPermission" name="inputPermission" >
 					<input type="hidden" id="inputProdutoId" name="inputProdutoId">
 					<input type="hidden" id="inputProdutoNome" name="inputProdutoNome">
 					<input type="hidden" id="inputProdutoStatus" name="inputProdutoStatus">

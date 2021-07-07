@@ -635,7 +635,11 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button id="alterar" class="btn btn-lg btn-principal" type="submit">Alterar</button>
+									<?php
+										if ($_POST['inputPermission']) {
+											echo '<button id="alterar" class="btn btn-lg btn-principal" type="submit">Alterar</button>';
+										}
+									?>	
 										<a href="servico.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

@@ -818,8 +818,12 @@ if (isset($_POST['inputTipo'])) {
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<div class="btn btn-lg btn-principal" id="enviar">Alterar</div>
-										<a href="ordemcompra.php" class="btn btn-basic" role="button">Cancelar</a>
+										<?php
+											if ($_POST['inputPermission']) {	
+												echo '<button id="enviar" class="btn btn-lg btn-principal" type="submit">Alterar</button>';
+											}
+										?>	
+											<a href="ordemcompra.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>
