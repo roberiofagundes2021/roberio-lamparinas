@@ -131,8 +131,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
   });
 
   //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-  function atualizaMovimentacao(MovimId, MovimNotaFiscal, MovimTipo, Tipo, Motivo) {
+  function atualizaMovimentacao(Permission, MovimId, MovimNotaFiscal, MovimTipo, Tipo, Motivo) {
 
+    document.getElementById('inputPermission').value = Permission;
     document.getElementById('inputMovimentacaoId').value = MovimId;
     document.getElementById('inputMovimentacaoNotaFiscal').value = MovimNotaFiscal;
 
@@ -145,8 +146,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
     } else if (Tipo == 'edita') {
       document.formMovimentacao.action = "movimentacaoEdita.php";
     } else if (Tipo == 'exclui') {
-      confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir essa movimentação?", "movimentacaoExclui.php");
-    } else if (Tipo == 'imprimir') {
+        if(Permission){
+          confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir essa movimentação?", "movimentacaoExclui.php");
+        }	else{
+          alerta('Permissão Negada!','');
+          return false;
+				}
+  } else if (Tipo == 'imprimir') {
 
       if (MovimTipo == 'E') {
         document.formMovimentacao.action = "movimentacaoImprimeEntrada.php";
@@ -254,20 +260,20 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 													<div class="list-icons">
 														<div class="list-icons list-icons-extended">
-															<!--<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'edita\', \'\');" class="list-icons-item"><i class="icon-pencil7"></i></a>-->
-															<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin"></i></a>
+															<!--<a href="#" onclick="atualizaMovimentacao('.$atualizar.',' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'edita\', \'\');" class="list-icons-item"><i class="icon-pencil7"></i></a>-->
+															<a href="#" onclick="atualizaMovimentacao('.$excluir.',' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin"></i></a>
 															<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'imprimir\', \'\');" class="dropdown-item"><i class="icon-printer2"></i> Imprimir</a>');
+																<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'imprimir\', \'\');" class="dropdown-item"><i class="icon-printer2"></i> Imprimir</a>');
 															
 																if (isset($item['BandeMotivo'])){
 																	print('
 																	<div class="dropdown-divider"></div>
-																	<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
+																	<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
 																}															
 										print('				</div>
 														</div>
@@ -288,6 +294,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
         <!-- /info blocks -->
 
         <form name="formMovimentacao" method="post" target="_blank">
+          <input type="hidden" id="inputPermission" name="inputPermission" >  
           <input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId">
           <input type="hidden" id="inputMovimentacaoNotaFiscal" name="inputMovimentacaoNotaFiscal">
         </form>
