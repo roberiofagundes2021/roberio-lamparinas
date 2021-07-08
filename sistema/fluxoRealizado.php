@@ -25,6 +25,15 @@ if ($row['FlOpeDataFim'] > date("Y-m-d")){
 	$dataFim = $row['FlOpeDataFim'];
 }
 
+if (isset($_POST['inputSelecionados'])){
+	
+	$aSelecionados = explode("#", $_POST['inputSelecionados']);
+
+/*	foreach ($selecionados as $key => $valor) {
+		echo $valor."<br>";
+	}	*/
+}
+
 /*
 $sql = "SELECT FOXPrProduto
 		FROM FluxoOperacionalXProduto
@@ -186,21 +195,37 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 																WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional."
 																ORDER BY SubCategoria";
 														$result = $conn->query($sql);
-														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
+														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														$itensSelecionados = '';
+
+														$seleciona = "selected";
 															
 														foreach ($rowProduto as $item){	
 															
-														/*	if (in_array($item['Id'], $aProdutos) or $countProdutoUtilizado == 0) {
-																$seleciona = "selected";
-															} else {*/
-																$seleciona = "selected";
-														//	}													
-															
+															// Está filtrando
+															if (isset($_POST['inputSelecionados'])){
+																if (!in_array($item['Id'], $aSelecionados)){
+																	$seleciona = "";
+																}
+															}
+
 															print('<option value="'.$item['Id'].'" '.$seleciona.'>'.$item['Nome'].'</option>');
+															
+															// Está filtrando
+															if (isset($_POST['inputSelecionados'])){
+																if (in_array($item['Id'], $aSelecionados)){
+																	$itensSelecionados .= $item['Id']."#";
+																}
+															} else{
+																$itensSelecionados .= $item['Id']."#";
+															}																
 														}
 													
 													?>
 												</select>
+
+												<input type="hidden" name="inputSelecionados" value="<?php echo $itensSelecionados; ?>">
 											</div>
 										</div>
 
