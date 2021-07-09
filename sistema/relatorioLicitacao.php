@@ -355,20 +355,29 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
             function Filtrar() {
                 let cont = false;
 
-                    const msg = $('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%; text-align: center">Nenhum registro encontrado...</td></tr>')
+                const msg = $('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%; text-align: center">Filtrando...</td></tr>')
+
+                let dataDe = $('#inputDataDe').val()
+                let dataAte = $('#inputDataAte').val()
+                let unidade = $('#cmbUnidade').val()
+                let empresaContratada = $('#cmbEmpresaContratada').val()
+                let categoria = $('#cmbCategoria').val()
+                let classificacao = $('#cmbClassificacao').val()
+                let modalidade = $('#cmbModalidade').val()
+                let prioridade = $('#cmbPrioridade').val()
+                let status = $('#cmbStatus').val()
+                let url = "relatorioLicitacaoFiltra.php";
+                    
+                if (dataDe == '' || dataAte == ''){
+                    if (dataDe == ''){
+                        alerta('Atenção', 'Data inicial inválida', 'error');
+                    } else {
+                        alerta('Atenção', 'Data final inválida', 'error');
+                    }                    
+                    return false;
+                } else {
 
                     $('tbody').html(msg)
-
-                    let dataDe = $('#inputDataDe').val()
-                    let dataAte = $('#inputDataAte').val()
-                    let unidade = $('#cmbUnidade').val()
-                    let empresaContratada = $('#cmbEmpresaContratada').val()
-                    let categoria = $('#cmbCategoria').val()
-                    let classificacao = $('#cmbClassificacao').val()
-                    let modalidade = $('#cmbModalidade').val()
-                    let prioridade = $('#cmbPrioridade').val()
-                    let status = $('#cmbStatus').val()
-                    let url = "relatorioLicitacaoFiltra.php";
 
                     inputsValues = {
                         inputDataDe: dataDe,
@@ -393,16 +402,18 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                 resultadosConsulta = data
                                 modalAcoes()
                             } else {
-                                $('tbody').html(msg)
+                                const msgErro = $('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%; text-align: center">Nenhum registro encontrado...</td></tr>')
+                                $('tbody').html(msgErro)
                                 $('#imprimir').attr('disabled', '')
                             }
                         }
                     );
                 }
+            }
 
-                $('#submitFiltro').on('click', (e) => {
-                    e.preventDefault()
-                    Filtrar(false)
+            $('#submitFiltro').on('click', (e) => {
+                e.preventDefault()
+                Filtrar(false)
             })
 
             Filtrar(true)

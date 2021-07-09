@@ -5,24 +5,16 @@ include('global_assets/php/conexao.php');
 
 function queryPesquisa()
 {
-
     $cont = 0;
 
     include('global_assets/php/conexao.php');
 
     $args = [];
 
-    if (!empty($_POST['inputDataDe'])){
-        empty($_POST['inputDataDe']) ? $inputDataDe = '' : $inputDataDe = " FlOpeDataInicio > '".$_POST['inputDataDe']."'";
+    empty($_POST['inputDataDe']) ? $inputDataDe = '' : $inputDataDe = " FlOpeDataInicio > '".$_POST['inputDataDe']."'";
+    $args[]  = $inputDataDe;
 
-         $args[]  = $inputDataDe;
-    } else{
-        alerta('Atenção Informe o período inicial Válido!', 'error');
-        return false;
-    }
-    
     empty($_POST['inputDataAte']) ? $inputDataAte = '' : $inputDataAte = " dbo.fnFimContrato(FlOpeId) < '". $_POST['inputDataAte']."'";
-    
     $args[]  = $inputDataAte;
 
     if (!empty($_POST['cmbUnidade']) && $_POST['cmbUnidade'] != "") {
