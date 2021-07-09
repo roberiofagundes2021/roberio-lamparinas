@@ -1368,8 +1368,12 @@ $dataInicio = date("Y-m-d");
                                             </div>
                                         </div>
                                     </div>
-                                    <button id="salvar" class="btn btn-principal">Salvar</button>
-                                    <a href="contasAReceber.php" class="btn">Cancelar</a>
+                                        <?php 
+                                            if ($atualizar) {
+                                                echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
+                                            }
+                                        ?>
+                                     <a href="contasAReceber.php" class="btn">Cancelar</a>
                                 </div>
 
                             </div>

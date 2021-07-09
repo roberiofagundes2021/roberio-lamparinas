@@ -12,9 +12,14 @@ function queryPesquisa()
 
     $args = [];
 
-    empty($_POST['inputDataDe']) ? $inputDataDe = '' : $inputDataDe = " FlOpeDataInicio > '".$_POST['inputDataDe']."'";
+    if (!empty($_POST['inputDataDe'])){
+        empty($_POST['inputDataDe']) ? $inputDataDe = '' : $inputDataDe = " FlOpeDataInicio > '".$_POST['inputDataDe']."'";
 
-    $args[]  = $inputDataDe;
+         $args[]  = $inputDataDe;
+    } else{
+        alerta('Atenção Informe o período inicial Válido!', 'error');
+        return false;
+    }
     
     empty($_POST['inputDataAte']) ? $inputDataAte = '' : $inputDataAte = " dbo.fnFimContrato(FlOpeId) < '". $_POST['inputDataAte']."'";
     
@@ -59,7 +64,7 @@ function queryPesquisa()
             //     $string .= ' and ';
             // }
 
-            $sql = "SELECT FlOpeId,  FlOpeDataInicio,  FlOpeDataFim,  FlOpeObservacao, FlOpePrioridade, UnidaNome, ForneNome, CategNome, MdLicNome, PriorNome, SituaNome
+            $sql = "SELECT FlOpeId,  FlOpeDataInicio,  FlOpeDataFim,  FlOpeObservacao, FlOpePrioridade, UnidaNome, ForneRazaoSocial, CategNome, MdLicNome, PriorNome, SituaNome
                     FROM FluxoOperacional
                     JOIN Unidade on UnidaId = FlOpeUnidade
                     JOIN Fornecedor on ForneId = FlOpeFornecedor
@@ -107,7 +112,7 @@ function queryPesquisa()
                     <tr idFluxoOperacional=" . $item['FlOpeId'] . " editado='0'>
                        <td class='even'>" . $cont . "</td>
                        <td class='odd'>" . $item['CategNome'] . "</td>
-                       <td class='odd'>" . $item['ForneNome'] . "</td>
+                       <td class='odd'>" . $item['ForneRazaoSocial'] . "</td>
                        <td class='even'>" . $item['UnidaNome'] . "</td>
                        <td class='odd'>" . $item['SituaNome'] . "</td>
                        <td class='even'>" . $item['MdLicNome'] . "</td>
@@ -132,7 +137,7 @@ function queryPesquisa()
                     <tr idFluxoOperacional=" . $item['FlOpeId'] . " editado='0'>
                        <td class='even'>" . $cont . "</td>
                        <td class='odd'>" . $item['CategNome'] . "</td>
-                       <td class='odd'>" . $item['ForneNome'] . "</td>
+                       <td class='odd'>" . $item['ForneRazaoSocial'] . "</td>
                        <td class='even'>" . $item['UnidaNome'] . "</td>
                        <td class='odd'>" . $item['SituaNome'] . "</td>
                        <td class='even'>" . $item['MdLicNome'] . "</td>

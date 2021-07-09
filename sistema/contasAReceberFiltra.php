@@ -3,9 +3,9 @@
 include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
-function queryPesquisa()
-{
-    include('global_assets/php/conexao.php');
+//function queryPesquisa()
+//{
+//   include('global_assets/php/conexao.php');
 
     if ($_POST['tipoFiltro'] == 'FiltroNormal') {
 
@@ -159,7 +159,7 @@ function queryPesquisa()
                 <div class='list-icons'>
                     <div class='list-icons list-icons-extended'>
                         <a href='#' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>
-                        <a href='#' idContaExcluir='" . $item['CnAReId'] . "' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
+                        <a href='#' idContaExcluir='" . $item['CnAReId'] . "' permissaoExclusao='".$excluir."' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
 				        <div class='dropdown'>													
 				        	<a href='#' class='list-icons-item' data-toggle='dropdown'>
 				        		<i class='icon-menu9'></i>
@@ -177,6 +177,6 @@ function queryPesquisa()
             ");
         }
     }
-}
+//}
 
-queryPesquisa();
+//queryPesquisa();

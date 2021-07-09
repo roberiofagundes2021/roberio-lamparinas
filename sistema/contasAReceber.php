@@ -353,11 +353,17 @@ $dataFim = date("Y-m-d");
                 let contas = $('.excluirConta').each((i, elem) => {
                     $(elem).on('click', (e) => {
                         let id = $(elem).attr('idContaExcluir')
+                        let permissaoExclusao = $(elem).attr('permissaoExclusao')
                         $('.idContaAReceber').val(id)
                         e.preventDefault
-                        confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `contasAReceberExclui.php?idContaAReceber=${id}`);
-
-                        document.contaExclui.submit()
+                        
+                         // Se tiver persmissão de exclusão
+                         if (permissaoExclusao == 1){
+                            confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `contasAReceberExclui.php?idContaAReceber=${id}`);
+                            document.contaExclui.submit()
+                        } else{
+                        alerta('Permissão Negada!','');
+                        }
                     })
                 })
 
