@@ -566,7 +566,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-2">
                                         <div class="form-group">
                                             <label for="cmbStatus">Status</label>
                                             <select id="cmbStatus" name="cmbStatus" class="form-control form-control-select2">
@@ -590,22 +590,22 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-4">
                                         <div class="form-group">
                                             <label for="cmbEmpresaContratada">Empresa Contratada</label>
                                             <select id="cmbEmpresaContratada" name="cmbEmpresaContratada" class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
-                                                $sql = "SELECT ForneId, ForneNome
+                                                $sql = "SELECT ForneId, ForneRazaoSocial
                                                         FROM Fornecedor
                                                         JOIN Situacao on SituaId = ForneStatus
                                                         WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                        ORDER BY ForneNome ASC";
+                                                        ORDER BY ForneRazaoSocial ASC";
                                                 $result = $conn->query($sql);
                                                 $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                 foreach ($rowFornecedor as $item) {
-                                                    print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                                                    print('<option value="' . $item['ForneId'] . '">' . $item['ForneRazaoSocial'] . '</option>');
                                                 }
                                                 ?>
                                             </select>
