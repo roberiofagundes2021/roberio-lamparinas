@@ -273,25 +273,29 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaSetor(SetorId, SetorNome, SetorStatus, Tipo){
+		function atualizaSetor(Permission, SetorId, SetorNome, SetorStatus, Tipo){
 		
-			document.getElementById('inputSetorId').value = SetorId;
-			document.getElementById('inputSetorNome').value = SetorNome;
-			document.getElementById('inputSetorStatus').value = SetorStatus;
-					
-			if (Tipo == 'edita'){	
-				document.getElementById('inputEstadoAtual').value = "EDITA";
-				document.formSetor.action = "setor.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formSetor, "Tem certeza que deseja excluir esse setor?", "setorExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formSetor.action = "setorMudaSituacao.php";
-			} else if (Tipo == 'imprime'){
-				document.formSetor.action = "setorImprime.php";
-				document.formSetor.setAttribute("target", "_blank");
+			if (Permission == 1){
+				document.getElementById('inputSetorId').value = SetorId;
+				document.getElementById('inputSetorNome').value = SetorNome;
+				document.getElementById('inputSetorStatus').value = SetorStatus;
+						
+				if (Tipo == 'edita'){	
+					document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formSetor.action = "setor.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formSetor, "Tem certeza que deseja excluir esse setor?", "setorExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formSetor.action = "setorMudaSituacao.php";
+				} else if (Tipo == 'imprime'){
+					document.formSetor.action = "setorImprime.php";
+					document.formSetor.setAttribute("target", "_blank");
+				}
+				
+				document.formSetor.submit();
+			} else{
+				alerta('Permissão Negada!','');
 			}
-			
-			document.formSetor.submit();
 		}		
 			
 	</script>
@@ -444,13 +448,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											print('<td>'.$item['UnidaNome'].'</td>');
 										}
 
-										print('<td><a href="#" onclick="atualizaSetor('.$item['SetorId'].', \''.$item['SetorNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaSetor(1,'.$item['SetorId'].', \''.$item['SetorNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaSetor('.$item['SetorId'].', \''.$item['SetorNome'].'\','.$item['SetorStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaSetor('.$item['SetorId'].', \''.$item['SetorNome'].'\','.$item['SetorStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														<a href="#" onclick="atualizaSetor('.$atualizar.','.$item['SetorId'].', \''.$item['SetorNome'].'\','.$item['SetorStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaSetor('.$excluir.','.$item['SetorId'].', \''.$item['SetorNome'].'\','.$item['SetorStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
 											</td>
