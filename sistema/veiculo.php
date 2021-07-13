@@ -104,8 +104,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaVeiculo(VeicuId, VeicuNome,  VeicuPlaca, VeicuStatus, Tipo){
+		function atualizaVeiculo(Permission, VeicuId, VeicuNome,  VeicuPlaca, VeicuStatus, Tipo){
 		
+			document.getElementById('inputPermission').value = Permission;
 			document.getElementById('inputVeicuId').value = VeicuId;
 			document.getElementById('inputVeicuNome').value = VeicuNome;
 			document.getElementById('inputVeicuPlaca').value = VeicuPlaca;
@@ -115,8 +116,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			if (Tipo == 'edita'){	
 				document.formVeiculo.action = "veiculoEdita.php";		
 			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formVeiculo, "Tem certeza que deseja excluir esse veículo?", "veiculoExclui.php");
-			} else if (Tipo == 'mudaStatus'){
+				if(Permission){
+					confirmaExclusao(document.formVeiculo, "Tem certeza que deseja excluir esse veículo?", "veiculoExclui.php");
+				} else{
+					alerta('Permissão Negada!','');
+					return false;
+				}
+		} else if (Tipo == 'mudaStatus'){
 				document.formVeiculo.action = "veiculoMudaSituacao.php";
 			} 			
 			document.formVeiculo.submit();
@@ -190,13 +196,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['SetorNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaVeiculo('.$item['VeicuId'].', \''.$item['VeicuNome'].'\', \''.$item['VeicuPlaca'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaVeiculo(1,'.$item['VeicuId'].', \''.$item['VeicuNome'].'\', \''.$item['VeicuPlaca'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaVeiculo('.$item['VeicuId'].', \''.$item['VeicuNome'].'\', \''.$item['VeicuPlaca'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaVeiculo('.$item['VeicuId'].', \''.$item['VeicuNome'].'\', \''.$item['VeicuPlaca'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>							
+														<a href="#" onclick="atualizaVeiculo('.$atualizar.','.$item['VeicuId'].', \''.$item['VeicuNome'].'\', \''.$item['VeicuPlaca'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaVeiculo('.$excluir.','.$item['VeicuId'].', \''.$item['VeicuNome'].'\', \''.$item['VeicuPlaca'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>							
 													</div>
 												</div>
 											</td>
@@ -215,6 +221,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<!-- /info blocks -->
 				
 				<form name="formVeiculo" method="post">
+					<input type="hidden" id="inputPermission" name="inputPermission" >
 					<input type="hidden" id="inputVeicuId" name="inputVeicuId" >
 					<input type="hidden" id="inputVeicuNome" name="inputVeicuNome" >
 					<input type="hidden" id="inputVeicuPlaca" name="inputVeicuPlaca" >

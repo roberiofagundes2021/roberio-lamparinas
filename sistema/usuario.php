@@ -136,8 +136,9 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 			/* Fim: Tabela Personalizada */
 		});	
 		
-		function atualizaUsuario(UsuarioId, UsuarioNome, UsuarioStatus, UsuarioPerfil, EmpresaUsuarioPerfil, Tipo){
+		function atualizaUsuario(Permission, UsuarioId, UsuarioNome, UsuarioStatus, UsuarioPerfil, EmpresaUsuarioPerfil, Tipo){
 
+			document.getElementById('inputPermission').value = Permission;
 			document.getElementById('inputUsuarioId').value = UsuarioId;
 			document.getElementById('inputUsuarioNome').value = UsuarioNome;
 			document.getElementById('inputUsuarioStatus').value = UsuarioStatus;
@@ -161,7 +162,12 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 			} else if (Tipo == 'edita'){
 				document.formUsuario.action = "usuarioEdita.php";
 			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formUsuario, "Tem certeza que deseja excluir esse usuário?", "usuarioExclui.php");
+				if(Permission){
+					confirmaExclusao(document.formUsuario, "Tem certeza que deseja excluir esse usuário?", "usuarioExclui.php");
+				}	else{
+					alerta('Permissão Negada!','');
+					return false;
+				}
 			} else if (Tipo == 'mudaStatus'){
 				document.formUsuario.action = "usuarioMudaSituacao.php";
 			} else if (Tipo == 'permissao'){
@@ -223,7 +229,7 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 										<p class="font-size-lg">Os usuários cadastrados abaixo pertencem a empresa <b><?php echo $EmpresaNome; ?></b>.</p>
 									</div>
 									<div class="col-lg-3">	
-										<div class="text-right"><a href="#" onclick="atualizaUsuario(0, '', '', '', '', 'novo')" class="btn btn-principal" role="button">Novo usuário</a></div>
+										<div class="text-right"><a href="#" onclick="atualizaUsuario(1,0, '', '', '', '', 'novo')" class="btn btn-principal" role="button">Novo usuário</a></div>
 									</div>
 								</div>
 							</div>							
@@ -254,7 +260,7 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 											<td>'.$item['PerfiNome'].'</td>');
 											
 										if ($_SESSION['UsuarId'] != $item['UsuarId']) {
-											print('<td><a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', \''.$item['SituaChave'].'\', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+											print('<td><a href="#" onclick="atualizaUsuario(1,'.$item['UsuarId'].', \''.$item['UsuarNome'].'\', \''.$item['SituaChave'].'\', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										} else {
 											print('<td><a href="#" data-popup="tooltip" data-trigger="focus" title="Seu usuário não pode ser desativado por você."><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										}
@@ -266,12 +272,12 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 													<div class="list-icons list-icons-extended">');
 
 										if (isset($_SESSION['EmpresaId'])){
-											print('		<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'lotacao\')" class="list-icons-item"><i class="icon-users4" data-popup="tooltip" data-placement="bottom" title="Lotação"></i></a>');
+											print('		<a href="#" onclick="atualizaUsuario(1,'.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'lotacao\')" class="list-icons-item"><i class="icon-users4" data-popup="tooltip" data-placement="bottom" title="Lotação"></i></a>');
 										}										
 										
-										print('	<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'exclui\')" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>'.
-														(!isset($_SESSION['EmpresaId'])?'<a href="#" onclick="atualizaUsuario('.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'permissao\')" class="list-icons-item"><i class="icon-lock2" data-popup="tooltip" data-placement="bottom" title="permissao"></i></a>':'')
+										print('	<a href="#" onclick="atualizaUsuario('.$atualizar.','.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaUsuario('.$excluir.','.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'exclui\')" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>'.
+														(!isset($_SESSION['EmpresaId'])?'<a href="#" onclick="atualizaUsuario(1,'.$item['UsuarId'].', \''.$item['UsuarNome'].'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'permissao\')" class="list-icons-item"><i class="icon-lock2" data-popup="tooltip" data-placement="bottom" title="permissao"></i></a>':'')
 													.'</div>
 												</div>
 											</td>
@@ -289,6 +295,7 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 				<!-- /info blocks -->
 				
 				<form name="formUsuario" method="post" action="usuarioEdita.php">
+					<input type="hidden" id="inputPermission" name="inputPermission" >
 					<input type="hidden" id="inputUsuarioId" name="inputUsuarioId" >
 					<input type="hidden" id="inputUsuarioNome" name="inputUsuarioNome" >
 					<input type="hidden" id="inputUsuarioStatus" name="inputUsuarioStatus" >
