@@ -13,6 +13,58 @@ $sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
 $result = $conn->query($sql);
 $rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
 
+$sqlFluxo = "SELECT FlOpeId, FlOpeTermoReferencia, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio,
+						FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao, FlOpeValor, FlOpeObservacao,
+						FlOpePrioridade, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa,
+						FlOpeUnidade, SituaChave
+						FROM FluxoOperacional
+						JOIN Situacao on SituaId = FlOpeStatus
+						WHERE FlOpeUnidade = ".$_SESSION['UnidadeId'].
+						" and UPPER(SituaChave) = 'LIBERADO'";
+$resultFluxo = $conn->query($sqlFluxo);
+$fluxo = $resultFluxo->fetchAll(PDO::FETCH_ASSOC);
+
+foreach($fluxo as $key=>$flx){
+	if($flx['FlOpeTermoReferencia']){
+		$sqlTermo = "SELECT TrRefId, TrRefTipo, TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio,
+								TrRefStatus, TrRefUnidade, TrRefTabelaProduto, TrRefTabelaServico, TrRefLiberaParcial
+								FROM TermoReferencia where TrRefId = ".$flx['FlOpeTermoReferencia'];
+								var_dump($flx);
+		$termoRef = $conn->query($sqlTermo);
+		$termo = $termoRef->fetch(PDO::FETCH_ASSOC);
+		$fluxo[$key]['FlOpeTermoReferencia'] = $termo;
+	}
+	if($flx['FlOpeFornecedor']){
+		$sqlForn = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+		FROM Fornecedor where ForneId = ".$flx['FlOpeFornecedor'];
+		$FlOfornecedor = $conn->query($sqlForn);
+		$forn = $FlOfornecedor->fetch(PDO::FETCH_ASSOC);
+		$fluxo[$key]['FlOpeFornecedor'] = $forn;
+	}
+	if($flx['FlOpeCategoria']){
+		$sqlCateg = "SELECT CategId, CategNome, CategStatus, CategUsuarioAtualizador, CategUnidade
+		FROM Categoria where CategId = ".$flx['FlOpeCategoria'];
+		$FlOCategoria = $conn->query($sqlCateg);
+		$categ = $FlOCategoria->fetch(PDO::FETCH_ASSOC);
+		$fluxo[$key]['FlOpeCategoria'] = $categ;
+	}
+	if($flx['FlOpeSubCategoria']){
+		$sqlSubCateg = "SELECT SbCatId, SbCatNome, SbCatCategoria, SbCatStatus, SbCatUnidade
+		FROM SubCategoria where SbCatId = ".$flx['FlOpeSubCategoria'];
+		$FlOSubCategoria = $conn->query($sqlSubCateg);
+		$subCateg = $FlOSubCategoria->fetch(PDO::FETCH_ASSOC);
+		$fluxo[$key]['FlOpeSubCategoria'] = $subCateg;
+	}
+}
+
+$sqlParametroEmp = "SELECT ParamEmpresaPublica 
+                   FROM Parametro
+                   WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+$resultParametroEmp = $conn->query($sqlParametroEmp);
+$parametroEmp = $resultParametroEmp->fetch(PDO::FETCH_ASSOC);	
+
+$empresaType = $parametroEmp['ParamEmpresaPublica'] ? 'publica' : 'privada';
+
 if(isset($_POST['inputData'])){
 	
 	try{
@@ -116,60 +168,24 @@ if(isset($_POST['inputData'])){
 
 	
 	<!-- Adicionando Javascript -->
-    <script type="text/javascript" >
+	<script type="text/javascript" >
+			<?php
+				$js_fluxo = json_encode($fluxo);
+				$emp = json_encode($empresaType);
+				echo "const fluxo = ".$js_fluxo." \n";
+				echo "var selectEmpresa = ".$emp." \n";
+			?>
 
-        $(document).ready(function() {	
+			$(document).ready(function() {
 		
 			$('#summernote').summernote();
-			
-			//Ao informar o fornecedor, trazer os demais dados dele (contato, e-mail, telefone)
-			$('#cmbFornecedor').on('change', function(e){				
-				
-				var Fornecedor = $('#cmbFornecedor').val();
-				var Forne = Fornecedor.split('#');
-				
-				$('#inputContato').val(Forne[1]);
-				$('#inputEmailFornecedor').val(Forne[2]);
-				if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
-					$('#inputTelefoneFornecedor').val(Forne[3]);
-				} else {
-					$('#inputTelefoneFornecedor').val(Forne[4]);
-				}
-				
-				$.getJSON('filtraCategoria.php?idFornecedor='+Forne[0], function (dados){
-					
-					//var option = '<option value="#">Selecione a Categoria</option>';
-					var option = '';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
-						});						
-						
-						$('#cmbCategoria').html(option).show();
-					} else {
-						ResetCategoria();
-					}					
-				});
-				
-				$.getJSON('filtraSubCategoria.php?idFornecedor='+Forne[0], function (dados){
-					
-					var option = '<option value="">Selecione a SubCategoria</option>';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						});						
-						
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}					
-				});				
-				
-			});
+
+			console.log(selectEmpresa)
+			if(selectEmpresa !== 'publica'){
+				$('#selectEmpresa').hide();
+				$('#Ata').hide();
+				$('#Lote').show();
+			}
 			
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
@@ -230,8 +246,52 @@ if(isset($_POST['inputData'])){
 				e.preventDefault();
 			
 				$("#formOrdemCompra").submit();
+			});	
+			
+			$('#cmbContrato').on('change', function(e){
+				
+				var cmbContrato = $('#cmbContrato').val();
+
+				if(cmbContrato){
+					var id = cmbContrato
+					var flux = fluxo[id]
+
+					// var valueTag = flux.FlOpeFornecedor.ForneId+'#'+flux.FlOpeFornecedor.ForneContato+'#'+flux.FlOpeFornecedor.ForneEmail+'#'+flux.FlOpeFornecedor.ForneTelefone+'#'+flux.FlOpeFornecedor.ForneCelular
+					var valueTag = 'teste'+'#'+'teste'+'#'+'teste'+'#'+'teste'+'#'+'teste'
+
+					var Forne = valueTag.split('#');
+
+					if(flux.FlOpeTermoReferencia){
+						$('#inputData').val(flux.FlOpeTermoReferencia.TrRefData);
+						$('#inputNumero').val(flux.FlOpeTermoReferencia.TrRefNumero);
+					}
+
+					$('#cmbFornecedor').val(valueTag);
+					$('#cmbFornecedorName').val(flux.FlOpeFornecedor.ForneNome);
+
+					$('#inputProcesso').val(flux.FlOpeNumProcesso);
+					$('#inputData').val(() =>{
+						var data = flux.FlOpeDataInicio.split('-')
+						return  (data[2]+'/'+data[1]+'/'+data[0])
+					});
+
+					$('#cmbCategoriaName').val(flux.FlOpeCategoria.CategNome);
+					$('#cmbCategoria').val(flux.FlOpeCategoria.CategId);
+					$('#cmbSubCategoriaName').val(flux.FlOpeSubCategoria.SbCatNome);
+					$('#cmbSubCategoria').val(flux.FlOpeSubCategoria.SbCatId);
+					
+					$('#inputContato').val(Forne[1]);
+					$('#inputEmailFornecedor').val(Forne[2]);
+					if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
+						$('#inputTelefoneFornecedor').val(Forne[3]);
+					} else {
+						$('#inputTelefoneFornecedor').val(Forne[4]);
+					}
+
+					console.log(flux)
+				}
+				
 			});
-						
 		}); //document.ready
 		
 		//Mostra o "Filtrando..." na combo SubCategoria
@@ -303,7 +363,7 @@ if(isset($_POST['inputData'])){
 									
 									<div class="row">										
 										<div class="col-lg-4">
-											<div class="form-group">							
+											<div id="selectEmpresa" class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
 														<input type="radio" id="inputTipo" name="inputTipo" value="C" class="form-input-styled" checked data-fouc onclick="selecionaTipo('C')">
@@ -317,42 +377,58 @@ if(isset($_POST['inputData'])){
 													</label>
 												</div>										
 											</div>
-										</div>										
-										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputData">Data da Emissão <span class="text-danger">*</span></label>
-												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" required readOnly>
-											</div>
-										</div>
-										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputNumero">Número <span class="text-danger">*</span></label>
-												<input type="text" id="inputNumero" name="inputNumero" class="form-control" required>
-											</div>
-										</div>
-										
-										<div class="col-lg-2" id="Ata">
-											<div class="form-group">
-												<label for="inputNumAta">Nº Ata Registro</label>
-												<input type="text" id="inputNumAta" name="inputNumAta" class="form-control">
-											</div>
-										</div>										
-										
-										<div class="col-lg-2" id="Lote" style="display:none">
-											<div class="form-group">
-												<label for="inputLote">Lote</label>
-												<input type="text" id="inputLote" name="inputLote" class="form-control">
-											</div>
-										</div>
-										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputProcesso">Processo</label>
-												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control">
-											</div>
+											
 										</div>	
+									</div>
+
+									<div class="row">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="contrato">Nº Contrato <span class="text-danger">*</span></label>
+												<select id="cmbContrato" name="contrato" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
+													<?php
+														foreach ($fluxo as $key=>$item){
+															print('<option value="'.$key.'">'.$item['FlOpeNumContrato'].'</option>');
+														}
+													?>
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputData">Data da Emissão <span class="text-danger">*</span></label>
+													<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" required readOnly>
+												</div>
+											</div>
+											
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputNumero">Número <span class="text-danger">*</span></label>
+													<input type="text" id="inputNumero" name="inputNumero" class="form-control" required>
+												</div>
+											</div>
+											
+											<div class="col-lg-2" id="Ata">
+												<div class="form-group">
+													<label for="inputNumAta">Nº Ata Registro</label>
+													<input type="text" id="inputNumAta" name="inputNumAta" class="form-control">
+												</div>
+											</div>										
+											
+											<div class="col-lg-2" id="Lote" style="display:none">
+												<div class="form-group">
+													<label for="inputLote">Lote</label>
+													<input type="text" id="inputLote" name="inputLote" class="form-control">
+												</div>
+											</div>
+											
+											<div class="col-lg-3">
+												<div class="form-group">
+													<label for="inputProcesso">Processo</label>
+													<input type="text" id="inputProcesso" name="inputProcesso" class="form-control">
+												</div>
+											</div>
 									</div>
 									
 									<div class="row">
@@ -360,26 +436,11 @@ if(isset($_POST['inputData'])){
 											<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
 											<br>
 											<div class="row">
-												<div class="col-lg-4">
+												<div class="col-lg-3">
 													<div class="form-group">
-														<label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
-														<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
-															<option value="">Selecione</option>
-															<?php 
-																$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-																		FROM Fornecedor
-																		JOIN Situacao on SituaId = ForneStatus												     
-																		WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																		ORDER BY ForneNome ASC";
-																$result = $conn->query($sql);
-																$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-																
-																foreach ($rowFornecedor as $item){															
-																	print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'">'.$item['ForneNome'].'</option>');
-																}
-															
-															?>
-														</select>
+														<label for="inputContato">Fornecedor</label>
+														<input type="text" id="cmbFornecedorName" name="cmbFornecedorName" class="form-control" readOnly>
+														<input type="hidden" id="cmbFornecedor" name="cmbFornecedor" class="form-control">
 													</div>
 												</div>
 												
@@ -408,25 +469,22 @@ if(isset($_POST['inputData'])){
 									</div>
 									<br>									
 									
-									<div class="row">											
+									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
-													<option value="">Selecione</option>
-												</select>
+												<input type="text" id="cmbCategoriaName" name="cmbCategoriaName" class="form-control" readOnly>
+												<input type="hidden" id="cmbCategoria" name="cmbCategoria">
 											</div>
 										</div>
-										
+
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="">Selecione</option>
-												</select>
+												<input type="text" id="cmbSubCategoriaName" name="cmbSubCategoriaName" class="form-control" readOnly>
+												<input type="hidden" id="cmbSubCategoria" name="cmbSubCategoria">
 											</div>
-										</div>										
-
+										</div>
 									</div>
 								</div>
 							</div>
