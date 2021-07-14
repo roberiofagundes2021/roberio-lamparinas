@@ -229,7 +229,7 @@ try {
 					* verifica se o evento é Keycode (para IE e outros browsers)
 					* se não for pega o evento Which (Firefox)
 				*/
-				var tecla = (e.keyCode?e.keyCode:e.which);
+				var tecla = (e.keyCode?e.keyCode:e.which);				
 
 				/* verifica se a tecla pressionada foi o ENTER */
 				if(tecla == 13){
@@ -246,7 +246,10 @@ try {
 						/* passa o foco para o proximo elemento */
 						proximo.focus();
 					}
+				} else {
+					return onlynumber(e);
 				}
+
 				/* impede o sumbit caso esteja dentro de um form */
 				e.preventDefault(e);
 				return false;
@@ -653,7 +656,7 @@ try {
 														</div>
 													</div>
 													<div class="col-lg-1">
-														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade text-right pula" onChange="calculaValorTotal()" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade text-right pula" onChange="calculaValorTotal()" value="' . $iQuantidade . '">
 													</div>	
 													<div class="col-lg-1">
 														<input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario text-right pula" onChange="calculaValorTotal()" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">

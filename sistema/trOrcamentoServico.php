@@ -147,7 +147,10 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 						/* passa o foco para o proximo elemento */
 						proximo.focus();
 					}
+				} else {
+					return onlynumber(e);
 				}
+
 				/* impede o sumbit caso esteja dentro de um form */
 				e.preventDefault(e);
 				return false;
@@ -374,7 +377,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 													        </div>
 												        </div>								
 												        <div class="col-lg-1">
-													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" readOnly value="' . $iQuantidade . '">
+													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" value="' . $iQuantidade . '" readOnly>
 												        </div>	
 												        <div class="col-lg-1">
 													         <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
@@ -410,7 +413,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 													        </div>
 												        </div>								
 												        <div class="col-lg-1">
-													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" readOnly value="' . $iQuantidade . '">
+													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" value="' . $iQuantidade . '" readOnly>
 												        </div>	
 												        <div class="col-lg-1">
 													        <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12">
@@ -459,7 +462,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 													        </div>
 												        </div>								
 												        <div class="col-lg-1">
-													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" readOnly value="' . $iQuantidade . '">
+													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" value="' . $iQuantidade . '" readOnly>
 												        </div>	
 												        <div class="col-lg-1">
 													         <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
