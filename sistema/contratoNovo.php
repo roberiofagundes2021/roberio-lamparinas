@@ -283,23 +283,19 @@ if (isset($_POST['inputDataInicio'])) {
 
 						<div class="card-body">
 
-							<h5 class="mb-0 font-weight-semibold">Termo de Referência</h5>
+							<h5 class="mb-0 font-weight-semibold">Dados do Termo de Referência</h5>
 							<br>
-                            <div class="row">
-                                 <div class="col-lg-3">
+							<div class="row">
+								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputTermoReferencia">Nº do Termo de Referência</label>
+										<label for="inputTermoReferencia">Nº Termo de Referência</label>
 										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $row['TrRefNumero']; ?>" readOnly>
 										<input type="hidden" id="inputTermoReferenciaId" name="inputTermoReferenciaId" value="<?php echo $row['TrRefId']; ?>">
 										<input type="hidden" id="inputTRId" name="inputTRId" value="<?php echo $row['TrRefId']; ?>">
 									</div>
 								</div>
-                            </div>
 
-							<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
-							<br>
-							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-5">
 									<div class="form-group">
 										<label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
 										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
@@ -332,14 +328,16 @@ if (isset($_POST['inputDataInicio'])) {
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-5">
 									<div class="form-group">
 										<label for="inputCategoria">Categoria <span class="text-danger">*</span></label>
 										<input type="text" id="inputCategoria" name="inputCategoria" class="form-control" value="<?php echo $row['CategNome']; ?>" readOnly>
 										<input type="hidden" id="inputCategoriaId" name="inputCategoriaId" value="<?php echo $row['TrRefCategoria']; ?>">
 									</div>
 								</div>
+							</div>
 
+							<div class="row">
 								<div class="col-lg-4">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSubCategoria">SubCategoria</label>
@@ -376,14 +374,14 @@ if (isset($_POST['inputDataInicio'])) {
 									</div>
 								</div>
 
-								<div class="col-lg-3">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputNumContrato">Numero do Contrato <?php if ($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
 										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" <?php echo $bObrigatorio; ?>>
 									</div>
 								</div>
 
-								<div class="col-lg-3">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbModalidadeLicitacao">Modalidade de Licitação</label>
 										<select id="cmbModalidadeLicitacao" name="cmbModalidadeLicitacao" class="form-control form-control-select2">
@@ -416,8 +414,8 @@ if (isset($_POST['inputDataInicio'])) {
 
 								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputNumAta">Nº Ata Registro <?php if ($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
-										<input type="text" id="inputNumAta" name="inputNumAta" class="form-control" placeholder="Nº Ata Registro" <?php echo $bObrigatorio; ?>>
+										<label for="inputNumAta">Nº Ata Registro</label>
+										<input type="text" id="inputNumAta" name="inputNumAta" class="form-control" placeholder="Nº Ata Registro">
 									</div>
 								</div>
 
