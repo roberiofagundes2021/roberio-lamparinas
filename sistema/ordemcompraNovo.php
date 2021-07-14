@@ -13,12 +13,20 @@ $sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
 $result = $conn->query($sql);
 $rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
 
+$sqlNumero = "SELECT Max(OrComNumero)
+							FROM OrdemCompra";
+$resultNumero = $conn->query($sqlNumero);
+$numero = $resultNumero->fetch(PDO::FETCH_ASSOC);
+
 $sqlFluxo = "SELECT FlOpeId, FlOpeTermoReferencia, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio,
 						FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao, FlOpeValor, FlOpeObservacao,
-						FlOpePrioridade, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa,
-						FlOpeUnidade, SituaChave
+						FlOpePrioridade, FlOpeNumAta, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa,
+						FlOpeUnidade, SituaChave, ForneId, ForneRazaoSocial, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular,
+						CategId, CategNome, CategStatus, CategUsuarioAtualizador, CategUnidade
 						FROM FluxoOperacional
 						JOIN Situacao on SituaId = FlOpeStatus
+						JOIN Fornecedor on ForneId = FlOpeFornecedor
+						JOIN Categoria on CategId = FlOpeCategoria
 						WHERE FlOpeUnidade = ".$_SESSION['UnidadeId'].
 						" and UPPER(SituaChave) = 'LIBERADO'";
 $resultFluxo = $conn->query($sqlFluxo);
@@ -29,31 +37,17 @@ foreach($fluxo as $key=>$flx){
 		$sqlTermo = "SELECT TrRefId, TrRefTipo, TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio,
 								TrRefStatus, TrRefUnidade, TrRefTabelaProduto, TrRefTabelaServico, TrRefLiberaParcial
 								FROM TermoReferencia where TrRefId = ".$flx['FlOpeTermoReferencia'];
-								var_dump($flx);
 		$termoRef = $conn->query($sqlTermo);
 		$termo = $termoRef->fetch(PDO::FETCH_ASSOC);
 		$fluxo[$key]['FlOpeTermoReferencia'] = $termo;
 	}
-	if($flx['FlOpeFornecedor']){
-		$sqlForn = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-		FROM Fornecedor where ForneId = ".$flx['FlOpeFornecedor'];
-		$FlOfornecedor = $conn->query($sqlForn);
-		$forn = $FlOfornecedor->fetch(PDO::FETCH_ASSOC);
-		$fluxo[$key]['FlOpeFornecedor'] = $forn;
-	}
 	if($flx['FlOpeCategoria']){
-		$sqlCateg = "SELECT CategId, CategNome, CategStatus, CategUsuarioAtualizador, CategUnidade
-		FROM Categoria where CategId = ".$flx['FlOpeCategoria'];
-		$FlOCategoria = $conn->query($sqlCateg);
-		$categ = $FlOCategoria->fetch(PDO::FETCH_ASSOC);
-		$fluxo[$key]['FlOpeCategoria'] = $categ;
-	}
-	if($flx['FlOpeSubCategoria']){
-		$sqlSubCateg = "SELECT SbCatId, SbCatNome, SbCatCategoria, SbCatStatus, SbCatUnidade
-		FROM SubCategoria where SbCatId = ".$flx['FlOpeSubCategoria'];
-		$FlOSubCategoria = $conn->query($sqlSubCateg);
-		$subCateg = $FlOSubCategoria->fetch(PDO::FETCH_ASSOC);
-		$fluxo[$key]['FlOpeSubCategoria'] = $subCateg;
+		$sqlSubCat = "SELECT SbCatId, SbCatNome, SbCatCategoria, SbCatStatus, SbCatUnidade
+								FROM SubCategoria
+								where SbCatCategoria = ".$flx['FlOpeCategoria'];
+		$SubCat = $conn->query($sqlSubCat);
+		$SubCateg = $SubCat->fetchAll(PDO::FETCH_ASSOC);
+		$fluxo[$key]['FlOpeSubCategoria'] = $SubCateg;
 	}
 }
 
@@ -72,8 +66,8 @@ if(isset($_POST['inputData'])){
 		$conn->beginTransaction();
 
 		$sql = "SELECT SituaId
-				FROM Situacao
-				Where SituaChave = 'PENDENTE' ";
+						FROM Situacao
+						Where SituaChave = 'PENDENTE' ";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 		
@@ -172,15 +166,74 @@ if(isset($_POST['inputData'])){
 			<?php
 				$js_fluxo = json_encode($fluxo);
 				$emp = json_encode($empresaType);
+				$num = json_encode($numero[""]+1);
 				echo "const fluxo = ".$js_fluxo." \n";
 				echo "var selectEmpresa = ".$emp." \n";
+				echo "var numero = ".$num." \n";
 			?>
 
 			$(document).ready(function() {
+				$('#cmbContrato').on('change', function(e){
+				
+					var cmbContrato = $('#cmbContrato').val();
+
+					if(cmbContrato){
+						var id = cmbContrato
+						var flux = fluxo[id]
+
+						var valueTag = flux.ForneId+'#'+flux.ForneContato+'#'+flux.ForneEmail+'#'+flux.ForneTelefone+'#'+flux.ForneCelular
+						// var valueTag = 'teste'+'#'+'teste'+'#'+'teste'+'#'+'teste'+'#'+'teste'
+
+						var Forne = valueTag.split('#');
+
+						if(flux.FlOpeTermoReferencia){
+							$('#inputData').val(flux.TrRefData);
+							$('#inputNumero').val(flux.TrRefNumero);
+						}
+
+						$('#cmbFornecedor').val(valueTag);
+						$('#cmbFornecedorName').val(flux.ForneRazaoSocial);
+
+						$('#inputProcesso').val(flux.FlOpeNumProcesso);
+
+						$('#cmbCategoriaName').val(flux.CategNome);
+						$('#cmbCategoria').val(flux.CategId);
+						$('#inputNumero').val(numero);
+						$('#inputNumAta').val(flux.FlOpeNumAta);
+						$('#inputLote').val(flux.FlOpeNumAta);
+
+						$.getJSON('filtraSubCategoria.php?idCategoria='+flux.CategId, function (dados){
+					
+							var option = '<option value="">Selecione a SubCategoria</option>';
+							
+							if (dados.length){						
+								
+								$.each(dados, function(i, obj){
+									option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+								});						
+								
+								$('#cmbSubCategoria').html(option).show();
+							} else {
+								ResetSubCategoria();
+							}					
+						});
+
+						// $('#cmbSubCategoria').val(flux.SbCatId);
+						// $('#cmbSubCategoriaName').val(flux.SbCatNome);
+						
+						$('#inputContato').val(Forne[1]);
+						$('#inputEmailFornecedor').val(Forne[2]);
+						if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
+							$('#inputTelefoneFornecedor').val(Forne[3]);
+						} else {
+							$('#inputTelefoneFornecedor').val(Forne[4]);
+						}
+					}
+					
+				});
 		
 			$('#summernote').summernote();
 
-			console.log(selectEmpresa)
 			if(selectEmpresa !== 'publica'){
 				$('#selectEmpresa').hide();
 				$('#Ata').hide();
@@ -227,8 +280,7 @@ if(isset($_POST['inputData'])){
 						
 						var option = '';
 
-						if (dados.length){						
-							
+						if (dados.length){
 							$.each(dados, function(i, obj){
 								option += '<option value="'+obj.LcEstId+'">' + obj.LcEstNome + '</option>';
 							});						
@@ -246,51 +298,6 @@ if(isset($_POST['inputData'])){
 				e.preventDefault();
 			
 				$("#formOrdemCompra").submit();
-			});	
-			
-			$('#cmbContrato').on('change', function(e){
-				
-				var cmbContrato = $('#cmbContrato').val();
-
-				if(cmbContrato){
-					var id = cmbContrato
-					var flux = fluxo[id]
-
-					// var valueTag = flux.FlOpeFornecedor.ForneId+'#'+flux.FlOpeFornecedor.ForneContato+'#'+flux.FlOpeFornecedor.ForneEmail+'#'+flux.FlOpeFornecedor.ForneTelefone+'#'+flux.FlOpeFornecedor.ForneCelular
-					var valueTag = 'teste'+'#'+'teste'+'#'+'teste'+'#'+'teste'+'#'+'teste'
-
-					var Forne = valueTag.split('#');
-
-					if(flux.FlOpeTermoReferencia){
-						$('#inputData').val(flux.FlOpeTermoReferencia.TrRefData);
-						$('#inputNumero').val(flux.FlOpeTermoReferencia.TrRefNumero);
-					}
-
-					$('#cmbFornecedor').val(valueTag);
-					$('#cmbFornecedorName').val(flux.FlOpeFornecedor.ForneNome);
-
-					$('#inputProcesso').val(flux.FlOpeNumProcesso);
-					$('#inputData').val(() =>{
-						var data = flux.FlOpeDataInicio.split('-')
-						return  (data[2]+'/'+data[1]+'/'+data[0])
-					});
-
-					$('#cmbCategoriaName').val(flux.FlOpeCategoria.CategNome);
-					$('#cmbCategoria').val(flux.FlOpeCategoria.CategId);
-					$('#cmbSubCategoriaName').val(flux.FlOpeSubCategoria.SbCatNome);
-					$('#cmbSubCategoria').val(flux.FlOpeSubCategoria.SbCatId);
-					
-					$('#inputContato').val(Forne[1]);
-					$('#inputEmailFornecedor').val(Forne[2]);
-					if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
-						$('#inputTelefoneFornecedor').val(Forne[3]);
-					} else {
-						$('#inputTelefoneFornecedor').val(Forne[4]);
-					}
-
-					console.log(flux)
-				}
-				
 			});
 		}); //document.ready
 		
@@ -396,39 +403,39 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 										<div class="col-lg-2">
-												<div class="form-group">
-													<label for="inputData">Data da Emissão <span class="text-danger">*</span></label>
-													<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" required readOnly>
-												</div>
+											<div class="form-group">
+												<label for="inputData">Data da Emissão <span class="text-danger">*</span></label>
+												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" readOnly>
 											</div>
-											
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="inputNumero">Número <span class="text-danger">*</span></label>
-													<input type="text" id="inputNumero" name="inputNumero" class="form-control" required>
-												</div>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputNumero">Número <span class="text-danger">*</span></label>
+												<input type="text" id="inputNumero" name="inputNumero" class="form-control" required readOnly>
 											</div>
-											
-											<div class="col-lg-2" id="Ata">
-												<div class="form-group">
-													<label for="inputNumAta">Nº Ata Registro</label>
-													<input type="text" id="inputNumAta" name="inputNumAta" class="form-control">
-												</div>
-											</div>										
-											
-											<div class="col-lg-2" id="Lote" style="display:none">
-												<div class="form-group">
-													<label for="inputLote">Lote</label>
-													<input type="text" id="inputLote" name="inputLote" class="form-control">
-												</div>
+										</div>
+										
+										<div class="col-lg-2" id="Ata">
+											<div class="form-group">
+												<label for="inputNumAta">Nº Ata Registro</label>
+												<input type="text" id="inputNumAta" name="inputNumAta" class="form-control" readOnly>
 											</div>
-											
-											<div class="col-lg-3">
-												<div class="form-group">
-													<label for="inputProcesso">Processo</label>
-													<input type="text" id="inputProcesso" name="inputProcesso" class="form-control">
-												</div>
+										</div>										
+										
+										<div class="col-lg-2" id="Lote" style="display:none">
+											<div class="form-group">
+												<label for="inputLote">Lote</label>
+												<input type="text" id="inputLote" name="inputLote" class="form-control" readOnly>
 											</div>
+										</div>
+										
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputProcesso">Processo</label>
+												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" readOnly>
+											</div>
+										</div>
 									</div>
 									
 									<div class="row">
@@ -478,13 +485,21 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 
-										<div class="col-lg-6">
+										<div class="form-group">
+											<label for="cmbSubCategoriaName">SubCategoria</label>
+											<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
+												<option value="">Selecione</option>
+											</select>
+										</div>
+
+										<!-- <div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<input type="text" id="cmbSubCategoriaName" name="cmbSubCategoriaName" class="form-control" readOnly>
 												<input type="hidden" id="cmbSubCategoria" name="cmbSubCategoria">
 											</div>
-										</div>
+										</div> -->
+
 									</div>
 								</div>
 							</div>
