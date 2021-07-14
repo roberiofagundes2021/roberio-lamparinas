@@ -267,7 +267,10 @@ if (count($rowProdutoUtilizado) >= 1) {
 						/* passa o foco para o proximo elemento */
 						proximo.focus();
 					}
+				} else {
+					return onlynumber(e);
 				}
+
 				/* impede o sumbit caso esteja dentro de um form */
 				e.preventDefault(e);
 				return false;
@@ -537,13 +540,13 @@ if (count($rowProdutoUtilizado) >= 1) {
 											if(count($rowOrcamentosTR) >= 1) {
 												print('
 													<div class="col-lg-2">
-														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" value="' . $iQuantidade . '" readOnly>
 													</div>	
 												');
 											} else {
 												print('
 													<div class="col-lg-2">
-														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" value="' . $iQuantidade . '">
 													</div>	
 												');
 											}
@@ -641,13 +644,13 @@ if (count($rowProdutoUtilizado) >= 1) {
 											if(count($rowOrcamentosTR) >= 1) {
 												print('
 													<div class="col-lg-2">
-														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="return onlynumber();" value="' . $iQuantidade . '" readOnly>
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" value="' . $iQuantidade . '" readOnly>
 													</div>	
 												');
 											} else {
 												print('
 													<div class="col-lg-2">
-														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" value="' . $iQuantidade . '">
 													</div>	
 												');
 											}

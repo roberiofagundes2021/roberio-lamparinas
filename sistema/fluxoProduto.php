@@ -242,7 +242,10 @@ try{
 						/* passa o foco para o proximo elemento */
 						proximo.focus();
 					}
+				} else {
+					return onlynumber(e);
 				}
+
 				/* impede o sumbit caso esteja dentro de um form */
 				e.preventDefault(e);
 				return false;
@@ -678,7 +681,7 @@ try{
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade pula" onChange="calculaValorTotal()" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade pula" onChange="calculaValorTotal()" value="'.$iQuantidade.'">
 												</div>	
 												<div class="col-lg-1">
 													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario text-right pula" onChange="calculaValorTotal()" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
