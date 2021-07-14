@@ -706,6 +706,24 @@ $dataFim = date("Y-m-d");
                 return false;
             })  
         });
+
+        //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
+        function atualizaFornecedor(ForneId, ForneNome, ForneStatus, Tipo) {
+
+                document.getElementById('inputFornecedorId').value = ForneId;
+                document.getElementById('inputFornecedorNome').value = ForneNome;
+                document.getElementById('inputFornecedorStatus').value = ForneStatus;
+
+                if (Tipo == 'editarLancamento') {
+                    document.formFornecedor.action = "contasAPagarNovoLancamento.php";
+                } else if (Tipo == 'excluirConta') {
+                    confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir essa Conta?", "contasAPagarExclui.php");
+                }
+            
+
+            document.formFornecedor.submit();
+        }
+
     </script>
 
 </head>
