@@ -6,6 +6,10 @@ $_SESSION['PaginaAtual'] = 'Novo Lançamento - Contas a Pagar';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputPermissionAtualiza'])){
+    $atualizar = $_POST['inputPermissionAtualiza'];
+}
+
 if (isset($_POST['cmbPlanoContas'])) {
 
     if (isset($_POST['inputEditar'])) {
@@ -275,12 +279,12 @@ if (isset($_POST['cmbPlanoContas'])) {
 }
 //$count = count($row);
 
-if (isset($_GET['lancamentoId'])) {
+if (isset($_POST['inputContasAPagarId'])) {
     $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
             CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero
     		FROM ContasAPagar
             LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
-    		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_GET['lancamentoId'] . "";
+    		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_POST['inputContasAPagarId'] . "";
     $result = $conn->query($sql);
     $lancamento = $result->fetch(PDO::FETCH_ASSOC);
 }

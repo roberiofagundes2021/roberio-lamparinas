@@ -3,6 +3,7 @@
 session_start();
 include('global_assets/php/conexao.php');
 $visualizar = true;
+$novo = 1;
 $atualizar = 0;
 $excluir = 0;
 

@@ -244,8 +244,8 @@ $dataFim = date("Y-m-d");
                         $('tbody').append(data)
                         alerta('Atenção', 'Parcelas geradas com sucesso!')
                         modalParcelas()
-                        editarLancamento()
-                        excluirConta()
+                        //editarLancamento()
+                        //excluirConta()
                         $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
                         pagamentoAgrupado()
                         atualizaTotal()
@@ -569,43 +569,6 @@ $dataFim = date("Y-m-d");
             }
             modalPagamentoAgrupado()
 
-            function editarLancamento() {
-                $('.editarLancamento').each((i, elem) => {
-                    $(elem).on('click', () => {
-                        let linha = $(elem).parent().parent().parent().parent()
-                        let tds = linha.children();
-
-                        let filhosPrimeiroTd = $(tds[0]).children();
-                        let idLancamento = $(filhosPrimeiroTd[1]).val()
-
-                        window.location.href =
-                            `contasAPagarNovoLancamento.php?lancamentoId=${idLancamento}`
-                    })
-                })
-            }
-
-            function excluirConta(){
-                let contas = $('.excluirConta').each((i, elem) => {
-                    $(elem).on('click', ( e ) => {
-                        let id = $(elem).attr('idContaExcluir')
-                        let permissaoExclusao = $(elem).attr('permissaoExclusao')
-                        $('.idContaAPagar').val(id)
-                        e.preventDefault
-
-                        // Se tiver persmissão de exclusão
-                        if (permissaoExclusao == 1){
-                            confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `contasAPagarExclui.php?idContaAPagar=${id}`);
-                            document.contaExclui.submit()
-                        } else{
-                            alerta('Permissão Negada!','');
-                        }
-                        
-                    })
-                })
-
-            }
-            excluirConta()
-
             function atualizaTotal(){
                 let childres = $('tbody').children()
                 let total = 0
@@ -644,6 +607,8 @@ $dataFim = date("Y-m-d");
                 let fornecedor = $('#cmbFornecedor').val()
                 let planoContas = $('#cmbPlanoContas').val()
                 let formaPagamento = $("#cmbFormaPagamento").val()
+                let inputPermissionAtualiza = $("#inputPermissionAtualiza").val()
+                let inputPermissionExclui = $("#inputPermissionExclui").val()
                 let statusArray = $('#cmbStatus').val().split('|')
                 let status = statusArray[0]
                 let statusTipo = statusArray[1]
@@ -663,7 +628,9 @@ $dataFim = date("Y-m-d");
                     cmbPlanoContas: planoContas,
                     cmbStatus: status,
                     statusTipo: statusTipo,
-                    tipoFiltro: tipoFiltro
+                    tipoFiltro: tipoFiltro,
+                    permissionAtualiza: inputPermissionAtualiza,
+                    permissionExclui: inputPermissionExclui
                 };
 
                 $.post(
@@ -676,9 +643,9 @@ $dataFim = date("Y-m-d");
                             resultadosConsulta = data
 
                             modalParcelas()
-                            editarLancamento()
+                            //editarLancamento()
                             pagamentoAgrupado()
-                            excluirConta()
+                            //excluirConta()
                             atualizaTotal()
 
                         } else {
@@ -699,30 +666,28 @@ $dataFim = date("Y-m-d");
                 Filtrar(false)
             })
 
-            Filtrar(true)
-
-            $('#novoLacamento').on('click', (e) => {
-                location.href = "contasAPagarNovoLancamento.php";
-                return false;
-            })  
+            Filtrar(true)               
         });
 
         //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-        function atualizaFornecedor(ForneId, ForneNome, ForneStatus, Tipo) {
+        function atualizaContasAPagar(Permission, ContasAPagarId, Tipo) {
 
-                document.getElementById('inputFornecedorId').value = ForneId;
-                document.getElementById('inputFornecedorNome').value = ForneNome;
-                document.getElementById('inputFornecedorStatus').value = ForneStatus;
+            document.getElementById('inputContasAPagarId').value = ContasAPagarId;
+            document.getElementById('inputPermissionAtualiza').value = Permission;
 
-                if (Tipo == 'editarLancamento') {
-                    document.formFornecedor.action = "contasAPagarNovoLancamento.php";
-                } else if (Tipo == 'excluirConta') {
-                    confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir essa Conta?", "contasAPagarExclui.php");
+            if (Tipo == 'novo' || Tipo == 'edita') {
+                document.formContasAPagar.action = "contasAPagarNovoLancamento.php";
+            } else if (Tipo == 'exclui') {
+                if(Permission){
+                    confirmaExclusao(document.formContasAPagar, "Tem certeza que deseja excluir essa Conta?", "contasAPagarExclui.php");
+                } else{
+                    alerta('Permissão Negada!','');
+                    return false;
                 }
-            
+            }            
 
-            document.formFornecedor.submit();
-        }
+            document.formContasAPagar.submit();
+        }         
 
     </script>
 
@@ -778,10 +743,6 @@ $dataFim = date("Y-m-d");
                                     <input id="cmbProduto_imp" type="hidden" name="cmbProduto_imp"></input>
                                     <input id="cmbServico_imp" type="hidden" name="cmbServico_imp"></input>
                                     <input id="cmbCodigo_imp" type="hidden" name="cmbCodigo_imp"></input>
-                                </form>
-
-                                <form name="contaExclui" action="" method="POST">
-                                    <input type="hidden" name="idContaAPagar" id="idContaAPagar">
                                 </form>
 
                                 <form name="formMovimentacao" method="post" class="p-3">
@@ -919,9 +880,9 @@ $dataFim = date("Y-m-d");
 
                                         <div class="text-right col-lg-11 pt-3">
                                             <div>
-                                                <button id="novoLacamento"
+                                                <a href="#" onclick="atualizaContasAPagar(<?php echo $novo; ?>, 0, 'novo');" 
                                                     class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo
-                                                    Lançamento</button>
+                                                    Lançamento</a>
                                                 <button id="efetuarPagamento"
                                                     class="btn btn-outline bg-slate-600 text-slate-600 border-slate"
                                                     disabled>Efetuar Pagamento</button>
@@ -1179,6 +1140,12 @@ $dataFim = date("Y-m-d");
                     </div>
                 </div>
                 <!--------------------------------------------------------------------------------------------------->
+
+                <form name="formContasAPagar" method="post">
+					<input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza" value="<?php echo $atualizar; ?>" >
+                    <input type="hidden" id="inputPermissionExclui" name="inputPermissionExclui" value="<?php echo $excluir; ?>" >
+					<input type="hidden" id="inputContasAPagarId" name="inputContasAPagarId" >
+				</form>
 
             </div>
             <!-- /content area -->

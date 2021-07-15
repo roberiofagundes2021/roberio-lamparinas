@@ -4,9 +4,9 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if(isset($_GET['idContaAPagar'])){
+if(isset($_POST['inputContasAPagarId'])){
 	
-    $id = $_GET['idContaAPagar'];
+    $id = $_POST['inputContasAPagarId'];
 
     try{
 		
