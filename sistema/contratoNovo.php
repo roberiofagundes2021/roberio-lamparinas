@@ -302,7 +302,7 @@ if (isset($_POST['inputDataInicio'])) {
 											<option value="">Selecione</option>
 											<?php
 											
-												$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+												$sql = "SELECT DISTINCT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 														FROM Fornecedor
 														JOIN Categoria on CategId = ForneCategoria
 														JOIN Situacao on SituaId = ForneStatus ";
@@ -338,7 +338,7 @@ if (isset($_POST['inputDataInicio'])) {
 							</div>
 
 							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-12">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSubCategoria">SubCategoria</label>
 										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>

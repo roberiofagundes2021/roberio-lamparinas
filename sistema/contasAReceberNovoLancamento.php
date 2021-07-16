@@ -6,6 +6,10 @@ $_SESSION['PaginaAtual'] = 'Novo Lançamento - Contas a Receber';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputPermissionAtualiza'])){
+    $atualizar = $_POST['inputPermissionAtualiza'];
+}
+
 if (isset($_POST['cmbPlanoContas'])) {
 
     if (isset($_POST['cmbFormaPagamento'])){
@@ -560,7 +564,7 @@ if (isset($_POST['cmbPlanoContas'])) {
 //$count = count($row);
 
 // SE TIVER EDITANDO 
-if (isset($_GET['lancamentoId'])) {
+if (isset($_POST['inputContasAReceberId'])) {
     try {
         $sql = "SELECT  CnAReId,
                         CnAReDtEmissao,  
@@ -595,7 +599,7 @@ if (isset($_GET['lancamentoId'])) {
                         FrPagChave            
     		       FROM ContasAReceber
                    LEFT JOIN FormaPagamento on FrPagId = CnAReFormaPagamento
-    		       WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " . $_GET['lancamentoId'] . "";
+    		       WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " .$_POST['inputContasAReceberId'] . "";
 
         $result = $conn->query($sql);
         $lancamento = $result->fetch(PDO::FETCH_ASSOC);

@@ -244,8 +244,6 @@ $dataFim = date("Y-m-d");
                         $('tbody').append(data)
                         alerta('Atenção', 'Parcelas geradas com sucesso!')
                         modalParcelas()
-                        editarLancamento()
-                        excluirConta()
                         $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
                         RecebimentoAgrupado()
                         atualizaTotal()
@@ -334,42 +332,6 @@ $dataFim = date("Y-m-d");
                 window.location.href = `contasAReceberNovoLancamento.php?lancamentoId=${id}`
             }
 
-            function editarLancamento() {
-                $('.editarLancamento').each((i, elem) => {
-                    $(elem).on('click', () => {
-                        let linha = $(elem).parent().parent().parent().parent()
-                        let tds = linha.children();
-
-                        let filhosPrimeiroTd = $(tds[0]).children();
-                        let idLancamento = $(filhosPrimeiroTd[1]).val()
-
-                        window.location.href =
-                            `contasAReceberNovoLancamento.php?lancamentoId=${idLancamento}`
-                    })
-                })
-            }
-
-            function excluirConta() {
-                let contas = $('.excluirConta').each((i, elem) => {
-                    $(elem).on('click', (e) => {
-                        let id = $(elem).attr('idContaExcluir')
-                        let permissaoExclusao = $(elem).attr('permissaoExclusao')
-                        $('.idContaAReceber').val(id)
-                        e.preventDefault
-                        
-                         // Se tiver persmissão de exclusão
-                         if (permissaoExclusao == 1){
-                            confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `contasAReceberExclui.php?idContaAReceber=${id}`);
-                            document.contaExclui.submit()
-                        } else{
-                        alerta('Permissão Negada!','');
-                        }
-                    })
-                })
-
-            }
-            excluirConta()
-
             function atualizaTotal() {
                 let childres = $('tbody').children()
                 let total = 0
@@ -409,6 +371,8 @@ $dataFim = date("Y-m-d");
                 let clientes = $('#cmbClientes').val()
                 let planoContas = $('#cmbPlanoContas').val()
                 let FormaPagamento = $("#cmbFormaDeRecebimento").val()
+                let inputPermissionAtualiza = $("#inputPermissionAtualiza").val()
+                let inputPermissionExclui = $("#inputPermissionExclui").val()
                 let statusArray = $('#cmbStatus').val().split('|')
                 let status = statusArray[0]
                 let statusTipo = statusArray[1]
@@ -430,7 +394,9 @@ $dataFim = date("Y-m-d");
                     cmbFormaDeRecebimento: FormaPagamento,
                     cmbStatus: status,
                     statusTipo: statusTipo,
-                    tipoFiltro: tipoFiltro
+                    tipoFiltro: tipoFiltro,
+                    permissionAtualiza: inputPermissionAtualiza,
+                    permissionExclui: inputPermissionExclui
                 };
 
                 $.post(
@@ -443,8 +409,6 @@ $dataFim = date("Y-m-d");
                             resultadosConsulta = data
 
                             modalParcelas()
-                            editarLancamento()
-                            excluirConta()
                             atualizaTotal()
 
                         } else {
@@ -466,12 +430,28 @@ $dataFim = date("Y-m-d");
             })
 
             Filtrar(true)
-
-            $('#novoLacamento').on('click', (e) => {
-                location.href = "contasAReceberNovoLancamento.php";
-                return false;
-            })
         });
+
+        //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
+        function atualizaContasAReceber(Permission, ContasAReceberId, Tipo) {
+
+            document.getElementById('inputContasAReceberId').value = ContasAReceberId;
+            document.getElementById('inputPermissionAtualiza').value = Permission;
+
+            if (Tipo == 'novo' || Tipo == 'edita') {
+                document.formContasAReceber.action = "contasAReceberNovoLancamento.php";
+            } else if (Tipo == 'exclui') {
+                if(Permission){
+                    confirmaExclusao(document.formContasAReceber, "Tem certeza que deseja excluir essa Conta?", "contasAReceberExclui.php");
+                } else{
+                    alerta('Permissão Negada!','');
+                    return false;
+                }
+            }            
+
+            document.formContasAReceber.submit();
+        }     
+
     </script>
 
 </head>
@@ -525,10 +505,6 @@ $dataFim = date("Y-m-d");
                                     <input id="cmbProduto_imp" type="hidden" name="cmbProduto_imp"></input>
                                     <input id="cmbServico_imp" type="hidden" name="cmbServico_imp"></input>
                                     <input id="cmbCodigo_imp" type="hidden" name="cmbCodigo_imp"></input>
-                                </form>
-
-                                <form name="contaExclui" action="" method="POST">
-                                    <input type="hidden" name="idContaAReceber" id="idContaAReceber">
                                 </form>
 
                                 <form name="formMovimentacao" method="post" class="p-3">
@@ -709,8 +685,9 @@ $dataFim = date("Y-m-d");
 
                                         <div class="text-right col-lg-11 pt-3">
                                             <div>
-                                                <button id="novoLacamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo
-                                                    Lançamento</button>
+                                            <a href="#" onclick="atualizaContasAReceber(<?php echo $novo; ?>, 0, 'novo');"  
+                                                class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo
+                                                    Lançamento</a>
                                                 <button id="efetuarRecebimento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate" disabled>Efetuar Recebimento</button>
                                                 <button class="btn bg-secondary"><i class="icon-printer2"></i></button>
                                             </div>
@@ -826,6 +803,11 @@ $dataFim = date("Y-m-d");
                     </div>
                 </div>
                 <!--------------------------------------------------------------------------------------------------->
+                <form name="formContasAReceber" method="post">
+					<input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza" value="<?php echo $atualizar; ?>" >
+                    <input type="hidden" id="inputPermissionExclui" name="inputPermissionExclui" value="<?php echo $excluir; ?>" >
+					<input type="hidden" id="inputContasAReceberId" name="inputContasAReceberId" >
+				</form>
             </div>
             <!-- /content area -->
 
