@@ -149,11 +149,14 @@
 					$('#inputArquivo').focus();
 					return false;
 				}
-								
+
+				var extensoes = ['pdf', 'PDF', 'doc', 'DOC', 'docx', 'DOCX', 'odt', 'ODT', 'jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'];
+
 				//Verifica se a extensão é  diferente de PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!
-				if (ext(inputFile) != 'pdf' && ext(inputFile) != 'doc' && ext(inputFile) != 'docx' && ext(inputFile) != 'odt' && ext(inputFile) != 'jpg' && ext(inputFile) != 'jpeg' && ext(inputFile) != 'png'){
+				//if (ext(inputFile) != 'pdf' && ext(inputFile) != 'doc' && ext(inputFile) != 'docx' && ext(inputFile) != 'odt' && ext(inputFile) != 'jpg' && ext(inputFile) != 'jpeg' && ext(inputFile) != 'png'){
+				if (extensoes.indexOf(ext(inputFile)) == -1){
 					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!','error');
-					$("#formDotacaoFields").submit();
+					//$("#formDotacaoFields").submit();
 					$('#inputArquivo').focus();
 					return false;	
 				}

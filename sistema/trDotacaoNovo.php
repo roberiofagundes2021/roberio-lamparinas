@@ -119,7 +119,7 @@
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir Anexo!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage().$e->getLine();
+		echo 'Error: ' . $e->getMessage().$e->getLine();exit;
 	}
 
 	irpara('trDotacao.php');
