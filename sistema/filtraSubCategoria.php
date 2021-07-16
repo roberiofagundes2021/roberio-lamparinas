@@ -55,6 +55,12 @@ if (isset($_GET['idOrcamento'])){
 			JOIN Produto on ProduSubCategoria = SbCatId
 			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and ProduId = ". $_GET['idProduto'];
 
+} else if (isset($_GET['idContrato']) && $_GET['idContrato'] != -1){
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria
+			JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
+			JOIN FluxoOperacional on FlOpeId = FOXSCFluxo
+			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and FlOpeId = ". $_GET['idContrato'];
 } else {
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria

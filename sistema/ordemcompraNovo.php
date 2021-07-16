@@ -14,21 +14,21 @@ $result = $conn->query($sql);
 $rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
 
 $sqlNumero = "SELECT Max(OrComNumero)
-							FROM OrdemCompra";
+			  FROM OrdemCompra";
 $resultNumero = $conn->query($sqlNumero);
 $numero = $resultNumero->fetch(PDO::FETCH_ASSOC);
 
 $sqlFluxo = "SELECT FlOpeId, FlOpeTermoReferencia, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio,
-						FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao, FlOpeValor, FlOpeObservacao,
-						FlOpePrioridade, FlOpeNumAta, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa,
-						FlOpeUnidade, SituaChave, ForneId, ForneRazaoSocial, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular,
-						CategId, CategNome, CategStatus, CategUsuarioAtualizador, CategUnidade
-						FROM FluxoOperacional
-						JOIN Situacao on SituaId = FlOpeStatus
-						JOIN Fornecedor on ForneId = FlOpeFornecedor
-						JOIN Categoria on CategId = FlOpeCategoria
-						WHERE FlOpeUnidade = ".$_SESSION['UnidadeId'].
-						" and UPPER(SituaChave) = 'LIBERADO'";
+			FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao, FlOpeValor, FlOpeObservacao,
+			FlOpePrioridade, FlOpeNumAta, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa,
+			FlOpeUnidade, SituaChave, ForneId, ForneRazaoSocial, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular,
+			CategId, CategNome, CategStatus, CategUsuarioAtualizador, CategUnidade
+			FROM FluxoOperacional
+			JOIN Situacao on SituaId = FlOpeStatus
+			JOIN Fornecedor on ForneId = FlOpeFornecedor
+			JOIN Categoria on CategId = FlOpeCategoria
+			WHERE FlOpeUnidade = ".$_SESSION['UnidadeId'].
+			" and UPPER(SituaChave) = 'LIBERADO'";
 $resultFluxo = $conn->query($sqlFluxo);
 $fluxo = $resultFluxo->fetchAll(PDO::FETCH_ASSOC);
 
@@ -202,7 +202,7 @@ if(isset($_POST['inputData'])){
 						$('#inputNumAta').val(flux.FlOpeNumAta);
 						$('#inputLote').val(flux.FlOpeNumAta);
 
-						$.getJSON('filtraSubCategoria.php?idCategoria='+flux.CategId, function (dados){
+						$.getJSON('filtraSubCategoria.php?idContrato='+id, function (dados){
 					
 							var option = '<option value="">Selecione a SubCategoria</option>';
 							
@@ -391,12 +391,12 @@ if(isset($_POST['inputData'])){
 									<div class="row">
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="contrato">Nº Contrato <span class="text-danger">*</span></label>
-												<select id="cmbContrato" name="contrato" class="form-control form-control-select2" required>
+												<label for="cmbContrato">Nº Contrato <span class="text-danger">*</span></label>
+												<select id="cmbContrato" name="cmbContrato" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php
-														foreach ($fluxo as $key=>$item){
-															print('<option value="'.$key.'">'.$item['FlOpeNumContrato'].'</option>');
+														foreach ($fluxo as $item){
+															print('<option value="'.$item['FlOpeId'].'">'.$item['FlOpeNumContrato'].'</option>');
 														}
 													?>
 												</select>
