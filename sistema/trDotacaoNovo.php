@@ -68,8 +68,8 @@
 			/* Muda o status da TR*/
 			$sql = "
 				SELECT SituaId
-					FROM Situacao	
-				WHERE SituaChave = 'LIBERADO'
+				FROM Situacao
+				WHERE SituaChave = 'LIBERADOCONTABILIDADE'
 			";
 			$result = $conn->query($sql);
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);

@@ -85,7 +85,7 @@
 
 			print('<a href="tr.php" class="dropdown-item"><i class="icon-circle-right2"></i> Acessar TR</a>');
 			
-			if ($item['SituaChaveTR'] == 'LIBERADO'){
+			if ($item['SituaChaveTR'] == 'LIBERADOCONTABILIDADE'){
 				print('<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'finalizarTR\', '.$item['BandeUsuario'].');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Finalizar TR</a>');
 			}			
 

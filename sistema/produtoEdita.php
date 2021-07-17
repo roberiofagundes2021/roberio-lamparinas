@@ -9,12 +9,14 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputProdutoId'])){
 
 	$sql = "SELECT TRXPrTermoReferencia
-	            FROM TermoReferenciaXProduto
-				JOIN Produto on ProduId = TRXPrProduto
-	            JOIN TermoReferencia on TrRefId = TRXPrTermoReferencia
-				JOIN Situacao on Situaid = TrRefStatus
-	            WHERE TRXPrProduto = ".$_POST['inputProdutoId']." and (SituaChave = 'ATIVO' or SituaChave = 'AGUARDANDOLIBERACAO' or SituaChave = 'FINALIZADO')  and TRXPrUnidade = ".$_SESSION['UnidadeId']."
-	            ";
+			FROM TermoReferenciaXProduto
+			JOIN Produto on ProduId = TRXPrProduto
+			JOIN TermoReferencia on TrRefId = TRXPrTermoReferencia
+			JOIN Situacao on Situaid = TrRefStatus
+			WHERE TRXPrProduto = ".$_POST['inputProdutoId']." and 
+			(SituaChave = 'LIBERADOCENTRO' or SituaChave = 'LIBERADOCONTABILIDADE' or SituaChave = 'FASEINTERNAFINALIZADA') 
+			and TRXPrUnidade = ".$_SESSION['UnidadeId']."
+			";
 	$result = $conn->query($sql);
 	$rowTrs = $result->fetchAll(PDO::FETCH_ASSOC);
 	$contTRs = count($rowTrs);

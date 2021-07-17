@@ -12,7 +12,7 @@ $sql = "SELECT TRXSrTermoReferencia
 		JOIN TermoReferencia on TrRefId =TRXSrTermoReferencia
 		JOIN Situacao on Situaid = TrRefStatus
 		WHERE TRXSrServico = " . $_POST['inputSrOrcId'] . " and 
-		(SituaChave = 'LIBERADOPARCIAL' or SituaChave = 'LIBERADO' or SituaChave = 'FASEINTERNAFINALIZADA') and
+		(SituaChave = 'LIBERADOCENTRO' or SituaChave = 'LIBERADOCONTABILIDADE' or SituaChave = 'FASEINTERNAFINALIZADA') and
 		TRXSrUnidade = " . $_SESSION['UnidadeId'];
 $result = $conn->query($sql);
 $rowTrs = $result->fetchAll(PDO::FETCH_ASSOC);

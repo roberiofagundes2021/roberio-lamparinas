@@ -77,7 +77,7 @@ $sql = "SELECT DISTINCT BandeId, BandeIdentificacao, BandeData, BandeDescricao, 
 		JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
 	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " 
-		and SituaChave in ('LIBERADO', 'LIBERADOPARCIAL') 
+		and SituaChave in ('LIBERADO', 'LIBERADOCENTRO', 'LIBERADOCONTABILIDADE') 
 		and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
@@ -90,7 +90,7 @@ $sql = "SELECT COUNT(DISTINCT BandeId) as TotalLiberado
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
 	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
-		and SituaChave  in ('LIBERADO', 'LIBERADOPARCIAL') 
+		and SituaChave  in ('LIBERADO', 'LIBERADOCENTRO', 'LIBERADOCONTABILIDADE') 
 		and (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ")";
 $result = $conn->query($sql);
 $rowTotalLiberado = $result->fetch(PDO::FETCH_ASSOC);
@@ -726,7 +726,7 @@ if ($totalAcoes) {
 					document.formBandeja.submit();
 				} else {
 					if (Tipo === 'liberarCentroAdministrativo') {
-						document.getElementById('inputTermoReferenciaStatus').value = 'LIBERADOPARCIAL'; //Liberado Parcial
+						document.getElementById('inputTermoReferenciaStatus').value = 'LIBERADOCENTRO'; //Liberado Centro
 						document.formBandeja.action = "trMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
@@ -750,7 +750,7 @@ if ($totalAcoes) {
 						});
 						 
 					} else if (Tipo === 'liberar') {
-						document.getElementById('inputTermoReferenciaStatus').value = 'LIBERADO'; //Liberado
+						document.getElementById('inputTermoReferenciaStatus').value = 'LIBERADOCONTABILIDADE'; //Liberado Contabilidade
 						document.formBandeja.action = "trMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();

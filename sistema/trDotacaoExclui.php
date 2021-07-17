@@ -16,8 +16,8 @@ if(isset($_POST['inputDotacaoID'])){
 
 		$sql = "
 			DELETE 
-				FROM DotacaoOrcamentaria
-			 WHERE DtOrcId = :id
+			FROM DotacaoOrcamentaria
+			WHERE DtOrcId = :id
 		";
 		$result = $conn->prepare("$sql");
 		$result->bindParam(':id', $iDotacaoID);
@@ -30,8 +30,8 @@ if(isset($_POST['inputDotacaoID'])){
 		/* Muda o status da TR*/
 		$sql = "
 			SELECT SituaId
-				FROM Situacao	
-			WHERE SituaChave = 'LIBERADOPARCIAL'
+			FROM Situacao	
+			WHERE SituaChave = 'LIBERADOCENTRO'
 		";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
