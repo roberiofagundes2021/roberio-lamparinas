@@ -13,18 +13,35 @@ $PerfilId = $_POST['inputPerfilId'];
 // ao recarregar fica sumindo o valor atribuido à $perfilId;
 
 $sqlModuloPxP = "SELECT ModulId, ModulOrdem, ModulNome, ModulStatus, SituaChave, SituaCor
-FROM modulo join situacao on ModulStatus = SituaId order by ModulOrdem asc";
+				 FROM Modulo 
+				 JOIN Situacao on ModulStatus = SituaId 
+				 ORDER BY ModulOrdem ASC";
 $resultModuloPxP = $conn->query($sqlModuloPxP);
 $moduloPxP = $resultModuloPxP->fetchAll(PDO::FETCH_ASSOC);
 
+//Recupera o parâmetro pra saber se a empresa é pública ou privada
+$sqlParametro = "SELECT ParamEmpresaPublica 
+				 FROM Parametro
+				 WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+$resultParametro = $conn->query($sqlParametro);
+$parametro = $resultParametro->fetch(PDO::FETCH_ASSOC);	
+$empresa = $parametro['ParamEmpresaPublica'] ? 'Publica' : 'Privada';
+
 $sqlMenuPxP = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo,
-MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, 
-PrXPeId, PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, 
-PrXPeUnidade
-FROM menu
-join situacao on MenuStatus = SituaId
-join PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$PerfilId' and PrXPeUnidade = $unidade
-order by MenuOrdem asc";
+				MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, 
+				PrXPeId, PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, 
+				PrXPeUnidade
+				FROM Menu
+				JOIN Situacao on MenuStatus = SituaId
+				JOIN PerfilXPermissao on MenuId = PrXPeMenu 
+				WHERE PrXPePerfil = ".$PerfilId." and PrXPeUnidade = ".$unidade;
+
+if($empresa == 'Publica'){
+	$sqlMenuPxP .=	" and MenuSetorPublico = 1 ";
+} else {
+	$sqlMenuPxP .=	" and MenuSetorPrivado = 1 ";
+}
+$sqlMenuPxP .=	" ORDER BY MenuOrdem asc";
 
 $resultMenuPxP = $conn->query($sqlMenuPxP);
 $menuPxP = $resultMenuPxP->fetchAll(PDO::FETCH_ASSOC);
