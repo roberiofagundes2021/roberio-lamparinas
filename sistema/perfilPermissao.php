@@ -33,13 +33,12 @@ $sqlMenuPxP = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModul
 				PrXPeUnidade
 				FROM Menu
 				JOIN Situacao on MenuStatus = SituaId
-				JOIN PerfilXPermissao on MenuId = PrXPeMenu 
-				WHERE PrXPePerfil = ".$PerfilId." and PrXPeUnidade = ".$unidade;
+				JOIN PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = ".$PerfilId." and PrXPeUnidade = ".$unidade;
 
 if($empresa == 'Publica'){
-	$sqlMenuPxP .=	" and MenuSetorPublico = 1 ";
+	$sqlMenuPxP .=	" WHERE MenuSetorPublico = 1 ";
 } else {
-	$sqlMenuPxP .=	" and MenuSetorPrivado = 1 ";
+	$sqlMenuPxP .=	" WHERE MenuSetorPrivado = 1 ";
 }
 $sqlMenuPxP .=	" ORDER BY MenuOrdem asc";
 
