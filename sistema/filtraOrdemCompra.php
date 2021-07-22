@@ -80,6 +80,5 @@ if ($count) {
         } else {
             print('<option idOrdemCompra="' . $value['OrComId'] . '" value="' . $value['OrComId'] . '">' . $value['OrComNumero'] . '</option>');
         }
-        var_dump($row);
     }
 }

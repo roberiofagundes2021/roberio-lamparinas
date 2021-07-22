@@ -30,7 +30,6 @@ if (isset($_POST['timesTampUsuarioOnline'])) {
             ORDER BY UsuarDataAcesso";
     $result = $conn->query($sql);
     $row = $result->fetchAll(PDO::FETCH_ASSOC);
-    var_dump($row);
 
 
     /**$ultimoAcesso = $_POST['timesTampUsuarioOnline'];
