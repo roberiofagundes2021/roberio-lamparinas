@@ -9,9 +9,11 @@ include('global_assets/php/conexao.php');
 //Se veio do ordemcompra.php
 if(isset($_POST['inputOrdemCompraId'])){
 	$iOrdemCompra = $_POST['inputOrdemCompraId'];
+	$iOrdemCompraFlOpe = $_POST['inputOrdemCompraFlOpeId'];
 	$iCategoria = $_POST['inputOrdemCompraCategoria'];
 } else if (isset($_POST['inputIdOrdemCompra'])){
 	$iOrdemCompra = $_POST['inputIdOrdemCompra'];
+	$iOrdemCompraFlOpe = $_POST['inputOrdemCompraFlOpeId'];
 	$iCategoria = $_POST['inputIdCategoria'];
 } else {
 	irpara("ordemcompra.php");
@@ -130,6 +132,10 @@ try{
 				var inputCategoria = $('#inputIdCategoria').val();
 				var inputSubCategoria = $('#inputIdSubCategoria').val(); //alert(inputSubCategoria);
 				var produtos = $(this).val();
+				<?php 
+					echo "var iFluxoOp = ".json_encode($iOrdemCompraFlOpe)."\n";
+					echo "var iOrdemCompra = ".json_encode($iOrdemCompra)."\n";
+				?>
 				//console.log(produtos);
 				
 				var cont = 1;
@@ -138,7 +144,7 @@ try{
 				var produtoValor = [];
 				
 				// Aqui é para cada "class" faça
-				$.each( $(".idProduto"), function() {			
+				$.each( $(".idProduto"), function() {
 					produtoId[cont] = $(this).val();
 					cont++;
 				});
@@ -147,7 +153,6 @@ try{
 				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
 				$.each( $(".Quantidade"), function() {
 					$id = produtoId[cont];
-					
 					produtoQuant[$id] = $(this).val();
 					cont++;
 				});				
@@ -155,7 +160,6 @@ try{
 				cont = 1;
 				$.each( $(".ValorUnitario"), function() {
 					$id = produtoId[cont];
-					
 					produtoValor[$id] = $(this).val();
 					cont++;
 				});
@@ -163,7 +167,7 @@ try{
 				$.ajax({
 					type: "POST",
 					url: "ordemcompraFiltraProduto.php",
-					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
+					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor, iFluxoOp: iFluxoOp, iOrdemCompra: iOrdemCompra},
 					success: function(resposta){
 						//alert(resposta);
 						$("#tabelaProdutos").html(resposta).show();
@@ -211,6 +215,14 @@ try{
 			
 			$('#inputTotalGeral').val(TotalGeral);			
 		}
+		function validaQuantInputModal(quantMax, obj) {
+			console.log(obj.id)
+				$('#'+obj.id).on('keyup', function() {
+					if (parseInt($('#'+obj.id).val()) > parseInt(quantMax)) {
+						$('#'+obj.id).val(quantMax)
+					}
+				})
+		}
 
 	</script>
 
@@ -241,6 +253,7 @@ try{
 							<h5 class="text-uppercase font-weight-bold">Listar Produtos - <?php echo $row['OrComTipo'] == 'C' ? 'Carta Contrato' : 'Ordem de Compra'; ?>  Nº "<?php echo $row['OrComNumero']; ?>"</h5>
 						</div>				
 						<input type="hidden" id="inputIdOrdemCompra" name="inputIdOrdemCompra" class="form-control" value="<?php echo $row['OrComId']; ?>">
+						<input type="hidden" id="inputOrdemCompraFlOpeId" name="inputOrdemCompraFlOpeId" class="form-control" value="<?php echo $iOrdemCompraFlOpe; ?>">
 						
 						<div class="card-body">		
 								
@@ -293,6 +306,7 @@ try{
 														$sql = "SELECT ProduId, ProduNome
 																FROM Produto
 																JOIN Situacao on SituaId = ProduStatus
+																JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iOrdemCompraFlOpe'
 																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and 
 																ProduCategoria = ".$iCategoria;
 														
@@ -337,53 +351,62 @@ try{
 								</div>
 
 								<div class="card-body">
-									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
+									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher a coluna <code>Quantidade</code> e depois clicar em <b>ALTERAR</b>.</p>
 
 									<!--<div class="hot-container">
 										<div id="example"></div>
 									</div>-->
 									
-									<?php									
-
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario
+									<?php										
+										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario,
+												dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
 												FROM Produto
 												JOIN OrdemCompraXProduto on OCXPrProduto = ProduId
 												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OCXPrOrdemCompra = ".$iOrdemCompra;
+										$sql = $sql." ORDER BY ProduNome";
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
 										
 										if (!$count){
-											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
+											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrValorUnitario,
+													dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
 													FROM Produto
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iOrdemCompraFlOpe'
 													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and ProduStatus = 1 ";
 													
 											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 												$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
 											}
+											$sql = $sql." ORDER BY ProduNome";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-										} 
+										}
 										
 										$cont = 0;
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-8">
-													<div class="row">
-														<div class="col-lg-1">
-															<label for="inputCodigo"><strong>Item</strong></label>
-														</div>
-														<div class="col-lg-11">
-															<label for="inputProduto"><strong>Produto</strong></label>
-														</div>
+											<div class="col-lg-6">
+												<div class="row">
+													<div class="col-lg-2">
+														<label for="inputCodigo"><strong>Item</strong></label>
 													</div>
-												</div>												
+													<div class="col-lg-10">
+														<label for="inputProduto"><strong>Produto</strong></label>
+													</div>
+												</div>
+											</div>
 											<div class="col-lg-1">
 												<div class="form-group">
 													<label for="inputUnidade"><strong>Unidade</strong></label>
+												</div>
+											</div>
+											<div class="col-lg-1">
+												<div class="form-group">
+													<label for="inputSaldo"><strong>Saldo</strong></label>
 												</div>
 											</div>
 											<div class="col-lg-1">
@@ -396,7 +419,7 @@ try{
 													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-1">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -408,24 +431,23 @@ try{
 										$fTotalGeral = 0;
 										
 										foreach ($rowProdutos as $item){
-											
 											$cont++;
-											
+											$saldo = isset($item['SaldoOrdemCompra']) ? $item['SaldoOrdemCompra'] : '';
 											$iQuantidade = isset($item['OCXPrQuantidade']) ? $item['OCXPrQuantidade'] : '';
-											$fValorUnitario = isset($item['OCXPrValorUnitario']) ? mostraValor($item['OCXPrValorUnitario']) : '';											
+											$fValorUnitario = isset($item['FOXPrValorUnitario']) ? mostraValor($item['FOXPrValorUnitario']) : mostraValor($item['OCXPrValorUnitario']);											
 											$fValorTotal = (isset($item['OCXPrQuantidade']) and isset($item['OCXPrValorUnitario'])) ? mostraValor($item['OCXPrQuantidade'] * $item['OCXPrValorUnitario']) : '';
 											
 											$fTotalGeral += (isset($item['OCXPrQuantidade']) and isset($item['OCXPrValorUnitario'])) ? $item['OCXPrQuantidade'] * $item['OCXPrValorUnitario'] : 0;
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
+												<div class="col-lg-6">
 													<div class="row">
-														<div class="col-lg-1">
+														<div class="col-lg-2">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
 															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
 														</div>
-														<div class="col-lg-11">
+														<div class="col-lg-10">
 															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
 														</div>
 													</div>
@@ -434,13 +456,16 @@ try{
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
-												</div>	
+													<input type="text" id="inputSaldo'.$cont.'" readOnly name="Saldo'.$cont.'" class="form-control-border-off" value="'.$saldo.'">
+												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
-												</div>	
+													<input type="text" class="form-control-border Quantidade" id="inputQuantidade'.$cont.'"'.($saldo > 0?'':'readOnly').' name="inputQuantidade'.$cont.'" onkeypress="validaQuantInputModal('.$saldo.',this)" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
+												</div>		
 												<div class="col-lg-1">
-													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>
+													<input readOnly type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border-off ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
+												</div>	
+												<div class="col-lg-2">
+													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off text-right" value="'.$fValorTotal.'" readOnly>
 												</div>											
 											</div>');											
 											
@@ -448,7 +473,7 @@ try{
 										
 										print('
 										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
+												<div class="col-lg-6">
 													<div class="row">
 														<div class="col-lg-1">
 															
@@ -467,11 +492,11 @@ try{
 												<div class="col-lg-1">
 													
 												</div>	
-												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+												<div class="col-lg-2" style="padding-top: 5px; text-align: right;">
 													<h5><b>Total:</b></h5>
 												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
+												<div class="col-lg-2">
+													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="'.mostraValor($fTotalGeral).'" readOnly>
 												</div>											
 											</div>'										
 										);

@@ -21,18 +21,23 @@ if (isset($_POST['servicos']) and $_POST['servicos'] != ''){
 }
 
 //echo $servico; 
-
+$iOrdemCompra = isset($_POST['iOrdemCompra'])?$_POST['iOrdemCompra']:'';
+$iFluxoOp = isset($_POST['iFluxoOp'])?$_POST['iFluxoOp']:'';
 if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != ''){
 
-	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
+	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario,
+			dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
 			FROM Servico
 			JOIN Categoria on CategId = ServiCategoria
+			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxoOp'
 			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiSubCategoria = '". $_POST['idSubCategoria']."' and ServiId in (".$lista.")
 			";
 } else {
-	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
+	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario,
+			dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
 			FROM Servico
 			JOIN Categoria on CategId = ServiCategoria
+			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxoOp'
 			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = '". $_POST['idCategoria']."' and ServiId in (".$lista.")
 			";
 }
@@ -55,38 +60,43 @@ foreach ($row as $item){
 	
 	$id = $item['ServiId'];
 	
-	$quantidade = isset($_POST['servicoQuant'][$id]) ? $_POST['servicoQuant'][$id] : '';
-	$valorUnitario = isset($_POST['servicoValor'][$id]) ? $_POST['servicoValor'][$id] : '';
+	$quantidade = isset($_POST['servicoQuant'][$id]) ? $_POST['servicoQuant'][$id]:'';
+	$valorUnitario = isset($item['FOXSrValorUnitario']) ? $item['FOXSrValorUnitario']:'';
+	$saldo = isset($item['SaldoOrdemCompra']) ? $item['SaldoOrdemCompra']:'';
 	$valorTotal = (isset($_POST['servicoQuant'][$id]) && isset($_POST['servicoValor'][$id])) ? mostraValor((float)$quantidade * (float)$valorUnitario) : '';
 	
 	$fTotalGeral += (isset($_POST['servicoQuant'][$id]) and isset($_POST['servicoValor'][$id])) ? (float)$quantidade * (float)$valorUnitario : 0;
 	
 	$output .= ' <div class="row" style="margin-top: 8px;">
-					<div class="col-lg-9">
-						<div class="row">
-							<div class="col-lg-1">
-								<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-								<input type="hidden" id="inputIdServico'.$cont.'" name="inputIdServico'.$cont.'" value="'.$item['ServiId'].'" class="idServico">
-							</div>
-							<div class="col-lg-11">
-								<input type="text" id="inputServico'.$cont.'" name="inputServico'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ServiDetalhamento'].'" value="'.$item['ServiNome'].'" readOnly>
-							</div>
-						</div>
-					</div>								
-					<div class="col-lg-1">
-						<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$quantidade.'">
-					</div>	
-					<div class="col-lg-1">
-						<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$valorUnitario.'">
-					</div>	
-					<div class="col-lg-1">
-						<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$valorTotal.'" readOnly>
-					</div>
-				</div>';	
+									<div class="col-lg-7">
+										<div class="row">
+											<div class="col-lg-2">
+												<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
+												<input type="hidden" id="inputIdServico'.$cont.'" name="inputIdServico'.$cont.'" value="'.$item['ServiId'].'" class="idServico">
+											</div>
+											<div class="col-lg-10">
+												<input type="text" id="inputServico'.$cont.'" name="inputServico'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ServiDetalhamento'].'" value="'.$item['ServiNome'].'" readOnly>
+											</div>
+										</div>
+									</div>
+									<div class="col-lg-1">
+										<input type="text" id="inputSaldo'.$cont.'" readOnly name="Saldo'.$cont.'" class="form-control-border-off" value="'.$saldo.'">
+									</div>
+									<div class="col-lg-1">
+										<input type="text" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'readOnly').
+										'name="inputQuantidade'.$cont.'" onkeypress="validaQuantInputModal('.$saldo.',this)" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$quantidade.'">
+									</div>	
+									<div class="col-lg-1">
+										<input readOnly type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border-off ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$valorUnitario.'">
+									</div>	
+									<div class="col-lg-2">
+										<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off text-right" value="'.$valorTotal.'" readOnly>
+									</div>											
+								</div>';	
 }
 
 $output .= ' <div class="row" style="margin-top: 8px;">
-				<div class="col-lg-8">
+				<div class="col-lg-7">
 					<div class="row">
 						<div class="col-lg-1">
 							
@@ -108,8 +118,8 @@ $output .= ' <div class="row" style="margin-top: 8px;">
 				<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
 					<h3><b>Total:</b></h3>
 				</div>	
-				<div class="col-lg-1">
-					<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
+				<div class="col-lg-2">
+					<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="'.mostraValor($fTotalGeral).'" readOnly>
 				</div>											
 			</div>';
 

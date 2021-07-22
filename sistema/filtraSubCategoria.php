@@ -61,11 +61,19 @@ if (isset($_GET['idOrcamento'])){
 			JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
 			JOIN FluxoOperacional on FlOpeId = FOXSCFluxo
 			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and FlOpeId = ". $_GET['idContrato'];
-} else {
+} else if (isset($_GET['idFluxo']) && isset($_GET['idCategoria'])){
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria
 			JOIN Situacao on SituaId = SbCatStatus
-			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = ". $_GET['idCategoria']." and SituaChave = 'ATIVO' ";
+			JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId and FOXSCFluxo = '$_GET[idFluxo]'
+			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = ".
+			$_GET['idCategoria']." and SituaChave = 'ATIVO'";
+}else {
+	$sql = "SELECT SbCatId, SbCatNome
+			FROM SubCategoria
+			JOIN Situacao on SituaId = SbCatStatus
+			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatCategoria = ".
+			$_GET['idCategoria']." and SituaChave = 'ATIVO' ";
 }
 
 $result = $conn->query($sql);
