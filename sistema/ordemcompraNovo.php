@@ -71,10 +71,10 @@ if(isset($_POST['inputData'])){
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 		
-		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, 
+		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComFluxoOperacional, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, 
 							OrComConteudo, OrComFornecedor, OrComValorFrete, OrComSolicitante, OrComUnidadeEntrega, OrComLocalEntrega, 
 							OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, OrComSituacao, OrComUsuarioAtualizador, OrComUnidade)
-				VALUES (:sTipo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, 
+				VALUES (:sTipo, :dFluxo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, 
 						:iSolicitante, :iUnidadeEntrega, :iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, 
 						:iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
@@ -84,6 +84,7 @@ if(isset($_POST['inputData'])){
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
+						':dFluxo' => $_POST['inputFluxoOperacional'],
 						':dData' => gravaData($_POST['inputData']),
 						':sNumero' => $_POST['inputNumero'],
 						':sLote' => $_POST['inputLote'],
@@ -164,32 +165,29 @@ if(isset($_POST['inputData'])){
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript" >
 			<?php
+			// essa parte transforma um array php em array js para que possa manipular dentro do JS com mais facilidade
 				$js_fluxo = json_encode($fluxo);
 				$emp = json_encode($empresaType);
-				$num = json_encode($numero[""]+1);
 				echo "const fluxo = ".$js_fluxo." \n";
 				echo "var selectEmpresa = ".$emp." \n";
-				echo "var numero = ".$num." \n";
 			?>
 
 			$(document).ready(function() {
+				// ao selecionar o contrato todos os campos serão preenchidos com os dados do contrato selecionado
 				$('#cmbContrato').on('change', function(e){
 				
 					var cmbContrato = $('#cmbContrato').val();
 
 					if(cmbContrato){
+						// essa parte vai pegar dentro do array fluxo o objeto que possui o FlOpeId igual ao selecionado no select
 						var id = cmbContrato
-						var flux = fluxo[id]
+						var flux = fluxo.find(x => x.FlOpeId === id)
 
 						var valueTag = flux.ForneId+'#'+flux.ForneContato+'#'+flux.ForneEmail+'#'+flux.ForneTelefone+'#'+flux.ForneCelular
-						// var valueTag = 'teste'+'#'+'teste'+'#'+'teste'+'#'+'teste'+'#'+'teste'
 
 						var Forne = valueTag.split('#');
 
-						if(flux.FlOpeTermoReferencia){
-							$('#inputData').val(flux.TrRefData);
-							$('#inputNumero').val(flux.TrRefNumero);
-						}
+						$("#inputFluxoOperacional").val(flux.FlOpeId);
 
 						$('#cmbFornecedor').val(valueTag);
 						$('#cmbFornecedorName').val(flux.ForneRazaoSocial);
@@ -198,7 +196,6 @@ if(isset($_POST['inputData'])){
 
 						$('#cmbCategoriaName').val(flux.CategNome);
 						$('#cmbCategoria').val(flux.CategId);
-						$('#inputNumero').val(numero);
 						$('#inputNumAta').val(flux.FlOpeNumAta);
 						$('#inputLote').val(flux.FlOpeNumAta);
 
@@ -217,9 +214,6 @@ if(isset($_POST['inputData'])){
 								ResetSubCategoria();
 							}					
 						});
-
-						// $('#cmbSubCategoria').val(flux.SbCatId);
-						// $('#cmbSubCategoriaName').val(flux.SbCatNome);
 						
 						$('#inputContato').val(Forne[1]);
 						$('#inputEmailFornecedor').val(Forne[2]);
@@ -248,7 +242,7 @@ if(isset($_POST['inputData'])){
 				var cmbCategoria = $('#cmbCategoria').val();
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
-					
+					// essa parte filtra a categoria pertecente a unidade e que está no contrato/fluxo
 					var option = '<option value="">Selecione a SubCategoria</option>';
 					
 					if (dados.length){						
@@ -275,7 +269,6 @@ if(isset($_POST['inputData'])){
 				if (cmbUnidade == ''){
 					ResetLocalEstoque();
 				} else {
-				
 					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados){
 						
 						var option = '';
@@ -283,7 +276,7 @@ if(isset($_POST['inputData'])){
 						if (dados.length){
 							$.each(dados, function(i, obj){
 								option += '<option value="'+obj.LcEstId+'">' + obj.LcEstNome + '</option>';
-							});						
+							});
 							
 							$('#cmbLocalEstoque').html(option).show();
 						} else {
@@ -292,12 +285,13 @@ if(isset($_POST['inputData'])){
 					});
 				}
 			});			
-			
+			// essa parte é responsavel por pegar o maior nymero registrado na tabela de ordemCompra e adicionar +1 para que fique incremental
 			$("#enviar").on('click', function(e){
-				
-				e.preventDefault();
-			
-				$("#formOrdemCompra").submit();
+				$.getJSON('filtraNumeroOrdemCompra.php', function (numero){
+					$("#inputNumero").val(numero);
+					e.preventDefault();
+					$("#formOrdemCompra").submit();
+				});
 			});
 		}); //document.ready
 		
@@ -361,6 +355,9 @@ if(isset($_POST['inputData'])){
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Ordem de Compra</h5>
 						</div>
+
+						<input type="hidden" id="inputNumero" name="inputNumero">
+						<input type="hidden" id="inputFluxoOperacional" name="inputFluxoOperacional">
 						
 						<div class="card-body">								
 								
@@ -409,13 +406,6 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputNumero">Número <span class="text-danger">*</span></label>
-												<input type="text" id="inputNumero" name="inputNumero" class="form-control" required readOnly>
-											</div>
-										</div>
-										
 										<div class="col-lg-2" id="Ata">
 											<div class="form-group">
 												<label for="inputNumAta">Nº Ata Registro</label>
@@ -423,14 +413,14 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>										
 										
-										<div class="col-lg-2" id="Lote" style="display:none">
+										<div class="col-lg-3" id="Lote" style="display:none">
 											<div class="form-group">
 												<label for="inputLote">Lote</label>
 												<input type="text" id="inputLote" name="inputLote" class="form-control" readOnly>
 											</div>
 										</div>
 										
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputProcesso">Processo</label>
 												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" readOnly>
@@ -443,7 +433,7 @@ if(isset($_POST['inputData'])){
 											<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
 											<br>
 											<div class="row">
-												<div class="col-lg-3">
+												<div class="col-lg-4">
 													<div class="form-group">
 														<label for="inputContato">Fornecedor</label>
 														<input type="text" id="cmbFornecedorName" name="cmbFornecedorName" class="form-control" readOnly>
@@ -485,20 +475,14 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>
 
-										<div class="form-group">
-											<label for="cmbSubCategoriaName">SubCategoria</label>
-											<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
-												<option value="">Selecione</option>
-											</select>
-										</div>
-
-										<!-- <div class="col-lg-6">
+										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbSubCategoria">SubCategoria</label>
-												<input type="text" id="cmbSubCategoriaName" name="cmbSubCategoriaName" class="form-control" readOnly>
-												<input type="hidden" id="cmbSubCategoria" name="cmbSubCategoria">
+												<label for="cmbSubCategoriaName">SubCategoria</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
+												</select>
 											</div>
-										</div> -->
+										</div>
 
 									</div>
 								</div>
@@ -607,18 +591,17 @@ if(isset($_POST['inputData'])){
 									</div>
 								</div>
 							</div>
-
-							<div class="row" style="margin-top: 10px;">
-								<div class="col-lg-12">								
-									<div class="form-group">
-										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-										<a href="ordemcompra.php" class="btn btn-basic" role="button">Cancelar</a>
-									</div>
-								</div>
-							</div>
 						</div>
 						<!-- /card-body -->
 					</form>
+					<div class="row" style="margin-top: 10px; margin-left:10px;">
+						<div class="col-lg-12">								
+							<div class="form-group">
+								<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+								<a href="ordemcompra.php" class="btn btn-basic" role="button">Cancelar</a>
+							</div>
+						</div>
+					</div>
 					
 				</div>
 				<!-- /info blocks -->
