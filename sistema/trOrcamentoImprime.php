@@ -51,7 +51,7 @@ try {
 			WHERE " . $campoPrefix . "Unidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento . "";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
-
+	$html = $sql;
 	// Selects para identificar se o orçamento já possue serviços.
 	$tabelaOrigemServico = $row['TrRefTabelaServico'];
 	$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
@@ -83,7 +83,7 @@ try {
 		'orientation' => 'P'
 	]);  // L - landscape, P - portrait
 
-	$html = "
+	$html .= "
 		<style>
 			th{
 				text-align: center; 
@@ -171,7 +171,7 @@ try {
 
 			if (isset($rowProdutos) && $exibirProduto) {
 
-				$html .= $sql.'
+				$html .= $sql.'XXXXXXX
 				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
 					SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
 				</div>

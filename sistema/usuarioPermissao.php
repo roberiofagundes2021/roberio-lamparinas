@@ -24,30 +24,55 @@ $UxPxP = $resultUserUxP->fetch(PDO::FETCH_ASSOC);
 // ao recarregar fica sumindo o valor atribuido à $perfilId;
 
 $sqlModuloUxP = "SELECT ModulId, ModulOrdem, ModulNome, ModulStatus, SituaChave, SituaCor
-FROM modulo join situacao on ModulStatus = SituaId order by ModulOrdem asc";
+				 FROM Modulo 
+				 JOIN Situacao on ModulStatus = SituaId 
+				 ORDER BY ModulOrdem ASC";
 $resultModuloUxP = $conn->query($sqlModuloUxP);
 $moduloUxP = $resultModuloUxP->fetchAll(PDO::FETCH_ASSOC);
 
+//Recupera o parâmetro pra saber se a empresa é pública ou privada
+$sqlParametro = "SELECT ParamEmpresaPublica 
+				 FROM Parametro
+				 WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+$resultParametro = $conn->query($sqlParametro);
+$parametro = $resultParametro->fetch(PDO::FETCH_ASSOC);	
+$empresa = $parametro['ParamEmpresaPublica'] ? 'Publica' : 'Privada';
+
+
 $sqlMenuUxP = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo,
-MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave,
-UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeUnidade
-FROM menu
-join situacao on MenuStatus = SituaId
-join UsuarioXPermissao on UsXPeUsuario = '$user' and UsXPeUnidade = '$unidade' and UsXPeMenu = MenuId
-order by MenuOrdem asc";
+				MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave,
+				UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeUnidade
+			   	FROM Menu
+               	JOIN Situacao on MenuStatus = SituaId
+               	JOIN UsuarioXPermissao on MenuId = UsXPeMenu  
+				WHERE UsXPeUnidade = ".$unidade." and UsXPeUsuario = ".$user;
+
+if($empresa == 'Publica'){
+	$sqlMenuUxP .=	" and MenuSetorPublico = 1 ";
+} else {
+	$sqlMenuUxP .=	" and MenuSetorPrivado = 1 ";
+}
+$sqlMenuUxP .= " ORDER BY MenuOrdem asc";
 
 $resultMenuUxP = $conn->query($sqlMenuUxP);
 $menuUxP = $resultMenuUxP->fetchAll(PDO::FETCH_ASSOC);
 
 if(!isset($menuUxP[0]['UsXPeVisualizar'])){
 	$sqlMenuUxP = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo,
-	MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, 
-	PrXPeId, PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, 
-	PrXPeUnidade
-	FROM menu
-	join situacao on MenuStatus = SituaId
-	join PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$perfilId[PerfiId]' and PrXPeUnidade = $unidade
-	order by MenuOrdem asc";
+					MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, 
+					PrXPeId, PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, 
+					PrXPeUnidade
+					FROM Menu
+					JOIN Situacao on MenuStatus = SituaId
+					JOIN PerfilXPermissao on MenuId = PrXPeMenu 
+					WHERE PrXPePerfil = '$perfilId[PerfiId]' and PrXPeUnidade = ".$unidade;
+
+	if($empresa == 'Publica'){
+		$sqlMenuUxP .=	" and MenuSetorPublico = 1 ";
+	} else {
+		$sqlMenuUxP .=	" and MenuSetorPrivado = 1 ";
+	}
+	$sqlMenuUxP .= " ORDER BY MenuOrdem asc";
 	
 	$resultMenuUxP = $conn->query($sqlMenuUxP);
 	$menuUxP = $resultMenuUxP->fetchAll(PDO::FETCH_ASSOC);

@@ -11,7 +11,7 @@ if (isset($_GET['idOrcamento'])){
 			JOIN Situacao on SituaId = SbCatStatus
 			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and OrXSCOrcamento = ". $_GET['idOrcamento']." and SituaChave = 'ATIVO' ";
 } else if (isset($_GET['idFornecedor']) && isset($_GET['idTR'])){
-	$sql = "SELECT SbCatId, SbCatNome
+	$sql = "SELECT DISTINCT SbCatId, SbCatNome
 			FROM SubCategoria
 			JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
 			JOIN Situacao on SituaId = SbCatStatus
