@@ -6,18 +6,30 @@ $_SESSION['PaginaAtual'] = 'Editar Ordem de Compra';
 
 include('global_assets/php/conexao.php');
 
+$sqlParametroEmp = "SELECT ParamEmpresaPublica 
+                   FROM Parametro
+                   WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+$resultParametroEmp = $conn->query($sqlParametroEmp);
+$parametroEmp = $resultParametroEmp->fetch(PDO::FETCH_ASSOC);	
+
+$empresaType = $parametroEmp['ParamEmpresaPublica'] ? 'publica' : 'privada';
+
+
 //Se veio da ordemcompra.php
 if (isset($_POST['inputOrdemCompraId'])) {
 
 	$iOrdemCompra = $_POST['inputOrdemCompraId'];
 
 	$sql = "SELECT OrComId, OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, 
-				   OrComSubCategoria, OrComConteudo, OrComFornecedor, ForneContato, ForneEmail, ForneTelefone, ForneCelular, 
+				   OrComSubCategoria, OrComConteudo, OrComFornecedor, ForneRazaoSocial, ForneContato, ForneEmail, ForneTelefone, ForneCelular, 
 				   OrComValorFrete, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
-				   OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, UsuarNome, UsuarEmail, UsuarTelefone
+				   OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, UsuarNome, UsuarEmail, UsuarTelefone,
+					 FlOpeNumContrato, CategNome
 			FROM OrdemCompra
 			JOIN Usuario on UsuarId = OrComSolicitante
 			JOIN Fornecedor on ForneId = OrComFornecedor
+			JOIN Categoria on CategId = OrComCategoria
+			JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
 			WHERE OrComId = $iOrdemCompra ";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -25,10 +37,9 @@ if (isset($_POST['inputOrdemCompraId'])) {
 
 	$sql = "SELECT MovimId
 			FROM Movimentacao
-		    JOIN OrdemCompra on OrComId = MovimOrdemCompra
-	        WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$row['OrComId']." and MovimTipo = 'E'
-        ";
-    $result = $conn->query($sql);
+			JOIN OrdemCompra on OrComId = MovimOrdemCompra
+			WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$row['OrComId']." and MovimTipo = 'E'";
+	$result = $conn->query($sql);
 	$rowM = $result->fetchAll(PDO::FETCH_ASSOC);
 	$movimentacoes = count($rowM);
 
@@ -157,6 +168,10 @@ if (isset($_POST['inputTipo'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+		<?php
+			$emp = json_encode($empresaType);
+			echo "var selectEmpresa = ".$emp." \n";
+		?>
 		window.onload = function () {
 
 			//Ao carregar a página é verificado se é PF ou PJ para aparecer os campos relacionados e esconder o que não estiver
@@ -199,87 +214,92 @@ if (isset($_POST['inputTipo'])) {
 
 			if($('#disabledForm').hasClass('disabledForm')){
 				$('#summernote').summernote('disable');
-				console.log('teste')
 			} else {
 				$('#summernote').summernote();
 			}
 
+			if(selectEmpresa !== 'publica'){
+				$('#selectEmpresa').hide();
+				$('#Ata').hide();
+				$('#Lote').show();
+			}
+
 			//Ao informar o fornecedor, trazer os demais dados dele (contato, e-mail, telefone)
-			$('#cmbFornecedor').on('change', function (e) {
+			// $('#cmbFornecedor').on('change', function (e) {
 
-				var Fornecedor = $('#cmbFornecedor').val();
-				var Forne = Fornecedor.split('#');
+			// 	var Fornecedor = $('#cmbFornecedor').val();
+			// 	var Forne = Fornecedor.split('#');
 
-				$('#inputContato').val(Forne[1]);
-				$('#inputEmailFornecedor').val(Forne[2]);
-				if (Forne[3] != "" && Forne[3] != "(__) ____-____") {
-					$('#inputTelefoneFornecedor').val(Forne[3]);
-				} else {
-					$('#inputTelefoneFornecedor').val(Forne[4]);
-				}
+			// 	$('#inputContato').val(Forne[1]);
+			// 	$('#inputEmailFornecedor').val(Forne[2]);
+			// 	if (Forne[3] != "" && Forne[3] != "(__) ____-____") {
+			// 		$('#inputTelefoneFornecedor').val(Forne[3]);
+			// 	} else {
+			// 		$('#inputTelefoneFornecedor').val(Forne[4]);
+			// 	}
 
-				$.getJSON('filtraCategoria.php?idFornecedor=' + Forne[0], function (dados) {
+			// 	$.getJSON('filtraCategoria.php?idFornecedor=' + Forne[0], function (dados) {
 
-					//var option = '<option value="#">Selecione a Categoria</option>';
-					var option = '';
+			// 		//var option = '<option value="#">Selecione a Categoria</option>';
+			// 		var option = '';
 
-					if (dados.length) {
+			// 		if (dados.length) {
 
-						$.each(dados, function (i, obj) {
-							option += '<option value="' + obj.CategId + '">' + obj.CategNome +
-								'</option>';
-						});
+			// 			$.each(dados, function (i, obj) {
+			// 				option += '<option value="' + obj.CategId + '">' + obj.CategNome +
+			// 					'</option>';
+			// 			});
 
-						$('#cmbCategoria').html(option).show();
-					} else {
-						ResetCategoria();
-					}
-				});
+			// 			$('#cmbCategoria').html(option).show();
+			// 		} else {
+			// 			ResetCategoria();
+			// 		}
+			// 	});
 
-				$.getJSON('filtraSubCategoria.php?idFornecedor=' + Forne[0], function (dados) {
+			// 	$.getJSON('filtraSubCategoria.php?idFornecedor=' + Forne[0], function (dados) {
 
-					var option = '<option value="">Selecione a SubCategoria</option>';
+			// 		var option = '<option value="">Selecione a SubCategoria</option>';
 
-					if (dados.length) {
+			// 		if (dados.length) {
 
-						$.each(dados, function (i, obj) {
-							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome +
-								'</option>';
-						});
+			// 			$.each(dados, function (i, obj) {
+			// 				option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome +
+			// 					'</option>';
+			// 			});
 
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}
-				});
+			// 			$('#cmbSubCategoria').html(option).show();
+			// 		} else {
+			// 			ResetSubCategoria();
+			// 		}
+			// 	});
 
-			});
+			// });
 
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
-			$('#cmbCategoria').on('change', function (e) {
+			// $('#cmbCategoria').on('change', function (e) {
 
-				Filtrando();
+			// 	Filtrando();
 
-				var cmbCategoria = $('#cmbCategoria').val();
+			// 	var cmbCategoria = $('#cmbCategoria').val();
 
-				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function (dados) {
+			// 	$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function (dados) {
 
-					var option = '<option value="">Selecione a SubCategoria</option>';
+			// 		var option = '<option value="">Selecione a SubCategoria</option>';
 
-					if (dados.length) {
+			// 		if (dados.length) {
 
-						$.each(dados, function (i, obj) {
-							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome +
-								'</option>';
-						});
+			// 			$.each(dados, function (i, obj) {
+			// 				option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome +
+			// 					'</option>';
+			// 			});
 
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}
-				});
+			// 			$('#cmbSubCategoria').html(option).show();
+			// 		} else {
+			// 			ResetSubCategoria();
+			// 		}
+			// 	});
 
-			});
+			// });
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbUnidade').on('change', function (e) {
@@ -452,40 +472,46 @@ if (isset($_POST['inputTipo'])) {
 
 							<div class="row">
 								<div class="col-lg-12">
-									<div class="row">
-
-										<div class="col-lg-4">
-											<div class="form-group">
-												<div class="form-check form-check-inline">
-													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="C" name="inputTipo"
-															class="form-input-styled" data-fouc
-															onclick="selecionaTipo('C')"
-															<?php if ($row['OrComTipo'] == 'C') echo "checked"; ?>
-															<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
-														Carta Contrato
-													</label>
-												</div>
-												<div class="form-check form-check-inline">
-													<label class="form-check-label">
-														<input type="radio" id="inputTipo" value="O" name="inputTipo"
-															class="form-input-styled" data-fouc
-															onclick="selecionaTipo('O')"
-															<?php if ($row['OrComTipo'] == 'O') echo "checked"; ?>
-															<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
-														Ordem de Compra
-													</label>
-												</div>
+									<div id="selectEmpresa" class="col-lg-4">
+										<div class="form-group">
+											<div class="form-check form-check-inline">
+												<label class="form-check-label">
+													<input type="radio" id="inputTipo" value="C" name="inputTipo"
+														class="form-input-styled" data-fouc
+														onclick="selecionaTipo('C')"
+														<?php if ($row['OrComTipo'] == 'C') echo "checked"; ?>
+														<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
+													Carta Contrato
+												</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<label class="form-check-label">
+													<input type="radio" id="inputTipo" value="O" name="inputTipo"
+														class="form-input-styled" data-fouc
+														onclick="selecionaTipo('O')"
+														<?php if ($row['OrComTipo'] == 'O') echo "checked"; ?>
+														<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
+													Ordem de Compra
+												</label>
 											</div>
 										</div>
-
+									</div>
+									<div class="row">
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbContrato">Contrato<span
+														class="text-danger">*</span></label>
+												<input type="text" id="cmbContrato" name="cmbContrato" class="form-control"
+													value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly
+													required>
+											</div>
+										</div>
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputData">Data da Emissão <span
 														class="text-danger">*</span></label>
 												<input type="text" id="inputData" name="inputData" class="form-control"
-													value="<?php echo mostraData($row['OrComDtEmissao']); ?>" readOnly
-													required>
+													value="<?php echo mostraData($row['OrComDtEmissao']); ?>" readOnly>
 											</div>
 										</div>
 
@@ -494,8 +520,8 @@ if (isset($_POST['inputTipo'])) {
 												<label for="inputNumero">Número <span
 														class="text-danger">*</span></label>
 												<input type="text" id="inputNumero" name="inputNumero"
-													class="form-control" value="<?php echo $row['OrComNumero']; ?>"
-													<?php $movimentacoes >= 1 ? print('readonly') : '' ?> required>
+													class="form-control" readOnly value="<?php echo $row['OrComNumero']; ?>"
+													<?php $movimentacoes >= 1 ? print('readonly') : '' ?> >
 											</div>
 										</div>
 
@@ -536,33 +562,10 @@ if (isset($_POST['inputTipo'])) {
 											<div class="row">
 												<div class="col-lg-4">
 													<div class="form-group">
-														<label for="cmbFornecedor">Fornecedor <span
-																class="text-danger">*</span></label>
-														<?php 
-														   if($movimentacoes >= 1){
-															   print('<input type="hidden" name="cmbFornecedor" value="'.$row['OrComFornecedor'].'" />');
-														   }
-														?>
-														<select id="cmbFornecedor" name="cmbFornecedor"
-															class="form-control form-control-select2" required
-															<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
-															<option value="">Selecione</option>
-															<?php
-															$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-																	FROM Fornecedor
-																	JOIN Situacao on SituaId = ForneStatus													     
-																	WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																	ORDER BY ForneNome ASC";
-															$result = $conn->query($sql);
-															$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-
-															foreach ($rowFornecedor as $item) {
-																$seleciona = $item['ForneId'] == $row['OrComFornecedor'] ? "selected" : "";
-																print('<option value="' . $item['ForneId'] . '#' . $item['ForneContato'] . '#' . $item['ForneEmail'] . '#' . $item['ForneTelefone'] . '#' . $item['ForneCelular'] . '" ' . $seleciona . '>' . $item['ForneNome'] . '</option>');
-															}
-
-															?>
-														</select>
+														<label for="cmbFornecedorName">Fornecedor <span class="text-danger">*</span></label>
+														<input type="text" id="cmbFornecedorName" name="cmbFornecedorName" readOnly class="form-control"
+																	value="<?php echo $row['ForneRazaoSocial']; ?>"/>
+														<input type="hidden" id="cmbFornecedor" name="cmbFornecedor" value="<?php echo $row['OrComFornecedor']; ?>"/>
 													</div>
 												</div>
 
@@ -606,28 +609,13 @@ if (isset($_POST['inputTipo'])) {
 												       print('<input type="hidden" name="cmbCategoria" value="'.$row['OrComCategoria'].'" />');
 												    }
 												?>
-												<label for="cmbCategoria">Categoria <span
+												<label for="cmbCategoriaName">Categoria <span
 														class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria"
-													class="form-control form-control-select2" required
-													<?php $movimentacoes >= 1 ? print('disabled') : '' ?>>
-													<option value="">Selecione</option>
-													<?php
-													$sql = "SELECT CategId, CategNome
-															FROM Categoria
-															JOIN Situacao on SituaId = CategStatus
-															WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															ORDER BY CategNome ASC";
-													$result = $conn->query($sql);
-													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowCategoria as $item) {
-														$seleciona = $item['CategId'] == $row['OrComCategoria'] ? "selected" : "";
-														print('<option value="' . $item['CategId'] . '" ' . $seleciona . '>' . $item['CategNome'] . '</option>');
-													}
-
-													?>
-												</select>
+												<input type="text" id="cmbCategoriaName"
+														name="cmbCategoriaName" class="form-control"
+														value="<?php echo $row['CategNome']; ?>" readOnly>
+												<input type="hidden" id="cmbCategoria"
+														name="cmbCategoria" value="<?php echo $row['OrComCategoria']; ?>">
 											</div>
 										</div>
 

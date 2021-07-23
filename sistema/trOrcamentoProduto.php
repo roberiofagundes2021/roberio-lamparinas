@@ -286,20 +286,20 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 									<?php
 
 									// Selects para identificar quais produtos de TermoReferenciaXProduto pertencem a TR deste Orçamento e a qual tabela eles pertencem
-									$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, UnMedNome
+									$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, UnMedNome, UnMedSigla
 											FROM ProdutoOrcamento
 											JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
-											LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+											JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
 											JOIN SubCategoria on SbCatId = PrOrcSubCategoria
 											WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'
 											ORDER BY SbCatNome, PrOrcNome ASC";
 									$result = $conn->query($sql);
 									$rowProdutosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
-									$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrQuantidade, UnMedNome
+									$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrQuantidade, UnMedNome, UnMedSigla
 											FROM Produto
 											JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
-											LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+											JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 											JOIN SubCategoria on SbCatId = ProduSubCategoria
 											WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'
 											ORDER BY SbCatNome, ProduNome ASC";
@@ -352,7 +352,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 										$sql = "SELECT *
 											    FROM TRXOrcamentoXProduto 
 												JOIN ProdutoOrcamento on PrOrcId = TXOXPProduto
-												LEFT JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
+												JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
 												JOIN SubCategoria on SbCatId = PrOrcSubCategoria
 											    WHERE TXOXPUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento."
 												ORDER BY SbCatNome, PrOrcNome ASC";
@@ -388,7 +388,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 													        </div>
 												        </div>								
 												        <div class="col-lg-1">
-													        <input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
+													        <input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
 												        </div>
 												        <div class="col-lg-1">
 													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" readOnly value="' . $iQuantidade . '">
@@ -427,7 +427,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 													        </div>
 												        </div>								
 												        <div class="col-lg-1">
-													        <input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['PrOrcUnidadeMedida'] . '" readOnly>
+													        <input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
 												        </div>
 												        <div class="col-lg-1">
 													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" readOnly value="' . $iQuantidade . '">
@@ -446,7 +446,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 										$sql = "SELECT *
 											    FROM TRXOrcamentoXProduto 
 												JOIN Produto on ProduId = TXOXPProduto
-												LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 												JOIN SubCategoria on SbCatId = ProduSubCategoria
 											    WHERE TXOXPUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento."
 												ORDER BY SbCatNome, ProduNome ASC";
@@ -480,7 +480,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 													        </div>
 												        </div>								
 												        <div class="col-lg-1">
-													        <input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
+													        <input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
 												        </div>
 												        <div class="col-lg-1">
 													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" readOnly value="' . $iQuantidade . '">
@@ -519,7 +519,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 													        </div>
 												        </div>								
 												        <div class="col-lg-1">
-													        <input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
+													        <input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
 												        </div>
 												        <div class="col-lg-1">
 													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" value="' . $iQuantidade . '" readOnly>

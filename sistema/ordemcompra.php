@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Ordem de Compra';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT OrComId, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
+$sql = "SELECT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
 		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor, BandeMotivo
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
@@ -134,9 +134,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaOrdemCompra(Permission, OrComId, OrComNumero, OrComCategoria, CategNome, OrComSituacao, OrComSituacaoChave, OrComTipo, Tipo, Motivo){
+		function atualizaOrdemCompra(Permission, OrComFlOpeId, OrComId, OrComNumero, OrComCategoria, CategNome, OrComSituacao, OrComSituacaoChave, OrComTipo, Tipo, Motivo){
 		
 			document.getElementById('inputPermission').value = Permission;
+			document.getElementById('inputOrdemCompraFlOpeId').value = OrComFlOpeId;
 			document.getElementById('inputOrdemCompraId').value = OrComId;
 			document.getElementById('inputOrdemCompraNumero').value = OrComNumero;
 			document.getElementById('inputOrdemCompraCategoria').value = OrComCategoria;
@@ -301,26 +302,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaOrdemCompra('.$atualizar.','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'edita\', \'\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Ordem de Compra"></i></a>
-														<a href="#" onclick="atualizaOrdemCompra('.$excluir.','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin" title="Excluir Ordem de Compra"></i></a>
-														<div class="dropdown">													
+														<a href="#" onclick="atualizaOrdemCompra('.$atualizar.','.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'edita\', \'\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Ordem de Compra"></i></a>
+														<a href="#" onclick="atualizaOrdemCompra('.$excluir.','.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin" title="Excluir Ordem de Compra"></i></a>
+														<div class="dropdown">
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>
+																<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>
 																<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>');
+																<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>');
 
 										if (isset($item['BandeMotivo'])){
 
 											print('
 																<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
+																<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
 										}
-
 										print('				</div>
 														</div>
 													</div>
@@ -342,6 +342,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<form name="formOrdemCompra" method="post">
 				<input type="hidden" id="inputPermission" name="inputPermission" >
+					<input type="hidden" id="inputOrdemCompraFlOpeId" name="inputOrdemCompraFlOpeId" >
 					<input type="hidden" id="inputOrdemCompraId" name="inputOrdemCompraId" >
 					<input type="hidden" id="inputOrdemCompraNumero" name="inputOrdemCompraNumero" >
 					<input type="hidden" id="inputOrdemCompraCategoria" name="inputOrdemCompraCategoria" >
