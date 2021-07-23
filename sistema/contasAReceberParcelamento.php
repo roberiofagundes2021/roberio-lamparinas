@@ -7,9 +7,9 @@ if (isset($_POST['numParcelas'])) {
 
     $sql = "SELECT * 
             FROM ContasAReceber
-       LEFT JOIN Cleinte 
+             LEFT JOIN Cliente 
               ON ClienId = CnAReCliente
-           WHERE CnAReId = " . $_POST['idConta'] . " and CnAReUnidade = " . $_SESSION['UnidadeId'] . "
+           WHERE CnAReId = ".$_POST['idConta']." and CnAReUnidade = " . $_SESSION['UnidadeId'] . "
     ";
     $result = $conn->query($sql);
     $conta = $result->fetch(PDO::FETCH_ASSOC);
@@ -31,7 +31,7 @@ if (isset($_POST['numParcelas'])) {
         $sql = "INSERT INTO ContasAReceber ( CnARePlanoContas, 
                                              CnAReCliente, 
                                              CnAReContaBanco, 
-                                             CnAReFormaRecebimento, 
+                                             CnAReFormaPagamento, 
                                              CnAReNumDocumento,
                                              CnAReDtEmissao, 
                                              CnAReDescricao, 
@@ -65,7 +65,7 @@ if (isset($_POST['numParcelas'])) {
             ':iPlanoContas'         => $conta['CnARePlanoContas'],
             ':iCliente'             => $conta['CnAReCliente'],
             ':iContaBanco'          => $conta['CnAReContaBanco'],
-            ':iFormaRecebimento'    => $conta['CnAReFormaRecebimento'],
+            ':iFormaRecebimento'    => $conta['CnAReFormaPagamento'],
             ':sNumDocumento'        => $conta['CnAReNumDocumento'],
             ':dateDtEmissao'        => $conta['CnAReDtEmissao'],
             ':sDescricao'           => $parcelas[$i]['descricao'],
