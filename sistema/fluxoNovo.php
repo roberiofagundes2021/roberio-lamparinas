@@ -57,8 +57,7 @@ if (isset($_POST['inputDataInicio'])) {
 			
 		$insertId = $conn->lastInsertId();	
 		
-		if ($_POST['cmbSubCategoria']){
-			
+		if (isset($_POST['cmbSubCategoria']) && $_POST['cmbSubCategoria'] != ''){			
 			
 			$sql = "INSERT INTO FluxoOperacionalXSubCategoria 
 						(FOXSCFluxo, FOXSCSubCategoria, FOXSCUnidade)

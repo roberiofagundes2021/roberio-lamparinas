@@ -140,7 +140,6 @@ if ((array_key_exists('ContRecPeriodoDe', $_SESSION)
 		|| array_key_exists('ContRecFormaPagamento', $_SESSION))
 	&& !in_array(basename($_SERVER['PHP_SELF']), $arquivosContasAReceber)
 ) {
-
 	unset($_SESSION['ContRecPeriodoDe']);
 	unset($_SESSION['ContRecAte']);
 	unset($_SESSION['ContRecCliente']);

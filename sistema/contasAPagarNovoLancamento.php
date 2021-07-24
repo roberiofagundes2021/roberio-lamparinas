@@ -338,7 +338,7 @@ $dataInicio = date("Y-m-d");
                 }
             });            
 
-            function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade) {
+            function gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade) {
                 $("#parcelasContainer").html("")
                 let descricao = $("#inputDescricao").val()
 
@@ -402,7 +402,7 @@ $dataInicio = date("Y-m-d");
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
 
-                    geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade)
+                    gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade)
                 })
             }
             parcelamento()

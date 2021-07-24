@@ -260,7 +260,7 @@ $dataFim = date("Y-m-d");
                 $('body').css('overflow', 'scroll');
             })
             /////////////////////////////////////////////////////////////////
-            function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
+            function gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
                 $("#parcelasContainer").html("")
 
                 let valorParcela = float2moeda(valorTotal / parcelas)
@@ -322,7 +322,7 @@ $dataFim = date("Y-m-d");
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
                     let descricao = $("#inputDescricao").val()
-                    geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
+                    gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
                 })
             }
             parcelamento()

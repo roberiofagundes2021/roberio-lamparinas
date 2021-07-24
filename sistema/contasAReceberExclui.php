@@ -11,7 +11,7 @@ if (isset($_POST['inputContasAReceberId'])) {
 	try {
 
 		$sql = "DELETE FROM ContasAReceber
-								  WHERE CnAReId = :id";
+				WHERE CnAReId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $id);
 		$result->execute();
