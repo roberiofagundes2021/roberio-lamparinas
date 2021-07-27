@@ -76,7 +76,7 @@ try {
 			FROM FluxoOperacional
 			JOIN Fornecedor on ForneId = FlOpeFornecedor
 			JOIN Categoria on CategId = FlOpeCategoria
-			JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
+			LEFT JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
 			JOIN Situacao on SituaId = FlOpeStatus
 			LEFT JOIN TermoReferencia on TrRefId = FlOpeTermoReferencia
 			WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
@@ -104,13 +104,13 @@ try {
 	$result = $conn->query($sql);
 	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
 
-	$sSubCategorias = '';
+	$sSubCategorias = 0;
 	$sSubCategoriasNome = '';
 
 	foreach ($rowBD as $item){
 
-		if ($sSubCategorias == ''){
-			$sSubCategorias .= $item['SbCatId'];
+		if ($sSubCategorias == 0){
+			$sSubCategorias = $item['SbCatId'];
 			$sSubCategoriasNome .= $item['SbCatNome'];
 		} else {
 			$sSubCategorias .= ", ".$item['SbCatId'];
@@ -425,8 +425,15 @@ try {
                                         <div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputSubCategoriaNome">SubCategoria(s)</label>
-												<select id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
-													<?php 
+												
+												<?php 
+													if ($sSubCategorias == 0){
+														echo '<input id="inputSemSubCategoriaNome" name="inputSemSubCategoriaNome" class="form-control" value="" readOnly >';
+													} else{
+
+														echo '<select id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control multiselect-filtering" multiple="multiple" data-fouc>';
+		
+
 														$sql = "SELECT SbCatId, SbCatNome
 																FROM SubCategoria
 																JOIN Situacao on SituaId = SbCatStatus	
@@ -438,9 +445,13 @@ try {
 																
 														foreach ( $rowBD as $item){	
 															print('<option value="'.$item['SbCatId,'].'"disabled selected>'.$item['SbCatNome'].'</option>');	
-														}                    
-													?>
-												</select>
+														} 
+														
+														echo '</select>';
+													}  
+
+												?>
+												
 											</div>
 										</div>
 
@@ -486,9 +497,9 @@ try {
 															$sql = "SELECT ServiId, ServiNome
 																	FROM Servico
 																	JOIN Situacao on SituaId = ServiStatus
-																	JOIN SubCategoria on SbCatId = ServiSubCategoria
+																	LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 																	WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria;
-															if ($sSubCategorias != "") {
+															if ($sSubCategorias != 0) {
 																$sql .= " and ServiSubCategoria in (".$sSubCategorias.")";
 															}
 															$sql .=	" ORDER BY SbCatNome ASC";
@@ -539,7 +550,7 @@ try {
 											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
 													FROM Servico
 													JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-													JOIN SubCategoria on SbCatId = ServiSubCategoria
+													LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
 													ORDER BY SbCatNome, ServiNome ASC";
 											$result = $conn->query($sql);
@@ -550,7 +561,7 @@ try {
 												$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento
 														FROM Servico
 														JOIN Situacao on SituaId = ServiStatus
-														JOIN SubCategoria on SbCatId = ServiSubCategoria
+														LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 														WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
 														ServiSubCategoria in (" .$sSubCategorias. ") and SituaChave = 'ATIVO' 
 														ORDER BY SbCatNome, ServiNome ASC";
@@ -565,7 +576,7 @@ try {
 													FROM Servico
 													JOIN ServicoOrcamento on SrOrcServico = ServiId
 													JOIN FluxoOperacionalXServico on FOXSrServico = ServiId 
-													JOIN SubCategoria on SbCatId = ServiSubCategoria
+													LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
 													and FOXSrFluxoOperacional = " . $iFluxoOperacional."
 													ORDER BY SbCatNome, ServiNome ASC";
@@ -578,7 +589,7 @@ try {
 												if ($row['TrRefTabelaServico'] == 'Servico'){
 													$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento as Detalhamento, SbCatNome
 															FROM Servico
-															JOIN SubCategoria on SbCatId = ServiSubCategoria
+															LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = ServiId
 															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia']."
 															ORDER BY SbCatNome, ServiNome ASC";
@@ -586,7 +597,7 @@ try {
 													$sql = "SELECT Distinct ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, SbCatNome
 															FROM Servico
 															JOIN ServicoOrcamento on SrOrcServico = ServiId
-															JOIN SubCategoria on SbCatId = ServiSubCategoria
+															LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia']."
 															ORDER BY SbCatNome, ServiNome ASC";

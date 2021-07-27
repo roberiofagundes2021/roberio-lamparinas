@@ -78,7 +78,7 @@ try{
 			FROM FluxoOperacional
 			JOIN Fornecedor on ForneId = FlOpeFornecedor
 			JOIN Categoria on CategId = FlOpeCategoria
-			JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
+			LEFT JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
 			JOIN Situacao on SituaId = FlOpeStatus
 			LEFT JOIN TermoReferencia on TrRefId = FlOpeTermoReferencia
 			WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ".$iFluxoOperacional;
@@ -106,13 +106,13 @@ try{
 	$result = $conn->query($sql);
 	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
 
-	$sSubCategorias = '';
+	$sSubCategorias = 0;
 	$sSubCategoriasNome = '';
 
 	foreach ($rowBD as $item){
 
-		if ($sSubCategorias == ''){
-			$sSubCategorias .= $item['SbCatId'];
+		if ($sSubCategorias == 0){
+			$sSubCategorias = $item['SbCatId'];
 			$sSubCategoriasNome .= $item['SbCatNome'];
 		} else {
 			$sSubCategorias .= ", ".$item['SbCatId'];
@@ -422,8 +422,14 @@ try{
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputSubCategoriaNome">SubCategoria(s)</label>
-												<select id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
-													<?php 
+
+												<?php 
+													if ($sSubCategorias == 0){
+														echo '<input id="inputSemSubCategoriaNome" name="inputSemSubCategoriaNome" class="form-control" value="" readOnly >';
+													} else{
+
+														echo '<select id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control multiselect-filtering" multiple="multiple" data-fouc>';
+															
 														$sql = "SELECT SbCatId, SbCatNome
 																FROM SubCategoria
 																JOIN Situacao on SituaId = SbCatStatus	
@@ -436,8 +442,11 @@ try{
 														foreach ( $rowBD as $item){	
 															print('<option value="'.$item['SbCatId,'].'"disabled selected>'.$item['SbCatNome'].'</option>');	
 														}                    
-													?>
-												</select>
+														
+														echo '</select>';
+													}  
+												?>
+												
 											</div>
 										</div>
 										<div class="col-lg-1 fluxoContrato">
@@ -482,9 +491,9 @@ try{
 															$sql = "SELECT ProduId, ProduNome
 																	FROM Produto
 																	JOIN Situacao on SituaId = ProduStatus
-																	JOIN SubCategoria on SbCatId = ProduSubCategoria
+																	LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 																	WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
-															if ($sSubCategorias != "") {
+															if ($sSubCategorias != 0) {
 																$sql .= " and ProduSubCategoria in (".$sSubCategorias.")";
 															}
 															$sql .=	" ORDER BY SbCatNome ASC";
@@ -506,7 +515,7 @@ try{
 														</select>
 													</div>
 												</div>
-											</div>');
+											</div>'); //echo $sql;die;
 										}										
 									?>
 								</div>
@@ -541,20 +550,20 @@ try{
 													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													LEFT JOIN Marca on MarcaId = ProduMarca
-													JOIN SubCategoria on SbCatId = ProduSubCategoria
+													LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
 													ORDER BY SbCatNome, ProduNome ASC";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 											$countProduto = count($rowProdutos);
-											
+
 											if (!$countProduto){
 												$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, MarcaNome
 														FROM Produto
 														JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 														JOIN Situacao on SituaId = ProduStatus
 														LEFT JOIN Marca on MarcaId = ProduMarca
-														JOIN SubCategoria on SbCatId = ProduSubCategoria
+														LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 														WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and 
 														ProduSubCategoria in (".$sSubCategorias.") and SituaChave = 'ATIVO' 
 														ORDER BY SbCatNome, ProduNome ASC";
@@ -572,7 +581,7 @@ try{
 													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId 
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													LEFT JOIN Marca on MarcaId = ProduMarca
-													JOIN SubCategoria on SbCatId = ProduSubCategoria
+													LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 													WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
 													and FOXPrFluxoOperacional = " . $iFluxoOperacional."
 													ORDER BY SbCatNome, ProduNome ASC";
@@ -588,7 +597,7 @@ try{
 															JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 															LEFT JOIN Marca on MarcaId = ProduMarca
-															JOIN SubCategoria on SbCatId = ProduSubCategoria
+															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
 															ORDER BY SbCatNome, ProduNome ASC";													
 												} else { //Se $row['TrRefTabelaProduto'] == ProdutoOrcamento
@@ -598,7 +607,7 @@ try{
 															JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 															LEFT JOIN Marca on MarcaId = ProduMarca
-															JOIN SubCategoria on SbCatId = ProduSubCategoria
+															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
 															ORDER BY SbCatNome, ProduNome ASC";
 												}

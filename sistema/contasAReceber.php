@@ -169,8 +169,7 @@ $dataFim = date("Y-m-d");
                 $('.btnParcelar').each((i, elem) => {
                     $(elem).on('click', function() {
 
-                        let recebimentos = $("#RecebimentoAgrupadoContainer").children()
-
+                        //let recebimentos = $("#RecebimentoAgrupadoContainer").children()
 
                         let linha = $(elem).parent().parent().parent().parent().parent()
                             .parent()
@@ -241,12 +240,13 @@ $dataFim = date("Y-m-d");
                     url,
                     data,
                     (data) => {
-                        $('tbody').append(data)
+                        //$('tbody').append(data)
                         alerta('Atenção', 'Parcelas geradas com sucesso!')
-                        modalParcelas()
-                        $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
-                        RecebimentoAgrupado()
-                        atualizaTotal()
+                        location.href = "contasAReceber.php";
+                       // modalParcelas()
+                      //  $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
+                        //RecebimentoAgrupado()
+                      //  atualizaTotal()                        
                     }
                 )
 
@@ -258,7 +258,7 @@ $dataFim = date("Y-m-d");
                 $('body').css('overflow', 'scroll');
             })
             /////////////////////////////////////////////////////////////////
-            function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
+            function gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
                 $("#parcelasContainer").html("")
 
                 let valorParcela = float2moeda(valorTotal / parcelas)
@@ -320,7 +320,7 @@ $dataFim = date("Y-m-d");
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
                     let descricao = $("#inputDescricao").val()
-                    geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
+                    gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
                 })
             }
             parcelamento()
@@ -516,7 +516,7 @@ $dataFim = date("Y-m-d");
                                                     <span class="input-group-prepend">
                                                         <span class="input-group-text"><i class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" value="<?php if (isset($_SESSION['ContPagPeriodoDe'])) echo $_SESSION['ContPagPeriodoDe'];
+                                                    <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" value="<?php if (isset($_SESSION['ContRecPeriodoDe'])) echo $_SESSION['ContRecPeriodoDe'];
                                                                                                                                                 else echo $dataInicio; ?>">
                                                 </div>
                                             </div>
@@ -529,7 +529,7 @@ $dataFim = date("Y-m-d");
                                                     <span class="input-group-prepend">
                                                         <span class="input-group-text"><i class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php if (isset($_SESSION['ContPagAte'])) echo $_SESSION['ContPagAte'];
+                                                    <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php if (isset($_SESSION['ContRecAte'])) echo $_SESSION['ContRecAte'];
                                                                                                                                     else echo $dataFim; ?>">
                                                 </div>
                                             </div>
@@ -591,8 +591,8 @@ $dataFim = date("Y-m-d");
                                                     $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                     foreach ($rowPlanoContas as $item) {
-                                                        if (isset($_SESSION['ContPagPlanoContas'])) {
-                                                            if ($item['PlConId'] == $_SESSION['ContPagPlanoContas']) {
+                                                        if (isset($_SESSION['ContRecPlanoContas'])) {
+                                                            if ($item['PlConId'] == $_SESSION['ContRecPlanoContas']) {
                                                                 print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                                             } else {
                                                                 print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
@@ -623,8 +623,8 @@ $dataFim = date("Y-m-d");
                                                         try {
                                                             foreach ($rowSituacao as $item) {
                                                                 if ($item['SituaChave'] == 'ARECEBER' || $item['SituaChave'] == 'RECEBIDA') {
-                                                                    if (isset($_SESSION['ContPagStatus'])) {
-                                                                        if ($item['SituaId'] == $_SESSION['ContPagStatus']) {
+                                                                    if (isset($_SESSION['ContRecStatus'])) {
+                                                                        if ($item['SituaId'] == $_SESSION['ContRecStatus']) {
                                                                             print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
                                                                         } else {
                                                                             print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');

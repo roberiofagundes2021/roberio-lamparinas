@@ -51,7 +51,7 @@ try {
 			WHERE " . $campoPrefix . "Unidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento . "";
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetch(PDO::FETCH_ASSOC);
-	$html = $sql;
+
 	// Selects para identificar se o orçamento já possue serviços.
 	$tabelaOrigemServico = $row['TrRefTabelaServico'];
 	$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
@@ -83,7 +83,7 @@ try {
 		'orientation' => 'P'
 	]);  // L - landscape, P - portrait
 
-	$html .= "
+	$html = "
 		<style>
 			th{
 				text-align: center; 
@@ -160,18 +160,18 @@ try {
 			        ".$campoPrefix."Detalhamento as Detalhamento, UnMedSigla, TXOXPQuantidade, TXOXPValorUnitario
 					FROM ".$tabelaOrigemProduto."
 					JOIN TRXOrcamentoXProduto on TXOXPProduto = ".$campoPrefix."Id
-                    JOIN TRXOrcamento on TrXOrId = TXOXPOrcamento
-                    JOIN TRXOrcamentoXSubcategoria on TXOXSCOrcamento = TXOXPOrcamento
 					JOIN UnidadeMedida on UnMedId = ".$campoPrefix."UnidadeMedida
 					JOIN SubCategoria on SbCatId = ".$campoPrefix."SubCategoria
                     WHERE ".$campoPrefix."Unidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento."
+					AND ".$campoPrefix."SubCategoria = " . $sbcat['TXOXSCSubcategoria']."
 					ORDER BY SbCatNome, ".$campoPrefix."Nome ASC";
 			$result = $conn->query($sql);
 			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+			$count = count($rowProdutos);
 
-			if (isset($rowProdutos) && $exibirProduto) {
+			if (isset($rowProdutos) && $count && $exibirProduto) {
 
-				$html .= $sql.'XXXXXXX
+				$html .= '
 				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
 					SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
 				</div>
@@ -205,7 +205,7 @@ try {
                             
                             <tr>
 					            <td style='text-align: center;'>" . $cont . "</td>
-					            <td style='text-align: left;'>" . $itemProduto['Nome'] . "</td>
+					            <td style='text-align: left;'>" . $itemProduto['Nome'] . ", " . $itemProduto['Detalhamento'] . "</td>
 					            <td style='text-align: center;'>" . $itemProduto['UnMedSigla'] . "</td>					
 					            <td style='text-align: center;'>" . $itemProduto['TXOXPQuantidade'] . "</td>
 					            <td style='text-align: right;'>" . $valorUnitario . "</td>
@@ -297,7 +297,7 @@ try {
                             
                             <tr>
 					            <td style='text-align: center;'>" . $cont . "</td>
-					            <td style='text-align: left;'>" . $itemProduto['Nome'] . "</td>
+					            <td style='text-align: left;'>" . $itemProduto['Nome'] . ", " . $itemProduto['Detalhamento'] . "</td>
 					            <td style='text-align: center;'>" . $itemProduto['UnMedSigla'] . "</td>					
 					            <td style='text-align: center;'>" . $itemProduto['TRXPrQuantidade'] . "</td>
 								<td style='text-align: center;'></td>
@@ -348,6 +348,7 @@ try {
 			$campoPrefix =  $row['TrRefTabelaServico'] == 'Servico' ? 'Servi' : 'SrOrc';
 
 			$sql = "SELECT ".$campoPrefix."Id as Id, ".$campoPrefix."Nome as Nome, ".$campoPrefix."Categoria as Categoria, 
+					" . $campoPrefix . "Detalhamento as Detalhamento,
 					".$campoPrefix."SubCategoria as SubCategoria, TXOXSQuantidade, TXOXSValorUnitario
 				  	FROM ".$tabelaOrigemServico."
 					JOIN TRXOrcamentoXServico ON TXOXSServico = ".$campoPrefix."Id
@@ -395,7 +396,7 @@ try {
 						$html .= "
     						<tr>
     							<td style='text-align: center;'>" . $cont . "</td>
-    							<td style='text-align: left;'>" . $itemServico['Nome'] . "</td>
+    							<td style='text-align: left;'>" . $itemServico['Nome'] . ", " . $itemServico['Detalhamento'] . "</td>
                                 <td style='text-align: center;'>" . $itemServico['TXOXSQuantidade'] . "</td>
                                 <td style='text-align: right;'>" . $valorUnitario . "</td>
 					            <td style='text-align: right;'>" . $valorTotal . "</td>
@@ -445,6 +446,7 @@ try {
 
 			$sql = "SELECT DISTINCT ".$campoPrefix ."Id as Id, 
 							 ".$campoPrefix ."Nome as Nome, 
+							 ". $campoPrefix . "Detalhamento as Detalhamento,
 							 ".$campoPrefix ."Categoria as Categoria, 
 							 ".$campoPrefix ."SubCategoria as SubCategoria, 
 							 TRXSrQuantidade
@@ -490,7 +492,7 @@ try {
 						$html .= "
 						<tr>
 						    <td style='text-align: center;'>" . $cont . "</td>
-						    <td style='text-align: left;'>" . $itemServico['Nome'] . "</td>
+						    <td style='text-align: left;'>" . $itemServico['Nome'] . ", " . $itemServico['Detalhamento'] . "</td>
 						    <td style='text-align: center;'>" . $itemServico['TRXSrQuantidade'] . "</td>
 						    <td style='text-align: right;'></td>
 						    <td style='text-align: right;'></td>

@@ -309,7 +309,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 
 								<?php
 									
-									$sql = "SELECT ProduId as Id, ProduNome as Nome, '' as Detalhamento, --ProduDetalhamento as Detalhamento, 
+									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
 											UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Produto
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
@@ -318,7 +318,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 											JOIN SubCategoria on SbCatId = ProduSubCategoria
 											WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
 											UNION
-											SELECT ServiId as Id, ServiNome as Nome, '' as Detalhamento, --ServiDetalhamento as Detalhamento, 
+											SELECT ServiId as Id, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
 											'' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Servico
 											JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
@@ -418,7 +418,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 
 								<?php
 									
-									$sql = "SELECT ProduId as Id, ProduNome as Nome, '' as Detalhamento, --ProduDetalhamento as Detalhamento, 
+									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
 											UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Produto
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
@@ -427,7 +427,7 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 											JOIN SubCategoria on SbCatId = ProduSubCategoria
 											WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional."											
 											UNION
-											SELECT ServiId as Id, ServiNome as Nome, '' as Detalhamento, --ServiDetalhamento as Detalhamento, 
+											SELECT ServiId as Id, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
 											'' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Servico
 											JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
