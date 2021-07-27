@@ -181,7 +181,7 @@ try{
 			//Enviar para aprovação do Centro Administrativo (via Bandeja)
 			$('#enviar').on('click', function(e){
 				
-				e.preventDefault();		
+				e.preventDefault();
 				
 				confirmaExclusao(document.formOrdemCompraProduto, "Essa ação enviará toda a Ordem de Compra (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "ordemcompraEnviar.php");
 			});			
@@ -251,11 +251,11 @@ try{
 					<form name="formOrdemCompraProduto" id="formOrdemCompraProduto" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Listar Produtos - <?php echo $row['OrComTipo'] == 'C' ? 'Carta Contrato' : 'Ordem de Compra'; ?>  Nº "<?php echo $row['OrComNumero']; ?>"</h5>
-						</div>				
+						</div>
 						<input type="hidden" id="inputIdOrdemCompra" name="inputIdOrdemCompra" class="form-control" value="<?php echo $row['OrComId']; ?>">
 						<input type="hidden" id="inputOrdemCompraFlOpeId" name="inputOrdemCompraFlOpeId" class="form-control" value="<?php echo $iOrdemCompraFlOpe; ?>">
 						
-						<div class="card-body">		
+						<div class="card-body">
 								
 							<div class="row">				
 								<div class="col-lg-12">
@@ -302,23 +302,18 @@ try{
 											<div class="form-group">
 												<label for="cmbProduto">Produto</label>
 												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
-													<?php 
+													<?php
 														$sql = "SELECT ProduId, ProduNome
 																FROM Produto
 																JOIN Situacao on SituaId = ProduStatus
 																JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iOrdemCompraFlOpe'
-																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and 
-																ProduCategoria = ".$iCategoria;
-														
-														if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
-															$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
-														}
+																WHERE ProduUnidade = $_SESSION[UnidadeId] and SituaChave = 'ATIVO'";
 														
 														$sql .= " ORDER BY ProduNome ASC";
 														$result = $conn->query($sql);
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 														
-														foreach ($rowProduto as $item){	
+														foreach ($rowProduto as $item){
 															
 															if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
 																$seleciona = "selected";
@@ -357,34 +352,31 @@ try{
 										<div id="example"></div>
 									</div>-->
 									
-									<?php										
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario,
-												dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
-												FROM Produto
-												JOIN OrdemCompraXProduto on OCXPrProduto = ProduId
-												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OCXPrOrdemCompra = ".$iOrdemCompra;
+									<?php
+										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, FOXPrValorUnitario,
+													dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
+													FROM Produto
+													JOIN Situacao on SituaId = ProduStatus
+													JOIN OrdemCompraXProduto on OCXPrProduto = ProduId and OCXPrOrdemCompra = '$iOrdemCompra'
+													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iOrdemCompraFlOpe'
+													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
 										$sql = $sql." ORDER BY ProduNome";
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
-										
-										if (!$count){
+										if(!$count>0){
 											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrValorUnitario,
-													dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
-													FROM Produto
-													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iOrdemCompraFlOpe'
-													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and ProduStatus = 1 ";
-													
-											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
-												$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
-											}
+															dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
+															FROM Produto
+															JOIN Situacao on SituaId = ProduStatus
+															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+															JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iOrdemCompraFlOpe'
+															WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
 											$sql = $sql." ORDER BY ProduNome";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										}
-										
 										$cont = 0;
 										
 										print('

@@ -23,31 +23,29 @@ if (isset($_POST['servicos']) and $_POST['servicos'] != ''){
 //echo $servico; 
 $iOrdemCompra = isset($_POST['iOrdemCompra'])?$_POST['iOrdemCompra']:'';
 $iFluxoOp = isset($_POST['iFluxoOp'])?$_POST['iFluxoOp']:'';
-if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != ''){
 
-	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario,
-			dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
-			FROM Servico
-			JOIN Categoria on CategId = ServiCategoria
-			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxoOp'
-			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiSubCategoria = '". $_POST['idSubCategoria']."' and ServiId in (".$lista.")
-			";
-} else {
-	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario,
-			dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
-			FROM Servico
-			JOIN Categoria on CategId = ServiCategoria
-			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxoOp'
-			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = '". $_POST['idCategoria']."' and ServiId in (".$lista.")
-			";
-}
-
-//echo $sql;
-
+$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario, OCXSrQuantidade,
+				dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
+				FROM Servico
+				JOIN Categoria on CategId = ServiCategoria
+				JOIN OrdemCompraXServico on OCXSrServico = ServiId and OCXSrOrdemCompra = '$iOrdemCompra'
+				JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxoOp'
+				WHERE ServiUnidade = $_SESSION[UnidadeId] and ServiId in (".$lista.")";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
-//echo json_encode($sql);
+$count = count($row);
+
+if(!$count>0){
+	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario,
+					dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
+					FROM Servico
+					JOIN Categoria on CategId = ServiCategoria
+					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxoOp'
+					WHERE ServiUnidade = $_SESSION[UnidadeId] and ServiId in (".$lista.")";
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+	$count = count($row);
+}
 
 $output = '';
 
@@ -60,8 +58,8 @@ foreach ($row as $item){
 	
 	$id = $item['ServiId'];
 	
-	$quantidade = isset($_POST['servicoQuant'][$id]) ? $_POST['servicoQuant'][$id]:'';
 	$valorUnitario = isset($item['FOXSrValorUnitario']) ? $item['FOXSrValorUnitario']:'';
+	$quantidade = isset($item['OCXSrQuantidade']) ? $item['OCXSrQuantidade']:'';
 	$saldo = isset($item['SaldoOrdemCompra']) ? $item['SaldoOrdemCompra']:'';
 	$valorTotal = (isset($_POST['servicoQuant'][$id]) && isset($_POST['servicoValor'][$id])) ? mostraValor((float)$quantidade * (float)$valorUnitario) : '';
 	

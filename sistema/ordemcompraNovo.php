@@ -203,7 +203,9 @@ if(isset($_POST['inputData'])){
 					
 							var option = '<option value="">Selecione a SubCategoria</option>';
 							
-							if (dados.length){						
+							if (dados.length){
+								$("#cmbSubCategoria").prop('required',true);
+								$("#cmbSubCategoriaName").last().html("SubCategoria <span class='text-danger'>*</span>");
 								
 								$.each(dados, function(i, obj){
 									option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
@@ -477,7 +479,7 @@ if(isset($_POST['inputData'])){
 
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="cmbSubCategoriaName">SubCategoria</label>
+												<label id="cmbSubCategoriaName" for="cmbSubCategoriaName">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 												</select>

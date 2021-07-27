@@ -24,23 +24,28 @@ if (isset($_POST['produtos']) and $_POST['produtos'] != ''){
 $iOrdemCompra = isset($_POST['iOrdemCompra'])?$_POST['iOrdemCompra']:'';
 $iFluxoOp = isset($_POST['iFluxoOp'])?$_POST['iFluxoOp']:'';
 
-if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != ''){
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrValorUnitario,
+$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, FOXPrValorUnitario,
 			dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
 			FROM Produto
-			JOIN Categoria on CategId = ProduCategoria
+			JOIN Situacao on SituaId = ProduStatus
+			JOIN OrdemCompraXProduto on OCXPrProduto = ProduId and OCXPrOrdemCompra = '$iOrdemCompra'
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 			JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxoOp'
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduSubCategoria = '". $_POST['idSubCategoria']."' and ProduId in (".$lista.")
-			";
-} else {
+			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduId in (".$lista.")";
+$sql = $sql." ORDER BY ProduNome";
+$result = $conn->query($sql);
+$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$count = count($rowProdutos);
+
+if(!$count>0){
 	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrValorUnitario,
-			dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
-			FROM Produto
-			JOIN Categoria on CategId = ProduCategoria
-			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxoOp'
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = '". $_POST['idCategoria']."' and ProduId in (".$lista.")";
+					dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
+	FROM Produto
+	JOIN Categoria on CategId = ProduCategoria
+	JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+	JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxoOp'
+	WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduId in (".$lista.")";
 }
 
 //echo $sql;
@@ -61,8 +66,8 @@ foreach ($row as $item){
 	
 	$id = $item['ProduId'];
 	$saldo = isset($item['SaldoOrdemCompra']) ? $item['SaldoOrdemCompra'] : '';
+	$quantidade = isset($item['OCXPrQuantidade']) ? $item['OCXPrQuantidade'] : '';
 	// $valorUnitario = isset($item['produtoValor']) ? $_POST['produtoValor'][$id] : '';]
-	$quantidade = (isset($_POST['produtoQuant'][$id]) ? $_POST['produtoQuant'][$id] : '');
 	$valorUnitario = isset($item['FOXPrValorUnitario']) ? mostraValor($item['FOXPrValorUnitario']) : '';
 	// $valorTotal = (isset($_POST['produtoQuant'][$id]) && isset($_POST['produtoValor'][$id])) ? mostraValor((float)$quantidade * (float)$valorUnitario) : '';
 	

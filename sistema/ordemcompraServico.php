@@ -362,32 +362,29 @@ try{
 									
 									<?php
 
-										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OCXSrQuantidade, OCXSrValorUnitario,
+										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario, OCXSrQuantidade,
 														dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
 														FROM Servico
-														JOIN OrdemCompraXServico on OCXSrServico = ServiId
-														WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and OCXSrOrdemCompra = ".$iOrdemCompra;
+														JOIN Situacao on SituaId = ServiStatus
+														JOIN OrdemCompraXServico on OCXSrServico = ServiId and OCXSrOrdemCompra = '$iOrdemCompra'
+														JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iOrdemCompraFlOpe'
+														WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
 										$sql = $sql." ORDER BY ServiNome";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowServicos);
-										
-										if (!$count){
+
+										if(!$count>0){
 											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario,
-															dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
-															FROM Servico
-															JOIN Situacao on SituaId = ServiStatus
-															JOIN OrdemCompraXServico on OCXSrServico = ServiId
-															JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iOrdemCompraFlOpe'
-															WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria." and 
-															SituaChave = 'ATIVO'";
-													
-											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
-												$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
-											}
+														dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
+														FROM Servico
+														JOIN Situacao on SituaId = ServiStatus
+														JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iOrdemCompraFlOpe'
+														WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
 											$sql = $sql." ORDER BY ServiNome";
 											$result = $conn->query($sql);
 											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+											$count = count($rowServicos);
 										}
 										
 										$cont = 0;
