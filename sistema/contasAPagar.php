@@ -241,9 +241,10 @@ $dataFim = date("Y-m-d");
                     url,
                     data,
                     (data) => {
-                        $('tbody').append(data)
+                       // $('tbody').append(data)
                         alerta('Atenção', 'Parcelas geradas com sucesso!')
-                        modalParcelas()
+                        location.href = "contasAPagar.php";
+                         modalParcelas()
                         //editarLancamento()
                         //excluirConta()
                         $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))

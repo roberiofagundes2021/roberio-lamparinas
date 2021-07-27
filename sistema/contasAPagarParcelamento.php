@@ -54,7 +54,13 @@ if(isset($_POST['numParcelas'])){
                 ':iUnidade' => $_SESSION['UnidadeId']
         ));
 
-        $parcelaId = $conn->lastInsertId();
+        $sql = "DELETE FROM ContasAPagar
+				WHERE CnAPaId = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $_POST['idConta']);
+		$result->execute();    
+
+    /*    $parcelaId = $conn->lastInsertId();
 
         $status = 'À Pagar';
 
@@ -130,7 +136,7 @@ if(isset($_POST['numParcelas'])){
         //         </div>
         //     </td>
         // </tr>
-        // ");
+        // ");*/
     }
 }
 
