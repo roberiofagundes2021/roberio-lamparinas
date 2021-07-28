@@ -17,7 +17,7 @@ if (isset($_GET['idOrcamento'])){
 			JOIN Situacao on SituaId = SbCatStatus
 			JOIN TRXSubcategoria on TRXSCSubcategoria = FrXSCSubCategoria
 			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and FrXSCFornecedor = ". $_GET['idFornecedor']." and 
-			SituaChave = 'ATIVO' and SbCatId not in (Select FOXSCSubCategoria From FluxoOperacional
+			SituaChave = 'ATIVO' and TRXSCTermoReferencia = ".$_GET['idTR']." and SbCatId not in (Select FOXSCSubCategoria From FluxoOperacional
 			JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
 			where FlOpeTermoReferencia = ".$_GET['idTR'].") ";
 
