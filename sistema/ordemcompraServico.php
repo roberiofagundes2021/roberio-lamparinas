@@ -38,13 +38,13 @@ if(isset($_POST['inputIdOrdemCompra'])){
 		$result = $conn->prepare($sql);
 		
 		$result->execute(array(
-						':iOrdemCompra' => $iOrdemCompra,
-						':iServico' => $_POST['inputIdServico'.$i],
-						':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-						':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iUnidade' => $_SESSION['UnidadeId']
-						));
+			':iOrdemCompra' => $iOrdemCompra,
+			':iServico' => $_POST['inputIdServico'.$i],
+			':iQuantidade' => $_POST['inputQuantidade'.$i] == ''? null : $_POST['inputQuantidade'.$i],
+			':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+			':iUnidade' => $_SESSION['UnidadeId']
+		));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Ordem de Compra alterado!!!";
@@ -455,8 +455,7 @@ try{
 													<input type="text" id="inputSaldo'.$cont.'" readOnly name="Saldo'.$cont.'" class="form-control-border-off text-right" value="'.$saldo.'">
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'readOnly').
-													'name="inputQuantidade'.$cont.'" onkeypress="validaQuantInputModal('.$saldo.',this)" class="form-control-border Quantidade text-right" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'readOnly').' name="inputQuantidade'.$cont.'" onkeypress="validaQuantInputModal('.$saldo.',this)" class="form-control-border Quantidade text-right" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
 												</div>	
 												<div class="col-lg-1">
 													<input readOnly type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border-off ValorUnitario text-right" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">

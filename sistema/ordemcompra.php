@@ -9,15 +9,16 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
 		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor, BandeMotivo,
 		(SELECT COUNT(FOXPrProduto) FROM FluxoOperacionalXProduto WHERE FOXPrFluxoOperacional = OrComFluxoOperacional) as produtoCount,
-		(SELECT count(FOXSrServico) FROM FluxoOperacionalXServico WHERE FOXSrFluxoOperacional = OrComFluxoOperacional) as servicoCount
+		(SELECT COUNT(FOXSrServico) FROM FluxoOperacionalXServico WHERE FOXSrFluxoOperacional = OrComFluxoOperacional) as servicoCount,
+		(SELECT COUNT(OCXPrProduto) FROM OrdemCompraXProduto WHERE OCXPrOrdemCompra = OrComId and OCXPrQuantidade <> '' and OCXPrQuantidade <> 0 and OCXPrValorUnitario <> 0.00) as produtoQuant,
+		(SELECT COUNT(OCXSrServico) FROM OrdemCompraXServico WHERE OCXSrOrdemCompra = OrComId and OCXSrQuantidade <> '' and OCXSrQuantidade <> 0 and OCXSrValorUnitario <> 0.00) as servicoQuant
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
 		JOIN Categoria on CategId = OrComCategoria
 		LEFT JOIN SubCategoria on SbCatId = OrComSubCategoria
 		JOIN Situacao on SituaId = OrComSituacao
-		LEFT JOIN Bandeja on BandeTabelaId = OrComId and BandeTabela = 'OrdemCompra' and BandeUnidade = " . $_SESSION['UnidadeId'] . "
-	    WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ."
-		ORDER BY OrComDtEmissao DESC";
+		LEFT JOIN Bandeja on BandeTabelaId = OrComId and BandeTabela = 'OrdemCompra' and BandeUnidade = ".$_SESSION['UnidadeId'].
+		" WHERE OrComUnidade = ".$_SESSION['UnidadeId']." ORDER BY OrComDtEmissao DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -133,6 +134,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 			/* Fim: Tabela Personalizada */		
 		});
+		function submitForm(id){
+			var id = "form-"+id
+			var form = document.getElementById(id)
+			confirmaExclusao(form, "Essa ação enviará toda a Ordem de Compra (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "ordemcompraEnviar.php");
+		}
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaOrdemCompra(Permission, OrComFlOpeId, OrComId, OrComNumero, OrComCategoria, CategNome, OrComSituacao, OrComSituacaoChave, OrComTipo, Tipo, Motivo){
@@ -280,8 +286,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								</thead>
 								<tbody>
 								<?php
-									foreach ($row as $item){
-										
+									foreach ($row as $item){										
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
@@ -311,8 +316,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">'.
-															($item['produtoCount']>0?'<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>':'').
-																($item['servicoCount']>0?'<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>':'')
+																($item['produtoCount']>0?'<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>':'').
+																($item['servicoCount']>0?'<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>':'').
+																'<form id="form-'.$item['OrComId'].'" method="POST" action="ordemcompraEnviar.php">
+																		<input type="hidden" name="inputIdOrdemCompra" value="'.$item['OrComId'].'">'.
+																		(($item['produtoQuant']>0 || $item['servicoQuant']>0)?'<div onClick="submitForm('.$item['OrComId'].')" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i></i>Enviar para Aprovação</div>':'').
+																	'</form>'
 																.'<div class="dropdown-divider"></div>
 																<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>');
 

@@ -184,7 +184,7 @@ try{
 				e.preventDefault();
 				
 				confirmaExclusao(document.formOrdemCompraProduto, "Essa ação enviará toda a Ordem de Compra (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "ordemcompraEnviar.php");
-			});			
+			});
 						
 		}); //document.ready
 		
@@ -257,7 +257,7 @@ try{
 						
 						<div class="card-body">
 								
-							<div class="row">				
+							<div class="row">
 								<div class="col-lg-12">
 									<div class="row">
 										<div class="col-lg-6">
@@ -451,7 +451,7 @@ try{
 													<input type="text" id="inputSaldo'.$cont.'" readOnly name="Saldo'.$cont.'" class="form-control-border-off text-right" value="'.$saldo.'">
 												</div>
 												<div class="col-lg-1">
-													<input type="text" class="form-control-border Quantidade text-right" id="inputQuantidade'.$cont.'"'.($saldo > 0?'':'readOnly').' name="inputQuantidade'.$cont.'" onkeypress="validaQuantInputModal('.$saldo.',this)" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
+													<input type="text" class="form-control-border Quantidade text-right" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'readOnly').' name="inputQuantidade'.$cont.'" onkeypress="validaQuantInputModal('.$saldo.',this)" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
 												</div>		
 												<div class="col-lg-1">
 													<input readOnly type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border-off ValorUnitario text-right" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
