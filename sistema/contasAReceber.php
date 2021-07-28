@@ -529,8 +529,7 @@ $dataFim = date("Y-m-d");
                                                     <span class="input-group-prepend">
                                                         <span class="input-group-text"><i class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php if (isset($_SESSION['ContRecAte'])) echo $_SESSION['ContRecAte'];
-                                                                                                                                    else echo $dataFim; ?>">
+                                                    <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php if (isset($_SESSION['ContRecAte'])) echo $_SESSION['ContRecAte'];                                                                            else echo $dataFim; ?>">
                                                 </div>
                                             </div>
                                         </div>
@@ -538,7 +537,7 @@ $dataFim = date("Y-m-d");
                                         <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label for="cmbNumDoc">Número Doc.</label>
-                                                <input id="cmbNumDoc" name="cmbNumDoc" class="form-control">
+                                                <input id="cmbNumDoc" name="cmbNumDoc" class="form-control" value="<?php if (isset($_SESSION['ContRecNumDoc'])) echo $_SESSION['ContRecNumDoc']; ?>">
                                             </div>
                                         </div>
 
@@ -547,30 +546,39 @@ $dataFim = date("Y-m-d");
                                             <div class="form-group">
                                                 <label for="cmbClientes">Clientes</label>
                                                 <select id="cmbClientes" name="cmbClientes" class="form-control form-control-select2">
+                                                    <option value="">Todos</option>
                                                     <?php
-                                                    $sql = "SELECT *
-                                                            FROM  Cliente
-                                                            JOIN  Empresa 
-                                                            ON    ClienUnidade = EmpreId
-                                                            WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . " and EmpreStatus = 1
-                                                            ORDER BY ClienNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                        try {
+                                                            $sql = "SELECT *
+                                                                    FROM  Cliente
+                                                                    JOIN  Empresa ON ClienUnidade = EmpreId
+                                                                    WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . " and EmpreStatus = 1
+                                                                    ORDER BY ClienNome ASC";
+                                                            $result = $conn->query($sql);
+                                                            $rowCliente = $result->fetchAll(PDO::FETCH_ASSOC);
 
+                                                            try {
 
-                                                    try {
-                                                        print('<option value= 0  selected>Todos</option>');
-
-                                                        foreach ($rowSituacao as $item) {
-                                                            if (isset($item['ClienId'])) {
-                                                                print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
-                                                                echo ($item['ClienId']);
+                                                                foreach ($rowCliente as $item) {
+                                                                    if (isset($item['ClienId'])) {
+                                                                        if (isset($_SESSION['ContRecCliente'])) {
+                                                                            if ($item['ClienId'] == $_SESSION['ContRecCliente']) {
+                                                                                print('<option value="' . $item['ClienId'] . '" selected>' . $item['ClienNome'] . '</option>');
+                                                                            } else {
+                                                                                print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
+                                                                            }
+                                                                        } else {
+                                                                            print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
+                                                                        }
+                                                                    }
+                                                                }
+                                                            } catch (Exception $e) {
+                                                                echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                             }
+                                                        } catch (Exception $e) {
+                                                            echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                         }
-                                                    } catch (Exception $e) {
-                                                        echo 'Exceção capturada: ',  $e->getMessage(), "\n";
-                                                    }
-                                                    ?>
+                                                   ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -649,27 +657,38 @@ $dataFim = date("Y-m-d");
                                             <div class="form-group">
                                                 <label for="cmbFormaDeRecebimento">Forma de Recebimento</label>
                                                 <select id="cmbFormaDeRecebimento" name="cmbFormaDeRecebimento" class="form-control form-control-select2">
+                                                    <option value="">Todos</option>
                                                     <?php
-                                                    $sql = "SELECT *
-                                                            FROM FormaPagamento
-                                                            JOIN Situacao on SituaId = FrPagStatus
-                                                            WHERE FrPagUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
-                                                            ORDER BY FrPagNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                        try {
+                                                            $sql = "SELECT FrPagId, FrPagNome
+                                                                    FROM FormaPagamento
+                                                                    JOIN Situacao on SituaId = FrPagStatus
+                                                                    WHERE FrPagUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+                                                                    ORDER BY FrPagNome ASC";
+                                                            $result = $conn->query($sql);
+                                                            $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    try {
-                                                        print('<option value=0  selected>Todos</option>');
+                                                            try {
 
-                                                        foreach ($rowSituacao as $item) {
-                                                            if (isset($item['FrPagId'])) {
-                                                                print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
-                                                                echo ($item['FrPagId']);
+                                                                foreach ($rowFormaPagamento as $item) {
+                                                                    if (isset($item['FrPagId'])) {
+                                                                        if (isset($_SESSION['ContRecFormaPagamento'])) {
+                                                                            if ($item['FrPagId'] == $_SESSION['ContRecFormaPagamento']) {
+                                                                                print('<option value="' . $item['FrPagId'] . '" selected>' . $item['FrPagNome'] . '</option>');
+                                                                            } else {
+                                                                                print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                                            }
+                                                                        } else {
+                                                                            print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                                        }
+                                                                    }
+                                                                }
+                                                            } catch (Exception $e) {
+                                                                echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                             }
-                                                        }
-                                                    } catch (Exception $e) {
-                                                        echo 'Exceção capturada: ',  $e->getMessage(), "\n";
-                                                    }
+                                                        } catch (Exception $e) {
+                                                            echo 'Exceção capturada: ',  $e->getMessage(), "\n";
+                                                        }   
                                                     ?>
                                                 </select>
                                             </div>

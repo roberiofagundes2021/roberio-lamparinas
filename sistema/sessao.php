@@ -133,7 +133,7 @@ $arquivosContasAReceber = array(
 
 if ((array_key_exists('ContRecPeriodoDe', $_SESSION)
 		|| array_key_exists('ContRecAte', $_SESSION)
-		|| array_key_exists('ContRecClientes', $_SESSION)
+		|| array_key_exists('ContRecCliente', $_SESSION)
 		|| array_key_exists('ContRecPlanoContas', $_SESSION)
 		|| array_key_exists('ContRecStatus', $_SESSION)
 		|| array_key_exists('ContRecNumDoc', $_SESSION)

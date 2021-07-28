@@ -34,7 +34,7 @@ include('global_assets/php/conexao.php');
 
         if (!empty($_POST['cmbClientes'])) {
             $args[]  = "CnAReCliente = " . $_POST['cmbClientes'] . " ";
-            $_SESSION['ContRecFornecedor'] = $_POST['cmbClientes'];
+            $_SESSION['ContRecCliente'] = $_POST['cmbClientes'];
         }
 
         if (!empty($_POST['cmbPlanoContas'])) {
@@ -76,7 +76,7 @@ include('global_assets/php/conexao.php');
 
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
         }
-    } else if (isset($_SESSION['ContRecPeriodoDe']) ||  isset($_SESSION['ContRecAte']) || isset($_SESSION['ContRecClientes']) || isset($_SESSION['ContRecPlanoContas']) || isset($_SESSION['ContRecStatus'])) {
+    } else if (isset($_SESSION['ContRecPeriodoDe']) ||  isset($_SESSION['ContRecAte']) || isset($_SESSION['ContRecCliente']) || isset($_SESSION['ContRecPlanoContas']) || isset($_SESSION['ContRecStatus'])) {
 
         $cont = 0;
         $args = [];
@@ -88,8 +88,8 @@ include('global_assets/php/conexao.php');
             $args[]  = "CnAReDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
         }
 
-        if (!empty($_SESSION['ContRecClientes'])) {
-            $args[]  = "CnAReCliente = " . $_SESSION['ContRecClientes'] . " ";
+        if (!empty($_SESSION['ContRecCliente'])) {
+            $args[]  = "CnAReCliente = " . $_SESSION['ContRecCliente'] . " ";
         }
 
         if (!empty($_SESSION['ContRecPlanoContas'])) {
