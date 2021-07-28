@@ -179,12 +179,12 @@ try{
 			});
 
 			//Enviar para aprovação do Centro Administrativo (via Bandeja)
-			$('#enviar').on('click', function(e){
+			// $('#enviar').on('click', function(e){
 				
-				e.preventDefault();
+			// 	e.preventDefault();
 				
-				confirmaExclusao(document.formOrdemCompraProduto, "Essa ação enviará toda a Ordem de Compra (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "ordemcompraEnviar.php");
-			});
+			// 	confirmaExclusao(document.formOrdemCompraProduto, "Essa ação enviará toda a Ordem de Compra (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "ordemcompraEnviar.php");
+			// });
 						
 		}); //document.ready
 		
@@ -510,9 +510,9 @@ try{
 									<div class="form-group">
 										<button class="btn btn-lg btn-principal" type="submit">Alterar</button>
 										<?php
-											if ($enviar){
-												print('<button class="btn btn-lg btn-default" id="enviar">Enviar para Aprovação</button>');
-											}
+											// if ($enviar){
+											// 	print('<button class="btn btn-lg btn-default" id="enviar">Enviar para Aprovação</button>');
+											// }
 										?>
 										<a href="ordemcompra.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
