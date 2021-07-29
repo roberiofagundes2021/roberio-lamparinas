@@ -579,6 +579,7 @@ try {
 													LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
 													and FOXSrFluxoOperacional = " . $iFluxoOperacional."
+													and SbCatId in (".$sSubCategorias.")
 													ORDER BY SbCatNome, ServiNome ASC";
 											$result = $conn->query($sql);
 											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -592,6 +593,7 @@ try {
 															LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = ServiId
 															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia']."
+															and SbCatId in (".$sSubCategorias.")
 															ORDER BY SbCatNome, ServiNome ASC";
 												} else { //Se $row['TrRefTabelaServico'] == ServicoOrcamento
 													$sql = "SELECT Distinct ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, SbCatNome
@@ -600,6 +602,7 @@ try {
 															LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia']."
+															and SbCatId in (".$sSubCategorias.")
 															ORDER BY SbCatNome, ServiNome ASC";
 												}
 

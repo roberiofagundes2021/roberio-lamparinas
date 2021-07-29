@@ -599,6 +599,7 @@ try{
 															LEFT JOIN Marca on MarcaId = ProduMarca
 															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
+															and SbCatId in (".$sSubCategorias.")
 															ORDER BY SbCatNome, ProduNome ASC";													
 												} else { //Se $row['TrRefTabelaProduto'] == ProdutoOrcamento
 													$sql = "SELECT Distinct ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
@@ -609,6 +610,7 @@ try{
 															LEFT JOIN Marca on MarcaId = ProduMarca
 															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
+															and SbCatId in (".$sSubCategorias.")
 															ORDER BY SbCatNome, ProduNome ASC";
 												}
 
