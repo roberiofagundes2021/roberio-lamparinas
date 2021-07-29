@@ -141,7 +141,7 @@ include('global_assets/php/conexao.php');
                     <input type="hidden" value="'.$item["CnAPaId"].'">
                 </td>
                 <td class="even"><p class="m-0">' . $data . '</p><input type="hidden" value="'.$item["CnAPaDtVencimento"].'"></td>
-                <td class="even"><a href="contasAPagarNovoLancamento.php?lancamentoId='.$item["CnAPaId"].'">' . $item["CnAPaDescricao"] . '</a></td>
+                <td class="even"><a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\')">' . $item["CnAPaDescricao"] . '</a></td>
                 <td class="even">' . $item["ForneNome"] . '</td>
                 <td class="even" style="text-align: center">' . $item["CnAPaNumDocumento"] . '</td>
                 <td class="even" style="text-align: right; padding-right:1.5rem;">' . mostraValor($item["CnAPaValorAPagar"]) . '</td>
