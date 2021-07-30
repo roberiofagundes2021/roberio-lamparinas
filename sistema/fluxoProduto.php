@@ -584,6 +584,7 @@ try{
 													LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 													WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
 													and FOXPrFluxoOperacional = " . $iFluxoOperacional."
+													and SbCatId in (".$sSubCategorias.")
 													ORDER BY SbCatNome, ProduNome ASC";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
