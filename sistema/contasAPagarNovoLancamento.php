@@ -279,7 +279,8 @@ if (isset($_POST['cmbPlanoContas'])) {
 }
 //$count = count($row);
 
-if (isset($_POST['inputContasAPagarId'])) {
+//Se estiver editando entra no IF
+if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) {
     $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
             CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero
     		FROM ContasAPagar

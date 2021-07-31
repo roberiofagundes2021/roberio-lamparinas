@@ -559,12 +559,12 @@ if (isset($_POST['cmbPlanoContas'])) {
         }
     }
 
-    irpara("ContasAReceber.php");
+    irpara("contasAReceber.php");
 }
 //$count = count($row);
 
 // SE TIVER EDITANDO 
-if (isset($_POST['inputContasAReceberId'])) {
+if (isset($_POST['inputContasAReceberId']) && $_POST['inputContasAReceberId'] != 0) {
     try {
         $sql = "SELECT  CnAReId,
                         CnAReDtEmissao,  
