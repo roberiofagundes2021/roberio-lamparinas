@@ -32,7 +32,7 @@ if(isset($_POST['inputTRId'])){
 
 			$sql = "SELECT SituaId
 					FROM Situacao
-					WHERE SituaChave = 'AGUARDANDOLIBERACAO' ";
+					WHERE SituaChave = 'AGUARDANDOFINALIZACAO' ";
 			$result = $conn->query($sql);
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);	
 
