@@ -114,6 +114,8 @@ try {
 		';
 	
 		foreach ($rowSubCategoria as $sbcat) {
+
+			$totalProdutos = 0;
 	
 			$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 					FROM Produto
@@ -133,11 +135,10 @@ try {
 				$html .= '
 						<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
 							SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
-						</div>
-						<br> ';	
+						</div>';	
 	
 				$html .= '
-				<table style="width:100%; border-collapse: collapse;">
+				<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
 					<tr>
 						<th style="text-align: center; width:8%">Item</th>
 						<th style="text-align: left; width:43%">Produto</th>
@@ -172,22 +173,24 @@ try {
 					";
 	
 					$cont++;
-					$totalGeralProdutos += $valorTotal;
+					$totalProdutos += $valorTotal;
 				}
-	
-				$html .= "<br>";
-			}
+
+				$totalGeralProdutos += $totalProdutos;
+
+				$html .= "  <tr>
+								<td colspan='5' height='50' valign='middle'>
+									<strong>Total Produtos</strong>
+								</td>
+								<td style='text-align: right' colspan='2'>
+									" . mostraValor($totalProdutos) . "
+								</td>
+							</tr>";
+				$html .= "</table>";	
+
+				$html .= "<br>";					
+			}		
 		}
-		
-		$html .= "  <tr>
-						<td colspan='5' height='50' valign='middle'>
-							<strong>Total Produtos</strong>
-						</td>
-						<td style='text-align: right' colspan='2'>
-							" . mostraValor($totalGeralProdutos) . "
-						</td>
-					</tr>";
-		$html .= "</table>";	
 	}
 
 	$totalGeralServicos = 0;
@@ -204,6 +207,8 @@ try {
 		';
 	
 		foreach ($rowSubCategoria as $sbcat) {
+
+			$totalServicos = 0;
 	
 			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
 					FROM Servico
@@ -221,8 +226,7 @@ try {
 				$html .= '
 						<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
 							SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
-						</div>
-						<br>';	
+						</div>';	
 	
 				$html .= '
 				<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
@@ -258,22 +262,24 @@ try {
 					";
 	
 					$cont++;
-					$totalGeralServicos += $valorTotal;
-				}
+					$totalServicos += $valorTotal;
+				}		
 				
-				$html .= "<br>";
+				$totalGeralServicos += $totalServicos;
+
+				$html .= "  <tr>
+								<td colspan='4' height='50' valign='middle'>
+									<strong>Total Serviços</strong>
+								</td>
+								<td style='text-align: right' colspan='2'>
+									" . mostraValor($totalServicos) . "
+								</td>
+							</tr>";
+				$html .= "</table>";
+
+				$html .= "<br>";				
 			}
 		}
-	
-		$html .= " <tr>
-						<td colspan='4' height='50' valign='middle'>
-							<strong>Total Serviços</strong>
-						</td>
-						<td style='text-align: right' colspan='2'>
-							" . mostraValor($totalGeralServicos) . "
-						</td>
-					</tr>";
-		$html .= "</table>"; 	
 	}
 
 	$totalGeral = $totalGeralProdutos + $totalGeralServicos;
@@ -303,17 +309,14 @@ try {
 
 	//$mpdf->SetHTMLHeader($topo,'O',true); //o SetHTMLHeader deve vir antes do WriteHTML para que o cabeçalho apareça em todas as páginas
 	$mpdf->SetHTMLFooter($rodape); 	//o SetHTMLFooter deve vir antes do WriteHTML para que o rodapé apareça em todas as páginas
-	$mpdf->WriteHTML($html);
 
-	// Other code
-	$mpdf->Output();
 } catch (\Mpdf\MpdfException $e) { // Note: safer fully qualified exception name used for catch
 
 	// Process the exception, log, print etc.
 	$html = $e->getMessage();
-
-	$mpdf->WriteHTML($html);
-
-	// Other code
-	$mpdf->Output();
 }
+
+$mpdf->WriteHTML($html);
+
+// Other code
+$mpdf->Output();
