@@ -21,34 +21,51 @@ if(isset($_POST['inputOrdemCompraId'])){
 
 //Se está alterando
 if(isset($_POST['inputIdOrdemCompra'])){
+	$valid = true;
+
+	for ($i = 1; $i <= $_POST['totalRegistros']; $i++){
+		$sqlSaldo = "SELECT dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ".$_POST['inputIdServico'.$i].", 'S') as Saldo";
+		$resultSaldo = $conn->query($sqlSaldo);
+		$saldo = $resultSaldo->fetch(PDO::FETCH_ASSOC);
+
+		if(intval($_POST['inputQuantidade'.$i]) > intval($saldo['Saldo'])){
+			$valid = false;
+		}
+	}
 	
-	$sql = "DELETE FROM OrdemCompraXServico
-			WHERE OCXSrOrdemCompra = :iOrdemCompra AND OCXSrUnidade = :iUnidade";
-	$result = $conn->prepare($sql);
-	
-	$result->execute(array(
-					':iOrdemCompra' => $iOrdemCompra,
-					':iUnidade' => $_SESSION['UnidadeId']
-					));		
-	
-	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
-	
-		$sql = "INSERT INTO OrdemCompraXServico (OCXSrOrdemCompra, OCXSrServico, OCXSrQuantidade, OCXSrValorUnitario, OCXSrUsuarioAtualizador, OCXSrUnidade)
-				VALUES (:iOrdemCompra, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+	if($valid){
+		$sql = "DELETE FROM OrdemCompraXServico
+				WHERE OCXSrOrdemCompra = :iOrdemCompra AND OCXSrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
 		
 		$result->execute(array(
 			':iOrdemCompra' => $iOrdemCompra,
-			':iServico' => $_POST['inputIdServico'.$i],
-			':iQuantidade' => $_POST['inputQuantidade'.$i] == ''? null : $_POST['inputQuantidade'.$i],
-			':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
 		
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Ordem de Compra alterado!!!";
-		$_SESSION['msg']['tipo'] = "success";
+		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+			
+			$sql = "INSERT INTO OrdemCompraXServico (OCXSrOrdemCompra, OCXSrServico, OCXSrQuantidade, OCXSrValorUnitario, OCXSrUsuarioAtualizador, OCXSrUnidade)
+					VALUES (:iOrdemCompra, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+			$result = $conn->prepare($sql);
+			
+			$result->execute(array(
+				':iOrdemCompra' => $iOrdemCompra,
+				':iServico' => $_POST['inputIdServico'.$i],
+				':iQuantidade' => $_POST['inputQuantidade'.$i] == ''? null : $_POST['inputQuantidade'.$i],
+				':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+				':iUnidade' => $_SESSION['UnidadeId']
+			));
+			
+			$_SESSION['msg']['titulo'] = "Sucesso";
+			$_SESSION['msg']['mensagem'] = "Ordem de Compra alterado!!!";
+			$_SESSION['msg']['tipo'] = "success";
+		}
+	}else{
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "O saldo de um dos serviços não está mais disponível!!!";
+		$_SESSION['msg']['tipo'] = "error";
 	}
 }	
 
@@ -192,6 +209,10 @@ try{
 		//Mostra o "Filtrando..." na combo Servico
 		function FiltraServico(){
 			$('#cmbServico').empty().append('<option value="">Filtrando...</option>');
+		}
+
+		function reset(id){
+			confirmaReset(document.formOrdemCompraServico, "Tem certeza que deseja resetar essa quantidade?", "ordemcompraServico.php", "inputQuantidade"+id);
 		}
 
 		function validaQuantInputModal(quantMax, obj) {
@@ -369,6 +390,9 @@ try{
 														JOIN OrdemCompraXServico on OCXSrServico = ServiId and OCXSrOrdemCompra = '$iOrdemCompra'
 														JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iOrdemCompraFlOpe'
 														WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
+										if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
+											$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
+										}
 										$sql = $sql." ORDER BY ServiNome";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -381,6 +405,9 @@ try{
 														JOIN Situacao on SituaId = ServiStatus
 														JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iOrdemCompraFlOpe'
 														WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
+											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
+												$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
+											}
 											$sql = $sql." ORDER BY ServiNome";
 											$result = $conn->query($sql);
 											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -391,12 +418,12 @@ try{
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-7">
+											<div class="col-lg-6">
 												<div class="row">
-													<div class="col-lg-2">
+													<div class="col-lg-2" style="max-width:60px">
 														<label for="inputCodigo"><strong>Item</strong></label>
 													</div>
-													<div class="col-lg-10">
+													<div class="col-lg-10" style="width:100%">
 														<label for="inputServico"><strong>Servico</strong></label>
 													</div>
 												</div>
@@ -420,7 +447,12 @@ try{
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
-											</div>											
+											</div>
+											<div class="col-sm-1">
+												<div class="form-group">
+													<label for=""><strong>Resetar</strong></label>
+												</div>
+											</div>
 										</div>');
 										
 										print('<div id="tabelaServicos">');
@@ -431,22 +463,22 @@ try{
 											
 											$cont++;
 											
-											$saldo = isset($item['SaldoOrdemCompra']) ? $item['SaldoOrdemCompra'] : '';
-											$iQuantidade = isset($item['OCXSrQuantidade']) ? $item['OCXSrQuantidade'] : '';
-											$fValorUnitario = isset($item['FOXSrValorUnitario']) ? mostraValor($item['FOXSrValorUnitario']) : mostraValor($item['OCXSrValorUnitario']);											
-											$fValorTotal = (isset($item['OCXSrQuantidade']) and isset($item['OCXSrValorUnitario'])) ? mostraValor($item['OCXSrQuantidade'] * $item['OCXSrValorUnitario']) : '';
+											$saldo = isset($item['SaldoOrdemCompra']) ? $item['SaldoOrdemCompra'] : 0;
+											$iQuantidade = isset($item['OCXSrQuantidade']) ? $item['OCXSrQuantidade'] : 0;
+											$fValorUnitario = isset($item['FOXSrValorUnitario']) ? mostraValor($item['FOXSrValorUnitario']) : 0;											
+											$fValorTotal = mostraValor(intval($iQuantidade)*gravaValor($fValorUnitario));
 											
-											$fTotalGeral += (isset($item['OCXSrQuantidade']) and isset($item['OCXSrValorUnitario'])) ? $item['OCXSrQuantidade'] * $item['OCXSrValorUnitario'] : 0;
+											$fTotalGeral += gravaValor($fValorTotal);
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-7">
+												<div class="col-lg-6">
 													<div class="row">
-														<div class="col-lg-2">
+														<div class="col-lg-2" style="max-width:60px">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
 															<input type="hidden" id="inputIdServico'.$cont.'" name="inputIdServico'.$cont.'" value="'.$item['ServiId'].'" class="idServico">
 														</div>
-														<div class="col-lg-10">
+														<div class="col-lg-10" style="width:100%">
 															<input type="text" id="inputServico'.$cont.'" name="inputServico'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ServiDetalhamento'].'" value="'.$item['ServiNome'].'" readOnly>
 														</div>
 													</div>
@@ -462,36 +494,41 @@ try{
 												</div>	
 												<div class="col-lg-2">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off text-right" value="'.$fValorTotal.'" readOnly>
-												</div>											
+												</div>
+												<div class="col-lg-1 btn" style="text-align:center;" onClick="reset('.$cont.')">
+													<i class="icon-reset" title="Resetar"></i>
+												</div>
 											</div>');											
 											
 										}
 										
-										print('
-										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-7">
-													<div class="row">
-														<div class="col-lg-1">
-															
-														</div>
-														<div class="col-lg-8">
-															
-														</div>
-														<div class="col-lg-3">
-															
-														</div>
-													</div>
-												</div>
+										print('<div class="row" style="margin-top: 8px;">
+										<div class="col-lg-6">
+											<div class="row">
 												<div class="col-lg-1">
 													
-												</div>	
-												<div class="col-lg-2" style="padding-top: 5px; text-align: right;">
-													<h5><b>Total:</b></h5>
-												</div>	
-												<div class="col-lg-2">
-													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="'.mostraValor($fTotalGeral).'" readOnly>
-												</div>											
-											</div>'										
+												</div>
+												<div class="col-lg-8">
+													
+												</div>
+												<div class="col-lg-3">
+													
+												</div>
+											</div>
+										</div>								
+										<div class="col-lg-1">
+											
+										</div>
+										<div class="col-lg-1">
+											
+										</div>	
+										<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+											<h3><b>Total:</b></h3>
+										</div>	
+										<div class="col-lg-2">
+											<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="'.mostraValor($fTotalGeral).'" readOnly>
+										</div>											
+									</div>'										
 										);
 										
 										
