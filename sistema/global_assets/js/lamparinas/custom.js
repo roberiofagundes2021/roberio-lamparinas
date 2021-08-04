@@ -79,6 +79,59 @@ function confirmaExclusao(form, texto, acao, acaoComplete) {
 		});
 }
 
+function confirmaReset(form, texto, acao, id) {
+	new PNotify({
+		title: 'Confirmação',
+		text: texto,
+		icon: 'icon-question4',
+		hide: false,
+		confirm: {
+			confirm: true,
+			buttons: [
+				{
+					text: 'Sim',
+					primary: true,
+					click: function (notice) {
+						form.action = acao;
+						if(Array.isArray(id)){
+							id.forEach(element => {
+								$("#"+element).val(null)
+							})
+						}else{
+							$("#"+id).val(null)
+						}
+						form.submit();
+					},
+				},
+				{
+					text: 'Não',
+					click: function (notice) {
+						notice.remove();
+					},
+				},
+			],
+		},
+		buttons: {
+			closer: false,
+			sticker: false,
+		},
+		history: {
+			history: false,
+		},
+		addclass: 'stack-modal',
+		stack: { dir1: 'down', dir2: 'right', modal: false },
+	})
+		.get()
+		.on('pnotify.confirm', function () {
+			form.action = acao;
+			form.submit();
+		})
+		.get()
+		.on('pnotify.cancel', function () {
+			return false;
+		});
+}
+
 function moeda(z) {
 	v = z.value;
 	v = v.replace(/\D/g, ''); //Permite digitar apenas números
