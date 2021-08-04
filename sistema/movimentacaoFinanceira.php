@@ -129,7 +129,7 @@ $dataFim = date("Y-m-d");
         }
       });
 
-      function excluirConta() {
+     /* function excluirConta() {
         let contas = $('.excluirConta').each((i, elem) => {
           $(elem).on('click', (e) => {
             const id = $(elem).attr('idContaExcluir');
@@ -145,8 +145,7 @@ $dataFim = date("Y-m-d");
         })
 
       }
-      excluirConta();
-
+      excluirConta(); */
       function atualizaTotal() {
         let childres = $('tbody').children()
         let total = 0
@@ -183,6 +182,8 @@ $dataFim = date("Y-m-d");
         const centroDeCustos = $('#cmbCentroDeCustos').val();
         const planoContas = $('#cmbPlanoContas').val();
         const FormaPagamento = $('#cmbFormaDeRecebimento').val();
+        const inputPermissionAtualiza = $("#inputPermissionAtualiza").val()
+        const inputPermissionExclui = $("#inputPermissionExclui").val()
         const statusArray = $('#cmbStatus').val().split('|');
         const status = statusArray[0];
         const statusTipo = statusArray[1];
@@ -198,7 +199,9 @@ $dataFim = date("Y-m-d");
           cmbFormaDeRecebimento: FormaPagamento,
           cmbStatus: status,
           statusTipo: statusTipo,
-          tipoFiltro: tipoFiltro
+          tipoFiltro: tipoFiltro,
+          permissionAtualiza: inputPermissionAtualiza,
+          permissionExclui: inputPermissionExclui
         };
 
         $.post(
@@ -210,7 +213,7 @@ $dataFim = date("Y-m-d");
               $('#imprimir').removeAttr('disabled')
               resultadosConsulta = data
 
-              excluirConta();
+             // excluirConta();
               atualizaTotal();
 
             } else {
@@ -295,6 +298,27 @@ $dataFim = date("Y-m-d");
     function ResetPlanoContas() {
       $('#cmbPlanoContas').empty().append('<option value="">Sem Plano de Contas</option>');
     } 
+
+    //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
+    function atualizaMovimentacao(Permission, MovimentacaoFinanceiraId, TipoMov, Tipo) {
+
+      document.getElementById('inputMovimentacaoFinanceiraId').value = MovimentacaoFinanceiraId;
+      document.getElementById('tipoMov').value = TipoMov;
+      document.getElementById('inputPermissionAtualiza').value = Permission;
+
+      if (Tipo == 'novo' || Tipo == 'edita') {
+          document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraPagamento.php";
+      } else if (Tipo == 'exclui') {
+          if(Permission){
+              confirmaExclusao(document.formMovimentacaoFinanceira, "Tem certeza que deseja excluir essa Movimentação ?", "movimentacaoFinanceiraExclui.php");
+          } else{
+              alerta('Permissão Negada!','');
+              return false;
+          }
+      }            
+
+      document.formMovimentacaoFinanceira.submit();
+    }     
   </script>
 
 </head>
@@ -341,12 +365,10 @@ $dataFim = date("Y-m-d");
                   <input id="inputStatusTipo_imp" type="hidden" name="inputStatusTipo_imp"></input>
                   <input id="inputTipoFiltro_imp" type="hidden" name="inputTipoFiltro_imp"></input>
                 </form>
-
-                <form name="contaExclui" method="POST">
+                <!--  <form name="contaExclui" method="POST">
                   <input type="hidden" name="idMov" id="idMov">
                   <input type="hidden" name="tipoMov" id="tipoMov">
-                </form>
-
+                </form> -->
                 <form name="formMovimentacao" method="post" class="p-3">
                   <div class="row">
                     <div class="col-lg-2">
@@ -571,8 +593,9 @@ $dataFim = date("Y-m-d");
                     <div class="text-right col-lg-4 pt-3">
                       <button id="submitPesquisar" class="btn btn-principal">Pesquisar</button>
 
-                      <button id="novoLacamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo Lançamento</button>
-
+                      <a href="#" onclick="atualizaMovimentacaoFinanceira(<?php echo $novo; ?>, 0, 'novo');"  
+                      class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo Lançamento</a>
+                     
                       <button id="imprimir" class="btn bg-secondary"><i class="icon-printer2"></i></button>
                     </div>
 
@@ -611,6 +634,15 @@ $dataFim = date("Y-m-d");
         </div>
 
         <!-- /info blocks -->
+
+        <form name="formMovimentacaoFinanceira" method="post">
+					<input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza" value="<?php echo $atualizar; ?>" >
+          <input type="hidden" id="inputPermissionExclui" name="inputPermissionExclui" value="<?php echo $excluir; ?>" >
+          <input type="hidden" id="tipoMov" name="tipoMov">
+					<input type="hidden" id="inputMovimentacaoFinanceiraId" name="inputMovimentacaoFinanceiraId" >
+		
+        </form>
+
       </div>
 
       <!-- /content area -->

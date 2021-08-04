@@ -4,14 +4,14 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if (isset($_POST['idMov'])) {
+if (isset($_POST['inputMovimentacaoFinanceiraId'])) {
 
 	if ($_POST['tipoMov'] === 'R') {
 		try {
 			$sql = "DELETE FROM ContasAReceber
 										WHERE CnAReId = :id";
 			$result = $conn->prepare($sql);
-			$result->bindParam(':id', $_POST['idMov']);
+			$result->bindParam(':id', $_POST['inputMovimentacaoFinanceiraId']);
 			$result->execute();
 
 			$_SESSION['msg']['titulo'] = "Sucesso";

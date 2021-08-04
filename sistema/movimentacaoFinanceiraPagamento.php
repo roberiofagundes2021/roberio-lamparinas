@@ -6,6 +6,10 @@ $_SESSION['PaginaAtual'] = 'Financeiro / Movimentação do Financeiro / Novo Lan
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputPermissionAtualiza'])){
+  $atualizar = $_POST['inputPermissionAtualiza'];
+}
+
 if (isset($_POST['inputDataEmissao'])) {
     if (isset($_POST['inputEditar'])) { //EDIÇÃO
       try {
@@ -128,7 +132,7 @@ if (isset($_POST['inputDataEmissao'])) {
     irpara("movimentacaoFinanceira.php");
 }
 
-if (isset($_GET['lancamentoId'])) {
+if (isset($_POST['inputMovimentacaoFinanceiraId'])) {
   
     $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtPagamento, 
                    CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, 
@@ -136,7 +140,7 @@ if (isset($_GET['lancamentoId'])) {
     		      FROM ContasAPagar
          LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
              WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " 
-               AND CnAPaId = " . $_GET['lancamentoId'] . "";
+               AND CnAPaId = " . $_POST['inputMovimentacaoFinanceiraId'] . "";
 
     $result = $conn->query($sql);
     $lancamento = $result->fetch(PDO::FETCH_ASSOC);
