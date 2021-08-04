@@ -2,12 +2,49 @@
 
 include_once("sessao.php"); 
 
+$inicio1 = microtime(true);
+
 $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
 include('global_assets/php/conexao.php');
 
 $iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
-$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
+
+if(isset($_POST['inputFluxoOperacionalCategoria'])){
+	$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
+} else {
+	$iCategoria = $_POST['inputCategoria'];
+}
+
+if (isset($_POST['cmbSubCategoria'])){
+
+	var_dump($_POST['cmbSubCategoria']);die;
+	
+	$aSubCategoriasSelecionadas = explode("#", $_POST['cmbSubCategoria']);
+
+	/*	
+	//SubCategorias filtradas
+	$sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
+			FROM SubCategoria
+			LEFT JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
+			WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
+			ORDER BY SbCatNome ASC";
+		$result = $conn->query($sql);
+		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC); */
+
+		$sSubCategorias = '';
+
+		foreach ($rowBD as $item){
+
+		if ($sSubCategorias == ''){
+			$sSubCategorias .= $item['SbCatId'];	
+		} else {
+			$sSubCategorias .= ", ".$item['SbCatId'];
+		}
+	}
+}
+
+
 
 $sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
 			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, ForneRazaoSocial, CategNome 
@@ -47,26 +84,6 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 	$aProdutos[] = $itemProdutoUtilizado['FOXPrProduto'];
 }
 */
-
-//SubCategorias para esse fornecedor
-$sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
-		FROM SubCategoria
-		LEFT JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
-		WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
-		ORDER BY SbCatNome ASC";
-	$result = $conn->query($sql);
-	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-
-	$sSubCategorias = '';
-
-	foreach ($rowBD as $item){
-
-	if ($sSubCategorias == ''){
-		$sSubCategorias .= $item['SbCatId'];	
-	} else {
-		$sSubCategorias .= ", ".$item['SbCatId'];
-	}
-}
 
 ?>
 
@@ -147,25 +164,27 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
+												<input type="hidden" id="inputCategoria" name="inputCategoria" value="<?php echo $row['FlOpeCategoria']; ?>" >
 												<input type="text" id="cmbCategoria" name="cmbCategoria" class="form-control"  value="<?php echo $row['CategNome']; ?>" readOnly >
 											</div>
 										</div>
 										
 										<div class="col-lg-4">
-											<label for="inputSubCategoriaNome">SubCategoria(s)</label>
-											<select id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+											<label for="cmbSubCategoria">SubCategoria(s)</label>
+											<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 												<?php 
 													$sql = "SELECT SbCatId, SbCatNome
 															FROM SubCategoria
 															JOIN Situacao on SituaId = SbCatStatus	
-															WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+															WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." AND 
+															SbCatId in (SELECT FOXSCSubCategoria FROM FluxoOperacionalXSubCategoria	WHERE FOXSCUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional)
 															ORDER BY SbCatNome ASC"; 
 													$result = $conn->query($sql);
 													$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
 													$count = count($rowBD);														
 															
 													foreach ( $rowBD as $item){	
-														print('<option value="'.$item['SbCatId,'].'"disabled selected>'.$item['SbCatNome'].'</option>');	
+														print('<option value="'.$item['SbCatId'].'" selected>'.$item['SbCatNome'].'</option>');	
 													}                    
 												?>
 											</select>
@@ -522,6 +541,9 @@ $sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
 	<!-- /page content -->
 
 	<?php include_once("alerta.php"); ?>
+
+	<?php  $total1 = microtime(true) - $inicio1;
+		 echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>';  ?>
 
 </body>
 
