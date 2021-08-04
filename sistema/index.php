@@ -109,7 +109,7 @@ $sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL,
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
 	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " 
-		and SituaChave = 'NAOLIBERADO' 
+		and SituaChave in ('NAOLIBERADO', 'NAOLIBERADOCENTROADMINISTRATIVO') 
 		and BnXPePerfil in (" . $idPerfilLogado . ")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
@@ -122,7 +122,7 @@ $sql = "SELECT COUNT(BandeId) as TotalNaoLiberado
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
 	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
-		and SituaChave = 'NAOLIBERADO' 
+		and SituaChave in ('NAOLIBERADO', 'NAOLIBERADOCENTROADMINISTRATIVO') 
 		and BnXPePerfil in (" . $idPerfilLogado . ")";
 $result = $conn->query($sql);
 $rowTotalNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);
@@ -779,7 +779,7 @@ if ($totalAcoes) {
 								} else {
 
 									document.getElementById('inputMotivo').value = result;
-									document.getElementById('inputTermoReferenciaStatus').value = 'NAOLIBERADO';
+									document.getElementById('inputTermoReferenciaStatus').value = 'NAOLIBERADOCENTROADMINISTRATIVO';
 									document.formBandeja.action = "trMudaSituacao.php";
 									document.formBandeja.setAttribute("target", "_self");
 									document.formBandeja.submit();

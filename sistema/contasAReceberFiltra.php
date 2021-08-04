@@ -150,7 +150,7 @@ include('global_assets/php/conexao.php');
                     <input type="hidden" value="' . $item["CnAReId"] . '">
                 </td>
                 <td class="even"><p class="m-0">' . $data . '</p><input type="hidden" value="' . $item["CnAReDtVencimento"] . '"></td>
-                <td class="even"><a href="contasAReceberNovoLancamento.php?lancamentoId=' . $item["CnAReId"] . '">' . $item["CnAReDescricao"] . '</a></td>
+                <td class="even"><a href=#" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'edita\')">' . $item["CnAReDescricao"] . '</a></td>
                 <td class="even">' . $item["ClienNome"] . '</td>
                 <td class="even" style="text-align: center">' . $item["CnAReNumDocumento"] . '</td>
                 <td class="even" style="text-align: right; padding-right:1.5rem;">' . mostraValor($item["CnAReValorAReceber"]) . '</td>

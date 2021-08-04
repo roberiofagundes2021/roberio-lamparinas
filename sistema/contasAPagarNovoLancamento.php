@@ -279,7 +279,8 @@ if (isset($_POST['cmbPlanoContas'])) {
 }
 //$count = count($row);
 
-if (isset($_POST['inputContasAPagarId'])) {
+//Se estiver editando entra no IF
+if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) {
     $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
             CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero
     		FROM ContasAPagar
@@ -763,7 +764,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label for="inputDescricao">Descrição <span class="text-danger">*</span></label>
-                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" required <?php if (isset($lancamento)) echo $lancamento['CnAPaDescricao'] ?>>
+                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDescricao'] ?>" required>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
