@@ -32,7 +32,7 @@ if (isset($_POST['produtos']) and $_POST['produtos'] != ''){
 }
 
 $sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, FOXPrValorUnitario,
-				dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
+				dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxoOp', ProduId, 'P') as SaldoOrdemCompra
 				FROM Produto
 				JOIN Situacao on SituaId = ProduStatus
 				JOIN OrdemCompraXProduto on OCXPrProduto = ProduId and OCXPrOrdemCompra = '$iOrdemCompra'
@@ -51,7 +51,7 @@ $count = count($row);
 
 if(!$count>0){
 	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrValorUnitario,
-					dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
+					dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxoOp', ProduId, 'P') as SaldoOrdemCompra
 					FROM Produto
 					JOIN Categoria on CategId = ProduCategoria
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida

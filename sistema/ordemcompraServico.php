@@ -9,11 +9,11 @@ include('global_assets/php/conexao.php');
 //Se veio do ordemcompra.php
 if(isset($_POST['inputOrdemCompraId'])){
 	$iOrdemCompra = $_POST['inputOrdemCompraId'];
-	$iOrdemCompraFlOpe = $_POST['inputOrdemCompraFlOpeId'];
+	$iFluxo = $_POST['inputOrdemCompraFlOpeId'];
 	$iCategoria = $_POST['inputOrdemCompraCategoria'];
 } else if (isset($_POST['inputIdOrdemCompra'])){
 	$iOrdemCompra = $_POST['inputIdOrdemCompra'];
-	$iOrdemCompraFlOpe = $_POST['inputOrdemCompraFlOpeId'];
+	$iFluxo = $_POST['inputOrdemCompraFlOpeId'];
 	$iCategoria = $_POST['inputIdCategoria'];
 } else {
 	irpara("ordemcompra.php");
@@ -23,16 +23,28 @@ if(isset($_POST['inputOrdemCompraId'])){
 if(isset($_POST['inputIdOrdemCompra'])){
 	$valid = true;
 
-	for ($i = 1; $i <= $_POST['totalRegistros']; $i++){
-		$sqlSaldo = "SELECT dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ".$_POST['inputIdServico'.$i].", 'S') as Saldo";
-		$resultSaldo = $conn->query($sqlSaldo);
-		$saldo = $resultSaldo->fetch(PDO::FETCH_ASSOC);
+	if($_POST['inputTypeRequest'] != "reset"){
+		for ($i = 1; $i <= $_POST['totalRegistros']; $i++){
+			$sqlSaldo = "SELECT OCXSrOrdemCompra, OCXSrQuantidade,
+			dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ".$_POST['inputIdServico'.$i].", 'S') as Saldo
+			FROM OrdemCompraXServico WHERE OCXSrOrdemCompra = '$iOrdemCompra' and OCXSrServico = ".$_POST['inputIdServico'.$i];
+			$resultSaldo = $conn->query($sqlSaldo);
+			$OCXSe = $resultSaldo->fetch(PDO::FETCH_ASSOC);
 
-		if(intval($_POST['inputQuantidade'.$i]) > intval($saldo['Saldo'])){
-			$valid = false;
+			$saldo = isset($OCXSe['Saldo'])?intval($OCXSe['Saldo']):0;
+			$ordComQuant = isset($OCXSe['OCXSrQuantidade'])?intval($OCXSe['OCXSrQuantidade']):0;
+			$quant = isset($_POST['inputQuantidade'.$i])?intval($_POST['inputQuantidade'.$i]):0;
+
+			$saldo = $saldo != null?$saldo:0;
+			$ordComQuant = $ordComQuant != null?$ordComQuant:0;
+			$quant = $quant != null?$quant:0;
+
+			if($quant > $saldo+$ordComQuant){
+				$valid = false;
+			}
 		}
 	}
-	
+		
 	if($valid){
 		$sql = "DELETE FROM OrdemCompraXServico
 				WHERE OCXSrOrdemCompra = :iOrdemCompra AND OCXSrUnidade = :iUnidade";
@@ -150,7 +162,7 @@ try{
 				var inputSubCategoria = $('#inputIdSubCategoria').val(); //alert(inputSubCategoria);
 				var servicos = $(this).val();
 				<?php 
-					echo "var iFluxoOp = ".json_encode($iOrdemCompraFlOpe)."\n";
+					echo "var iFluxoOp = ".json_encode($iFluxo)."\n";
 					echo "var iOrdemCompra = ".json_encode($iOrdemCompra)."\n";
 				?>
 				
@@ -211,15 +223,22 @@ try{
 			$('#cmbServico').empty().append('<option value="">Filtrando...</option>');
 		}
 
-		function reset(id){
-			confirmaReset(document.formOrdemCompraServico, "Tem certeza que deseja resetar essa quantidade?", "ordemcompraServico.php", "inputQuantidade"+id);
+		function reset(id, type){
+			if (type == "all"){
+				var array = [];
+				for(var x=1; x<=id; x++){
+					array.push("inputQuantidade"+x)
+				}
+				confirmaReset(document.formOrdemCompraServico, "Tem certeza que deseja resetar TODAS as quantidades ?", "ordemcompraServico.php", array);
+			}else{
+				confirmaReset(document.formOrdemCompraServico, "Tem certeza que deseja resetar essa quantidade ?", "ordemcompraServico.php", id);
+			}
 		}
 
-		function validaQuantInputModal(quantMax, obj) {
-			console.log(obj.id)
-				$('#'+obj.id).on('keyup', function() {
-					if (parseInt($('#'+obj.id).val()) > parseInt(quantMax)) {
-						$('#'+obj.id).val(quantMax)
+		function validaQuantInputModal(quantMax,quant,obj) {
+			$('#'+obj.id).on('keyup', function() {
+					if (parseInt($('#'+obj.id).val()) > (parseInt(quantMax)+parseInt(quant))) {
+						$('#'+obj.id).val(parseInt(quantMax)+parseInt(quant))
 					}
 				})
 		}
@@ -275,9 +294,9 @@ try{
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Listar Serviços - <?php echo $row['OrComTipo'] == 'C' ? 'Carta Contrato' : 'Ordem de Compra'; ?> Nº "<?php echo $row['OrComNumero']; ?>"</h5>
 						</div>					
-						
+						<input type="hidden" id="inputTypeRequest" name="inputTypeRequest" value="submit">
 						<input type="hidden" id="inputIdOrdemCompra" name="inputIdOrdemCompra" class="form-control" value="<?php echo $row['OrComId']; ?>">
-						<input type="hidden" id="inputOrdemCompraFlOpeId" name="inputOrdemCompraFlOpeId" class="form-control" value="<?php echo $iOrdemCompraFlOpe; ?>">
+						<input type="hidden" id="inputOrdemCompraFlOpeId" name="inputOrdemCompraFlOpeId" class="form-control" value="<?php echo $iFluxo; ?>">
 						
 						<div class="card-body">		
 								
@@ -330,7 +349,7 @@ try{
 														$sql = "SELECT ServiId, ServiNome
 																FROM Servico
 																JOIN Situacao on SituaId = ServiStatus
-																JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iOrdemCompraFlOpe'
+																JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
 																WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and 
 																ServiCategoria = ".$iCategoria;
 														
@@ -384,11 +403,11 @@ try{
 									<?php
 
 										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario, OCXSrQuantidade,
-														dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
+														dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ServiId, 'S') as SaldoOrdemCompra
 														FROM Servico
 														JOIN Situacao on SituaId = ServiStatus
 														JOIN OrdemCompraXServico on OCXSrServico = ServiId and OCXSrOrdemCompra = '$iOrdemCompra'
-														JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iOrdemCompraFlOpe'
+														JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
 														WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
 										if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 											$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
@@ -400,10 +419,10 @@ try{
 
 										if(!$count>0){
 											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario,
-														dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
+														dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ServiId, 'S') as SaldoOrdemCompra
 														FROM Servico
 														JOIN Situacao on SituaId = ServiStatus
-														JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iOrdemCompraFlOpe'
+														JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
 														WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
 											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 												$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
@@ -487,7 +506,7 @@ try{
 													<input type="text" id="inputSaldo'.$cont.'" readOnly name="Saldo'.$cont.'" class="form-control-border-off text-right" value="'.$saldo.'">
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'readOnly').' name="inputQuantidade'.$cont.'" onkeypress="validaQuantInputModal('.$saldo.',this)" class="form-control-border Quantidade text-right" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'').' name="inputQuantidade'.$cont.'" onkeypress="validaQuantInputModal('.$saldo.','.$iQuantidade.',this)" class="form-control-border Quantidade text-right" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
 												</div>	
 												<div class="col-lg-1">
 													<input readOnly type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border-off ValorUnitario text-right" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
@@ -495,7 +514,7 @@ try{
 												<div class="col-lg-2">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off text-right" value="'.$fValorTotal.'" readOnly>
 												</div>
-												<div class="col-lg-1 btn" style="text-align:center;" onClick="reset('.$cont.')">
+												<div class="col-lg-1 btn" style="text-align:center;" onClick="reset(`inputQuantidade'.$cont.'`, 0)">
 													<i class="icon-reset" title="Resetar"></i>
 												</div>
 											</div>');											
@@ -503,7 +522,7 @@ try{
 										}
 										
 										print('<div class="row" style="margin-top: 8px;">
-										<div class="col-lg-6">
+										<div class="col-lg-5">
 											<div class="row">
 												<div class="col-lg-1">
 													
@@ -522,11 +541,14 @@ try{
 										<div class="col-lg-1">
 											
 										</div>	
-										<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+										<div class="col-lg-2" style="padding-top: 5px; text-align: right;">
 											<h3><b>Total:</b></h3>
 										</div>	
 										<div class="col-lg-2">
 											<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="'.mostraValor($fTotalGeral).'" readOnly>
+										</div>
+										<div class="col-lg-1 btn" style="text-align:center;" onClick="reset('.count($rowServicos).',`all`)">
+											<i class="icon-reset" title="Resetar"></i>
 										</div>											
 									</div>'										
 										);

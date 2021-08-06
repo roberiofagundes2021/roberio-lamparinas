@@ -9,11 +9,11 @@ include('global_assets/php/conexao.php');
 //Se veio do ordemcompra.php
 if(isset($_POST['inputOrdemCompraId'])){
 	$iOrdemCompra = $_POST['inputOrdemCompraId'];
-	$iOrdemCompraFlOpe = $_POST['inputOrdemCompraFlOpeId'];
+	$iFluxo = $_POST['inputOrdemCompraFlOpeId'];
 	$iCategoria = $_POST['inputOrdemCompraCategoria'];
 } else if (isset($_POST['inputIdOrdemCompra'])){
 	$iOrdemCompra = $_POST['inputIdOrdemCompra'];
-	$iOrdemCompraFlOpe = $_POST['inputOrdemCompraFlOpeId'];
+	$iFluxo = $_POST['inputOrdemCompraFlOpeId'];
 	$iCategoria = $_POST['inputIdCategoria'];
 } else {
 	irpara("ordemcompra.php");
@@ -23,13 +23,25 @@ if(isset($_POST['inputOrdemCompraId'])){
 if(isset($_POST['inputIdOrdemCompra'])){
 	$valid = true;
 
-	for ($i = 1; $i <= $_POST['totalRegistros']; $i++){
-		$sqlSaldo = "SELECT dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ".$_POST['inputIdProduto'.$i].", 'P') as Saldo";
-		$resultSaldo = $conn->query($sqlSaldo);
-		$saldo = $resultSaldo->fetch(PDO::FETCH_ASSOC);
+	if($_POST['inputTypeRequest'] != "reset"){
+		for ($i = 1; $i <= $_POST['totalRegistros']; $i++){
+			$sqlSaldo = "SELECT OCXPrOrdemCompra, OCXPrQuantidade,
+			dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ".$_POST['inputIdProduto'.$i].", 'P') as Saldo
+			FROM OrdemCompraXProduto WHERE OCXPrOrdemCompra = '$iOrdemCompra' and OCXPrProduto = ".$_POST['inputIdProduto'.$i];
+			$resultSaldo = $conn->query($sqlSaldo);
+			$OCXPr = $resultSaldo->fetch(PDO::FETCH_ASSOC);
 
-		if(intval($_POST['inputQuantidade'.$i]) > intval($saldo['Saldo'])){
-			$valid = false;
+			$saldo = isset($OCXPr['Saldo'])?intval($OCXPr['Saldo']):0;
+			$ordComQuant = isset($OCXPr['OCXPrQuantidade'])?intval($OCXPr['OCXPrQuantidade']):0;
+			$quant = isset($_POST['inputQuantidade'.$i])?intval($_POST['inputQuantidade'.$i]):0;
+
+			$saldo = $saldo != null?$saldo:0;
+			$ordComQuant = $ordComQuant != null?$ordComQuant:0;
+			$quant = $quant != null?$quant:0;
+
+			if($quant > $saldo+$ordComQuant){
+				$valid = false;
+			}
 		}
 	}
 	if($valid){
@@ -157,7 +169,7 @@ try{
 				var inputSubCategoria = $('#inputIdSubCategoria').val(); //alert(inputSubCategoria);
 				var produtos = $(this).val();
 				<?php 
-					echo "var iFluxoOp = ".json_encode($iOrdemCompraFlOpe)."\n";
+					echo "var iFluxoOp = ".json_encode($iFluxo)."\n";
 					echo "var iOrdemCompra = ".json_encode($iOrdemCompra)."\n";
 				?>
 				//console.log(produtos);
@@ -221,8 +233,16 @@ try{
 			$('#cmbProduto').empty().append('<option>Sem produto</option>');
 		}
 
-		function reset(id){
-			confirmaReset(document.formOrdemCompraProduto, "Tem certeza que deseja resetar essa quantidade?", "ordemcompraProduto.php", "inputQuantidade"+id);
+		function reset(id, type){
+			if (type == "all"){
+				var array = [];
+				for(var x=1; x<=id; x++){
+					array.push("inputQuantidade"+x)
+				}
+				confirmaReset(document.formOrdemCompraProduto, "Tem certeza que deseja resetar TODAS as quantidades ?", "ordemcompraProduto.php", array);
+			}else{
+				confirmaReset(document.formOrdemCompraProduto, "Tem certeza que deseja resetar essa quantidade ?", "ordemcompraProduto.php", id);
+			}
 		}
 		
 		function calculaValorTotal(id){
@@ -243,10 +263,10 @@ try{
 			
 			$('#inputTotalGeral').val(TotalGeral);			
 		}
-		function validaQuantInputModal(quantMax, obj) {
+		function validaQuantInputModal(quantMax,quant,obj) {
 			$('#'+obj.id).on('keyup', function() {
-					if (parseInt($('#'+obj.id).val()) > parseInt(quantMax)) {
-						$('#'+obj.id).val(quantMax)
+					if (parseInt($('#'+obj.id).val()) > (parseInt(quantMax)+parseInt(quant))) {
+						$('#'+obj.id).val(parseInt(quantMax)+parseInt(quant))
 					}
 				})
 		}
@@ -279,8 +299,9 @@ try{
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Listar Produtos - <?php echo $row['OrComTipo'] == 'C' ? 'Carta Contrato' : 'Ordem de Compra'; ?>  Nº "<?php echo $row['OrComNumero']; ?>"</h5>
 						</div>
-						<input type="hidden" id="inputIdOrdemCompra" name="inputIdOrdemCompra" class="form-control" value="<?php echo $row['OrComId']; ?>">
-						<input type="hidden" id="inputOrdemCompraFlOpeId" name="inputOrdemCompraFlOpeId" class="form-control" value="<?php echo $iOrdemCompraFlOpe; ?>">
+						<input type="hidden" id="inputTypeRequest" name="inputTypeRequest" value="submit">
+						<input type="hidden" id="inputIdOrdemCompra" name="inputIdOrdemCompra" value="<?php echo $row['OrComId']; ?>">
+						<input type="hidden" id="inputOrdemCompraFlOpeId" name="inputOrdemCompraFlOpeId" value="<?php echo $iFluxo; ?>">
 						
 						<div class="card-body">
 								
@@ -333,7 +354,7 @@ try{
 														$sql = "SELECT ProduId, ProduNome
 																FROM Produto
 																JOIN Situacao on SituaId = ProduStatus
-																JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iOrdemCompraFlOpe'
+																JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxo'
 																WHERE ProduUnidade = $_SESSION[UnidadeId] and SituaChave = 'ATIVO' and
 																ProduCategoria = '$iCategoria'";
 														if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
@@ -383,12 +404,12 @@ try{
 									
 									<?php
 										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, FOXPrValorUnitario,
-													dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
+													dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ProduId, 'P') as SaldoOrdemCompra
 													FROM Produto
 													JOIN Situacao on SituaId = ProduStatus
 													JOIN OrdemCompraXProduto on OCXPrProduto = ProduId and OCXPrOrdemCompra = '$iOrdemCompra'
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iOrdemCompraFlOpe'
+													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxo'
 													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
 										if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 											$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
@@ -399,11 +420,11 @@ try{
 										$count = count($rowProdutos);
 										if(!$count>0){
 											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrValorUnitario,
-															dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ProduId, 'P') as SaldoOrdemCompra
+															dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ProduId, 'P') as SaldoOrdemCompra
 															FROM Produto
 															JOIN Situacao on SituaId = ProduStatus
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-															JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iOrdemCompraFlOpe'
+															JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxo'
 															WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
 											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 												$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
@@ -491,7 +512,7 @@ try{
 													<input type="text" id="inputSaldo'.$cont.'" readOnly name="Saldo'.$cont.'" class="form-control-border-off text-right" value="'.$saldo.'">
 												</div>
 												<div class="col-lg-1">
-													<input type="text" class="form-control-border Quantidade text-right" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'readOnly').' name="inputQuantidade'.$cont.'" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber(), validaQuantInputModal('.$saldo.',this)" value="'.$iQuantidade.'">
+													<input type="text" class="form-control-border Quantidade text-right" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'').' name="inputQuantidade'.$cont.'" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber(), validaQuantInputModal('.$saldo.','.$iQuantidade.',this)" value="'.$iQuantidade.'">
 												</div>		
 												<div class="col-lg-1">
 													<input readOnly type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border-off ValorUnitario text-right" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
@@ -499,7 +520,7 @@ try{
 												<div class="col-lg-2">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off text-right" value="'.$fValorTotal.'" readOnly>
 												</div>
-												<div class="col-sm-1 btn" style="text-align:center;" onClick="reset('.$cont.')">
+												<div class="col-sm-1 btn" style="text-align:center;" onClick="reset(`inputQuantidade'.$cont.'`, 0)">
 													<i class="icon-reset" title="Resetar"></i>
 												</div>
 											</div>');
@@ -507,7 +528,7 @@ try{
 										
 										print('
 										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-6">
+												<div class="col-lg-5">
 													<div class="row">
 														<div class="col-lg-1">
 															
@@ -526,12 +547,15 @@ try{
 												<div class="col-lg-1">
 													
 												</div>	
-												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+												<div class="col-lg-2" style="padding-top: 5px; text-align: right;">
 													<h5><b>Total:</b></h5>
 												</div>	
 												<div class="col-lg-2">
 													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="'.mostraValor($fTotalGeral).'" readOnly>
-												</div>											
+												</div>
+												<div class="col-sm-1 btn" style="text-align:center;" onClick="reset('.count($rowProdutos).', `all`)">
+													<i class="icon-reset" title="Resetar Todos"></i>
+												</div>
 											</div>'										
 										);
 										

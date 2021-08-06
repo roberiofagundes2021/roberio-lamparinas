@@ -5,7 +5,7 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 $iOrdemCompra = isset($_POST['iOrdemCompra'])?$_POST['iOrdemCompra']:'';
-$iFluxoOp = isset($_POST['iFluxoOp'])?$_POST['iFluxoOp']:'';
+$iFluxo = isset($_POST['iFluxoOp'])?$_POST['iFluxoOp']:'';
 
 $sqlServ = "SELECT *
 			FROM OrdemCompra
@@ -33,11 +33,11 @@ if (isset($_POST['servicos']) and $_POST['servicos'] != ''){
 }
 
 $sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario, OCXSrQuantidade,
-				dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
+				dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ServiId, 'S') as SaldoOrdemCompra
 				FROM Servico
 				JOIN Categoria on CategId = ServiCategoria
 				JOIN OrdemCompraXServico on OCXSrServico = ServiId and OCXSrOrdemCompra = '$iOrdemCompra'
-				JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxoOp'
+				JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
 				WHERE ServiUnidade = $_SESSION[UnidadeId] and ServiId in (".$lista.")";
 if (isset($rowServ['OrComSubCategoria']) and $rowServ['OrComSubCategoria'] != '' and $rowServ['OrComSubCategoria'] != null){
 	$sql .= " and ServiSubCategoria = ".$rowServ['OrComSubCategoria'];
@@ -48,10 +48,10 @@ $count = count($row);
 
 if(!$count>0){
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario,
-					dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iOrdemCompra', ServiId, 'S') as SaldoOrdemCompra
+					dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ServiId, 'S') as SaldoOrdemCompra
 					FROM Servico
 					JOIN Categoria on CategId = ServiCategoria
-					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxoOp'
+					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
 					WHERE ServiUnidade = $_SESSION[UnidadeId] and ServiId in (".$lista.")";
 	if (isset($rowServ['OrComSubCategoria']) and $rowServ['OrComSubCategoria'] != '' and $rowServ['OrComSubCategoria'] != null){
 		$sql .= " and ServiSubCategoria = ".$rowServ['OrComSubCategoria'];

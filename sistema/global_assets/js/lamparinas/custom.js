@@ -93,12 +93,13 @@ function confirmaReset(form, texto, acao, id) {
 					primary: true,
 					click: function (notice) {
 						form.action = acao;
+						$("#inputTypeRequest").val("reset");
 						if(Array.isArray(id)){
 							id.forEach(element => {
-								$("#"+element).val(null)
+								$("#"+element).val(null);
 							})
 						}else{
-							$("#"+id).val(null)
+							$("#"+id).val(null);
 						}
 						form.submit();
 					},
