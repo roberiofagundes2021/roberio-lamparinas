@@ -235,10 +235,10 @@ $dataFim = date("Y-m-d");
 
       Filtrar(true);
 
-      $('#novoLacamento').on('click', (e) => {
+     /* $('#novoLacamento').on('click', (e) => {
         location.href = "movimentacaoFinanceiraPagamento.php";
         return false;
-      })
+      })*/
 
       function imprime() {
         let url = 'movimentacaoFinanceiraImprime.php';
@@ -300,7 +300,7 @@ $dataFim = date("Y-m-d");
     } 
 
     //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-    function atualizaMovimentacao(Permission, MovimentacaoFinanceiraId, TipoMov, Tipo) {
+    function atualizaMovimentacaoFinanceira(Permission, MovimentacaoFinanceiraId, TipoMov, Tipo) {
 
       document.getElementById('inputMovimentacaoFinanceiraId').value = MovimentacaoFinanceiraId;
       document.getElementById('tipoMov').value = TipoMov;
