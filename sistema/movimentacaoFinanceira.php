@@ -307,7 +307,14 @@ $dataFim = date("Y-m-d");
       document.getElementById('inputPermissionAtualiza').value = Permission;
 
       if (Tipo == 'novo' || Tipo == 'edita') {
-          document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraPagamento.php";
+          
+          if (TipoMov == 'T'){
+            document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraTransferencia.php";
+          } else if (TipoMov == 'R'){
+            document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraRecebimento.php";
+          } else {
+            document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraPagamento.php";
+          }          
       } else if (Tipo == 'exclui') {
           if(Permission){
               confirmaExclusao(document.formMovimentacaoFinanceira, "Tem certeza que deseja excluir essa Movimentação ?", "movimentacaoFinanceiraExclui.php");
@@ -593,7 +600,7 @@ $dataFim = date("Y-m-d");
                     <div class="text-right col-lg-4 pt-3">
                       <button id="submitPesquisar" class="btn btn-principal">Pesquisar</button>
 
-                      <a href="#" onclick="atualizaMovimentacaoFinanceira(<?php echo $novo; ?>, 0, 'novo');"  
+                      <a href="#" onclick="atualizaMovimentacaoFinanceira(<?php echo $novo; ?>, 0, 'P', 'novo');"  
                       class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo Lançamento</a>
                      
                       <button id="imprimir" class="btn bg-secondary"><i class="icon-printer2"></i></button>
