@@ -441,44 +441,45 @@ function queryPesquisa(){
                     }
                     
                     //MENU EDITAR E EXCLUIR
-                    $print .= "
-                        <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
-                            <div class='list-icons'>
-                                <div class='list-icons list-icons-extended'> ";
+                    $print .= '
+                    <td class="even d-flex flex-row justify-content-around align-content-center" style="text-align: center">
+                        <div class="list-icons">
+                            <div class="list-icons list-icons-extended"> ';
 
-                                    //BOTAO EDITAR
-                                    if (intval($item['CODTRANSFREC']) > 0){
-                                        $print .= "<a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFREC'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
-                
-                                    } else if (intval($item['CODTRANSFPAG']) > 0) {
-                                        $print .= "<a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFPAG'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
-                
-                                    } else if ($item['TIPO'] === 'R'){
-                                        $print .= "<a href='movimentacaoFinanceiraRecebimento.php?lancamentoId=" . $item['ID'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
-                                        
-                                    } else if ($item['TIPO'] === 'P') {
-                                        $print .= "<a href='movimentacaoFinanceiraPagamento.php?lancamentoId=" . $item['ID'] . "' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>";
-                                    }
+                                //BOTAO EDITAR
+                                if (intval($item["CODTRANSFREC"]) > 0){
+                                    $print .= '<a href="movimentacaoFinanceiraTransferencia.php?lancamentoId=' . $item["CODTRANSFREC"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
+                                    /*' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["CODTRANSFREC"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';*/
+                                } else if (intval($item["CODTRANSFPAG"]) > 0) {
+                                    $print .= '<a href="movimentacaoFinanceiraTransferencia.php?lancamentoId=' . $item["CODTRANSFPAG"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
+            
+                                } else if ($item["TIPO"] === "R"){
+                                    $print .= '<a href="movimentacaoFinanceiraRecebimento.php?lancamentoId=' . $item["ID"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
                                     
-                                    //BOTAO EXCLUIR
-                                    if (intval($item['CODTRANSFREC']) > 0){
-                                        $print .= "
-                                            <a href='#' idContaExcluir='" . $item['CODTRANSFREC'] . "' tipo='T' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>";
-                
-                                    } else if (intval($item['CODTRANSFPAG']) > 0) {
-                                        $print .= "
-                                            <a href='#' idContaExcluir='" . $item['CODTRANSFPAG'] . "' tipo='T' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>";
+                                } else if ($item["TIPO"] === "P") {
+                                    $print .= '<a href="movimentacaoFinanceiraPagamento.php?lancamentoId=' . $item["ID"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
+                                }
+                                
+                                //BOTAO EXCLUIR
+                                if (intval($item["CODTRANSFREC"]) > 0){
+                                    $print .= '
+                                        <a href="#" idContaExcluir="' . $item["CODTRANSFREC"] . '" tipo="T" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+                                       /* '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["CODTRANSFREC"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';*/
+            
+                                } else if (intval($item["CODTRANSFPAG"]) > 0) {
+                                    $print .= '
+                                        <a href="#" idContaExcluir="' . $item["CODTRANSFPAG"] . '" tipo="T" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
 
-                                    } else {
-                                        $print .= "
-                                            <a href='#' idContaExcluir='" . $item['ID'] . "' tipo='" . $item['TIPO'] . "' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>";
-                                    }
-                                    $print .= "
-                                </div>
+                                } else {
+                                    $print .= '
+                                        <a href="#" idContaExcluir="' . $item["ID"] . '" tipo="' . $item["TIPO"] . '" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+                                }
+                                $print .= '
                             </div>
-                        </td>
-                    </tr>
-                ";
+                        </div>
+                    </td>
+                </tr>
+            ';
             print($print);
         }
     }
