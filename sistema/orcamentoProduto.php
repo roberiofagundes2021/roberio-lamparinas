@@ -78,10 +78,10 @@ try{
 			JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
 			WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and OrXSCOrcamento = $iOrcamento
 			ORDER BY SbCatNome ASC";
-		$result = $conn->query($sql);
-		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-		
-		$aSubCategorias = '';
+	$result = $conn->query($sql);
+	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+	
+	$aSubCategorias = '';
 
 	foreach ($rowBD as $item) {
 		
@@ -335,8 +335,8 @@ try{
 																JOIN Situacao on SituaId = ProduStatus
 																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
 														
-														if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-															$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
+														if ($aSubCategorias != ""){
+															$sql .= " and ProduSubCategoria in (".$aSubCategorias.") ";
 														}
 														
 														$sql .= " ORDER BY ProduNome ASC";
@@ -379,11 +379,7 @@ try{
 
 								<div class="card-body">
 									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
-
-									<!--<div class="hot-container">
-										<div id="example"></div>
-									</div>-->
-									
+								
 									<?php									
 
 										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OrXPrQuantidade, OrXPrValorUnitario
@@ -402,9 +398,10 @@ try{
 													JOIN Situacao on SituaId = ProduStatus
 													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and SituaChave = 'ATIVO' ";
 													
-											if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-												$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
+											if ($aSubCategorias != ""){
+												$sql .= " and ProduSubCategoria in (".$aSubCategorias.") ";
 											}
+											$sql .= " ORDER BY ProduNome ASC";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										} 
