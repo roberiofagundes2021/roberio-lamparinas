@@ -12,8 +12,15 @@ if (isset($_POST['inputTRId'])){
 
 $iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
 
+$sql = "SELECT SituaChave	   
+		FROM FluxoOperacional
+		JOIN Situacao on SituaId = FlOpeStatus
+		WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
+$result = $conn->query($sql);
+$rowChave = $result->fetch(PDO::FETCH_ASSOC);
+
 $sql = "SELECT FlOpeId, FlOpeCategoria, FlOpeFornecedor, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeNumAta,
-		FlOpeValor, FlOpeConteudoInicio, FlOpeConteudoFim, TrRefId, TrRefNumero, TrRefCategoria, CategNome, CategId
+		FlOpeModalidadeLicitacao, FlOpeValor, FlOpeConteudoInicio, FlOpeConteudoFim, TrRefId, TrRefNumero, TrRefCategoria, CategNome, CategId
 		FROM TermoReferencia
 		JOIN FluxoOperacional on FlOpeTermoReferencia = TrRefId
 		JOIN Categoria ON CategId = TrRefCategoria
@@ -517,13 +524,15 @@ if (isset($_POST['inputDataInicio'])) {
 
 										if ($_POST['inputPermission']) {
 											
-											if ($bFechado) {
-												if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'ADMINISTRADOR' or $_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' or $_SESSION['PerfiChave'] == 'CONTROLADORIA') {
+											if ($rowChave['SituaChave'] != 'LIBERADO'){	
+												if ($bFechado) {
+													if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'ADMINISTRADOR' or $_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' or $_SESSION['PerfiChave'] == 'CONTROLADORIA') {
+														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+													}
+												} else {
 													print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
 												}
-											} else {
-												print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-											}
+											}	
 										}												
 											?>
 										<a href="contrato.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
