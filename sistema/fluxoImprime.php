@@ -38,20 +38,22 @@ $result = $conn->query($sql);
 $rowAditivos = $result->fetchAll(PDO::FETCH_ASSOC);
 
 if ($row['FlOpeTermoReferencia'] && $row['TrRefTabelaProduto'] != null && $row['TrRefTabelaProduto'] == 'ProdutoOrcamento'){
-	$sql = "SELECT ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
+	$sql = "SELECT ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 			FROM Produto
 			JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 			JOIN ProdutoOrcamento on PrOrcProduto = ProduId
 			JOIN SubCategoria on SbCatId = ProduSubCategoria
+			LEFT JOIN Marca on MarcaId = ProduMarca
 			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
 			ORDER BY SbCatNome, ProduNome ASC";
 } else{
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
+	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 			FROM Produto
 			JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 			JOIN SubCategoria on SbCatId = ProduSubCategoria
+			LEFT JOIN Marca on MarcaId = ProduMarca
 			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
 			ORDER BY SbCatNome, ProduNome ASC";
 }
@@ -60,18 +62,20 @@ $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 $totalProdutos = count($rowProdutos);
 
 if ($row['FlOpeTermoReferencia'] && $row['TrRefTabelaServico'] != null && $row['TrRefTabelaServico'] == 'ServicoOrcamento'){
-	$sql = "SELECT ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
+	$sql = "SELECT ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
 			FROM Servico
 			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 			JOIN ServicoOrcamento on SrOrcServico = ServiId
 			JOIN SubCategoria on SbCatId = ServiSubCategoria
+			LEFT JOIN Marca on MarcaId = ServiMarca
 			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
 			ORDER BY SbCatNome, ServiNome ASC";
 } else {
-	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
+	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
 			FROM Servico
 			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 			JOIN SubCategoria on SbCatId = ServiSubCategoria
+			LEFT JOIN Marca on MarcaId = ServiMarca
 			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
 			ORDER BY SbCatNome, ServiNome ASC";
 }
@@ -265,7 +269,8 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'] . "</td>
+					<td style='text-align: left;'>".$rowProduto['ProduNome'].": ".
+					$rowProduto['Detalhamento']."<br>Marca: ".$rowProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
 					<td style='text-align: center;'>" . $rowProduto['FOXPrQuantidade'] . "</td>
 					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
@@ -276,7 +281,8 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'] . "</td>
+					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'].
+					"<br>Marca: ".$rowProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
 					<td style='text-align: center;'>" . $rowProduto['FOXPrQuantidade'] . "</td>
 					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
@@ -405,20 +411,22 @@ try {
 	            <br>';
 
 		if ($row['FlOpeTermoReferencia'] && $row['TrRefTabelaProduto'] != null && $row['TrRefTabelaProduto'] == 'ProdutoOrcamento'){
-			$sql = "SELECT ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario
+			$sql = "SELECT ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome
 					FROM Produto
 					JOIN AditivoXProduto on AdXPrProduto = ProduId
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 					JOIN SubCategoria on SbCatId = ProduSubCategoria
 					JOIN ProdutoOrcamento on PrOrcProduto = ProduId
+					JOIN Marca on MarcaId = ProduMarca
 					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and AdXPrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		} else {
-			$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario
+			$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome
 					FROM Produto
 					JOIN AditivoXProduto on AdXPrProduto = ProduId
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 					JOIN SubCategoria on SbCatId = ProduSubCategoria
+					JOIN Marca on MarcaId = ProduMarca
 					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and AdXPrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		}
@@ -427,18 +435,20 @@ try {
 		$totalProdutos = count($rowProdutos);
 
 		if ($row['FlOpeTermoReferencia'] && $row['TrRefTabelaServico'] != null && $row['TrRefTabelaServico'] == 'ServicoOrcamento'){		
-			$sql = "SELECT ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, AdXSrQuantidade, AdXSrValorUnitario
+			$sql = "SELECT ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, AdXSrQuantidade, AdXSrValorUnitario, MarcaNome
 					FROM Servico
 					JOIN AditivoXServico on AdXSrServico = ServiId
 					JOIN SubCategoria on SbCatId = ServiSubCategoria
 					JOIN ServicoOrcamento on SrOrcServico = ServiId
+					JOIN Marca on MarcaId = ServiMarca
 					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and AdXSrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		} else {
-			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, AdXSrQuantidade, AdXSrValorUnitario
+			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, AdXSrQuantidade, AdXSrValorUnitario, MarcaNome
 					FROM Servico
 					JOIN AditivoXServico on AdXSrServico = ServiId
 					JOIN SubCategoria on SbCatId = ServiSubCategoria
+					JOIN Marca on MarcaId = ServiMarca
 					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and AdXSrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		}
@@ -480,7 +490,8 @@ try {
 					$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'] . "</td>
+					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'].
+					"<br>Marca: ".$rowProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
 					<td style='text-align: center;'>" . $rowProduto['AdXPrQuantidade'] . "</td>
 					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
@@ -491,7 +502,8 @@ try {
 					$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'] . "</td>
+					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'].
+					"<br>Marca: ".$rowProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
 					<td style='text-align: center;'>" . $rowProduto['AdXPrQuantidade'] . "</td>
 					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
@@ -550,7 +562,8 @@ try {
 					$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'] . "</td>	
+					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'].
+					"<br>Marca: ".$rowProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>" . $rowServico['AdXSrQuantidade'] . "</td>
 					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
 					<td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>
@@ -560,7 +573,8 @@ try {
 					$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'] . "</td>
+					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'].
+					"<br>Marca: ".$rowProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>" . $rowServico['AdXSrQuantidade'] . "</td>
 					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
 					<td style='text-align: right'>" . mostraValor($valorTotal) . "</td>
