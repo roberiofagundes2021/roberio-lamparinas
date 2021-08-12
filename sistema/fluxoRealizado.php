@@ -9,13 +9,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 include('global_assets/php/conexao.php');
 
 $iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
-
-if(isset($_POST['inputFluxoOperacionalCategoria'])){
-	$iCategoria = $_POST['inputFluxoOperacionalCategoria'];
-} else {
-	$iCategoria = $_POST['inputCategoria'];
-}
-
+/*
 if (isset($_POST['cmbSubCategoria'])){
 
 	var_dump($_POST['cmbSubCategoria']);die;
@@ -30,7 +24,7 @@ if (isset($_POST['cmbSubCategoria'])){
 			WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
 			ORDER BY SbCatNome ASC";
 		$result = $conn->query($sql);
-		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC); */
+		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC); *
 
 		$sSubCategorias = '';
 
@@ -43,9 +37,7 @@ if (isset($_POST['cmbSubCategoria'])){
 		}
 	}
 }
-
-
-
+*/
 $sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
 			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, ForneRazaoSocial, CategNome 
 		FROM FluxoOperacional
@@ -56,19 +48,9 @@ $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 //$count = count($row);
 
-if ($row['FlOpeDataFim'] > date("Y-m-d")){
-	$dataFim = date("Y-m-d");
-} else {
-	$dataFim = $row['FlOpeDataFim'];
-}
-
 if (isset($_POST['inputSelecionados'])){
-	
-	$aSelecionados = explode("#", $_POST['inputSelecionados']);
 
-/*	foreach ($selecionados as $key => $valor) {
-		echo $valor."<br>";
-	}	*/
+	$aSelecionados = array($_POST['inputSelecionados']);
 }
 
 /*
@@ -114,6 +96,53 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>		
 	
 	<!-- /theme JS files -->
+
+	<script type="text/javascript">
+		
+		$(document).ready(function() {
+			
+			//Ao marcar ou desmarcar os Produtos/Serviços, filtra a lista via ajax (retorno via JSON)
+			$('#cmbProduto').on('change', function(e){
+				
+				let produtos 		  = $(this).val();
+				let fluxoId 		  = $('#inputFluxoOperacionalId').val();
+				let cont 			  = 1;
+				let produtoId 		  = [];
+				let produtoQuant 	  = [];
+
+				// Aqui é para cada "class" faça
+				$.each($(".idProduto"), function() {
+					produtoId[cont] = $(this).val();
+					cont++;
+				});
+
+				cont = 1;
+				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
+				$.each($(".Quantidade"), function() {
+					$id 							= produtoId[cont];
+					produtoQuant[$id] = $(this).val();
+					cont++;
+				});
+
+				$.ajax({
+					type: "POST",
+					url: "trFiltraProduto.php",
+					data: {
+						iFluxo: fluxoId,
+						produtos: produtos,
+						produtoId: produtoId,
+						produtoQuant: produtoQuant
+					},
+					success: function(resposta) {
+						$("#tabelaProdutos").html(resposta).show();
+						return false;
+					}
+				});
+			});
+
+		});
+
+	</script>	
 
 </head>
 
@@ -218,7 +247,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 														$result = $conn->query($sql);
 														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 														
-														$itensSelecionados = '';
+														$itensSelecionados = array();
 
 														$seleciona = "selected";
 															
@@ -233,20 +262,19 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 
 															print('<option value="'.$item['Id'].'" '.$seleciona.'>'.$item['Nome'].'</option>');
 															
-															// Está filtrando
 															if (isset($_POST['inputSelecionados'])){
 																if (in_array($item['Id'], $aSelecionados)){
-																	$itensSelecionados .= $item['Id']."#";
+																	$itensSelecionados[] = $item['Id'];
 																}
-															} else{
-																$itensSelecionados .= $item['Id']."#";
-															}																
+															} else {
+																$itensSelecionados[] = $item['Id'];
+															}															
 														}
 													
 													?>
 												</select>
 
-												<input type="hidden" name="inputSelecionados" value="<?php echo $itensSelecionados; ?>">
+												<input type="text" name="inputSelecionados" value="<?php var_dump($itensSelecionados); ?>">
 											</div>
 										</div>
 
@@ -381,7 +409,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 												$sql = "SELECT ISNULL(SUM(MvXPrQuantidade), 0) as Controle, MvXPrValorUnitario
 														FROM Movimentacao														
 														JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['Id']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$dataFim."' and MovimTipo = 'E' 
+														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['Id']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$row['FlOpeDataFim']."' and MovimTipo = 'E' 
 														GROUP By MvXPrQuantidade, MvXPrValorUnitario";
 												$result = $conn->query($sql);
 												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -489,7 +517,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 												$sql = "SELECT ISNULL(SUM(MvXPrQuantidade), 0) as Controle, MvXPrValorUnitario
 														FROM Movimentacao														
 														JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['Id']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$dataFim."' and MovimTipo = 'E' 
+														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['Id']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$row['FlOpeDataFim']."' and MovimTipo = 'E' 
 														GROUP By MvXPrQuantidade, MvXPrValorUnitario";
 												$result = $conn->query($sql);
 												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);

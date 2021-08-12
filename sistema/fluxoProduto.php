@@ -748,19 +748,21 @@ try{
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-6">
 									<div class="form-group">
-										<?php										
-											if ($row['FluxoFechado'] && $row['SituaChave'] != 'LIBERADO'){												
-												print('
-												<button class="btn btn-lg btn-principal" id="enviar" style="margin-right:5px;">Alterar</button>
-												<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
-											} else{ 
-												if (!$countProduto){
-													print('<button class="btn btn-lg btn-principal" id="enviar" disabled>Alterar</button>');
-												} else {
-													print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-												}
+										<?php	
+                                            if ($row['SituaChave'] != 'LIBERADO'){	
+												if ($row['FluxoFechado']){												
+													print('
+													<button class="btn btn-lg btn-principal" id="enviar" style="margin-right:5px;">Alterar</button>
+													<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
+												} else{ 
+													if (!$countProduto){
+														print('<button class="btn btn-lg btn-principal" id="enviar" disabled>Alterar</button>');
+													} else {
+														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+													}
+												} 
 											} 
-										
+
 											if ($_POST['inputOrigem'] == 'fluxo.php'){
 												print('<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>');
 											} else {
