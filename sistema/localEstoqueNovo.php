@@ -91,7 +91,9 @@ if(isset($_POST['inputNome'])){
 				$("#inputEndereco").val("");
 				$("#inputBairro").val("");
 				$("#inputCidade").val("");
-				$("#cmbEstado").val("");                
+				$("#cmbEstado").val("");
+				$("#inputNumero").val("");
+				$("#inputComplemento").val("");                    
 			}
 			
 			//Quando o campo cep perde o foco.
@@ -141,6 +143,7 @@ if(isset($_POST['inputNome'])){
 					} //end if.
 					else {
 						//cep é inválido.
+						$("#inputCep").val("");
 						limpa_formulário_cep();
 						alerta("Erro","Formato de CEP inválido.","erro");
 					}

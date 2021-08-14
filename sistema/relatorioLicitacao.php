@@ -23,7 +23,7 @@ $m = date("m");
 $Y = date("Y");
 
 $dataInicio = date('Y')."-01-01";  //date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
-$dataFim = date('Y')."-12-31"; //date("Y-m-d");
+$dataFim =  date("Y-12-31", mktime(0, 0, 0, $m, $d, $Y + 1)); //1 ano a mais
 
 
 $sql = "SELECT PerfiChave
@@ -580,7 +580,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                                 $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                 foreach ($rowSituacao as $item) {
-                                                    if ($item['SituaChave'] == 'PENDENTE') {
+                                                    if ($item['SituaChave'] == 'LIBERADO') {
                                                         print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
                                                     } else if ($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "LIBERADO"|| $item['SituaChave'] == "NAOLIBERADO") {
                                                         print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
