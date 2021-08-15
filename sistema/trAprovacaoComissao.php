@@ -10,13 +10,11 @@ if(isset($_POST['inputTRId'])){
 	
 	$iTrId = $_POST['inputTRId'];
 
-	$sql = "
-		SELECT TRXEqPresidente, TRXEqUsuario, TrRefNumero, TrRefTipo, TrRefData, TrRefStatus
-  		FROM TRXEquipe
-		JOIN TermoReferencia on TrRefId = TRXEqTermoReferencia
- 	 	WHERE TRXEqUnidade = ".$_SESSION['UnidadeId']." AND TRXEqTermoReferencia = ".$iTrId."
-   		AND TRXEqPresidente > 0
-	";
+	$sql = "SELECT TRXEqPresidente, TRXEqUsuario, TrRefNumero, TrRefTipo, TrRefData, TrRefStatus
+  			FROM TRXEquipe
+			JOIN TermoReferencia on TrRefId = TRXEqTermoReferencia
+ 	 		WHERE TRXEqUnidade = ".$_SESSION['UnidadeId']." AND TRXEqTermoReferencia = ".$iTrId."
+   			AND TRXEqPresidente > 0	";
 	$result = $conn->query($sql);
 	$rowTRPresidente = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -30,11 +28,12 @@ if(isset($_POST['inputTRId'])){
 		try{
 			$conn->beginTransaction();
 
+			//Recupera o ID da Situação 'AGUARDANDOFINALIZACAO'
 			$sql = "SELECT SituaId
 					FROM Situacao
 					WHERE SituaChave = 'AGUARDANDOFINALIZACAO' ";
 			$result = $conn->query($sql);
-			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);	
+			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 			/* Verifica se a Bandeja já tem um registro com BandeTabela: TermoReferencia, Perfil: COMISSAO e e BandeTabelaId: $iTrId, evitando duplicação */
 			$sql = "SELECT COUNT(BandeId) as Count
@@ -115,6 +114,28 @@ if(isset($_POST['inputTRId'])){
 					':iPresidente' 			=> $rowTRPresidente['TRXEqUsuario'],
 					':iUnidade' 			=> $_SESSION['UnidadeId'],
 					':iIdBandeja' 			=> $rowBandeja['BandeId']														
+				));
+			}
+
+			//Recupera a chave da situação do TR
+			$sql = "SELECT SituaChave
+					FROM Situacao
+					WHERE SituaId = ".$_POST['inputTRStatus'];
+			$result = $conn->query($sql);
+			$rowChave = $result->fetch(PDO::FETCH_ASSOC);
+
+			//Se já foi liberado pela Contabilidade o Status do TR deve ser alterado para "Aguardando Finalização - Comissão"
+			if ($rowChave['SituaChave'] == 'LIBERADOCONTABILIDADE'){
+				
+				$sql = "UPDATE TermoReferencia SET TrRefStatus = :iSituacao, 
+						TrRefUsuarioAtualizador = :iUsuarioAtualizador
+						WHERE TrRefUnidade = :iUnidade AND TrRefId = :iTR";
+				$result = $conn->prepare($sql);						
+				$result->execute(array(
+					':iSituacao' 			=> $rowSituacao['SituaId'],
+					':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+					':iUnidade' 			=> $_SESSION['UnidadeId'],
+					':iTR' 					=> $iTrId
 				));
 			}
 
