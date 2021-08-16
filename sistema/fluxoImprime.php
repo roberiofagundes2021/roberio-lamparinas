@@ -35,13 +35,9 @@ $result = $conn->query($sql);
 $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
 $sql = "SELECT AditiId, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, AditiValor, FlOpeId, 
-		FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, CategNome, SbCatNome,
-		ForneNome, ForneRazaoSocial, ForneCelular, ForneEmail
+		FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim
 		FROM Aditivo
 		JOIN FluxoOperacional on FlOpeId = AditiFluxoOperacional
-		JOIN Fornecedor on ForneId = FlOpeFornecedor
-		JOIN Categoria on CategId = FlOpeCategoria
-		JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 		WHERE AditiUnidade = " . $_SESSION['UnidadeId'] . " and AditiFluxoOperacional = " . $iFluxoOperacional;
 $result = $conn->query($sql);
 $rowAditivos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -128,7 +124,7 @@ try {
 	<table style="width:100%; border-collapse: collapse;">
         <tr>
             <td style="width:40%; font-size:14px;">Categoria:<br>' . $row['CategNome'] . '</td>
-            <td style="width:60%; font-size:14px;">Sub Categoria:<br>' . $row['SubCategorias'] . '</td>
+            <td style="width:60%; font-size:14px;">Sub Categoria(s):<br>' . $row['SubCategorias'] . '</td>
         </tr>
 	</table>
 	<table style="width:100%; border-collapse: collapse;">

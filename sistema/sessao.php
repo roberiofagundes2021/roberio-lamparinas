@@ -64,6 +64,7 @@ $arquivosAditivo = array('fluxoAditivo.php', 'fluxoAditivoNovo.php', 'fluxoAditi
 //Se existe a sessão $_SESSION['FluxoId'] e a página que está sendo acessada não é nenhuma das sitadas acima, limpa essa sessão.	  
 if (array_key_exists('FluxoId', $_SESSION) and !in_array(basename($_SERVER['PHP_SELF']), $arquivosAditivo)) {
 	unset($_SESSION['FluxoId']);
+	unset($_SESSION['Origem']);
 }
 
 $arquivoAditivoNovo = array('fluxoAditivoNovo.php');
