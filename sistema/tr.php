@@ -303,7 +303,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										A relação abaixo faz referência aos orçamentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
 									</div>
 									<div class="col-lg-3">
-										<div class="text-right"><a href="trNovo.php" class="btn btn-principal" role="button">Nova TR</a></div>
+										<div class="text-right"><a href="trNovo.php" class="btn btn-principal" role="button">Novo TR</a></div>
 									</div>
 								</div>
 							</div>

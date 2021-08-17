@@ -371,13 +371,8 @@ if (count($rowProdutoUtilizado) >= 1) {
 																		JOIN Situacao on SituaId = PrOrcSituacao				     
 																	 	WHERE PrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " 
 																	   	AND SituaChave = 'ATIVO' and PrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
-																		AND PrOrcCategoria = " . $iCategoria;
-
-																if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null) {
-																	$sql .= " and PrOrcSubCategoria = " . $row['TrRefSubCategoria'];
-																}
-
-																$sql .= " ORDER BY PrOrcNome ASC";
+																		AND PrOrcCategoria = " . $iCategoria. "
+																		ORDER BY PrOrcNome ASC";
 																$result = $conn->query($sql);
 																$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
 

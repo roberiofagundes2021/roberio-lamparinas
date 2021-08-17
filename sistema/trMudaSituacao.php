@@ -18,30 +18,27 @@ if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 
 		$conn->beginTransaction();
 
-		$sql = "
-			SELECT SituaId
-			FROM Situacao	
-			WHERE SituaChave = '".$_POST['inputTermoReferenciaStatus']."'";
+		$sql = "SELECT SituaId
+				FROM Situacao	
+				WHERE SituaChave = '".$_POST['inputTermoReferenciaStatus']."'";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 
-		if ($_POST['inputTermoReferenciaStatus'] === 'NAOLIBERADO'){
+		if ($_POST['inputTermoReferenciaStatus'] === 'NAOLIBERADOCENTROADMINISTRATIVO'){
 			$motivo = $_POST['inputMotivo'];
 
-			$sql = "
-				UPDATE TermoReferencia
+			$sql = "UPDATE TermoReferencia
 					SET TrRefStatus = :bStatus, 
 						TrRefUsuarioAtualizador = :iUsuario
-				WHERE TrRefId = :iTermoReferenciaId";			
+					WHERE TrRefId = :iTermoReferenciaId";			
 		} else{
 			$motivo = NULL;
 
-			$sql = "
-				UPDATE TermoReferencia
+			$sql = "UPDATE TermoReferencia
 					SET TrRefStatus = :bStatus, 
 						TrRefUsuarioAtualizador = :iUsuario,
 						TrRefLiberaParcial = ".true."
-				WHERE TrRefId = :iTermoReferenciaId";			
+					WHERE TrRefId = :iTermoReferenciaId";			
 		}
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $row['SituaId']);
@@ -49,11 +46,10 @@ if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 		$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
 		$result->execute();		
 		
-		$sql = "
-			UPDATE Bandeja 
-				 SET BandeStatus = :iStatus, 
-					 BandeMotivo = :sMotivo, 
-					 BandeUsuarioAtualizador = :iUsuario ";
+		$sql = "UPDATE Bandeja 
+				SET BandeStatus = :iStatus, 
+					BandeMotivo = :sMotivo, 
+					BandeUsuarioAtualizador = :iUsuario ";
 		
 		if ($_POST['inputTermoReferenciaStatus'] === 'FASEINTERNAFINALIZADA'){
 			$sql .= ", BandeDescricao = 'CONCLUÍDO'";

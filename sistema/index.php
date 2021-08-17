@@ -44,7 +44,7 @@ $sql = "
 				ON BnXPeBandeja = BandeId
 		WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
 		  AND UsXUnUnidade = " . $_SESSION['UnidadeId'] . " 
-			AND B.SituaChave in ('AGUARDANDOLIBERACAO', 'AGUARDANDOLIBERACAOCENTRO' , 'AGUARDANDOLIBERACAOCONTABILIDADE') 
+			AND B.SituaChave in ('AGUARDANDOLIBERACAO', 'AGUARDANDOLIBERACAOCENTRO', 'AGUARDANDOLIBERACAOCONTABILIDADE', 'AGUARDANDOFINALIZACAO') 
 			AND (BnXPePerfil in (" . $idPerfilLogado . ") OR BandeUsuario = " . $_SESSION['UsuarId'] . ") 
 		ORDER BY BandeData DESC, BandeId DESC";
 //echo $sql;die;		

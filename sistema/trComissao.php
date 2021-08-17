@@ -383,7 +383,7 @@ if(isset($_POST['cmbUsuario'])){
 								<div class="card-body">
 									<div class="row">
 										<div class="col-lg-9">
-											A relação abaixo faz referência a Comissão do Processo Licitatório da <span style="color: #FF0000; font-weight: bold;">TR nº <?php echo $_SESSION['TRNumero']; ?></span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>	
+											A relação abaixo faz referência a Comissão do Processo Licitatório do <span style="color: #FF0000; font-weight: bold;">TR nº <?php echo $_SESSION['TRNumero']; ?></span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>	
 										</div>	
 										<div class="col-lg-3">	
 											<div class="text-right">
