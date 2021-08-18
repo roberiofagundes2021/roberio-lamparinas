@@ -43,12 +43,11 @@ $countProdutosTr2 = count($rowProdutos);
 
 if (count($rowProdutosOrcamento) >= 1) {
 
-	$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrTabela, UnMedNome
+	$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, UnMedNome
 			FROM ProdutoOrcamento
-			JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
-			JOIN Categoria on CategId = PrOrcCategoria
 			JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-			WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and PrOrcId in (" . $lista . ")
+			WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and PrOrcId in (" . $lista . ")
+			Order By PrOrcSubCategoria ASC
 			";
 	//echo $sql;
 
