@@ -389,8 +389,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																	print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoComissao\');" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i> Enviar para comissão</a>');
 																}
 
-																//Se o TR estiver LIBERADOCONTABILIDADE e o Presidente da Comissão for o usuário Logado mostra a opção para ele "Finalizar TR"
-																if ($item['SituaChave'] == 'LIBERADOCONTABILIDADE' && $item['TRXEqUsuario'] == $_SESSION['UsuarId']){
+																//Se o TR estiver AGUARDANDOFINALIZACAO e o Presidente da Comissão for o usuário Logado mostra a opção para ele "Finalizar TR"
+																if ($item['SituaChave'] == 'AGUARDANDOFINALIZACAO' && $item['TRXEqUsuario'] == $_SESSION['UsuarId']){
 																	print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'finalizarTR\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Finalizar TR</a>');
 																}
 
