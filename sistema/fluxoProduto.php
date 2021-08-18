@@ -249,7 +249,7 @@ try{
 				/* impede o sumbit caso esteja dentro de um form */
 				e.preventDefault(e);
 				return false;
-            });
+      });
 			
 			//Valida Registro
 			$('#enviar').on('click', function(e){

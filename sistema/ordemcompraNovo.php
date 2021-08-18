@@ -272,7 +272,11 @@ if(isset($_POST['inputData'])){
 					ResetLocalEstoque();
 				} else {
 					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados){
-						
+						$.getJSON('filtraEnderecoEstoque.php?idUnidade=' + cmbUnidade, function (endereco){
+							endereco = endereco.replace(', ,',',')
+							$('#inputEnderecoEntrega').val(endereco)
+						});
+
 						var option = '';
 
 						if (dados.length){
