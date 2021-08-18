@@ -15,12 +15,13 @@ if (isset($_POST['inputFluxoId'])) {
 }
 
 //Pega os dados principais do fluxo
-$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, 
-		FlOpeConteudoInicio, FlOpeConteudoFim, CategNome, dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, ForneNome, ForneRazaoSocial, ForneCelular, 
-		ForneEmail
+$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, CategNome, 
+		dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, ForneNome, ForneRazaoSocial, ForneCelular, 
+		ForneEmail, FlOpeTermoReferencia, TrRefTabelaProduto, TrRefTabelaServico
 		FROM FluxoOperacional
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
 		JOIN Categoria on CategId = FlOpeCategoria
+		LEFT JOIN TermoReferencia on TrRefId = FlOpeTermoReferencia
 		WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
