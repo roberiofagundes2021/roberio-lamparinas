@@ -150,6 +150,15 @@ if ((array_key_exists('ContRecPeriodoDe', $_SESSION)
 	unset($_SESSION['ContRecFormaPagamento']);
 }
 
+$arquivosFluxoRealizado = array(
+	'fluxoRealizado.php'
+);
+
+if (array_key_exists('OrigemFluxoRealizado', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosFluxoRealizado)) {
+
+	unset($_SESSION['OrigemFluxoRealizado']);
+}
+
 
 if (!array_key_exists('UsuarId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
 	header('Expires: 0');

@@ -2,70 +2,34 @@
 
 include_once("sessao.php"); 
 
-$inicio1 = microtime(true);
+//$inicio1 = microtime(true);
 
 $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
 include('global_assets/php/conexao.php');
 
-$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
-/*
-if (isset($_POST['cmbSubCategoria'])){
-
-	var_dump($_POST['cmbSubCategoria']);die;
+if (isset($_POST['inputFluxoOperacionalId'])){
 	
-	$aSubCategoriasSelecionadas = explode("#", $_POST['cmbSubCategoria']);
+	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
+	$_SESSION['OrigemFluxoRealizado'] = $_POST['inputOrigem'];
 
-	/*	
-	//SubCategorias filtradas
-	$sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
-			FROM SubCategoria
-			LEFT JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
-			WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
-			ORDER BY SbCatNome ASC";
-		$result = $conn->query($sql);
-		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC); *
-
-		$sSubCategorias = '';
-
-		foreach ($rowBD as $item){
-
-		if ($sSubCategorias == ''){
-			$sSubCategorias .= $item['SbCatId'];	
-		} else {
-			$sSubCategorias .= ", ".$item['SbCatId'];
-		}
-	}
+	$sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
+				   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, ForneRazaoSocial, CategNome 
+			FROM FluxoOperacional
+			JOIN Fornecedor ON ForneId = FlOpeFornecedor
+			JOIN Categoria ON CategId = FlOpeCategoria	 
+			WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ". $iFluxoOperacional . "";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+	//$count = count($row);
+} else {
+	irpara($_SESSION['OrigemFluxoRealizado']); //Isso aqui é pensando no caso do usuário der um refresh nessa página. Um ENTER, por exemplo na URL.
 }
-*/
-$sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
-			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, ForneRazaoSocial, CategNome 
-		FROM FluxoOperacional
-		JOIN Fornecedor ON ForneId = FlOpeFornecedor
-		JOIN Categoria ON CategId = FlOpeCategoria	 
-	    WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ". $iFluxoOperacional . "";
-$result = $conn->query($sql);
-$row = $result->fetch(PDO::FETCH_ASSOC);
-//$count = count($row);
 
 if (isset($_POST['inputSelecionados'])){
 
 	$aSelecionados = array($_POST['inputSelecionados']);
 }
-
-/*
-$sql = "SELECT FOXPrProduto
-		FROM FluxoOperacionalXProduto
-		LEFT JOIN Produto on ProduId = FOXPrProduto
-		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
-$result = $conn->query($sql);
-$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
-$countProdutoUtilizado = count($rowProdutoUtilizado);
-
-foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
-	$aProdutos[] = $itemProdutoUtilizado['FOXPrProduto'];
-}
-*/
 
 ?>
 
@@ -279,7 +243,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 													?>
 												</select>
 
-												<input type="text" name="inputSelecionados" value="<?php var_dump($itensSelecionados); ?>">
+												<input type="hidden" name="inputSelecionados" value="<?php var_dump($itensSelecionados); ?>">
 											</div>
 										</div>
 
@@ -685,8 +649,8 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 
 	<?php include_once("alerta.php"); ?>
 
-	<?php  $total1 = microtime(true) - $inicio1;
-		 echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>';  ?>
+	<?php /* $total1 = microtime(true) - $inicio1;
+		 echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; */ ?>
 
 </body>
 
