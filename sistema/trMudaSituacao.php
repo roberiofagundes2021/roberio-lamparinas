@@ -44,7 +44,24 @@ if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 		$result->bindParam(':bStatus', $row['SituaId']);
 		$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
 		$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
-		$result->execute();		
+		$result->execute();
+
+		if ($_POST['inputTermoReferenciaStatus'] === 'FASEINTERNAFINALIZADA'){
+			
+			//Essa consulta é feita para pegar o Id da Bandeja quando o Finalizar TR for feito a partir do tr.php para atualizar a bandeja após finalizar o TR
+			$sql = "SELECT BandeId
+					FROM Bandeja	
+					WHERE BandeUnidade = ".$_SESSION['UnidadeId']." and BandeTabela = 'TermoReferencia' 
+					and BandeTabelaId = ".$iTermoReferenciaId." and BandePerfil = 'COMISSAO' ";
+			$result = $conn->query($sql);
+			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
+		}
+
+		if (isset($_POST['inputBandejaId'])){
+			$iBandeja = $_POST['inputBandejaId'];
+		} else{
+			$iBandeja = $rowBandeja['BandeId'];
+		}
 		
 		$sql = "UPDATE Bandeja 
 				SET BandeStatus = :iStatus, 
@@ -60,7 +77,7 @@ if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 		$result->bindParam(':iStatus', $row['SituaId']);
 		$result->bindParam(':sMotivo', $motivo);
 		$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
-		$result->bindParam(':iBandeja', $_POST['inputBandejaId']);
+		$result->bindParam(':iBandeja', $iBandeja);
 		$result->execute();
 
 		$conn->commit();

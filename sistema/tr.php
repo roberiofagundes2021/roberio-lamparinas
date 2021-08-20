@@ -178,15 +178,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							return false;
 						}
 
-				} else if (Tipo == 'mudaStatus') {
-					document.formTR.action = "trMudaSituacao.php";
-					document.formTR.submit();
-
 				} else if (Tipo == 'listarProdutos') {
 					document.formTR.action = "trProduto.php";
 					document.formTR.submit();
 
-				}else if (Tipo == 'listarServicos') {
+				} else if (Tipo == 'listarServicos') {
 					document.formTR.action = "trServico.php";
 					document.formTR.submit();
 
@@ -337,7 +333,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 													<td>' . $item['SubCategorias'] . '</td>
 										');
 
-										// print('<td><a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
 										print('<td><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></td>');
 
 										print('<td class="text-center">
