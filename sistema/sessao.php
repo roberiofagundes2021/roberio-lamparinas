@@ -160,7 +160,7 @@ if (array_key_exists('OrigemFluxoRealizado', $_SESSION) && !in_array(basename($_
 }
 
 
-if (!array_key_exists('UsuarId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
+if (!array_key_exists('UsuarId', $_SESSION) or !array_key_exists('UnidadeId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
 	header('Expires: 0');
 	header('Pragma: no-cache');
 	header("Location: login.php");
