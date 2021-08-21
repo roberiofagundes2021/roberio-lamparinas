@@ -12,14 +12,12 @@ if(isset($_POST['inputTRId'])){
 	try{
 		$conn->beginTransaction();	
 
-		/* Aqui não estou usando o Foreign Key on Cascade. Portanto, preciso excluir primeiro o TRXOrcamentoXProduto, TRXOrcamentoXServico e TRXOrcamentoXSubCategoria */
+		/* Aqui não estou usando o Foreign Key on Cascade. Portanto, preciso excluir primeiro o TRXOrcamentoXProduto, 
+		TRXOrcamentoXServico e TRXOrcamentoXSubCategoria */
 
-		$sql = "
-			SELECT TrXOrId
+		$sql = "SELECT TrXOrId
 				FROM TRXOrcamento
-			 WHERE TrXOrTermoReferencia = $iTR 
-			   AND TrXOrUnidade = $iUnidade
-		";
+			 	WHERE TrXOrTermoReferencia = $iTR AND TrXOrUnidade = $iUnidade ";
 		$result = $conn->query($sql);
 		$rowOrcamentosTR = $result->fetchAll(PDO::FETCH_ASSOC);
 		
@@ -27,95 +25,63 @@ if(isset($_POST['inputTRId'])){
 		   
 			$iOrcamento = $item['TrXOrId'];
 		   
-			$sql = "
-				DELETE 
-					FROM TRXOrcamentoXSubCategoria
-				 WHERE TXOXSCOrcamento = :iOrcamento 
-				   AND TXOXSCUnidade = :iUnidade
-			";
+			$sql = "DELETE FROM TRXOrcamentoXSubCategoria
+				 	WHERE TXOXSCOrcamento = :iOrcamento AND TXOXSCUnidade = :iUnidade ";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
 			$result->bindParam(':iUnidade', $iUnidade); 
 			$result->execute();
 			
-			$sql = "
-				DELETE 
-					FROM TRXOrcamentoXProduto
-				 WHERE TXOXPOrcamento = :iOrcamento 
-				   AND TXOXPUnidade = :iUnidade
-			";
+			$sql = "DELETE FROM TRXOrcamentoXProduto
+				 	WHERE TXOXPOrcamento = :iOrcamento AND TXOXPUnidade = :iUnidade	";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
 			$result->bindParam(':iUnidade', $iUnidade); 
 			$result->execute();	
 
-			$sql = "
-				DELETE 
-					FROM TRXOrcamentoXServico
-				 WHERE TXOXSOrcamento = :iOrcamento 
-				   AND TXOXSUnidade = :iUnidade
-			";
+			$sql = "DELETE FROM TRXOrcamentoXServico
+				 	WHERE TXOXSOrcamento = :iOrcamento AND TXOXSUnidade = :iUnidade ";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':iOrcamento', $iOrcamento);
 			$result->bindParam(':iUnidade', $iUnidade); 
 			$result->execute();				
 		}
 		   
-		$sql = "
-			DELETE 
-				FROM TRXOrcamento
-			 WHERE TrXOrTermoReferencia = :iTR 
-			   AND TrXOrUnidade = :iUnidade";
+		$sql = "DELETE FROM TRXOrcamento
+			 	WHERE TrXOrTermoReferencia = :iTR AND TrXOrUnidade = :iUnidade ";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
 		$result->bindParam(':iUnidade', $iUnidade); 
 		$result->execute();
 		
-		$sql = "
-			DELETE 
-				FROM TermoReferenciaXProduto
-			 WHERE TRXPrTermoReferencia = :iTR 
-			   AND TRXPrUnidade = :iUnidade
-		";
+		$sql = "DELETE FROM TermoReferenciaXProduto
+			 	WHERE TRXPrTermoReferencia = :iTR AND TRXPrUnidade = :iUnidade ";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
 		$result->bindParam(':iUnidade', $iUnidade); 
 		$result->execute();
 		
-		$sql = "
-			DELETE 
-				FROM TermoReferenciaXServico
-			 WHERE TRXSrTermoReferencia = :iTR 
-			   AND TRXSrUnidade = :iUnidade
-		";
+		$sql = "DELETE FROM TermoReferenciaXServico
+			 	WHERE TRXSrTermoReferencia = :iTR AND TRXSrUnidade = :iUnidade ";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iTR', $iTR);
 		$result->bindParam(':iUnidade', $iUnidade); 
 		$result->execute();	
 	
-		$sql = "
-			DELETE 
-				FROM TRXEquipe
-			 WHERE TRXEqTermoReferencia = :id
-		";
+		$sql = "DELETE FROM TRXEquipe
+				WHERE TRXEqTermoReferencia = :id ";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iTR);
 		$result->execute();
 
-		$sql = "
-			DELETE 
-				FROM TRXSubcategoria
-			WHERE TRXSCTermoReferencia = :id
-		";
+		$sql = "DELETE FROM TRXSubcategoria
+				WHERE TRXSCTermoReferencia = :id ";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iTR); 
 		$result->execute();
 		
-		$sql = "
-			DELETE 
-				FROM TermoReferencia
-			 WHERE TrRefId = :id
-		";
+		$sql = "DELETE FROM TermoReferencia
+			 	WHERE TrRefId = :id	";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iTR); 
 		$result->execute();

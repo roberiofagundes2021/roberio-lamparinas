@@ -29,11 +29,11 @@ if (isset($_POST['inputMovimentacaoFinanceiraId'])) {
 			$sql = "DELETE FROM ContasAPagar
 										WHERE CnAPaId = :id";
 			$result = $conn->prepare($sql);
-			$result->bindParam(':id', $_POST['idMov']);
+			$result->bindParam(':id', $_POST['inputMovimentacaoFinanceiraId']);
 			$result->execute();
 
 			$_SESSION['msg']['titulo'] = "Sucesso";
-			$_SESSION['msg']['mensagem'] = "Conta excluída!!!";
+			$_SESSION['msg']['mensagem'] = "Conta excluída !!!";
 			$_SESSION['msg']['tipo'] = "success";
 		} catch (PDOException $e) {
 
@@ -50,21 +50,21 @@ if (isset($_POST['inputMovimentacaoFinanceiraId'])) {
 			$sql = "DELETE FROM ContasTransferencia
 										WHERE CnTraId = :id";
 			$result = $conn->prepare($sql);
-			$result->bindParam(':id', $_POST['idMov']);
+			$result->bindParam(':id', $_POST['inputMovimentacaoFinanceiraId']);
 			$result->execute();
 
 			/*----- DELETA MOVIMENTAÇÃO - ContasAReceber -----*/
 			$sql = "DELETE FROM ContasAReceber
 										WHERE CnAReTransferencia = :id";
 			$result = $conn->prepare($sql);
-			$result->bindParam(':id', $_POST['idMov']);
+			$result->bindParam(':id',$_POST['inputMovimentacaoFinanceiraId']);
 			$result->execute();
 
 			/*----- DELETA MOVIMENTAÇÃO - ContasAPagar -----*/
 			$sql = "DELETE FROM ContasAPagar
 										WHERE CnAPaTransferencia = :id";
 			$result = $conn->prepare($sql);
-			$result->bindParam(':id', $_POST['idMov']);
+			$result->bindParam(':id', $_POST['inputMovimentacaoFinanceiraId']);
 			$result->execute();
 	
 			$conn->commit();
