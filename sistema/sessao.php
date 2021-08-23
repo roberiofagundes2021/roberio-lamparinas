@@ -10,7 +10,7 @@ $excluir = 0;
 // faz o controle de acesso às paginas de acordo à permissão
 if (isset($_SESSION['Permissoes'])){
 	foreach($_SESSION['Permissoes'] as $key => $permissao){
-		if($permissao['url'] == basename($_SERVER['REQUEST_URI'])){
+		if($permissao['url'] == basename($_SERVER['REQUEST_URI']) && strtoupper($permissao['posicao']) != "APOIO"){
 			$atualizar = $permissao['atualizar'];
 			$excluir = $permissao['excluir'];
 			if($permissao['visualizar'] == 0){

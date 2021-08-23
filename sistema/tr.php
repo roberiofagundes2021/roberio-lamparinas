@@ -8,20 +8,85 @@ $_SESSION['PaginaAtual'] = 'Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
-$sql = "
-		SELECT DISTINCT TrRefId, TrRefNumero, TrRefData,	TrRefCategoria,	TrRefTipo, CategNome, 
-		TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome, 
-		dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias, BandeMotivo, TRXEqUsuario
-		FROM TermoReferencia
-		JOIN Categoria ON CategId = TrRefCategoria
-		JOIN Situacao  ON SituaId = TrRefStatus
-		LEFT JOIN Bandeja ON BandeTabelaId = TrRefId AND BandeTabela = 'TermoReferencia' AND BandeUnidade = " . $_SESSION['UnidadeId'] . "
-		LEFT JOIN TRXEquipe ON TRXEqTermoReferencia = TrRefId and TRXEqPresidente = 1
-		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . "
-		ORDER BY TrRefData DESC
-";
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
+$unidade = $_SESSION['UnidadeId'];
+$perfil = $_SESSION['PerfiChave'];
+$userId = $_SESSION['UsuarId'];
+$url = basename($_SERVER['PHP_SELF']);
+
+$sqlPerfil = "SELECT PerfiId FROM Perfil
+WHERE PerfiChave = '$perfil'";
+$resultPerfilId = $conn->query($sqlPerfil);
+$perfilId = $resultPerfilId->fetchAll(PDO::FETCH_ASSOC);
+$perfilId = $perfilId[0]['PerfiId'];
+
+$sqlUsuarioEquipe = "SELECT TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente, TRXEqUnidade
+										FROM TRXEquipe
+										WHERE TRXEqUsuario = $userId and TRXEqUnidade = $unidade";
+$resultUsuarioEquipe = $conn->query($sqlUsuarioEquipe);
+$UsuarioEquipe = $resultUsuarioEquipe->fetchAll(PDO::FETCH_ASSOC);
+
+$sqlUser = "SELECT UsuarPermissaoPerfil
+FROM Usuario
+Where UsuarId = '$userId'";
+
+$resultUserId = $conn->query($sqlUser);
+$usuaXPerm = $resultUserId->fetch(PDO::FETCH_ASSOC);
+
+if($usuaXPerm['UsuarPermissaoPerfil'] == 0){
+	$sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
+							MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, MenuSetorPrivado,
+							UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeUnidade
+							FROM Menu
+							JOIN Situacao on MenuStatus = SituaId
+							JOIN UsuarioXPermissao on UsXPeUsuario = '$userId' and UsXPeUnidade = '$unidade' and UsXPeMenu = MenuId
+							WHERE UPPER(MenuPosicao) = 'APOIO' and MenuUrl = '$url'";
+} else {
+	$sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
+							MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, PrXPeId, PrXPePerfil, MenuSetorPrivado,
+							PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeUnidade
+							FROM Menu
+							JOIN Situacao on MenuStatus = SituaId
+							JOIN PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$perfilId' and PrXPeUnidade  = '$unidade'
+							WHERE UPPER(MenuPosicao) = 'APOIO' and MenuUrl = '$url'";
+}
+$resultMenu = $conn->query($sqlMenu);
+$menuPermissao = $resultMenu->fetch(PDO::FETCH_ASSOC);
+$permissao = isset($menuPermissao['UsXPeVisualizar'])?$menuPermissao['UsXPeVisualizar']:$menuPermissao['PrXPeVisualizar'];
+
+if($permissao == 1){
+	$sql = "SELECT DISTINCT TrRefId, TrRefNumero, TrRefData,	TrRefCategoria,	TrRefTipo, CategNome, 
+					TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome, 
+					dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias, BandeMotivo, TRXEqUsuario
+					FROM TermoReferencia
+					JOIN Categoria ON CategId = TrRefCategoria
+					JOIN Situacao  ON SituaId = TrRefStatus
+					LEFT JOIN Bandeja ON BandeTabelaId = TrRefId AND BandeTabela = 'TermoReferencia' AND BandeUnidade = $_SESSION[UnidadeId]
+					LEFT JOIN TRXEquipe ON TRXEqTermoReferencia = TrRefId AND TRXEqPresidente = 1
+					WHERE TrRefUnidade = $_SESSION[UnidadeId] ORDER BY TrRefData DESC";
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+}else{
+	if(COUNT($UsuarioEquipe)>0){
+		$sql = "SELECT DISTINCT TrRefId, TrRefNumero, TrRefData,	TrRefCategoria,	TrRefTipo, CategNome, 
+						TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome, 
+						dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias, BandeMotivo, TRXEqUsuario
+						FROM TermoReferencia
+						JOIN Categoria ON CategId = TrRefCategoria
+						JOIN Situacao  ON SituaId = TrRefStatus
+						LEFT JOIN Bandeja ON BandeTabelaId = TrRefId AND BandeTabela = 'TermoReferencia' AND BandeUnidade = $_SESSION[UnidadeId]
+						LEFT JOIN TRXEquipe ON TRXEqTermoReferencia = TrRefId AND TRXEqPresidente = 1
+						WHERE TrRefUnidade = $_SESSION[UnidadeId] AND (";
+		for($x=0; $x<COUNT($UsuarioEquipe); $x++){
+			$sql .= "TrRefId = ".$UsuarioEquipe[$x]['TRXEqTermoReferencia'];
+			$sql .= $x<(COUNT($UsuarioEquipe)-1)?" OR ":"";
+		}
+		$sql .= ") ORDER BY TrRefData DESC";
+		
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+	}
+}
+
 //$count = count($row);
 
 ?>
@@ -321,105 +386,113 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								</thead>
 								<tbody>
 									<?php
-									foreach ($row as $item) {
-										
-										$situacao = $item['SituaNome'];
-										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
-										$situacaoChave ='\''.$item['SituaChave'].'\'';
+										if(ISSET($row)){
+											foreach ($row as $item) {
+												
+												$situacao = $item['SituaNome'];
+												$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
+												$situacaoChave ='\''.$item['SituaChave'].'\'';
 
-										//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
+												//$telefone = isset($item['ForneTelefone']) ? $item['ForneTelefone'] : $item['ForneCelular'];
 
-										print('
-										    <tr>
-											    <td>' . mostraData($item['TrRefData']) . '</td>
-											    <td>' . $item['TrRefNumero'] . '</td>
-													<td>' . $item['CategNome'] . '</td>
-													<td>' . $item['SubCategorias'] . '</td>
-										');
+												print('
+														<tr>
+															<td>' . mostraData($item['TrRefData']) . '</td>
+															<td>' . $item['TrRefNumero'] . '</td>
+															<td>' . $item['CategNome'] . '</td>
+															<td>' . $item['SubCategorias'] . '</td>
+												');
 
-										// print('<td><a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
-										print('<td><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></td>');
+												// print('<td><a href="#" onclick="atualizaTR(' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'mudaStatus\');"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
+												print('<td><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></td>');
 
-										print('<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaTR('.$atualizar.',' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
+												print('<td class="text-center">
+														<div class="list-icons">
+															<div class="list-icons list-icons-extended">
+																<a href="#" onclick="atualizaTR('.$atualizar.',' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
 
-														<a href="#" onclick="atualizaTR('.$excluir.',' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\', \'' . $item['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+																<a href="#" onclick="atualizaTR('.$excluir.',' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\', \'' . $item['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 
-														<div class="dropdown">													
-															<a href="#" class="list-icons-item" data-toggle="dropdown">
-																<i class="icon-menu9"></i>
-															</a>
+																<div class="dropdown">													
+																	<a href="#" class="list-icons-item" data-toggle="dropdown">
+																		<i class="icon-menu9"></i>
+																	</a>
 
-															<div class="dropdown-menu dropdown-menu-right">');
-															
-															if ($item['TrRefTipo'] == 'P' || $item['TrRefTipo'] == 'PS') {
-																print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarProdutos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>');
-															}
-															
-															if ($item['TrRefTipo'] == 'S' || $item['TrRefTipo'] == 'PS') {
-																print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarServicos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>');
-															}
+																	<div class="dropdown-menu dropdown-menu-right">');
+																	
+																	if ($item['TrRefTipo'] == 'P' || $item['TrRefTipo'] == 'PS') {
+																		print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarProdutos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>');
+																	}
+																	
+																	if ($item['TrRefTipo'] == 'S' || $item['TrRefTipo'] == 'PS') {
+																		print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'listarServicos\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>');
+																	}
 
-															if ($item['SituaChave'] != 'FASEINTERNAFINALIZADA'){
-																print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>');
-															}
+																	if ($item['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+																		if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('ADMINISTRATIVO')){
+																			print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoAdministrativo\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Centro Administrativo"></i> Enviar para aprovação</a>');
+																		}
+																	}
 
-															if (isset($item['BandeMotivo']) && $item['SituaChave'] == 'NAOLIBERADO'){
-																print('
-																	<div class="dropdown-divider"></div>
+																	if (isset($item['BandeMotivo']) && $item['SituaChave'] == 'NAOLIBERADO'){
+																		print('
+																			<div class="dropdown-divider"></div>
 
-																	<a href="#" onclick="atualizaTR(1,'.$item['TrRefId'].', \''.$item['TrRefNumero'].'\', \''.$item['TrRefCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrRefStatus'].', \'motivo\', \'0\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>
-																');
-															}
+																			<a href="#" onclick="atualizaTR(1,'.$item['TrRefId'].', \''.$item['TrRefNumero'].'\', \''.$item['TrRefCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrRefStatus'].', \'motivo\', \'0\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>
+																		');
+																	}
 
-															if(isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == true) {
-																
-																print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'orcamento\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Orçamentos</a>');
-																
-																if ($item['SituaChave'] != 'FASEINTERNAFINALIZADA'){
-																	print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoContabilidade\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Contabilidade"></i> Enviar para contabilidade</a>');
-																}
-
-																print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'dotacaoOrcamentaria\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Dotação Orçamentária</a>																
-																	   <a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'comissaoProcessoLicitatorio\');" class="dropdown-item"><i class="icon-stack2" title=" Comissão do Processo Licitatório "></i>  Comissão do Processo Licitatório </a>');
-
-																if ($item['SituaChave'] != 'FASEINTERNAFINALIZADA'){	   
-																	print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoComissao\');" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i> Enviar para comissão</a>');
-																}
-
-																//Se o TR estiver AGUARDANDOFINALIZACAO e o Presidente da Comissão for o usuário Logado mostra a opção para ele "Finalizar TR"
-																if ($item['SituaChave'] == 'AGUARDANDOFINALIZACAO' && $item['TRXEqUsuario'] == $_SESSION['UsuarId']){
-																	print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'finalizarTR\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Finalizar TR</a>');
-																}
-
-																print('
-																
-																<div class="dropdown-divider"></div>
-
-																<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirTr\');" class="dropdown-item" title="Imprimir TR"><i class="icon-printer2"></i> Imprimir TR</a>
-																');
-
-																if ($item['SituaChave'] == 'FASEINTERNAFINALIZADA'){
-																	print('
-																		<div class="dropdown-divider"></div>
+																	if(isset($item['TrRefLiberaParcial']) && $item['TrRefLiberaParcial'] == true) {
 																		
-																		<a href="#" onclick="atualizaTR(1,'.$item['TrRefId'].', \''.$item['TrRefNumero'].'\', \''.$item['TrRefCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrRefStatus'].', \'gerarContrato\')" class="dropdown-item" title="Gerar Contrato"><i class="icon-file-text"></i> Gerar Contrato</a>
-																	');
-																}
+																		print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'orcamento\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Orçamentos</a>');
+																		
+																		if ($item['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+																			if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('ADMINISTRATIVO')){
+																				print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoContabilidade\');" class="dropdown-item"><i class="icon-list2" title="Aprovação - Contabilidade"></i> Enviar para contabilidade</a>');
+																			}
+																		}
 
-															}
+																		print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'dotacaoOrcamentaria\');" class="dropdown-item"><i class="icon-coin-dollar" title="Orçamentos"></i> Dotação Orçamentária</a>																
+																				<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'comissaoProcessoLicitatorio\');" class="dropdown-item"><i class="icon-stack2" title=" Comissão do Processo Licitatório "></i>  Comissão do Processo Licitatório </a>');
 
-										print('
+																		if ($item['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+																			if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('ADMINISTRATIVO')){
+																				print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'aprovacaoComissao\');" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i> Enviar para comissão</a>');
+																			}
+																		}
+
+																		//Se o TR estiver AGUARDANDOFINALIZACAO e o Presidente da Comissão for o usuário Logado mostra a opção para ele "Finalizar TR"
+																		if ($item['SituaChave'] == 'AGUARDANDOFINALIZACAO' && $item['TRXEqUsuario'] == $_SESSION['UsuarId']){
+																			print('<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'finalizarTR\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Finalizar TR</a>');
+																		}
+
+																		print('
+																		
+																		<div class="dropdown-divider"></div>
+
+																		<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'imprimirTr\');" class="dropdown-item" title="Imprimir TR"><i class="icon-printer2"></i> Imprimir TR</a>
+																		');
+
+																		if ($item['SituaChave'] == 'FASEINTERNAFINALIZADA'){
+																			print('
+																				<div class="dropdown-divider"></div>
+																				
+																				<a href="#" onclick="atualizaTR(1,'.$item['TrRefId'].', \''.$item['TrRefNumero'].'\', \''.$item['TrRefCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrRefStatus'].', \'gerarContrato\')" class="dropdown-item" title="Gerar Contrato"><i class="icon-file-text"></i> Gerar Contrato</a>
+																			');
+																		}
+
+																	}
+
+												print('
+																	</div>
+																</div>
 															</div>
 														</div>
-													</div>
-												</div>
-											  </td>
-											</tr>
-										');
-									}
+														</td>
+													</tr>
+												');
+											}
+										}
 									?>
 
 								</tbody>

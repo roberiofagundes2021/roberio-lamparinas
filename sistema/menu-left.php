@@ -55,9 +55,10 @@
   // primeiramente faz a varredura das visibilidade dos subMenu para setar a visibilidade do menuPai
   foreach($menu as $menuPai){
     // adiciona as paginas e suas permissões em um array
-    if($menuPai['SituaChave'] == strtoupper("ativo")){
+    if(strtoupper($menuPai['SituaChave']) =="ATIVO"){
       array_push($arrayPermissao, Array(
         'url'=>$menuPai['MenuUrl'],
+        'posicao'=>$menuPai['MenuPosicao'],
         'visualizar'=>(isset($menuPai['UsXPeVisualizar'])?$menuPai['UsXPeVisualizar']:$menuPai['PrXPeVisualizar']),
         'atualizar'=>(isset($menuPai['PrXPeAtualizar'])?$menuPai['PrXPeAtualizar']:$menuPai['UsXPeAtualizar']),
         'excluir'=>(isset($menuPai['PrXPeExcluir'])?$menuPai['PrXPeExcluir']:$menuPai['UsXPeExcluir']),
@@ -199,7 +200,7 @@
                     </li>';
               foreach($menu as $men){
                 $visualizar = (isset($men['UsXPeVisualizar'])?$men['UsXPeVisualizar']:$men['PrXPeVisualizar']);
-                if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo")){  
+                if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo") && $men['MenuPosicao']=='PRINCIPAL'){  
                   
                   //Empresa pública e o menu visível para o Setor Público ou Empresa Privada e o menu visível para o Setor Privado
                   if($visualizar == 1){
@@ -222,7 +223,7 @@
                     foreach($menu as $men_f){
                       $visualizar_f = (isset($men_f['UsXPeVisualizar'])?$men_f['UsXPeVisualizar']:$men_f['PrXPeVisualizar']);
                   
-                      if($men_f['MenuPai'] == $men['MenuId'] && $visualizar_f == 1){
+                      if($men_f['MenuPai'] == $men['MenuId'] && $visualizar_f == 1 && $men_f['MenuPosicao']=='PRINCIPAL'){
                           
                         if (($empresa == 'Publica' && $men_f['MenuSetorPublico']) || ($empresa == 'Privada' && $men_f['MenuSetorPrivado'])){
                           echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link">'.$men_f['MenuNome'].'</a></li>';
