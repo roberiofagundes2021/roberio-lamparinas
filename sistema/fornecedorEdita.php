@@ -271,6 +271,11 @@ if(isset($_POST['inputTipo'])){
 			$("#enviar").on('click', function(e){
 				
 				e.preventDefault();
+
+				// subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
+				var cep = $("#inputCep").val()
+				cep = cep.replace(' ','')
+				$("#inputCep").val(cep)
 				
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputNomeNovo  = $('#inputNome').val();

@@ -164,6 +164,11 @@ if(isset($_POST['inputNome'])){
 			$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
+
+				// subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
+				var cep = $("#inputCep").val()
+				cep = cep.replace(' ','')
+				$("#inputCep").val(cep)
 				
 				var inputNome  = $('#inputNome').val();
 				var cmbUnidade  = $('#cmbUnidade').val();
