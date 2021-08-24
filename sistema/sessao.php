@@ -83,7 +83,7 @@ if (array_key_exists('AditivoNovo', $_SESSION) and !in_array(basename($_SERVER['
 $arquivosMovimentacaoFinanceira = array(
 	'movimentacaoFinanceira.php', 'movimentacaoFinanceiraFiltra.php', 'movimentacaoFinanceiraExclui.php', 'movimentacaoFinanceiraImprime.php', 'movimentacaoFinanceiraPagamento.php', 'movimentacaoFinanceiraRecebimento.php', 'movimentacaoFinanceiraTransferencia.php');
 
-if ((array_key_exists('MovFinancPeriodoDe', $_SESSION) || array_key_exists('MovFinancAte', $_SESSION) || array_key_exists('MovFinancContaBanco', $_SESSION) || array_key_exists('MovFinancPlanoContas', $_SESSION)|| array_key_exists('MovFinancCentroDeCustos', $_SESSION) || array_key_exists('MovFinancStatus', $_SESSION) || array_key_exists('MovFinancFormaPagamento', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoFinanceira)) {
+if ((array_key_exists('MovFinancPeriodoDe', $_SESSION) || array_key_exists('MovFinancAte', $_SESSION) || array_key_exists('MovFinancContaBanco', $_SESSION) || array_key_exists('MovFinancPlanoContas', $_SESSION)|| array_key_exists('MovFinancCentroDeCustos', $_SESSION) || array_key_exists('MovFinancStatus', $_SESSION) || array_key_exists('MovFinancFormaPagamento', $_SESSION) || array_key_exists('MovFinancPermissionAtualiza', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoFinanceira)) {
 	
 	unset($_SESSION['MovFinancPeriodoDe']);
 	unset($_SESSION['MovFinancAte']);
@@ -92,6 +92,7 @@ if ((array_key_exists('MovFinancPeriodoDe', $_SESSION) || array_key_exists('MovF
 	unset($_SESSION['MovFinancCentroDeCustos']);
 	unset($_SESSION['MovFinancStatus']);
 	unset($_SESSION['MovFinancFormaPagamento']);
+	unset($_SESSION['MovFinancPermissionAtualiza']);
 }
 
 $arquivosMovimentacaoFinanceiraConciliacao = array(
@@ -150,8 +151,17 @@ if ((array_key_exists('ContRecPeriodoDe', $_SESSION)
 	unset($_SESSION['ContRecFormaPagamento']);
 }
 
+$arquivosFluxoRealizado = array(
+	'fluxoRealizado.php'
+);
 
-if (!array_key_exists('UsuarId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
+if (array_key_exists('OrigemFluxoRealizado', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosFluxoRealizado)) {
+
+	unset($_SESSION['OrigemFluxoRealizado']);
+}
+
+
+if (!array_key_exists('UsuarId', $_SESSION) or !array_key_exists('UnidadeId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
 	header('Expires: 0');
 	header('Pragma: no-cache');
 	header("Location: login.php");

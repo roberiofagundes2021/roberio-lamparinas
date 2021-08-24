@@ -386,16 +386,16 @@ function queryPesquisa(){
 
                     //HISTÓRICO
                     if (intval($item['CODTRANSFREC']) > 0){
-                        $print .= "<td class='even'><a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFREC'] . "'>" . $item['HISTORICO'] . "</a></td>";
-
+                        $print .= "<td class='even'><a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['CODTRANSFREC'].", \"T\", \"edita\");'>" . $item['HISTORICO'] . "</a></td>";
+                                   
                     } else if (intval($item['CODTRANSFPAG']) > 0) {
-                        $print .= "<td class='even'><a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFPAG'] . "'>" . $item['HISTORICO'] . "</a></td>";
+                        $print .= "<td class='even'><a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['CODTRANSFPAG'].", \"T\", \"edita\");'>" . $item['HISTORICO'] . "</a></td>";
 
                     } else if ($item['TIPO'] === 'R'){
-                        $print .= "<td class='even'><a href='movimentacaoFinanceiraRecebimento.php?lancamentoId=" . $item['ID'] . "'>" . $item['HISTORICO'] . "</a></td>";
+                        $print .= "<td class='even'><a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['ID'].", \"R\", \"edita\");'>" . $item['HISTORICO'] . "</a></td>";
 
                     } else if ($item['TIPO'] === 'P') {
-                        $print .= "<td class='even'><a href='movimentacaoFinanceiraPagamento.php?lancamentoId=" . $item['ID'] . "'>" . $item['HISTORICO'] . "</a></td>";
+                        $print .= "<td class='even'><a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['ID'].", \"P\", \"edita\");'>" . $item['HISTORICO'] . "</a></td>";
                     }
 
 
@@ -463,18 +463,23 @@ function queryPesquisa(){
                                 
                                 //BOTAO EXCLUIR
                                 if (intval($item["CODTRANSFREC"]) > 0){
-                                    $print .= '
-                                        <a href="#" idContaExcluir="' . $item["CODTRANSFREC"] . '" tipo="T" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
-                                       /* '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["CODTRANSFREC"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';*/
+                                    $print .= 
+                                       // '<a href="#" idContaExcluir="' . $item["CODTRANSFREC"] . '" tipo="T" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+                                        '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["CODTRANSFREC"].', \'T\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';
             
                                 } else if (intval($item["CODTRANSFPAG"]) > 0) {
-                                    $print .= '
-                                        <a href="#" idContaExcluir="' . $item["CODTRANSFPAG"] . '" tipo="T" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
-
-                                } else {
-                                    $print .= '
-                                        <a href="#" idContaExcluir="' . $item["ID"] . '" tipo="' . $item["TIPO"] . '" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
-                                }
+                                    $print .= 
+                                       // '<a href="#" idContaExcluir="' . $item["CODTRANSFPAG"] . '" tipo="T" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+                                        '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["CODTRANSFPAG"].', \'T\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';
+                                    } else if  ($item["TIPO"] === "R"){
+                                        $print .= 
+                                          // '<a href="#" idContaExcluir="' . $item["ID"] . '" tipo="' . $item["TIPO"] . '" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+                                        '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["ID"].', \'R\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';
+                                    } else if ($item["TIPO"] === "P") {
+                                        $print .= 
+                                        // '<a href="#" idContaExcluir="' . $item["ID"] . '" tipo="' . $item["TIPO"] . '" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+                                        '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["ID"].', \'P\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';
+                                    }
                                 $print .= '
                             </div>
                         </div>

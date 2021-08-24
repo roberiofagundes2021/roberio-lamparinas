@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Financeiro / Movimentação do Financeiro / Novo Lan
 include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputPermissionAtualiza'])){
-  $atualizar = $_POST['inputPermissionAtualiza'];
+  $_SESSION['MovFinancPermissionAtualiza'] = $_POST['inputPermissionAtualiza'];
 }
 
 if (isset($_POST['inputDataEmissao'])) {
@@ -132,7 +132,7 @@ if (isset($_POST['inputDataEmissao'])) {
     irpara("movimentacaoFinanceira.php");
 }
 
-if (isset($_POST['inputMovimentacaoFinanceiraId'])) {
+if (isset($_POST['inputMovimentacaoFinanceiraId']) && $_POST['inputMovimentacaoFinanceiraId'] != 0) {
   
     $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtPagamento, 
                    CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, 
@@ -518,8 +518,12 @@ $dataInicio = date("Y-m-d");
                       </div>
                     </div>
                   </div>
-
-                  <button id="salvar" class="btn btn-principal">Salvar</button>
+            
+                 <?php 
+                    if ($_SESSION['MovFinancPermissionAtualiza']) {
+                        echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
+                      }
+                  ?>
                   <?php if($_SESSION['Conciliacao'] === true) { ?>
                     <a href="movimentacaoFinanceiraConciliacao.php" class="btn">Cancelar</a>
                   <?php } else { ?>

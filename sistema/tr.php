@@ -243,15 +243,11 @@ if($permissao == 1){
 							return false;
 						}
 
-				} else if (Tipo == 'mudaStatus') {
-					document.formTR.action = "trMudaSituacao.php";
-					document.formTR.submit();
-
 				} else if (Tipo == 'listarProdutos') {
 					document.formTR.action = "trProduto.php";
 					document.formTR.submit();
 
-				}else if (Tipo == 'listarServicos') {
+				} else if (Tipo == 'listarServicos') {
 					document.formTR.action = "trServico.php";
 					document.formTR.submit();
 

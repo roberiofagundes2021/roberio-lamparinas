@@ -6,10 +6,6 @@ $_SESSION['PaginaAtual'] = 'Novo Lançamento - Contas a Receber';
 
 include('global_assets/php/conexao.php');
 
-if (isset($_POST['inputPermissionAtualiza'])){
-  $atualizar = $_POST['inputPermissionAtualiza'];
-}
-
 if (isset($_POST['inputDataEmissao'])) {
 
     if (isset($_POST['cmbFormaDePagamento'])){
@@ -785,7 +781,11 @@ $dataInicio = date("Y-m-d");
                     </div>
                   </div>
 
-                  <button id="salvar" class="btn btn-principal">Salvar</button>
+                  <?php 
+                    if ($_SESSION['MovFinancPermissionAtualiza']) {
+                        echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
+                      }
+                  ?>
                   <?php if($_SESSION['Conciliacao'] === true) { ?>
                     <a href="movimentacaoFinanceiraConciliacao.php" class="btn">Cancelar</a>
                   <?php } else { ?>
