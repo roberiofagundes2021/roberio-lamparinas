@@ -157,13 +157,26 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
             });
 		});	
 
+		//Referência: https://forum.fluig.com/1398-calculo-de-valor-total
+		function convertStringFloat(valor){
+    
+			if (valor.indexOf(',') == -1) {
+
+			} else {
+				valor = String(valor).split(".").join("").replace(",",".");
+			}
+			valor = parseFloat(valor);
+
+			return valor;
+		}		
+
 		function calculaValorTotal(id) {
 
-			var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : $('#inputValorTotal' + id + '').val().replace('.', '').replace(',', '.');
-			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+			var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : convertStringFloat($('#inputValorTotal' + id + '').val());
+			var TotalGeralAnterior = convertStringFloat($('#inputTotalGeral').val());
 
 			var Quantidade = $('#inputQuantidade' + id + '').val().trim() == '' ? 0 : $('#inputQuantidade' + id + '').val();
-			var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : $('#inputValorUnitario' + id + '').val().replace('.', '').replace(',', '.');
+			var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : convertStringFloat($('#inputValorUnitario' + id + '').val());
 			var ValorTotal = 0;
 
 			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
@@ -308,7 +321,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 
 									print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-9">
+											<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
@@ -328,7 +341,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-1">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -365,7 +378,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 
 												print('
 											        <div class="row" style="margin-top: 8px;">
-												        <div class="col-lg-9">
+												        <div class="col-lg-8">
 													        <div class="row">
 														        <div class="col-lg-1">
 															        <input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -382,7 +395,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 												        <div class="col-lg-1">
 													         <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
 												        </div>	
-												        <div class="col-lg-1">
+												        <div class="col-lg-2">
 													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" style="text-align: right;" value="' . $fValorTotal . '" readOnly>
 												        </div>											
 													</div>');
@@ -401,7 +414,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 
 												print('
 											        <div class="row" style="margin-top: 8px;">
-												        <div class="col-lg-9">
+												        <div class="col-lg-8">
 													        <div class="row">
 														        <div class="col-lg-1">
 															        <input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -418,7 +431,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 												        <div class="col-lg-1">
 													        <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12">
 												        </div>	
-												        <div class="col-lg-1">
+												        <div class="col-lg-2">
 													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" style="text-align: right;" value="' . $fValorTotal . '" readOnly>
 												        </div>
 												   </div>');
@@ -450,7 +463,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 
 												print('
 											        <div class="row" style="margin-top: 8px;">
-												        <div class="col-lg-9">
+												        <div class="col-lg-8">
 													        <div class="row">
 														        <div class="col-lg-1">
 															        <input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -467,7 +480,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 												        <div class="col-lg-1">
 													         <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
 												        </div>	
-												        <div class="col-lg-1">
+												        <div class="col-lg-2">
 													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" style="text-align: right;" value="' . $fValorTotal . '" readOnly>
 												        </div>											
 													</div>');
@@ -486,7 +499,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 
 												print('
 											        <div class="row" style="margin-top: 8px;">
-												        <div class="col-lg-9">
+												        <div class="col-lg-8">
 													        <div class="row">
 														        <div class="col-lg-1">
 															        <input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -503,7 +516,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 												        <div class="col-lg-1">
 													        <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12">
 												        </div>	
-												        <div class="col-lg-1">
+												        <div class="col-lg-2">
 													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" style="text-align: right;" value="' . $fValorTotal . '" readOnly>
 												        </div>											
 												   </div>');
@@ -513,7 +526,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 
 									print('
 										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
+												<div class="col-lg-6">
 													<div class="row">
 														<div class="col-lg-1">
 															
@@ -532,10 +545,10 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 												<div class="col-lg-1">
 													
 												</div>	
-												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+												<div class="col-lg-2" style="padding-top: 5px; text-align: right;">
 													<h5><b>Total:</b></h5>
 												</div>	
-												<div class="col-lg-1">
+												<div class="col-lg-2">
 													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" style="text-align: right;" value="' . mostraValor($fTotalGeral) . '" readOnly>
 												</div>											
 											</div>');

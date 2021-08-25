@@ -874,7 +874,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputDataEmissao">Data Emissão</label>
-												<input type="text" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data NF">
+												<input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data NF">
 											</div>
 										</div>
 
