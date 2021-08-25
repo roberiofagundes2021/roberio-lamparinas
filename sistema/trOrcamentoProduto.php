@@ -157,13 +157,26 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
             });
 		});
 
+		//Referência: https://forum.fluig.com/1398-calculo-de-valor-total
+		function convertStringFloat(valor){
+    
+			if (valor.indexOf(',') == -1) {
+
+			} else {
+				valor = String(valor).split(".").join("").replace(",",".");
+			}
+			valor = parseFloat(valor);
+
+			return valor;
+		}		
+
 		function calculaValorTotal(id) {
 
-			var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : $('#inputValorTotal' + id + '').val().replace('.', '').replace(',', '.');
-			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+			var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : convertStringFloat($('#inputValorTotal' + id + '').val());
+			var TotalGeralAnterior = convertStringFloat($('#inputTotalGeral').val());
 
 			var Quantidade = $('#inputQuantidade' + id + '').val().trim() == '' ? 0 : $('#inputQuantidade' + id + '').val();
-			var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : $('#inputValorUnitario' + id + '').val().replace('.', '').replace(',', '.');
+			var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : convertStringFloat($('#inputValorUnitario' + id + '').val());
 			var ValorTotal = 0;
 
 			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
