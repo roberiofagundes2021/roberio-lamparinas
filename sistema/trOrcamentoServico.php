@@ -157,7 +157,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
             });
 		});	
 
-		//Referência: https://forum.fluig.com/1398-calculo-de-valor-total
+		//Referência: https://forum.fluig.com/1398-calculo-de-valor-total (isso aqui resolve os números com milhões)
 		function convertStringFloat(valor){
     
 			if (valor.indexOf(',') == -1) {
