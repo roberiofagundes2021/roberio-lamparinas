@@ -4,13 +4,13 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, ProduDetalhamento as detalhamento, ProduValorCusto as valorCusto, ProduCustoFinal as custoFinal, UnMedSigla, tipo = 'P'
+$sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, ProduDetalhamento as detalhamento, OCXPrValorUnitario as valorCusto, ProduCustoFinal as custoFinal, UnMedSigla, tipo = 'P'
 		FROM OrdemCompraXProduto
         JOIN Produto on ProduId = OCXPrProduto
  		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
         WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and OCXPrOrdemCompra = '" . $_POST['ordemCompra'] . "'
         UNION
-        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, ServiValorCusto as valorCusto, ServiCustoFinal as custoFinal, '', tipo = 'S'
+        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, OCXSrValorUnitario as valorCusto, ServiCustoFinal as custoFinal, '', tipo = 'S'
 		FROM OrdemCompraXServico
         JOIN Servico on ServiId = OCXSrServico
         WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and OCXSrOrdemCompra = '" . $_POST['ordemCompra'] . "'

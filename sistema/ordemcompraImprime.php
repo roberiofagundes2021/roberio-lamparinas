@@ -16,7 +16,8 @@ if (isset($_POST['inputOrdemCompraId'])){
 		   </script> ');
 }
 
-$sql = "SELECT ForneNome, ForneCelular, ForneEmail, CategNome, OrComTipo, OrComNumero, OrComConteudo
+$sql = "SELECT OrComTipo, OrComNumero, OrComDtEmissao, OrComLote, OrComNumAta, OrComNumProcesso, 
+		OrComConteudo, ForneCnpj, ForneNome, ForneCelular, ForneEmail, CategNome
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
 		JOIN Categoria on CategId = OrComCategoria
@@ -75,10 +76,11 @@ try {
 	<div style='text-align:center; margin-top: 20px;'><h1>".strtoupper($sTipo)."</h1></div>
 	";
 	
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario
+	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario, MarcaNome
 			FROM Produto
 			JOIN OrdemCompraXProduto on OCXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			LEFT JOIN Marca on MarcaId = ProduMarca
 			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OCXPrOrdemCompra = ".$iOrdemCompra;
 
 	$result = $conn->query($sql);
@@ -96,13 +98,32 @@ try {
 	
 	$html .= '
 	<table style="width:100%; border-collapse: collapse;">
+		<tr>
+			<td colspan="1" style="width:25%; font-size:12px;">Nº Contrato:<br>'. $row['OrComNumero'].'</td>	
+			<td colspan="1" style="width:25%; font-size:12px;">Data Emissão:<br>'. mostraData($row['OrComDtEmissao']).'</td>';
+
+	if ($row['OrComTipo'] == 'O'){		
+		$html .= '<td colspan="1" style="width:25%; font-size:12px;">Lote:<br>'. $row['OrComLote'].'</td>';
+	} else {
+		$html .= '<td colspan="1" style="width:25%; font-size:12px;">Nº Ata Registro:<br>'. $row['OrComNumAta'].'</td>';
+	}
+
+	$html .= '<td colspan="1" style="width:25%; font-size:12px;">Nº Processo:<br>'. $row['OrComNumProcesso'].'</td>
+		</tr>
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
 		<tr style="background-color:#F1F1F1;">
-			<td colspan="2" style="width:40%; font-size:12px;">Fornecedor: '. $row['ForneNome'].'</td>
-			<td colspan="1" style="width:30%; font-size:12px;">Telefone: '. $row['ForneCelular'].'</td>
-			<td colspan="1" style="width:30%; font-size:12px;">E-mail: '. $row['ForneEmail'].'</td>
+			<td colspan="3" style="width:100%; font-size:12px;">Fornecedor:<br>'. $row['ForneNome'].'</td>
 		</tr>
 		<tr>
-			<td colspan="4" style="width:100%; font-size:12px;">Categoria: '.$row['CategNome'].'</td>
+			<td colspan="1" style="width:30%; font-size:12px;">CNPJ:<br>'. $row['ForneCnpj'].'</td>	
+			<td colspan="1" style="width:30%; font-size:12px;">Telefone:<br>'. $row['ForneCelular'].'</td>
+			<td colspan="1" style="width:40%; font-size:12px;">E-mail:<br>'. $row['ForneEmail'].'</td>
+		</tr>
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
+		<tr>
+			<td style="width:100%; font-size:12px;">Categoria:<br>'.$row['CategNome'].'</td>
 		</tr>
 	</table>';
 	
@@ -145,7 +166,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
+					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."<br>Marca: ".$itemProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>".$itemProduto['UnMedSigla']."</td>					
 					<td style='text-align: center;'>".$itemProduto['OCXPrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
@@ -156,7 +177,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
+					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."<br>Marca: ".$itemProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>".$itemProduto['UnMedSigla']."</td>					
 					<td style='text-align: center;'>".$itemProduto['OCXPrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
