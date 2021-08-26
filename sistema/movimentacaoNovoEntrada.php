@@ -46,7 +46,7 @@ if (isset($_POST['inputData'])) {
 			':iFornecedor' => $_POST['cmbFornecedor'] == '' ? null : $_POST['cmbFornecedor'],
 			':iOrdemCompra' => $_POST['cmbOrdemCompra'] == '' ? null : $_POST['cmbOrdemCompra'],
 			':sNotaFiscal' => $_POST['inputNotaFiscal'] == '' ? null : $_POST['inputNotaFiscal'],
-			':dDataEmissao' => $_POST['inputDataEmissao'] == '' ? null : gravaData($_POST['inputDataEmissao']),
+			':dDataEmissao' => $_POST['inputDataEmissao'] == '' ? null : $_POST['inputDataEmissao'],
 			':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
 			':fValorTotal' => $_POST['inputValorTotal'] == '' ? null : gravaValor($_POST['inputValorTotal']),
 			':sChaveAcesso' => $_POST['inputChaveAcesso'] == '' ? null : $_POST['inputChaveAcesso'],
