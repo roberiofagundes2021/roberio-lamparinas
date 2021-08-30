@@ -68,7 +68,8 @@ try {
 	<div style='text-align:center; margin-top: 20px;'><h1>ENTRADA DE MERCADORIA</h1></div>
 	";
 	
-    $sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MvXPrQuantidade, MvXPrValorUnitario
+    $sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MvXPrQuantidade, MvXPrValorUnitario,
+						(SELECT MarcaNome FROM Marca WHERE MarcaId = ProduMarca) as Marca, MvXPrLote, MvXPrValidade
             FROM Produto
             JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
             JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -77,7 +78,8 @@ try {
     $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
     $totalProdutos = count($rowProdutos);
 
-    $sql = "SELECT ServiId, ServiNome, ServiDetalhamento, MvXSrQuantidade, MvXSrValorUnitario
+    $sql = "SELECT ServiId, ServiNome, ServiDetalhamento, MvXSrQuantidade, MvXSrValorUnitario,
+						(SELECT MarcaNome FROM Marca WHERE MarcaId = ServiMarca) as Marca
             FROM Servico
             JOIN MovimentacaoXServico on MvXSrServico = ServiId
             WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and MvXSrMovimentacao = ".$iMovimentacao." and MvXSrQuantidade <> 0";
@@ -127,7 +129,11 @@ try {
 				$html .= "
 					<tr>
 						<td style='text-align: center;'>".$cont."</td>
-						<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
+						<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']
+						.($itemProduto['Marca']!=''?"<br>Marca: ".$itemProduto['Marca']:'')
+						.($itemProduto['MvXPrLote']!=''?"<br>Lote: ".$itemProduto['MvXPrLote']:'')
+						.($itemProduto['MvXPrValidade']!=''?"<br>Validade: ".mostraData($itemProduto['MvXPrValidade']):'').
+						"</td>
 						<td style='text-align: center;'>".$itemProduto['UnMedSigla']."</td>					
 						<td style='text-align: center;'>".$itemProduto['MvXPrQuantidade']."</td>
 						<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
@@ -182,7 +188,9 @@ try {
 				$html .= "
 					<tr>
 						<td style='text-align: center;'>".$cont."</td>
-						<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']."</td>	
+						<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']
+						.($itemServico['Marca']!=''?"<br>Marca: ".$itemServico['Marca']:'').
+						"</td>
 						<td style='text-align: center;'>".$itemServico['MvXSrQuantidade']."</td>
 						<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
 						<td style='text-align: right;'>".mostraValor($valorTotal)."</td>
