@@ -486,6 +486,8 @@ include_once("topo.php");
 									</div>
 								</div>
 							</div>
+							
+							<?php if (!isset($_SESSION['EmpresaId'])){ ?>
 							<h5 class="mb-0 font-weight-semibold">Lotação</h5>
 							<br>
 							<div class="row">
@@ -537,9 +539,10 @@ include_once("topo.php");
 
 									</div>
 								</div>
-							</div>	
+							</div>
+							<?php } ?>
 						</div>
-						
+
 						<div class="row" style="margin-top: 20px;">
 							<div class="col-lg-12">
 								<div class="form-group">

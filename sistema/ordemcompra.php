@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Ordem de Compra';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
-		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor, BandeMotivo, SbCatNome,
+		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor, BandeMotivo, SbCatNome, dbo.fnValorTotalOrdemCompra(OrComUnidade, OrComId) as ValorTotalOrdemCompra,
 		(SELECT COUNT(FOXPrProduto) FROM FluxoOperacionalXProduto WHERE FOXPrFluxoOperacional = OrComFluxoOperacional) as produtoCount,
 		(SELECT COUNT(FOXSrServico) FROM FluxoOperacionalXServico WHERE FOXSrFluxoOperacional = OrComFluxoOperacional) as servicoCount,
 		(SELECT COUNT(OCXPrProduto) FROM OrdemCompraXProduto WHERE OCXPrOrdemCompra = OrComId and OCXPrQuantidade <> '' and OCXPrQuantidade <> 0 and OCXPrValorUnitario <> 0.00) as produtoQuant,
@@ -65,10 +65,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			$('#tblOrdemCompra').DataTable( {
 				"order": [[ 0, "desc" ]],
 			    autoWidth: false,
-					responsive: true,
+				responsive: true,
 			    columnDefs: [{ 
 					orderable: true,   //Data
-					width: "5%",
+					width: "10%",
 					targets: [0]
 				},
 				{ 
@@ -78,38 +78,43 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},				
 				{ 
 					orderable: true,   //Lote
-					width: "12%",
+					width: "10%",
 					targets: [2]
 				},
 				{ 
 					orderable: true,   //Tipo
-					width: "5%",
+					width: "10%",
 					targets: [3]
 				},
 				{ 
 					orderable: true,   //Fornecedor
-					width: "5%",
+					width: "15%",
 					targets: [4]
 				},
 				{ 
 					orderable: true,   //Processo
-					width: "5%",
+					width: "10%",
 					targets: [5]
 				},
 				{
 					orderable: true,   //SubCategoria
-					width: "5%",
+					width: "20%",
 					targets: [6]
+				},
+				{
+					orderable: true,   //Valor Total
+					width: "10%",
+					targets: [7]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [7]
+					targets: [8]
 				},
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [8]
+					targets: [9]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -285,6 +290,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>Fornecedor</th>
 										<th>Processo</th>
 										<th>SubCategoria</th>
+										<th>Valor Total</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -305,7 +311,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$tipo.'</td>
 											<td>'.$item['ForneNome'].'</td>
 											<td>'.$item['OrComNumProcesso'].'</td>
-											<td>'.$item['SbCatNome'].'</td>											
+											<td>'.$item['SbCatNome'].'</td>
+											<td>'.mostraValor($item['ValorTotalOrdemCompra']).'</td>											
 											');
 										
 										print('<td><span class="'.$situacaoClasse.'">'.$situacao.'</span></td>');
