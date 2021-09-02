@@ -161,36 +161,42 @@ try{
 	<script type="text/javascript" >
 
 		$(document).ready(function() {
-			$('.pula').keypress(function(e){
-				/*
-					* verifica se o evento é Keycode (para IE e outros browsers)
-					* se não for pega o evento Which (Firefox)
-				*/
-				var tecla = (e.keyCode?e.keyCode:e.which);
 
-				/* verifica se a tecla pressionada foi o ENTER */
-				if(tecla == 13){
-					/* guarda o seletor do campo que foi pressionado Enter */
-					campo =  $('.pula');
-					/* pega o indice do elemento*/
-					indice = campo.index(this);
-					/*soma mais um ao indice e verifica se não é null
-					*se não for é porque existe outro elemento
+			function pular() {
+				
+				$('.pula').keypress(function(e){
+					/*
+						* verifica se o evento é Keycode (para IE e outros browsers)
+						* se não for pega o evento Which (Firefox)
 					*/
-					if(campo[indice+1] != null){
-						/* adiciona mais 1 no valor do indice */
-						proximo = campo[indice + 1];
-						/* passa o foco para o proximo elemento */
-						proximo.focus();
-					}
-				} else {
-					return onlynumber(e);
-				}
+					var tecla = (e.keyCode?e.keyCode:e.which);
 
-				/* impede o sumbit caso esteja dentro de um form */
-				e.preventDefault(e);
-				return false;
-			});
+					/* verifica se a tecla pressionada foi o ENTER */
+					if(tecla == 13){
+						/* guarda o seletor do campo que foi pressionado Enter */
+						campo =  $('.pula');
+						/* pega o indice do elemento*/
+						indice = campo.index(this);
+						/*soma mais um ao indice e verifica se não é null
+						*se não for é porque existe outro elemento
+						*/
+						if(campo[indice+1] != null){
+							/* adiciona mais 1 no valor do indice */
+							proximo = campo[indice + 1];
+							/* passa o foco para o proximo elemento */
+							proximo.focus();
+						}
+					} else {
+						return onlynumber(e);
+					}
+
+					/* impede o sumbit caso esteja dentro de um form */
+					e.preventDefault(e);
+					return false;
+				});
+			}
+
+			pular();
 
 			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
 			$('#cmbProduto').on('change', function(e){
@@ -237,6 +243,8 @@ try{
 					success: function(resposta){
 						//alert(resposta);
 						$("#tabelaProdutos").html(resposta).show();
+
+						pular();
 						
 						return false;
 						
