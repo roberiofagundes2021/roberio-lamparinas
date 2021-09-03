@@ -31,6 +31,12 @@ if(isset($_POST['inputIdOrdemCompra'])){
 			$resultSaldo = $conn->query($sqlSaldo);
 			$OCXSe = $resultSaldo->fetch(PDO::FETCH_ASSOC);
 
+			if(!isset($OCXSe['Saldo'])){
+				$sqlSaldo = "SELECT dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ".$_POST['inputIdServico'.$i].", 'S') as Saldo";
+				$resultSaldo = $conn->query($sqlSaldo);
+				$OCXSe = $resultSaldo->fetch(PDO::FETCH_ASSOC);
+			}
+
 			$saldo = isset($OCXSe['Saldo'])?intval($OCXSe['Saldo']):0;
 			$ordComQuant = isset($OCXSe['OCXSrQuantidade'])?intval($OCXSe['OCXSrQuantidade']):0;
 			$quant = isset($_POST['inputQuantidade'.$i])?intval($_POST['inputQuantidade'.$i]):0;
