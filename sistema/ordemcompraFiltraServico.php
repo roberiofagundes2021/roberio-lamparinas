@@ -96,7 +96,7 @@ foreach ($row as $item){
 									</div>
 									<div class="col-lg-1">
 										<input type="text" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'readOnly ').
-										'name="inputQuantidade'.$cont.'" class="form-control-border Quantidade text-right" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber(), validaQuantInputModal('.$saldo.',this)" value="'.$quantidade.'">
+										'name="inputQuantidade'.$cont.'" class="form-control-border Quantidade text-right pula" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber(), validaQuantInputModal('.$saldo.',this)" value="'.$quantidade.'">
 									</div>	
 									<div class="col-lg-1">
 										<input readOnly type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border-off ValorUnitario text-right" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$valorUnitario.'">
