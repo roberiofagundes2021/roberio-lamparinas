@@ -184,9 +184,9 @@ try {
 						servicoValor: servicoValor
 					},
 					success: function(resposta) {
-						//alert(resposta); 
-						$("#tabelaServicos").html(resposta).show();
+						//alert(resposta);
 
+						$("#tabelaServicos").html(resposta).show();
 						return false;
 					}
 				});
