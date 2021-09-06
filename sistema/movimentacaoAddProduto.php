@@ -4,9 +4,12 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla, ProduDetalhamento, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', '".$_POST['origem']."') as Estoque
+$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla, ProduDetalhamento, MarcaNome,
+		dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', '".$_POST['origem']."') as Estoque,
+		dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade
 		FROM Produto
 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+		LEFT JOIN Marca on MarcaId = ProduMarca
 		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId = " . $_POST['idProduto'];
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -21,10 +24,12 @@ if ($count) {
 		$valorTotal = formataMoeda($_POST['quantidade'] * $row['ProduCustoFinal']);
 
 		$total = $_POST['quantidade'] * $row['ProduCustoFinal'];
+
+		$validade = $row['Validade'] != "" ? " - Validade: ".mostraData($row['Validade']) : "";
 		
 		$output = 	'<tr id="row' . $_POST['numItens'] . '" class="trGrid">
 						 <td>' . $_POST['numItens'] . '</td>
-						 <td data-popup="tooltip" title="' . $row['ProduDetalhamento'] . '">' . $row['ProduNome'] . '</td>
+						 <td data-popup="tooltip" title="' . $row['ProduDetalhamento'] . ' MARCA: '. $row['MarcaNome'] . $validade.'">' . $row['ProduNome'] . '</td>
 						 <td style="text-align: center">' . $row['UnMedSigla'] . '</td>
 						 <td style="text-align: center">' . $_POST['quantidade'] . '</td>
 						 <td style="text-align: right">' . $valorCusto . '</td>
