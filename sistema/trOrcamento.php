@@ -80,7 +80,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Nº Orçamento
-					width: "16%",
+					width: "13%",
 					targets: [1]
 				},				
 				{ 
@@ -95,7 +95,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //SubCategoria
-					width: "17%",
+					width: "20%",
 					targets: [4]
 				},
 				{ 
@@ -347,12 +347,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				</form>
 
 			</div>
-			<!-- /content area -->
-			
-			<?php include_once("footer.php"); ?>
+			<!-- /content area -->			
 
 		</div>
 		<!-- /main content -->
+
+		<?php include_once("footer.php"); ?>
 
 	</div>
 	<!-- /page content -->
