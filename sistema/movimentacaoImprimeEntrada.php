@@ -16,9 +16,11 @@ if (isset($_POST['inputMovimentacaoId'])){
 		   </script> ');
 }
 
-$sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimNotaFiscal, MovimObservacao		
+$sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimNotaFiscal, MovimObservacao, OrComNumero,
+		dbo.fnValorTotalOrdemCompra(" . $_SESSION['UnidadeId'] . ", MovimOrdemCompra) as TotalOrdemCompra		
         FROM Movimentacao
 		JOIN Fornecedor on ForneId = MovimFornecedor
+		JOIN OrdemCompra on OrComId = MovimOrdemCompra
 		WHERE MovimUnidade = ". $_SESSION['UnidadeId'] ." and MovimId = ".$iMovimentacao." and MovimTipo = 'E'";
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -90,14 +92,27 @@ try {
 	$html .= '
 	<table style="width:100%; border-collapse: collapse;">
 		<tr style="background-color:#F1F1F1;">
-			<td colspan="2" style="width:40%; font-size:12px;">Fornecedor: '. $row['ForneNome'].'</td>
-			<td colspan="1" style="width:30%; font-size:12px;">Telefone: '. $row['ForneCelular'].'</td>
-			<td colspan="1" style="width:30%; font-size:12px;">E-mail: '. $row['ForneEmail'].'</td>
+			<td style="width:40%; font-size:12px;">Nº Ordem Compra / Carta Contrato:<br>'. $row['OrComNumero'].'</td>
+			<td style="width:25%; font-size:12px;">Valor:<br>'. mostraValor($row['TotalOrdemCompra']).'</td>
+			<td style="width:35%; font-size:12px;">Nº Nota Fiscal:<br>'. $row['MovimNotaFiscal'].'</td>
 		</tr>
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
 		<tr>
-			<td colspan="4" style="width:100%; font-size:12px;">Observação: '.$row['MovimObservacao'].'</td>
+			<td style="width:40%; font-size:12px;">Fornecedor:<br>'. $row['ForneNome'].'</td>
+			<td style="width:25%; font-size:12px;">Telefone:<br>'. $row['ForneCelular'].'</td>
+			<td style="width:35%; font-size:12px;">E-mail:<br>'. $row['ForneEmail'].'</td>
 		</tr>
-	</table>';
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
+		<tr>
+			<td style="width:100%; font-size:12px;">Observação: '.$row['MovimObservacao'].'</td>
+		</tr>
+	</table>
+	
+	
+	
+	';
 
 	$totalGeralProdutos = 0;
 		
