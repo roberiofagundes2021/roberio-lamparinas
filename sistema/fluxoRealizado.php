@@ -27,11 +27,12 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 	irpara($_SESSION['OrigemFluxoRealizado']); //Isso aqui é pensando no caso do usuário der um refresh nessa página. Um ENTER, por exemplo na URL.
 }
 
+/*
 if (isset($_POST['inputSelecionados'])){
 
 	$aSelecionados = array($_POST['inputSelecionados']);
 }
-
+*/
 ?>
 
 <!DOCTYPE html>
@@ -245,7 +246,7 @@ if (isset($_POST['inputSelecionados'])){
 													?>
 												</select>
 
-												<input type="hidden" name="inputSelecionados" value="<?php isset($aSelecionados) ? var_dump($aSelecionados) : ""; ?>">
+												<!--<input type="hidden" name="inputSelecionados" value="<?php //isset($aSelecionados) ? var_dump($aSelecionados) : ""; ?>">-->
 											</div>
 										</div>
 
