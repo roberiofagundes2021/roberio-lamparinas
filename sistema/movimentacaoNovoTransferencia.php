@@ -43,7 +43,19 @@ if (isset($_POST['inputData'])) {
 			}
 		}
 
+    $conn->beginTransaction();
+
+    $sqlMovi = "SELECT MAX(MovimNumRecibo) as MovimNumRecibo
+        FROM Movimentacao
+        WHERE MovimUnidade = '$_SESSION[UnidadeId]'";
+		$resultMovi = $conn->query($sqlMovi);
+		$rowMovi = $resultMovi->fetch(PDO::FETCH_ASSOC);
+
+		$newMovi = explode('/', $rowMovi['MovimNumRecibo']);
+		$newMovi = (intval($newMovi[0])+1).'/'.(date("Y"));
+
 		$sql = "INSERT INTO Movimentacao (MovimTipo,
+                                      MovimNumRecibo,
 																			MovimData, 
 																			MovimFinalidade,
 																			MovimOrigemLocal,
@@ -64,6 +76,7 @@ if (isset($_POST['inputData'])) {
 																			MovimUnidade, 
 																			MovimUsuarioAtualizador)
 								VALUES (:sTipo, 
+												:dMovi,
 												:dData,
 												:iFinalidade,
 												:iOrigemLocal, 
@@ -85,10 +98,9 @@ if (isset($_POST['inputData'])) {
 												:iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 
-		$conn->beginTransaction();
-
 		$result->execute(array(
 			':sTipo' => 'T',  // Transferência
+			':dMovi' => $newMovi,  // Número incremental
 			':dData' => gravaData($_POST['inputData']),
 			':iFinalidade' => null,
 			':iOrigemLocal' => $tipoOrigem == 'Local' ? $idOrigem : $tipoOrigem == 'OrigemLocalTransferencia' ? $idOrigem : null,

@@ -55,14 +55,24 @@ if (isset($_POST['inputData'])) {
 
 		$conn->beginTransaction();
 
-		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimData, MovimOrigemLocal, MovimDestinoSetor, MovimObservacao, 
+		$sqlMovi = "SELECT MAX(MovimNumRecibo) as MovimNumRecibo
+        FROM Movimentacao
+        WHERE MovimUnidade = '$_SESSION[UnidadeId]'";
+		$resultMovi = $conn->query($sqlMovi);
+		$rowMovi = $resultMovi->fetch(PDO::FETCH_ASSOC);
+
+		$newMovi = explode('/', $rowMovi['MovimNumRecibo']);
+		$newMovi = (intval($newMovi[0])+1).'/'.(date("Y"));
+
+		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimNumRecibo, MovimData, MovimOrigemLocal, MovimDestinoSetor, MovimObservacao, 
 				MovimValorTotal, MovimSituacao, MovimUnidade, MovimUsuarioAtualizador)
-				VALUES (:sTipo, :dData, :iOrigemLocal, :iDestinoSetor, :sObservacao, :fValorTotal, :iSituacao, 
+				VALUES (:sTipo, :dMovi, :dData, :iOrigemLocal, :iDestinoSetor, :sObservacao, :fValorTotal, :iSituacao, 
 				:iUnidade, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 			':sTipo' => 'S',  // Saída
+			':dMovi' => $newMovi,  // Número incremental
 			':dData' => gravaData($_POST['inputData']),
 			':iOrigemLocal' => $_POST['cmbEstoqueOrigem'],
 			':iDestinoSetor' => $_POST['cmbDestinoSetor'],
