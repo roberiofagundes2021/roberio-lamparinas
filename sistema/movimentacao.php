@@ -152,7 +152,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
           alerta('Permissão Negada!','');
           return false;
 				}
-  } else if (Tipo == 'imprimir') {
+    } else if (Tipo == 'imprimir') {
 
       if (MovimTipo == 'E') {
         document.formMovimentacao.action = "movimentacaoImprimeEntrada.php";
@@ -161,6 +161,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
       }
 
       document.formMovimentacao.setAttribute("target", "_blank");
+    } else if (Tipo == 'anexo') {
+      document.formMovimentacao.action = "movimentacaoAnexo.php";
     }
 
     document.formMovimentacao.submit();
@@ -272,8 +274,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'imprimir\', \'\');" class="dropdown-item"><i class="icon-printer2"></i> Imprimir</a>');
 															
+                                <a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'imprimir\', \'\');" class="dropdown-item"><i class="icon-printer2"></i> Imprimir</a>');
+                               
+                                if ($item['MovimTipo'] == 'E'){
+                                  print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'anexo\', \'\');" class="dropdown-item"><i class="icon-attachment"></i> Anexar Nota Fiscal</a>');
+                                }
+
 																if (isset($item['BandeMotivo'])){
 																	print('
 																	<div class="dropdown-divider"></div>
