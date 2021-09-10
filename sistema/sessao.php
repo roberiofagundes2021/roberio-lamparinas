@@ -156,8 +156,15 @@ $arquivosFluxoRealizado = array(
 );
 
 if (array_key_exists('OrigemFluxoRealizado', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosFluxoRealizado)) {
-
 	unset($_SESSION['OrigemFluxoRealizado']);
+}
+
+$arquivosMovimentacaoAnexo = array(
+	'movimentacaoAnexo.php', 'movimentacaoAnexoNovo.php', 'movimentacaoAnexoExclui.php'
+);
+
+if (array_key_exists('MovimentacaoIdAnexo', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoAnexo)) {
+	unset($_SESSION['MovimentacaoIdAnexo']);
 }
 
 

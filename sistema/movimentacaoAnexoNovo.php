@@ -46,7 +46,7 @@
 					':iData' 				=> gravaData($_POST['inputData']),
 					':sNome' 				=> $_POST['inputNome'],
 					':iArquivo' 			=> $nome_final,
-					':iMovimentacao' 	=> $_SESSION['inputMovimentacaoIdAnexo'],
+					':iMovimentacao' 		=> $_SESSION['MovimentacaoIdAnexo'],
 					':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
 					':iUnidade' 			=> $_SESSION['UnidadeId'],
 			));

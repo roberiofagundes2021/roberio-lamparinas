@@ -4,21 +4,27 @@
 
 	$_SESSION['PaginaAtual'] = 'Movimentação Anexo';
 
+	//Se veio de movimentacao.php
 	if (isset($_POST['inputMovimentacaoId'])){
-        $_SESSION['inputMovimentacaoIdAnexo'] = $_POST['inputMovimentacaoId'];
-        $iMovimentacao = $_POST['inputMovimentacaoId'];
-
-        $sql = "SELECT MvAneId, MvAneData, MvAneNome, MvAneArquivo
-                FROM   MovimentacaoAnexo
-                WHERE  MvAneUnidade = ". $_SESSION['UnidadeId'] ." AND MvAneMovimentacao = ".$iMovimentacao."
-                ORDER BY MvAneNome ASC";
-        $result = $conn->query($sql);
-        $row = $result->fetchAll(PDO::FETCH_ASSOC);
-        $count = count($row);
+        
+		$_SESSION['MovimentacaoIdAnexo'] = $_POST['inputMovimentacaoId'];
+       
     } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
-        irpara("movimentacao.php");
+		if (!isset($_SESSION['MovimentacaoIdAnexo'])){
+			irpara("movimentacao.php");			
+		}       
     }
+
+	$iMovimentacao = $_SESSION['MovimentacaoIdAnexo'];
+
+	$sql = "SELECT MvAneId, MvAneData, MvAneNome, MvAneArquivo
+			FROM   MovimentacaoAnexo
+			WHERE  MvAneUnidade = ". $_SESSION['UnidadeId'] ." AND MvAneMovimentacao = ".$iMovimentacao."
+			ORDER BY MvAneNome ASC";
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+	$count = count($row);	
 
 ?>
 <!DOCTYPE html>

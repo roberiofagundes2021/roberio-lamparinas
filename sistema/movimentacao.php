@@ -161,6 +161,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
       }
 
       document.formMovimentacao.setAttribute("target", "_blank");
+
     } else if (Tipo == 'anexo') {
       document.formMovimentacao.action = "movimentacaoAnexo.php";
     }
@@ -304,7 +305,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
         <!-- /info blocks -->
 
-        <form name="formMovimentacao" method="post" target="_blank">
+        <form name="formMovimentacao" method="post">
           <input type="hidden" id="inputPermission" name="inputPermission" >  
           <input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId">
           <input type="hidden" id="inputMovimentacaoNotaFiscal" name="inputMovimentacaoNotaFiscal">
