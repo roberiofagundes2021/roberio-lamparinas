@@ -167,6 +167,14 @@ if (array_key_exists('MovimentacaoIdAnexo', $_SESSION) && !in_array(basename($_S
 	unset($_SESSION['MovimentacaoIdAnexo']);
 }
 
+$arquivosMovimentacaoNotaFiscal = array(
+	'movimentacaoAnexo.php', 'movimentacaoAnexoNovo.php', 'movimentacaoAnexoExclui.php'
+);
+
+if (array_key_exists('MovimentacaoNotaFiscal', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoNotaFiscal)) {
+	unset($_SESSION['MovimentacaoNotaFiscal']);
+}
+
 
 if (!array_key_exists('UsuarId', $_SESSION) or !array_key_exists('UnidadeId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
 	header('Expires: 0');

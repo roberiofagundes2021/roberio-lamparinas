@@ -5,21 +5,23 @@
 	$_SESSION['PaginaAtual'] = 'Movimentação Anexo';
 
 	//Se veio de movimentacao.php
-	if (isset($_POST['inputMovimentacaoId'])){
+	if (isset($_POST['inputMovimentacaoId']) && isset($_POST['inputMovimentacaoNotaFiscal'])){
         
 		$_SESSION['MovimentacaoIdAnexo'] = $_POST['inputMovimentacaoId'];
+		$_SESSION['MovimentacaoNotaFiscal'] = $_POST['inputMovimentacaoNotaFiscal'];
        
     } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
-		if (!isset($_SESSION['MovimentacaoIdAnexo'])){
+		if (!isset($_SESSION['MovimentacaoIdAnexo']) && !isset($_SESSION['MovimentacaoNotaFiscal'])){
 			irpara("movimentacao.php");			
 		}       
     }
 
 	$iMovimentacao = $_SESSION['MovimentacaoIdAnexo'];
 
-	$sql = "SELECT MvAneId, MvAneData, MvAneNome, MvAneArquivo
+	$sql = "SELECT MvAneId, MvAneData, MvAneNome, MvAneArquivo, MovimNotaFiscal
 			FROM   MovimentacaoAnexo
+			JOIN   Movimentacao ON MovimId = MvAneMovimentacao
 			WHERE  MvAneUnidade = ". $_SESSION['UnidadeId'] ." AND MvAneMovimentacao = ".$iMovimentacao."
 			ORDER BY MvAneNome ASC";
 	$result = $conn->query($sql);
@@ -214,7 +216,9 @@
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Notas Fiscais</h3>
+								<div class="col-lg-12">
+									<h3 class="card-title">Anexar Nota Fiscal<span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['MovimentacaoNotaFiscal']; ?> </span></h3>
+								</div>
 							</div>
 
 							<div class="card-body">
