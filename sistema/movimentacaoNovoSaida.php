@@ -874,19 +874,24 @@ if (isset($_POST['inputData'])) {
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var cmbProduto = $('#cmbProduto').val();
 				var inputValorUnitario = $('#inputValorUnitario').val();
+				var inputLote = $('#inputLote').val();
+				var inputValidade = $('#inputValidade').val();
+
 
 				var Produto = cmbProduto.split("#");
 				var valor = Produto[1].replace(".", ",");
-				//var lote = Produto[2];
-				//var validade = Produto[3];
+				var lote = Produto[2];
+				var validade = Produto[3];
 
 				if (valor != 'null' && valor) {
 					$('#inputValorUnitario').val(valor);
 				} else {
 					$('#inputValorUnitario').val('0,00');
 				}
-				//$('#inputLote').val(lote);
-				//$('#inputValidade').val(validade);
+				  
+				$('#inputLote').val(lote);
+
+				$('#inputValidade').val(validade);
 
 				$('#inputQuantidade').focus();
 			});
