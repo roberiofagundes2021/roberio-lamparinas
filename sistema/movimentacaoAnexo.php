@@ -217,7 +217,7 @@
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<div class="col-lg-12">
-									<h3 class="card-title">Anexar Nota Fiscal<span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['MovimentacaoNotaFiscal']; ?> </span></h3>
+									<h3 class="card-title"> " Nota Fiscal:<span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['MovimentacaoNotaFiscal']; ?></span> e demais documentos"</h3>
 								</div>
 							</div>
 
@@ -262,9 +262,7 @@
 									<div class="row" style="margin-top: 10px;">
 										<div class="col-lg-12">								
 											<div class="form-group">
-												<?php if ($count <= 0) : ?>
-													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-												<?php endif; ?>												
+													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>											
 											</div>
 										</div>
 									</div>

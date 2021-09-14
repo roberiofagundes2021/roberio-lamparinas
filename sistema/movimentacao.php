@@ -282,6 +282,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                   print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'anexo\', \'\');" class="dropdown-item"><i class="icon-attachment"></i> Anexar Nota Fiscal</a>');
                                 }
 
+                                if ($item['SituaChave'] == 'LIBERADO'){
+                                  print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'contabilidade\', \'\');" class="dropdown-item"><i class="icon-list2"></i> Enviar para Contabilidade</a>');
+                                }
+
+                                if ($item['SituaChave'] == 'LIBERADO'){
+                                  print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'liquidar\', \'\');" class="dropdown-item"><i class="icon-coin-dollar"></i>Liquidar</a>');
+                                }
+
 																if (isset($item['BandeMotivo'])){
 																	print('
 																	<div class="dropdown-divider"></div>
