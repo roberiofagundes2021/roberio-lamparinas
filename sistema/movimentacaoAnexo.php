@@ -19,9 +19,8 @@
 
 	$iMovimentacao = $_SESSION['MovimentacaoIdAnexo'];
 
-	$sql = "SELECT MvAneId, MvAneData, MvAneNome, MvAneArquivo, MovimNotaFiscal
-			FROM   MovimentacaoAnexo
-			JOIN   Movimentacao ON MovimId = MvAneMovimentacao
+	$sql = "SELECT MvAneId, MvAneData, MvAneNome, MvAneArquivo
+			FROM   MovimentacaoAnexo	
 			WHERE  MvAneUnidade = ". $_SESSION['UnidadeId'] ." AND MvAneMovimentacao = ".$iMovimentacao."
 			ORDER BY MvAneNome ASC";
 	$result = $conn->query($sql);
@@ -217,7 +216,7 @@
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<div class="col-lg-12">
-									<h3 class="card-title"> " Nota Fiscal:<span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['MovimentacaoNotaFiscal']; ?></span> e demais documentos"</h3>
+									<h3 class="card-title"> " Nota Fiscal<span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['MovimentacaoNotaFiscal']; ?></span> e demais documentos"</h3>
 								</div>
 							</div>
 
