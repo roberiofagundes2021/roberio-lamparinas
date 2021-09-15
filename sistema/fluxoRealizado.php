@@ -11,6 +11,7 @@ include('global_assets/php/conexao.php');
 if (isset($_POST['inputFluxoOperacionalId'])){
 	
 	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
+	
 	$_SESSION['OrigemFluxoRealizado'] = $_POST['inputOrigem'];
 
 	$sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
@@ -26,11 +27,12 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 	irpara($_SESSION['OrigemFluxoRealizado']); //Isso aqui é pensando no caso do usuário der um refresh nessa página. Um ENTER, por exemplo na URL.
 }
 
+/*
 if (isset($_POST['inputSelecionados'])){
 
 	$aSelecionados = array($_POST['inputSelecionados']);
 }
-
+*/
 ?>
 
 <!DOCTYPE html>
@@ -145,6 +147,7 @@ if (isset($_POST['inputSelecionados'])){
 								<form name="formFluxoOperacional" method="post" action="fluxoRealizado.php">
 
 									<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" value="<?php echo $_POST['inputFluxoOperacionalId']; ?>" />
+									<input type="hidden" id="inputOrigem" name="inputOrigem" value="<?php echo $_POST['inputOrigem']; ?>" />
 
 									<div class="row">
 										<div class="col-lg-4">
@@ -243,7 +246,7 @@ if (isset($_POST['inputSelecionados'])){
 													?>
 												</select>
 
-												<input type="hidden" name="inputSelecionados" value="<?php var_dump($itensSelecionados); ?>">
+												<!--<input type="hidden" name="inputSelecionados" value="<?php //isset($aSelecionados) ? var_dump($aSelecionados) : ""; ?>">-->
 											</div>
 										</div>
 
@@ -395,11 +398,11 @@ if (isset($_POST['inputSelecionados'])){
 												}
 											}
 
-									$sql .= "ORDER BY SubCategoria, Nome ASC";
+									$sql .= " ORDER BY SubCategoria, Nome ASC";
 											
 									$result = $conn->query($sql);
 									$rowPrevisto = $result->fetchAll(PDO::FETCH_ASSOC);
-									
+									//echo $sql;die;
 									$cont = 0;
 
 								?>
@@ -457,7 +460,7 @@ if (isset($_POST['inputSelecionados'])){
 													<td style="text-align:right;">'.mostraValor($fValorTotalPrevisto).'</td>
 													<td style="background-color: #eee; color:#333; text-align:center;">'.$controle.'</td>
 													<td style="background-color: #eee; color:#333; text-align:right;">'.$saldo.'</td>
-													<td style="background-color: #eee; color:#333; text-align:center;">'.$porcentagem.'%</td>
+													<td style="background-color: #eee; color:#333; text-align:center;">'.mostraValor($porcentagem).'%</td>
 												</tr>');
 
 												$cont++;
@@ -559,7 +562,7 @@ if (isset($_POST['inputSelecionados'])){
 												}
 											}
 
-									$sql .= "ORDER BY SubCategoria, Nome ASC";
+									$sql .= " ORDER BY SubCategoria, Nome ASC";
 
 									$result = $conn->query($sql);
 									$rowRealizado = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -616,11 +619,11 @@ if (isset($_POST['inputSelecionados'])){
 													<td>'.$item['Marca'].'</td>
 													<td style="text-align:center;">'.$item['UnidadeMedida'].'</td>
 													<td style="text-align:center;">'.$iQuantidadeRealizada.'</td>
-													<td style="text-align:right;">'.mostraValor($fValorUnitarioRealizado).'</td>
+													<td style="text-align:right;">'.$fValorUnitarioRealizado.'</td>
 													<td style="text-align:right;">'.mostraValor($fValorTotalRealizado).'</td>
 													<td style="background-color: #eee; color:#333; text-align:center;">'.$iQuantidadeRealizada.'</td>
 													<td style="background-color: #eee; color:#333; text-align:right;">'.mostraValor($fValorTotalRealizado).'</td>
-													<td style="background-color: #eee; color:#333; text-align:center;">'.$porcentagem.'%</td>
+													<td style="background-color: #eee; color:#333; text-align:center;">'.mostraValor($porcentagem).'%</td>
 												</tr>');
 
 												$cont++;

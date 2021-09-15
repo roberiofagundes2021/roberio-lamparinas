@@ -33,10 +33,12 @@ if(isset($_POST['inputOrcamentoId'])){
 	
 	$iOrcamento = $_POST['inputOrcamentoId'];
 			
-	$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrConteudo, TrXOrFornecedor, 
+	$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrConteudo, TrXOrFornecedor, SituaChave,
 					ForneId, ForneContato, ForneEmail, ForneTelefone, ForneCelular, TrXOrSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
 			FROM TRXOrcamento
 			JOIN Usuario on UsuarId = TrXOrSolicitante
+			JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+			JOIN Situacao  ON SituaId = TrRefStatus
 			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
 			WHERE TrXOrId = $iOrcamento ";
 	$result = $conn->query($sql);
@@ -453,8 +455,12 @@ if(isset($_POST['inputData'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<div class="btn btn-lg btn-principal" id="enviar">Alterar</div>
-										<a href="trOrcamento.php" class="btn btn-basic" role="button">Cancelar</a>
+                                        <?php 
+											if ($row['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+												print('<div class="btn btn-lg btn-principal" id="enviar">Alterar</div>');
+											}
+										?>
+											<a href="trOrcamento.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

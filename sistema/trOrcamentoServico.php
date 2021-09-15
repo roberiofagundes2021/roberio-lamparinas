@@ -55,6 +55,8 @@ $sql = "SELECT *
 		LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
 		JOIN Categoria on CategId = TrXOrCategoria
 		LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
+		JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+		JOIN Situacao  ON SituaId = TrRefStatus
 		WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -567,7 +569,11 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<button class="btn btn-lg btn-principal" type="submit">Alterar</button>
+										<?php 
+											if ($row['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+												print('<button class="btn btn-lg btn-principal" type="submit">Alterar</button>');
+											}
+										?>
 										<a href="trOrcamento.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

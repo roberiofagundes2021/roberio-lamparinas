@@ -236,7 +236,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -312,7 +312,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['ForneNome'].'</td>
 											<td>'.$item['OrComNumProcesso'].'</td>
 											<td>'.$item['SbCatNome'].'</td>
-											<td>'.mostraValor($item['ValorTotalOrdemCompra']).'</td>											
+											<td class="text-right" style="padding-right:40px !important;">'.mostraValor($item['ValorTotalOrdemCompra']).'</td>											
 											');
 										
 										print('<td><span class="'.$situacaoClasse.'">'.$situacao.'</span></td>');

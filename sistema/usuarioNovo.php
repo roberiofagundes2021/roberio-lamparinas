@@ -51,7 +51,7 @@ if (isset($_POST['inputCpf'])) {
 			));
 			$LAST_ID_EXUXP = $conn->lastInsertId();
 
-			if (!$_SESSION['EmpresaId']){
+			if (!isset($_SESSION['EmpresaId'])){
 				
 				//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
 				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)

@@ -168,10 +168,9 @@ try{
 					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
 					success: function(resposta){
 						//alert(resposta);
-						$("#tabelaProdutos").html(resposta).show();
-						
-						return false;
-						
+
+						$("#tabelaProdutos").html(resposta).show();					
+						return false;						
 					}	
 				});
 			});

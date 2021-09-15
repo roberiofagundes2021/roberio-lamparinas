@@ -162,10 +162,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
         }
 
         document.formMovimentacao.setAttribute("target", "_blank");
+      } else if (Tipo == 'anexo') {
+        document.formMovimentacao.action = "movimentacaoAnexo.php";
       }
-
       document.formMovimentacao.submit();
-    }
+    } 
   </script>
 
 </head>
@@ -274,10 +275,23 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'' . $item['MovimTipo'] . '\', \'imprimir\', \'\');" class="dropdown-item"><i class="icon-printer2"></i> Imprimir</a>');
+															
+                                <a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'imprimir\', \'\');" class="dropdown-item"><i class="icon-printer2"></i> Imprimir</a>');
+                               
+                                if ($item['MovimTipo'] == 'E'){
+                                  print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'anexo\', \'\');" class="dropdown-item"><i class="icon-attachment"></i> Anexar Nota Fiscal</a>');
+                                }
 
-                    if (isset($item['BandeMotivo'])) {
-                      print('
+                                if ($item['SituaChave'] == 'LIBERADO'){
+                                  print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'contabilidade\', \'\');" class="dropdown-item"><i class="icon-list2"></i> Enviar para Contabilidade</a>');
+                                }
+
+                                if ($item['SituaChave'] == 'LIBERADO'){
+                                  print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'liquidar\', \'\');" class="dropdown-item"><i class="icon-coin-dollar"></i>Liquidar</a>');
+                                }
+
+																if (isset($item['BandeMotivo'])){
+																	print('
 																	<div class="dropdown-divider"></div>
 																	<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \'' . $item['MovimTipo'] . '\', \'motivo\', \'' . $item['BandeMotivo'] . '\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
                     }
@@ -299,8 +313,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
         <!-- /info blocks -->
 
-        <form name="formMovimentacao" method="post" target="_blank">
-          <input type="hidden" id="inputPermission" name="inputPermission">
+        <form name="formMovimentacao" method="post">
+          <input type="hidden" id="inputPermission" name="inputPermission" > 
           <input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId">
           <input type="hidden" id="inputMovimentacaoNotaFiscal" name="inputMovimentacaoNotaFiscal">
         </form>
