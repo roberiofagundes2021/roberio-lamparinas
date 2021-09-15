@@ -77,8 +77,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
             targets: [2]
           },
           {
+            orderable: true, //Nº Recibo
+            width: "10%",
+            targets: [2]
+          },
+          {
             orderable: true, //Fornecedor
-            width: "30%",
+            width: "20%",
             targets: [3]
           },
           {
@@ -257,7 +262,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>' . mostraData($item['MovimData']) . '</td>
 											<td>' . $tipo . '</td>
 											<td>' . $item['MovimNotaFiscal'] . '</td>
-											<td class="col-2">' . $item['MovimNumRecibo'] . '</td>
+											<td>' . $item['MovimNumRecibo'] . '</td>
 											<td>' . $item['ForneNome'] . '</td>
 											<td class="col-5">' . $local . '</td>
 											');
