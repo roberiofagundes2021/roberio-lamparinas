@@ -225,7 +225,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					document.formOrdemCompra.action = "ordemcompraServico.php";
 				} else if (Tipo == 'duplica'){
 					document.formOrdemCompra.action = "ordemcompraDuplica.php";
+				} else if (Tipo == 'aprovacaoContabilidade') {
+					document.formOrdemCompra = "ordemcompraAprovacaoContabilidade.php";
+					document.formOrdemCompra.submit();
+				} else if (Tipo == 'empenho') {
+					document.formOrdemCompra.action = "ordemCompraEmpenho.php";
 				}
+
 				document.formOrdemCompra.setAttribute("target", "_self");
 			}
 			
@@ -334,8 +340,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																		<input type="hidden" name="inputIdOrdemCompra" value="'.$item['OrComId'].'">'.
 																		(($item['produtoQuant']>0 || $item['servicoQuant']>0)?'<div onClick="submitForm('.$item['OrComId'].')" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i></i>Enviar para Aprovação</div>':'').
 																	'</form>'
-																.'<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>');
+															.'<div class="dropdown-divider"></div>
+																
+															    <a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>');
+
+																if ($item['SituaChave'] == 'LIBERADO'){
+																	print('<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'aprovacaoContabilidade\', \'\')" class="dropdown-item" title="Contabilidade"><i class="icon-list2"></i> Enviar para  Contabilidade</a>');
+																
+																}
+								  
+																  if ($item['SituaChave'] == 'LIBERADO'){
+																	print('<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'empenho\', \'\')" class="dropdown-item" title="Empenhar"><i class="icon-coin-dollar"></i> Empenhar</a>');
+																}
+								  
 
 										if (isset($item['BandeMotivo'])){
 
