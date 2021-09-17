@@ -29,7 +29,7 @@ try{
 
 		$result->execute(array(
 			':iStatus' => $rowSituacao['SituaId'],
-			':iOrdemCompraId' => $OrdemCompraId					
+			':iOrdemCompraId' => $iOrdemCompraId					
 		));
 		/* Fim Atualiza */
 
@@ -43,7 +43,7 @@ try{
 
 		$sql = "SELECT OrComNumero, OrComTipo, OrComDtEmissao
 				FROM OrdemCompra
-				WHERE OrComId = ".$OrdemCompraId
+				WHERE OrComId = ".$iOrdemCompraId
 		;
 		$result = $conn->query($sql);
 		$rowOrdemCompra = $result->fetch(PDO::FETCH_ASSOC);
@@ -53,7 +53,7 @@ try{
 			SELECT COUNT(BandeId) as Count
 			FROM Bandeja
 			WHERE BandeTabela = 'OrdemCompra' AND BandePerfil = 'CONTABILIDADE'
-			AND BandeTabelaId =  ".$OrdemCompraId
+			AND BandeTabelaId =  ".$iOrdemCompraId
 		;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
@@ -63,7 +63,7 @@ try{
 				FROM Bandeja
 				JOIN Situacao on SituaId = BandeStatus
 				WHERE BandeTabela = 'OrdemCompra' AND BandePerfil = 'CONTABILIDADE'
-				AND BandeTabelaId =  ".$OrdemCompraId
+				AND BandeTabelaId =  ".$iOrdemCompraId
 		;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
@@ -95,7 +95,7 @@ try{
 				':iSolicitante' 		=> $_SESSION['UsuarId'],
 				':iSolicitanteSetor' 	=> null,
 				':sTabela' 				=> 'OrdemCompra',
-				':iTabelaId' 			=> $OrdemCompraId,
+				':iTabelaId' 			=> $iOrdemCompraId,
 				':iStatus' 				=> $rowSituacao['SituaId'],
 				':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
 				':iUnidade' 			=> $_SESSION['UnidadeId'],
