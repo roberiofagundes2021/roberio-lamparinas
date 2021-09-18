@@ -45,14 +45,31 @@ if (isset($_POST['inputData'])) {
 
     $conn->beginTransaction();
 
-    $sqlMovi = "SELECT MAX(MovimNumRecibo) as MovimNumRecibo
+    $newMovi = '0/'.(date("Y"));
+
+		// vai retornar um valor contendo somente a segunda parte da string ex: "1/2021" => "2021"
+		$sqlMovi = "SELECT MAX(SUBSTRING(MovimNumRecibo, 3, 6)) as MovimNumRecibo
         FROM Movimentacao
         WHERE MovimUnidade = '$_SESSION[UnidadeId]'";
 		$resultMovi = $conn->query($sqlMovi);
 		$rowMovi = $resultMovi->fetch(PDO::FETCH_ASSOC);
 
-		$newMovi = explode('/', $rowMovi['MovimNumRecibo']);
-		$newMovi = (intval($newMovi[0])+1).'/'.(date("Y"));
+		// Se ultimo valor cadastrado no banco for de um ano diferente do ano atual,
+		// a contagem será reiniciada
+		if ($rowMovi['MovimNumRecibo'] == date("Y")) {
+			// vai buscar o ultimo valor completo no banco
+			$sqlMovi = "SELECT MAX(MovimNumRecibo) as MovimNumRecibo
+					FROM Movimentacao
+					WHERE MovimUnidade = '$_SESSION[UnidadeId]' and MovimNumRecibo LIKE '%".date("Y")."%'";
+			$resultMovi = $conn->query($sqlMovi);
+			$rowMovi = $resultMovi->fetch(PDO::FETCH_ASSOC);
+	
+			$newMovi = explode('/', $rowMovi['MovimNumRecibo']);
+			$newMovi = (intval($newMovi[0])+1).'/'.(date("Y"));
+		}
+
+    var_dump($newMovi);
+    exit();
 
 		$sql = "INSERT INTO Movimentacao (MovimTipo,
                                       MovimNumRecibo,
@@ -769,6 +786,7 @@ if (isset($_POST['inputData'])) {
       let cmbCategoria = $('#cmbCategoria').val();
       let cmbClassificacao = $('#cmbClassificacao').val();
       let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val();
+      let cmbDestino = $('#cmbDestinoLocalEstoqueSetor').val()? $('#cmbDestinoLocalEstoqueSetor').val():$('#inputDestinoManual').val();
       let Produto = cmbProduto.split("#");
       let inputTipo = $('input[name="inputTipo"]:checked').val();
       let inputNumItens = $('#inputNumItens').val();
@@ -800,6 +818,13 @@ if (isset($_POST['inputData'])) {
           scrollTop: $("#cmbEstoqueOrigemLocalSetor")[0].scrollHeight
         }, 1500);
         $('#cmbEstoqueOrigemLocalSetor').focus();
+        return false;
+      } else if (cmbDestino == '' || cmbDestino == null) {
+        alerta('Atenção', 'Informe o destino antes de adicionar!', 'error');
+        $('html, body').animate({
+          scrollTop: $("#cmbDestinoLocalEstoqueSetor").scrollHeight
+        }, 1500);
+        $('#cmbDestinoLocalEstoqueSetor').focus();
         return false;
       } else if ((cmbCategoria == '' || cmbCategoria == null) && (cmbPatrimonio == '' || cmbPatrimonio == null)) {
         alerta('Atenção', 'Informe a categoria ou o patrimonio antes de adicionar!', 'error');
@@ -928,7 +953,7 @@ if (isset($_POST['inputData'])) {
       var inputTotal = $('#inputTotal').val();
       var cmbMotivo = $('#cmbMotivo').val();
       var cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val();
-      var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val();
+      var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val()? $('#cmbDestinoLocalEstoqueSetor').val():$('#inputDestinoManual').val();
       var inputDestinoManual = $('#inputDestinoManual').val();
 
       var Motivo = cmbMotivo.split("#");
@@ -958,6 +983,18 @@ if (isset($_POST['inputData'])) {
           scrollTop: $("#cmbEstoqueOrigemLocalSetor")[0].scrollHeight
         }, 1500);
         $('#cmbEstoqueOrigemLocalSetor').focus();
+        $('#btnAdicionar').click();
+        // $("#formMovimentacao").submit();
+        return false;
+      }
+
+      if (cmbDestinoLocalEstoqueSetor == '' || cmbDestinoLocalEstoqueSetor == null) {
+        event.preventDefault();
+        alerta('Atenção', 'Informe o Local de Destino!', 'error');
+        $('html, body').animate({
+          scrollTop: $("#cmbDestinoLocalEstoqueSetor")[0].scrollHeight
+        }, 1500);
+        $('#cmbDestinoLocalEstoqueSetor').focus();
         $('#btnAdicionar').click();
         // $("#formMovimentacao").submit();
         return false;

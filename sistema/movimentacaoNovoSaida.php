@@ -54,15 +54,31 @@ if (isset($_POST['inputData'])) {
 		//var_dump($_POST);die;
 
 		$conn->beginTransaction();
+		// SELECT MAX(SUBSTRING(MovimNumRecibo, 3, 6))
+		// 	FROM [Movimentacao] WHERE [MovimTipo] = 'T'
 
-		$sqlMovi = "SELECT MAX(MovimNumRecibo) as MovimNumRecibo
+		$newMovi = '0/'.(date("Y"));
+
+		// vai retornar um valor contendo somente a segunda parte da string ex: "1/2021" => "2021"
+		$sqlMovi = "SELECT MAX(SUBSTRING(MovimNumRecibo, 3, 6)) as MovimNumRecibo
         FROM Movimentacao
         WHERE MovimUnidade = '$_SESSION[UnidadeId]'";
 		$resultMovi = $conn->query($sqlMovi);
 		$rowMovi = $resultMovi->fetch(PDO::FETCH_ASSOC);
 
-		$newMovi = explode('/', $rowMovi['MovimNumRecibo']);
-		$newMovi = (intval($newMovi[0])+1).'/'.(date("Y"));
+		// Se ultimo valor cadastrado no banco for de um ano diferente do ano atual,
+		// a contagem será reiniciada
+		if ($rowMovi['MovimNumRecibo'] == date("Y")) {
+			// vai buscar o ultimo valor completo no banco
+			$sqlMovi = "SELECT MAX(MovimNumRecibo) as MovimNumRecibo
+					FROM Movimentacao
+					WHERE MovimUnidade = '$_SESSION[UnidadeId]' and MovimNumRecibo LIKE '%".date("Y")."%'";
+			$resultMovi = $conn->query($sqlMovi);
+			$rowMovi = $resultMovi->fetch(PDO::FETCH_ASSOC);
+	
+			$newMovi = explode('/', $rowMovi['MovimNumRecibo']);
+			$newMovi = (intval($newMovi[0])+1).'/'.(date("Y"));
+		}
 
 		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimNumRecibo, MovimData, MovimOrigemLocal, MovimDestinoSetor, MovimObservacao, 
 				MovimValorTotal, MovimSituacao, MovimUnidade, MovimUsuarioAtualizador)
@@ -863,9 +879,11 @@ if (isset($_POST['inputData'])) {
 						var option = '<option value="#" "selected">Selecione o Produto</option>';
 
 						if (dados.length) {
+							// console.log(dados)
 
 							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
+								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + 
+								'#' + obj.Validade + '#' + obj.Lote + '">' + obj.ProduNome + '</option>';
 							});
 
 							$('#cmbProduto').html(option).show();
@@ -890,8 +908,9 @@ if (isset($_POST['inputData'])) {
 
 				var Produto = cmbProduto.split("#");
 				var valor = Produto[1].replace(".", ",");
-				var lote = Produto[2];
-				var validade = Produto[3];
+				var validade = Produto[2]?Produto[2]:'';
+				var lote = Produto[3]?Produto[3]:'';
+				console.log(lote)
 
 				if (valor != 'null' && valor) {
 					$('#inputValorUnitario').val(valor);
@@ -1686,14 +1705,14 @@ if (isset($_POST['inputData'])) {
 												<div class="col-lg-2" id="formLote">
 													<div class="form-group">
 														<label for="inputLote">Lote</label>
-														<input type="text" maxlength="50" id="inputLote" name="inputLote" class="form-control">
+														<input type="text" maxlength="50" id="inputLote" name="inputLote" class="form-control" readOnly>
 													</div>
 												</div>
 
 												<div class="col-lg-2" id="formValidade">
 													<div class="form-group">
 														<label for="inputValidade">Validade</label>
-														<input type="date" id="inputValidade" name="inputValidade" class="form-control">
+														<input type="date" id="inputValidade" name="inputValidade" class="form-control" readOnly>
 													</div>
 												</div>
 
