@@ -26,10 +26,11 @@ if ($count) {
 		$total = $_POST['quantidade'] * $row['ProduCustoFinal'];
 
 		$validade = $row['Validade'] != "" ? " - Validade: ".mostraData($row['Validade']) : "";
+		$lote = $_POST['Lote'] != "" ? " - Lote: ".$_POST['Lote'] : "";
 		
 		$output = 	'<tr id="row' . $_POST['numItens'] . '" class="trGrid">
 						 <td>' . $_POST['numItens'] . '</td>
-						 <td data-popup="tooltip" title="' . $row['ProduDetalhamento'] . ' MARCA: '. $row['MarcaNome'] . $validade.'">' . $row['ProduNome'] . '</td>
+						 <td data-popup="tooltip" title="' . $row['ProduDetalhamento'] . ' MARCA: '. $row['MarcaNome'] . $validade."".$lote.'">' . $row['ProduNome'] . '</td>
 						 <td style="text-align: center">' . $row['UnMedSigla'] . '</td>
 						 <td style="text-align: center">' . $_POST['quantidade'] . '</td>
 						 <td style="text-align: right">' . $valorCusto . '</td>

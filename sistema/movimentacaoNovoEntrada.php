@@ -666,12 +666,14 @@ if (isset($_POST['inputData'])) {
 
 		function selecionaTipo(tipo) {
 
-			$('#divConteudo').css({
-				"background-color": "#eeeded",
-				"box-shadow": "none"
-			});
+			// $('#divConteudo').css({
+			// 	"background-color": "#eeeded",
+			// 	"box-shadow": "none"
+			// });
 			// $('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
 			
+			// setTimeout(() => {
+			// }, 3000);
 			if (tipo == 'E') {
 				location.href = 'movimentacaoNovoEntrada.php';
 			} else if (tipo == 'S') {

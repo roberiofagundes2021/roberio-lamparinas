@@ -937,9 +937,10 @@ if (isset($_POST['inputData'])) {
 				var cmbClassificacao = $('#cmbClassificacao').val();
 				var inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
 				var inputIdServicos = $('#inputIdServicos').val(); //esse aqui guarda todos os IDs de serviços que estão na grid para serem movimentados
-				console.log('Id_Produtos: '+inputIdProdutos);
-				console.log('Id_Servicos: '+inputIdServicos);
-				console.log('Item: '+Item[0]);
+				// console.log('Id_Produtos: '+inputIdProdutos);
+				// console.log('Id_Servicos: '+inputIdServicos);
+				// console.log('Item: '+Item[0]);
+				// console.log('Lote: '+inputLote);
 
 				//remove os espaços desnecessários antes e depois
 				inputQuantidade = inputQuantidade.trim();
@@ -1018,7 +1019,8 @@ if (isset($_POST['inputData'])) {
 							idProduto: Item[0],
 							origem: origem,
 							quantidade: inputQuantidade,
-							classific: cmbClassificacao
+							classific: cmbClassificacao,
+							Lote: inputLote
 						},
 						success: function(resposta) {
 
