@@ -226,7 +226,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				} else if (Tipo == 'duplica'){
 					document.formOrdemCompra.action = "ordemcompraDuplica.php";
 				} else if (Tipo == 'aprovacaoContabilidade') {
-					document.formOrdemCompra = "ordemcompraAprovacaoContabilidade.php";
+					document.formOrdemCompra.action = "ordemcompraAprovacaoContabilidade.php";
 					document.formOrdemCompra.submit();
 				} else if (Tipo == 'empenho') {
 					document.formOrdemCompra.action = "ordemCompraEmpenho.php";
@@ -349,7 +349,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																
 																}
 								  
-																  if ($item['SituaChave'] == 'LIBERADO'){
+																  if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCONTABILIDADE'){
 																	print('<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'empenho\', \'\')" class="dropdown-item" title="Empenhar"><i class="icon-coin-dollar"></i> Empenhar</a>');
 																}
 								  

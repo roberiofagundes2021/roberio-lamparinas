@@ -715,6 +715,21 @@ if ($totalAcoes) {
 					}
 				}
 			}
+			if  (BandeTabela == 'OrdemCompra') {
+
+				document.getElementById('inputOrdemCompraId').value = BandeTabelaId;
+
+
+				if (Tipo == 'liberarContabilidade') {
+
+					document.getElementById('inputTRIdIndex').value = BandeTabelaId;
+					document.formBandeja.action = "ordemCompraEmpenho.php";
+					document.formBandeja.setAttribute("target", "_self");
+					document.formBandeja.submit();
+							
+				}
+			}	
+
 
 			if (BandeTabela == 'TermoReferencia') {
 
