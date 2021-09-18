@@ -670,8 +670,8 @@ if (isset($_POST['inputData'])) {
 				"background-color": "#eeeded",
 				"box-shadow": "none"
 			});
-			$('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
-
+			// $('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
+			
 			if (tipo == 'E') {
 				location.href = 'movimentacaoNovoEntrada.php';
 			} else if (tipo == 'S') {
