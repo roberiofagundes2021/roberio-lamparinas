@@ -34,27 +34,27 @@
                         </tr>
                         <tr>
                             <td rowspan="3" width="15%" style="text-align: center; background-color: #eee;">Patrimônio: '.$value['PatriNumero'].'</td>
-                            <td colspan="5" width="65%">Produto: '.$value['ProduNome'].'</td>
-                            <td colspan="1" width="20%">Código: '.$value['ProduCodigo'].'</td>
+                            <td colspan="5" width="65%">Produto:<br>'.$value['ProduNome'].'</td>
+                            <td colspan="1" width="20%">Código:<br>'.$value['ProduCodigo'].'</td>
                         </tr>
                         <tr>
-                            <td colspan="3">Marca: '. $value['MarcaNome'] .'</td>
-                            <td colspan="2">Modelo: '.$value['ModelNome'].'</td>
-                            <td colspan="1">Unidade: '.$value['UnMedSigla'].'</td>                                    
+                            <td colspan="3">Marca:<br>'. $value['MarcaNome'] .'</td>
+                            <td colspan="2">Modelo:<br>'.$value['ModelNome'].'</td>
+                            <td colspan="1">Unidade:<br>'.$value['UnMedSigla'].'</td>                                    
                         </tr>
                         <tr>
                         ';
 
-                $html .= '  <td colspan="3">Categoria: '.$value['CategNome'].'</td>';
+                $html .= '  <td colspan="3">Categoria:<br>'.$value['CategNome'].'</td>';
 
                 if($value['Validade'] == ''){
-                    $html .= '  <td colspan="2">Lote: '.$value['MvXPrLote'].'</td>';                    
+                    $html .= '  <td colspan="2">Lote:<br>'.$value['MvXPrLote'].'</td>';                    
                 } else{
-                    $html .= '  <td colspan="1">Lote: '.$value['MvXPrLote'].'</td>';
-                    $html .= '  <td colspan="1">Validade: '.mostraData($value['Validade']).'</td>';    
+                    $html .= '  <td colspan="1">Lote:<br>'.$value['MvXPrLote'].'</td>';
+                    $html .= '  <td colspan="1">Validade:<br>'.mostraData($value['Validade']).'</td>';    
                 }
 
-                $html .= '  <td colspan="1">Quantidade: 1</td>
+                $html .= '  <td colspan="1">Quantidade:<br>1</td>
                          </tr>
                         ';
             }
