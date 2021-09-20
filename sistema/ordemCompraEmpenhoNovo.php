@@ -6,7 +6,7 @@
 
 	try{	
 		
-		$_UP['pasta'] = 'global_assets/anexos/OrdemCompraEmpenho/';
+		$_UP['pasta'] = 'global_assets/anexos/ordemCompraEmpenho/';
 
 		// Renomeia o arquivo? (Se true, o arquivo será salvo como .csv e um nome único)
 		$_UP['renomeia'] = false;

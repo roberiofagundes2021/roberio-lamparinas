@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Ordem de Compra';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
+$sql = "SELECT DISTINCT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
 		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor, BandeMotivo, SbCatNome, dbo.fnValorTotalOrdemCompra(OrComUnidade, OrComId) as ValorTotalOrdemCompra,
 		(SELECT COUNT(FOXPrProduto) FROM FluxoOperacionalXProduto WHERE FOXPrFluxoOperacional = OrComFluxoOperacional) as produtoCount,
 		(SELECT COUNT(FOXSrServico) FROM FluxoOperacionalXServico WHERE FOXSrFluxoOperacional = OrComFluxoOperacional) as servicoCount,
@@ -22,6 +22,7 @@ $sql = "SELECT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, OrComLote
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
+
 ?>
 
 <!DOCTYPE html>
