@@ -28,16 +28,14 @@ if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#' && $_GET['idFor
 	if(isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] == null) $_GET['idSubCategoria'] = "#";
 
 	if (isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] != "#" and $_GET['idSubCategoria'] != ""){
-		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, MvXPrLote,
-		dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade, dbo.fnLoteProduto(ProduUnidade, ProduId) as Lote
+		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal,
+				dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade, dbo.fnLoteProduto(ProduUnidade, ProduId) as Lote
 				FROM Produto
-				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduSubCategoria = '". $_GET['idSubCategoria']."'";
 	} else {
 		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal,
-		dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade, dbo.fnLoteProduto(ProduUnidade, ProduId) as Lote
+				dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade, dbo.fnLoteProduto(ProduUnidade, ProduId) as Lote
 				FROM Produto
-				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = '". $_GET['idCategoria']."'";
 	}
 }
