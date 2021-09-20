@@ -175,6 +175,14 @@ if (array_key_exists('MovimentacaoNotaFiscal', $_SESSION) && !in_array(basename(
 	unset($_SESSION['MovimentacaoNotaFiscal']);
 }
 
+$arquivosOrdemCompraEmpenho = array(
+	'ordemCompraEmpenho.php', 'ordemCompraEmpenhoNovo.php', 'ordemCompraEmpenhoExclui.php'
+);
+
+if (array_key_exists('OrdemCompraIdEmpenho', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosOrdemCompraEmpenho)) {
+	unset($_SESSION['OrdemCompraIdEmpenho']);
+}
+
 
 if (!array_key_exists('UsuarId', $_SESSION) or !array_key_exists('UnidadeId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
 	header('Expires: 0');

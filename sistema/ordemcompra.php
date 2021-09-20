@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Ordem de Compra';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
+$sql = "SELECT DISTINCT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
 		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor, BandeMotivo, SbCatNome, dbo.fnValorTotalOrdemCompra(OrComUnidade, OrComId) as ValorTotalOrdemCompra,
 		(SELECT COUNT(FOXPrProduto) FROM FluxoOperacionalXProduto WHERE FOXPrFluxoOperacional = OrComFluxoOperacional) as produtoCount,
 		(SELECT COUNT(FOXSrServico) FROM FluxoOperacionalXServico WHERE FOXSrFluxoOperacional = OrComFluxoOperacional) as servicoCount,
@@ -22,6 +22,7 @@ $sql = "SELECT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, OrComLote
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
+
 ?>
 
 <!DOCTYPE html>
@@ -226,7 +227,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				} else if (Tipo == 'duplica'){
 					document.formOrdemCompra.action = "ordemcompraDuplica.php";
 				} else if (Tipo == 'aprovacaoContabilidade') {
-					document.formOrdemCompra = "ordemcompraAprovacaoContabilidade.php";
+					document.formOrdemCompra.action = "ordemcompraAprovacaoContabilidade.php";
 					document.formOrdemCompra.submit();
 				} else if (Tipo == 'empenho') {
 					document.formOrdemCompra.action = "ordemCompraEmpenho.php";
@@ -349,7 +350,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																
 																}
 								  
-																  if ($item['SituaChave'] == 'LIBERADO'){
+																  if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCONTABILIDADE'){
 																	print('<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'empenho\', \'\')" class="dropdown-item" title="Empenhar"><i class="icon-coin-dollar"></i> Empenhar</a>');
 																}
 								  

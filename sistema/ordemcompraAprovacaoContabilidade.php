@@ -11,50 +11,42 @@ try{
 	
 		$conn->beginTransaction();
 		
-		$iOrdemCompraId = $_POST['inputOrdemCompraId'];
+		$iOrdemCompra = $_POST['inputOrdemCompraId'];
 
 		/* Atualiza o Status da Ordem de Compra para "Aguardando Liberação" */
 		$sql = "SELECT SituaId
 				FROM Situacao
-				WHERE SituaChave = 'AGUARDANDOLIBERACAOCONTABILIDADE'
-		";
+				WHERE SituaChave = 'AGUARDANDOLIBERACAOCONTABILIDADE' ";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
-		$sql = "UPDATE OrdemCompra 
-				SET OrComSituacao = :iStatus
-				WHERE OrComId = :iOrdemCompraId
-		";
+		$sql = "UPDATE OrdemCompra SET OrComSituacao = :iStatus
+				WHERE OrComId = :iOrdemCompra";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 			':iStatus' => $rowSituacao['SituaId'],
-			':iOrdemCompraId' => $iOrdemCompraId					
+			':iOrdemCompra' => $iOrdemCompra					
 		));
 		/* Fim Atualiza */
 
 		$sql = "SELECT PerfiId
 	            FROM Perfil
-	            WHERE PerfiChave = 'CONTABILIDADE'
-		";
+	            WHERE PerfiChave = 'CONTABILIDADE' ";
 		$result = $conn->query($sql);
 		$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 		// var_dump($rowPerfil);
 
 		$sql = "SELECT OrComNumero, OrComTipo, OrComDtEmissao
 				FROM OrdemCompra
-				WHERE OrComId = ".$iOrdemCompraId
-		;
+				WHERE OrComId = ".$iOrdemCompra;
 		$result = $conn->query($sql);
 		$rowOrdemCompra = $result->fetch(PDO::FETCH_ASSOC);
 
 		/* Verifica se a Bandeja já tem um registro com BandeTabela: Ordemcompra, Perfil: CONTABILIDADE e e BandeTabelaId: IdOrdemcompraAtual, evitando duplicação */
-		$sql = "
-			SELECT COUNT(BandeId) as Count
-			FROM Bandeja
-			WHERE BandeTabela = 'OrdemCompra' AND BandePerfil = 'CONTABILIDADE'
-			AND BandeTabelaId =  ".$iOrdemCompraId
-		;
+		$sql = " SELECT COUNT(BandeId) as Count
+				 FROM Bandeja
+			     WHERE BandeTabela = 'OrdemCompra' AND BandePerfil = 'CONTABILIDADE' AND BandeTabelaId =  ".$iOrdemCompra;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 		$count = $rowBandeja['Count'];
@@ -62,9 +54,7 @@ try{
 		$sql = "SELECT BandeId, SituaChave
 				FROM Bandeja
 				JOIN Situacao on SituaId = BandeStatus
-				WHERE BandeTabela = 'OrdemCompra' AND BandePerfil = 'CONTABILIDADE'
-				AND BandeTabelaId =  ".$iOrdemCompraId
-		;
+				WHERE BandeTabela = 'OrdemCompra' AND BandePerfil = 'CONTABILIDADE' AND BandeTabelaId =  ".$iOrdemCompra;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -95,7 +85,7 @@ try{
 				':iSolicitante' 		=> $_SESSION['UsuarId'],
 				':iSolicitanteSetor' 	=> null,
 				':sTabela' 				=> 'OrdemCompra',
-				':iTabelaId' 			=> $iOrdemCompraId,
+				':iTabelaId' 			=> $iOrdemCompra,
 				':iStatus' 				=> $rowSituacao['SituaId'],
 				':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
 				':iUnidade' 			=> $_SESSION['UnidadeId'],
