@@ -441,7 +441,14 @@ if ($totalAcoes) {
 					document.formBandeja.setAttribute("target", "_blank");
 					document.formBandeja.submit();
 				} else {
-					if (Tipo == 'liberar') {
+
+					document.getElementById('inputOrdemCompraId').value = BandeTabelaId;					
+
+					if (Tipo == 'liberarContabilidade') {
+						document.formBandeja.action = "ordemCompraEmpenho.php";
+						document.formBandeja.setAttribute("target", "_self");
+						document.formBandeja.submit();								
+					} else if (Tipo == 'liberar') {
 						document.getElementById('inputOrdemCompraStatus').value = 'LIBERADO'; //Liberado
 						document.formBandeja.action = "ordemcompraBandejaMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
@@ -715,21 +722,6 @@ if ($totalAcoes) {
 					}
 				}
 			}
-			if  (BandeTabela == 'OrdemCompra') {
-
-				document.getElementById('inputOrdemCompraId').value = BandeTabelaId;
-
-
-				if (Tipo == 'liberarContabilidade') {
-
-					document.getElementById('inputTRIdIndex').value = BandeTabelaId;
-					document.formBandeja.action = "ordemCompraEmpenho.php";
-					document.formBandeja.setAttribute("target", "_self");
-					document.formBandeja.submit();
-							
-				}
-			}	
-
 
 			if (BandeTabela == 'TermoReferencia') {
 

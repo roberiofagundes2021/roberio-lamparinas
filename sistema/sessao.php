@@ -165,13 +165,6 @@ $arquivosMovimentacaoAnexo = array(
 
 if (array_key_exists('MovimentacaoIdAnexo', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoAnexo)) {
 	unset($_SESSION['MovimentacaoIdAnexo']);
-}
-
-$arquivosMovimentacaoNotaFiscal = array(
-	'movimentacaoAnexo.php', 'movimentacaoAnexoNovo.php', 'movimentacaoAnexoExclui.php'
-);
-
-if (array_key_exists('MovimentacaoNotaFiscal', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoNotaFiscal)) {
 	unset($_SESSION['MovimentacaoNotaFiscal']);
 }
 
@@ -181,16 +174,8 @@ $arquivosOrdemCompraEmpenho = array(
 
 if (array_key_exists('OrdemCompraIdEmpenho', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosOrdemCompraEmpenho)) {
 	unset($_SESSION['OrdemCompraIdEmpenho']);
+	unset($_SESSION['OrdemCompraNumero']);
 }
-
-$arquivosOrdemCompraNumero = array(
-	'ordemCompraEmpenho.php', 'ordemCompraEmpenhoNovo.php', 'ordemCompraEmpenhoExclui.php', 'index.php', 'bandejaPendente.php'
-);
-
-if (array_key_exists('OrdemCompraIdNumero', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosOrdemCompraNumero )) {
-	unset($_SESSION['OrdemCompraIdNumero']);
-}
-
 
 if (!array_key_exists('UsuarId', $_SESSION) or !array_key_exists('UnidadeId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
 	header('Expires: 0');
