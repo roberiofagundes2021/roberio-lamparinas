@@ -45,7 +45,7 @@ if (isset($_POST['inputData'])) {
 
     $conn->beginTransaction();
 
-    $newMovi = '0/'.(date("Y"));
+    $newMovi = '1/'.(date("Y"));
 
 		// vai retornar um valor contendo somente a segunda parte da string ex: "1/2021" => "2021"
 		$sqlMovi = "SELECT MAX(SUBSTRING(MovimNumRecibo, 3, 6)) as MovimNumRecibo
@@ -67,9 +67,6 @@ if (isset($_POST['inputData'])) {
 			$newMovi = explode('/', $rowMovi['MovimNumRecibo']);
 			$newMovi = (intval($newMovi[0])+1).'/'.(date("Y"));
 		}
-
-    var_dump($newMovi);
-    exit();
 
 		$sql = "INSERT INTO Movimentacao (MovimTipo,
                                       MovimNumRecibo,

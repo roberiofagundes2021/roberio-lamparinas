@@ -57,7 +57,7 @@ if (isset($_POST['inputData'])) {
 		// SELECT MAX(SUBSTRING(MovimNumRecibo, 3, 6))
 		// 	FROM [Movimentacao] WHERE [MovimTipo] = 'T'
 
-		$newMovi = '0/'.(date("Y"));
+		$newMovi = '1/'.(date("Y"));
 
 		// vai retornar um valor contendo somente a segunda parte da string ex: "1/2021" => "2021"
 		$sqlMovi = "SELECT MAX(SUBSTRING(MovimNumRecibo, 3, 6)) as MovimNumRecibo
