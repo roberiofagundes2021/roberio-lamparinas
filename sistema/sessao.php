@@ -184,7 +184,7 @@ if (array_key_exists('OrdemCompraIdEmpenho', $_SESSION) && !in_array(basename($_
 }
 
 $arquivosOrdemCompraNumero = array(
-	'ordemCompraEmpenho.php', 'ordemCompraEmpenhoNovo.php', 'ordemCompraEmpenhoExclui.php'
+	'ordemCompraEmpenho.php', 'ordemCompraEmpenhoNovo.php', 'ordemCompraEmpenhoExclui.php', 'index.php', 'bandejaPendente.php'
 );
 
 if (array_key_exists('OrdemCompraIdNumero', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosOrdemCompraNumero )) {

@@ -5,7 +5,7 @@
 	$_SESSION['PaginaAtual'] = 'Ordem de Compra Empenho';
 
 	//Se veio de OrdemCompra.php
-	if (isset($_POST['inputOrdemCompraId']) && isset($_POST['inputOrdemCompraNumero'])){
+	if (isset($_POST['inputOrdemCompraId']) || isset($_POST['inputOrdemCompraNumero'])){
         
 		$_SESSION['OrdemCompraIdEmpenho'] = $_POST['inputOrdemCompraId'];
 		$_SESSION['OrdemCompraIdNumero'] = $_POST['inputOrdemCompraNumero'];
@@ -13,7 +13,7 @@
        
     } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
-		if (!isset($_SESSION['OrdemCompraIdEmpenho']) && !isset($_SESSION['OrdemCompraIdNumero'])){
+		if (!isset($_SESSION['OrdemCompraIdEmpenho']) || !isset($_SESSION['OrdemCompraIdNumero'])){
 			irpara("ordemcompra.php");			
 		}       
     }
