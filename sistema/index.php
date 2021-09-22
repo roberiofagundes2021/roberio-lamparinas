@@ -444,7 +444,7 @@ if ($totalAcoes) {
 
 					document.getElementById('inputOrdemCompraId').value = BandeTabelaId;					
 
-					if (Tipo == 'liberarContabilidade') {
+					if (Tipo == 'empenharContabilidade') {
 						document.formBandeja.action = "ordemCompraEmpenho.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();								
@@ -622,7 +622,12 @@ if ($totalAcoes) {
 					document.formBandeja.setAttribute("target", "_blank");
 					document.formBandeja.submit();
 				} else {
-					if (Tipo == 'liberar') {
+
+					if (Tipo == 'liquidarContabilidade') {
+						document.formBandeja.action = " movimentacaoLiquidarContabilidade.php ";
+						document.formBandeja.setAttribute("target", "_self");
+						document.formBandeja.submit();								
+					} else if (Tipo == 'liberar') {
 						document.getElementById('inputMovimentacaoStatus').value = 'LIBERADO';
 						document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
