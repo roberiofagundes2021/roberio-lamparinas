@@ -171,13 +171,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				return false;
 			} else if (Tipo == 'imprimir'){
-				if (OrComSituacaoChave == 'AGUARDANDOLIBERACAO'){			
+				if (OrComSituacaoChave == 'AGUARDANDOLIBERACAOCENTRO'){			
 					alerta('Atenção','Enquanto o status estiver AGUARDANDO LIBERAÇÃO a impressão não poderá ser realizada!','error');
 					return false;
 				} else if (OrComSituacaoChave == 'PENDENTE'){			
 					alerta('Atenção','Enquanto o status estiver PENDENTE de preenchimento a impressão não poderá ser realizada!','error');
 					return false;
-				} else if (OrComSituacaoChave == 'NAOLIBERADO'){			
+				} else if (OrComSituacaoChave == 'NAOLIBERADOCENTROADMINISTRATIVO'){			
 					alerta('Atenção','A ordem de compra/contrato não foi liberada, portanto, a impressão não poderá ser realizada!','error');
 					return false;
 				} else {
@@ -345,7 +345,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																
 															    <a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>');
 
-																if ($item['SituaChave'] == 'LIBERADO'){
+																if ($item['SituaChave'] == 'LIBERADOCENTRO'){
 																	print('<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'aprovacaoContabilidade\', \'\')" class="dropdown-item" title="Contabilidade"><i class="icon-list2"></i> Enviar para  Contabilidade</a>');
 																
 																}

@@ -14,7 +14,7 @@ try{
 		/* Atualiza o Status da Ordem de Compra para "Aguardando Liberação" */
 		$sql = "SELECT SituaId
 				FROM Situacao
-				Where SituaChave = 'AGUARDANDOLIBERACAO' ";
+				Where SituaChave = 'AGUARDANDOLIBERACAOCENTRO' ";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
