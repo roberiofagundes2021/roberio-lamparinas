@@ -114,7 +114,17 @@
 
 			if (isset($item['OrComTipo']) == 'O' || $item['OrComTipo'] == 'C' ) {
 				print('
-					<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberarContabilidade\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Empenhar </a>
+					<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'empenharContabilidade\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Empenhar </a>
+
+									</div>
+								</div>
+							</div>
+						</td>
+					</tr>
+				'); 
+			} else if(isset($item['MovimTipo']) == 'E' ) {
+				print('
+					<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liquidarContabilidade\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liquidar </a>
 
 									</div>
 								</div>
