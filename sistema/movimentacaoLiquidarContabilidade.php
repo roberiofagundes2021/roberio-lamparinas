@@ -30,13 +30,6 @@ try{
 		));
 		/* Fim Atualiza */
 
-		$sql = "SELECT PerfiId
-	            FROM Perfil
-	            WHERE PerfiChave = 'CONTABILIDADE' ";
-		$result = $conn->query($sql);
-		$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
-		// var_dump($rowPerfil);
-
 		$sql = "SELECT  MovimId, MovimNumRecibo, MovimTipo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal,
 			            MovimDestinoSetor, MovimDestinoManual, MovimObservacao, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie,
 					    MovimValorTotal, MovimChaveAcesso, MovimFornecedor, MovimMotivo, MovimSituacao, MovimUnidade, MovimUsuarioAtualizador
@@ -64,29 +57,24 @@ try{
             ':iFormaPagamento' => null,
             ':sNumDocumento' => $rowMovimentacao['MovimNumRecibo'],
             ':sNotaFiscal' => $rowMovimentacao['MovimNotaFiscal'],
-            ':dateDtEmissao' => $rowMovimentacao['MovimDataEmissao'],
+            ':dateDtEmissao' => $rowMovimentacao['MovimDataEmissao'], //Se for Data da Liquidação ficará assim: date('Y-m-d')
             ':iOrdemCompra' => $rowMovimentacao['MovimOrdemCompra'],
-            ':sDescricao' => null,
-            ':dateDtVencimento' => null,
+            ':sDescricao' => 'Pagamento da NF '.$rowMovimentacao['MovimNotaFiscal'], // Ver com Valma
+            ':dateDtVencimento' => date('Y-m-d', strtotime('+30 days', $rowMovimentacao['MovimDataEmissao'])), //Se for Data Liquidação ficará assim: date('Y-m-d', strtotime('+30 days'))
             ':fValorAPagar' => $rowMovimentacao['MovimValorTotal'],
             ':dateDtPagamento' => null,
             ':fValorPago' => null,
-            ':sObservacao' => $rowMovimentacao['MovimObservacao'],
+            ':sObservacao' => null,
             ':sTipoJuros' => null,
             ':fJuros' =>  null,
             ':sTipoDesconto' =>  null,
             ':fDesconto' => null,
-            ':iStatus' => $rowSituacao['SituaId'],
+            ':iStatus' => $rowSituacao['SituaId'], // Trocar para A Pagar
             ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
             ':iUnidade' => $_SESSION['UnidadeId']
-        ));
-
-        $insertId = $conn->lastInsertId();
-
+        ));        
         
-        /* Fim Insere ContasAPagar */
-
-		
+        /* Fim Insere ContasAPagar */		
 
 		$conn->commit();
         

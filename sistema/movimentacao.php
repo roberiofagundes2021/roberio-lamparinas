@@ -173,8 +173,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
         document.formMovimentacao.action = "movimentacaoAnexo.php";
       }else if (Tipo == 'aprovacaoContabilidade') {
 					document.formMovimentacao.action = "movimentacaoAprovacaoContabilidade.php";
-					document.formMovimentacao.submit();
-			}
+			} else if (Tipo == 'liquidar'){
+          document.formMovimentacao.action = "movimentacaoLiquidarContabilidade.php";
+      }
       document.formMovimentacao.submit();
     } 
   </script>
