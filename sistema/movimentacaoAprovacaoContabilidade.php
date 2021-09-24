@@ -68,8 +68,8 @@ try{
 		} 
 
 		/* Insere na Bandeja para Aprovação do perfil CONTABILIDADE */
-		$sIdentificacao = 'Movimentação (Nº da Nota Fiscal: '.$rowMovimentacao['MovimNotaFiscal'].' | Data: '.$rowMovimentacao['MovimData'].' | Tipo: '.$tipo.')';
-
+		$sIdentificacao = 'Movimentação (Nº da Nota Fiscal: '.$rowMovimentacao['MovimNotaFiscal'].' | Data: '.mostradata($rowMovimentacao['MovimData']).' | Tipo: '.$tipo.')';
+		                                                                                            
 		if ($count == 0){
 		
 			$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante,BandeSolicitanteSetor, 

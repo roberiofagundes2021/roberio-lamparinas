@@ -12,6 +12,7 @@ try{
 		$conn->beginTransaction();
 		
 		$iMovimentacao = $_POST['inputMovimentacaoId'];
+        
 
 		/* Atualiza o Status da Movimentação para "Liberado Contabilidade" */
 		$sql = "SELECT SituaId
@@ -28,6 +29,26 @@ try{
 			':iStatus' => $rowSituacao['SituaId'],
 			':iMovimentacao' => $iMovimentacao					
 		));
+
+        /* Capturando dados para Update */
+		$iStatus = intval($rowSituacao['SituaId']);
+        
+        /* Atualiza status bandeja */
+	 	$sql = " UPDATE Bandeja SET BandeStatus = :iStatus
+                 WHERE BandeUnidade = :iUnidade AND BandeId in (Select BandeId FROM Bandeja 
+                 WHERE BandeTabelaId = :iMovimentacao and BandePerfil = 'CONTABILIDADE')";
+        $result = $conn->prepare($sql);
+        $result->bindParam(':iStatus', $iStatus);
+        $result->bindParam(':iUnidade', $_SESSION['UnidadeId']);
+        $result->bindParam(':iMovimentacao', $iMovimentacao);
+        $result->execute();
+
+        /* Status do Contas Apagar*/
+        $sql = "SELECT SituaId
+				FROM Situacao
+				WHERE SituaChave = 'APAGAR' ";
+		$result = $conn->query($sql);
+		$rowSituaChave = $result->fetch(PDO::FETCH_ASSOC);
 		/* Fim Atualiza */
 
 		$sql = "SELECT  MovimId, MovimNumRecibo, MovimTipo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal,
@@ -41,26 +62,27 @@ try{
 
 		/* Insere na Tabela Contas a Pagar */
 		
-        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+        $sql = "INSERT INTO ContasAPagar ( CnAPaMovimentacao, CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
                                             CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
                                             CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
                                             CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                VALUES ( :iMovimentacao, :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
                         :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
                         :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
         $result = $conn->prepare($sql);
                 
         $result->execute(array(
+            ':iMovimentacao' => $iMovimentacao,
             ':iPlanoContas' => null,
             ':iFornecedor' => $rowMovimentacao['MovimFornecedor'],
             ':iContaBanco' => null,
             ':iFormaPagamento' => null,
             ':sNumDocumento' => $rowMovimentacao['MovimNumRecibo'],
             ':sNotaFiscal' => $rowMovimentacao['MovimNotaFiscal'],
-            ':dateDtEmissao' => $rowMovimentacao['MovimDataEmissao'], //Se for Data da Liquidação ficará assim: date('Y-m-d')
+            ':dateDtEmissao' => date('Y-m-d') , //Se for Data da Liquidação ficará assim: $rowMovimentacao['MovimDataEmissao']
             ':iOrdemCompra' => $rowMovimentacao['MovimOrdemCompra'],
             ':sDescricao' => 'Pagamento da NF '.$rowMovimentacao['MovimNotaFiscal'], // Ver com Valma
-            ':dateDtVencimento' => date('Y-m-d', strtotime('+30 days', $rowMovimentacao['MovimDataEmissao'])), //Se for Data Liquidação ficará assim: date('Y-m-d', strtotime('+30 days'))
+            ':dateDtVencimento' => date('Y-m-d', strtotime('+60 days')), //Se for Data Liquidação ficará assim: date('Y-m-d', strtotime('+60 days', $rowMovimentacao['MovimDataEmissao']))
             ':fValorAPagar' => $rowMovimentacao['MovimValorTotal'],
             ':dateDtPagamento' => null,
             ':fValorPago' => null,
@@ -69,7 +91,7 @@ try{
             ':fJuros' =>  null,
             ':sTipoDesconto' =>  null,
             ':fDesconto' => null,
-            ':iStatus' => $rowSituacao['SituaId'], // Trocar para A Pagar
+            ':iStatus' => $rowSituaChave['SituaId'],
             ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
             ':iUnidade' => $_SESSION['UnidadeId']
         ));        

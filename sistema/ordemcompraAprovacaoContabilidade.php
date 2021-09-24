@@ -66,8 +66,7 @@ try{
 		} 
 
 		/* Insere na Bandeja para Aprovação do perfil CONTABILIDADE */
-		$sIdentificacao = 'Ordem de Compra (Nº da Ordem de Compra: '.$rowOrdemCompra['OrComNumero'].' | Data: '.$rowOrdemCompra['OrComDtEmissao'].' | Tipo: '.$tipo.')';
-
+		$sIdentificacao = 'Ordem de Compra (Nº da Ordem de Compra: '.$rowOrdemCompra['OrComNumero'].' | Data: '.mostradata($rowOrdemCompra['OrComDtEmissao']).' | Tipo: '.$tipo.')';
 		if ($count == 0){
 		
 			$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante,BandeSolicitanteSetor, 
