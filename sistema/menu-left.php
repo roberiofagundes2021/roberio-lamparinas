@@ -51,11 +51,11 @@
   }
   $resultMenu = $conn->query($sqlMenu);
   $menu = $resultMenu->fetchAll(PDO::FETCH_ASSOC);
-  $arrayPermissao= Array();
+  $arrayPermissao = [];
   // primeiramente faz a varredura das visibilidade dos subMenu para setar a visibilidade do menuPai
   foreach($menu as $menuPai){
     // adiciona as paginas e suas permissões em um array
-    if(strtoupper($menuPai['SituaChave']) =="ATIVO"){
+    if(strtoupper($menuPai['SituaChave']) == "ATIVO"){
       array_push($arrayPermissao, Array(
         'url'=>$menuPai['MenuUrl'],
         'posicao'=>$menuPai['MenuPosicao'],
