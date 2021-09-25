@@ -8,7 +8,7 @@ if(isset($_POST['inputOrdemCompraEmpenhoID'])){
 	
 	$iOrdemCompraEmpenho = $_POST['inputOrdemCompraEmpenhoID'];
 	$sArquivo = $_POST['inputOrdemCompraEmpenhoArquivo'];
-	$sPasta = 'global_assets/anexos/OrdemCompraEmpenho/';
+	$sPasta = 'global_assets/anexos/ordemCompraEmpenho/';
 
 	try{
 		

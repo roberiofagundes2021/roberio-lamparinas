@@ -441,8 +441,15 @@ if ($totalAcoes) {
 					document.formBandeja.setAttribute("target", "_blank");
 					document.formBandeja.submit();
 				} else {
-					if (Tipo == 'liberar') {
-						document.getElementById('inputOrdemCompraStatus').value = 'LIBERADO'; //Liberado
+
+					document.getElementById('inputOrdemCompraId').value = BandeTabelaId;					
+
+					if (Tipo == 'empenharContabilidade') {
+						document.formBandeja.action = "ordemCompraEmpenho.php";
+						document.formBandeja.setAttribute("target", "_self");
+						document.formBandeja.submit();								
+					} else if (Tipo == 'liberar') {
+						document.getElementById('inputOrdemCompraStatus').value = 'LIBERADOCENTRO'; //Liberado
 						document.formBandeja.action = "ordemcompraBandejaMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
@@ -470,7 +477,7 @@ if ($totalAcoes) {
 								} else {
 
 									document.getElementById('inputMotivo').value = result;
-									document.getElementById('inputOrdemCompraStatus').value = 'NAOLIBERADO';
+									document.getElementById('inputOrdemCompraStatus').value = 'NAOLIBERADOCENTROADMINISTRATIVO';
 									document.formBandeja.action = "ordemcompraBandejaMudaSituacao.php";
 									document.formBandeja.setAttribute("target", "_self");
 									document.formBandeja.submit();
@@ -615,7 +622,12 @@ if ($totalAcoes) {
 					document.formBandeja.setAttribute("target", "_blank");
 					document.formBandeja.submit();
 				} else {
-					if (Tipo == 'liberar') {
+
+					if (Tipo == 'liquidarContabilidade') {
+						document.formBandeja.action = " movimentacaoLiquidarContabilidade.php ";
+						document.formBandeja.setAttribute("target", "_self");
+						document.formBandeja.submit();								
+					} else if (Tipo == 'liberar') {
 						document.getElementById('inputMovimentacaoStatus').value = 'LIBERADO';
 						document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
@@ -715,21 +727,6 @@ if ($totalAcoes) {
 					}
 				}
 			}
-			if  (BandeTabela == 'OrdemCompra') {
-
-				document.getElementById('inputOrdemCompraId').value = BandeTabelaId;
-
-
-				if (Tipo == 'liberarContabilidade') {
-
-					document.getElementById('inputTRIdIndex').value = BandeTabelaId;
-					document.formBandeja.action = "ordemCompraEmpenho.php";
-					document.formBandeja.setAttribute("target", "_self");
-					document.formBandeja.submit();
-							
-				}
-			}	
-
 
 			if (BandeTabela == 'TermoReferencia') {
 

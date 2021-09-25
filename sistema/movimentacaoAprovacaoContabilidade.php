@@ -7,26 +7,26 @@ $_SESSION['PaginaAtual'] = 'Enviar para Aprovação - Contabilidade';
 include('global_assets/php/conexao.php');
 
 try{
-	if(isset($_POST['inputOrdemCompraId'])){
+	if(isset($_POST['inputMovimentacaoId'])){
 	
 		$conn->beginTransaction();
 		
-		$iOrdemCompra = $_POST['inputOrdemCompraId'];
+		$iMovimentacao = $_POST['inputMovimentacaoId'];
 
-		/* Atualiza o Status da Ordem de Compra para "Aguardando Liberação" */
+		/* Atualiza o Status da Movimentação para "Aguardando Liberação" */
 		$sql = "SELECT SituaId
 				FROM Situacao
 				WHERE SituaChave = 'AGUARDANDOLIBERACAOCONTABILIDADE' ";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
-		$sql = "UPDATE OrdemCompra SET OrComSituacao = :iStatus
-				WHERE OrComId = :iOrdemCompra";
+		$sql = "UPDATE Movimentacao SET MovimSituacao = :iStatus
+				WHERE MovimId = :iMovimentacao";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 			':iStatus' => $rowSituacao['SituaId'],
-			':iOrdemCompra' => $iOrdemCompra					
+			':iMovimentacao' => $iMovimentacao					
 		));
 		/* Fim Atualiza */
 
@@ -37,16 +37,16 @@ try{
 		$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 		// var_dump($rowPerfil);
 
-		$sql = "SELECT OrComNumero, OrComTipo, OrComDtEmissao
-				FROM OrdemCompra
-				WHERE OrComId = ".$iOrdemCompra;
+		$sql = "SELECT MovimNotaFiscal, MovimTipo, MovimData
+				FROM Movimentacao
+				WHERE MovimId = ".$iMovimentacao;
 		$result = $conn->query($sql);
-		$rowOrdemCompra = $result->fetch(PDO::FETCH_ASSOC);
+		$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
 
-		/* Verifica se a Bandeja já tem um registro com BandeTabela: Ordemcompra, Perfil: CONTABILIDADE e e BandeTabelaId: IdOrdemcompraAtual, evitando duplicação */
+		/* Verifica se a Bandeja já tem um registro com BandeTabela: Movimentacao, Perfil: CONTABILIDADE e e BandeTabelaId: IdMovimentacaoAtual, evitando duplicação */
 		$sql = " SELECT COUNT(BandeId) as Count
 				 FROM Bandeja
-			     WHERE BandeTabela = 'OrdemCompra' AND BandePerfil = 'CONTABILIDADE' AND BandeTabelaId =  ".$iOrdemCompra;
+			     WHERE BandeTabela = 'Movimentacao' AND BandePerfil = 'CONTABILIDADE' AND BandeTabelaId =  ".$iMovimentacao;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 		$count = $rowBandeja['Count'];
@@ -54,19 +54,22 @@ try{
 		$sql = "SELECT BandeId, SituaChave
 				FROM Bandeja
 				JOIN Situacao on SituaId = BandeStatus
-				WHERE BandeTabela = 'OrdemCompra' AND BandePerfil = 'CONTABILIDADE' AND BandeTabelaId =  ".$iOrdemCompra;
+				WHERE BandeTabela = 'Movimentacao' AND BandePerfil = 'CONTABILIDADE' AND BandeTabelaId =  ".$iMovimentacao;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 
 		$tipo = '';
-		if ($rowOrdemCompra['OrComTipo'] === "O") {
-			$tipo = 'Ordem de Compra';
-		} else if ($rowOrdemCompra['OrComTipo'] === "C") {
-			$tipo = 'Carta Contrato';
+		if ($rowMovimentacao['MovimTipo'] === "E") {
+			$tipo = 'Entrada';
+		} else if ($rowMovimentacao['MovimTipo'] === "S") {
+			$tipo = 'Saida';
+		} else if ($rowMovimentacao['MovimTipo'] === "T") {
+			$tipo = 'Transferencia';
 		} 
 
 		/* Insere na Bandeja para Aprovação do perfil CONTABILIDADE */
-		$sIdentificacao = 'Ordem de Compra (Nº da Ordem de Compra: '.$rowOrdemCompra['OrComNumero'].' | Data: '.mostradata($rowOrdemCompra['OrComDtEmissao']).' | Tipo: '.$tipo.')';
+		$sIdentificacao = 'Movimentação (Nº da Nota Fiscal: '.$rowMovimentacao['MovimNotaFiscal'].' | Data: '.mostradata($rowMovimentacao['MovimData']).' | Tipo: '.$tipo.')';
+		                                                                                            
 		if ($count == 0){
 		
 			$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante,BandeSolicitanteSetor, 
@@ -79,12 +82,12 @@ try{
 			$result->execute(array(
 				':sIdentificacao' 		=> $sIdentificacao,
 				':dData' 				=> date("Y-m-d"),
-				':sDescricao' 			=> 'Liberar Ordem de Compra',
+				':sDescricao' 			=> 'Liberar Movimentação',
 				':sURL' 				=> '',
 				':iSolicitante' 		=> $_SESSION['UsuarId'],
 				':iSolicitanteSetor' 	=> null,
-				':sTabela' 				=> 'OrdemCompra',
-				':iTabelaId' 			=> $iOrdemCompra,
+				':sTabela' 				=> 'Movimentacao',
+				':iTabelaId' 			=> $iMovimentacao,
 				':iStatus' 				=> $rowSituacao['SituaId'],
 				':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
 				':iUnidade' 			=> $_SESSION['UnidadeId'],
@@ -152,7 +155,7 @@ try{
 		$conn->commit();
         
 		$_SESSION['msg']['titulo'] 		= "Sucesso";
-		$_SESSION['msg']['mensagem'] 	= "Ordem de Compra enviado para aprovação!!!";
+		$_SESSION['msg']['mensagem'] 	= "Movimentação enviado para aprovação!!!";
 		$_SESSION['msg']['tipo'] 		= "success";      		
 	}
 
@@ -161,12 +164,12 @@ try{
     $conn->rollback();
 		
     $_SESSION['msg']['titulo'] 		= "Erro";
-    $_SESSION['msg']['mensagem'] 	= "Erro ao enviar Ordem de Compra para aprovação!!!";
+    $_SESSION['msg']['mensagem'] 	= "Erro ao enviar Movimentação para aprovação!!!";
     $_SESSION['msg']['tipo'] 		= "error";	
 
     echo 'Error1: ' . $e->getMessage();
 }
 
-irpara("ordemcompra.php");
+irpara("movimentacao.php");
 
 ?>

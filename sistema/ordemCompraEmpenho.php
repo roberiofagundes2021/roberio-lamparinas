@@ -1,4 +1,5 @@
 <?php 
+
 	include_once("sessao.php"); 
 	include('global_assets/php/conexao.php');
 
@@ -8,11 +9,18 @@
 	if (isset($_POST['inputOrdemCompraId'])){
         
 		$_SESSION['OrdemCompraIdEmpenho'] = $_POST['inputOrdemCompraId'];
-		
+
+		$sql = "SELECT OrComNumero
+				FROM OrdemCompra	
+				WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." AND OrComId = ".$_SESSION['OrdemCompraIdEmpenho'];
+		$result = $conn->query($sql);
+		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);
+
+		$_SESSION['OrdemCompraNumero'] = $rowNumero['OrComNumero'];		
        
     } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
-		if (!isset($_SESSION['OrdemCompraIdEmpenho'])){
+		if (!isset($_SESSION['OrdemCompraIdEmpenho'])){			
 			irpara("ordemcompra.php");			
 		}       
     }
@@ -80,17 +88,17 @@
 				{ 
 					orderable: true,   //Nome
 					width: "30%",
-					targets: [1]
+					targets: [2]
 				},				
 				{ 
-					orderable: true,   //Arquivo
+					orderable: false,   //Arquivo
 					width: "30%",
-					targets: [2]
+					targets: [3]
 				},
 				{ 
 					orderable: false,  //Ações
 					width: "10%",
-					targets: [3]
+					targets: [4]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -219,9 +227,9 @@
 					<div class="col-lg-12">
 						<!-- Basic responsive configuration -->
 						<div class="card">
-							<div class="card-header header-elements-inline">
+						<div class="card-header header-elements-inline">
 								<div class="col-lg-12">
-									<h3 class="card-title">  Anexos do  Empenho </h3>
+									<h3 class="card-title">Ordem de Compra<span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['OrdemCompraNumero']; ?></span> - Anexos do Empenho</h3>
 								</div>
 							</div>
 
