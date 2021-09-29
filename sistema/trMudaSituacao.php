@@ -26,6 +26,7 @@ if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 
 		if ($_POST['inputTermoReferenciaStatus'] === 'NAOLIBERADOCENTROADMINISTRATIVO'){
 			$motivo = $_POST['inputMotivo'];
+			$msg = "Termo de Referência não liberado!";
 
 			$sql = "UPDATE TermoReferencia
 					SET TrRefStatus = :bStatus, 
@@ -33,6 +34,7 @@ if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 					WHERE TrRefId = :iTermoReferenciaId";			
 		} else{
 			$motivo = NULL;
+			$msg = "Termo de Referência liberado!";
 
 			$sql = "UPDATE TermoReferencia
 					SET TrRefStatus = :bStatus, 
@@ -83,7 +85,7 @@ if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação do Termo de Referência alterado!!!";
+		$_SESSION['msg']['mensagem'] = $msg;
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
@@ -91,7 +93,7 @@ if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do Termo de Referência!!!";
+		$_SESSION['msg']['mensagem'] = "Erro na liberação do Termo de Referência!!!";
 		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();
