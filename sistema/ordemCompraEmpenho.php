@@ -286,7 +286,9 @@
 										<div class="col-lg-12">								
 											<div class="form-group">
 													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>											
-											</div>
+													<a href="#" onclick="removeOrdemCompraEmpenho('.$item['OrCEmId'].', \''.$item['OrCEmNome'].'\',\''.$item['OrCEmDataEmpenho'].'\',\''.$item['OrCEmNumEmpenho'].'\', \''.$item['OrCEmArquivo'].'\', \'empenhar\');" 
+                                                    class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Finalizar Empenho</a>
+												</div>
 										</div>
 									</div>
 
