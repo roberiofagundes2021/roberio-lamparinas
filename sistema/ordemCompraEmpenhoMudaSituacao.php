@@ -6,6 +6,8 @@
 
 	try{	
 		
+		$conn->beginTransaction();
+
 		/* Muda o status da TR*/
 		$sql = "SELECT SituaId
 	              FROM Situacao

@@ -186,7 +186,7 @@
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function removeOrdemCompraEmpenho(OrCEmId, OrCEmNome, OrCEmDataEmpenho,OrCEmNumEmpenho, OrCEmArquivo, Tipo){
-
+alert('Entrou');return false;
 			document.getElementById('inputOrdemCompraEmpenhoID').value = OrCEmId;
 			document.getElementById('inputOrdemCompraEmpenhoNome').value = OrCEmNome;
 			document.getElementById('inputOrdemCompraEmpenhoData').value = OrCEmDataEmpenho;
@@ -285,9 +285,8 @@
 									<div class="row" style="margin-top: 10px;">
 										<div class="col-lg-12">								
 											<div class="form-group">
-													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>											
-													<a href="#" onclick="removeOrdemCompraEmpenho('.$item['OrCEmId'].', \''.$item['OrCEmNome'].'\',\''.$item['OrCEmDataEmpenho'].'\',\''.$item['OrCEmNumEmpenho'].'\', \''.$item['OrCEmArquivo'].'\', \'empenhar\');" 
-                                                    class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Finalizar Empenho</a>
+													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>	
+													<a href="ordemCompraEmpenhoMudaSituacao.php" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Finalizar Empenho</a>													
 												</div>
 										</div>
 									</div>
