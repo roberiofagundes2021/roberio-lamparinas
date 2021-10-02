@@ -9,17 +9,66 @@ use Mpdf\Mpdf;
 require_once 'global_assets/php/vendor/autoload.php';
 
 
-$sql = "SELECT DISTINCT ProduCategoria, CategNome, ProduCodigo, ProduNome, ProduEstoqueMinimo, 
+$sql = "SELECT DISTINCT ProduId, ProduCategoria, CategNome, ProduCodigo, ProduNome, ProduEstoqueMinimo, 
 		dbo.fnSaldoEstoque(MovimUnidade, ProduId, 'P', NULL) as saldo
 	    FROM Produto
 	    JOIN Categoria on CategId = ProduCategoria
 	    JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 	    JOIN Movimentacao on MovimId = MvXPrMovimentacao
-	    WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and dbo.fnSaldoEstoque(MovimUnidade, ProduId, 'P', NULL) < ProduEstoqueMinimo
-	    Group By ProduCategoria, CategNome, ProduId, ProduCodigo, ProduNome, ProduEstoqueMinimo, MovimUnidade
-	    ";
+	    WHERE MovimUnidade = ".$_SESSION['UnidadeId'].
+			"Group By ProduCategoria, CategNome, ProduId, ProduCodigo, ProduNome, ProduEstoqueMinimo, MovimUnidade";
 $result = $conn->query($sql);
-$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+$rows = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$rowProduto = [];
+for($x=0;  $x < COUNT($rows); $x++){
+	if($rows[$x]['saldo'] < $rows[$x]['ProduEstoqueMinimo']){
+		array_push($rowProduto, $rows[$x]);
+	}
+	// se não foi informado o campo ProduEstoqueMinimo ele setar como 30% da quantidade total
+	if($rows[$x]['ProduEstoqueMinimo'] == null) {
+		// buscando o ultimo Fluxo cadastrado do produto especifico
+		$sql = "SELECT FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario,
+		FOXPrUsuarioAtualizador, FOXPrEmpresa, FOXPrUnidade FROM FluxoOperacionalXProduto
+		WHERE FOXPrUnidade = $_SESSION[UnidadeId] AND FOXPrProduto = ".$rows[$x]['ProduId']."
+		ORDER BY FOXPrFluxoOperacional DESC";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		// buscando os aditivos relacionados ao fluxo se encontrado
+		if(ISSET($row['FOXPrFluxoOperacional'])){
+			$sql = "SELECT AditiId, AditiFluxoOperacional, AditiNumero, AditiDtCelebracao, AditiDtInicio,
+			AditiDtFim, AditiValor, AditiStatusFluxo, AditiStatus, AditiUsuarioAtualizador, AditiUnidade
+			FROM Aditivo
+			WHERE AditiFluxoOperacional = $row[FOXPrFluxoOperacional] AND AditiUnidade = $_SESSION[UnidadeId]";
+			var_dump($sql);
+			$resultAditivos = $conn->query($sql);
+			$rowAditivos = $resultAditivos->fetchAll(PDO::FETCH_ASSOC);
+
+			// agora ele ira buscar AditivoXProduto para somar todos os campos AdXPrQuantidade referentes ao Aditivo
+
+			if(COUNT($rowAditivos) > 0){
+				foreach($rowAditivos as $aditivo){
+					$sql = "SELECT SUM(AdXPrQuantidade) as quantidade FROM AditivoXProduto
+					WHERE AdXPrAditivo = $aditivo[AditiId] AND AdXPrProduto = ".$rows[$x]['ProduId'];
+					$resultAditiXProd = $conn->query($sql);
+					$rowAditiXProd = $resultAditiXProd->fetch(PDO::FETCH_ASSOC);
+					$row['FOXPrQuantidade'] += $rowAditiXProd['quantidade'];
+				}
+
+				// adiciona ao campo ProduEstoqueMinimo o valor (já arredondado) de 30% referente ao total de produtos
+
+				$rows[$x]['ProduEstoqueMinimo'] = ceil($row['FOXPrQuantidade']*0.3);
+
+				// verifica se o saldo é menor que o valor em ProduEstoqueMinimo
+				
+				if($rows[$x]['saldo'] < $rows[$x]['ProduEstoqueMinimo']){
+					array_push($rowProduto, $rows[$x]);
+				}
+			}
+		}
+	}
+}
 
 try {
 	$mpdf = new mPDF([
