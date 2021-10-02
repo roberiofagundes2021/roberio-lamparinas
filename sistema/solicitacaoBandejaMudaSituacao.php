@@ -22,8 +22,10 @@ if(isset($_POST['inputSolicitacaoId'])){
 
 		if ($_POST['inputSolicitacaoStatus'] == 'NAOLIBERADO'){
 			$motivo = $_POST['inputMotivo'];
+			$msg = "Solicitação não liberada!";
 		} else{
 			$motivo = NULL;
+			$msg = "Solicitação liberada!";
 		}
 		
 		$sql = "UPDATE Solicitacao SET SolicSituacao = :bStatus, SolicUsuarioAtualizador = :iUsuario
@@ -46,7 +48,7 @@ if(isset($_POST['inputSolicitacaoId'])){
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação da solicitação alterada!!!";
+		$_SESSION['msg']['mensagem'] =  $msg;
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
@@ -54,7 +56,7 @@ if(isset($_POST['inputSolicitacaoId'])){
 		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação da solicitação!!!";
+		$_SESSION['msg']['mensagem'] = "Erro na liberação da solicitação!!!";
 		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();exit;

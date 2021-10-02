@@ -130,7 +130,7 @@ if(isset($_POST['inputOrdemCompraId'])){
 		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro na libração da ordem compra!!!";
+		$_SESSION['msg']['mensagem'] = "Erro na liberação da ordem compra!!!";
 		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();

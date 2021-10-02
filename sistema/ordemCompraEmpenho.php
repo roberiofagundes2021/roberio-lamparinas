@@ -10,13 +10,15 @@
         
 		$_SESSION['OrdemCompraIdEmpenho'] = $_POST['inputOrdemCompraId'];
 
-		$sql = "SELECT OrComNumero
-				FROM OrdemCompra	
+		$sql = "SELECT OrComNumero, SituaChave
+				FROM OrdemCompra
+				JOIN Situacao on SituaId = OrComSituacao
 				WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." AND OrComId = ".$_SESSION['OrdemCompraIdEmpenho'];
 		$result = $conn->query($sql);
-		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);
+		$rowSituaNumero = $result->fetch(PDO::FETCH_ASSOC);
 
-		$_SESSION['OrdemCompraNumero'] = $rowNumero['OrComNumero'];		
+		$_SESSION['OrdemCompraNumero'] = $rowSituaNumero ['OrComNumero'];
+		$_SESSION['OrdemCompraSituacao'] = $rowSituaNumero ['SituaChave'];		
        
     } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
@@ -27,8 +29,10 @@
 
 	$iOrdemCompra = $_SESSION['OrdemCompraIdEmpenho'];
 
-	$sql = "SELECT OrCEmId, OrCEmDataEmpenho, OrCEmNumEmpenho, OrCEmNome, OrCEmArquivo
-			FROM   OrdemCompraEmpenho	
+	$sql = "SELECT OrCEmId, OrCEmDataEmpenho, OrCEmNumEmpenho, OrCEmNome, OrCEmArquivo,SituaChave
+			FROM   OrdemCompraEmpenho
+			JOIN OrdemCompra on OrComId = OrCEmOrdemCompra
+			JOIN Situacao on SituaId = OrComSituacao	
 			WHERE  OrCEmUnidade = ". $_SESSION['UnidadeId'] ." AND OrCEmOrdemCompra = ".$iOrdemCompra."
 			ORDER BY OrCEmNome ASC";
 	$result = $conn->query($sql);
@@ -186,7 +190,6 @@
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function removeOrdemCompraEmpenho(OrCEmId, OrCEmNome, OrCEmDataEmpenho,OrCEmNumEmpenho, OrCEmArquivo, Tipo){
-
 			document.getElementById('inputOrdemCompraEmpenhoID').value = OrCEmId;
 			document.getElementById('inputOrdemCompraEmpenhoNome').value = OrCEmNome;
 			document.getElementById('inputOrdemCompraEmpenhoData').value = OrCEmDataEmpenho;
@@ -241,56 +244,65 @@
 										</div>
 									</div>
 								</div>								
+                                <?php
 
-								<form name="formOrdemCompraEmpenho" id="formOrdemCompraEmpenho" method="post" enctype="multipart/form-data" class="form-validate-jquery">
-									<div class="row">
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputData">Data do Empenho <span class="text-danger">*</span></label>
-												<div class="input-group">
-													<span class="input-group-prepend">
-														<span class="input-group-text"><i class="icon-calendar22"></i></span>
-													</span>
-													<input type="date" id="inputData" name="inputData" class="form-control" placeholder="Data do Empenho " required>
+									if ($_SESSION['OrdemCompraSituacao'] == 'AGUARDANDOLIBERACAOCONTABILIDADE'&& $_SESSION['PerfiChave'] == 'CONTABILIDADE' ){
+									 print('<form name="formOrdemCompraEmpenho" id="formOrdemCompraEmpenho" method="post" enctype="multipart/form-data" class="form-validate-jquery">
+												<div class="row">
+													<div class="col-lg-2">
+														<div class="form-group">
+															<label for="inputData">Data do Empenho <span class="text-danger">*</span></label>
+															<div class="input-group">
+																<span class="input-group-prepend">
+																	<span class="input-group-text"><i class="icon-calendar22"></i></span>
+																</span>
+																<input type="date" id="inputData" name="inputData" class="form-control" placeholder="Data do Empenho " required>
+															</div>
+														</div>
+													</div>
+													<div class="col-lg-2">
+														<div class="form-group">
+															<label for="inputNumero">Nº do Empenho<span class="text-danger">*</span></label>
+															<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número do Empenho" required autofocus>
+														</div>
+													</div>
+													<div class="col-lg-8">
+														<div class="form-group">
+															<label for="inputNome">Descrição<span class="text-danger"> *</span></label>
+															<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Descrição" required>
+														</div>
+													</div>
+												</div>	
+												<div class="row">
+													<div class="col-lg-12">
+														<label for="inputArquivo">Arquivo<span class="text-danger"> *</span></label>
+														<input type="file" id="inputArquivo" name="inputArquivo" class="form-control" required>
+													</div>
+												</div>	
+												<div class="row">	
+													<div class="col-lg-12">
+														<div class="form-group">										
+															Obs.: arquivos permitidos (.pdf, .doc, .docx, .odt, .jpg, .jpeg, .png) Tamanho máximo: 32MB
+														</div>
+													</div>									
 												</div>
-											</div>
-										</div>
-                                        <div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputNumero">Nº do Empenho<span class="text-danger">*</span></label>
-												<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número do Empenho" required autofocus>
-											</div>
-										</div>
-										<div class="col-lg-8">
-											<div class="form-group">
-												<label for="inputNome">Descrição<span class="text-danger"> *</span></label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Descrição" required>
-											</div>
-										</div>
-									</div>	
-									<div class="row">
-										<div class="col-lg-12">
-											<label for="inputArquivo">Arquivo<span class="text-danger"> *</span></label>
-											<input type="file" id="inputArquivo" name="inputArquivo" class="form-control" required>
-										</div>
-									</div>	
-									<div class="row">	
-										<div class="col-lg-12">
-											<div class="form-group">										
-												Obs.: arquivos permitidos (.pdf, .doc, .docx, .odt, .jpg, .jpeg, .png) Tamanho máximo: 32MB
-											</div>
-										</div>									
-									</div>
 
-									<div class="row" style="margin-top: 10px;">
-										<div class="col-lg-12">								
-											<div class="form-group">
-													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>											
-											</div>
-										</div>
-									</div>
+												<div class="row" style="margin-top: 10px;">
+													<div class="col-lg-12">								
+														<div class="form-group">
+																<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');	
+																if ($count >= 1){
+																	print('<a href="ordemCompraEmpenhoMudaSituacao.php" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Finalizar Empenho</a>');													
+																}
+							     				 print('</div>
+													</div>
+												</div>
+										
 
-								</form>
+											</form>
+										');	
+									}
+								?>
 							</div>
 
 							
@@ -320,9 +332,11 @@
 												
 												<td class="text-center">
 													<div class="list-icons">
-														<div class="list-icons list-icons-extended">
-															<a href="#" onclick="removeOrdemCompraEmpenho('.$item['OrCEmId'].', \''.$item['OrCEmNome'].'\',\''.$item['OrCEmDataEmpenho'].'\',\''.$item['OrCEmNumEmpenho'].'\', \''.$item['OrCEmArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>	
-														</div>
+														<div class="list-icons list-icons-extended">');
+															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCONTABILIDADE'){
+																print('<a href="#" onclick="removeOrdemCompraEmpenho('.$item['OrCEmId'].', \''.$item['OrCEmNome'].'\',\''.$item['OrCEmDataEmpenho'].'\',\''.$item['OrCEmNumEmpenho'].'\', \''.$item['OrCEmArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>');	
+															}
+												 print('</div>
 													</div>
 												</td>
 
