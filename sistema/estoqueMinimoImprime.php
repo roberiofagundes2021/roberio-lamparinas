@@ -39,8 +39,8 @@ for($x=0;  $x < COUNT($rows); $x++){
 		if(ISSET($row['FOXPrFluxoOperacional'])){
 			$sql = "SELECT AditiId, AditiFluxoOperacional, AditiNumero, AditiDtCelebracao, AditiDtInicio,
 			AditiDtFim, AditiValor, AditiStatusFluxo, AditiStatus, AditiUsuarioAtualizador, AditiUnidade
-			FROM Aditivo
-			WHERE AditiFluxoOperacional = $row[FOXPrFluxoOperacional] AND AditiUnidade = $_SESSION[UnidadeId]";
+			FROM Aditivo WHERE AditiFluxoOperacional = $row[FOXPrFluxoOperacional]
+			AND AditiUnidade = $_SESSION[UnidadeId] AND AditiStatus = 4";
 			// var_dump($sql);
 			$resultAditivos = $conn->query($sql);
 			$rowAditivos = $resultAditivos->fetchAll(PDO::FETCH_ASSOC);

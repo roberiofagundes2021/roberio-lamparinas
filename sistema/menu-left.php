@@ -206,7 +206,7 @@
                   if($visualizar == 1){
                     if ((($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado']))){
                         echo  (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
-                          '<a href="'.$men['MenuUrl'].'"';
+                          '<a href="$men[MenuUrl]"';
                           if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
                             {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
                           echo '<i class="'.$men['MenuIco'].'"></i>
@@ -224,9 +224,11 @@
                       $visualizar_f = (isset($men_f['UsXPeVisualizar'])?$men_f['UsXPeVisualizar']:$men_f['PrXPeVisualizar']);
                   
                       if($men_f['MenuPai'] == $men['MenuId'] && $visualizar_f == 1 && $men_f['MenuPosicao']=='PRINCIPAL'){
-                          
+                        // mostra todos os submenus e caso a rota destino(MenuUrl) seja "estoqueMinimoImprime.php"
+                        // ele abrirá em uma nova aba
                         if (($empresa == 'Publica' && $men_f['MenuSetorPublico']) || ($empresa == 'Privada' && $men_f['MenuSetorPrivado'])){
-                          echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link">'.$men_f['MenuNome'].'</a></li>';
+                          echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link"'
+                          .($men_f['MenuUrl']=='estoqueMinimoImprime.php'? ' target="_blank" >':'>').$men_f['MenuNome'].'</a></li>';
                         }
                       } 
                     } 
