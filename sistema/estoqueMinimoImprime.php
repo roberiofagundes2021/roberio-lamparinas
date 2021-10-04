@@ -41,7 +41,7 @@ for($x=0;  $x < COUNT($rows); $x++){
 			AditiDtFim, AditiValor, AditiStatusFluxo, AditiStatus, AditiUsuarioAtualizador, AditiUnidade
 			FROM Aditivo
 			WHERE AditiFluxoOperacional = $row[FOXPrFluxoOperacional] AND AditiUnidade = $_SESSION[UnidadeId]";
-			var_dump($sql);
+			// var_dump($sql);
 			$resultAditivos = $conn->query($sql);
 			$rowAditivos = $resultAditivos->fetchAll(PDO::FETCH_ASSOC);
 
