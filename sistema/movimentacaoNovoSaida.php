@@ -909,8 +909,7 @@ if (isset($_POST['inputData'])) {
 				var Produto = cmbProduto.split("#");
 				var valor = Produto[1].replace(".", ",");
 				var validade = Produto[2]?Produto[2]:'';
-				var lote = Produto[3]?Produto[3]:'';
-				console.log(lote)
+				var lote = Produto[3]==='null'?'':Produto[3];
 
 				if (valor != 'null' && valor) {
 					$('#inputValorUnitario').val(valor);
