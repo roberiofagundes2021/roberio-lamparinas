@@ -60,6 +60,7 @@
         'url'=>$menuPai['MenuUrl'],
         'posicao'=>$menuPai['MenuPosicao'],
         'visualizar'=>(isset($menuPai['UsXPeVisualizar'])?$menuPai['UsXPeVisualizar']:$menuPai['PrXPeVisualizar']),
+        'inserir'=>(isset($menuPai['UsXPeVisualizar'])?$menuPai['UsXPeVisualizar']:$menuPai['PrXPeVisualizar']),
         'atualizar'=>(isset($menuPai['PrXPeAtualizar'])?$menuPai['PrXPeAtualizar']:$menuPai['UsXPeAtualizar']),
         'excluir'=>(isset($menuPai['PrXPeExcluir'])?$menuPai['PrXPeExcluir']:$menuPai['UsXPeExcluir']),
       ));
@@ -206,7 +207,7 @@
                   if($visualizar == 1){
                     if ((($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado']))){
                         echo  (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
-                          '<a href="$men[MenuUrl]"';
+                          '<a href="'.$men['MenuUrl'].'"';
                           if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
                             {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
                           echo '<i class="'.$men['MenuIco'].'"></i>

@@ -6,18 +6,33 @@ $visualizar = true;
 $novo = 1;
 $atualizar = 0;
 $excluir = 0;
+$inserir = 0;
+$keys = [];
 
 // faz o controle de acesso às paginas de acordo à permissão
 if (isset($_SESSION['Permissoes'])){
 	foreach($_SESSION['Permissoes'] as $key => $permissao){
 		if($permissao['url'] == basename($_SERVER['REQUEST_URI']) && strtoupper($permissao['posicao']) != "APOIO"){
+			// adiciona as posições(no array) dos menus que redirecionam para uma mesma pagina
+			array_push($keys, $key);
+
 			$atualizar = $permissao['atualizar'];
 			$excluir = $permissao['excluir'];
-			if($permissao['visualizar'] == 0){
-				$visualizar = false;
-			}
+			$inserir = $permissao['excluir'];
+
+			$visualizar = $permissao['visualizar'];
 		}
-	}	
+	}
+}
+// verifica se existe mais de um menu pertencente a modulos diferentes que
+// redireciona para a mesma pagina e verifica se possui visibilidade "true" em alguma delas
+// para que não ocorra o problema de sobrescrever o valor adicionado anteriormente
+if($keys > 1){
+	foreach($keys as $key){
+		if($_SESSION['Permissoes'][$key]['visualizar']){
+			$visualizar = true;
+		}
+	}
 }
 if(!$visualizar){header("location:javascript://history.go(-1)");}
 
