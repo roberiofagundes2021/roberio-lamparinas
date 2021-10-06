@@ -272,12 +272,19 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 
 									<div class="row">
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputNome">Nome da Categoria <span class="text-danger"> *</span></label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Categoria" value="<?php if (isset($_POST['inputCategoriaId'])) echo $rowCategoria['CategNome']; ?>" required autofocus>
-											</div>
-										</div>
+										<?php
+											// verifica se o perfil possui permissão de inserir caso possua ira aparecer esse camo
+											if($inserir){
+												print('
+												<div class="col-lg-6">
+													<div class="form-group">
+														<label for="inputNome">Nome da Categoria <span class="text-danger"> *</span></label>
+														<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Categoria" value="'.(isset($_POST['inputCategoriaId'])?$rowCategoria['CategNome']:'').'" required autofocus>
+													</div>
+												</div>
+											');
+											}
+										?>
 										<div class="col-lg-6">
 											<div class="form-group" style="padding-top:25px;">
 												<?php
@@ -287,7 +294,10 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
 														print('<a href="categoria.php" class="btn btn-basic" role="button">Cancelar</a>');
 													} else{ //inserindo
-														print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
+														// verifica se o perfil possui permissão de inserir caso possua ira aparecer esse camo
+														if($inserir){
+															print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
+														}
 													}
 
 												?>

@@ -32,11 +32,11 @@ try{
 
 		if (count($UsXPeList)==0){
 			$sqlInsert = "INSERT INTO UsuarioXPermissao
-				(UsXPeUsuario, UsXPeMenu, UsXPeUnidade, UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir)
+				(UsXPeUsuario, UsXPeMenu, UsXPeUnidade, UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeInserir)
 				VALUES ";
 			foreach($menuUxPId as $key){
 				$id = $key['MenuId'];
-				$sqlInsert = $sqlInsert."('$usuario', '$id', '$unidade', 0, 0, 0),";
+				$sqlInsert = $sqlInsert."('$usuario', '$id', '$unidade', 0, 0, 0, 0),";
 			}
 			$sqlInsert = substr($sqlInsert, 0, -1);
 			$conn->query($sqlInsert);
@@ -46,7 +46,8 @@ try{
 			$id = $key['MenuId'];
 			$sqlUpdate = "UPDATE UsuarioXPermissao set UsXPeVisualizar=".
 			(array_key_exists($id."-view", $_POST)? 1:0).", UsXPeAtualizar=".
-			(array_key_exists($id."-edit", $_POST)? 1:0).", UsXPeExcluir=".
+			(array_key_exists($id."-edit", $_POST)? 1:0).", UsXPeInserir=".
+			(array_key_exists($id."-insert", $_POST)? 1:0).", UsXPeExcluir=".
 			(array_key_exists($id."-delet", $_POST)? 1:0)."
 			WHERE UsXPeUsuario='$usuario' and UsXPeMenu='$id' and UsXPeUnidade = '$unidade'";
 			$conn->query($sqlUpdate);

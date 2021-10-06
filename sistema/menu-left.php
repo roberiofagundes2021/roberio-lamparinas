@@ -35,7 +35,7 @@
   if($usuaXPerm['UsuarPermissaoPerfil'] == 0){
     $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
                 MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, MenuSetorPrivado,
-                UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeUnidade
+                UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeInserir, UsXPeUnidade
                 FROM Menu
                 JOIN Situacao on MenuStatus = SituaId
                 JOIN UsuarioXPermissao on UsXPeUsuario = '$userId' and UsXPeUnidade = '$unidade' and UsXPeMenu = MenuId
@@ -43,7 +43,7 @@
   } else {
     $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
                 MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, PrXPeId, PrXPePerfil, MenuSetorPrivado,
-                PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeUnidade
+                PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeInserir, PrXPeUnidade
                 FROM Menu
                 JOIN Situacao on MenuStatus = SituaId
                 JOIN PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$perfilId' and PrXPeUnidade  = '$unidade'
@@ -60,7 +60,7 @@
         'url'=>$menuPai['MenuUrl'],
         'posicao'=>$menuPai['MenuPosicao'],
         'visualizar'=>(isset($menuPai['UsXPeVisualizar'])?$menuPai['UsXPeVisualizar']:$menuPai['PrXPeVisualizar']),
-        'inserir'=>(isset($menuPai['UsXPeVisualizar'])?$menuPai['UsXPeVisualizar']:$menuPai['PrXPeVisualizar']),
+        'inserir'=>(isset($menuPai['UsXPeInserir'])?$menuPai['UsXPeInserir']:$menuPai['PrXPeInserir']),
         'atualizar'=>(isset($menuPai['PrXPeAtualizar'])?$menuPai['PrXPeAtualizar']:$menuPai['UsXPeAtualizar']),
         'excluir'=>(isset($menuPai['PrXPeExcluir'])?$menuPai['PrXPeExcluir']:$menuPai['UsXPeExcluir']),
       ));

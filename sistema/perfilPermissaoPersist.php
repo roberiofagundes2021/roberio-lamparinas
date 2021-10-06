@@ -27,7 +27,8 @@ try{
 	foreach($menusUpdate as $menu){
 		$sqlUpdate = "UPDATE PerfilXPermissao set PrXPeVisualizar =".
 		(array_key_exists($menu['PrXPeId']."-view", $_POST)? 1:0).", PrXPeAtualizar = ".
-		(array_key_exists($menu['PrXPeId']."-edit", $_POST)? 1:0).", PrXPeExcluir = ".
+		(array_key_exists($menu['PrXPeId']."-edit", $_POST)? 1:0).", PrXPeInserir = ".
+		(array_key_exists($menu['PrXPeId']."-insert", $_POST)? 1:0).", PrXPeExcluir = ".
 		(array_key_exists($menu['PrXPeId']."-delet", $_POST)? 1:0)." where PrXPeId = '$menu[PrXPeId]'";
 		array_push($arrayUpdate, $sqlUpdate);
 	}

@@ -18,7 +18,7 @@ if (isset($_SESSION['Permissoes'])){
 
 			$atualizar = $permissao['atualizar'];
 			$excluir = $permissao['excluir'];
-			$inserir = $permissao['excluir'];
+			$inserir = $permissao['inserir'];
 
 			$visualizar = $permissao['visualizar'];
 		}

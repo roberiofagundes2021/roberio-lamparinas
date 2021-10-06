@@ -29,7 +29,7 @@ $empresa = $parametro['ParamEmpresaPublica'] ? 'Publica' : 'Privada';
 
 $sqlMenuPxP = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo,
 				MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, 
-				PrXPeId, PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, 
+				PrXPeId, PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeInserir, 
 				PrXPeUnidade
 				FROM Menu
 				JOIN Situacao on MenuStatus = SituaId
@@ -111,7 +111,7 @@ $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [
 				{
 					orderable: true,   //permissao
-					width: "80%",
+					width: "70%",
 					targets: [0]
 				},
 				{ 
@@ -128,6 +128,11 @@ $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 					orderable: false,   //excluir
 					width: "10%",
 					targets: [3]
+				},
+				{ 
+					orderable: false,   //inserir
+					width: "10%",
+					targets: [4]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -317,6 +322,7 @@ td{
 										<th style="text-align: center">Visualizar</th>
 										<th style="text-align: center">Atualizar</th>
 										<th style="text-align: center">Excluir</th>
+										<th style="text-align: center">Inserir</th>
 									</tr>
 								</thead>
 								<div class="separate"></div>
@@ -359,6 +365,16 @@ td{
 															}
 															echo '
 														</td>
+														<td class="text-center">';
+															if(isset($men['UsXPeInserir'])){
+																echo '<input name="'.$men['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
+																($men['UsXPeInserir'] == 1?'checked/>':'/>');
+															}else{
+																echo '<input name="'.$men['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
+																($men['PrXPeInserir'] == 1?'checked/>':'/>');
+															}
+															echo '
+														</td>
 													</tr>';
 												}
 												if($men['MenuSubMenu'] == 1  && $men["MenuModulo"] == $mod["ModulId"]){
@@ -395,6 +411,16 @@ td{
 																	}else{
 																		echo '<input name="'.$men_f['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"'.
 																		($men_f['PrXPeExcluir'] == 1?'checked/>':'/>');
+																	}
+																	echo '
+																</td>
+																<td class="text-center">';
+																	if(isset($men_f['UsXPeInserir'])){
+																		echo '<input name="'.$men_f['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
+																		($men_f['UsXPeInserir'] == 1?'checked/>':'/>');
+																	}else{
+																		echo '<input name="'.$men_f['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
+																		($men_f['PrXPeInserir'] == 1?'checked/>':'/>');
 																	}
 																	echo '
 																</td>
