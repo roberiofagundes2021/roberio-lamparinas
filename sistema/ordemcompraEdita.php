@@ -21,7 +21,7 @@ if (isset($_POST['inputOrdemCompraId'])) {
 	$iOrdemCompra = $_POST['inputOrdemCompraId'];
 
 	$sql = "SELECT OrComId, OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, 
-				   OrComSubCategoria, OrComConteudo, OrComFornecedor, ForneRazaoSocial, ForneContato, ForneEmail, ForneTelefone, ForneCelular, 
+				   OrComSubCategoria, OrComConteudoInicio, OrComFornecedor, ForneRazaoSocial, ForneContato, ForneEmail, ForneTelefone, ForneCelular, 
 				   OrComValorFrete, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
 				   OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, UsuarNome, UsuarEmail, UsuarTelefone,
 					 FlOpeNumContrato, CategNome
@@ -64,7 +64,7 @@ if (isset($_POST['inputTipo'])) {
 		$iOrdemCompra = $_POST['inputOrdemCompraId'];
 
 		$sql = "UPDATE OrdemCompra SET OrComTipo = :sTipo, OrComNumero = :sNumero, OrComLote = :sLote, OrComNumProcesso = :sProcesso, 
-									   OrComCategoria = :iCategoria, OrComSubCategoria = :iSubCategoria, OrComConteudo = :sConteudo,  
+									   OrComCategoria = :iCategoria, OrComSubCategoria = :iSubCategoria, OrComConteudoInicio = :sConteudo,  
 									   OrComFornecedor = :iFornecedor, OrComUnidade = :iUnidade, OrComLocalEntrega = :iLocalEntrega, 
 									   OrComEnderecoEntrega = :sEnderecoEntrega, OrComSituacao = :iSituacao, OrComDtEntrega = :dDataEntrega, 
 									   OrComObservacao = :sObservacao,  OrComUsuarioAtualizador = :iUsuarioAtualizador
@@ -661,7 +661,7 @@ if (isset($_POST['inputTipo'])) {
 										<textarea rows="5" cols="5" class="form-control" id="summernote"
 											name="txtareaConteudo"
 											placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"
-											><?php echo $row['OrComConteudo']; ?></textarea>
+											><?php echo $row['OrComConteudoInicio']; ?></textarea>
 									</div>
 								</div>
 							</div>
