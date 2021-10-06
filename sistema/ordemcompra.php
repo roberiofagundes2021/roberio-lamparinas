@@ -339,7 +339,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																($item['servicoCount']>0?'<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>':'').
 																'<form id="form-'.$item['OrComId'].'" method="POST" action="ordemcompraEnviar.php">
 																		<input type="hidden" name="inputIdOrdemCompra" value="'.$item['OrComId'].'">'.
-																		(($item['produtoQuant']>0 || $item['servicoQuant']>0)?'<div onClick="submitForm('.$item['OrComId'].')" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i></i>Enviar para Aprovação</div>':'').
+																		// se o usuario ter perfil CONTABILIDADE essa opção ão irá aparecer para ele
+																		((($item['produtoQuant']>0 || $item['servicoQuant']>0) && $_SESSION['PerfiChave'] != 'CONTABILIDADE')?'<div onClick="submitForm('.$item['OrComId'].')" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i></i>Enviar para Aprovação</div>':'').
 																	'</form>'
 															.'<div class="dropdown-divider"></div>');
 

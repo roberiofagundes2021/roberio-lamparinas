@@ -3,6 +3,8 @@
 include_once("sessao.php"); 
 $inicio1 = microtime(true);
 $_SESSION['PaginaAtual'] = 'Orçamento';
+// var_dump($_SESSION['PerfiChave']);
+// exit;
 
 include('global_assets/php/conexao.php');
 
@@ -256,10 +258,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 															<div class="dropdown-menu dropdown-menu-right">
 																<a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'produto\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																<a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'imprimir\')" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
-																<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'duplica\')" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
-															</div>
+																<a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'imprimir\')" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>'
+																// se o usuario ter perfil CONTABILIDADE essa opção ão irá aparecer para ele
+																.($_SESSION['PerfiChave'] == 'CONTABILIDADE'?'':'<div class="dropdown-divider"></div><a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'duplica\')" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>').
+															'</div>
 														</div>
 													</div>
 												</div>
