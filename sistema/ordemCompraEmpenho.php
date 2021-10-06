@@ -288,12 +288,17 @@
 												</div>
 
 												<div class="row" style="margin-top: 10px;">
-													<div class="col-lg-12">								
+
+													<div class="col-lg-2">								
 														<div class="form-group">
-																<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');	
-																if ($count >= 1){
-																	print('<a href="ordemCompraEmpenhoMudaSituacao.php" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Finalizar Empenho</a>');													
-																}
+																<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>											
+														</div>
+													</div>
+													<div class="col-lg-10">								
+														<div class="form-group">');
+															if ($count >= 1){
+																print('<a href="ordemCompraEmpenhoMudaSituacao.php" class="btn btn-lg btn-outline bg-slate-600 text-slate-600 border-slate">Finalizar Empenho</a>');													
+															}
 							     				 print('</div>
 													</div>
 												</div>

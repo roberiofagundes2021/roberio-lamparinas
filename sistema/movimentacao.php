@@ -297,7 +297,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                   print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'aprovacaoContabilidade\', \'\');" class="dropdown-item"><i class="icon-list2"></i> Enviar para Contabilidade</a>');
                                 }
 
-                                if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCONTABILIDADE' && $item['MovimTipo'] == 'E'){
+                                if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCONTABILIDADE' && $item['MovimTipo'] == 'E' && $_SESSION['PerfiChave'] == 'CONTABILIDADE' ){
                                   print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'liquidar\', \'\');" class="dropdown-item"><i class="icon-coin-dollar"></i>Liquidar</a>');
                                 }
 

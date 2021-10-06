@@ -123,15 +123,18 @@
 					</tr>
 				'); 
 			} else if(isset($item['MovimTipo']) == 'E' ) {
-				print('
-					<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liquidarContabilidade\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liquidar </a>
+				
+				if ( $_SESSION['PerfiChave'] == 'CONTABILIDADE' ){
+					print('
+						<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liquidarContabilidade\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liquidar </a>
 
+										</div>
 									</div>
 								</div>
-							</div>
-						</td>
-					</tr>
-				'); 
+							</td>
+						</tr>
+					'); 
+				}
 			} else {
 				print('
 					<a href="#" onclick="atualizaBandeja('.$item['BandeId'].',\''.$item['BandeTabela'].'\','.$item['BandeTabelaId'].', \''.$item['MovimTipo'].'\', \'liberarContabilidade\');" class="dropdown-item"><i class="icon-checkmark3 text-success"></i> Liberar</a>

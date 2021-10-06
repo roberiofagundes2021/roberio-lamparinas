@@ -88,7 +88,7 @@ if (isset($_POST['inputTipo'])) {
 			':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
 			':iLocalEntrega' => $_POST['cmbLocalEstoque'] == '' ? null : $_POST['cmbLocalEstoque'],
 			':sEnderecoEntrega' => $_POST['inputEnderecoEntrega'],
-			':dDataEntrega' => gravaData($_POST['inputDataEntrega']),
+			':dDataEntrega' => $_POST['inputDataEntrega'] == '' ? null : $_POST['inputDataEntrega'],
 			':iSituacao' => $Situacao['SituaId'],
 			':sObservacao' => $_POST['txtareaObservacao'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -782,10 +782,7 @@ if (isset($_POST['inputTipo'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputDataEntrega">Previsão de Entrega</label>
-												<input type="text" id="inputDataEntrega" name="inputDataEntrega"
-													class="form-control"
-													value="<?php echo mostraData($row['OrComDtEntrega']); ?>"
-													<?php $movimentacoes >= 1 ? print('readOnly') : '' ?>>
+												<input type="date" id="inputDataEntrega" name="inputDataEntrega"class="form-control" value="<?php echo ($row['OrComDtEntrega']); ?>" <?php $movimentacoes >= 1 ? print('readOnly') : '' ?>>
 											</div>
 										</div>
 									</div>
