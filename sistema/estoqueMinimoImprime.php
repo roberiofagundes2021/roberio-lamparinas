@@ -27,20 +27,26 @@ for($x=0;  $x < COUNT($rows); $x++){
 	}
 	// se não foi informado o campo ProduEstoqueMinimo ele setar como 30% da quantidade total
 	if($rows[$x]['ProduEstoqueMinimo'] == null) {
-		// buscando o ultimo Fluxo cadastrado do produto especifico
+		// buscando o ultimo Fluxo cadastrado do produto especifico com situação "LIBERADO"
 		$sql = "SELECT FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario,
-		FOXPrUsuarioAtualizador, FOXPrEmpresa, FOXPrUnidade FROM FluxoOperacionalXProduto
+		FOXPrUsuarioAtualizador, FOXPrEmpresa, FOXPrUnidade
+		FROM FluxoOperacionalXProduto
+		JOIN FluxoOperacional on FlOpeId = FOXPrFluxoOperacional
+		JOIN Situacao on SituaId = FlOpeStatus
 		WHERE FOXPrUnidade = $_SESSION[UnidadeId] AND FOXPrProduto = ".$rows[$x]['ProduId']."
+		AND SituaChave = 'LIBERADO'
 		ORDER BY FOXPrFluxoOperacional DESC";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 
-		// buscando os aditivos relacionados ao fluxo se encontrado
+		// buscando os aditivos com situação "LIBERADO" relacionados ao fluxo se encontrado
 		if(ISSET($row['FOXPrFluxoOperacional'])){
 			$sql = "SELECT AditiId, AditiFluxoOperacional, AditiNumero, AditiDtCelebracao, AditiDtInicio,
-			AditiDtFim, AditiValor, AditiStatusFluxo, AditiStatus, AditiUsuarioAtualizador, AditiUnidade
-			FROM Aditivo WHERE AditiFluxoOperacional = $row[FOXPrFluxoOperacional]
-			AND AditiUnidade = $_SESSION[UnidadeId] AND AditiStatus = 4";
+			AditiDtFim, AditiValor, AditiStatusFluxo, AditiStatus, AditiUsuarioAtualizador, AditiUnidade, SituaChave
+			FROM Aditivo
+			JOIN Situacao on AditiStatus = SituaId
+			WHERE AditiFluxoOperacional = $row[FOXPrFluxoOperacional]
+			AND AditiUnidade = $_SESSION[UnidadeId] AND SituaChave = 'LIBERADO'";
 			// var_dump($sql);
 			$resultAditivos = $conn->query($sql);
 			$rowAditivos = $resultAditivos->fetchAll(PDO::FETCH_ASSOC);
