@@ -17,7 +17,7 @@ if (isset($_POST['inputOrdemCompraId'])){
 }
 
 $sql = "SELECT OrComTipo, OrComNumero, OrComDtEmissao, OrComLote, OrComNumAta, OrComNumProcesso, 
-		OrComConteudo, ForneCnpj, ForneNome, ForneCelular, ForneEmail, CategNome
+		OrComConteudoInicio, ForneCnpj, ForneNome, ForneCelular, ForneEmail, CategNome
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
 		JOIN Categoria on CategId = OrComCategoria
@@ -129,7 +129,7 @@ try {
 	
 	$html .= '
 	<br>
-	<div>'.$row['OrComConteudo'].'</div>
+	<div>'.$row['OrComConteudoInicio'].'</div>
 	<br>';
 
 	$totalGeralProdutos = 0;

@@ -65,7 +65,7 @@ if(isset($_POST['inputProdutoId'])){
 					FROM FluxoOperacionalXProduto
 					JOIN FluxoOperacional on FlOpeId = FOXPrFluxoOperacional
 					JOIN Situacao on SituaId = FlOpeStatus
-					WHERE FOXPrProduto = ".$iProduto." and SituaChave = 'ATIVO' ";
+					WHERE FOXPrProduto = ".$iProduto." and SituaChave = 'LIBERADO' ";
 			$result = $conn->query($sql);
 			$rowExiste = $result->fetch(PDO::FETCH_ASSOC);
 		} else if ($rowParamentro['ParamValorAtualizadoOrdemCompra']){
