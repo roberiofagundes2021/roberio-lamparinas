@@ -276,14 +276,19 @@ td{
 											targets: [1]
 										},
 										{ 
-											orderable: false,   //atualizar
+											orderable: false,   //inserir
 											width: "10%",
 											targets: [2]
 										},
 										{ 
-											orderable: false,   //excluir
+											orderable: false,   //atualizar
 											width: "10%",
 											targets: [3]
+										},
+										{ 
+											orderable: false,   //excluir
+											width: "10%",
+											targets: [4]
 										}],
 										dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 										language: {
@@ -320,9 +325,9 @@ td{
 									<tr class="bg-slate">
 										<th>Permissão</th>
 										<th style="text-align: center">Visualizar</th>
+										<th style="text-align: center">Inserir</th>
 										<th style="text-align: center">Atualizar</th>
 										<th style="text-align: center">Excluir</th>
-										<th style="text-align: center">Inserir</th>
 									</tr>
 								</thead>
 								<div class="separate"></div>
@@ -346,6 +351,16 @@ td{
 															echo '
 														</td>
 														<td class="text-center">';
+															if(isset($men['UsXPeInserir'])){
+																echo '<input name="'.$men['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
+																($men['UsXPeInserir'] == 1?'checked/>':'/>');
+															}else{
+																echo '<input name="'.$men['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
+																($men['PrXPeInserir'] == 1?'checked/>':'/>');
+															}
+															echo '
+														</td>
+														<td class="text-center">';
 															if(isset($men['UsXPeAtualizar'])){
 																echo '<input name="'.$men['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"'.
 																($men['UsXPeAtualizar'] == 1?'checked/>':'/>');
@@ -362,16 +377,6 @@ td{
 															}else{
 																echo '<input name="'.$men['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"'.
 																($men['PrXPeExcluir'] == 1?'checked/>':'/>');
-															}
-															echo '
-														</td>
-														<td class="text-center">';
-															if(isset($men['UsXPeInserir'])){
-																echo '<input name="'.$men['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
-																($men['UsXPeInserir'] == 1?'checked/>':'/>');
-															}else{
-																echo '<input name="'.$men['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
-																($men['PrXPeInserir'] == 1?'checked/>':'/>');
 															}
 															echo '
 														</td>
@@ -395,6 +400,16 @@ td{
 																	echo '
 																</td>
 																<td class="text-center">';
+																	if(isset($men_f['UsXPeInserir'])){
+																		echo '<input name="'.$men_f['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
+																		($men_f['UsXPeInserir'] == 1?'checked/>':'/>');
+																	}else{
+																		echo '<input name="'.$men_f['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
+																		($men_f['PrXPeInserir'] == 1?'checked/>':'/>');
+																	}
+																	echo '
+																</td>
+																<td class="text-center">';
 																	if(isset($men_f['UsXPeAtualizar'])){
 																		echo '<input name="'.$men_f['PrXPeId'].'-edit'.'" onclick="needSave()" value="edit" type="checkbox"'.
 																		($men_f['UsXPeAtualizar'] == 1?'checked/>':'/>');
@@ -411,16 +426,6 @@ td{
 																	}else{
 																		echo '<input name="'.$men_f['PrXPeId'].'-delet'.'" onclick="needSave()" value="delet" type="checkbox"'.
 																		($men_f['PrXPeExcluir'] == 1?'checked/>':'/>');
-																	}
-																	echo '
-																</td>
-																<td class="text-center">';
-																	if(isset($men_f['UsXPeInserir'])){
-																		echo '<input name="'.$men_f['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
-																		($men_f['UsXPeInserir'] == 1?'checked/>':'/>');
-																	}else{
-																		echo '<input name="'.$men_f['PrXPeId'].'-insert'.'" onclick="needSave()" value="insert" type="checkbox"'.
-																		($men_f['PrXPeInserir'] == 1?'checked/>':'/>');
 																	}
 																	echo '
 																</td>
