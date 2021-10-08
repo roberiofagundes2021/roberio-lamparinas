@@ -4,15 +4,17 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, ProduDetalhamento as detalhamento, OCXPrValorUnitario as valorCusto, ProduCustoFinal as custoFinal, UnMedSigla, tipo = 'P'
+$sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, ProduDetalhamento as detalhamento, OCXPrValorUnitario as valorCusto, ProduCustoFinal as custoFinal, UnMedSigla, MarcaNome, tipo = 'P'
 		FROM OrdemCompraXProduto
         JOIN Produto on ProduId = OCXPrProduto
  		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+        LEFT JOIN Marca on MarcaId = ProduMarca
         WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and OCXPrOrdemCompra = '" . $_POST['ordemCompra'] . "'
         UNION
-        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, OCXSrValorUnitario as valorCusto, ServiCustoFinal as custoFinal, '', tipo = 'S'
+        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, OCXSrValorUnitario as valorCusto, ServiCustoFinal as custoFinal, '', MarcaNome, tipo = 'S'
 		FROM OrdemCompraXServico
         JOIN Servico on ServiId = OCXSrServico
+        LEFT JOIN Marca on MarcaId = ServiMarca
         WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and OCXSrOrdemCompra = '" . $_POST['ordemCompra'] . "'
         ";
 $result = $conn->query($sql);
@@ -192,14 +194,14 @@ if ($countMovimentAprovada) {
             $totalGeral += $item['quantidade'] * $item['valorCusto'];
             // var_dump($saldo);
             $output .=  '<tr class="trGrid" id="row' . $numItens . '">
-						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $numItens . '</td>
-						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip">' . $item['nome'] . '</td>
-						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $item['UnMedSigla'] . '</td>
-                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center"></td>
-                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $saldo['Saldo'] . '</td>
-						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: right">' . $valorCusto . '</td>
-                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" class="valorTotal" style="text-align: right">R$ 0, 00</td>
-                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center"></td>
+						 <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: center">' . $numItens . '</td>
+						 <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip">' . $item['nome'] . '</td>
+                         <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: center">' . $item['UnMedSigla'] . '</td>
+                         <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: center"></td>
+                         <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: center">' . $saldo['Saldo'] . '</td>
+						 <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: right">' . $valorCusto . '</td>
+                         <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" class="valorTotal" style="text-align: right">R$ 0, 00</td>
+                         <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: center"></td>
                          <td  style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
                          <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" idLinha="row' . $numItens . '" quantInicial="' . $saldo['Quantidade'] . '" saldoInicial="' . $saldo['Saldo'] . '"  name="campo' . $numItens . '" value="' . $item['tipo'] . '#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>

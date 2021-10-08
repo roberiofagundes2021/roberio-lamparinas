@@ -17,7 +17,7 @@ if (isset($_POST['inputOrdemCompraId'])){
 }
 
 $sql = "SELECT OrComTipo, OrComNumero, OrComDtEmissao, OrComLote, OrComNumAta, OrComNumProcesso, 
-		OrComConteudoInicio, ForneCnpj, ForneNome, ForneCelular, ForneEmail, CategNome
+		OrComConteudoInicio, OrComConteudoFim, ForneCnpj, ForneNome, ForneCelular, ForneEmail, CategNome
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
 		JOIN Categoria on CategId = OrComCategoria
@@ -285,25 +285,10 @@ try {
 				</table>
 	";
 	
-	$sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
-			FROM Usuario
-			Where UsuarId = ".$_SESSION['UsuarId']."
-			ORDER BY UsuarNome ASC";
-	$result = $conn->query($sql);
-	$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);	
-	
-	$html .= '			
-		<br><br>
-		<div style="width: 100%; margin-top: 100px;">
-			<div style="position: relative; float: left; text-align: center;">
-				Solicitante: '.$rowUsuario['UsuarNome'].'<br>
-				<div style="margin-top:3px;">
-					Telefone: '.$rowUsuario['UsuarTelefone'].' <br>
-					E-mail: '.$rowUsuario['UsuarEmail'].'
-				</div>
-			</div>
-		</div>
-	';	
+	$html .= '
+	<br><br>
+	<div>' . $row['OrComConteudoFim'] . '</div>
+	<br>';
 	
     $rodape = "<hr/>
     <div style='width:100%'>

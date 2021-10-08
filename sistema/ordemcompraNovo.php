@@ -72,9 +72,9 @@ if(isset($_POST['inputData'])){
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 		
 		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComFluxoOperacional, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, 
-							OrComConteudoInicio, OrComFornecedor, OrComValorFrete, OrComSolicitante, OrComUnidadeEntrega, OrComLocalEntrega, 
+							OrComConteudoInicio, OrComConteudoFim, OrComFornecedor, OrComValorFrete, OrComSolicitante, OrComUnidadeEntrega, OrComLocalEntrega, 
 							OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, OrComSituacao, OrComUsuarioAtualizador, OrComUnidade)
-				VALUES (:sTipo, :dFluxo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, 
+				VALUES (:sTipo, :dFluxo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudoInicio, :sConteudoFim, :iFornecedor, :fValorFrete, 
 						:iSolicitante, :iUnidadeEntrega, :iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, 
 						:iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
@@ -92,7 +92,8 @@ if(isset($_POST['inputData'])){
 						':sProcesso' => $_POST['inputProcesso'],
 						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
-						':sConteudo' => $_POST['txtareaConteudo'],
+						':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+						':sConteudoFim' => $_POST['txtareaConteudoFim'],
 						':iFornecedor' => $iFornecedor,
 						':fValorFrete' => null,
 						':iSolicitante' => $_SESSION['UsuarId'],
@@ -228,7 +229,8 @@ if(isset($_POST['inputData'])){
 					
 				});
 		
-			$('#summernote').summernote();
+			$('#summernoteInicio').summernote();
+			$('#summernoteFim').summernote();
 
 			if(selectEmpresa !== 'publica'){
 				$('#selectEmpresa').hide();
@@ -497,12 +499,23 @@ if(isset($_POST['inputData'])){
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaConteudo">Conteúdo personalizado</label>
+										<label for="txtareaConteudo">Conteúdo Personalizado - Introdução</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
-										<textarea rows="5" cols="5" class="form-control" id="summernote" name="txtareaConteudo" placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"></textarea>
 									</div>
 								</div>
 							</div>		
+							<br>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudoFim">Conteúdo Personalizado - Finalização</label>
+										<!--<div id="summernote" name="txtareaConteudoFim"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder=" Considerações Finais do orçamento (informe aqui o texto que você queira que apareça no término do orçamento)"></textarea>
+									</div>                                                                                                         
+								</div>
+							</div>
 							<br>
 																					
 							<div class="row">
