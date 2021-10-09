@@ -153,7 +153,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaOrdemCompra(Permission, OrComFlOpeId, OrComId, OrComNumero, OrComCategoria, CategNome, OrComSituacao, OrComSituacaoChave, OrComTipo, Tipo, Motivo){
-			alert('Teste1');
+
 			document.getElementById('inputPermission').value = Permission;
 			document.getElementById('inputOrdemCompraFlOpeId').value = OrComFlOpeId;
 			document.getElementById('inputOrdemCompraId').value = OrComId;
@@ -227,7 +227,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				} else if (Tipo == 'duplica'){
 					document.formOrdemCompra.action = "ordemcompraDuplica.php";
 				} else if (Tipo == 'aprovacaoContabilidade') {
-					alert('Teste');
 					document.formOrdemCompra.action = "ordemcompraAprovacaoContabilidade.php";
 				} else if (Tipo == 'empenho') {
 					document.formOrdemCompra.action = "ordemCompraEmpenho.php";
