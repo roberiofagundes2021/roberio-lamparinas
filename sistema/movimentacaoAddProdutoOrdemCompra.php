@@ -93,17 +93,18 @@ if ($countMovimentAprovada) {
             $valorCusto = formataMoeda($item['valorCusto']);
             $valorTotal = formataMoeda($item['quantidade'] * $item['valorCusto']);
 
+            $marca = $item['MarcaNome'] != '' ?  ' MARCA: '. $item['MarcaNome'] : '';
              
             // var_dump($saldo);
             $output .=  '<tr class="trGrid" id="row' . $numItens . '">
-						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $numItens . '</td>
-						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip">' . $item['nome'] . '</td>
-						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $item['UnMedSigla'] . '</td>
-                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">0</td>
-                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center">' . $saldo['Saldo'] . '</td>
-						 <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: right">' . $valorCusto . '</td>
-                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" class="valorTotal" style="text-align: right">R$ 0, 00</td> <!-- esse campo é calculado depois na função recalcValorTotal() -->
-                         <td title="' . $item['detalhamento'] . '" data-popup="tooltip" style="text-align: center"></td>
+						 <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: center">' . $numItens . '</td>
+						 <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip">' . $item['nome'] . '</td>
+						 <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: center">' . $item['UnMedSigla'] . '</td>
+                         <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: center">0</td>
+                         <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: center">' . $saldo['Saldo'] . '</td>
+						 <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: right">' . $valorCusto . '</td>
+                         <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" class="valorTotal" style="text-align: right">R$ 0, 00</td> <!-- esse campo é calculado depois na função recalcValorTotal() -->
+                         <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: center"></td>
                          <td style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
                          <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" idLinha="row' . $numItens . '" quantInicial="' . $saldo['Quantidade'] . '" saldoInicial="' . $saldo['Saldo'] . '"  name="campo' . $numItens . '" value="' . $item['tipo'] . '#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>
@@ -193,15 +194,18 @@ if ($countMovimentAprovada) {
 
             $totalGeral += $item['quantidade'] * $item['valorCusto'];
             // var_dump($saldo);
+
+            $marca = $item['MarcaNome'] != '' ?  ' MARCA: '. $item['MarcaNome'] : '';
+
             $output .=  '<tr class="trGrid" id="row' . $numItens . '">
-						 <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: center">' . $numItens . '</td>
-						 <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip">' . $item['nome'] . '</td>
-                         <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: center">' . $item['UnMedSigla'] . '</td>
-                         <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: center"></td>
-                         <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: center">' . $saldo['Saldo'] . '</td>
-						 <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: right">' . $valorCusto . '</td>
-                         <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" class="valorTotal" style="text-align: right">R$ 0, 00</td>
-                         <td title="' . $item['detalhamento'] . ' MARCA: '. $item['MarcaNome'] . '" data-popup="tooltip" style="text-align: center"></td>
+						 <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: center">' . $numItens . '</td>
+						 <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip">' . $item['nome'] . '</td>
+                         <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: center">' . $item['UnMedSigla'] . '</td>
+                         <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: center"></td>
+                         <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: center">' . $saldo['Saldo'] . '</td>
+						 <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: right">' . $valorCusto . '</td>
+                         <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" class="valorTotal" style="text-align: right">R$ 0, 00</td>
+                         <td title="' . $item['detalhamento'] . $marca . '" data-popup="tooltip" style="text-align: center"></td>
                          <td  style="text-align: center"><i idInput="campo' . $numItens . '" idRow="row' . $numItens . '" class="icon-file-check btn-acoes" style="cursor: pointer"></i></td>
                          <input type="hidden" tipo="' . $item['tipo'] . '" id="campo' . $numItens . '" idLinha="row' . $numItens . '" quantInicial="' . $saldo['Quantidade'] . '" saldoInicial="' . $saldo['Saldo'] . '"  name="campo' . $numItens . '" value="' . $item['tipo'] . '#' . $item['id'] . '#' . $item['valorCusto'] . '#0#0#0#0">
 					<tr>
