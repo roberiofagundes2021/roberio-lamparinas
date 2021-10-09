@@ -153,7 +153,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaOrdemCompra(Permission, OrComFlOpeId, OrComId, OrComNumero, OrComCategoria, CategNome, OrComSituacao, OrComSituacaoChave, OrComTipo, Tipo, Motivo){
-		
+
 			document.getElementById('inputPermission').value = Permission;
 			document.getElementById('inputOrdemCompraFlOpeId').value = OrComFlOpeId;
 			document.getElementById('inputOrdemCompraId').value = OrComId;
@@ -162,7 +162,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			document.getElementById('inputOrdemCompraNomeCategoria').value = CategNome;
 			document.getElementById('inputOrdemCompraStatus').value = OrComSituacao;
 			document.getElementById('inputOrdemCompraTipo').value = OrComTipo;
-			
+		
 			if (Tipo == 'motivo'){
 				bootbox.alert({
 							title: '<strong>Motivo da Não Liberação</strong>',
@@ -228,7 +228,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					document.formOrdemCompra.action = "ordemcompraDuplica.php";
 				} else if (Tipo == 'aprovacaoContabilidade') {
 					document.formOrdemCompra.action = "ordemcompraAprovacaoContabilidade.php";
-					document.formOrdemCompra.submit();
 				} else if (Tipo == 'empenho') {
 					document.formOrdemCompra.action = "ordemCompraEmpenho.php";
 				}
@@ -345,7 +344,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															.'<div class="dropdown-divider"></div>');
 
 																if ($item['SituaChave'] == 'LIBERADOCENTRO'){
-																	print('<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'aprovacaoContabilidade\', \'\')" class="dropdown-item" title="Contabilidade"><i class="icon-list2"></i> Enviar para  Contabilidade</a>');
+																	print('<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'aprovacaoContabilidade\', \'\')" class="dropdown-item" title="Contabilidade"><i class="icon-list2"></i> Enviar para Contabilidade</a>');
 																
 																}
 								  
