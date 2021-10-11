@@ -111,7 +111,7 @@ if (isset($_POST['inputData'])) {
 						':iMovimentacao' => $insertId,
 						':iServico' => $registro[1],
 						':iQuantidade' => (int) $registro[3],
-						':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
+						':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
 					));
@@ -324,7 +324,6 @@ if (isset($_POST['inputData'])) {
 															<th width="75%">Serviço</th>
 															<th width="10%">Quantidade</th>
 															<th width="10%">Saldo</th>
-															<th width="10%"></th>
 														</tr>`;
 
 							linhaTabela = `<tr id='trModal'>
@@ -585,28 +584,24 @@ if (isset($_POST['inputData'])) {
 				if (cmbDestinoLocal == '') {
 					alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
 					$('#cmbDestinoLocal').focus();
-					$("#formMovimentacao").submit();
 					return false;
 				}
 
 				if (cmbFornecedor == '') {
 					alerta('Atenção', 'Informe o Fornecedor!', 'error');
-					$('#cmbFornecedor').focus();
-					$("#formMovimentacao").submit();
+					$('#cmbFornecedor').focus();	
 					return false;
 				}
 
 				if (cmbOrdemCompra == '') {
 					alerta('Atenção', 'Informe a Ordem Compra / Carta Contrato!', 'error');
 					$('#cmbOrdemCompra').focus();
-					$("#formMovimentacao").submit();
 					return false;
 				}
 
 				if (inputValorTotal == '') {
 					alerta('Atenção', 'Informe o Valor Total da Nota Fiscal!', 'error');
 					$('#inputValorTotal').focus();
-					$("#formMovimentacao").submit();
 					return false;
 				}
 
