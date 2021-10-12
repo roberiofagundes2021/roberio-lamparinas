@@ -10,7 +10,7 @@ include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputSolicitacaoId'])) {
 
-	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
+	$sql = "SELECT SlXPrQuantidade as Quantidade, ProduId as Id, ProduNome as Nome, ProduValorVenda as ValorVenda, UnMedNome
 			FROM SolicitacaoXProduto
 			JOIN Solicitacao on SolicId = SlXPrSolicitacao
 			JOIN Produto on ProduId = SlXPrProduto
@@ -21,30 +21,30 @@ if (isset($_POST['inputSolicitacaoId'])) {
 	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
 	$numProdutos = count($produtosSolicitacao);
 
+	$sql = "SELECT SlXSrQuantidade as Quantidade, ServiId as Id, ServiNome as Nome, ServiValorVenda as ValorVenda
+			FROM SolicitacaoXServico
+			JOIN Solicitacao on SolicId = SlXSrSolicitacao
+			JOIN Servico on ServiId = SlXSrServico
+			WHERE SlXSrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
+			";
+	$result = $conn->query($sql);
+	$servicoSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
+	$numServicos = count($servicoSolicitacao);
+	
+	$solicitacoes = array_merge($servicoSolicitacao, $produtosSolicitacao);
 	$idsProdutos = '';
 
 	if ($numProdutos) {
 
-		foreach ($produtosSolicitacao as $chave => $produto) {
-
+		foreach ($solicitacoes as $chave => $produto) {
 			if ($chave == 0) {
-				$idsProdutos .= '0, ' . $produto['ProduId'] . '';
+				$idsProdutos .= '0, ' . $produto['Id'] . '';
 			} else {
-				$idsProdutos .= ', ' . $produto['ProduId'] . '';
+				$idsProdutos .= ', ' . $produto['Id'] . '';
 			}
 		}
 	}
 
-	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
-			FROM SolicitacaoXProduto
-			JOIN Solicitacao on SolicId = SlXPrSolicitacao
-			JOIN Produto on ProduId = SlXPrProduto
-			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
-			";
-	$result = $conn->query($sql);
-	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
-	$numProdutos = count($produtosSolicitacao);
 }
 
 /* VALIDA SE OS DADOS VIERAM DA MESMA PÁGINA */
@@ -1773,8 +1773,8 @@ if (isset($_POST['inputData'])) {
 										if (isset($_POST['inputSolicitacaoId'])) {
 											$totalGeral = 0;
 
-											foreach ($produtosSolicitacao  as $produto) {
-												$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+											foreach ($solicitacoes  as $produto) {
+												$totalGeral += $produto['Quantidade'] * $produto['ValorVenda'];
 											}
 
 											print('<input type="hidden" id="inputTotal" name="inputTotal" value="' . $totalGeral . '">');
@@ -1858,25 +1858,29 @@ if (isset($_POST['inputData'])) {
 													$idProdutoSolicitacao = 0;
 													$totalGeral = 0;
 
-													foreach ($produtosSolicitacao  as $produto) {
+													foreach ($solicitacoes  as $produto) {
 
 														$idProdutoSolicitacao++;
 
-														$valorCusto = formataMoeda($produto['ProduValorVenda']);
-														$valorTotal = formataMoeda($produto['SlXPrQuantidade'] * $produto['ProduValorVenda']);
-														$valorTotalSemFormatacao = $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+														$valorCusto = formataMoeda($produto['ValorVenda']);
+														$valorTotal = formataMoeda($produto['Quantidade'] * $produto['ValorVenda']);
+														$valorTotalSemFormatacao = $produto['Quantidade'] * $produto['ValorVenda'];
 
-														$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+														$UnMedNome = isset($produto['UnMedNome'])? $produto['UnMedNome']:'';
+														$SlXPrQuantidade = isset($produto['SlXPrQuantidade'])? $produto['SlXPrQuantidade']:'';
+														$ProduValorVenda = isset($produto['ProduValorVenda'])? $produto['ProduValorVenda']:'';
+
+														$totalGeral += $produto['Quantidade'] * $produto['ValorVenda'];
 
 														$linha = '';
 
 														$linha .= "
-																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
+																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['Id'] . "'>
 																		<td>" . $idProdutoSolicitacao . "</td>
-																		<td>" . $produto['ProduNome'] . "</td>
-																		<td style='text-align:center'>" . $produto['UnMedNome'] . "</td>
-																		<td style='text-align:center'>" . $produto['SlXPrQuantidade'] . "</td>
-																		<td valorUntPrSolici='" . $produto['ProduValorVenda'] . "' style='text-align:right'>" . $valorCusto . "</td>
+																		<td>" . $produto['Nome'] . "</td>
+																		<td style='text-align:center'>" . $UnMedNome . "</td>
+																		<td style='text-align:center'>" . $SlXPrQuantidade . "</td>
+																		<td valorUntPrSolici='" . $ProduValorVenda . "' style='text-align:right'>" . $valorCusto . "</td>
 																		<td style='text-align:right'>" . $valorTotal . "</td>
 																
 															";

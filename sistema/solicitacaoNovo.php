@@ -75,10 +75,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				const cmbCategoria = $('#cmbCategoria')
 
 				cmbCategoria.on('change', () => {
-					Filtrando()
 					const valCategoria = $('#cmbCategoria').val()
-
-					$.getJSON('filtraSubCategoria.php?idCategoria=' + valCategoria, function(dados) {
+					// if adicionado para corrigir bug de ao retirar a seleção da categoria a
+					// subcategoria ficava com valor "Filtrando..." e dava erro na requisição
+					if(valCategoria){
+						Filtrando()
+						$.getJSON('filtraSubCategoria.php?idCategoria=' + valCategoria, function(dados) {
 
 						var option = '<option value="">Selecione a SubCategoria</option>';
 
@@ -92,7 +94,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						} else {
 							Reset();
 						}
-					});
+						});
+					} else {
+						Reset();
+					}
 				})
 
 				function contaClicks(direc) {
@@ -256,6 +261,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							let verifExistProduQuantMaiorZero = 0
 							if (data) {
 								let carrinho = JSON.parse(data)
+								var produtoServico = $('input[name="inputProdutoServico"]:checked').val();
 
 								// Iterando sobre o array para ter acesso aos valores id de cada Objeto 
 								carrinho.forEach(item => {
@@ -266,7 +272,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										if ($(elem).attr('produId') == item.id && item.quantidade != 0) {
 											// Desabilitando o botão e trocando o conteúdo.
 											elem.setAttribute('disabled', '')
-											$(elem).html('PRODUTO ADICIONADO')
+											var menssagem = produtoServico == 'P'? 'PRODUTO ADICIONADO':'SERVIÇO ADICIONADO'
+											$(elem).html(menssagem)
 										}
 									})
 								})
@@ -324,15 +331,18 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					$('.add-cart').each((i, elem) => {
 						$(elem).on('click', () => {
 							let id = $(elem).attr('produId')
+							var produtoServico = $('input[name="inputProdutoServico"]:checked').val();
 
 							$.post(
 								'solicitacaoNovoCarrinho.php', {
-									inputProdutoId: id
+									inputId: id,
+									type: produtoServico
 								},
 								function(data) {
 									if (data) {
 										elem.setAttribute('disabled', '')
-										$(elem).html('PRODUTO ADICIONADO')
+										var menssagem = produtoServico == 'P'? 'PRODUTO ADICIONADO':'SERVIÇO ADICIONADO'
+										$(elem).html(menssagem)
 										$('.custon-modal-lista').append(data)
 										//editaQuantidade()
 										editaCarrinhoBotoes()

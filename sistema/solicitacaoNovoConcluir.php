@@ -93,21 +93,18 @@ if (isset($_SESSION['Carrinho'])) {
 
 		$SolicitacaoId = $conn->lastInsertId();
 
-		$sql = "INSERT INTO SolicitacaoXProduto
-					(SlXPrSolicitacao, SlXPrProduto, SlXPrQuantidade, SlXPrUsuarioAtualizador, SlXPrUnidade)
-				VALUES 
-					(:iSolicitacao, :iProduto, :iQuantidade, :iUsuarioAtualizador, :iUnidade)";
-		$result = $conn->prepare($sql);
-
 		foreach ($_SESSION['Carrinho'] as $key => $value) {
-
-			$result->execute(array(
-				':iSolicitacao' => $SolicitacaoId,
-				':iProduto' => $value['id'],
-				':iQuantidade' => $value['quantidade'],
-				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-				':iUnidade' => $_SESSION['UnidadeId']
-			));
+			if($value['type']=='P'){
+				$sql = "INSERT INTO SolicitacaoXProduto
+					(SlXPrSolicitacao, SlXPrProduto, SlXPrQuantidade, SlXPrUsuarioAtualizador, SlXPrUnidade)
+					VALUES ($SolicitacaoId, $value[id], $value[quantidade], $_SESSION[UsuarId], $_SESSION[UnidadeId])";
+				$conn->query($sql);
+			}else{
+				$sql = "INSERT INTO SolicitacaoXServico
+					(SlXSrSolicitacao, SlXSrServico, SlXSrQuantidade, SlXSrUsuarioAtualizador, SlXSrUnidade)
+					VALUES ($SolicitacaoId, $value[id], $value[quantidade], $_SESSION[UsuarId], $_SESSION[UnidadeId])";
+				$conn->query($sql);
+			}
 		}
 
 		$sIdentificacao = 'Solicitação de materiais (' . $Setor['SetorNome'] . ')';

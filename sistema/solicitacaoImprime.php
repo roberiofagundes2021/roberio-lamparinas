@@ -20,8 +20,8 @@ $sql = "SELECT SolicNumero, SolicData, SolicObservacao, UsuarNome, UsuarTelefone
 		BandeSolicitanteSetor as SetorQuandoSolicitou, SolicSolicitante
 		FROM Solicitacao
 		JOIN Bandeja on BandeTabela = 'Solicitacao' and BandeTabelaId = SolicId
-        JOIN Usuario on UsuarId = SolicSolicitante
-        JOIN Setor on SetorId = BandeSolicitanteSetor
+		JOIN Usuario on UsuarId = SolicSolicitante
+		JOIN Setor on SetorId = BandeSolicitanteSetor
 		WHERE SolicUnidade = ". $_SESSION['UnidadeId'] ." and SolicId = ".$iSolicitacao;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -81,17 +81,19 @@ try {
 	
 	$html .= '
     <table style="width:100%; border-collapse: collapse;">
-        <tr style="background-color:#F1F1F1;">
-            <td colspan="1" style="width:25%; font-size:12px;">Nº Solicitacao: '. $row['SolicNumero'].'</td>
-            <td colspan="1" style="width:25%; font-size:12px;">Data: '. mostraData($row['SolicData']).'</td>
-            <td colspan="2" style="width:50%; font-size:12px;">Setor: '. $row['SetorNome'].'</td>
-        </tr>
-        <tr>
-            <td colspan="1" style="width:40%; font-size:12px;">Solicitante: '.$row['UsuarNome'].'</td>
-            <td colspan="1" style="width:20%; font-size:12px;">Telefone: '.$row['UsuarTelefone'].'</td>
-            <td colspan="1" style="width:20%; font-size:12px;">Celular: '.$row['UsuarCelular'].'</td>
-            <td colspan="1" style="width:20%; font-size:12px;">E-mail: '.$row['UsuarEmail'].'</td>
-		</tr>';
+			<tr style="background-color:#F1F1F1;">
+					<td colspan="1" style="width:25%; font-size:12px;">Nº Solicitacao:<br>'. $row['SolicNumero'].'</td>
+					<td colspan="1" style="width:25%; font-size:12px;">Data:<br>'. mostraData($row['SolicData']).'</td>
+					<td colspan="2" style="width:50%; font-size:12px;">Setor:<br>'. $row['SetorNome'].'</td>
+			</tr>
+		</table>
+		<table style="width:100%; border-collapse: collapse;">
+			<tr>
+					<td colspan="1" style="width:40%; font-size:12px;">Solicitante:<br>'.$row['UsuarNome'].'</td>
+					<td colspan="1" style="width:20%; font-size:12px;">Telefone:<br>'.$row['UsuarTelefone'].'</td>
+					<td colspan="1" style="width:20%; font-size:12px;">Celular:<br>'.$row['UsuarCelular'].'</td>
+					<td colspan="1" style="width:20%; font-size:12px;">E-mail:<br>'.$row['UsuarEmail'].'</td>
+			</tr>';
 	
 	$obs = $row['SolicObservacao'];
 
@@ -114,16 +116,26 @@ try {
 	<br>';
 	
 	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, SlXPrQuantidade
-			FROM Produto
-			JOIN SolicitacaoXProduto on SlXPrProduto = ProduId
-			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SlXPrSolicitacao = ".$iSolicitacao;
+	FROM Produto
+	JOIN SolicitacaoXProduto on SlXPrProduto = ProduId
+	JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+	WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SlXPrSolicitacao = ".$iSolicitacao;
 
-	$result = $conn->query($sql);
-	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+	$resultProduto = $conn->query($sql);
+	$rowProdutos = $resultProduto->fetchAll(PDO::FETCH_ASSOC);
 	$totalProdutos = count($rowProdutos);
+
+
+	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, SlXSrQuantidade
+	FROM Servico
+	JOIN SolicitacaoXServico on SlXSrServico = ServiId
+	WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and SlXSrSolicitacao = ".$iSolicitacao;
+
+	$resultServico = $conn->query($sql);
+	$rowServicos = $resultServico->fetchAll(PDO::FETCH_ASSOC);
+	$totalServico = count($rowServicos);
     
-    $totalItens = 0;
+	$totalItens = 0;
 	
 	if($totalProdutos > 0){
 
@@ -154,6 +166,40 @@ try {
             			
 			$cont++;
 			$totalItens += $rowProduto['SlXPrQuantidade'];
+		}
+
+		$html .= "<br>";
+		
+		$html .= "</table><br>";
+	}
+
+	if($totalServico > 0){
+
+		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
+
+		$html .= '
+		<table style="width:100%; border-collapse: collapse;">
+			<tr>
+				<th style="text-align: center; width:10%">Item</th>
+				<th style="text-align: left; width:70%">Serviço</th>
+				<th style="text-align: center; width:20%">Quantidade</th>
+			</tr>
+		';
+		
+		$cont = 1;
+		
+		foreach ($rowServicos as $rowServico){
+
+            $html .= "
+            <tr>
+                <td style='text-align: center;'>".$cont."</td>
+                <td style='text-align: left;'>".$rowServico['ServiNome'].": ".$rowServico['ServiDetalhamento']."</td>
+                <td style='text-align: center;'>".$rowServico['SlXSrQuantidade']."</td>
+            </tr>
+            ";
+            			
+			$cont++;
+			$totalItens += $rowServico['SlXSrQuantidade'];
 		}
 
 		$html .= "<br>";
