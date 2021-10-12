@@ -19,38 +19,17 @@ try {
 
 	//Dados do Fluxo
 	$sql = "SELECT FlOpeId, FlOpeNumContrato, FlOpeCategoria, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
-				   SbCatNome, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, FlOpeStatus, SituaChave
+				   FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, FlOpeStatus, SituaChave,
+					 dbo.fnSubCategoriasIdFluxo(FlOpeUnidade, FlOpeId) as FlOpeSubCategoria
 			FROM FluxoOperacional
-			LEFT JOIN Fornecedor on ForneId = FlOpeFornecedor
-			LEFT JOIN Categoria on CategId = FlOpeCategoria
-			LEFT JOIN SubCategoria on SbCatId = FlOpeSubCategoria
-			LEFT JOIN Situacao on SituaId = FlOpeStatus
+			JOIN Fornecedor on ForneId = FlOpeFornecedor
+			JOIN Categoria on CategId = FlOpeCategoria
+			JOIN Situacao on SituaId = FlOpeStatus
 			WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
-	//SubCategorias desse fluxo
-	$sql = "SELECT SbCatId, SbCatNome, FOXSCSubCategoria
-			FROM SubCategoria
-			JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
-			WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
-			ORDER BY SbCatNome ASC";
-	$result = $conn->query($sql);
-	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-
-	$sSubCategorias = 0;
-	$sSubCategoriasNome = '';
-
-	foreach ($rowBD as $item){
-
-		if ($sSubCategorias == 0){
-			$sSubCategorias = $item['SbCatId'];
-			$sSubCategoriasNome .= $item['SbCatNome'];
-		} else {
-			$sSubCategorias .= ", ".$item['SbCatId'];
-			$sSubCategoriasNome .= ", ".$item['SbCatNome'];
-		}
-	}
+	$sSubCategorias = $row['FlOpeSubCategoria'];
 
 
 	$sql = "SELECT AditiId, AditiNumero, AditiDtInicio, AditiDtFim, AditiValor, AditiDtCelebracao
