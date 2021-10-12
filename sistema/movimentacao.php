@@ -174,7 +174,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
       }else if (Tipo == 'aprovacaoContabilidade') {
 					document.formMovimentacao.action = "movimentacaoAprovacaoContabilidade.php";
 			} else if (Tipo == 'liquidar'){
-          document.formMovimentacao.action = "movimentacaoLiquidarContabilidade.php";
+          confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja liquidar essa entrada? Após liquidação um novo registro será gerado no Contas à Pagar com vencimento de 60 dias após a data de hoje.", "movimentacaoLiquidarContabilidade.php");
       }
       document.formMovimentacao.submit();
     } 

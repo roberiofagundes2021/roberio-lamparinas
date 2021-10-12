@@ -21,7 +21,7 @@ if (isset($_POST['inputOrdemCompraId'])) {
 	$iOrdemCompra = $_POST['inputOrdemCompraId'];
 
 	$sql = "SELECT OrComId, OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, 
-				   OrComSubCategoria, OrComConteudoInicio, OrComFornecedor, ForneRazaoSocial, ForneContato, ForneEmail, ForneTelefone, ForneCelular, 
+				   OrComSubCategoria, OrComConteudoInicio,OrComConteudoFim, OrComFornecedor, ForneRazaoSocial, ForneContato, ForneEmail, ForneTelefone, ForneCelular, 
 				   OrComValorFrete, OrComSolicitante, OrComUnidade, OrComLocalEntrega, 
 				   OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, UsuarNome, UsuarEmail, UsuarTelefone,
 					 FlOpeNumContrato, CategNome
@@ -64,7 +64,7 @@ if (isset($_POST['inputTipo'])) {
 		$iOrdemCompra = $_POST['inputOrdemCompraId'];
 
 		$sql = "UPDATE OrdemCompra SET OrComTipo = :sTipo, OrComNumero = :sNumero, OrComLote = :sLote, OrComNumProcesso = :sProcesso, 
-									   OrComCategoria = :iCategoria, OrComSubCategoria = :iSubCategoria, OrComConteudoInicio = :sConteudo,  
+									   OrComCategoria = :iCategoria, OrComSubCategoria = :iSubCategoria, OrComConteudoInicio = :sConteudoInicio, OrComConteudoFim = :sConteudoFim, 
 									   OrComFornecedor = :iFornecedor, OrComUnidade = :iUnidade, OrComLocalEntrega = :iLocalEntrega, 
 									   OrComEnderecoEntrega = :sEnderecoEntrega, OrComSituacao = :iSituacao, OrComDtEntrega = :dDataEntrega, 
 									   OrComObservacao = :sObservacao,  OrComUsuarioAtualizador = :iUsuarioAtualizador
@@ -83,7 +83,8 @@ if (isset($_POST['inputTipo'])) {
 			':sProcesso' => $_POST['inputProcesso'],
 			':iCategoria' => $_POST['cmbCategoria'],
 			':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
-			':sConteudo' => $_POST['txtareaConteudo'],
+			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+			':sConteudoFim' => $_POST['txtareaConteudoFim'],
 			':iFornecedor' => $iFornecedor,
 			':iUnidade' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
 			':iLocalEntrega' => $_POST['cmbLocalEstoque'] == '' ? null : $_POST['cmbLocalEstoque'],
@@ -213,9 +214,11 @@ if (isset($_POST['inputTipo'])) {
 		$(document).ready(function () {
 
 			if($('#disabledForm').hasClass('disabledForm')){
-				$('#summernote').summernote('disable');
+				$('#summernoteInicio').summernote('disable');
+			    $('#summernoteFim').summernote('disable');
 			} else {
-				$('#summernote').summernote();
+				$('#summernoteInicio').summernote();
+			    $('#summernoteFim').summernote();
 			}
 
 			if(selectEmpresa !== 'publica'){
@@ -657,15 +660,21 @@ if (isset($_POST['inputTipo'])) {
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaConteudo">Conteúdo personalizado</label>
-										<textarea rows="5" cols="5" class="form-control" id="summernote"
-											name="txtareaConteudo"
-											placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"
-											><?php echo $row['OrComConteudoInicio']; ?></textarea>
+										<label for="txtareaConteudoInicio">Conteúdo personalizado - Introdução </label>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio"name="txtareaConteudoInicio" placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"><?php echo $row['OrComConteudoInicio']; ?></textarea>
 									</div>
 								</div>
 							</div>
 							<br>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudoFim">Conteúdo personalizado - Finalização</label>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais do orçamento (informe aqui o texto que você queira que apareça no término do orçamento)"><?php echo $row['OrComConteudoFim']; ?></textarea>
+									</div>
+								</div>
+							</div>
 
 							<div class="row">
 								<div class="col-lg-12">

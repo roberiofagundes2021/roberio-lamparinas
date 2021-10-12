@@ -256,14 +256,14 @@
 																<span class="input-group-prepend">
 																	<span class="input-group-text"><i class="icon-calendar22"></i></span>
 																</span>
-																<input type="date" id="inputData" name="inputData" class="form-control" placeholder="Data do Empenho " required>
+																<input type="date" id="inputData" name="inputData" class="form-control" placeholder="Data do Empenho " required autofocus>
 															</div>
 														</div>
 													</div>
 													<div class="col-lg-2">
 														<div class="form-group">
 															<label for="inputNumero">Nº do Empenho<span class="text-danger">*</span></label>
-															<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número do Empenho" required autofocus>
+															<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número do Empenho" required>
 														</div>
 													</div>
 													<div class="col-lg-8">

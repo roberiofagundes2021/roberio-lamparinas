@@ -624,7 +624,7 @@ if ($totalAcoes) {
 				} else {
 
 					if (Tipo == 'liquidarContabilidade') {
-						document.formBandeja.action = " movimentacaoLiquidarContabilidade.php ";
+						confirmaExclusao(document.formBandeja, "Tem certeza que deseja liquidar essa entrada? Após liquidação um novo registro será gerado no Contas à Pagar com vencimento de 60 dias após a data de hoje.", "movimentacaoLiquidarContabilidade.php");
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();								
 					} else if (Tipo == 'liberar') {

@@ -17,7 +17,7 @@ if (isset($_POST['inputOrdemCompraId'])){
 }
 
 $sql = "SELECT OrComTipo, OrComNumero, OrComDtEmissao, OrComLote, OrComNumAta, OrComNumProcesso, 
-		OrComConteudoInicio, ForneCnpj, ForneNome, ForneCelular, ForneEmail, CategNome
+		OrComConteudoInicio, OrComConteudoFim, ForneCnpj, ForneNome, ForneCelular, ForneEmail, CategNome
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
 		JOIN Categoria on CategId = OrComCategoria
@@ -62,12 +62,12 @@ try {
 	</style>
 
 	<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
-		<div style='width:300px; float:left; display: inline;'>
-			<img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
+		<div style='width:480px; float:left; display: inline;'>
+			<img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:110px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
 			<span style='font-weight:bold;line-height:200px;'>".$_SESSION['EmpreNomeFantasia']."</span><br>
 			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: ".$_SESSION['UnidadeNome']."</div>
 		</div>
-		<div style='width:250px; float:right; display: inline; text-align:right;'>
+		<div style='width:200px; float:right; display: inline; text-align:right;'>
 			<div>".date('d/m/Y')."</div>
 			<div style='margin-top:8px;'>".$sTipo.": ".formatarNumero($row['OrComNumero'])."</div>
 		</div> 
@@ -285,25 +285,10 @@ try {
 				</table>
 	";
 	
-	$sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
-			FROM Usuario
-			Where UsuarId = ".$_SESSION['UsuarId']."
-			ORDER BY UsuarNome ASC";
-	$result = $conn->query($sql);
-	$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);	
-	
-	$html .= '			
-		<br><br>
-		<div style="width: 100%; margin-top: 100px;">
-			<div style="position: relative; float: left; text-align: center;">
-				Solicitante: '.$rowUsuario['UsuarNome'].'<br>
-				<div style="margin-top:3px;">
-					Telefone: '.$rowUsuario['UsuarTelefone'].' <br>
-					E-mail: '.$rowUsuario['UsuarEmail'].'
-				</div>
-			</div>
-		</div>
-	';	
+	$html .= '
+	<br><br>
+	<div>' . $row['OrComConteudoFim'] . '</div>
+	<br>';
 	
     $rodape = "<hr/>
     <div style='width:100%'>
