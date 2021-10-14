@@ -48,7 +48,7 @@ function queryPesquisa(){
             }
 
             $sql = "SELECT PatriId ,PatriNumero, PatriNumSerie, PatriEstadoConservacao, MvXPrId, MovimId, MovimData,
-                    MovimNotaFiscal, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, MarcaNome, FabriNome,                    
+                    MovimNotaFiscal, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, MvXPrAnoFabricacao, ProduNome, MarcaNome, FabriNome,                    
                     CASE 
                         WHEN MovimOrigemLocal IS NULL THEN SetorO.SetorNome
                         ELSE LocalO.LcEstNome 
@@ -88,7 +88,7 @@ function queryPesquisa(){
                 <tr idPatrimonio=".$item['PatriId']." editado='0'>
                    <td class='even'>" . $cont . "</td>
                    <td class='odd'>" . $item['ProduNome'] . "</td>
-                   <td  class='even'>".$item['PatriNumero']."</td>
+                   <td class='even'>".$item['PatriNumero']."</td>
                    <td class='odd'>" . $item['MovimNotaFiscal'] . "</td>
                    <td class='even'>".mostraValor($item['MvXPrValorUnitario'])."</td>
                    <td class='odd'></td>
@@ -98,6 +98,7 @@ function queryPesquisa(){
                    <td class='even' style='display: none'>" . $item['MarcaNome'] . "</td>
                    <td class='even' style='display: none'>" . $item['FabriNome'] . "</td>
                    <td class='even' style='display: none'>" . mostraData($item['MovimData']) . "</td>
+                   <td class='even' style='display: none'>" . $item['MvXPrAnoFabricacao'] . "</td>
                    <td style='text-align: center'>
                          <i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>
                    </td>

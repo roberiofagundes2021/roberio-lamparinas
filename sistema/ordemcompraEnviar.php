@@ -5,11 +5,11 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 try{
-	if(isset($_POST['inputIdOrdemCompra'])){
+	if(isset($_POST['inputOrdemCompraId'])){
 	
         $conn->beginTransaction();		
 		
-		$iOrdemCompra = $_POST['inputIdOrdemCompra'];
+		$iOrdemCompra = $_POST['inputOrdemCompraId'];
 
 		/* Atualiza o Status da Ordem de Compra para "Aguardando Liberação" */
 		$sql = "SELECT SituaId
@@ -112,6 +112,24 @@ try{
 							':iIdBandeja' => $rowBandeja['BandeId']														
 							));
 		}
+
+		/* Deleta os registros gravados nas  tabela OrdemCompraXProduto  que possuem os produtos com quantidade ZERO. */ 
+		$sql = "DELETE FROM OrdemCompraXProduto
+		WHERE OCXPrOrdemCompra = :id AND OCXPrQuantidade = 0
+		";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iOrdemCompra);
+		$result->execute();
+
+
+
+		/* Deleta os registros gravados nas  tabela OrdemCompraXServico  que possuem os serviços com quantidade ZERO. */ 
+		$sql = "DELETE FROM OrdemCompraXServico
+				WHERE OCXSrOrdemCompra = :id AND OCXSrQuantidade = 0
+		";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iOrdemCompra);
+		$result->execute();
 
         $conn->commit();
         
