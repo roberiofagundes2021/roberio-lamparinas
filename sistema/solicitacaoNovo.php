@@ -6,16 +6,42 @@ $_SESSION['PaginaAtual'] = 'Nova Solicitação';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, 
-		dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
+// verifica se existe um valor minimo e maximo para paginação de itens
+if(isset($_POST['min'])){
+	$sql = "WITH itens as (SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, 
+			dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ProduNome) as rownum
+			FROM Produto
+			JOIN Categoria on CategId = ProduCategoria
+			JOIN Situacao on SituaId = ProduStatus
+			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
+			SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, Estoque, rownum
+			FROM itens WHERE rownum >= ".$_POST['min']." and rownum <= ".$_POST['max']." ORDER BY ProduNome ASC";
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+} else {
+	$sql = "WITH itens as (SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, 
+			dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ProduNome) as rownum
+			FROM Produto
+			JOIN Categoria on CategId = ProduCategoria
+			JOIN Situacao on SituaId = ProduStatus
+			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
+			SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, Estoque, rownum
+			FROM itens WHERE rownum >= 0 and rownum <= 12 ORDER BY ProduNome ASC";
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+}
+
+//$count = count($row);
+
+// pega a quantidade total de itens que vem do banco para fazer a paginação
+
+$sqlCount = "SELECT COUNT(ProduId) as quantidade
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN Situacao on SituaId = ProduStatus
-	    WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-		ORDER BY ProduNome ASC";
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
+	    WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
+$resultCount = $conn->query($sqlCount);
+$count = $resultCount->fetch(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -63,6 +89,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+	// transforma as variaveis PHP em variaveis JavaScript atravez do jsonEncode
+		<?php
+			$js_array = json_encode($count['quantidade']);
+			$posicao = isset($_POST['posicao'])?$_POST['posicao']:1;
+			echo "var Maxitens = ".$js_array.";\n";
+			echo "var posicao = ".json_encode($posicao).";\n";
+		?>
 		$(document).ready(function() {
 
 			//Aqui sou obrigado a instanciar novamente a utilização do fancybox
@@ -467,6 +500,44 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				})
 			})()
 			/**/
+
+			// cria a numeração da paginação de acordo ao numero maximo de itens que vem do banco
+
+			$('#pagination').append("<li id='next' class='page-item'><a class='page-link page-link-white'><i class='icon-arrow-small-right'></i></a></li>")
+			
+			// quantidade de itens por pagina
+			var quantItens = 12
+
+			// calcula quantas paginas serão necessarias
+			var count = Maxitens%quantItens?  (Math.round(Maxitens/quantItens)+1):Maxitens/quantItens
+
+			for(var x=1; x < count; x++){
+				$('#pagination').append("<li id='lista-"+x+"' class='page-item "+(x==posicao?'active':'')+"'><a class='page-link page-link-white'>"+x+"</a></li>")
+			}
+			$('#pagination').append("<li id='back' class='page-item'><a class='page-link page-link-white'><i class='icon-arrow-small-left'></i></a></li>")
+
+			$('.page-item').click(function(item){
+				// pega o id que foi selecionado
+				if($(this).attr('id') == 'next'){
+					var id = posicao<count ? parseInt(posicao)+1 : parseInt(posicao)
+				} else if($(this).attr('id') == 'back'){
+					var id = posicao==1 ? parseInt(posicao) : parseInt(posicao)-1
+				}else {
+					var id = parseInt($(this).attr('id').split('-')[1])
+				}
+				
+				console.log(id)
+				// adiciona o valor maximo de items
+				$('#max').val(quantItens*id)
+
+				// a partir do valor maxio ja adicionado ele adiciona o valor minimo
+				var min = ((parseInt($('#max').val())+1) - quantItens)
+				$('#min').val(min)
+				$('#posicao').val(id)
+				// console.log(id)
+
+				$('#formPaginacao').submit()
+			})
 		});
 	</script>
 
@@ -754,16 +825,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 						<!-- Pagination -->
 						<div class="d-flex justify-content-center pt-3 mb-3">
-							<ul class="pagination shadow-1">
-								<li class="page-item"><a href="#" class="page-link page-link-white"><i class="icon-arrow-small-right"></i></a></li>
-								<li class="page-item active"><a href="#" class="page-link page-link-white">1</a></li>
-								<li class="page-item"><a href="#" class="page-link page-link-white">2</a></li>
-								<li class="page-item"><a href="#" class="page-link page-link-white">3</a></li>
-								<li class="page-item"><a href="#" class="page-link page-link-white">4</a></li>
-								<li class="page-item"><a href="#" class="page-link page-link-white">5</a></li>
-								<li class="page-item"><a href="#" class="page-link page-link-white"><i class="icon-arrow-small-left"></i></a></li>
+							<ul id="pagination" class="pagination shadow-1">
+								
 							</ul>
 						</div>
+						<form id="formPaginacao" method="POST" action="solicitacaoNovo.php">
+							<input id="min" type="hidden" name="min" value="" />
+							<input id="max" type="hidden" name="max" value="" />
+							<input id="posicao" type="hidden" name="posicao" value="" />
+						</form>
 						<!-- /pagination -->
 
 					</div>

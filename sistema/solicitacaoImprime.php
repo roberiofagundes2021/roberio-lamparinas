@@ -181,8 +181,8 @@ try {
 		<table style="width:100%; border-collapse: collapse;">
 			<tr>
 				<th style="text-align: center; width:10%">Item</th>
-				<th style="text-align: left; width:70%">Serviço</th>
-				<th style="text-align: center; width:20%">Quantidade</th>
+				<th style="text-align: left; width:75%">Serviço</th>
+				<th style="text-align: center; width:15%">Quantidade</th>
 			</tr>
 		';
 		
