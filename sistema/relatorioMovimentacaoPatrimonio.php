@@ -292,6 +292,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         let marca = $(tds[9]).html();
                         let fabricante = $(tds[10]).html();
                         let data = $(tds[11]).html();
+                        let anoFabr = $(tds[12]).html();
                         let numeroSerie = $(tds[13]).children().first().val();
                         let estadoConservacao = $(tds[14]).children().first().val();
                         //console.log(numeroSerie)
@@ -367,7 +368,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                         </div>
                                         
                                         <div class='row'>
-                                            <div class='col-lg-3'>
+                                            <div class='col-lg-2'>
                                                 <div class="form-group">
                                                     <label for="produto">Nota Fiscal</label>
                                                     <div class="input-group">
@@ -385,13 +386,21 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                             </div>
                                             <div class='col-lg-3'>
                                                 <div class="form-group">
+                                                    <label for="produto">Ano da Fabricação</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${anoFabr}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class='col-lg-2'>
+                                                <div class="form-group">
                                                     <label for="produto">(R$) Aquisição</label>
                                                     <div class="input-group">
                                                         <input class='form-control' value='${aquisicao}' readOnly />
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class='col-lg-3'>
+                                            <div class='col-lg-2'>
                                                 <div class="form-group">
                                                     <label for="produto">(R$) Depreciação</label>
                                                     <div class="input-group">
