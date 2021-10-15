@@ -13,27 +13,27 @@ function queryPesquisa()
     $args = [];
 
     if (!empty($_POST['inputPesquisaProduto'])) {
-        $args[]  = "ProduNome LIKE '%" . $_POST['inputPesquisaProduto'] . "%'";
+        $args[]  = $_POST['inputProdutoServico'] == 'P'? "ProduNome LIKE '%" . $_POST['inputPesquisaProduto'] . "%'" : "ServiNome LIKE '%" . $_POST['inputPesquisaProduto'] . "%'";
     }
 
     if (!empty($_POST['inputCategoria'])) {
-        $args[]  = "ProduCategoria = " . $_POST['inputCategoria'] . " ";
+        $args[]  = $_POST['inputProdutoServico'] == 'P'? "ProduCategoria = " . $_POST['inputCategoria'] . " " : "ServiCategoria = " . $_POST['inputCategoria'] . " ";
     }
 
     if (!empty($_POST['inputSubCategoria'])) {
-        $args[]  = "ProduSubCategoria = " . $_POST['inputSubCategoria'] . " ";
+        $args[]  = $_POST['inputProdutoServico'] == 'P'? "ProduSubCategoria = " . $_POST['inputSubCategoria'] . " " : "ServiSubCategoria = " . $_POST['inputSubCategoria'] . " ";
     }
 
     if (!empty($_POST['inputMarca'])) {
-        $args[]  = "ProduMarca = " . $_POST['inputMarca'] . " ";
+        $args[]  = $_POST['inputProdutoServico'] == 'P'? "ProduMarca = " . $_POST['inputMarca'] . " " : "ServiMarca = " . $_POST['inputMarca'] . " ";
     }
 
     if (!empty($_POST['inputFabricante'])) {
-        $args[]  = "ProduFabricante = " . $_POST['inputFabricante'] . " ";
+        $args[]  = $_POST['inputProdutoServico'] == 'P'? "ProduFabricante = " . $_POST['inputFabricante'] . " " : "ServiFabricante = " . $_POST['inputFabricante'] . " ";
     }
 
     if (!empty($_POST['inputModelo'])) {
-        $args[]  = "ProduModelo = " . $_POST['inputModelo'] . " ";
+        $args[]  = $_POST['inputProdutoServico'] == 'P'? "ProduModelo = " . $_POST['inputModelo'] . " " : "ServiModelo = " . $_POST['inputModelo'] . " ";
     }
 
 
@@ -47,18 +47,22 @@ function queryPesquisa()
             }
 
             if ($_POST['inputProdutoServico'] == 'S'){
-                $sql = "SELECT ServiId, ServiCodigo, ServiNome, ServiDetalhamento, CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
+                $sql = "SELECT ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
+                CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
                 FROM Servico
                 JOIN Categoria on CategId = ServiCategoria
                 JOIN Situacao on SituaId = ServiStatus
                 WHERE " . $string . " ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' ";
             } else {
-                $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduDetalhamento, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
+                $sql = "SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
+                ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
                 FROM Produto
                 JOIN Categoria on CategId = ProduCategoria
                 JOIN Situacao on SituaId = ProduStatus
                 WHERE " . $string . " ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' ";
             }
+            // var_dump($sql);
+            // exit;
 
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -69,24 +73,21 @@ function queryPesquisa()
         }
     } else {
         try {
-
             if ($_POST['inputProdutoServico'] == 'S'){
-                
                 $sql = "SELECT ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
                 CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
                 FROM Servico
                 JOIN Categoria on CategId = ServiCategoria
                 JOIN Situacao on SituaId = ServiStatus
                 WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' 
-                ORDER BY ServiNome ASC ";        
+                ORDER BY ServiNome ASC ";
             } else {
-                
                 $sql = "SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
                 ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
                 FROM Produto
                 JOIN Categoria on CategId = ProduCategoria
                 JOIN Situacao on SituaId = ProduStatus
-                WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' 
+                WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
                 ORDER BY ProduNome ASC ";
             }
             $result = $conn->query($sql);

@@ -145,11 +145,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 			/* Fim: Tabela Personalizada */		
 		});
-		function submitForm(id){
-			var id = "form-"+id
-			var form = document.getElementById(id)
-			confirmaExclusao(form, "Essa ação enviará toda a Ordem de Compra (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "ordemcompraEnviar.php");
-		}
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaOrdemCompra(Permission, OrComFlOpeId, OrComId, OrComNumero, OrComCategoria, CategNome, OrComSituacao, OrComSituacaoChave, OrComTipo, Tipo, Motivo){
@@ -224,6 +219,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					document.formOrdemCompra.action = "ordemcompraProduto.php";
 				} else if (Tipo == 'servico'){
 					document.formOrdemCompra.action = "ordemcompraServico.php";
+				}else if (Tipo == 'aprovacao'){
+					confirmaExclusao(document.formOrdemCompra, "Essa ação enviará toda a Ordem de Compra (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "ordemcompraEnviar.php");
 				} else if (Tipo == 'duplica'){
 					document.formOrdemCompra.action = "ordemcompraDuplica.php";
 				} else if (Tipo == 'aprovacaoContabilidade') {
@@ -336,11 +333,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="dropdown-menu dropdown-menu-right">'.
 																($item['produtoCount']>0?'<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>':'').
 																($item['servicoCount']>0?'<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>':'').
-																'<form id="form-'.$item['OrComId'].'" method="POST" action="ordemcompraEnviar.php">
-																		<input type="hidden" name="inputIdOrdemCompra" value="'.$item['OrComId'].'">'.
-																		// se o usuario ter perfil CONTABILIDADE essa opção ão irá aparecer para ele
-																		((($item['produtoQuant']>0 || $item['servicoQuant']>0) && $_SESSION['PerfiChave'] != 'CONTABILIDADE')?'<div onClick="submitForm('.$item['OrComId'].')" class="dropdown-item"><i class="icon-list2" title="Aprovação"></i></i>Enviar para Aprovação</div>':'').
-																	'</form>'
+																((($item['produtoQuant']>0 || $item['servicoQuant']>0) && $_SESSION['PerfiChave'] != 'CONTABILIDADE')?'<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'aprovacao\', \'\');" class="dropdown-item"><i class="icon-list2" title="Enviar para Aprovação"></i> Enviar para Aprovação</a>':'').''
 															.'<div class="dropdown-divider"></div>');
 
 																if ($item['SituaChave'] == 'LIBERADOCENTRO'){

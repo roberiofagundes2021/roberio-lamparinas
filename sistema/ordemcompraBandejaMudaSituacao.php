@@ -20,7 +20,7 @@ if(isset($_POST['inputOrdemCompraId'])){
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);        	
 
-		if ($_POST['inputOrdemCompraStatus'] == 'NAOLIBERADO'){
+		if ($_POST['inputOrdemCompraStatus'] == 'NAOLIBERADOCENTROADMINISTRATIVO'){
 			$motivo = $_POST['inputMotivo'];
 			$msg = "Ordem de Compra não liberada!";
 		} else{

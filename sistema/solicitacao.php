@@ -307,7 +307,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																</a>
 
 																<div class="dropdown-menu dropdown-menu-right">
-																	<a id="' . $item['SolicId'] . '" class="btn-modal dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																	<a id="' . $item['SolicId'] . '" class="btn-modal dropdown-item"><i class="icon-stackoverflow" title="Listar Itens"></i> Listar Itens</a>
 																	<div class="dropdown-divider"></div>
 																	' );
 
@@ -368,7 +368,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			<div class="card custon-modal-content">
 				<div class="custon-modal-title">
 					<i class="fab-icon-open icon-cart p-3"></i>
-					<p class="h3">Produtos Selecionados</p>
+					<p class="h3">Itens Selecionados</p>
 					<i id="modal-close" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
 				</div>
 				<div class="custon-modal-lista d-flex flex-column">
