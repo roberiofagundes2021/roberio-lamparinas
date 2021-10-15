@@ -248,14 +248,12 @@ if (isset($_POST['inputData'])) {
 
 		function produtosOrdemCompra(ordemCompra) {
 			let inputLote = $('#inputLote').val();
-			let numOrdemCompra = $('#cmbOrdemCompra').val()
 
 			$.ajax({
 				type: "POST",
 				url: "movimentacaoAddProdutoOrdemCompra.php",
 				data: {
 					ordemCompra: ordemCompra,
-					numOrdemCompra: numOrdemCompra,
 					lote: inputLote
 				},
 				success: function(resposta) {
@@ -556,7 +554,10 @@ if (isset($_POST['inputData'])) {
 			});
 
 			$('#cmbOrdemCompra').on('change', function() {
+				
 				var ordemCompra = '';
+
+				//Buscao o ID da OrdemCompra que está no atributo idOrdemCompra do option do select (pra usar logo abaixo)
 				$('#cmbOrdemCompra').children().each((i, elem) => {
 					if ($(elem).val() == $('#cmbOrdemCompra').val()) {
 						ordemCompra = $(elem).attr('idOrdemCompra');
