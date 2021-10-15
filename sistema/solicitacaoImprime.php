@@ -90,9 +90,9 @@ try {
 		<table style="width:100%; border-collapse: collapse;">
 			<tr>
 					<td colspan="1" style="width:40%; font-size:12px;">Solicitante:<br>'.$row['UsuarNome'].'</td>
-					<td colspan="1" style="width:20%; font-size:12px;">Telefone:<br>'.$row['UsuarTelefone'].'</td>
-					<td colspan="1" style="width:20%; font-size:12px;">Celular:<br>'.$row['UsuarCelular'].'</td>
-					<td colspan="1" style="width:20%; font-size:12px;">E-mail:<br>'.$row['UsuarEmail'].'</td>
+					<td colspan="1" style="width:17%; font-size:12px;">Telefone:<br>'.$row['UsuarTelefone'].'</td>
+					<td colspan="1" style="width:17%; font-size:12px;">Celular:<br>'.$row['UsuarCelular'].'</td>
+					<td colspan="1" style="width:26%; font-size:12px;">E-mail:<br>'.$row['UsuarEmail'].'</td>
 			</tr>';
 	
 	$obs = $row['SolicObservacao'];

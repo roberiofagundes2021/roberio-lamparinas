@@ -26,7 +26,7 @@ if(isset($_POST['min'])){
 			JOIN Situacao on SituaId = ProduStatus
 			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
 			SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, Estoque, rownum
-			FROM itens WHERE rownum >= 0 and rownum <= 12 ORDER BY ProduNome ASC";
+			FROM itens WHERE rownum >= 0 and rownum <= 20 ORDER BY ProduNome ASC";
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -506,7 +506,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 			$('#pagination').append("<li id='next' class='page-item'><a class='page-link page-link-white'><i class='icon-arrow-small-right'></i></a></li>")
 			
 			// quantidade de itens por pagina
-			var quantItens = 12
+			var quantItens = 20
 
 			// calcula quantas paginas serão necessarias
 			var count = Maxitens%quantItens?  (Math.round(Maxitens/quantItens)+1):Maxitens/quantItens
@@ -568,8 +568,14 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 						<div id="produtos" class="row">
 							<!--Search Filter-->
 							<div id="filter" class="col-12">
-								<div class="card pt-3 pb-3 pl-2 pr-2">
-									<div class="card-bod">
+								<div class="card pb-3 pr-2">
+									<div class="card-header header-elements-inline">
+										<h5 class="card-title">Nova Solicitação de Materiais/Serviços</h5>
+										<div class="header-elements">
+											<a href="solicitacao.php"><< Solicitações</a>
+										</div>
+									</div>
+									<div class="card-bod pt-1 pl-3 pr-2">
 										<form class="col-12" id="pesquisa" action="">
 											<div class="row">
 												<div class="col-lg-2 pt-3">
