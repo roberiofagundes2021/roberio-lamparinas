@@ -29,11 +29,11 @@
 
 	$iOrdemCompra = $_SESSION['OrdemCompraIdEmpenho'];
 
-	$sql = "SELECT OrCEmId, OrCEmDataEmpenho, OrCEmNumEmpenho, OrCEmNome, OrCEmArquivo,SituaChave
-			FROM   OrdemCompraEmpenho
+	$sql = "SELECT OrCEmId, OrCEmDataEmpenho, OrCEmNumEmpenho, OrCEmNome, OrCEmArquivo, SituaChave
+			FROM OrdemCompraEmpenho
 			JOIN OrdemCompra on OrComId = OrCEmOrdemCompra
 			JOIN Situacao on SituaId = OrComSituacao	
-			WHERE  OrCEmUnidade = ". $_SESSION['UnidadeId'] ." AND OrCEmOrdemCompra = ".$iOrdemCompra."
+			WHERE OrCEmUnidade = ". $_SESSION['UnidadeId'] ." AND OrCEmOrdemCompra = ".$iOrdemCompra."
 			ORDER BY OrCEmNome ASC";
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -48,7 +48,8 @@ function queryPesquisa(){
             }
 
             $sql = "SELECT PatriId ,PatriNumero, PatriNumSerie, PatriEstadoConservacao, MvXPrId, MovimId, MovimData,
-                    MovimNotaFiscal, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, MvXPrAnoFabricacao, ProduNome, MarcaNome, FabriNome,                    
+                    MovimNotaFiscal, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, MvXPrAnoFabricacao, ProduNome, MarcaNome, FabriNome,
+                    dbo.fnEmpenhosOrdemCompra(MovimUnidade, MovimOrdemCompra) as EmpenhosOrdemCompra,                    
                     CASE 
                         WHEN MovimOrigemLocal IS NULL THEN SetorO.SetorNome
                         ELSE LocalO.LcEstNome 
