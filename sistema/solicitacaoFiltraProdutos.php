@@ -11,7 +11,6 @@ function queryPesquisa()
     include('global_assets/php/conexao.php');
 
     $args = [];
-
     if (!empty($_POST['inputPesquisaProduto'])) {
         $args[]  = $_POST['inputProdutoServico'] == 'P'? "ProduNome LIKE '%" . $_POST['inputPesquisaProduto'] . "%'" : "ServiNome LIKE '%" . $_POST['inputPesquisaProduto'] . "%'";
     }
@@ -47,25 +46,41 @@ function queryPesquisa()
             }
 
             if ($_POST['inputProdutoServico'] == 'S'){
-                $sql = "SELECT ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
-                CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
+                $sql = "WITH itens as (SELECT  ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
+                CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ServiId) as rownum
                 FROM Servico
                 JOIN Categoria on CategId = ServiCategoria
                 JOIN Situacao on SituaId = ServiStatus
-                WHERE " . $string . " ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' ";
+                WHERE " . $string . " ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
+                SELECT Id, Codigo, Nome, Detalhamento, CategNome, Estoque, rownum
+                FROM itens WHERE rownum >= ".$_POST['min']." and rownum <= ".$_POST['max']." ORDER BY Nome ASC";
+
+                $sqlCount = "SELECT ServiId
+                FROM Servico
+                JOIN Categoria on CategId = ServiCategoria
+                JOIN Situacao on SituaId = ServiStatus
+                WHERE " . $string . " ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
             } else {
-                $sql = "SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-                ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
+                $sql = "WITH itens as (SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
+                ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ProduId) as rownum
                 FROM Produto
                 JOIN Categoria on CategId = ProduCategoria
                 JOIN Situacao on SituaId = ProduStatus
-                WHERE " . $string . " ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' ";
-            }
-            // var_dump($sql);
-            // exit;
+                WHERE " . $string . " ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
+                SELECT Id, Codigo, Nome, Detalhamento, CategNome, Estoque, ProduFoto, rownum
+                FROM itens WHERE rownum >= ".$_POST['min']." and rownum <= ".$_POST['max']." ORDER BY Nome ASC";
 
+                $sqlCount = "SELECT ProduId
+                FROM Produto
+                JOIN Categoria on CategId = ProduCategoria
+                JOIN Situacao on SituaId = ProduStatus
+                WHERE " . $string . " ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
+            }
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
+
+            $resultCount = $conn->query($sqlCount);
+            $count = COUNT($resultCount->fetchAll(PDO::FETCH_ASSOC));
 
             count($rowData) >= 1 ? $cont = 1 : $cont = 0;
         } catch (PDOException $e) {
@@ -74,24 +89,39 @@ function queryPesquisa()
     } else {
         try {
             if ($_POST['inputProdutoServico'] == 'S'){
-                $sql = "SELECT ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
-                CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
+                $sql = "WITH itens as (SELECT  ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
+                CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ServiNome) as rownum
                 FROM Servico
                 JOIN Categoria on CategId = ServiCategoria
                 JOIN Situacao on SituaId = ServiStatus
-                WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' 
-                ORDER BY ServiNome ASC ";
+                WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
+                SELECT Id, Codigo, Nome, Detalhamento, CategNome, Estoque, rownum
+                FROM itens WHERE rownum >= ".$_POST['min']." and rownum <= ".$_POST['max']." ORDER BY Nome ASC";
+
+                $sqlCount = "SELECT ServiId
+                FROM Servico
+                JOIN Situacao on SituaId = ServiStatus
+                WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
             } else {
-                $sql = "SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-                ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
+                $sql = "WITH itens as (SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
+                ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ProduNome) as rownum
                 FROM Produto
                 JOIN Categoria on CategId = ProduCategoria
                 JOIN Situacao on SituaId = ProduStatus
-                WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                ORDER BY ProduNome ASC ";
+                WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
+                SELECT Id, Codigo, Nome, Detalhamento, CategNome, Estoque, ProduFoto, rownum
+                FROM itens WHERE rownum >= ".$_POST['min']." and rownum <= ".$_POST['max']." ORDER BY Nome ASC";
+                
+                $sqlCount = "SELECT ProduId
+                FROM Produto
+                JOIN Situacao on SituaId = ProduStatus
+                WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
             }
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
+
+            $resultCount = $conn->query($sqlCount);
+            $count = COUNT($resultCount->fetchAll(PDO::FETCH_ASSOC));
 
             $cont = 1;
         } catch (PDOException $e) {
@@ -100,13 +130,14 @@ function queryPesquisa()
     }
 
     if ($cont == 1) {
+        print("<input type='hidden' id='count' value='".$count."'/>");
         $cont = 0;
         foreach ($rowData as $item) {
             $cont++;
 
             $sFoto = "global_assets/images/lamparinas/sem_foto.gif";
 
-            if ($_POST['inputProdutoServico'] == 'P'){               
+            if ($_POST['inputProdutoServico'] == 'P'){
 
                 if ($item['ProduFoto'] != null) {
 
