@@ -93,7 +93,7 @@ if (isset($_POST['inputData'])) {
 							':sLote' => $registro[5],
 							':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
 							':iNumSerie' => isset($registro[7])? $registro[7] : '',
-							':iFabricacao' => isset($registro[8])? $registro[8] : '',
+							':iFabricacao' => $registro[8] != '0' ? $registro[8] : gravaData('12/09/2333') ? $registro[8] : null,
 							':iClassificacao' => isset($registro[9]) ? (int) $registro[9] : null,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId'],
@@ -350,7 +350,7 @@ if (isset($_POST['inputData'])) {
 												<td><input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center"  disabled></td>
 												<td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
 												<td><input id='numSerie' type="text" class="form-control" value="" style="text-align: center"></td>
-												<td><input id='fabricacao' type="number" min="2000" max="2099" class="form-control" value="" style="text-align: center"></td>
+												<td><input id='fabricacao' type="date" class="form-control" value="" style="text-align: center"></td>
 												<td><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
 											</tr>
 											`;
