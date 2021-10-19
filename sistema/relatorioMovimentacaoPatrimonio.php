@@ -293,8 +293,10 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         let fabricante = $(tds[10]).html();
                         let data = $(tds[11]).html();
                         let anoFabr = $(tds[12]).html();
-                        let numeroSerie = $(tds[13]).children().first().val();
-                        let estadoConservacao = $(tds[14]).children().first().val();
+                        let empenho = $(tds[13]).html();
+                        let numeroSerie = $(tds[14]).children().first().val();
+                        let estadoConservacao = $(tds[15]).children().first().val();
+                        
                         //console.log(numeroSerie)
 
                         const fonte1 = 'style="font-size: 1.1rem"'
@@ -338,8 +340,16 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                                         <input class='form-control' value='${patrimonio}' readOnly />
                                                     </div>
                                                 </div>
-                                            </div>                                    
-                                            <div class='col-lg-10'>
+                                            </div>
+                                            <div class='col-lg-2'>
+                                                <div class="form-group">
+                                                    <label for="produto">N.º do Empenho</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${empenho}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>                                 
+                                            <div class='col-lg-8'>
                                                 <div class="form-group">
                                                     <label for="produto">Produto</label>
                                                     <div class="input-group">
@@ -668,8 +678,8 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                             $('[idpatrimonio]').each((i, elem) => {
                                 let tds = $(elem).children()
                                 if ($(elem).attr('idpatrimonio') == id) {
-                                    $(tds[13]).children().first().val(numeroSerie)
-                                    $(tds[14]).children().first().val(estadoConservacao)
+                                    $(tds[14]).children().first().val(numeroSerie)
+                                    $(tds[15]).children().first().val(estadoConservacao)
                                     // $(elem).append(inputNumeroSerie).append(inputEstadoConservacao)
                                 }
                             })

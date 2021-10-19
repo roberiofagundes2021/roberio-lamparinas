@@ -49,7 +49,7 @@ function queryPesquisa(){
 
             $sql = "SELECT PatriId ,PatriNumero, PatriNumSerie, PatriEstadoConservacao, MvXPrId, MovimId, MovimData,
                     MovimNotaFiscal, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, MvXPrAnoFabricacao, ProduNome, MarcaNome, FabriNome,
-                    dbo.fnEmpenhosOrdemCompra(MovimUnidade, MovimOrdemCompra) as EmpenhosOrdemCompra,                    
+                    dbo.fnEmpenhosOrdemCompra(MovimUnidade, MovimOrdemCompra) as EmpenhosOrdemCompra,                   
                     CASE 
                         WHEN MovimOrigemLocal IS NULL THEN SetorO.SetorNome
                         ELSE LocalO.LcEstNome 
@@ -99,7 +99,8 @@ function queryPesquisa(){
                    <td class='even' style='display: none'>" . $item['MarcaNome'] . "</td>
                    <td class='even' style='display: none'>" . $item['FabriNome'] . "</td>
                    <td class='even' style='display: none'>" . mostraData($item['MovimData']) . "</td>
-                   <td class='even' style='display: none'>" . $item['MvXPrAnoFabricacao'] . "</td>
+                   <td class='even' style='display: none'>" . mostraData($item['MvXPrAnoFabricacao']) . "</td>
+                   <td class='even' style='display: none'>" . $item['EmpenhosOrdemCompra'] . "</td>
                    <td style='text-align: center'>
                          <i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>
                    </td>
