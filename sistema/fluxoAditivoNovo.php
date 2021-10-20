@@ -612,8 +612,8 @@ try {
 										JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 										LEFT JOIN Marca on MarcaId = ProduMarca
 										JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-										WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = " . $iCategoria . " and 
-										ProduSubCategoria in (" . $sSubCategorias . ") ";
+										WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = $iCategoria and 
+										ProduSubCategoria in ($sSubCategorias)";
 								$result = $conn->query($sql);
 								$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 								$countProduto = count($rowProdutos);
