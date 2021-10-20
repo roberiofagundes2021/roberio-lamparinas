@@ -402,12 +402,12 @@ if (isset($_POST['inputData'])) {
 
 						if (i == 0 && indiceProdutoModal == indiceLinha) {
 
-							let novaQuantidade = $(tdsModal[2]).children().val() // pegando a quantidade digitada pelo usuário
-							let saldo = $(tdsModal[3]).children().val() // pegando o saldo do produto
-							let lote = $(tdsModal[4]).children().val() // pegando o lote digitado pelo usuário
-							let numSerie = $(tdsModal[5]).children().val() // pegando o Nº Serie digitado pelo usuário
-							let fabricacao = $(tdsModal[6]).children().val() // pegando ano de fabricação digitado pelo usuário
-							let validade = $(tdsModal[7]).children().val() // pegando a validade digitada pelo usuário
+							let novaQuantidade = ($(tdsModal[2]).children().val()? $(tdsModal[2]).children().val(): '') // pegando a quantidade digitada pelo usuário
+							let saldo = ($(tdsModal[3]).children().val()? $(tdsModal[3]).children().val(): '') // pegando o saldo do produto
+							let lote = ($(tdsModal[4]).children().val()? $(tdsModal[4]).children().val(): '') // pegando o lote digitado pelo usuário
+							let numSerie = ($(tdsModal[5]).children().val()? $(tdsModal[5]).children().val(): '') // pegando o Nº Serie digitado pelo usuário
+							let fabricacao = ($(tdsModal[6]).children().val()? $(tdsModal[6]).children().val(): '') // pegando ano de fabricação digitado pelo usuário
+							let validade = ($(tdsModal[7]).children().val()? $(tdsModal[7]).children().val(): '') // pegando a validade digitada pelo usuário
 
 							let inputProdutoGridValores = inputHiddenProdutoServico.val()
 							let arrayValInput = inputProdutoGridValores.split('#')
@@ -572,6 +572,10 @@ if (isset($_POST['inputData'])) {
 
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e) {
+
+				// close modal
+				$('#page-modal').fadeOut(200);
+				$('body').css('overflow', 'scroll');
 
 				var inputTotal = $('#inputTotal').val();
 				var cmbOrdemCompra = $('#cmbOrdemCompra').val();
