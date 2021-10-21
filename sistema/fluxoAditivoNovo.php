@@ -544,7 +544,7 @@ try {
 							<input type="hidden" id="inputSubCategorias" name="inputSubCategorias" class="form-control" value="<?php echo $sSubCategorias; ?>">
 
 							<div class="row">
-								<div class="col-lg-1">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputNumero">Nº Aditivo <span class="text-danger">*</span></label>
 										<input type="text" id="inputNumero" name="inputNumero" class="form-control" value="<?php echo $iProxAditivo; ?>" readOnly>
@@ -587,7 +587,7 @@ try {
 									</div>
 								</div>
 
-								<div class="col-lg-3">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputValor">Valor Total</label>
 										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" value="<?php isset($_POST['inputDataInicio']) ? print($_POST['inputValor']) : print('')  ?>" onKeyUp="moeda(this)" maxLength="12" <?php isset($_POST['inputDataInicio']) ? print('disabled') : print('')  ?>>
@@ -631,7 +631,7 @@ try {
 									if (isset($_POST['inputDataInicio'])) {
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-8">
+											<div class="col-lg-7">
 												<div class="row">
 													<div class="col-lg-1">
 														<label for="inputCodigo"><strong>Item</strong></label>
@@ -659,7 +659,7 @@ try {
 													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-1">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -683,7 +683,7 @@ try {
 
 											print('
 											<div class="row" style="margin-top: 8px;" >
-												<div class="col-lg-8">
+												<div class="col-lg-7">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -706,8 +706,8 @@ try {
 												<div class="col-lg-1">
 													<input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
 												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" value="' . $fValorTotal . '" readOnly>
+												<div class="col-lg-2">
+													<input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off text-right" value="' . $fValorTotal . '" readOnly>
 												</div>											
 											</div>');
 										}
@@ -716,7 +716,7 @@ try {
 									if (isset($_POST['inputDataInicio'])) {
 										print('
 										<div class="row" style="margin-top: 8px;">
-											<div class="col-lg-8">
+											<div class="col-lg-7">
 												<div class="row">
 													<div class="col-lg-1">
 														
@@ -738,8 +738,8 @@ try {
 											<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
 												<h5><b>Total:</b></h5>
 											</div>	
-											<div class="col-lg-1">
-												<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="' . mostraValor($fTotalGeral) . '" readOnly>
+											<div class="col-lg-2">
+												<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="' . mostraValor($fTotalGeral) . '" readOnly>
 											</div>											
 										</div>');
 
