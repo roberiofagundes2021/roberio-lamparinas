@@ -211,7 +211,7 @@ if (isset($_SESSION['EmpresaId'])){
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-9">
-									<p class="font-size-lg">A relação abaixo faz referência aos Locais de Estoque <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+									<p class="font-size-lg">A relação abaixo faz referência aos Locais de Estoque <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>
 									</div>	
 										<div class="col-lg-3">	
 										<div class="text-right"><a href="localEstoqueNovo.php" class="btn btn-principal" role="button">Novo Local de Estoque</a></div>

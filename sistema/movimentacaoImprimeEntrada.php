@@ -16,7 +16,7 @@ if (isset($_POST['inputMovimentacaoId'])){
 		   </script> ');
 }
 
-$sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimNotaFiscal, MovimObservacao, OrComNumero,
+$sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimData, MovimNotaFiscal, MovimObservacao, MovimUsuarioAtualizador, OrComNumero,
 		dbo.fnValorTotalOrdemCompra(" . $_SESSION['UnidadeId'] . ", MovimOrdemCompra) as TotalOrdemCompra		
         FROM Movimentacao
 		JOIN Fornecedor on ForneId = MovimFornecedor
@@ -24,6 +24,14 @@ $sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimNotaFiscal, 
 		WHERE MovimUnidade = ". $_SESSION['UnidadeId'] ." and MovimId = ".$iMovimentacao." and MovimTipo = 'E'";
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
+
+$sql = "SELECT MvLiqMovimentacao, MvLiqData, MvLiqUsuario,UsuarNome
+		FROM MovimentacaoLiquidacao
+		JOIN Usuario on UsuarId = MvLiqUsuario
+		WHERE MvLiqUnidade = ". $_SESSION['UnidadeId'] ." and MvLiqMovimentacao = ".$iMovimentacao."
+		ORDER BY MvLiqUsuario ASC";
+$result = $conn->query($sql);
+$rowLiquida = $result->fetch(PDO::FETCH_ASSOC);	
 
 try {
 	$mpdf = new mPDF([
@@ -93,15 +101,22 @@ try {
 	<table style="width:100%; border-collapse: collapse;">
 		<tr style="background-color:#F1F1F1;">
 			<td style="width:40%; font-size:12px;">Nº Ordem Compra / Carta Contrato:<br>'. $row['OrComNumero'].'</td>
-			<td style="width:25%; font-size:12px;">Valor:<br>'. mostraValor($row['TotalOrdemCompra']).'</td>
-			<td style="width:35%; font-size:12px;">Nº Nota Fiscal:<br>'. $row['MovimNotaFiscal'].'</td>
+			<td style="width:20%; font-size:12px;">Valor:<br>'. mostraValor($row['TotalOrdemCompra']).'</td>
+			<td style="width:20%; font-size:12px;">Nº Nota Fiscal:<br>'. $row['MovimNotaFiscal'].'</td>
+			<td style="width:20%; font-size:12px;">Data:<br>'. mostraData($row['MovimData']).'</td>
+		</tr>
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
+		<tr>
+			<td style="width:40%; font-size:12px;">Data da Liquidação:<br>'. mostraData($rowLiquida['MvLiqData']).'</td>
+			<td style="width:60%; font-size:12px;">Contador:<br>'. $rowLiquida['UsuarNome'].'</td>
 		</tr>
 	</table>
 	<table style="width:100%; border-collapse: collapse;">
 		<tr>
 			<td style="width:40%; font-size:12px;">Fornecedor:<br>'. $row['ForneNome'].'</td>
-			<td style="width:25%; font-size:12px;">Telefone:<br>'. $row['ForneCelular'].'</td>
-			<td style="width:35%; font-size:12px;">E-mail:<br>'. $row['ForneEmail'].'</td>
+			<td style="width:20%; font-size:12px;">Telefone:<br>'. $row['ForneCelular'].'</td>
+			<td style="width:40%; font-size:12px;">E-mail:<br>'. $row['ForneEmail'].'</td>
 		</tr>
 	</table>
 	<table style="width:100%; border-collapse: collapse;">
@@ -243,6 +258,22 @@ try {
 				</tr>
 				</table>
 	";
+
+	$sql = "SELECT UsuarNome
+		    FROM Usuario
+			Where UsuarId = ". $row['MovimUsuarioAtualizador']."";
+	$result = $conn->query($sql);
+	$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);	
+	
+	$html .= '			
+		<br><br>
+		<div style="width: 100%; margin-top: 100px;">
+			<div style="position: relative; float: left; text-align: center;">
+				 '.$rowUsuario['UsuarNome'].'<br>
+				<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; float: left; text-align: center; margin-left: 220px;">Responsável</div>
+			</div>
+		</div>
+	';	
 	
     $rodape = "<hr/>
     <div style='width:100%'>

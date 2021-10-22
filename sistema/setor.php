@@ -79,8 +79,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO Setor (SetorNome, SetorStatus, SetorUsuarioAtualizador, SetorUnidade)
-					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO Setor (SetorNome, SetorStatus, SetorUsuarioAtualizador, SetorUnidade, SetorEmpresa)
+					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade, :iEmpresa)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -88,6 +88,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $iUnidade,
+							':iEmpresa' => $_SESSION['EmpresaId'], 
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Setor incluído!!!";
