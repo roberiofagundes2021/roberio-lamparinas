@@ -109,7 +109,7 @@ try {
 	<table style="width:100%; border-collapse: collapse;">
 		<tr>
 			<td style="width:40%; font-size:12px;">Data da Liquidação:<br>'. mostraData($rowLiquida['MvLiqData']).'</td>
-			<td style="width:60%; font-size:12px;">Contador:<br>'. $rowLiquida['UsuarNome'].'</td>
+			<td style="width:60%; font-size:12px;">Liquidado por:<br>'. $rowLiquida['UsuarNome'].'</td>
 		</tr>
 	</table>
 	<table style="width:100%; border-collapse: collapse;">
