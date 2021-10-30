@@ -16,13 +16,15 @@ if (isset($_POST['inputMovimentacaoId'])){
 		   </script> ');
 }
 
-$sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimData, MovimNotaFiscal, MovimObservacao, UsuarNome, LcEstNome, OrComNumero,
-		dbo.fnValorTotalOrdemCompra(" . $_SESSION['UnidadeId'] . ", MovimOrdemCompra) as TotalOrdemCompra		
+$sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimData, MovimNotaFiscal, MovimObservacao, UsuarNome, OrComNumero,
+		dbo.fnValorTotalOrdemCompra(" . $_SESSION['UnidadeId'] . ", MovimOrdemCompra) as TotalOrdemCompra, SetorNome		
         FROM Movimentacao
 		JOIN Fornecedor on ForneId = MovimFornecedor
 		JOIN OrdemCompra on OrComId = MovimOrdemCompra
 		JOIN Usuario on UsuarId = MovimUsuarioAtualizador
-		JOIN LocalEstoque on LcEstId = MovimDestinoLocal
+		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+		JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+		JOIN Setor on SetorId = UsXUnSetor
 		WHERE MovimUnidade = ". $_SESSION['UnidadeId'] ." and MovimId = ".$iMovimentacao." and MovimTipo = 'E'";
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -66,12 +68,12 @@ try {
 	</style>
 
 	<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
-		<div style='width:300px; float:left; display: inline;'>
+		<div style='width:470px; float:left; display: inline;'>
 			<img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
 			<span style='font-weight:bold;line-height:200px;'>".$_SESSION['EmpreNomeFantasia']."</span><br>
 			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: ".$_SESSION['UnidadeNome']."</div>
 		</div>
-		<div style='width:250px; float:right; display: inline; text-align:right;'>
+		<div style='width:130px; float:right; display: inline; text-align:right;'>
 			<div>".date('d/m/Y')."</div>
 			<div style='margin-top:8px;'>Nota Fiscal: ".$row['MovimNotaFiscal']."</div>
 		</div> 
@@ -266,7 +268,7 @@ try {
 		<div style="width: 100%; margin-top: 100px;">
 			<div style="position: relative; float: left; text-align: center;">
 				<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; float: left; text-align: center; margin-left: 220px;">'.$row['UsuarNome'].'</div>
-				'.$row['LcEstNome'].'<br>
+				'.$row['SetorNome'].'<br>
 			</div>
 		</div>
 	';	
