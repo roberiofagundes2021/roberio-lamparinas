@@ -16,11 +16,13 @@ if (isset($_POST['inputMovimentacaoId'])){
 		   </script> ');
 }
 
-$sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimData, MovimNotaFiscal, MovimObservacao, MovimUsuarioAtualizador, OrComNumero,
+$sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimData, MovimNotaFiscal, MovimObservacao, UsuarNome, LcEstNome, OrComNumero,
 		dbo.fnValorTotalOrdemCompra(" . $_SESSION['UnidadeId'] . ", MovimOrdemCompra) as TotalOrdemCompra		
         FROM Movimentacao
 		JOIN Fornecedor on ForneId = MovimFornecedor
 		JOIN OrdemCompra on OrComId = MovimOrdemCompra
+		JOIN Usuario on UsuarId = MovimUsuarioAtualizador
+		JOIN LocalEstoque on LcEstId = MovimDestinoLocal
 		WHERE MovimUnidade = ". $_SESSION['UnidadeId'] ." and MovimId = ".$iMovimentacao." and MovimTipo = 'E'";
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -258,19 +260,13 @@ try {
 				</tr>
 				</table>
 	";
-
-	$sql = "SELECT UsuarNome
-		    FROM Usuario
-			Where UsuarId = ". $row['MovimUsuarioAtualizador']."";
-	$result = $conn->query($sql);
-	$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);	
 	
 	$html .= '			
 		<br><br>
 		<div style="width: 100%; margin-top: 100px;">
 			<div style="position: relative; float: left; text-align: center;">
-				 '.$rowUsuario['UsuarNome'].'<br>
-				<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; float: left; text-align: center; margin-left: 220px;">Responsável</div>
+				<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; float: left; text-align: center; margin-left: 220px;">'.$row['UsuarNome'].'</div>
+				'.$row['LcEstNome'].'<br>
 			</div>
 		</div>
 	';	
