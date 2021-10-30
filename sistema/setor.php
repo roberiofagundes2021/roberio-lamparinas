@@ -88,7 +88,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $iUnidade,
-							':iEmpresa' => $_SESSION['EmpresaId'], 
+							':iEmpresa' => $_SESSION['EmpresaId'] 
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Setor incluído!!!";
