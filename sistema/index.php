@@ -449,7 +449,7 @@ if ($totalAcoes) {
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();								
 					} else if (Tipo == 'liberar') {
-						document.getElementById('inputOrdemCompraStatus').value = 'LIBERADOCENTRO'; //Liberado
+						document.getElementById('inputOrdemCompraStatus').value = 'LIBERADO'; //Liberado
 						document.formBandeja.action = "ordemcompraBandejaMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
@@ -477,10 +477,11 @@ if ($totalAcoes) {
 								} else {
 
 									document.getElementById('inputMotivo').value = result;
-									document.getElementById('inputOrdemCompraStatus').value = 'NAOLIBERADOCENTROADMINISTRATIVO';
+									document.getElementById('inputOrdemCompraStatus').value = 'NAOLIBERADO';
 									document.formBandeja.action = "ordemcompraBandejaMudaSituacao.php";
 									document.formBandeja.setAttribute("target", "_self");
 									document.formBandeja.submit();
+									MovimTipo=='E'?'LIBERADOCENTRO':'LIBERADO'
 
 									/*
 			                        bootbox.alert({
@@ -628,7 +629,7 @@ if ($totalAcoes) {
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();								
 					} else if (Tipo == 'liberar') {
-						document.getElementById('inputMovimentacaoStatus').value = 'LIBERADO';
+						document.getElementById('inputMovimentacaoStatus').value = MovimTipo=='E'?'LIBERADOCENTRO':'LIBERADO';
 						document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
@@ -656,7 +657,7 @@ if ($totalAcoes) {
 								} else {
 
 									document.getElementById('inputMotivo').value = result;
-									document.getElementById('inputMovimentacaoStatus').value = 'NAOLIBERADO';
+									document.getElementById('inputMovimentacaoStatus').value = MovimTipo=='E'?'NAOLIBERADOCENTROADMINISTRATIVO':'NAOLIBERADO';
 									document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
 									document.formBandeja.setAttribute("target", "_self");
 									document.formBandeja.submit();
