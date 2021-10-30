@@ -32,6 +32,40 @@ if(isset($_POST['inputNome'])){
 						':iEmpresa' => $_SESSION['EmpresaId'],
 						));
 
+    // adicionar permissões à nova unidade
+
+    // seleciona a nova unidade
+    $sqlUnidade = "SELECT UnidaId FROM Unidade
+    WHERE UnidaNome = ".$_POST['inputNome']." and UnidaEmpresa = ".$_SESSION['EmpresaId'];
+    $sqlUnidade = $conn->query($sqlUnidade);
+    $sqlUnidade = $sqlUnidade->fetch(PDO::FETCH_ASSOC);
+
+    // seleciona todos os menus cadastrados
+    $sqlMenu = "SELECT MenuId FROM Menu";
+    $sqlMenu = $conn->query($sqlMenu);
+    $sqlMenu = $sqlMenu->fetchAll(PDO::FETCH_ASSOC);
+
+    // seleciona todos os perfis cadastrados
+    $sqlPerfil = "SELECT PerfiId FROM Perfil";
+    $sqlPerfil = $conn->query($sqlPerfil);
+    $sqlPerfil = $sqlPerfil->fetchAll(PDO::FETCH_ASSOC);
+
+    // Laço de repetição, para cada perfil será adicionado todos os menus com permissões padrões
+    foreach($sqlPerfil as $perfil){
+      $sql = "INSERT INTO PerfilXPermissao(PrXPePerfil,PrXPeMenu,PrXPeInserir,PrXPeVisualizar,PrXPeAtualizar,PrXPeExcluir,PrXPeUnidade) VALUES";
+      $count = COUNT($sqlMenu);
+      $x = 0;
+      foreach($sqlMenu as $menu){
+              if ($x != $count - 1){
+                      $x += 1;
+                      $sql .= " ($perfil[PerfiId], $menu[MenuId], 1, 1, 1, 1, $sqlUnidade[UnidaId]),";
+              } else {
+                      $sql .= " ($perfil[PerfiId], $menu[MenuId], 1, 1, 1, 1, $sqlUnidade[UnidaId])";
+              }
+      }
+      $conn->query($sql);
+}
+
 		$insertId = $conn->lastInsertId();
     
     /* Após criar a Unidade deve se cadastrar o Local de Estoque Padrão para essa Unidade nova criada */
