@@ -296,6 +296,7 @@ if (isset($_POST['inputData'])) {
 					if ($(elem).attr('idRow') == linha.attr('id')) {
 						let tds = linha.children();
 						let tipoProdutoServico = $(tds[9]).attr('tipo');
+						$('#tipo').val(tipoProdutoServico)
 
 						let valores = [];
 
@@ -616,7 +617,7 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
-				if (validadeNaoInformada == '') {
+				if (validadeNaoInformada == '' && $('#tipo').val() != 'S') {
 					alerta('Atenção', 'Tem itens sem validade!', 'error');
 					return false;
 				}				
@@ -779,6 +780,7 @@ if (isset($_POST['inputData'])) {
 
 					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovoEntrada.php">
 						<div class="card-body">
+							<input type="hidden" name="tipo" id="tipo" value="" />
 
 							<div class="row">
 								<div class="col-lg-12">
