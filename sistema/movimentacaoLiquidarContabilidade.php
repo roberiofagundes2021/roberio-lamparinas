@@ -94,7 +94,20 @@ try{
             ':iStatus' => $rowSituaChave['SituaId'],
             ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
             ':iUnidade' => $_SESSION['UnidadeId']
-        ));        
+        ));     
+        
+        /* Insere na Tabela Movimentacao Liquidacao */
+		
+        $sql = "INSERT INTO MovimentacaoLiquidacao ( MvLiqMovimentacao, MvLiqData, MvLiqUsuario,  MvLiqUnidade )
+                VALUES ( :iMovimentacao, :dateData, :iUsuario, :iUnidade)";
+        $result = $conn->prepare($sql);
+       
+        $result->execute(array(
+            ':iMovimentacao' => $iMovimentacao,
+            ':dateData' => date('Y-m-d'), 
+            ':iUsuario' => $_SESSION['UsuarId'],
+            ':iUnidade' => $_SESSION['UnidadeId']
+        ));     
         
         /* Fim Insere ContasAPagar */		
 

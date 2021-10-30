@@ -333,22 +333,14 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
 
                         formModal = `
                                         <div class='row'>
-                                            <div class='col-lg-2'>
+                                            <div class='col-lg-4'>
                                                 <div class="form-group">
                                                     <label for="produto">Patrimônio</label>
                                                     <div class="input-group">
                                                         <input class='form-control' value='${patrimonio}' readOnly />
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class='col-lg-2'>
-                                                <div class="form-group">
-                                                    <label for="produto">N.º do Empenho</label>
-                                                    <div class="input-group">
-                                                        <input class='form-control' value='${empenho}' readOnly />
-                                                    </div>
-                                                </div>
-                                            </div>                                 
+                                            </div>                            
                                             <div class='col-lg-8'>
                                                 <div class="form-group">
                                                     <label for="produto">Produto</label>
@@ -378,7 +370,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                         </div>
                                         
                                         <div class='row'>
-                                            <div class='col-lg-2'>
+                                            <div class='col-lg-3'>
                                                 <div class="form-group">
                                                     <label for="produto">Nota Fiscal</label>
                                                     <div class="input-group">
@@ -394,15 +386,25 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class='col-lg-3'>
+                                            <div class='col-lg-6'>
                                                 <div class="form-group">
-                                                    <label for="produto">Ano da Fabricação</label>
+                                                    <label for="produto">Empenhos</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${empenho}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>     
+                                        </div>
+                                        <div class='row'> 
+                                            <div class='col-lg-4'>
+                                                <div class="form-group">
+                                                    <label for="produto">Data da Fabricação</label>
                                                     <div class="input-group">
                                                         <input class='form-control' value='${anoFabr}' readOnly />
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class='col-lg-2'>
+                                            <div class='col-lg-4'>
                                                 <div class="form-group">
                                                     <label for="produto">(R$) Aquisição</label>
                                                     <div class="input-group">
@@ -410,7 +412,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class='col-lg-2'>
+                                            <div class='col-lg-4'>
                                                 <div class="form-group">
                                                     <label for="produto">(R$) Depreciação</label>
                                                     <div class="input-group">
