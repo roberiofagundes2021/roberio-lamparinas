@@ -430,7 +430,7 @@ if($permissao == 1){
 																		}
 																	}
 
-																	if (isset($item['BandeMotivo']) && $item['SituaChave'] == 'NAOLIBERADO'){
+																	if (isset($item['BandeMotivo']) && $item['SituaChave'] == 'NAOLIBERADOCENTROADMINISTRATIVO'){
 																		print('
 																			<div class="dropdown-divider"></div>
 

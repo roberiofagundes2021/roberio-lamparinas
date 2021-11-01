@@ -93,6 +93,7 @@ if(isset($_POST['inputNome'])){
 	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
@@ -523,7 +524,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbMarca">Marca</label>
-												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
+												<select id="cmbMarca" name="cmbMarca" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT MarcaId, MarcaNome
