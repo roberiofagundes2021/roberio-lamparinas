@@ -449,7 +449,7 @@ if ($totalAcoes) {
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();								
 					} else if (Tipo == 'liberar') {
-						document.getElementById('inputOrdemCompraStatus').value = 'LIBERADO'; //Liberado
+						document.getElementById('inputOrdemCompraStatus').value = 'LIBERADOCENTRO'; //Liberado
 						document.formBandeja.action = "ordemcompraBandejaMudaSituacao.php";
 						document.formBandeja.setAttribute("target", "_self");
 						document.formBandeja.submit();
