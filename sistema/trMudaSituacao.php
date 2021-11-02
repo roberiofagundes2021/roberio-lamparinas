@@ -24,7 +24,7 @@ if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 
-		if ($_POST['inputTermoReferenciaStatus'] === 'NAOLIBERADOCENTROADMINISTRATIVO'){
+		if ($_POST['inputTermoReferenciaStatus'] === 'NAOLIBERADOCENTRO'){
 			$motivo = $_POST['inputMotivo'];
 			$msg = "Termo de Referência não liberado!";
 

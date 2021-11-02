@@ -172,7 +172,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				} else if (OrComSituacaoChave == 'PENDENTE'){			
 					alerta('Atenção','Enquanto o status estiver PENDENTE de preenchimento a impressão não poderá ser realizada!','error');
 					return false;
-				} else if (OrComSituacaoChave == 'NAOLIBERADOCENTROADMINISTRATIVO'){			
+				} else if (OrComSituacaoChave == 'NAOLIBERADOCENTRO'){			
 					alerta('Atenção','A ordem de compra/contrato não foi liberada, portanto, a impressão não poderá ser realizada!','error');
 					return false;
 				} else {

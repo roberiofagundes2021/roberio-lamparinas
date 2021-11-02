@@ -109,7 +109,7 @@ $sql = "SELECT BandeId, BandeIdentificacao, BandeData, BandeDescricao, BandeURL,
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
 	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " and UsXUnUnidade = " . $_SESSION['UnidadeId'] . " 
-		and SituaChave in ('NAOLIBERADO', 'NAOLIBERADOCENTROADMINISTRATIVO') 
+		and SituaChave in ('NAOLIBERADO', 'NAOLIBERADOCENTRO') 
 		and BnXPePerfil in (" . $idPerfilLogado . ")
 		ORDER BY BandeData DESC";
 $result = $conn->query($sql);
@@ -122,7 +122,7 @@ $sql = "SELECT COUNT(BandeId) as TotalNaoLiberado
 		LEFT JOIN Situacao on SituaId = BandeStatus
 		LEFT JOIN BandejaXPerfil on BnXPeBandeja = BandeId
 	    WHERE BandeUnidade = " . $_SESSION['UnidadeId'] . " 
-		and SituaChave in ('NAOLIBERADO', 'NAOLIBERADOCENTROADMINISTRATIVO') 
+		and SituaChave in ('NAOLIBERADO', 'NAOLIBERADOCENTRO') 
 		and BnXPePerfil in (" . $idPerfilLogado . ")";
 $result = $conn->query($sql);
 $rowTotalNaoLiberado = $result->fetch(PDO::FETCH_ASSOC);
@@ -657,7 +657,7 @@ if ($totalAcoes) {
 								} else {
 
 									document.getElementById('inputMotivo').value = result;
-									document.getElementById('inputMovimentacaoStatus').value = MovimTipo=='E'?'NAOLIBERADOCENTROADMINISTRATIVO':'NAOLIBERADO';
+									document.getElementById('inputMovimentacaoStatus').value = MovimTipo=='E'?'NAOLIBERADOCENTRO':'NAOLIBERADO';
 									document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
 									document.formBandeja.setAttribute("target", "_self");
 									document.formBandeja.submit();
@@ -792,7 +792,7 @@ if ($totalAcoes) {
 								} else {
 
 									document.getElementById('inputMotivo').value = result;
-									document.getElementById('inputTermoReferenciaStatus').value = 'NAOLIBERADOCENTROADMINISTRATIVO';
+									document.getElementById('inputTermoReferenciaStatus').value = 'NAOLIBERADOCENTRO';
 									document.formBandeja.action = "trMudaSituacao.php";
 									document.formBandeja.setAttribute("target", "_self");
 									document.formBandeja.submit();
