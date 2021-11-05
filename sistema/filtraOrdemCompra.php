@@ -23,7 +23,7 @@ if ($count) {
                 FROM Movimentacao
                 JOIN Situacao on SituaId = MovimSituacao
                 WHERE MovimUnidade = ". $_SESSION['UnidadeId'] . " and MovimOrdemCompra = " . $value['OrComId'] . " 
-                and MovimTipo = 'E' and SituaChave = 'LIBERADOCONTABILIDADE' ";
+                and MovimTipo = 'E' and SituaChave in ('LIBERADOCENTRO', 'LIBERADOCONTABILIDADE', 'AGUARDANDOLIBERACAO') ";
         $result = $conn->query($sql);
         $rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -43,7 +43,7 @@ if ($count) {
             $result = $conn->query($sql);
             $rowProdutoServico = $result->fetchAll(PDO::FETCH_ASSOC);
 
-            $saldosPositivos = '';
+            $saldosPositivos = 0;
             $totalProdutos = count($rowProdutoServico);
 
             foreach ($rowProdutoServico as $item) {
