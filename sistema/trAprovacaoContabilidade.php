@@ -218,7 +218,7 @@ try{
 		$conn->commit();
         
 		$_SESSION['msg']['titulo'] 		= "Sucesso";
-		$_SESSION['msg']['mensagem'] 	= "Termo de Referência enviado para aprovação!!!";
+		$_SESSION['msg']['mensagem'] 	= "Termo de Referência enviado para dotação!!!";
 		$_SESSION['msg']['tipo'] 		= "success";      		
 	}
 

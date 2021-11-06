@@ -418,7 +418,11 @@ if(isset($_POST['cmbUsuario'])){
 											</div>
 										</div>
 										<div class="col-lg-3">
-											<button class="btn btn-lg btn-principal" style="margin-top: 25px;" id="adicionar">Adicionar</button>
+										<?php
+											if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')){
+												print('<button class="btn btn-lg btn-principal" style="margin-top: 25px;" id="adicionar">Adicionar</button>');
+											}
+											?>
 										</div>
 									</div>										
 								</div>	
@@ -447,9 +451,11 @@ if(isset($_POST['cmbUsuario'])){
 											
 											print('<td class="text-center">
 													<div class="list-icons">
-														<div class="list-icons list-icons-extended">
-															<a href="#" onclick="atualizaComissao('.$item['TRXEqTermoReferencia'].', '.$item['TRXEqUsuario'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
-														</div>
+														<div class="list-icons list-icons-extended">');
+														if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')){
+															print('<a href="#" onclick="atualizaComissao('.$item['TRXEqTermoReferencia'].', '.$item['TRXEqUsuario'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>');	
+														}
+												print('</div>
 													</div>
 												</td>
 											</tr>');
