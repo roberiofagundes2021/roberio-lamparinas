@@ -338,7 +338,7 @@ if (isset($_POST['inputData'])) {
 														<th width="5%">Quantidade</th>
 														<th width="5%">Saldo</th>
 														<th width="10%">Lote</th>
-														<th width="15%">Nº Série</th>
+														<th width="15%">Nº Série/Chassi</th>
 														<th width="10%">Fabricação</th>
 														<th width="10%">Validade</th>
 													</tr>
