@@ -9,6 +9,13 @@
 				$resultUserId = $conn->query($sqlUser);
 				$usuaXPerm = $resultUserId->fetch(PDO::FETCH_ASSOC);
 
+				$sqlEmpresa = "SELECT EmpreId, EmpreNomeFantasia
+				FROM Empresa
+				Where EmpreId = ".$_SESSION['EmpreId'];
+			
+				$resultEmpresa = $conn->query($sqlEmpresa);
+				$empresa = $resultEmpresa->fetch(PDO::FETCH_ASSOC);
+
 				if($usuaXPerm['UsuarPermissaoPerfil'] == 0){
 				$sqlConfig = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
 							MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, MenuSetorPrivado,
@@ -33,6 +40,17 @@
 			?>
 
 			<!-- Page header -->
+			<script>
+				function goPage(content){
+					var conteudo = content.split('#')
+					document.getElementById('formActionConfig').action = conteudo[0]
+					document.getElementById('inputEmpresaIdConfig').value = conteudo[1]
+					document.getElementById('inputEmpresaNomeConfig').value = conteudo[2]
+
+					document.getElementById('formActionConfig').submit()
+
+				}
+			</script>
 			<div class="page-header page-header-light">
 				<div class="page-header-content header-elements-md-inline" style="display:none;">
 					<div class="page-title d-flex">
@@ -84,11 +102,9 @@
 												<i class="icon-gear mr-2"></i>
 												Configurador
 											</a>
-
-											<div class="dropdown-menu dropdown-menu-right">');
+										<div class="dropdown-menu dropdown-menu-right">');
 								foreach($config as $conf){
-									print('<a href="'.$conf['MenuUrl'].'" class="dropdown-item"><i class="'.
-										$conf['MenuIco'].'"></i>'.$conf['MenuNome'].'</a>');
+									echo('<a href="#" onclick="goPage('.'\''.$conf['MenuUrl'].'#'.$empresa['EmpreId'].'#'.$empresa['EmpreNomeFantasia'].'\''.');" class="dropdown-item"><i class="'.$conf['MenuIco'].'"></i>'.$conf['MenuNome'].'</a>');
 								}
 								print('</div>
 								</div>');
@@ -97,5 +113,9 @@
 						</div>
 					</div>
 				</div>
+				<form id="formActionConfig" name="formActionConfig" method="POST">
+					<input type="hidden" id="inputEmpresaIdConfig" name="inputEmpresaId" >
+					<input type="hidden" id="inputEmpresaNomeConfig" name="inputEmpresaNome" >
+				</form>
 			</div>
 			<!-- /page header -->

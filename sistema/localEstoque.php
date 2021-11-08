@@ -6,6 +6,11 @@ $_SESSION['PaginaAtual'] = 'Local do Estoque';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputEmpresaId'])){
+	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
+	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
+}
+
 if (isset($_SESSION['EmpresaId'])){
 	
 	//Essa consulta é para preencher a grid usando a coluna Unidade
