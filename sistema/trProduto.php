@@ -245,36 +245,36 @@ if (count($rowProdutoUtilizado) >= 1) {
 			});
 
 			/* ao pressionar uma tecla em um campo que seja de class="pula" */
-			$('.pula').keypress(function(e){
-				/*
-					* verifica se o evento é Keycode (para IE e outros browsers)
-					* se não for pega o evento Which (Firefox)
-				*/
-				var tecla = (e.keyCode?e.keyCode:e.which);
+			// $('.pula').keypress(function(e){
+			// 	/*
+			// 		* verifica se o evento é Keycode (para IE e outros browsers)
+			// 		* se não for pega o evento Which (Firefox)
+			// 	*/
+			// 	var tecla = (e.keyCode?e.keyCode:e.which);
 
-				/* verifica se a tecla pressionada foi o ENTER */
-				if(tecla == 13){
-					/* guarda o seletor do campo que foi pressionado Enter */
-					campo =  $('.pula');
-					/* pega o indice do elemento*/
-					indice = campo.index(this);
-					/*soma mais um ao indice e verifica se não é null
-					*se não for é porque existe outro elemento
-					*/
-					if(campo[indice+1] != null){
-						/* adiciona mais 1 no valor do indice */
-						proximo = campo[indice + 1];
-						/* passa o foco para o proximo elemento */
-						proximo.focus();
-					}
-				} else {
-					return onlynumber(e);
-				}
+			// 	/* verifica se a tecla pressionada foi o ENTER */
+			// 	if(tecla == 13){
+			// 		/* guarda o seletor do campo que foi pressionado Enter */
+			// 		campo =  $('.pula');
+			// 		/* pega o indice do elemento*/
+			// 		indice = campo.index(this);
+			// 		/*soma mais um ao indice e verifica se não é null
+			// 		*se não for é porque existe outro elemento
+			// 		*/
+			// 		if(campo[indice+1] != null){
+			// 			/* adiciona mais 1 no valor do indice */
+			// 			proximo = campo[indice + 1];
+			// 			/* passa o foco para o proximo elemento */
+			// 			proximo.focus();
+			// 		}
+			// 	} else {
+			// 		return onlynumber(e);
+			// 	}
 
-				/* impede o sumbit caso esteja dentro de um form */
-				e.preventDefault(e);
-				return false;
-            });				
+			// 	/* impede o sumbit caso esteja dentro de um form */
+			// 	e.preventDefault(e);
+			// 	return false;
+			// });
 
 			function disabledSelect(){
 				let btnSubmit = $('#btnsubmit')
@@ -287,6 +287,38 @@ if (count($rowProdutoUtilizado) >= 1) {
 			disabledSelect()
 
 		});
+
+		function pula(e){
+			/*
+			* verifica se o evento é Keycode (para IE e outros browsers)
+			* se não for pega o evento Which (Firefox)
+			*/
+			var tecla = (e.keyCode?e.keyCode:e.which);
+
+			/* verifica se a tecla pressionada foi o ENTER */
+			if(tecla == 13){
+				/* guarda o seletor do campo que foi pressionado Enter */
+				var array_campo = document.getElementsByClassName('pula');
+
+				/* pega o indice do elemento*/
+				var id = e.path[0].id.split('inputQuantidade')
+				id = 'inputQuantidade' + (parseInt(id[1])+1)
+
+				/*soma mais um ao indice e verifica se não é null
+				*se não for é porque existe outro elemento
+				*/
+
+				if(document.getElementById(id)){
+					document.getElementById(id).focus()
+				}
+			} else {
+				return onlynumber(e);
+			}
+
+			/* impede o sumbit caso esteja dentro de um form */
+			e.preventDefault(e);
+			return false;
+		}
 
 		//Mostra o "Filtrando..." na combo Produto
 		function FiltraProduto() {
@@ -535,13 +567,13 @@ if (count($rowProdutoUtilizado) >= 1) {
 											if(count($rowOrcamentosTR) >= 1) {
 												print('
 													<div class="col-lg-2">
-														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" value="' . $iQuantidade . '" readOnly>
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="pula(event)" value="' . $iQuantidade . '" readOnly>
 													</div>	
 												');
 											} else {
 												print('
 													<div class="col-lg-2">
-														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" value="' . $iQuantidade . '">
+														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="pula(event)" value="' . $iQuantidade . '">
 													</div>	
 												');
 											}
