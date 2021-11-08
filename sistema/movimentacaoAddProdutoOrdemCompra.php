@@ -26,16 +26,14 @@ $count = count($row);
 $output = '';
 $totalGeral = 0;
 
-
 $sql = "SELECT MovimId
 		FROM Movimentacao
 		JOIN Situacao on SituaId = MovimSituacao
 	    WHERE MovimOrdemCompra = " . $_POST['ordemCompra'] . " and MovimTipo = 'E' and 
-        MovimUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADOCONTABILIDADE' ";
+        MovimUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave in ('LIBERADOCENTRO', 'LIBERADOCONTABILIDADE', 'AGUARDANDOLIBERACAOCENTRO', 'AGUARDANDOLIBERACAOCONTABILIDADE') ";
 $result = $conn->query($sql);
 $movimentAprovada = $result->fetchAll(PDO::FETCH_ASSOC);
 $countMovimentAprovada = count($movimentAprovada);
-
 
 $sql = " SELECT dbo.fnValorTotalOrdemCompra(" . $_SESSION['UnidadeId'] . ",  " . $_POST['ordemCompra'] . ") as valorTotalOrdemCompra";
 $result = $conn->query($sql);

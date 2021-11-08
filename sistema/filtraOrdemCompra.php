@@ -23,7 +23,7 @@ if ($count) {
                 FROM Movimentacao
                 JOIN Situacao on SituaId = MovimSituacao
                 WHERE MovimUnidade = ". $_SESSION['UnidadeId'] . " and MovimOrdemCompra = " . $value['OrComId'] . " 
-                and MovimTipo = 'E' and SituaChave in ('LIBERADOCENTRO', 'LIBERADOCONTABILIDADE', 'AGUARDANDOLIBERACAO') ";
+                and MovimTipo = 'E' and SituaChave in ('LIBERADOCENTRO', 'LIBERADOCONTABILIDADE', 'AGUARDANDOLIBERACAOCENTRO') ";
         $result = $conn->query($sql);
         $rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
 

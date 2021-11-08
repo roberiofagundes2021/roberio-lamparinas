@@ -349,13 +349,6 @@ if($permissao == 1){
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h5 class="card-title">Relação de Termos de Referência</h5>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="perfil.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
@@ -363,9 +356,16 @@ if($permissao == 1){
 									<div class="col-lg-9">
 										A relação abaixo faz referência aos orçamentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
 									</div>
-									<div class="col-lg-3">
-										<div class="text-right"><a href="trNovo.php" class="btn btn-principal" role="button">Novo TR</a></div>
-									</div>
+										<?php
+											// verifica se o perfil possui permissão de inserir caso possua ira aparecer esse camo
+											if($inserir){ 
+												print('	
+												<div class="col-lg-3">
+													<div class="text-right"><a href="trNovo.php" class="btn btn-principal" role="button">Novo TR</a></div>
+												</div>
+											');
+											}
+										?>
 								</div>
 							</div>
 

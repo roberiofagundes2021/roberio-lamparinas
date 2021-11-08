@@ -39,8 +39,8 @@
 		$result->bindParam(':iOrdemCompraIdEmpenho', $iOrdemCompraIdEmpenho);
 		$result->execute();
 
-
 		$conn->commit();
+
 		$_SESSION['msg']['titulo'] 		= "Sucesso";
 		$_SESSION['msg']['mensagem'] 	= "Empenho Finalizado!!!";
 		$_SESSION['msg']['tipo'] 		= "success";
@@ -49,6 +49,7 @@
 	} catch(PDOException $e) {
 		
 		$conn->rollback();
+
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao Finalizar Empenho!!!";
 		$_SESSION['msg']['tipo'] = "error";	
@@ -56,5 +57,5 @@
 		echo 'Error: ' . $e->getMessage().$e->getLine();exit;
 	}
 
-	irpara('ordemCompraEmpenho.php');
+	irpara('ordemcompra.php');
 ?>
