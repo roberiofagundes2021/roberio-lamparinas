@@ -155,7 +155,7 @@ try{
 		$conn->commit();
         
 		$_SESSION['msg']['titulo'] 		= "Sucesso";
-		$_SESSION['msg']['mensagem'] 	= "Movimentação enviado para aprovação!!!";
+		$_SESSION['msg']['mensagem'] 	= "Movimentação enviada para liquidação!!!";
 		$_SESSION['msg']['tipo'] 		= "success";      		
 	}
 

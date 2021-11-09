@@ -152,7 +152,7 @@ try{
 		$conn->commit();
         
 		$_SESSION['msg']['titulo'] 		= "Sucesso";
-		$_SESSION['msg']['mensagem'] 	= "Ordem de Compra enviado para aprovação!!!";
+		$_SESSION['msg']['mensagem'] 	= "Ordem de Compra enviada para realização do empenho!!!";
 		$_SESSION['msg']['tipo'] 		= "success";      		
 	}
 

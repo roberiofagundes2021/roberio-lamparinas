@@ -17,9 +17,10 @@ if (isset($_POST['inputOrdemCompraId'])){
 }
 
 $sql = "SELECT OrComTipo, OrComNumero, OrComDtEmissao, OrComLote, OrComNumAta, OrComNumProcesso, 
-		OrComConteudoInicio, OrComConteudoFim, ForneCnpj, ForneNome, ForneCelular, ForneEmail, CategNome
+		OrComConteudoInicio, OrComConteudoFim, ForneCnpj, ForneNome, ForneCelular, ForneEmail, CategNome, FlOpeNumContrato
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
+		JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
 		JOIN Categoria on CategId = OrComCategoria
 		WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$iOrdemCompra;
 $result = $conn->query($sql);
@@ -97,9 +98,9 @@ try {
 	$totalServicos = count($rowServicos);
 	
 	$html .= '
-	<table style="width:100%; border-collapse: collapse;">
+	<table style="width:100%; border-collapse: collapse;"> 
 		<tr>
-			<td colspan="1" style="width:25%; font-size:12px;">Nº Contrato:<br>'. $row['OrComNumero'].'</td>	
+			<td colspan="1" style="width:25%; font-size:12px;">Nº Contrato:<br>'. $row['FlOpeNumContrato'].'</td>	
 			<td colspan="1" style="width:25%; font-size:12px;">Data Emissão:<br>'. mostraData($row['OrComDtEmissao']).'</td>';
 
 	if ($row['OrComTipo'] == 'O'){		

@@ -675,7 +675,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-10">
 											<div class="form-group">
 												<label for="cmbNcmFiscal">NCM</label>
-												<select id="cmbNcmFiscal" name="cmbNcmFiscal" class="form-control form-control-select2">
+												<select id="cmbNcmFiscal" name="cmbNcmFiscal" class="form-control select-search">
 													<option value="#">Selecione um NCM</option>
 													<?php 
 														$sql = "SELECT NcmNome
