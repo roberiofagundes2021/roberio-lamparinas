@@ -653,6 +653,9 @@ if (isset($_POST['inputData'])) {
 				//$('#cmbFornecedor').prop('disabled', false);
 				$('#cmbSituacao').prop('disabled', false);
 
+				//desabilita o botão Incluir evitando duplo clique, ou seja, evitando inserções duplicadas
+				$('#enviar').prop("disabled", true);
+
 				$("#formMovimentacao").submit();
 
 				//console.log(inputTipo)

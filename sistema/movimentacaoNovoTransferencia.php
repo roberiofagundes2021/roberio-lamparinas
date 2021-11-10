@@ -1023,6 +1023,10 @@ if (isset($_POST['inputData'])) {
 
       //desabilita as combos "Fornecedor" e "Situacao" na hora de gravar, senão o POST não o encontra
       $('#cmbSituacao').prop('disabled', false);
+
+      //desabilita o botão Incluir evitando duplo clique, ou seja, evitando inserções duplicadas
+      $('#enviar').prop("disabled", true);
+
       $("#formMovimentacao").submit();
     });
 
