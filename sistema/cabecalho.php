@@ -44,7 +44,7 @@
 				function goPage(content){
 					var conteudo = content.split('#')
 					document.getElementById('formActionConfig').action = conteudo[0]
-					document.getElementById('inputEmpresaIdConfig').value = conteudo[1]
+					// document.getElementById('inputEmpresaIdConfig').value = conteudo[1]
 					document.getElementById('inputEmpresaNomeConfig').value = conteudo[2]
 
 					document.getElementById('formActionConfig').submit()
@@ -114,7 +114,7 @@
 					</div>
 				</div>
 				<form id="formActionConfig" name="formActionConfig" method="POST">
-					<input type="hidden" id="inputEmpresaIdConfig" name="inputEmpresaId" >
+					<!-- <input type="hidden" id="inputEmpresaIdConfig" name="inputEmpresaId" > -->
 					<input type="hidden" id="inputEmpresaNomeConfig" name="inputEmpresaNome" >
 				</form>
 			</div>
