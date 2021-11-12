@@ -625,9 +625,36 @@ if ($totalAcoes) {
 				} else {
 
 					if (Tipo == 'liquidarContabilidade') {
-						confirmaExclusao(document.formBandeja, "Tem certeza que deseja liquidar essa entrada? Após liquidação um novo registro será gerado no Contas à Pagar com vencimento de 60 dias após a data de hoje.", "movimentacaoLiquidarContabilidade.php");
-						document.formBandeja.setAttribute("target", "_self");
-						document.formBandeja.submit();								
+						bootbox.prompt({
+							title: 'Informe a data do vencimento',
+							inputType: 'date',
+							buttons: {
+								confirm: {
+									label: 'Enviar',
+									className: 'btn-principal'
+								},
+								cancel: {
+									label: 'Cancelar',
+									className: 'btn-link'
+								}
+							},
+							callback: function(result) {
+
+								if (result === null) {
+									bootbox.alert({
+										title: 'Não Liquidar',
+										message: 'A liquidação foi cancelada!'
+									});
+								} else {
+
+									document.getElementById('inputDataVencimento').value = result;
+									document.formBandeja.action = "movimentacaoLiquidarContabilidade.php";
+									document.formBandeja.setAttribute("target", "_self");
+									document.formBandeja.submit();	
+								}
+							}
+						});		
+												
 					} else if (Tipo == 'liberar') {
 						document.getElementById('inputMovimentacaoStatus').value = MovimTipo=='E'?'LIBERADOCENTRO':'LIBERADO';
 						document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
@@ -1004,6 +1031,7 @@ if ($totalAcoes) {
 					<input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId">
 					<input type="hidden" id="inputMovimentacaoStatus" name="inputMovimentacaoStatus">
 					<input type="hidden" id="inputMotivo" name="inputMotivo">
+					<input type="hidden" id="inputDataVencimento" name="inputDataVencimento">
 					<input type="hidden" id="inputAditivoId" name="inputAditivoId">
 					<input type="hidden" id="inputAditivoStatus" name="inputAditivoStatus">
 

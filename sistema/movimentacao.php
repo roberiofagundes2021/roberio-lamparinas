@@ -151,8 +151,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
           message: Motivo
         });
         return false;
+        document.formMovimentacao.submit();	
       } else if (Tipo == 'edita') {
         document.formMovimentacao.action = "movimentacaoEdita.php";
+        document.formMovimentacao.submit();	
       } else if (Tipo == 'exclui') {
         if (Permission) {
           confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir essa movimentação?", "movimentacaoExclui.php");
@@ -160,6 +162,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
           alerta('Permissão Negada!', '');
           return false;
         }
+        document.formMovimentacao.submit();	
       } else if (Tipo == 'imprimir') {
 
         if (MovimTipo == 'E') {
@@ -169,14 +172,44 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
         }
 
         document.formMovimentacao.setAttribute("target", "_blank");
+        document.formMovimentacao.submit();	
       } else if (Tipo == 'anexo') {
         document.formMovimentacao.action = "movimentacaoAnexo.php";
+        document.formMovimentacao.submit();	
       }else if (Tipo == 'aprovacaoContabilidade') {
 					document.formMovimentacao.action = "movimentacaoAprovacaoContabilidade.php";
+          document.formMovimentacao.submit();	
 			} else if (Tipo == 'liquidar'){
-          confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja liquidar essa entrada? Após liquidação um novo registro será gerado no Contas à Pagar com vencimento de 60 dias após a data de hoje.", "movimentacaoLiquidarContabilidade.php");
-      }
-      document.formMovimentacao.submit();
+         bootbox.prompt({
+							title: 'Informe a data do vencimento',
+							inputType: 'date',
+							buttons: {
+								confirm: {
+									label: 'Enviar',
+									className: 'btn-principal'
+								},
+								cancel: {
+									label: 'Cancelar',
+									className: 'btn-link'
+								}
+							},
+							callback: function(result) {
+
+								if (result === null) {
+									bootbox.alert({
+										title: 'Não Liquidar',
+										message: 'A liquidação foi cancelada!'
+									});
+								} else {
+
+									document.getElementById('inputDataVencimento').value = result;
+									document.formMovimentacao.action = "movimentacaoLiquidarContabilidade.php";
+									document.formMovimentacao.setAttribute("target", "_self");
+									document.formMovimentacao.submit();	
+								}
+					   }
+				});
+      }    
     } 
   </script>
 
@@ -329,6 +362,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
           <input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId">
           <input type="hidden" id="inputMovimentacaoData" name="inputMovimentacaoData">
           <input type="hidden" id="inputMovimentacaoTipo" name="inputMovimentacaoTipo">
+          <input type="hidden" id="inputDataVencimento" name="inputDataVencimento">
           <input type="hidden" id="inputMovimentacaoNotaFiscal" name="inputMovimentacaoNotaFiscal">
         </form>
 

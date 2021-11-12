@@ -82,7 +82,7 @@ try{
             ':dateDtEmissao' => date('Y-m-d') , //Se for Data da Liquidação ficará assim: $rowMovimentacao['MovimDataEmissao']
             ':iOrdemCompra' => $rowMovimentacao['MovimOrdemCompra'],
             ':sDescricao' => 'Pagamento da NF '.$rowMovimentacao['MovimNotaFiscal'], // Ver com Valma
-            ':dateDtVencimento' => date('Y-m-d', strtotime('+60 days')), //Se for Data Liquidação ficará assim: date('Y-m-d', strtotime('+60 days', $rowMovimentacao['MovimDataEmissao']))
+            ':dateDtVencimento' => $_POST['inputDataVencimento'],
             ':fValorAPagar' => $rowMovimentacao['MovimValorTotal'],
             ':dateDtPagamento' => null,
             ':fValorPago' => null,
