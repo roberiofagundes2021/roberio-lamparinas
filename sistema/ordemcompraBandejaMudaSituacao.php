@@ -20,10 +20,12 @@ if(isset($_POST['inputOrdemCompraId'])){
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);        	
 
-		if ($_POST['inputOrdemCompraStatus'] == 'NAOLIBERADO'){
+		if ($_POST['inputOrdemCompraStatus'] == 'NAOLIBERADOCENTRO'){
 			$motivo = $_POST['inputMotivo'];
+			$msg = "Ordem de Compra não liberada!";
 		} else{
 			$motivo = NULL;
+			$msg = "Ordem de Compra liberada!";
 		}
 		
 		$sql = "UPDATE OrdemCompra SET OrComSituacao = :bStatus, OrComUsuarioAtualizador = :iUsuario
@@ -120,7 +122,7 @@ if(isset($_POST['inputOrdemCompraId'])){
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação da ordem de compra alterada!!!";
+		$_SESSION['msg']['mensagem'] = $msg;
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
@@ -128,7 +130,7 @@ if(isset($_POST['inputOrdemCompraId'])){
 		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação da ordem compra !!!";
+		$_SESSION['msg']['mensagem'] = "Erro na liberação da ordem compra!!!";
 		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();

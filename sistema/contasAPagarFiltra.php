@@ -3,9 +3,9 @@
 include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
-function queryPesquisa()
-{
-    include('global_assets/php/conexao.php');
+//function queryPesquisa()
+//{
+//    include('global_assets/php/conexao.php');
 
     if($_POST['tipoFiltro'] == 'FiltroNormal')
     {
@@ -133,31 +133,31 @@ function queryPesquisa()
 
             $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Paga';
             $data = $_POST['statusTipo'] == 'APAGAR' ? mostraData($item['CnAPaDtVencimento']) : mostraData($item['CnAPaDtPagamento']);
-            print("
+            print('
             
             <tr>
-                <td class='even'>
-                    <input type='checkbox' id='check".$cont."'>
-                    <input type='hidden' value='".$item['CnAPaId']."'>
+                <td class="even">
+                    <input type="checkbox" id="check'.$cont.'">
+                    <input type="hidden" value="'.$item["CnAPaId"].'">
                 </td>
-                <td class='even'><p class='m-0'>" . $data . "</p><input type='hidden' value='".$item['CnAPaDtVencimento']."'></td>
-                <td class='even'><a href='contasAPagarNovoLancamento.php?lancamentoId=".$item['CnAPaId']."'>" . $item['CnAPaDescricao'] . "</a></td>
-                <td class='even'>" . $item['ForneNome'] . "</td>
-                <td class='even' style='text-align: center'>" . $item['CnAPaNumDocumento'] . "</td>
-                <td class='even' style='text-align: right; padding-right:1.5rem;'>" . mostraValor($item['CnAPaValorAPagar']) . "</td>
-                <td class='even' style='text-align: center'>" .$status. "</td>
-                <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
-                <div class='list-icons'>
-                    <div class='list-icons list-icons-extended'>
-                        <a href='#' class='list-icons-item editarLancamento'  data-popup='tooltip' data-placement='bottom' title='Editar Conta'><i class='icon-pencil7'></i></a>
-                        <a href='#' idContaExcluir='".$item['CnAPaId']."' class='list-icons-item excluirConta'  data-popup='tooltip' data-placement='bottom' title='Excluir Conta'><i class='icon-bin'></i></a>
-				        <div class='dropdown'>													
-				        	<a href='#' class='list-icons-item' data-toggle='dropdown'>
-				        		<i class='icon-menu9'></i>
+                <td class="even"><p class="m-0">' . $data . '</p><input type="hidden" value="'.$item["CnAPaDtVencimento"].'"></td>
+                <td class="even"><a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\')">' . $item["CnAPaDescricao"] . '</a></td>
+                <td class="even">' . $item["ForneNome"] . '</td>
+                <td class="even" style="text-align: center">' . $item["CnAPaNumDocumento"] . '</td>
+                <td class="even" style="text-align: right; padding-right:1.5rem;">' . mostraValor($item["CnAPaValorAPagar"]) . '</td>
+                <td class="even" style="text-align: center">' .$status. '</td>
+                <td class="even d-flex flex-row justify-content-around align-content-center" style="text-align: center">
+                <div class="list-icons">
+                    <div class="list-icons list-icons-extended">
+                        <a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>
+                        <a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>
+				        <div class="dropdown">													
+				        	<a href="#" class="list-icons-item" data-toggle="dropdown">
+				        		<i class="icon-menu9"></i>
 				    
-				        	<div class='dropdown-menu dropdown-menu-right'>
-                                <a href='#' class='dropdown-item btnParcelar'  data-popup='tooltip' data-placement='bottom' title='Parcelar'><i class='icon-file-text2'></i> Parcelar</a>
-                                <a href='#' class='dropdown-item'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-file-empty'></i></a>
+				        	<div class="dropdown-menu dropdown-menu-right">
+                                <a href="#" class="dropdown-item btnParcelar"  data-popup="tooltip" data-placement="bottom" title="Parcelar"><i class="icon-file-text2"></i> Parcelar</a>
+                                <a href="#" class="dropdown-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Produto"><i class="icon-file-empty"></i></a>
 				        	</div>
 				        </div>
 				    </div>
@@ -165,9 +165,9 @@ function queryPesquisa()
                     </div>
                 </td>
             </tr>
-            ");
+            ');
         }
     }
-}
+//}
 
-queryPesquisa();
+//queryPesquisa();

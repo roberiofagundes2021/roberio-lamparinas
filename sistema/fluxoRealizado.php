@@ -1,39 +1,38 @@
-<?php 
+<?php
 
 include_once("sessao.php"); 
+
+//$inicio1 = microtime(true);
 
 $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
 include('global_assets/php/conexao.php');
 
-$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
+if (isset($_POST['inputFluxoOperacionalId'])){
+	
+	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
+	
+	$_SESSION['OrigemFluxoRealizado'] = $_POST['inputOrigem'];
 
-$sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
-			   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus
-		FROM FluxoOperacional
-	    WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ". $iFluxoOperacional . "";
-$result = $conn->query($sql);
-$row = $result->fetch(PDO::FETCH_ASSOC);
-//$count = count($row);
-
-if ($row['FlOpeDataFim'] > date("Y-m-d")){
-	$dataFim = date("Y-m-d");
+	$sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
+				   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, ForneRazaoSocial, CategNome 
+			FROM FluxoOperacional
+			JOIN Fornecedor ON ForneId = FlOpeFornecedor
+			JOIN Categoria ON CategId = FlOpeCategoria	 
+			WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ". $iFluxoOperacional . "";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+	//$count = count($row);
 } else {
-	$dataFim = $row['FlOpeDataFim'];
+	irpara($_SESSION['OrigemFluxoRealizado']); //Isso aqui é pensando no caso do usuário der um refresh nessa página. Um ENTER, por exemplo na URL.
 }
 
-$sql = "SELECT FOXPrProduto
-		FROM FluxoOperacionalXProduto
-		JOIN Produto on ProduId = FOXPrProduto
-		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
-$result = $conn->query($sql);
-$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
-$countProdutoUtilizado = count($rowProdutoUtilizado);
+/*
+if (isset($_POST['inputSelecionados'])){
 
-foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
-	$aProdutos[] = $itemProdutoUtilizado['FOXPrProduto'];
+	$aSelecionados = array($_POST['inputSelecionados']);
 }
-
+*/
 ?>
 
 <!DOCTYPE html>
@@ -62,116 +61,58 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>		
 	
-	<!-- /theme JS files -->	
-	
+	<!-- /theme JS files -->
+
 	<script type="text/javascript">
 		
 		$(document).ready(function() {
-			//Ao mudar o Fornecedor, filtra a categoria e a SubCategoria via ajax (retorno via JSON)
-			$('#cmbFornecedor').on('change', function(e){
+			
+			//Ao marcar ou desmarcar os Produtos/Serviços, filtra a lista via ajax (retorno via JSON)
+			$('#cmbProduto').on('change', function(e){
 				
-				FiltraCategoria();
-				FiltraSubCategoria();
-				FiltraProduto();
-				
-				var cmbFornecedor = $('#cmbFornecedor').val();
-				
-				$.getJSON('filtraCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
-					
-					//var option = '<option value="#">Selecione a Categoria</option>';
-					var option = '';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
-						});						
-						
-						$('#cmbCategoria').html(option).show();
-					} else {
-						ResetCategoria();
-					}					
+				let produtos 		  = $(this).val();
+				let fluxoId 		  = $('#inputFluxoOperacionalId').val();
+				let cont 			  = 1;
+				let produtoId 		  = [];
+				let produtoQuant 	  = [];
+
+				// Aqui é para cada "class" faça
+				$.each($(".idProduto"), function() {
+					produtoId[cont] = $(this).val();
+					cont++;
 				});
-				
-				$.getJSON('filtraSubCategoria.php?idFornecedor='+cmbFornecedor, function (dados){
-					
-					if (dados.length > 1){
-						var option = '<option value="#" "selected">Selecione a SubCategoria</option>';
-					} else {
-						var option = '';
+
+				cont = 1;
+				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
+				$.each($(".Quantidade"), function() {
+					$id 							= produtoId[cont];
+					produtoQuant[$id] = $(this).val();
+					cont++;
+				});
+
+				$.ajax({
+					type: "POST",
+					url: "trFiltraProduto.php",
+					data: {
+						iFluxo: fluxoId,
+						produtos: produtos,
+						produtoId: produtoId,
+						produtoQuant: produtoQuant
+					},
+					success: function(resposta) {
+						$("#tabelaProdutos").html(resposta).show();
+						return false;
 					}
-					
-					if (dados.length){
-						
-						$.each(dados, function(i, obj){							
-							option += '<option value="'+obj.SbCatId+'">' + obj.SbCatNome + '</option>';
-						});						
-						
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}					
 				});
+			});
 
-				$.getJSON('filtraProduto.php?idFornecedor='+cmbFornecedor, function (dados){
+		});
 
-					if (dados.length){
-
-						var option = '';
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.ProduId+'">'+obj.ProduNome+'</option>';
-						});	
-
-						//alert(option);
-
-						//$('#cmbProduto').removeClass('form-control multiselect-filtering').addClass('form-control form-control-select2');
-						
-						$('#cmbProduto').html(option).show();
-					} else {
-						ResetProduto();
-					}					
-				});
-
-
-				$('#inputNumContrato').val('');
-				$('#inputNumProcesso').val('');
-			});	
-						
-			//Mostra o "Filtrando..." na combo Categoria
-			function FiltraCategoria(){
-				$('#cmbCategoria').empty().append('<option>Filtrando...</option>');
-			}
-			
-			//Mostra o "Filtrando..." na combo SubCategoria
-			function FiltraSubCategoria(){
-				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
-			}
-
-			//Mostra o "Filtrando..." na combo Produto
-			function FiltraProduto(){
-				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
-			}			
-			
-			function ResetCategoria(){
-				$('#cmbCategoria').empty().append('<option value="">Sem Categoria</option>');
-			}
-
-			function ResetSubCategoria(){
-				$('#cmbSubCategoria').empty().append('<option value="">Sem SubCategoria</option>');
-			}
-
-			function ResetProduto(){
-				$('#cmbProduto').empty().append('<option>Sem produto</option>');
-			}
-
-		});	
-			
-	</script>
+	</script>	
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top  sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -198,85 +139,63 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="fluxo.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
 							</div>
 
 							<div class="card-body">
-								<form name="formFluxoOperacional" method="post">
+								<form name="formFluxoOperacional" method="post" action="fluxoRealizado.php">
+
+									<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" value="<?php echo $_POST['inputFluxoOperacionalId']; ?>" />
+									<input type="hidden" id="inputOrigem" name="inputOrigem" value="<?php echo $_POST['inputOrigem']; ?>" />
 
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor</label>
-												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
-													<option value="">Selecione</option>
-													<?php 
-														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-																FROM Fornecedor
-																JOIN Situacao on SituaId = ForneStatus
-																WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																ORDER BY ForneNome ASC";
-														$result = $conn->query($sql);
-														$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowFornecedor as $item){
-															$seleciona = $item['ForneId'] == $row['FlOpeFornecedor'] ? "selected" : "";												
-															print('<option value="'.$item['ForneId'].'" '. $seleciona .'>'.$item['ForneNome'].'</option>');
-														}
-													
-													?>
-												</select>
+												<input type="text" id="cmbFornecedor" name="cmbFornecedor" class="form-control"  value="<?php echo $row['ForneRazaoSocial']; ?>" readOnly >
 											</div>
 										</div>
 										
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
-													<option value="">Selecione</option>
-													<?php 
-														$sql = "SELECT CategId, CategNome
-																FROM Categoria
-																JOIN Fornecedor on ForneCategoria = CategId
-																WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and ForneId = ".$row['FlOpeFornecedor']."
-																ORDER BY CategNome ASC";
-														$result = $conn->query($sql);
-														$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowCategoria as $item){			
-															$seleciona = $item['CategId'] == $row['FlOpeCategoria'] ? "selected" : "";
-															print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
-														}
-													
-													?>											
-												</select>
+												<input type="hidden" id="inputCategoria" name="inputCategoria" value="<?php echo $row['FlOpeCategoria']; ?>" >
+												<input type="text" id="cmbCategoria" name="cmbCategoria" class="form-control"  value="<?php echo $row['CategNome']; ?>" readOnly >
 											</div>
 										</div>
 										
 										<div class="col-lg-4">
-											<label for="cmbSubCategoria">SubCategoria</label>
-											<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
-												<option value="">Selecione</option>
-												<?php 
-												 
+											<label for="cmbSubCategoria">SubCategoria(s)</label>
+											<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+												<?php
 													$sql = "SELECT SbCatId, SbCatNome
 															FROM SubCategoria
-															LEFT JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId
-															JOIN Situacao on SituaId = SbCatStatus
-															WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and FrXSCFornecedor = '". $row['FlOpeFornecedor']."' and SituaChave = 'ATIVO'
-															Order By SbCatNome ASC";
+															JOIN Situacao on SituaId = SbCatStatus	
+															WHERE SbCatUnidade = $_SESSION[UnidadeId] AND 
+															SbCatId in (SELECT ProduSubCategoria  FROM Produto
+															JOIN FluxoOperacionalXProduto on FOXPrProduto =  ProduId
+															WHERE ProduUnidade  = $_SESSION[UnidadeId] and FOXPrFluxoOperacional = $iFluxoOperacional) ORDER BY SbCatNome ASC"; 
 													$result = $conn->query($sql);
-													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($rowSubCategoria as $item){			
-														$seleciona = $item['SbCatId'] == $row['FlOpeSubCategoria'] ? "selected" : "";
-														print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
+													$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+													$count = count($rowBD);
+															
+													foreach ($rowBD as $item){
+														if(isset($_POST['cmbFornecedor'])){
+															if(isset($_POST['cmbSubCategoria'])){
+																if(in_array($item['SbCatId'], $_POST['cmbSubCategoria'])){
+																	print('<option value="'.$item['SbCatId'].'" selected>'.$item['SbCatNome'].'</option>');	
+																}else{
+																	print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');	
+																}
+															}else{
+																print('<option value="'.$item['SbCatId'].'">'.$item['SbCatNome'].'</option>');	
+															}
+														}else{
+															print('<option value="'.$item['SbCatId'].'" selected>'.$item['SbCatNome'].'</option>');	
+														}
 													}
-												
-												?>										
+												?>
 											</select>
 										</div>	
 									</div>
@@ -285,74 +204,104 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="cmbProduto">Produto</label>
-												<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc >
+												<label for="cmbProduto">Produto/Serviço</label>
+												<select id="cmbProduto" name="cmbProduto[]" class="form-control multiselect-filtering" multiple="multiple" data-fouc >
 													<?php 
-														$sql = "SELECT ProduId, ProduNome
+														$sql = "SELECT ProduId as Id, ProduNome as Nome, --ProduDetalhamento as Detalhamento, 
+																UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 																FROM Produto
-																JOIN Situacao on SituaId = ProduStatus
-																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduSubCategoria = ".$iSubCategoria."
-																ORDER BY ProduNome ASC";
+																JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+																JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+																LEFT JOIN Marca on MarcaId = ProduMarca
+																JOIN SubCategoria on SbCatId = ProduSubCategoria
+																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
+																UNION
+																SELECT ServiId as Id, ServiNome as Nome, --ServiDetalhamento as Detalhamento, 
+																'' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
+																FROM Servico
+																JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+																LEFT JOIN Marca on MarcaId = ServiMarca
+																JOIN SubCategoria on SbCatId = ServiSubCategoria
+																WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$iFluxoOperacional."
+																ORDER BY SubCategoria";
 														$result = $conn->query($sql);
-														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
-														
-														foreach ($rowProduto as $item){	
-															
-															if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
-																$seleciona = "selected";
-															} else {
-																$seleciona = "";
-															}													
-															
-															print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
+														$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($rowProduto as $item){
+															if(isset($_POST['cmbFornecedor'])){
+																if(isset($_POST['cmbProduto'])){
+																	if(in_array($item['Id'], $_POST['cmbProduto'])){
+																		print('<option value="'.$item['Id'].'" selected>'.$item['Nome'].'</option>');	
+																	}else{
+																		print('<option value="'.$item['Id'].'">'.$item['Nome'].'</option>');	
+																	}
+																}else{
+																	print('<option value="'.$item['Id'].'">'.$item['Nome'].'</option>');	
+																}
+															}else{
+																print('<option value="'.$item['Id'].'" selected>'.$item['Nome'].'</option>');	
+															}
 														}
 													
 													?>
 												</select>
+
+												<!--<input type="hidden" name="inputSelecionados" value="<?php //isset($aSelecionados) ? var_dump($aSelecionados) : ""; ?>">-->
 											</div>
 										</div>
 
-										<div class="col-lg-2">
+										<div class="col-lg-1" style="min-width: 200px;">
 											<div class="form-group">
 												<label for="inputDataInicio">Data Início <span class="text-danger">*</span></label>
 												<div class="input-group">
 													<span class="input-group-prepend">
 														<span class="input-group-text"><i class="icon-calendar22"></i></span>
 													</span>
-													<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['FlOpeDataInicio']; ?>" >
+													<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['FlOpeDataInicio']; ?>" readOnly >
 												</div>
 											</div>
 										</div>
 										
-										<div class="col-lg-2">
+										<div class="col-lg-1" style="min-width: 200px;">
 											<div class="form-group">
 												<label for="inputDataFim">Data Fim <span class="text-danger">*</span></label>
 												<div class="input-group">
 													<span class="input-group-prepend">
 														<span class="input-group-text"><i class="icon-calendar22"></i></span>
 													</span>
-													<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $dataFim; ?>" >
+													<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['FlOpeDataFim']; ?>" readOnly >
 												</div>
 											</div>
 										</div>								
 										
-										<div class="col-lg-2">
+										<div class="col-lg-2" style="max-width: 210px;">
 											<div class="form-group">
-												<label for="inputNumContrato">Número do Contrato</label>
-												<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>" >
+												<label for="inputNumContrato">Nº Contrato</label>
+												<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly >
 											</div>
 										</div>
 												
-										<div class="col-lg-2">
+										<div class="col-lg-2" style="max-width: 210px;">
 											<div class="form-group">
-												<label for="inputNumProcesso">Número do Processo</label>
-												<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>" >
+												<label for="inputNumProcesso">Nº Processo</label>
+												<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
 											</div>
 										</div>
 
-									</div>
+										<div class="col-lg-2" style="max-width: 210px;">
+											<div class="form-group">
+												<label for="inputValor">Valor Total</label>
+												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
+											</div>
+										</div>	
 
-									<div class="text-right"><a href="fluxoRealizado.php" class="btn btn-principal" role="button">Filtrar</a></div>
+									</div>
+									<div class="col-lg-12">	
+											<div class="text-right">
+												<a href="contrato.php" class="btn btn-basic" role="button"><< Fluxo Operacional/Contrato</a>
+												<button type="submit" class="btn btn-principal">Filtrar</button>
+											</div>
+									</div>
 								</form>
 							</div>
 						</div>
@@ -371,8 +320,6 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="fluxo.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
 							</div>
@@ -381,15 +328,81 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 
 								<?php
 									
-									$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
+											UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Produto
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-											LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+											JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 											LEFT JOIN Marca on MarcaId = ProduMarca
-											WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+											JOIN SubCategoria on SbCatId = ProduSubCategoria
+											WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = $iFluxoOperacional";
+
+											// filtrar de acordo com as subCategorias marcados
+											if(isset($_POST['cmbFornecedor'])){
+												if(isset($_POST['cmbSubCategoria'])){
+													$sql .= " and (";
+													$values = $_POST['cmbSubCategoria'];
+													for($x=0; $x<COUNT($values); $x++){
+														$sql .= "ProduSubCategoria = $values[$x]".
+														($x < (COUNT($values)-1)?' or ':'');
+													}
+													$sql .= ") ";
+												}else{
+													$sql .= " and ProduSubCategoria = NULL ";
+												}
+												if(isset($_POST['cmbProduto'])){
+													$sql .= " and (";
+													$values = $_POST['cmbProduto'];
+													for($x=0; $x<COUNT($values); $x++){
+														$sql .= "ProduId = $values[$x]".
+														($x < (COUNT($values)-1)?' or ':'');
+													}
+													$sql .= ") ";
+												}else{
+													$sql .= " and ProduId = NULL ";
+												}
+											}
+
+											$sql .= " UNION
+											SELECT ServiId as Id, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
+											'' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
+											FROM Servico
+											JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+											LEFT JOIN Marca on MarcaId = ServiMarca
+											JOIN SubCategoria on SbCatId = ServiSubCategoria
+											WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = $iFluxoOperacional";
+
+											// filtrar de acordo com os produtos marcados
+											if(isset($_POST['cmbFornecedor'])){
+												if(isset($_POST['cmbSubCategoria'])){
+													$sql .= " and (";
+													$values = $_POST['cmbSubCategoria'];
+													for($x=0; $x<COUNT($values); $x++){
+														$sql .= "ServiSubCategoria = $values[$x]".
+														($x < (COUNT($values)-1)?' or ':'');
+													}
+													$sql .= ") ";
+												}else{
+													$sql .= " and ServiSubCategoria = NULL ";
+												}
+												if(isset($_POST['cmbProduto'])){
+													$sql .= " and (";
+													$values = $_POST['cmbProduto'];
+													for($x=0; $x<COUNT($values); $x++){
+														$sql .= "ServiId = $values[$x]".
+														($x < (COUNT($values)-1)?' or ':'');
+													}
+													$sql .= ") ";
+												}else{
+													$sql .= " and ServiId = NULL ";
+												}
+											}
+
+									$sql .= " ORDER BY SubCategoria, Nome ASC";
+											
 									$result = $conn->query($sql);
 									$rowPrevisto = $result->fetchAll(PDO::FETCH_ASSOC);
-									
+									//echo $sql;die;
 									$cont = 0;
 
 								?>
@@ -398,15 +411,15 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 									<thead>
 										<tr class="bg-slate">
 											<th width="4%">Item</th>
-											<th width="26%">Produto</th>
+											<th width="26%">Produto/Serviço</th>
 											<th width="15%">Marca</th>
-											<th width="9%">Unidade</th>
-											<th width="9%">Quant.</th>									
-											<th width="9%">Valor Unit.</th>										
-											<th width="9%">Valor Total</th>
-											<th width="7%" style="background-color: #ccc; color:#333;">Saldo (Qt)</th>
-											<th width="7%" style="background-color: #ccc; color:#333;">Saldo (R$)</th>
-											<th width="5%" style="background-color: #ccc; color:#333;">%</th>
+											<th width="9%" style="text-align:center;">Unidade</th>
+											<th width="9%" style="text-align:center;">Quant.</th>									
+											<th width="9%" style="text-align:right;">Valor Unit.</th>										
+											<th width="9%" style="text-align:right;">Valor Total</th>
+											<th width="7%" style="background-color: #ccc; color:#333; text-align:right;">Saldo (Qt)</th>
+											<th width="7%" style="background-color: #ccc; color:#333; text-align:right;">Saldo (R$)</th>
+											<th width="5%" style="background-color: #ccc; color:#333; text-align:center;">%</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -415,15 +428,15 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 
 											foreach ($rowPrevisto as $item){
 
-												$iQuantidadePrevista = isset($item['FOXPrQuantidade']) ? $item['FOXPrQuantidade'] : '';
-												$fValorUnitarioPrevisto = isset($item['FOXPrValorUnitario']) ? mostraValor($item['FOXPrValorUnitario']) : '';											
-												$fValorTotalPrevisto = (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? $item['FOXPrQuantidade'] * $item['FOXPrValorUnitario'] : '';
+												$iQuantidadePrevista = isset($item['Quantidade']) ? $item['Quantidade'] : '';
+												$fValorUnitarioPrevisto = isset($item['ValorUnitario']) ? mostraValor($item['ValorUnitario']) : '';											
+												$fValorTotalPrevisto = (isset($item['Quantidade']) and isset($item['ValorUnitario'])) ? $item['Quantidade'] * $item['ValorUnitario'] : '';
 
 
 												$sql = "SELECT ISNULL(SUM(MvXPrQuantidade), 0) as Controle, MvXPrValorUnitario
 														FROM Movimentacao														
 														JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['ProduId']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$dataFim."' and MovimTipo = 'E' 
+														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['Id']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$row['FlOpeDataFim']."' and MovimTipo = 'E' 
 														GROUP By MvXPrQuantidade, MvXPrValorUnitario";
 												$result = $conn->query($sql);
 												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -439,15 +452,15 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 												print('
 												<tr>
 													<td>'.$cont.'</td>
-													<td>'.$item['ProduNome'].'</td>
-													<td>'.$item['MarcaNome'].'</td>
-													<td>'.$item['UnMedSigla'].'</td>
-													<td>'.$iQuantidadePrevista.'</td>
-													<td>'.$fValorUnitarioPrevisto.'</td>											
-													<td>'.mostraValor($fValorTotalPrevisto).'</td>
-													<td style="background-color: #eee; color:#333;">'.$controle.'</td>
-													<td style="background-color: #eee; color:#333;">'.$saldo.'</td>
-													<td style="background-color: #eee; color:#333;">'.$porcentagem.'%</td>
+													<td data-popup="tooltip" title="'.$item['Detalhamento'].'">'.$item['Nome'].'</td>													
+													<td>'.$item['Marca'].'</td>
+													<td style="text-align:center;">'.$item['UnidadeMedida'].'</td>
+													<td style="text-align:center;">'.$iQuantidadePrevista.'</td>
+													<td style="text-align:right;">'.$fValorUnitarioPrevisto.'</td>											
+													<td style="text-align:right;">'.mostraValor($fValorTotalPrevisto).'</td>
+													<td style="background-color: #eee; color:#333; text-align:center;">'.$controle.'</td>
+													<td style="background-color: #eee; color:#333; text-align:right;">'.$saldo.'</td>
+													<td style="background-color: #eee; color:#333; text-align:center;">'.mostraValor($porcentagem).'%</td>
 												</tr>');
 
 												$cont++;
@@ -471,8 +484,6 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="fluxo.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
 							</div>
@@ -481,12 +492,78 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 
 								<?php
 									
-									$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
+											UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Produto
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 											JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 											LEFT JOIN Marca on MarcaId = ProduMarca
-											WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+											JOIN SubCategoria on SbCatId = ProduSubCategoria
+											WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = $iFluxoOperacional";
+
+											// filtrar de acordo com as subCategorias marcados
+											if(isset($_POST['cmbFornecedor'])){
+												if(isset($_POST['cmbSubCategoria'])){
+													$sql .= " and (";
+													$values = $_POST['cmbSubCategoria'];
+													for($x=0; $x<COUNT($values); $x++){
+														$sql .= "ProduSubCategoria = $values[$x]".
+														($x < (COUNT($values)-1)?' or ':'');
+													}
+													$sql .= ") ";
+												}else{
+													$sql .= " and ProduSubCategoria = NULL ";
+												}
+												if(isset($_POST['cmbProduto'])){
+													$sql .= " and (";
+													$values = $_POST['cmbProduto'];
+													for($x=0; $x<COUNT($values); $x++){
+														$sql .= "ProduId = $values[$x]".
+														($x < (COUNT($values)-1)?' or ':'');
+													}
+													$sql .= ") ";
+												}else{
+													$sql .= " and ProduId = NULL ";
+												}
+											}
+
+											$sql .= " UNION
+											SELECT ServiId as Id, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
+											'' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
+											FROM Servico
+											JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+											LEFT JOIN Marca on MarcaId = ServiMarca
+											JOIN SubCategoria on SbCatId = ServiSubCategoria
+											WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = $iFluxoOperacional";
+
+											// filtrar de acordo com os produtos marcados
+											if(isset($_POST['cmbFornecedor'])){
+												if(isset($_POST['cmbSubCategoria'])){
+													$sql .= " and (";
+													$values = $_POST['cmbSubCategoria'];
+													for($x=0; $x<COUNT($values); $x++){
+														$sql .= "ServiSubCategoria = $values[$x]".
+														($x < (COUNT($values)-1)?' or ':'');
+													}
+													$sql .= ") ";
+												}else{
+													$sql .= " and ServiSubCategoria = NULL ";
+												}
+												if(isset($_POST['cmbProduto'])){
+													$sql .= " and (";
+													$values = $_POST['cmbProduto'];
+													for($x=0; $x<COUNT($values); $x++){
+														$sql .= "ServiId = $values[$x]".
+														($x < (COUNT($values)-1)?' or ':'');
+													}
+													$sql .= ") ";
+												}else{
+													$sql .= " and ServiId = NULL ";
+												}
+											}
+
+									$sql .= " ORDER BY SubCategoria, Nome ASC";
+
 									$result = $conn->query($sql);
 									$rowRealizado = $result->fetchAll(PDO::FETCH_ASSOC);
 									
@@ -498,15 +575,15 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 									<thead>
 										<tr class="bg-slate">
 											<th width="4%">Item</th>
-											<th width="26%">Produto</th>
+											<th width="26%">Produto/Serviço</th>
 											<th width="15%">Marca</th>
-											<th width="9%">Unidade</th>
-											<th width="9%">Quant.</th>									
-											<th width="9%">Valor Unit.</th>										
-											<th width="9%">Valor Total</th>
-											<th width="7%" style="background-color: #ccc; color:#333;">Total (Qt)</th>
-											<th width="7%" style="background-color: #ccc; color:#333;">Total (R$)</th>
-											<th width="5%" style="background-color: #ccc; color:#333;">%</th>
+											<th width="9%" style="text-align:center;">Unidade</th>
+											<th width="9%" style="text-align:center;">Quant.</th>									
+											<th width="9%" style="text-align:right;">Valor Unit.</th>										
+											<th width="9%" style="text-align:right;">Valor Total</th>
+											<th width="7%" style="background-color: #ccc; color:#333; text-align:right;">Total (Qt)</th>
+											<th width="7%" style="background-color: #ccc; color:#333; text-align:right;">Total (R$)</th>
+											<th width="5%" style="background-color: #ccc; color:#333; text-align:center;">%</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -515,14 +592,14 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 
 											foreach ($rowRealizado as $item){
 
-												$iQuantidadePrevista = isset($item['FOXPrQuantidade']) ? $item['FOXPrQuantidade'] : 0;
-												$fValorUnitarioPrevisto = isset($item['FOXPrValorUnitario']) ? mostraValor($item['FOXPrValorUnitario']) : '0.00';
-												$fValorTotalPrevisto = (isset($item['FOXPrQuantidade']) and isset($item['FOXPrValorUnitario'])) ? $item['FOXPrQuantidade'] * $item['FOXPrValorUnitario']: 0.00;
+												$iQuantidadePrevista = isset($item['Quantidade']) ? $item['Quantidade'] : 0;
+												$fValorUnitarioPrevisto = isset($item['ValorUnitario']) ? mostraValor($item['ValorUnitario']) : '0.00';
+												$fValorTotalPrevisto = (isset($item['Quantidade']) and isset($item['ValorUnitario'])) ? $item['Quantidade'] * $item['ValorUnitario']: 0.00;
 
 												$sql = "SELECT ISNULL(SUM(MvXPrQuantidade), 0) as Controle, MvXPrValorUnitario
 														FROM Movimentacao														
 														JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['ProduId']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$dataFim."' and MovimTipo = 'E' 
+														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['Id']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$row['FlOpeDataFim']."' and MovimTipo = 'E' 
 														GROUP By MvXPrQuantidade, MvXPrValorUnitario";
 												$result = $conn->query($sql);
 												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -538,15 +615,15 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 												print('
 												<tr>
 													<td>'.$cont.'</td>
-													<td>'.$item['ProduNome'].'</td>
-													<td>'.$item['MarcaNome'].'</td>
-													<td>'.$item['UnMedSigla'].'</td>
-													<td>'.$iQuantidadeRealizada.'</td>
-													<td>'.$fValorUnitarioRealizado.'</td>											
-													<td>'.mostraValor($fValorTotalRealizado).'</td>
-													<td style="background-color: #eee; color:#333;">'.$iQuantidadeRealizada.'</td>
-													<td style="background-color: #eee; color:#333;">'.mostraValor($fValorTotalRealizado).'</td>
-													<td style="background-color: #eee; color:#333;">'.$porcentagem.'%</td>
+													<td data-popup="tooltip" title="'.$item['Detalhamento'].'">'.$item['Nome'].'</td>
+													<td>'.$item['Marca'].'</td>
+													<td style="text-align:center;">'.$item['UnidadeMedida'].'</td>
+													<td style="text-align:center;">'.$iQuantidadeRealizada.'</td>
+													<td style="text-align:right;">'.$fValorUnitarioRealizado.'</td>
+													<td style="text-align:right;">'.mostraValor($fValorTotalRealizado).'</td>
+													<td style="background-color: #eee; color:#333; text-align:center;">'.$iQuantidadeRealizada.'</td>
+													<td style="background-color: #eee; color:#333; text-align:right;">'.mostraValor($fValorTotalRealizado).'</td>
+													<td style="background-color: #eee; color:#333; text-align:center;">'.mostraValor($porcentagem).'%</td>
 												</tr>');
 
 												$cont++;
@@ -574,6 +651,9 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
 	<!-- /page content -->
 
 	<?php include_once("alerta.php"); ?>
+
+	<?php /* $total1 = microtime(true) - $inicio1;
+		 echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; */ ?>
 
 </body>
 

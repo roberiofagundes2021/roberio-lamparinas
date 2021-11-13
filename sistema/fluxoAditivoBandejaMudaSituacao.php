@@ -30,8 +30,10 @@ if (isset($_POST['inputAditivoId'])) {
 
 		if ($_POST['inputAditivoStatus'] == 'NAOLIBERADO') {
 			$motivo = $_POST['inputMotivo'];
+			$msg = "Fluxo operacional não liberado!";
 		} else {
 			$motivo = NULL;
+			$msg = "Fluxo operacional liberado!";
 		}
 
 // Se o aditivo não é liberado, o fluxo volta ao status armazenado em AditiStatusFluxo
@@ -156,14 +158,14 @@ if (isset($_POST['inputAditivoId'])) {
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação do fluxo operacional alterada!!!";
+		$_SESSION['msg']['mensagem'] = $msg;
 		$_SESSION['msg']['tipo'] = "success";
 	} catch (PDOException $e) {
 
 		$conn->rollback();
 
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do fluxo operacional!!!";
+		$_SESSION['msg']['mensagem'] = "Erro na liberação do fluxo operacional!!!";
 		$_SESSION['msg']['tipo'] = "error";
 
 		echo 'Error: ' . $e->getMessage();

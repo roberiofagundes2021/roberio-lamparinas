@@ -1,6 +1,10 @@
 <?php 
 
-include_once("sessao.php"); 
+include_once("sessao.php");
+
+if(!$_SESSION['PerfiChave'] == "SUPER"){
+	header("location:javascript://history.go(-1)");
+}
 
 $_SESSION['PaginaAtual'] = 'Empresa';
 
@@ -104,8 +108,9 @@ $count = count($row);
 		});
 				
 				
-		function atualizaEmpresa(EmpresaId, EmpresaNome, EmpresaStatus, Tipo){
+		function atualizaEmpresa(Permission, EmpresaId, EmpresaNome, EmpresaStatus, Tipo){
 
+			document.getElementById('inputPermission').value = Permission;
 			document.getElementById('inputEmpresaId').value = EmpresaId;
 			document.getElementById('inputEmpresaNome').value = EmpresaNome;
 			document.getElementById('inputEmpresaStatus').value = EmpresaStatus;
@@ -120,7 +125,12 @@ $count = count($row);
 			if (Tipo == 'edita'){	
 				document.formEmpresa.action = "empresaEdita.php";		
 			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formEmpresa, "Tem certeza que deseja excluir essa empresa?", "empresaExclui.php");
+				if(Permission){
+					confirmaExclusao(document.formEmpresa, "Tem certeza que deseja excluir essa empresa?", "empresaExclui.php");
+				}	else{
+					alerta('Permissão Negada!','');
+					return false;
+				}
 			} else if (Tipo == 'mudaStatus'){
 				document.formEmpresa.action = "empresaMudaSituacao.php";
 			} else if (Tipo == 'licenca'){
@@ -218,7 +228,7 @@ $count = count($row);
 											<td>'.formatarCPF_Cnpj($item['EmpreCnpj']).'</td>');
 										
 										if ($_SESSION['EmpreId'] != $item['EmpreId']) {
-											print('<td><a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+											print('<td><a href="#" onclick="atualizaEmpresa(1,'.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										} else {
 											print('<td><a href="#" data-popup="tooltip" data-trigger="focus" title="Essa empresa está sendo usada por você no momento"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										}
@@ -228,21 +238,21 @@ $count = count($row);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaEmpresa('.$atualizar.','.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaEmpresa('.$excluir.','.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 														<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'licenca\');" class="dropdown-item"><i class="icon-certificate"></i> Licença</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'unidade\');" class="dropdown-item"><i class="icon-home7"></i> Unidade</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'setor\');" class="dropdown-item"><i class="icon-store"></i> Setor</a>
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'localestoque\');" class="dropdown-item"><i class="icon-box"></i> Local de Estoque</a>																
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'usuario\');" class="dropdown-item"><i class="icon-user-plus"></i> Usuários</a>
-																<!--<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'menu\');" class="dropdown-item"><i class="icon-menu2"></i> Menu</a>-->
-																<a href="#" onclick="atualizaEmpresa('.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'parametro\');" class="dropdown-item"><i class="icon-equalizer"></i> Parâmetro</a>
+																<a href="#" onclick="atualizaEmpresa(1,'.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'licenca\');" class="dropdown-item"><i class="icon-certificate"></i> Licença</a>
+																<a href="#" onclick="atualizaEmpresa(1,'.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'unidade\');" class="dropdown-item"><i class="icon-home7"></i> Unidade</a>
+																<a href="#" onclick="atualizaEmpresa(1,'.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'setor\');" class="dropdown-item"><i class="icon-store"></i> Setor</a>
+																<a href="#" onclick="atualizaEmpresa(1,'.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'localestoque\');" class="dropdown-item"><i class="icon-box"></i> Local de Estoque</a>																
+																<a href="#" onclick="atualizaEmpresa(1,'.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'usuario\');" class="dropdown-item"><i class="icon-user-plus"></i> Usuários</a>
+																<!--<a href="#" onclick="atualizaEmpresa(1,'.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'menu\');" class="dropdown-item"><i class="icon-menu2"></i> Menu</a>-->
+																<a href="#" onclick="atualizaEmpresa(1,'.$item['EmpreId'].', \''.$item['EmpreNomeFantasia'].'\',\''.$item['SituaChave'].'\', \'parametro\');" class="dropdown-item"><i class="icon-equalizer"></i> Parâmetro</a>
 															</div>
 														</div>
 													</div>
@@ -263,6 +273,7 @@ $count = count($row);
 				<!-- /info blocks -->
 				
 				<form name="formEmpresa" method="post">
+					<input type="hidden" id="inputPermission" name="inputPermission" >
 					<input type="hidden" id="inputEmpresaId" name="inputEmpresaId" >
 					<input type="hidden" id="inputEmpresaNome" name="inputEmpresaNome" >
 					<input type="hidden" id="inputEmpresaStatus" name="inputEmpresaStatus" >

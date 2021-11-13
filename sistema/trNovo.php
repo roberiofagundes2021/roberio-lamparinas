@@ -6,12 +6,9 @@ $_SESSION['PaginaAtual'] = 'Novo Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
-$sql = "
-	SELECT ParamProdutoOrcamento, 
-				 ParamServicoOrcamento
+$sql = "SELECT ParamProdutoOrcamento, ParamServicoOrcamento
 		FROM Parametro
-	 WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
-";
+		WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
 $result = $conn->query($sql);
 $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -35,12 +32,10 @@ if (isset($_POST['inputData'])) {
 		$conn->beginTransaction();
 
 		//Gera o novo Número (incremental)
-		$sql = "
-			 SELECT TOP 1 isnull(TrRefNumero,0) as Numero
-			 FROM TermoReferencia
-			 Where TrRefUnidade = " . $_SESSION['UnidadeId'] . "
-			 Order By TrRefNumero desc
-		";
+		$sql = "SELECT TOP 1 isnull(TrRefNumero,0) as Numero
+			 	FROM TermoReferencia
+			 	Where TrRefUnidade = " . $_SESSION['UnidadeId'] . "
+			 	Order By TrRefNumero desc";
 		$result = $conn->query($sql);
 		$rowNumero = $result->fetch(PDO::FETCH_ASSOC);
 

@@ -206,25 +206,29 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaFabricante(FabriId, FabriNome, FabriStatus, Tipo){
+		function atualizaFabricante(Permission, FabriId, FabriNome, FabriStatus, Tipo){
 		
-			document.getElementById('inputFabricanteId').value = FabriId;
-			document.getElementById('inputFabricanteNome').value = FabriNome;
-			document.getElementById('inputFabricanteStatus').value = FabriStatus;
-					
-			if (Tipo == 'edita'){	
-				document.getElementById('inputEstadoAtual').value = "EDITA";
-				document.formFabricante.action = "fabricante.php";			
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formFabricante, "Tem certeza que deseja excluir esse fabricante?", "fabricanteExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formFabricante.action = "fabricanteMudaSituacao.php";
-			} else if (Tipo == 'imprime'){
-				document.formFabricante.action = "fabricanteImprime.php";
-				document.formFabricante.setAttribute("target", "_blank");
+			if (Permission == 1){
+				document.getElementById('inputFabricanteId').value = FabriId;
+				document.getElementById('inputFabricanteNome').value = FabriNome;
+				document.getElementById('inputFabricanteStatus').value = FabriStatus;
+						
+				if (Tipo == 'edita'){	
+					document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formFabricante.action = "fabricante.php";			
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formFabricante, "Tem certeza que deseja excluir esse fabricante?", "fabricanteExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formFabricante.action = "fabricanteMudaSituacao.php";
+				} else if (Tipo == 'imprime'){
+					document.formFabricante.action = "fabricanteImprime.php";
+					document.formFabricante.setAttribute("target", "_blank");
+				}
+				
+				document.formFabricante.submit();
+			} else{
+				alerta('Permissão Negada!','');
 			}
-			
-			document.formFabricante.submit();
 		}		
 			
 	</script>
@@ -313,13 +317,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['FabriNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaFabricante('.$item['FabriId'].', \''.addslashes($item['FabriNome']).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaFabricante(1,'.$item['FabriId'].', \''.addslashes($item['FabriNome']).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaFabricante('.$item['FabriId'].', \''.addslashes($item['FabriNome']).'\','.$item['FabriStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaFabricante('.$item['FabriId'].', \''.addslashes($item['FabriNome']).'\','.$item['FabriStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														<a href="#" onclick="atualizaFabricante('.$atualizar.','.$item['FabriId'].', \''.addslashes($item['FabriNome']).'\','.$item['FabriStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaFabricante('.$excluir.','.$item['FabriId'].', \''.addslashes($item['FabriNome']).'\','.$item['FabriStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
 											</td>

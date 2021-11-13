@@ -26,12 +26,13 @@
 	}
 
 	//Essa consulta é para preencher a grid usando a coluna Unidade
-	$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome
+	$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome, EmpreNomeFantasia
 			FROM UsuarioXUnidade
 			JOIN Unidade ON UnidaId = UsXUnUnidade
 			JOIN Setor ON SetorId = UsXUnSetor
 			LEFT JOIN LocalEstoque on LcEstId = UsXUnLocalEstoque
 			JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
+			JOIN Empresa on EmpreId = EXUXPEmpresa
 			WHERE EXUXPUsuario = ".$_SESSION['UsuarioId'];
 	
 	if (!isset($_SESSION['EmpresaId'])){
@@ -230,24 +231,29 @@
 				responsive: true,
 			    columnDefs: [
 				{ 
-					orderable: true,   //Unidade
-					width: "35%",
+					orderable: true,   //Empresa
+					width: "30%",
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Setor
+					orderable: true,   //Unidade
 					width: "30%",
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //Local Estoque
-					width: "30%",
+					orderable: true,   //Setor
+					width: "20%",
 					targets: [2]
+				},
+				{ 
+					orderable: true,   //Local Estoque
+					width: "20%",
+					targets: [3]
 				},								
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [3]
+					targets: [4]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -476,7 +482,8 @@
 								<tr class="bg-slate">
 									<?php 
 										if (isset($_SESSION['EmpresaId'])){
-											print('<td>Unidade</td>');
+											print('<th>Empresa</th>');
+											print('<th>Unidade</th>');
 										}
 									?>
 									<th >Setor</th>
@@ -492,6 +499,7 @@
 										<tr>
 											');
 											if (isset($_SESSION['EmpresaId'])){
+												print('<td>'.$item['EmpreNomeFantasia'].'</td>');
 										 		print('<td>'.$item['UnidaNome'].'</td>');
 											}
 											

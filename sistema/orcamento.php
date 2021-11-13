@@ -3,6 +3,8 @@
 include_once("sessao.php"); 
 $inicio1 = microtime(true);
 $_SESSION['PaginaAtual'] = 'Orçamento';
+// var_dump($_SESSION['PerfiChave']);
+// exit;
 
 include('global_assets/php/conexao.php');
 
@@ -124,8 +126,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaOrcamento(OrcamId, OrcamNumero, OrcamCategoria, CategNome, OrcamStatus, Tipo){
+		function atualizaOrcamento(Permission, OrcamId, OrcamNumero, OrcamCategoria, CategNome, OrcamStatus, Tipo){
 		
+			document.getElementById('inputPermission').value = Permission;
 			document.getElementById('inputOrcamentoId').value = OrcamId;
 			document.getElementById('inputOrcamentoNumero').value = OrcamNumero;
 			document.getElementById('inputOrcamentoCategoria').value = OrcamCategoria;
@@ -139,8 +142,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			} else {
 				if (Tipo == 'edita'){	
 					document.formOrcamento.action = "orcamentoEdita.php";		
-				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formOrcamento, "Tem certeza que deseja excluir esse orcamento?", "orcamentoExclui.php");
 				} else if (Tipo == 'mudaStatus'){
 					document.formOrcamento.action = "orcamentoMudaSituacao.php";
 				} else if (Tipo == 'produto'){
@@ -149,6 +150,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                     document.formOrcamento.action = "orcamentoServico.php";
 				} else if (Tipo == 'duplica'){
 					document.formOrcamento.action = "orcamentoDuplica.php";
+				} else if (Tipo == 'exclui'){
+					if(Permission){
+						confirmaExclusao(document.formOrcamento, "Tem certeza que deseja excluir esse orcamento?", "orcamentoExclui.php");
+					}	else{
+						alerta('Permissão Negada!','');
+						return false;
+					}
 				}
 			}
 			
@@ -235,25 +243,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												<td>'.$item['SubCategorias'].'</td>
 										');
 										
-										print('<td><a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										if($item['OrcamTipo'] == 'P'){
 											print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
-														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$atualizar.','.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$excluir.','.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
 														<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'produto\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'imprimir\')" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
-																<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'duplica\')" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
-															</div>
+																<a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'produto\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																<a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'imprimir\')" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>'
+																// se o usuario ter perfil CONTABILIDADE essa opção ão irá aparecer para ele
+																.($_SESSION['PerfiChave'] == 'CONTABILIDADE'?'':'<div class="dropdown-divider"></div><a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'duplica\')" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>').
+															'</div>
 														</div>
 													</div>
 												</div>
@@ -263,18 +271,18 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
-														<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$atualizar.','.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$excluir.','.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
 														<div class="dropdown">	
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'servico\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Serviços</a>
-																<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'imprimir\')" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
+																<a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'servico\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Serviços</a>
+																<a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'imprimir\')" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
 																<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaOrcamento('.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'duplica\')" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
+																<a href="#" onclick="atualizaOrcamento(1,'.$item['OrcamId'].', \''.$item['OrcamNumero'].'\', \''.$item['OrcamCategoria'].'\', \''.$item['CategNome'].'\',\''.$item['SituaChave'].'\', \'duplica\')" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
 															</div>
 														</div>
 													</div>
@@ -296,6 +304,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<!-- /info blocks -->
 				
 				<form name="formOrcamento" method="post">
+					<input type="hidden" id="inputPermission" name="inputPermission" >
 					<input type="hidden" id="inputOrcamentoId" name="inputOrcamentoId" >
 					<input type="hidden" id="inputOrcamentoNumero" name="inputOrcamentoNumero" >
 					<input type="hidden" id="inputOrcamentoCategoria" name="inputOrcamentoCategoria" >

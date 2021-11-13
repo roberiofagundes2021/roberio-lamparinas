@@ -25,9 +25,9 @@
 
 	$sql = "
 		SELECT DtOrcId, 
-					 DtOrcData, 
-					 DtOrcNome, 
-					 DtOrcArquivo
+				DtOrcData, 
+				DtOrcNome, 
+				DtOrcArquivo
 			FROM DotacaoOrcamentaria
 		 WHERE DtOrcUnidade = ". $_SESSION['UnidadeId'] ." 
 			 AND DtOrcTermoReferencia = ". $_SESSION['inputTRIdDotacao'] ."
@@ -61,6 +61,11 @@
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<script src="global_assets/js/lamparinas/stop-back.js"></script>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	
 	<!-- /theme JS files -->	
 	
@@ -125,11 +130,18 @@
 			$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
-							
+
+				var inputDescricao = $('#inputNome').val();			
 				var inputFile = $('#inputArquivo').val();
 				var id = $("input:file").attr('id');
 				var tamanho =  1024 * 1024 * 32; //32MB
-								
+
+				if (inputDescricao == ''){
+					$("#formDotacaoFields").submit();
+					$('#inputNome').focus();
+					return false;
+				}
+
 				//Verifica se o campo só possui espaços em branco
 				if (inputFile == ''){
 					alerta('Atenção','Selecione o arquivo!','error');
@@ -137,11 +149,14 @@
 					$('#inputArquivo').focus();
 					return false;
 				}
-								
+
+				var extensoes = ['pdf', 'PDF', 'doc', 'DOC', 'docx', 'DOCX', 'odt', 'ODT', 'jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'];
+
 				//Verifica se a extensão é  diferente de PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!
-				if (ext(inputFile) != 'pdf' && ext(inputFile) != 'doc' && ext(inputFile) != 'docx' && ext(inputFile) != 'odt' && ext(inputFile) != 'jpg' && ext(inputFile) != 'jpeg' && ext(inputFile) != 'png'){
+				//if (ext(inputFile) != 'pdf' && ext(inputFile) != 'doc' && ext(inputFile) != 'docx' && ext(inputFile) != 'odt' && ext(inputFile) != 'jpg' && ext(inputFile) != 'jpeg' && ext(inputFile) != 'png'){
+				if (extensoes.indexOf(ext(inputFile)) == -1){
 					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!','error');
-					$("#formDotacaoFields").submit();
+					//$("#formDotacaoFields").submit();
 					$('#inputArquivo').focus();
 					return false;	
 				}
@@ -220,9 +235,16 @@
 							</div>
 
 							<div class="card-body">
-								<p>
-									A relação abaixo faz referência as Dotações Orçamentárias do Termo de Referência <span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['inputTRNumero']; ?> </span>
-								</p>
+								<div class="row">
+									<div class="col-lg-7">
+										A relação abaixo faz referência as Dotações Orçamentárias do Termo de Referência <span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['inputTRNumero']; ?> </span>
+									</div>
+									<div class="col-lg-5">	
+										<div class="text-right">
+											<a href="tr.php" class="btn btn-basic" role="button"><< Termo de Referência</a>
+										</div>
+									</div>
+								</div>								
 
 								<form name="formDotacaoFields" id="formDotacaoFields" method="post" enctype="multipart/form-data" class="form-validate-jquery">
 									<div class="row">
@@ -253,14 +275,17 @@
 										</div>									
 									</div>
 
-									
-									<div class="row" style="margin-top: 30px;">
+									<div class="row" style="margin-top: 10px;">
 										<div class="col-lg-12">								
 											<div class="form-group">
 												<?php if ($count <= 0) : ?>
-													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-												<?php endif; ?>
-												<a href="tr.php" class="btn btn-basic" role="button"><< Termo de Referência</a>
+
+												<?php
+												if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('ADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA') || $_SESSION['PerfiChave']==strtoupper('JURIDICO')){
+													print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button> ');
+												}
+												?>
+													<?php endif; ?>												
 											</div>
 										</div>
 									</div>
@@ -288,16 +313,16 @@
 												<td>'.$item['DtOrcNome'].'</td>
 
 												<td>
-													<a href="global_assets/anexos/cliente/'.$item['DtOrcArquivo'].'" target="_blank">'.$item['DtOrcArquivo'].'</a>
+													<a href="global_assets/anexos/dotacaoOrcamentaria/'.$item['DtOrcArquivo'].'" target="_blank">'.$item['DtOrcArquivo'].'</a>
 												</td>
 												
 												<td class="text-center">
 													<div class="list-icons">
-														<div class="list-icons list-icons-extended">
-
-															<a href="#" onclick="removeDotacao('.$item['DtOrcId'].', \''.$item['DtOrcData'].'\',\''.$item['DtOrcNome'].'\', \''.$item['DtOrcArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>	
-
-														</div>
+														<div class="list-icons list-icons-extended">');
+														if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('ADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA') || $_SESSION['PerfiChave']==strtoupper('JURIDICO')){
+															print('	<a href="#" onclick="removeDotacao('.$item['DtOrcId'].', \''.$item['DtOrcData'].'\',\''.$item['DtOrcNome'].'\', \''.$item['DtOrcArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>');	
+														}
+												print('	</div>
 													</div>
 												</td>
 

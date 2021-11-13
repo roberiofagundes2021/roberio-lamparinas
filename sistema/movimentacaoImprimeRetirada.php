@@ -146,8 +146,8 @@ try {
             <td colspan="2" style="width:50%; border: none;"></td>
         </tr>
         <tr>
-            <td colspan="2" style="width:50%">Origem: '. $Origem .'</td>
-            <td colspan="2" style="width:50%">Destino: '.$Destino.'</td>
+            <td colspan="2" style="width:50%">Origem:<br>'. $Origem .'</td>
+            <td colspan="2" style="width:50%">Destino:<br>'.$Destino.'</td>
         </tr>
     ';
 

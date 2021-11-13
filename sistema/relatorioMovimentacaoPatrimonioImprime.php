@@ -48,15 +48,26 @@ if (count($args) >= 1) {
 
 		$string != '' ? $string .= ' and ' : $string;
 
-		$sql = "SELECT PatriNumero ,MvXPrId, MovimId ,MovimData, MovimNotaFiscal, MovimOrigemLocal, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, SetorNome
-                    FROM Patrimonio
-                    JOIN MovimentacaoXProduto on MvXPrPatrimonio = PatriId
-                    JOIN Movimentacao on MovimId = MvXPrMovimentacao
-                    JOIN Produto on ProduId = MvXPrProduto
-                    LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
-                    LEFT JOIN Setor on SetorId = MovimDestinoSetor
-                    WHERE " . $string . " ProduUnidade = " . $_SESSION['UnidadeId'] . "
-                    ";
+		$sql = "SELECT PatriNumero ,MvXPrId, MovimId, MovimData, MovimNotaFiscal, MvXPrValidade, 
+				MvXPrValorUnitario, MvXPrValidade, ProduNome,
+				CASE 
+					WHEN MovimOrigemLocal IS NULL THEN SetorO.SetorNome
+					ELSE LocalO.LcEstNome 
+						END as Origem,
+					CASE 
+					WHEN MovimDestinoLocal IS NULL THEN ISNULL(SetorD.SetorNome, MovimDestinoManual)
+					ELSE LocalD.LcEstNome
+						END as Destino
+				FROM Patrimonio
+				JOIN MovimentacaoXProduto on MvXPrPatrimonio = PatriId
+				JOIN Movimentacao on MovimId = MvXPrMovimentacao
+				JOIN Produto on ProduId = MvXPrProduto
+				LEFT JOIN LocalEstoque LocalO on LocalO.LcEstId = MovimOrigemLocal 
+				LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
+				LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
+				LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
+				WHERE " . $string . " ProduUnidade = " . $_SESSION['UnidadeId'] . "
+				";
 		$result = $conn->query($sql);
 		$rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -237,8 +248,8 @@ if (isset($_POST['resultados'])) {
 				<td style='text-align: right'>" . mostraValor($produto['MvXPrValorUnitario']) . "</td>
 				<td style='text-align: right'></td>
 				<td style='text-align: center'>" . mostraData($produto['MvXPrValidade']) . "</td>
-				<td style='text-align: left'>" . $produto['LcEstNome'] . "</td>
-				<td style='text-align: left'>" . $produto['SetorNome'] . "</td>
+				<td style='text-align: left'>" . $produto['Origem'] . "</td>
+				<td style='text-align: left'>" . $produto['Destino'] . "</td>
 			</tr>
 		 ";
 		}

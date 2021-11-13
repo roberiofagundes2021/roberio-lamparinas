@@ -14,32 +14,42 @@ if (isset($_POST['inputFluxoId'])) {
 	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
 }
 
-$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim,FlOpeConteudoInicio, FlOpeConteudoFim, CategNome, SbCatNome,
-		ForneNome, ForneCelular, ForneEmail
+//Pega os dados principais do contrato
+$sql = "SELECT FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, 
+		FlOpeConteudoInicio, FlOpeConteudoFim, CategNome, ForneNome, ForneCelular, ForneEmail
 		FROM FluxoOperacional
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
 		JOIN Categoria on CategId = FlOpeCategoria
-		JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 		WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
-$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
+// Lista as SubCategorias
+$sql = "SELECT SbCatId, SbCatNome
+		FROM FluxoOperacionalXSubCategoria
+		JOIN SubCategoria ON SbCatId = FOXSCSubcategoria
+		WHERE FOXSCUnidade = " . $_SESSION['UnidadeId'] . "	AND FOXSCFluxo = " . $iFluxoOperacional."
+		ORDER BY SbCatNome ASC";
+$result = $conn->query($sql);
+$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+
+//Verifica se o contrato tem produtos
+$sql = "SELECT ProduId
 		FROM Produto
 		JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
+		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;	
 $result = $conn->query($sql);
-$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-$totalProdutos = count($rowProdutos);
+$rowProd = $result->fetchAll(PDO::FETCH_ASSOC);
+$totalProdutos = count($rowProd);
 
-$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario
+//Verifica se o contrato tem serviços
+$sql = "SELECT ServiId
 		FROM Servico
 		JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
 $result = $conn->query($sql);
-$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-$totalServicos = count($rowServicos);
+$rowServ = $result->fetchAll(PDO::FETCH_ASSOC);
+$totalServicos = count($rowServ);
 
 try {
 	$mpdf = new mPDF([
@@ -73,7 +83,7 @@ try {
 	</style>
 
 	<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
-		<div style='width:300px; float:left; display: inline;'>
+		<div style='width:400px; float:left; display: inline;'>
 			<img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
 			<span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
 			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: " . $_SESSION['UnidadeNome'] . "</div>
@@ -91,139 +101,185 @@ try {
 	<div>' . $row['FlOpeConteudoInicio'] . '</div>
 	<br>';
 
-	if ($totalProdutos > 0) {		
+	$totalGeralProdutos = 0;
 
-        $html .= "<div style='text-align:center; margin-top: 20px;'><h2>PRODUTOS</h2></div>";
-        
-        $html .= '
+	if ($totalProdutos > 0){
+		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>PRODUTOS</h2></div>";
+			
+		$html .= '
 		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd; padding: 8px; border: 1px solid #ccc;">
 			Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
 		</div>
 		<br>
 		';
+	
+		foreach ($rowSubCategoria as $sbcat) {
 
-		$html .= '
-				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
-					SubCategoria: <span style="font-weight:normal;">' . $row['SbCatNome'] . '</span>
-				</div>
-				<br> ';	
+			$totalProdutos = 0;
+	
+			$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+					FROM Produto
+					JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+					JOIN SubCategoria on SbCatId = ProduSubCategoria
+					LEFT JOIN Marca on MarcaId = ProduMarca
+					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
+					and SbCatId = ".$sbcat['SbCatId']."
+					ORDER BY SbCatNome, ProduNome ASC";	
+			$result = $conn->query($sql);
+			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+			$countProdutos = count($rowProdutos);		
+	
+			if ($countProdutos > 0) {
+	
+				$html .= '
+						<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
+							SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
+						</div>';	
+	
+				$html .= '
+				<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
+					<tr>
+						<th style="text-align: center; width:8%">Item</th>
+						<th style="text-align: left; width:43%">Produto</th>
+						<th style="text-align: center; width:10%">Unidade</th>				
+						<th style="text-align: center; width:12%">Quant.</th>
+						<th style="text-align: center; width:12%">V. Unit.</th>
+						<th style="text-align: center; width:15%">V. Total</th>
+					</tr>
+				';
+	
+				$cont = 1;
+	
+				foreach ($rowProdutos as $rowProduto) {
+	
+					if ($rowProduto['FOXPrValorUnitario'] != '' and $rowProduto['FOXPrValorUnitario'] != null) {
+						$valorUnitario = $rowProduto['FOXPrValorUnitario'];
+						$valorTotal = $rowProduto['FOXPrQuantidade'] * $rowProduto['FOXPrValorUnitario'];
+					} else {
+						$valorUnitario = 0;
+						$valorTotal = 0;
+					}
+					
+					$html .= "
+						<tr>
+							<td style='text-align: center;'>" . $cont . "</td>
+							<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'] . "<br>Marca: ".$rowProduto['MarcaNome']."</td>
+							<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
+							<td style='text-align: center;'>" . $rowProduto['FOXPrQuantidade'] . "</td>	
+							<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
+							<td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>	
+						</tr>
+					";
+	
+					$cont++;
+					$totalProdutos += $valorTotal;
+				}
 
-		$html .= '
-		<table style="width:100%; border-collapse: collapse;">
-			<tr>
-				<th style="text-align: center; width:8%">Item</th>
-				<th style="text-align: left; width:65%">Produto</th>
-				<th style="text-align: center; width:12%">Unidade</th>				
-				<th style="text-align: center; width:15%">Quant.</th>
-			</tr>
-		';
+				$totalGeralProdutos += $totalProdutos;
 
-		$cont = 1;
+				$html .= "  <tr>
+								<td colspan='5' height='50' valign='middle'>
+									<strong>Total Produtos</strong>
+								</td>
+								<td style='text-align: right' colspan='2'>
+									" . mostraValor($totalProdutos) . "
+								</td>
+							</tr>";
+				$html .= "</table>";	
 
-		foreach ($rowProdutos as $rowProduto) {
-			
-			if ($totalProdutos == ($cont)) {
-				$html .= "
-				<tr>
-					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['ProduDetalhamento'] . "</td>
-					<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
-					<td style='text-align: center;'>" . $rowProduto['FOXPrQuantidade'] . "</td>		
-			";
-			} else {
-				$html .= "
-				<tr>
-					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['ProduDetalhamento'] . "</td>
-					<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
-					<td style='text-align: center;'>" . $rowProduto['FOXPrQuantidade'] . "</td>
-				</tr>
-			";
-			}
-
-			$cont++;
-			$totalGeralProdutos += $rowProduto['FOXPrQuantidade'];
+				$html .= "<br>";					
+			}		
 		}
-
-		$html .= "<br>";
-
-		$html .= "  <tr>
-	                	<td colspan='3' height='50' valign='middle'>
-		                    <strong>Total Produtos</strong>
-	                    </td>
-					    <td style='text-align: center' colspan='1'>
-					        " . $totalGeralProdutos . "
-					    </td>
-				    </tr>";
-		$html .= "</table>";
 	}
 
 	$totalGeralServicos = 0;
 
-	if ($totalServicos > 0) {
-
-        $html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
-        
-        $html .= '
+	if ($totalServicos > 0){
+		
+		$html .= "<div style='text-align:center; margin-top: 20px;'><h2>SERVIÇOS</h2></div>";
+			
+		$html .= '
 		<div style="font-weight: bold; position:relative; margin-top: 5px; background-color:#ddd;  padding: 8px;  border: 1px solid #ccc;">
 			Categoria: <span style="font-weight:normal;">' . $row['CategNome'] . '</span> 
 		</div>
 		<br>
 		';
+	
+		foreach ($rowSubCategoria as $sbcat) {
 
-		$html .= '
-				<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
-					SubCategoria: <span style="font-weight:normal;">' . $row['SbCatNome'] . '</span>
-				</div>
-				<br> ';	
-
-		$html .= '
-		<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
-			<tr>
-				<th style="text-align: center; width:8%">Item</th>
-				<th style="text-align: left; width:77%">Serviço</th>
-				<th style="text-align: center; width:15%">Quant.</th>
-			</tr>
-		';
-
-		$cont = 1;
-
-		foreach ($rowServicos as $rowServico) {
-
-			if ($totalServicos == ($cont)) {
-				$html .= "
-				<tr>
-					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['ServiDetalhamento'] . "</td>	
-					<td style='text-align: center;'>" . $rowServico['FOXSrQuantidade'] . "</td>			
-				</tr>
-			";
-			} else {
-				$html .= "
-				<tr>
-					<td style='text-align: center;'>" . $cont . "</td>
-					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['ServiDetalhamento'] . "</td>
-					<td style='text-align: center;'>" . $rowServico['FOXSrQuantidade'] . "</td>
+			$totalServicos = 0;
+	
+			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
+					FROM Servico
+					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+					JOIN SubCategoria on SbCatId = ServiSubCategoria
+					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
+					and SbCatId = ".$sbcat['SbCatId']."
+					ORDER BY SbCatNome, ServiNome ASC";
+			$result = $conn->query($sql);
+			$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+			$countServicos = count($rowServicos);		
+	
+			if ($countServicos > 0) {
+	
+				$html .= '
+						<div style="font-weight: bold; position:relative; margin-top: 15px; background-color:#eee; padding: 8px; border: 1px solid #ccc;">
+							SubCategoria: <span style="font-weight:normal;">' . $sbcat['SbCatNome'] . '</span>
+						</div>';	
+	
+				$html .= '
+				<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
+					<tr>
+						<th style="text-align: center; width:8%">Item</th>
+						<th style="text-align: left; width:53%">Serviço</th>
+						<th style="text-align: center; width:12%">Quant.</th>
+						<th style="text-align: center; width:12%">V. Unit.</th>
+						<th style="text-align: center; width:15%">V. Total</th>
+					</tr>
+				';
+	
+				$cont = 1;
+	
+				foreach ($rowServicos as $rowServico) {
+	
+					if ($rowServico['FOXSrValorUnitario'] != '' and $rowServico['FOXSrValorUnitario'] != null) {
+						$valorUnitario = $rowServico['FOXSrValorUnitario'];
+						$valorTotal = $rowServico['FOXSrQuantidade'] * $rowServico['FOXSrValorUnitario'];
+					} else {
+						$valorUnitario = 0;
+						$valorTotal = 0;
+					}
 					
-				</tr>
-			";
+					$html .= "
+						<tr>
+							<td style='text-align: center;'>" . $cont . "</td>
+							<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'] . "</td>	
+							<td style='text-align: center;'>" . $rowServico['FOXSrQuantidade'] . "</td>	
+							<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
+							<td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>		
+						</tr>
+					";
+	
+					$cont++;
+					$totalServicos += $valorTotal;
+				}		
+				
+				$totalGeralServicos += $totalServicos;
+
+				$html .= "  <tr>
+								<td colspan='4' height='50' valign='middle'>
+									<strong>Total Serviços</strong>
+								</td>
+								<td style='text-align: right' colspan='2'>
+									" . mostraValor($totalServicos) . "
+								</td>
+							</tr>";
+				$html .= "</table>";
+
+				$html .= "<br>";				
 			}
-
-			$cont++;
-			$totalGeralServicos += $rowServico['FOXSrQuantidade'];
 		}
-
-		$html .= "<br>";
-
-		$html .= "  <tr>
-	                	<td colspan='2' height='50' valign='middle'>
-		                    <strong>Total Serviços</strong>
-	                    </td>
-					    <td style='text-align: center' colspan='1'>
-					        " . $totalGeralServicos . "
-					    </td>
-				    </tr>";
-		$html .= "</table>";
 	}
 
 	$totalGeral = $totalGeralProdutos + $totalGeralServicos;
@@ -233,20 +289,17 @@ try {
                 	<td colspan='5' height='50' valign='middle' style='width:85%'>
 	                    <strong>TOTAL DE ITENS GERAIS</strong>
                     </td>
-				    <td style='text-align: center; width:15%'>
-				        " . $totalGeral . "
+				    <td style='text-align: right; width:15%'>
+				        " . mostraValor($totalGeral) . "
 				    </td>
 			    </tr>
 			  </table>
 	";
-
-	
-    
+   
     $html .= '
 	<br><br>
 	<div>' . $row['FlOpeConteudoFim'] . '</div>
 	<br>';
-
 
 	$rodape = "<hr/>
     <div style='width:100%'>
@@ -256,17 +309,14 @@ try {
 
 	//$mpdf->SetHTMLHeader($topo,'O',true); //o SetHTMLHeader deve vir antes do WriteHTML para que o cabeçalho apareça em todas as páginas
 	$mpdf->SetHTMLFooter($rodape); 	//o SetHTMLFooter deve vir antes do WriteHTML para que o rodapé apareça em todas as páginas
-	$mpdf->WriteHTML($html);
 
-	// Other code
-	$mpdf->Output();
 } catch (\Mpdf\MpdfException $e) { // Note: safer fully qualified exception name used for catch
 
 	// Process the exception, log, print etc.
 	$html = $e->getMessage();
-
-	$mpdf->WriteHTML($html);
-
-	// Other code
-	$mpdf->Output();
 }
+
+$mpdf->WriteHTML($html);
+
+// Other code
+$mpdf->Output();

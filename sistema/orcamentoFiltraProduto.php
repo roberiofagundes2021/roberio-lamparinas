@@ -27,19 +27,17 @@ if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POS
 	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
 			FROM Produto
 			JOIN Categoria on CategId = ProduCategoria
-			LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduSubCategoria = '". $_POST['idSubCategoria']."' and ProduId in (".$lista.")
 			";
 } else {
 	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
 			FROM Produto
 			JOIN Categoria on CategId = ProduCategoria
-			LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = '". $_POST['idCategoria']."' and ProduId in (".$lista.")
 			";
 }
-
-//echo $sql;
 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -56,7 +54,6 @@ foreach ($row as $item){
 	$cont++;
 	
 	$id = $item['ProduId'];
-	
 	
 	$quantidade = isset($_POST['produtoQuant'][$id]) ? $_POST['produtoQuant'][$id] : '';
 	$valorUnitario = isset($_POST['produtoValor'][$id]) ? $_POST['produtoValor'][$id] : '';

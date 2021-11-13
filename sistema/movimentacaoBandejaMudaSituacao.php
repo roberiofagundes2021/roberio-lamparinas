@@ -22,8 +22,10 @@ if (isset($_POST['inputMovimentacaoId'])) {
 
 		if ($_POST['inputMovimentacaoStatus'] == 'NAOLIBERADO') {
 			$motivo = $_POST['inputMotivo'];
+			$msg = "Movimentação não liberada!";
 		} else {
 			$motivo = NULL;
+			$msg = "Movimentação liberada!";
 		}
 
 
@@ -54,14 +56,14 @@ if (isset($_POST['inputMovimentacaoId'])) {
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação da movimentação alterada!!!";
+		$_SESSION['msg']['mensagem'] = $msg;
 		$_SESSION['msg']['tipo'] = "success";
 	} catch (PDOException $e) {
 
 		$conn->rollback();
 
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação da movimentação!!!";
+		$_SESSION['msg']['mensagem'] = "Erro na liberação da movimentação!!!";
 		$_SESSION['msg']['tipo'] = "error";
 
 		echo 'Error: ' . $e->getMessage();

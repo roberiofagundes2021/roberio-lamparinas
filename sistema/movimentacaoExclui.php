@@ -21,7 +21,7 @@ if(isset($_POST['inputMovimentacaoId'])){
 
 		/*----- DELETA MOVIMENTAÇÃO POR SERVICO -----*/
 		$sql = "DELETE FROM MovimentacaoXServico
-				WHERE MvXSrMovimentacao = :id";
+				WHERE MvXSrMovimentacao = :id"; 
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iMovimentacao); 
 		$result->execute();
@@ -31,6 +31,28 @@ if(isset($_POST['inputMovimentacaoId'])){
 				WHERE MovimId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iMovimentacao); 
+		$result->execute();
+
+		// Selecionando o id da Bandeja 
+		$sql = "SELECT BandeId 
+		FROM Bandeja
+		WHERE BandeTabelaId =  ". $iMovimentacao ." and BandeTabela = 'Movimentacao' ";
+		$result = $conn->query($sql);
+		$Bandeja= $result->fetch(PDO::FETCH_ASSOC);
+
+		/*----- DELETA BANDEJA -----*/
+		$sql = "DELETE FROM Bandeja
+				WHERE BandeId = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $Bandeja['BandeId']); 
+		$result->execute();
+
+		
+		/*----- DELETA BANDEJA X PERFIL -----*/
+		$sql = "DELETE FROM BandejaXPerfil
+				WHERE BnXPeBandeja = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $Bandeja['BandeId']); 
 		$result->execute();
 
 		$conn->commit();

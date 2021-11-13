@@ -16,12 +16,26 @@ if (isset($_POST['inputMovimentacaoId'])){
 		   </script> ');
 }
 
-$sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimNotaFiscal, MovimObservacao		
+$sql = "SELECT ForneNome, ForneCelular, ForneEmail, MovimTipo, MovimData, MovimNotaFiscal, MovimObservacao, UsuarNome, OrComNumero,
+		dbo.fnValorTotalOrdemCompra(" . $_SESSION['UnidadeId'] . ", MovimOrdemCompra) as TotalOrdemCompra, SetorNome		
         FROM Movimentacao
 		JOIN Fornecedor on ForneId = MovimFornecedor
+		JOIN OrdemCompra on OrComId = MovimOrdemCompra
+		JOIN Usuario on UsuarId = MovimUsuarioAtualizador
+		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+		JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+		JOIN Setor on SetorId = UsXUnSetor
 		WHERE MovimUnidade = ". $_SESSION['UnidadeId'] ." and MovimId = ".$iMovimentacao." and MovimTipo = 'E'";
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
+
+$sql = "SELECT MvLiqMovimentacao, MvLiqData, MvLiqUsuario,UsuarNome
+		FROM MovimentacaoLiquidacao
+		JOIN Usuario on UsuarId = MvLiqUsuario
+		WHERE MvLiqUnidade = ". $_SESSION['UnidadeId'] ." and MvLiqMovimentacao = ".$iMovimentacao."
+		ORDER BY MvLiqUsuario ASC";
+$result = $conn->query($sql);
+$rowLiquida = $result->fetch(PDO::FETCH_ASSOC);	
 
 try {
 	$mpdf = new mPDF([
@@ -54,12 +68,12 @@ try {
 	</style>
 
 	<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
-		<div style='width:300px; float:left; display: inline;'>
+		<div style='width:470px; float:left; display: inline;'>
 			<img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
 			<span style='font-weight:bold;line-height:200px;'>".$_SESSION['EmpreNomeFantasia']."</span><br>
 			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: ".$_SESSION['UnidadeNome']."</div>
 		</div>
-		<div style='width:250px; float:right; display: inline; text-align:right;'>
+		<div style='width:130px; float:right; display: inline; text-align:right;'>
 			<div>".date('d/m/Y')."</div>
 			<div style='margin-top:8px;'>Nota Fiscal: ".$row['MovimNotaFiscal']."</div>
 		</div> 
@@ -68,7 +82,8 @@ try {
 	<div style='text-align:center; margin-top: 20px;'><h1>ENTRADA DE MERCADORIA</h1></div>
 	";
 	
-    $sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MvXPrQuantidade, MvXPrValorUnitario
+    $sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MvXPrQuantidade, MvXPrValorUnitario,
+						(SELECT MarcaNome FROM Marca WHERE MarcaId = ProduMarca) as Marca, MvXPrLote, MvXPrValidade
             FROM Produto
             JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
             JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -77,7 +92,8 @@ try {
     $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
     $totalProdutos = count($rowProdutos);
 
-    $sql = "SELECT ServiId, ServiNome, ServiDetalhamento, MvXSrQuantidade, MvXSrValorUnitario
+    $sql = "SELECT ServiId, ServiNome, ServiDetalhamento, MvXSrQuantidade, MvXSrValorUnitario,
+						(SELECT MarcaNome FROM Marca WHERE MarcaId = ServiMarca) as Marca
             FROM Servico
             JOIN MovimentacaoXServico on MvXSrServico = ServiId
             WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and MvXSrMovimentacao = ".$iMovimentacao." and MvXSrQuantidade <> 0";
@@ -88,14 +104,34 @@ try {
 	$html .= '
 	<table style="width:100%; border-collapse: collapse;">
 		<tr style="background-color:#F1F1F1;">
-			<td colspan="2" style="width:40%; font-size:12px;">Fornecedor: '. $row['ForneNome'].'</td>
-			<td colspan="1" style="width:30%; font-size:12px;">Telefone: '. $row['ForneCelular'].'</td>
-			<td colspan="1" style="width:30%; font-size:12px;">E-mail: '. $row['ForneEmail'].'</td>
+			<td style="width:40%; font-size:12px;">Nº Ordem Compra / Carta Contrato:<br>'. $row['OrComNumero'].'</td>
+			<td style="width:20%; font-size:12px;">Valor:<br>'. mostraValor($row['TotalOrdemCompra']).'</td>
+			<td style="width:20%; font-size:12px;">Nº Nota Fiscal:<br>'. $row['MovimNotaFiscal'].'</td>
+			<td style="width:20%; font-size:12px;">Data:<br>'. mostraData($row['MovimData']).'</td>
 		</tr>
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
 		<tr>
-			<td colspan="4" style="width:100%; font-size:12px;">Observação: '.$row['MovimObservacao'].'</td>
+			<td style="width:40%; font-size:12px;">Data da Liquidação:<br>'. mostraData($rowLiquida['MvLiqData']).'</td>
+			<td style="width:60%; font-size:12px;">Liquidado por:<br>'. $rowLiquida['UsuarNome'].'</td>
 		</tr>
-	</table>';
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
+		<tr>
+			<td style="width:40%; font-size:12px;">Fornecedor:<br>'. $row['ForneNome'].'</td>
+			<td style="width:20%; font-size:12px;">Telefone:<br>'. $row['ForneCelular'].'</td>
+			<td style="width:40%; font-size:12px;">E-mail:<br>'. $row['ForneEmail'].'</td>
+		</tr>
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
+		<tr>
+			<td style="width:100%; font-size:12px;">Observação: '.$row['MovimObservacao'].'</td>
+		</tr>
+	</table>
+	
+	
+	
+	';
 
 	$totalGeralProdutos = 0;
 		
@@ -127,7 +163,11 @@ try {
 				$html .= "
 					<tr>
 						<td style='text-align: center;'>".$cont."</td>
-						<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
+						<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']
+						.($itemProduto['Marca']!=''?"<br>Marca: ".$itemProduto['Marca']:'')
+						.($itemProduto['MvXPrLote']!=''?"<br>Lote: ".$itemProduto['MvXPrLote']:'')
+						.($itemProduto['MvXPrValidade']!=''?"<br>Validade: ".mostraData($itemProduto['MvXPrValidade']):'').
+						"</td>
 						<td style='text-align: center;'>".$itemProduto['UnMedSigla']."</td>					
 						<td style='text-align: center;'>".$itemProduto['MvXPrQuantidade']."</td>
 						<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
@@ -182,7 +222,9 @@ try {
 				$html .= "
 					<tr>
 						<td style='text-align: center;'>".$cont."</td>
-						<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']."</td>	
+						<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']
+						.($itemServico['Marca']!=''?"<br>Marca: ".$itemServico['Marca']:'').
+						"</td>
 						<td style='text-align: center;'>".$itemServico['MvXSrQuantidade']."</td>
 						<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
 						<td style='text-align: right;'>".mostraValor($valorTotal)."</td>
@@ -220,6 +262,16 @@ try {
 				</tr>
 				</table>
 	";
+	
+	$html .= '			
+		<br><br>
+		<div style="width: 100%; margin-top: 100px;">
+			<div style="position: relative; float: left; text-align: center;">
+				<div style="position: relative; width: 250px; border-top: 1px solid #333; padding-top:10px; float: left; text-align: center; margin-left: 220px;">'.$row['UsuarNome'].'</div>
+				'.$row['SetorNome'].'<br>
+			</div>
+		</div>
+	';	
 	
     $rodape = "<hr/>
     <div style='width:100%'>

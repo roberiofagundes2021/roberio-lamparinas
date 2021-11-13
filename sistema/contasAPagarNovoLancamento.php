@@ -6,6 +6,10 @@ $_SESSION['PaginaAtual'] = 'Novo Lançamento - Contas a Pagar';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputPermissionAtualiza'])){
+    $atualizar = $_POST['inputPermissionAtualiza'];
+}
+
 if (isset($_POST['cmbPlanoContas'])) {
 
     if (isset($_POST['inputEditar'])) {
@@ -275,12 +279,13 @@ if (isset($_POST['cmbPlanoContas'])) {
 }
 //$count = count($row);
 
-if (isset($_GET['lancamentoId'])) {
+//Se estiver editando entra no IF
+if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) {
     $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
             CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero
     		FROM ContasAPagar
             LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
-    		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_GET['lancamentoId'] . "";
+    		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_POST['inputContasAPagarId'] . "";
     $result = $conn->query($sql);
     $lancamento = $result->fetch(PDO::FETCH_ASSOC);
 }
@@ -334,7 +339,7 @@ $dataInicio = date("Y-m-d");
                 }
             });            
 
-            function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade) {
+            function gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade) {
                 $("#parcelasContainer").html("")
                 let descricao = $("#inputDescricao").val()
 
@@ -398,7 +403,7 @@ $dataInicio = date("Y-m-d");
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
 
-                    geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade)
+                    gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade)
                 })
             }
             parcelamento()
@@ -759,7 +764,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label for="inputDescricao">Descrição <span class="text-danger">*</span></label>
-                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" required <?php if (isset($lancamento)) echo $lancamento['CnAPaDescricao'] ?>>
+                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDescricao'] ?>" required>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
@@ -914,8 +919,12 @@ $dataInicio = date("Y-m-d");
                                             </div>
                                         </div>
                                     </div>
-                                    <button id="salvar" class="btn btn-principal">Salvar</button>
-                                    <a href="contasAPagar.php" class="btn">Cancelar</a>
+                                        <?php 
+                                            if ($atualizar) {
+                                                echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
+                                             }
+                                        ?>
+                                        <a href="contasAPagar.php" class="btn">Cancelar</a>
                                 </div>
 
                             </div>

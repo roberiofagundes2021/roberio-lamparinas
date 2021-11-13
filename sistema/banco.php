@@ -1,6 +1,10 @@
 <?php 
 
-include_once("sessao.php"); 
+include_once("sessao.php");
+
+if(!$_SESSION['PerfiChave'] == "SUPER"){
+	header("location:javascript://history.go(-1)");
+}
 
 $_SESSION['PaginaAtual'] = 'Banco';
 
@@ -222,22 +226,26 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaBanco(BancoId, BancoNome, BancoStatus, Tipo){
+		function atualizaBanco(Permission, BancoId, BancoNome, BancoStatus, Tipo){
 
-			document.getElementById('inputBancoId').value = BancoId;
-			document.getElementById('inputBancoNome').value = BancoNome;
-			document.getElementById('inputBancoStatus').value = BancoStatus;
-					
-			if (Tipo == 'edita'){	
-				document.getElementById('inputEstadoAtual').value = "EDITA";
-				document.formBanco.action = "banco.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formBanco, "Tem certeza que deseja excluir esse Banco?", "bancoExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formBanco.action = "bancoMudaSituacao.php";
+			if (Permission == 1){
+				document.getElementById('inputBancoId').value = BancoId;
+				document.getElementById('inputBancoNome').value = BancoNome;
+				document.getElementById('inputBancoStatus').value = BancoStatus;
+						
+				if (Tipo == 'edita'){	
+					document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formBanco.action = "banco.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formBanco, "Tem certeza que deseja excluir esse Banco?", "bancoExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formBanco.action = "bancoMudaSituacao.php";
+				}
+				
+				document.formBanco.submit();
+			} else{
+				alerta('Permissão Negada!','');
 			}
-			
-			document.formBanco.submit();
 		}		
 			
 	</script>
@@ -334,13 +342,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['BancoNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaBanco('.$item['BancoId'].', \''.$item['BancoNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaBanco(1,'.$item['BancoId'].', \''.$item['BancoNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaBanco('.$item['BancoId'].', \''.$item['BancoNome'].'\','.$item['BancoStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaBanco('.$item['BancoId'].', \''.$item['BancoNome'].'\','.$item['BancoStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaBanco('.$atualizar.','.$item['BancoId'].', \''.$item['BancoNome'].'\','.$item['BancoStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaBanco('.$excluir.','.$item['BancoId'].', \''.$item['BancoNome'].'\','.$item['BancoStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>

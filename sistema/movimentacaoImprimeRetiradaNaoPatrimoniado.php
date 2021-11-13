@@ -34,35 +34,35 @@
                         </tr>
                         <tr>
                             <td rowspan="3" width="15%" style="text-align: center; background-color: #eee;">Código: '.$value['ProduCodigo'].'</td>
-                            <td colspan="4" width="65%">Produto: '.$value['ProduNome'].'</td>
-                            <td colspan="2" width="20%">Categoria: '.$value['CategNome'].'</td>
+                            <td colspan="4" width="65%">Produto:<br>'.$value['ProduNome'].'</td>
+                            <td colspan="2" width="20%">Categoria:<br>'.$value['CategNome'].'</td>
                         </tr>
                         <tr>
-                            <td colspan="3">Marca: '. $value['MarcaNome'] .'</td>
-                            <td colspan="2">Modelo: '.$value['ModelNome'].'</td>
-                            <td colspan="1">Unidade: '.$value['UnMedSigla'].'</td>                                    
+                            <td colspan="3">Marca:<br>'. $value['MarcaNome'] .'</td>
+                            <td colspan="2">Modelo:<br>'.$value['ModelNome'].'</td>
+                            <td colspan="1">Unidade:<br>'.$value['UnMedSigla'].'</td>                                    
                         </tr>
                         <tr>
                         ';
 
-                $html .= '  <td colspan="3">Classificação: '.$value['ClassNome'].'</td>';
+                $html .= '  <td colspan="3">Classificação:<br>'.$value['ClassNome'].'</td>';
 
                 if($value['Validade'] == ''){
-                    $html .= '  <td colspan="2">Lote: '.$value['MvXPrLote'].'</td>';                    
+                    $html .= '  <td colspan="2">Lote:<br>'.$value['MvXPrLote'].'</td>';                    
                 } else{
 
                     if ($value['Validade'] == '1900-01-01'){
-                        $validade = 'não informada';
+                        $validade = 'Não informado';
                     } else{
-                        $valida = mostraData($value['Validade']);
+                        $validade = mostraData($value['Validade']);
                     }
 
-                    $html .= '  <td colspan="1">Lote: '.$value['MvXPrLote'].'</td>';
-                    $html .= '  <td colspan="1">Validade: '.$validade.'</td>';    
+                    $html .= '  <td colspan="1">Lote:<br>'.$value['MvXPrLote'].'</td>';
+                    $html .= '  <td colspan="1">Validade:<br>'.$validade.'</td>';    
                 }
 
                 $html .= '
-                                <td colspan="1">Quantidade: '.$value['MvXPrQuantidade'].'</td>                                
+                                <td colspan="1">Quantidade:<br>'.$value['MvXPrQuantidade'].'</td>                                
                             </tr>
                         ';
             }

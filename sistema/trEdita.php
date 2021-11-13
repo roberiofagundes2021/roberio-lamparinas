@@ -8,8 +8,7 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT ParamProdutoOrcamento, ParamServicoOrcamento
 		FROM Parametro
-		WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . " 
-		";
+		WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
 $result = $conn->query($sql);
 $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -21,8 +20,9 @@ if (isset($_POST['inputTRId'])) {
 
 	$iTR = $_POST['inputTRId'];
 
-	$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio, TrRefConteudoFim, TrRefTipo
+	$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio, TrRefConteudoFim, TrRefTipo, SituaChave
 			FROM TermoReferencia
+			JOIN Situacao on SituaId = TrRefStatus
 			WHERE TrRefId = $iTR ";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -592,7 +592,13 @@ if (isset($_POST['inputTRData'])) {
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<button type="submit" class="btn btn-lg btn-principal" id="enviar">Alterar</button>
+										<?php 
+											if ($_POST['inputPermission']) {
+												if ($row['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+													print('<button type="submit" class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+												}											
+											}
+										?>
 										<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

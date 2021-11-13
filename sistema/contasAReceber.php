@@ -169,8 +169,7 @@ $dataFim = date("Y-m-d");
                 $('.btnParcelar').each((i, elem) => {
                     $(elem).on('click', function() {
 
-                        let recebimentos = $("#RecebimentoAgrupadoContainer").children()
-
+                        //let recebimentos = $("#RecebimentoAgrupadoContainer").children()
 
                         let linha = $(elem).parent().parent().parent().parent().parent()
                             .parent()
@@ -241,14 +240,13 @@ $dataFim = date("Y-m-d");
                     url,
                     data,
                     (data) => {
-                        $('tbody').append(data)
+                        //$('tbody').append(data)
                         alerta('Atenção', 'Parcelas geradas com sucesso!')
-                        modalParcelas()
-                        editarLancamento()
-                        excluirConta()
-                        $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
-                        RecebimentoAgrupado()
-                        atualizaTotal()
+                        location.href = "contasAReceber.php";
+                       // modalParcelas()
+                      //  $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
+                        //RecebimentoAgrupado()
+                      //  atualizaTotal()                        
                     }
                 )
 
@@ -260,7 +258,7 @@ $dataFim = date("Y-m-d");
                 $('body').css('overflow', 'scroll');
             })
             /////////////////////////////////////////////////////////////////
-            function geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
+            function gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao) {
                 $("#parcelasContainer").html("")
 
                 let valorParcela = float2moeda(valorTotal / parcelas)
@@ -322,7 +320,7 @@ $dataFim = date("Y-m-d");
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
                     let descricao = $("#inputDescricao").val()
-                    geararParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
+                    gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade, descricao)
                 })
             }
             parcelamento()
@@ -333,36 +331,6 @@ $dataFim = date("Y-m-d");
             function redirecionarPagamento(id) {
                 window.location.href = `contasAReceberNovoLancamento.php?lancamentoId=${id}`
             }
-
-            function editarLancamento() {
-                $('.editarLancamento').each((i, elem) => {
-                    $(elem).on('click', () => {
-                        let linha = $(elem).parent().parent().parent().parent()
-                        let tds = linha.children();
-
-                        let filhosPrimeiroTd = $(tds[0]).children();
-                        let idLancamento = $(filhosPrimeiroTd[1]).val()
-
-                        window.location.href =
-                            `contasAReceberNovoLancamento.php?lancamentoId=${idLancamento}`
-                    })
-                })
-            }
-
-            function excluirConta() {
-                let contas = $('.excluirConta').each((i, elem) => {
-                    $(elem).on('click', (e) => {
-                        let id = $(elem).attr('idContaExcluir')
-                        $('.idContaAReceber').val(id)
-                        e.preventDefault
-                        confirmaExclusao(document.contaExclui, "Tem certeza que deseja excluir essa Conta?", `contasAReceberExclui.php?idContaAReceber=${id}`);
-
-                        document.contaExclui.submit()
-                    })
-                })
-
-            }
-            excluirConta()
 
             function atualizaTotal() {
                 let childres = $('tbody').children()
@@ -403,6 +371,8 @@ $dataFim = date("Y-m-d");
                 let clientes = $('#cmbClientes').val()
                 let planoContas = $('#cmbPlanoContas').val()
                 let FormaPagamento = $("#cmbFormaDeRecebimento").val()
+                let inputPermissionAtualiza = $("#inputPermissionAtualiza").val()
+                let inputPermissionExclui = $("#inputPermissionExclui").val()
                 let statusArray = $('#cmbStatus').val().split('|')
                 let status = statusArray[0]
                 let statusTipo = statusArray[1]
@@ -424,7 +394,9 @@ $dataFim = date("Y-m-d");
                     cmbFormaDeRecebimento: FormaPagamento,
                     cmbStatus: status,
                     statusTipo: statusTipo,
-                    tipoFiltro: tipoFiltro
+                    tipoFiltro: tipoFiltro,
+                    permissionAtualiza: inputPermissionAtualiza,
+                    permissionExclui: inputPermissionExclui
                 };
 
                 $.post(
@@ -437,8 +409,6 @@ $dataFim = date("Y-m-d");
                             resultadosConsulta = data
 
                             modalParcelas()
-                            editarLancamento()
-                            excluirConta()
                             atualizaTotal()
 
                         } else {
@@ -460,12 +430,28 @@ $dataFim = date("Y-m-d");
             })
 
             Filtrar(true)
-
-            $('#novoLacamento').on('click', (e) => {
-                location.href = "contasAReceberNovoLancamento.php";
-                return false;
-            })
         });
+
+        //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
+        function atualizaContasAReceber(Permission, ContasAReceberId, Tipo) {
+
+            document.getElementById('inputContasAReceberId').value = ContasAReceberId;
+            document.getElementById('inputPermissionAtualiza').value = Permission;
+
+            if (Tipo == 'novo' || Tipo == 'edita') {
+                document.formContasAReceber.action = "contasAReceberNovoLancamento.php";
+            } else if (Tipo == 'exclui') {
+                if(Permission){
+                    confirmaExclusao(document.formContasAReceber, "Tem certeza que deseja excluir essa Conta?", "contasAReceberExclui.php");
+                } else{
+                    alerta('Permissão Negada!','');
+                    return false;
+                }
+            }            
+
+            document.formContasAReceber.submit();
+        }     
+
     </script>
 
 </head>
@@ -494,13 +480,6 @@ $dataFim = date("Y-m-d");
                         <div class="card">
                             <div class="card-header header-elements-inline">
                                 <h3 class="card-title">Relação de Contas à Receber</h3>
-                                <div class="header-elements">
-                                    <div class="list-icons">
-                                        <a class="list-icons-item" data-action="collapse"></a>
-                                        <a href="relatorioMovimentacao.php" class="list-icons-item" data-action="reload"></a>
-                                        <!--<a class="list-icons-item" data-action="remove"></a>-->
-                                    </div>
-                                </div>
                             </div>
 
                             <div class="card-body">
@@ -521,10 +500,6 @@ $dataFim = date("Y-m-d");
                                     <input id="cmbCodigo_imp" type="hidden" name="cmbCodigo_imp"></input>
                                 </form>
 
-                                <form name="contaExclui" action="" method="POST">
-                                    <input type="hidden" name="idContaAReceber" id="idContaAReceber">
-                                </form>
-
                                 <form name="formMovimentacao" method="post" class="p-3">
                                     <div class="row">
                                         <div class="col-lg-2">
@@ -534,7 +509,7 @@ $dataFim = date("Y-m-d");
                                                     <span class="input-group-prepend">
                                                         <span class="input-group-text"><i class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" value="<?php if (isset($_SESSION['ContPagPeriodoDe'])) echo $_SESSION['ContPagPeriodoDe'];
+                                                    <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" value="<?php if (isset($_SESSION['ContRecPeriodoDe'])) echo $_SESSION['ContRecPeriodoDe'];
                                                                                                                                                 else echo $dataInicio; ?>">
                                                 </div>
                                             </div>
@@ -547,8 +522,7 @@ $dataFim = date("Y-m-d");
                                                     <span class="input-group-prepend">
                                                         <span class="input-group-text"><i class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php if (isset($_SESSION['ContPagAte'])) echo $_SESSION['ContPagAte'];
-                                                                                                                                    else echo $dataFim; ?>">
+                                                    <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php if (isset($_SESSION['ContRecAte'])) echo $_SESSION['ContRecAte'];                                                                            else echo $dataFim; ?>">
                                                 </div>
                                             </div>
                                         </div>
@@ -556,7 +530,7 @@ $dataFim = date("Y-m-d");
                                         <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label for="cmbNumDoc">Número Doc.</label>
-                                                <input id="cmbNumDoc" name="cmbNumDoc" class="form-control">
+                                                <input id="cmbNumDoc" name="cmbNumDoc" class="form-control" value="<?php if (isset($_SESSION['ContRecNumDoc'])) echo $_SESSION['ContRecNumDoc']; ?>">
                                             </div>
                                         </div>
 
@@ -565,30 +539,39 @@ $dataFim = date("Y-m-d");
                                             <div class="form-group">
                                                 <label for="cmbClientes">Clientes</label>
                                                 <select id="cmbClientes" name="cmbClientes" class="form-control form-control-select2">
+                                                    <option value="">Todos</option>
                                                     <?php
-                                                    $sql = "SELECT *
-                                                            FROM  Cliente
-                                                            JOIN  Empresa 
-                                                            ON    ClienUnidade = EmpreId
-                                                            WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . " and EmpreStatus = 1
-                                                            ORDER BY ClienNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                        try {
+                                                            $sql = "SELECT *
+                                                                    FROM  Cliente
+                                                                    JOIN  Empresa ON ClienUnidade = EmpreId
+                                                                    WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . " and EmpreStatus = 1
+                                                                    ORDER BY ClienNome ASC";
+                                                            $result = $conn->query($sql);
+                                                            $rowCliente = $result->fetchAll(PDO::FETCH_ASSOC);
 
+                                                            try {
 
-                                                    try {
-                                                        print('<option value= 0  selected>Todos</option>');
-
-                                                        foreach ($rowSituacao as $item) {
-                                                            if (isset($item['ClienId'])) {
-                                                                print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
-                                                                echo ($item['ClienId']);
+                                                                foreach ($rowCliente as $item) {
+                                                                    if (isset($item['ClienId'])) {
+                                                                        if (isset($_SESSION['ContRecCliente'])) {
+                                                                            if ($item['ClienId'] == $_SESSION['ContRecCliente']) {
+                                                                                print('<option value="' . $item['ClienId'] . '" selected>' . $item['ClienNome'] . '</option>');
+                                                                            } else {
+                                                                                print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
+                                                                            }
+                                                                        } else {
+                                                                            print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
+                                                                        }
+                                                                    }
+                                                                }
+                                                            } catch (Exception $e) {
+                                                                echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                             }
+                                                        } catch (Exception $e) {
+                                                            echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                         }
-                                                    } catch (Exception $e) {
-                                                        echo 'Exceção capturada: ',  $e->getMessage(), "\n";
-                                                    }
-                                                    ?>
+                                                   ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -609,8 +592,8 @@ $dataFim = date("Y-m-d");
                                                     $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                     foreach ($rowPlanoContas as $item) {
-                                                        if (isset($_SESSION['ContPagPlanoContas'])) {
-                                                            if ($item['PlConId'] == $_SESSION['ContPagPlanoContas']) {
+                                                        if (isset($_SESSION['ContRecPlanoContas'])) {
+                                                            if ($item['PlConId'] == $_SESSION['ContRecPlanoContas']) {
                                                                 print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
                                                             } else {
                                                                 print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
@@ -641,8 +624,8 @@ $dataFim = date("Y-m-d");
                                                         try {
                                                             foreach ($rowSituacao as $item) {
                                                                 if ($item['SituaChave'] == 'ARECEBER' || $item['SituaChave'] == 'RECEBIDA') {
-                                                                    if (isset($_SESSION['ContPagStatus'])) {
-                                                                        if ($item['SituaId'] == $_SESSION['ContPagStatus']) {
+                                                                    if (isset($_SESSION['ContRecStatus'])) {
+                                                                        if ($item['SituaId'] == $_SESSION['ContRecStatus']) {
                                                                             print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
                                                                         } else {
                                                                             print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
@@ -667,27 +650,38 @@ $dataFim = date("Y-m-d");
                                             <div class="form-group">
                                                 <label for="cmbFormaDeRecebimento">Forma de Recebimento</label>
                                                 <select id="cmbFormaDeRecebimento" name="cmbFormaDeRecebimento" class="form-control form-control-select2">
+                                                    <option value="">Todos</option>
                                                     <?php
-                                                    $sql = "SELECT *
-                                                            FROM FormaPagamento
-                                                            JOIN Situacao on SituaId = FrPagStatus
-                                                            WHERE FrPagUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
-                                                            ORDER BY FrPagNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                        try {
+                                                            $sql = "SELECT FrPagId, FrPagNome
+                                                                    FROM FormaPagamento
+                                                                    JOIN Situacao on SituaId = FrPagStatus
+                                                                    WHERE FrPagUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+                                                                    ORDER BY FrPagNome ASC";
+                                                            $result = $conn->query($sql);
+                                                            $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    try {
-                                                        print('<option value=0  selected>Todos</option>');
+                                                            try {
 
-                                                        foreach ($rowSituacao as $item) {
-                                                            if (isset($item['FrPagId'])) {
-                                                                print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
-                                                                echo ($item['FrPagId']);
+                                                                foreach ($rowFormaPagamento as $item) {
+                                                                    if (isset($item['FrPagId'])) {
+                                                                        if (isset($_SESSION['ContRecFormaPagamento'])) {
+                                                                            if ($item['FrPagId'] == $_SESSION['ContRecFormaPagamento']) {
+                                                                                print('<option value="' . $item['FrPagId'] . '" selected>' . $item['FrPagNome'] . '</option>');
+                                                                            } else {
+                                                                                print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                                            }
+                                                                        } else {
+                                                                            print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                                        }
+                                                                    }
+                                                                }
+                                                            } catch (Exception $e) {
+                                                                echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                                             }
-                                                        }
-                                                    } catch (Exception $e) {
-                                                        echo 'Exceção capturada: ',  $e->getMessage(), "\n";
-                                                    }
+                                                        } catch (Exception $e) {
+                                                            echo 'Exceção capturada: ',  $e->getMessage(), "\n";
+                                                        }   
                                                     ?>
                                                 </select>
                                             </div>
@@ -703,8 +697,9 @@ $dataFim = date("Y-m-d");
 
                                         <div class="text-right col-lg-11 pt-3">
                                             <div>
-                                                <button id="novoLacamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo
-                                                    Lançamento</button>
+                                            <a href="#" onclick="atualizaContasAReceber(<?php echo $novo; ?>, 0, 'novo');"  
+                                                class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo
+                                                    Lançamento</a>
                                                 <button id="efetuarRecebimento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate" disabled>Efetuar Recebimento</button>
                                                 <button class="btn bg-secondary"><i class="icon-printer2"></i></button>
                                             </div>
@@ -820,6 +815,11 @@ $dataFim = date("Y-m-d");
                     </div>
                 </div>
                 <!--------------------------------------------------------------------------------------------------->
+                <form name="formContasAReceber" method="post">
+					<input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza" value="<?php echo $atualizar; ?>" >
+                    <input type="hidden" id="inputPermissionExclui" name="inputPermissionExclui" value="<?php echo $excluir; ?>" >
+					<input type="hidden" id="inputContasAReceberId" name="inputContasAReceberId" >
+				</form>
             </div>
             <!-- /content area -->
 

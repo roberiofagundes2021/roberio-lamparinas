@@ -6,72 +6,87 @@ $_SESSION['PaginaAtual'] = 'Editar Contrato';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT TrRefId, TrRefNumero, TrRefCategoria, CategNome, CategId, TrRefConteudoInicio, TrRefConteudoFim
-		FROM TermoReferencia
-		JOIN Categoria ON CategId = TrRefCategoria
-		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and TrRefId = 151";	
+if (isset($_POST['inputTRId'])){
+	$iTR = $_POST['inputTRId'];
+}
+
+$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
+
+$sql = "SELECT SituaChave	   
+		FROM FluxoOperacional
+		JOIN Situacao on SituaId = FlOpeStatus
+		WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
 $result = $conn->query($sql);
-$rowTR = $result->fetch(PDO::FETCH_ASSOC);
+$rowChave = $result->fetch(PDO::FETCH_ASSOC);
+
+$sql = "SELECT FlOpeId, FlOpeCategoria, FlOpeFornecedor, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeNumAta,
+		FlOpeModalidadeLicitacao, FlOpeValor, FlOpeConteudoInicio, FlOpeConteudoFim, TrRefId, TrRefNumero, TrRefCategoria, CategNome, CategId
+		FROM TermoReferencia
+		JOIN FluxoOperacional on FlOpeTermoReferencia = TrRefId
+		JOIN Categoria ON CategId = TrRefCategoria
+		WHERE TrRefUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = ".$iFluxoOperacional;
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
 
 $sql = "SELECT ParamEmpresaPublica
 		FROM Parametro
 	    WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
 $result = $conn->query($sql);
-$row = $result->fetch(PDO::FETCH_ASSOC);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
-if ($row['ParamEmpresaPublica']) {
+if ($rowParametro['ParamEmpresaPublica']) {
 	$bObrigatorio = "required";
 } else {
 	$bObrigatorio = "";
 }
 
+//Verifica se o TR tem SubCategoria
+$sql = "SELECT COUNT(TRXSCSubcategoria) as CountSubCategoria
+		FROM TRXSubcategoria
+		WHERE TRXSCUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = ".$iTR;	
+$result = $conn->query($sql);
+$rowSubCategoria = $result->fetch(PDO::FETCH_ASSOC);
+
 //Se veio do fluxo.php
 if (isset($_POST['inputFluxoOperacionalId'])) {
 
-		$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
+	//SubCategorias para esse fornecedor
+	$sql = "SELECT SbCatId, SbCatNome,FOXSCSubCategoria
+			FROM SubCategoria
+			JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
+			WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
+			ORDER BY SbCatNome ASC";
+	$result = $conn->query($sql);
+	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+	
+	$sSubCategorias = '';
 
-		$sql = "SELECT *
-				FROM FluxoOperacional
-				WHERE FlOpeId = $iFluxoOperacional ";
-		$result = $conn->query("$sql");
-		$row = $result->fetch(PDO::FETCH_ASSOC);
+	foreach ($rowBD as $item){
+		$aSubCategorias[] = $item['SbCatId'];
 
-		//SubCategorias para esse fornecedor
-		$sql = "SELECT SbCatId, SbCatNome,FOXSCSubCategoria
-				FROM SubCategoria
-				JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
-				WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
-				ORDER BY SbCatNome ASC";
-		$result = $conn->query($sql);
-		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-		
-		$sSubCategorias = '';
-
-		foreach ($rowBD as $item){
-			$aSubCategorias[] = $item['SbCatId'];
-
-			if ($sSubCategorias == ''){
-				$sSubCategorias .= $item['SbCatId'];
-			} else {
-				$sSubCategorias .= ", ".$item['SbCatId'];
-			}
+		if ($sSubCategorias == ''){
+			$sSubCategorias .= $item['SbCatId'];
+		} else {
+			$sSubCategorias .= ", ".$item['SbCatId'];
 		}
-					
-		$_SESSION['msg'] = array();
+	}
+				
+	$_SESSION['msg'] = array();
 
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 
 	irpara("contrato.php");
 }
 
+//Se estiver gravando
 if (isset($_POST['inputDataInicio'])) {
 
 	try {
 
 		$sql = "UPDATE FluxoOperacional SET FlOpeTermoReferencia = :iTermoReferencia, FlOpeFornecedor = :iFornecedor, FlOpeCategoria = :iCategoria,
 										    FlOpeDataInicio = :dDataInicio, FlOpeDataFim = :dDataFim, FlOpeNumContrato = :iNumContrato, 
-										    FlOpeNumProcesso = :iNumProcesso, FlOpeModalidadeLicitacao = :iModalidadeLicitacao, FlOpeValor = :fValor,
-										    FlOpeConteudoInicio = :sConteudoInicio, FlOpeConteudoFim = :sConteudoFim,
+										    FlOpeNumProcesso = :iNumProcesso, FlOpeNumAta = :iNumAta, FlOpeModalidadeLicitacao = :iModalidadeLicitacao,
+											FlOpeValor = :fValor, FlOpeConteudoInicio = :sConteudoInicio, FlOpeConteudoFim = :sConteudoFim,
 											FlOpeUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE FlOpeId = " . $_POST['inputFluxoOperacionalId'] . "
 				";
@@ -87,6 +102,7 @@ if (isset($_POST['inputDataInicio'])) {
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':iNumContrato' => $_POST['inputNumContrato'],
 			':iNumProcesso' => $_POST['inputNumProcesso'],
+			':iNumAta' => $_POST['inputNumAta'],
 			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'] == '' ? null : $_POST['cmbModalidadeLicitacao'],
 			':fValor' => gravaValor($_POST['inputValor']),
 			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
@@ -191,8 +207,9 @@ if (isset($_POST['inputDataInicio'])) {
 				FiltraSubCategoria();
 
 				var cmbFornecedor = $('#cmbFornecedor').val();
+				var idTR = $('#inputTRId').val();
 
-				$.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
+				$.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor + '&idTR=' + idTR, function(dados) {
 
 
 					if (dados.length) {
@@ -288,81 +305,90 @@ if (isset($_POST['inputDataInicio'])) {
 
 						<input type="hidden" id="inputFluxoOperacionalId" name="inputFluxoOperacionalId" value="<?php echo $row['FlOpeId']; ?>">
 						<input type="hidden" id="inputSubCategoria" name="inputSubCategoria" value="<?php echo $sSubCategorias; ?>" >
-
+						<input type="hidden" id="inputTRId" name="inputTRId" value="<?php echo $row['TrRefId']; ?>">
+						
 						<div class="card-body">
 
-							<h5 class="mb-0 font-weight-semibold">Termo de Referência</h5>
-							<br>
-                            <div class="row">
-                                 <div class="col-lg-3">
-									<div class="form-group">
-										<label for="inputTermoReferencia">Nº do Termo de Referência</label>
-										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $rowTR['TrRefNumero']; ?>" readOnly>
-									    <input type="hidden" id="inputTermoReferenciaId" name="inputTermoReferenciaId" value="<?php echo $rowTR['TrRefId']; ?>">
-									</div>
-								</div>
-                            </div>
-
-							<h5 class="mb-0 font-weight-semibold">Dados do Fornecedor</h5>
+							<h5 class="mb-0 font-weight-semibold">Dados do Termo Referência</h5>
 							<br>
 							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputTermoReferencia">Nº Termo de Referência</label>
+										<input type="text" id="inputTermoReferencia" name="inputTermoReferencia" class="form-control" placeholder="Nº da TR" value="<?php echo $row['TrRefNumero']; ?>" readOnly>
+									    <input type="hidden" id="inputTermoReferenciaId" name="inputTermoReferenciaId" value="<?php echo $row['TrRefId']; ?>">
+									</div>
+								</div>
+
+								<div class="col-lg-5">
 									<div class="form-group">
 										<label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
 										<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
 											<?php
-											$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-													FROM Fornecedor
-													JOIN Situacao on SituaId = ForneStatus
-													WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and ForneCategoria = " . $rowTR['CategId'] . " and SituaChave = 'ATIVO'
-													ORDER BY ForneNome ASC";
-											$result = $conn->query($sql);
-											$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+												$sql = "SELECT Distinct ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
+														FROM Fornecedor
+														JOIN Categoria on CategId = ForneCategoria
+														JOIN Situacao on SituaId = ForneStatus ";
+												
+												//Se tiver SubCategoria deve-se filtrar os fornecedores que possuem as SubCategorias do TR, evitando de trazer fornecedores desnecessários
+												if ($rowSubCategoria['CountSubCategoria']){
+													$sql .=	" JOIN FornecedorXSubCategoria on FrXSCFornecedor = ForneId
+															  JOIN TRXSubcategoria on TRXSCSubcategoria = FrXSCSubCategoria ";
+												}		
 
-											foreach ($rowFornecedor as $item) {
-												$seleciona = $item['ForneId'] == $row['FlOpeFornecedor'] ? "selected" : "";
-												print('<option value="' . $item['ForneId'] . '" ' . $seleciona . '>' . $item['ForneNome'] . '</option>');
-											}
+												$sql .=	"WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and 
+														ForneCategoria = " . $row['CategId'] . " and SituaChave = 'ATIVO'
+														ORDER BY ForneNome ASC";
+												$result = $conn->query($sql);
+												$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+												
+												foreach ($rowFornecedor as $item) {
+													$seleciona = $item['ForneId'] == $row['FlOpeFornecedor'] ? "selected" : "";
+													print('<option value="' . $item['ForneId'] . '" ' . $seleciona . '>' . $item['ForneNome'] . '</option>');
+												}
 
 											?>
 										</select>
 									</div>
 								</div>
-
-								<div class="col-lg-4">
+		
+								<div class="col-lg-5">
 									<div class="form-group">
 									<label for="inputCategoria">Categoria <span class="text-danger">*</span></label>
-										<input type="text" id="inputCategoria" name="inputCategoria" class="form-control" value="<?php echo $rowTR['CategNome']; ?>" readOnly>
+										<input type="text" id="inputCategoria" name="inputCategoria" class="form-control" value="<?php echo $row['CategNome']; ?>" readOnly>
 										<input type="hidden" id="inputCategoriaId" name="inputCategoriaId" value="<?php echo $row['FlOpeCategoria']; ?>">
 									</div>
 								</div>
+							</div>
 
-								<div class="col-lg-4">
-								<div class="form-group" style="border-bottom:1px solid #ddd;">
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSubCategoria">SubCategoria</label>
 										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
 											<!--<option value="#">Selecione uma subcategoria</option>-->
 											<?php
-												
-												if (isset($row['FlOpeCategoria'])){
 													
-													$sql = ("SELECT SbCatId, SbCatNome
-															 FROM SubCategoria	
-															 JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId														 													 
-															 WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['FlOpeCategoria']."
-													         and FrXSCFornecedor = ". $row['FlOpeFornecedor']."
-															 ORDER BY SbCatNome ASC");
-													$result = $conn->query("$sql");
-													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-													$count = count($rowSubCategoria);
+												$sql = "SELECT Distinct SbCatId, SbCatNome
+														FROM SubCategoria	
+														JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId	
+														JOIN Situacao on SituaId = SbCatStatus
+														JOIN TRXSubcategoria on TRXSCSubcategoria = FrXSCSubCategoria
+														WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and FrXSCFornecedor = ". $row['FlOpeFornecedor']."
+														and SituaChave = 'ATIVO' 
+														ORDER BY SbCatNome ASC
+														";
+												$result = $conn->query($sql);
+												$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+												$count = count($rowSubCategoria);
 
-													if($count){
-														foreach ($rowSubCategoria as $item){
-															$seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
-															print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
-														}
-													} 
-												}
+												if($count){
+													foreach ($rowSubCategoria as $item){
+														$seleciona = in_array($item['SbCatId'], $aSubCategorias) ? "selected" : "";
+														print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
+													}
+												} 
+
 											?>
 										</select>
 									</div>
@@ -372,7 +398,7 @@ if (isset($_POST['inputDataInicio'])) {
 							<h5 class="mb-0 font-weight-semibold">Dados do Contrato</h5>
 							<br>
 							<div class="row">
-								<div class="col-lg-2">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputDataInicio">Data Início <span class="text-danger">*</span></label>
 										<div class="input-group">
@@ -384,7 +410,7 @@ if (isset($_POST['inputDataInicio'])) {
 									</div>
 								</div>
 
-								<div class="col-lg-2">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputDataFim">Data Fim <span class="text-danger">*</span></label>
 										<div class="input-group">
@@ -403,7 +429,7 @@ if (isset($_POST['inputDataInicio'])) {
 									</div>
 								</div>
 
-								<div class="col-lg-2">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbModalidadeLicitacao">Modalidade de Licitação</label>
 										<select id="cmbModalidadeLicitacao" name="cmbModalidadeLicitacao" class="form-control form-control-select2">
@@ -428,15 +454,24 @@ if (isset($_POST['inputDataInicio'])) {
 										</select>
 									</div>
 								</div>
-
-								<div class="col-lg-2">
+							</div>
+								
+							<div class="row">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputNumProcesso">Número do Processo <?php if ($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
 										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>" <?php echo $bObrigatorio; ?>>
 									</div>
 								</div>
 
-								<div class="col-lg-2">
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="inputNumAta">Nº Ata Registro</label>
+										<input type="text" id="inputNumAta" name="inputNumAta" class="form-control" placeholder="Nº da Ata" value="<?php echo $row['FlOpeNumAta']; ?>">
+									</div>
+								</div>
+
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputValor">Valor Total <span class="text-danger">*</span></label>
 										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" value="<?php echo mostraValor($row['FlOpeValor']); ?>" onKeyUp="moeda(this)" maxLength="12" required>
@@ -469,33 +504,37 @@ if (isset($_POST['inputDataInicio'])) {
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<?php
-										$sql = "SELECT SUM(FOXPrQuantidade * FOXPrValorUnitario) as total
-												FROM FluxoOperacionalXProduto
-												WHERE FOXPrUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
-										$result = $conn->query($sql);
-										$rowTotal = $result->fetch(PDO::FETCH_ASSOC);
-										$count = count($rowTotal);
+											<?php
+											$sql = "SELECT SUM(FOXPrQuantidade * FOXPrValorUnitario) as total
+													FROM FluxoOperacionalXProduto
+													WHERE FOXPrUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;
+											$result = $conn->query($sql);
+											$rowTotal = $result->fetch(PDO::FETCH_ASSOC);
+											$count = count($rowTotal);
 
-										if ($count) {
-											if ($rowTotal['total'] == $row['FlOpeValor']) {
-												$bFechado = 1;
+											if ($count) {
+												if ($rowTotal['total'] == $row['FlOpeValor']) {
+													$bFechado = 1;
+												} else {
+													$bFechado = 0;
+												}
 											} else {
 												$bFechado = 0;
 											}
-										} else {
-											$bFechado = 0;
-										}
 
-										if ($bFechado) {
-											if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'ADMINISTRADOR' or $_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' or $_SESSION['PerfiChave'] == 'CONTROLADORIA') {
-												print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-											}
-										} else {
-											print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-										}
-
-										?>
+										if ($_POST['inputPermission']) {
+											
+											if ($rowChave['SituaChave'] != 'LIBERADO'){	
+												if ($bFechado) {
+													if ($_SESSION['PerfiChave'] == 'SUPER' or $_SESSION['PerfiChave'] == 'ADMINISTRADOR' or $_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' or $_SESSION['PerfiChave'] == 'CONTROLADORIA') {
+														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+													}
+												} else {
+													print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+												}
+											}	
+										}												
+											?>
 										<a href="contrato.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 									</div>
 								</div>

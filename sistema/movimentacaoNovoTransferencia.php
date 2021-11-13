@@ -43,7 +43,33 @@ if (isset($_POST['inputData'])) {
 			}
 		}
 
+    $conn->beginTransaction();
+
+    $newMovi = '1/'.(date("Y"));
+
+		// vai retornar um valor contendo somente a segunda parte da string ex: "1/2021" => "2021"
+		$sqlMovi = "SELECT MAX(SUBSTRING(MovimNumRecibo, 3, 6)) as MovimNumRecibo
+        FROM Movimentacao
+        WHERE MovimUnidade = '$_SESSION[UnidadeId]'";
+		$resultMovi = $conn->query($sqlMovi);
+		$rowMovi = $resultMovi->fetch(PDO::FETCH_ASSOC);
+
+		// Se ultimo valor cadastrado no banco for de um ano diferente do ano atual,
+		// a contagem será reiniciada
+		if ($rowMovi['MovimNumRecibo'] == date("Y")) {
+			// vai buscar o ultimo valor completo no banco
+			$sqlMovi = "SELECT MAX(MovimNumRecibo) as MovimNumRecibo
+					FROM Movimentacao
+					WHERE MovimUnidade = '$_SESSION[UnidadeId]' and MovimNumRecibo LIKE '%".date("Y")."%'";
+			$resultMovi = $conn->query($sqlMovi);
+			$rowMovi = $resultMovi->fetch(PDO::FETCH_ASSOC);
+	
+			$newMovi = explode('/', $rowMovi['MovimNumRecibo']);
+			$newMovi = (intval($newMovi[0])+1).'/'.(date("Y"));
+		}
+
 		$sql = "INSERT INTO Movimentacao (MovimTipo,
+                                      MovimNumRecibo,
 																			MovimData, 
 																			MovimFinalidade,
 																			MovimOrigemLocal,
@@ -64,6 +90,7 @@ if (isset($_POST['inputData'])) {
 																			MovimUnidade, 
 																			MovimUsuarioAtualizador)
 								VALUES (:sTipo, 
+												:dMovi,
 												:dData,
 												:iFinalidade,
 												:iOrigemLocal, 
@@ -85,10 +112,9 @@ if (isset($_POST['inputData'])) {
 												:iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 
-		$conn->beginTransaction();
-
 		$result->execute(array(
 			':sTipo' => 'T',  // Transferência
+			':dMovi' => $newMovi,  // Número incremental
 			':dData' => gravaData($_POST['inputData']),
 			':iFinalidade' => null,
 			':iOrigemLocal' => $tipoOrigem == 'Local' ? $idOrigem : $tipoOrigem == 'OrigemLocalTransferencia' ? $idOrigem : null,
@@ -757,6 +783,7 @@ if (isset($_POST['inputData'])) {
       let cmbCategoria = $('#cmbCategoria').val();
       let cmbClassificacao = $('#cmbClassificacao').val();
       let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val();
+      let cmbDestino = $('#cmbDestinoLocalEstoqueSetor').val()? $('#cmbDestinoLocalEstoqueSetor').val():$('#inputDestinoManual').val();
       let Produto = cmbProduto.split("#");
       let inputTipo = $('input[name="inputTipo"]:checked').val();
       let inputNumItens = $('#inputNumItens').val();
@@ -788,6 +815,13 @@ if (isset($_POST['inputData'])) {
           scrollTop: $("#cmbEstoqueOrigemLocalSetor")[0].scrollHeight
         }, 1500);
         $('#cmbEstoqueOrigemLocalSetor').focus();
+        return false;
+      } else if (cmbDestino == '' || cmbDestino == null) {
+        alerta('Atenção', 'Informe o destino antes de adicionar!', 'error');
+        $('html, body').animate({
+          scrollTop: $("#cmbDestinoLocalEstoqueSetor").scrollHeight
+        }, 1500);
+        $('#cmbDestinoLocalEstoqueSetor').focus();
         return false;
       } else if ((cmbCategoria == '' || cmbCategoria == null) && (cmbPatrimonio == '' || cmbPatrimonio == null)) {
         alerta('Atenção', 'Informe a categoria ou o patrimonio antes de adicionar!', 'error');
@@ -916,7 +950,7 @@ if (isset($_POST['inputData'])) {
       var inputTotal = $('#inputTotal').val();
       var cmbMotivo = $('#cmbMotivo').val();
       var cmbEstoqueOrigemLocalSetor = $('#cmbEstoqueOrigemLocalSetor').val();
-      var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val();
+      var cmbDestinoLocalEstoqueSetor = $('#cmbDestinoLocalEstoqueSetor').val()? $('#cmbDestinoLocalEstoqueSetor').val():$('#inputDestinoManual').val();
       var inputDestinoManual = $('#inputDestinoManual').val();
 
       var Motivo = cmbMotivo.split("#");
@@ -951,6 +985,18 @@ if (isset($_POST['inputData'])) {
         return false;
       }
 
+      if (cmbDestinoLocalEstoqueSetor == '' || cmbDestinoLocalEstoqueSetor == null) {
+        event.preventDefault();
+        alerta('Atenção', 'Informe o Local de Destino!', 'error');
+        $('html, body').animate({
+          scrollTop: $("#cmbDestinoLocalEstoqueSetor")[0].scrollHeight
+        }, 1500);
+        $('#cmbDestinoLocalEstoqueSetor').focus();
+        $('#btnAdicionar').click();
+        // $("#formMovimentacao").submit();
+        return false;
+      }
+
       if (chave == 'DOACAO' || chave == 'DESCARTE' || chave == 'DEVOLUCAO' || chave == 'CONSIGNACAO') {
 
         //Verifica se o input Destino foi informado
@@ -977,6 +1023,10 @@ if (isset($_POST['inputData'])) {
 
       //desabilita as combos "Fornecedor" e "Situacao" na hora de gravar, senão o POST não o encontra
       $('#cmbSituacao').prop('disabled', false);
+
+      //desabilita o botão Incluir evitando duplo clique, ou seja, evitando inserções duplicadas
+      $('#enviar').prop("disabled", true);
+
       $("#formMovimentacao").submit();
     });
 
@@ -1165,7 +1215,7 @@ if (isset($_POST['inputData'])) {
 													$sql = "SELECT MotivId, MotivNome, MotivChave
 																	FROM Motivo
 																	JOIN Situacao on SituaId = MotivStatus
-																	WHERE MotivEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+																	WHERE SituaChave = 'ATIVO'
 																	ORDER BY MotivNome ASC";
 													$result = $conn->query($sql);
 													$rowMotivo = $result->fetchAll(PDO::FETCH_ASSOC);

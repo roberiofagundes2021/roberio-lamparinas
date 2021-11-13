@@ -5,7 +5,6 @@ include('global_assets/php/conexao.php');
 
 function queryPesquisa()
 {
-
     $cont = 0;
 
     include('global_assets/php/conexao.php');
@@ -13,17 +12,15 @@ function queryPesquisa()
     $args = [];
 
     empty($_POST['inputDataDe']) ? $inputDataDe = '' : $inputDataDe = " FlOpeDataInicio > '".$_POST['inputDataDe']."'";
-
     $args[]  = $inputDataDe;
-    
+
     empty($_POST['inputDataAte']) ? $inputDataAte = '' : $inputDataAte = " dbo.fnFimContrato(FlOpeId) < '". $_POST['inputDataAte']."'";
-    
     $args[]  = $inputDataAte;
-
-
 
     if (!empty($_POST['cmbUnidade']) && $_POST['cmbUnidade'] != "") {
         $args[]  = "FlOpeUnidade = " . $_POST['cmbUnidade'] . " ";
+    } else{
+        $args[]  = "FlOpeUnidade = " . $_SESSION['UnidadeId'] . " ";
     }
 
     if (!empty($_POST['cmbEmpresaContratada']) && $_POST['cmbEmpresaContratada'] != "") {
@@ -59,11 +56,11 @@ function queryPesquisa()
             //     $string .= ' and ';
             // }
 
-            $sql = "SELECT FlOpeId,  FlOpeDataInicio,  FlOpeDataFim,  FlOpeObservacao, FlOpePrioridade, UnidaNome, ForneNome, CategNome, MdLicNome, PriorNome, SituaNome
+            $sql = "SELECT FlOpeId,  FlOpeDataInicio,  FlOpeDataFim,  FlOpeObservacao, FlOpePrioridade, UnidaNome, ForneRazaoSocial, CategNome, MdLicNome, PriorNome, SituaNome
                     FROM FluxoOperacional
                     JOIN Unidade on UnidaId = FlOpeUnidade
-                    LEFT JOIN Fornecedor on ForneId = FlOpeFornecedor
-                    LEFT JOIN Categoria  on CategId = FlOpeCategoria
+                    JOIN Fornecedor on ForneId = FlOpeFornecedor
+                    JOIN Categoria  on CategId = FlOpeCategoria
                     LEFT JOIN ModalidadeLicitacao on MdLicId = FlOpeModalidadeLicitacao
                     LEFT JOIN Prioridade on PriorId = FlOpePrioridade 
                     JOIN Situacao on SituaId = FlOpeStatus
@@ -107,7 +104,7 @@ function queryPesquisa()
                     <tr idFluxoOperacional=" . $item['FlOpeId'] . " editado='0'>
                        <td class='even'>" . $cont . "</td>
                        <td class='odd'>" . $item['CategNome'] . "</td>
-                       <td class='odd'>" . $item['ForneNome'] . "</td>
+                       <td class='odd'>" . $item['ForneRazaoSocial'] . "</td>
                        <td class='even'>" . $item['UnidaNome'] . "</td>
                        <td class='odd'>" . $item['SituaNome'] . "</td>
                        <td class='even'>" . $item['MdLicNome'] . "</td>
@@ -132,7 +129,7 @@ function queryPesquisa()
                     <tr idFluxoOperacional=" . $item['FlOpeId'] . " editado='0'>
                        <td class='even'>" . $cont . "</td>
                        <td class='odd'>" . $item['CategNome'] . "</td>
-                       <td class='odd'>" . $item['ForneNome'] . "</td>
+                       <td class='odd'>" . $item['ForneRazaoSocial'] . "</td>
                        <td class='even'>" . $item['UnidaNome'] . "</td>
                        <td class='odd'>" . $item['SituaNome'] . "</td>
                        <td class='even'>" . $item['MdLicNome'] . "</td>

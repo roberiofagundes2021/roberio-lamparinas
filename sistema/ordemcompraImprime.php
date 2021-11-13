@@ -16,9 +16,11 @@ if (isset($_POST['inputOrdemCompraId'])){
 		   </script> ');
 }
 
-$sql = "SELECT ForneNome, ForneCelular, ForneEmail, CategNome, OrComTipo, OrComNumero, OrComConteudo
+$sql = "SELECT OrComTipo, OrComNumero, OrComDtEmissao, OrComLote, OrComNumAta, OrComNumProcesso, 
+		OrComConteudoInicio, OrComConteudoFim, ForneCnpj, ForneNome, ForneCelular, ForneEmail, CategNome, FlOpeNumContrato
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
+		JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
 		JOIN Categoria on CategId = OrComCategoria
 		WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$iOrdemCompra;
 $result = $conn->query($sql);
@@ -61,12 +63,12 @@ try {
 	</style>
 
 	<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
-		<div style='width:300px; float:left; display: inline;'>
-			<img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
+		<div style='width:480px; float:left; display: inline;'>
+			<img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:110px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
 			<span style='font-weight:bold;line-height:200px;'>".$_SESSION['EmpreNomeFantasia']."</span><br>
 			<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: ".$_SESSION['UnidadeNome']."</div>
 		</div>
-		<div style='width:250px; float:right; display: inline; text-align:right;'>
+		<div style='width:200px; float:right; display: inline; text-align:right;'>
 			<div>".date('d/m/Y')."</div>
 			<div style='margin-top:8px;'>".$sTipo.": ".formatarNumero($row['OrComNumero'])."</div>
 		</div> 
@@ -75,10 +77,11 @@ try {
 	<div style='text-align:center; margin-top: 20px;'><h1>".strtoupper($sTipo)."</h1></div>
 	";
 	
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario
+	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario, MarcaNome
 			FROM Produto
 			JOIN OrdemCompraXProduto on OCXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			LEFT JOIN Marca on MarcaId = ProduMarca
 			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OCXPrOrdemCompra = ".$iOrdemCompra;
 
 	$result = $conn->query($sql);
@@ -95,20 +98,39 @@ try {
 	$totalServicos = count($rowServicos);
 	
 	$html .= '
+	<table style="width:100%; border-collapse: collapse;"> 
+		<tr>
+			<td colspan="1" style="width:25%; font-size:12px;">Nº Contrato:<br>'. $row['FlOpeNumContrato'].'</td>	
+			<td colspan="1" style="width:25%; font-size:12px;">Data Emissão:<br>'. mostraData($row['OrComDtEmissao']).'</td>';
+
+	if ($row['OrComTipo'] == 'O'){		
+		$html .= '<td colspan="1" style="width:25%; font-size:12px;">Lote:<br>'. $row['OrComLote'].'</td>';
+	} else {
+		$html .= '<td colspan="1" style="width:25%; font-size:12px;">Nº Ata Registro:<br>'. $row['OrComNumAta'].'</td>';
+	}
+
+	$html .= '<td colspan="1" style="width:25%; font-size:12px;">Nº Processo:<br>'. $row['OrComNumProcesso'].'</td>
+		</tr>
+	</table>
 	<table style="width:100%; border-collapse: collapse;">
 		<tr style="background-color:#F1F1F1;">
-			<td colspan="2" style="width:40%; font-size:12px;">Fornecedor: '. $row['ForneNome'].'</td>
-			<td colspan="1" style="width:30%; font-size:12px;">Telefone: '. $row['ForneCelular'].'</td>
-			<td colspan="1" style="width:30%; font-size:12px;">E-mail: '. $row['ForneEmail'].'</td>
+			<td colspan="3" style="width:100%; font-size:12px;">Fornecedor:<br>'. $row['ForneNome'].'</td>
 		</tr>
 		<tr>
-			<td colspan="4" style="width:100%; font-size:12px;">Categoria: '.$row['CategNome'].'</td>
+			<td colspan="1" style="width:30%; font-size:12px;">CNPJ:<br>'. $row['ForneCnpj'].'</td>	
+			<td colspan="1" style="width:30%; font-size:12px;">Telefone:<br>'. $row['ForneCelular'].'</td>
+			<td colspan="1" style="width:40%; font-size:12px;">E-mail:<br>'. $row['ForneEmail'].'</td>
+		</tr>
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
+		<tr>
+			<td style="width:100%; font-size:12px;">Categoria:<br>'.$row['CategNome'].'</td>
 		</tr>
 	</table>';
 	
 	$html .= '
 	<br>
-	<div>'.$row['OrComConteudo'].'</div>
+	<div>'.$row['OrComConteudoInicio'].'</div>
 	<br>';
 
 	$totalGeralProdutos = 0;
@@ -145,7 +167,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
+					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."<br>Marca: ".$itemProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>".$itemProduto['UnMedSigla']."</td>					
 					<td style='text-align: center;'>".$itemProduto['OCXPrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
@@ -156,7 +178,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."</td>
+					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."<br>Marca: ".$itemProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>".$itemProduto['UnMedSigla']."</td>					
 					<td style='text-align: center;'>".$itemProduto['OCXPrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
@@ -264,25 +286,10 @@ try {
 				</table>
 	";
 	
-	$sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
-			FROM Usuario
-			Where UsuarId = ".$_SESSION['UsuarId']."
-			ORDER BY UsuarNome ASC";
-	$result = $conn->query($sql);
-	$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);	
-	
-	$html .= '			
-		<br><br>
-		<div style="width: 100%; margin-top: 100px;">
-			<div style="position: relative; float: left; text-align: center;">
-				Solicitante: '.$rowUsuario['UsuarNome'].'<br>
-				<div style="margin-top:3px;">
-					Telefone: '.$rowUsuario['UsuarTelefone'].' <br>
-					E-mail: '.$rowUsuario['UsuarEmail'].'
-				</div>
-			</div>
-		</div>
-	';	
+	$html .= '
+	<br><br>
+	<div>' . $row['OrComConteudoFim'] . '</div>
+	<br>';
 	
     $rodape = "<hr/>
     <div style='width:100%'>

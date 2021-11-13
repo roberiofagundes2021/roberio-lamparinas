@@ -78,10 +78,10 @@ try{
 			JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
 			WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and OrXSCOrcamento = $iOrcamento
 			ORDER BY SbCatNome ASC";
-		$result = $conn->query($sql);
-		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-		
-		$aSubCategorias = '';
+	$result = $conn->query($sql);
+	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+	
+	$aSubCategorias = '';
 
 	foreach ($rowBD as $item) {
 		
@@ -168,13 +168,44 @@ try{
 					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
 					success: function(resposta){
 						//alert(resposta);
-						$("#tabelaProdutos").html(resposta).show();
-						
-						return false;
-						
+
+						$("#tabelaProdutos").html(resposta).show();					
+						return false;						
 					}	
 				});
 			});
+
+			/* ao pressionar uma tecla em um campo que seja de class="pula" */
+			$('.pula').keypress(function(e){
+				/*
+					* verifica se o evento é Keycode (para IE e outros browsers)
+					* se não for pega o evento Which (Firefox)
+				*/
+				var tecla = (e.keyCode?e.keyCode:e.which);
+
+				/* verifica se a tecla pressionada foi o ENTER */
+				if(tecla == 13){
+					/* guarda o seletor do campo que foi pressionado Enter */
+					campo =  $('.pula');
+					/* pega o indice do elemento*/
+					indice = campo.index(this);
+					/*soma mais um ao indice e verifica se não é null
+					*se não for é porque existe outro elemento
+					*/
+					if(campo[indice+1] != null){
+						/* adiciona mais 1 no valor do indice */
+						proximo = campo[indice + 1];
+						/* passa o foco para o proximo elemento */
+						proximo.focus();
+					}
+				} else {
+					return onlynumber(e);
+				}
+
+				/* impede o sumbit caso esteja dentro de um form */
+				e.preventDefault(e);
+				return false;
+            });			
 						
 		}); //document.ready
 		
@@ -303,8 +334,8 @@ try{
 																JOIN Situacao on SituaId = ProduStatus
 																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
 														
-														if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-															$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
+														if ($aSubCategorias != ""){
+															$sql .= " and ProduSubCategoria in (".$aSubCategorias.") ";
 														}
 														
 														$sql .= " ORDER BY ProduNome ASC";
@@ -347,11 +378,7 @@ try{
 
 								<div class="card-body">
 									<p class="mb-3">Abaixo estão listados todos os produtos da Categoria e SubCategoria selecionadas logo acima. Para atualizar os valores, basta preencher as colunas <code>Quantidade</code> e <code>Valor Unitário</code> e depois clicar em <b>ALTERAR</b>.</p>
-
-									<!--<div class="hot-container">
-										<div id="example"></div>
-									</div>-->
-									
+								
 									<?php									
 
 										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OrXPrQuantidade, OrXPrValorUnitario
@@ -370,9 +397,10 @@ try{
 													JOIN Situacao on SituaId = ProduStatus
 													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and SituaChave = 'ATIVO' ";
 													
-											if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-												$sql .= " and ProduSubCategoria = ".$row['OrcamSubCategoria'];
+											if ($aSubCategorias != ""){
+												$sql .= " and ProduSubCategoria in (".$aSubCategorias.") ";
 											}
+											$sql .= " ORDER BY ProduNome ASC";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										} 
@@ -444,10 +472,10 @@ try{
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade pula" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
 												</div>	
 												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
+													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario pula" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
 												</div>	
 												<div class="col-lg-1">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>

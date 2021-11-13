@@ -22,8 +22,10 @@ if(isset($_POST['inputFluxoId'])){
 
 		if ($_POST['inputFluxoStatus'] == 'NAOLIBERADO'){
 			$motivo = $_POST['inputMotivo'];
+			$msg = "Fluxo operacional não liberado!";
 		} else{
 			$motivo = NULL;
+			$msg = "Fluxo operacional liberado!";
 		}
 		
 		$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus, FlOpeUsuarioAtualizador = :iUsuario
@@ -120,7 +122,7 @@ if(isset($_POST['inputFluxoId'])){
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação do fluxo operacional alterada!!!";
+		$_SESSION['msg']['mensagem'] =  $msg;
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
@@ -128,7 +130,7 @@ if(isset($_POST['inputFluxoId'])){
 		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do fluxo operacional!!!";
+		$_SESSION['msg']['mensagem'] = "Erro na liberação do fluxo operacional!!!";
 		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();exit;

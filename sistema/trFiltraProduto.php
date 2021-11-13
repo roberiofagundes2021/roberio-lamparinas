@@ -43,12 +43,11 @@ $countProdutosTr2 = count($rowProdutos);
 
 if (count($rowProdutosOrcamento) >= 1) {
 
-	$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrTabela, UnMedNome
+	$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, UnMedNome
 			FROM ProdutoOrcamento
-			JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
-			JOIN Categoria on CategId = PrOrcCategoria
 			JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-			WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and PrOrcId in (" . $lista . ")
+			WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and PrOrcId in (" . $lista . ")
+			Order By PrOrcSubCategoria ASC
 			";
 	//echo $sql;
 
@@ -86,7 +85,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 						<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
 					</div>
 					<div class="col-lg-2">
-						<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $quantidade . '">
+						<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="pula(event)" value="' . $quantidade . '">
 					</div>	
 				</div>';
 
@@ -139,7 +138,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 						<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedNome'] . '" readOnly>
 					</div>
 					<div class="col-lg-2">
-						<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade" onkeypress="return onlynumber();" value="' . $quantidade . '">
+						<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onkeypress="pula(event)" value="' . $quantidade . '">
 					</div>	
 				</div>';
 

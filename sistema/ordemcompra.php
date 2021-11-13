@@ -6,16 +6,19 @@ $_SESSION['PaginaAtual'] = 'Ordem de Compra';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT OrComId, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
-		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor, BandeMotivo
+$sql = "SELECT DISTINCT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
+		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor, BandeMotivo, SbCatNome, dbo.fnValorTotalOrdemCompra(OrComUnidade, OrComId) as ValorTotalOrdemCompra,
+		(SELECT COUNT(FOXPrProduto) FROM FluxoOperacionalXProduto WHERE FOXPrFluxoOperacional = OrComFluxoOperacional) as produtoCount,
+		(SELECT COUNT(FOXSrServico) FROM FluxoOperacionalXServico WHERE FOXSrFluxoOperacional = OrComFluxoOperacional) as servicoCount,
+		(SELECT COUNT(OCXPrProduto) FROM OrdemCompraXProduto WHERE OCXPrOrdemCompra = OrComId and OCXPrQuantidade <> '' and OCXPrQuantidade <> 0 and OCXPrValorUnitario <> 0.00) as produtoQuant,
+		(SELECT COUNT(OCXSrServico) FROM OrdemCompraXServico WHERE OCXSrOrdemCompra = OrComId and OCXSrQuantidade <> '' and OCXSrQuantidade <> 0 and OCXSrValorUnitario <> 0.00) as servicoQuant
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
 		JOIN Categoria on CategId = OrComCategoria
 		LEFT JOIN SubCategoria on SbCatId = OrComSubCategoria
 		JOIN Situacao on SituaId = OrComSituacao
-		LEFT JOIN Bandeja on BandeTabelaId = OrComId and BandeTabela = 'OrdemCompra' and BandeUnidade = " . $_SESSION['UnidadeId'] . "
-	    WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ."
-		ORDER BY OrComDtEmissao DESC";
+		LEFT JOIN Bandeja on BandeTabelaId = OrComId and BandeTabela = 'OrdemCompra' and BandeUnidade = ".$_SESSION['UnidadeId'].
+		" WHERE OrComUnidade = ".$_SESSION['UnidadeId']." ORDER BY OrComDtEmissao DESC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -31,6 +34,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<title>Lamparinas | Ordem de Compra</title>
 
 	<?php include_once("head.php"); ?>
+	<style>
+		table td{
+			padding: 1rem !important;
+		}
+	</style>
 	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
@@ -66,7 +74,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Numero
-					width: "10%",
+					width: "5%",
 					targets: [1]
 				},				
 				{ 
@@ -76,12 +84,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Tipo
-					width: "15%",
+					width: "10%",
 					targets: [3]
 				},
 				{ 
 					orderable: true,   //Fornecedor
-					width: "20%",
+					width: "15%",
 					targets: [4]
 				},
 				{ 
@@ -89,20 +97,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					width: "10%",
 					targets: [5]
 				},
-				{ 
-					orderable: true,   //Categoria
-					width: "15%",
+				{
+					orderable: true,   //SubCategoria
+					width: "20%",
 					targets: [6]
+				},
+				{
+					orderable: true,   //Valor Total
+					width: "10%",
+					targets: [7]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [7]
+					targets: [8]
 				},
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [8]
+					targets: [9]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -134,15 +147,17 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaOrdemCompra(OrComId, OrComNumero, OrComCategoria, CategNome, OrComSituacao, OrComSituacaoChave, OrComTipo, Tipo, Motivo){
-		
+		function atualizaOrdemCompra(Permission, OrComFlOpeId, OrComId, OrComNumero, OrComCategoria, CategNome, OrComSituacao, OrComSituacaoChave, OrComTipo, Tipo, Motivo){
+
+			document.getElementById('inputPermission').value = Permission;
+			document.getElementById('inputOrdemCompraFlOpeId').value = OrComFlOpeId;
 			document.getElementById('inputOrdemCompraId').value = OrComId;
 			document.getElementById('inputOrdemCompraNumero').value = OrComNumero;
 			document.getElementById('inputOrdemCompraCategoria').value = OrComCategoria;
 			document.getElementById('inputOrdemCompraNomeCategoria').value = CategNome;
 			document.getElementById('inputOrdemCompraStatus').value = OrComSituacao;
 			document.getElementById('inputOrdemCompraTipo').value = OrComTipo;
-			
+		
 			if (Tipo == 'motivo'){
 				bootbox.alert({
 							title: '<strong>Motivo da Não Liberação</strong>',
@@ -151,13 +166,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				return false;
 			} else if (Tipo == 'imprimir'){
-				if (OrComSituacaoChave == 'AGUARDANDOLIBERACAO'){			
+				if (OrComSituacaoChave == 'AGUARDANDOLIBERACAOCENTRO'){			
 					alerta('Atenção','Enquanto o status estiver AGUARDANDO LIBERAÇÃO a impressão não poderá ser realizada!','error');
 					return false;
 				} else if (OrComSituacaoChave == 'PENDENTE'){			
 					alerta('Atenção','Enquanto o status estiver PENDENTE de preenchimento a impressão não poderá ser realizada!','error');
 					return false;
-				} else if (OrComSituacaoChave == 'NAOLIBERADO'){			
+				} else if (OrComSituacaoChave == 'NAOLIBERADOCENTRO'){			
 					alerta('Atenção','A ordem de compra/contrato não foi liberada, portanto, a impressão não poderá ser realizada!','error');
 					return false;
 				} else {
@@ -169,38 +184,51 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					document.formOrdemCompra.action = "ordemcompraEdita.php";		
 				} else if (Tipo == 'exclui'){
 
-					//Esse ajax verifica se a Ordem de Compra está sendo usada. Se sim, não deixa excluir.
-					$.ajax({
-						type: "POST",
-						url: "ordemcompraEmUso.php",
-						data: ('iOrdemCompra='+OrComId),
-						success: function(resposta){
-							
-							if (resposta == 1){								
-								alerta('Atenção','Há movimentações usando essa Ordem de Compra, portanto, não pode ser excluída!','error');
-								return false;
-							} else{
-								confirmaExclusao(document.formOrdemCompra, "Tem certeza que deseja excluir essa ordem de compra?", "ordemcompraExclui.php");
-							} 
+					if(Permission){
+						//Esse ajax verifica se a Ordem de Compra está sendo usada. Se sim, não deixa excluir.
+						$.ajax({
+							type: "POST",
+							url: "ordemcompraEmUso.php",
+							data: ('iOrdemCompra='+OrComId),
+							success: function(resposta){
+								
+								if (resposta == 1){								
+									alerta('Atenção','Há movimentações usando essa Ordem de Compra, portanto, não pode ser excluída!','error');
+									return false;
+								} else{
+									confirmaExclusao(document.formOrdemCompra, "Tem certeza que deseja excluir essa ordem de compra?", "ordemcompraExclui.php");
+								} 
 
-							document.getElementById('inputOrdemCompraId').value = resposta;
+								document.getElementById('inputOrdemCompraId').value = resposta;
+							}
+						});
+
+						if (document.getElementById('inputOrdemCompraId').value){
+							return false;
 						}
-					});
+					
+					} else{
+							alerta('Permissão Negada!','');
+							return false;
+						}
 
-					if (document.getElementById('inputOrdemCompraId').value){
-						return false;
-					}
-					
-					
+
 				} else if (Tipo == 'mudaStatus'){
 					document.formOrdemCompra.action = "ordemcompraMudaSituacao.php";
 				} else if (Tipo == 'produto'){
 					document.formOrdemCompra.action = "ordemcompraProduto.php";
 				} else if (Tipo == 'servico'){
 					document.formOrdemCompra.action = "ordemcompraServico.php";
+				}else if (Tipo == 'aprovacao'){
+					confirmaExclusao(document.formOrdemCompra, "Essa ação enviará toda a Ordem de Compra (com seus produtos e serviços) para aprovação do Centro Administrativo. Tem certeza que deseja enviar?", "ordemcompraEnviar.php");
 				} else if (Tipo == 'duplica'){
 					document.formOrdemCompra.action = "ordemcompraDuplica.php";
+				} else if (Tipo == 'aprovacaoContabilidade') {
+					document.formOrdemCompra.action = "ordemcompraAprovacaoContabilidade.php";
+				} else if (Tipo == 'empenho') {
+					document.formOrdemCompra.action = "ordemCompraEmpenho.php";
 				}
+
 				document.formOrdemCompra.setAttribute("target", "_self");
 			}
 			
@@ -211,7 +239,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -260,19 +288,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<tr class="bg-slate">
 										<th>Data</th>
 										<th>Número</th>
-										<th>Lote</th>
+										<th>Nº Ata/Lote</th>
 										<th>Tipo</th>
 										<th>Fornecedor</th>
 										<th>Processo</th>
-										<th>Categoria</th>
+										<th>SubCategoria</th>
+										<th>Valor Total</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
 								<?php
-									foreach ($row as $item){
-										
+									foreach ($row as $item){										
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
@@ -286,7 +314,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$tipo.'</td>
 											<td>'.$item['ForneNome'].'</td>
 											<td>'.$item['OrComNumProcesso'].'</td>
-											<td>'.$item['CategNome'].'</td>											
+											<td>'.$item['SbCatNome'].'</td>
+											<td class="text-right" style="padding-right:40px !important;">'.mostraValor($item['ValorTotalOrdemCompra']).'</td>											
 											');
 										
 										print('<td><span class="'.$situacaoClasse.'">'.$situacao.'</span></td>');
@@ -294,26 +323,35 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'edita\', \'\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Ordem de Compra"></i></a>
-														<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin" title="Excluir Ordem de Compra"></i></a>
-														<div class="dropdown">													
+														<a href="#" onclick="atualizaOrdemCompra('.$atualizar.','.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'edita\', \'\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Ordem de Compra"></i></a>
+														<a href="#" onclick="atualizaOrdemCompra('.$excluir.','.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin" title="Excluir Ordem de Compra"></i></a>
+														<div class="dropdown">
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
-															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>
-																<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>');
+															<div class="dropdown-menu dropdown-menu-right">'.
+																($item['produtoCount']>0?'<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'produto\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>':'').
+																($item['servicoCount']>0?'<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'servico\', \'\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Serviços"></i> Listar Serviços</a>':'').
+																((($item['produtoQuant']>0 || $item['servicoQuant']>0) && $_SESSION['PerfiChave'] != 'CONTABILIDADE')?'<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'aprovacao\', \'\');" class="dropdown-item"><i class="icon-list2" title="Enviar para Aprovação"></i> Enviar para Aprovação</a>':'').''
+															.'<div class="dropdown-divider"></div>');
+
+																if ($item['SituaChave'] == 'LIBERADOCENTRO'){
+																	print('<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'aprovacaoContabilidade\', \'\')" class="dropdown-item" title="Contabilidade"><i class="icon-list2"></i> Enviar para Contabilidade</a>');
+																
+																}
+								  
+																  if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCONTABILIDADE' || $item['SituaChave'] == 'LIBERADOCONTABILIDADE'){
+																	print('<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'empenho\', \'\')" class="dropdown-item" title="Empenhar"><i class="icon-coin-dollar"></i> Empenhos</a>');
+																}
+																print('	<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir"><i class="icon-printer2"></i> Imprimir</a>');
 
 										if (isset($item['BandeMotivo'])){
 
 											print('
 																<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaOrdemCompra('.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
+																<a href="#" onclick="atualizaOrdemCompra(1,'.$item['OrComFluxoOperacional'].','.$item['OrComId'].', \''.$item['OrComNumero'].'\', \''.$item['OrComCategoria'].'\', \''.$item['CategNome'].'\','.$item['OrComSituacao'].',\''.$item['SituaChave'].'\', \''.$item['OrComTipo'].'\', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
 										}
-
 										print('				</div>
 														</div>
 													</div>
@@ -334,6 +372,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<!-- /info blocks -->
 				
 				<form name="formOrdemCompra" method="post">
+				<input type="hidden" id="inputPermission" name="inputPermission" >
+					<input type="hidden" id="inputOrdemCompraFlOpeId" name="inputOrdemCompraFlOpeId" >
 					<input type="hidden" id="inputOrdemCompraId" name="inputOrdemCompraId" >
 					<input type="hidden" id="inputOrdemCompraNumero" name="inputOrdemCompraNumero" >
 					<input type="hidden" id="inputOrdemCompraCategoria" name="inputOrdemCompraCategoria" >

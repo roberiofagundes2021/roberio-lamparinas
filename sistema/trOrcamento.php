@@ -1,7 +1,7 @@
 <?php 
 
 include_once("sessao.php"); 
-$inicio1 = microtime(true);
+//$inicio1 = microtime(true);
 include('global_assets/php/conexao.php');
 
 $_SESSION['PaginaAtual'] = 'Termo de Referência / Orçamento';
@@ -13,35 +13,26 @@ if (isset($_POST['inputTRId'])){
 	$_SESSION['TRNumero'] = $_POST['inputTRNumero'];
 }
 
-$sql = "
-	SELECT 
-		TrXOrId, 
-		TrXOrNumero, 
-		TrXOrData, 
-		TrXOrCategoria, 
-		TrXOrStatus, 
-		TrRefNumero, 
-		TrRefTipo, 
-		ForneNome, 
-		CategNome, 
-		SituaId, 
-		SituaCor, 
-		SituaChave, 
-		dbo.fnSubCategoriasTRXOrcamento(TrXOrUnidade, TrXOrId) as SubCategorias
-	  FROM TRXOrcamento
-		JOIN TermoReferencia 
-			ON TrRefId = TrXOrTermoReferencia
-		LEFT 
-			JOIN Fornecedor 
-				ON ForneId = TrXOrFornecedor
-		JOIN Categoria 
-			ON CategId = TrXOrCategoria
-		JOIN Situacao 
-			ON SituaId = TrXOrStatus
-	 WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." 
-	   AND TrXOrTermoReferencia = ".$_SESSION['TRId']."
-	 ORDER BY TrXOrData DESC
-";
+$sql = "SELECT SituaChave
+		FROM TRXOrcamento
+		JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+		JOIN Situacao  ON SituaId = TrRefStatus
+		WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." AND TrXOrTermoReferencia = ".$_SESSION['TRId']."
+		";
+$result = $conn->query($sql);
+$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrCategoria, TrXOrStatus, TrRefNumero, 
+			   TrRefTipo, ForneNome, CategNome, SituaId, SituaCor, SituaChave, 
+			   dbo.fnSubCategoriasTRXOrcamento(TrXOrUnidade, TrXOrId) as SubCategorias,
+			   dbo.fnValorTotalOrcamentoTR(TrXOrUnidade, TrXOrId) as ValorTotalOrcamentoTR
+	 	FROM TRXOrcamento
+		JOIN TermoReferencia ON TrRefId = TrXOrTermoReferencia
+		LEFT JOIN Fornecedor ON ForneId = TrXOrFornecedor
+		JOIN Categoria ON CategId = TrXOrCategoria
+		JOIN Situacao ON SituaId = TrXOrStatus
+		WHERE TrXOrUnidade = ". $_SESSION['UnidadeId'] ." AND TrXOrTermoReferencia = ".$_SESSION['TRId']."
+		ORDER BY TrXOrData DESC";
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -89,33 +80,38 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //Nº Orçamento
-					width: "15%",
+					width: "13%",
 					targets: [1]
 				},				
 				{ 
 					orderable: true,   //Fornecedor
-					width: "25%",
+					width: "20%",
 					targets: [2]
 				},
 				{ 
 					orderable: true,   //Categoria
-					width: "20%",
+					width: "15%",
 					targets: [3]
 				},
 				{ 
-					orderable: true,   //Categoria
+					orderable: true,   //SubCategoria
 					width: "20%",
 					targets: [4]
 				},
 				{ 
+					orderable: true,   //ValorTotal
+					width: "12%",
+					targets: [5]
+				},
+				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [5]
+					targets: [6]
 				},
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [6]
+					targets: [7]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -208,19 +204,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h5 class="card-title">Relação de Orçamentos do Termo de Referência</h5>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="perfil.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
 								A relação abaixo faz referência aos orçamentos da <span style="color: #FF0000; font-weight: bold;">TR nº <?php echo $_SESSION['TRNumero']; ?></span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
 								<div class="text-right"><a href="tr.php" role="button"><< Termo de Referência</a>&nbsp;&nbsp;&nbsp;
-								<a href="trOrcamentoNovo.php" class="btn btn-principal" role="button">Novo Orçamento</a></div>
+								<?php 
+									if ($rowSituacao['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+										print('<a href="trOrcamentoNovo.php" class="btn btn-principal" role="button">Novo Orçamento</a></div>');
+									}
+								?>
 							</div>
 							
 							<table class="table" id="tblOrcamento">
@@ -231,6 +224,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>Fornecedor</th>
 										<th>Categoria</th>
 										<th>SubCategoria</th>
+										<th>ValorTotal</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -250,6 +244,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											    <td>'.$item['ForneNome'].'</td>
 												<td>'.$item['CategNome'].'</td>
 												<td>'.$item['SubCategorias'].'</td>
+												<td class="text-right" style="padding-right: 40px !important;">'.mostraValor($item['ValorTotalOrcamentoTR']).'</td>
 										');
 										
 										// print('<td><a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
@@ -258,70 +253,70 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										//////////////////////////////////////////////////////////
 										if ($item['TrRefTipo'] == 'P') {
 											print('<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
+													<div class="list-icons">
+														<div class="list-icons list-icons-extended">
 
-														<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
-														<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
 
-														<div class="dropdown">													
-															<a href="#" class="list-icons-item" data-toggle="dropdown">
-																<i class="icon-menu9"></i>
-															</a>
+															<div class="dropdown">													
+																<a href="#" class="list-icons-item" data-toggle="dropdown">
+																	<i class="icon-menu9"></i>
+																</a>
 
-															<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'P\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
-															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
+																<div class="dropdown-menu dropdown-menu-right">
+																	<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'P\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																	<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
+																	<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
+																</div>
 															</div>
 														</div>
 													</div>
-												</div>
-											</td>
-										</tr>');
+												</td>
+											</tr>');
 										} else if ($item['TrRefTipo'] == 'S') {
 											print('<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-													<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
-													<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
-														<div class="dropdown">													
-															<a href="#" class="list-icons-item" data-toggle="dropdown">
-																<i class="icon-menu9"></i>
-															</a>
+														<div class="list-icons">
+															<div class="list-icons list-icons-extended">
+																<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
+																<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
+																<div class="dropdown">													
+																	<a href="#" class="list-icons-item" data-toggle="dropdown">
+																		<i class="icon-menu9"></i>
+																	</a>
 
-															<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'S\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Serviços</a>
-															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
-															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
+																	<div class="dropdown-menu dropdown-menu-right">
+																		<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'S\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Serviços</a>
+																		<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
+																		<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
+																	</div>
+																</div>
 															</div>
 														</div>
-													</div>
-												</div>
-											</td>
-										</tr>');
+													</td>
+												</tr>');
 										} else {
 											print('<td class="text-center">
-												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-													<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
-													<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
-														<div class="dropdown">													
-															<a href="#" class="list-icons-item" data-toggle="dropdown">
-																<i class="icon-menu9"></i>
-															</a>
+													<div class="list-icons">
+														<div class="list-icons list-icons-extended">
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar Orçamento"></i></a>
+															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" title="Excluir Orçamento"></i></a>
+															<div class="dropdown">													
+																<a href="#" class="list-icons-item" data-toggle="dropdown">
+																	<i class="icon-menu9"></i>
+																</a>
 
-															<div class="dropdown-menu dropdown-menu-right">
-															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'P\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
-															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'S\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Serviços</a>
-															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
-															<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
+																<div class="dropdown-menu dropdown-menu-right">
+																	<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'P\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Produtos</a>
+																	<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'S\');" class="dropdown-item"><i class="icon-stackoverflow" title="Listar Produtos"></i> Listar Serviços</a>
+																	<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'imprimir\');" class="dropdown-item" title="Imprimir Lista"><i class="icon-printer2"></i> Imprimir Orçamento</a>
+																	<a href="#" onclick="atualizaOrcamento('.$item['TrXOrId'].', \''.$item['TrXOrNumero'].'\', \''.$item['TrXOrCategoria'].'\', \''.$item['CategNome'].'\','.$item['TrXOrStatus'].', \'duplica\');" class="dropdown-item" title="Duplicar Orçamento"><i class="icon-popout"></i> Duplicar Orçamento</a>
+																</div>
 															</div>
 														</div>
 													</div>
-												</div>
-											</td>
-										</tr>');
+												</td>
+											</tr>');
 										}
 									}
 									
@@ -345,8 +340,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				</form>
 
 			</div>
-			<!-- /content area -->
-			
+			<!-- /content area -->			
+
 			<?php include_once("footer.php"); ?>
 
 		</div>
@@ -357,8 +352,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<?php include_once("alerta.php"); ?>
 	
-	<?php $total1 = microtime(true) - $inicio1;
-	echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; ?>	
+	<?php //$total1 = microtime(true) - $inicio1;
+	//echo '<span style="background-color:yellow">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; ?>	
 
 </body>
 

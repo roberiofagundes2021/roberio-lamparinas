@@ -93,6 +93,7 @@ if(isset($_POST['inputNome'])){
 	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
@@ -433,7 +434,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control select-search" required>
 													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT CategId, CategNome
@@ -456,7 +457,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control select-search">
 													<option value="#">Selecione</option>
 
 												</select>
@@ -523,7 +524,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbMarca">Marca</label>
-												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
+												<select id="cmbMarca" name="cmbMarca" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT MarcaId, MarcaNome
@@ -546,7 +547,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbModelo">Modelo</label>
-												<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
+												<select id="cmbModelo" name="cmbModelo" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT ModelId, ModelNome
@@ -569,7 +570,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbFabricante">Fabricante</label>
-												<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
+												<select id="cmbFabricante" name="cmbFabricante" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT FabriId, FabriNome
@@ -601,7 +602,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbUnidadeMedida">Unidade de Medida<span class="text-danger">*</span></label>
-												<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control form-control-select2" required>
+												<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control select-search" required>
 													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
@@ -624,7 +625,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbTipoFiscal">Tipo</label>
-												<select id="cmbTipoFiscal" name="cmbTipoFiscal" class="form-control form-control-select2">
+												<select id="cmbTipoFiscal" name="cmbTipoFiscal" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT TpFisId, TpFisNome
@@ -647,7 +648,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbOrigemFiscal">Origem</label>
-												<select id="cmbOrigemFiscal" name="cmbOrigemFiscal" class="form-control form-control-select2">
+												<select id="cmbOrigemFiscal" name="cmbOrigemFiscal" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT OrFisId, OrFisNome
@@ -674,7 +675,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-10">
 											<div class="form-group">
 												<label for="cmbNcmFiscal">NCM</label>
-												<select id="cmbNcmFiscal" name="cmbNcmFiscal" class="form-control form-control-select2">
+												<select id="cmbNcmFiscal" name="cmbNcmFiscal" class="form-control select-search">
 													<option value="#">Selecione um NCM</option>
 													<?php 
 														$sql = "SELECT NcmNome

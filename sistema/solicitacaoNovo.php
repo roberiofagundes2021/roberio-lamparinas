@@ -6,16 +6,29 @@ $_SESSION['PaginaAtual'] = 'Nova Solicitação';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, 
-		dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
+// verifica se existe um valor minimo e maximo para paginação de itens
+$sql = "WITH itens as (SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, 
+		dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ProduNome) as rownum
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN Situacao on SituaId = ProduStatus
-	    WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-		ORDER BY ProduNome ASC";
+		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
+		SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, Estoque, rownum
+		FROM itens WHERE rownum >= 0 and rownum <= 20 ORDER BY ProduNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
+
 //$count = count($row);
+
+// pega a quantidade total de itens que vem do banco para fazer a paginação
+
+$sqlCount = "SELECT COUNT(ProduId) as quantidade
+		FROM Produto
+		JOIN Categoria on CategId = ProduCategoria
+		JOIN Situacao on SituaId = ProduStatus
+	    WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
+$resultCount = $conn->query($sqlCount);
+$count = $resultCount->fetch(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -63,6 +76,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+	// transforma as variaveis PHP em variaveis JavaScript atravez do jsonEncode
+		<?php
+			$js_array = json_encode($count['quantidade']);
+			echo "var Maxitens = ".$js_array.";\n";
+		?>
 		$(document).ready(function() {
 
 			//Aqui sou obrigado a instanciar novamente a utilização do fancybox
@@ -75,10 +93,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				const cmbCategoria = $('#cmbCategoria')
 
 				cmbCategoria.on('change', () => {
-					Filtrando()
 					const valCategoria = $('#cmbCategoria').val()
-
-					$.getJSON('filtraSubCategoria.php?idCategoria=' + valCategoria, function(dados) {
+					// if adicionado para corrigir bug de ao retirar a seleção da categoria a
+					// subcategoria ficava com valor "Filtrando..." e dava erro na requisição
+					if(valCategoria){
+						Filtrando()
+						$.getJSON('filtraSubCategoria.php?idCategoria=' + valCategoria, function(dados) {
 
 						var option = '<option value="">Selecione a SubCategoria</option>';
 
@@ -92,7 +112,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						} else {
 							Reset();
 						}
-					});
+						});
+					} else {
+						Reset();
+					}
 				})
 
 				function contaClicks(direc) {
@@ -256,6 +279,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							let verifExistProduQuantMaiorZero = 0
 							if (data) {
 								let carrinho = JSON.parse(data)
+								var produtoServico = $('input[name="inputProdutoServico"]:checked').val();
 
 								// Iterando sobre o array para ter acesso aos valores id de cada Objeto 
 								carrinho.forEach(item => {
@@ -266,7 +290,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										if ($(elem).attr('produId') == item.id && item.quantidade != 0) {
 											// Desabilitando o botão e trocando o conteúdo.
 											elem.setAttribute('disabled', '')
-											$(elem).html('PRODUTO ADICIONADO')
+											var menssagem = produtoServico == 'P'? 'PRODUTO ADICIONADO':'SERVIÇO ADICIONADO'
+											$(elem).html(menssagem)
 										}
 									})
 								})
@@ -324,15 +349,18 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					$('.add-cart').each((i, elem) => {
 						$(elem).on('click', () => {
 							let id = $(elem).attr('produId')
+							var produtoServico = $('input[name="inputProdutoServico"]:checked').val();
 
 							$.post(
 								'solicitacaoNovoCarrinho.php', {
-									inputProdutoId: id
+									inputId: id,
+									type: produtoServico
 								},
 								function(data) {
 									if (data) {
 										elem.setAttribute('disabled', '')
-										$(elem).html('PRODUTO ADICIONADO')
+										var menssagem = produtoServico == 'P'? 'PRODUTO ADICIONADO':'SERVIÇO ADICIONADO'
+										$(elem).html(menssagem)
 										$('.custon-modal-lista').append(data)
 										//editaQuantidade()
 										editaCarrinhoBotoes()
@@ -370,58 +398,58 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				let resultadosConsulta = '';
 				let inputsValues = {};
 
-				(function Filtrar() {
+				$('#submitFiltro').on('click', (e) => {
+					e.preventDefault()
 
-					$('#submitFiltro').on('click', (e) => {
-						e.preventDefault()
+					var produtoServico = $('input[name="inputProdutoServico"]:checked').val()
+					let pesquisaProduto = $('#inputPesquisaProduto').val()
+					let categoria = $('#cmbCategoria').val()
+					let subCategoria = $('#cmbSubCategoria').val()
+					let marca = $('#cmbMarca').val()
+					let fabricante = $('#cmbFabricante').val()
+					let modelo = $('#cmbModelo').val()
 
-						var produtoServico = $('input[name="inputProdutoServico"]:checked').val();
-						let pesquisaProduto = $('#inputPesquisaProduto').val()
-						let categoria = $('#cmbCategoria').val()
-						let subCategoria = $('#cmbSubCategoria').val()
-						let marca = $('#cmbMarca').val()
-						let fabricante = $('#cmbFabricante').val()
-						let modelo = $('#cmbModelo').val()
+					let url = "solicitacaoFiltraProdutos.php"
 
-						let url = "solicitacaoFiltraProdutos.php";
+					inputsValues = {
+						inputProdutoServico: produtoServico, 
+						inputPesquisaProduto: pesquisaProduto,
+						inputCategoria: categoria,
+						inputSubCategoria: subCategoria,
+						inputMarca: marca,
+						inputFabricante: fabricante,
+						inputModelo: modelo,
+						min: 0,
+						max: 20,
+					};
 
-						inputsValues = {
-							inputProdutoServico: produtoServico, 
-							inputPesquisaProduto: pesquisaProduto,
-							inputCategoria: categoria,
-							inputSubCategoria: subCategoria,
-							inputMarca: marca,
-							inputFabricante: fabricante,
-							inputModelo: modelo,
-						};
+					$.post(
+						url,
+						inputsValues,
+						(data) => {
+							if (data) {
+								$('#cards-produto').removeClass('justify-content-center px-2')
+								$('#cards-produto').html(data)
+								resultadosConsulta = data
+								var count = parseInt($('#count').val())
+								makePagitation(count)
 
-						$.post(
-							url,
-							inputsValues,
-							(data) => {
-
-								if (data) {
-									$('#cards-produto').removeClass('justify-content-center px-2')
-									$('#cards-produto').html(data)
-									resultadosConsulta = data
-
-									// Estas duas funções são chamadas a cada requisição Ajax realizada, onde 
-									// novos elementos são carregados na tela, para que possam agir sobre eles,
-									// como no carregamento da pagina.
-									carrinho()
-									verificarCarrinho()
+								// Estas duas funções são chamadas a cada requisição Ajax realizada, onde 
+								// novos elementos são carregados na tela, para que possam agir sobre eles,
+								// como no carregamento da pagina.
+								carrinho()
+								verificarCarrinho()
 
 
-									$(".fancybox").fancybox({
-										// options
-									});
-								} else {
-									semResultados()
-								}
+								$(".fancybox").fancybox({
+									// options
+								});
+							} else {
+								semResultados()
 							}
-						);
-					})
-				})()
+						}
+					);
+				})
 
 				function semResultados() {
 					const msg = $('<div class="card" style="width: 100%"><p class="text-center m-2">Sem resultados...</p></div>')
@@ -435,6 +463,95 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					$('.pagination').html('')
 					$('.pagination').append(btnDireita).append(pagina0).append(btnEsquerda)
 				}
+
+				// cria a numeração da paginação de acordo ao numero maximo de itens que vem do banco
+				function makePagitation(MaxItens){
+					// quantidade de itens por pagina
+					var quantItens = 20
+					var posicao = 1
+
+					// calcula quantas paginas serão necessarias
+					var count = MaxItens%quantItens? (Math.ceil(MaxItens/quantItens)+1):MaxItens/quantItens
+
+					var HTMLpaginacao = "<li id='next' class='page-item'><a class='page-link page-link-white'><i class='icon-arrow-small-right'></i></a></li>"
+					for(var x=1; x < count; x++) {
+						HTMLpaginacao += "<li id='lista-"+x+"' class='page-item "+(x==posicao?'active':'')+"'><a class='page-link page-link-white'>"+x+"</a></li>"
+					}
+					HTMLpaginacao += "<li id='back' class='page-item'><a class='page-link page-link-white'><i class='icon-arrow-small-left'></i></a></li>"
+					$('#pagination').html(HTMLpaginacao)
+
+					$('.page-item').click(function(e){
+					e.preventDefault()
+
+					// pega o id que foi selecionado
+					if($(this).attr('id') == 'next'){
+						var id = posicao<count ? parseInt(posicao) : parseInt(posicao)+1
+					} else if($(this).attr('id') == 'back'){
+						var id = posicao==1 ? parseInt(posicao) : parseInt(posicao)-1
+					} else {
+						var id = parseInt($(this).attr('id').split('-')[1])
+					}
+					$('#lista-'+posicao).removeClass("active")
+					posicao = id
+					$('#lista-'+posicao).addClass("active")
+
+					// adiciona o valor maximo de items
+					var max = quantItens*id
+
+					// a partir do valor maxio ja adicionado ele adiciona o valor minimo
+					var min = ((parseInt(max)+1) - quantItens)
+
+					var produtoServico = $('input[name="inputProdutoServico"]:checked').val();
+					let pesquisaProduto = $('#inputPesquisaProduto').val()
+					let categoria = $('#cmbCategoria').val()
+					let subCategoria = $('#cmbSubCategoria').val()
+					let marca = $('#cmbMarca').val()
+					let fabricante = $('#cmbFabricante').val()
+					let modelo = $('#cmbModelo').val()
+
+					let url = "solicitacaoFiltraProdutos.php";
+
+					inputsValues = {
+						inputProdutoServico: produtoServico, 
+						inputPesquisaProduto: pesquisaProduto,
+						inputCategoria: categoria,
+						inputSubCategoria: subCategoria,
+						inputMarca: marca,
+						inputFabricante: fabricante,
+						inputModelo: modelo,
+						min: min,
+						max: max,
+					};
+
+					$.post(
+						url,
+						inputsValues,
+						(data) => {
+							if (data) {
+								$('#cards-produto').removeClass('justify-content-center px-2')
+								$('#cards-produto').html(data)
+								resultadosConsulta = data
+
+								// retorna o scroll da pagina para o topo
+								$('html, body').animate({ scrollTop: 0 }, 0);
+
+								// Estas duas funções são chamadas a cada requisição Ajax realizada, onde 
+								// novos elementos são carregados na tela, para que possam agir sobre eles,
+								// como no carregamento da pagina.
+								// carrinho()
+								// verificarCarrinho()
+
+								$(".fancybox").fancybox({
+									// options
+								});
+							} else {
+								semResultados()
+							}
+						}
+					);
+				})
+				}
+				makePagitation(Maxitens)
 			})()
 
 			function Filtrando() {
@@ -487,8 +604,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<div id="produtos" class="row">
 							<!--Search Filter-->
 							<div id="filter" class="col-12">
-								<div class="card pt-3 pb-3 pl-2 pr-2">
-									<div class="card-bod">
+								<div class="card pb-3 pr-2">
+									<div class="card-header header-elements-inline">
+										<h5 class="card-title">Nova Solicitação de Materiais/Serviços</h5>
+										<div class="header-elements">
+											<a href="solicitacao.php"><< Solicitações</a>
+										</div>
+									</div>
+									<div class="card-bod pt-1 pl-3 pr-2">
 										<form class="col-12" id="pesquisa" action="">
 											<div class="row">
 												<div class="col-lg-2 pt-3">
@@ -744,16 +867,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 						<!-- Pagination -->
 						<div class="d-flex justify-content-center pt-3 mb-3">
-							<ul class="pagination shadow-1">
-								<li class="page-item"><a href="#" class="page-link page-link-white"><i class="icon-arrow-small-right"></i></a></li>
-								<li class="page-item active"><a href="#" class="page-link page-link-white">1</a></li>
-								<li class="page-item"><a href="#" class="page-link page-link-white">2</a></li>
-								<li class="page-item"><a href="#" class="page-link page-link-white">3</a></li>
-								<li class="page-item"><a href="#" class="page-link page-link-white">4</a></li>
-								<li class="page-item"><a href="#" class="page-link page-link-white">5</a></li>
-								<li class="page-item"><a href="#" class="page-link page-link-white"><i class="icon-arrow-small-left"></i></a></li>
+							<ul id="pagination" class="pagination shadow-1">
+								
 							</ul>
 						</div>
+						<form id="formPaginacao" method="POST" action="solicitacaoNovo.php">
+							<input id="min" type="hidden" name="min" value="" />
+							<input id="max" type="hidden" name="max" value="" />
+							<input id="tipoPagina" type="hidden" name="tipoPagina" value="" />
+							<input id="posicao" type="hidden" name="posicao" value="" />
+						</form>
 						<!-- /pagination -->
 
 					</div>

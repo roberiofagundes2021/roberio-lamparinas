@@ -7,16 +7,18 @@ include('global_assets/php/conexao.php');
 if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#' && $_GET['idFornecedor'] != '-1'){
 
 	if (isset($_GET['idSubCategoria']) && $_GET['idSubCategoria'] != '#'){
-		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
+		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, MvXPrLote, dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade
 				FROM Produto
 				JOIN Categoria on CategId = ProduCategoria
 				JOIN Fornecedor on ForneCategoria = CategId
+				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ForneId = '". $_GET['idFornecedor']."' and ProduSubCategoria = '". $_GET['idSubCategoria']."'";
 	} else {
-		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
+		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, MvXPrLote, dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade
 				FROM Produto
 				JOIN Categoria on CategId = ProduCategoria
 				JOIN Fornecedor on ForneCategoria = CategId
+				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ForneId = '". $_GET['idFornecedor']."'";
 	}
 	
@@ -26,11 +28,13 @@ if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != '#' && $_GET['idFor
 	if(isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] == null) $_GET['idSubCategoria'] = "#";
 
 	if (isset($_GET['idSubCategoria']) and $_GET['idSubCategoria'] != "#" and $_GET['idSubCategoria'] != ""){
-		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
+		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal,
+				dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade, dbo.fnLoteProduto(ProduUnidade, ProduId) as Lote
 				FROM Produto
 				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduSubCategoria = '". $_GET['idSubCategoria']."'";
 	} else {
-		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal
+		$sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal,
+				dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade, dbo.fnLoteProduto(ProduUnidade, ProduId) as Lote
 				FROM Produto
 				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = '". $_GET['idCategoria']."'";
 	}

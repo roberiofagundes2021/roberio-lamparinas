@@ -6,19 +6,24 @@
 				
 				var id = empresa[0];
 				var nome = empresa[1];
+
+				$('#inputEmpresaId').val(id)
+				$('#inputEmpresaNome').val(nome)
+
+				$('#formNewEmpresa').submit()
 				
-				$.ajax({
-					type: "POST",
-					url: "menuLeftSecundarioAjax.php",
-					data: ('id='+id+'&nome='+nome),
-					success: function(resposta){
+				// $.ajax({
+				// 	type: "POST",
+				// 	url: "menuLeftSecundarioAjax.php",
+				// 	data: ('id='+id+'&nome='+nome),
+				// 	success: function(resposta){
 				
-						if(resposta){
-							location.reload();
-							return false;
-						}
-					}
-				})				
+				// 		if(resposta){
+				// 			location.reload();
+				// 			return false;
+				// 		}
+				// 	}
+				// })				
 				
 			}
 							
@@ -70,6 +75,11 @@
 							</div>
 						</form>
 					</div>
+
+					<form id="formNewEmpresa" name="formEmpresa" method="post" action="localEstoque.php">
+						<input type="hidden" id="inputEmpresaId" name="inputEmpresaId" >
+						<input type="hidden" id="inputEmpresaNome" name="inputEmpresaNome" >
+					</form>
 				</div>
 				<!-- /sidebar Empresa -->
 

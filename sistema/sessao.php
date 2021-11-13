@@ -3,6 +3,51 @@
 session_start();
 include('global_assets/php/conexao.php');
 
+if (!array_key_exists('UsuarId', $_SESSION) or !array_key_exists('UnidadeId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
+	header('Expires: 0');
+	header('Pragma: no-cache');
+	header("Location: login.php");
+	return false;
+}
+
+$visualizar = true;
+$novo = 1;
+$atualizar = 0;
+$excluir = 0;
+$inserir = 0;
+$keys = [];
+
+// faz o controle de acesso às paginas de acordo à permissão
+if (isset($_SESSION['Permissoes'])){
+	foreach($_SESSION['Permissoes'] as $key => $permissao){
+		if($permissao['url'] == basename($_SERVER['REQUEST_URI']) && strtoupper($permissao['posicao']) != "APOIO"){
+			// adiciona as posições(no array) dos menus que redirecionam para uma mesma pagina
+			array_push($keys, $key);
+
+			$atualizar = $permissao['atualizar'];
+			$excluir = $permissao['excluir'];
+			$inserir = $permissao['inserir'];
+
+			$visualizar = $permissao['visualizar'];
+		}
+	}
+}
+// verifica se existe mais de um menu pertencente a modulos diferentes que
+// redireciona para a mesma pagina e verifica se possui visibilidade "true" em alguma delas
+// para que não ocorra o problema de sobrescrever o valor adicionado anteriormente
+if($keys > 1){
+	foreach($keys as $key){
+		if($_SESSION['Permissoes'][$key]['visualizar']){
+			$visualizar = true;
+		}
+	}
+}
+if(!$visualizar){header("location:javascript://history.go(-1)");}
+
+//Isso aqui é para resolver o problema da data nos relatórios, já que a função date() do PHP pega a data do servidor. E na Azure o servidor não deve está no Brasil, já que apresenta data/hora com 3h de diferença
+setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
+date_default_timezone_set('America/Sao_Paulo');
+
 $arquivosEmpresa = array(
 	'usuario.php', 'usuarioNovo.php', 'usuarioEdita.php', 'usuarioExclui.php', 'usuarioMudaSituacao.php', 'usuarioValida.php',
 	'licenca.php', 'licencaNovo.php', 'licencaEdita.php', 'licencaExclui.php', 'licencaMudaSituacao.php',
@@ -20,11 +65,29 @@ if (array_key_exists('EmpresaId', $_SESSION) and !in_array(basename($_SERVER['PH
 	unset($_SESSION['EmpresaNome']);
 }
 
+$arquivosTermoReferencia = array(
+	'trAprovacaoAdministrativo.php', 'trAprovacaoComissao.php', 'trAprovacaoContabilidade.php', 
+	'trComissao.php', 'trComissaoExclui.php', 'trComissaoPresidente.php', 'trComissaoValida.php', 
+	'trDotacao.php', 'trDotacaoExclui.php', 'trDotacaoNovo.php', 'trEdita.php', 'trExclui.php', 
+	'trFiltraProduto.php', 'trFiltraServico.php', 'trGravaProduto.php', 'trGravaServico.php',
+ 	'trImprime.php', 'trMudaSituacao.php', 'trMudaSituacaoContabilidade', 'trNovo.php', 'trOrcamento.php',
+	'trOrcamentoDuplica.php', 'trOrcamentoEdita.php', 'trOrcamentoExclui.php', 'trOrcamentoImprime.php',
+	'trOrcamentoNovo.php', 'trOrcamentoProduto.php', 'trOrcamentoServico.php', 'trProduto.php', 'trServico.php',
+	'trValidaProdutoServico.php', 'trValidaQuantidade.php', 'trVerificaProdutoServico.php', 'trComissaoAnexoNovo.php',
+	'trComissaoAnexoExclui.php');
+
+if ((array_key_exists('TRId', $_SESSION) || array_key_exists('TRNumero', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosTermoReferencia)) {
+	
+	unset($_SESSION['TRId']);
+	unset($_SESSION['TRNumero']);
+}
+
 $arquivosAditivo = array('fluxoAditivo.php', 'fluxoAditivoNovo.php', 'fluxoAditivoEdita.php', 'fluxoAditivoExclui.php');
 
 //Se existe a sessão $_SESSION['FluxoId'] e a página que está sendo acessada não é nenhuma das sitadas acima, limpa essa sessão.	  
 if (array_key_exists('FluxoId', $_SESSION) and !in_array(basename($_SERVER['PHP_SELF']), $arquivosAditivo)) {
 	unset($_SESSION['FluxoId']);
+	unset($_SESSION['Origem']);
 }
 
 $arquivoAditivoNovo = array('fluxoAditivoNovo.php');
@@ -43,7 +106,7 @@ if (array_key_exists('AditivoNovo', $_SESSION) and !in_array(basename($_SERVER['
 $arquivosMovimentacaoFinanceira = array(
 	'movimentacaoFinanceira.php', 'movimentacaoFinanceiraFiltra.php', 'movimentacaoFinanceiraExclui.php', 'movimentacaoFinanceiraImprime.php', 'movimentacaoFinanceiraPagamento.php', 'movimentacaoFinanceiraRecebimento.php', 'movimentacaoFinanceiraTransferencia.php');
 
-if ((array_key_exists('MovFinancPeriodoDe', $_SESSION) || array_key_exists('MovFinancAte', $_SESSION) || array_key_exists('MovFinancContaBanco', $_SESSION) || array_key_exists('MovFinancPlanoContas', $_SESSION)|| array_key_exists('MovFinancCentroDeCustos', $_SESSION) || array_key_exists('MovFinancStatus', $_SESSION) || array_key_exists('MovFinancFormaPagamento', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoFinanceira)) {
+if ((array_key_exists('MovFinancPeriodoDe', $_SESSION) || array_key_exists('MovFinancAte', $_SESSION) || array_key_exists('MovFinancContaBanco', $_SESSION) || array_key_exists('MovFinancPlanoContas', $_SESSION)|| array_key_exists('MovFinancCentroDeCustos', $_SESSION) || array_key_exists('MovFinancStatus', $_SESSION) || array_key_exists('MovFinancFormaPagamento', $_SESSION) || array_key_exists('MovFinancPermissionAtualiza', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoFinanceira)) {
 	
 	unset($_SESSION['MovFinancPeriodoDe']);
 	unset($_SESSION['MovFinancAte']);
@@ -52,6 +115,7 @@ if ((array_key_exists('MovFinancPeriodoDe', $_SESSION) || array_key_exists('MovF
 	unset($_SESSION['MovFinancCentroDeCustos']);
 	unset($_SESSION['MovFinancStatus']);
 	unset($_SESSION['MovFinancFormaPagamento']);
+	unset($_SESSION['MovFinancPermissionAtualiza']);
 }
 
 $arquivosMovimentacaoFinanceiraConciliacao = array(
@@ -94,14 +158,13 @@ $arquivosContasAReceber = array(
 
 if ((array_key_exists('ContRecPeriodoDe', $_SESSION)
 		|| array_key_exists('ContRecAte', $_SESSION)
-		|| array_key_exists('ContRecClientes', $_SESSION)
+		|| array_key_exists('ContRecCliente', $_SESSION)
 		|| array_key_exists('ContRecPlanoContas', $_SESSION)
 		|| array_key_exists('ContRecStatus', $_SESSION)
 		|| array_key_exists('ContRecNumDoc', $_SESSION)
 		|| array_key_exists('ContRecFormaPagamento', $_SESSION))
 	&& !in_array(basename($_SERVER['PHP_SELF']), $arquivosContasAReceber)
 ) {
-
 	unset($_SESSION['ContRecPeriodoDe']);
 	unset($_SESSION['ContRecAte']);
 	unset($_SESSION['ContRecCliente']);
@@ -111,12 +174,31 @@ if ((array_key_exists('ContRecPeriodoDe', $_SESSION)
 	unset($_SESSION['ContRecFormaPagamento']);
 }
 
+$arquivosFluxoRealizado = array(
+	'fluxoRealizado.php'
+);
 
-if (!array_key_exists('UsuarId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
-	header('Expires: 0');
-	header('Pragma: no-cache');
-	header("Location: login.php");
-	return false;
+if (array_key_exists('OrigemFluxoRealizado', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosFluxoRealizado)) {
+	unset($_SESSION['OrigemFluxoRealizado']);
+}
+
+$arquivosMovimentacaoAnexo = array(
+	'movimentacaoAnexo.php', 'movimentacaoAnexoNovo.php', 'movimentacaoAnexoExclui.php'
+);
+
+if (array_key_exists('MovimentacaoIdAnexo', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoAnexo)) {
+	unset($_SESSION['MovimentacaoIdAnexo']);
+	unset($_SESSION['MovimentacaoNotaFiscal']);
+}
+
+$arquivosOrdemCompraEmpenho = array(
+	'ordemCompraEmpenho.php', 'ordemCompraEmpenhoNovo.php', 'ordemCompraEmpenhoExclui.php', 'ordemCompraEmpenhoMudaSituacao.php'
+);
+
+if (array_key_exists('OrdemCompraIdEmpenho', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosOrdemCompraEmpenho)) {
+	unset($_SESSION['OrdemCompraIdEmpenho']);
+	unset($_SESSION['OrdemCompraNumero']);
+	unset($_SESSION['OrdemCompraSituacao']);
 }
 
 require_once("global_assets/php/funcoesgerais.php");

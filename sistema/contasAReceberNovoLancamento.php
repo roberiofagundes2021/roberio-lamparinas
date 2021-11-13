@@ -6,6 +6,10 @@ $_SESSION['PaginaAtual'] = 'Novo Lançamento - Contas a Receber';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputPermissionAtualiza'])){
+    $atualizar = $_POST['inputPermissionAtualiza'];
+}
+
 if (isset($_POST['cmbPlanoContas'])) {
 
     if (isset($_POST['cmbFormaPagamento'])){
@@ -555,12 +559,12 @@ if (isset($_POST['cmbPlanoContas'])) {
         }
     }
 
-    irpara("ContasAReceber.php");
+    irpara("contasAReceber.php");
 }
 //$count = count($row);
 
 // SE TIVER EDITANDO 
-if (isset($_GET['lancamentoId'])) {
+if (isset($_POST['inputContasAReceberId']) && $_POST['inputContasAReceberId'] != 0) {
     try {
         $sql = "SELECT  CnAReId,
                         CnAReDtEmissao,  
@@ -595,7 +599,7 @@ if (isset($_GET['lancamentoId'])) {
                         FrPagChave            
     		       FROM ContasAReceber
                    LEFT JOIN FormaPagamento on FrPagId = CnAReFormaPagamento
-    		       WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " . $_GET['lancamentoId'] . "";
+    		       WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " .$_POST['inputContasAReceberId'] . "";
 
         $result = $conn->query($sql);
         $lancamento = $result->fetch(PDO::FETCH_ASSOC);
@@ -1368,8 +1372,12 @@ $dataInicio = date("Y-m-d");
                                             </div>
                                         </div>
                                     </div>
-                                    <button id="salvar" class="btn btn-principal">Salvar</button>
-                                    <a href="contasAReceber.php" class="btn">Cancelar</a>
+                                        <?php 
+                                            if ($atualizar) {
+                                                echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
+                                            }
+                                        ?>
+                                     <a href="contasAReceber.php" class="btn">Cancelar</a>
                                 </div>
 
                             </div>

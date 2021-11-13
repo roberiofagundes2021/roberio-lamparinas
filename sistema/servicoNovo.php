@@ -54,13 +54,13 @@ if(isset($_POST['inputNome'])){
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Produto incluído!!!";
+		$_SESSION['msg']['mensagem'] = "Serviço incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {		
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir produto!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao incluir serviço!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error2: ' . $e->getMessage();die;

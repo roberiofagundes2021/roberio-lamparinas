@@ -25,27 +25,133 @@ $Y = date("Y");
 $dataInicio = date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
 $dataFim = date("Y-m-d");
 
-/*
-if (isset($_POST['inputNumero'])){
+if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
 
-    $sql = "INSERT INTO Patrimonio ( PatriNumero, PatriNumSerie, PatriEstadoConservacao, PatriProduto,
-                                    PatriStatus, PatriUsuarioAtualizador,PatriUnidade)
+	try {
 
-            VALUES ( :sPatriNumero, :sPatriNumSerie,:sPatriEstadoConservacao, :iPatriProduto,
-                    :iPatriStatus,:iPatriUsuarioAtualizador, :iPatriUnidade)";
+		$conn->beginTransaction();
 
-    $result = $conn->prepare($sql);
-    $result->execute(array(
-                    ':sPatriNumero'             => isset($_POST['inputNumero']) ? $_POST['inputNumero'] : null,
-                    ':sPatriNumSerie'          => isset($_POST['inputNumSerie']) ? $_POST['inputNumSerie'] : null,
-                    ':sPatriEstadoConservacao'  => isset($_POST['cmbEstadoConservacao']) ? $_POST['cmbEstadoConservacao'] : null,
-                    ':iPatriProduto'            => isset($_POST['inputProduto']) ? $_POST['inputProduto'] : null,
-                    ':iStatus'                  => 1,
-                    ':iUsuarioAtualizador'      => $_SESSION['UsuarId'],
-                    ':iUnidade'                 => $_SESSION['UnidadeId']
-                    )); 
-}
-*/
+        $produto = explode('#', $_POST['cmbPatriProduto']);
+        $idProduto = $produto[0];
+		
+		$sql = "INSERT INTO Patrimonio ( PatriNumero, PatriNumSerie, PatriEstadoConservacao, PatriProduto,
+		        PatriStatus, PatriUsuarioAtualizador, PatriUnidade)
+				VALUES (:sPatriNumero,:sPatriNumSerie,:sPatriEstadoConservacao,:iPatriProduto,
+				:iPatriStatus,:iPatriUsuarioAtualizador,:iPatriUnidade)";
+
+        $result = $conn->prepare($sql);
+        $result->execute(array(
+        ':sPatriNumero'             => $_POST['inputPatriNumero'],
+        ':sPatriNumSerie'           => isset($_POST['inputPatriNumSerie']) ? $_POST['inputPatriNumSerie'] : null,
+        ':sPatriEstadoConservacao'  => isset($_POST['cmbPatriEstadoConservacao']) ? $_POST['cmbPatriEstadoConservacao'] : null,
+        ':iPatriProduto'            => $idProduto,
+        ':iPatriStatus'             => 1,
+        ':iPatriUsuarioAtualizador' => $_SESSION['UsuarId'],
+        ':iPatriUnidade'            => $_SESSION['UnidadeId']
+        )); 
+		
+		$insertIdPatrimonio = $conn->lastInsertId();
+
+        $sql = "SELECT MotivId
+                FROM Motivo
+                JOIN Situacao on SituaId = MotivStatus
+                WHERE SituaChave = 'ATIVO' and MotivChave = 'TRANSFERENCIA'";
+        $result = $conn->query($sql);
+        $rowMotivo = $result->fetch(PDO::FETCH_ASSOC);   
+        
+        $destino = explode('#', $_POST['cmbPatriDestino']);        
+        $referencia = $destino[2];
+
+        if ($referencia == 'Local'){
+            $destinoLocal = $destino[0];
+            $destinoSetor = null;
+        } else {
+            $destinoLocal = null;
+            $destinoSetor = $destino[0];
+        }
+
+		$sql = "INSERT INTO Movimentacao ( MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
+							MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
+							MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimUnidade)
+				VALUES (:sTipo, :iMotivo, :dData, :iFinalidade, :iOrigemLocal, :iOrigemSetor, :iDestinoLocal, :iDestinoSetor, :sDestinoManual, 
+				:sObservacao, :iFornecedor, :iOrdemCompra, :sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, 
+				:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
+
+        $result = $conn->prepare($sql);
+
+        $result->execute(array(
+        ':sTipo'               => 'T',
+        ':iMotivo'             => $rowMotivo['MotivId'],
+        ':dData'               => date('Y-m-d'),
+        ':iFinalidade'         => null,
+        ':iOrigemLocal'        => $_POST['inputPatriOrigemId'],
+        ':iOrigemSetor'        => null,
+        ':iDestinoLocal'       => $destinoLocal,
+        ':iDestinoSetor'       => $destinoSetor,
+        ':sDestinoManual'      => null,
+        ':sObservacao'         => null,
+        ':iFornecedor'         => null,
+        ':iOrdemCompra'        => null,
+        ':sNotaFiscal'         => $_POST['inputPatriNotaFiscal'] == '' ? null : $_POST['inputPatriNotaFiscal'],
+        ':dDataEmissao'        => $_POST['inputPatriDataCompra'] == '' ? null : $_POST['inputPatriDataCompra'],
+        ':sNumSerie'           => $_POST['inputPatriNumSerie'] == '' ? null : $_POST['inputPatriNumSerie'],
+        ':fValorTotal'         => $_POST['inputPatriAquisicao'] == '' ? null: gravaValor($_POST['inputPatriAquisicao']),
+        ':sChaveAcesso'        => null,
+        ':iSituacao'           => 1,
+        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+        ':iUnidade'            => $_SESSION['UnidadeId']
+        ));
+           
+        $insertIdMovimentacao = $conn->lastInsertId();
+
+        $sql = "SELECT ClassId
+                FROM Classificacao
+                JOIN Situacao on SituaId = ClassStatus
+                WHERE SituaChave = 'ATIVO' and ClassChave = 'PERMANENTE'";
+        $result = $conn->query($sql);
+        $rowClassificacao = $result->fetch(PDO::FETCH_ASSOC);        
+
+        $sql = "INSERT INTO MovimentacaoXProduto
+                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+                        VALUES 
+                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
+        $result = $conn->prepare($sql);
+        $result->execute(array(
+            ':iMovimentacao' => $insertIdMovimentacao,
+            ':iProduto' => $idProduto,
+            ':iQuantidade' => 1,
+            ':fValorUnitario' => $_POST['inputPatriAquisicao'] == '' ? null: gravaValor($_POST['inputPatriAquisicao']),
+            ':sLote' => null,
+            ':dValidade' =>  null,
+            ':iClassificacao' => $rowClassificacao['ClassId'],
+            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+            ':iUnidade' => $_SESSION['UnidadeId'],
+            ':iPatrimonio' => $insertIdPatrimonio
+        ));
+
+		$conn->commit();
+
+		// Fim de cadastro
+
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Patrimonio incluído!!!";
+		$_SESSION['msg']['tipo'] = "success";
+	} catch (PDOException $e) {
+
+		$conn->rollback();
+
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro ao incluir Patrimonio!!!";
+		$_SESSION['msg']['tipo'] = "error";
+
+		echo 'Error1X: ' . $e->getMessage();
+        echo '<br>';
+        echo 'Erro na Linha: '.$e->getLine();
+		die;
+	}
+
+	irpara("relatorioMovimentacaoPatrimonio.php");
+} 
 
 ?>
 
@@ -67,192 +173,300 @@ if (isset($_POST['inputNumero'])){
     <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
     <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
     <script src="global_assets/js/demo_pages/form_layouts.js"></script>
+    <script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+    
+    <!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
     <script type="text/javascript">
-        const selectEstCo = $('#selectSetadoConservacao').html()
 
-        function modalPatrimonio() {
+        $(document).ready(function() {
 
-            $('#btnPatrimonio').on('click', (e) => {
-                e.preventDefault()
-                $('#pageModalPatrimonio').fadeIn(200);
+            //Valida Registro Duplicado
+            $('#salvarPatrimonio').on('click', function(e) {
 
-            })
+                e.preventDefault();
 
-            $('#modalClosePatrimonio').on('click', function() {
-                $('#pageModalPatrimonio').fadeOut(200);
-                $('body').css('overflow', 'scroll');
-                $("#patrimonioContainer").html("")
-            })
+                var inputPatriNumero = $('#inputPatriNumero').val();
+                var cmbPatriProduto = $('#cmbPatriProduto').val();
+                var cmbPatriDestino = $('#cmbPatriDestino').val();
 
-            $("#salvarPatrimonio").on('click', function() {
-                $('#pageModalPatrimonio').fadeOut(200);
-                $('body').css('overflow', 'scroll');
-            })
-        }        
+                //remove os espaços desnecessários antes e depois
+                inputPatriNumero = inputPatriNumero.trim();
 
-        function modalAcoes() {
+                if (inputPatriNumero == ""){
+                    alerta('Atenção', 'O número do patrimônio é obrigatório!', 'error');
+                    $('#inputPatriNumero').focus();
+                    return false;
+                }
+                if (cmbPatriProduto== ""){
+                    alerta('Atenção', 'O produto é obrigatório!', 'error');
+                    $('#inputPatriNumero').focus();
+                    return false;
+                }
 
-            $('.btn-acoes').each((i, elem) => {
-                $(elem).on('click', function () {
-                    $('#page-modal').fadeIn(200);
+                if (cmbPatriDestino== ""){
+                    alerta('Atenção', 'O destino é obrigatório!', 'error');
+                    $('#inputPatriNumero').focus();
+                    return false;
+                }
 
-                    let linha = $(elem).parent().parent()
+                //Esse ajax está sendo usado para verificar no banco se o registro já existe
+                $.ajax({
+                    type: "POST",
+                    url: "patrimonioValida.php",
+                    data: ('numero=' + inputPatriNumero),
+                    success: function(resposta) {
 
-                    let id = linha.attr('idPatrimonio')
-                    let editado = linha.attr('editado')
-
-                    let tds = linha.children();
-                    let produto = $(tds[1]).html();
-                    let patrimonio = $(tds[2]).html();
-                    let notaFisc = $(tds[3]).html();
-                    let aquisicao = $(tds[4]).html();
-                    let depreciacao = $(tds[5]).html();
-                    let origem = $(tds[7]).html();
-                    let destino = $(tds[8]).html();
-                    let marca = $(tds[9]).html();
-                    let fabricante = $(tds[10]).html();
-                    let numeroSerie = $(tds[12]).children().first().val()
-                    let estadoConservacao = $(tds[13]).children().first().val()
-                    //console.log(numeroSerie)
-
-                    const fonte1 = 'style="font-size: 1.1rem"'
-                    const fonte2 = 'style="font-size: 0.9rem"'
-                    const textCenter = 'style="text-align: center"'
-                    const styleLabel1 = 'style="min-width: 250px; font-size: 0.9rem"'
-                    const styleLabel2 = 'style="min-width: 150px; font-size: 0.9rem"'
-                    const styleLabel3 = 'style="min-width: 100px; font-size: 0.9rem"'
-                    const marginP = 'style="font-size: 0.9rem; margin-top: 4px"'
-
-                    var NumSerie = numeroSerie ? numeroSerie : ''
-
-                    $('#numeroSerie').val(NumSerie)
-
-                    $('#cmbEstadoConservacao').val(estadoConservacao)
-
-                    if (estadoConservacao) {
-                        let url = 'filtraEstadoConservacao.php'
-                        let inputsValues = {
-                            inputEstadoConservacao: estadoConservacao
+                        if (resposta == 1) {
+                            alerta('Atenção', 'Esse registro já existe!', 'error');
+                            return false;
                         }
 
-                        $.post(
-                            url,
-                            inputsValues,
-                            (data) => {
-                                if (data) {
-                                    $('#cmbEstadoConservacao').html(data)
-
-                                } else {}
-                            }
-                        );
+                        $("#incluirProduto").submit();
                     }
-
-                    formModal = `
-                                    <div class='row'>
-                                         <div class='col-lg-2'>
-                                             <div class="form-group">
-                                                 <label for="produto">Patrimônio</label>
-                                                 <div class="input-group">
-                                                    <input class='form-control' value='${patrimonio}' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>                                    
-                                         <div class='col-lg-10'>
-                                             <div class="form-group">
-                                                 <label for="produto">Produto</label>
-                                                 <div class="input-group">
-                                                     <input class='form-control' value='${produto}' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>
-                                    </div>
-                                    <div class='row'>
-                                         <div class='col-lg-6'>
-                                              <div class="form-group">
-                                                  <label for="produto">Origem</label>
-                                                  <div class="input-group">
-                                                    <input class='form-control' value='${origem}' readOnly />
-                                                  </div>
-                                             </div>
-                                          </div>
-                                          <div class='col-lg-6'>
-                                              <div class="form-group">
-                                                  <label for="produto">Destino</label>
-                                                  <div class="input-group">
-                                                    <input class='form-control' value='${destino}' readOnly />
-                                                  </div>
-                                             </div>
-                                         </div>
-                                     </div>
-                                     
-                                    <div class='row'>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="produto">Nota Fiscal</label>
-                                                 <div class="input-group">
-                                                     <input class='form-control' value='${notaFisc}' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="produto">Data da Compra</label>
-                                                 <div class="input-group">
-                                                     <input class='form-control' value='' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="produto">(R$) Aquisição</label>
-                                                 <div class="input-group">
-                                                     <input class='form-control' value='${aquisicao}' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="produto">(R$) Depreciação</label>
-                                                 <div class="input-group">
-                                                     <input class='form-control' value='${depreciacao}' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>
-                                     </div>
-                                     <div class='row'>
-                                         <div class='col-lg-6'>
-                                             <div class="form-group">
-                                                 <label for="produto">Marca</label>
-                                                 <div class="input-group">
-                                                     <input class='form-control' value='${marca}' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-6'>
-                                             <div class="form-group">
-                                                 <label for="produto">Fabricante</label>
-                                                 <div class="input-group">
-                                                     <input class='form-control' value='${fabricante}' readOnly />
-                                                 </div>
-                                            </div>
-                                         </div>
-                                     </div>
-                                     <input type="text" id="inputProdutoEdita" name="inputProdutoEdita" value="${id}" style="display: none">
-                    `;
-                    $('.dados-produto').html(formModal)
                 })
             })
 
-            $('#modal-close').on('click', function () {
-                $('#page-modal').fadeOut(200);
-                $('body').css('overflow', 'scroll');
-            })
-        }
+            const selectEstCo = $('#selectSetadoConservacao').html()
 
-        $(document).ready(function () {
+            function limparPatrimonio() {
+                $("#inputPatriNumero").val("");
+                $("#cmbPatriProduto").val("");
+                $("#cmbPatriDestino").val("");
+                $("#inputPatriNotaFiscal").val("");
+                $("#inputPatriDataCompra").val("");
+                $("#inputPatriAquisicao").val("");
+                $("#inputPatriDepreciacao").val("");
+                $("#inputPatriMarca").val("");
+                $("#inputPatriFabricante").val("");
+                $("#inputPatriNumSerie").val("");
+                $("#cmbPatriEstadoConservacao").val("");
+
+                $('#pageModalPatrimonio').fadeOut(200);
+                $('#select2-cmbPatriProduto-container').prop('title','Todos').html('Todos');
+                $('#select2-cmbPatriDestino-container').prop('title','Todos').html('Todos');
+                $('#select2-cmbPatriEstadoConservacao-container').prop('title','Todos').html('Todos');
+                $('body').css('overflow', 'scroll');
+                $("#patrimonioContainer").html("");            
+            }
+        
+            function modalPatrimonio() {
+
+                $('#btnPatrimonio').on('click', (e) => {
+                    e.preventDefault()
+                    $('#pageModalPatrimonio').fadeIn(200);
+                });
+
+                $('#modalClosePatrimonio').on('click', function() {
+                    limparPatrimonio();
+                });
+
+                $('#modalClosePatri').on('click', function() {
+                    limparPatrimonio();
+                });
+                
+            }        
+
+            function modalAcoes() {
+
+                $('.btn-acoes').each((i, elem) => {
+                    $(elem).on('click', function () {
+                        $('#page-modal').fadeIn(200);
+
+                        let linha = $(elem).parent().parent()
+
+                        let id = linha.attr('idPatrimonio')
+                        let editado = linha.attr('editado')
+
+                        let tds = linha.children();
+                        let produto = $(tds[1]).html();
+                        let patrimonio = $(tds[2]).html();
+                        let notaFisc = $(tds[3]).html();
+                        let aquisicao = $(tds[4]).html();
+                        let depreciacao = $(tds[5]).html();
+                        let origem = $(tds[7]).html();
+                        let destino = $(tds[8]).html();
+                        let marca = $(tds[9]).html();
+                        let fabricante = $(tds[10]).html();
+                        let data = $(tds[11]).html();
+                        let anoFabr = $(tds[12]).html();
+                        let empenho = $(tds[13]).html();
+                        let numeroSerie = $(tds[14]).children().first().val();
+                        let estadoConservacao = $(tds[15]).children().first().val();
+                        
+                        //console.log(numeroSerie)
+
+                        const fonte1 = 'style="font-size: 1.1rem"'
+                        const fonte2 = 'style="font-size: 0.9rem"'
+                        const textCenter = 'style="text-align: center"'
+                        const styleLabel1 = 'style="min-width: 250px; font-size: 0.9rem"'
+                        const styleLabel2 = 'style="min-width: 150px; font-size: 0.9rem"'
+                        const styleLabel3 = 'style="min-width: 100px; font-size: 0.9rem"'
+                        const marginP = 'style="font-size: 0.9rem; margin-top: 4px"'
+
+                        var NumSerie = numeroSerie ? numeroSerie : ''
+
+                        $('#numeroSerie').val(NumSerie)
+
+                        $('#cmbEstadoConservacao').val(estadoConservacao)
+
+                        if (estadoConservacao) {
+                            let url = 'filtraEstadoConservacao.php'
+                            let inputsValues = {
+                                inputEstadoConservacao: estadoConservacao
+                            }
+
+                            $.post(
+                                url,
+                                inputsValues,
+                                (data) => {
+                                    if (data) {
+                                        $('#cmbEstadoConservacao').html(data)
+
+                                    } else {}
+                                }
+                            );
+                        }
+
+                        formModal = `
+                                        <div class='row'>
+                                            <div class='col-lg-4'>
+                                                <div class="form-group">
+                                                    <label for="produto">Patrimônio</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${patrimonio}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>                            
+                                            <div class='col-lg-8'>
+                                                <div class="form-group">
+                                                    <label for="produto">Produto</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${produto}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='row'>
+                                            <div class='col-lg-6'>
+                                                <div class="form-group">
+                                                    <label for="produto">Origem</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${origem}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class='col-lg-6'>
+                                                <div class="form-group">
+                                                    <label for="produto">Destino</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${destino}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class='row'>
+                                            <div class='col-lg-3'>
+                                                <div class="form-group">
+                                                    <label for="produto">Nota Fiscal</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${notaFisc}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class='col-lg-3'>
+                                                <div class="form-group">
+                                                    <label for="produto">Data da Compra</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${data}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class='col-lg-6'>
+                                                <div class="form-group">
+                                                    <label for="produto">Empenhos</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${empenho}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>     
+                                        </div>
+                                        <div class='row'> 
+                                            <div class='col-lg-4'>
+                                                <div class="form-group">
+                                                    <label for="produto">Data da Fabricação</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${anoFabr}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class='col-lg-4'>
+                                                <div class="form-group">
+                                                    <label for="produto">(R$) Aquisição</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${aquisicao}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class='col-lg-4'>
+                                                <div class="form-group">
+                                                    <label for="produto">(R$) Depreciação</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${depreciacao}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='row'>
+                                            <div class='col-lg-6'>
+                                                <div class="form-group">
+                                                    <label for="produto">Marca</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${marca}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class='col-lg-6'>
+                                                <div class="form-group">
+                                                    <label for="produto">Fabricante</label>
+                                                    <div class="input-group">
+                                                        <input class='form-control' value='${fabricante}' readOnly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="text" id="inputProdutoEdita" name="inputProdutoEdita" value="${id}" style="display: none">
+                        `;
+                        $('.dados-produto').html(formModal)
+                    })
+                })
+                $('#modal-close-x').on('click', function () {
+                    $('#page-modal').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                })
+                $('#modal-close').on('click', function () {
+                    $('#page-modal').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                })
+            }
 
             modalPatrimonio()
+
+
+            //Ao informar o Patrimonio, trazer os demais dados dele (marca e fabricante)
+            
+            $('#cmbPatriProduto').on('change', function(e){				
+                
+                var Produto = $('#cmbPatriProduto').val();
+                var Patri = Produto.split('#');
+                
+                $('#inputPatriMarca').val(Patri[1]);
+                $('#inputPatriFabricante').val(Patri[2]);		
+            });
 
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
@@ -387,53 +601,60 @@ if (isset($_POST['inputNumero'])){
             let resultadosConsulta = '';
             let inputsValues = {};
 
-            (function Filtrar() {
+            function Filtrar() {
                 let cont = false;
 
-                $('#submitFiltro').on('click', (e) => {
-                    e.preventDefault()
 
-                    const msg = $(
-                        '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-                        )
+                const msg = $(
+                    '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+                )
 
-                    let dataDe = $('#inputDataDe').val()
-                    let dataAte = $('#inputDataAte').val()
-                    let localEstoque = $('#cmbLocalEstoque').val()
-                    let setor = $('#cmbSetor').val()
-                    let categoria = $('#cmbCategoria').val()
-                    let subCategoria = $('#cmbSubCategoria').val()
-                    let inputProduto = $('#inputProduto').val()
-                    let url = "relatorioMovimentacaoPatrimonioFiltra.php";
+                $('tbody').html(msg)
 
-                    inputsValues = {
-                        inputDataDe: dataDe,
-                        inputDataAte: dataAte,
-                        inputLocalEstoque: localEstoque,
-                        inputSetor: setor,
-                        inputCategoria: categoria,
-                        inputSubCategoria: subCategoria,
-                        inputProduto: inputProduto
-                    };
+                let dataDe = $('#inputDataDe').val()
+                let dataAte = $('#inputDataAte').val()
+                let localEstoque = $('#cmbLocalEstoque').val()
+                let setor = $('#cmbSetor').val()
+                let categoria = $('#cmbCategoria').val()
+                let subCategoria = $('#cmbSubCategoria').val()
+                let inputProduto = $('#inputProduto').val()
+                let url = "relatorioMovimentacaoPatrimonioFiltra.php";
+                
+                inputsValues = {
+                    inputDataDe: dataDe,
+                    inputDataAte: dataAte,
+                    inputLocalEstoque: localEstoque,
+                    inputSetor: setor,
+                    inputCategoria: categoria,
+                    inputSubCategoria: subCategoria,
+                    inputProduto: inputProduto
+                    
+                };
 
-                    $.post(
-                        url,
-                        inputsValues,
-                        (data) => {
+                $.post(
+                    url,
+                    inputsValues,
+                    (data) => {
 
-                            if (data) {
-                                $('tbody').html(data)
-                                $('#imprimir').removeAttr('disabled')
-                                resultadosConsulta = data
-                                modalAcoes()
-                            } else {
-                                $('tbody').html(msg)
-                                $('#imprimir').attr('disabled', '')
-                            }
+                        if (data) {
+                            $('tbody').html(data)
+                            $('#imprimir').removeAttr('disabled')
+                            resultadosConsulta = data
+                            modalAcoes()
+                        } else {
+                            $('tbody').html(msg)
+                            $('#imprimir').attr('disabled', '')
                         }
-                    );
-                })
-            })()
+                    }
+                );    
+            }
+                
+            $('#submitFiltro').on('click', (e) => {
+                e.preventDefault()
+                Filtrar(false)
+            })
+
+            Filtrar(true)
 
             $('#salvar').on('click', function (e) {
                 let numeroSerie = $('#numeroSerie').val()
@@ -459,8 +680,8 @@ if (isset($_POST['inputNumero'])){
                             $('[idpatrimonio]').each((i, elem) => {
                                 let tds = $(elem).children()
                                 if ($(elem).attr('idpatrimonio') == id) {
-                                    $(tds[12]).children().first().val(numeroSerie)
-                                    $(tds[13]).children().first().val(estadoConservacao)
+                                    $(tds[14]).children().first().val(numeroSerie)
+                                    $(tds[15]).children().first().val(estadoConservacao)
                                     // $(elem).append(inputNumeroSerie).append(inputEstadoConservacao)
                                 }
                             })
@@ -711,144 +932,203 @@ if (isset($_POST['inputNumero'])){
                             <div class="custon-modal-title">
                                 <i class=""></i>
                                 <p class="h3">Dados Produto</p>
-                                <i class=""></i>
+                                <i id="modalClosePatri" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
                             </div>
-                            <form id="incluirProduto" method="POST">
-                                <div class="p-3"></div>
-                                    <div class="d-flex flex-row p-2">                                      
-                                        <div class='row'>
-                                            <div class='col-lg-2'>
-                                                <div class="form-group">
-                                                    <label for="inputNumero">Patrimônio</label>
-                                                    <div class="input-group">
-                                                    <input type="text" id="inputNumero" name="inputNumero" class="form-control">
+                            <form name="incluirProduto" id="incluirProduto" method="post" class="form-validate-jquery">
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class='col-lg-2'>
+                                            <div class="form-group">
+                                                <label for="inputPatriNumero">Patrimônio <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriNumero" name="inputPatriNumero" class="form-control" required autofocus>
                                                 </div>
-                                            </div>                                   
-                                            <div class='col-lg-10'>
-                                                <div class="form-group">
-                                                    <label for="inputProduto">Produto</label>
-                                                    <div class="input-group">
-                                                    <input type="text" id="inputProduto" name="inputProduto" class="form-control">
+                                            </div> 
+                                        </div> 
+
+                                        <div class="col-lg-10">
+                                            <label for="cmbPatriProduto">Produto <span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                <select id="cmbPatriProduto" name="cmbPatriProduto" class="form-control form-control-select2" required>
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+                                                    $sql = "SELECT  ProduId, ProduNome, MarcaNome, FabriNome
+                                                            FROM Produto
+                                                            JOIN Situacao on SituaId = ProduStatus 
+                                                            LEFT JOIN Marca on MarcaId = ProduMarca
+                                                            LEFT JOIN Fabricante on FabriId = ProduFabricante
+                                                            WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                            ORDER BY ProduNome ASC";
+                                                    $result = $conn->query($sql);
+                                                    $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                    foreach ($rowEstCo as $item) {
+                                                        print('<option value="' . $item['ProduId'] . '#' . $item['MarcaNome'] . '#' . $item['FabriNome'] . '">' . $item['ProduNome'] . '</option>');
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class='col-lg-6'>
+                                            <div class="form-group">
+                                                <label for="inputPatriOrigem">Origem <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+
+                                                    <?php
+                                                        $sql = "SELECT LcEstId, LcEstNome
+                                                                FROM LocalEstoque
+                                                                JOIN Situacao on SituaId = LcEstStatus
+                                                                WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and LcEstChave = 'GESTAOANTERIOR'
+                                                               ";
+
+                                                        $result = $conn->query($sql);
+                                                        $rowOrigem = $result->fetch(PDO::FETCH_ASSOC);
+
+                                                    ?>
+
+                                                    <input type="hidden" id="inputPatriOrigemId" name="inputPatriOrigemId" value="<?php echo $rowOrigem['LcEstId']; ?>">
+                                                    <input type="text" id="inputPatriOrigem" name="inputPatriOrigem" class="form-control" value="<?php echo $rowOrigem['LcEstNome']; ?>" readOnly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-6'>
+                                            <div class="form-group">
+                                                <label for="cmbPatriDestino">Destino <span class="text-danger">*</span></label>
+                                                <select id="cmbPatriDestino" name="cmbPatriDestino" class="form-control form-control-select2" required>
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+                                                    $sql = "SELECT LcEstId as Id, LcEstNome as Nome, 'Local' as Referencia 
+                                                            FROM LocalEstoque
+                                                            JOIN Situacao on SituaId = LcEstStatus
+                                                            WHERE LcEstUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                            UNION
+                                                            SELECT SetorId as Id, SetorNome as Nome, 'Setor' as Referencia 
+                                                            FROM Setor
+                                                            JOIN Situacao on SituaId = SetorStatus
+                                                            WHERE SetorUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                            Order By Nome";
+
+                                                    $result = $conn->query($sql);
+                                                    $rowDestino = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                    foreach ($rowDestino as $item) {
+                                                        print('<option value="' . $item['Id'] . '#' . $item['Nome'] . '#' . $item['Referencia'] . '">' . $item['Nome'] . '</option>');
+                                                    }
+
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class='col-lg-3'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriNotaFiscal">Nota Fiscal</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriNotaFiscal" name="inputPatriNotaFiscal" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-3'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriDataCompra">Data da Compra</label>
+                                                <div class="input-group">
+                                                    <input type="date" id="inputPatriDataCompra" name="inputPatriDataCompra" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-3'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriAquisicao">(R$) Aquisição</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriAquisicao" name="inputPatriAquisicao" class="form-control" onKeyUp="moeda(this)" maxLength="12">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-3'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriDepreciacao">(R$) Depreciação</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriDepreciacao" name="inputPatriDepreciacao" class="form-control" onKeyUp="moeda(this)" maxLength="12">
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div class='row'>
-                                         <div class='col-lg-6'>
-                                              <div class="form-group">
-                                                  <label for="inputorigem">Origem</label>
-                                                  <div class="input-group">
-                                                  <input type="text" id="inputorigem" name="inputorigem" class="form-control">
-                                                  </div>
-                                             </div>
-                                          </div>
-                                          <div class='col-lg-6'>
-                                              <div class="form-group">
-                                                  <label for="inputdestino">Destino</label>
-                                                  <div class="input-group">
-                                                  <input type="text" id="inputdestino" name="inputdestino" class="form-control">
-                                                  </div>
-                                             </div>
-                                         </div>
-                                     </div>
-                                     
-                                    <div class='row'>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="inputnotaFiscal">Nota Fiscal</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputnotaFiscal" name="inputnotaFiscal" class="form-control">
-                                                 </div>
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class='col-lg-6'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriMarca">Marca</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriMarca" name="inputPatriMarca" class="form-control" readOnly>
+                                                </div>
                                             </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="inputdataCompra">Data da Compra</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputdataCompra" name="inputdataCompra" class="form-control">
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="inputaquisicao">(R$) Aquisição</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputaquisicao" name="inputaquisicao" class="form-control">
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-3'>
-                                             <div class="form-group">
-                                                 <label for="inputdepreciacao">(R$) Depreciação</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputdepreciacao" name="inputdepreciacao" class="form-control">
-                                                 </div>
-                                            </div>
-                                         </div>
-                                     </div>
-                                     <div class='row'>
-                                         <div class='col-lg-6'>
-                                             <div class="form-group">
-                                                 <label for="inputmarca">Marca</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputmarca" name="inputmarca" class="form-control">
-                                                 </div>
-                                            </div>
-                                         </div>
-                                         <div class='col-lg-6'>
-                                             <div class="form-group">
-                                                 <label for="inputfabricante">Fabricante</label>
-                                                 <div class="input-group">
-                                                 <input type="text" id="inputfabricante" name="inputfabricante" class="form-control">
-                                              </div>
-                                         </div>
                                         </div>
-                                    </div>
-
-                                    <div class='col-lg-6'>
-                                        <div class="form-group">
-                                            <label for="inputNumSerie">Nº Série/Chassi <span class="text-danger">(Editável)</span></label>
-                                            <div class="input-group">
-                                                <input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control">
+                                        <div class='col-lg-6'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriFabricante">Fabricante</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriFabricante" name="inputPatriFabricante" class="form-control" readOnly>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6">
-                                        <label for="cmbEstadoConservacao">Estado de Conservação <span
-                                                class="text-danger">(Editável)</span></label>
-                                        <div class="form-group">
-                                            <select id="cmbEstadoConservacao" name="cmbEstadoConservacao"
-                                                class="form-control form-control-select2">
-                                                <option value="">Selecionar</option>
-                                                <?php
-                                                $sql = "SELECT EstCoId, EstCoNome
-                                                        FROM EstadoConservacao
-                                                        JOIN Situacao on SituaId = EstCoStatus
-                                                        WHERE SituaChave = 'ATIVO'
-                                                        ORDER BY EstCoNome ASC";
-                                                $result = $conn->query($sql);
-                                                $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
+                                </div>
+                                
+                                <div class="px-3 pt-3">
+                                    <div class="d-flex flex-row p-1">
+                                        <div class='col-lg-6'>
+                                            <div class="form-group">
+                                                    <label for="inputPatriNumSerie">Nº Série/Chassi</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPatriNumSerie" name="inputPatriNumSerie" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <label for="cmbPatriEstadoConservacao">Estado de Conservação</label>
+                                            <div class="form-group">
+                                                <select id="cmbPatriEstadoConservacao" name="cmbPatriEstadoConservacao" class="form-control form-control-select2">
+                                                    <option value="">Selecionar</option>
+                                                        <?php
+                                                    $sql = "SELECT EstCoId, EstCoNome
+                                                            FROM EstadoConservacao
+                                                            JOIN Situacao on SituaId = EstCoStatus
+                                                            WHERE SituaChave = 'ATIVO'
+                                                            ORDER BY EstCoNome ASC";
+                                                    $result = $conn->query($sql);
+                                                    $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                foreach ($rowEstCo as $item) {
-                                                    print('<option value="' . $item['EstCoId'] . '">' . $item['EstCoNome'] . '</option>');
-                                                }
+                                                    foreach ($rowEstCo as $item) {
+                                                        print('<option value="' . $item['EstCoId'] . '">' . $item['EstCoNome'] . '</option>');
+                                                    }
                                                 ?>
-                                            </select>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </form>
-                            <div class="card-footer mt-2 d-flex flex-column">
-                                <div class="row" style="margin-top: 10px;">
-                                    <div class="col-lg-12">
-                                        <div class="form-group">
-                                            <button class="btn btn-lg btn-principal" id="salvarPatrimonio">Salvar</button>
-                                            <a id="modalClosePatrimonio" class="btn btn-basic" role="button">Cancelar</a>
+                                </div>    
+                                <div class="card-footer mt-2 d-flex flex-column">
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-lg-12">
+                                            <div class="form-group">
+                                                <button class="btn btn-lg btn-principal" id="salvarPatrimonio">Salvar</button>
+                                                <a id="modalClosePatrimonio" class="btn btn-basic" role="button">Cancelar</a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                </div>                                
+                            </form>                           
                         </div>
                     </div>
                 </div>
@@ -860,7 +1140,7 @@ if (isset($_POST['inputNumero'])){
                             <div class="custon-modal-title">
                                 <i class=""></i>
                                 <p class="h3">Dados Produto</p>
-                                <i class=""></i>
+                                <i id="modal-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
                             </div>
                             <form id="editarProduto" method="POST">
                                 <div class="dados-produto p-3">
@@ -906,7 +1186,11 @@ if (isset($_POST['inputNumero'])){
                                 <div class="row" style="margin-top: 10px;">
                                     <div class="col-lg-12">
                                         <div class="form-group">
-                                            <button class="btn btn-lg btn-principal" id="salvar">Salvar</button>
+                                            <?php 
+                                                if ($atualizar) {
+                                                 echo' <button class="btn btn-lg btn-principal" id="salvar">Salvar</button>';
+                                                }
+                                            ?>
                                             <a id="modal-close" class="btn btn-basic" role="button">Cancelar</a>
                                         </div>
                                     </div>

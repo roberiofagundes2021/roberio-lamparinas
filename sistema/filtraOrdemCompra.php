@@ -8,7 +8,7 @@ include('global_assets/php/conexao.php');
 $sql = " SELECT OrComId, OrComNumero
 		 FROM OrdemCompra
          JOIN Situacao on SituaId = OrComSituacao
-		 WHERE OrComUnidade = ". $_SESSION['UnidadeId'] . " and OrComFornecedor = " . $_GET['idFornecedor'] . " and SituaChave = 'LIBERADO' ";
+		 WHERE OrComUnidade = ". $_SESSION['UnidadeId'] . " and OrComFornecedor = " . $_GET['idFornecedor'] . " and SituaChave = 'LIBERADOCONTABILIDADE' ";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
@@ -23,7 +23,7 @@ if ($count) {
                 FROM Movimentacao
                 JOIN Situacao on SituaId = MovimSituacao
                 WHERE MovimUnidade = ". $_SESSION['UnidadeId'] . " and MovimOrdemCompra = " . $value['OrComId'] . " 
-                and MovimTipo = 'E' and SituaChave = 'LIBERADO' ";
+                and MovimTipo = 'E' and SituaChave in ('LIBERADOCENTRO', 'LIBERADOCONTABILIDADE', 'AGUARDANDOLIBERACAOCENTRO') ";
         $result = $conn->query($sql);
         $rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -43,7 +43,7 @@ if ($count) {
             $result = $conn->query($sql);
             $rowProdutoServico = $result->fetchAll(PDO::FETCH_ASSOC);
 
-            $saldosPositivos = '';
+            $saldosPositivos = 0;
             $totalProdutos = count($rowProdutoServico);
 
             foreach ($rowProdutoServico as $item) {
@@ -80,6 +80,5 @@ if ($count) {
         } else {
             print('<option idOrdemCompra="' . $value['OrComId'] . '" value="' . $value['OrComId'] . '">' . $value['OrComNumero'] . '</option>');
         }
-        var_dump($row);
     }
 }

@@ -10,7 +10,7 @@ include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputSolicitacaoId'])) {
 
-	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
+	$sql = "SELECT SlXPrQuantidade as Quantidade, ProduId as Id, ProduNome as Nome, ProduValorVenda as ValorVenda, UnMedNome
 			FROM SolicitacaoXProduto
 			JOIN Solicitacao on SolicId = SlXPrSolicitacao
 			JOIN Produto on ProduId = SlXPrProduto
@@ -21,30 +21,30 @@ if (isset($_POST['inputSolicitacaoId'])) {
 	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
 	$numProdutos = count($produtosSolicitacao);
 
+	$sql = "SELECT SlXSrQuantidade as Quantidade, ServiId as Id, ServiNome as Nome, ServiValorVenda as ValorVenda
+			FROM SolicitacaoXServico
+			JOIN Solicitacao on SolicId = SlXSrSolicitacao
+			JOIN Servico on ServiId = SlXSrServico
+			WHERE SlXSrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
+			";
+	$result = $conn->query($sql);
+	$servicoSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
+	$numServicos = count($servicoSolicitacao);
+	
+	$solicitacoes = array_merge($servicoSolicitacao, $produtosSolicitacao);
 	$idsProdutos = '';
 
 	if ($numProdutos) {
 
-		foreach ($produtosSolicitacao as $chave => $produto) {
-
+		foreach ($solicitacoes as $chave => $produto) {
 			if ($chave == 0) {
-				$idsProdutos .= '0, ' . $produto['ProduId'] . '';
+				$idsProdutos .= '0, ' . $produto['Id'] . '';
 			} else {
-				$idsProdutos .= ', ' . $produto['ProduId'] . '';
+				$idsProdutos .= ', ' . $produto['Id'] . '';
 			}
 		}
 	}
 
-	$sql = "SELECT SlXPrQuantidade, ProduId, ProduNome, ProduValorVenda, UnMedNome
-			FROM SolicitacaoXProduto
-			JOIN Solicitacao on SolicId = SlXPrSolicitacao
-			JOIN Produto on ProduId = SlXPrProduto
-			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
-			";
-	$result = $conn->query($sql);
-	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
-	$numProdutos = count($produtosSolicitacao);
 }
 
 /* VALIDA SE OS DADOS VIERAM DA MESMA PÁGINA */
@@ -54,15 +54,41 @@ if (isset($_POST['inputData'])) {
 		//var_dump($_POST);die;
 
 		$conn->beginTransaction();
+		// SELECT MAX(SUBSTRING(MovimNumRecibo, 3, 6))
+		// 	FROM [Movimentacao] WHERE [MovimTipo] = 'T'
 
-		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimData, MovimOrigemLocal, MovimDestinoSetor, MovimObservacao, 
+		$newMovi = '1/'.(date("Y"));
+
+		// vai retornar um valor contendo somente a segunda parte da string ex: "1/2021" => "2021"
+		$sqlMovi = "SELECT MAX(SUBSTRING(MovimNumRecibo, 3, 6)) as MovimNumRecibo
+        FROM Movimentacao
+        WHERE MovimUnidade = '$_SESSION[UnidadeId]'";
+		$resultMovi = $conn->query($sqlMovi);
+		$rowMovi = $resultMovi->fetch(PDO::FETCH_ASSOC);
+
+		// Se ultimo valor cadastrado no banco for de um ano diferente do ano atual,
+		// a contagem será reiniciada
+		if ($rowMovi['MovimNumRecibo'] == date("Y")) {
+			// vai buscar o ultimo valor completo no banco
+			$sqlMovi = "SELECT MAX(MovimNumRecibo) as MovimNumRecibo
+					FROM Movimentacao
+					WHERE MovimUnidade = '$_SESSION[UnidadeId]' and MovimNumRecibo LIKE '%".date("Y")."%'";
+			$resultMovi = $conn->query($sqlMovi);
+			$rowMovi = $resultMovi->fetch(PDO::FETCH_ASSOC);
+	
+			$newMovi = explode('/', $rowMovi['MovimNumRecibo']);
+			$newMovi = (intval($newMovi[0])+1).'/'.(date("Y"));
+		}
+
+		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimNumRecibo, MovimData, MovimOrigemLocal, MovimDestinoSetor, MovimObservacao, 
 				MovimValorTotal, MovimSituacao, MovimUnidade, MovimUsuarioAtualizador)
-				VALUES (:sTipo, :dData, :iOrigemLocal, :iDestinoSetor, :sObservacao, :fValorTotal, :iSituacao, 
+				VALUES (:sTipo, :dMovi, :dData, :iOrigemLocal, :iDestinoSetor, :sObservacao, :fValorTotal, :iSituacao, 
 				:iUnidade, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
 			':sTipo' => 'S',  // Saída
+			':dMovi' => $newMovi,  // Número incremental
 			':dData' => gravaData($_POST['inputData']),
 			':iOrigemLocal' => $_POST['cmbEstoqueOrigem'],
 			':iDestinoSetor' => $_POST['cmbDestinoSetor'],
@@ -804,7 +830,7 @@ if (isset($_POST['inputData'])) {
 				if (valor == '´' || valor == '~' || valor == '`' || valor == ';') {
 					$('#inputQuantidade').val('')
 				}
-				if (event.keyCode != '8' && event.keyCode != '48' && event.keyCode != '49' && event.keyCode != '50' && event.keyCode != '51' && event.keyCode != '52' && event.keyCode != '53' && event.keyCode != '54' && event.keyCode != '55' && event.keyCode != '56' && event.keyCode != '57' && event.keyCode != '96' && event.keyCode != '97' && event.keyCode != '98' && event.keyCode != '99' && event.keyCode != '100' && event.keyCode != '101' && event.keyCode != '102' && event.keyCode != '103' && event.keyCode != '104' && event.keyCode != '105' && event.keyCode != '106' && event.keyCode != '107') {
+				if (event.keyCode != '9' && event.keyCode != '8' && event.keyCode != '48' && event.keyCode != '49' && event.keyCode != '50' && event.keyCode != '51' && event.keyCode != '52' && event.keyCode != '53' && event.keyCode != '54' && event.keyCode != '55' && event.keyCode != '56' && event.keyCode != '57' && event.keyCode != '96' && event.keyCode != '97' && event.keyCode != '98' && event.keyCode != '99' && event.keyCode != '100' && event.keyCode != '101' && event.keyCode != '102' && event.keyCode != '103' && event.keyCode != '104' && event.keyCode != '105' && event.keyCode != '106' && event.keyCode != '107') {
 					return false
 				}
 
@@ -853,9 +879,11 @@ if (isset($_POST['inputData'])) {
 						var option = '<option value="#" "selected">Selecione o Produto</option>';
 
 						if (dados.length) {
+							// console.log(dados)
 
 							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + '">' + obj.ProduNome + '</option>';
+								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + 
+								'#' + obj.Validade + '#' + obj.Lote + '">' + obj.ProduNome + '</option>';
 							});
 
 							$('#cmbProduto').html(option).show();
@@ -874,15 +902,25 @@ if (isset($_POST['inputData'])) {
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var cmbProduto = $('#cmbProduto').val();
 				var inputValorUnitario = $('#inputValorUnitario').val();
+				var inputLote = $('#inputLote').val();
+				var inputValidade = $('#inputValidade').val();
+
 
 				var Produto = cmbProduto.split("#");
 				var valor = Produto[1].replace(".", ",");
+				var validade = Produto[2]?Produto[2]:'';
+				var lote = Produto[3]==='null'?'':Produto[3];
 
 				if (valor != 'null' && valor) {
 					$('#inputValorUnitario').val(valor);
 				} else {
 					$('#inputValorUnitario').val('0,00');
 				}
+				  
+				$('#inputLote').val(lote);
+
+				$('#inputValidade').val(validade);
+
 				$('#inputQuantidade').focus();
 			});
 
@@ -917,9 +955,10 @@ if (isset($_POST['inputData'])) {
 				var cmbClassificacao = $('#cmbClassificacao').val();
 				var inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
 				var inputIdServicos = $('#inputIdServicos').val(); //esse aqui guarda todos os IDs de serviços que estão na grid para serem movimentados
-				console.log('Id_Produtos: '+inputIdProdutos);
-				console.log('Id_Servicos: '+inputIdServicos);
-				console.log('Item: '+Item[0]);
+				// console.log('Id_Produtos: '+inputIdProdutos);
+				// console.log('Id_Servicos: '+inputIdServicos);
+				// console.log('Item: '+Item[0]);
+				// console.log('Lote: '+inputLote);
 
 				//remove os espaços desnecessários antes e depois
 				inputQuantidade = inputQuantidade.trim();
@@ -998,7 +1037,8 @@ if (isset($_POST['inputData'])) {
 							idProduto: Item[0],
 							origem: origem,
 							quantidade: inputQuantidade,
-							classific: cmbClassificacao
+							classific: cmbClassificacao,
+							Lote: inputLote
 						},
 						success: function(resposta) {
 
@@ -1664,14 +1704,14 @@ if (isset($_POST['inputData'])) {
 												<div class="col-lg-2" id="formLote">
 													<div class="form-group">
 														<label for="inputLote">Lote</label>
-														<input type="text" maxlength="50" id="inputLote" name="inputLote" class="form-control">
+														<input type="text" maxlength="50" id="inputLote" name="inputLote" class="form-control" readOnly>
 													</div>
 												</div>
 
 												<div class="col-lg-2" id="formValidade">
 													<div class="form-group">
 														<label for="inputValidade">Validade</label>
-														<input type="date" id="inputValidade" name="inputValidade" class="form-control">
+														<input type="date" id="inputValidade" name="inputValidade" class="form-control" readOnly>
 													</div>
 												</div>
 
@@ -1733,8 +1773,8 @@ if (isset($_POST['inputData'])) {
 										if (isset($_POST['inputSolicitacaoId'])) {
 											$totalGeral = 0;
 
-											foreach ($produtosSolicitacao  as $produto) {
-												$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+											foreach ($solicitacoes  as $produto) {
+												$totalGeral += $produto['Quantidade'] * $produto['ValorVenda'];
 											}
 
 											print('<input type="hidden" id="inputTotal" name="inputTotal" value="' . $totalGeral . '">');
@@ -1818,25 +1858,29 @@ if (isset($_POST['inputData'])) {
 													$idProdutoSolicitacao = 0;
 													$totalGeral = 0;
 
-													foreach ($produtosSolicitacao  as $produto) {
+													foreach ($solicitacoes  as $produto) {
 
 														$idProdutoSolicitacao++;
 
-														$valorCusto = formataMoeda($produto['ProduValorVenda']);
-														$valorTotal = formataMoeda($produto['SlXPrQuantidade'] * $produto['ProduValorVenda']);
-														$valorTotalSemFormatacao = $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+														$valorCusto = formataMoeda($produto['ValorVenda']);
+														$valorTotal = formataMoeda($produto['Quantidade'] * $produto['ValorVenda']);
+														$valorTotalSemFormatacao = $produto['Quantidade'] * $produto['ValorVenda'];
 
-														$totalGeral += $produto['SlXPrQuantidade'] * $produto['ProduValorVenda'];
+														$UnMedNome = isset($produto['UnMedNome'])? $produto['UnMedNome']:'';
+														$SlXPrQuantidade = isset($produto['SlXPrQuantidade'])? $produto['SlXPrQuantidade']:'';
+														$ProduValorVenda = isset($produto['ProduValorVenda'])? $produto['ProduValorVenda']:'';
+
+														$totalGeral += $produto['Quantidade'] * $produto['ValorVenda'];
 
 														$linha = '';
 
 														$linha .= "
-																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['ProduId'] . "'>
+																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['Id'] . "'>
 																		<td>" . $idProdutoSolicitacao . "</td>
-																		<td>" . $produto['ProduNome'] . "</td>
-																		<td style='text-align:center'>" . $produto['UnMedNome'] . "</td>
-																		<td style='text-align:center'>" . $produto['SlXPrQuantidade'] . "</td>
-																		<td valorUntPrSolici='" . $produto['ProduValorVenda'] . "' style='text-align:right'>" . $valorCusto . "</td>
+																		<td>" . $produto['Nome'] . "</td>
+																		<td style='text-align:center'>" . $UnMedNome . "</td>
+																		<td style='text-align:center'>" . $SlXPrQuantidade . "</td>
+																		<td valorUntPrSolici='" . $ProduValorVenda . "' style='text-align:right'>" . $valorCusto . "</td>
 																		<td style='text-align:right'>" . $valorTotal . "</td>
 																
 															";

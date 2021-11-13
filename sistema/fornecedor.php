@@ -112,30 +112,37 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaFornecedor(ForneId, ForneNome, ForneStatus, Tipo){
+		function atualizaFornecedor(Permission, ForneId, ForneNome, ForneStatus, Tipo){
 			
-			if (Tipo == 'imprime'){
+				if (Tipo == 'imprime'){
+					// alerta('Esse Termo de Referência já está finalizado e não pode ser excluído!','');
+
+					document.getElementById('inputFornecedorCategoria').value = document.getElementById('cmbCategoria').value;
+					
+					document.formFornecedor.action = "fornecedorImprime.php";
+					document.formFornecedor.setAttribute("target", "_blank");
+				} else {
+					document.getElementById('inputPermission').value = Permission;
+					document.getElementById('inputFornecedorId').value = ForneId;
+					document.getElementById('inputFornecedorNome').value = ForneNome;
+					document.getElementById('inputFornecedorStatus').value = ForneStatus;
+					console.log(ForneId, ForneNome, ForneStatus, Tipo)
+							
+					if (Tipo == 'edita'){	
+						document.formFornecedor.action = "fornecedorEdita.php";		
+					} else if (Tipo == 'mudaStatus'){
+						document.formFornecedor.action = "fornecedorMudaSituacao.php";
+					}else if (Tipo == 'exclui'){
+						if(Permission){
+							confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir esse fornecedor?", "fornecedorExclui.php");
+						}else{
+							alerta('Permissão Negada!','');
+							return false;
+						}
+					}
+				}
 				
-				document.getElementById('inputFornecedorCategoria').value = document.getElementById('cmbCategoria').value;
-				
-				document.formFornecedor.action = "fornecedorImprime.php";
-				document.formFornecedor.setAttribute("target", "_blank");
-			} else {
-				document.getElementById('inputFornecedorId').value = ForneId;
-				document.getElementById('inputFornecedorNome').value = ForneNome;
-				document.getElementById('inputFornecedorStatus').value = ForneStatus;
-				console.log(ForneId, ForneNome, ForneStatus, Tipo)
-						
-				if (Tipo == 'edita'){	
-					document.formFornecedor.action = "fornecedorEdita.php";		
-				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir esse fornecedor?", "fornecedorExclui.php");
-				} else if (Tipo == 'mudaStatus'){
-					document.formFornecedor.action = "fornecedorMudaSituacao.php";
-				} 
-			}
-			
-			document.formFornecedor.submit();
+				document.formFornecedor.submit();
 		}		
 			
 	</script>
@@ -214,7 +221,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														</select>
 													</div>
 												
-													<a href="#" onclick="atualizaFornecedor(0, '','', 'imprime');" class="form-control btn bg-slate-700 btn-icon" role="button" data-placement="bottom" data-container="body">
+													<a href="#" onclick="atualizaFornecedor(1,0, '','', 'imprime');" class="form-control btn bg-slate-700 btn-icon" role="button" data-placement="bottom" data-container="body">
 														<i class="icon-printer2"> Gerar PDF ou Imprimir</i>
 													</a>
 												</div>
@@ -254,13 +261,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['CategNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
-													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaFornecedor('.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+													<div class="list-icons list-icons-extended">'.
+													'<a href="#" onclick="atualizaFornecedor('.$atualizar.','.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaFornecedor('.$excluir.','.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>
@@ -279,6 +286,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				<!-- /info blocks -->
 				
 				<form name="formFornecedor" method="post">
+					<input type="hidden" id="inputPermission" name="inputPermission" >
 					<input type="hidden" id="inputFornecedorId" name="inputFornecedorId" >
 					<input type="hidden" id="inputFornecedorNome" name="inputFornecedorNome" >
 					<input type="hidden" id="inputFornecedorStatus" name="inputFornecedorStatus" >

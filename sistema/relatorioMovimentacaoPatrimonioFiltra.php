@@ -47,15 +47,27 @@ function queryPesquisa(){
                 $string .= ' and ';
             }
 
-            $sql = "SELECT PatriId ,PatriNumero, PatriNumSerie, PatriEstadoConservacao, MvXPrId, MovimId, MvXPrValorUnitario, MovimData, MovimNotaFiscal, MovimOrigemLocal, LcEstNome, MovimDestinoSetor, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, ProduNome, MarcaNome, FabriNome, SetorNome
+            $sql = "SELECT PatriId ,PatriNumero, PatriNumSerie, PatriEstadoConservacao, MvXPrId, MovimId, MovimData,
+                    MovimNotaFiscal, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, MvXPrAnoFabricacao, ProduNome, MarcaNome, FabriNome,
+                    dbo.fnEmpenhosOrdemCompra(MovimUnidade, MovimOrdemCompra) as EmpenhosOrdemCompra,                   
+                    CASE 
+                        WHEN MovimOrigemLocal IS NULL THEN SetorO.SetorNome
+                        ELSE LocalO.LcEstNome 
+                            END as Origem,
+                        CASE 
+                        WHEN MovimDestinoLocal IS NULL THEN ISNULL(SetorD.SetorNome, MovimDestinoManual)
+                        ELSE LocalD.LcEstNome
+                            END as Destino
                     FROM Patrimonio
                     JOIN MovimentacaoXProduto on MvXPrPatrimonio = PatriId
                     JOIN Movimentacao on MovimId = MvXPrMovimentacao
                     JOIN Produto on ProduId = MvXPrProduto
                     LEFT JOIN Marca on MarcaId = ProduMarca
                     LEFT JOIN Fabricante on FabriId = ProduFabricante 
-                    LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
-                    LEFT JOIN Setor on SetorId = MovimDestinoSetor
+                    LEFT JOIN LocalEstoque LocalO on LocalO.LcEstId = MovimOrigemLocal 
+                    LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
+                    LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
+                    LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
                     WHERE ".$string." ProduUnidade = ".$_SESSION['UnidadeId']."
                     ";
             $result = $conn->query($sql);
@@ -77,15 +89,18 @@ function queryPesquisa(){
                 <tr idPatrimonio=".$item['PatriId']." editado='0'>
                    <td class='even'>" . $cont . "</td>
                    <td class='odd'>" . $item['ProduNome'] . "</td>
-                   <td  class='even'>".$item['PatriNumero']."</td>
+                   <td class='even'>".$item['PatriNumero']."</td>
                    <td class='odd'>" . $item['MovimNotaFiscal'] . "</td>
                    <td class='even'>".mostraValor($item['MvXPrValorUnitario'])."</td>
                    <td class='odd'></td>
                    <td class='even'>".mostraData($item['MvXPrValidade'])."</td>
-                   <td class='odd'>" . $item['LcEstNome'] . "</td>
-                   <td class='even'>" . $item['SetorNome'] . "</td>
+                   <td class='odd'>" . $item['Origem'] . "</td>
+                   <td class='even'>" . $item['Destino'] . "</td>
                    <td class='even' style='display: none'>" . $item['MarcaNome'] . "</td>
                    <td class='even' style='display: none'>" . $item['FabriNome'] . "</td>
+                   <td class='even' style='display: none'>" . mostraData($item['MovimData']) . "</td>
+                   <td class='even' style='display: none'>" . mostraData($item['MvXPrAnoFabricacao']) . "</td>
+                   <td class='even' style='display: none'>" . $item['EmpenhosOrdemCompra'] . "</td>
                    <td style='text-align: center'>
                          <i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>
                    </td>
@@ -94,7 +109,7 @@ function queryPesquisa(){
                    </td>
                    <td style='display: none' id='inputEstadoConservacao'>
                         <input type='text' value='" . $item['PatriEstadoConservacao'] . "'>
-                   </td>
+                   </td>                   
                 </tr>
              ");
         }

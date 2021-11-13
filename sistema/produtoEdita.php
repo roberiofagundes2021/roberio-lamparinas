@@ -9,12 +9,14 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputProdutoId'])){
 
 	$sql = "SELECT TRXPrTermoReferencia
-	            FROM TermoReferenciaXProduto
-				JOIN Produto on ProduId = TRXPrProduto
-	            JOIN TermoReferencia on TrRefId = TRXPrTermoReferencia
-				JOIN Situacao on Situaid = TrRefStatus
-	            WHERE TRXPrProduto = ".$_POST['inputProdutoId']." and (SituaChave = 'ATIVO' or SituaChave = 'AGUARDANDOLIBERACAO' or SituaChave = 'FINALIZADO')  and TRXPrUnidade = ".$_SESSION['UnidadeId']."
-	            ";
+			FROM TermoReferenciaXProduto
+			JOIN Produto on ProduId = TRXPrProduto
+			JOIN TermoReferencia on TrRefId = TRXPrTermoReferencia
+			JOIN Situacao on Situaid = TrRefStatus
+			WHERE TRXPrProduto = ".$_POST['inputProdutoId']." and 
+			(SituaChave = 'LIBERADOCENTRO' or SituaChave = 'LIBERADOCONTABILIDADE' or SituaChave = 'FASEINTERNAFINALIZADA') 
+			and TRXPrUnidade = ".$_SESSION['UnidadeId']."
+			";
 	$result = $conn->query($sql);
 	$rowTrs = $result->fetchAll(PDO::FETCH_ASSOC);
 	$contTRs = count($rowTrs);
@@ -63,7 +65,7 @@ if(isset($_POST['inputProdutoId'])){
 					FROM FluxoOperacionalXProduto
 					JOIN FluxoOperacional on FlOpeId = FOXPrFluxoOperacional
 					JOIN Situacao on SituaId = FlOpeStatus
-					WHERE FOXPrProduto = ".$iProduto." and SituaChave = 'ATIVO' ";
+					WHERE FOXPrProduto = ".$iProduto." and SituaChave = 'LIBERADO' ";
 			$result = $conn->query($sql);
 			$rowExiste = $result->fetch(PDO::FETCH_ASSOC);
 		} else if ($rowParamentro['ParamValorAtualizadoOrdemCompra']){
@@ -186,6 +188,7 @@ if(isset($_POST['inputNome'])){
 	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
@@ -554,7 +557,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required <?php $contTRs >= 1 ? print('disabled') : ''?>>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control select-search" required <?php $contTRs >= 1 ? print('disabled') : ''?>>
 													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT CategId, CategNome
@@ -578,7 +581,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" <?php $contTRs >= 1 ? print('disabled') : ''?>>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control select-search" <?php $contTRs >= 1 ? print('disabled') : ''?>>
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT SbCatId, SbCatNome
@@ -660,7 +663,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbMarca">Marca</label>
-												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
+												<select id="cmbMarca" name="cmbMarca" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT MarcaId, MarcaNome
@@ -684,7 +687,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbModelo">Modelo</label>
-												<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
+												<select id="cmbModelo" name="cmbModelo" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT ModelId, ModelNome
@@ -708,7 +711,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbFabricante">Fabricante</label>
-												<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
+												<select id="cmbFabricante" name="cmbFabricante" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT FabriId, FabriNome
@@ -741,7 +744,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbUnidadeMedida">Unidade de Medida<span class="text-danger">*</span></label>
-												<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control form-control-select2" required>
+												<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control select-search" required>
 													<option value="">Selecione</option>
 													<?php 
 														$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
@@ -765,7 +768,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbTipoFiscal">Tipo</label>
-												<select id="cmbTipoFiscal" name="cmbTipoFiscal" class="form-control form-control-select2">
+												<select id="cmbTipoFiscal" name="cmbTipoFiscal" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT TpFisId, TpFisNome
@@ -789,7 +792,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbOrigemFiscal">Origem</label>
-												<select id="cmbOrigemFiscal" name="cmbOrigemFiscal" class="form-control form-control-select2">
+												<select id="cmbOrigemFiscal" name="cmbOrigemFiscal" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<?php 
 														$sql = "SELECT OrFisId, OrFisNome
@@ -815,7 +818,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-10">
 											<div class="form-group">
 												<label for="cmbNcmFiscal">NCM</label>
-												<select id="cmbNcmFiscal" name="cmbNcmFiscal" class="form-control form-control-select2">
+												<select id="cmbNcmFiscal" name="cmbNcmFiscal" class="form-control select-search">
 													<option value="#">Selecione um NCM</option>
 													<?php 
 														$sql = "SELECT NcmId, NcmCodigo, NcmNome
@@ -849,7 +852,11 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button id="alterar" class="btn btn-lg btn-principal" type="submit">Alterar</button>
+										<?php
+											if ($_POST['inputPermission']) {
+												echo '<button id="alterar" class="btn btn-lg btn-principal" type="submit">Alterar</button>';
+											}
+										?>	
 										<a href="produto.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

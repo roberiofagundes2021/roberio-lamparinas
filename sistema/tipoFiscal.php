@@ -1,6 +1,10 @@
 <?php 
 
-include_once("sessao.php"); 
+include_once("sessao.php");
+
+if(!$_SESSION['PerfiChave'] == "SUPER"){
+	header("location:javascript://history.go(-1)");
+}
 
 $_SESSION['PaginaAtual'] = 'TipoFiscal';
 
@@ -203,22 +207,26 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaTipoFiscal(TpFisId, TpFisNome, TpFisStatus, Tipo){
+		function atualizaTipoFiscal(Permission, TpFisId, TpFisNome, TpFisStatus, Tipo){
 		
-			document.getElementById('inputTipoFiscalId').value = TpFisId;
-			document.getElementById('inputTipoFiscalNome').value = TpFisNome;
-			document.getElementById('inputTipoFiscalStatus').value = TpFisStatus;
-					
-			if (Tipo == 'edita'){	
-				document.getElementById('inputEstadoAtual').value = "EDITA";
-				document.formTipoFiscal.action = "tipoFiscal.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formTipoFiscal, "Tem certeza que deseja excluir esse Tipo Fiscal?", "tipoFiscalExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formTipoFiscal.action = "tipoFiscalMudaSituacao.php";
+			if (Permission == 1){
+				document.getElementById('inputTipoFiscalId').value = TpFisId;
+				document.getElementById('inputTipoFiscalNome').value = TpFisNome;
+				document.getElementById('inputTipoFiscalStatus').value = TpFisStatus;
+						
+				if (Tipo == 'edita'){	
+					document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formTipoFiscal.action = "tipoFiscal.php";		
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formTipoFiscal, "Tem certeza que deseja excluir esse Tipo Fiscal?", "tipoFiscalExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formTipoFiscal.action = "tipoFiscalMudaSituacao.php";
+				}
+				
+				document.formTipoFiscal.submit();
+			} else{
+				alerta('Permissão Negada!','');
 			}
-			
-			document.formTipoFiscal.submit();
 		}		
 			
 	</script>
@@ -307,13 +315,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['TpFisNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaTipoFiscal('.$item['TpFisId'].', \''.$item['TpFisNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaTipoFiscal(1,'.$item['TpFisId'].', \''.$item['TpFisNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaTipoFiscal('.$item['TpFisId'].', \''.$item['TpFisNome'].'\','.$item['TpFisStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaTipoFiscal('.$item['TpFisId'].', \''.$item['TpFisNome'].'\','.$item['TpFisStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaTipoFiscal('.$atualizar.','.$item['TpFisId'].', \''.$item['TpFisNome'].'\','.$item['TpFisStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaTipoFiscal('.$excluir.','.$item['TpFisId'].', \''.$item['TpFisNome'].'\','.$item['TpFisStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>

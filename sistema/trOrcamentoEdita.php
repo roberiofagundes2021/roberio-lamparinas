@@ -33,10 +33,12 @@ if(isset($_POST['inputOrcamentoId'])){
 	
 	$iOrcamento = $_POST['inputOrcamentoId'];
 			
-	$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrConteudo, TrXOrFornecedor, 
+	$sql = "SELECT TrXOrId, TrXOrNumero, TrXOrData, TrXOrConteudo, TrXOrFornecedor, SituaChave,
 					ForneId, ForneContato, ForneEmail, ForneTelefone, ForneCelular, TrXOrSolicitante, UsuarNome, UsuarEmail, UsuarTelefone
 			FROM TRXOrcamento
 			JOIN Usuario on UsuarId = TrXOrSolicitante
+			JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+			JOIN Situacao  ON SituaId = TrRefStatus
 			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
 			WHERE TrXOrId = $iOrcamento ";
 	$result = $conn->query($sql);
@@ -163,17 +165,19 @@ if(isset($_POST['inputData'])){
 
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>	
-
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 
 	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>	
 
 	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>		
 
     <script type="text/javascript" >
 
@@ -196,62 +200,6 @@ if(isset($_POST['inputData'])){
 					$('#inputTelefoneFornecedor').val(Forne[4]);
 				}
 			});
-			
-			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
-			$('#cmbCategoria').on('change', function(e){
-				
-				Filtrando();
-				
-				var cmbCategoria = $('#cmbCategoria').val();
-
-				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
-					
-					var option = '<option value="#">Selecione a SubCategoria</option>';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						});						
-						
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}					
-				});
-
-				
-				$.getJSON('filtraFornecedor.php?idCategoria='+cmbCategoria, function (dados){
-					
-					var option = '<option value="#">Selecione o Fornecedor</option>';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.ForneId+'#'+obj.ForneContato+'#'+obj.ForneEmail+'#'+obj.ForneTelefone+'#'+obj.ForneCelular+'">'+obj.ForneNome+'</option>';
-						});						
-						
-						$('#cmbFornecedor').html(option).show();
-					} else {
-						ResetFornecedor();
-					}					
-				});				
-				
-			});
-
-
-			// Limpa os campos de fornecedor quando uma nova categoria é selecionada
-			$('#cmbCategoria').on('change', function(){
-				let inputContato = $('#inputContato')
-				let inputEmailFornecedor = $('#inputEmailFornecedor')
-				let inputTelefoneFornecedor = $('#inputTelefoneFornecedor')
-
-				if(inputContato.val() || inputEmailFornecedor.val() || inputTelefoneFornecedor.val()){
-                    inputContato.val('')
-                    inputEmailFornecedor.val('')
-                    inputTelefoneFornecedor.val('')
-				} 
-			})
 
 			$("#enviar").on('click', function(e){
 				
@@ -273,6 +221,14 @@ if(isset($_POST['inputData'])){
 					$('#cmbCategoria').focus();
 					return false;
 				}
+
+				var cmbFornecedor = $('#cmbFornecedor').val(); 
+
+				//Se o fornecedor não foi selecionado, força o envio do formulário para acionar a Validação dos campos obrigatórios
+				if (cmbFornecedor == ""){
+					$("#formOrcamento").submit();
+					return false;
+				}
 				
 				//Tem produto cadastrado para esse orçamento na tabela OrcamentoXProduto?
 				var inputProduto = $('#inputOrcamentoProduto').val();
@@ -289,7 +245,7 @@ if(isset($_POST['inputData'])){
 						inputExclui = 1;
 						$('#inputOrcamentoProdutoExclui').val(inputExclui);
 						
-						confirmaExclusao(document.formOrcamento, "Tem certeza que deseja alterar o orçamento? Existem produtos com quantidades ou valores lançados!", "trOrcamentoEdita.php");
+						confirmaExclusao(document.formOrcamento, "Tem certeza que deseja alterar o orçamento? Existem produtos e/ou serviços com valores já lançados!", "trOrcamentoEdita.php");
 						
 					} else{
 						inputExclui = 0;
@@ -334,7 +290,7 @@ if(isset($_POST['inputData'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formOrcamento" id="formOrcamento" method="post" class="form-validate">
+					<form name="formOrcamento" id="formOrcamento" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Orçamento Nº "<?php echo $_POST['inputOrcamentoNumero']; ?>"</h5>
 						</div>						
@@ -363,13 +319,13 @@ if(isset($_POST['inputData'])){
 										
 										<div class="col-lg-1">
 											<div class="form-group">
-												<label for="inputData">Data</label>
+												<label for="inputData">Data <span class="text-danger"> *</span></label>
 												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo mostraData($row['TrXOrData']); ?>" readOnly>
 											</div>
 										</div>									
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
+												<label for="cmbCategoria">Categoria <span class="text-danger"> *</span></label>
 												<div class="d-flex flex-row" style="padding-top: 7px;">
 													<input type="text" class="form-control pb-0" value="<?php echo $rowCategoria['CategNome'] ?>" readOnly>
 													<input type="hidden" id="inputCategoria" name="inputCategoria" class="form-control pb-0" value="<?php echo $rowCategoria['CategId'] ?>">
@@ -418,9 +374,9 @@ if(isset($_POST['inputData'])){
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="cmbFornecedor">Fornecedor</label>
-												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
+												<label for="cmbFornecedor">Fornecedor <span class="text-danger"> *</span></label>
+												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php
 														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																FROM Fornecedor
@@ -474,14 +430,14 @@ if(isset($_POST['inputData'])){
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNomeSolicitante">Solicitante</label>
+												<label for="inputNomeSolicitante">Solicitante <span class="text-danger"> *</span></label>
 												<input type="text" id="inputNomeSolicitante" name="inputNomeSolicitante" class="form-control" value="<?php echo $row['UsuarNome']; ?>" readOnly>
 											</div>
 										</div>
 										
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputEmailSolicitante">E-mail</label>
+												<label for="inputEmailSolicitante">E-mail <span class="text-danger"> *</span></label>
 												<input type="text" id="inputEmailSolicitante" name="inputEmailSolicitante" class="form-control" value="<?php echo $row['UsuarEmail']; ?>" readOnly>
 											</div>
 										</div>									
@@ -499,8 +455,12 @@ if(isset($_POST['inputData'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<div class="btn btn-lg btn-principal" id="enviar">Alterar</div>
-										<a href="trOrcamento.php" class="btn btn-basic" role="button">Cancelar</a>
+                                        <?php 
+											if ($row['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+												print('<div class="btn btn-lg btn-principal" id="enviar">Alterar</div>');
+											}
+										?>
+											<a href="trOrcamento.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

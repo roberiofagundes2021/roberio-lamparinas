@@ -18,10 +18,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 $sql = "SELECT ParamPrecoGridServico
 	    FROM Parametro
-		WHERE ParamEmpresa = " . $_SESSION['EmpreId'] . "
-	   ";
+		WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
 $result = $conn->query($sql);
-$parametro = $result->fetch(PDO::FETCH_ASSOC);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -161,40 +160,69 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 			return separador <= 0 ? '' : final.substr(separador + 1);
 		}			
 			
-		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaServico(ServicoId, ServicoNome, ServicoStatus, Tipo){
-		
-			if (Tipo == 'exportar'){	
-				document.formServico.action = "servicoExportar.php";
-				document.formServico.setAttribute("target", "_blank");	
-			} else {
+			//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
+			function atualizaServico(Permission,ServicoId, ServicoNome, ServicoStatus, Tipo){
+
+				document.getElementById('inputPermission').value = Permission;
 				document.getElementById('inputServicoId').value = ServicoId;
 				document.getElementById('inputServicoNome').value = ServicoNome;
 				document.getElementById('inputServicoStatus').value = ServicoStatus;
-						
-				if (Tipo == 'edita'){	
-					document.formServico.action = "servicoEdita.php";		
-				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formServico, "Tem certeza que deseja excluir esse serviço?", "servicoExclui.php");
-				} else if (Tipo == 'mudaStatus'){
-					if(ServicoStatus != 'ALTERAR'){
-						document.formServico.action = "servicoMudaSituacao.php";
+
+				if(Tipo == 'exporta') {
+
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+
+						type: "POST",
+						url: "servicoOrcamentoValida.php",
+						data: ('IdServico='+ServicoId),
+						success: function(resposta){
+							
+							if(resposta == 1){
+								alerta('Atenção','Esse serviço já foi exportado !','error');
+								return false;
+							}
+							
+							if(ServicoStatus != 'ALTERAR'){
+								document.formServico.action = "servicoExportaServicoOrcamento.php";
+							} else {
+								alerta('Atenção','Edite o serviço e altere a categoria para a situação ficar "ATIVO".','error');
+								return false;
+							}
+
+							document.formServico.submit();
+						}
+					})
+
+				} else{
+
+					if (Tipo == 'exportar'){	
+						document.formServico.action = "servicoExportar.php";
+						document.formServico.setAttribute("target", "_blank");	
 					} else {
-						alerta('Atenção','Edite o serviço e altere a categoria para a situação ficar "ATIVO".','error');
-						return false;
+
+						if (Tipo == 'edita'){	
+							document.formServico.action = "servicoEdita.php";
+						} else if (Tipo == 'mudaStatus'){
+							if(ServicoStatus != 'ALTERAR'){
+								document.formServico.action = "servicoMudaSituacao.php";
+							} else {
+								alerta('Atenção','Edite o serviço e altere a categoria para a situação ficar "ATIVO".','error');
+								return false;
+							}
+						}	else if (Tipo == 'exclui'){
+							if(Permission){
+								confirmaExclusao(document.formServico, "Tem certeza que deseja excluir esse serviço?", "servicoExclui.php");
+							}	else{
+								alerta('Permissão Negada!','');
+								return false;
+							}
+						}  
 					}
-				} else if(Tipo == 'exporta') {
-					if(ServicoStatus != 'ALTERAR'){
-                    	document.formServico.action = "servicoExportaServicoOrcamento.php";
-                    } else{
-                    	alerta('Atenção','Edite o serviço e altere a categoria antes de realizar a exportação.','error');
-                    	return false;
-                    }
+					
+					document.formServico.submit();
 				}
-			}
-			
-			document.formServico.submit();
-		}		
+			}	
 			
 	</script>
 
@@ -303,9 +331,9 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 										<th>Categoria</th>
 										<th>SubCategoria</th>
 										<?php
-										if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') print('<th>Preço Custo Final</th>');
-										else if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTO') print('<th>Preço Custo</th>');
-										else if ($parametro['ParamPrecoGridServico'] == 'PRECOVENDA') print('<th>Preço Venda</th>');
+										if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') print('<th>Preço Custo Final</th>');
+										else if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOCUSTO') print('<th>Preço Custo</th>');
+										else if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOVENDA') print('<th>Preço Venda</th>');
 										else print('<th>Preço Venda</th>');
 										?>
 										<th>Situação</th>
@@ -318,9 +346,9 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 
 										$tipoValorServico = '';										
 
-										if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') $tipoValorServico = '<td>' . formataMoeda($item['ServiCustoFinal']) . '</td>';
-										else if ($parametro['ParamPrecoGridServico'] == 'PRECOCUSTO') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorCusto']) . '</td>';
-										else if ($parametro['ParamPrecoGridServico'] == 'PRECOVENDA') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
+										if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOCUSTOFINAL') $tipoValorServico = '<td>' . formataMoeda($item['ServiCustoFinal']) . '</td>';
+										else if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOCUSTO') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorCusto']) . '</td>';
+										else if (isset($rowParametro['ParamPrecoGridServico']) && $rowParametro['ParamPrecoGridServico'] == 'PRECOVENDA') $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
 										else $tipoValorServico = '<td>' . formataMoeda($item['ServiValorVenda']) . '</td>';
 	
 										$situacao = $item['SituaNome'];
@@ -335,14 +363,14 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 											' . $tipoValorServico . '
 											');
 										
-										print('<td><a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');" data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaServico(1,'.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');" data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'exporta\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Exportar para Serviço Orçamento"><i class="icon-drawer-out"></i></a>
-														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Serviço"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaServico('.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Excluir Serviço"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaServico(1,'.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'exporta\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Exportar para Serviço Orçamento"><i class="icon-drawer-out"></i></a>
+														<a href="#" onclick="atualizaServico('.$atualizar.','.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Serviço"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaServico('.$excluir.','.$item['ServiId'].', \''.$item['ServiNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Excluir Serviço"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
@@ -361,6 +389,7 @@ $parametro = $result->fetch(PDO::FETCH_ASSOC);
 				<!-- /info blocks -->
 				
 				<form name="formServico" method="post">
+					<input type="hidden" id="inputPermission" name="inputPermission" >
 					<input type="hidden" id="inputServicoId" name="inputServicoId" >
 					<input type="hidden" id="inputServicoNome" name="inputServicoNome" >
 					<input type="hidden" id="inputServicoStatus" name="inputServicoStatus" >

@@ -22,19 +22,6 @@ if (isset($_POST['servicos']) and $_POST['servicos'] != '') {
 
 $iTR = $_POST['idTr'];
 
-// $sql = "SELECT SrOrcId
-// 		FROM ServicoOrcamento
-// 		WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . "";
-// $result = $conn->query($sql);
-// $rowServicosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-// $sql = "SELECT ServiId
-// 		FROM Servico
-// 		WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . "";
-// $result = $conn->query($sql);
-// $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-// $countServicosTr2 = count($rowServicos);
 $sql = "SELECT TRXSrServico
 		FROM TermoReferenciaXServico
 		JOIN ServicoOrcamento on SrOrcId = TRXSrServico
@@ -57,7 +44,6 @@ if (count($rowServicosOrcamento) >= 1) {
 
 	$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento
 			FROM ServicoOrcamento
-			JOIN Categoria on CategId = SrOrcCategoria
 			WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and SrOrcId in (" . $lista . ")
 			";
 	//echo $sql;
@@ -81,7 +67,7 @@ if (count($rowServicosOrcamento) >= 1) {
 		$quantidade = isset($_POST['servicoQuant'][$id]) ? $_POST['servicoQuant'][$id] : '';
 
 		$output .= ' <div class="row" style="margin-top: 8px;">
-					<div class="col-lg-9">
+					<div class="col-lg-10">
 						<div class="row">
 							<div class="col-lg-1">
 								<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>

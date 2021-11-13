@@ -4,14 +4,14 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if (isset($_GET['idContaAReceber'])) {
+if (isset($_POST['inputContasAReceberId'])) {
 
-	$id = $_GET['idContaAReceber'];
+	$id = $_POST['inputContasAReceberId'];
 
 	try {
 
 		$sql = "DELETE FROM ContasAReceber
-								  WHERE CnAReId = :id";
+				WHERE CnAReId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $id);
 		$result->execute();

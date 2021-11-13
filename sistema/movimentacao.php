@@ -6,7 +6,8 @@ $_SESSION['PaginaAtual'] = 'Movimentação';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave, SituaCor, LcEstNome, SetorNome, BandeMotivo
+$sql = "SELECT DISTINCT MovimId, MovimData, MovimTipo, MovimNotaFiscal, ForneNome, SituaNome, SituaChave,
+    SituaCor, LcEstNome, SetorNome, BandeMotivo, MovimNumRecibo
 		FROM Movimentacao
 		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
 		LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
@@ -49,116 +50,134 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
   <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
 
   <script type="text/javascript">
-  $(document).ready(function() {
+    $(document).ready(function() {
 
-    $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
+      $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
 
-    /* Início: Tabela Personalizada */
-    $('#tblMovimentacao').DataTable({
-      "order": [
-        [0, "desc"]
-      ],
-      autoWidth: false,
-      responsive: true,
-      columnDefs: [{
-          orderable: true, //Data
-          width: "10%",
-          targets: [0]
-        },
-        {
-          orderable: true, //Tipo
-          width: "10%",
-          targets: [1]
-        },
-        {
-          orderable: true, //Nota Fiscal
-          width: "10%",
-          targets: [2]
-        },
-        {
-          orderable: true, //Fornecedor
-          width: "30%",
-          targets: [3]
-        },
-        {
-          orderable: true, //Destino
-          width: "20%",
-          targets: [4]
-        },
-        {
-          orderable: true, //Situação
-          width: "10%",
-          targets: [5]
-        },
-        {
-          orderable: false, //Ações
-          width: "10%",
-          targets: [6]
+      /* Início: Tabela Personalizada */
+      $('#tblMovimentacao').DataTable({
+        "order": [
+          [0, "desc"]
+        ],
+        autoWidth: false,
+        responsive: true,
+        columnDefs: [{
+            orderable: true, //Data
+            width: "10%",
+            targets: [0]
+          },
+          {
+            orderable: true, //Tipo
+            width: "10%",
+            targets: [1]
+          },
+          {
+            orderable: true, //Nota Fiscal
+            width: "10%",
+            targets: [2]
+          },
+          {
+            orderable: true, //Nº Recibo
+            width: "10%",
+            targets: [2]
+          },
+          {
+            orderable: true, //Fornecedor
+            width: "20%",
+            targets: [3]
+          },
+          {
+            orderable: true, //Destino
+            width: "20%",
+            targets: [4]
+          },
+          {
+            orderable: true, //Situação
+            width: "10%",
+            targets: [5]
+          },
+          {
+            orderable: false, //Ações
+            width: "10%",
+            targets: [6]
+          }
+        ],
+        dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+        language: {
+          search: '<span>Filtro:</span> _INPUT_',
+          searchPlaceholder: 'filtra qualquer coluna...',
+          lengthMenu: '<span>Mostrar:</span> _MENU_',
+          paginate: {
+            'first': 'Primeira',
+            'last': 'Última',
+            'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+            'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+          }
         }
-      ],
-      dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
-      language: {
-        search: '<span>Filtro:</span> _INPUT_',
-        searchPlaceholder: 'filtra qualquer coluna...',
-        lengthMenu: '<span>Mostrar:</span> _MENU_',
-        paginate: {
-          'first': 'Primeira',
-          'last': 'Última',
-          'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-          'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+      });
+
+      // Select2 for length menu styling
+      var _componentSelect2 = function() {
+        if (!$().select2) {
+          console.warn('Warning - select2.min.js is not loaded.');
+          return;
         }
-      }
+
+        // Initialize
+        $('.dataTables_length select').select2({
+          minimumResultsForSearch: Infinity,
+          dropdownAutoWidth: true,
+          width: 'auto'
+        });
+      };
+
+      _componentSelect2();
+
+      /* Fim: Tabela Personalizada */
     });
 
-    // Select2 for length menu styling
-    var _componentSelect2 = function() {
-      if (!$().select2) {
-        console.warn('Warning - select2.min.js is not loaded.');
-        return;
+    //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
+    function atualizaMovimentacao(Permission, MovimId, MovimData, MovimNotaFiscal, MovimTipo, Tipo, Motivo) {
+
+      document.getElementById('inputPermission').value = Permission;
+      document.getElementById('inputMovimentacaoId').value = MovimId;
+      document.getElementById('inputMovimentacaoData').value = MovimData;
+      document.getElementById('inputMovimentacaoTipo').value = MovimTipo;
+      document.getElementById('inputMovimentacaoNotaFiscal').value = MovimNotaFiscal;
+
+      if (Tipo == 'motivo') {
+        bootbox.alert({
+          title: '<strong>Motivo da Não Liberação</strong>',
+          message: Motivo
+        });
+        return false;
+      } else if (Tipo == 'edita') {
+        document.formMovimentacao.action = "movimentacaoEdita.php";
+      } else if (Tipo == 'exclui') {
+        if (Permission) {
+          confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir essa movimentação?", "movimentacaoExclui.php");
+        } else {
+          alerta('Permissão Negada!', '');
+          return false;
+        }
+      } else if (Tipo == 'imprimir') {
+
+        if (MovimTipo == 'E') {
+          document.formMovimentacao.action = "movimentacaoImprimeEntrada.php";
+        } else {
+          document.formMovimentacao.action = "movimentacaoImprimeRetirada.php";
+        }
+
+        document.formMovimentacao.setAttribute("target", "_blank");
+      } else if (Tipo == 'anexo') {
+        document.formMovimentacao.action = "movimentacaoAnexo.php";
+      }else if (Tipo == 'aprovacaoContabilidade') {
+					document.formMovimentacao.action = "movimentacaoAprovacaoContabilidade.php";
+			} else if (Tipo == 'liquidar'){
+          confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja liquidar essa entrada? Após liquidação um novo registro será gerado no Contas à Pagar com vencimento de 60 dias após a data de hoje.", "movimentacaoLiquidarContabilidade.php");
       }
-
-      // Initialize
-      $('.dataTables_length select').select2({
-        minimumResultsForSearch: Infinity,
-        dropdownAutoWidth: true,
-        width: 'auto'
-      });
-    };
-
-    _componentSelect2();
-
-    /* Fim: Tabela Personalizada */
-  });
-
-  //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-  function atualizaMovimentacao(MovimId, MovimNotaFiscal, MovimTipo, Tipo, Motivo) {
-
-    document.getElementById('inputMovimentacaoId').value = MovimId;
-    document.getElementById('inputMovimentacaoNotaFiscal').value = MovimNotaFiscal;
-
-    if (Tipo == 'motivo') {
-      bootbox.alert({
-        title: '<strong>Motivo da Não Liberação</strong>',
-        message: Motivo
-      });
-      return false;
-    } else if (Tipo == 'edita') {
-      document.formMovimentacao.action = "movimentacaoEdita.php";
-    } else if (Tipo == 'exclui') {
-      confirmaExclusao(document.formMovimentacao, "Tem certeza que deseja excluir essa movimentação?", "movimentacaoExclui.php");
-    } else if (Tipo == 'imprimir') {
-
-      if (MovimTipo == 'E') {
-        document.formMovimentacao.action = "movimentacaoImprimeEntrada.php";
-      } else {
-        document.formMovimentacao.action = "movimentacaoImprimeRetirada.php";
-      }
-
-      document.formMovimentacao.setAttribute("target", "_blank");
-    }
-
-    document.formMovimentacao.submit();
-  }
+      document.formMovimentacao.submit();
+    } 
   </script>
 
 </head>
@@ -205,7 +224,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                   <div class="col-lg-4">
                     <div class="text-right">
                       <a href="movimentacaoNovoEntrada.php" class="btn btn-principal" role="button">Nova Movimentação</a>
-                      <a href="index.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Listar Requisições">Requisições</a>
+                      <?php
+                      if ($_SESSION['PerfiChave'] == 'ALMOXARIFADO') {
+                        print('<a href="index.php" class="btn bg-slate-700" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Listar Requisições">Requisições</a>');
+                      }
+                      ?>
                     </div>
                   </div>
                 </div>
@@ -217,65 +240,79 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                     <th>Data</th>
                     <th>Tipo</th>
                     <th>NF</th>
+                    <th class="col-2">Nº Recibo</th>
                     <th>Fornecedor</th>
-                    <th>Destino</th>
+                    <th class="col-5">Destino</th>
                     <th>Situação</th>
                     <th class="text-center">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   <?php
-									foreach ($row as $item) {
+                  foreach ($row as $item) {
+                    $tipo = $item['MovimTipo'] == 'E' ? 'Entrada' : ($item['MovimTipo'] == 'S' ? 'Saída' : 'Transferência');
 
-										$tipo = $item['MovimTipo'] == 'E' ? 'Entrada' : ($item['MovimTipo'] == 'S' ? 'Saída' : 'Transferência');
-										if ($item['MovimTipo'] == 'S' || $item['MovimTipo'] == 'E') {
+                    if ($tipo == 'Entrada') {
+                      $local = $item['MovimTipo'] == 'S' ? $item['LcEstNome'] : $item['LcEstNome'];
+                    } else if ($tipo == 'Saída') {
+                      $local = isset($item['SetorNome']) ? $item['SetorNome'] : $item['LcEstNome'];
+                    } else if ($tipo == 'Transferência') {
+                      $local = isset($item['LcEstNome']) ? $item['LcEstNome'] : $item['SetorNome'];
+                    }
 
-											$local = $item['MovimTipo'] == 'S' ? $item['LcEstNome'] : $item['LcEstNome'];
-											
-										} else if ($item['MovimTipo'] == 'T') {
+                    $situacao = $item['SituaNome'];
+                    $situacaoClasse = 'badge badge-flat border-' . $item['SituaCor'] . ' text-' . $item['SituaCor'];
 
-											$local = isset($item['LcEstNome']) ? $item['LcEstNome'] : $item['SetorNome'];
-										}
-										
-										$situacao = $item['SituaNome'];
-										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];									
-
-										print('
+                    print('
 										<tr>
 											<td>' . mostraData($item['MovimData']) . '</td>
 											<td>' . $tipo . '</td>
 											<td>' . $item['MovimNotaFiscal'] . '</td>
+											<td>' . $item['MovimNumRecibo'] . '</td>
 											<td>' . $item['ForneNome'] . '</td>
-											<td>' . $local . '</td>
+											<td class="col-5">' . $local . '</td>
 											');
 
-										print('<td><span class="'.$situacaoClasse.'">'.$situacao.'</span></td>');
+                    print('<td><span class="' . $situacaoClasse . '">' . $situacao . '</span></td>');
 
-										print('<td class="text-center">
+                    print('<td class="text-center">
 													<div class="list-icons">
 														<div class="list-icons list-icons-extended">
-															<!--<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'edita\', \'\');" class="list-icons-item"><i class="icon-pencil7"></i></a>-->
-															<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin"></i></a>
+															<!--<a href="#" onclick="atualizaMovimentacao(' . $atualizar . ',' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \'' . $item['MovimTipo'] . '\', \'edita\', \'\');" class="list-icons-item"><i class="icon-pencil7"></i></a>-->
+															<a href="#" onclick="atualizaMovimentacao(' . $excluir . ',' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \'' . $item['MovimTipo'] . '\', \'exclui\', \'\');" class="list-icons-item"><i class="icon-bin"></i></a>
 															<div class="dropdown">													
 															<a href="#" class="list-icons-item" data-toggle="dropdown">
 																<i class="icon-menu9"></i>
 															</a>
 
 															<div class="dropdown-menu dropdown-menu-right">
-																<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'imprimir\', \'\');" class="dropdown-item"><i class="icon-printer2"></i> Imprimir</a>');
 															
+                                <a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'imprimir\', \'\');" class="dropdown-item"><i class="icon-printer2"></i> Imprimir</a>');
+                               
+                                if ($item['MovimTipo'] == 'E'){
+                                  print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'anexo\', \'\');" class="dropdown-item"><i class="icon-attachment"></i> Anexar Nota Fiscal</a>');
+                                }
+
+                                if ($item['SituaChave'] == 'LIBERADOCENTRO' && $item['MovimTipo'] == 'E'){
+                                  print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'aprovacaoContabilidade\', \'\');" class="dropdown-item"><i class="icon-list2"></i> Enviar para Contabilidade</a>');
+                                }
+
+                                if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCONTABILIDADE' && $item['MovimTipo'] == 'E' && $_SESSION['PerfiChave'] == 'CONTABILIDADE' ){
+                                  print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'liquidar\', \'\');" class="dropdown-item"><i class="icon-coin-dollar"></i>Liquidar</a>');
+                                }
+
 																if (isset($item['BandeMotivo'])){
 																	print('
 																	<div class="dropdown-divider"></div>
-																	<a href="#" onclick="atualizaMovimentacao(' . $item['MovimId'] . ', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'motivo\', \''.$item['BandeMotivo'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
-																}															
-										print('				</div>
+																	<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \'' . $item['MovimTipo'] . '\', \'motivo\', \'' . $item['BandeMotivo'] . '\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo</a>');
+                    }
+                    print('				</div>
 														</div>
 													</div>
 												</td>
 											</tr>');
-									}
-									?>
+                  }
+                  ?>
 
                 </tbody>
               </table>
@@ -287,8 +324,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
         <!-- /info blocks -->
 
-        <form name="formMovimentacao" method="post" target="_blank">
+        <form name="formMovimentacao" method="post">
+          <input type="hidden" id="inputPermission" name="inputPermission" > 
           <input type="hidden" id="inputMovimentacaoId" name="inputMovimentacaoId">
+          <input type="hidden" id="inputMovimentacaoData" name="inputMovimentacaoData">
+          <input type="hidden" id="inputMovimentacaoTipo" name="inputMovimentacaoTipo">
           <input type="hidden" id="inputMovimentacaoNotaFiscal" name="inputMovimentacaoNotaFiscal">
         </form>
 

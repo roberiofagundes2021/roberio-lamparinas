@@ -9,12 +9,13 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputServicoId'])){
 
 	$sql = "SELECT TRXSrTermoReferencia
-	            FROM TermoReferenciaXServico
-				JOIN Servico on ServiId =TRXSrServico
-	            JOIN TermoReferencia on TrRefId =TRXSrTermoReferencia
-				JOIN Situacao on Situaid = TrRefStatus
-	            WHERE TRXSrServico = ".$_POST['inputServicoId']." and (SituaChave = 'ATIVO' or SituaChave = 'AGUARDANDOLIBERACAO' or SituaChave = 'FINALIZADO')  and TRXSrUnidade = ".$_SESSION['UnidadeId']."
-	            ";
+			FROM TermoReferenciaXServico
+			JOIN Servico on ServiId =TRXSrServico
+			JOIN TermoReferencia on TrRefId =TRXSrTermoReferencia
+			JOIN Situacao on Situaid = TrRefStatus
+			WHERE TRXSrServico = ".$_POST['inputServicoId']." and 
+			(SituaChave = 'LIBERADOCENTRO' or SituaChave = 'LIBERADOCONTABILIDADE' or SituaChave = 'FASEINTERNAFINALIZADA') and 
+			TRXSrUnidade = ".$_SESSION['UnidadeId'];
 	$result = $conn->query($sql);
 	$rowTrs = $result->fetchAll(PDO::FETCH_ASSOC);
 	$contTRs = count($rowTrs);
@@ -429,7 +430,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtDetalhamento">Detalhamento</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do produto"><?php echo $row['ServiDetalhamento']; ?></textarea>
+												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do serviço"><?php echo $row['ServiDetalhamento']; ?></textarea>
 											</div>
 										</div>
 									</div>
@@ -634,7 +635,11 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button id="alterar" class="btn btn-lg btn-principal" type="submit">Alterar</button>
+									<?php
+										if ($_POST['inputPermission']) {
+											echo '<button id="alterar" class="btn btn-lg btn-principal" type="submit">Alterar</button>';
+										}
+									?>	
 										<a href="servico.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

@@ -38,38 +38,38 @@
 			/* Cria registro inserindo arquivo na tabela */
 			$sql = "
 				INSERT 
-					INTO  DotacaoOrcamentaria
-							 (DtOrcData, 
-							  DtOrcNome, 
-							  DtOrcArquivo, 
-							  DtOrcTermoReferencia, 
-							  DtOrcUsuarioAtualizador,
-							  DtOrcUnidade)
+					INTO DotacaoOrcamentaria
+						(DtOrcData, 
+						DtOrcNome, 
+						DtOrcArquivo, 
+						DtOrcTermoReferencia, 
+						DtOrcUsuarioAtualizador,
+						DtOrcUnidade)
 				VALUES (:iData,
-								:sNome, 
-								:iArquivo, 
-								:iTermoReferencia, 
-								:iUsuarioAtualizador, 
-								:iUnidade)
+						:sNome, 
+						:iArquivo, 
+						:iTermoReferencia, 
+						:iUsuarioAtualizador, 
+						:iUnidade)
 			";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(
 				array(
-					':iData' 								=> gravaData($_POST['inputData']),
-					':sNome' 								=> $_POST['inputNome'],
-					':iArquivo' 						=> $nome_final,
-					':iTermoReferencia' 		=> $_SESSION['inputTRIdDotacao'],
+					':iData' 				=> gravaData($_POST['inputData']),
+					':sNome' 				=> $_POST['inputNome'],
+					':iArquivo' 			=> $nome_final,
+					':iTermoReferencia' 	=> $_SESSION['inputTRIdDotacao'],
 					':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
-					':iUnidade' 						=> $_SESSION['UnidadeId'],
+					':iUnidade' 			=> $_SESSION['UnidadeId'],
 				)
 			);
 
 			/* Muda o status da TR*/
 			$sql = "
 				SELECT SituaId
-					FROM Situacao	
-				WHERE SituaChave = 'LIBERADO'
+				FROM Situacao
+				WHERE SituaChave = 'LIBERADOCONTABILIDADE'
 			";
 			$result = $conn->query($sql);
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -83,7 +83,7 @@
 			$sql = "
 				UPDATE TermoReferencia
 					 SET TrRefStatus = :bStatus, 
-					 		 TrRefUsuarioAtualizador = :iUsuario
+					 	 TrRefUsuarioAtualizador = :iUsuario
 				WHERE TrRefId = :iTermoReferenciaId";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':bStatus', $bStatus);
@@ -96,7 +96,8 @@
 				UPDATE Bandeja 
 					 SET BandeStatus = :bStatus
 				 WHERE BandeUnidade = :iUnidade 
-					 AND BandeId in (SELECT BANDEID FROM BANDEJA WHERE BANDETABELAID = :iTermoReferenciaId)
+					 AND BandeId in (Select BandeId FROM Bandeja WHERE BandeTabelaId = :iTermoReferenciaId and 
+					 BandePerfil = 'CONTABILIDADE')
 			";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':bStatus', $bStatus);
@@ -108,7 +109,7 @@
 			$conn->commit();
 			$_SESSION['msg']['titulo'] 		= "Sucesso";
 			$_SESSION['msg']['mensagem'] 	= "Anexo incluído!!!";
-			$_SESSION['msg']['tipo'] 			= "success";
+			$_SESSION['msg']['tipo'] 		= "success";
 		}
 
 	} catch(PDOException $e) {
@@ -118,7 +119,7 @@
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir Anexo!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage().$e->getLine();
+		echo 'Error: ' . $e->getMessage().$e->getLine();exit;
 	}
 
 	irpara('trDotacao.php');

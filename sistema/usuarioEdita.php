@@ -446,11 +446,13 @@ include_once("topo.php");
 							<div class="col-lg-12">
 								<div class="form-group">
 									<?php
-										if (isset($_SESSION['EmpresaId'])){
-											print('<button class="btn btn-lg btn-principal" id="enviarEmpresa">Alterar</button>');
-										} else{
-											print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-										}										
+										if ($_POST['inputPermission']) {	
+											if (isset($_SESSION['EmpresaId'])){
+												print('<button class="btn btn-lg btn-principal" id="enviarEmpresa">Alterar</button>');
+											} else{
+												print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+											}										
+										}
 									?>
 									<a href="usuario.php" class="btn btn-basic" role="button" id="cancelar">Cancelar</a>
 								</div>

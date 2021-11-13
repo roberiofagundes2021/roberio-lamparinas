@@ -59,7 +59,7 @@ if (isset($_POST['inputDataEmissao'])) {
           $result->execute(array(
             ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
             ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? intval($_POST['cmbPlanoContas']) : null,
-            ':iCliente'             => intval($_POST['cmbCliente']),
+            ':iCliente'             => isset($_POST['cmbCliente']) ? intval($_POST['cmbCliente']) : 0,
             ':sDescricao'           => $_POST['inputDescricao'],
             ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
             ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
@@ -229,12 +229,12 @@ if (isset($_POST['inputDataEmissao'])) {
         echo 'Error: ' . $e->getMessage();
         die;
       }
-    }
+    } 
   irpara("movimentacaoFinanceira.php");
 }
 
 // SE TIVER EDITANDO 
-if (isset($_GET['lancamentoId'])) {
+if (isset($_POST['inputMovimentacaoFinanceiraId'])) {
     try {
         $sql = "SELECT  CnAReId,
                         CnAReDtEmissao,  
@@ -269,7 +269,7 @@ if (isset($_GET['lancamentoId'])) {
                         FrPagChave            
     		       FROM ContasAReceber
                    LEFT JOIN FormaPagamento on FrPagId = CnAReFormaPagamento
-    		       WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " . $_GET['lancamentoId'] . "";
+    		       WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " . $_POST['inputMovimentacaoFinanceiraId'] . "";
 
         $result = $conn->query($sql);
         $lancamento = $result->fetch(PDO::FETCH_ASSOC);
@@ -781,7 +781,11 @@ $dataInicio = date("Y-m-d");
                     </div>
                   </div>
 
-                  <button id="salvar" class="btn btn-principal">Salvar</button>
+                  <?php 
+                    if ($_SESSION['MovFinancPermissionAtualiza']) {
+                        echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
+                      }
+                  ?>
                   <?php if($_SESSION['Conciliacao'] === true) { ?>
                     <a href="movimentacaoFinanceiraConciliacao.php" class="btn">Cancelar</a>
                   <?php } else { ?>

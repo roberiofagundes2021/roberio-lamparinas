@@ -10,22 +10,27 @@ include('global_assets/php/conexao.php');
 if (isset($_POST['inputFluxoOperacionalId'])) {
 
 	$_SESSION['FluxoId'] = $_POST['inputFluxoOperacionalId'];
+	$_SESSION['Origem'] = $_POST['inputOrigem'];
 }
 
 $iFluxoOperacional = $_SESSION['FluxoId'];
 
 try {
 
-	$sql = "SELECT FlOpeId, FlOpeNumContrato, FlOpeCategoria, FlOpeSubCategoria, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
-				   SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, FlOpeStatus, SituaChave
+	//Dados do Fluxo
+	$sql = "SELECT FlOpeId, FlOpeNumContrato, FlOpeCategoria, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
+				   FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, FlOpeStatus, SituaChave,
+					 dbo.fnSubCategoriasIdFluxo(FlOpeUnidade, FlOpeId) as FlOpeSubCategoria
 			FROM FluxoOperacional
-			LEFT JOIN Fornecedor on ForneId = FlOpeFornecedor
-			LEFT JOIN Categoria on CategId = FlOpeCategoria
-			LEFT JOIN SubCategoria on SbCatId = FlOpeSubCategoria
-			LEFT JOIN Situacao on SituaId = FlOpeStatus
+			JOIN Fornecedor on ForneId = FlOpeFornecedor
+			JOIN Categoria on CategId = FlOpeCategoria
+			JOIN Situacao on SituaId = FlOpeStatus
 			WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
+
+	$sSubCategorias = $row['FlOpeSubCategoria'];
+
 
 	$sql = "SELECT AditiId, AditiNumero, AditiDtInicio, AditiDtFim, AditiValor, AditiDtCelebracao
 			FROM Aditivo
@@ -96,12 +101,12 @@ try {
 		}); //document.ready
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaAditivo(FluxoId, AditiId, Categoria, SubCategoria, Situacao, Tipo) {
+		function atualizaAditivo(FluxoId, AditiId, Categoria, SubCategorias, Situacao, Tipo) {
 
 			document.getElementById('inputFluxoId').value = FluxoId;
 			document.getElementById('inputAditivoId').value = AditiId;
 			document.getElementById('inputCategoria').value = Categoria;
-			document.getElementById('inputSubCategoria').value = SubCategoria;
+			document.getElementById('inputSubCategorias').value = SubCategorias;
 
 
 			if (Tipo == 'novo') {
@@ -157,6 +162,11 @@ try {
 						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional"
 							class="form-control" value="<?php echo $row['FlOpeId']; ?>">
 
+						<input type="hidden" id="inputFluxoId" name="inputFluxoId">
+						<input type="hidden" id="inputAditivoId" name="inputAditivoId">
+						<input type="hidden" id="inputCategoria" name="inputCategoria">
+						<input type="hidden" id="inputSubCategorias" name="inputSubCategorias">		
+
 						<div class="card-body">
 
 							<div class="row">
@@ -200,18 +210,36 @@ try {
 													class="form-control" value="<?php echo $row['FlOpeCategoria']; ?>">
 											</div>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-5">
 											<div class="form-group">
-												<label for="inputCategoriaNome">SubCategoria</label>
-												<input type="text" id="inputSubCategoriaNome"
-													name="inputSubCategoriaNome" class="form-control"
-													value="<?php echo $row['SbCatNome']; ?>" readOnly>
-												<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria"
-													class="form-control"
-													value="<?php echo $row['FlOpeSubCategoria']; ?>">
+												<label for="inputSubCategoriaNome">SubCategoria(s)</label>
+
+												<?php 
+													if ($sSubCategorias == 0){
+														echo '<input id="inputSemSubCategoriaNome" name="inputSemSubCategoriaNome" class="form-control" value="" readOnly >';
+													} else{
+
+														echo '<select id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control multiselect-filtering" multiple="multiple" data-fouc>';
+															
+														$sql = "SELECT SbCatId, SbCatNome
+																FROM SubCategoria
+																JOIN Situacao on SituaId = SbCatStatus	
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+																ORDER BY SbCatNome ASC"; 
+														$result = $conn->query($sql);
+														$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+														$count = count($rowBD);														
+																
+														foreach ( $rowBD as $item){	
+															print('<option value="'.$item['SbCatId,'].'"disabled selected>'.$item['SbCatNome'].'</option>');	
+														}                    
+														
+														echo '</select>';
+													}  
+												?>													
 											</div>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputContrato">Contrato</label>
 												<input type="text" id="inputContrato" name="inputContrato"
@@ -219,7 +247,7 @@ try {
 													readOnly>
 											</div>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputProcesso">Processo</label>
 												<input type="text" id="inputProcesso" name="inputProcesso"
@@ -259,9 +287,8 @@ try {
 												<div class="col-lg-6 font-size-lg">A relação abaixo faz referência aos
 													aditivos do fluxo acima</div>
 												<div class="col-lg-6 text-right">
-													<a href="fluxo.php" class="btn btn-classic" role="button">Voltar</a>
-													<a href="#"
-														onclick="atualizaAditivo('<?php echo $row['FlOpeId']; ?>', '0', '<?php echo $row['FlOpeCategoria'] ?>', '<?php echo $row['FlOpeSubCategoria'] ?>','<?php echo $row['SituaChave']; ?>', 'novo');"
+													<a href="<?php echo $_SESSION['Origem']; ?>" class="btn btn-classic" role="button">Voltar</a>
+													<a href="#"	onclick="atualizaAditivo('<?php echo $row['FlOpeId']; ?>', '0', '<?php echo $row['FlOpeCategoria'] ?>', '<?php echo $sSubCategorias ?>','<?php echo $row['SituaChave']; ?>', 'novo');"
 														class="btn btn-principal" role="button">Novo Aditivo </a>
 												</div>
 											</div>
@@ -355,13 +382,6 @@ try {
 							</div>
 
 							<!-- /info blocks -->
-
-							<form name="formAditivo" method="post">
-								<input type="hidden" id="inputFluxoId" name="inputFluxoId">
-								<input type="hidden" id="inputAditivoId" name="inputAditivoId">
-								<input type="hidden" id="inputCategoria" name="inputCategoria">
-								<input type="hidden" id="inputSubCategoria" name="inputSubCategoria">
-							</form>
 
 						</div>
 						<!-- /card-body -->

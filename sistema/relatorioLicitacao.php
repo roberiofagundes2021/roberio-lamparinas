@@ -23,10 +23,10 @@ $m = date("m");
 $Y = date("Y");
 
 $dataInicio = date('Y')."-01-01";  //date("Y-m-d", mktime(0, 0, 0, $m, $d - 30, $Y)); //30 dias atrás
-$dataFim = date('Y')."-12-31"; //date("Y-m-d");
+$dataFim =  date("Y-12-31", mktime(0, 0, 0, $m, $d, $Y + 1)); //1 ano a mais
 
 
-$sql = "SELECT PerfiNome
+$sql = "SELECT PerfiChave
         FROM Usuario
         JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
         JOIN Perfil on PerfiId = EXUXPPerfil
@@ -352,26 +352,32 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
             let resultadosConsulta = '';
             let inputsValues = {};
 
-            (function Filtrar() {
+            function Filtrar() {
                 let cont = false;
 
-                $('#submitFiltro').on('click', (e) => {
-                    e.preventDefault()
+                const msg = $('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%; text-align: center">Filtrando...</td></tr>')
 
-                    const msg = $('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%; text-align: center">Nenhum registro encontrado...</td></tr>')
+                let dataDe = $('#inputDataDe').val()
+                let dataAte = $('#inputDataAte').val()
+                let unidade = $('#cmbUnidade').val()
+                let empresaContratada = $('#cmbEmpresaContratada').val()
+                let categoria = $('#cmbCategoria').val()
+                let classificacao = $('#cmbClassificacao').val()
+                let modalidade = $('#cmbModalidade').val()
+                let prioridade = $('#cmbPrioridade').val()
+                let status = $('#cmbStatus').val()
+                let url = "relatorioLicitacaoFiltra.php";
+                    
+                if (dataDe == '' || dataAte == ''){
+                    if (dataDe == ''){
+                        alerta('Atenção', 'Data inicial inválida', 'error');
+                    } else {
+                        alerta('Atenção', 'Data final inválida', 'error');
+                    }                    
+                    return false;
+                } else {
 
-                    $('tbody').html('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%; text-align: center"><i class="icon-spinner2 spinner"></i></td></tr>')
-
-                    let dataDe = $('#inputDataDe').val()
-                    let dataAte = $('#inputDataAte').val()
-                    let unidade = $('#cmbUnidade').val()
-                    let empresaContratada = $('#cmbEmpresaContratada').val()
-                    let categoria = $('#cmbCategoria').val()
-                    let classificacao = $('#cmbClassificacao').val()
-                    let modalidade = $('#cmbModalidade').val()
-                    let prioridade = $('#cmbPrioridade').val()
-                    let status = $('#cmbStatus').val()
-                    let url = "relatorioLicitacaoFiltra.php";
+                    $('tbody').html(msg)
 
                     inputsValues = {
                         inputDataDe: dataDe,
@@ -396,13 +402,22 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                 resultadosConsulta = data
                                 modalAcoes()
                             } else {
-                                $('tbody').html(msg)
+                                const msgErro = $('<tr class="odd"><td valign="top" colspan="10" class="dataTables_empty" style="width: 100%; text-align: center">Nenhum registro encontrado...</td></tr>')
+                                $('tbody').html(msgErro)
                                 $('#imprimir').attr('disabled', '')
                             }
                         }
                     );
-                })
-            })()
+                }
+            }
+
+            $('#submitFiltro').on('click', (e) => {
+                e.preventDefault()
+                Filtrar(false)
+            })
+
+            Filtrar(true)
+            
 
             $('#salvar').on('click', function(e) {
                 let prioridade = $('#cmbPrioridadeEdit').val()
@@ -551,7 +566,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-2">
                                         <div class="form-group">
                                             <label for="cmbStatus">Status</label>
                                             <select id="cmbStatus" name="cmbStatus" class="form-control form-control-select2">
@@ -565,9 +580,9 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                                 $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                 foreach ($rowSituacao as $item) {
-                                                    if ($item['SituaChave'] == 'ATIVO') {
+                                                    if ($item['SituaChave'] == 'LIBERADO') {
                                                         print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-                                                    } else if ($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "NAOLIBERADO") {
+                                                    } else if ($item['SituaChave'] == "AGUARDANDOLIBERACAO" || $item['SituaChave'] == "PENDENTE" || $item['SituaChave']  == "FINALIZADO" || $item['SituaChave'] == "LIBERADO"|| $item['SituaChave'] == "NAOLIBERADO") {
                                                         print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
                                                     }
                                                 }
@@ -575,22 +590,22 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-4">
                                         <div class="form-group">
                                             <label for="cmbEmpresaContratada">Empresa Contratada</label>
                                             <select id="cmbEmpresaContratada" name="cmbEmpresaContratada" class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
-                                                $sql = "SELECT ForneId, ForneNome
+                                                $sql = "SELECT ForneId, ForneRazaoSocial
                                                         FROM Fornecedor
                                                         JOIN Situacao on SituaId = ForneStatus
                                                         WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                        ORDER BY ForneNome ASC";
+                                                        ORDER BY ForneRazaoSocial ASC";
                                                 $result = $conn->query($sql);
                                                 $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                 foreach ($rowFornecedor as $item) {
-                                                    print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                                                    print('<option value="' . $item['ForneId'] . '">' . $item['ForneRazaoSocial'] . '</option>');
                                                 }
                                                 ?>
                                             </select>
@@ -672,7 +687,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3" style="display:<?php if($rowPerfil['PerfiNome'] != 'Controladoria') echo 'none' ?>">
+                                    <div class="col-lg-3" style="display:<?php if($rowPerfil['PerfiChave'] != 'CONTROLADORIA') echo 'none' ?>">
                                         <div class="form-group">
                                             <label for="cmbUnidade">Local</label>
                                             <select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
@@ -782,7 +797,11 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                 <div class="row" style="margin-top: 10px;">
                                     <div class="col-lg-12">
                                         <div class="form-group">
-                                            <button class="btn btn-lg btn-principal" id="salvar">Salvar</button>
+                                            <?php 
+                                               if ($atualizar) {
+                                                echo' <button class="btn btn-lg btn-principal" id="salvar">Salvar</button>';
+                                                }
+                                            ?>
                                             <a class="btn btn-basic modal-close" role="button">Cancelar</a>
                                         </div>
                                     </div>

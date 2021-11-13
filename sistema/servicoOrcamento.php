@@ -106,21 +106,28 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			/* Fim: Tabela Personalizada */			
 		});
 			
-		function atualizaOrcamento(SrOrcId, SrOrcNome, SrOrcStatus, Tipo){
-
+		function atualizaOrcamento(Permission, SrOrcId, SrOrcNome, SrOrcStatus, Tipo){
+            
+			
 			document.getElementById('inputSrOrcId').value = SrOrcId;
 			document.getElementById('inputSrOrcNome').value = SrOrcNome;
 			document.getElementById('inputSrOrcStatus').value = SrOrcStatus;
-					
+			document.getElementById('inputPermission').value = Permission;
+
 			if (Tipo == 'edita'){	
 				document.formSrOrc.action = "servicoOrcamentoEdita.php";		
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formSrOrc, "Tem certeza que deseja excluir esse serviço?", "servicoOrcamentoExclui.php");
 			} else if (Tipo == 'mudaStatus'){
 				document.formSrOrc.action = "servicoOrcamentoMudaStatus.php";
+			} else if (Tipo == 'exclui'){
+				if(Permission){
+					confirmaExclusao(document.formSrOrc, "Tem certeza que deseja excluir esse serviço?", "servicoOrcamentoExclui.php");
+				} else{
+					alerta('Permissão Negada!','');
+					return false;
+				}
 			}
 
-			document.formSrOrc.submit();
+			document.formSrOrc.submit();		
 		}
 			
 	</script>
@@ -195,13 +202,13 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['SbCatNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaOrcamento('.$item['SrOrcId'].', \''.htmlentities(addslashes($item['SrOrcNome']), ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaOrcamento(1,'.$item['SrOrcId'].', \''.htmlentities(addslashes($item['SrOrcNome']), ENT_QUOTES).'\',\''.$item['SituaChave'].'\', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaOrcamento('.$item['SrOrcId'].', \''.htmlentities(addslashes($item['SrOrcNome']), ENT_QUOTES).'\','.$item['SrOrcSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar Serviço"></i></a>
-														<a href="#" onclick="atualizaOrcamento('.$item['SrOrcId'].', \''.htmlentities(addslashes($item['SrOrcNome']), ENT_QUOTES).'\','.$item['SrOrcSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir Serviço"></i></a>							
+														<a href="#" onclick="atualizaOrcamento('.$atualizar.','.$item['SrOrcId'].', \''.htmlentities(addslashes($item['SrOrcNome']), ENT_QUOTES).'\','.$item['SrOrcSituacao'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar Serviço"></i></a>
+														<a href="#" onclick="atualizaOrcamento('.$excluir.','.$item['SrOrcId'].', \''.htmlentities(addslashes($item['SrOrcNome']), ENT_QUOTES).'\','.$item['SrOrcSituacao'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir Serviço"></i></a>							
 													</div>
 												</div>
 											</td>
@@ -214,6 +221,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					</div>
 				</div>				
 				<form name="formSrOrc" method="post">
+					<input type="hidden" id="inputPermission" name="inputPermission" >
 					<input type="hidden" id="inputSrOrcId" name="inputSrOrcId" >
 					<input type="hidden" id="inputSrOrcNome" name="inputSrOrcNome" >
 					<input type="hidden" id="inputSrOrcStatus" name="inputSrOrcStatus" >

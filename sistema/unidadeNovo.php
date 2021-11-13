@@ -32,8 +32,56 @@ if(isset($_POST['inputNome'])){
 						':iEmpresa' => $_SESSION['EmpresaId'],
 						));
 
-		$insertId = $conn->lastInsertId();				
-		
+    // adicionar permissões à nova unidade
+
+    // seleciona a nova unidade
+    $sqlUnidade = "SELECT UnidaId FROM Unidade
+    WHERE UnidaNome = ".$_POST['inputNome']." and UnidaEmpresa = ".$_SESSION['EmpresaId'];
+    $sqlUnidade = $conn->query($sqlUnidade);
+    $sqlUnidade = $sqlUnidade->fetch(PDO::FETCH_ASSOC);
+
+    // seleciona todos os menus cadastrados
+    $sqlMenu = "SELECT MenuId FROM Menu";
+    $sqlMenu = $conn->query($sqlMenu);
+    $sqlMenu = $sqlMenu->fetchAll(PDO::FETCH_ASSOC);
+
+    // seleciona todos os perfis cadastrados
+    $sqlPerfil = "SELECT PerfiId FROM Perfil";
+    $sqlPerfil = $conn->query($sqlPerfil);
+    $sqlPerfil = $sqlPerfil->fetchAll(PDO::FETCH_ASSOC);
+
+    // Laço de repetição, para cada perfil será adicionado todos os menus com permissões padrões
+    foreach($sqlPerfil as $perfil){
+      $sql = "INSERT INTO PerfilXPermissao(PrXPePerfil,PrXPeMenu,PrXPeInserir,PrXPeVisualizar,PrXPeAtualizar,PrXPeExcluir,PrXPeUnidade) VALUES";
+      $count = COUNT($sqlMenu);
+      $x = 0;
+      foreach($sqlMenu as $menu){
+              if ($x != $count - 1){
+                      $x += 1;
+                      $sql .= " ($perfil[PerfiId], $menu[MenuId], 1, 1, 1, 1, $sqlUnidade[UnidaId]),";
+              } else {
+                      $sql .= " ($perfil[PerfiId], $menu[MenuId], 1, 1, 1, 1, $sqlUnidade[UnidaId])";
+              }
+      }
+      $conn->query($sql);
+}
+
+		$insertId = $conn->lastInsertId();
+    
+    /* Após criar a Unidade deve se cadastrar o Local de Estoque Padrão para essa Unidade nova criada */
+    $sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstChave, LcEstStatus, LcEstUsuarioAtualizador, LcEstUnidade)
+					VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+    $result = $conn->prepare($sql);
+        
+    $result->execute(array(
+            ':sNome' => 'GESTAO ANTERIOR',
+            ':sChave' => 'GESTAOANTERIOR',
+            ':bStatus' => 1,
+            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+            ':iUnidade' => $insertId
+            ));
+
+  
 		/* Após criar a Unidade deve se cadastrar as Formas de Pagamento Padrão para essa Unidade nova criada */
 		$sql = "INSERT INTO FormaPagamento (FrPagNome, FrPagChave, FrPagStatus, FrPagUsuarioAtualizador, FrPagUnidade)
 				VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";
@@ -186,6 +234,11 @@ if(isset($_POST['inputNome'])){
     $('#enviar').on('click', function(e) {
 
       e.preventDefault();
+
+      // subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
+				var cep = $("#inputCep").val()
+				cep = cep.replace(' ','')
+				$("#inputCep").val(cep)
 
       let inputNome = $('#inputNome').val();
       let inputCep = $('#inputCep').val();

@@ -102,6 +102,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
@@ -226,26 +227,29 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaSubCategoria(SbCatId, SbCatNome,  SbCatCategoria, SbCatStatus, Tipo){
-		
-			document.getElementById('inputSubCategoriaId').value = SbCatId;
-			document.getElementById('cmbCategoria').value = SbCatCategoria;
-			document.getElementById('inputSubCategoriaNome').value = SbCatNome;
-			document.getElementById('inputSubCategoriaStatus').value = SbCatStatus;
-					
-			if (Tipo == 'edita'){	
-				document.getElementById('inputEstadoAtual').value = "EDITA";
-				document.formSubCategoria.action = "subCategoria.php";	
-			} else if (Tipo == 'exclui'){
-				confirmaExclusao(document.formSubCategoria, "Tem certeza que deseja excluir essa subcategoria?", "subcategoriaExclui.php");
-			} else if (Tipo == 'mudaStatus'){
-				document.formSubCategoria.action = "subcategoriaMudaSituacao.php";
-			} else if (Tipo == 'imprime'){
-				document.formSubCategoria.action = "subcategoriaImprime.php";
-				document.formSubCategoria.setAttribute("target", "_blank");
+		function atualizaSubCategoria(Permission, SbCatId, SbCatNome,  SbCatCategoria, SbCatStatus, Tipo){
+			if (Permission == 1){
+				document.getElementById('inputSubCategoriaId').value = SbCatId;
+				document.getElementById('cmbCategoria').value = SbCatCategoria;
+				document.getElementById('inputSubCategoriaNome').value = SbCatNome;
+				document.getElementById('inputSubCategoriaStatus').value = SbCatStatus;
+						
+				if (Tipo == 'edita'){	
+					document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formSubCategoria.action = "subCategoria.php";	
+				} else if (Tipo == 'exclui'){
+					confirmaExclusao(document.formSubCategoria, "Tem certeza que deseja excluir essa subcategoria?", "subcategoriaExclui.php");
+				} else if (Tipo == 'mudaStatus'){
+					document.formSubCategoria.action = "subcategoriaMudaSituacao.php";
+				} else if (Tipo == 'imprime'){
+					document.formSubCategoria.action = "subcategoriaImprime.php";
+					document.formSubCategoria.setAttribute("target", "_blank");
+				}
+				
+				document.formSubCategoria.submit();
+		    } else{
+				alerta('Permissão Negada!','');
 			}
-			
-			document.formSubCategoria.submit();
 		}		
 			
 	</script>
@@ -296,7 +300,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										</div>
 										<div class="col-lg-4">
 											<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
-											<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+											<select id="cmbCategoria" name="cmbCategoria" class="form-control select-search" required>
 												<option value="">Selecione</option>
 												<?php 
 													$sql = "SELECT CategId, CategNome
@@ -358,13 +362,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['CategNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].', '.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaSubCategoria(1,'.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].', '.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaSubCategoria('.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														<a href="#" onclick="atualizaSubCategoria('.$atualizar.','.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaSubCategoria('.$excluir.','.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
 											</td>

@@ -9,9 +9,6 @@ include('global_assets/php/conexao.php');
 if (isset($_POST['inputData'])) {
 
 	try {
-
-		//var_dump($_POST);die;
-
 		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
 										  MovimChaveAcesso, MovimSituacao, MovimUsuarioAtualizador, MovimUnidade)
@@ -27,6 +24,7 @@ if (isset($_POST['inputData'])) {
 		 gravaData($_POST['inputDataEmissao']), $_POST['inputNumSerie'], gravaValor($_POST['inputValorTotal']), $_POST['inputChaveAcesso'],
 		 $_POST['cmbSituacao'], $_SESSION['UsuarId'], $_SESSION['EmpreId']);
 		die;*/
+
 		$conn->beginTransaction();
 
 		$result->execute(array(
@@ -46,7 +44,7 @@ if (isset($_POST['inputData'])) {
 			':iFornecedor' => $_POST['cmbFornecedor'] == '' ? null : $_POST['cmbFornecedor'],
 			':iOrdemCompra' => $_POST['cmbOrdemCompra'] == '' ? null : $_POST['cmbOrdemCompra'],
 			':sNotaFiscal' => $_POST['inputNotaFiscal'] == '' ? null : $_POST['inputNotaFiscal'],
-			':dDataEmissao' => $_POST['inputDataEmissao'] == '' ? null : gravaData($_POST['inputDataEmissao']),
+			':dDataEmissao' => $_POST['inputDataEmissao'] == '' ? null : $_POST['inputDataEmissao'],
 			':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
 			':fValorTotal' => $_POST['inputValorTotal'] == '' ? null : gravaValor($_POST['inputValorTotal']),
 			':sChaveAcesso' => $_POST['inputChaveAcesso'] == '' ? null : $_POST['inputChaveAcesso'],
@@ -70,6 +68,8 @@ if (isset($_POST['inputData'])) {
 			if (isset($_POST[$campo])) {
 				//var_dump($campo);
 				$registro = explode('#', $_POST[$campo]);
+				// var_dump($registro);
+				// exit();
 
 				if ($registro[0] == 'P') {
 
@@ -77,9 +77,12 @@ if (isset($_POST['inputData'])) {
 
 					if ((int) $registro[3] > 0) {
 						$sql = "INSERT INTO MovimentacaoXProduto
-								(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+								(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote,
+								MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio,
+								MvXPrAnoFabricacao, MvXPrNumSerie)
 								VALUES 
-								(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
+								(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao,
+								:iUsuarioAtualizador, :iUnidade, :iPatrimonio, :iFabricacao, :iNumSerie)";
 						$result = $conn->prepare($sql);
 
 						$result->execute(array(
@@ -89,7 +92,9 @@ if (isset($_POST['inputData'])) {
 							':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 							':sLote' => $registro[5],
 							':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
-							':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+							':iNumSerie' => isset($registro[7])? $registro[7] : '',
+							':iFabricacao' => $registro[8] != '0' ? $registro[8] : gravaData('12/09/2333') ? $registro[8] : null,
+							':iClassificacao' => isset($registro[9]) ? (int) $registro[9] : null,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId'],
 							':iPatrimonio' => null
@@ -106,7 +111,7 @@ if (isset($_POST['inputData'])) {
 						':iMovimentacao' => $insertId,
 						':iServico' => $registro[1],
 						':iQuantidade' => (int) $registro[3],
-						':fValorUnitario' => $registro[2] != '' ? (float) $registro[2] : null,
+						':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
 					));
@@ -125,7 +130,7 @@ if (isset($_POST['inputData'])) {
 
 			$destinoChave = '';
 
-			if ($rowSituacao['SituaChave'] == 'AGUARDANDOLIBERACAO') $destinoChave = 'CENTROADMINISTRATIVO';
+			if ($rowSituacao['SituaChave'] == 'AGUARDANDOLIBERACAOCENTRO') $destinoChave = 'CENTROADMINISTRATIVO';
 			if ($rowSituacao['SituaChave'] == 'PENDENTE') $destinoChave = 'ALMOXARIFADO';
 
 			if ($rowSituacao['SituaChave'] != 'LIBERADO') {
@@ -243,14 +248,12 @@ if (isset($_POST['inputData'])) {
 
 		function produtosOrdemCompra(ordemCompra) {
 			let inputLote = $('#inputLote').val();
-			let numOrdemCompra = $('#cmbOrdemCompra').val()
 
 			$.ajax({
 				type: "POST",
 				url: "movimentacaoAddProdutoOrdemCompra.php",
 				data: {
 					ordemCompra: ordemCompra,
-					numOrdemCompra: numOrdemCompra,
 					lote: inputLote
 				},
 				success: function(resposta) {
@@ -293,6 +296,7 @@ if (isset($_POST['inputData'])) {
 					if ($(elem).attr('idRow') == linha.attr('id')) {
 						let tds = linha.children();
 						let tipoProdutoServico = $(tds[9]).attr('tipo');
+						$('#tipo').val(tipoProdutoServico)
 
 						let valores = [];
 
@@ -314,32 +318,30 @@ if (isset($_POST['inputData'])) {
 
 							cabecalho = `
 							               
-							                <tr class="bg-slate">
-											     <th width="5%">Item</th>
-											     <th width="75%">Serviço</th>
-											     <th width="10%">Quantidade</th>
-												 <th width="10%">Saldo</th>
-											     <th width="10%"></th>
-									     	</tr>
-							                    `;
+														<tr class="bg-slate">
+															<th width="5%">Item</th>
+															<th width="75%">Serviço</th>
+															<th width="10%">Quantidade</th>
+															<th width="10%">Saldo</th>
+														</tr>`;
 
 							linhaTabela = `<tr id='trModal'>
-						                        <td>${valores[0]}</td>
-												<td>${valores[1]}</td>
-												<td><input id='quantidade' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus></td>
-												<td><input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled></td>
-											</tr>
-						                  `;
+															<td>${valores[0]}</td>
+															<td>${valores[1]}</td>
+															<td><input id='quantidade' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus></td>
+															<td><input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled></td>
+														</tr>`;
 						} else {
-							cabecalho = `
-							             	<tr class="bg-slate">
-												<th width="5%">Item</th>
-												<th width="45%">Produto</th>
-												<th width="8%">Quantidade</th>
-												<th width="10%">Saldo</th>
-												<th width="10%">Lote</th>
-												<th width="12%">Validade</th>
-								    		</tr>
+							cabecalho = `<tr class="bg-slate">
+														<th width="5%">Item</th>
+														<th width="40%">Produto</th>
+														<th width="5%">Quantidade</th>
+														<th width="5%">Saldo</th>
+														<th width="10%">Lote</th>
+														<th width="15%">Nº Série/Chassi</th>
+														<th width="10%">Fabricação</th>
+														<th width="10%">Validade</th>
+													</tr>
 												`;
 
 							linhaTabela = `<tr id='trModal'>
@@ -348,6 +350,8 @@ if (isset($_POST['inputData'])) {
 												<td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus></td>
 												<td><input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center"  disabled></td>
 												<td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
+												<td><input id='numSerie' type="text" class="form-control" value="" style="text-align: center"></td>
+												<td><input id='fabricacao' type="date" class="form-control" value="" style="text-align: center"></td>
 												<td><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
 											</tr>
 											`;
@@ -390,6 +394,7 @@ if (isset($_POST['inputData'])) {
 
 					let td = tr.first()
 					let indiceLinha = td.html()
+					// console.log(elem1)
 
 					tdsModal.each((i, elem2) => {
 						let indiceProdutoModal = $(elem2).html()
@@ -398,10 +403,12 @@ if (isset($_POST['inputData'])) {
 
 						if (i == 0 && indiceProdutoModal == indiceLinha) {
 
-							let novaQuantidade = $(tdsModal[2]).children().val() // pegando a quantidade digitada pelo usuário
-							let saldo = $(tdsModal[3]).children().val() // pegando o saldo do produto
-							let lote = $(tdsModal[4]).children().val() // pegando o lote digitado pelo usuário
-							let validade = $(tdsModal[5]).children().val() // pegando a validade digitada pelo usuário
+							let novaQuantidade = ($(tdsModal[2]).children().val()? $(tdsModal[2]).children().val(): '') // pegando a quantidade digitada pelo usuário
+							let saldo = ($(tdsModal[3]).children().val()? $(tdsModal[3]).children().val(): '') // pegando o saldo do produto
+							let lote = ($(tdsModal[4]).children().val()? $(tdsModal[4]).children().val(): '') // pegando o lote digitado pelo usuário
+							let numSerie = ($(tdsModal[5]).children().val()? $(tdsModal[5]).children().val(): '') // pegando o Nº Serie digitado pelo usuário
+							let fabricacao = ($(tdsModal[6]).children().val()? $(tdsModal[6]).children().val(): '') // pegando ano de fabricação digitado pelo usuário
+							let validade = ($(tdsModal[7]).children().val()? $(tdsModal[7]).children().val(): '') // pegando a validade digitada pelo usuário
 
 							let inputProdutoGridValores = inputHiddenProdutoServico.val()
 							let arrayValInput = inputProdutoGridValores.split('#')
@@ -411,6 +418,8 @@ if (isset($_POST['inputData'])) {
 							arrayValInput[4] = saldo
 							arrayValInput[5] = lote
 							arrayValInput[6] = validade
+							arrayValInput[7] = numSerie
+							arrayValInput[8] = fabricacao
 
 							var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
 
@@ -429,13 +438,12 @@ if (isset($_POST['inputData'])) {
 							$(tr[6]).attr('valorTotalSomaGeral', novosValores.somaTotalValorGeral)
 							$(tr[7]).html(formatDate(validade, 'pt-BR'))
 
-							console.log(novosValores.somaTotalValorGeral);
-
 							$('#inputNumItens').val()
 							stringVallnput = ''
 
 							// O input itemEditadoquantidade recebe como valor a ultima quantidade editada, para garantir que pelo menos uma quantidade de produtos ou serviços foi editada 
 							$('#itemEditadoquantidade').val(novaQuantidade)
+							$('#validadeNaoInformada').val(validade)
 
 						}
 					})
@@ -485,43 +493,41 @@ if (isset($_POST['inputData'])) {
 			$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`).attr('valor', novoTotalGeral)
 		}
 
-		function calcSaldoOrdemCompra() {
-			let valorTotal = $('#total').attr('valor')
-			let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial') ///??????????????????? undefined
-
-			//console.log(valorTotal)
-			//console.log(valorSaldoOrdemCompra)
-
-			let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
-
-			if (calcSaldoAtual < 0) {
-				alerta('Atenção', 'O valor total da Ordem de Compra foi ultrapaçado.', 'error');
-				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
-				return
-			} else {
-				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
-			}
-		}
-
 		function inputsModal() {
 			$('#tbody-modal')
 		}
 
-		function verificaTotalNotaFiscal() {
-			let valorTotalNotaFiscal = $('#inputValorTotal').val().replace('.', '').replace(',', '.')
-			let valorTotalNotaFiscalGrid = $('#total').attr('valor')
-
-			if (parseFloat(valorTotalNotaFiscalGrid) != parseFloat(valorTotalNotaFiscal)) {
-				alerta('Atenção', 'O valor total da Nota Fiscal informado não corresponde ao total da entrada.', 'error');
-				$('#inputValorTotal').focus();
-				$("#formMovimentacao").submit((e) => {
-					e.preventDefault()
-				})
-				return false
-			}
-		}
-
 		$(document).ready(function() {
+
+			function verificaTotalNotaFiscal() {
+				let valorTotalNotaFiscal = $('#inputValorTotal').val().replace('.', '').replace(',', '.')
+				let valorTotalNotaFiscalGrid = $('#total').attr('valor')
+
+				if (parseFloat(valorTotalNotaFiscalGrid) != parseFloat(valorTotalNotaFiscal)) {
+					alerta('Atenção', 'O valor total da Nota Fiscal informado não corresponde ao total da entrada.', 'error');
+					$('#inputValorTotal').focus();
+					return false;
+				}
+
+				return true;
+			}
+
+			function calcSaldoOrdemCompra() {
+				let valorTotal = $('#total').attr('valor')
+				let valorSaldoOrdemCompra = $("#totalSaldo").attr('valorTotalInicial')
+				let calcSaldoAtual = (parseFloat(valorSaldoOrdemCompra) - parseFloat(valorTotal))
+
+				if (calcSaldoAtual < 0) {
+					alerta('Atenção', 'O valor total da Ordem de Compra foi ultrapassado.', 'error');
+					$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
+					$('#inputValorTotal').focus();
+					return false;
+				} 
+				
+				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
+
+				return true;
+			}			
 
 			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
@@ -548,7 +554,10 @@ if (isset($_POST['inputData'])) {
 			});
 
 			$('#cmbOrdemCompra').on('change', function() {
+				
 				var ordemCompra = '';
+
+				//Buscao o ID da OrdemCompra que está no atributo idOrdemCompra do option do select (pra usar logo abaixo)
 				$('#cmbOrdemCompra').children().each((i, elem) => {
 					if ($(elem).val() == $('#cmbOrdemCompra').val()) {
 						ordemCompra = $(elem).attr('idOrdemCompra');
@@ -565,6 +574,10 @@ if (isset($_POST['inputData'])) {
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e) {
 
+				// close modal
+				$('#page-modal').fadeOut(200);
+				$('body').css('overflow', 'scroll');
+
 				var inputTotal = $('#inputTotal').val();
 				var cmbOrdemCompra = $('#cmbOrdemCompra').val();
 				var cmbFornecedor = $('#cmbFornecedor').val();
@@ -577,28 +590,24 @@ if (isset($_POST['inputData'])) {
 				if (cmbDestinoLocal == '') {
 					alerta('Atenção', 'Informe o Estoque de Destino!', 'error');
 					$('#cmbDestinoLocal').focus();
-					$("#formMovimentacao").submit();
 					return false;
 				}
 
 				if (cmbFornecedor == '') {
 					alerta('Atenção', 'Informe o Fornecedor!', 'error');
-					$('#cmbFornecedor').focus();
-					$("#formMovimentacao").submit();
+					$('#cmbFornecedor').focus();	
 					return false;
 				}
 
 				if (cmbOrdemCompra == '') {
 					alerta('Atenção', 'Informe a Ordem Compra / Carta Contrato!', 'error');
 					$('#cmbOrdemCompra').focus();
-					$("#formMovimentacao").submit();
 					return false;
 				}
 
 				if (inputValorTotal == '') {
 					alerta('Atenção', 'Informe o Valor Total da Nota Fiscal!', 'error');
 					$('#inputValorTotal').focus();
-					$("#formMovimentacao").submit();
 					return false;
 				}
 
@@ -608,7 +617,7 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
-				if (validadeNaoInformada > 0) {
+				if (validadeNaoInformada == '' && $('#tipo').val() != 'S') {
 					alerta('Atenção', 'Tem itens sem validade!', 'error');
 					return false;
 				}				
@@ -618,7 +627,9 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
-				verificaTotalNotaFiscal();
+				if (!verificaTotalNotaFiscal()){
+					return false;
+				}
 
 				//Verifica se tem algum produto na Grid
 				if (inputTotal == '' || inputTotal == 0) {
@@ -634,9 +645,16 @@ if (isset($_POST['inputData'])) {
 					return false;
 				}
 
+				if (!calcSaldoOrdemCompra()){
+					return false;
+				}
+
 				//desabilita as combos "Fornecedor" e "Situacao" na hora de gravar, senão o POST não o encontra
 				//$('#cmbFornecedor').prop('disabled', false);
 				$('#cmbSituacao').prop('disabled', false);
+
+				//desabilita o botão Incluir evitando duplo clique, ou seja, evitando inserções duplicadas
+				$('#enviar').prop("disabled", true);
 
 				$("#formMovimentacao").submit();
 
@@ -661,12 +679,14 @@ if (isset($_POST['inputData'])) {
 
 		function selecionaTipo(tipo) {
 
-			$('#divConteudo').css({
-				"background-color": "#eeeded",
-				"box-shadow": "none"
-			});
-			$('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
-
+			// $('#divConteudo').css({
+			// 	"background-color": "#eeeded",
+			// 	"box-shadow": "none"
+			// });
+			// $('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
+			
+			// setTimeout(() => {
+			// }, 3000);
 			if (tipo == 'E') {
 				location.href = 'movimentacaoNovoEntrada.php';
 			} else if (tipo == 'S') {
@@ -763,6 +783,7 @@ if (isset($_POST['inputData'])) {
 
 					<form name="formMovimentacao" id="formMovimentacao" method="post" class="form-validate-jquery" action="movimentacaoNovoEntrada.php">
 						<div class="card-body">
+							<input type="hidden" name="tipo" id="tipo" value="" />
 
 							<div class="row">
 								<div class="col-lg-12">
@@ -869,7 +890,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputDataEmissao">Data Emissão</label>
-												<input type="text" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data NF">
+												<input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data NF">
 											</div>
 										</div>
 
@@ -902,7 +923,7 @@ if (isset($_POST['inputData'])) {
 							<div id="inputProdutos">
 								<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">
 								<input type="hidden" id="itemEditadoquantidade" name="itemEditadoquantidade" value="0">
-								<input type="text" id="validadeNaoInformada" name="validadeNaoInformada" value="0">
+								<input type="hidden" id="validadeNaoInformada" name="validadeNaoInformada" value="0">
 								<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">
 								<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
 								<input type="hidden" id="inputTotal" name="inputTotal" value="0">
@@ -957,8 +978,6 @@ if (isset($_POST['inputData'])) {
 									<div class="row">
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputSituacao">Situação</label>
-
 												<?php
 
 												$sql = "SELECT SituaId, SituaNome, SituaChave
@@ -970,12 +989,13 @@ if (isset($_POST['inputData'])) {
 
 												if ($_SESSION['PerfiChave'] == 'CENTROADMINISTRATIVO' || $_SESSION['PerfiChave'] == 'ADMINISTRADOR') {
 
-													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" required>');
+													print('<label for="inputSituacao">Situação</label>
+													<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" required value="0">');
 													print('<option value="">Selecione</option>');
 
 													foreach ($row as $item) {
-														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
-															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
+														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCENTRO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
+															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCENTRO') {
 																print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
 															} else {
 																print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
@@ -983,17 +1003,22 @@ if (isset($_POST['inputData'])) {
 														}
 													}
 												} else {
-
-													print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
-													print('<option value="#">Selecione</option>');
-
 													foreach ($row as $item) {
-														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
-															print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-														} else if ($item['SituaChave'] == 'LIBERADO') {
-															print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCENTRO') {
+															print('<input name="cmbSituacao" value="' . $item['SituaId'] . '" type="hidden" />');
 														}
 													}
+
+													// print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
+													// print('<option value="#">Selecione</option>');
+
+													// foreach ($row as $item) {
+													// 	if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCENTRO') {
+													// 		print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
+													// 	} else if ($item['SituaChave'] == 'LIBERADO') {
+													// 		print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
+													// 	}
+													// }
 												}
 												?>
 												</select>
@@ -1021,14 +1046,14 @@ if (isset($_POST['inputData'])) {
 				<!-- /info blocks -->
 
 				<div id="page-modal" class="custon-modal">
-					<div class="custon-modal-container">
-						<div class="card custon-modal-content">
+					<div class="custon-modal-container" style="width:90%">
+						<div class="card custon-modal-content" style="width:100%">
 							<div class="custon-modal-title">
 								<i class=""></i>
 								<p class="h3">Itens Recebidos</p>
 								<i class=""></i>
 							</div>
-							<div class="card-footer mt-2 d-flex flex-column">
+							<div class="card-footer mt-2 d-flex flex-column" style="width:100%">
 								<table class="table table-modal">
 									<thead id="thead-modal">
 

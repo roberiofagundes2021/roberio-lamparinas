@@ -7,17 +7,14 @@ if (isset($_POST['numParcelas'])) {
 
     $sql = "SELECT * 
             FROM ContasAReceber
-       LEFT JOIN Cleinte 
-              ON ClienId = CnAReCliente
-           WHERE CnAReId = " . $_POST['idConta'] . " and CnAReUnidade = " . $_SESSION['UnidadeId'] . "
-    ";
+            LEFT JOIN Cliente ON ClienId = CnAReCliente
+            WHERE CnAReId = ".$_POST['idConta']." and CnAReUnidade = " . $_SESSION['UnidadeId'];
     $result = $conn->query($sql);
     $conta = $result->fetch(PDO::FETCH_ASSOC);
 
     $sql = "SELECT SituaId
-	          FROM Situacao
-             WHERE SituaChave = 'ARECEBER'";
-
+	        FROM Situacao
+            WHERE SituaChave = 'ARECEBER'";
     $result = $conn->query($sql);
     $situacao = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -31,7 +28,7 @@ if (isset($_POST['numParcelas'])) {
         $sql = "INSERT INTO ContasAReceber ( CnARePlanoContas, 
                                              CnAReCliente, 
                                              CnAReContaBanco, 
-                                             CnAReFormaRecebimento, 
+                                             CnAReFormaPagamento, 
                                              CnAReNumDocumento,
                                              CnAReDtEmissao, 
                                              CnAReDescricao, 
@@ -65,7 +62,7 @@ if (isset($_POST['numParcelas'])) {
             ':iPlanoContas'         => $conta['CnARePlanoContas'],
             ':iCliente'             => $conta['CnAReCliente'],
             ':iContaBanco'          => $conta['CnAReContaBanco'],
-            ':iFormaRecebimento'    => $conta['CnAReFormaRecebimento'],
+            ':iFormaRecebimento'    => $conta['CnAReFormaPagamento'],
             ':sNumDocumento'        => $conta['CnAReNumDocumento'],
             ':dateDtEmissao'        => $conta['CnAReDtEmissao'],
             ':sDescricao'           => $parcelas[$i]['descricao'],
@@ -79,6 +76,13 @@ if (isset($_POST['numParcelas'])) {
             ':iUnidade'             => $_SESSION['UnidadeId']
         ));
 
+		$sql = "DELETE FROM ContasAReceber
+				WHERE CnAReId = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $_POST['idConta']);
+		$result->execute();        
+
+/*
         $parcelaId = $conn->lastInsertId();
         $status = 'À Receber';
         $numeroLinhasNaGrid++;
@@ -94,7 +98,7 @@ if (isset($_POST['numParcelas'])) {
             <td class='even'><a href='contasAPagarNovoLancamento.php?lancamentoId=" . $parcelaId . "'>" . $parcelas[$i]['descricao'] . "</a></td>
             <td class='even'>" . $conta['ClienNome'] . "</td>
             <td class='even' style='text-align: center'>" . $conta['CnAReNumDocumento'] . "</td>
-            <td class='even' style='text-align: center'>" . $parcelas[$i]['valor'] . "</td>
+            <td class='even' style='text-align: right'>" . $parcelas[$i]['valor'] . "</td>
             <td class='even' style='text-align: center'>" . $status . "</td>
             <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>
             <div class='list-icons'>
@@ -114,6 +118,6 @@ if (isset($_POST['numParcelas'])) {
                 </div>
             </td>
         </tr>
-        ");
+        ");*/
     }
 }

@@ -1,22 +1,118 @@
 <?php
+  include('global_assets/php/conexao.php');
+  $unidade = $_SESSION['UnidadeId'];
+  $perfil = $_SESSION['PerfiChave'];
+  $userId = $_SESSION['UsuarId'];
 
-			$arquivosFornecedor = array(
-				'fornecedor.php', 'fornecedorNovo.php', 'fornecedorEdita.php', 'fornecedorExclui.php', 'fornecedorMudaSituacao.php'
-			);
 
-			$arquivosProduto = array(
-				'produto.php', 'produtoNovo.php', 'produtoEdita.php', 'produtoExclui.php', 'produtoMudaSituacao.php'
-			);			
+  $sqlUser = "SELECT UsuarPermissaoPerfil
+  FROM Usuario
+  Where UsuarId = '$userId'";
 
-			$arquivosServico = array(
-				'servico.php', 'servicoNovo.php', 'servicoEdita.php', 'servicoExclui.php', 'servicoMudaSituacao.php'
-			);			
+  $resultUserId = $conn->query($sqlUser);
+  $usuaXPerm = $resultUserId->fetch(PDO::FETCH_ASSOC);
 
-			$arquivosInventario = array(
-				'inventario.php', 'inventarioNovo.php', 'inventarioEdita.php', 'inventarioExclui.php', 'inventarioMudaSituacao.php'
-			);			
-		
-		?>
+  $userPermission = (isset($usuaXPerm['UsuarPermissaoPerfil'])?$usuaXPerm['UsuarPermissaoPerfil']:0);
+
+  $sqlPerfil = "SELECT PerfiId FROM Perfil
+  WHERE PerfiChave = '$perfil'";
+
+  $resultPerfilId = $conn->query($sqlPerfil);
+  $perfilId = $resultPerfilId->fetchAll(PDO::FETCH_ASSOC);
+  $perfilId = $perfilId[0]['PerfiId'];
+
+  //Recupera todos os módulos do sistema
+  $sqlModulo = "SELECT ModulId, ModulOrdem, ModulNome, ModulStatus, SituaChave, SituaCor
+                FROM Modulo 
+                JOIN Situacao on ModulStatus = SituaId 
+                ORDER BY ModulOrdem ASC";
+
+  $resultModulo = $conn->query($sqlModulo);
+  $modulo = $resultModulo->fetchAll(PDO::FETCH_ASSOC);
+
+  //Recupera todos os menus do sistema caso esteja usando permissao personalizada
+
+  if($usuaXPerm['UsuarPermissaoPerfil'] == 0){
+    $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
+                MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, MenuSetorPrivado,
+                UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeInserir, UsXPeUnidade
+                FROM Menu
+                JOIN Situacao on MenuStatus = SituaId
+                JOIN UsuarioXPermissao on UsXPeUsuario = '$userId' and UsXPeUnidade = '$unidade' and UsXPeMenu = MenuId
+                ORDER BY MenuOrdem ASC";
+  } else {
+    $sqlMenu = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
+                MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, PrXPeId, PrXPePerfil, MenuSetorPrivado,
+                PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeInserir, PrXPeUnidade
+                FROM Menu
+                JOIN Situacao on MenuStatus = SituaId
+                JOIN PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$perfilId' and PrXPeUnidade  = '$unidade'
+                ORDER BY MenuOrdem ASC";
+  }
+  $resultMenu = $conn->query($sqlMenu);
+  $menu = $resultMenu->fetchAll(PDO::FETCH_ASSOC);
+  $arrayPermissao = [];
+  // primeiramente faz a varredura das visibilidade dos subMenu para setar a visibilidade do menuPai
+  foreach($menu as $menuPai){
+    // adiciona as paginas e suas permissões em um array
+    if(strtoupper($menuPai['SituaChave']) == "ATIVO"){
+      array_push($arrayPermissao, Array(
+        'url'=>$menuPai['MenuUrl'],
+        'posicao'=>$menuPai['MenuPosicao'],
+        'visualizar'=>(isset($menuPai['UsXPeVisualizar'])?$menuPai['UsXPeVisualizar']:$menuPai['PrXPeVisualizar']),
+        'inserir'=>(isset($menuPai['UsXPeInserir'])?$menuPai['UsXPeInserir']:$menuPai['PrXPeInserir']),
+        'atualizar'=>(isset($menuPai['PrXPeAtualizar'])?$menuPai['PrXPeAtualizar']:$menuPai['UsXPeAtualizar']),
+        'excluir'=>(isset($menuPai['PrXPeExcluir'])?$menuPai['PrXPeExcluir']:$menuPai['UsXPeExcluir']),
+      ));
+    }
+    $position = array_search($menuPai, $menu);
+    $menuContente = 0;
+    // verifica em cada menuPai se existe algum submenu com visibilidade true, se sim ele o menuPai será visivel
+    foreach($menu as $subMenu){
+      if ($menuPai['MenuId'] == $subMenu['MenuPai']){
+        $visualizar = (isset($subMenu['UsXPeVisualizar'])?$subMenu['UsXPeVisualizar']:$subMenu['PrXPeVisualizar']);
+
+        // altera a o valor do visualizar modulo para 1 caso tenha algo para exibir ou 0 se não houver
+        if($visualizar == 1 && $subMenu['MenuPosicao']=='PRINCIPAL'){
+          $menuContente = 1;
+        }
+        // seta a visibilidade do menuPai em 0 ou 1 de acordo com a visibilidae dos subMenus
+        if(isset($menuPai['UsXPeVisualizar'])){$menu[$position]['UsXPeVisualizar'] = $menuContente;}
+        else{$menu[$position]['PrXPeVisualizar'] = $menuContente;}
+      }
+    }
+  }
+  // adiciona o arry em uma session para ser acessado em outras páginas
+  $_SESSION['Permissoes'] = $arrayPermissao;
+  // Faz uma varredura para identificar quais modulos irão aparecer de
+  // acordo com a visibilidade dos menus já atualizadas
+  foreach($modulo as $mod){
+    $menuCont = 0;
+    if($mod['SituaChave'] == strtoupper("ativo")){
+      // percorre os menus para verificar se existe algum menu pertencente ao modulo que tenha visibilidade true
+      foreach($menu as $men){
+        if($men["SituaChave"] == strtoupper("ativo") && $men["MenuModulo"] == $mod["ModulId"] && $men['MenuPai']==0){
+          $visualizar = (isset($men['UsXPeVisualizar'])?$men['UsXPeVisualizar']:$men['PrXPeVisualizar']);
+          if($visualizar == 1 && $men['MenuPosicao'] == 'PRINCIPAL'){
+            $menuCont = 1;
+          }
+        }
+      }
+      // seta o valor conteudo no modulo em 0 ou 1 de acordo com a visibilidade dos menus 
+      $positionMenu = array_search($mod, $modulo);
+      $modulo[$positionMenu]['conteudo'] = $menuCont;
+    }
+  }
+
+  //Recupera o parâmetro pra saber se a empresa é pública ou privada
+  $sqlParametro = "SELECT ParamEmpresaPublica 
+                   FROM Parametro
+                   WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+  $resultParametro = $conn->query($sqlParametro);
+  $parametro = $resultParametro->fetch(PDO::FETCH_ASSOC);	
+  
+  $empresa = $parametro['ParamEmpresaPublica'] ? 'Publica' : 'Privada';
+?>
 
 <!-- Main sidebar -->
 <div class="sidebar sidebar-dark sidebar-main sidebar-expand-md">
@@ -60,7 +156,7 @@
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="icon-user-plus"></i>
-              <span>Meu Perfil</span>
+              <span>Meu Perfil</span><?php echo $userId; ?>
             </a>
           </li>
           <!--<li class="nav-item">
@@ -97,143 +193,57 @@
     <!-- Main navigation -->
     <div class="card card-sidebar-mobile">
       <ul class="nav nav-sidebar" data-nav-type="accordion">
+      <?php
+          foreach($modulo as $mod){
+            if($mod['SituaChave'] == strtoupper("ativo")  && $mod['conteudo'] == 1){
+              echo '<li class="nav-item-header">
+                      <div class="text-uppercase font-size-xs line-height-xs">'.$mod['ModulNome'].'</div>
+                    </li>';
+              foreach($menu as $men){
+                $visualizar = (isset($men['UsXPeVisualizar'])?$men['UsXPeVisualizar']:$men['PrXPeVisualizar']);
+                if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo") && $men['MenuPosicao']=='PRINCIPAL'){  
+                  
+                  //Empresa pública e o menu visível para o Setor Público ou Empresa Privada e o menu visível para o Setor Privado
+                  if($visualizar == 1){
+                    if ((($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado']))){
+                        echo  (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
+                          '<a href="'.$men['MenuUrl'].'"';
+                          if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
+                            {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
+                          echo '<i class="'.$men['MenuIco'].'"></i>
+                          <span>'.
+                            $men['MenuNome']
+                          .'</span>
+                        </a>';
+                    }
+                  }
 
-        <!-- Main -->
-        <li class="nav-item-header">
-          <div class="text-uppercase font-size-xs line-height-xs">Principal</div> <i class="icon-menu" title="Main"></i>
-        </li>
-        <li class="nav-item">
-          <a href="index.php" <?php if (basename($_SERVER['PHP_SELF']) == 'index.php') { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
-            <i class="icon-home4"></i>
-            <span>
-              Página Inicial
-            </span>
-          </a>
-        </li>
-        <!-- /main -->
+                  if($men['MenuSubMenu'] == 1) {
+                    echo '<ul class="nav nav-group-sub" data-submenu-title="Text editors">';
 
-        <!-- Forms -->
-        <li class="nav-item-header">
-          <div class="text-uppercase font-size-xs line-height-xs">Controle de Estoque</div> <i class="icon-menu" title="Forms"></i>
-        </li>
+                    foreach($menu as $men_f){
+                      $visualizar_f = (isset($men_f['UsXPeVisualizar'])?$men_f['UsXPeVisualizar']:$men_f['PrXPeVisualizar']);
+                  
+                      if($men_f['MenuPai'] == $men['MenuId'] && $visualizar_f == 1 && $men_f['MenuPosicao']=='PRINCIPAL'){
+                        // mostra todos os submenus e caso a rota destino(MenuUrl) seja "estoqueMinimoImprime.php"
+                        // ele abrirá em uma nova aba
+                        if (($empresa == 'Publica' && $men_f['MenuSetorPublico']) || ($empresa == 'Privada' && $men_f['MenuSetorPrivado'])){
+                          echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link"'
+                          .($men_f['MenuUrl']=='estoqueMinimoImprime.php'? ' target="_blank" >':'>').$men_f['MenuNome'].'</a></li>';
+                        }
+                      } 
+                    } 
+                    
+                    echo '</ul>';
+                  }
 
-        <li class="nav-item nav-item-submenu">
-          <a href="#" class="nav-link"> <span>Apoio</span></a>
-          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
-            <li class="nav-item"><a href="categoria.php" class="nav-link">Categoria</a></li>
-            <li class="nav-item"><a href="subcategoria.php" class="nav-link">SubCategoria</a></li>
-            <li class="nav-item"><a href="marca.php" class="nav-link">Marca</a></li>
-            <li class="nav-item"><a href="modelo.php" class="nav-link">Modelo</a></li>
-            <li class="nav-item"><a href="fabricante.php" class="nav-link">Fabricante</a></li>
-            <li class="nav-item"><a href="unidademedida.php" class="nav-link">Unidade de Medida</a></li>
-            <li class="nav-item"><a href="produtoOrcamento.php" class="nav-link">Produtos para Orçamento</a></li>
-            <li class="nav-item"><a href="servicoOrcamento.php" class="nav-link">Serviços para Orçamento</a></li>
-          </ul>
-        </li>
-
-        <li class="nav-item">
-          <a href="fornecedor.php" <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosFornecedor)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
-            <i class="icon-users2"></i> <span>Fornecedor</span></a>
-        </li>
-        <li class="nav-item">
-          <a href="produto.php" <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosProduto)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
-            <i class="icon-gift"></i> <span>Produto</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="servico.php" <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosServico)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
-            <i class="icon-cogs"></i><span>Serviços</span>
-          </a>
-        </li>
-        <li class="nav-item nav-item-submenu">
-          <a href="#" class="nav-link"><i class="icon-drawer3"></i> <span>Processo Licitatório</span></a>
-          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
-            <li class="nav-item"><a href="tr.php" class="nav-link">Termo de Referência</a></li>
-            <li class="nav-item"><a href="relatorioLicitacao.php" class="nav-link">Rol de Licitações</a></li>
-          </ul>
-        </li>        
-        <li class="nav-item nav-item-submenu">
-          <a href="#" class="nav-link"><i class="icon-bag"></i> <span>Compras</span></a>
-          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
-            <li class="nav-item"><a href="orcamento.php" class="nav-link">Orçamento</a></li>
-            <li class="nav-item"><a href="solicitacao.php" class="nav-link">Solicitação</a></li>
-            <li class="nav-item"><a href="ordemcompra.php" class="nav-link">Ordem de Compra</a></li>
-          </ul>
-        </li>
-        <li class="nav-item nav-item-submenu">
-          <a href="#" class="nav-link"><i class="icon-stack2"></i> <span>Gerenciamento do Estoque</span></a>
-          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
-            <li class="nav-item"><a href="movimentacao.php" class="nav-link">Movimentação</a></li>
-            <li class="nav-item"><a href="fluxo.php" class="nav-link">Fluxo Operacional</a></li>
-            <li class="nav-item"><a href="estoqueMinimoImprime.php" class="nav-link" target="_blank">Estoque Minimo</a></li>
-          </ul>
-        </li>
-
-        <li class="nav-item">
-          <a href="inventario.php" <?php if (in_array(basename($_SERVER['PHP_SELF']), $arquivosInventario)) { echo 'class="nav-link active"'; } else{ echo 'class="nav-link"';} ?>>
-            <i class="icon-paste2"></i> <span>Inventário</span>
-          </a>
-        </li>
-        <li class="nav-item nav-item-submenu">
-          <a href="#" class="nav-link"><i class="icon-stack-text"></i> <span>Relatórios</span></a>
-          <ul class="nav nav-group-sub" data-submenu-title="Form layouts">
-            <li class="nav-item"><a href="relatorioMovimentacao.php" class="nav-link">Movimentação</a></li>
-            <li class="nav-item"><a href="relatorioMovimentacaoPatrimonio.php" class="nav-link">Movimentação do Patrimônio</a></li>
-            <li class="nav-item"><a href="relatorioCurvaABC.php" class="nav-link">Curva ABC</a></li>
-          </ul>
-        </li>
-        <!-- /Controle de Estoque -->
-
-        <!-- Financeiro -->
-        <li class="nav-item-header">
-          <div class="text-uppercase font-size-xs line-height-xs">Financeiro</div> <i class="icon-menu" title="Forms"></i>
-        </li>
-
-        <li class="nav-item nav-item-submenu">
-          <a href="#" class="nav-link"> <span>Apoio</span></a>
-          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
-            <li class="nav-item"><a href="caixa.php" class="nav-link">Caixa</a></li>
-            <li class="nav-item"><a href="centroCusto.php" class="nav-link">Centro de Custo</a></li>            
-            <li class="nav-item"><a href="contaBanco.php" class="nav-link">Conta</a></li>
-            <li class="nav-item"><a href="formaPagamento.php" class="nav-link">Forma de Pagamento</a></li>            
-            <li class="nav-item"><a href="grupo.php" class="nav-link">Grupos</a></li>
-            <li class="nav-item"><a href="planoContas.php" class="nav-link">Plano de Contas</a></li>            
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a href="contasAPagar.php" class="nav-link"><i class="icon-cash"></i> <span>Contas à Pagar</span></a>
-          <a href="contasAReceber.php" class="nav-link"><i class="icon-cash2"></i> <span>Contas à Receber</span></a>
-          <a href="movimentacaoFinanceira.php" class="nav-link"><i class="icon-coins"></i> <span>Movimentação</span></a>
-          <a href="movimentacaoFinanceiraConciliacao.php" class="nav-link"><i class="icon-coins"></i> <span>Conciliação</span></a>
-          <a href="fluxoDeCaixa.php" class="nav-link"><i class="icon-calendar"></i> <span>Fluxo de caixa</span></a>
-        </li>
-        <li class="nav-item nav-item-submenu">
-          <a href="#" class="nav-link"> <span>Relatórios</span></a>
-          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
-            <li class="nav-item"><a href="#" class="nav-link">Cheques Emitidos</a></li>
-          </ul>
-        </li>
-
-        <!-- /Financeiro -->
-
-        <!-- Vendas -->
-        <li class="nav-item-header">
-          <div class="text-uppercase font-size-xs line-height-xs">Vendas</div> <i class="icon-menu" title="Forms"></i>
-        </li>
-
-        <li class="nav-item nav-item-submenu">
-          <a href="#" class="nav-link"> <span>Apoio</span></a>
-          <ul class="nav nav-group-sub" data-submenu-title="Text editors">
-            <li class="nav-item"><a href="cliente.php" class="nav-link">Cliente</a></li>
-          </ul>
-        </li>
-        <!-- /Vendas -->
+                  echo '</li>';
+                }
+              }
+            }
+          }?>
       </ul>
     </div>
-    <!-- /main navigation -->
-
+    <!-- /Main navigation -->
   </div>
-  <!-- /sidebar content -->
-
 </div>
-<!-- /main sidebar -->

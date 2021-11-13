@@ -200,6 +200,11 @@ if(isset($_POST['inputCnpj'])){
 			$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
+
+				// subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
+				var cep = $("#inputCep").val()
+				cep = cep.replace(' ','')
+				$("#inputCep").val(cep)
 				
 				//pega só os números do campo CNPJ
 				var inputCnpjNovo  = $('#inputCnpj').val().replace(/[^\d]+/g,'');
@@ -572,7 +577,11 @@ if(isset($_POST['inputCnpj'])){
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>
+										<?php
+											if ($_POST['inputPermission']) {	
+												echo '<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>';
+											}
+										?>	
 										<a href="empresa.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

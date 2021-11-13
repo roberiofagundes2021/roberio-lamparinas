@@ -231,11 +231,11 @@ if (isset($_POST['inputDataEmissao'])) {
   irpara("movimentacaoFinanceira.php");
 }
 
-if (isset($_GET['lancamentoId'])) {
+if (isset($_POST['inputMovimentacaoFinanceiraId'])) {
     $sql = "SELECT  *
               FROM  ContasTransferencia
              WHERE  CnTraUnidade = " . $_SESSION['UnidadeId'] . "
-               AND  CnTraId = " . $_GET['lancamentoId'] . "";
+               AND  CnTraId = " . $_POST['inputMovimentacaoFinanceiraId'] . "";
     $result = $conn->query($sql);
     $lancamento = $result->fetch(PDO::FETCH_ASSOC);
 }
@@ -586,7 +586,11 @@ $dataInicio = date("Y-m-d");
                       </div>
                     </div>
                   <?php } else { ?>
-                    <button id="salvar" class="btn btn-principal">Salvar</button>
+                  <?php 
+                    if ($_SESSION['MovFinancPermissionAtualiza']) {
+                        echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
+                    }
+                  ?>
                     
                     <?php if($_SESSION['Conciliacao'] === true) { ?>
                       <a href="movimentacaoFinanceiraConciliacao.php" class="btn">Cancelar</a>

@@ -50,49 +50,51 @@ if (isset($_POST['inputIdOrcamento'])) {
 	}
 }
 
-try {
+$sql = "SELECT *
+		FROM TRXOrcamento
+		LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
+		JOIN Categoria on CategId = TrXOrCategoria
+		LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
+		JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+		JOIN Situacao  ON SituaId = TrRefStatus
+		WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+$iTR = $row['TrXOrTermoReferencia'];
 
-	$sql = "SELECT *
-			FROM TRXOrcamento
-			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
-			JOIN Categoria on CategId = TrXOrCategoria
-			LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
-			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
-	$result = $conn->query($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
-	//////////////////////////////////////////////////////////////////////////////////////////////////
-	$sql = "SELECT SbCatId, SbCatNome
-				 FROM SubCategoria
-				 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-				 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $_SESSION['TRId'] . "
-				 ORDER BY SbCatNome ASC";
-	$result = $conn->query($sql);
-	$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-			
-			$aSubCategorias = '';
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
-		foreach ($rowSubCategoria as $item) {
-			
-			if ($aSubCategorias == '') {
-				$aSubCategorias .= $item['SbCatId'];
-			} else {
-				$aSubCategorias .= ", ".$item['SbCatId'];
-			}
-		}
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	$sql = "SELECT TXOXSServico
-			FROM  TRXOrcamentoXServico
-			JOIN Servico on ServiId = TXOXSServico
-			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento;
-	$result = $conn->query($sql);
-	$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countServicoUtilizado = count($rowServicoUtilizado);
+$sql = "SELECT SbCatId, SbCatNome
+		FROM SubCategoria
+		JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
+		WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $_SESSION['TRId'] . "
+		ORDER BY SbCatNome ASC";
+$result = $conn->query($sql);
+$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+		
+$aSubCategorias = '';
 
-	foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
-		$aServico[] = $itemServicoUtilizado['TXOXSServico'];
+foreach ($rowSubCategoria as $item) {
+	
+	if ($aSubCategorias == '') {
+		$aSubCategorias .= $item['SbCatId'];
+	} else {
+		$aSubCategorias .= ", ".$item['SbCatId'];
 	}
-} catch (PDOException $e) {
-	echo 'Error: ' . $e->getMessage();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+$sql = "SELECT TXOXSServico
+		FROM  TRXOrcamentoXServico
+		JOIN Servico on ServiId = TXOXSServico
+		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento;
+$result = $conn->query($sql);
+$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+$countServicoUtilizado = count($rowServicoUtilizado);
+
+foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
+	$aServico[] = $itemServicoUtilizado['TXOXSServico'];
 }
 
 ?>
@@ -121,83 +123,62 @@ try {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+
 		$(document).ready(function() {
 
-			//Ao mudar a SubCategoria, filtra o produto via ajax (retorno via JSON)
-			$('#cmbServico').on('change', function(e) {
+			/* ao pressionar uma tecla em um campo que seja de class="pula" */
+			$('.pula').keypress(function(e){
+				/*
+					* verifica se o evento é Keycode (para IE e outros browsers)
+					* se não for pega o evento Which (Firefox)
+				*/
+				var tecla = (e.keyCode?e.keyCode:e.which);
 
-				var inputCategoria = $('#inputIdCategoria').val();
-				var inputSubCategoria = $('#inputIdSubCategoria').val();
-				var servicos = $(this).val();
-				//console.log(servicos);
-
-				var cont = 1;
-				var servicoId = [];
-				var servicoQuant = [];
-				var servicoValor = [];
-
-				// Aqui é para cada "class" faça
-				$.each($(".idServico"), function() {
-					servicoId[cont] = $(this).val();
-					cont++;
-				});
-
-				cont = 1;
-				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
-				$.each($(".Quantidade"), function() {
-					$id = servicoId[cont];
-
-					servicoQuant[$id] = $(this).val();
-					cont++;
-				});
-
-				cont = 1;
-				$.each($(".ValorUnitario"), function() {
-					$id = servicoId[cont];
-
-					servicoValor[$id] = $(this).val();
-					cont++;
-				});
-
-				$.ajax({
-					type: "POST",
-					url: "orcamentoFiltraServico.php",
-					data: {
-						idCategoria: inputCategoria,
-						idSubCategoria: inputSubCategoria,
-						servicos: servicos,
-						servicoId: servicoId,
-						servicoQuant: servicoQuant,
-						servicoValor: servicoValor
-					},
-					success: function(resposta) {
-						//alert(resposta);
-						$("#tabelaServicos").html(resposta).show();
-
-						return false;
-
+				/* verifica se a tecla pressionada foi o ENTER */
+				if(tecla == 13){
+					/* guarda o seletor do campo que foi pressionado Enter */
+					campo =  $('.pula');
+					/* pega o indice do elemento*/
+					indice = campo.index(this);
+					/*soma mais um ao indice e verifica se não é null
+					*se não for é porque existe outro elemento
+					*/
+					if(campo[indice+1] != null){
+						/* adiciona mais 1 no valor do indice */
+						proximo = campo[indice + 1];
+						/* passa o foco para o proximo elemento */
+						proximo.focus();
 					}
-				});
-			});
+				} else {
+					return onlynumber(e);
+				}
 
-		}); //document.ready
+				/* impede o sumbit caso esteja dentro de um form */
+				e.preventDefault(e);
+				return false;
+            });
+		});	
 
-		//Mostra o "Filtrando..." na combo Servico
-		function FiltraServico() {
-			$('#cmbServico').empty().append('<option>Filtrando...</option>');
-		}
+		//Referência: https://forum.fluig.com/1398-calculo-de-valor-total (isso aqui resolve os números com milhões)
+		function convertStringFloat(valor){
+    
+			if (valor.indexOf(',') == -1) {
 
-		function ResetServico() {
-			$('#cmbServico').empty().append('<option>Sem produto</option>');
-		}
+			} else {
+				valor = String(valor).split(".").join("").replace(",",".");
+			}
+			valor = parseFloat(valor);
+
+			return valor;
+		}		
 
 		function calculaValorTotal(id) {
 
-			var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : $('#inputValorTotal' + id + '').val().replace('.', '').replace(',', '.');
-			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+			var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : convertStringFloat($('#inputValorTotal' + id + '').val());
+			var TotalGeralAnterior = convertStringFloat($('#inputTotalGeral').val());
 
 			var Quantidade = $('#inputQuantidade' + id + '').val().trim() == '' ? 0 : $('#inputQuantidade' + id + '').val();
-			var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : $('#inputValorUnitario' + id + '').val().replace('.', '').replace(',', '.');
+			var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : convertStringFloat($('#inputValorUnitario' + id + '').val());
 			var ValorTotal = 0;
 
 			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
@@ -294,40 +275,6 @@ try {
 											</div>
 										</div>
 									</div>
-									<!--<div class="row">	
-										<div class="col-lg-12">
-											<div class="form-group">
-												<label for="cmbServico">Servico</label>
-												<select id="cmbServico" name="cmbServico" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
-													<? php/* 
-														$sql = "SELECT ServiId, ServiNome
-																FROM Servico										     
-																WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and ServiStatus = 1 and ServiCategoria = ".$iCategoria;
-														
-														if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-															$sql .= " and ServiSubCategoria = ".$row['OrcamSubCategoria'];
-														}
-														
-														$sql .= " ORDER BY ServiNome ASC";
-														$result = $conn->query($sql);
-														$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);														
-														
-														foreach ($rowServico as $item){	
-															
-															if (in_array($item['ServiId'], $aServicos) or $countServicoUtilizado == 0) {
-																$seleciona = "selected";
-															} else {
-																$seleciona = "";
-															}													
-															
-															print('<option value="'.$item['ServiId'].'" '.$seleciona.'>'.$item['ServiNome'].'</option>');
-														}
-													
-													*/ ?>
-												</select>
-											</div>
-										</div>
-									</div>-->
 								</div>
 							</div>
 
@@ -353,51 +300,30 @@ try {
 
 									<?php
 
-									$sql = "SELECT *
-			                                    FROM TRXOrcamento
-			                                    LEFT JOIN Fornecedor on ForneId = TRXOrFornecedor
-			                                    JOIN Categoria on CategId = TRXOrCategoria
-			                                    LEFT JOIN SubCategoria on SbCatId = TRXOrSubCategoria
-			                                    WHERE TRXOrUnidade = " . $_SESSION['UnidadeId'] . " and TRXOrId = " . $iOrcamento;
-									$result = $conn->query($sql);
-									$row = $result->fetch(PDO::FETCH_ASSOC);
-									$iTR = $row['TrXOrTermoReferencia'];
-
 									// Selects para identificar quais servicos de TermoReferenciaXServico pertencem a TR deste Orçamento e a qual tabela eles pertencem
 									$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, TRXSrQuantidade
 											FROM ServicoOrcamento
 											JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
-											WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'";
+											JOIN SubCategoria on SbCatId = SrOrcSubCategoria
+											WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'
+											ORDER BY SbCatNome, SrOrcNome ASC";
 									$result = $conn->query($sql);
 									$rowServicosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
 									$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, TRXSrQuantidade
 											FROM Servico
 											JOIN TermoReferenciaXServico on TRXSrServico = ServiId
-											WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
+											JOIN SubCategoria on SbCatId = ServiSubCategoria
+											WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'
+											ORDER BY SbCatNome, ServiNome ASC";
 									$result = $conn->query($sql);
 									$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-
-									/*if (!$count){
-											$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, SrOrcUnidadeMedida
-													FROM ServicoOrcamento
-													LEFT JOIN UnidadeMedida on UnMedId = SrOrcUnidadeMedida
-													WHERE SrOrcEmpresa = ".$_SESSION['EmpreId']." and SrOrcSubcategoria = ".$iCategoria." and SrOrcSituacao = 1 ";
-													
-											if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null){
-												$sql .= " and SrOrcSubcategoria = ".$row['OrcamSubCategoria'];
-											}
-											$result = $conn->query($sql);
-											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-										} */
 
 									$cont = 0;
 
 									print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-9">
+											<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
@@ -417,7 +343,7 @@ try {
 													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-1">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -431,12 +357,14 @@ try {
 									if (count($rowServicosOrcamento) >= 1) {
 
 										$sql = "SELECT *
-											    FROM  TRXOrcamentoXServico 
+											    FROM TRXOrcamentoXServico 
 												JOIN ServicoOrcamento on SrOrcId = TXOXSServico
-											    WHERE TXOXSUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento;
+												JOIN SubCategoria on SbCatId = SrOrcSubCategoria
+											    WHERE TXOXSUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento."
+												ORDER BY SbCatNome, SrOrcNome ASC";
 										$result = $conn->query($sql);
 										$rowServicosOrc = $result->fetchAll(PDO::FETCH_ASSOC);
-										$countServicoOrc = count($rowServicos);
+										$countServicoOrc = count($rowServicosOrc);
 
 										if ($countServicoOrc >= 1) {
 
@@ -452,7 +380,7 @@ try {
 
 												print('
 											        <div class="row" style="margin-top: 8px;">
-												        <div class="col-lg-9">
+												        <div class="col-lg-8">
 													        <div class="row">
 														        <div class="col-lg-1">
 															        <input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -464,13 +392,13 @@ try {
 													        </div>
 												        </div>								
 												        <div class="col-lg-1">
-													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" readOnly value="' . $iQuantidade . '">
+													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" value="' . $iQuantidade . '" readOnly>
 												        </div>	
 												        <div class="col-lg-1">
-													         <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
+													         <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
 												        </div>	
-												        <div class="col-lg-1">
-													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" value="' . $fValorTotal . '" readOnly>
+												        <div class="col-lg-2">
+													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" style="text-align: right;" value="' . $fValorTotal . '" readOnly>
 												        </div>											
 													</div>');
 											}
@@ -488,7 +416,7 @@ try {
 
 												print('
 											        <div class="row" style="margin-top: 8px;">
-												        <div class="col-lg-9">
+												        <div class="col-lg-8">
 													        <div class="row">
 														        <div class="col-lg-1">
 															        <input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -500,13 +428,13 @@ try {
 													        </div>
 												        </div>								
 												        <div class="col-lg-1">
-													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" readOnly value="' . $iQuantidade . '">
+													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" value="' . $iQuantidade . '" readOnly>
 												        </div>	
 												        <div class="col-lg-1">
-													        <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12">
+													        <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12">
 												        </div>	
-												        <div class="col-lg-1">
-													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" value="' . $fValorTotal . '" readOnly>
+												        <div class="col-lg-2">
+													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" style="text-align: right;" value="' . $fValorTotal . '" readOnly>
 												        </div>
 												   </div>');
 											}
@@ -516,7 +444,9 @@ try {
 										$sql = "SELECT *
 											    FROM  TRXOrcamentoXServico 
 												JOIN Servico on ServiId = TXOXSServico
-											    WHERE TXOXSUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento;
+												JOIN SubCategoria on SbCatId = ServiSubCategoria
+											    WHERE TXOXSUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento."
+												ORDER BY SbCatNome, ServiNome ASC";
 										$result = $conn->query($sql);
 										$rowTRServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countServicos = count($rowTRServicos);
@@ -535,7 +465,7 @@ try {
 
 												print('
 											        <div class="row" style="margin-top: 8px;">
-												        <div class="col-lg-9">
+												        <div class="col-lg-8">
 													        <div class="row">
 														        <div class="col-lg-1">
 															        <input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -547,13 +477,13 @@ try {
 													        </div>
 												        </div>								
 												        <div class="col-lg-1">
-													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" readOnly value="' . $iQuantidade . '">
+													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" value="' . $iQuantidade . '" readOnly>
 												        </div>	
 												        <div class="col-lg-1">
-													         <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
+													         <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
 												        </div>	
-												        <div class="col-lg-1">
-													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" value="' . $fValorTotal . '" readOnly>
+												        <div class="col-lg-2">
+													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" style="text-align: right;" value="' . $fValorTotal . '" readOnly>
 												        </div>											
 													</div>');
 											}
@@ -571,7 +501,7 @@ try {
 
 												print('
 											        <div class="row" style="margin-top: 8px;">
-												        <div class="col-lg-9">
+												        <div class="col-lg-8">
 													        <div class="row">
 														        <div class="col-lg-1">
 															        <input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -583,13 +513,13 @@ try {
 													        </div>
 												        </div>								
 												        <div class="col-lg-1">
-													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" readOnly value="' . $iQuantidade . '">
+													        <input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border-off Quantidade" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" readOnly value="' . $iQuantidade . '">
 												        </div>	
 												        <div class="col-lg-1">
-													        <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12">
+													        <input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" style="text-align: right;" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12">
 												        </div>	
-												        <div class="col-lg-1">
-													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" value="' . $fValorTotal . '" readOnly>
+												        <div class="col-lg-2">
+													        <input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" style="text-align: right;" value="' . $fValorTotal . '" readOnly>
 												        </div>											
 												   </div>');
 											}
@@ -598,7 +528,7 @@ try {
 
 									print('
 										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
+												<div class="col-lg-6">
 													<div class="row">
 														<div class="col-lg-1">
 															
@@ -617,11 +547,11 @@ try {
 												<div class="col-lg-1">
 													
 												</div>	
-												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+												<div class="col-lg-2" style="padding-top: 5px; text-align: right;">
 													<h5><b>Total:</b></h5>
 												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="' . mostraValor($fTotalGeral) . '" readOnly>
+												<div class="col-lg-2">
+													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" style="text-align: right;" value="' . mostraValor($fTotalGeral) . '" readOnly>
 												</div>											
 											</div>');
 
@@ -639,7 +569,11 @@ try {
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<button class="btn btn-lg btn-principal" type="submit">Alterar</button>
+										<?php 
+											if ($row['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+												print('<button class="btn btn-lg btn-principal" type="submit">Alterar</button>');
+											}
+										?>
 										<a href="trOrcamento.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>

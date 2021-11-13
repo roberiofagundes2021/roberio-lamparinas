@@ -11,11 +11,11 @@ $iFluxoOperacional = $_POST['inputFluxoId'];
 if (isset($_POST['inputIdFluxoOperacional'])) {
 	$iFluxoOperacional = $_POST['inputIdFluxoOperacional'];
 	$iCategoria = $_POST['inputIdCategoria'];
-	$iSubCategoria = $_POST['inputIdSubCategoria'];
+	$sSubCategorias = $_POST['inputSubCategorias'];
 } else if (isset($_POST['inputFluxoId'])) {
 	$iFluxoOperacional = $_POST['inputFluxoId'];
 	$iCategoria = $_POST['inputIdCategoria'];
-	$iSubCategoria = $_POST['inputIdSubCategoria'];
+	$sSubCategorias = $_POST['inputSubCategorias'];
 } else {
 	irpara("fluxo.php");
 }
@@ -141,9 +141,6 @@ if (isset($_POST['inputDataInicio'])) {
 			$result->bindParam(':id', $iFluxoOperacional);
 			$result->execute();
 
-
-
-
 			$sql = "SELECT SituaId, SituaNome, SituaChave
 			FROM Situacao
 			WHERE SituaStatus = 1 and SituaChave = 'AGUARDANDOLIBERACAO'";
@@ -211,10 +208,9 @@ if (isset($_POST['inputDataInicio'])) {
 }
 
 if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
+	
 	try {
 		$conn->beginTransaction();
-
-
 
 		$sql = "SELECT SituaId, SituaNome, SituaChave
 		        FROM Situacao
@@ -282,8 +278,8 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 			for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
 				$sql = "INSERT INTO AditivoXProduto (AdXPrAditivo, AdXPrProduto, AdXPrQuantidade, AdXPrValorUnitario, 
-					AdXPrUsuarioAtualizador, AdXPrUnidade)
-					VALUES (:iAditivo, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+						AdXPrUsuarioAtualizador, AdXPrUnidade)
+						VALUES (:iAditivo, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				$result->execute(array(
@@ -369,11 +365,10 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 try {
 
 	$sql = "SELECT FlOpeId, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
-				   SbCatNome, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, SituaNome
+				   FlOpeNumProcesso, FlOpeValor, FlOpeStatus, SituaNome
 			FROM FluxoOperacional
 			JOIN Fornecedor on ForneId = FlOpeFornecedor
 			JOIN Categoria on CategId = FlOpeCategoria
-			JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 			JOIN Situacao on SituaId = FlOpeStatus
 			WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
 	$result = $conn->query($sql);
@@ -546,10 +541,10 @@ try {
 
 							<input type="hidden" id="inputFluxoId" name="inputFluxoId" class="form-control" value="<?php echo $iFluxoOperacional; ?>">
 							<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $iCategoria; ?>">
-							<input type="hidden" id="inputIdSubCategoria" name="inputIdSubCategoria" class="form-control" value="<?php echo $iSubCategoria; ?>">
+							<input type="hidden" id="inputSubCategorias" name="inputSubCategorias" class="form-control" value="<?php echo $sSubCategorias; ?>">
 
 							<div class="row">
-								<div class="col-lg-1">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputNumero">Nº Aditivo <span class="text-danger">*</span></label>
 										<input type="text" id="inputNumero" name="inputNumero" class="form-control" value="<?php echo $iProxAditivo; ?>" readOnly>
@@ -592,7 +587,7 @@ try {
 									</div>
 								</div>
 
-								<div class="col-lg-3">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputValor">Valor Total</label>
 										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" value="<?php isset($_POST['inputDataInicio']) ? print($_POST['inputValor']) : print('')  ?>" onKeyUp="moeda(this)" maxLength="12" <?php isset($_POST['inputDataInicio']) ? print('disabled') : print('')  ?>>
@@ -612,17 +607,16 @@ try {
 							<!-- /card-body -->
 							<!---------------------------------------------------------------------------------------------Produtos---------------------------------------------------------------------------------------------------------->
 							<?php
-							$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
-                                				FROM Produto
-                                				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-                                				LEFT JOIN Marca on MarcaId = ProduMarca
-                                				JOIN Situacao on SituaId = ProduStatus
-                                				WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = " . $iCategoria . " and 
-                                				ProduSubCategoria = " . $iSubCategoria . " and SituaChave = 'ATIVO' ";
-							$result = $conn->query($sql);
-							$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-							$countProduto = count($rowProdutos);
-
+								$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+										FROM Produto
+										JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+										LEFT JOIN Marca on MarcaId = ProduMarca
+										JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+										WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = $iCategoria and 
+										ProduSubCategoria in ($sSubCategorias)";
+								$result = $conn->query($sql);
+								$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+								$countProduto = count($rowProdutos);
 							?>
 							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && $countProduto >= 1 ? print('block') : print('none')  ?>">
 								<div class="card-header header-elements-inline">
@@ -637,7 +631,7 @@ try {
 									if (isset($_POST['inputDataInicio'])) {
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-8">
+											<div class="col-lg-7">
 												<div class="row">
 													<div class="col-lg-1">
 														<label for="inputCodigo"><strong>Item</strong></label>
@@ -665,7 +659,7 @@ try {
 													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-1">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -689,7 +683,7 @@ try {
 
 											print('
 											<div class="row" style="margin-top: 8px;" >
-												<div class="col-lg-8">
+												<div class="col-lg-7">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -712,8 +706,8 @@ try {
 												<div class="col-lg-1">
 													<input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
 												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off" value="' . $fValorTotal . '" readOnly>
+												<div class="col-lg-2">
+													<input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off text-right" value="' . $fValorTotal . '" readOnly>
 												</div>											
 											</div>');
 										}
@@ -722,7 +716,7 @@ try {
 									if (isset($_POST['inputDataInicio'])) {
 										print('
 										<div class="row" style="margin-top: 8px;">
-											<div class="col-lg-8">
+											<div class="col-lg-7">
 												<div class="row">
 													<div class="col-lg-1">
 														
@@ -744,8 +738,8 @@ try {
 											<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
 												<h5><b>Total:</b></h5>
 											</div>	
-											<div class="col-lg-1">
-												<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="' . mostraValor($fTotalGeral) . '" readOnly>
+											<div class="col-lg-2">
+												<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="' . mostraValor($fTotalGeral) . '" readOnly>
 											</div>											
 										</div>');
 
@@ -760,10 +754,10 @@ try {
 							<!---------------------------------------------------------------------------------------------Serviços---------------------------------------------------------------------------------------------------------->
 							<?php
 							$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
-							        			  FROM Servico
-							        			  JOIN Situacao on SituaId = ServiStatus
-							        			  WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-							        			  ServiSubCategoria = " . $iSubCategoria . " and SituaChave = 'ATIVO' ";
+									FROM Servico
+									JOIN Situacao on SituaId = ServiStatus
+									WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
+									ServiSubCategoria in (" . $sSubCategorias . ") and SituaChave = 'ATIVO' ";
 							$result = $conn->query($sql);
 							$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 							$countServico = count($rowServicos);
@@ -794,7 +788,7 @@ try {
 													FROM Servico
 													JOIN Situacao on SituaId = ServiStatus
 													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-													ServiSubCategoria = " . $iSubCategoria . " and SituaChave = 'ATIVO' ";
+													ServiSubCategoria in (" . $sSubCategorias . ") and SituaChave = 'ATIVO' ";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countServico = count($rowServicos);

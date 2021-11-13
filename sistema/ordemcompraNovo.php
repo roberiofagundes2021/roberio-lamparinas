@@ -13,6 +13,52 @@ $sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
 $result = $conn->query($sql);
 $rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
 
+$sqlNumero = "SELECT Max(OrComNumero)
+			  FROM OrdemCompra";
+$resultNumero = $conn->query($sqlNumero);
+$numero = $resultNumero->fetch(PDO::FETCH_ASSOC);
+
+$sqlFluxo = "SELECT FlOpeId, FlOpeTermoReferencia, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio,
+			FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao, FlOpeValor, FlOpeObservacao,
+			FlOpePrioridade, FlOpeNumAta, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa,
+			FlOpeUnidade, SituaChave, ForneId, ForneRazaoSocial, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular,
+			CategId, CategNome, CategStatus, CategUsuarioAtualizador, CategUnidade
+			FROM FluxoOperacional
+			JOIN Situacao on SituaId = FlOpeStatus
+			JOIN Fornecedor on ForneId = FlOpeFornecedor
+			JOIN Categoria on CategId = FlOpeCategoria
+			WHERE FlOpeUnidade = ".$_SESSION['UnidadeId'].
+			" and UPPER(SituaChave) = 'LIBERADO'";
+$resultFluxo = $conn->query($sqlFluxo);
+$fluxo = $resultFluxo->fetchAll(PDO::FETCH_ASSOC);
+
+foreach($fluxo as $key=>$flx){
+	if($flx['FlOpeTermoReferencia']){
+		$sqlTermo = "SELECT TrRefId, TrRefTipo, TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio,
+								TrRefStatus, TrRefUnidade, TrRefTabelaProduto, TrRefTabelaServico, TrRefLiberaParcial
+								FROM TermoReferencia where TrRefId = ".$flx['FlOpeTermoReferencia'];
+		$termoRef = $conn->query($sqlTermo);
+		$termo = $termoRef->fetch(PDO::FETCH_ASSOC);
+		$fluxo[$key]['FlOpeTermoReferencia'] = $termo;
+	}
+	if($flx['FlOpeCategoria']){
+		$sqlSubCat = "SELECT SbCatId, SbCatNome, SbCatCategoria, SbCatStatus, SbCatUnidade
+								FROM SubCategoria
+								where SbCatCategoria = ".$flx['FlOpeCategoria'];
+		$SubCat = $conn->query($sqlSubCat);
+		$SubCateg = $SubCat->fetchAll(PDO::FETCH_ASSOC);
+		$fluxo[$key]['FlOpeSubCategoria'] = $SubCateg;
+	}
+}
+
+$sqlParametroEmp = "SELECT ParamEmpresaPublica 
+                   FROM Parametro
+                   WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+$resultParametroEmp = $conn->query($sqlParametroEmp);
+$parametroEmp = $resultParametroEmp->fetch(PDO::FETCH_ASSOC);	
+
+$empresaType = $parametroEmp['ParamEmpresaPublica'] ? 'publica' : 'privada';
+
 if(isset($_POST['inputData'])){
 	
 	try{
@@ -20,15 +66,15 @@ if(isset($_POST['inputData'])){
 		$conn->beginTransaction();
 
 		$sql = "SELECT SituaId
-				FROM Situacao
-				Where SituaChave = 'PENDENTE' ";
+						FROM Situacao
+						Where SituaChave = 'PENDENTE' ";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 		
-		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, 
-							OrComConteudo, OrComFornecedor, OrComValorFrete, OrComSolicitante, OrComUnidadeEntrega, OrComLocalEntrega, 
+		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComFluxoOperacional, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, 
+							OrComConteudoInicio, OrComConteudoFim, OrComFornecedor, OrComValorFrete, OrComSolicitante, OrComUnidadeEntrega, OrComLocalEntrega, 
 							OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, OrComSituacao, OrComUsuarioAtualizador, OrComUnidade)
-				VALUES (:sTipo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudo, :iFornecedor, :fValorFrete, 
+				VALUES (:sTipo, :dFluxo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudoInicio, :sConteudoFim, :iFornecedor, :fValorFrete, 
 						:iSolicitante, :iUnidadeEntrega, :iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, 
 						:iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
@@ -38,6 +84,7 @@ if(isset($_POST['inputData'])){
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
+						':dFluxo' => $_POST['inputFluxoOperacional'],
 						':dData' => gravaData($_POST['inputData']),
 						':sNumero' => $_POST['inputNumero'],
 						':sLote' => $_POST['inputLote'],
@@ -45,14 +92,15 @@ if(isset($_POST['inputData'])){
 						':sProcesso' => $_POST['inputProcesso'],
 						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
-						':sConteudo' => $_POST['txtareaConteudo'],
+						':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+						':sConteudoFim' => $_POST['txtareaConteudoFim'],
 						':iFornecedor' => $iFornecedor,
 						':fValorFrete' => null,
 						':iSolicitante' => $_SESSION['UsuarId'],
 						':iUnidadeEntrega' => $_POST['cmbUnidade'] == '' ? null : $_POST['cmbUnidade'],
 						':iLocalEntrega' => $_POST['cmbLocalEstoque'] == '' ? null : $_POST['cmbLocalEstoque'],
 						':sEnderecoEntrega' => $_POST['inputEnderecoEntrega'],
-						':dDataEntrega' => gravaData($_POST['inputDataEntrega']),
+						':dDataEntrega' => $_POST['inputDataEntrega'] == '' ? null : $_POST['inputDataEntrega'],
 						':sObservacao' => $_POST['txtareaObservacao'],
 						':bStatus' => $rowSituacao['SituaId'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -116,60 +164,79 @@ if(isset($_POST['inputData'])){
 
 	
 	<!-- Adicionando Javascript -->
-    <script type="text/javascript" >
+	<script type="text/javascript" >
+			<?php
+			// essa parte transforma um array php em array js para que possa manipular dentro do JS com mais facilidade
+				$js_fluxo = json_encode($fluxo);
+				$emp = json_encode($empresaType);
+				echo "const fluxo = ".$js_fluxo." \n";
+				echo "var selectEmpresa = ".$emp." \n";
+			?>
 
-        $(document).ready(function() {	
-		
-			$('#summernote').summernote();
-			
-			//Ao informar o fornecedor, trazer os demais dados dele (contato, e-mail, telefone)
-			$('#cmbFornecedor').on('change', function(e){				
+			$(document).ready(function() {
+				// ao selecionar o contrato todos os campos serão preenchidos com os dados do contrato selecionado
+				$('#cmbContrato').on('change', function(e){
 				
-				var Fornecedor = $('#cmbFornecedor').val();
-				var Forne = Fornecedor.split('#');
-				
-				$('#inputContato').val(Forne[1]);
-				$('#inputEmailFornecedor').val(Forne[2]);
-				if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
-					$('#inputTelefoneFornecedor').val(Forne[3]);
-				} else {
-					$('#inputTelefoneFornecedor').val(Forne[4]);
-				}
-				
-				$.getJSON('filtraCategoria.php?idFornecedor='+Forne[0], function (dados){
+					var cmbContrato = $('#cmbContrato').val();
+
+					if(cmbContrato){
+						// essa parte vai pegar dentro do array fluxo o objeto que possui o FlOpeId igual ao selecionado no select
+						var id = cmbContrato
+						var flux = fluxo.find(x => x.FlOpeId === id)
+
+						var valueTag = flux.ForneId+'#'+flux.ForneContato+'#'+flux.ForneEmail+'#'+flux.ForneTelefone+'#'+flux.ForneCelular
+
+						var Forne = valueTag.split('#');
+
+						$("#inputFluxoOperacional").val(flux.FlOpeId);
+
+						$('#cmbFornecedor').val(valueTag);
+						$('#cmbFornecedorName').val(flux.ForneRazaoSocial);
+
+						$('#inputProcesso').val(flux.FlOpeNumProcesso);
+
+						$('#cmbCategoriaName').val(flux.CategNome);
+						$('#cmbCategoria').val(flux.CategId);
+						$('#inputNumAta').val(flux.FlOpeNumAta);
+						$('#inputLote').val(flux.FlOpeNumAta);
+
+						$.getJSON('filtraSubCategoria.php?idContrato='+id, function (dados){
 					
-					//var option = '<option value="#">Selecione a Categoria</option>';
-					var option = '';
+							var option = '<option value="">Selecione a SubCategoria</option>';
+							
+							if (dados.length){
+								$("#cmbSubCategoria").prop('required',true);
+								$("#cmbSubCategoriaName").last().html("SubCategoria <span class='text-danger'>*</span>");
+								
+								$.each(dados, function(i, obj){
+									option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+								});						
+								
+								$('#cmbSubCategoria').html(option).show();
+							} else {
+								ResetSubCategoria();
+							}					
+						});
+						
+						$('#inputContato').val(Forne[1]);
+						$('#inputEmailFornecedor').val(Forne[2]);
+						if(Forne[3] != "" && Forne[3] != "(__) ____-____"){
+							$('#inputTelefoneFornecedor').val(Forne[3]);
+						} else {
+							$('#inputTelefoneFornecedor').val(Forne[4]);
+						}
+					}
 					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.CategId+'">'+obj.CategNome+'</option>';
-						});						
-						
-						$('#cmbCategoria').html(option).show();
-					} else {
-						ResetCategoria();
-					}					
 				});
-				
-				$.getJSON('filtraSubCategoria.php?idFornecedor='+Forne[0], function (dados){
-					
-					var option = '<option value="">Selecione a SubCategoria</option>';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						});						
-						
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}					
-				});				
-				
-			});
+		
+			$('#summernoteInicio').summernote();
+			$('#summernoteFim').summernote();
+
+			if(selectEmpresa !== 'publica'){
+				$('#selectEmpresa').hide();
+				$('#Ata').hide();
+				$('#Lote').show();
+			}
 			
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
@@ -179,7 +246,7 @@ if(isset($_POST['inputData'])){
 				var cmbCategoria = $('#cmbCategoria').val();
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
-					
+					// essa parte filtra a categoria pertecente a unidade e que está no contrato/fluxo
 					var option = '<option value="">Selecione a SubCategoria</option>';
 					
 					if (dados.length){						
@@ -206,16 +273,18 @@ if(isset($_POST['inputData'])){
 				if (cmbUnidade == ''){
 					ResetLocalEstoque();
 				} else {
-				
 					$.getJSON('filtraLocalEstoque.php?idUnidade=' + cmbUnidade, function (dados){
-						
+						$.getJSON('filtraEnderecoEstoque.php?idUnidade=' + cmbUnidade, function (endereco){
+							endereco = endereco.replace(', ,',',')
+							$('#inputEnderecoEntrega').val(endereco)
+						});
+
 						var option = '';
 
-						if (dados.length){						
-							
+						if (dados.length){
 							$.each(dados, function(i, obj){
 								option += '<option value="'+obj.LcEstId+'">' + obj.LcEstNome + '</option>';
-							});						
+							});
 							
 							$('#cmbLocalEstoque').html(option).show();
 						} else {
@@ -224,14 +293,14 @@ if(isset($_POST['inputData'])){
 					});
 				}
 			});			
-			
+			// essa parte é responsavel por pegar o maior nymero registrado na tabela de ordemCompra e adicionar +1 para que fique incremental
 			$("#enviar").on('click', function(e){
-				
-				e.preventDefault();
-			
-				$("#formOrdemCompra").submit();
+				$.getJSON('filtraNumeroOrdemCompra.php', function (numero){
+					$("#inputNumero").val(numero);
+					e.preventDefault();
+					$("#formOrdemCompra").submit();
+				});
 			});
-						
 		}); //document.ready
 		
 		//Mostra o "Filtrando..." na combo SubCategoria
@@ -294,6 +363,9 @@ if(isset($_POST['inputData'])){
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Ordem de Compra</h5>
 						</div>
+
+						<input type="hidden" id="inputNumero" name="inputNumero">
+						<input type="hidden" id="inputFluxoOperacional" name="inputFluxoOperacional">
 						
 						<div class="card-body">								
 								
@@ -303,7 +375,7 @@ if(isset($_POST['inputData'])){
 									
 									<div class="row">										
 										<div class="col-lg-4">
-											<div class="form-group">							
+											<div id="selectEmpresa" class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
 														<input type="radio" id="inputTipo" name="inputTipo" value="C" class="form-input-styled" checked data-fouc onclick="selecionaTipo('C')">
@@ -317,42 +389,51 @@ if(isset($_POST['inputData'])){
 													</label>
 												</div>										
 											</div>
-										</div>										
-										
+											
+										</div>	
+									</div>
+
+									<div class="row">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="cmbContrato">Nº Contrato <span class="text-danger">*</span></label>
+												<select id="cmbContrato" name="cmbContrato" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
+													<?php
+														foreach ($fluxo as $item){
+															print('<option value="'.$item['FlOpeId'].'">'.$item['FlOpeNumContrato'].'</option>');
+														}
+													?>
+												</select>
+											</div>
+										</div>
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputData">Data da Emissão <span class="text-danger">*</span></label>
-												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" required readOnly>
-											</div>
-										</div>
-										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputNumero">Número <span class="text-danger">*</span></label>
-												<input type="text" id="inputNumero" name="inputNumero" class="form-control" required>
+												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php echo date('d/m/Y'); ?>" readOnly>
 											</div>
 										</div>
 										
 										<div class="col-lg-2" id="Ata">
 											<div class="form-group">
 												<label for="inputNumAta">Nº Ata Registro</label>
-												<input type="text" id="inputNumAta" name="inputNumAta" class="form-control">
+												<input type="text" id="inputNumAta" name="inputNumAta" class="form-control" readOnly>
 											</div>
 										</div>										
 										
-										<div class="col-lg-2" id="Lote" style="display:none">
+										<div class="col-lg-3" id="Lote" style="display:none">
 											<div class="form-group">
 												<label for="inputLote">Lote</label>
-												<input type="text" id="inputLote" name="inputLote" class="form-control">
+												<input type="text" id="inputLote" name="inputLote" class="form-control" readOnly>
 											</div>
 										</div>
 										
-										<div class="col-lg-2">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputProcesso">Processo</label>
-												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control">
+												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" readOnly>
 											</div>
-										</div>	
+										</div>
 									</div>
 									
 									<div class="row">
@@ -362,24 +443,9 @@ if(isset($_POST['inputData'])){
 											<div class="row">
 												<div class="col-lg-4">
 													<div class="form-group">
-														<label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
-														<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
-															<option value="">Selecione</option>
-															<?php 
-																$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
-																		FROM Fornecedor
-																		JOIN Situacao on SituaId = ForneStatus												     
-																		WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																		ORDER BY ForneNome ASC";
-																$result = $conn->query($sql);
-																$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-																
-																foreach ($rowFornecedor as $item){															
-																	print('<option value="'.$item['ForneId'].'#'.$item['ForneContato'].'#'.$item['ForneEmail'].'#'.$item['ForneTelefone'].'#'.$item['ForneCelular'].'">'.$item['ForneNome'].'</option>');
-																}
-															
-															?>
-														</select>
+														<label for="inputContato">Fornecedor</label>
+														<input type="text" id="cmbFornecedorName" name="cmbFornecedorName" class="form-control" readOnly>
+														<input type="hidden" id="cmbFornecedor" name="cmbFornecedor" class="form-control">
 													</div>
 												</div>
 												
@@ -408,24 +474,23 @@ if(isset($_POST['inputData'])){
 									</div>
 									<br>									
 									
-									<div class="row">											
+									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
+												<input type="text" id="cmbCategoriaName" name="cmbCategoriaName" class="form-control" readOnly>
+												<input type="hidden" id="cmbCategoria" name="cmbCategoria">
+											</div>
+										</div>
+
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label id="cmbSubCategoriaName" for="cmbSubCategoriaName">SubCategoria</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 												</select>
 											</div>
 										</div>
-										
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="">Selecione</option>
-												</select>
-											</div>
-										</div>										
 
 									</div>
 								</div>
@@ -434,12 +499,23 @@ if(isset($_POST['inputData'])){
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaConteudo">Conteúdo personalizado</label>
+										<label for="txtareaConteudo">Conteúdo Personalizado - Introdução</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
-										<textarea rows="5" cols="5" class="form-control" id="summernote" name="txtareaConteudo" placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do orçamento (informe aqui o texto que você queira que apareça no orçamento)"></textarea>
 									</div>
 								</div>
 							</div>		
+							<br>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudoFim">Conteúdo Personalizado - Finalização</label>
+										<!--<div id="summernote" name="txtareaConteudoFim"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder=" Considerações Finais do orçamento (informe aqui o texto que você queira que apareça no término do orçamento)"></textarea>
+									</div>                                                                                                         
+								</div>
+							</div>
 							<br>
 																					
 							<div class="row">
@@ -519,7 +595,7 @@ if(isset($_POST['inputData'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputDataEntrega">Previsão de Entrega</label>
-												<input type="text" id="inputDataEntrega" name="inputDataEntrega" class="form-control">
+												<input type="date" id="inputDataEntrega" name="inputDataEntrega" class="form-control">
 											</div>
 										</div>	
 									</div>
@@ -534,18 +610,17 @@ if(isset($_POST['inputData'])){
 									</div>
 								</div>
 							</div>
-
-							<div class="row" style="margin-top: 10px;">
-								<div class="col-lg-12">								
-									<div class="form-group">
-										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-										<a href="ordemcompra.php" class="btn btn-basic" role="button">Cancelar</a>
-									</div>
-								</div>
-							</div>
 						</div>
 						<!-- /card-body -->
 					</form>
+					<div class="row" style="margin-top: 10px; margin-left:10px;">
+						<div class="col-lg-12">								
+							<div class="form-group">
+								<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+								<a href="ordemcompra.php" class="btn btn-basic" role="button">Cancelar</a>
+							</div>
+						</div>
+					</div>
 					
 				</div>
 				<!-- /info blocks -->

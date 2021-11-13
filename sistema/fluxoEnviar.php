@@ -4,12 +4,14 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
+$sDestino = $_POST['inputOrigem'];
+
 try{
-	if(isset($_POST['inputIdFluxoOperacional'])){
+	if(isset($_POST['inputIdFluxoOperacional']) || isset($_POST['inputFluxoOperacionalId'])){
 
         $conn->beginTransaction();
 	
-		$iFluxoOperacional = $_POST['inputIdFluxoOperacional'];
+		$iFluxoOperacional = isset($_POST['inputIdFluxoOperacional']) ? $_POST['inputIdFluxoOperacional'] : $_POST['inputFluxoOperacionalId'];
 
 		/* Atualiza o Status da Fluxo Operacional para "Aguardando Liberação" */
 		$sql = "SELECT SituaId
@@ -38,7 +40,7 @@ try{
 				FROM FluxoOperacional
 				Where FlOpeId = ".$iFluxoOperacional;
 		$result = $conn->query($sql);
-        $rowFluxoOperacional = $result->fetch(PDO::FETCH_ASSOC);     
+        $rowFluxo = $result->fetch(PDO::FETCH_ASSOC);     
 
 		/* Verifica se a Bandeja já tem um registro com BandeTabela: FluxoOperacional e BandeTabelaId: IdFluxoOperacionalAtual, evitando duplicação */
 		$sql = "SELECT COUNT(BandeId) as Count
@@ -69,7 +71,7 @@ try{
             $result->execute(array(
                             ':sIdentificacao' => $sIdentificacao,
                             ':dData' => date("Y-m-d"),
-                            ':sDescricao' => 'Liberar Fluxo',
+                            ':sDescricao' => $sDestino == 'fluxo.php' ? 'Liberar Fluxo' : 'Liberar Contrato',
                             ':sURL' => '',
 							':iSolicitante' => $_SESSION['UsuarId'],
 							':iSolicitanteSetor' => null,
@@ -116,7 +118,7 @@ try{
         $conn->commit();
         
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Fluxo Operacional enviado para aprovação!!!";
+		$_SESSION['msg']['mensagem'] = $sDestino == 'fluxo.php' ? "Fluxo Operacional enviado para aprovação!!!" : "Contrato enviado para aprovação!!!";
 		$_SESSION['msg']['tipo'] = "success";        
 	}
 
@@ -125,12 +127,12 @@ try{
     $conn->rollback();
 		
     $_SESSION['msg']['titulo'] = "Erro";
-    $_SESSION['msg']['mensagem'] = "Erro ao enviar Fluxo Operacional para aprovação!!!";
+    $_SESSION['msg']['mensagem'] = $sDestino == 'fluxo.php' ? "Erro ao enviar Fluxo Operacional para aprovação!!!" : "Erro ao enviar Contrato para aprovação!!!";
     $_SESSION['msg']['tipo'] = "error";	
 
     echo 'Error1: ' . $e->getMessage();
 }
 
-irpara("fluxo.php");
+irpara($sDestino);
 
 ?>

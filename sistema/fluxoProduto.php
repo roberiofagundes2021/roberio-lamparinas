@@ -70,15 +70,17 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 
 try{
 	
-	$sql = "SELECT FlOpeId, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
-				   FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, SituaNome,
+	$sql = "SELECT FlOpeId, FlOpeTermoReferencia, FlOpeNumContrato, ForneId, ForneNome, ForneTelefone, ForneCelular, 
+				   CategNome, FlOpeCategoria, FlOpeSubCategoria, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, 
+				   SituaNome, SituaChave,  TrRefTabelaProduto,
 				   dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, 
 				   dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado
 			FROM FluxoOperacional
 			JOIN Fornecedor on ForneId = FlOpeFornecedor
 			JOIN Categoria on CategId = FlOpeCategoria
-			JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
+			LEFT JOIN FluxoOperacionalXSubCategoria on FOXSCFluxo = FlOpeId
 			JOIN Situacao on SituaId = FlOpeStatus
+			LEFT JOIN TermoReferencia on TrRefId = FlOpeTermoReferencia
 			WHERE FlOpeUnidade = ". $_SESSION['UnidadeId'] ." and FlOpeId = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -104,13 +106,13 @@ try{
 	$result = $conn->query($sql);
 	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
 
-	$sSubCategorias = '';
+	$sSubCategorias = 0;
 	$sSubCategoriasNome = '';
 
 	foreach ($rowBD as $item){
 
-		if ($sSubCategorias == ''){
-			$sSubCategorias .= $item['SbCatId'];
+		if ($sSubCategorias == 0){
+			$sSubCategorias = $item['SbCatId'];
 			$sSubCategoriasNome .= $item['SbCatNome'];
 		} else {
 			$sSubCategorias .= ", ".$item['SbCatId'];
@@ -216,6 +218,38 @@ try{
 					}	
 				});
 			});
+
+			/* ao pressionar uma tecla em um campo que seja de class="pula" */
+			$('.pula').keypress(function(e){
+				/*
+					* verifica se o evento é Keycode (para IE e outros browsers)
+					* se não for pega o evento Which (Firefox)
+				*/
+				var tecla = (e.keyCode?e.keyCode:e.which);
+
+				/* verifica se a tecla pressionada foi o ENTER */
+				if(tecla == 13){
+					/* guarda o seletor do campo que foi pressionado Enter */
+					campo =  $('.pula');
+					/* pega o indice do elemento*/
+					indice = campo.index(this);
+					/*soma mais um ao indice e verifica se não é null
+					*se não for é porque existe outro elemento
+					*/
+					if(campo[indice+1] != null){
+						/* adiciona mais 1 no valor do indice */
+						proximo = campo[indice + 1];
+						/* passa o foco para o proximo elemento */
+						proximo.focus();
+					}
+				} else {
+					return onlynumber(e);
+				}
+
+				/* impede o sumbit caso esteja dentro de um form */
+				e.preventDefault(e);
+				return false;
+      });
 			
 			//Valida Registro
 			$('#enviar').on('click', function(e){
@@ -225,20 +259,30 @@ try{
 				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
 				var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
 				var totalProdutos = $('#totalRegistros').val();
+				var inputOrigem = $('#inputOrigem').val();
 
                 var cont = 1;
 
 				for(i = 0; i <= totalProdutos; i++){
-                       var valorTotal = $(`#inputValorTotal${i}`).val()
-                       cont = valorTotal == '' ? 0 : 1;
-					   if ($(`#inputValorTotal${i}`).val() == '0,00') {
-						alerta('Atenção', 'Preencha todas as quantidades e valores dos produtos selecionados ou retire da lista', 'error');
+                    var valorTotal = $(`#inputValorTotal${i}`).val()
+                    cont = valorTotal == '' ? 0 : 1;
+					if ($(`#inputValorTotal${i}`).val() == '0,00') {
+						if (inputOrigem == 'fluxo.php'){
+							alerta('Atenção', 'Preencha todas as quantidades e valores dos produtos selecionados ou retire da lista', 'error');
+						} else {
+							alerta('Atenção', 'Preencha todas as quantidades e valores dos produtos', 'error');
+						}
+						
 						return false;
 					}
 				}
 
 				if(cont == 0){
-					alerta('Atenção','Preencha todas as quantidades e valores dos produtos selecionados, ou retire da lista','error');
+					if (inputOrigem == 'fluxo.php'){
+						alerta('Atenção','Preencha todas as quantidades e valores dos produtos selecionados, ou retire da lista','error');
+					} else {
+						alerta('Atenção','Preencha todas as quantidades e valores dos produtos','error');
+					}
 					return false;
 				}
 				
@@ -253,12 +297,20 @@ try{
 			}); // enviar	
 			
 			//Enviar para aprovação da Controladoria (via Bandeja)
-			$('#enviarAprovacao').on('click', function(e){
-				
-				e.preventDefault();		
-				
-				confirmaExclusao(document.formFluxoOperacionalProduto, "Essa ação enviará todo o Fluxo Operacional (com seus produtos e serviços) para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
-			});			
+			$('#enviarAprovacao').on('click', function(e) {
+
+				var inputOrigem = $('#inputOrigem').val();
+
+			e.preventDefault();
+
+				if (inputOrigem == 'fluxo.php') {
+					confirmaExclusao(document.formFluxoOperacionalProduto, "Essa ação enviará  o Contrato formalizado para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
+				}  else {
+					confirmaExclusao(document.formFluxoOperacionalProduto, "Essa ação enviará o Fluxo Operacional para aprovação da Controladoria. Tem certeza que deseja enviar?", "fluxoEnviar.php");
+				}
+
+				return false;
+			});		
 						
 		}); //document.ready
 		
@@ -271,21 +323,33 @@ try{
 			$('#cmbProduto').empty().append('<option>Sem produto</option>');
 		}	
 		
-		function calculaValorTotal(id){
+		function calculaValorTotal() {
 			
-			var ValorTotalAnterior = $('#inputValorTotal'+id+'').val() == '' ? 0 : $('#inputValorTotal'+id+'').val().replace('.', '').replace(',', '.');
-			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+			let n = 1;
+			let totalRegistros = $('#totalRegistros').val();
+			let Quantidade = 0
+			let ValorUnitario = 0;
+			let ValorTotal = 0;
+			let ValorTotalMoeda = 0;
+			let TotalGeral = 0;
+
+			while (n <= totalRegistros) {
+				
+				Quantidade = $('#inputQuantidade' + n + '').val().trim() == '' ? 0 : $('#inputQuantidade' + n + '').val();
+				ValorUnitario = $('#inputValorUnitario' + n + '').val() == '' ? 0 : $('#inputValorUnitario' + n + '').val().replace('.', '').replace(',', '.');
+
+				ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
+				TotalGeral += ValorTotal;
+
+				ValorTotalMoeda = float2moeda(ValorTotal).toString();
+
+				$('#inputValorTotal' + n + '').val(ValorTotalMoeda);
+
+				n++;
+			}
 			
-			var Quantidade = $('#inputQuantidade'+id+'').val().trim() == '' ? 0 : $('#inputQuantidade'+id+'').val();
-			var ValorUnitario = $('#inputValorUnitario'+id+'').val() == '' ? 0 : $('#inputValorUnitario'+id+'').val().replace('.', '').replace(',', '.');
-			var ValorTotal = 0;
-			
-			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
-			var TotalGeral = float2moeda(parseFloat(TotalGeralAnterior) - parseFloat(ValorTotalAnterior) + ValorTotal).toString();
-			ValorTotal = float2moeda(ValorTotal).toString();
-			
-			$('#inputValorTotal'+id+'').val(ValorTotal);
-			
+			TotalGeral = float2moeda(TotalGeral).toString();
+
 			$('#inputTotalGeral').val(TotalGeral);
 		}
 							
@@ -355,25 +419,49 @@ try{
 												<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['FlOpeCategoria']; ?>">
 											</div>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="inputCategoriaNome">SubCategorias</label>
-												<input type="text" id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control" value="<?php echo $sSubCategoriasNome; ?>" readOnly>
+												<label for="inputSubCategoriaNome">SubCategoria(s)</label>
+
+												<?php 
+													if ($sSubCategorias == 0){
+														echo '<input id="inputSemSubCategoriaNome" name="inputSemSubCategoriaNome" class="form-control" value="" readOnly >';
+													} else{
+
+														echo '<select id="inputSubCategoriaNome" name="inputSubCategoriaNome" class="form-control multiselect-filtering" multiple="multiple" data-fouc>';
+															
+														$sql = "SELECT SbCatId, SbCatNome
+																FROM SubCategoria
+																JOIN Situacao on SituaId = SbCatStatus	
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+																ORDER BY SbCatNome ASC"; 
+														$result = $conn->query($sql);
+														$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
+														$count = count($rowBD);														
+																
+														foreach ( $rowBD as $item){	
+															print('<option value="'.$item['SbCatId,'].'"disabled selected>'.$item['SbCatNome'].'</option>');	
+														}                    
+														
+														echo '</select>';
+													}  
+												?>
+												
 											</div>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-1 fluxoContrato">
 											<div class="form-group">
 												<label for="inputContrato">Contrato</label>
 												<input type="text" id="inputContrato" name="inputContrato" class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly>
 											</div>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-2 fluxoProcesso">
 											<div class="form-group">
 												<label for="inputProcesso">Processo</label>
 												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
 											</div>
 										</div>	
-										<div class="col-lg-2">
+										<div class="col-lg-2 fluxoProcesso">
 											<div class="form-group">
 												<label for="inputValor">Valor Total</label>
 												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
@@ -402,12 +490,13 @@ try{
 
 															$sql = "SELECT ProduId, ProduNome
 																	FROM Produto
-																	JOIN Situacao on SituaId = ProduStatus  
+																	JOIN Situacao on SituaId = ProduStatus
+																	LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 																	WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
-															if ($sSubCategorias != "") {
+															if ($sSubCategorias != 0) {
 																$sql .= " and ProduSubCategoria in (".$sSubCategorias.")";
 															}
-															$sql .=	" ORDER BY ProduNome ASC";
+															$sql .=	" ORDER BY SbCatNome ASC";
 															$result = $conn->query($sql);
 															$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
 															
@@ -426,7 +515,7 @@ try{
 														</select>
 													</div>
 												</div>
-											</div>');
+											</div>'); //echo $sql;die;
 										}										
 									?>
 								</div>
@@ -452,64 +541,89 @@ try{
 										<div id="example"></div>
 									</div>-->
 									
-									<?php								
+									<?php
 
 										if ($_POST['inputOrigem'] == 'fluxo.php'){
-
-											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+											
+											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 													FROM Produto
 													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													LEFT JOIN Marca on MarcaId = ProduMarca
-													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+													LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
+													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
+													ORDER BY SbCatNome, ProduNome ASC";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 											$countProduto = count($rowProdutos);
-											
+
 											if (!$countProduto){
-												$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+												$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, MarcaNome
 														FROM Produto
 														JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 														JOIN Situacao on SituaId = ProduStatus
 														LEFT JOIN Marca on MarcaId = ProduMarca
+														LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 														WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and 
-														ProduSubCategoria in (".$sSubCategorias.") and SituaChave = 'ATIVO' ";
+														ProduSubCategoria in (".$sSubCategorias.") and SituaChave = 'ATIVO' 
+														ORDER BY SbCatNome, ProduNome ASC";
 												$result = $conn->query($sql);
 												$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 												$countProduto = count($rowProdutos);
 											} 
+
 										} else{
-											$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+
+											$sql = "SELECT Distinct ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, UnMedSigla, 
+													FOXPrQuantidade, FOXPrValorUnitario, SbCatNome, MarcaNome
 													FROM Produto
-													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-													JOIN TermoReferenciaXProduto on TRXPrProduto = FOXPrProduto
+													JOIN ProdutoOrcamento on PrOrcProduto = ProduId
+													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId 
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													LEFT JOIN Marca on MarcaId = ProduMarca
-													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+													LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
+													WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+													and FOXPrFluxoOperacional = " . $iFluxoOperacional."
+													and SbCatId in (".$sSubCategorias.")
+													ORDER BY SbCatNome, ProduNome ASC";
 											$result = $conn->query($sql);
 											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 											$countProduto = count($rowProdutos);
-											
-											if (!$countProduto){
-												$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
-														FROM Produto
-														JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
-														JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-														JOIN Situacao on SituaId = ProduStatus
-														LEFT JOIN Marca on MarcaId = ProduMarca
-														WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and 
-														ProduSubCategoria in (".$sSubCategorias.") and SituaChave = 'ATIVO' ";
+
+											if (!$countProduto) {
+
+												if ($row['TrRefTabelaProduto'] == 'Produto'){
+													$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
+															FROM Produto															
+															JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
+															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+															LEFT JOIN Marca on MarcaId = ProduMarca
+															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
+															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
+															and SbCatId in (".$sSubCategorias.")
+															ORDER BY SbCatNome, ProduNome ASC";													
+												} else { //Se $row['TrRefTabelaProduto'] == ProdutoOrcamento
+													$sql = "SELECT Distinct ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
+															FROM Produto
+															JOIN ProdutoOrcamento on PrOrcProduto = ProduId
+															JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
+															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+															LEFT JOIN Marca on MarcaId = ProduMarca
+															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
+															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
+															and SbCatId in (".$sSubCategorias.")
+															ORDER BY SbCatNome, ProduNome ASC";
+												}
+
 												$result = $conn->query($sql);
 												$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 												$countProduto = count($rowProdutos);
-											} 											
+											}
 										}
-
-										$cont = 0;
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-8">
+											<div class="col-lg-7">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
@@ -537,7 +651,7 @@ try{
 													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-1">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -546,6 +660,7 @@ try{
 										
 										print('<div id="tabelaProdutos">');
 										
+										$cont = 0;
 										$fTotalGeral = 0;
 										
 										foreach ($rowProdutos as $item){
@@ -560,14 +675,14 @@ try{
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
+												<div class="col-lg-7">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
 															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
 														</div>
 														<div class="col-lg-8">
-															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['Detalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
 														</div>
 														<div class="col-lg-3">
 															<input type="text" id="inputMarca'.$cont.'" name="inputMarca'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['MarcaNome'].'" value="'.$item['MarcaNome'].'" readOnly>
@@ -578,13 +693,13 @@ try{
 													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade pula" onChange="calculaValorTotal()" value="'.$iQuantidade.'">
 												</div>	
 												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
+													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario text-right pula" onChange="calculaValorTotal()" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
 												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$fValorTotal.'" readOnly>
+												<div class="col-lg-2">
+													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off text-right" value="'.$fValorTotal.'" readOnly>
 												</div>											
 											</div>');											
 											
@@ -592,7 +707,7 @@ try{
 										
 										print('
 										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
+												<div class="col-lg-7">
 													<div class="row">
 														<div class="col-lg-1">
 															
@@ -614,8 +729,8 @@ try{
 												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
 													<h5><b>Total:</b></h5>
 												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
+												<div class="col-lg-2">
+													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="'.mostraValor($fTotalGeral).'" readOnly>
 												</div>											
 											</div>'										
 										);
@@ -633,19 +748,21 @@ try{
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-6">
 									<div class="form-group">
-										<?php										
-											if ($row['FluxoFechado']){												
-												print('
-												<button class="btn btn-lg btn-principal" id="enviar" style="margin-right:5px;">Alterar</button>
-												<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
-											} else{ 
-												if (!$countProduto){
-													print('<button class="btn btn-lg btn-principal" id="enviar" disabled>Alterar</button>');
-												} else {
-													print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-												}
+										<?php	
+                                            if ($row['SituaChave'] != 'LIBERADO'){	
+												if ($row['FluxoFechado']){												
+													print('
+													<button class="btn btn-lg btn-principal" id="enviar" style="margin-right:5px;">Alterar</button>
+													<button class="btn btn-lg btn-default" id="enviarAprovacao">Enviar para Aprovação</button>');
+												} else{ 
+													if (!$countProduto){
+														print('<button class="btn btn-lg btn-principal" id="enviar" disabled>Alterar</button>');
+													} else {
+														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+													}
+												} 
 											} 
-										
+
 											if ($_POST['inputOrigem'] == 'fluxo.php'){
 												print('<a href="fluxo.php" class="btn btn-basic" role="button">Cancelar</a>');
 											} else {
@@ -658,7 +775,7 @@ try{
 
 								<div class="col-lg-6" style="text-align: right; padding-right: 35px; color: red;">
 								<?php	
-									if ($row['FluxoFechado']){
+									if ($row['FluxoFechado' ] && $row['SituaChave'] != 'LIBERADO'){
 										if($row['SituaNome'] == 'PENDENTE'){
 											print('<i class="icon-info3" data-popup="tooltip" data-placement="bottom"></i>Preenchimento Concluído (ENVIE PARA APROVAÇÃO)');
 										} else {

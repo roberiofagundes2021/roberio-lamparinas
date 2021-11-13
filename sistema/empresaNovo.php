@@ -241,6 +241,11 @@ if(isset($_POST['inputCnpj'])){
 			$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
+
+				// subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
+				var cep = $("#inputCep").val()
+				cep = cep.replace(' ','')
+				$("#inputCep").val(cep)
 				
 				//pega só os números do campo CNPJ
 				var inputCnpj = $('#inputCnpj').val().replace(/[^\d]+/g,'');
