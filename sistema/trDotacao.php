@@ -279,13 +279,8 @@
 										<div class="col-lg-12">								
 											<div class="form-group">
 												<?php if ($count <= 0) : ?>
-
-												<?php
-												if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('ADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA') || $_SESSION['PerfiChave']==strtoupper('JURIDICO')){
-													print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button> ');
-												}
-												?>
-													<?php endif; ?>												
+													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+												<?php endif; ?>												
 											</div>
 										</div>
 									</div>
@@ -318,11 +313,9 @@
 												
 												<td class="text-center">
 													<div class="list-icons">
-														<div class="list-icons list-icons-extended">');
-														if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('ADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA') || $_SESSION['PerfiChave']==strtoupper('JURIDICO')){
-															print('	<a href="#" onclick="removeDotacao('.$item['DtOrcId'].', \''.$item['DtOrcData'].'\',\''.$item['DtOrcNome'].'\', \''.$item['DtOrcArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>');	
-														}
-												print('	</div>
+														<div class="list-icons list-icons-extended">														
+															<a href="#" onclick="removeDotacao('.$item['DtOrcId'].', \''.$item['DtOrcData'].'\',\''.$item['DtOrcNome'].'\', \''.$item['DtOrcArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														</div>
 													</div>
 												</td>
 

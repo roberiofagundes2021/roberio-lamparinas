@@ -47,7 +47,33 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			const inputDateInitial = document.querySelector('#inputDataInicio');
 			const inputDateEnd = document.querySelector('#inputDataFim');
 			const submitPesquisar = document.querySelector('#submitPesquisar');
-
+			const cmbCentroDeCustosItens = $(".centroDeCustosClass");
+/////////////////////////////////////
+			cmbCentroDeCustosItens.each((i, element) => {
+				
+				if($(element).hasClass('multiselect-item')){
+					let check = $(element).children().children().first();
+                    let value = $(check).val()
+					console.log(value)
+					check.click((e) => {
+						try {
+						    $.post(
+						    	url,
+						    	request,
+						    	(response) => {
+						    		if (response) {
+						    			
+						    		}
+						    	}
+						    );
+					    } catch(err) {
+					        console.error('Houve um error: ',err);
+					    }
+					})
+		
+				}
+			});
+////////////////////////////////////////
 
 			inputDateInitial.addEventListener('change', (e) => {
 				const monthInitial = (inputDateInitial.value).split('-')[1] ? (inputDateInitial.value).split('-')[1] : "";
@@ -55,6 +81,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 				const dayInitial = (inputDateInitial.value).split('-')[2] ? (inputDateInitial.value).split('-')[2] : "";
 				const dayEnd = (inputDateEnd.value).split('-')[2] ? (inputDateEnd.value).split('-')[2] : "";
 				const typeDate = document.querySelector('.btn.active').textContent;
+				const yearInitial = (inputDateInitial.value).split('-')[0] ? (inputDateInitial.value).split('-')[0] : "";
+				const yearEnd = (inputDateEnd.value).split('-')[0] ? (inputDateEnd.value).split('-')[0] : "";
 
 				if (typeDate === 'Dia') {
 					if ((monthEnd !== '' && monthEnd !== null) && (monthInitial !== '' && monthInitial !== null) && (monthEnd !== monthInitial)) {
@@ -62,6 +90,13 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 						inputDateInitial.value = "";
 					} else if ((dayInitial !== '' && dayInitial !== null) && (dayEnd !== '' && dayEnd !== null) && (dayInitial > dayEnd)) {
 						alerta('Atenção','A data inicial tem que ser menor que a data final!', 'error');
+						inputDateInitial.value = "";
+					}
+				}
+
+				if (typeDate === 'Mês') {
+					if ((yearInitial !== '' && yearInitial !== null) && (yearEnd !== '' && yearEnd !== null) && (yearInitial != yearEnd)) {
+						alerta('Atenção','Informe um período detro do mesmo ano!', 'error');
 						inputDateInitial.value = "";
 					}
 				}
@@ -75,6 +110,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 				const dayInitial = (inputDateInitial.value).split('-')[2] ? (inputDateInitial.value).split('-')[2] : "";
 				const dayEnd = (inputDateEnd.value).split('-')[2] ? (inputDateEnd.value).split('-')[2] : "";
 				const typeDate = document.querySelector('.btn.active').textContent;
+				const yearInitial = (inputDateInitial.value).split('-')[0] ? (inputDateInitial.value).split('-')[0] : "";
+				const yearEnd = (inputDateEnd.value).split('-')[0] ? (inputDateEnd.value).split('-')[0] : "";
 
 				if (typeDate === 'Dia') {
 					if ((monthEnd !== '' && monthEnd !== null) && (monthInitial !== '' && monthInitial !== null) && (monthEnd !== monthInitial)) {
@@ -83,6 +120,13 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 					} else if ((dayInitial !== '' && dayInitial !== null) && (dayEnd !== '' && dayEnd !== null) && (dayEnd < dayInitial)) {
 						alerta('Atenção','A data final tem que ser maior que a data inicial!', 'error');
 						inputDateEnd.value = "";
+					}
+				}
+
+				if (typeDate === 'Mês') {
+					if ((yearInitial !== '' && yearInitial !== null) && (yearEnd !== '' && yearEnd !== null) && (yearInitial != yearEnd)) {
+						alerta('Atenção','Informe um período detro do mesmo ano!', 'error');
+						inputDateInitial.value = "";
 					}
 				}
 			});
@@ -116,6 +160,12 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 				buttonDay.style.color = 'black';
 				buttonDay.classList.remove('active');
 			});
+
+
+			//cmbCentroDeCustos
+			$("#cmbCentroDeCustos").click(e => {
+				console.log('teste')
+			})
 
 
 			submitPesquisar.addEventListener('click', (e) => {
@@ -158,11 +208,30 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 						quantityDays: quantityDays,
 						dayInitial: dayInitial,
 						dayEnd: dayEnd,
-						inputDateInitial: inputDateInitial.value,
-						inputDateEnd: inputDateEnd.value,
+						inputDateInitial: `${inputDateInitial.value}-01`,
+						inputDateEnd: `${inputDateEnd.value}-01`,
 						cmbCentroDeCustos: cmbCentroDeCustosReq,
 						cmbPlanoContas: cmbPlanoContasReq,
 					};
+					// console.log(request)
+					/* Adicionando os dados do filtro para o formulário que será enviado para o exportar */
+
+					$("#quantityPages").val(quantityPages)
+					$("#typeDate").val(typeDate)
+					$("#quantityDays").val(quantityDays)
+					$("#dayInitial").val(dayInitial)
+					$("#dayEnd").val(dayEnd)
+					$("#inputDateInitial").val(`${inputDateInitial.value}-01`)
+					$("#inputDateEnd").val(`${inputDateEnd.value}-01`)
+					$("#inputCentroDeCustos").val(cmbCentroDeCustosReq)
+					$("#inputPlanoContas").val(cmbPlanoContasReq)
+					// console.log($("#cmbPlanoContas").val())
+
+					const form = $("#formFluxoDeCaixaExportar").children()
+					// console.log(form)
+					form.each((i, e)=>{
+                       console.log($(e).val())
+					})
 
 					$('#dataResponse').html(msg);
 
@@ -185,7 +254,13 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 				getData();
 
 			});
+
 		});
+
+		function exportarTabelaExcel() {
+            document.formFluxoDeCaixaExportar.action = "fluxoDeCaixaExportar.php";
+			document.formFluxoDeCaixaExportar.submit();
+		}
 	</script>
 
 </head>
@@ -271,14 +346,14 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 														$rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
 
 														foreach ($rowCentroDeCustos as $item) {
-															print('<option value="' . $item['CnCusId'] . '" selected>' . $item['CnCusNome'] . '</option>');
+															print('<option value="' . $item['CnCusId'] . '" class="centroDeCustosClass" selected>' . $item['CnCusNome'] . '</option>');
 														}
 													?>
 												</select>
 											</div>
 										</div>
 
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group container-cmbPlanoContas">
 												<label for="cmbPlanoContas">Plano de Contas</label>
 												<select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control multiselect-select-all" multiple="multiple" data-fouc>
@@ -305,27 +380,33 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 										<div class="text-left col-lg-1 pt-3">
 											<button id="submitPesquisar" class="btn btn-principal" style='margin-left:1rem'><i class="fas fa-search"></i></button>
 										</div>
+										<div class="text-left col-lg-1 pt-3">
+									        <a href="#" style="" onclick="exportarTabelaExcel()" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>									
+								        </div>
 									</div>
 								</form>
 							</div>
+							<!-- <div class="row mb-2">
+								<div class="col-lg-11">		
+								</div>
+								<div class="col-lg-1">
+									<a href="#" style="float:left; margin-left: 5px;" onclick="exportarTabelaExcel()" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>									
+								</div>
+							</div> -->
 
 							<div id="dataResponse"></div>
 
-							<!-- <div class="row">
-								<div class="col-lg-12">
-									 Basic responsive configuration
-										<div class="card-body" >
-											<div class="row">
-												<div class="col-lg-2">
-												</div>
-												<div class="col-lg-2" style='text-align:center; border-top: 2px solid #1B3280; padding-top: 1rem;'>
-													<span><strong>2021</strong></span><br/>
-													<span><strong>JAN</strong></span>
-												</div>
-											</div>
-										</div>
-								</div>
-							</div> -->
+							<form id="formFluxoDeCaixaExportar" name="formFluxoDeCaixaExportar" method="post">
+					            <input type="hidden" id="quantityPages" name="quantityPages">
+					            <input type="hidden" id="typeDate" name="typeDate">
+					            <input type="hidden" id="quantityDays" name="quantityDays">
+					            <input type="hidden" id="dayInitial" name="dayInitial">
+					            <input type="hidden" id="dayEnd" name="dayEnd">
+					            <input type="hidden" id="inputDateInitial" name="inputDateInitial">
+					            <input type="hidden" id="inputDateEnd" name="inputDateEnd">
+					            <input type="hidden" id="inputCentroDeCustos" name="inputCentroDeCustos">
+					            <input type="hidden" id="inputPlanoContas" name="inputPlanoContas">
+				            </form>
 
 						<!-- FIM DO CARD -->	
 						</div>
