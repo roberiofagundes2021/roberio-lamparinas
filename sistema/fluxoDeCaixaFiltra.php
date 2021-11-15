@@ -499,6 +499,16 @@ function retornaBuscaComoArray($datasFiltro,$ccFiltro,$plFiltro)
 // loop dos dias 
 //-------------------------------------------------------------------------------------
 
+if(!isset($_POST["cmbCentroDeCustos"]) || !isset($_POST["cmbPlanoContas"])){
+   print("
+            <div class='d-flex flex-column justify-content-center' style='height:300px'>
+              <div class='flex-row justify-content-center'>
+                <p style='text-align:center'>Relatório não pode ser gerado. Ainda não foi cadastrado nenhum Centro de Custos e Plano de contas.</p>
+              </div>
+            </div>
+          ");
+   return;
+}
 $numDias    = $_POST["quantityDays"];
 $diaInicio  = $_POST["dayInitial"];
 $diaFim     = $_POST["dayEnd"];

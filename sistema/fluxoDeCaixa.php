@@ -381,7 +381,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 											<button id="submitPesquisar" class="btn btn-principal" style='margin-left:1rem'><i class="fas fa-search"></i></button>
 										</div>
 										<div class="text-left col-lg-1 pt-3">
-									        <a href="#" style="" onclick="exportarTabelaExcel()" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>									
+									        <a href="#" onclick="exportarTabelaExcel()" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Produtos"><i class="icon-drawer-out"></i></a>									
 								        </div>
 									</div>
 								</form>
