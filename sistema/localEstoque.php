@@ -6,6 +6,7 @@ $_SESSION['PaginaAtual'] = 'Local do Estoque';
 
 include('global_assets/php/conexao.php');
 
+
 if (isset($_POST['inputEmpresaId'])){
 	$_SESSION['EmpresaId'] = $_POST['inputEmpresaId'];
 }
@@ -13,7 +14,13 @@ if (isset($_POST['inputEmpresaNome'])){
 	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
 }
 
-if (isset($_SESSION['EmpresaId'])){
+// isset($_POST['inputEmpresaId'])
+// isset($_POST['inputEmpresaId'])
+
+// isset($_POST['inputEmpresaNome'])
+// isset($_POST['inputEmpresaNome'])
+
+if (isset($_POST['inputEmpresaId'])){
 	
 	//Essa consulta é para preencher a grid usando a coluna Unidade
 	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, LcEstChave, UnidaNome, SituaNome, SituaCor, SituaChave
@@ -25,9 +32,7 @@ if (isset($_SESSION['EmpresaId'])){
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
 	//$count = count($row);
-
 } else{
-	
 	//Essa consulta é para preencher a grid sem a coluna Unidade, já que aqui é a unidade do usuário logado
 	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, LcEstChave, SituaNome, SituaCor, SituaChave
 			FROM LocalEstoque
@@ -37,8 +42,13 @@ if (isset($_SESSION['EmpresaId'])){
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
 	//$count = count($row);
-}
 
+	$sqlUnidade = "SELECT UnidaId, UnidaNome
+				FROM Unidade
+				WHERE UnidaId = ". $_SESSION['UnidadeId'];
+	$resultUnidade = $conn->query($sqlUnidade);
+	$unidadeUser = $resultUnidade->fetch(PDO::FETCH_ASSOC);
+}
 
 ?>
 
@@ -183,7 +193,7 @@ if (isset($_SESSION['EmpresaId'])){
 
 </head>
 
-<body class="navbar-top <?php if (isset($_SESSION['EmpresaId'])) echo "sidebar-xs"; ?>">
+<body class="navbar-top <?php if (isset($_POST['inputEmpresaId'])) echo "sidebar-xs"; ?>">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -193,7 +203,7 @@ if (isset($_SESSION['EmpresaId'])){
 		<?php include_once("menu-left.php"); ?>
 
 		<?php 
-			  if (isset($_SESSION['EmpresaId'])){ 
+			  if (isset($_POST['inputEmpresaId'])){ 
 				include_once("menuLeftSecundario.php");
 			  } 
 		?>		
@@ -218,7 +228,10 @@ if (isset($_SESSION['EmpresaId'])){
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-9">
-									<p class="font-size-lg">A relação abaixo faz referência aos Locais de Estoque da empresa <b><?php echo $_SESSION['EmpresaNome']; ?></b></p>
+										<?php 
+											echo (isset($_POST['inputEmpresaNome'])?'<p class="font-size-lg">A relação abaixo faz referência aos Locais de Estoque da empresa <b>'.$_POST['inputEmpresaNome'].'</b></p>':
+											'<p class="font-size-lg">A relação abaixo faz referência a unidade <b>'.$unidadeUser['UnidaNome'].'</b></p>');
+										?>
 									</div>	
 										<div class="col-lg-3">	
 										<div class="text-right"><a href="localEstoqueNovo.php" class="btn btn-principal" role="button">Novo Local de Estoque</a></div>
@@ -229,7 +242,7 @@ if (isset($_SESSION['EmpresaId'])){
 							
 							<?php 
 							
-								if (isset($_SESSION['EmpresaId'])){
+								if (isset($_POST['inputEmpresaId'])){
 									print('<table id="tblLocalEstoqueEmpresa" class="table">');
 								} else {
 									print('<table id="tblLocalEstoque" class="table">');
@@ -241,7 +254,7 @@ if (isset($_SESSION['EmpresaId'])){
 										<th>Local do Estoque</th>
 
 										<?php 
-											if (isset($_SESSION['EmpresaId'])){
+											if (isset($_POST['inputEmpresaId'])){
 												print('<td>Unidade</td>');
 											}
 										?>
@@ -261,7 +274,7 @@ if (isset($_SESSION['EmpresaId'])){
 											<td>'.$item['LcEstNome'].'</td>
 											');
 										
-										if (isset($_SESSION['EmpresaId'])){
+										if (isset($_POST['inputEmpresaId'])){
 											print('<td>'.$item['UnidaNome'].'</td>');
 										}
 

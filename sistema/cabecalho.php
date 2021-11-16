@@ -41,15 +41,15 @@
 
 			<!-- Page header -->
 			<script>
-				function goPage(content){
-					var conteudo = content.split('#')
-					document.getElementById('formActionConfig').action = conteudo[0]
-					// document.getElementById('inputEmpresaIdConfig').value = conteudo[1]
-					document.getElementById('inputEmpresaNomeConfig').value = conteudo[2]
+				// function goPage(content){
+				// 	var conteudo = content.split('#')
+				// 	document.getElementById('formActionConfig').action = conteudo[0]
+				// 	document.getElementById('inputEmpresaIdConfig').value = conteudo[1]
+				// 	document.getElementById('inputEmpresaNomeConfig').value = conteudo[2]
 
-					document.getElementById('formActionConfig').submit()
+				// 	document.getElementById('formActionConfig').submit()
 
-				}
+				// }
 			</script>
 			<div class="page-header page-header-light">
 				<div class="page-header-content header-elements-md-inline" style="display:none;">
@@ -104,7 +104,8 @@
 											</a>
 										<div class="dropdown-menu dropdown-menu-right">');
 								foreach($config as $conf){
-									echo('<a href="#" onclick="goPage('.'\''.$conf['MenuUrl'].'#'.$empresa['EmpreId'].'#'.$empresa['EmpreNomeFantasia'].'\''.');" class="dropdown-item"><i class="'.$conf['MenuIco'].'"></i>'.$conf['MenuNome'].'</a>');
+									// echo('<a href="#" onclick="goPage('.'\''.$conf['MenuUrl'].'#'.$empresa['EmpreId'].'#'.$empresa['EmpreNomeFantasia'].'\''.');" class="dropdown-item"><i class="'.$conf['MenuIco'].'"></i>'.$conf['MenuNome'].'</a>');
+									echo('<a href="'.$conf['MenuUrl'].'" class="dropdown-item"><i class="'.$conf['MenuIco'].'"></i>'.$conf['MenuNome'].'</a>');
 								}
 								print('</div>
 								</div>');
@@ -113,9 +114,9 @@
 						</div>
 					</div>
 				</div>
-				<form id="formActionConfig" name="formActionConfig" method="POST">
-					<!-- <input type="hidden" id="inputEmpresaIdConfig" name="inputEmpresaId" > -->
+				<!-- <form id="formActionConfig" name="formActionConfig" method="POST">
+					<input type="hidden" id="inputEmpresaIdConfig" name="inputEmpresaId" >
 					<input type="hidden" id="inputEmpresaNomeConfig" name="inputEmpresaNome" >
-				</form>
+				</form> -->
 			</div>
 			<!-- /page header -->
