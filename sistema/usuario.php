@@ -11,7 +11,7 @@ if (isset($_POST['inputEmpresaId'])){
 	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
 }
 
-if (isset($_SESSION['EmpresaId'])){	
+if (isset($_POST['inputEmpresaId'])){	
 	$EmpresaId =   $_SESSION['EmpresaId'];
 	$EmpresaNome = $_SESSION['EmpresaNome'];
 } else {	
@@ -183,7 +183,7 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 
 	<?php
 		
-		if (isset($_SESSION['EmpresaId'])){	
+		if (isset($_POST['inputEmpresaId'])){	
 			print('<body class="navbar-top sidebar-xs">');
 		} else {
 			print('<body class="navbar-top">');
@@ -199,7 +199,7 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 		
 			include_once("menu-left.php"); 
 		
-			if (isset($_SESSION['EmpresaId'])){
+			if (isset($_POST['inputEmpresaId'])){
 				include_once("menuLeftSecundario.php");
 			}
 		?>		
@@ -271,13 +271,13 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">');
 
-										if (isset($_SESSION['EmpresaId'])){
+										if (isset($_POST['inputEmpresaId'])){
 											print('		<a href="#" onclick="atualizaUsuario(1,'.$item['UsuarId'].', \''.addslashes($item['UsuarNome']).'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'lotacao\')" class="list-icons-item"><i class="icon-users4" data-popup="tooltip" data-placement="bottom" title="Lotação"></i></a>');
 										}										
 										
 										print('	<a href="#" onclick="atualizaUsuario('.$atualizar.','.$item['UsuarId'].', \''.addslashes($item['UsuarNome']).'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'edita\')" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
 														<a href="#" onclick="atualizaUsuario('.$excluir.','.$item['UsuarId'].', \''.addslashes($item['UsuarNome']).'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'exclui\')" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>'.
-														(!isset($_SESSION['EmpresaId'])?'<a href="#" onclick="atualizaUsuario(1,'.$item['UsuarId'].', \''.addslashes($item['UsuarNome']).'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'permissao\')" class="list-icons-item"><i class="icon-lock2" data-popup="tooltip" data-placement="bottom" title="permissao"></i></a>':'')
+														(!isset($_POST['inputEmpresaId'])?'<a href="#" onclick="atualizaUsuario(1,'.$item['UsuarId'].', \''.addslashes($item['UsuarNome']).'\', '.$item['EXUXPStatus'].', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'permissao\')" class="list-icons-item"><i class="icon-lock2" data-popup="tooltip" data-placement="bottom" title="permissao"></i></a>':'')
 													.'</div>
 												</div>
 											</td>

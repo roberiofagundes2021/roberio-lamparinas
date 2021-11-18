@@ -1,8 +1,9 @@
 		<script language ="javascript">
 		
-			function mudarEmpresa(empresaSelecionada) {				
+			function mudarEmpresa(URL) {
 				
-				var empresa = empresaSelecionada.split("#");
+				var empresa = $('#cmbEmpresa').val()
+				empresa = empresa.split("#");
 				
 				var id = empresa[0];
 				var nome = empresa[1];
@@ -10,6 +11,7 @@
 				$('#inputEmpresaId').val(id)
 				$('#inputEmpresaNome').val(nome)
 
+				$('#formNewEmpresa').attr('action', URL)
 				$('#formNewEmpresa').submit()
 				
 				// $.ajax({
@@ -57,7 +59,7 @@
 					<div class="card-body">
 						<form action="#">
 							<div class="form-group-feedback form-group-feedback-right">
-								<select id="cmbEmpresa" name="cmbEmpresa" class="form-control form-control-select2" onChange="mudarEmpresa(this.value); ">
+								<select id="cmbEmpresa" name="cmbEmpresa" class="form-control form-control-select2" onChange="mudarEmpresa('localEstoque.php'); ">
 									<?php 
 										$sql = "SELECT EmpreId, EmpreNomeFantasia
 												FROM Empresa
@@ -76,7 +78,7 @@
 						</form>
 					</div>
 
-					<form id="formNewEmpresa" name="formEmpresa" method="post" action="localEstoque.php">
+					<form id="formNewEmpresa" name="formEmpresa" method="post">
 						<input type="hidden" id="inputEmpresaId" name="inputEmpresaId" >
 						<input type="hidden" id="inputEmpresaNome" name="inputEmpresaNome" >
 					</form>
@@ -90,19 +92,19 @@
 						<ul class="nav nav-sidebar" data-nav-type="accordion">
 							<li class="nav-item-header">GERENCIAR EMPRESA</li>
 							<li class="nav-item">
-								<a href="licenca.php" class="nav-link"><i class="icon-certificate"></i> Licença</a>
+								<a href="#" onclick="mudarEmpresa('licenca.php')" class="nav-link"><i class="icon-certificate"></i> Licença</a>
 							</li>
 							<li class="nav-item">
-								<a href="unidade.php" class="nav-link"><i class="icon-home7"></i> Unidade</a>
+								<a href="#" onclick="mudarEmpresa('unidade.php')" class="nav-link"><i class="icon-home7"></i> Unidade</a>
 							</li>
 							<li class="nav-item">
-								<a href="setor.php" class="nav-link"><i class="icon-cabinet"></i> Setor</a>
+								<a href="#" onclick="mudarEmpresa('setor.php')" class="nav-link"><i class="icon-cabinet"></i> Setor</a>
 							</li>
 							<li class="nav-item">
-								<a href="localEstoque.php" class="nav-link"><i class="icon-box"></i> Local de Estoque</a>
+								<a href="#" onclick="mudarEmpresa('localEstoque.php')" class="nav-link"><i class="icon-box"></i> Local de Estoque</a>
 							</li>
 							<li class="nav-item">
-								<a href="usuario.php" class="nav-link">
+								<a href="#" onclick="mudarEmpresa('usuario.php')" class="nav-link">
 								
 									<?php 
 										$sql = "SELECT EXUXPUsuario
