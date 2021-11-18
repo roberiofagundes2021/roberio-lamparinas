@@ -41,7 +41,7 @@ $empresa = $parametro['ParamEmpresaPublica'] ? 'Publica' : 'Privada';
 
 $sqlMenuUxP = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo,
 				MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave,
-				UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeInserir, UsXPeUnidade
+				UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeInserir, UsXPeSuperAdmin, UsXPeUnidade
 				FROM Menu
 				JOIN Situacao on MenuStatus = SituaId
 				JOIN UsuarioXPermissao on MenuId = UsXPeMenu  
@@ -61,7 +61,7 @@ if(!isset($menuUxP[0]['UsXPeVisualizar'])){
 	$sqlMenuUxP = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo,
 					MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, 
 					PrXPeId, PrXPePerfil, PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeInserir,
-					PrXPeUnidade
+					PrXPeSuperAdmin, PrXPeUnidade
 					FROM Menu
 					JOIN Situacao on MenuStatus = SituaId
 					JOIN PerfilXPermissao on MenuId = PrXPeMenu 
@@ -360,7 +360,11 @@ $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 									<?php
 
 										foreach($menuUxP as $men){
-											if ($men["MenuModulo"] == $mod["ModulId"] && $men['MenuSubMenu'] == 0 && $men['MenuPai'] == 0 && $men['SituaChave'] == strtoupper("ativo")){
+											$superADmin = false;
+											if ($men["PrXPeSuperAdmin"] == 0 || $_SESSION['PerfiChave'] == 'SUPER'){
+												$superADmin = true;
+											}
+											if ($men["MenuModulo"] == $mod["ModulId"] && $men['MenuSubMenu'] == 0 && $men['MenuPai'] == 0 && $men['SituaChave'] == strtoupper("ativo") && $superADmin){
 												echo '<input name="'.$men['MenuId'].'-MenuId" value='.$men['MenuId'].' type="hidden">';
 												echo '<tr>
 													<td><h5>'.$men['MenuNome'].'</h5></td>

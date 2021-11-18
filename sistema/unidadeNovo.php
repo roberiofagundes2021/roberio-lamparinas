@@ -41,27 +41,35 @@ if(isset($_POST['inputNome'])){
     $sqlUnidade = $sqlUnidade->fetch(PDO::FETCH_ASSOC);
 
     // seleciona todos os menus cadastrados
-    $sqlMenu = "SELECT MenuId FROM Menu";
+    $sqlMenu = "SELECT MenuId, MenuNome FROM Menu";
     $sqlMenu = $conn->query($sqlMenu);
     $sqlMenu = $sqlMenu->fetchAll(PDO::FETCH_ASSOC);
 
     // seleciona todos os perfis cadastrados
-    $sqlPerfil = "SELECT PerfiId FROM Perfil";
+    $sqlPerfil = "SELECT PerfiId, PerfiChave FROM Perfil";
     $sqlPerfil = $conn->query($sqlPerfil);
     $sqlPerfil = $sqlPerfil->fetchAll(PDO::FETCH_ASSOC);
 
     // Laço de repetição, para cada perfil será adicionado todos os menus com permissões padrões
     foreach($sqlPerfil as $perfil){
-      $sql = "INSERT INTO PerfilXPermissao(PrXPePerfil,PrXPeMenu,PrXPeInserir,PrXPeVisualizar,PrXPeAtualizar,PrXPeExcluir,PrXPeUnidade) VALUES";
+      // esse array representa os menus que so podem ser vistos por super admin
+      $arraySuperAdimin = [
+        'Bancos',
+        'Tipo Fiscal',
+        'Setor'
+      ];
+      $sql = "INSERT INTO PerfilXPermissao(PrXPePerfil,PrXPeMenu,PrXPeInserir,PrXPeVisualizar,PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin,PrXPeUnidade) VALUES";
       $count = COUNT($sqlMenu);
       $x = 0;
       foreach($sqlMenu as $menu){
-              if ($x != $count - 1){
-                      $x += 1;
-                      $sql .= " ($perfil[PerfiId], $menu[MenuId], 1, 1, 1, 1, $sqlUnidade[UnidaId]),";
-              } else {
-                      $sql .= " ($perfil[PerfiId], $menu[MenuId], 1, 1, 1, 1, $sqlUnidade[UnidaId])";
-              }
+        // se o menu atual pertencer ao arraySuperAdimin  então ele so pode ser acessodo por um SuperAdmin 
+        $superAdmin = in_array($menu['MenuNome'], $arraySuperAdimin)?1:0;
+        if ($x != $count - 1){
+                $x += 1;
+                $sql .= " ($perfil[PerfiId], $menu[MenuId], 1, 1, 1, 1, $superAdmin, $sqlUnidade[UnidaId]),";
+        } else {
+                $sql .= " ($perfil[PerfiId], $menu[MenuId], 1, 1, 1, 1, $superAdmin, $sqlUnidade[UnidaId])";
+        }
       }
       $conn->query($sql);
 }
