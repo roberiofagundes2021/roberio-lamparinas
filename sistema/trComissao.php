@@ -522,7 +522,11 @@ if(isset($_POST['cmbUsuario'])){
 									<div class="row" style="margin-top: 10px;">
 										<div class="col-lg-12">								
 											<div class="form-group">
-												<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>											
+											<?php
+											if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')){
+												print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
+											}
+											?>											
 											</div>
 										</div>
 									</div>
