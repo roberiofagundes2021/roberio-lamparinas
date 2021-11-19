@@ -116,7 +116,7 @@ if ($sTipoProdutoServico == 'P') {
 			LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
 			JOIN Situacao on SituaId = MovimSituacao
 			Where MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimData between '" . $dDataInicio . "' and '" . $dDataFim . "' 
-			and SituaChave = 'LIBERADO' ";
+			and SituaChave in ('LIBERADO', 'LIBERADOCENTRO', 'AGUARDANDOLIBERACAOCONTABILIDADE', 'LIBERADOCONTABILIDADE') ";
 
 	if ($iTipo != 0) {
 		$sql .= " and MovimTipo = $iTipo ";
@@ -187,7 +187,7 @@ if ($sTipoProdutoServico == 'P') {
 			LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor
 			JOIN Situacao on SituaId = MovimSituacao
 		    Where MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimData between '" . $dDataInicio . "' and '" . $dDataFim . "' 
-		    and SituaChave = 'LIBERADO' ";
+		    and SituaChave in ('LIBERADO', 'LIBERADOCENTRO', 'AGUARDANDOLIBERACAOCONTABILIDADE', 'LIBERADOCONTABILIDADE') ";
 
 	if ($iCategoria != '' and $iCategoria != 0) {
 		$sql .= " and ServiCategoria = $iCategoria ";
@@ -359,15 +359,15 @@ try {
 					<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
 				</tr>
 				<tr>
-					<td style='border:none' colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
-					<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+					<td colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
+					<td colspan='2'>Destino: " . $item['Destino'] . "</td>											
 				</tr>
 				<tr>	
-					<td style='width:25%; border:none'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
-					<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
-					<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
-					<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
-					<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+					<td style='width:25%'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
+					<td style='width:25%'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+					<td style='width:25%'>Lote: " . $item['MvXPrLote'] . "</td>
+					<td style='width:25%'>Validade: " . $dValidade . "</td>
+					<td style='width:25%'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
 				</tr>
 				<tr><td style='border:none;'></td></tr>
 				";
@@ -380,15 +380,15 @@ try {
 					<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
 				</tr>
 				<tr>
-					<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
-					<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+					<td colspan='3'>Origem: " . $item['Origem'] . "</td>
+					<td colspan='2'>Destino: " . $item['Destino'] . "</td>											
 				</tr>
 				<tr>	
-					<td style='width:25%; border:none'>Classificação: " . $item['ClassNome'] . "</td>
-					<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
-					<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
-					<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
-					<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+					<td style='width:25%'>Classificação: " . $item['ClassNome'] . "</td>
+					<td style='width:25%'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+					<td style='width:25%'>Lote: " . $item['MvXPrLote'] . "</td>
+					<td style='width:25%'>Validade: " . $dValidade . "</td>
+					<td style='width:25%'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
 				</tr>
 				<tr><td style='border:none;'></td></tr>
 				";
@@ -400,15 +400,15 @@ try {
 					<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
 				</tr>
 				<tr>
-					<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
-					<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+					<td colspan='3'>Origem: " . $item['Origem'] . "</td>
+					<td colspan='2'>Destino: " . $item['Destino'] . "</td>											
 				</tr>
 				<tr>	
-					<td style='width:25%; border:none'>Classificação: " . $item['ClassNome'] . "</td>
-					<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
-					<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
-					<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
-					<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+					<td style='width:25%'>Classificação: " . $item['ClassNome'] . "</td>
+					<td style='width:25%'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+					<td style='width:25%'>Lote: " . $item['MvXPrLote'] . "</td>
+					<td style='width:25%'>Validade: " . $dValidade . "</td>
+					<td style='width:25%'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
 				</tr>
 				<tr><td style='border:none;'></td></tr>
 				";
@@ -422,15 +422,15 @@ try {
 						<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
 					</tr>
 					<tr>
-						<td style='border:none' colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
-						<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+						<td colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
+						<td colspan='2'>Destino: " . $item['Destino'] . "</td>											
 					</tr>
 					<tr>	
-						<td style='width:25%; border:none'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
-						<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
-						<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
-						<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
-						<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+						<td style='width:25%'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
+						<td style='width:25%'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+						<td style='width:25%'>Lote: " . $item['MvXPrLote'] . "</td>
+						<td style='width:25%'>Validade: " . $dValidade . "</td>
+						<td style='width:25%'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
 					</tr>
 					<tr><td style='border:none;'></td></tr>
 					";
@@ -445,15 +445,15 @@ try {
 						<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
 					</tr>
 					<tr>
-						<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
-						<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+						<td colspan='3'>Origem: " . $item['Origem'] . "</td>
+						<td colspan='2'>Destino: " . $item['Destino'] . "</td>											
 					</tr>
 					<tr>	
-						<td style='width:25%; border:none'>Classificação: " . $item['ClassNome'] . "</td>
-						<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
-						<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
-						<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
-						<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+						<td style='width:25%'>Classificação: " . $item['ClassNome'] . "</td>
+						<td style='width:25%'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+						<td style='width:25%'>Lote: " . $item['MvXPrLote'] . "</td>
+						<td style='width:25%'>Validade: " . $dValidade . "</td>
+						<td style='width:25%'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
 					</tr>
 					<tr><td style='border:none;'></td></tr>
 					";
@@ -468,15 +468,15 @@ try {
 						<td colspan='4' style='background-color:#EEEEEE;'>Produto: " . $item['ProduNome'] . "</td>
 					</tr>
 					<tr>
-						<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
-						<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+						<td colspan='3'>Origem: " . $item['Origem'] . "</td>
+						<td colspan='2'>Destino: " . $item['Destino'] . "</td>											
 					</tr>
 					<tr>	
-						<td style='width:25%; border:none'>Classificação: " . $item['ClassNome'] . "</td>
-						<td style='width:25%; border:none'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
-						<td style='width:25%; border:none'>Lote: " . $item['MvXPrLote'] . "</td>
-						<td style='width:25%; border:none'>Validade: " . $dValidade . "</td>
-						<td style='width:25%; border:none'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+						<td style='width:25%'>Classificação: " . $item['ClassNome'] . "</td>
+						<td style='width:25%'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+						<td style='width:25%'>Lote: " . $item['MvXPrLote'] . "</td>
+						<td style='width:25%'>Validade: " . $dValidade . "</td>
+						<td style='width:25%'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
 					</tr>
 					<tr><td style='border:none;'></td></tr>
 					";
@@ -496,13 +496,13 @@ try {
 					<td colspan='4' style='background-color:#EEEEEE;'>Serviço: " . $item['ServiNome'] . "</td>
 				</tr>
 				<tr>
-					<td style='border:none' colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
-					<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+					<td colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
+					<td colspan='2'>Destino: " . $item['Destino'] . "</td>											
 				</tr>
 				<tr>	
-					<td style='border:none' colspan='2'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
-					<td style='border:none' colspan='1'>Quantidade: " . $item['MvXSrQuantidade'] . "</td>
-					<td style='border:none' colspan='2'>Valor: " . mostraValor($item['MvXSrValorUnitario']) . "</td>
+					<td colspan='2'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
+					<td colspan='1'>Quantidade: " . $item['MvXSrQuantidade'] . "</td>
+					<td colspan='2'>Valor: " . mostraValor($item['MvXSrValorUnitario']) . "</td>
 				</tr>
 				<tr><td style='border:none;'></td></tr>
 				";
@@ -515,12 +515,12 @@ try {
 					<td colspan='4' style='background-color:#EEEEEE;'>Serviço: " . $item['ServiNome'] . "</td>
 				</tr>
 				<tr>
-					<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
-					<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+					<td colspan='3'>Origem: " . $item['Origem'] . "</td>
+					<td colspan='2'>Destino: " . $item['Destino'] . "</td>											
 				</tr>
 				<tr>	
-					<td style='border:none' colspan='3'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
-					<td style='border:none' colspan='2'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
+					<td colspan='3'>Quantidade: " . $item['MvXPrQuantidade'] . "</td>
+					<td colspan='2'>Valor: " . mostraValor($item['MvXPrValorUnitario']) . "</td>
 				</tr>
 				<tr><td style='border:none;'></td></tr>
 				";
@@ -535,13 +535,13 @@ try {
 						<td colspan='4' style='background-color:#EEEEEE;'>Serviço: " . $item['ServiNome'] . "</td>
 					</tr>
 					<tr>
-						<td style='border:none' colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
-						<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+						<td colspan='3'>Fornecedor: " . $item['ForneNome'] . "</td>
+						<td colspan='2'>Destino: " . $item['Destino'] . "</td>											
 					</tr>
 					<tr>	
-						<td style='border:none' colspan='2'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
-						<td style='border:none' colspan='1'>Quantidade: " . $item['MvXSrQuantidade'] . "</td>
-						<td style='border:none' colspan='2'>Valor: " . mostraValor($item['MvXSrValorUnitario']) . "</td>
+						<td colspan='2'>Nota Fiscal: " . $item['MovimNotaFiscal'] . "</td>
+						<td colspan='1'>Quantidade: " . $item['MvXSrQuantidade'] . "</td>
+						<td colspan='2'>Valor: " . mostraValor($item['MvXSrValorUnitario']) . "</td>
 					</tr>
 					<tr><td style='border:none;'></td></tr>
 					";
@@ -556,12 +556,12 @@ try {
 						<td colspan='4' style='background-color:#EEEEEE;'>Serviço: " . $item['ServiNome'] . "</td>
 					</tr>
 					<tr>
-						<td style='border:none' colspan='3'>Origem: " . $item['Origem'] . "</td>
-						<td style='border:none' colspan='2'>Destino: " . $item['Destino'] . "</td>											
+						<td colspan='3'>Origem: " . $item['Origem'] . "</td>
+						<td colspan='2'>Destino: " . $item['Destino'] . "</td>											
 					</tr>
 					<tr>	
-						<td style='border:none' colspan='3'>Quantidade: " . $item['MvXSrQuantidade'] . "</td>
-						<td style='border:none' colspan='2'>Valor: " . mostraValor($item['MvXSrValorUnitario']) . "</td>
+						<td colspan='3'>Quantidade: " . $item['MvXSrQuantidade'] . "</td>
+						<td colspan='2'>Valor: " . mostraValor($item['MvXSrValorUnitario']) . "</td>
 					</tr>
 					<tr><td style='border:none;'></td></tr>
 					";
@@ -609,7 +609,7 @@ try {
 		<div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
 	</div>";
 
-	$mpdf->SetHTMLHeader($topo, 'O', true);
+	//$mpdf->SetHTMLHeader($topo, 'O', true);
 	$mpdf->WriteHTML($html);
 	$mpdf->SetHTMLFooter($rodape);
 

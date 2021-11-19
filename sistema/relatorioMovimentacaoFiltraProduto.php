@@ -100,7 +100,8 @@ function queryPesquisa()
             LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
             LEFT JOIN Fornecedor on ForneId = MovimFornecedor
             LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
-            WHERE " . $string . " MovimUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'LIBERADO'
+            WHERE " . $string . " MovimUnidade = " . $_SESSION['UnidadeId'] . " and 
+            SituaChave in ('LIBERADO', 'LIBERADOCENTRO', 'AGUARDANDOLIBERACAOCONTABILIDADE', 'LIBERADOCONTABILIDADE')
             ";
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
