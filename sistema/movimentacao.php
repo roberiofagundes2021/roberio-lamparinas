@@ -177,8 +177,22 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
         document.formMovimentacao.action = "movimentacaoAnexo.php";
         document.formMovimentacao.submit();	
       }else if (Tipo == 'aprovacaoContabilidade') {
-					document.formMovimentacao.action = "movimentacaoAprovacaoContabilidade.php";
-          document.formMovimentacao.submit();	
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+						type: "POST",
+						url: "movimentacaoAnexoValida.php",
+						data: {IMovim: MovimId},
+						success: function(resposta){
+
+            if (resposta == 0){
+              alerta('Atenção','Nenhuma Nota Fiscal foi inserida. Favor anexar para continuar.','error');
+              return false;
+            } else{
+              document.formMovimentacao.action = "movimentacaoAprovacaoContabilidade.php";
+              document.formMovimentacao.submit();
+            }
+					}
+				})
 			} else if (Tipo == 'liquidar'){
          bootbox.prompt({
 							title: 'Informe a data do vencimento',
