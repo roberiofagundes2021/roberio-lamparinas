@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Centro de Custo';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusTipo, CnCusStatus, SituaNome, SituaCor, SituaChave
+$sql = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusDetalhamento, CnCusStatus, SituaNome, SituaCor, SituaChave
 		FROM CentroCusto
 		JOIN Situacao on SituaId = CnCusStatus
 	    WHERE CnCusUnidade = ". $_SESSION['UnidadeId'] ."
@@ -53,12 +53,12 @@ $count = count($row);
 				},
 				{
 					orderable: true,   //Centro de Custo
-					width: "35%",
+					width: "25%",
 					targets: [1]
 				},
 				{
-					orderable: true,   //Tipo
-					width: "35%",
+					orderable: true,   //Detalhamento
+					width: "45%",
 					targets: [2]
 				},
 				{ 
@@ -176,7 +176,7 @@ $count = count($row);
 									<tr class="bg-slate">
 										<th data-filter>Código</th>
 										<th data-filter>Centro de Custo</th>
-										<th data-filter>Tipo</th>
+										<th data-filter>Detalhamento</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -188,14 +188,12 @@ $count = count($row);
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
-
-										$tipo = $item['CnCusTipo'] == 'R' ? 'Receita' : 'Despesa';
 										
 										print('
 										<tr>
 											<td>'.$item['CnCusCodigo'].'</td>
 											<td>'.$item['CnCusNome'].'</td>
-											<td>'.$tipo.'</td>
+											<td>'.$item['CnCusDetalhamento'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaCentroCusto(1,'.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$situacaoChave .', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

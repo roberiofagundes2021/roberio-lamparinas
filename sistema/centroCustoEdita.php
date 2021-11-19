@@ -10,7 +10,7 @@ if(isset($_POST['inputCentroCustoId'])){
 	
 	$iCentroCusto = $_POST['inputCentroCustoId'];
 		
-	$sql = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusTipo
+	$sql = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusDetalhamento
 			FROM CentroCusto
 			WHERE CnCusId = $iCentroCusto ";
 	$result = $conn->query($sql);
@@ -26,14 +26,15 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE CentroCusto SET CnCusCodigo = :iCodigo, CnCusNome = :sNome, CnCusTipo = :sTipo, CnCusUsuarioAtualizador = :iUsuarioAtualizador
+		$sql = "UPDATE CentroCusto SET CnCusCodigo = :iCodigo, CnCusNome = :sNome, 
+				CnCusDetalhamento = :sDetalhamento, CnCusUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE CnCusId = :iCentroCusto";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':iCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
-						':sTipo' => $_POST['cmbTipo'],
+						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iCentroCusto' => $_POST['inputCentroCustoId']
 						));
@@ -65,9 +66,6 @@ if(isset($_POST['inputNome'])){
 	<title>Lamparinas | Centro de Custo</title>
 
 	<?php include_once("head.php"); ?>
-
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
@@ -140,7 +138,6 @@ if(isset($_POST['inputNome'])){
 						<input type="hidden" id="inputCentroCustoNome" name="inputCentroCustoNome" value="<?php echo $row['CnCusNome']; ?>" >
 						<div class="card-body">								
 							<div class="row">
-
 								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputCodigo">Código<span class="text-danger"> *</span></label>
@@ -148,19 +145,17 @@ if(isset($_POST['inputNome'])){
 									</div>
 								</div>
 
-								<div class="col-lg-5">
+								<div class="col-lg-10">
 									<div class="form-group">
 										<label for="inputNome">Centro de Custo<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Centro de Custo" value="<?php echo $row['CnCusNome']; ?>" required >
 									</div>
 								</div>
-								<div class="col-lg-5">
-										<label for="cmbTipo">Tipo<span class="text-danger"> *</span></label>
-										<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2" required>
-													<option value="">Selecione</option>
-													<option value="R"<?php if ($row['CnCusTipo'] == 'R') echo "selected"; ?>>Receita</option>
-													<option value="D"<?php if ($row['CnCusTipo'] == 'D') echo "selected"; ?>>Despesa</option>
-										</select>					
+							</div>
+							<div class="row">
+								<div class="col-lg-12">
+									<label for="txtDetalhamento">Detalhamento</label>
+									<textarea id="txtDetalhamento" name="txtDetalhamento" class="form-control" placeholder="Detalhamento do Centro de Custo" rows="7" cols="5" ><?php echo $row['CnCusDetalhamento']; ?></textarea>
 								</div>
 							</div>                 
 								

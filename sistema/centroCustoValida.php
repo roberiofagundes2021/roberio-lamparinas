@@ -10,8 +10,8 @@ if(isset($_POST['nomeVelho'])){
 			 WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and CnCusNome = '". $_POST['nomeNovo']."' and CnCusNome <> '". $_POST['nomeVelho']."'";
 } else{
 	$sql = "SELECT CnCusId
-			 FROM CentroCusto
-			 WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and CnCusNome = '". $_POST['nome']."'";
+			FROM CentroCusto
+			WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and CnCusNome = '". $_POST['nome']."'";
 }
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

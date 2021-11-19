@@ -10,14 +10,14 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO CentroCusto (CnCusCodigo, CnCusNome, CnCusTipo, CnCusStatus, CnCusUsuarioAtualizador, CnCusUnidade)
-				VALUES (:iCodigo, :sNome, :sTipo, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+		$sql = "INSERT INTO CentroCusto (CnCusCodigo, CnCusNome, CnCusDetalhamento, CnCusStatus, CnCusUsuarioAtualizador, CnCusUnidade)
+				VALUES (:iCodigo, :sNome, :sDetalhamento, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':iCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
-						':sTipo' => $_POST['cmbTipo'],
+						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId'],
@@ -51,9 +51,6 @@ if(isset($_POST['inputNome'])){
 
 	<?php include_once("head.php"); ?>
 
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
@@ -65,7 +62,7 @@ if(isset($_POST['inputNome'])){
 			
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e){
-				
+
 				e.preventDefault();
 				
 				var inputNome = $('#inputNome').val();
@@ -73,21 +70,27 @@ if(isset($_POST['inputNome'])){
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
 				
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "centroCustoValida.php",
-					data: ('nome='+inputNome),
-					success: function(resposta){
-						
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;
+				//Se o usuário preencheu com espaços em branco ou não preencheu nada
+				if (inputNome == ''){
+					$('#inputNome').val('');
+					$('#formCentroCusto').submit();
+				} else{
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "centroCustoValida.php",
+						data: ('nome='+inputNome),
+						success: function(resposta){
+							alert(resposta)
+							if(resposta == 1){
+								alerta('Atenção','Esse registro já existe!','error');
+								return false;
+							}
+							
+							$('#formCentroCusto').submit();
 						}
-						
-						$( "#formCentroCusto" ).submit();
-					}
-				})
+					})
+				}				
 			})
 		})
 	</script>
@@ -120,7 +123,6 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-
 								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputCodigo">Código<span class="text-danger"> *</span></label>
@@ -128,25 +130,21 @@ if(isset($_POST['inputNome'])){
 									</div>
 								</div>
 
-								<div class="col-lg-5">
+								<div class="col-lg-10">
 									<div class="form-group">
-										<label for="inputNome">Centro de Custo<span class="text-danger"> *</span></label>
+										<label for="inputNome">Título<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Centro de Custo" required>
 									</div>
 								</div>
-
-								<div class="col-lg-5">
-										<label for="cmbTipo">Tipo<span class="text-danger"> *</span></label>
-										<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2" required>
-													<option value="">Selecione</option>
-													<option value="R">Receita</option>
-													<option value="D">Despesa</option>
-										</select>		
-								</div>
-
 							</div>
+							<div class="row">
+								<div class="col-lg-12">
+									<label for="txtDetalhamento">Detalhamento</label>
+									<textarea id="txtDetalhamento" name="txtDetalhamento" class="form-control" placeholder="Detalhamento do Centro de Custo" rows="7" cols="5" ></textarea>
+								</div>
+							</div>							
 															
-							<div class="row" style="margin-top: 10px;">
+							<div class="row" style="margin-top: 30px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
