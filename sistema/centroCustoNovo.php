@@ -116,7 +116,7 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formCentroCusto" id="formCentroCusto" method="post" class="form-validate-jquery">
+					<form id="formCentroCusto" name="formCentroCusto" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Centro de Custo</h5>
 						</div>
