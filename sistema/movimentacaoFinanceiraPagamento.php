@@ -392,7 +392,7 @@ $dataInicio = date("Y-m-d");
                                       FROM PlanoContas
                                       JOIN Situacao on SituaId = PlConStatus
                                       JOIN CentroCusto on CnCusId = PlConCentroCusto
-                                      WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and CnCusTipo = 'D'
+                                      WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
                                       ORDER BY PlConCodigo ASC";
 
                             $result = $conn->query($sql);
