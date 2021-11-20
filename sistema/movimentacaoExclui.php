@@ -25,7 +25,27 @@ if(isset($_POST['inputMovimentacaoId'])){
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iMovimentacao); 
 		$result->execute();
+
+		/*----- SELECIONA OS ANEXOS DA MOVIMENTAÇÃO PARA EXCLUIR OS ARQUIVOS FÍSICOS (SE COMMIT OCORRER) -----*/
+		$sql = "SELECT MvAneArquivo FROM MovimentacaoAnexo
+				WHERE MvAneMovimentacao = ". $iMovimentacao; 
+		$result = $conn->query($sql);
+		$rowAnexos = $result->fetchAll();				
+
+		/*----- DELETA MOVIMENTAÇÃO ANEXO -----*/
+		$sql = "DELETE FROM MovimentacaoAnexo
+				WHERE MvAneMovimentacao = :id"; 
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iMovimentacao); 
+		$result->execute();
 		
+		/*----- DELETA MOVIMENTAÇÃO ANEXO -----*/
+		$sql = "DELETE FROM MovimentacaoLiquidacao
+				WHERE MvLiqMovimentacao = :id"; 
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iMovimentacao); 
+		$result->execute();		
+
 		/*----- DELETA MOVIMENTAÇÃO -----*/
 		$sql = "DELETE FROM Movimentacao
 				WHERE MovimId = :id";
@@ -56,6 +76,16 @@ if(isset($_POST['inputMovimentacaoId'])){
 		$result->execute();
 
 		$conn->commit();
+
+		// Exlui os anexos físicos do servidor
+		foreach ($rowAnexos as $item){
+			$sArquivo = $item['MvAneArquivo'];
+			$sPasta = 'global_assets/anexos/movimentacao/';
+	
+			if (file_exists($sPasta.$sArquivo) and $sArquivo <> ""){
+				unlink($sPasta.$sArquivo);
+			}
+		}		
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Movimentação excluída!!!";
@@ -69,7 +99,7 @@ if(isset($_POST['inputMovimentacaoId'])){
 		$_SESSION['msg']['mensagem'] = "Erro ao excluir movimentação!!!";
 		$_SESSION['msg']['tipo'] = "error";			
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 }
 

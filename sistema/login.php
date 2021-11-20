@@ -269,125 +269,174 @@ if(isset($_POST['usuario'])){
 
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
+<!--
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript">
+
+		$(document).ready(function() {
+		
+			$('.carousel').carousel({
+				interval: 3000
+			})
+		})
+
+	</script>-->
 </head>
 
 <body>
 
 	<!-- Page content -->
-	<div class="page-content login-cover">
+	<div class="page-content">
 
-		<!-- Main content -->
-		<div class="content-wrapper">
+		<div class="col-lg-12">
+			
+			<div class="row" style="height:100%">
+				
+				<div class="col-lg-8 login-cover login-banner" style="min-height: 100%">
+					
+					<!--<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+						<!-- Indicators --
+						<ol class="carousel-indicators">
+							<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+							<li data-target="#carousel-example-generic" data-slide-to="1"></li>							
+						</ol>
 
-			<!-- Content area -->
-			<div class="content d-flex justify-content-center align-items-center">
-
-				<!-- Login form -->
-				<form name="formLogin" method="post" class="login-form form-validate" action="login.php">
-					<div class="card mb-0">
-						<div class="card-body">
-							<div class="text-center mb-3">
-								<!--<i class="icon-reading icon-2x text-slate-300 border-slate-300 border-3 rounded-round p-3 mb-3 mt-1"></i>-->
-								<img src="global_assets/images/lamparinas/logo-lamparinas_200x200.jpg" />
-								<h5 class="mb-0">Acesse sua conta</h5>
-								<span class="d-block text-muted">Informe as credenciais abaixo</span>
-							</div>
-
-							<?php 
-								if(isset($erro)) {
-									if(count($erro) > 0){ 
-							?>
-										<div class="alert alert-danger">
-											<?php foreach($erro as $msg) echo "$msg <br>"; ?>
-										</div>
-							<?php 
-									}
-								}
-								
-								if (isset($_SESSION['EmpreId'])){	
-									
-									print('
-									
-									<div class="form-group">
-										<select name="empresa" class="form-control select" data-fouc>
-											<option value="0">Selecione uma empresa</option>');
-											
-											foreach($_SESSION['Empresa'] as $indice => $valor){
-												if ($_SESSION['EmpreId'] == $indice){
-													echo '<option value="'.$indice.'" selected>'.$valor.'</option>';
-												} else {
-													echo '<option value="'.$indice.'">'.$valor.'</option>';
-												}
-											}
-											
-											print('
-										</select>
-									</div>
-									
-									');
-								}
-								
-								if (isset($_SESSION['UnidadeId'])){	
-									
-									print('
-									
-									<div class="form-group">
-										<select name="unidade" class="form-control select" data-fouc>
-											<option value="0">Selecione uma unidade</option>');
-											
-											foreach($_SESSION['Unidade'] as $indice => $valor){
-												if ($_SESSION['UnidadeId'] == $indice){
-													echo '<option value="'.$indice.'" selected>'.$valor.'</option>';
-												} else {
-													echo '<option value="'.$indice.'">'.$valor.'</option>';
-												}
-											}
-											
-											print('
-										</select>
-									</div>
-									
-									');
-								}									
-                            ?>							
-							
-							<div class="form-group form-group-feedback form-group-feedback-left">
-								<input value="<?php if(isset($_SESSION['UsuarLogin'])) echo $_SESSION['UsuarLogin']; ?>" name="usuario" type="text" class="form-control" placeholder="Usuário..." required <?php if(!isset($_SESSION['UsuarLogin'])) echo "autofocus"; ?>>
-								<div class="form-control-feedback">
-									<i class="icon-user text-muted"></i>
+						<!-- Wrapper for slides --
+						<div class="carousel-inner" role="listbox">
+							<div class="item active">
+								<img src="global_assets/images/login_cover.jpg" alt="Teste1">
+								<div class="carousel-caption">
+									Testando primeiro slide
 								</div>
 							</div>
-
-							<div class="form-group form-group-feedback form-group-feedback-left">
-								<input value="<?php if(isset($_SESSION['UsuarSenha'])) echo $_SESSION['UsuarSenha']; ?>" name="senha" id="senha" type="password" class="form-control" placeholder="Senha..." onKeyPress="if (event.keyCode == 13){document.forms[0].submit();}" required  <?php if(isset($_SESSION['UsuarLogin'])) echo "autofocus"; ?>>
-								<div class="form-control-feedback">
-									<i class="icon-lock2 text-muted"></i>
+							<div class="item">
+								<img src="global_assets/images/login_coverX1.jpg" alt="Teste2">
+								<div class="carousel-caption">
+									Testando segundo slide
 								</div>
-							</div>
-
-							<div class="form-group">
-								<button type="submit" class="btn btn-primary btn-block">Entrar <i class="icon-circle-right2 ml-2"></i></button>
-							</div>
-
-							<div class="form-group text-center">
-								<a href="esqueceu-sua-senha.php">Esqueceu sua senha?</a>
 							</div>							
 						</div>
-					</div>
-					<div class="form-group text-center text-muted content-divider" style="margin-top: 15px;">
-						<span class="px-2"><a href="http://www.lamparinas.com.br">Ir para o site</a></spam>
-					</div>
-				</form>
-				<!-- /login form -->
 
+						<!-- Controls --
+						<a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+							<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+							<span class="sr-only">Anterior</span>
+						</a>
+						<a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+							<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+							<span class="sr-only">Próximo</span>
+						</a>
+					</div> -->
+				</div>
+				<div class="col-lg-4 col-xs-12">
+
+					<div class="content d-flex justify-content-center align-items-center" style="display: table-cell; vertical-align: middle; height: 100%">
+						
+						<!-- Login form -->
+						<form name="formLogin" method="post" class="login-form form-validate" action="login.php">
+							<div>
+								<div>
+									<div class="text-center" style="margin-bottom: 60px;">
+										<!--<i class="icon-reading icon-2x text-slate-300 border-slate-300 border-3 rounded-round p-3 mb-3 mt-1"></i>-->
+										<img src="global_assets/images/lamparinas/logo-lamparinas.png" style="max-width:300px;" />
+									</div>
+
+									<?php 
+										if(isset($erro)) {
+											if(count($erro) > 0){ 
+									?>
+												<div class="alert alert-danger">
+													<?php foreach($erro as $msg) echo "$msg <br>"; ?>
+												</div>
+									<?php 
+											}
+										}
+										
+										if (isset($_SESSION['EmpreId'])){	
+											
+											print('
+											
+											<div class="form-group">
+												<select name="empresa" class="form-control select" data-fouc>
+													<option value="0">Selecione uma empresa</option>');
+													
+													foreach($_SESSION['Empresa'] as $indice => $valor){
+														if ($_SESSION['EmpreId'] == $indice){
+															echo '<option value="'.$indice.'" selected>'.$valor.'</option>';
+														} else {
+															echo '<option value="'.$indice.'">'.$valor.'</option>';
+														}
+													}
+													
+													print('
+												</select>
+											</div>
+											
+											');
+										}
+										
+										if (isset($_SESSION['UnidadeId'])){	
+											
+											print('
+											
+											<div class="form-group">
+												<select name="unidade" class="form-control select" data-fouc>
+													<option value="0">Selecione uma unidade</option>');
+													
+													foreach($_SESSION['Unidade'] as $indice => $valor){
+														if ($_SESSION['UnidadeId'] == $indice){
+															echo '<option value="'.$indice.'" selected>'.$valor.'</option>';
+														} else {
+															echo '<option value="'.$indice.'">'.$valor.'</option>';
+														}
+													}
+													
+													print('
+												</select>
+											</div>
+											
+											');
+										}									
+									?>							
+									
+									<div class="form-group form-group-feedback form-group-feedback-left">
+										<input value="<?php if(isset($_SESSION['UsuarLogin'])) echo $_SESSION['UsuarLogin']; ?>" name="usuario" type="text" class="form-control" placeholder="Usuário..." required <?php if(!isset($_SESSION['UsuarLogin'])) echo "autofocus"; ?>>
+										<div class="form-control-feedback">
+											<i class="icon-user text-muted"></i>
+										</div>
+									</div>
+
+									<div class="form-group form-group-feedback form-group-feedback-left">
+										<input value="<?php if(isset($_SESSION['UsuarSenha'])) echo $_SESSION['UsuarSenha']; ?>" name="senha" id="senha" type="password" class="form-control" placeholder="Senha..." onKeyPress="if (event.keyCode == 13){document.forms[0].submit();}" required  <?php if(isset($_SESSION['UsuarLogin'])) echo "autofocus"; ?>>
+										<div class="form-control-feedback">
+											<i class="icon-lock2 text-muted"></i>
+										</div>
+									</div>
+
+									<div class="form-group" style="margin-top: 30px;">
+										<button type="submit" class="btn btn-primary btn-lg btn-block" style="padding: 10px;">Acessar Sistema</button>
+									</div>
+
+									<div class="form-group text-center mt-5">
+										<a href="esqueceu-sua-senha.php">Esqueceu sua senha?</a>
+									</div>							
+								</div>
+							</div>
+							<div class="form-group text-center text-muted content-divider" style="margin-bottom: 85px; display:none;">
+								<span class="px-2"><a href="http://www.lamparinas.com.br">Ir para o site</a></spam>
+							</div>
+						</form>
+						<!-- /login form -->
+
+					</div>
+
+				</div>
 			</div>
-			<!-- /content area -->			
-
-			<?php //include_once("footer.php"); ?>
-
 		</div>
-		<!-- /main content -->
-
+	
 	</div>
 	<!-- /page content -->
 

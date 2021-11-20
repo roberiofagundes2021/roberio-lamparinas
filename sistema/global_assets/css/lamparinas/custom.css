@@ -240,6 +240,11 @@ Copyright (c) 2018 Carlos Victor
     .custon-modal-container{
         width: 90%;
     }
+
+    /* Não mostra o banner do login na versão mobile */
+    .login-banner{
+        display: none !important;
+    }
 }
 
 @media (max-width: 400px){
