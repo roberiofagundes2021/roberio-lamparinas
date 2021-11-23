@@ -17,6 +17,23 @@ function mostraData($data)
 	return ($dataformatada);
 }
 
+/*----------------------------------------------------------------------
+	|	 Passando dataHora "AAAA-MM-DD 00:00:00" para "DD/MM/AAAA 00:00:00" |
+	---------------------------------------------------------------------*/
+	function mostraDataHora($data) {
+
+	if ($data <> '0000-00-00 00:00:00' and $data <> ''){
+		$dataHora = explode(" ", $data);
+		$data = explode("-", $dataHora[0]);
+		$dataformatada = array();
+		@$dataformatada = date("d/m/Y", mktime(0,0,0, $data[1] , $data[2] , $data[0] )) . " " . $dataHora[1];
+	} 
+	else{
+		$dataformatada = '';
+	}
+	return($dataformatada);
+}	
+
 /*--------------------------------------------------------------------------
 	  |					Exibe mensagem na tela								   |
 	  -------------------------------------------------------------------------*/

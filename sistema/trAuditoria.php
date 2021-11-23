@@ -7,13 +7,18 @@ $_SESSION['PaginaAtual'] = 'Auditoria';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT AdiTRId, AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento,UsuarNome
-		FROM AuditTR
-		JOIN Usuario ON UsuarId = AdiTRUsuario
-	    WHERE AdiTRUsuario = ". $_SESSION['UsuarId'] ." AND AdiTRTermoReferencia = ".$_POST['inputTRId']."
-		ORDER BY AdiTRDataHora ASC";
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
+if (isset($_POST['inputTRId'])){
+	$sql = "SELECT AdiTRId, AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento,UsuarNome
+			FROM AuditTR
+			JOIN Usuario ON UsuarId = AdiTRUsuario
+			WHERE AdiTRTermoReferencia = ".$_POST['inputTRId']."
+			ORDER BY AdiTRDataHora ASC";
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
+} else{
+	irpara("tr.php");
+}
+
 
 ?>
 
@@ -151,7 +156,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                             
                                             print('
                                             <tr>
-                                                <td>'.mostraData($item['AdiTRDataHora']).'</td>
+                                                <td>'.mostraDataHora($item['AdiTRDataHora']).'</td>
                                                 <td>'.$item['UsuarNome'].'</td>
                                                 <td>'.$item['AdiTRTela'].'</td>
                                                 <td>'.$item['AdiTRDetalhamento'].'</td>
