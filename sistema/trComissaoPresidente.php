@@ -46,6 +46,18 @@ try{
 			':iTRXEqUnidade' => $iTRXEqUnidade,
 		));
 
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+		VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+			':iTRTermoReferencia' => $iTRXEqTermoRefencia,
+			':iTRDataHora' => date("Y-m-d H:i:s"),
+			':iTRUsuario' => $_SESSION['UsuarId'],
+			':iTRTela' =>'TERMO DE REFERÊNCIA COMISSÃO ',
+			':iTRDetalhamento' =>'INCLUSÃO DO PRESIDENTE'
+		));
+
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";

@@ -19,6 +19,18 @@ if(isset($_POST['inputTRId'])){
 		$result->bindParam(':iTr', $iTR);
 		$result->bindParam(':iUsuario', $iUsuario);
 		$result->execute();
+
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+			':iTRTermoReferencia' => $iTR ,
+			':iTRDataHora' => date("Y-m-d H:i:s"),
+			':iTRUsuario' => $_SESSION['UsuarId'],
+			':iTRTela' =>'TERMO DE REFERÊNCIA COMISSÃO ',
+			':iTRDetalhamento' =>'EXCLUSÃO DE MEMBRO'
+		));
 		
 		$conn->commit();
 		

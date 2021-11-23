@@ -211,10 +211,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<div class="text-right"><a href="tr.php" role="button"><< Termo de Referência</a>&nbsp;&nbsp;&nbsp;
 									<?php 
 										if ($rowSituacao['SituaChave'] != 'FASEINTERNAFINALIZADA'){
-											print('<a href="trOrcamentoNovo.php" class="btn btn-principal" role="button">Novo Orçamento</a></div>');
+											print('<a href="trOrcamentoNovo.php" class="btn btn-principal" role="button">Novo Orçamento</a>');
 										}
 									?>
-								</div>
+								</div>	
 							</div>
 							
 							<table class="table" id="tblOrcamento">

@@ -68,6 +68,18 @@ if(isset($_POST['inputDotacaoID'])){
 		$result->bindParam(':iTermoReferenciaId', $iTermoReferenciaId);
 		$result->execute();
 
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+			':iTRTermoReferencia' => $iTermoReferenciaId ,
+			':iTRDataHora' => date("Y-m-d H:i:s"),
+			':iTRUsuario' => $_SESSION['UsuarId'],
+			':iTRTela' =>'TERMO DE REFERÊNCIA DOTAÇÃO',
+			':iTRDetalhamento' =>'EXCLUSÃO'
+		));
+
 
 		$conn->commit();
 		$_SESSION['msg']['titulo'] = "Sucesso";

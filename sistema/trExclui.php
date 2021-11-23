@@ -86,6 +86,12 @@ if(isset($_POST['inputTRId'])){
 		$result->bindParam(':id', $iTR); 
 		$result->execute();
 
+		$sql = "DELETE FROM AuditTR
+			 	WHERE AdiTRTermoReferencia = :id	";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iTR); 
+		$result->execute();
+
 		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

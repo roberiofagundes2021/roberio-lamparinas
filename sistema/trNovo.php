@@ -116,6 +116,19 @@ if (isset($_POST['inputData'])) {
 			}
 		}
 
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+			':iTRTermoReferencia' => $insertId ,
+			':iTRDataHora' => date("Y-m-d H:i:s"),
+			':iTRUsuario' => $_SESSION['UsuarId'],
+			':iTRTela' =>'TERMO DE REFERÊNCIA',
+			':iTRDetalhamento' =>'NOVO REGISTRO'
+		));
+
+
 		//Se for Produto e Serviço
 		if ($tipoTr == 'PS') {
 

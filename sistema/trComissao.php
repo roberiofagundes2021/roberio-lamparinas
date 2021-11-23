@@ -85,6 +85,19 @@ if(isset($_POST['cmbUsuario'])){
 				':iTRXEqUnidade' => $_SESSION['UnidadeId'],
 			));
 		}
+
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+				':iTRTermoReferencia' => $_POST['inputTRId'],
+				':iTRDataHora' => date("Y-m-d H:i:s"),
+				':iTRUsuario' => $_SESSION['UsuarId'],
+				':iTRTela' =>'TERMO DE REFERÊNCIA COMISSÃO',
+				':iTRDetalhamento' =>'NOVO MEMBRO'
+			));
+
 		
 		$_SESSION['msg']['titulo'] 		= "Sucesso";
 		$_SESSION['msg']['mensagem'] 	= "Membro incluído!!!";

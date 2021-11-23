@@ -173,6 +173,19 @@ if (isset($_POST['inputTRData'])) {
 
 		}
 
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+			':iTRTermoReferencia' => $iTR ,
+			':iTRDataHora' => date("Y-m-d H:i:s"),
+			':iTRUsuario' => $_SESSION['UsuarId'],
+			':iTRTela' =>'TERMO DE REFERÊNCIA',
+			':iTRDetalhamento' =>'ATUALIZAÇÃO'
+		));
+
+
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
