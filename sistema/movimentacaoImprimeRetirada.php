@@ -13,7 +13,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
 
     $iMovimentacao = $_POST['inputMovimentacaoId'];
 
-    $sql = "SELECT MovimTipo, MovimData, MovimObservacao, ParamValorObsImpreRetirada
+    $sql = "SELECT MovimTipo, MovimData, MovimNumRecibo, MovimObservacao, ParamValorObsImpreRetirada
             FROM Movimentacao
             JOIN Unidade on UnidaId = MovimUnidade
             JOIN Parametro on ParamEmpresa = UnidaEmpresa
@@ -142,7 +142,7 @@ try {
     <table style="width:100%;">
         <tr>                                
             <td style="width:25%">Data: ' . mostraData($row['MovimData']) . '</td>
-            <td style="width:25%; text-align: center; background-color: #d8d8d8;">Nº: 0001/21</td>
+            <td style="width:25%; text-align: center; background-color: #d8d8d8;">Nº: '.$row['MovimNumRecibo'].'</td>
             <td colspan="2" style="width:50%; border: none;"></td>
         </tr>
         <tr>

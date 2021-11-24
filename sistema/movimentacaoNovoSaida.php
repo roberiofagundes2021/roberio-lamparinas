@@ -7,21 +7,20 @@ $_SESSION['PaginaAtual'] = 'Nova Movimentação';
 include('global_assets/php/conexao.php');
 
 //Caso a chamada à página venha da liberação de uma solicitação na bandeja.
-
 if (isset($_POST['inputSolicitacaoId'])) {
 
-	$sql = "SELECT SlXPrQuantidade as Quantidade, ProduId as Id, ProduNome as Nome, ProduValorVenda as ValorVenda, UnMedNome
+	$sql = "SELECT SlXPrQuantidade as Quantidade, ProduId as Id, ProduNome as Nome, ProduValorCusto as Valor, UnMedNome
 			FROM SolicitacaoXProduto
 			JOIN Solicitacao on SolicId = SlXPrSolicitacao
 			JOIN Produto on ProduId = SlXPrProduto
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 			WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
-			";
+			";		
 	$result = $conn->query($sql);
 	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
 	$numProdutos = count($produtosSolicitacao);
 
-	$sql = "SELECT SlXSrQuantidade as Quantidade, ServiId as Id, ServiNome as Nome, ServiValorVenda as ValorVenda
+	$sql = "SELECT SlXSrQuantidade as Quantidade, ServiId as Id, ServiNome as Nome, ServiValorCusto as Valor
 			FROM SolicitacaoXServico
 			JOIN Solicitacao on SolicId = SlXSrSolicitacao
 			JOIN Servico on ServiId = SlXSrServico
@@ -787,7 +786,7 @@ if (isset($_POST['inputData'])) {
 			$('#cmbEstoqueOrigem').on('change', function(e) {
 				filtraCategoriaOrigem();
 			})
-			//filtraCategoriaOrigem();
+			filtraCategoriaOrigem();
 
 			function filtraPatrimonioProdutoOrigem() {
 				let cmbOrigem = $('#cmbEstoqueOrigemLocalSetor').val().split('#')
@@ -1774,7 +1773,7 @@ if (isset($_POST['inputData'])) {
 											$totalGeral = 0;
 
 											foreach ($solicitacoes  as $produto) {
-												$totalGeral += $produto['Quantidade'] * $produto['ValorVenda'];
+												$totalGeral += $produto['Quantidade'] * $produto['Valor'];
 											}
 
 											print('<input type="hidden" id="inputTotal" name="inputTotal" value="' . $totalGeral . '">');
@@ -1858,19 +1857,19 @@ if (isset($_POST['inputData'])) {
 													$idProdutoSolicitacao = 0;
 													$totalGeral = 0;
 
-													foreach ($solicitacoes  as $produto) {
+													foreach ($solicitacoes as $produto) {
 
 														$idProdutoSolicitacao++;
 
-														$valorCusto = formataMoeda($produto['ValorVenda']);
-														$valorTotal = formataMoeda($produto['Quantidade'] * $produto['ValorVenda']);
-														$valorTotalSemFormatacao = $produto['Quantidade'] * $produto['ValorVenda'];
+														$valorCusto = formataMoeda($produto['Valor']);
+														$valorTotal = formataMoeda($produto['Quantidade'] * $produto['Valor']);
+														$valorTotalSemFormatacao = $produto['Quantidade'] * $produto['Valor'];
 
 														$UnMedNome = isset($produto['UnMedNome'])? $produto['UnMedNome']:'';
-														$SlXPrQuantidade = isset($produto['SlXPrQuantidade'])? $produto['SlXPrQuantidade']:'';
-														$ProduValorVenda = isset($produto['ProduValorVenda'])? $produto['ProduValorVenda']:'';
+														$SlXPrQuantidade = isset($produto['Quantidade'])? $produto['Quantidade']:'';
+														$ProduValor = isset($produto['Valor'])? $produto['Valor']:'';
 
-														$totalGeral += $produto['Quantidade'] * $produto['ValorVenda'];
+														$totalGeral += $produto['Quantidade'] * $produto['Valor'];
 
 														$linha = '';
 
@@ -1880,7 +1879,7 @@ if (isset($_POST['inputData'])) {
 																		<td>" . $produto['Nome'] . "</td>
 																		<td style='text-align:center'>" . $UnMedNome . "</td>
 																		<td style='text-align:center'>" . $SlXPrQuantidade . "</td>
-																		<td valorUntPrSolici='" . $ProduValorVenda . "' style='text-align:right'>" . $valorCusto . "</td>
+																		<td valorUntPrSolici='" . $ProduValor . "' style='text-align:right'>" . $valorCusto . "</td>
 																		<td style='text-align:right'>" . $valorTotal . "</td>
 																
 															";
