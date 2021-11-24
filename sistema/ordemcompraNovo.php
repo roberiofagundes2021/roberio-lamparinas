@@ -13,11 +13,6 @@ $sql = "SELECT UsuarId, UsuarNome, UsuarEmail, UsuarTelefone
 $result = $conn->query($sql);
 $rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
 
-$sqlNumero = "SELECT Max(OrComNumero)
-			  FROM OrdemCompra";
-$resultNumero = $conn->query($sqlNumero);
-$numero = $resultNumero->fetch(PDO::FETCH_ASSOC);
-
 $sqlFluxo = "SELECT FlOpeId, FlOpeTermoReferencia, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio,
 			FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao, FlOpeValor, FlOpeObservacao,
 			FlOpePrioridade, FlOpeNumAta, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa,
@@ -62,7 +57,23 @@ $empresaType = $parametroEmp['ParamEmpresaPublica'] ? 'publica' : 'privada';
 if(isset($_POST['inputData'])){
 	
 	try{
-		
+		// pega o ultimo OrComNumero da tabela  OrdemCompra e incrementa +1 ao valor,
+		// lembrando que esse valor é para cada contrato
+		$sqlNumero = "SELECT Max(CAST(OrComNumero AS int))
+		FROM OrdemCompra where OrComUnidade = ".$_SESSION['UnidadeId']." and OrComFluxoOperacional = ".$_POST['inputFluxoOperacional'];
+		$resultNumero = $conn->query($sqlNumero);
+		$numero = $resultNumero->fetch(PDO::FETCH_ASSOC);
+
+		// refatora o numero com 6 casas ex: 26 => 000026
+		$newNumero = "";
+		$number = intval($numero[""])+1;
+		$cont = strlen($number)<6?6-strlen($number):0;
+
+		for ($x=0; $x<$cont;$x++){
+			$newNumero = $newNumero."0";
+		}
+		$newNumero = $newNumero.$number;
+		// --------------------------------------------------------------
 		$conn->beginTransaction();
 
 		$sql = "SELECT SituaId
@@ -86,7 +97,7 @@ if(isset($_POST['inputData'])){
 						':sTipo' => $_POST['inputTipo'],
 						':dFluxo' => $_POST['inputFluxoOperacional'],
 						':dData' => gravaData($_POST['inputData']),
-						':sNumero' => $_POST['inputNumero'],
+						':sNumero' => $newNumero,
 						':sLote' => $_POST['inputLote'],
 						':sNumAta' => $_POST['inputNumAta'],
 						':sProcesso' => $_POST['inputProcesso'],
@@ -292,14 +303,11 @@ if(isset($_POST['inputData'])){
 						}					
 					});
 				}
-			});			
+			});
 			// essa parte é responsavel por pegar o maior nymero registrado na tabela de ordemCompra e adicionar +1 para que fique incremental
 			$("#enviar").on('click', function(e){
-				$.getJSON('filtraNumeroOrdemCompra.php', function (numero){
-					$("#inputNumero").val(numero);
-					e.preventDefault();
-					$("#formOrdemCompra").submit();
-				});
+				e.preventDefault();
+				$("#formOrdemCompra").submit();
 			});
 		}); //document.ready
 		
@@ -364,7 +372,6 @@ if(isset($_POST['inputData'])){
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Nova Ordem de Compra</h5>
 						</div>
 
-						<input type="hidden" id="inputNumero" name="inputNumero">
 						<input type="hidden" id="inputFluxoOperacional" name="inputFluxoOperacional">
 						
 						<div class="card-body">								
