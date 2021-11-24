@@ -54,22 +54,22 @@ if (isset($_POST['inputTRId'])){
 			    columnDefs: [
 				{
 					orderable: true,   //DATA/HORA
-					width: "25%",
+					width: "20%",
 					targets: [0]
 				},	
 				{
 					orderable: true,   //USUÁRIO
-					width: "25%",
+					width: "20%",
 					targets: [1]
 				},
 				{ 
 					orderable: true,   //TELA
-					width: "25%",
+					width: "30%",
 					targets: [2]
 				},
 				{ 
 					orderable: true,   //LOG
-					width: "25%",
+					width: "30%",
 					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',

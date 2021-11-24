@@ -125,7 +125,7 @@ if (isset($_POST['inputData'])) {
 			':iTRDataHora' => date("Y-m-d H:i:s"),
 			':iTRUsuario' => $_SESSION['UsuarId'],
 			':iTRTela' =>'TERMO DE REFERÊNCIA',
-			':iTRDetalhamento' =>'NOVO REGISTRO'
+			':iTRDetalhamento' =>'INCLUSÃO DO REGISTRO'
 		));
 
 

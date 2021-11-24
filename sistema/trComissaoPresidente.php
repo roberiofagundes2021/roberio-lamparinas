@@ -54,7 +54,7 @@ try{
 			':iTRTermoReferencia' => $iTRXEqTermoRefencia,
 			':iTRDataHora' => date("Y-m-d H:i:s"),
 			':iTRUsuario' => $_SESSION['UsuarId'],
-			':iTRTela' =>'TERMO DE REFERÊNCIA COMISSÃO ',
+			':iTRTela' =>'COMISSÃO DO PROCESSO LICITATÓRIO',
 			':iTRDetalhamento' =>'INCLUSÃO DO PRESIDENTE'
 		));
 

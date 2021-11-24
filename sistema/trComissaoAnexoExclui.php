@@ -35,8 +35,8 @@ if(isset($_POST['inputComissaoAnexoID'])){
 			':iTRTermoReferencia' => $_SESSION['TRId'],
 			':iTRDataHora' => date("Y-m-d H:i:s"),
 			':iTRUsuario' => $_SESSION['UsuarId'],
-			':iTRTela' =>'TERMO DE REFERÊNCIA COMISSÃO ',
-			':iTRDetalhamento' =>'EXCLUSÃO DE ANEXO'
+			':iTRTela' =>'COMISSÃO DO PROCESSO LICITATÓRIO',
+			':iTRDetalhamento' =>'EXCLUSÃO DO ANEXO'
 		));
 
 		$conn->commit();

@@ -94,7 +94,7 @@ if(isset($_POST['cmbUsuario'])){
 				':iTRTermoReferencia' => $_POST['inputTRId'],
 				':iTRDataHora' => date("Y-m-d H:i:s"),
 				':iTRUsuario' => $_SESSION['UsuarId'],
-				':iTRTela' =>'TERMO DE REFERÊNCIA COMISSÃO',
+				':iTRTela' =>'COMISSÃO DO PROCESSO LICITATÓRIO',
 				':iTRDetalhamento' =>'NOVO MEMBRO'
 			));
 

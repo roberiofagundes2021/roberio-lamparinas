@@ -76,8 +76,8 @@ if(isset($_POST['inputDotacaoID'])){
 			':iTRTermoReferencia' => $iTermoReferenciaId ,
 			':iTRDataHora' => date("Y-m-d H:i:s"),
 			':iTRUsuario' => $_SESSION['UsuarId'],
-			':iTRTela' =>'TERMO DE REFERÊNCIA DOTAÇÃO',
-			':iTRDetalhamento' =>'EXCLUSÃO'
+			':iTRTela' =>'DOTAÇÃO ORÇAMENTÁRIA',
+			':iTRDetalhamento' =>'EXCLUSÃO DO REGISTRO'
 		));
 
 

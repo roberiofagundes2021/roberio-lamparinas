@@ -95,6 +95,18 @@ if (isset($_POST['inputOrcamentoId'])){
 									));
 				}
 
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+		VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+			':iTRTermoReferencia' => $rowOrcamento['TrXOrTermoReferencia'] ,
+			':iTRDataHora' => date("Y-m-d H:i:s"),
+			':iTRUsuario' => $_SESSION['UsuarId'],
+			':iTRTela' =>'ORÇAMENTO',
+			':iTRDetalhamento' =>'ORÇAMENTO DUPLICADO DE Nº '.$sNumero. ''
+		));
+
 	
 	$_SESSION['msg']['titulo'] = "Sucesso";
 	$_SESSION['msg']['mensagem'] = "Orçamento duplicado!!!";
