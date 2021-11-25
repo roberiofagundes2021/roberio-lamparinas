@@ -11,31 +11,33 @@
 	} else if (isset($_POST['inputTRIdIndex'])) {
 		$_SESSION['inputTRIdDotacao'] = $_POST['inputTRIdIndex'];
 
-		$sql = "
-			SELECT TrRefNumero
+		$sql = "SELECT TrRefNumero
 				FROM TermoReferencia
-			 WHERE TrRefUnidade = ". $_SESSION['UnidadeId'] ." 
-				 AND TrRefId = ".$_SESSION['inputTRIdDotacao']."
+			    WHERE TrRefUnidade = ". $_SESSION['UnidadeId'] ." AND TrRefId = ".$_SESSION['inputTRIdDotacao']."
 		";
 		$result = $conn->query($sql);
 		$TrID = $result->fetch(PDO::FETCH_ASSOC);
 
 		$_SESSION['inputTRNumero'] = $TrID['TrRefNumero'];
 	}
+	
 
-	$sql = "
-		SELECT DtOrcId, 
-				DtOrcData, 
-				DtOrcNome, 
-				DtOrcArquivo
+	$sql = "SELECT DtOrcId, DtOrcData, DtOrcNome, DtOrcArquivo
 			FROM DotacaoOrcamentaria
-		 WHERE DtOrcUnidade = ". $_SESSION['UnidadeId'] ." 
-			 AND DtOrcTermoReferencia = ". $_SESSION['inputTRIdDotacao'] ."
-		 ORDER BY DtOrcNome ASC
+		    WHERE DtOrcUnidade = ". $_SESSION['UnidadeId'] ." AND DtOrcTermoReferencia = ". $_SESSION['inputTRIdDotacao'] ."
+		    ORDER BY DtOrcNome ASC
 	";
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
 	$count = count($row);
+
+	$sql = "SELECT TrRefId,SituaChave
+			FROM TermoReferencia
+			JOIN Situacao  ON SituaId = TrRefStatus
+			WHERE TrRefId = ". $_SESSION['inputTRIdDotacao'] ."
+	 ";
+	$result = $conn->query($sql);
+	$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>
@@ -239,45 +241,49 @@
 										</div>
 									</div>
 								</div>								
-								
 								<?php if ($count <= 0) : ?>
-									<form name="formDotacaoFields" id="formDotacaoFields" method="post" enctype="multipart/form-data" class="form-validate-jquery">
-										<div class="row">
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="inputData">Data</label>
-													<input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
+								<?php 
+									if ($rowSituacao['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+										print('<form name="formDotacaoFields" id="formDotacaoFields" method="post" enctype="multipart/form-data" class="form-validate-jquery">
+											<div class="row">
+												<div class="col-lg-2">
+													<div class="form-group">
+														<label for="inputData">Data</label>
+														<input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data" value="'); echo date('d/m/Y');  print('"  readOnly>
+													</div>
 												</div>
-											</div>
-											<div class="col-lg-10">
-												<div class="form-group">
-													<label for="inputNome">Descrição<span class="text-danger"> *</span></label>
-													<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Descrição" required autofocus>
+												<div class="col-lg-10">
+													<div class="form-group">
+														<label for="inputNome">Descrição<span class="text-danger"> *</span></label>
+														<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Descrição" required autofocus>
+													</div>
 												</div>
-											</div>
-										</div>	
-										<div class="row">
-											<div class="col-lg-12">
-												<label for="inputArquivo">Arquivo<span class="text-danger"> *</span></label>
-												<input type="file" id="inputArquivo" name="inputArquivo" class="form-control" required>
-											</div>
-										</div>	
-										<div class="row">	
-											<div class="col-lg-12">
-												<div class="form-group">										
-													Obs.: arquivos permitidos (.pdf, .doc, .docx, .odt, .jpg, .jpeg, .png) Tamanho máximo: 32MB
+											</div>	
+											<div class="row">
+												<div class="col-lg-12">
+													<label for="inputArquivo">Arquivo<span class="text-danger"> *</span></label>
+													<input type="file" id="inputArquivo" name="inputArquivo" class="form-control" required>
 												</div>
-											</div>									
-										</div>
+											</div>	
+											<div class="row">	
+												<div class="col-lg-12">
+													<div class="form-group">										
+														Obs.: arquivos permitidos (.pdf, .doc, .docx, .odt, .jpg, .jpeg, .png) Tamanho máximo: 32MB
+													</div>
+												</div>									
+											</div>
 
-										<div class="row" style="margin-top: 10px;">
-											<div class="col-lg-12">								
-												<div class="form-group">												
-													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>																							
+											<div class="row" style="margin-top: 10px;">
+												<div class="col-lg-12">								
+													<div class="form-group">									
+															<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>											
+													</div>
 												</div>
 											</div>
-										</div>
-									</form>
+
+										</form>');
+									}
+								?>
 								<?php endif; ?>	
 							</div>
 
@@ -306,9 +312,11 @@
 												
 												<td class="text-center">
 													<div class="list-icons">
-														<div class="list-icons list-icons-extended">														
-															<a href="#" onclick="removeDotacao('.$item['DtOrcId'].', \''.$item['DtOrcData'].'\',\''.$item['DtOrcNome'].'\', \''.$item['DtOrcArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
-														</div>
+														<div class="list-icons list-icons-extended">');														
+														if ($rowSituacao['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+															print('<a href="#" onclick="removeDotacao('.$item['DtOrcId'].', \''.$item['DtOrcData'].'\',\''.$item['DtOrcNome'].'\', \''.$item['DtOrcArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>');
+														}														
+													print('</div>
 													</div>
 												</td>
 

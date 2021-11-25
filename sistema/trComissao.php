@@ -11,29 +11,29 @@ if (!isset($_SESSION['TRId'])){
 	$_SESSION['TRNumero'] = $_POST['inputTRNumero'];
 }
 
-$sql = "
-	SELECT TRXCoId, TRXCoData, TRXCoNome, TRXCoArquivo
-	FROM TRXComissao
-	WHERE TRXCoUnidade = ". $_SESSION['UnidadeId'] ." AND TRXCoTermoReferencia = ".$_SESSION['TRId']."	
-	ORDER BY TRXCoNome ASC	
+$sql = "SELECT TrRefId,SituaChave
+		FROM TermoReferencia
+		JOIN Situacao  ON SituaId = TrRefStatus
+		WHERE TrRefId = " .$_SESSION['TRId']. "
+";
+$result = $conn->query($sql);
+$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+
+$sql = "SELECT TRXCoId, TRXCoData, TRXCoNome, TRXCoArquivo
+		FROM TRXComissao
+		WHERE TRXCoUnidade = ". $_SESSION['UnidadeId'] ." AND TRXCoTermoReferencia = ".$_SESSION['TRId']."	
+		ORDER BY TRXCoNome ASC	
 ";
 $result = $conn->query($sql);
 $rowAnexo = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
-$sql = "
-	SELECT TRXEqTermoReferencia,
-				 TRXEqUsuario,
-				 TRXEqPresidente, 
-				 TRXEqUnidade, 
-				 UsuarLogin		
+$sql = "SELECT TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente, TRXEqUnidade, UsuarLogin		
 		FROM TRXEquipe
-		JOIN Usuario 
-		  ON UsuarId = TRXEqUsuario
-	 WHERE TRXEqUnidade = ". $_SESSION['UnidadeId'] ." 
-	 	 AND TRXEqTermoReferencia = ".$_SESSION['TRId']."
-	 ORDER 
-	 		BY UsuarLogin ASC
+		JOIN Usuario  ON UsuarId = TRXEqUsuario
+	    WHERE TRXEqUnidade = ". $_SESSION['UnidadeId'] ."  AND TRXEqTermoReferencia = ".$_SESSION['TRId']."
+	    ORDER BY UsuarLogin ASC
 ";
 $result = $conn->query($sql);
 $row 		= $result->fetchAll(PDO::FETCH_ASSOC);
@@ -42,31 +42,16 @@ $row 		= $result->fetchAll(PDO::FETCH_ASSOC);
 //Grava a equipe e presidente
 if(isset($_POST['cmbUsuario'])){
 	try{
-		$sql = "
-			SELECT COUNT(TRXEqUsuario) as count
-				FROM TRXEquipe
-			 WHERE TRXEqTermoReferencia = ".$_POST['inputTRId']."
-			 	 AND TRXEqUnidade 		= ".$_SESSION['UnidadeId']."
-				 AND TRXEqPresidente 	= 1
+		$sql = " SELECT COUNT(TRXEqUsuario) as count
+				 FROM TRXEquipe
+			     WHERE TRXEqTermoReferencia = ".$_POST['inputTRId']." AND TRXEqUnidade 		= ".$_SESSION['UnidadeId']." AND TRXEqPresidente 	= 1
 		";
 		$result 			= $conn->query($sql);
 		$rowTRXEquipe = $result->fetch(PDO::FETCH_ASSOC);
 		$count 				= $rowTRXEquipe['count'];
 
-		$sql = "
-			INSERT INTO 
-				TRXEquipe (
-					TRXEqTermoReferencia, 
-					TRXEqUsuario, 
-					TRXEqPresidente, 
-					TRXEqUnidade
-				)
-			VALUES (
-				:iTermoReferencia, 
-				:iUsuario, 
-				:iPresidente, 
-				:iTRXEqUnidade
-			)
+		$sql = "INSERT INTO TRXEquipe (TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente, TRXEqUnidade)
+			    VALUES (:iTermoReferencia, :iUsuario, :iPresidente,:iTRXEqUnidade )
 		";
 		$result = $conn->prepare($sql);
 
@@ -406,14 +391,16 @@ if(isset($_POST['cmbUsuario'])){
 									</div>
 									<br>
 									<?php if ($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')) : ?>
-										<div class="row">
+										<?php 
+										if ($rowSituacao['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+										print('<div class="row">
 											<div class="col-lg-6">
 												<div class="form-group">
 													<label for="cmbUsuario"> Membro<span class="text-danger">
 															*</span></label>
 													<select id="cmbUsuario" name="cmbUsuario" class="form-control select">
-													<option value="">Selecione</option>
-														<?php
+													<option value="">Selecione</option>');
+														
 														$sql = "SELECT UsuarId, UsuarLogin
 																FROM Usuario
 																JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
@@ -427,14 +414,16 @@ if(isset($_POST['cmbUsuario'])){
 														foreach ($rowEquipe as $item) {
 															print('<option value="' . $item['UsuarId'] . '">' . $item['UsuarLogin'] . '</option>');
 														}
-														?>
-													</select>
+														
+													print('</select>
 												</div>
 											</div>
 											<div class="col-lg-3">												
 												<button class="btn btn-lg btn-principal" style="margin-top: 25px;" id="adicionar">Adicionar</button>
 											</div>
-										</div>
+										</div>');
+										}
+										?>
 									<?php endif; ?>		
 								</div>	
 
@@ -463,9 +452,12 @@ if(isset($_POST['cmbUsuario'])){
 											print('<td class="text-center">
 													<div class="list-icons">
 														<div class="list-icons list-icons-extended">');
-														if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')){
-															print('<a href="#" onclick="atualizaComissao('.$item['TRXEqTermoReferencia'].', '.$item['TRXEqUsuario'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>');	
-														}
+														if ($rowSituacao['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+															
+															if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')){
+																print('<a href="#" onclick="atualizaComissao('.$item['TRXEqTermoReferencia'].', '.$item['TRXEqUsuario'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>');	
+															}
+													    }
 												print('</div>
 													</div>
 												</td>
@@ -501,13 +493,15 @@ if(isset($_POST['cmbUsuario'])){
 							<div class="card-body">							
 
 								<?php if ($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')) : ?>							
-									<form name="formAnexoComissao" id="formAnexoComissao" method="post" enctype="multipart/form-data" class="form-validate-jquery">
+									<?php 
+									if ($rowSituacao['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+									print('<form name="formAnexoComissao" id="formAnexoComissao" method="post" enctype="multipart/form-data" class="form-validate-jquery">
 									
 										<div class="row">
 											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputData">Data</label>
-													<input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
+													<input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data" value="'); echo date('d/m/Y');  print('"   readOnly>
 												</div>
 											</div>
 											<div class="col-lg-10">
@@ -538,7 +532,9 @@ if(isset($_POST['cmbUsuario'])){
 												</div>
 											</div>
 										</div>
-									</form>
+									</form>');
+									}
+								?>
 								<?php endif; ?>	
 							</div>
 
@@ -567,9 +563,13 @@ if(isset($_POST['cmbUsuario'])){
 												
 												<td class="text-center">
 													<div class="list-icons">
-														<div class="list-icons list-icons-extended">
-															<a href="#" onclick="removeComissaoAnexo('.$item['TRXCoId'].', \''.$item['TRXCoData'].'\',\''.$item['TRXCoNome'].'\', \''.$item['TRXCoArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>	
-														</div>
+														<div class="list-icons list-icons-extended">');														
+															if ($rowSituacao['SituaChave'] != 'FASEINTERNAFINALIZADA'){
+																if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')){
+																	print('<a href="#" onclick="removeComissaoAnexo('.$item['TRXCoId'].', \''.$item['TRXCoData'].'\',\''.$item['TRXCoNome'].'\', \''.$item['TRXCoArquivo'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>');
+															    }
+															}															
+														print('</div>
 													</div>
 												</td>
 
