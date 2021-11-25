@@ -48,18 +48,18 @@ if (isset($_POST['inputTRId'])){
 
 		$(document).ready(function (){	
 			$('#tblAuditotia').DataTable( {
-				"order": [[ 0, "asc" ]],
+				"order": [[ 0, "desc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [
 				{
 					orderable: true,   //DATA/HORA
-					width: "20%",
+					width: "17%",
 					targets: [0]
 				},	
 				{
 					orderable: true,   //USUÁRIO
-					width: "20%",
+					width: "13%",
 					targets: [1]
 				},
 				{ 
@@ -69,7 +69,7 @@ if (isset($_POST['inputTRId'])){
 				},
 				{ 
 					orderable: true,   //LOG
-					width: "30%",
+					width: "40%",
 					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -145,7 +145,7 @@ if (isset($_POST['inputTRId'])){
 								<thead>
 									<tr class="bg-slate">
 										<th>Data/Hora</th>
-										<th>Usúario</th>
+										<th>Usuário</th>
 										<th>Tela</th>
 										<th>Detalhamento</th>
 									</tr>
@@ -157,7 +157,7 @@ if (isset($_POST['inputTRId'])){
                                             print('
                                             <tr>
                                                 <td>'.mostraDataHora($item['AdiTRDataHora']).'</td>
-                                                <td>'.$item['UsuarNome'].'</td>
+                                                <td>'.nomeSobrenome($item['UsuarNome'], 2).'</td>
                                                 <td>'.$item['AdiTRTela'].'</td>
                                                 <td>'.$item['AdiTRDetalhamento'].'</td>
                                             ');

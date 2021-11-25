@@ -405,39 +405,37 @@ if(isset($_POST['cmbUsuario'])){
 										</div>											
 									</div>
 									<br>
-									<div class="row">
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="cmbUsuario"> Membro<span class="text-danger">
-														*</span></label>
-												<select id="cmbUsuario" name="cmbUsuario" class="form-control select">
-												<option value="">Selecione</option>
-													<?php
-													$sql = "SELECT UsuarId, UsuarLogin
-															FROM Usuario
-															JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
-															JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
-															JOIN Situacao on SituaId = EXUXPStatus
-															WHERE UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															ORDER BY UsuarLogin ASC";
-													$result = $conn->query($sql);
-													$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
+									<?php if ($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')) : ?>
+										<div class="row">
+											<div class="col-lg-6">
+												<div class="form-group">
+													<label for="cmbUsuario"> Membro<span class="text-danger">
+															*</span></label>
+													<select id="cmbUsuario" name="cmbUsuario" class="form-control select">
+													<option value="">Selecione</option>
+														<?php
+														$sql = "SELECT UsuarId, UsuarLogin
+																FROM Usuario
+																JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+																JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+																JOIN Situacao on SituaId = EXUXPStatus
+																WHERE UsXUnUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY UsuarLogin ASC";
+														$result = $conn->query($sql);
+														$rowEquipe = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													foreach ($rowEquipe as $item) {
-														print('<option value="' . $item['UsuarId'] . '">' . $item['UsuarLogin'] . '</option>');
-													}
-													?>
-												</select>
+														foreach ($rowEquipe as $item) {
+															print('<option value="' . $item['UsuarId'] . '">' . $item['UsuarLogin'] . '</option>');
+														}
+														?>
+													</select>
+												</div>
+											</div>
+											<div class="col-lg-3">												
+												<button class="btn btn-lg btn-principal" style="margin-top: 25px;" id="adicionar">Adicionar</button>
 											</div>
 										</div>
-										<div class="col-lg-3">
-										<?php
-											if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')){
-												print('<button class="btn btn-lg btn-principal" style="margin-top: 25px;" id="adicionar">Adicionar</button>');
-											}
-											?>
-										</div>
-									</div>										
+									<?php endif; ?>		
 								</div>	
 
 								<table id="tblComissao" class="table">
@@ -502,49 +500,46 @@ if(isset($_POST['cmbUsuario'])){
 
 							<div class="card-body">							
 
-								<form name="formAnexoComissao" id="formAnexoComissao" method="post" enctype="multipart/form-data" class="form-validate-jquery">
-								 
-									<div class="row">
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputData">Data</label>
-												<input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
+								<?php if ($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')) : ?>							
+									<form name="formAnexoComissao" id="formAnexoComissao" method="post" enctype="multipart/form-data" class="form-validate-jquery">
+									
+										<div class="row">
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputData">Data</label>
+													<input type="text" id="inputData" name="inputData" class="form-control" placeholder="Data" value="<?php echo date('d/m/Y'); ?>"  readOnly>
+												</div>
 											</div>
-										</div>
-										<div class="col-lg-10">
-											<div class="form-group">
-												<label for="inputNome">Descrição<span class="text-danger"> *</span></label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Descrição" required autofocus>
+											<div class="col-lg-10">
+												<div class="form-group">
+													<label for="inputNome">Descrição<span class="text-danger"> *</span></label>
+													<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Descrição" required autofocus>
+												</div>
 											</div>
-										</div>
-									</div>	
-									<div class="row">
-										<div class="col-lg-12">
-											<label for="inputArquivo">Arquivo<span class="text-danger"> *</span></label>
-											<input type="file" id="inputArquivo" name="inputArquivo" class="form-control" required>
-										</div>
-									</div>	
-									<div class="row">	
-										<div class="col-lg-12">
-											<div class="form-group">										
-												Obs.: arquivos permitidos (.pdf, .doc, .docx, .odt, .jpg, .jpeg, .png) Tamanho máximo: 32MB
+										</div>	
+										<div class="row">
+											<div class="col-lg-12">
+												<label for="inputArquivo">Arquivo<span class="text-danger"> *</span></label>
+												<input type="file" id="inputArquivo" name="inputArquivo" class="form-control" required>
 											</div>
-										</div>									
-									</div>
+										</div>	
+										<div class="row">	
+											<div class="col-lg-12">
+												<div class="form-group">										
+													Obs.: arquivos permitidos (.pdf, .doc, .docx, .odt, .jpg, .jpeg, .png) Tamanho máximo: 32MB
+												</div>
+											</div>									
+										</div>
 
-									<div class="row" style="margin-top: 10px;">
-										<div class="col-lg-12">								
-											<div class="form-group">
-											<?php
-											if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA')){
-												print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
-											}
-											?>											
+										<div class="row" style="margin-top: 10px;">
+											<div class="col-lg-12">								
+												<div class="form-group">
+													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>										
+												</div>
 											</div>
 										</div>
-									</div>
-
-								</form>
+									</form>
+								<?php endif; ?>	
 							</div>
 
 							
