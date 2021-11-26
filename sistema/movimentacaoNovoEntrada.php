@@ -583,6 +583,7 @@ if (isset($_POST['inputData'])) {
 				var cmbFornecedor = $('#cmbFornecedor').val();
 				var cmbDestinoLocal = $('#cmbDestinoLocal').val();
 				var inputValorTotal = $('#inputValorTotal').val();
+				var inputNotaFiscal = $('#inputNotaFiscal').val();
 				var itemEditado = $('#itemEditadoquantidade').val();
 				var validadeNaoInformada = $('#validadeNaoInformada').val();
 
@@ -602,6 +603,12 @@ if (isset($_POST['inputData'])) {
 				if (cmbOrdemCompra == '') {
 					alerta('Atenção', 'Informe a Ordem Compra / Carta Contrato!', 'error');
 					$('#cmbOrdemCompra').focus();
+					return false;
+				}
+
+				if (inputNotaFiscal == '') {
+					alerta('Atenção', 'Informe Nº Nota Fiscal', 'error');
+					$('#inputNotaFiscal').focus();	
 					return false;
 				}
 
@@ -882,8 +889,8 @@ if (isset($_POST['inputData'])) {
 									<div class="row">
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label for="inputNotaFiscal">Nº Nota Fiscal</label>
-												<input type="text" id="inputNotaFiscal" name="inputNotaFiscal" class="form-control" placeholder="Nº NF" maxlength="50">
+												<label for="inputNotaFiscal">Nº Nota Fiscal<span style="color: red">*</span></label>
+												<input type="text" id="inputNotaFiscal" name="inputNotaFiscal" class="form-control" placeholder="Nº NF" maxlength="50" required>
 											</div>
 										</div>
 

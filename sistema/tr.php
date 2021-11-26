@@ -408,11 +408,11 @@ if($permissao == 1){
 
 												print('<td class="text-center">
 														<div class="list-icons">
-															<div class="list-icons list-icons-extended">');
-															if($_SESSION['PerfiChave']==strtoupper('ADMINISTRADOR') || $_SESSION['PerfiChave']==strtoupper('CENTROADMINISTRATIVO') || $_SESSION['PerfiChave']==strtoupper('ADMINISTRATIVO')|| $_SESSION['PerfiChave']==strtoupper('CONTROLADORIA') || $_SESSION['PerfiChave']==strtoupper('JURIDICO')){
-																print('<a href="#" onclick="atualizaTR('.$atualizar.',' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>');
-															      }
-																print('<a href="#" onclick="atualizaTR('.$excluir.',' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\', \'' . $item['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
+															<div class="list-icons list-icons-extended">
+															
+																<a href="#" onclick="atualizaTR('.$atualizar.',' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'edita\');" class="list-icons-item"><i class="icon-pencil7" title="Editar TR"></i></a>
+															      
+																<a href="#" onclick="atualizaTR('.$excluir.',' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\', \'' . $item['SituaChave'] . '\', \'exclui\', \'' . $item['TrRefLiberaParcial'] . '\');" class="list-icons-item"><i class="icon-bin" title="Excluir TR"></i></a>
 
 																<a href="#" onclick="atualizaTR(1,' . $item['TrRefId'] . ', \'' . $item['TrRefNumero'] . '\', \'' . $item['TrRefCategoria'] . '\', \'' . $item['CategNome'] . '\',' . $item['TrRefStatus'] . ', \'auditoria\');" class="list-icons-item"><i class="icon-eye4" title="Auditoria"></i></a>
 

@@ -129,6 +129,19 @@ if(isset($_POST['inputData'])){
 								':iOrcamento' => $iOrcamento,
 								':iUnidade' => $_SESSION['UnidadeId']));
 		}
+
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+			':iTRTermoReferencia' => $_SESSION['TRId'],
+			':iTRDataHora' => date("Y-m-d H:i:s"),
+			':iTRUsuario' => $_SESSION['UsuarId'],
+			':iTRTela' =>'ORÇAMENTO',
+			':iTRDetalhamento' =>' MODIFICAÇÃO DO ORÇAMENTO DE Nº '. $row['TrXOrNumero']. ''
+		));
+
 		
 		$conn->commit();						
 		

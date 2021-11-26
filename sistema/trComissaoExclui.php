@@ -28,8 +28,8 @@ if(isset($_POST['inputTRId'])){
 			':iTRTermoReferencia' => $iTR ,
 			':iTRDataHora' => date("Y-m-d H:i:s"),
 			':iTRUsuario' => $_SESSION['UsuarId'],
-			':iTRTela' =>'TERMO DE REFERÊNCIA COMISSÃO ',
-			':iTRDetalhamento' =>'EXCLUSÃO DE MEMBRO'
+			':iTRTela' =>'COMISSÃO DO PROCESSO LICITATÓRIO',
+			':iTRDetalhamento' =>'EXCLUSÃO DO MEMBRO'
 		));
 		
 		$conn->commit();

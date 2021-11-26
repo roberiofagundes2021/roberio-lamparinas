@@ -118,6 +118,19 @@ if (isset($_POST['inputData'])) {
 			exit;
 		}
 
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+			':iTRTermoReferencia' => $_SESSION['TRId'],
+			':iTRDataHora' => date("Y-m-d H:i:s"),
+			':iTRUsuario' => $_SESSION['UsuarId'],
+			':iTRTela' =>'ORÇAMENTO',
+			':iTRDetalhamento' =>' INCLUSÃO DO ORÇAMENTO  DE Nº '. $sNumero . ' '
+		));
+
+
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Orçamento incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";

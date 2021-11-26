@@ -113,8 +113,8 @@
 				':iTRTermoReferencia' => $iTermoReferenciaId ,
 				':iTRDataHora' => date("Y-m-d H:i:s"),
 				':iTRUsuario' => $_SESSION['UsuarId'],
-				':iTRTela' =>'TERMO DE REFERÊNCIA DOTAÇÃO',
-				':iTRDetalhamento' =>'NOVO REGISTRO'
+				':iTRTela' =>'DOTAÇÃO ORÇAMENTÁRIA',
+				':iTRDetalhamento' =>'INCLUSÃO DO REGISTRO'
 			));
 
 

@@ -86,7 +86,7 @@ if (isset($_POST['inputIdTR'])) {
 			':iTRTermoReferencia' => $iTR ,
 			':iTRDataHora' => date("Y-m-d H:i:s"),
 			':iTRUsuario' => $_SESSION['UsuarId'],
-			':iTRTela' =>'TERMO DE REFERÊNCIA SERVIÇO',
+			':iTRTela' =>'LISTAR SERVIÇO',
 			':iTRDetalhamento' =>'ATUALIZAÇÃO'
 		));
 

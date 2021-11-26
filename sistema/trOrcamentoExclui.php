@@ -4,10 +4,17 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputOrcamentoId'])){
-	
 	$iOrcamento = $_POST['inputOrcamentoId'];
-        	
+
+	$sql = "SELECT  TrXOrNumero
+			FROM TRXOrcamento
+			JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+			WHERE TrXOrId = $iOrcamento ";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+
+if(isset($_POST['inputOrcamentoId'])){
+		
 	try{
 		$conn->beginTransaction();	
 		
@@ -29,6 +36,19 @@ if(isset($_POST['inputOrcamentoId'])){
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iOrcamento); 
 		$result->execute();
+
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+			':iTRTermoReferencia' => $_SESSION['TRId'],
+			':iTRDataHora' => date("Y-m-d H:i:s"),
+			':iTRUsuario' => $_SESSION['UsuarId'],
+			':iTRTela' =>'ORÇAMENTO',
+			':iTRDetalhamento' =>' EXCLUSÃO DO ORÇAMENTO DE Nº '. $row['TrXOrNumero']. ' '
+		));
+
 		
 		$conn->commit();
 		
