@@ -50,6 +50,7 @@ if (isset($_POST['inputTRId'])) {
 	irpara("tr.php");
 }
 
+//Se está alterando
 if (isset($_POST['inputTRData'])) {
 
 	try {
