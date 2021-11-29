@@ -10,13 +10,13 @@
 			
 			if ($parametroProduto = 'ProdutoOrcamento') {
 			
-				$sql = "SELECT PrOrcId as idProduto
+				$sql = "SELECT PrOrcId as idProduto, PrOrcDetalhamento as Detalhamento
 						FROM ProdutoOrcamento
 						JOIN Situacao on SituaId = PrOrcSituacao
 						WHERE PrOrcSubcategoria = " . $value . " and SituaChave = 'ATIVO'";
 			} else{
 			
-				$sql = "SELECT ProduId as idProduto
+				$sql = "SELECT ProduId as idProduto, ProduDetalhamento as Detalhamento
 						FROM Produto
 						JOIN Situacao on SituaId = ProduStatus
 						WHERE ProduSubCategoria = " . $value . " and SituaChave = 'ATIVO'";
@@ -27,8 +27,8 @@
 
 			foreach ($produtos as $produto) {
 
-				$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrUnidade)
-						VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
+				$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrDetalhamento, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrUnidade)
+						VALUES (:iTR, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				if ($produto) {
@@ -36,6 +36,7 @@
 					$result->execute(array(
 						':iTR' => $insertId,
 						':iProduto' => $produto['idProduto'],
+						':sDetalhamento' => $produto['Detalhamento'],
 						':iQuantidade' => null,
 						':fValorUnitario' => null,
 						':sTabela' => $parametroProduto,
@@ -52,13 +53,13 @@
 			
 		if ($parametroProduto = 'ProdutoOrcamento') {
 		
-			$sql = "SELECT PrOrcId as idProduto
+			$sql = "SELECT PrOrcId as idProduto, PrOrcDetalhamento as Detalhamento
 					FROM ProdutoOrcamento
 					JOIN Situacao on SituaId = PrOrcSituacao
 					WHERE PrOrcCategoria = " . $value . " and SituaChave = 'ATIVO'";
 		} else {
 		
-			$sql = "SELECT ProduId as idProduto
+			$sql = "SELECT ProduId as idProduto, ProduDetalhamento as Detalhamento
 					FROM Produto
 					JOIN Situacao on SituaId = ProduStatus
 					WHERE ProduCategoria = " . $value . " and SituaChave = 'ATIVO'";
@@ -69,8 +70,8 @@
 	
 		foreach ($produtos as $produto) {
 
-			$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrUnidade)
-					VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrDetalhamento, TRXPrQuantidade, TRXPrValorUnitario, TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrUnidade)
+					VALUES (:iTR, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 
 			if ($produto) {
@@ -78,6 +79,7 @@
 				$result->execute(array(
 					':iTR' => $insertId,
 					':iProduto' => $produto['idProduto'],
+					':sDetalhamento' => $produto['Detalhamento'],
 					':iQuantidade' => null,
 					':fValorUnitario' => null,
 					':sTabela' => $parametroProduto,

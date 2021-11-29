@@ -78,6 +78,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 							</div>
 							<div class="col-lg-11">
 								<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['PrOrcDetalhamento'] . '" value="' . $item['PrOrcNome'] . '" readOnly>
+								<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['PrOrcDetalhamento'] . '">
 							</div>
 						</div>
 					</div>								
@@ -131,6 +132,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 							</div>
 							<div class="col-lg-11">
 								<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+								<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['ProduDetalhamento'] . '">
 							</div>
 						</div>
 					</div>								
