@@ -12,7 +12,8 @@ try {
 
 	/* Detalhamento para todos os TRs já cadastrados */
 	$sql = "SELECT EmpreId, EmpreNomeFantasia
-			FROM Empresa";
+			FROM Empresa
+			Where EmpreId in (12, 14, 15, 16)";
 	$result = $conn->query($sql);
 	$rowEmpresa = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -50,19 +51,20 @@ try {
 						WHERE TRXPrTermoReferencia = " . $iTR;
 				$result = $conn->query($sql);
 				$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);
+				$countProduto = count($rowProduto);
 
-				if ($parametroProduto == 'ProdutoOrcamento'){
+				if ($countProduto){
 					
-					foreach ($rowProduto as $itemProduto){
-						
-						$sql = "SELECT PrOrcDetalhamento
-								FROM ProdutoOrcamento
-								WHERE PrOrcId = " . $itemProduto['TRXPrProduto'];
-						$result = $conn->query($sql);
-						$rowProdutoDet = $result->fetchAll(PDO::FETCH_ASSOC);
-						$countProdutoDet = count($rowProdutoDet);
-
-						if ($countProdutoDet){
+					if ($parametroProduto == 'ProdutoOrcamento'){
+					
+						foreach ($rowProduto as $itemProduto){
+							
+							$sql = "SELECT PrOrcDetalhamento
+									FROM ProdutoOrcamento
+									WHERE PrOrcId = " . $itemProduto['TRXPrProduto'];
+							$result = $conn->query($sql);
+							$rowProdutoDet = $result->fetch(PDO::FETCH_ASSOC);
+	
 							$sql = "UPDATE TermoReferenciaXProduto SET TRXPrDetalhamento = :sDetalhamento
 									WHERE TRXPrTermoReferencia = :iTR";
 							$result = $conn->prepare($sql);
@@ -70,21 +72,17 @@ try {
 							$result->execute(array(
 								':sDetalhamento' => $rowProdutoDet['PrOrcDetalhamento'],
 								':iTR' => $iTR
-							));
-						}
-					}
-				
-				} else {
-					foreach ($rowProduto as $itemProduto){
-						
-						$sql = "SELECT ProduDetalhamento
-								FROM Produto
-								WHERE ProduId = " . $itemProduto['TRXPrProduto'];
-						$result = $conn->query($sql);
-						$rowProdutoDet = $result->fetchAll(PDO::FETCH_ASSOC);
-						$countProdutoDet = count($rowProdutoDet);
+							));	
+						}					
+					} else {
+						foreach ($rowProduto as $itemProduto){
+							
+							$sql = "SELECT ProduDetalhamento
+									FROM Produto
+									WHERE ProduId = " . $itemProduto['TRXPrProduto'];
+							$result = $conn->query($sql);
+							$rowProdutoDet = $result->fetch(PDO::FETCH_ASSOC);
 
-						if ($countProdutoDet){
 							$sql = "UPDATE TermoReferenciaXProduto SET TRXPrDetalhamento = :sDetalhamento
 									WHERE TRXPrTermoReferencia = :iTR";
 							$result = $conn->prepare($sql);
@@ -94,7 +92,7 @@ try {
 								':iTR' => $iTR
 							));
 						}
-					}
+					}	
 				}
 
 				$sql = "SELECT TRXSrServico
@@ -102,19 +100,20 @@ try {
 						WHERE TRXSrTermoReferencia = " . $iTR;
 				$result = $conn->query($sql);
 				$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);
+				$countServico = count($rowServico);
 
-				if ($parametroServico == 'ServicoOrcamento'){
-					
-					foreach ($rowServico as $itemServico){
+				if ($countServico){				
+
+					if ($parametroServico == 'ServicoOrcamento'){
 						
-						$sql = "SELECT SrOrcDetalhamento
-								FROM ServicoOrcamento
-								WHERE SrOrcId = " . $itemServico['TRXSrServico'];
-						$result = $conn->query($sql);
-						$rowServicoDet = $result->fetchAll(PDO::FETCH_ASSOC);
-						$countServicoDet = count($rowServicoDet);
-
-						if ($countServicoDet){
+						foreach ($rowServico as $itemServico){
+							
+							$sql = "SELECT SrOrcDetalhamento
+									FROM ServicoOrcamento
+									WHERE SrOrcId = " . $itemServico['TRXSrServico'];
+							$result = $conn->query($sql);
+							$rowServicoDet = $result->fetch(PDO::FETCH_ASSOC);
+							
 							$sql = "UPDATE TermoReferenciaXServico SET TRXSrDetalhamento = :sDetalhamento
 									WHERE TRXSrTermoReferencia = :iTR";
 							$result = $conn->prepare($sql);
@@ -124,23 +123,20 @@ try {
 								':iTR' => $iTR
 							));
 						}
-					}
-				
-				} else {
-					foreach ($rowServico as $itemServico){
-						
-						$sql = "SELECT ServiDetalhamento
-								FROM Servico
-								WHERE ServiId = " . $itemProduto['TRXSrServico'];
-						$result = $conn->query($sql);
-						$rowServicoDet = $result->fetchAll(PDO::FETCH_ASSOC);
-						$countServicoDet = count($rowServicoDet);
+					
+					} else {
+						foreach ($rowServico as $itemServico){
+							
+							$sql = "SELECT ServiDetalhamento
+									FROM Servico
+									WHERE ServiId = " . $itemProduto['TRXSrServico'];
+							$result = $conn->query($sql);
+							$rowServicoDet = $result->fetch(PDO::FETCH_ASSOC);
 
-						if ($countServicoDet){
 							$sql = "UPDATE TermoReferenciaXServico SET TRXSrDetalhamento = :sDetalhamento
 									WHERE TRXSrTermoReferencia = :iTR";
 							$result = $conn->prepare($sql);
-					
+						
 							$result->execute(array(
 								':sDetalhamento' => $rowServicoDet['ServiDetalhamento'],
 								':iTR' => $iTR
@@ -151,12 +147,12 @@ try {
 
 			}
 
-			echo "	- Unidade: ". $rowUnidade['UnidaNome']. " concluída com sucesso!";
+			echo "Unidade: ". $itemUnidade['UnidaNome']. " concluída com sucesso!";
 			echo "<br>";
 		}
 
-		echo "<b>Empresa: ". $rowEmpresa['EmpreNomeFantasia']. " concluído com sucesso!</b>";
-		echo "<br>";
+		echo "<b>Empresa: ". $itemEmpresa['EmpreNomeFantasia']. " concluído com sucesso!</b>";
+		echo "<br><hr /><br>";
 	}
 
 	$conn->commit();
