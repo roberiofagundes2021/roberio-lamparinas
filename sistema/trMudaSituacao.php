@@ -28,10 +28,23 @@ if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 			$motivo = $_POST['inputMotivo'];
 			$msg = "Termo de Referência não liberado!";
 
+			$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+					VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+					$result = $conn->prepare($sql);
+							
+					$result->execute(array(
+						':iTRTermoReferencia' => $iTermoReferenciaId,
+						':iTRDataHora' => date("Y-m-d H:i:s"),
+						':iTRUsuario' => $_SESSION['UsuarId'],
+						':iTRTela' =>'LIBERAR CENTRO ADIMINISTRATIVO',
+						':iTRDetalhamento' =>'NÃO LIBERADO PELO CENTRO ADIMINISTRATIVO'
+			));
+
 			$sql = "UPDATE TermoReferencia
 					SET TrRefStatus = :bStatus, 
 						TrRefUsuarioAtualizador = :iUsuario
-					WHERE TrRefId = :iTermoReferenciaId";			
+					WHERE TrRefId = :iTermoReferenciaId";
+					
 		} else{
 			$motivo = NULL;
 			$msg = "Termo de Referência liberado!";
@@ -57,6 +70,33 @@ if(isset($_POST['inputTermoReferenciaId']) || isset($_POST['inputTRId'])){
 					and BandeTabelaId = ".$iTermoReferenciaId." and BandePerfil = 'COMISSAO' ";
 			$result = $conn->query($sql);
 			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
+
+			$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+					VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+					$result = $conn->prepare($sql);
+							
+					$result->execute(array(
+						':iTRTermoReferencia' => $iTermoReferenciaId,
+						':iTRDataHora' => date("Y-m-d H:i:s"),
+						':iTRUsuario' => $_SESSION['UsuarId'],
+						':iTRTela' =>'FINALIZAR TR',
+						':iTRDetalhamento' =>'TR FINALIZADA '
+			));
+		}
+
+		if ($_POST['inputTermoReferenciaStatus'] === 'LIBERADOCENTRO'){
+			$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+			VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+				':iTRTermoReferencia' => $iTermoReferenciaId,
+				':iTRDataHora' => date("Y-m-d H:i:s"),
+				':iTRUsuario' => $_SESSION['UsuarId'],
+				':iTRTela' =>'LIBERAR CENTRO ADIMINISTRATIVO',
+				':iTRDetalhamento' =>'LIBERADO PELO CENTRO ADIMINISTRATIVO'
+	));
+					
 		}
 
 		if (isset($_POST['inputBandejaId'])){

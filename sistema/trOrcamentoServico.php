@@ -17,6 +17,18 @@ if (isset($_POST['inputOrcamentoId'])) {
 	irpara("orcamento.php");
 }
 
+	$sql = "SELECT *
+			FROM TRXOrcamento
+			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
+			JOIN Categoria on CategId = TrXOrCategoria
+			LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
+			JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+			JOIN Situacao  ON SituaId = TrRefStatus
+			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+	$iTR = $row['TrXOrTermoReferencia'];
+
 //Se está alterando
 if (isset($_POST['inputIdOrcamento'])) {
 
@@ -27,6 +39,18 @@ if (isset($_POST['inputIdOrcamento'])) {
 	$result->execute(array(
 		':iOrcamento' => $iOrcamento,
 		':iUnidade' => $_SESSION['UnidadeId']
+	));
+
+	$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+			':iTRTermoReferencia' => $_SESSION['TRId'],
+			':iTRDataHora' => date("Y-m-d H:i:s"),
+			':iTRUsuario' => $_SESSION['UsuarId'],
+			':iTRTela' =>'ORÇAMENTO / LISTAR SERVIÇO  ',
+			':iTRDetalhamento' =>' ATUALIZAÇÃO DO SERVIÇO DO ORÇAMENTO DE Nº '.$row['TrXOrNumero'].' '
 	));
 
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
@@ -49,18 +73,6 @@ if (isset($_POST['inputIdOrcamento'])) {
 		$_SESSION['msg']['tipo'] = "success";
 	}
 }
-
-$sql = "SELECT *
-		FROM TRXOrcamento
-		LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
-		JOIN Categoria on CategId = TrXOrCategoria
-		LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
-		JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
-		JOIN Situacao  ON SituaId = TrRefStatus
-		WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
-$result = $conn->query($sql);
-$row = $result->fetch(PDO::FETCH_ASSOC);
-$iTR = $row['TrXOrTermoReferencia'];
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 

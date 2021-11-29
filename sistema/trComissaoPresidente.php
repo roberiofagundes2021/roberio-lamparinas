@@ -6,6 +6,8 @@ $_SESSION['PaginaAtual'] = 'Enviar para Aprovação - Centro Administrativo';
 
 include('global_assets/php/conexao.php');
 
+	
+
 try{
 	if(isset($_POST['inputReferenceTermId'])){
 		$bIsPresident = $_POST['inputIsPresident'] == 1 ? false : true;
@@ -46,17 +48,30 @@ try{
 			':iTRXEqUnidade' => $iTRXEqUnidade,
 		));
 
-		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
-		VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
-		$result = $conn->prepare($sql);
-				
-		$result->execute(array(
-			':iTRTermoReferencia' => $iTRXEqTermoRefencia,
-			':iTRDataHora' => date("Y-m-d H:i:s"),
-			':iTRUsuario' => $_SESSION['UsuarId'],
-			':iTRTela' =>'COMISSÃO DO PROCESSO LICITATÓRIO',
-			':iTRDetalhamento' =>'INCLUSÃO DO PRESIDENTE'
-		));
+		
+			$sql = "SELECT UsuarNome
+				FROM TRXEquipe
+				JOIN Usuario ON UsuarId = TRXEqUsuario
+				WHERE TRXEqUnidade = ". $_SESSION['UnidadeId'] ."  AND TRXEqTermoReferencia = ".$_POST['inputReferenceTermId']." AND TRXEqPresidente = 1
+				ORDER BY UsuarLogin ASC";
+			$result = $conn->query($sql);
+			$row = $result->fetchAll(PDO::FETCH_ASSOC);
+		
+		foreach ($row as $item){
+		
+			$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+					VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+					$result = $conn->prepare($sql);
+							
+					$result->execute(array(
+						':iTRTermoReferencia' => $iTRXEqTermoRefencia,
+						':iTRDataHora' => date("Y-m-d H:i:s"),
+						':iTRUsuario' => $_SESSION['UsuarId'],
+						':iTRTela' =>'COMISSÃO DO PROCESSO LICITATÓRIO',
+						':iTRDetalhamento' =>'PROMOVIDO '.$item['UsuarNome'].' PARA PRESIDENTE'
+			));	
+		} 
+		
 
 		$conn->commit();
 
