@@ -41,7 +41,7 @@ if (isset($_POST['inputIdOrcamento'])) {
 		':iUnidade' => $_SESSION['UnidadeId']
 	));
 
-	$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+	$sql = "INSERT INTO AuditTR (AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
 				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
 		$result = $conn->prepare($sql);
 				
@@ -55,17 +55,18 @@ if (isset($_POST['inputIdOrcamento'])) {
 
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
-		$sql = "INSERT INTO  TRXOrcamentoXServico (TXOXSOrcamento, TXOXSServico, TXOXSQuantidade, TXOXSValorUnitario, TXOXSUsuarioAtualizador, TXOXSUnidade)
-				VALUES (:iOrcamento, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+		$sql = "INSERT INTO  TRXOrcamentoXServico (TXOXSOrcamento, TXOXSServico, TXOXSDetalhamento, TXOXSQuantidade, TXOXSValorUnitario, TXOXSUsuarioAtualizador, TXOXSUnidade)
+				VALUES (:iOrcamento, :iServico, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
-			':iOrcamento' => $iOrcamento,
-			':iServico' => $_POST['inputIdServico' . $i],
-			':iQuantidade' => $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
-			':fValorUnitario' => $_POST['inputValorUnitario' . $i] == '' ? null : gravaValor($_POST['inputValorUnitario' . $i]),
-			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iUnidade' => $_SESSION['UnidadeId']
+			':iOrcamento' 			=> $iOrcamento,
+			':iServico' 			=> $_POST['inputIdServico' . $i],
+			':sDetalhamento' 	    => $_POST['inputDetalhamento' . $i],
+			':iQuantidade' 			=> $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
+			':fValorUnitario' 		=> $_POST['inputValorUnitario' . $i] == '' ? null : gravaValor($_POST['inputValorUnitario' . $i]),
+			':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+			':iUnidade' 			=> $_SESSION['UnidadeId']
 		));
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -306,7 +307,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 									<?php
 
 									// Selects para identificar quais servicos de TermoReferenciaXServico pertencem a TR deste Orçamento e a qual tabela eles pertencem
-									$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento, TRXSrQuantidade
+									$sql = "SELECT SrOrcId, SrOrcNome, TRXSrDetalhamento as Detalhamento, TRXSrQuantidade
 											FROM ServicoOrcamento
 											JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 											JOIN SubCategoria on SbCatId = SrOrcSubCategoria
@@ -315,7 +316,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 									$result = $conn->query($sql);
 									$rowServicosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
-									$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, TRXSrQuantidade
+									$sql = "SELECT ServiId, ServiNome, TRXSrDetalhamento as Detalhamento, TRXSrQuantidade
 											FROM Servico
 											JOIN TermoReferenciaXServico on TRXSrServico = ServiId
 											JOIN SubCategoria on SbCatId = ServiSubCategoria
@@ -392,7 +393,8 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 															        <input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['SrOrcId'] . '" class="idServico">
 														       </div>
 														       <div class="col-lg-11">
-															        <input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['SrOrcDetalhamento'] . '" value="' . $item['SrOrcNome'] . '" readOnly>
+															        <input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['TXOXSDetalhamento'] . '" value="' . $item['SrOrcNome'] . '" readOnly>
+																	<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['TXOXSDetalhamento'] . '">
 														        </div>
 													        </div>
 												        </div>								
@@ -428,7 +430,8 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 															        <input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['SrOrcId'] . '" class="idServico">
 														        </div>
 														        <div class="col-lg-11">
-															        <input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['SrOrcDetalhamento'] . '" value="' . $item['SrOrcNome'] . '" readOnly>
+															        <input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['Detalhamento'] . '" value="' . $item['SrOrcNome'] . '" readOnly>
+																	<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
 														        </div>
 													        </div>
 												        </div>								
@@ -477,7 +480,8 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 															        <input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
 														       </div>
 														       <div class="col-lg-11">
-															        <input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+															        <input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['TXOXSDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+																	<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['TXOXSDetalhamento'] . '">
 														        </div>
 													        </div>
 												        </div>								
@@ -513,7 +517,8 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 															        <input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
 														        </div>
 														        <div class="col-lg-11">
-															        <input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+															        <input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['Detalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+																	<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
 														        </div>
 													        </div>
 												        </div>								

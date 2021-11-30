@@ -13,7 +13,7 @@ try {
 	/* Detalhamento para todos os TRs já cadastrados */
 	$sql = "SELECT EmpreId, EmpreNomeFantasia
 			FROM Empresa
-			Where EmpreId in (12, 14, 15, 16)";
+			Where EmpreId in (8, 10, 11)";
 	$result = $conn->query($sql);
 	$rowEmpresa = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -66,12 +66,12 @@ try {
 							$rowProdutoDet = $result->fetch(PDO::FETCH_ASSOC);
 	
 							$sql = "UPDATE TermoReferenciaXProduto SET TRXPrDetalhamento = :sDetalhamento
-									WHERE TRXPrTermoReferencia = :iTR";
+									WHERE TRXPrProduto = :iProduto";
 							$result = $conn->prepare($sql);
 					
 							$result->execute(array(
 								':sDetalhamento' => $rowProdutoDet['PrOrcDetalhamento'],
-								':iTR' => $iTR
+								':iProduto' => $itemProduto['TRXPrProduto']
 							));	
 						}					
 					} else {
@@ -84,12 +84,12 @@ try {
 							$rowProdutoDet = $result->fetch(PDO::FETCH_ASSOC);
 
 							$sql = "UPDATE TermoReferenciaXProduto SET TRXPrDetalhamento = :sDetalhamento
-									WHERE TRXPrTermoReferencia = :iTR";
+									WHERE TRXPrProduto = :iProduto";
 							$result = $conn->prepare($sql);
 					
 							$result->execute(array(
 								':sDetalhamento' => $rowProdutoDet['ProduDetalhamento'],
-								':iTR' => $iTR
+								':iProduto' => $itemProduto['TRXPrProduto']
 							));
 						}
 					}	
@@ -115,12 +115,12 @@ try {
 							$rowServicoDet = $result->fetch(PDO::FETCH_ASSOC);
 							
 							$sql = "UPDATE TermoReferenciaXServico SET TRXSrDetalhamento = :sDetalhamento
-									WHERE TRXSrTermoReferencia = :iTR";
+									WHERE TRXSrServico = :iServico";
 							$result = $conn->prepare($sql);
 					
 							$result->execute(array(
 								':sDetalhamento' => $rowServicoDet['SrOrcDetalhamento'],
-								':iTR' => $iTR
+								':iServico' => $itemServico['TRXSrServico']
 							));
 						}
 					
@@ -129,17 +129,17 @@ try {
 							
 							$sql = "SELECT ServiDetalhamento
 									FROM Servico
-									WHERE ServiId = " . $itemProduto['TRXSrServico'];
+									WHERE ServiId = " . $itemServico['TRXSrServico'];
 							$result = $conn->query($sql);
 							$rowServicoDet = $result->fetch(PDO::FETCH_ASSOC);
 
 							$sql = "UPDATE TermoReferenciaXServico SET TRXSrDetalhamento = :sDetalhamento
-									WHERE TRXSrTermoReferencia = :iTR";
+									WHERE TRXSrServico = :iServico";
 							$result = $conn->prepare($sql);
 						
 							$result->execute(array(
 								':sDetalhamento' => $rowServicoDet['ServiDetalhamento'],
-								':iTR' => $iTR
+								':iServico' => $itemServico['TRXSrServico']
 							));
 						}
 					}

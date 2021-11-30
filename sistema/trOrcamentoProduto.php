@@ -17,17 +17,17 @@ if (isset($_POST['inputOrcamentoId'])) {
 	irpara("orcamento.php");
 }
 
-	$sql = "SELECT *
-			FROM TRXOrcamento
-			LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
-			JOIN Categoria on CategId = TrXOrCategoria
-			JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
-			JOIN Situacao  ON SituaId = TrRefStatus
-			LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
-			WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
-	$result = $conn->query($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
-	$iTR = $row['TrXOrTermoReferencia'];
+$sql = "SELECT *
+		FROM TRXOrcamento
+		LEFT JOIN Fornecedor on ForneId = TrXOrFornecedor
+		JOIN Categoria on CategId = TrXOrCategoria
+		JOIN TermoReferencia on TrRefId = TrXOrTermoReferencia
+		JOIN Situacao  ON SituaId = TrRefStatus
+		LEFT JOIN SubCategoria on SbCatId = TrXOrSubCategoria
+		WHERE TrXOrUnidade = " . $_SESSION['UnidadeId'] . " and TrXOrId = " . $iOrcamento;
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+$iTR = $row['TrXOrTermoReferencia'];
 
 //Se está alterando
 if (isset($_POST['inputIdOrcamento'])) {
@@ -41,7 +41,7 @@ if (isset($_POST['inputIdOrcamento'])) {
 		':iUnidade' => $_SESSION['UnidadeId']
 	));
 
-	$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+	$sql = "INSERT INTO AuditTR (AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
 				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
 		$result = $conn->prepare($sql);
 				
@@ -55,17 +55,18 @@ if (isset($_POST['inputIdOrcamento'])) {
 
 	for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
-		$sql = "INSERT INTO TRXOrcamentoXProduto (TXOXPOrcamento, TXOXPProduto, TXOXPQuantidade, TXOXPValorUnitario, TXOXPUsuarioAtualizador, TXOXPUnidade)
-				VALUES (:iOrcamento, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+		$sql = "INSERT INTO TRXOrcamentoXProduto (TXOXPOrcamento, TXOXPProduto, TXOXPDetalhamento, TXOXPQuantidade, TXOXPValorUnitario, TXOXPUsuarioAtualizador, TXOXPUnidade)
+				VALUES (:iOrcamento, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
-			':iOrcamento' => $iOrcamento,
-			':iProduto' => $_POST['inputIdProduto' . $i],
-			':iQuantidade' => $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
-			':fValorUnitario' => $_POST['inputValorUnitario' . $i] == '' ? null : gravaValor($_POST['inputValorUnitario' . $i]),
-			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iUnidade' => $_SESSION['UnidadeId']
+			':iOrcamento' 			=> $iOrcamento,
+			':iProduto' 			=> $_POST['inputIdProduto' . $i],
+			':sDetalhamento' 	    => $_POST['inputDetalhamento' . $i],
+			':iQuantidade'			=> $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
+			':fValorUnitario' 		=> $_POST['inputValorUnitario' . $i] == '' ? null : gravaValor($_POST['inputValorUnitario' . $i]),
+			':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+			':iUnidade' 			=> $_SESSION['UnidadeId']
 		));
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -73,7 +74,6 @@ if (isset($_POST['inputIdOrcamento'])) {
 		$_SESSION['msg']['tipo'] = "success";
 	}
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -314,7 +314,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 									<?php
 
 									// Selects para identificar quais produtos de TermoReferenciaXProduto pertencem a TR deste Orçamento e a qual tabela eles pertencem
-									$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, UnMedNome, UnMedSigla
+									$sql = "SELECT PrOrcId, PrOrcNome, TRXPrDetalhamento as Detalhamento, PrOrcUnidadeMedida, TRXPrQuantidade, UnMedNome, UnMedSigla
 											FROM ProdutoOrcamento
 											JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 											JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
@@ -324,7 +324,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 									$result = $conn->query($sql);
 									$rowProdutosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
-									$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, ProduUnidadeMedida, TRXPrQuantidade, UnMedNome, UnMedSigla
+									$sql = "SELECT ProduId, ProduNome, TRXPrDetalhamento as Detalhamento, ProduUnidadeMedida, TRXPrQuantidade, UnMedNome, UnMedSigla
 											FROM Produto
 											JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 											JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -411,7 +411,8 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 															        <input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['PrOrcId'] . '" class="idProduto">
 														       </div>
 														       <div class="col-lg-11">
-															        <input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['PrOrcDetalhamento'] . '" value="' . $item['PrOrcNome'] . '" readOnly>
+															        <input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['TXOXPDetalhamento'] . '" value="' . $item['PrOrcNome'] . '" readOnly>
+																	<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['TXOXPDetalhamento'] . '">
 														        </div>
 													        </div>
 												        </div>								
@@ -450,7 +451,8 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 															        <input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['PrOrcId'] . '" class="idProduto">
 														        </div>
 														        <div class="col-lg-11">
-															        <input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['PrOrcDetalhamento'] . '" value="' . $item['PrOrcNome'] . '" readOnly>
+															        <input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['Detalhamento'] . '" value="' . $item['PrOrcNome'] . '" readOnly>
+																	<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
 														        </div>
 													        </div>
 												        </div>								
@@ -503,7 +505,8 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 															        <input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['ProduId'] . '" class="idProduto">
 														       </div>
 														       <div class="col-lg-11">
-															        <input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+															        <input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['TXOXPDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+																	<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['TXOXPDetalhamento'] . '">
 														        </div>
 													        </div>
 												        </div>								
@@ -542,7 +545,8 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 															        <input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['ProduId'] . '" class="idProduto">
 														        </div>
 														        <div class="col-lg-11">
-															        <input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+															        <input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['Detalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+																	<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
 														        </div>
 													        </div>
 												        </div>								
