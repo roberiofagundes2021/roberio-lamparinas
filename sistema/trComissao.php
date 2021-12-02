@@ -11,31 +11,29 @@ if (!isset($_SESSION['TRId'])){
 	$_SESSION['TRNumero'] = $_POST['inputTRNumero'];
 }
 
-$sql = "SELECT TrRefId,SituaChave
+/* Retorna a situação do TR */
+$sql = "SELECT TrRefId, SituaChave
 		FROM TermoReferencia
 		JOIN Situacao  ON SituaId = TrRefStatus
-		WHERE TrRefId = " .$_SESSION['TRId']. "
-";
+		WHERE TrRefId = " .$_SESSION['TRId'];
 $result = $conn->query($sql);
 $rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
-
+/* Retorna os anexos da comissão */
 $sql = "SELECT TRXCoId, TRXCoData, TRXCoNome, TRXCoArquivo
 		FROM TRXComissao
 		WHERE TRXCoUnidade = ". $_SESSION['UnidadeId'] ." AND TRXCoTermoReferencia = ".$_SESSION['TRId']."	
-		ORDER BY TRXCoNome ASC	
-";
+		ORDER BY TRXCoNome ASC";
 $result = $conn->query($sql);
 $rowAnexo = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
-$sql = "SELECT TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente, TRXEqUnidade, UsuarLogin,TrRefStatus		
+/* Retorna os membros da equipe */
+$sql = "SELECT TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente, TRXEqUnidade, UsuarLogin
 		FROM TRXEquipe
 		JOIN Usuario  ON UsuarId = TRXEqUsuario
-		JOIN TermoReferencia  ON TrRefId = TRXEqTermoReferencia
 	    WHERE TRXEqUnidade = ". $_SESSION['UnidadeId'] ."  AND TRXEqTermoReferencia = ".$_SESSION['TRId']."
-	    ORDER BY UsuarLogin ASC
-";
+	    ORDER BY UsuarLogin ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -325,9 +323,8 @@ if(isset($_POST['cmbUsuario'])){
 		function atualizaComissao(TRXEqTermoReferencia, TRXEqUsuario, Tipo){
 			document.getElementById('inputTRId').value = TRXEqTermoReferencia;
 			document.getElementById('inputUsuarioId').value = TRXEqUsuario;
-					
-				
-			 if (Tipo == 'exclui'){
+						
+			if (Tipo == 'exclui'){
 				confirmaExclusao(document.formComissao, "Tem certeza que deseja excluir essa comissão?", "trComissaoExclui.php");
 			}
 			
@@ -344,10 +341,10 @@ if(isset($_POST['cmbUsuario'])){
 			$('#inputUnitId').val(unitId);
 			$('#inputTRefStatus').val(tRefStatus);
 
-			if (tRefStatus === 18) {
-                 alerta('Esse Termo de Referência já está finalizado e não pode trocar o presidente da comissão!','');
+			if (tRefStatus === 'FASEINTERNAFINALIZADA') {
+                alerta('Esse Termo de Referência já está finalizado e não pode trocar o presidente da comissão!','');
             } else {
-			confirmaExclusao(document.formUpdatePresident, "Essa ação irá trocar o presidente da comissão. Tem certeza disso?", "trComissaoPresidente.php");
+				confirmaExclusao(document.formUpdatePresident, "Essa ação irá trocar o presidente da comissão. Tem certeza disso?", "trComissaoPresidente.php");
 		    }
 		}		
 			
@@ -437,7 +434,7 @@ if(isset($_POST['cmbUsuario'])){
 									<thead>
 										<tr class="bg-slate">
 											<th>Membro</th>
-											<th>Presidente</th>
+											<th class="text-center">Presidente</th>
 											<th class="text-center">Ações</th>
 										</tr>
 									</thead>
@@ -450,8 +447,8 @@ if(isset($_POST['cmbUsuario'])){
 											print('
 											<tr>
 												<td>'.$item['UsuarLogin'].'</td>
-												<td>
-													<input type="checkbox" name="atualizaPresidente" id="atualizaPresidente" '."$checked".' onclick="updatePresident(event,'.$item['TRXEqTermoReferencia'].','.$item['TRXEqUsuario'].','.$isPresident.','.$item['TRXEqUnidade'].','.$item['TrRefStatus'].')">
+												<td class="text-center">
+													<input type="checkbox" name="atualizaPresidente" id="atualizaPresidente" '."$checked".' onclick="updatePresident(event,'.$item['TRXEqTermoReferencia'].','.$item['TRXEqUsuario'].','.$isPresident.','.$item['TRXEqUnidade'].', \''.$rowSituacao['SituaChave'].'\')">
 												</td>
 												');
 											
