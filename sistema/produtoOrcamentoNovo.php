@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Novo Produto de Orçamento';
+$_SESSION['PaginaAtual'] = 'Novo Produto para Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
@@ -14,16 +14,18 @@ $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
+//Se estiver inserindo
 if(isset($_POST['inputNome'])){
 
 	try{
+
+		$conn->beginTransaction();
 
 		$sql = "INSERT INTO ProdutoOrcamento (PrOrcNome, PrOrcProduto, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubcategoria, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcUsuarioAtualizador, PrOrcUnidade) 
 				VALUES (:sNome, :iProduto, :sDetalhamento, :iCategoria, :iSubCategoria, :iUnidadeMedida, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
-		$result->execute(array(
-						
+		$result->execute(array(						
 						':sNome' => $_POST['inputNome'],
 						':iProduto' => $_POST['cmbProduto'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
@@ -34,12 +36,30 @@ if(isset($_POST['inputNome'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
 						));
+
+		if (isset($_POST['cmbProduto'])){
+
+			$sql = "UPDATE Produto SET ProduDetalhamento = :sDetalhamento, ProduUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE ProduId = :iProduto and ProduUnidade = :iUnidade";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+						':sDetalhamento' => $_POST['txtDetalhamento'],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iProduto' => $_POST['cmbProduto'],
+						':iUnidade' => $_SESSION['UnidadeId']
+						));
+		}						
+
+		$conn->commit();							
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Produto incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
-	} catch(PDOException $e) {		
+	} catch(PDOException $e) {	
+		
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir produto!!!";
@@ -60,7 +80,7 @@ if(isset($_POST['inputNome'])){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Novo Produto para Orçamento</title>
+	<title>Lamparinas | Novo Produto para Termo de Referência</title>
 
 	<?php include_once("head.php"); ?>
 
@@ -267,12 +287,20 @@ if(isset($_POST['inputNome'])){
 										</div>
 									</div>
 								</div>
-								<br>
-								<div class="row" style="margin-top: 40px;">
-									<div class="col-lg-12">								
-										<div class="form-group">
-											<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-											<a href="produtoOrcamento.php" class="btn btn-basic" id="cancelar">Cancelar</a>
+							</div>
+							<br>
+							<div class="row" style="margin-top: 40px;">
+								<div class="col-lg-12">								
+									<div class="form-group">
+										<div class="row">
+											<div class="col-lg-6">										
+												<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+												<a href="produtoOrcamento.php" class="btn btn-basic" id="cancelar">Cancelar</a>
+											</div>
+
+											<div class="col-lg-6" style="text-align: right;">
+												<p style="color: red; margin-right: 20px"><i class="icon-info3"></i>Alterações no detalhamento são replicados para o cadastro de produtos (baseado no produto de referência).</p>
+											</div>
 										</div>
 									</div>
 								</div>

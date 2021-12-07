@@ -3,7 +3,7 @@
 include_once("sessao.php"); 
 include('global_assets/php/conexao.php');
 
-$_SESSION['PaginaAtual'] = 'Produto Orçamento';
+$_SESSION['PaginaAtual'] = 'Produto para Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
@@ -26,7 +26,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Produtos para Orçamento</title>
+	<title>Lamparinas | Produtos para Termo de Referência</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -154,7 +154,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Produtos para Orçamento</h3>
+								<h3 class="card-title">Relação de Produtos para Termo de Referência</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
@@ -167,7 +167,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-9">
-										<p class="font-size-lg">A relação abaixo faz referência aos produtos para orçamento da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+										<p class="font-size-lg">A relação abaixo faz referência aos produtos para Termo de Referência da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 									</div>	
 									<div class="col-lg-3">	
 										<div class="text-right"><a href="produtoOrcamentoNovo.php" class="btn btn-principal" role="button">Novo Produto</a></div>
