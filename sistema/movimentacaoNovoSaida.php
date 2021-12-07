@@ -92,7 +92,7 @@ if (isset($_POST['inputData'])) {
 			':iOrigemLocal' => $_POST['cmbEstoqueOrigem'],
 			':iDestinoSetor' => $_POST['cmbDestinoSetor'],
 			':sObservacao' => $_POST['txtareaObservacao'],
-			':fValorTotal' => $_POST['inputTotal'],
+			':fValorTotal' => isset($_POST['inputTotal']) ? floatval(gravaValor($_POST['inputTotal'])) : null,
 			':iSituacao' => $_POST['cmbSituacao'],
 			':iUnidade' => $_SESSION['UnidadeId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId']
@@ -207,7 +207,7 @@ if (isset($_POST['inputData'])) {
 								':iMovimentacao' => $insertId,
 								':iProduto' => $registro[1],
 								':iQuantidade' => (int) $registro[3],
-								':fValorUnitario' => isset($registro[2]) ? gravaValor($registro[2]) : null,
+								':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 								':sLote' => $registro[5],
 								':dValidade' => $registro[6] != '0' ? $registro[6] : null,
 								':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
@@ -249,7 +249,7 @@ if (isset($_POST['inputData'])) {
 						':iMovimentacao' => $insertId,
 						':iServico' => $registro[1],
 						':iQuantidade' => (int) $registro[3],
-						':fValorUnitario' => $registro[2] != '' ? gravaValor($registro[2]) : null,
+						':fValorUnitario' =>isset( $registro[2]) != '' ? (float)$registro[2] : null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
 					));

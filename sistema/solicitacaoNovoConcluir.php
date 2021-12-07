@@ -49,7 +49,7 @@ if (isset($_SESSION['Carrinho'])) {
                 FROM EmpresaXUsuarioXPerfil 
 				JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
                 JOIN Setor on SetorId = UsXUnSetor
-		        WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . "
+		        WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and UsXUnUnidade =  " . $_SESSION['UnidadeId'] . "
 		       ";
 		$result = $conn->query($sql);
 		$Setor = $result->fetch(PDO::FETCH_ASSOC);
