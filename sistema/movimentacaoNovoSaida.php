@@ -1269,7 +1269,7 @@ if (isset($_POST['inputData'])) {
 				}
 
 				if ($('input[name="inputTipo"]:checked').attr('saidaSolicitacao')) {
-					alert('Saida Solicitação!');
+					//alert('Saida Solicitação!');
 					const submitProduto = {}
 
 					$('.inputProdutoServicoClasse').each((i, elem) => {
@@ -1317,6 +1317,7 @@ if (isset($_POST['inputData'])) {
 					}
 
 				} else {
+					$('#cmbDestinoSetor').prop("disabled", false);
 					document.querySelector("#formMovimentacao").submit();
 				}
 			});
