@@ -257,6 +257,36 @@ if (isset($_POST['inputData'])) {
 			}
 		}
 
+		/*Atualiza o Status da Solicitação para "Liberado "*/
+	/*  $sql = "SELECT SituaId
+				FROM Situacao
+				WHERE SituaChave = 'LIBERADO' ";
+		$result = $conn->query($sql);
+		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC); 
+   */
+		/*Capturando dados para Update*/
+	/*  $iStatus = intval($rowSituacao['SituaId']);  
+    */
+		  /*Atualiza status bandeja*/
+	/*	$sql = " UPDATE Bandeja SET BandeStatus = :iStatus
+				   WHERE BandeUnidade = :iUnidade AND BandeId in (Select BandeId FROM Bandeja 
+				   WHERE BandeTabelaId = :iSolicitacao and BandePerfil = 'ALMOXARIFADO')";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':iStatus', $iStatus);
+		$result->bindParam(':iUnidade', $_SESSION['UnidadeId']);
+		$result->bindParam(':iSolicitacao', $_POST['inputSolicitacaoId']);
+		$result->execute();
+   */
+         /* Atualiza status das Ações */
+
+	/*	$sql = "UPDATE Solicitacao SET SolicSituacao = :bStatus, SolicUsuarioAtualizador = :iUsuario
+				WHERE SolicId = :iSolicitacao";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':iStatus', $iStatus);
+		$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
+		$result->bindParam(':iSolicitacao', $_POST['inputSolicitacaoId']);
+		$result->execute()
+    */
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";

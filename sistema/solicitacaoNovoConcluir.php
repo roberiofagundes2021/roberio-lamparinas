@@ -110,9 +110,9 @@ if (isset($_SESSION['Carrinho'])) {
 		$sIdentificacao = 'Solicitação de materiais (' . $Setor['SetorNome'] . ')';
 
 		$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
-				BandeSolicitanteSetor, BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
+				BandeSolicitanteSetor, BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade, BandePerfil)
 				VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :iSolicitanteSetor, :sTabela, 
-				:iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+				:iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade, :sPerfil)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -126,7 +126,8 @@ if (isset($_SESSION['Carrinho'])) {
 			':iTabelaId' => $SolicitacaoId,
 			':iStatus' => $Situacao['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iUnidade' => $_SESSION['UnidadeId']
+			':iUnidade' => $_SESSION['UnidadeId'],
+			':sPerfil' => 'ALMOXARIFADO',
 		));
 
 		$BandejaId = $conn->lastInsertId();
