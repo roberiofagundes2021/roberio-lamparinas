@@ -9,7 +9,7 @@ include('global_assets/php/conexao.php');
 //Caso a chamada à página venha da liberação de uma solicitação na bandeja.
 if (isset($_POST['inputSolicitacaoId'])) {
 
-	$sql = "SELECT SlXPrQuantidade as Quantidade, ProduId as Id, ProduNome as Nome, ProduValorCusto as Valor, UnMedNome
+	$sql = "SELECT SlXPrQuantidade as Quantidade, ProduId as Id, ProduNome as Nome, ProduValorCusto as Valor, UnMedNome, Tipo = 'P'
 			FROM SolicitacaoXProduto
 			JOIN Solicitacao on SolicId = SlXPrSolicitacao
 			JOIN Produto on ProduId = SlXPrProduto
@@ -20,7 +20,7 @@ if (isset($_POST['inputSolicitacaoId'])) {
 	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
 	$numProdutos = count($produtosSolicitacao);
 
-	$sql = "SELECT SlXSrQuantidade as Quantidade, ServiId as Id, ServiNome as Nome, ServiValorCusto as Valor
+	$sql = "SELECT SlXSrQuantidade as Quantidade, ServiId as Id, ServiNome as Nome, ServiValorCusto as Valor, Tipo = 'S'
 			FROM SolicitacaoXServico
 			JOIN Solicitacao on SolicId = SlXSrSolicitacao
 			JOIN Servico on ServiId = SlXSrServico
@@ -258,35 +258,34 @@ if (isset($_POST['inputData'])) {
 		}
 
 		/*Atualiza o Status da Solicitação para "Liberado "*/
-	/*  $sql = "SELECT SituaId
+		$sql = "SELECT SituaId
 				FROM Situacao
 				WHERE SituaChave = 'LIBERADO' ";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC); 
-   */
+   
 		/*Capturando dados para Update*/
-	/*  $iStatus = intval($rowSituacao['SituaId']);  
-    */
-		  /*Atualiza status bandeja*/
-	/*	$sql = " UPDATE Bandeja SET BandeStatus = :iStatus
-				   WHERE BandeUnidade = :iUnidade AND BandeId in (Select BandeId FROM Bandeja 
-				   WHERE BandeTabelaId = :iSolicitacao and BandePerfil = 'ALMOXARIFADO')";
+	  	$iStatus = $rowSituacao['SituaId'];
+    
+		/*Atualiza status bandeja*/
+		$sql = "UPDATE Bandeja SET BandeStatus = :iStatus
+				WHERE BandeUnidade = :iUnidade AND BandeId = :iBandeja";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iStatus', $iStatus);
 		$result->bindParam(':iUnidade', $_SESSION['UnidadeId']);
-		$result->bindParam(':iSolicitacao', $_POST['inputSolicitacaoId']);
+		$result->bindParam(':iBandeja', $_POST['inputBandejaId']);
 		$result->execute();
-   */
+   
          /* Atualiza status das Ações */
 
-	/*	$sql = "UPDATE Solicitacao SET SolicSituacao = :bStatus, SolicUsuarioAtualizador = :iUsuario
+		$sql = "UPDATE Solicitacao SET SolicSituacao = :iStatus, SolicUsuarioAtualizador = :iUsuario
 				WHERE SolicId = :iSolicitacao";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iStatus', $iStatus);
 		$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
-		$result->bindParam(':iSolicitacao', $_POST['inputSolicitacaoId']);
-		$result->execute()
-    */
+		$result->bindParam(':iSolicitacao', $_POST['SolicitacaoId']);
+		$result->execute();
+    
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -1207,7 +1206,7 @@ if (isset($_POST['inputData'])) {
 					var idProdutoGrid = $(elem).attr('idProduSolicitacao')
 					var idGridProdu = $(tds[0]).html()
 					var quantProduGrid = $(tds[3]).html()
-					var valUnitProduGrid = $(tds[5]).attr('valorUntPrSolici')
+					var valUnitProduGrid = $(tds[4]).attr('valorUntPrSolici')
 
 					$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + 'P#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '#' + 0 + '#' + 0 + '#' + 0 + '#' + 0 + '">');
 				})
@@ -1549,6 +1548,10 @@ if (isset($_POST['inputData'])) {
 				<div class="card" id="divConteudo">
 
 					<form name="formMovimentacao" id="formMovimentacao" method="POST" class="form-validate-jquery" action="movimentacaoNovoSaida.php">
+
+						<input type="hidden" id="inputBandejaId" name="inputBandejaId" value="<?php echo $_POST['inputBandejaId']; ?>">
+						<input type="hidden" id="SolicitacaoId" name="SolicitacaoId" value="<?php echo $_POST['inputSolicitacaoId']; ?>">
+
 						<div class="card-body">
 
 							<div class="row">
@@ -1892,6 +1895,8 @@ if (isset($_POST['inputData'])) {
 
 														$idProdutoSolicitacao++;
 
+														$tipo = "P";
+
 														$valorCusto = formataMoeda($produto['Valor']);
 														$valorTotal = formataMoeda($produto['Quantidade'] * $produto['Valor']);
 														$valorTotalSemFormatacao = $produto['Quantidade'] * $produto['Valor'];
@@ -1905,7 +1910,7 @@ if (isset($_POST['inputData'])) {
 														$linha = '';
 
 														$linha .= "
-																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['Id'] . "'>
+																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['Id'] . "' tipo='".$tipo."'>
 																		<td>" . $idProdutoSolicitacao . "</td>
 																		<td>" . $produto['Nome'] . "</td>
 																		<td style='text-align:center'>" . $UnMedNome . "</td>
