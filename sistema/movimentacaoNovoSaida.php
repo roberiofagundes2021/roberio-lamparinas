@@ -9,7 +9,8 @@ include('global_assets/php/conexao.php');
 //Caso a chamada à página venha da liberação de uma solicitação na bandeja.
 if (isset($_POST['inputSolicitacaoId'])) {
 
-	$sql = "SELECT SlXPrQuantidade as Quantidade, ProduId as Id, ProduNome as Nome, ProduValorCusto as Valor, UnMedNome, Tipo = 'P'
+	$sql = "SELECT SlXPrQuantidade as Quantidade, ProduId as Id, ProduNome as Nome, ProduValorCusto as Valor, UnMedNome, Tipo = 'P',
+			dbo.fnLoteProduto(ProduUnidade, ProduId) as Lote, dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade
 			FROM SolicitacaoXProduto
 			JOIN Solicitacao on SolicId = SlXPrSolicitacao
 			JOIN Produto on ProduId = SlXPrProduto
@@ -20,7 +21,8 @@ if (isset($_POST['inputSolicitacaoId'])) {
 	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
 	$numProdutos = count($produtosSolicitacao);
 
-	$sql = "SELECT SlXSrQuantidade as Quantidade, ServiId as Id, ServiNome as Nome, ServiValorCusto as Valor, Tipo = 'S'
+	$sql = "SELECT SlXSrQuantidade as Quantidade, ServiId as Id, ServiNome as Nome, ServiValorCusto as Valor, Tipo = 'S',
+			NULL as Lote, NULL as Validade
 			FROM SolicitacaoXServico
 			JOIN Solicitacao on SolicId = SlXSrSolicitacao
 			JOIN Servico on ServiId = SlXSrServico
@@ -105,6 +107,8 @@ if (isset($_POST['inputData'])) {
 		for ($i = 1; $i <=  $numItems; $i++) {
 
 			$campo = 'campo' . $i;
+			$classificacao = 'cmbClassificacao' . $i;
+			$classificacao = $_POST[$classificacao];
 
 			//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
 			if (isset($_POST[$campo])) {
@@ -116,10 +120,10 @@ if (isset($_POST['inputData'])) {
 					$quantItens = intval($registro[3]);
 
 					//Se classificação
-					if (isset($registro[7])) {
+					if (isset($classificacao)) {
 							
 						// Se produto é um bem permanente (Insere na tabela Patrimonio).
-						if ($registro[7] == 2) {
+						if ($classificacao == 2) {
 
 							// Selecionando o id da situacao 'ATIVO'
 							$sql = "SELECT SituaId
@@ -189,7 +193,7 @@ if (isset($_POST['inputData'])) {
 								':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 								':sLote' => $registro[5] != '' ? $registro[5] : null,
 								':dValidade' => $registro[6] != '' ? $registro[6] : null,
-								':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+								':iClassificacao' => isset($classificacao) ? (int) $classificacao : null,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 								':iUnidade' => $_SESSION['UnidadeId'],
 								':iPatrimonio' => $insertIdPatrimonio
@@ -210,7 +214,7 @@ if (isset($_POST['inputData'])) {
 								':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 								':sLote' => $registro[5],
 								':dValidade' => $registro[6] != '0' ? $registro[6] : null,
-								':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+								':iClassificacao' => isset($classificacao) ? (int) $classificacao : null,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 								':iUnidade' => $_SESSION['UnidadeId'],
 								':iPatrimonio' => null
@@ -231,7 +235,7 @@ if (isset($_POST['inputData'])) {
 								':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 								':sLote' => $registro[5],
 								':dValidade' => $registro[6] != '0' ? $registro[6] : null,
-								':iClassificacao' => isset($registro[7]) ? (int) $registro[7] : null,
+								':iClassificacao' => isset($classificacao) ? (int) $classificacao : null,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 								':iUnidade' => $_SESSION['UnidadeId'],
 								':iPatrimonio' => null
@@ -1006,7 +1010,7 @@ if (isset($_POST['inputData'])) {
 				}
 
 				//Verifica se a combo Classificação foi informada
-				if (cmbClassificacao == '#') {
+				if (cmbClassificacao == '#' || cmbClassificacao == 'NULL') {
 
 					if (inputProdutoServico == 'P') {
 						alerta('Atenção', 'Informe a Classificação/Bens!', 'error');
@@ -1207,8 +1211,11 @@ if (isset($_POST['inputData'])) {
 					var idGridProdu = $(tds[0]).html()
 					var quantProduGrid = $(tds[3]).html()
 					var valUnitProduGrid = $(tds[4]).attr('valorUntPrSolici')
+					var tipo = $(elem).attr('Tipo')
+					var lote = $(elem).attr('Lote')
+					var validade = $(elem).attr('Validade')
 
-					$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + 'P#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '#' + 0 + '#' + 0 + '#' + 0 + '#' + 0 + '">');
+					$('#inputProdutos').append('<input type="hidden" class="inputProdutoServicoClasse" id="campo' + idGridProdu + '" name="campo' + idGridProdu + '" value="' + tipo + '#' + idProdutoGrid + '#' + valUnitProduGrid + '#' + quantProduGrid + '#' + 'NULL' + '#' + lote + '#' + validade + '#' + 'NULL' + '">');
 				})
 				//$('#inputProdutos').append('<input type="hidden" id="campo' + resNumItens + '" name="campo' + resNumItens + '" value="' + 'P#' + Produto[0] + '#' + inputValorUnitario + '#' + inputQuantidade + '#' + 'SaldoValNull' + '#' + inputLote + '#' + inputValidade + '#' + cmbClassificacao + '">');
 			}
@@ -1325,12 +1332,15 @@ if (isset($_POST['inputData'])) {
 					$('.selectClassific').each((i, elem) => {
 						let valor = $(elem).val()
 
-						if (valor != '#') {
+						if (valor != '#' && valor != 'NULL') {
 							contSelectClassVal++
 						}
 					})
 
 					if (contSelectClass == contSelectClassVal) {
+						
+						$('#cmbDestinoSetor').prop("disabled", false);
+						
 						$.ajax({
 							type: "POST",
 							url: "movimentacaoNovoSaida.php",
@@ -1525,7 +1535,7 @@ if (isset($_POST['inputData'])) {
 									</div>
 									<div class="form-check form-check-inline">
 										<label class="form-check-label">
-											<input type="radio" name="inputTipo" value="S" class="form-input-styled" checked data-fouc>
+											<input type="radio" name="inputTipo" value="S" class="form-input-styled" checked <?php if (isset($_POST['inputSolicitacaoId'])) echo 'saidaSolicitacao="true"' ?> data-fouc>
 											Saída
 										</label>
 									</div>
@@ -1549,8 +1559,8 @@ if (isset($_POST['inputData'])) {
 
 					<form name="formMovimentacao" id="formMovimentacao" method="POST" class="form-validate-jquery" action="movimentacaoNovoSaida.php">
 
-						<input type="hidden" id="inputBandejaId" name="inputBandejaId" value="<?php echo $_POST['inputBandejaId']; ?>">
-						<input type="hidden" id="SolicitacaoId" name="SolicitacaoId" value="<?php echo $_POST['inputSolicitacaoId']; ?>">
+						<input type="hidden" id="inputBandejaId" name="inputBandejaId" value="<?php if (isset($_POST['inputBandejaId'])){ echo $_POST['inputBandejaId']; } ?>">
+						<input type="hidden" id="SolicitacaoId" name="SolicitacaoId" value="<?php if (isset($_POST['inputSolicitacaoId'])) { echo $_POST['inputSolicitacaoId']; } ?>">
 
 						<div class="card-body">
 
@@ -1895,7 +1905,9 @@ if (isset($_POST['inputData'])) {
 
 														$idProdutoSolicitacao++;
 
-														$tipo = "P";
+														$tipo = $produto['Tipo'];
+														$lote = $produto['Lote'];
+														$validade = $produto['Validade'];
 
 														$valorCusto = formataMoeda($produto['Valor']);
 														$valorTotal = formataMoeda($produto['Quantidade'] * $produto['Valor']);
@@ -1910,20 +1922,20 @@ if (isset($_POST['inputData'])) {
 														$linha = '';
 
 														$linha .= "
-																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['Id'] . "' tipo='".$tipo."'>
-																		<td>" . $idProdutoSolicitacao . "</td>
-																		<td>" . $produto['Nome'] . "</td>
-																		<td style='text-align:center'>" . $UnMedNome . "</td>
-																		<td style='text-align:center'>" . $SlXPrQuantidade . "</td>
-																		<td valorUntPrSolici='" . $ProduValor . "' style='text-align:right'>" . $valorCusto . "</td>
-																		<td style='text-align:right'>" . $valorTotal . "</td>
+																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['Id'] . "' tipo='".$tipo."' lote='".$lote."' validade='".$validade."'>
+																	<td>" . $idProdutoSolicitacao . "</td>
+																	<td>" . $produto['Nome'] . "</td>
+																	<td style='text-align:center'>" . $UnMedNome . "</td>
+																	<td style='text-align:center'>" . $SlXPrQuantidade . "</td>
+																	<td valorUntPrSolici='" . $ProduValor . "' style='text-align:right'>" . $valorCusto . "</td>
+																	<td style='text-align:right'>" . $valorTotal . "</td>
 																
 															";
 
 														$linha .= '
 																	<td style="text-align:center">
 																		<div class="d-flex flex-row ">
-																			<select id="' . $idProdutoSolicitacao . '" name="cmbClassificacao" class="form-control form-control-select2 selectClassific">
+																			<select id="' . $idProdutoSolicitacao . '" name="cmbClassificacao' . $idProdutoSolicitacao . '" class="form-control form-control-select2 selectClassific">
 																				<option value="#">Selecione</option>
 															';
 

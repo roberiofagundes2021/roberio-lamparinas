@@ -42,7 +42,7 @@ if ($count) {
 		$output .= '
 					<td style="text-align:center">
 					    <div class="d-flex flex-row ">
-					        <select id="' . $_POST['numItens'] . '" name="cmbClassificacao" class="form-control form-control-select2 selectClassific2">
+					        <select id="' . $_POST['numItens'] . '" name="cmbClassificacao' . $_POST['numItens'] . '" class="form-control form-control-select2 selectClassific2">
 					            <option value="#">Selecione</option>
 				';
 
