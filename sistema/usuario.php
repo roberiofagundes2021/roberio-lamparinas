@@ -42,6 +42,12 @@ $rowLimite = $result->fetch(PDO::FETCH_ASSOC);
 
 $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 
+$sqlUnidade = "SELECT UnidaId, UnidaNome
+				FROM Unidade
+				WHERE UnidaId = ". $_SESSION['UnidadeId'];
+$resultUnidade = $conn->query($sqlUnidade);
+$unidadeUser = $resultUnidade->fetch(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -226,7 +232,10 @@ $limiteUsuarios = $rowLimite['LicenLimiteUsuarios'];
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-9">
-										<p class="font-size-lg">Os usuários cadastrados abaixo pertencem a empresa <b><?php echo $EmpresaNome; ?></b>.</p>
+										<?php 
+											echo (isset($_POST['inputEmpresaNome'])?'<p class="font-size-lg">Os usuários cadastrados abaixo pertencem a empresa <b>'.$_POST['inputEmpresaNome'].'</b></p>':
+											'<p class="font-size-lg">Os usuários cadastrados abaixo pertencem a unidade <b>'.$unidadeUser['UnidaNome'].'</b></p>');
+										?>
 									</div>
 									<div class="col-lg-3">	
 										<div class="text-right"><a href="#" onclick="atualizaUsuario(1,0, '', '', '', '', 'novo')" class="btn btn-principal" role="button">Novo usuário</a></div>
