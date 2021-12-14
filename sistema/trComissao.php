@@ -70,6 +70,12 @@ if(isset($_POST['cmbUsuario'])){
 			));
 		}
 
+		$sql = " SELECT UsuarNome
+				 FROM Usuario
+			     WHERE UsuarId = ".$_POST ['cmbUsuario']." ";
+		$result = $conn->query($sql);
+		$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
+		
 		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
 				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
 			$result = $conn->prepare($sql);
@@ -79,7 +85,7 @@ if(isset($_POST['cmbUsuario'])){
 				':iTRDataHora' => date("Y-m-d H:i:s"),
 				':iTRUsuario' => $_SESSION['UsuarId'],
 				':iTRTela' =>'COMISSÃO DO PROCESSO LICITATÓRIO',
-				':iTRDetalhamento' =>'NOVO MEMBRO'
+				':iTRDetalhamento' =>' NOVO MEMBRO '. $rowUsuario['UsuarNome']. ''
 			));
 
 		
