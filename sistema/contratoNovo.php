@@ -130,14 +130,14 @@ if (isset($_POST['inputDataInicio'])) {
 			':iTRDataHora' => date("Y-m-d H:i:s"),
 			':iTRUsuario' => $_SESSION['UsuarId'],
 			':iTRTela' =>'GERAR CONTRATO ',
-			':iTRDetalhamento' =>'CONTRATO GERADO DE DE Nº '.$_POST['inputNumContrato'].''
+			':iTRDetalhamento' =>'CONTRATO GERADO DE Nº '.$_POST['inputNumContrato'].''
 		));
 
 
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = " Contrato incluído!!!";
+		$_SESSION['msg']['mensagem'] = "Contrato incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
 	} catch (PDOException $e) {
 

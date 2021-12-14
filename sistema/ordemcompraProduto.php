@@ -19,8 +19,18 @@ if(isset($_POST['inputOrdemCompraId'])){
 	irpara("ordemcompra.php");
 }
 
+$sql = "SELECT *
+		FROM OrdemCompra
+		JOIN Fornecedor on ForneId = OrComFornecedor
+		JOIN Categoria on CategId = OrComCategoria
+		LEFT JOIN SubCategoria on SbCatId = OrComSubCategoria
+		WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$iOrdemCompra;
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+
 //Se está alterando
-if(isset($_POST['inputIdOrdemCompra'])){
+if (isset($_POST['inputIdOrdemCompra'])){
+	
 	$valid = true;
 
 	if($_POST['inputTypeRequest'] != "reset"){
@@ -49,7 +59,9 @@ if(isset($_POST['inputIdOrdemCompra'])){
 			}
 		}
 	}
-	if($valid){
+
+	if ($valid){
+
 		$sql = "DELETE FROM OrdemCompraXProduto
 				WHERE OCXPrOrdemCompra = :iOrdemCompra AND OCXPrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
@@ -67,25 +79,27 @@ if(isset($_POST['inputIdOrdemCompra'])){
 
 			$saldo = $saldo['Saldo'];
 			$quantidade = $_POST['inputQuantidade'.$i];
-
 			
-				$sql = "INSERT INTO OrdemCompraXProduto (OCXPrOrdemCompra, OCXPrProduto, OCXPrQuantidade, OCXPrValorUnitario, OCXPrUsuarioAtualizador, OCXPrUnidade)
-						VALUES (:iOrdemCompra, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
-				$result = $conn->prepare($sql);
-				
-				$result->execute(array(
-								':iOrdemCompra' => $iOrdemCompra,
-								':iProduto' => $_POST['inputIdProduto'.$i],
-								':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-								':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iUnidade' => $_SESSION['UnidadeId']
-								));
-				
-				$_SESSION['msg']['titulo'] = "Sucesso";
-				$_SESSION['msg']['mensagem'] = "Ordem de Compra alterado!!!";
-				$_SESSION['msg']['tipo'] = "success";
+			$sql = "INSERT INTO OrdemCompraXProduto (OCXPrOrdemCompra, OCXPrProduto, OCXPrQuantidade, OCXPrValorUnitario, OCXPrUsuarioAtualizador, OCXPrUnidade)
+					VALUES (:iOrdemCompra, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+			$result = $conn->prepare($sql);
+			
+			$result->execute(array(
+							':iOrdemCompra' => $iOrdemCompra,
+							':iProduto' => $_POST['inputIdProduto'.$i],
+							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $_SESSION['UnidadeId']
+							));
 		}
+
+		$tipo = $row['OrComTipo'] == 'C' ? 'Carta Contrato' : 'Ordem de Compra';							
+
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = $tipo." alterada!!!";
+		$_SESSION['msg']['tipo'] = "success";
+
 	}else{
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "O saldo de um dos produtos não está mais disponível!!!";
@@ -93,50 +107,35 @@ if(isset($_POST['inputIdOrdemCompra'])){
 	}
 }	
 
-try{
 	
-	$sql = "SELECT *
-			FROM OrdemCompra
-			JOIN Fornecedor on ForneId = OrComFornecedor
-			JOIN Categoria on CategId = OrComCategoria
-			LEFT JOIN SubCategoria on SbCatId = OrComSubCategoria
-			WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$iOrdemCompra;
-	$result = $conn->query($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
-	
-	
-	$sql = "SELECT OCXPrProduto
-			FROM OrdemCompraXProduto
-			JOIN Produto on ProduId = OCXPrProduto
-			WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and ProduCategoria = ".$iCategoria." and OCXPrOrdemCompra = ".$row['OrComId']."";
-	
-	if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
-		$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
-	}	
-	$result = $conn->query($sql);
-	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countProdutoUtilizado = count($rowProdutoUtilizado);
-	
-	foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
-		$aProdutos[] = $itemProdutoUtilizado['OCXPrProduto'];
-	}
-	
-	$sql = "SELECT COUNT(OCXPrProduto) as Quant
-			FROM OrdemCompraXProduto
-			WHERE OCXPrUnidade = ". $_SESSION['UnidadeId'] ." and OCXPrOrdemCompra = ".$iOrdemCompra." and 
-			OCXPrQuantidade <> '' and OCXPrQuantidade <> 0 and OCXPrValorUnitario <> 0.00 ";
-	$result = $conn->query($sql);
-	$rowCompleto = $result->fetch(PDO::FETCH_ASSOC);
+$sql = "SELECT OCXPrProduto
+		FROM OrdemCompraXProduto
+		JOIN Produto on ProduId = OCXPrProduto
+		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and ProduCategoria = ".$iCategoria." and OCXPrOrdemCompra = ".$row['OrComId']."";
 
-	$enviar = 0;
+if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
+	$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
+}	
+$result = $conn->query($sql);
+$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+$countProdutoUtilizado = count($rowProdutoUtilizado);
 
-	//Verifica se o número de produtos é igual ao número de produtos com a quantidade e valor unitário preenchido para habilitar o botào "Enviar"
-	if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado != 0 && $rowCompleto['Quant'] != 0)){
-		$enviar = 1;
-	}
+foreach ($rowProdutoUtilizado as $itemProdutoUtilizado){
+	$aProdutos[] = $itemProdutoUtilizado['OCXPrProduto'];
+}
 
-} catch(PDOException $e) {
-	echo 'Error: ' . $e->getMessage();
+$sql = "SELECT COUNT(OCXPrProduto) as Quant
+		FROM OrdemCompraXProduto
+		WHERE OCXPrUnidade = ". $_SESSION['UnidadeId'] ." and OCXPrOrdemCompra = ".$iOrdemCompra." and 
+		OCXPrQuantidade <> '' and OCXPrQuantidade <> 0 and OCXPrValorUnitario <> 0.00 ";
+$result = $conn->query($sql);
+$rowCompleto = $result->fetch(PDO::FETCH_ASSOC);
+
+$enviar = 0;
+
+//Verifica se o número de produtos é igual ao número de produtos com a quantidade e valor unitário preenchido para habilitar o botào "Enviar"
+if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado != 0 && $rowCompleto['Quant'] != 0)){
+	$enviar = 1;
 }
 
 ?>
