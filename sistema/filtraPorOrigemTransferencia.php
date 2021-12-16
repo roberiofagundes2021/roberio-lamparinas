@@ -18,19 +18,13 @@ if ($_POST['tipoDeFiltro'] == '#Categoria') {
 
 	if ($post_string[2] == 'Local') {
 		$sql = "SELECT DISTINCT CategId, CategNome
-							FROM MovimentacaoXProduto
-							JOIN Movimentacao 
-							  ON MovimId = MvXPrMovimentacao
-							JOIN Produto 
-							  ON ProduId = MvXPrProduto
-							JOIN Categoria 
-							  ON CategId = ProduCategoria
-							JOIN Situacao 
-							  ON SituaId = MovimSituacao
-							WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . "
-							  AND MovimDestinoLocal = " . $post_string[0] . " 
-								AND SituaChave = 'LIBERADO'
-					ORDER BY CategNome ASC";
+				FROM MovimentacaoXProduto
+				JOIN Movimentacao ON MovimId = MvXPrMovimentacao
+				JOIN Produto ON ProduId = MvXPrProduto
+				JOIN Categoria ON CategId = ProduCategoria
+				JOIN Situacao  ON SituaId = MovimSituacao
+				WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " AND MovimDestinoLocal = " . $post_string[0] . " AND SituaChave = 'LIBERADOCONTABILIDADE'
+				ORDER BY CategNome ASC";
 
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -46,19 +40,13 @@ if ($_POST['tipoDeFiltro'] == '#Categoria') {
 		}
 	} else if ($post_string[2] == 'Setor') {
 		$sql = "SELECT DISTINCT CategId, CategNome
-							FROM MovimentacaoXProduto
-							JOIN Movimentacao 
-							  on MovimId = MvXPrMovimentacao
-							JOIN Produto 
-							  on ProduId = MvXPrProduto
-							JOIN Categoria 
-							  on CategId = ProduCategoria
-							JOIN Situacao 
-							  on SituaId = MovimSituacao
-							WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " 
-							  and MovimDestinoSetor = " . $post_string[0] . "  
-								and SituaChave = 'LIBERADO'
-						ORDER BY CategNome ASC";
+				FROM MovimentacaoXProduto
+				JOIN Movimentacao ON MovimId = MvXPrMovimentacao
+				JOIN Produto ON ProduId = MvXPrProduto
+				JOIN Categoria ON CategId = ProduCategoria
+				JOIN Situacao  ON SituaId = MovimSituacao
+				WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " AND MovimDestinoSetor = " . $post_string[0] . " AND SituaChave = 'LIBERADOCONTABILIDADE'
+				ORDER BY CategNome ASC";
 
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -75,27 +63,15 @@ if ($_POST['tipoDeFiltro'] == '#Categoria') {
 	}
 } else if ($_POST['tipoDeFiltro'] == '#CategoriaPatrimonio') {
 
-	$sql = "SELECT DISTINCT CategId,
-													CategNome,
-													SbCatId,
-													SbCatNome,
-													CONVERT(varchar(10), produid) 
-												+ '#' 
-												+ CONVERT(varchar(10),ProduValorCusto) as ProduValue,
-													produNome,
-													MvXPrValidade
-												FROM PRODUTO
-												JOIN PATRIMONIO
-													ON PatriProduto = ProduId
-												JOIN categoria
-													ON categid = produCategoria
-												JOIN SubCategoria
-													ON SbCatId = ProduSubCategoria
-												join MovimentacaoXProduto
-													on MvXPrPatrimonio = PatriId
-												join movimentacao
-													on MovimId = MvXPrMovimentacao
-													WHERE PatriId = " . $_POST['valor'] . "";
+	$sql = "SELECT DISTINCT CategId, CategNome, SbCatId, SbCatNome, CONVERT(varchar(10), produid) + '#' 
+	                        + CONVERT(varchar(10),ProduValorCusto) as ProduValue,produNome,MvXPrValidade
+			FROM PRODUTO
+			JOIN PATRIMONIO ON PatriProduto = ProduId
+			JOIN categoria ON categid = produCategoria
+			JOIN SubCategoria ON SbCatId = ProduSubCategoria
+			JOIN MovimentacaoXProduto ON MvXPrPatrimonio = PatriId
+			JOIN movimentacao ON MovimId = MvXPrMovimentacao
+			WHERE PatriId = " . $_POST['valor'] . "";
 
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -138,17 +114,11 @@ if ($_POST['tipoDeFiltro'] == '#Categoria') {
 } else if ($_POST['tipoDeFiltro'] === 'Patrimonio') {
 
 	$sql = "SELECT PatriId, PatriNumero
-						FROM Patrimonio
-						JOIN MovimentacaoXProduto 
-						  ON MvXPrPatrimonio = PatriId
-						JOIN Movimentacao 
-						  ON MovimId = MvXPrMovimentacao
-						JOIN Situacao 
-						  ON SituaId = MovimSituacao
-					 WHERE MvXPrUnidade 			= " . $_SESSION['UnidadeId'] . "
-					   AND MovimDestinoSetor 	= " . $_POST['origem'] . " 
-						 AND SituaChave = 'LIBERADO'";
-
+			FROM Patrimonio
+			JOIN MovimentacaoXProduto ON MvXPrPatrimonio = PatriId
+			JOIN Movimentacao ON MovimId = MvXPrMovimentacao
+			JOIN Situacao  ON SituaId = MovimSituacao
+			WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " AND MovimDestinoSetor 	= " . $_POST['origem'] . " AND SituaChave = 'LIBERADO'";
 	$result = $conn->query($sql);
 	$rowPatrimonios = $result->fetchAll(PDO::FETCH_ASSOC);
 	$cont = count($rowPatrimonios);
