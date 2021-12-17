@@ -23,7 +23,7 @@ if ($_POST['tipoDeFiltro'] == '#Categoria') {
 				JOIN Produto ON ProduId = MvXPrProduto
 				JOIN Categoria ON CategId = ProduCategoria
 				JOIN Situacao  ON SituaId = MovimSituacao
-				WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " AND MovimDestinoLocal = " . $post_string[0] . " AND SituaChave = 'LIBERADOCONTABILIDADE'
+				WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " AND MovimDestinoLocal = " . $post_string[0] . " AND SituaChave in ('LIBERADO', 'LIBERADOCONTABILIDADE')
 				ORDER BY CategNome ASC";
 
 		$result = $conn->query($sql);
@@ -45,7 +45,7 @@ if ($_POST['tipoDeFiltro'] == '#Categoria') {
 				JOIN Produto ON ProduId = MvXPrProduto
 				JOIN Categoria ON CategId = ProduCategoria
 				JOIN Situacao  ON SituaId = MovimSituacao
-				WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " AND MovimDestinoSetor = " . $post_string[0] . " AND SituaChave = 'LIBERADOCONTABILIDADE'
+				WHERE MvXPrUnidade = " . $_SESSION['UnidadeId'] . " AND MovimDestinoSetor = " . $post_string[0] . " AND SituaChave = 'LIBERADO'
 				ORDER BY CategNome ASC";
 
 		$result = $conn->query($sql);
