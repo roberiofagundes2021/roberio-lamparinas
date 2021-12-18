@@ -288,7 +288,7 @@ if(isset($_POST['inputNome'])){
 								<div class="col-lg-12">
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-6">
+											<div class="col-lg-4">
 												<?php
 													if ($_POST['inputPermission']) {
 														echo '<button class="btn btn-lg btn-principal" id="enviar">Editar</button>';
@@ -297,7 +297,7 @@ if(isset($_POST['inputNome'])){
 												<a href="servicoOrcamento.php" class="btn btn-basic" id="cancelar">Cancelar</a>
 											</div>
 
-											<div class="col-lg-6" style="text-align: right;">
+											<div class="col-lg-8" style="text-align: right;">
 												<p style="color: red; margin-right: 20px"><i class="icon-info3"></i>Alterações no detalhamento são replicados para o cadastro de serviços (baseado no serviço de referência).</p>
 											</div>
 										</div>

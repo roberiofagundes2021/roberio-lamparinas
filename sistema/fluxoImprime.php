@@ -255,10 +255,10 @@ try {
 				<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
 					<tr>
 						<th style="text-align: center; width:8%">Item</th>
-						<th style="text-align: left; width:43%">Produto</th>
+						<th style="text-align: left; width:40%">Produto</th>
 						<th style="text-align: center; width:10%">Unidade</th>				
 						<th style="text-align: center; width:12%">Quant.</th>
-						<th style="text-align: center; width:12%">V. Unit.</th>
+						<th style="text-align: center; width:15%">V. Unit.</th>
 						<th style="text-align: center; width:15%">V. Total</th>
 					</tr>
 				';
