@@ -274,7 +274,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																print('<a href="#" onclick="atualizaFluxoOperacional(1,\''.$disabled.'\','.$item['FlOpeId'].', '.$item['TrRefId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'aditivo\', \'\');" class="dropdown-item"><i class="icon-add-to-list" title="Gerenciar Aditivos"></i> Aditivos</a>
 																
 																<div class="dropdown-divider"></div>
-																<a href="#" onclick="atualizaFluxoOperacional(1,\''.$disabled.'\','.$item['FlOpeId'].', '.$item['TrRefId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir Fluxo<"><i class="icon-printer2"></i> Imprimir Fluxo</a>');
+																<a href="#" onclick="atualizaFluxoOperacional(1,\''.$disabled.'\','.$item['FlOpeId'].', '.$item['TrRefId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'imprimir\', \'\')" class="dropdown-item" title="Imprimir Contrato<"><i class="icon-printer2"></i> Imprimir Fluxo</a>');
 										
 																if ($item['SituaChave'] == 'LIBERADO'){
 																	print('<a href="#" onclick="atualizaFluxoOperacional(1,\''.$disabled.'\','.$item['FlOpeId'].', '.$item['TrRefId'].', \''.$item['FlOpeCategoria'].'\', \''.$item['SituaChave'].'\', \'contrato\', \'\')" class="dropdown-item" title="Imprimir Contrato"><i class="icon-printer2"></i> Imprimir Contrato</a>');
