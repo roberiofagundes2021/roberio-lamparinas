@@ -12,6 +12,45 @@ try{
 		$conn->beginTransaction();
 		
 		$iMovimentacao = $_POST['inputMovimentacaoId'];
+        $movimentacao = $_POST['inputMovimentacaoId'];
+        $data = $_POST['inputPeriodoDe'];
+        $UsuarId = $_SESSION['UsuarId'];
+        $UnidadeId = $_SESSION['UnidadeId'];
+        $planoCusto = $_POST['cmbPlanoContaId'];
+
+        $registros = intval($_POST['totalRegistros']);
+
+        /* Insere na Tabela Movimentacao Liquidacao */
+        
+        $sqlMovimentacao = "INSERT INTO MovimentacaoLiquidacao(MvLiqMovimentacao, MvLiqData, MvLiqUsuario,
+        MvLiqUnidade, MvLiqPlanoContas)
+        VALUES('$movimentacao', '$data', '$UsuarId', '$UnidadeId', '$planoCusto')";
+
+        $conn->query($sqlMovimentacao);
+        $newMovimentacaoId = $conn->lastInsertId();
+
+        // insere todos os Centro de custos Selecionados em movimentação
+
+        $sqlMovimentacaoXCentro = "INSERT INTO MovimentacaoLiquidacaoXCentroCusto
+        (MvLiqXCnCusMovimentacaoLiquidacao, MvLiqXCnCusCentroCusto, MvLiqXCnCusUsuarioAtualizador, MvLiqXCnCusValor,
+        MvLiqXCnCusUnidade)
+        VALUES ";    
+
+        for($x=0; $x < $registros; $x++){
+            $keyNome = 'inputCentroNome-'.$x;
+            $keyValor = 'inputCentroValor-'.$x;
+            $keyId = 'inputIdCentro-'.$x;
+
+            if(isset($_POST[$keyNome])){
+                $sqlMovimentacaoXCentro .= "('$newMovimentacaoId', ".$_POST[$keyId].", '$UsuarId', ".$_POST[$keyValor].", '$UnidadeId')";
+
+                if($x < ($registros-1)){
+                    $sqlMovimentacaoXCentro .= ',';
+                }
+            }
+        }
+        $conn->query($sqlMovimentacaoXCentro);
+        $sqlMovimentacaoXCentro = $conn->lastInsertId();
         
 
 		/* Atualiza o Status da Movimentação para "Liberado Contabilidade" */
@@ -82,7 +121,7 @@ try{
             ':dateDtEmissao' => date('Y-m-d') , //Se for Data da Liquidação ficará assim: $rowMovimentacao['MovimDataEmissao']
             ':iOrdemCompra' => $rowMovimentacao['MovimOrdemCompra'],
             ':sDescricao' => 'Pagamento da NF '.$rowMovimentacao['MovimNotaFiscal'], // Ver com Valma
-            ':dateDtVencimento' => $_POST['inputDataVencimento'],
+            ':dateDtVencimento' => $data,
             ':fValorAPagar' => $rowMovimentacao['MovimValorTotal'],
             ':dateDtPagamento' => null,
             ':fValorPago' => null,
@@ -94,20 +133,30 @@ try{
             ':iStatus' => $rowSituaChave['SituaId'],
             ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
             ':iUnidade' => $_SESSION['UnidadeId']
-        ));     
-        
-        /* Insere na Tabela Movimentacao Liquidacao */
-		
-        $sql = "INSERT INTO MovimentacaoLiquidacao ( MvLiqMovimentacao, MvLiqData, MvLiqUsuario,  MvLiqUnidade )
-                VALUES ( :iMovimentacao, :dateData, :iUsuario, :iUnidade)";
-        $result = $conn->prepare($sql);
-       
-        $result->execute(array(
-            ':iMovimentacao' => $iMovimentacao,
-            ':dateData' => date('Y-m-d'), 
-            ':iUsuario' => $_SESSION['UsuarId'],
-            ':iUnidade' => $_SESSION['UnidadeId']
-        ));     
+        ));
+
+        $newContasAPagarId = $conn->lastInsertId();
+
+        // insere todos os Centro de custos Selecionados em contas a pagar
+
+        $sqlContasAPagar = "INSERT INTO ContasAPagarXCentroCusto
+        (CnAPaXCnCusContasAPagar, CnAPaXCnCusCentroCusto, CnAPaXCnCusUsuarioAtualizador, CnAPaXCnCusValor,
+        CnAPaXCnCusUnidade)
+        VALUES ";   
+        for($x=0; $x < $registros; $x++){
+            $keyNome = 'inputCentroNome-'.$x;
+            $keyValor = 'inputCentroValor-'.$x;
+            $keyId = 'inputIdCentro-'.$x;
+
+            if(isset($_POST[$keyNome])){
+                $sqlContasAPagar .= "('$newContasAPagarId', ".$_POST[$keyId].", '$UsuarId', ".$_POST[$keyValor].", '$UnidadeId')";
+
+                if($x < ($registros-1)){
+                    $sqlContasAPagar .= ',';
+                }
+            }
+        }
+        $conn->query($sqlContasAPagar);
         
         /* Fim Insere ContasAPagar */		
 

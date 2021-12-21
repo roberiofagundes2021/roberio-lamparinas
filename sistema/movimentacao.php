@@ -194,35 +194,37 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					}
 				})
 			} else if (Tipo == 'liquidar'){
-         bootbox.prompt({
-							title: 'Informe a data do vencimento',
-							inputType: 'date',
-							buttons: {
-								confirm: {
-									label: 'Enviar',
-									className: 'btn-principal'
-								},
-								cancel: {
-									label: 'Cancelar',
-									className: 'btn-link'
-								}
-							},
-							callback: function(result) {
+        //  bootbox.prompt({
+				// 			title: 'Informe a data do vencimento',
+				// 			inputType: 'date',
+				// 			buttons: {
+				// 				confirm: {
+				// 					label: 'Enviar',
+				// 					className: 'btn-principal'
+				// 				},
+				// 				cancel: {
+				// 					label: 'Cancelar',
+				// 					className: 'btn-link'
+				// 				}
+				// 			},
+				// 			callback: function(result) {
 
-								if (result === null) {
-									bootbox.alert({
-										title: 'Não Liquidar',
-										message: 'A liquidação foi cancelada!'
-									});
-								} else {
+				// 				if (result === null) {
+				// 					bootbox.alert({
+				// 						title: 'Não Liquidar',
+				// 						message: 'A liquidação foi cancelada!'
+				// 					});
+				// 				} else {
 
-									document.getElementById('inputDataVencimento').value = result;
-									document.formMovimentacao.action = "movimentacaoLiquidarContabilidade.php";
-									document.formMovimentacao.setAttribute("target", "_self");
-									document.formMovimentacao.submit();	
-								}
-					   }
-				});
+				// 					document.getElementById('inputDataVencimento').value = result;
+				// 					document.formMovimentacao.action = "movimentacaoLiquidarContabilidade.php";
+				// 					document.formMovimentacao.setAttribute("target", "_self");
+				// 					document.formMovimentacao.submit();	
+				// 				}
+				// 	   }
+				// });
+        document.formMovimentacao.action = "movimentacaoLiquidar.php";
+        document.formMovimentacao.submit();	
       }    
     } 
   </script>

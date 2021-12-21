@@ -625,35 +625,37 @@ if ($totalAcoes) {
 				} else {
 
 					if (Tipo == 'liquidarContabilidade') {
-						bootbox.prompt({
-							title: 'Informe a data do vencimento',
-							inputType: 'date',
-							buttons: {
-								confirm: {
-									label: 'Enviar',
-									className: 'btn-principal'
-								},
-								cancel: {
-									label: 'Cancelar',
-									className: 'btn-link'
-								}
-							},
-							callback: function(result) {
+						// bootbox.prompt({
+						// 	title: 'Informe a data do vencimento',
+						// 	inputType: 'date',
+						// 	buttons: {
+						// 		confirm: {
+						// 			label: 'Enviar',
+						// 			className: 'btn-principal'
+						// 		},
+						// 		cancel: {
+						// 			label: 'Cancelar',
+						// 			className: 'btn-link'
+						// 		}
+						// 	},
+						// 	callback: function(result) {
 
-								if (result === null) {
-									bootbox.alert({
-										title: 'Não Liquidar',
-										message: 'A liquidação foi cancelada!'
-									});
-								} else {
+						// 		if (result === null) {
+						// 			bootbox.alert({
+						// 				title: 'Não Liquidar',
+						// 				message: 'A liquidação foi cancelada!'
+						// 			});
+						// 		} else {
 
-									document.getElementById('inputDataVencimento').value = result;
-									document.formBandeja.action = "movimentacaoLiquidarContabilidade.php";
-									document.formBandeja.setAttribute("target", "_self");
-									document.formBandeja.submit();	
-								}
-							}
-						});		
+						// 			document.getElementById('inputDataVencimento').value = result;
+						// 			document.formBandeja.action = "movimentacaoLiquidarContabilidade.php";
+						// 			document.formBandeja.setAttribute("target", "_self");
+						// 			document.formBandeja.submit();	
+						// 		}
+						// 	}
+						// });
+						document.formBandeja.action = "movimentacaoLiquidar.php";
+						document.formBandeja.submit();
 												
 					} else if (Tipo == 'liberar') {
 						document.getElementById('inputMovimentacaoStatus').value = MovimTipo=='E'?'LIBERADOCENTRO':'LIBERADO';
