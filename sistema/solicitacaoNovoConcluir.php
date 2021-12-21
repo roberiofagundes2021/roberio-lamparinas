@@ -49,7 +49,7 @@ if (isset($_SESSION['Carrinho'])) {
                 FROM EmpresaXUsuarioXPerfil 
 				JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
                 JOIN Setor on SetorId = UsXUnSetor
-		        WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . "
+		        WHERE EXUXPUsuario = " . $_SESSION['UsuarId'] . " and UsXUnUnidade =  " . $_SESSION['UnidadeId'] . "
 		       ";
 		$result = $conn->query($sql);
 		$Setor = $result->fetch(PDO::FETCH_ASSOC);
@@ -110,9 +110,9 @@ if (isset($_SESSION['Carrinho'])) {
 		$sIdentificacao = 'Solicitação de materiais (' . $Setor['SetorNome'] . ')';
 
 		$sql = "INSERT INTO Bandeja (BandeIdentificacao, BandeData, BandeDescricao, BandeURL, BandeSolicitante, 
-				BandeSolicitanteSetor, BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade)
+				BandeSolicitanteSetor, BandeTabela, BandeTabelaId, BandeStatus, BandeUsuarioAtualizador, BandeUnidade, BandePerfil)
 				VALUES (:sIdentificacao, :dData, :sDescricao, :sURL, :iSolicitante, :iSolicitanteSetor, :sTabela, 
-				:iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+				:iTabelaId, :iStatus, :iUsuarioAtualizador, :iUnidade, :sPerfil)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -126,7 +126,8 @@ if (isset($_SESSION['Carrinho'])) {
 			':iTabelaId' => $SolicitacaoId,
 			':iStatus' => $Situacao['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iUnidade' => $_SESSION['UnidadeId']
+			':iUnidade' => $_SESSION['UnidadeId'],
+			':sPerfil' => 'ALMOXARIFADO',
 		));
 
 		$BandejaId = $conn->lastInsertId();

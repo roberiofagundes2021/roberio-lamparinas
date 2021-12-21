@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Ordem de Compra';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT DISTINCT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, OrComLote, OrComDtEmissao, OrComCategoria, ForneNome, 
-		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor, BandeMotivo, SbCatNome, dbo.fnValorTotalOrdemCompra(OrComUnidade, OrComId) as ValorTotalOrdemCompra,
+		CategNome, OrComNumProcesso, OrComSituacao, SituaNome, SituaChave, SituaCor, FlOpeNumContrato, BandeMotivo, SbCatNome, dbo.fnValorTotalOrdemCompra(OrComUnidade, OrComId) as ValorTotalOrdemCompra,
 		(SELECT COUNT(FOXPrProduto) FROM FluxoOperacionalXProduto WHERE FOXPrFluxoOperacional = OrComFluxoOperacional) as produtoCount,
 		(SELECT COUNT(FOXSrServico) FROM FluxoOperacionalXServico WHERE FOXSrFluxoOperacional = OrComFluxoOperacional) as servicoCount,
 		(SELECT COUNT(OCXPrProduto) FROM OrdemCompraXProduto WHERE OCXPrOrdemCompra = OrComId and OCXPrQuantidade <> '' and OCXPrQuantidade <> 0 and OCXPrValorUnitario <> 0.00) as produtoQuant,
@@ -17,6 +17,7 @@ $sql = "SELECT DISTINCT OrComId, OrComFluxoOperacional, OrComTipo, OrComNumero, 
 		JOIN Categoria on CategId = OrComCategoria
 		LEFT JOIN SubCategoria on SbCatId = OrComSubCategoria
 		JOIN Situacao on SituaId = OrComSituacao
+		JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
 		LEFT JOIN Bandeja on BandeTabelaId = OrComId and BandeTabela = 'OrdemCompra' and BandeUnidade = ".$_SESSION['UnidadeId'].
 		" WHERE OrComUnidade = ".$_SESSION['UnidadeId']." ORDER BY OrComDtEmissao DESC";
 $result = $conn->query($sql);
@@ -73,49 +74,54 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Numero
+					orderable: true,   //Numero Ordem Compra
 					width: "5%",
 					targets: [1]
+				},
+				{ 
+					orderable: true,   //Contrato
+					width: "5%",
+					targets: [2]
 				},				
 				{ 
 					orderable: true,   //Lote
 					width: "10%",
-					targets: [2]
-				},
-				{ 
-					orderable: true,   //Tipo
-					width: "10%",
 					targets: [3]
 				},
 				{ 
-					orderable: true,   //Fornecedor
-					width: "15%",
+					orderable: true,   //Tipo
+					width: "9%",
 					targets: [4]
+				},
+				{ 
+					orderable: true,   //Fornecedor
+					width: "14%",
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Processo
 					width: "10%",
-					targets: [5]
+					targets: [6]
 				},
 				{
 					orderable: true,   //SubCategoria
-					width: "20%",
-					targets: [6]
+					width: "19%",
+					targets: [7]
 				},
 				{
 					orderable: true,   //Valor Total
 					width: "10%",
-					targets: [7]
+					targets: [8]
 				},
 				{ 
 					orderable: true,   //Situação
-					width: "5%",
-					targets: [8]
+					width: "3%",
+					targets: [9]
 				},
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [9]
+					targets: [10]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -288,6 +294,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<tr class="bg-slate">
 										<th>Data</th>
 										<th>Número</th>
+										<th>Contrato</th>
 										<th>Nº Ata/Lote</th>
 										<th>Tipo</th>
 										<th>Fornecedor</th>
@@ -310,6 +317,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<tr>
 											<td>'.mostraData($item['OrComDtEmissao']).'</td>
 											<td>'.$item['OrComNumero'].'</td>
+											<td>'.$item['FlOpeNumContrato'].'</td>
 											<td>'.$item['OrComLote'].'</td>
 											<td>'.$tipo.'</td>
 											<td>'.$item['ForneNome'].'</td>

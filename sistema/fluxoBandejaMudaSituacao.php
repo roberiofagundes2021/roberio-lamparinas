@@ -55,7 +55,7 @@ if(isset($_POST['inputFluxoId'])){
 		$fPrecoVenda = 0;		
 
 		//Se o parâmetro diz que o Valor do Produto/Serviço será atualizado a partir do Fluxo, tais valores devem ser atualizados		
-		if ($rowParametro['ParamValorAtualizadoFluxo'] && $_POST['inputFluxoStatus'] == 'ATIVO'){
+		if ($rowParametro['ParamValorAtualizadoFluxo'] && $_POST['inputFluxoStatus'] == 'LIBERADO'){
 			
 			$sql = "SELECT FOXPrProduto, FOXPrValorUnitario 
 					FROM FluxoOperacionalXProduto
@@ -99,7 +99,7 @@ if(isset($_POST['inputFluxoId'])){
 
 				$sql = "SELECT ServiOutrasDespesas, ServiMargemLucro 
 						FROM Servico
-						WHERE ServiId = ".$item['OCXSrServico'];
+						WHERE ServiId = ".$item['FOXSrServico'];
 				$result = $conn->query($sql);
 				$rowAtualizaServico = $result->fetch(PDO::FETCH_ASSOC);
 				

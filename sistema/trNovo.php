@@ -15,6 +15,7 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 isset($rowParametro['ParamProdutoOrcamento']) && $rowParametro['ParamProdutoOrcamento'] == 1 ? $parametroProduto = 'ProdutoOrcamento' : $parametroProduto = 'Produto';
 isset($rowParametro['ParamServicoOrcamento']) && $rowParametro['ParamServicoOrcamento'] == 1 ? $parametroServico = 'ServicoOrcamento' : $parametroServico = 'Servico';
 
+//Se está incluindo
 if (isset($_POST['inputData'])) {
 
 	$tipoTr = '';

@@ -61,6 +61,19 @@ $result = $conn->query($sql);
 $rowServ = $result->fetchAll(PDO::FETCH_ASSOC);
 $totalServicos = count($rowServ);
 
+//Se empresa pública usar o termo CONTRATO, se empresa privado FLUXO OPERACIONAL
+$sql = "SELECT ParamEmpresaPublica
+		FROM Parametro
+		WHERE ParamEmpresa = ". $_SESSION['EmpreId'];
+$result = $conn->query($sql);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
+
+if ($rowParametro['ParamEmpresaPublica']){
+	$fluxo = "CONTRATO";
+} else {
+	$fluxo = "FLUXO OPERACIONAL";
+}
+
 try {
 	$mpdf = new mPDF([
 		'mode' => 'utf-8',    // mode - default ''
@@ -100,7 +113,7 @@ try {
 		</div>
 		<div style='width:250px; float:right; display: inline; text-align:right;'>
 			<div>" . date('d/m/Y') . "</div>
-			<div style='margin-top:8px;'>Fluxo Operacional: " . $row['FlOpeNumContrato'] . "</div>
+			<div style='margin-top:8px;'>".$fluxo.": " . $row['FlOpeNumContrato'] . "</div>
 		</div> 
 	</div>
 
@@ -200,7 +213,7 @@ try {
 	$html .= "<table style='width:100%; border-collapse: collapse; margin-top: 20px;'>
 	 			<tr>
                 	<td colspan='5' height='50' valign='middle' style='width:80%'>
-	                    <strong>TOTAL GERAL (Fluxo + Aditivos)</strong>
+	                    <strong>TOTAL GERAL (".ucfirst(strtolower($fluxo))." + Aditivos)</strong>
                     </td>
 				    <td style='text-align: right; width:20%'>
 				        " . mostraValor($totalGeral) . "
@@ -255,10 +268,10 @@ try {
 				<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
 					<tr>
 						<th style="text-align: center; width:8%">Item</th>
-						<th style="text-align: left; width:43%">Produto</th>
+						<th style="text-align: left; width:40%">Produto</th>
 						<th style="text-align: center; width:10%">Unidade</th>				
 						<th style="text-align: center; width:12%">Quant.</th>
-						<th style="text-align: center; width:12%">V. Unit.</th>
+						<th style="text-align: center; width:15%">V. Unit.</th>
 						<th style="text-align: center; width:15%">V. Total</th>
 					</tr>
 				';

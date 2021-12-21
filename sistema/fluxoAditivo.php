@@ -107,7 +107,8 @@ try {
 			document.getElementById('inputAditivoId').value = AditiId;
 			document.getElementById('inputCategoria').value = Categoria;
 			document.getElementById('inputSubCategorias').value = SubCategorias;
-
+			//alert(FluxoId + " - " + AditiId);
+			//return false;
 
 			if (Tipo == 'novo') {
 				if (Situacao != 'LIBERADO' && Situacao != 'FINALIZADO') {

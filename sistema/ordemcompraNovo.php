@@ -77,8 +77,8 @@ if(isset($_POST['inputData'])){
 		$conn->beginTransaction();
 
 		$sql = "SELECT SituaId
-						FROM Situacao
-						Where SituaChave = 'PENDENTE' ";
+				FROM Situacao
+				Where SituaChave = 'PENDENTE' ";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 		
@@ -118,14 +118,6 @@ if(isset($_POST['inputData'])){
 						':iUnidade' => $_SESSION['UnidadeId']
 						));
 
-		$insertId = $conn->lastInsertId();	
-		
-		if ($_POST['inputTipo'] == 'C'){
-			$sIdentificacao = 'Carta Contrato nº '.$_POST['inputNumero'];
-		} else {
-			$sIdentificacao = 'Ordem de Compra nº '.$_POST['inputNumero']." / Lote ".$_POST['inputLote'];
-		}
-
 		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -142,7 +134,7 @@ if(isset($_POST['inputData'])){
 		
 		echo 'Error: ' . $e->getMessage();die;
 	}
-	
+
 	irpara("ordemcompra.php");
 }
 

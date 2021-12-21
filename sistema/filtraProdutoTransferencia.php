@@ -10,50 +10,26 @@ if (
 	&& $_POST['idSubCategoria'] !== ''
 	&& $_POST['idSubCategoria'] !== null
 ) {
-	$sql = "SELECT DISTINCT CONVERT(varchar(10), produid) 
-	+ '#' 
-	+ CONVERT(varchar(10),ProduValorCusto) as ProduValue, 
-	       ProduNome, 
-				 ProduValorCusto, 
-				 ProduCustoFinal,
-				 MvXPrValidade
-		from Produto
-		JOIN MovimentacaoXProduto
-			on MvXPrProduto = ProduId
-		JOIN Movimentacao 
-			on MovimId = MvXPrMovimentacao
-		JOIN Categoria 
-			on CategId = ProduCategoria
-		JOIN SubCategoria 
-			on SbCatId = ProduSubCategoria
-		JOIN Situacao 
-			on SituaId = MovimSituacao
-		WHERE SituaChave = 'LIBERADO'
-		and MovimTipo = 'E'
-		and ProduCategoria = " . $_POST['idCategoria'] . "
-		and ProduSubCategoria = " . $_POST['idSubCategoria'] . "
-		ORDER BY ProduNome ASC";
+	$sql = "SELECT DISTINCT CONVERT(varchar(10), produid) + '#'	+ CONVERT(varchar(10),ProduValorCusto) as ProduValue, 
+				            ProduNome, ProduValorCusto, ProduCustoFinal, MvXPrValidade
+			FROM Produto
+			JOIN MovimentacaoXProduto ON MvXPrProduto = ProduId
+			JOIN Movimentacao ON MovimId = MvXPrMovimentacao
+			JOIN Categoria ON CategId = ProduCategoria
+			JOIN SubCategoria ON SbCatId = ProduSubCategoria
+			JOIN Situacao ON SituaId = MovimSituacao
+			WHERE SituaChave = 'LIBERADOCONTABILIDADE' AND MovimTipo = 'E' AND ProduCategoria = " . $_POST['idCategoria'] . " AND  ProduSubCategoria = " . $_POST['idSubCategoria'] . "
+			ORDER BY ProduNome ASC";
 } else {
-	$sql = "SELECT DISTINCT CONVERT(varchar(10), produid) 
-	+ '#' 
-	+ CONVERT(varchar(10),ProduValorCusto) as ProduValue, 
-	       ProduNome, 
-				 ProduValorCusto, 
-				 ProduCustoFinal,
-				 MvXPrValidade
-		from Produto
-		JOIN MovimentacaoXProduto
-			on MvXPrProduto = ProduId
-		JOIN Movimentacao 
-			on MovimId = MvXPrMovimentacao
-		JOIN Categoria 
-			on CategId = ProduCategoria
-		JOIN Situacao 
-			on SituaId = MovimSituacao
-		WHERE SituaChave = 'LIBERADO'
-		and MovimTipo = 'E'
-		and ProduCategoria = " . $_POST['idCategoria'] . "
-		ORDER BY ProduNome ASC";
+	$sql = "SELECT DISTINCT CONVERT(varchar(10), produid) + '#' + CONVERT(varchar(10),ProduValorCusto) as ProduValue, 
+	                        ProduNome, ProduValorCusto, ProduCustoFinal, MvXPrValidade
+			FROM Produto
+			JOIN MovimentacaoXProduto ON MvXPrProduto = ProduId
+			JOIN Movimentacao ON MovimId = MvXPrMovimentacao
+			JOIN Categoria ON CategId = ProduCategoria
+			JOIN Situacao ON SituaId = MovimSituacao
+			WHERE SituaChave = 'LIBERADOCONTABILIDADE' AND MovimTipo = 'E' AND ProduCategoria = " . $_POST['idCategoria'] . "
+			ORDER BY ProduNome ASC";
 }
 
 

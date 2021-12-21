@@ -111,7 +111,7 @@ try {
 			//Se foi utilizado ProdutoOrcamento
 			if ($row['TrRefTabelaProduto'] == 'ProdutoOrcamento'){
 				$sql = "SELECT PrOrcId as Id, PrOrcNome as Nome, PrOrcCategoria as Categoria, PrOrcSubCategoria as SubCategoria,
-						PrOrcDetalhamento as Detalhamento, UnMedSigla, TRXPrQuantidade, TRXPrValorUnitario
+						TRXPrDetalhamento, UnMedSigla, TRXPrQuantidade, TRXPrValorUnitario
 						FROM ProdutoOrcamento
 						JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 						JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
@@ -120,7 +120,7 @@ try {
 						ORDER BY SbCatNome, PrOrcNome ASC";
 			} else {
 				$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduCategoria as Categoria, ProduSubCategoria as SubCategoria, 
-						ProduDetalhamento as Detalhamento, UnMedSigla, TRXPrQuantidade, TRXPrValorUnitario
+						TRXPrDetalhamento, UnMedSigla, TRXPrQuantidade, TRXPrValorUnitario
 						FROM Produto
 						JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 						JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -156,7 +156,7 @@ try {
 						$html .= "
 							<tr>
 								<td style='text-align: center;'>" . $cont . "</td>
-								<td style='text-align: left;'>" . $itemProduto['Nome'] . ": " . $itemProduto['Detalhamento'] . "</td>
+								<td style='text-align: left;'>" . $itemProduto['Nome'] . ": " . $itemProduto['TRXPrDetalhamento'] . "</td>
 								<td style='text-align: center;'>" . $itemProduto['UnMedSigla'] . "</td>							
 								<td style='text-align: center;'>" . $itemProduto['TRXPrQuantidade'] . "</td>
 							</tr>
@@ -205,7 +205,7 @@ try {
 			//Se foi utilizado ServicoOrcamento
 			if ($row['TrRefTabelaServico'] == 'ServicoOrcamento'){
 				$sql = "SELECT SrOrcId as Id, SrOrcNome as Nome, SrOrcCategoria as Categoria, SrOrcSubCategoria as SubCategoria,
-						SrOrcDetalhamento as Detalhamento, TRXSrQuantidade
+						TRXSrDetalhamento, TRXSrQuantidade
 						FROM ServicoOrcamento
 						JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 						JOIN SubCategoria on SbCatId = SrOrcSubCategoria
@@ -213,7 +213,7 @@ try {
 						ORDER BY SbCatNome, SrOrcNome ASC";
 			} else {
 				$sql = "SELECT ServiId as Id, ServiNome as Nome, ServiCategoria as Categoria, ServiSubCategoria as SubCategoria, 
-						ServiDetalhamento as Detalhamento, TRXSrQuantidade
+						TRXSrDetalhamento, TRXSrQuantidade
 						FROM Servico
 						JOIN TermoReferenciaXServico on TRXSrServico = ServiId
 						JOIN SubCategoria on SbCatId = ServicoSubCategoria
@@ -248,7 +248,7 @@ try {
 						$html .= "
 							<tr>
 								<td style='text-align: center;'>" . $cont . "</td>
-								<td style='text-align: left;'>" . $itemServico['Nome'] . ": " . $itemServico['Detalhamento'] . "</td>
+								<td style='text-align: left;'>" . $itemServico['Nome'] . ": " . $itemServico['TRXSrDetalhamento'] . "</td>
 								<td style='text-align: center;'>" . $itemServico['TRXSrQuantidade'] . "</td>
 							</tr>
 						";

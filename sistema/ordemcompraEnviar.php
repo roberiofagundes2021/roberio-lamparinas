@@ -121,8 +121,6 @@ try{
 		$result->bindParam(':id', $iOrdemCompra);
 		$result->execute();
 
-
-
 		/* Deleta os registros gravados nas  tabela OrdemCompraXServico  que possuem os serviços com quantidade ZERO. */ 
 		$sql = "DELETE FROM OrdemCompraXServico
 				WHERE OCXSrOrdemCompra = :id AND OCXSrQuantidade = 0

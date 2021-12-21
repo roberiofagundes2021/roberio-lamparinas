@@ -120,10 +120,24 @@ if (isset($_POST['inputDataInicio'])) {
 							));		
 		} 
 		*/
+
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+		VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+		$result = $conn->prepare($sql);
+				
+		$result->execute(array(
+			':iTRTermoReferencia' => $_POST['inputTermoReferenciaId'],
+			':iTRDataHora' => date("Y-m-d H:i:s"),
+			':iTRUsuario' => $_SESSION['UsuarId'],
+			':iTRTela' =>'GERAR CONTRATO ',
+			':iTRDetalhamento' =>'CONTRATO GERADO DE Nº '.$_POST['inputNumContrato'].''
+		));
+
+
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = " Contrato incluído!!!";
+		$_SESSION['msg']['mensagem'] = "Contrato incluído!!!";
 		$_SESSION['msg']['tipo'] = "success";
 	} catch (PDOException $e) {
 

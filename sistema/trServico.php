@@ -33,18 +33,19 @@ if (isset($_POST['inputIdTR'])) {
 
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
-			$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrUnidade)
-					VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrDetalhamento, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrUnidade)
+					VALUES (:iTR, :iServico, :sDetalhamento, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
-				':iTR' => $iTR,
-				':iServico' => $_POST['inputIdServico' . $i],
-				':iQuantidade' => $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
-				':fValorUnitario' => null,
-				':sTabela' => $_POST['inputTabelaServico' . $i],
-				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-				':iUnidade' => $_SESSION['UnidadeId']
+				':iTR' 					=> $iTR,
+				':iServico' 			=> $_POST['inputIdServico' . $i],
+				':sDetalhamento' 	    => $_POST['inputDetalhamento' . $i],
+				':iQuantidade' 			=> $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
+				':fValorUnitario'		=> null,
+				':sTabela' 				=> $_POST['inputTabelaServico' . $i],
+				':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+				':iUnidade' 			=> $_SESSION['UnidadeId']
 			));
 		}
 
@@ -86,7 +87,7 @@ if (isset($_POST['inputIdTR'])) {
 			':iTRTermoReferencia' => $iTR ,
 			':iTRDataHora' => date("Y-m-d H:i:s"),
 			':iTRUsuario' => $_SESSION['UsuarId'],
-			':iTRTela' =>'LISTAR SERVIÇO',
+			':iTRTela' =>'TR / LISTAR SERVIÇO',
 			':iTRDetalhamento' =>'ATUALIZAÇÃO'
 		));
 
@@ -536,7 +537,7 @@ if (count($rowServicoUtilizado) >= 1) {
 
 									if ($row['TrRefTabelaServico'] == 'ServicoOrcamento') {
 
-										$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento,
+										$sql = "SELECT SrOrcId, SrOrcNome, TRXSrDetalhamento,
 												TRXSrQuantidade, TRXSrTabela
 												FROM ServicoOrcamento
 												JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
@@ -587,7 +588,8 @@ if (count($rowServicoUtilizado) >= 1) {
 															</div>
 
 															<div class="col-lg-11">
-																<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['SrOrcDetalhamento'] . '" value="' . $item['SrOrcNome'] . '" readOnly>
+																<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['TRXSrDetalhamento'] . '" value="' . $item['SrOrcNome'] . '" readOnly>
+																<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['TRXSrDetalhamento'] . '">
 															</div>
 														</div>
 													</div>
@@ -620,7 +622,7 @@ if (count($rowServicoUtilizado) >= 1) {
 									} else {
 
 										$sql = "SELECT TRXSrQuantidade,	TRXSrTabela, ServiId, 
-												ServiNome, ServiDetalhamento
+												ServiNome, TRXSrDetalhamento
 												FROM TermoReferenciaXServico
 												JOIN Servico ON ServiId = TRXSrServico
 												JOIN SubCategoria on SbCatId = ServiSubCategoria
@@ -672,7 +674,8 @@ if (count($rowServicoUtilizado) >= 1) {
 																</div>
 
 																<div class="col-lg-11">
-																	<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+																	<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['TRXSrDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+																	<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['TRXSrDetalhamento'] . '">
 																</div>
 															</div>
 														</div>	

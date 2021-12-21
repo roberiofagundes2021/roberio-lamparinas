@@ -19,11 +19,21 @@ if(isset($_POST['inputOrdemCompraId'])){
 	irpara("ordemcompra.php");
 }
 
+$sql = "SELECT *
+		FROM OrdemCompra
+		JOIN Fornecedor on ForneId = OrComFornecedor
+		JOIN Categoria on CategId = OrComCategoria
+		LEFT JOIN SubCategoria on SbCatId = OrComSubCategoria
+		WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$iOrdemCompra;
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+
 //Se está alterando
-if(isset($_POST['inputIdOrdemCompra'])){
+if (isset($_POST['inputIdOrdemCompra'])){
+	
 	$valid = true;
 
-	if($_POST['inputTypeRequest'] != "reset"){
+	if ($_POST['inputTypeRequest'] != "reset"){
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++){
 			$sqlSaldo = "SELECT OCXSrOrdemCompra, OCXSrQuantidade,
 			dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ".$_POST['inputIdServico'.$i].", 'S') as Saldo
@@ -51,7 +61,8 @@ if(isset($_POST['inputIdOrdemCompra'])){
 		}
 	}
 		
-	if($valid){
+	if ($valid){
+		
 		$sql = "DELETE FROM OrdemCompraXServico
 				WHERE OCXSrOrdemCompra = :iOrdemCompra AND OCXSrUnidade = :iUnidade";
 		$result = $conn->prepare($sql);
@@ -74,64 +85,50 @@ if(isset($_POST['inputIdOrdemCompra'])){
 				':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 				':iUnidade' => $_SESSION['UnidadeId']
-			));
-			
-			$_SESSION['msg']['titulo'] = "Sucesso";
-			$_SESSION['msg']['mensagem'] = "Ordem de Compra alterado!!!";
-			$_SESSION['msg']['tipo'] = "success";
+			));			
 		}
+
+		$tipo = $row['OrComTipo'] == 'C' ? 'Carta Contrato' : 'Ordem de Compra';							
+
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = $tipo." alterada!!!";
+		$_SESSION['msg']['tipo'] = "success";
 	}else{
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "O saldo de um dos serviços não está mais disponível!!!";
 		$_SESSION['msg']['tipo'] = "error";
 	}
-}	
-
-try{
-	
-	$sql = "SELECT *
-			FROM OrdemCompra
-			JOIN Fornecedor on ForneId = OrComFornecedor
-			JOIN Categoria on CategId = OrComCategoria
-			LEFT JOIN SubCategoria on SbCatId = OrComSubCategoria
-			WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$iOrdemCompra;
-	$result = $conn->query($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
-	
-	
-	$sql = "SELECT OCXSrServico
-			FROM OrdemCompraXServico
-			JOIN Servico on ServiId = OCXSrServico
-			WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ." and ServiCategoria = ".$iCategoria." and OCXSrOrdemCompra = ".$row['OrComId']."";
-	
-	if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
-		$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
-	}	
-	$result = $conn->query($sql);
-	$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countServicoUtilizado = count($rowServicoUtilizado);
-	
-	foreach ($rowServicoUtilizado as $itemServicoUtilizado){
-		$aServicos[] = $itemServicoUtilizado['OCXSrServico'];
-	}
-
-	$sql = "SELECT COUNT(OCXSrServico) as Quant
-			FROM OrdemCompraXServico
-			WHERE OCXSrUnidade = ". $_SESSION['UnidadeId'] ." and OCXSrOrdemCompra = ".$iOrdemCompra." and 
-			OCXSrQuantidade <> '' and OCXSrQuantidade <> 0 and OCXSrValorUnitario <> 0.00 ";
-	$result = $conn->query($sql);
-	$rowCompleto = $result->fetch(PDO::FETCH_ASSOC);
-
-	$enviar = 0;
-
-	//Verifica se o número de serviços é igual ao número de serviços com a quantidade e valor unitário preenchido para habilitar o botào "Enviar"
-	if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado != 0 && $rowCompleto['Quant'] != 0)){
-		$enviar = 1;
-	}	
-	
-} catch(PDOException $e) {
-	echo 'Error: ' . $e->getMessage();die;
 }
+
+$sql = "SELECT OCXSrServico
+		FROM OrdemCompraXServico
+		JOIN Servico on ServiId = OCXSrServico
+		WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ." and ServiCategoria = ".$iCategoria." and OCXSrOrdemCompra = ".$row['OrComId']."";
+
+if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
+	$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
+}	
+$result = $conn->query($sql);
+$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
+$countServicoUtilizado = count($rowServicoUtilizado);
+
+foreach ($rowServicoUtilizado as $itemServicoUtilizado){
+	$aServicos[] = $itemServicoUtilizado['OCXSrServico'];
+}
+
+$sql = "SELECT COUNT(OCXSrServico) as Quant
+		FROM OrdemCompraXServico
+		WHERE OCXSrUnidade = ". $_SESSION['UnidadeId'] ." and OCXSrOrdemCompra = ".$iOrdemCompra." and 
+		OCXSrQuantidade <> '' and OCXSrQuantidade <> 0 and OCXSrValorUnitario <> 0.00 ";
+$result = $conn->query($sql);
+$rowCompleto = $result->fetch(PDO::FETCH_ASSOC);
+
+$enviar = 0;
+
+//Verifica se o número de serviços é igual ao número de serviços com a quantidade e valor unitário preenchido para habilitar o botào "Enviar"
+if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado != 0 && $rowCompleto['Quant'] != 0)){
+	$enviar = 1;
+}	
 
 ?>
 
@@ -445,12 +442,12 @@ try{
 									<?php
 
 										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario, OCXSrQuantidade,
-														dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ServiId, 'S') as SaldoOrdemCompra
-														FROM Servico
-														JOIN Situacao on SituaId = ServiStatus
-														JOIN OrdemCompraXServico on OCXSrServico = ServiId and OCXSrOrdemCompra = '$iOrdemCompra'
-														JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
-														WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
+												dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ServiId, 'S') as SaldoOrdemCompra
+												FROM Servico
+												JOIN Situacao on SituaId = ServiStatus
+												JOIN OrdemCompraXServico on OCXSrServico = ServiId and OCXSrOrdemCompra = '$iOrdemCompra'
+												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
+												WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
 										if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 											$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
 										}
@@ -461,11 +458,11 @@ try{
 
 										if(!$count>0){
 											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario,
-														dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ServiId, 'S') as SaldoOrdemCompra
-														FROM Servico
-														JOIN Situacao on SituaId = ServiStatus
-														JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
-														WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
+													dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ServiId, 'S') as SaldoOrdemCompra
+													FROM Servico
+													JOIN Situacao on SituaId = ServiStatus
+													JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
+													WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
 											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 												$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
 											}
@@ -485,7 +482,7 @@ try{
 														<label for="inputCodigo"><strong>Item</strong></label>
 													</div>
 													<div class="col-lg-10" style="width:100%">
-														<label for="inputServico"><strong>Servico</strong></label>
+														<label for="inputServico"><strong>Serviço</strong></label>
 													</div>
 												</div>
 											</div>
@@ -509,8 +506,8 @@ try{
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
 											</div>
-											<div class="col-sm-1">
-												<div class="form-group">
+											<div class="col-lg-1">
+												<div class="form-group" style="text-align:center;">
 													<label for=""><strong>Resetar</strong></label>
 												</div>
 											</div>
@@ -564,15 +561,12 @@ try{
 										}
 										
 										print('<div class="row" style="margin-top: 8px;">
-										<div class="col-lg-5">
+										<div class="col-lg-6">
 											<div class="row">
-												<div class="col-lg-1">
+												<div class="col-lg-2">
 													
 												</div>
-												<div class="col-lg-8">
-													
-												</div>
-												<div class="col-lg-3">
+												<div class="col-lg-10">
 													
 												</div>
 											</div>
@@ -583,7 +577,7 @@ try{
 										<div class="col-lg-1">
 											
 										</div>	
-										<div class="col-lg-2" style="padding-top: 5px; text-align: right;">
+										<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
 											<h3><b>Total:</b></h3>
 										</div>	
 										<div class="col-lg-2">

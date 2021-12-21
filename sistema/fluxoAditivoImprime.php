@@ -30,12 +30,22 @@ $sql = "SELECT AditiId, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFi
 		JOIN FluxoOperacional on FlOpeId = AditiFluxoOperacional
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
 		JOIN Categoria on CategId = FlOpeCategoria
-		JOIN SubCategoria on SbCatId = FlOpeSubCategoria
+		LEFT JOIN SubCategoria on SbCatId = FlOpeSubCategoria
 		WHERE AditiUnidade = ". $_SESSION['UnidadeId'] ." and AditiId = ".$iAditivo;
-
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
+$sql = "SELECT ParamEmpresaPublica
+		FROM Parametro
+		WHERE ParamEmpresa = ". $_SESSION['EmpreId'];
+$result = $conn->query($sql);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
+
+if ($rowParametro['ParamEmpresaPublica']){
+	$fluxo = "CONTRATO";
+} else {
+	$fluxo = "FLUXO OPERACIONAL";
+}
 
 try {
 	$mpdf = new mPDF([
@@ -75,34 +85,35 @@ try {
 		</div>
 		<div style='width:250px; float:right; display: inline; text-align:right;'>
 			<div>".date('d/m/Y')."</div>
-			<div style='margin-top:8px;'>Fluxo Operacional: ".$row['FlOpeNumContrato']."</div>
+			<div style='margin-top:8px;'>".$fluxo.": ".$row['FlOpeNumContrato']."</div>
 		</div> 
-	</div>
+	</div>";
+	
+	$html .= "<div style='text-align:center; margin-top: 20px;'><h1>".$fluxo."/ADITIVO</h1></div>";
 
-	<div style='text-align:center; margin-top: 20px;'><h1>FLUXO OPERACIONAL/ADITIVO</h1></div>
-	";
-
-	$html .= '
-	    <h3>FLUXO OPERACIONAL</h3>
-	';
+	$html .= "<h3>".$fluxo."</h3>";
 	
 	$html .= '
     <table style="width:100%; border-collapse: collapse;">
         <tr style="background-color:#F1F1F1;">
-            <td style="width:25%; font-size:12px;">Nº Ata Registro: '. $row['FlOpeNumContrato'].'</td>
-            <td style="width:25%; font-size:12px;">Nº Processo: '. $row['FlOpeNumProcesso'].'</td>
-            <td style="width:20%; font-size:12px;">Valor: '. mostraValor($row['FlOpeValor']).'</td>
-            <td style="width:15%; font-size:12px;">Início: '. mostraData($row['FlOpeDataInicio']).'</td>
-            <td style="width:15%; font-size:12px;">Fim: '. mostraData($row['FlOpeDataFim']).'</td>
+            <td style="width:25%; font-size:12px;">Nº Ata Registro:<br>'. $row['FlOpeNumContrato'].'</td>
+            <td style="width:25%; font-size:12px;">Nº Processo:<br>'. $row['FlOpeNumProcesso'].'</td>
+            <td style="width:20%; font-size:12px;">Valor:<br>'. mostraValor($row['FlOpeValor']).'</td>
+            <td style="width:15%; font-size:12px;">Início:<br>'. mostraData($row['FlOpeDataInicio']).'</td>
+            <td style="width:15%; font-size:12px;">Fim:<br>'. mostraData($row['FlOpeDataFim']).'</td>
         </tr>
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
         <tr>
-            <td colspan="3" style="font-size:12px;">Categoria: '.$row['CategNome'].'</td>
-            <td colspan="2" style="font-size:12px;">Sub Categoria: '.$row['SbCatNome'].'</td>
+            <td style="font-size:12px; width: 50%">Categoria:<br>'.$row['CategNome'].'</td>
+            <td style="font-size:12px; width: 50%">Sub Categoria:<br>'.$row['SbCatNome'].'</td>
         </tr>
+	</table>
+	<table style="width:100%; border-collapse: collapse;">
         <tr>
-            <td colspan="3" style="width:40%; font-size:12px;">Fornecedor: '.$row['ForneNome'].'</td>
-            <td colspan="1" style="width:30%; font-size:12px;">Telefone: '.$row['ForneCelular'].'</td>
-            <td colspan="1" style="width:30%; font-size:12px;">E-mail: '.$row['ForneEmail'].'</td>
+            <td style="width:45%; font-size:12px;">Fornecedor:<br>'.$row['ForneNome'].'</td>
+            <td style="width:25%; font-size:12px;">Telefone:<br>'.$row['ForneCelular'].'</td>
+            <td style="width:30%; font-size:12px;">E-mail:<br>'.$row['ForneEmail'].'</td>
         </tr>
     </table>
 	<br>';
@@ -152,10 +163,10 @@ try {
 		<table style="width:100%; border-collapse: collapse;">
 			<tr>
 				<th style="text-align: center; width:8%">Item</th>
-				<th style="text-align: left; width:43%">Produto</th>
+				<th style="text-align: left; width:40%">Produto</th>
 				<th style="text-align: center; width:10%">Unidade</th>				
 				<th style="text-align: center; width:12%">Quant.</th>
-				<th style="text-align: center; width:12%">V. Unit.</th>
+				<th style="text-align: center; width:15%">V. Unit.</th>
 				<th style="text-align: center; width:15%">V. Total</th>
 			</tr>
 		';

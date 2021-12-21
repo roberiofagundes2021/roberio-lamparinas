@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Editar Produto de Orçamento';
+$_SESSION['PaginaAtual'] = 'Editar Produto para Termo de Referência';
 
 include('global_assets/php/conexao.php');
 
@@ -31,6 +31,8 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 if(isset($_POST['inputNome'])){
 
 	try{
+
+		$conn->beginTransaction();
 		
 		$sql = "UPDATE ProdutoOrcamento SET PrOrcNome = :sNome, PrOrcProduto = :iProduto, 
 		        PrOrcDetalhamento = :sDetalhamento, PrOrcCategoria = :iCategoria, PrOrcSubcategoria = :iSubCategoria, PrOrcUnidadeMedida = :iUnidadeMedida, 
@@ -49,12 +51,30 @@ if(isset($_POST['inputNome'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
 						));
+
+		if (isset($_POST['cmbProduto'])){
+
+			$sql = "UPDATE Produto SET ProduDetalhamento = :sDetalhamento, ProduUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE ProduId = :iProduto and ProduUnidade = :iUnidade";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+						':sDetalhamento' => $_POST['txtDetalhamento'],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iProduto' => $_POST['cmbProduto'],
+						':iUnidade' => $_SESSION['UnidadeId']
+						));
+		}						
+
+		$conn->commit();							
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Produto alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
-	} catch(PDOException $e) {		
+	} catch(PDOException $e) {	
+		
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao alterar produto!!!";
@@ -77,7 +97,7 @@ if(isset($_POST['inputNome'])){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Produto para Orçamento</title>
+	<title>Lamparinas | Produto para Termo de Referência</title>
 
 	<?php include_once("head.php"); ?>
 
@@ -290,12 +310,20 @@ if(isset($_POST['inputNome'])){
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<?php 
-											if ($_POST['inputPermission']) {
-												echo '<button class="btn btn-lg btn-principal" id="enviar">Editar</button>';
-											}
-										?>
-										<a href="produtoOrcamento.php" class="btn btn-basic" id="cancelar">Cancelar</a>
+										<div class="row">
+											<div class="col-lg-4">										
+												<?php 
+													if ($_POST['inputPermission']) {
+														echo '<button class="btn btn-lg btn-principal" id="enviar">Editar</button>';
+													}
+												?>
+												<a href="produtoOrcamento.php" class="btn btn-basic" id="cancelar">Cancelar</a>
+											</div>
+
+											<div class="col-lg-8" style="text-align: right;">
+												<p style="color: red; margin-right: 20px"><i class="icon-info3"></i>Alterações no detalhamento são replicados para o cadastro de produtos (baseado no produto de referência).</p>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>

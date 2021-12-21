@@ -35,14 +35,15 @@ if (isset($_POST['inputIdTR'])) {
 
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 			
-			$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrQuantidade, TRXPrValorUnitario, 
+			$sql = "INSERT INTO TermoReferenciaXProduto (TRXPrTermoReferencia, TRXPrProduto, TRXPrDetalhamento, TRXPrQuantidade, TRXPrValorUnitario, 
 					TRXPrTabela, TRXPrUsuarioAtualizador, TRXPrUnidade)
-					VALUES (:iTR, :iProduto, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
+					VALUES (:iTR, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
 				':iTR' 				   => $iTR,
 				':iProduto' 		   => $_POST['inputIdProduto' . $i],
+				':sDetalhamento' 	   => $_POST['inputDetalhamento' . $i],
 				':iQuantidade' 	 	   => $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
 				':fValorUnitario' 	   => null,
 				':sTabela' 			   => $_POST['inputTabelaProduto' . $i],
@@ -89,7 +90,7 @@ if (isset($_POST['inputIdTR'])) {
 			':iTRTermoReferencia' => $iTR ,
 			':iTRDataHora' => date("Y-m-d H:i:s"),
 			':iTRUsuario' => $_SESSION['UsuarId'],
-			':iTRTela' =>'LISTAR PRODUTO',
+			':iTRTela' =>'TR / LISTAR PRODUTO  ',
 			':iTRDetalhamento' =>'ATUALIZAÇÃO'
 		));
 
@@ -498,13 +499,6 @@ if (count($rowProdutoUtilizado) >= 1) {
 							<div class="card">
 								<div class="card-header header-elements-inline">
 									<h5 class="card-title">Relação de Produtos</h5>
-									<div class="header-elements">
-										<div class="list-icons">
-											<a class="list-icons-item" data-action="collapse"></a>
-											<a class="list-icons-item" data-action="reload"></a>
-											<a class="list-icons-item" data-action="remove"></a>
-										</div>
-									</div>
 								</div>
 
 								<div class="card-body">
@@ -513,7 +507,7 @@ if (count($rowProdutoUtilizado) >= 1) {
 									<?php
 									if ($row['TrRefTabelaProduto'] == 'ProdutoOrcamento') {
 
-										$sql = "SELECT PrOrcId,	PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, 
+										$sql = "SELECT PrOrcId,	PrOrcNome, TRXPrDetalhamento, PrOrcUnidadeMedida, 
 													   TRXPrQuantidade, TRXPrTabela, UnMedNome, UnMedSigla
 												FROM ProdutoOrcamento
 												JOIN TermoReferenciaXProduto ON TRXPrProduto = PrOrcId
@@ -568,7 +562,8 @@ if (count($rowProdutoUtilizado) >= 1) {
 																<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['PrOrcId'] . '" class="idProduto">
 															</div>
 															<div class="col-lg-11">
-																<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['PrOrcDetalhamento'] . '" value="' . $item['PrOrcNome'] . '" readOnly>
+																<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['TRXPrDetalhamento'] . '" value="' . $item['PrOrcNome'] . '" readOnly>
+																<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['TRXPrDetalhamento'] . '">
 															</div>
 														</div>
 													</div>								
@@ -609,7 +604,7 @@ if (count($rowProdutoUtilizado) >= 1) {
 
 									} else {
 
-										$sql = "SELECT TRXPrQuantidade, TRXPrTabela, ProduId, ProduNome, ProduDetalhamento, 
+										$sql = "SELECT TRXPrQuantidade, TRXPrTabela, ProduId, ProduNome, TRXPrDetalhamento, 
 													   ProduUnidadeMedida, UnMedNome, UnMedSigla
 												FROM TermoReferenciaXProduto
 												JOIN Produto ON ProduId = TRXPrProduto
@@ -670,7 +665,8 @@ if (count($rowProdutoUtilizado) >= 1) {
 															</div>
 
 															<div class="col-lg-11">
-																<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+																<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['TRXPrDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+																<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['TRXPrDetalhamento'] . '">
 															</div>
 
 														</div>

@@ -10,13 +10,13 @@
 		
 			if ($parametroServico == 'ServicoOrcamento') {
 
-				$sql = "SELECT SrOrcId as idServico
+				$sql = "SELECT SrOrcId as idServico, SrOrcDetalhamento as Detalhamento
 						FROM ServicoOrcamento
 						JOIN Situacao on SituaId = SrOrcSituacao
 						WHERE SrOrcSubcategoria = " . $value . " and SituaChave = 'ATIVO'";
 			} else{
 				
-				$sql = "SELECT ServiId as idServico
+				$sql = "SELECT ServiId as idServico, ServiDetalhamento as Detalhamento
 						FROM Servico
 						JOIN Situacao on SituaId = ServiStatus
 						WHERE ServiSubCategoria = " . $value . " and SituaChave = 'ATIVO'";						
@@ -27,8 +27,8 @@
 
 			foreach ($servicos as $servico) {
 
-				$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrUnidade)
-						VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
+				$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrDetalhamento, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrUnidade)
+						VALUES (:iTR, :iServico, :sDetalhamento, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 				$result = $conn->prepare($sql);
 
 				if ($servico) {
@@ -36,6 +36,7 @@
 					$result->execute(array(
 						':iTR' => $insertId,
 						':iServico' => $servico['idServico'],
+						':sDetalhamento' => $servico['Detalhamento'],
 						':iQuantidade' => null,
 						':fValorUnitario' => null,
 						':sTabela' => $parametroServico,
@@ -52,13 +53,13 @@
 	
 		if ($parametroServico == 'ServicoOrcamento') {
 
-			$sql = "SELECT SrOrcId as idServico
+			$sql = "SELECT SrOrcId as idServico, SrOrcDetalhamento as Detalhamento
 					FROM ServicoOrcamento
 					JOIN Situacao on SituaId = SrOrcSituacao
 					WHERE SrOrcCategoria = " . $value . " and SituaChave = 'ATIVO'";
 		} else{
 			
-			$sql = "SELECT ServiId as idServico
+			$sql = "SELECT ServiId as idServico, ServiDetalhamento as Detalhamento
 					FROM Servico
 					JOIN Situacao on SituaId = ServiStatus
 					WHERE ServiCategoria = " . $value . " and SituaChave = 'ATIVO'";						
@@ -69,8 +70,8 @@
 
 		foreach ($servicos as $servico) {
 
-			$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrUnidade)
-					VALUES (:iTR, :iServico, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO TermoReferenciaXServico (TRXSrTermoReferencia, TRXSrServico, TRXSrDetalhamento, TRXSrQuantidade, TRXSrValorUnitario, TRXSrTabela, TRXSrUsuarioAtualizador, TRXSrUnidade)
+					VALUES (:iTR, :iServico, :sDetalhamento, :iQuantidade, :fValorUnitario, :sTabela, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 
 			if ($servico) {
@@ -78,6 +79,7 @@
 				$result->execute(array(
 					':iTR' => $insertId,
 					':iServico' => $servico['idServico'],
+					':sDetalhamento' => $servico['Detalhamento'],
 					':iQuantidade' => null,
 					':fValorUnitario' => null,
 					':sTabela' => $parametroServico,

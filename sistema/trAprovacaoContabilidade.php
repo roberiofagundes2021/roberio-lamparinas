@@ -215,6 +215,19 @@ try{
 			}
 		}
 
+		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
+					VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
+				$result = $conn->prepare($sql);
+						
+				$result->execute(array(
+					':iTRTermoReferencia' => $iTrId,
+					':iTRDataHora' => date("Y-m-d H:i:s"),
+					':iTRUsuario' => $_SESSION['UsuarId'],
+					':iTRTela' =>'ENVIAR PARA CONTABILIDADE',
+					':iTRDetalhamento' =>' ENVIADO PARA CONTABILIDADE'
+			));
+
+
 		$conn->commit();
         
 		$_SESSION['msg']['titulo'] 		= "Sucesso";

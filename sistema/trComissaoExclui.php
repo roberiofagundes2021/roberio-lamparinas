@@ -20,6 +20,12 @@ if(isset($_POST['inputTRId'])){
 		$result->bindParam(':iUsuario', $iUsuario);
 		$result->execute();
 
+		$sql = " SELECT UsuarNome
+				 FROM Usuario
+			     WHERE UsuarId = ".$iUsuario." ";
+		$result = $conn->query($sql);
+		$rowUsuario = $result->fetch(PDO::FETCH_ASSOC);
+
 		$sql = "INSERT INTO AuditTR ( AdiTRTermoReferencia, AdiTRDataHora, AdiTRUsuario, AdiTRTela, AdiTRDetalhamento)
 				VALUES (:iTRTermoReferencia, :iTRDataHora, :iTRUsuario, :iTRTela, :iTRDetalhamento)";
 		$result = $conn->prepare($sql);
@@ -29,7 +35,7 @@ if(isset($_POST['inputTRId'])){
 			':iTRDataHora' => date("Y-m-d H:i:s"),
 			':iTRUsuario' => $_SESSION['UsuarId'],
 			':iTRTela' =>'COMISSÃO DO PROCESSO LICITATÓRIO',
-			':iTRDetalhamento' =>'EXCLUSÃO DO MEMBRO'
+			':iTRDetalhamento' =>' EXCLUSÃO DO MEMBRO '. $rowUsuario['UsuarNome']. ''
 		));
 		
 		$conn->commit();
