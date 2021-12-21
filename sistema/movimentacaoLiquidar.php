@@ -113,7 +113,7 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
                     // alerta('Atenção', menssagem, 'success')
 
                 } else {
-                    var menssagem = 'Os valores dos centros de custos devem bater com o total da Nota Fiscal (R$ '+response.val+') !'
+                    var menssagem = 'Os valores dos centros de custos devem bater com o total da Nota Fiscal (R$ '+parseFloat(response.val).toFixed(2).replace('.', ',')+') !'
                     alerta('Atenção', menssagem, 'error')
                 }
             })
