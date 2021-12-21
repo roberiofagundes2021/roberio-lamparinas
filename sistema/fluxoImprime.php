@@ -117,7 +117,7 @@ try {
 		</div> 
 	</div>
 
-	<div style='text-align:center; margin-top: 20px;'><h1>".$fluxo."</h1></div>
+	<div style='text-align:center; margin-top: 20px;'><h1>FLUXO OPERACIONAL</h1></div>
 	";
 
 	$html .= '
