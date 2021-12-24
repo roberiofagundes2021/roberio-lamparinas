@@ -10,7 +10,7 @@ if(isset($_POST['inputPlanoContasId'])){
 	
 	$iPlanoContas = $_POST['inputPlanoContasId'];
 		
-	$sql = "SELECT PlConId, PlConCodigo, PlConNome, PlConCentroCusto
+	$sql = "SELECT *
 			FROM PlanoContas
 			WHERE PlConId = $iPlanoContas ";
 	$result = $conn->query($sql);
@@ -25,15 +25,20 @@ if(isset($_POST['inputPlanoContasId'])){
 if(isset($_POST['inputNome'])){
 	
 	try{
-		
-		$sql = "UPDATE PlanoContas SET PlConCodigo = :sCodigo, PlConNome = :sNome, PlConCentroCusto = :iCentroCusto, PlConUsuarioAtualizador = :iUsuarioAtualizador
+
+		$sql = "UPDATE PlanoContas SET PlConCodigo = :iCodigo, PlConNome = :sNome, PlConTipo = :sTipo, PlConNatureza = :sNatureza, PlConGrupo = :sGrupo, PlConDetalhamento = :sDetalhamento, PlConPlanoContaPai = :sPlanoContaPai, PlConStatus = :bStatus, PlConUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE PlConId = :iPlanoContas";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':sCodigo' => $_POST['inputCodigo'],
+						':iCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
-						':iCentroCusto' => $_POST['cmbCentroCusto'],
+						':sTipo' => $_POST['cmbTipo'],
+						':sNatureza' => $_POST['cmbNatureza'],
+						':sGrupo' => $_POST['cmbGrupo'],
+						':sDetalhamento' => $_POST['inputDetalhamento'] == '' ? null : $_POST['inputDetalhamento'],
+						':sPlanoContaPai' => $_POST['cmbPlanoContaPai'] == '' ? null : $_POST['cmbPlanoContaPai'],
+						':bStatus' => $_POST['cmbStatus'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iPlanoContas' => $_POST['inputPlanoContasId']
 						));
@@ -152,33 +157,93 @@ if(isset($_POST['inputNome'])){
 										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="<?php echo $row['PlConCodigo']; ?>" required autofocus>
 									</div>
 								</div>
-								<div class="col-lg-5">
+								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputNome">Plano de Contas<span class="text-danger"> *</span></label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Plano de Contas" value="<?php echo $row['PlConNome']; ?>" required>
+										<label for="inputNome">Título<span class="text-danger"> *</span></label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Título" value="<?php echo $row['PlConNome']; ?>" required>
 									</div>
 								</div>
-								<div class="col-lg-5">
-									<label for="cmbCentroCusto">Centro de Custo<span class="text-danger"> *</span></label>
-									<select id="cmbCentroCusto" name="cmbCentroCusto" class="form-control form-control-select2" required>
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="cmbTipo">Tipo<span class="text-danger"> *</span></label>
+										<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2" required>
+											<option value="">Selecione</option>
+											<option value="A" <?php if ($row['PlConTipo'] == 'A') echo "selected"; ?> >Analítico</option>
+											<option value="S" <?php if ($row['PlConTipo'] == 'S') echo "selected"; ?> >Sintético</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="cmbNatureza">Natureza<span class="text-danger"> *</span></label>
+										<select id="cmbNatureza" name="cmbNatureza" class="form-control form-control-select2" required>
+											<option value="">Selecione</option>
+											<option value="D" <?php if ($row['PlConNatureza'] == 'D') echo "selected"; ?> >Despesa</option>
+											<option value="R" <?php if ($row['PlConNatureza'] == 'R') echo "selected"; ?> >Receita</option>
+										</select>
+									</div>
+								</div>								
+							</div>
+							<div class="row">
+								<div class="col-lg-4">
+									<label for="cmbGrupo">Grupo de Conta<span class="text-danger"> *</span></label>
+									<select id="cmbGrupo" name="cmbGrupo" class="form-control form-control-select2" required>
 										<option value="">Selecione</option>
 										<?php 
-											$sql = "SELECT CnCusId, CnCusCodigo, CnCusNome
-													FROM CentroCusto
-													JOIN Situacao on SituaId = CnCusStatus
-													WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
-													ORDER BY CnCusCodigo ASC";
+											$sql = "SELECT GrConId, GrConNome
+													FROM GrupoConta
+													JOIN Situacao on SituaId = GrConStatus
+													WHERE GrConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+													ORDER BY GrConNome ASC";
 											$result = $conn->query($sql);
 											$rowCentroCusto = $result->fetchAll(PDO::FETCH_ASSOC);
 											
 											foreach ($rowCentroCusto as $item){
-												$seleciona = $item['CnCusId'] == $row['PlConCentroCusto'] ? "selected" : "";
-												print('<option value="'.$item['CnCusId'].'" '. $seleciona .'>'.$item['CnCusCodigo'].' - '.$item['CnCusNome'].'</option>');
+												$seleciona = $item['GrConId'] == $row['PlConGrupo'] ? "selected" : "";
+												print('<option value="'.$item['GrConId'].'" '. $seleciona .'>'.$item['GrConNome'].'</option>');
 											}
 										
 										?>
 									</select>
-								</div>								
+								</div>
+								<div class="col-lg-5">
+									<label for="cmbPlanoContaPai">Plano de Conta</label>
+									<select id="cmbPlanoContaPai" name="cmbPlanoContaPai" class="form-control form-control-select2">
+										<option value="">Selecione</option>
+										<?php 
+											$sql = "SELECT PlConId, PlConCodigo, PlConNome
+													FROM PlanoContas
+													JOIN Situacao on SituaId = PlConStatus
+													WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+													ORDER BY PlConCodigo ASC";
+											$result = $conn->query($sql);
+											$rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											foreach ($rowPlanoContas as $item){
+												$seleciona = $item['PlConId'] == $row['PlConPlanoContaPai'] ? "selected" : "";
+												print('<option value="'.$item['PlConId'].'" '. $seleciona .'>'.$item['PlConCodigo'].' - '.$item['PlConNome'].'</option>');
+											}
+										
+										?>
+									</select>
+								</div>
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="cmbStatus">Status<span class="text-danger"> *</span></label>
+										<select id="cmbStatus" name="cmbStatus" class="form-control form-control-select2" required>
+											<option value="">Selecione</option>
+											<option value="1" <?php if ($row['PlConStatus'] == '1') echo "selected"; ?> >Ativo</option>
+											<option value="8" <?php if ($row['PlConStatus'] == '8') echo "selected"; ?> >Inativo</option>
+										</select>
+									</div>
+								</div>	
+							</div>
+							<br>
+							<div class="row">
+								<div class="col-lg-12">
+									<label for="inputDetalhamento">Detalhamento</label>
+									<textarea id="inputDetalhamento" name="inputDetalhamento" class="form-control" placeholder="Detalhamento do Plano de Contas" rows="7" cols="5" ><?php echo $row['PlConDetalhamento']; ?></textarea>
+								</div>
 							</div>
 								
 							<div class="row" style="margin-top: 10px;">

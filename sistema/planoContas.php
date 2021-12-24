@@ -6,9 +6,9 @@ $_SESSION['PaginaAtual'] = 'Plano de Contas';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT PlConId, PlConCodigo, PlConNome, PlConStatus, CnCusNome, SituaNome, SituaCor, SituaChave
+$sql = "SELECT PlConId, PlConCodigo, PlConNome, PlConTipo, PlConNatureza, PlConGrupo, PlConDetalhamento, PlConPlanoContaPai, PlConStatus, SituaNome, SituaCor, SituaChave, GrConNome
 		FROM PlanoContas
-		JOIN CentroCusto on CnCusId = PlConCentroCusto
+		LEFT JOIN GrupoConta on GrConId = PlConGrupo
 		JOIN Situacao on SituaId = PlConStatus
 	    WHERE PlConUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY PlConNome ASC";
@@ -49,29 +49,40 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				responsive: true,
 			    columnDefs: [
 				{
-					orderable: true,   //Plano de Contas
+					orderable: true,   //Código
 					width: "10%",
 					targets: [0]
 				},	
 				{
-					orderable: true,   //Plano de Contas
-					width: "35%",
+					orderable: true,   //Título
+					width: "25%",
 					targets: [1]
 				},	
 				{
-					orderable: true,   //Centro de Custo
-					width: "35%",
+					orderable: true,   //Tipo
+					width: "10%",
 					targets: [2]
 				},
+				{
+					orderable: true,   //Natureza
+					width: "10%",
+					targets: [3]
+				},
+				{
+					orderable: true,   //Grupo de Contas
+					width: "25%",
+					targets: [4]
+				},
+
 				{ 
 					orderable: true,   //Situação
 					width: "10%",
-					targets: [3]
+					targets: [5]
 				},
 				{ 
 					orderable: false,   //Ações
 					width: "10%",
-					targets: [4]
+					targets: [6]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -176,8 +187,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<thead>
 									<tr class="bg-slate">
 										<th>Código</th>
-										<th>Plano de Contas</th>
-										<th>Centro de Custo</th>
+										<th>Título</th>
+										<th>Tipo</th>
+										<th>Natureza</th>
+										<th>Grupo de Conta</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -190,11 +203,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
 										
+										$tipo = $item['PlConTipo'] == 'A' ? 'Analítico' : 'Sintético';
+										$Natureza = $item['PlConNatureza'] == 'D' ? 'Despesa' : 'Receita';
+
 										print('
 										<tr>
 											<td>'.$item['PlConCodigo'].'</td>
 											<td>'.$item['PlConNome'].'</td>
-											<td>'.$item['CnCusNome'].'</td>
+											<td>'.$tipo.'</td>
+											<td>'.$Natureza.'</td>
+											<td>'.$item['GrConNome'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaPlanoContas(1,'.$item['PlConId'].', \''.$item['PlConNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

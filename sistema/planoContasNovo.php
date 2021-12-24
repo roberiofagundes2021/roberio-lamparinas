@@ -10,15 +10,19 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO PlanoContas (PlConCodigo, PlConNome, PlConCentroCusto, PlConStatus, PlConUsuarioAtualizador, PlConUnidade)
-				VALUES (:iCodigo, :sNome, :sCentroCusto, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+		$sql = "INSERT INTO PlanoContas (PlConCodigo, PlConNome, PlConTipo, PlConNatureza, PlConGrupo, PlConDetalhamento, PlConPlanoContaPai, PlConStatus, PlConUsuarioAtualizador, PlConUnidade)
+				VALUES (:iCodigo, :sNome, :sTipo, :sNatureza, :sGrupo, :sDetalhamento, :sPlanoContaPai, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':iCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
-						':sCentroCusto' => $_POST['cmbCentroCusto'],
-						':bStatus' => 1,
+						':sTipo' => $_POST['cmbTipo'],
+						':sNatureza' => $_POST['cmbNatureza'],
+						':sGrupo' => $_POST['cmbGrupo'],
+						':sDetalhamento' => $_POST['inputDetalhamento'] == '' ? null : $_POST['inputDetalhamento'],
+						':sPlanoContaPai' => $_POST['cmbPlanoContaPai'] == '' ? null : $_POST['cmbPlanoContaPai'],
+						':bStatus' => $_POST['cmbStatus'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId'],
 						));
@@ -132,32 +136,93 @@ if(isset($_POST['inputNome'])){
 										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" required autofocus>
 									</div>
 								</div>
-								<div class="col-lg-5">
+								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputNome">Plano de Contas<span class="text-danger"> *</span></label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Plano de Contas" required>
+										<label for="inputNome">Título<span class="text-danger"> *</span></label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Título" required>
 									</div>
 								</div>
-								<div class="col-lg-5">
-									<label for="cmbCentroCusto">Centro de Custo<span class="text-danger"> *</span></label>
-									<select id="cmbCentroCusto" name="cmbCentroCusto" class="form-control form-control-select2" required>
-										<option value="">Selecione</option>
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="cmbTipo">Tipo<span class="text-danger"> *</span></label>
+										<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2" required>
+											<option value="">Selecione </option>
+											<option value="A">Analítico</option>
+											<option value="S">Sintético</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="cmbNatureza">Natureza<span class="text-danger"> *</span></label>
+										<select id="cmbNatureza" name="cmbNatureza" class="form-control form-control-select2" required>
+											<option value="">Selecione </option>
+											<option value="D">Despesa </option>
+											<option value="R">Receita</option>
+										</select>
+									</div>
+								</div>
+								
+							</div>
+							<div class="row">
+								
+								<div class="col-lg-4">
+									<label for="cmbGrupo">Grupo de Conta<span class="text-danger"> *</span></label>
+									<select id="cmbGrupo" name="cmbGrupo" class="form-control form-control-select2" required>
+										<option value="">Selecione </option>
 										<?php 
-											$sql = "SELECT CnCusId, CnCusCodigo, CnCusNome
-													FROM CentroCusto
-													JOIN Situacao on SituaId = CnCusStatus
-													WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
-													ORDER BY CnCusCodigo ASC";
+											$sql = "SELECT GrConId, GrConNome
+													FROM GrupoConta
+													JOIN Situacao on SituaId = GrConStatus
+													WHERE GrConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+													ORDER BY GrConNome ASC";
 											$result = $conn->query($sql);
 											$row = $result->fetchAll(PDO::FETCH_ASSOC);
 											
 											foreach ($row as $item){
-												print('<option value="'.$item['CnCusId'].'">'.$item['CnCusCodigo'].' - '.$item['CnCusNome'].'</option>');
+												print('<option value="'.$item['GrConId'].'">'.$item['GrConNome'].'</option>');
 											}
 										
 										?>
 									</select>
-								</div>						
+								</div>
+								<div class="col-lg-5">
+									<label for="cmbPlanoContaPai">Plano de Contas</label>
+									<select id="cmbPlanoContaPai" name="cmbPlanoContaPai" class="form-control form-control-select2" >
+										<option value="">Selecione </option>
+										<?php 
+											$sql = "SELECT PlConId, PlConCodigo, PlConNome
+													FROM PlanoContas
+													JOIN Situacao on SituaId = PlConStatus
+													WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+													ORDER BY PlConCodigo ASC";
+											$result = $conn->query($sql);
+											$row = $result->fetchAll(PDO::FETCH_ASSOC);
+											
+											foreach ($row as $item){
+												print('<option value="'.$item['PlConId'].'">'.$item['PlConCodigo'].' - '.$item['PlConNome'].'</option>');
+											}
+										
+										?>
+									</select>
+								</div>
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="cmbStatus">Status<span class="text-danger"> *</span></label>
+										<select id="cmbStatus" name="cmbStatus" class="form-control form-control-select2" required>
+											<option value="">Selecione </option>
+											<option value="1">Ativo </option>
+											<option value="8">Inativo</option>
+										</select>
+									</div>
+								</div>		
+							</div>
+                              <br>
+							<div class="row">
+								<div class="col-lg-12">
+									<label for="inputDetalhamento">Detalhamento</label>
+									<textarea id="inputDetalhamento" name="inputDetalhamento" class="form-control" placeholder="Detalhamento do Plano de Conta" rows="7" cols="5" ></textarea>
+								</div>
 							</div>
 															
 							<div class="row" style="margin-top: 10px;">
