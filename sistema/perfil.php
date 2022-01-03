@@ -229,6 +229,9 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				else if (Tipo == 'permicao'){
 					document.formPerfil.action = "perfilPermissao.php";
 				}
+				else if (Tipo == 'padraoPermicao'){
+					document.formPerfil.action = "padraoPerfilPermissao.php";
+				}
 
 				document.formPerfil.submit();
 			} else{
@@ -329,6 +332,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 														<a href="#" onclick="atualizaPerfil('.$atualizar.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
 														<a href="#" onclick="atualizaPerfil('.$excluir.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 														<a href="#" onclick="atualizaPerfil(1,'.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'permicao\');" class="list-icons-item"><i class="icon-lock2"></i></a>
+														<a href="#" onclick="atualizaPerfil(1,'.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'padraoPermicao\');" class="list-icons-item"><i class="icon-gear"></i></a>
 													</div>
 												</div>
 											</td>
