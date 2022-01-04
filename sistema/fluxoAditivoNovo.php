@@ -263,7 +263,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		/* Fim Insere Bandeja */
 
 
-		//Se está aincluindo Produtos
+		//Se está incluindo Produtos
 		if (isset($_POST['inputIdProduto1'])) {
 
 			$sql = "DELETE FROM AditivoXProduto
@@ -378,27 +378,7 @@ try {
 		FROM Aditivo
 		Where AditiUnidade = " . $_SESSION['UnidadeId'] . " and AditiFluxoOperacional = " . $iFluxoOperacional;
 	$result = $conn->query($sql);
-	$rowAditivo = $result->fetch(PDO::FETCH_ASSOC);
-
-	/*	$sql = "SELECT SbCatId, SbCatNome
-				FROM SubCategoria
-				JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
-				WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and FOXSCFluxo = $iFluxoOperacional
-				ORDER BY SbCatNome ASC";
-		$result = $conn->query($sql);
-		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
-
-		$aSubCategorias = '';
-
-		foreach ($rowBD as $item) {
-
-			if ($aSubCategorias == '') {
-				$aSubCategorias .= $item['SbCatId'];
-			} else {
-				$aSubCategorias .= ", ".$item['SbCatId'];
-			}
-        }
-    */
+	$rowAditivo = $result->fetch(PDO::FETCH_ASSOC);    
 
 } catch (PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
@@ -422,6 +402,9 @@ try {
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 
+	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>	
+	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
+
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script> <!-- CV Documentacao: https://jqueryvalidation.org/ -->
@@ -430,45 +413,14 @@ try {
 	<script type="text/javascript">
 		$(document).ready(function() {
 
-		/*	$('#cmbProduto').on('change', function(e){
+			$('#cmbSubCategoria').on('change', function(e){				
 				
-				var inputCategoria = $('#inputIdCategoria').val();
 				var inputSubCategoria = $('#inputIdSubCategoria').val(); //alert(inputSubCategoria);
-				var produtos = $(this).val();
-				//console.log(produtos);
-				
-				var cont = 1;
-				var produtoId = [];
-				var produtoQuant = [];
-				var produtoValor = [];
-				
-				// Aqui é para cada "class" faça
-				$.each( $(".idProduto"), function() {			
-					produtoId[cont] = $(this).val();
-					cont++;
-				});
-				
-				cont = 1;
-				//aqui fazer um for que vai até o ultimo cont (dando cont++ dentro do for)
-				$.each( $(".Quantidade"), function() {
-					$id = produtoId[cont];
-					
-					produtoQuant[$id] = $(this).val();
-					cont++;
-				});				
-				
-				cont = 1;
-				$.each( $(".ValorUnitario"), function() {
-					$id = produtoId[cont];
-					
-					produtoValor[$id] = $(this).val();
-					cont++;
-				});
 				
 				$.ajax({
 					type: "POST",
 					url: "fluxoAditivoNovofiltraProduto.php",
-					data: {idCategoria: inputCategoria, idSubCategoria: inputSubCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
+					data: {idSubCategoria: inputSubCategoria, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
 					success: function(resposta){
 						//alert(resposta);
 
@@ -486,7 +438,7 @@ try {
 			function ResetProduto(){
 				$('#cmbProduto').empty().append('<option>Sem produto</option>');
 			}
-        */
+        
 			function pular() {
 				
 				$('.pula').keypress(function(e){
@@ -708,75 +660,7 @@ try {
 									</div>
 								</div>
 							</div>
-							<!-- <div class="row">
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="inputCategoriaNome">Categoria</label>
-										<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" value="<?php echo $row['CategNome']; ?>" readOnly>
-										<input type="hidden" id="inputIdCategoria" name="inputIdCategoria" class="form-control" value="<?php echo $row['FlOpeCategoria']; ?>">
-									</div>
-								</div>
-									
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="cmbSubCategoria">SubCategoria(s)</label>
-										<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
-											<?php 
-											/*	$sql = "SELECT SbCatId, SbCatNome
-														FROM SubCategoria
-														JOIN Situacao on SituaId = SbCatStatus	
-														WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
-														ORDER BY SbCatNome ASC";
-												$result = $conn->query($sql);
-												$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-												$count = count($rowSubCategoria);														
 														
-												foreach ( $rowSubCategoria as $item){	
-													print('<option value="'.$item['SbCatId,'].'"disabled selected>'.$item['SbCatNome'].'</option>');	
-												}                  
-											?>
-										</select>
-									</div>
-								</div>
-							</div>
-							<div class="row">	
-								<div class="col-lg-12">
-									<div class="form-group">
-										<label for="cmbProduto">Produto</label>
-										<select id="cmbProduto" name="cmbProduto" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
-											<?php 
-												$sql = "SELECT ProduId, ProduNome
-														FROM Produto
-														JOIN Situacao on SituaId = ProduStatus
-														WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
-												
-												if ($aSubCategorias != ""){
-													$sql .= " and ProduSubCategoria in (".$aSubCategorias.") ";
-												}
-												
-												$sql .= " ORDER BY ProduNome ASC";
-												$result = $conn->query($sql);
-												$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);														
-												
-												foreach ($rowProduto as $item){	
-													
-													if (in_array($item['ProduId'], $aProdutos) or $countProdutoUtilizado == 0) {
-														$seleciona = "selected";
-														print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
-													} else {
-														$seleciona = "";
-														print('<option value="'.$item['ProduId'].'" '.$seleciona.'>'.$item['ProduNome'].'</option>');
-													}													
-													
-													
-												} */
-											
-											?>
-										</select>
-									</div>
-								</div>
-							</div> -->
-							
 							<div class="row" style="margin-top: 10px; display: <?php isset($_POST['inputDataInicio']) ? print('none') : print('block')   ?>">
 								<div class="col-lg-12">
 									<div class="form-group">
@@ -800,7 +684,33 @@ try {
 								$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 								$countProduto = count($rowProdutos);
 							?>
+
 							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && $countProduto >= 1 ? print('block') : print('none')  ?>">
+								
+								<div class="row">
+									<div class="col-lg-12">
+										<div class="form-group">
+											<label for="cmbSubCategoria">SubCategoria(s)</label>
+											<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+												<?php 
+													$sql = "SELECT SbCatId, SbCatNome
+															FROM SubCategoria
+															JOIN Situacao on SituaId = SbCatStatus	
+															WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+															ORDER BY SbCatNome ASC";
+													$result = $conn->query($sql);
+													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+													$count = count($rowSubCategoria);														
+															
+													foreach ( $rowSubCategoria as $item){	
+														print('<option value="'.$item['SbCatId,'].'" selected>'.$item['SbCatNome'].'</option>');	
+													}                  
+												?>
+											</select>
+										</div>
+									</div>
+								</div>
+							
 								<div class="card-header header-elements-inline">
 									<h5 class="card-title">Relação de Produtos</h5>
 								</div>
@@ -808,32 +718,6 @@ try {
 								<div class="card-body">
 
 									<?php
-
-									/*	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
-												FROM Produto
-												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-												LEFT JOIN Marca on MarcaId = ProduMarca
-												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrProduto = ".$iFluxoOperacional;
-										$result = $conn->query($sql);
-										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-										$count = count($rowProdutos);
-
-										if (!$count){
-											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
-													FROM Produto
-													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-													LEFT JOIN Marca on MarcaId = ProduMarca
-													JOIN Situacao on SituaId = ProduStatus
-													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and SituaChave = 'ATIVO' ";
-
-											if ($aSubCategorias != ""){
-												$sql .= " and ProduSubCategoria in (".$aSubCategorias.") ";
-											}
-											$sql .= " ORDER BY ProduNome ASC";
-											$result = $conn->query($sql);
-											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-										} */
 
 									$cont = 0;
 									if (isset($_POST['inputDataInicio'])) {
