@@ -263,7 +263,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		/* Fim Insere Bandeja */
 
 
-		//Se está aincluindo Produtos
+		//Se está incluindo Produtos
 		if (isset($_POST['inputIdProduto1'])) {
 
 			$sql = "DELETE FROM AditivoXProduto
@@ -378,7 +378,8 @@ try {
 		FROM Aditivo
 		Where AditiUnidade = " . $_SESSION['UnidadeId'] . " and AditiFluxoOperacional = " . $iFluxoOperacional;
 	$result = $conn->query($sql);
-	$rowAditivo = $result->fetch(PDO::FETCH_ASSOC);
+	$rowAditivo = $result->fetch(PDO::FETCH_ASSOC);    
+
 } catch (PDOException $e) {
 	echo 'Error: ' . $e->getMessage();
 }
@@ -401,6 +402,9 @@ try {
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 
+	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>	
+	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
+
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script> <!-- CV Documentacao: https://jqueryvalidation.org/ -->
@@ -409,7 +413,32 @@ try {
 	<script type="text/javascript">
 		$(document).ready(function() {
 
+			$('#cmbSubCategoria').on('change', function(e){				
+				
+				var inputSubCategoria = $('#inputIdSubCategoria').val(); //alert(inputSubCategoria);
+				
+				$.ajax({
+					type: "POST",
+					url: "fluxoAditivoNovofiltraProduto.php",
+					data: {idSubCategoria: inputSubCategoria, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
+					success: function(resposta){
+						//alert(resposta);
 
+						$("#tabelaProdutos").html(resposta).show();					
+						return false;						
+					}	
+				});
+			});
+
+			//Mostra o "Filtrando..." na combo Produto
+			function FiltraProduto(){
+				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+			}
+			
+			function ResetProduto(){
+				$('#cmbProduto').empty().append('<option>Sem produto</option>');
+			}
+        
 			function pular() {
 				
 				$('.pula').keypress(function(e){
@@ -631,7 +660,7 @@ try {
 									</div>
 								</div>
 							</div>
-
+														
 							<div class="row" style="margin-top: 10px; display: <?php isset($_POST['inputDataInicio']) ? print('none') : print('block')   ?>">
 								<div class="col-lg-12">
 									<div class="form-group">
@@ -655,7 +684,33 @@ try {
 								$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 								$countProduto = count($rowProdutos);
 							?>
+
 							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && $countProduto >= 1 ? print('block') : print('none')  ?>">
+								
+								<div class="row">
+									<div class="col-lg-12">
+										<div class="form-group">
+											<label for="cmbSubCategoria">SubCategoria(s)</label>
+											<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+												<?php 
+													$sql = "SELECT SbCatId, SbCatNome
+															FROM SubCategoria
+															JOIN Situacao on SituaId = SbCatStatus	
+															WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+															ORDER BY SbCatNome ASC";
+													$result = $conn->query($sql);
+													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+													$count = count($rowSubCategoria);														
+															
+													foreach ( $rowSubCategoria as $item){	
+														print('<option value="'.$item['SbCatId,'].'" selected>'.$item['SbCatNome'].'</option>');	
+													}                  
+												?>
+											</select>
+										</div>
+									</div>
+								</div>
+							
 								<div class="card-header header-elements-inline">
 									<h5 class="card-title">Relação de Produtos</h5>
 								</div>

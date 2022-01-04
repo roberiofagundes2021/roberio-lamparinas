@@ -35,18 +35,19 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 		
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 		
-			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario, 
+			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrDetalhamento, FOXPrQuantidade, FOXPrValorUnitario, 
 					FOXPrUsuarioAtualizador, FOXPrUnidade)
-					VALUES (:iFluxoOperacional, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+					VALUES (:iFluxoOperacional, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 			
 			$result->execute(array(
-							':iFluxoOperacional' => $iFluxoOperacional,
-							':iProduto' => $_POST['inputIdProduto'.$i],
-							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId']
+							':iFluxoOperacional' 	=> $iFluxoOperacional,
+							':iProduto' 			=> $_POST['inputIdProduto'.$i],
+							':sDetalhamento' 	   	=> $_POST['inputDetalhamento' . $i],
+							':iQuantidade' 			=> $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+							':fValorUnitario' 		=> $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+							':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+							':iUnidade' 			=> $_SESSION['UnidadeId']
 							));
 		}
 
@@ -545,7 +546,7 @@ try{
 
 										if ($_POST['inputOrigem'] == 'fluxo.php'){
 											
-											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+											$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 													FROM Produto
 													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -683,6 +684,7 @@ try{
 														</div>
 														<div class="col-lg-8">
 															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['Detalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+															<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['TRXPrDetalhamento'] . '">
 														</div>
 														<div class="col-lg-3">
 															<input type="text" id="inputMarca'.$cont.'" name="inputMarca'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['MarcaNome'].'" value="'.$item['MarcaNome'].'" readOnly>
