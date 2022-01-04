@@ -350,6 +350,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 						$(elem).on('click', () => {
 							let id = $(elem).attr('produId')
 							var produtoServico = $('input[name="inputProdutoServico"]:checked').val();
+							console.log('teste')
 
 							$.post(
 								'solicitacaoNovoCarrinho.php', {
@@ -439,7 +440,6 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 								// como no carregamento da pagina.
 								carrinho()
 								verificarCarrinho()
-
 
 								$(".fancybox").fancybox({
 									// options
@@ -538,8 +538,8 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 								// Estas duas funções são chamadas a cada requisição Ajax realizada, onde 
 								// novos elementos são carregados na tela, para que possam agir sobre eles,
 								// como no carregamento da pagina.
-								// carrinho()
-								// verificarCarrinho()
+								carrinho()
+								verificarCarrinho()
 
 								$(".fancybox").fancybox({
 									// options
@@ -727,7 +727,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 																	ORDER BY FabriNome ASC";
 															$result = $conn->query($sql);
 															$rowFabri = $result->fetchAll(PDO::FETCH_ASSOC);
-															var_dump($rowFabri);
+															// var_dump($rowFabri);
 
 															foreach ($rowFabri as $item) {
 																print('<option value="' . $item['FabriId'] . '">' . $item['FabriNome'] . '</option>');
