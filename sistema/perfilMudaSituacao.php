@@ -11,21 +11,22 @@ if(isset($_POST['inputPerfilId'])){
 	$iPerfil = $_POST['inputPerfilId'];
 	$sStatus = $_POST['inputPerfilStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
         	
+	$sql = "SELECT SituaId
+				FROM Situacao
+				WHERE SituaChave = '$sStatus'";
+	$result = $conn->query($sql);
+	$situacao = $result->fetch(PDO::FETCH_ASSOC);
+	$iStatus = $situacao['SituaId'];
+	
+	$sql = "UPDATE Perfil SET PerfiStatus = :iStatus 
+			WHERE PerfiId = :id";
+	$result = $conn->prepare($sql);
+	$result->bindParam(':iStatus', $iStatus);
+	$result->bindParam(':id', $iPerfil); 
+	$result->execute();
+	exit;
 	try{
 
-		$sql = "SELECT SituaId
-		            FROM Situacao
-		            WHERE SituaChave = '$sStatus'";
-		$result = $conn->query($sql);
-		$situacao = $result->fetch(PDO::FETCH_ASSOC);
-		$iStatus = $situacao['SituaId'];
-		
-		$sql = "UPDATE Perfil SET PerfiStatus = :iStatus 
-				WHERE PerfiId = :id";
-		$result = $conn->prepare($sql);
-		$result->bindParam(':iStatus', $iStatus); 
-		$result->bindParam(':id', $iPerfil); 
-		$result->execute();
 		
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

@@ -16,6 +16,7 @@
 				$resultEmpresa = $conn->query($sqlEmpresa);
 				$empresa = $resultEmpresa->fetch(PDO::FETCH_ASSOC);
 
+				// Verifica se o usuário esta utilizando permissao personalizada ou do perfil
 				if($usuaXPerm['UsuarPermissaoPerfil'] == 0){
 				$sqlConfig = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
 							MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, MenuSetorPrivado,
