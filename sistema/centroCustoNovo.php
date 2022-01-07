@@ -11,14 +11,14 @@ if(isset($_POST['inputNome'])){
 	try{
 		
 		$sql = "INSERT INTO CentroCusto (CnCusCodigo, CnCusNome, CnCusDetalhamento, CnCusStatus, CnCusUsuarioAtualizador, CnCusUnidade)
-				VALUES (:iCodigo, :sNome, :sDetalhamento, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+				VALUES (:iCodigo, :sNome, :sDetalhamento, :iStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':iCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
-						':bStatus' => 1,
+						':iStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId'],
 						));
@@ -33,7 +33,7 @@ if(isset($_POST['inputNome'])){
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir Centro de Custo!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage(); die;
 	}
 	
 	irpara("centroCusto.php");
@@ -81,7 +81,7 @@ if(isset($_POST['inputNome'])){
 						url: "centroCustoValida.php",
 						data: ('nome='+inputNome),
 						success: function(resposta){
-							alert(resposta)
+							
 							if(resposta == 1){
 								alerta('Atenção','Esse registro já existe!','error');
 								return false;

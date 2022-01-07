@@ -16,50 +16,60 @@
                 $html .= '<br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
             }
 
-            $html .= '                      
-            <table style="width:100%;">
-            <tr>
-                <td colspan="7" style="border: none;"></td>
-            </tr> 
-            <tr>
-                <td colspan="7" style="background-color: #d8d8d8; text-align: center; font-weight: bold;">BENS PATRIMONIADOS</td>
-            </tr>
-            ';
+            $html .= '  
+           
+            <table style="width:100%; border: none;">
+                <tr>
+                    <td  style="background-color: #d8d8d8; text-align: center; font-weight: bold; width:100%; ">BENS PATRIMONIADOS</td>
+                </tr>
+            </table> <br> ';
 
             foreach ($produtos3 as $value) {
 
-                $html .= '        
-                        <tr>
-                            <td colspan="7" style="border: none;"></td>
-                        </tr>
-                        <tr>
-                            <td rowspan="3" width="15%" style="text-align: center; background-color: #eee;">Patrimônio: '.$value['PatriNumero'].'</td>
-                            <td colspan="5" width="65%">Produto:<br>'.$value['ProduNome'].'</td>
-                            <td colspan="1" width="20%">Código:<br>'.$value['ProduCodigo'].'</td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">Marca:<br>'. $value['MarcaNome'] .'</td>
-                            <td colspan="2">Modelo:<br>'.$value['ModelNome'].'</td>
-                            <td colspan="1">Unidade:<br>'.$value['UnMedSigla'].'</td>                                    
-                        </tr>
-                        <tr>
-                        ';
+                $html .= '   
+                
+                <table style="width:100%;">
+                    <tr>   
 
-                $html .= '  <td colspan="3">Categoria:<br>'.$value['CategNome'].'</td>';
+                        <td style="text-align: center; background-color: #eee;">Patrimônio: '.$value['PatriNumero'].'</td>
+                                          
+                        <td>   
+                            <table style="width:100%; border: none;"> 
+                                <tr>
+                                    <td style="text-align: left; width:50%">Produto:<br>'.$value['ProduNome'].'</td>
+                                    <td style="text-align: left; width:40%">Código:<br>'.$value['ProduCodigo'].'</td>
+                                </tr>
+                            </table>
+                            <table style="width:100%; border: none;">
+                                <tr>
+                                    <td style="text-align: left; width:60%">Marca:<br>'. $value['MarcaNome'] .'</td>
+                                    <td style="text-align: left; width:20%">Modelo:<br>'.$value['ModelNome'].'</td>
+                                    <td style="text-align: left; width:20%">Unidade:<br>'.$value['UnMedSigla'].'</td>                                    
+                                </tr>
+                            </table>
 
-                if($value['Validade'] == ''){
-                    $html .= '  <td colspan="2">Lote:<br>'.$value['MvXPrLote'].'</td>';                    
-                } else{
-                    $html .= '  <td colspan="1">Lote:<br>'.$value['MvXPrLote'].'</td>';
-                    $html .= '  <td colspan="1">Validade:<br>'.mostraData($value['Validade']).'</td>';    
-                }
+                            <table style="width:100%;border: none;">
+                                <tr>
+                                    ';
 
-                $html .= '  <td colspan="1">Quantidade:<br>1</td>
-                         </tr>
-                        ';
+                                    $html .= '  <td style="text-align: left; width:30%">Categoria:<br>'.$value['CategNome'].'</td>';
+
+                                    if($value['Validade'] == ''){
+                                        $html .= '  <td style="text-align: left; width:20%">Lote:<br>'.$value['MvXPrLote'].'</td>';                    
+                                    } else{
+                                        $html .= '  <td style="text-align: left; width:20%">Lote:<br>'.$value['MvXPrLote'].'</td>';
+                                        $html .= '  <td style="text-align: left; width:30%">Validade:<br>'.mostraData($value['Validade']).'</td>';    
+                                    }
+
+                                    $html .= '  <td style="text-align: left; width:20%">Quantidade:<br>1</td>';
+
+                                $html .= '</tr>
+                            </table> 
+                        </td> 
+                    </tr>   
+                </table> <br> ';
             }
 
-            $html .= '</table>';
         }
 
         //*************************************** Caso seja uma movimentação de Transferência ***********************************\\
