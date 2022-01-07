@@ -415,7 +415,7 @@ include_once("topo.php");
 													$sql = "SELECT PerfiId, PerfiNome, PerfiChave
 															FROM Perfil
 															JOIN Situacao on SituaId = PerfiStatus															     
-															WHERE SituaChave = 'ATIVO'
+															WHERE SituaChave = 'ATIVO' and PerfiUnidade = ".$_SESSION['UnidadeId']."
 															ORDER BY PerfiNome ASC";
 													$result = $conn->query($sql);
 													$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);

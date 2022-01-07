@@ -11,18 +11,19 @@ $_SESSION['PaginaAtual'] = 'Perfil';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = ("SELECT PerfiId, PerfiNome, PerfiChave, PerfiStatus, SituaNome, SituaChave, SituaCor
-		 FROM Perfil
-		 JOIN Situacao on SituaId = PerfiStatus
-		 ORDER BY PerfiNome ASC");
-$result = $conn->query("$sql");
+$sql = "SELECT PerfiId, PerfiNome, PerfiChave, PerfiStatus, SituaNome, SituaChave, SituaCor
+		FROM Perfil
+		JOIN Situacao on SituaId = PerfiStatus
+		WHERE PerfiUnidade = ".$_SESSION['UnidadeId']."
+		ORDER BY PerfiNome ASC";
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
 //Se estiver editando
 if(isset($_POST['inputPerfilId']) && $_POST['inputPerfilId']){
 
-	//Essa consulta é para preencher o campo Nome com a perfil a ser editar
+	//Essa consulta é para preencher o campo Nome com o perfil a ser editado
 	$sql = "SELECT PerfiId, PerfiNome
 			FROM Perfil
 			WHERE PerfiId = " . $_POST['inputPerfilId'];
@@ -54,8 +55,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 
-			$sql = "INSERT INTO Perfil (PerfiNome, PerfiChave, PerfiStatus, PerfiUsuarioAtualizador)
-					VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador)";
+			$sql = "INSERT INTO Perfil (PerfiNome, PerfiChave, PerfiStatus, PerfiUsuarioAtualizador, PerfiUnidade)
+					VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -63,6 +64,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':sChave' => formatarChave($_POST['inputNome']),
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $_SESSION['UnidadeId']
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Perfil incluído!!!";

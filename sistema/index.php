@@ -12,7 +12,7 @@ if (isset($_POST['cmbPerfil'])) {
 	$sql = "SELECT PerfiId
 			FROM Perfil
 			JOIN Situacao on SituaId = PerfiStatus		
-			WHERE PerfiChave = '" . $_SESSION['PerfiChave'] . "' and SituaChave = 'ATIVO'";
+			WHERE PerfiChave = '" . $_SESSION['PerfiChave'] . "' and SituaChave = 'ATIVO' and PerfiUnidade = " . $_SESSION['UnidadeId'];
 	$result = $conn->query($sql);
 	$rowPerfilLogado = $result->fetch(PDO::FETCH_ASSOC);
 	$idPerfilLogado = $rowPerfilLogado['PerfiId'];
@@ -950,7 +950,7 @@ if ($totalAcoes) {
 								$sql = "SELECT PerfiId, PerfiNome
 										FROM Perfil
 										JOIN Situacao on SituaId = PerfiStatus
-										WHERE SituaChave = 'ATIVO'
+										WHERE SituaChave = 'ATIVO' and PerfiUnidade = " . $_SESSION['UnidadeId'] . "
 										ORDER BY PerfiNome ASC";
 								$result = $conn->query($sql);
 								$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);

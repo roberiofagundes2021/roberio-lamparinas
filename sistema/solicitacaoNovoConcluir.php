@@ -63,8 +63,8 @@ if (isset($_SESSION['Carrinho'])) {
 
 		$sql = "SELECT PerfiId
 				FROM Perfil
-				Where PerfiChave = 'ALMOXARIFADO' ";
-		$result = $conn->query("$sql");
+				Where PerfiChave = 'ALMOXARIFADO' and PerfiUnidade = " . $_SESSION['UnidadeId'];
+		$result = $conn->query($sql);
 		$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
 		$soliObservacao = '';

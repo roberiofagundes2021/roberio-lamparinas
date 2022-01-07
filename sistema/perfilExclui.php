@@ -12,7 +12,7 @@ if(isset($_POST['inputPerfilId'])){
 		
 		$sql = "DELETE FROM Perfil
 				WHERE PerfiId = :id";
-		$result = $conn->prepare("$sql");
+		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iPerfil); 
 		$result->execute();
 		

@@ -110,58 +110,48 @@ if(isset($_POST['inputTRId'])){
 			$conn->beginTransaction();
 
 			/* Atualiza o Status do TR para "Aguardando Liberação" */
-			$sql = "
-				SELECT SituaId
-				FROM Situacao
-				WHERE SituaChave = 'AGUARDANDOLIBERACAOCENTRO' 
-			";
+			$sql = "SELECT SituaId
+					FROM Situacao
+					WHERE SituaChave = 'AGUARDANDOLIBERACAOCENTRO' ";
 			$result = $conn->query($sql);
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
-			$sql = "
-				UPDATE TermoReferencia 
-				SET TrRefStatus = :iStatus
-				WHERE TrRefId = :iTrId
-			";
+			$sql = "UPDATE TermoReferencia 
+					SET TrRefStatus = :iStatus
+					WHERE TrRefId = :iTrId";
 			$result = $conn->prepare($sql);
-
 			$result->execute(array(
 			':iStatus' => $rowSituacao['SituaId'],
 			':iTrId' => $iTrId					
 			));
 			/* Fim Atualiza */
 
-			$sql = "
-				SELECT PerfiId
-				FROM Perfil
-				WHERE PerfiChave IN ('ADMINISTRADOR', 'CENTROADMINISTRATIVO');
-			";
+			$sql = "SELECT PerfiId
+					FROM Perfil
+					WHERE PerfiChave IN ('ADMINISTRADOR', 'CENTROADMINISTRATIVO') and PerfiUnidade = " . $_SESSION['UnidadeId'];
 			$result = $conn->query($sql);
 			$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 
-			$sql = "
-				SELECT TrRefNumero, TrRefTipo, TrRefData
-				FROM TermoReferencia
-				WHERE TrRefId = ".$iTrId;
+			$sql = "SELECT TrRefNumero, TrRefTipo, TrRefData
+					FROM TermoReferencia
+					WHERE TrRefId = " . $iTrId;
 			$result = $conn->query($sql);
 			$rowTermoReferencia = $result->fetch(PDO::FETCH_ASSOC);
 
 			/* Verifica se a Bandeja já tem um registro com BandeTabela: TR, Perfil: CENTROADMINISTRATIVO e BandeTabelaId: IdTRAtual, evitando duplicação */
-			$sql = "
-				SELECT COUNT(BandeId) as Count
-				FROM Bandeja
-				WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CENTROADMINISTRATIVO'
-				AND BandeTabelaId =  ".$iTrId;
+			$sql = "SELECT COUNT(BandeId) as Count
+					FROM Bandeja
+					WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CENTROADMINISTRATIVO'
+					AND BandeTabelaId =  " . $iTrId;
 			$result = $conn->query($sql);
 			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 			$count = $rowBandeja['Count'];
 
-			$sql = "
-				SELECT BandeId, SituaChave
-				FROM Bandeja
-				JOIN Situacao on SituaId = BandeStatus
-				WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CENTROADMINISTRATIVO'
-				AND BandeTabelaId =  ".$iTrId;
+			$sql = "SELECT BandeId, SituaChave
+					FROM Bandeja
+					JOIN Situacao on SituaId = BandeStatus
+					WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CENTROADMINISTRATIVO'
+					AND BandeTabelaId =  " . $iTrId;
 			$result = $conn->query($sql);
 			$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 

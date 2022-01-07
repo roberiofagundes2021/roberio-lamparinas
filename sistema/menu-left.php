@@ -6,16 +6,17 @@
 
 
   $sqlUser = "SELECT UsuarPermissaoPerfil
-  FROM Usuario
-  Where UsuarId = '$userId'";
+              FROM Usuario
+              Where UsuarId = " . $userId;
 
   $resultUserId = $conn->query($sqlUser);
   $usuaXPerm = $resultUserId->fetch(PDO::FETCH_ASSOC);
 
   $userPermission = (isset($usuaXPerm['UsuarPermissaoPerfil'])?$usuaXPerm['UsuarPermissaoPerfil']:0);
 
-  $sqlPerfil = "SELECT PerfiId FROM Perfil
-  WHERE PerfiChave = '$perfil'";
+  $sqlPerfil = "SELECT PerfiId 
+                FROM Perfil
+                WHERE PerfiChave = '" . $perfil . "' and PerfiUnidade = " . $_SESSION['UnidadeId'];
 
   $resultPerfilId = $conn->query($sqlPerfil);
   $perfilId = $resultPerfilId->fetchAll(PDO::FETCH_ASSOC);

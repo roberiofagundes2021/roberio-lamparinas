@@ -30,7 +30,7 @@ try{
 
 		$sql = "SELECT PerfiId
 				FROM Perfil
-				Where PerfiChave IN ('ADMINISTRADOR','CENTROADMINISTRATIVO') ";
+				Where PerfiChave IN ('ADMINISTRADOR','CENTROADMINISTRATIVO') and PerfiUnidade = " . $_SESSION['UnidadeId'];
 		$result = $conn->query($sql);
 		$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 

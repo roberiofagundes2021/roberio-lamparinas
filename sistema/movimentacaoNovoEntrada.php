@@ -136,8 +136,7 @@ if (isset($_POST['inputData'])) {
 			if ($rowSituacao['SituaChave'] != 'LIBERADO') {
 				$sql = "SELECT PerfiId
 				        FROM Perfil
-				        WHERE PerfiChave = '" . $destinoChave . "' 
-				        ";
+				        WHERE PerfiChave = '" . $destinoChave . "' and PerfiUnidade = " . $_SESSION['UnidadeId'];
 				$result = $conn->query($sql);
 				$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
 

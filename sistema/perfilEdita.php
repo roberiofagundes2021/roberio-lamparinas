@@ -13,9 +13,9 @@ if(isset($_POST['inputPerfilId'])){
 	try{
 		
 		$sql = "SELECT PerfiId, PerfiNome
-				FROM Perfil
-				WHERE PerfiId = $iPerfil ";
-		$result = $conn->query("$sql");
+				    FROM Perfil
+				    WHERE PerfiId = $iPerfil ";
+		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		
 	} catch(PDOException $e) {

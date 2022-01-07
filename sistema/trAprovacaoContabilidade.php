@@ -22,11 +22,9 @@ try{
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
-		$sql = "
-			UPDATE TermoReferencia 
-			SET TrRefStatus = :iStatus
-			WHERE TrRefId = :iTrId
-		";
+		$sql = "UPDATE TermoReferencia 
+				SET TrRefStatus = :iStatus
+				WHERE TrRefId = :iTrId ";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -35,38 +33,33 @@ try{
 		));
 		/* Fim Atualiza */
 
-		$sql = "
-			SELECT PerfiId
-			FROM Perfil
-			WHERE PerfiChave = 'CONTABILIDADE'
-		";
+		$sql = "SELECT PerfiId
+				FROM Perfil
+				WHERE PerfiChave = 'CONTABILIDADE' and PerfiUnidade = " . $_SESSION['UnidadeId'];
 		$result = $conn->query($sql);
 		$rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 		// var_dump($rowPerfil);
 
-		$sql = "
-			SELECT TrRefNumero, TrRefTipo, TrRefData
-			FROM TermoReferencia
-			WHERE TrRefId = ".$iTrId;
+		$sql = "SELECT TrRefNumero, TrRefTipo, TrRefData
+				FROM TermoReferencia
+				WHERE TrRefId = " . $iTrId;
 		$result = $conn->query($sql);
 		$rowTermoReferencia = $result->fetch(PDO::FETCH_ASSOC);
 
 		/* Verifica se a Bandeja já tem um registro com BandeTabela: TR, Perfil: CONTABILIDADE e e BandeTabelaId: IdTRAtual, evitando duplicação */
-		$sql = "
-			SELECT COUNT(BandeId) as Count
-			FROM Bandeja
-			WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CONTABILIDADE'
-			AND BandeTabelaId =  ".$iTrId;
+		$sql = "SELECT COUNT(BandeId) as Count
+				FROM Bandeja
+				WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CONTABILIDADE'
+				AND BandeTabelaId =  " . $iTrId;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 		$count = $rowBandeja['Count'];
 
-		$sql = "
-			SELECT BandeId, SituaChave
-			FROM Bandeja
-			JOIN Situacao on SituaId = BandeStatus
-			WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CONTABILIDADE'
-			AND BandeTabelaId =  ".$iTrId;
+		$sql = "SELECT BandeId, SituaChave
+				FROM Bandeja
+				JOIN Situacao on SituaId = BandeStatus
+				WHERE BandeTabela = 'TermoReferencia' AND BandePerfil = 'CONTABILIDADE'
+				AND BandeTabelaId =  " . $iTrId;
 		$result = $conn->query($sql);
 		$rowBandeja = $result->fetch(PDO::FETCH_ASSOC);
 

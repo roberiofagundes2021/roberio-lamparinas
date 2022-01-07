@@ -13,22 +13,22 @@ $perfil = $_SESSION['PerfiChave'];
 $userId = $_SESSION['UsuarId'];
 $url = basename($_SERVER['PHP_SELF']);
 
-$sqlPerfil = "SELECT PerfiId FROM Perfil
-WHERE PerfiChave = '$perfil'";
+$sqlPerfil = "SELECT PerfiId 
+			  FROM Perfil
+			  WHERE PerfiChave = ". $perfil . " and PerfiUnidade = " . $_SESSION['UnidadeId'];
 $resultPerfilId = $conn->query($sqlPerfil);
 $perfilId = $resultPerfilId->fetchAll(PDO::FETCH_ASSOC);
 $perfilId = $perfilId[0]['PerfiId'];
 
 $sqlUsuarioEquipe = "SELECT TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente, TRXEqUnidade
-										FROM TRXEquipe
-										WHERE TRXEqUsuario = $userId and TRXEqUnidade = $unidade";
+					 FROM TRXEquipe
+					 WHERE TRXEqUsuario = $userId and TRXEqUnidade = $unidade";
 $resultUsuarioEquipe = $conn->query($sqlUsuarioEquipe);
 $UsuarioEquipe = $resultUsuarioEquipe->fetchAll(PDO::FETCH_ASSOC);
 
 $sqlUser = "SELECT UsuarPermissaoPerfil
-FROM Usuario
-Where UsuarId = '$userId'";
-
+			FROM Usuario
+			Where UsuarId = " . $userId;
 $resultUserId = $conn->query($sqlUser);
 $usuaXPerm = $resultUserId->fetch(PDO::FETCH_ASSOC);
 

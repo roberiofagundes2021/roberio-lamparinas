@@ -148,9 +148,8 @@ if (isset($_POST['inputDataInicio'])) {
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 			$sql = "SELECT PerfiId
-				FROM Perfil
-				WHERE PerfiChave = 'CONTROLADORIA' 
-				";
+					FROM Perfil
+					WHERE PerfiChave = 'CONTROLADORIA' and PerfiUnidade = " . $_SESSION['UnidadeId'];
 			$result = $conn->query($sql);
 			$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -219,9 +218,8 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "SELECT PerfiId
-				        FROM Perfil
-				        WHERE PerfiChave = 'CONTROLADORIA' 
-				        ";
+				FROM Perfil
+				WHERE PerfiChave = 'CONTROLADORIA' and PerfiUnidade = " . $_SESSION['UnidadeId'];
 		$result = $conn->query($sql);
 		$rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -251,7 +249,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		$insertIdBande = $conn->lastInsertId();
 
 		$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeUnidade)
-			VALUES (:iBandeja, :iPerfil, :iUnidade)";
+				VALUES (:iBandeja, :iPerfil, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -324,9 +322,8 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		}
 		//// Mudando status do fluxo, após gravar produtos e serviços
 		$sql = "SELECT SituaId
-		            FROM Situacao
-		            WHERE SituaChave = 'AGUARDANDOLIBERACAO'
-		";
+				FROM Situacao
+				WHERE SituaChave = 'AGUARDANDOLIBERACAO' ";
 		$result = $conn->query($sql);
 		$rowStatus = $result->fetch(PDO::FETCH_ASSOC);
 		$bStatus = $rowStatus['SituaId'];

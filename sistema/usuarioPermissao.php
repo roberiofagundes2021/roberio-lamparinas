@@ -11,13 +11,13 @@ if(!isset($_POST['inputUsuarioId']) || !isset($_POST['inputUsuarioPerfil'])){
 $user = $_POST['inputUsuarioId'];
 $perfilId = $_POST['inputUsuarioPerfil'];
 
-$sqlUserPerfil = "SELECT PerfiId FROM perfil WHERE PerfiChave = '$perfilId'";
+$sqlUserPerfil = "SELECT PerfiId FROM Perfil WHERE PerfiChave = '$perfilId' and PerfiUnidade = " . $_SESSION['UnidadeId'];
 $resultUserPerfil = $conn->query($sqlUserPerfil);
 $perfilId = $resultUserPerfil->fetch(PDO::FETCH_ASSOC);
 
 $userPxP = "SELECT UsuarPermissaoPerfil
-		FROM Usuario
-		Where UsuarId = '$user'";
+			FROM Usuario
+			WHERE UsuarId = '$user'";
 $resultUserUxP = $conn->query($userPxP);
 $UxPxP = $resultUserUxP->fetch(PDO::FETCH_ASSOC);
 
