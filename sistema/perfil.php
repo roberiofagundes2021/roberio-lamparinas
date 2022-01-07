@@ -42,13 +42,14 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
 			$sql = "UPDATE Perfil SET PerfiNome = :sNome, PerfiUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE PerfiId = :iPerfil";
+					WHERE PerfiId = :iPerfil and PerfiUnidade = :iUnidade";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iPerfil' => $_POST['inputPerfilId']
+							':iPerfil' => $_POST['inputPerfilId'],
+							':iUnidade' => $_SESSION['UnidadeId']
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Perfil alterado!!!";

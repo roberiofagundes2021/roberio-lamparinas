@@ -13,9 +13,10 @@ include('global_assets/php/conexao.php');
 //Essa consulta é para preencher a grid
 $sql = ("SELECT PerfiId, PerfiNome, PerfiChave, PerfiStatus, SituaNome, SituaChave, SituaCor
 		 FROM Perfil
-		 JOIN Situacao on SituaId = PerfiStatus");
+		 JOIN Situacao on SituaId = PerfiStatus
+		 WHERE PerfiUnidade is null and PerfiPadrao = 1");
 
-$sql .= $_SESSION['PerfiChave'] != "SUPER"? " WHERE PerfiChave != 'SUPER' ORDER BY PerfiNome ASC":" ORDER BY PerfiNome ASC";
+$sql .= $_SESSION['PerfiChave'] != "SUPER"? " and PerfiChave != 'SUPER' ORDER BY PerfiNome ASC":" ORDER BY PerfiNome ASC";
 $result = $conn->query("$sql");
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -41,7 +42,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
 			$sql = "UPDATE Perfil SET PerfiNome = :sNome, PerfiUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE PerfiId = :iPerfil";
+					WHERE PerfiId = :iPerfil and PerfiUnidade is null and PerfiPadrao = 1";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -54,8 +55,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 
-			$sql = "INSERT INTO Perfil (PerfiNome, PerfiChave, PerfiStatus, PerfiUsuarioAtualizador)
-					VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador)";
+			$sql = "INSERT INTO Perfil (PerfiNome, PerfiChave, PerfiStatus, PerfiUsuarioAtualizador, PerfiPadrao, PerfiUnidade)
+					VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :PerfiPadrao, :PerfiUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -63,6 +64,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':sChave' => formatarChave($_POST['inputNome']),
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':PerfiPadrao' => 1,
+							':PerfiUnidade' => null
 							));
 
 			$iPerfil = $conn->lastInsertId();
@@ -79,25 +82,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			];
 
 			// adicionando em PadraoPermissao
-			$sql = "INSERT INTO PerfilXPermissao
-			(PrXPePerfil, PrXPeUnidade, PrXPeMenu,PrXPeVisualizar,PrXPeAtualizar,PrXPeExcluir,
-			PrXPeInserir, PrXPeSuperAdmin) VALUES";
+			$sql = "INSERT INTO PadraoPermissao
+			(PaPerPerfil, PaPerMenu,PaPerVisualizar,PaPerAtualizar,PaPerExcluir,
+			PaPerInserir, PaPerSuperAdmin) VALUES";
 
 			foreach($sqlMenu as $menu){
 				$superAdmin = in_array($menu['MenuNome'], $arraySuperAdimin)?1:0;
-				$sql .= " ($iPerfil,".$_SESSION['UnidadeId'].",$menu[MenuId], 1, 1, 1, 1, $superAdmin),";
-			}
-			$sql = substr_replace($sql ,"", -1);
-			$conn->query($sql);
-
-			// adicionando em PadraoPerfilXPermissao
-			$sql = "INSERT INTO PadraoPerfilXPermissao
-			(PaPrXPePerfil,PaPrXPeUnidade,PaPrXPeMenu,PaPrXPeInserir,PaPrXPeVisualizar,PaPrXPeAtualizar,
-			PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES";
-
-			foreach($sqlMenu as $menu){
-				$superAdmin = in_array($menu['MenuNome'], $arraySuperAdimin)?1:0;
-				$sql .= " ($iPerfil,".$_SESSION['UnidadeId'].",$menu[MenuId], 1, 1, 1, 1, $superAdmin),";
+				$sql .= " ($iPerfil,$menu[MenuId], 1, 1, 1, 1, $superAdmin),";
 			}
 			$sql = substr_replace($sql ,"", -1);
 			$conn->query($sql);
@@ -118,7 +109,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		echo 'Error: ' . $e->getMessage();
 	}
 
-	irpara("perfil.php");
+	irpara("padraoPerfil.php");
 }
 
 ?>

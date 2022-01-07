@@ -34,39 +34,45 @@ if(isset($_POST['inputNome'])){
 
     $insertId = $conn->lastInsertId();
 
-    // busca os padrões de permissões
+    // criar novos perfis para a nova unidade
 
-    $sqlPadrao = "SELECT PaPerPerfil, PaPerMenu, PaPerInserir, PaPerVisualizar, PaPerAtualizar,
-    PaPerExcluir, PaPerSuperAdmin FROM PadraoPermissao WHERE ";
-    // adicionar where para perfis ativos*********************************
-    // OBS.: Não possui o campo status, verificar se realmente precisa adicionar essa condicional
+    $sqlPerfisPadrao = "SELECT PaPerPerfil, PaPerMenu, PaPerInserir, PaPerVisualizar, PaPerAtualizar,
+    PaPerExcluir, PaPerSuperAdmin, PerfiNome,PerfiChave,PerfiStatus,PerfiUsuarioAtualizador,PerfiUnidade,
+    PerfiPadrao 
+    FROM PadraoPermissao
+    JOIN Perfil ON PerfiId = PaPerPerfil and PerfiPadrao = 1
+    JOIN Situacao ON SituaId = PerfiStatus and SituaChave = 'ATIVO'";
 
-    $sqlPadrao = $conn->query($sqlPadrao);
-    $sqlPadrao = $sqlPadrao->fetchAll(PDO::FETCH_ASSOC);
+    $sqlPerfisPadrao = $conn->query($sqlPerfisPadrao);
+    $sqlPerfisPadrao = $sqlPerfisPadrao->fetchAll(PDO::FETCH_ASSOC);
+
+    $usuaId = $_SESSION['UsuarId'];
 
     // inserir em PerfilXPermissao -------------------------------------------------------------------
-
-    $sql = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
+    $sqlPerfilXPermissao = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
     PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin) VALUES";
 
-    // Laço de repetição, para cada perfil será adicionado todos os menus com permissões padrões
-    foreach($sqlPadrao as $padrao){
-      $sql .= " ($padrao[PaPerPerfil], $padrao[PaPerMenu], $insertId, $padrao[PaPerInserir],
-      $padrao[PaPerVisualizar], $padrao[PaPerAtualizar], $padrao[PaPerExcluir], $padrao[PaPerSuperAdmin]),";
-    }
-    $sql = substr_replace($sql ,"", -1);
-    $conn->query($sql);
-
     // inserir em PadraoPerfilXPermissao -------------------------------------------------------------
-    $sql = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
+    $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
     PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES";
 
-    foreach($sqlPadrao as $padrao){
-      $sql .= " ($padrao[PaPerPerfil], $padrao[PaPerMenu], $insertId, $padrao[PaPerInserir],
-      $padrao[PaPerVisualizar], $padrao[PaPerAtualizar], $padrao[PaPerExcluir], $padrao[PaPerSuperAdmin]),";
+    foreach($sqlPerfisPadrao as $perfPadrao){
+      $sql = "INSERT INTO Perfil(PerfiNome,PerfiChave,PerfiStatus,PerfiUsuarioAtualizador,PerfiUnidade,PerfiPadrao)
+      VALUES ($perfPadrao[PerfiNome],$perfPadrao[PerfiChave],$perfPadrao[PerfiStatus],$usuaId,$insertId,0)";
+      $conn->query($sql);
+
+      $lastId = $conn->lastInsertId();
+
+      $sqlPerfilXPermissao .= " ($lastId, $perfPadrao[PaPerMenu], $insertId, $perfPadrao[PaPerInserir],
+      $perfPadrao[PaPerVisualizar], $perfPadrao[PaPerAtualizar], $perfPadrao[PaPerExcluir], $perfPadrao[PaPerSuperAdmin]),";
+
+      $sqlPadraoPerfilXPermissao .= " ($lastId, $perfPadrao[PaPerMenu], $insertId, $perfPadrao[PaPerInserir],
+      $perfPadrao[PaPerVisualizar], $perfPadrao[PaPerAtualizar], $perfPadrao[PaPerExcluir], $perfPadrao[PaPerSuperAdmin]),";
     }
-    $sql = substr_replace($sql ,"", -1);
-    $conn->query($sql);
+    $sqlPerfilXPermissao = substr_replace($sqlPerfilXPermissao, "", -1);
+    $sqlPadraoPerfilXPermissao = substr_replace($sqlPadraoPerfilXPermissao, "", -1);
+    $conn->query($sqlPerfilXPermissao);
+    $conn->query($sqlPadraoPerfilXPermissao);
 
     // FIM---------------------------------------------------------------------------------------------
     

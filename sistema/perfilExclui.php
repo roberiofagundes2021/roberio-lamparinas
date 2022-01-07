@@ -7,14 +7,21 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputPerfilId'])){
 	
 	$iPerfil = $_POST['inputPerfilId'];
+	$iUnidade = $_SESSION['UnidadeId'];
         	
 	try{
 		
+		$sql = "DELETE FROM PerfilXPermissao
+				WHERE PrXPePerfil = $iPerfil and PrXPeUnidade = $iUnidade";
+		$conn->query($sql);
+
+		$sql = "DELETE FROM PadraoPerfilXPermissao
+				WHERE PaPrXPePerfil = $iPerfil and PaPrXPeUnidade = $iUnidade";
+		$conn->query($sql);
+
 		$sql = "DELETE FROM Perfil
-				WHERE PerfiId = :id";
-		$result = $conn->prepare($sql);
-		$result->bindParam(':id', $iPerfil); 
-		$result->execute();
+				WHERE PerfiId = $iPerfil and PerfiUnidade = $iUnidade";
+		$conn->query($sql);
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Perfil excluído!!!";
@@ -29,7 +36,6 @@ if(isset($_POST['inputPerfilId'])){
 		echo 'Error: ' . $e->getMessage();
 	}
 }
-
 irpara("perfil.php");
 
 ?>

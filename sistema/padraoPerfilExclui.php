@@ -14,6 +14,10 @@ if(isset($_POST['inputPerfilId'])){
 
 		$sql = "DELETE FROM PadraoPermissao WHERE PaPerPerfil = $iPerfil";
 		$conn->query($sql);
+
+		$sql = "DELETE FROM Perfil
+				WHERE PerfiId = $iPerfil and PerfiUnidade is null and PerfiPadrao = 1";
+		$conn->query($sql);
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Padrão de perfil deletado!!!";
