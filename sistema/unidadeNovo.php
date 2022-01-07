@@ -19,62 +19,56 @@ if(isset($_POST['inputNome'])){
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':sNome' => $_POST['inputNome'],
-						':sCep' => $_POST['inputCep'],
-						':sEndereco' => $_POST['inputEndereco'],
-						':sNumero' => $_POST['inputNumero'],
-						':sComplemento' => $_POST['inputComplemento'],
-						':sBairro' => $_POST['inputBairro'],
-						':sCidade' => $_POST['inputCidade'],
-						':sEstado' => $_POST['cmbEstado'] == "" ? null : $_POST['cmbEstado'],
-						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpresaId'],
-						));
+      ':sNome' => $_POST['inputNome'],
+      ':sCep' => $_POST['inputCep'],
+      ':sEndereco' => $_POST['inputEndereco'],
+      ':sNumero' => $_POST['inputNumero'],
+      ':sComplemento' => $_POST['inputComplemento'],
+      ':sBairro' => $_POST['inputBairro'],
+      ':sCidade' => $_POST['inputCidade'],
+      ':sEstado' => $_POST['cmbEstado'] == "" ? null : $_POST['cmbEstado'],
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iEmpresa' => $_SESSION['EmpresaId'],
+    ));
 
-    // adicionar permissões à nova unidade
+    $insertId = $conn->lastInsertId();
 
-    // seleciona a nova unidade
-    $sqlUnidade = "SELECT UnidaId FROM Unidade
-    WHERE UnidaNome = ".$_POST['inputNome']." and UnidaEmpresa = ".$_SESSION['EmpresaId'];
-    $sqlUnidade = $conn->query($sqlUnidade);
-    $sqlUnidade = $sqlUnidade->fetch(PDO::FETCH_ASSOC);
+    // busca os padrões de permissões
 
-    // seleciona todos os menus cadastrados
-    $sqlMenu = "SELECT MenuId, MenuNome FROM Menu";
-    $sqlMenu = $conn->query($sqlMenu);
-    $sqlMenu = $sqlMenu->fetchAll(PDO::FETCH_ASSOC);
+    $sqlPadrao = "SELECT PaPerPerfil, PaPerMenu, PaPerInserir, PaPerVisualizar, PaPerAtualizar,
+    PaPerExcluir, PaPerSuperAdmin FROM PadraoPermissao WHERE ";
+    // adicionar where para perfis ativos*********************************
+    // OBS.: Não possui o campo status, verificar se realmente precisa adicionar essa condicional
 
-    // seleciona todos os perfis cadastrados
-    $sqlPerfil = "SELECT PerfiId, PerfiChave FROM Perfil";
-    $sqlPerfil = $conn->query($sqlPerfil);
-    $sqlPerfil = $sqlPerfil->fetchAll(PDO::FETCH_ASSOC);
+    $sqlPadrao = $conn->query($sqlPadrao);
+    $sqlPadrao = $sqlPadrao->fetchAll(PDO::FETCH_ASSOC);
+
+    // inserir em PerfilXPermissao -------------------------------------------------------------------
+
+    $sql = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
+    PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin) VALUES";
 
     // Laço de repetição, para cada perfil será adicionado todos os menus com permissões padrões
-    foreach($sqlPerfil as $perfil){
-      // esse array representa os menus que so podem ser vistos por super admin
-      $arraySuperAdimin = [
-        'Bancos',
-        'Tipo Fiscal',
-        'Setor'
-      ];
-      $sql = "INSERT INTO PerfilXPermissao(PrXPePerfil,PrXPeMenu,PrXPeInserir,PrXPeVisualizar,PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin,PrXPeUnidade) VALUES";
-      $count = COUNT($sqlMenu);
-      $x = 0;
-      foreach($sqlMenu as $menu){
-        // se o menu atual pertencer ao arraySuperAdimin  então ele so pode ser acessodo por um SuperAdmin 
-        $superAdmin = in_array($menu['MenuNome'], $arraySuperAdimin)?1:0;
-        if ($x != $count - 1){
-                $x += 1;
-                $sql .= " ($perfil[PerfiId], $menu[MenuId], 1, 1, 1, 1, $superAdmin, $sqlUnidade[UnidaId]),";
-        } else {
-                $sql .= " ($perfil[PerfiId], $menu[MenuId], 1, 1, 1, 1, $superAdmin, $sqlUnidade[UnidaId])";
-        }
-      }
-      $conn->query($sql);
-}
+    foreach($sqlPadrao as $padrao){
+      $sql .= " ($padrao[PaPerPerfil], $padrao[PaPerMenu], $insertId, $padrao[PaPerInserir],
+      $padrao[PaPerVisualizar], $padrao[PaPerAtualizar], $padrao[PaPerExcluir], $padrao[PaPerSuperAdmin]),";
+    }
+    $sql = substr_replace($sql ,"", -1);
+    $conn->query($sql);
 
-		$insertId = $conn->lastInsertId();
+    // inserir em PadraoPerfilXPermissao -------------------------------------------------------------
+    $sql = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
+    PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES";
+
+    foreach($sqlPadrao as $padrao){
+      $sql .= " ($padrao[PaPerPerfil], $padrao[PaPerMenu], $insertId, $padrao[PaPerInserir],
+      $padrao[PaPerVisualizar], $padrao[PaPerAtualizar], $padrao[PaPerExcluir], $padrao[PaPerSuperAdmin]),";
+    }
+    $sql = substr_replace($sql ,"", -1);
+    $conn->query($sql);
+
+    // FIM---------------------------------------------------------------------------------------------
     
     /* Após criar a Unidade deve se cadastrar o Local de Estoque Padrão para essa Unidade nova criada */
     $sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstChave, LcEstStatus, LcEstUsuarioAtualizador, LcEstUnidade)
@@ -82,12 +76,12 @@ if(isset($_POST['inputNome'])){
     $result = $conn->prepare($sql);
         
     $result->execute(array(
-            ':sNome' => 'GESTAO ANTERIOR',
-            ':sChave' => 'GESTAOANTERIOR',
-            ':bStatus' => 1,
-            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-            ':iUnidade' => $insertId
-            ));
+      ':sNome' => 'GESTAO ANTERIOR',
+      ':sChave' => 'GESTAOANTERIOR',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $insertId
+    ));
 
   
 		/* Após criar a Unidade deve se cadastrar as Formas de Pagamento Padrão para essa Unidade nova criada */
@@ -96,40 +90,40 @@ if(isset($_POST['inputNome'])){
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-							':sNome' => 'Boleto Bancário',
-							':sChave' => 'BOLETO',
-							':bStatus' => 1,
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $insertId
-						));
+      ':sNome' => 'Boleto Bancário',
+      ':sChave' => 'BOLETO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $insertId
+    ));
 		$result->execute(array(
-							':sNome' => 'Cartão de Crédito',
-							':sChave' => 'CARTAOCREDITO',
-							':bStatus' => 1,
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $insertId
-						));				
+      ':sNome' => 'Cartão de Crédito',
+      ':sChave' => 'CARTAOCREDITO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $insertId
+    ));				
 		$result->execute(array(
-							':sNome' => 'Cartão de Débito',
-							':sChave' => 'CARTAODEBITO',
-							':bStatus' => 1,
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $insertId
-						));
+      ':sNome' => 'Cartão de Débito',
+      ':sChave' => 'CARTAODEBITO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $insertId
+    ));
 		$result->execute(array(
-							':sNome' => 'Cheque',
-							':sChave' => 'CHEQUE',
-							':bStatus' => 1,
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $insertId
-						));	
+      ':sNome' => 'Cheque',
+      ':sChave' => 'CHEQUE',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $insertId
+    ));	
 		$result->execute(array(
-							':sNome' => 'Dinheiro',
-							':sChave' => 'DINHEIRO',
-							':bStatus' => 1,
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $insertId
-						));							
+      ':sNome' => 'Dinheiro',
+      ':sChave' => 'DINHEIRO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $insertId
+    ));							
 					
 		$conn->commit();			
 

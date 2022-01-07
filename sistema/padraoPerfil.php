@@ -37,7 +37,6 @@ if(isset($_POST['inputPerfilId']) && $_POST['inputPerfilId']){
 if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5) == 'GRAVA'){
 
 	try{
-
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
@@ -60,18 +59,16 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
-				':sNome' => $_POST['inputNome'],
-				':sChave' => formatarChave($_POST['inputNome']),
-				':bStatus' => 1,
-				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			));
+							':sNome' => $_POST['inputNome'],
+							':sChave' => formatarChave($_POST['inputNome']),
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							));
 
 			$iPerfil = $conn->lastInsertId();
 
-			$sqlMenu = "SELECT MenuId, MenuNome, SituaChave
-			FROM Menu
-			LEFT JOIN Situacao ON MenuStatus = SituaId
-			WHERE SituaChave = 'ATIVO'";
+			$sqlMenu = "SELECT MenuId, MenuNome
+			FROM Menu";
 			$sqlMenu = $conn->query($sqlMenu);
 			$sqlMenu = $sqlMenu->fetchAll(PDO::FETCH_ASSOC);
 
@@ -105,8 +102,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			$sql = substr_replace($sql ,"", -1);
 			$conn->query($sql);
 	
-	
-			$_SESSION['msg']['mensagem'] = "Perfil incluído!!!";
+			$_SESSION['msg']['mensagem'] = "Padrão de perfil incluído!!!";
 					
 		}
 	
@@ -259,19 +255,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				document.getElementById('inputPerfilNome').value = PerfilNome;
 				document.getElementById('inputPerfilStatus').value = PerfilStatus;
 						
-				if (Tipo == 'edita'){
+				if (Tipo == 'edita'){	
 					document.getElementById('inputEstadoAtual').value = "EDITA";
-					document.formPerfil.action = "perfil.php";				
+					document.formPerfil.action = "padraoPerfil.php";				
 				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formPerfil, "Tem certeza que deseja excluir esse perfil?", "perfilExclui.php");
-				} else if (Tipo == 'mudaStatus'){
-					document.formPerfil.action = "perfilMudaSituacao.php";
-				}
-				else if (Tipo == 'permicao'){
-					document.formPerfil.action = "perfilPermissao.php";
-				}
-				else if (Tipo == 'padraoPermicao'){
-					document.formPerfil.action = "padraoPerfilPermissao.php";
+					confirmaExclusao(document.formPerfil, "Tem certeza que deseja excluir esse perfil?", "padraoPerfilExclui.php");
+				}else if (Tipo == 'permicao'){
+					document.formPerfil.action = "padraoPermissao.php";
 				}
 
 				document.formPerfil.submit();
@@ -307,7 +297,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h5 class="card-title">Relação de Perfis</h5>
+								<h5 class="card-title">Relação de Perfis Padrões</h5>
 							</div>
 
 							<div class="card-body">
@@ -373,7 +363,6 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 														<a href="#" onclick="atualizaPerfil('.$atualizar.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
 														<a href="#" onclick="atualizaPerfil('.$excluir.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
 														<a href="#" onclick="atualizaPerfil(1,'.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'permicao\');" class="list-icons-item"><i class="icon-lock2"></i></a>
-														<a href="#" onclick="atualizaPerfil(1,'.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'padraoPermicao\');" class="list-icons-item"><i class="icon-gear"></i></a>
 													</div>
 												</div>
 											</td>
