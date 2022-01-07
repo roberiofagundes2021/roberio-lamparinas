@@ -13,7 +13,7 @@ if (isset($_SESSION['EmpresaId'])){
 if(isset($_GET['cpf'])){
 
 	$sql = "SELECT UsuarId, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, 
-				   EXUXPEmpresa, EXUXPPerfil
+				   EXUXPEmpresa
 			FROM Usuario
 			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 			JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId

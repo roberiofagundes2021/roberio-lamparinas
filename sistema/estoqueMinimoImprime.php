@@ -29,7 +29,7 @@ for($x=0;  $x < COUNT($rows); $x++){
 	if($rows[$x]['ProduEstoqueMinimo'] == null) {
 		// buscando o ultimo Fluxo cadastrado do produto especifico com situação "LIBERADO"
 		$sql = "SELECT FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario,
-		FOXPrUsuarioAtualizador, FOXPrEmpresa, FOXPrUnidade
+		FOXPrUsuarioAtualizador, FOXPrUnidade
 		FROM FluxoOperacionalXProduto
 		JOIN FluxoOperacional on FlOpeId = FOXPrFluxoOperacional
 		JOIN Situacao on SituaId = FlOpeStatus

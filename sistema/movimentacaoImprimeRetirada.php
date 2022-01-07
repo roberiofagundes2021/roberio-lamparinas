@@ -63,12 +63,12 @@ if (isset($_POST['inputMovimentacaoId'])) {
     } else if ($row['MovimTipo'] == 'T'){
         
         $sql = "SELECT CASE
-                         WHEN MovimOrigemLocal IS NULL THEN MovimOrigemSetor
-                         ELSE MovimOrigemLocal
+                         WHEN MovimOrigemLocal IS NULL THEN StO.SetorNome
+                         ELSE LcO.LcEstNome
                        END AS Origem, 
                        CASE
-                         WHEN MovimDestinoLocal IS NULL THEN isnull(MovimDestinoSetor, MovimDestinoManual)
-                         ELSE MovimDestinoLocal
+                         WHEN MovimDestinoLocal IS NULL THEN isnull(StD.SetorNome, MovimDestinoManual)
+                         ELSE LcD.LcEstNome
                        END AS Destino, 
                        MotivChave
                 FROM Movimentacao
