@@ -60,19 +60,12 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
-<<<<<<< HEAD
 							':sNome' => $_POST['inputNome'],
 							':sChave' => formatarChave($_POST['inputNome']),
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId']
 							));
-=======
-				':sNome' => $_POST['inputNome'],
-				':sChave' => formatarChave($_POST['inputNome']),
-				':bStatus' => 1,
-				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			));
 
 			$iPerfil = $conn->lastInsertId();
 
@@ -112,8 +105,6 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			}
 			$sql = substr_replace($sql ,"", -1);
 			$conn->query($sql);
-	
->>>>>>> 5d1fd6fb3cbbd5faaa6e18d5f6184a59e4bb2eb2
 	
 			$_SESSION['msg']['mensagem'] = "Perfil incluído!!!";
 					

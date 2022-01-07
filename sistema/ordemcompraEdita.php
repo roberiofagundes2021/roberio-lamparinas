@@ -760,8 +760,7 @@ if (isset($_POST['inputTipo'])) {
 														$sql = "SELECT LcEstId, LcEstNome
 														        FROM LocalEstoque
 														        JOIN Situacao on SituaId = LcEstStatus 												     
-														        WHERE LcEstEmpresa = " . $_SESSION['EmpreId'] . " and 
-														        LcEstUnidade = " . $row['OrComUnidade'] . " and SituaChave = 'ATIVO'
+														        WHERE LcEstUnidade = " . $row['OrComUnidade'] . " and SituaChave = 'ATIVO'
 														        ORDER BY LcEstNome ASC";
 														$result = $conn->query($sql);
 														$rowLocal = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -75,31 +75,6 @@ if (isset($_POST['inputDataInicio'])) {
 			}
 		}
 		
-		/*
-		$sql = "SELECT *
-				FROM Produto
-				JOIN Categoria on CategId = ProduCategoria
-				JOIN SubCategoria on SbCatId = ProduSubCategoria
-				Where ProduEmpresa = ".$_SESSION['EmpreId']." and CategId = ".$_POST['cmbCategoria']." and SbCatId = ".$_POST['cmbSubCategoria'];
-		$result = $conn->query($sql);
-		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-		
-		foreach ($rowProdutos as $item){
-		
-			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrQuantidade, FOXPrValorUnitario, FOXPrUsuarioAtualizador, FOXPrEmpresa)
-					VALUES (:iFluxoOperacional, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iEmpresa)";
-			$result = $conn->prepare($sql);
-					
-			$result->execute(array(
-							':iFluxoOperacional' => $insertId,
-							':iProduto' => $item['ProduId'],
-							':iQuantidade' => NULL,
-							':fValorUnitario' => NULL,
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iEmpresa' => $_SESSION['EmpreId']
-							));		
-		} 
-		*/
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
