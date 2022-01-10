@@ -102,10 +102,10 @@ if (isset($_POST['inputDataInicio'])) {
 
 		$conn->beginTransaction();
 
-		$sql = "INSERT INTO Aditivo (AditiFluxoOperacional, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, 
-									 AditiValor, AditiStatusFluxo, AditiStatus, AditiUsuarioAtualizador, AditiUnidade)
-				VALUES (:iFluxo, :iNumero, :dDataCelebracao, :dDataInicio, :dDataFim, 
-						:fValor, :iStatusFluxo, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+		$sql = "INSERT INTO Aditivo (AditiFluxoOperacional, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim,AditiValor, 
+	                                 AditiConteudoInicio, AditiConteudoFim,  AditiStatusFluxo, AditiStatus, AditiUsuarioAtualizador, AditiUnidade)
+				VALUES (:iFluxo, :iNumero, :dDataCelebracao, :dDataInicio, :dDataFim, :fValor, 
+					    :sConteudoInicio, :sConteudoFim, :iStatusFluxo, :iStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -115,6 +115,8 @@ if (isset($_POST['inputDataInicio'])) {
 			':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':fValor' => $_POST['inputValor'] == '' ? null : gravaValor($_POST['inputValor']),
+			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+			':sConteudoFim' => $_POST['txtareaConteudoFim'],
 			':iStatusFluxo' => $rowFluxoStatus['FlOpeStatus'],
 			':iStatus' => $rowAditSitua['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -249,7 +251,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		$insertIdBande = $conn->lastInsertId();
 
 		$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeUnidade)
-				VALUES (:iBandeja, :iPerfil, :iUnidade)";
+			VALUES (:iBandeja, :iPerfil, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -402,6 +404,9 @@ try {
 	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>	
 	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
 
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_checkboxes_radios.js"></script>
+
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script> <!-- CV Documentacao: https://jqueryvalidation.org/ -->
@@ -410,7 +415,11 @@ try {
 	<script type="text/javascript">
 		$(document).ready(function() {
 
-			$('#cmbSubCategoria').on('change', function(e){				
+			//Inicializa o editor de texto que será usado pelos campos "Conteúdo Personalizado - Inicialização" e "Conteúdo Personalizado - Finalização"
+			$('#summernoteInicio').summernote();
+			$('#summernoteFim').summernote();
+
+		/*	$('#cmbSubCategoria').on('change', function(e){				
 				
 				var inputSubCategoria = $('#inputIdSubCategoria').val(); //alert(inputSubCategoria);
 				
@@ -426,7 +435,7 @@ try {
 					}	
 				});
 			});
-
+		*/
 			//Mostra o "Filtrando..." na combo Produto
 			function FiltraProduto(){
 				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
@@ -657,6 +666,28 @@ try {
 									</div>
 								</div>
 							</div>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudo">Conteúdo Personalizado - Introdução</label>
+										<!--<div id="summernote" name="txtareaConteudo"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do Aditivo (informe aqui o texto que você queira que apareça no Aditivo)"></textarea>
+									</div>
+								</div>
+							</div>
+							<br>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudoFinalizacao">Conteúdo Personalizado - Finalização</label>
+										<!--<div id="summernote" name="txtareaConteudo"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Aditivo (informe aqui o texto que você queira que apareça no término do Aditivo)"></textarea>
+									</div>
+								</div>
+							</div>
+							<br>
 														
 							<div class="row" style="margin-top: 10px; display: <?php isset($_POST['inputDataInicio']) ? print('none') : print('block')   ?>">
 								<div class="col-lg-12">
