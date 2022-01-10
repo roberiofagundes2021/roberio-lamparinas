@@ -84,11 +84,12 @@ if ($rowNumero['Aditivo'] > 0) {
 	}
 }
 
-if (isset($_POST['inputDataInicio'])) {
+//Para corrigir o problema do usuário dar um Refresh na página é feito a verificação se já existe a sessão do Aditivo, ou seja, se já entrou nesse IF uma vez
+if (isset($_POST['inputDataInicio']) && !isset($_SESSION['AditivoNovo'])) {
 
 	$sql = "SELECT SituaId
-		         FROM Situacao
-		         Where SituaChave = 'LIBERADO' ";
+			FROM Situacao
+			Where SituaChave = 'LIBERADO' ";
 	$result = $conn->query($sql);
 	$rowAditSitua = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -358,7 +359,7 @@ if (isset($_POST['inputIdProduto1']) || isset($_POST['inputIdServico1'])) {
 		unset($_SESSION['AditivoNovo']);
 
 		irpara("fluxoAditivo.php");
-		
+
 	} catch (PDOException $e) {
 
 		echo 'Error: ' . $e->getMessage();
