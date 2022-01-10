@@ -672,7 +672,7 @@ try {
 									<div class="form-group">
 										<label for="txtareaConteudo">Conteúdo Personalizado - Introdução</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
-										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do Aditivo (informe aqui o texto que você queira que apareça no Aditivo)"></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do Aditivo (informe aqui o texto que você queira que apareça no Aditivo)" value="<?php isset($_POST['inputDataInicio']) ? print($_POST['txtareaConteudoInicio']) : print('')  ?>" <?php isset($_POST['inputDataInicio']) ? print('disabled') : print('')  ?>></textarea>
 									</div>
 								</div>
 							</div>
@@ -683,7 +683,7 @@ try {
 									<div class="form-group">
 										<label for="txtareaConteudoFinalizacao">Conteúdo Personalizado - Finalização</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
-										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Aditivo (informe aqui o texto que você queira que apareça no término do Aditivo)"></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Aditivo (informe aqui o texto que você queira que apareça no término do Aditivo)" value="<?php isset($_POST['inputDataInicio']) ? print($_POST['txtareaConteudoFim']) : print('')  ?>" <?php isset($_POST['inputDataInicio']) ? print('disabled') : print('')  ?>></textarea>
 									</div>
 								</div>
 							</div>
