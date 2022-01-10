@@ -125,8 +125,6 @@ if (isset($_POST['inputDataInicio'])) {
 
 		$_SESSION['AditivoNovo'] = $conn->lastInsertId();
 
-		$conn->commit();
-
 		if ($_POST['inputValor'] == '') {
 
 			$sql = "SELECT SituaId
@@ -199,6 +197,9 @@ if (isset($_POST['inputDataInicio'])) {
 
 			irpara("fluxoAditivo.php");
 		}
+
+		$conn->commit();
+
 	} catch (PDOException $e) {
 
 		$conn->rollback();
@@ -208,14 +209,26 @@ if (isset($_POST['inputDataInicio'])) {
 	}
 }
 
-if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
+if (isset($_POST['inputIdProduto1']) || isset($_POST['inputIdServico1'])) {
 	
 	try {
+		
 		$conn->beginTransaction();
 
-		$sql = "SELECT SituaId, SituaNome, SituaChave
+		$sql = "UPDATE Aditivo SET AditiConteudoInicio = :sConteudoInicio, AditiConteudoFim = :sConteudoFim
+				WHERE AditiId = :iAditivo and AditiUnidade = :iUnidade";
+		$result = $conn->prepare($sql);
+
+		$result->execute(array(
+			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+			':sConteudoFim' => $_POST['txtareaConteudoFim'],
+			':iAditivo' => $_SESSION['AditivoNovo'],
+			':iUnidade' => $_SESSION['UnidadeId']
+		));
+
+		$sql = "SELECT SituaId
 		        FROM Situacao
-		        WHERE SituaStatus = 1 and SituaChave = 'AGUARDANDOLIBERACAO' ";
+		        WHERE SituaChave = 'AGUARDANDOLIBERACAO' ";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -259,9 +272,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 			':iPerfil' => $rowPerfil['PerfiId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
-
 		/* Fim Insere Bandeja */
-
 
 		//Se está incluindo Produtos
 		if (isset($_POST['inputIdProduto1'])) {
@@ -322,6 +333,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 				));
 			}
 		}
+		
 		//// Mudando status do fluxo, após gravar produtos e serviços
 		$sql = "SELECT SituaId
 				FROM Situacao
@@ -331,13 +343,14 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		$bStatus = $rowStatus['SituaId'];
 
 		$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
-	                 WHERE FlOpeId = :id";
+	            WHERE FlOpeId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $bStatus);
 		$result->bindParam(':id', $iFluxoOperacional);
 		$result->execute();
 
 		$conn->commit();
+		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Aditivo realizado com sucesso!!!";
 		$_SESSION['msg']['tipo'] = "success";
@@ -345,6 +358,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		unset($_SESSION['AditivoNovo']);
 
 		irpara("fluxoAditivo.php");
+		
 	} catch (PDOException $e) {
 
 		echo 'Error: ' . $e->getMessage();
@@ -413,11 +427,12 @@ try {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+		
 		$(document).ready(function() {
 
 			//Inicializa o editor de texto que será usado pelos campos "Conteúdo Personalizado - Inicialização" e "Conteúdo Personalizado - Finalização"
-			$('#summernoteInicio').summernote();
-			$('#summernoteFim').summernote();
+			$('#txtareaConteudoInicio').summernote();
+			$('#txtareaConteudoFim').summernote();
 
 		/*	$('#cmbSubCategoria').on('change', function(e){				
 				
@@ -670,9 +685,9 @@ try {
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaConteudo">Conteúdo Personalizado - Introdução</label>
+										<label for="txtareaConteudoInicio">Conteúdo Personalizado - Introdução</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
-										<textarea rows="5" cols="5" class="form-control" id="summernoteInicio" name="txtareaConteudoInicio" placeholder="Corpo do Aditivo (informe aqui o texto que você queira que apareça no Aditivo)" value="<?php isset($_POST['inputDataInicio']) ? print($_POST['txtareaConteudoInicio']) : print('')  ?>" <?php isset($_POST['inputDataInicio']) ? print('disabled') : print('')  ?>></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="txtareaConteudoInicio" name="txtareaConteudoInicio" placeholder="Corpo do Aditivo (informe aqui o texto que você queira que apareça no Aditivo)"><?php isset($_POST['inputDataInicio']) ? print($_POST['txtareaConteudoInicio']) : print('')  ?></textarea>
 									</div>
 								</div>
 							</div>
@@ -681,9 +696,9 @@ try {
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<label for="txtareaConteudoFinalizacao">Conteúdo Personalizado - Finalização</label>
+										<label for="txtareaConteudoFim">Conteúdo Personalizado - Finalização</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
-										<textarea rows="5" cols="5" class="form-control" id="summernoteFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Aditivo (informe aqui o texto que você queira que apareça no término do Aditivo)" value="<?php isset($_POST['inputDataInicio']) ? print($_POST['txtareaConteudoFim']) : print('')  ?>" <?php isset($_POST['inputDataInicio']) ? print('disabled') : print('')  ?>></textarea>
+										<textarea rows="5" cols="5" class="form-control" id="txtareaConteudoFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Aditivo (informe aqui o texto que você queira que apareça no término do Aditivo)"><?php isset($_POST['inputDataInicio']) ? print($_POST['txtareaConteudoFim']) : print('')  ?></textarea>
 									</div>
 								</div>
 							</div>
