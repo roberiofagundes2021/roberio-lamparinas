@@ -24,7 +24,7 @@ if(isset($_POST['inputAditivoId'])){
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);*/
 
-$sql = "SELECT AditiId, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, AditiValor, FlOpeId, FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, CategNome, SbCatNome,
+$sql = "SELECT AditiId, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, AditiValor, AditiConteudoInicio, AditiConteudoFim, FlOpeId, FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, CategNome, SbCatNome,
 		ForneNome, ForneCelular, ForneEmail
 		FROM Aditivo
 		JOIN FluxoOperacional on FlOpeId = AditiFluxoOperacional
@@ -152,6 +152,10 @@ try {
 	$result = $conn->query($sql);
 	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 	$totalServicos = count($rowServicos);
+
+	$html .= '
+	<div>' . $row['AditiConteudoInicio'] . '</div>
+	<br>';
 
 	$totalGeralProdutos = 0;
 	
@@ -305,6 +309,11 @@ try {
 			    </tr>
 			  </table>
 	";
+
+	$html .= '
+	<br><br>
+	<div>' . $row['AditiConteudoFim'] . '</div>
+	<br>';
 			
     $rodape = "<hr/>
     <div style='width:100%'>

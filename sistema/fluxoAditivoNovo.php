@@ -84,11 +84,12 @@ if ($rowNumero['Aditivo'] > 0) {
 	}
 }
 
-if (isset($_POST['inputDataInicio'])) {
+//Para corrigir o problema do usuário dar um Refresh na página é feito a verificação se já existe a sessão do Aditivo, ou seja, se já entrou nesse IF uma vez
+if (isset($_POST['inputDataInicio']) && !isset($_SESSION['AditivoNovo'])) {
 
 	$sql = "SELECT SituaId
-		         FROM Situacao
-		         Where SituaChave = 'LIBERADO' ";
+			FROM Situacao
+			Where SituaChave = 'LIBERADO' ";
 	$result = $conn->query($sql);
 	$rowAditSitua = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -102,10 +103,10 @@ if (isset($_POST['inputDataInicio'])) {
 
 		$conn->beginTransaction();
 
-		$sql = "INSERT INTO Aditivo (AditiFluxoOperacional, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, 
-									 AditiValor, AditiStatusFluxo, AditiStatus, AditiUsuarioAtualizador, AditiUnidade)
-				VALUES (:iFluxo, :iNumero, :dDataCelebracao, :dDataInicio, :dDataFim, 
-						:fValor, :iStatusFluxo, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+		$sql = "INSERT INTO Aditivo (AditiFluxoOperacional, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim,AditiValor, 
+	                                 AditiConteudoInicio, AditiConteudoFim,  AditiStatusFluxo, AditiStatus, AditiUsuarioAtualizador, AditiUnidade)
+				VALUES (:iFluxo, :iNumero, :dDataCelebracao, :dDataInicio, :dDataFim, :fValor, 
+					    :sConteudoInicio, :sConteudoFim, :iStatusFluxo, :iStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -115,6 +116,8 @@ if (isset($_POST['inputDataInicio'])) {
 			':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':fValor' => $_POST['inputValor'] == '' ? null : gravaValor($_POST['inputValor']),
+			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+			':sConteudoFim' => $_POST['txtareaConteudoFim'],
 			':iStatusFluxo' => $rowFluxoStatus['FlOpeStatus'],
 			':iStatus' => $rowAditSitua['SituaId'],
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -122,8 +125,6 @@ if (isset($_POST['inputDataInicio'])) {
 		));
 
 		$_SESSION['AditivoNovo'] = $conn->lastInsertId();
-
-		$conn->commit();
 
 		if ($_POST['inputValor'] == '') {
 
@@ -197,6 +198,9 @@ if (isset($_POST['inputDataInicio'])) {
 
 			irpara("fluxoAditivo.php");
 		}
+
+		$conn->commit();
+
 	} catch (PDOException $e) {
 
 		$conn->rollback();
@@ -206,14 +210,26 @@ if (isset($_POST['inputDataInicio'])) {
 	}
 }
 
-if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
+if (isset($_POST['inputIdProduto1']) || isset($_POST['inputIdServico1'])) {
 	
 	try {
+		
 		$conn->beginTransaction();
 
-		$sql = "SELECT SituaId, SituaNome, SituaChave
+		$sql = "UPDATE Aditivo SET AditiConteudoInicio = :sConteudoInicio, AditiConteudoFim = :sConteudoFim
+				WHERE AditiId = :iAditivo and AditiUnidade = :iUnidade";
+		$result = $conn->prepare($sql);
+
+		$result->execute(array(
+			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
+			':sConteudoFim' => $_POST['txtareaConteudoFim'],
+			':iAditivo' => $_SESSION['AditivoNovo'],
+			':iUnidade' => $_SESSION['UnidadeId']
+		));
+
+		$sql = "SELECT SituaId
 		        FROM Situacao
-		        WHERE SituaStatus = 1 and SituaChave = 'AGUARDANDOLIBERACAO' ";
+		        WHERE SituaChave = 'AGUARDANDOLIBERACAO' ";
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -249,7 +265,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		$insertIdBande = $conn->lastInsertId();
 
 		$sql = "INSERT INTO BandejaXPerfil (BnXPeBandeja, BnXPePerfil, BnXPeUnidade)
-				VALUES (:iBandeja, :iPerfil, :iUnidade)";
+			VALUES (:iBandeja, :iPerfil, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -257,9 +273,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 			':iPerfil' => $rowPerfil['PerfiId'],
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
-
 		/* Fim Insere Bandeja */
-
 
 		//Se está incluindo Produtos
 		if (isset($_POST['inputIdProduto1'])) {
@@ -320,6 +334,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 				));
 			}
 		}
+		
 		//// Mudando status do fluxo, após gravar produtos e serviços
 		$sql = "SELECT SituaId
 				FROM Situacao
@@ -329,13 +344,14 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		$bStatus = $rowStatus['SituaId'];
 
 		$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
-	                 WHERE FlOpeId = :id";
+	            WHERE FlOpeId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $bStatus);
 		$result->bindParam(':id', $iFluxoOperacional);
 		$result->execute();
 
 		$conn->commit();
+		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Aditivo realizado com sucesso!!!";
 		$_SESSION['msg']['tipo'] = "success";
@@ -343,6 +359,7 @@ if (isset($_POST['inputIdProduto1'])  || isset($_POST['inputIdServico1'])) {
 		unset($_SESSION['AditivoNovo']);
 
 		irpara("fluxoAditivo.php");
+
 	} catch (PDOException $e) {
 
 		echo 'Error: ' . $e->getMessage();
@@ -402,15 +419,23 @@ try {
 	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>	
 	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
 
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_checkboxes_radios.js"></script>
+
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script> <!-- CV Documentacao: https://jqueryvalidation.org/ -->
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+		
 		$(document).ready(function() {
 
-			$('#cmbSubCategoria').on('change', function(e){				
+			//Inicializa o editor de texto que será usado pelos campos "Conteúdo Personalizado - Inicialização" e "Conteúdo Personalizado - Finalização"
+			$('#txtareaConteudoInicio').summernote();
+			$('#txtareaConteudoFim').summernote();
+
+		/*	$('#cmbSubCategoria').on('change', function(e){				
 				
 				var inputSubCategoria = $('#inputIdSubCategoria').val(); //alert(inputSubCategoria);
 				
@@ -426,7 +451,7 @@ try {
 					}	
 				});
 			});
-
+		*/
 			//Mostra o "Filtrando..." na combo Produto
 			function FiltraProduto(){
 				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
@@ -657,6 +682,28 @@ try {
 									</div>
 								</div>
 							</div>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudoInicio">Conteúdo Personalizado - Introdução</label>
+										<!--<div id="summernote" name="txtareaConteudo"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="txtareaConteudoInicio" name="txtareaConteudoInicio" placeholder="Corpo do Aditivo (informe aqui o texto que você queira que apareça no Aditivo)"><?php isset($_POST['inputDataInicio']) ? print($_POST['txtareaConteudoInicio']) : print('')  ?></textarea>
+									</div>
+								</div>
+							</div>
+							<br>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label for="txtareaConteudoFim">Conteúdo Personalizado - Finalização</label>
+										<!--<div id="summernote" name="txtareaConteudo"></div>-->
+										<textarea rows="5" cols="5" class="form-control" id="txtareaConteudoFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Aditivo (informe aqui o texto que você queira que apareça no término do Aditivo)"><?php isset($_POST['inputDataInicio']) ? print($_POST['txtareaConteudoFim']) : print('')  ?></textarea>
+									</div>
+								</div>
+							</div>
+							<br>
 														
 							<div class="row" style="margin-top: 10px; display: <?php isset($_POST['inputDataInicio']) ? print('none') : print('block')   ?>">
 								<div class="col-lg-12">
