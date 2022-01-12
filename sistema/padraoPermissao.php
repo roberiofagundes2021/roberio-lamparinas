@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Padrao Permissões';
+$_SESSION['PaginaAtual'] = 'Padrão Perfil';
 
 $unidade = $_SESSION['UnidadeId'];
 if(!isset($_POST['inputPerfilId'])){

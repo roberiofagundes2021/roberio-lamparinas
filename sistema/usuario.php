@@ -11,10 +11,10 @@ if (isset($_POST['inputEmpresaId'])){
 	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
 }
 
-if (isset($_POST['inputEmpresaId'])){	
-	$EmpresaId =   $_SESSION['EmpresaId'];
+if (isset($_POST['inputEmpresaId'])){
+	$EmpresaId = $_SESSION['EmpresaId'];
 	$EmpresaNome = $_SESSION['EmpresaNome'];
-} else {	
+} else {
 	$EmpresaId = $_SESSION['EmpreId'];
 	$EmpresaNome = $_SESSION['EmpreNomeFantasia'];
 	$_SESSION['UC'] = 'Usuario';

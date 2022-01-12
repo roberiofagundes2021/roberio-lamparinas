@@ -85,24 +85,24 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 			// adicionando em PadraoPermissao
 			$sql = "INSERT INTO PerfilXPermissao
-			(PrXPePerfil, PrXPeUnidade, PrXPeMenu,PrXPeVisualizar,PrXPeAtualizar,PrXPeExcluir,
-			PrXPeInserir, PrXPeSuperAdmin) VALUES";
+			(PrXPePerfil, PrXPeUnidade, PrXPeMenu,PrXPeVisualizar,PrXPeInserir,PrXPeAtualizar,
+			PrXPeExcluir,PrXPeSuperAdmin) VALUES";
 
 			foreach($sqlMenu as $menu){
 				$superAdmin = in_array($menu['MenuNome'], $arraySuperAdimin)?1:0;
-				$sql .= " ($iPerfil,".$_SESSION['UnidadeId'].",$menu[MenuId], 1, 1, 1, 1, $superAdmin),";
+				$sql .= " ($iPerfil,".$_SESSION['UnidadeId'].",$menu[MenuId], 1, 0, 0, 0, $superAdmin),";
 			}
 			$sql = substr_replace($sql ,"", -1);
 			$conn->query($sql);
 
 			// adicionando em PadraoPerfilXPermissao
 			$sql = "INSERT INTO PadraoPerfilXPermissao
-			(PaPrXPePerfil,PaPrXPeUnidade,PaPrXPeMenu,PaPrXPeInserir,PaPrXPeVisualizar,PaPrXPeAtualizar,
+			(PaPrXPePerfil,PaPrXPeUnidade,PaPrXPeMenu,PaPrXPeVisualizar,PaPrXPeInserir,PaPrXPeAtualizar,
 			PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES";
 
 			foreach($sqlMenu as $menu){
 				$superAdmin = in_array($menu['MenuNome'], $arraySuperAdimin)?1:0;
-				$sql .= " ($iPerfil,".$_SESSION['UnidadeId'].",$menu[MenuId], 1, 1, 1, 1, $superAdmin),";
+				$sql .= " ($iPerfil,".$_SESSION['UnidadeId'].",$menu[MenuId], 1, 0, 0, 0, $superAdmin),";
 			}
 			$sql = substr_replace($sql ,"", -1);
 			$conn->query($sql);

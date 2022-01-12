@@ -6,7 +6,7 @@ if(!$_SESSION['PerfiChave'] == "SUPER"){
 	header("location:javascript://history.go(-1)");
 }
 
-$_SESSION['PaginaAtual'] = 'Perfil';
+$_SESSION['PaginaAtual'] = 'Perfil padrão';
 
 include('global_assets/php/conexao.php');
 
@@ -88,7 +88,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 			foreach($sqlMenu as $menu){
 				$superAdmin = in_array($menu['MenuNome'], $arraySuperAdimin)?1:0;
-				$sql .= " ($iPerfil,$menu[MenuId], 1, 1, 1, 1, $superAdmin),";
+				$sql .= " ($iPerfil,$menu[MenuId], 1, 0, 0, 0, $superAdmin),";
 			}
 			$sql = substr_replace($sql ,"", -1);
 			$conn->query($sql);
