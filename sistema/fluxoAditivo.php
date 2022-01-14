@@ -2,6 +2,8 @@
 
 include_once("sessao.php");
 
+//$inicio1 = microtime(true);
+
 $_SESSION['PaginaAtual'] = 'Fluxo Operacional Aditivo';
 
 include('global_assets/php/conexao.php');
@@ -15,42 +17,28 @@ if (isset($_POST['inputFluxoOperacionalId'])) {
 
 $iFluxoOperacional = $_SESSION['FluxoId'];
 
-try {
+//Dados do Fluxo
+$sql = "SELECT FlOpeId, FlOpeNumContrato, FlOpeCategoria, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
+			   FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, FlOpeStatus, SituaChave,
+			   dbo.fnSubCategoriasIdFluxo(FlOpeUnidade, FlOpeId) as FlOpeSubCategoria,
+			   dbo.fnFimContrato(FlOpeId) as FimContrato, dbo.fnValorTotalContrato(FlOpeId) as TotalContrato
+		FROM FluxoOperacional
+		JOIN Fornecedor on ForneId = FlOpeFornecedor
+		JOIN Categoria on CategId = FlOpeCategoria
+		JOIN Situacao on SituaId = FlOpeStatus
+		WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
 
-	//Dados do Fluxo
-	$sql = "SELECT FlOpeId, FlOpeNumContrato, FlOpeCategoria, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
-				   FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, FlOpeStatus, SituaChave,
-					 dbo.fnSubCategoriasIdFluxo(FlOpeUnidade, FlOpeId) as FlOpeSubCategoria
-			FROM FluxoOperacional
-			JOIN Fornecedor on ForneId = FlOpeFornecedor
-			JOIN Categoria on CategId = FlOpeCategoria
-			JOIN Situacao on SituaId = FlOpeStatus
-			WHERE FlOpeUnidade = " . $_SESSION['UnidadeId'] . " and FlOpeId = " . $iFluxoOperacional;
-	$result = $conn->query($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
+$sSubCategorias = $row['FlOpeSubCategoria'];
 
-	$sSubCategorias = $row['FlOpeSubCategoria'];
-
-
-	$sql = "SELECT AditiId, AditiNumero, AditiDtInicio, AditiDtFim, AditiValor, AditiDtCelebracao
-			FROM Aditivo
-			JOIN Situacao on SituaId = AditiStatus
-			WHERE AditiUnidade = " . $_SESSION['UnidadeId'] . " and AditiFluxoOperacional = " . $iFluxoOperacional ." and SituaChave = 'LIBERADO' ";
-	$result = $conn->query($sql);
-	$rowAditivo = $result->fetchAll(PDO::FETCH_ASSOC);
-	$countAditivos = count($rowAditivo);
-
-	$sql = "SELECT Top 1 isnull(AditiDtFim, FlOpeDataFim) as DataFim
-			FROM FluxoOperacional
-			LEFT JOIN Aditivo on AditiFluxoOperacional = FlOpeId
-			WHERE FlOpeId = " . $iFluxoOperacional . "
-			ORDER BY AditiDtFim DESC";
-	$result = $conn->query($sql);
-	$rowDataFim = $result->fetch(PDO::FETCH_ASSOC);
-	$dataFim = $rowDataFim['DataFim'];
-} catch (PDOException $e) {
-	echo 'Error: ' . $e->getMessage();
-}
+$sql = "SELECT AditiId, AditiNumero, AditiDtInicio, AditiDtFim, AditiValor, AditiDtCelebracao
+		FROM Aditivo
+		JOIN Situacao on SituaId = AditiStatus
+		WHERE AditiUnidade = " . $_SESSION['UnidadeId'] . " and AditiFluxoOperacional = " . $iFluxoOperacional ." and SituaChave = 'LIBERADO' ";
+$result = $conn->query($sql);
+$rowAditivo = $result->fetchAll(PDO::FETCH_ASSOC);
+$countAditivos = count($rowAditivo);
 
 ?>
 
@@ -297,25 +285,23 @@ try {
 										<table class="table" id="tblFluxo">
 											<thead>
 												<tr class="bg-slate">
-													<th width="30%">Principal/Aditivos</th>
-													<th width="15%">Data Início</th>
-													<th width="15%">Data Fim</th>
-													<th width="15%">Valor</th>
-													<th width="15%">Data da Celebração</th>
+													<th width="35%">Principal/Aditivos</th>
+													<th width="15%" style="text-align:center;">Data Início</th>
+													<th width="15%" style="text-align:center;">Data Fim</th>
+													<th width="10%" style="text-align:right;">Valor</th>
+													<th width="15%" style="text-align:center;">Data da Celebração</th>
 													<th width="10%" class="text-center">Ações</th>
 												</tr>
 											</thead>
 											<tbody>
 												<?php
 
-												$total = $row['FlOpeValor'];
-
 												print('
 												<tr>
 													<td>Termo Base</td>
-													<td>' . mostraData($row['FlOpeDataInicio']) . '</td>
-													<td>' . mostraData($row['FlOpeDataFim']) . '</td>
-													<td>' . mostraValor($row['FlOpeValor']) . '</td>
+													<td style="text-align:center;">' . mostraData($row['FlOpeDataInicio']) . '</td>
+													<td style="text-align:center;">' . mostraData($row['FlOpeDataFim']) . '</td>
+													<td style="text-align:right;">' . mostraValor($row['FlOpeValor']) . '</td>
 													<td></td>
 													<td></td>
 												</tr>
@@ -325,15 +311,13 @@ try {
 
 												foreach ($rowAditivo as $item) {
 
-													$total += $item['AditiValor'];
-
 													print('
 													<tr>
 														<td>' . $item['AditiNumero'] . 'º Termo Aditivo</td>
-														<td>' . mostraData($item['AditiDtInicio']) . '</td>
-														<td>' . mostraData($item['AditiDtFim']) . '</td>
-														<td>' . mostraValor($item['AditiValor']) . '</td>
-														<td>' . mostraData($item['AditiDtCelebracao']) . '</td>
+														<td style="text-align:center;">' . mostraData($item['AditiDtInicio']) . '</td>
+														<td style="text-align:center;">' . mostraData($item['AditiDtFim']) . '</td>
+														<td style="text-align:right;">' . mostraValor($item['AditiValor']) . '</td>
+														<td style="text-align:center;">' . mostraData($item['AditiDtCelebracao']) . '</td>
 														');
 
 													print('<td class="text-center">');
@@ -364,9 +348,9 @@ try {
 												print('
 												<tr style="background-color:#eeeeee; font-weight: bold">
 													<td></td>
-													<td>' . mostraData($row['FlOpeDataInicio']) . '</td>
-													<td>' . mostraData($dataFim) . '</td>
-													<td>' . mostraValor($total) . '</td>
+													<td style="text-align:center;">' . mostraData($row['FlOpeDataInicio']) . '</td>
+													<td style="text-align:center;">' . mostraData($row['FimContrato']) . '</td>
+													<td style="text-align:right;">' . mostraValor($row['TotalContrato']) . '</td>
 													<td></td>
 													<td></td>
 												</tr>
@@ -404,6 +388,9 @@ try {
 	<!-- /page content -->
 
 	<?php include_once("alerta.php"); ?>
+
+	<?php //$total1 = microtime(true) - $inicio1;
+		 //echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>';  ?>
 
 </body>
 
