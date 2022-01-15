@@ -331,7 +331,7 @@ if (isset($_POST['inputSelecionados'])){
 								<?php
 									
 									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-											UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, 
+											UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, ProduValorCusto as ValorUnitario, 
 											MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Produto
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId

@@ -49,8 +49,8 @@ if (isset($_POST['inputAditivoId'])) {
 		} else {
 
 			$sql = "SELECT SituaId
-				FROM Situacao	
-				WHERE SituaChave = 'INATIVO' ";
+					FROM Situacao	
+					WHERE SituaChave = 'INATIVO' ";
 		    $result = $conn->query($sql);
 		    $rowSitua = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -63,7 +63,7 @@ if (isset($_POST['inputAditivoId'])) {
 			$result->execute();
 
 			$sql = "UPDATE Aditivo SET AditiStatus = :bStatus, AditiUsuarioAtualizador = :iUsuario
-			WHERE AditiId = :iAditivo";
+					WHERE AditiId = :iAditivo";
 			$result = $conn->prepare($sql);
 			$result->bindParam(':bStatus', $rowSitua['SituaId']);
 			$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
