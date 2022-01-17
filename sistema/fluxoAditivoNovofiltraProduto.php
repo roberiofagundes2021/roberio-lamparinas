@@ -4,125 +4,110 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if (isset($_POST['produtos']) and $_POST['produtos'] != ''){
-	$produtos = $_POST['produtos'];
-	$numProdutos = count($produtos);
-	
-	$lista = "";
-	
-	for ($i=0; $i < $numProdutos; $i++){
-		$lista .= $produtos[$i] . ",";
+// cmbSubCategoria
+// inputIdCategoria
+
+if(isset($_POST['cmbSubCategoria']) && isset($_POST['inputIdCategoria'])){
+
+	$iCategorias = $_POST['cmbSubCategoria'];
+	$iSubCategoria = $_POST['inputIdCategoria'];
+
+	$subCategoriaList = "(";
+
+	foreach($iCategorias as $subCat){
+		$subCategoriaList .= "$subCat,";
 	}
-	
-	//retira a última vírgula
-	$lista = substr($lista, 0, -1);
-} else{
-	$lista = 0;
-}
-
-//echo $produto; 
-
-if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != ''){
+	$subCategoriaList  = substr($subCategoriaList, 0, -1).")";
 
 	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
-			FROM Produto
-			JOIN Categoria on CategId = ProduCategoria
-			LEFT JOIN Marca on MarcaId = ProduMarca
-			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduSubCategoria = '". $_POST['idSubCategoria']."' and ProduId in (".$lista.")
-			";
-} else {
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
-			FROM Produto
-			JOIN Categoria on CategId = ProduCategoria
-			LEFT JOIN Marca on MarcaId = ProduMarca
-			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = '". $_POST['idCategoria']."' and ProduId in (".$lista.")
-			";
-}
+	FROM Produto
+	JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+	LEFT JOIN Marca on MarcaId = ProduMarca
+	JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = $iSubCategoria and 
+	ProduSubCategoria in ($subCategoriaList)";
 
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
-//echo json_encode($sql);
+	$result = $conn->query($sql);
+	$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-$output = '';
+	$output = '';
+	$fTotalGeral = 0;
 
-$cont = 0;
-$fTotalGeral = 0;
+	foreach ($row as $cont=>$item){
+		
+		$cont++;
+		
+		$id = $item['ProduId'];
+		
+		$iQuantidade = isset($item['AdXPrQuantidade']) ? $item['AdXPrQuantidade'] : '';
+		$fValorUnitario = isset($item['AdXPrValorUnitario']) ? mostraValor($item['AdXPrValorUnitario']) : '';
+		$fValorTotal = (isset($item['AdXPrQuantidade']) and isset($item['AdXPrValorUnitario'])) ? mostraValor($item['AdXPrQuantidade'] * $item['AdXPrValorUnitario']) : '';
 
-foreach ($row as $item){
-	
-	$cont++;
-	
-	$id = $item['ProduId'];
-	
-	$quantidade = isset($_POST['AdXPrQuantidade'][$id]) ? $_POST['AdXPrQuantidade'][$id] : '';
-	$valorUnitario = isset($_POST['AdXPrValorUnitario'][$id]) ? $_POST['AdXPrValorUnitario'][$id] : '';
-	$valorTotal = (isset($_POST['AdXPrQuantidade'][$id]) && isset($_POST['AdXPrValorUnitario'][$id])) ? mostraValor((float)$quantidade * (float)$valorUnitario) : '';
-	
-	$fTotalGeral += (isset($_POST['AdXPrQuantidade'][$id]) and isset($_POST['AdXPrValorUnitario'][$id])) ? (float)$quantidade * (float)$valorUnitario : 0;	
-	
+		$fTotalGeral += (isset($item['AdXPrQuantidade']) and isset($item['AdXPrValorUnitario'])) ? $item['AdXPrQuantidade'] * $item['AdXPrValorUnitario'] : 0;
+		
+		$output .= '<div class="row" style="margin-top: 8px;" >
+		<div class="col-lg-7">
+			<div class="row">
+				<div class="col-lg-1">
+					<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
+					<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['ProduId'] . '" class="idProduto">
+				</div>
+				<div class="col-lg-8">
+					<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+				</div>
+				<div class="col-lg-3">
+					<input type="text" id="inputMarca' . $cont . '" name="inputMarca' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['MarcaNome'] . '" value="' . $item['MarcaNome'] . '" readOnly>
+				</div>
+			</div>
+		</div>								
+		<div class="col-lg-1">
+			<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
+		</div>
+		<div class="col-lg-1">
+			<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+		</div>	
+		<div class="col-lg-1">
+			<input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
+		</div>	
+		<div class="col-lg-2">
+			<input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off text-right" value="' . $fValorTotal . '" readOnly>
+		</div>											
+	</div>';	
+	}
+
 	$output .= ' <div class="row" style="margin-top: 8px;">
 					<div class="col-lg-7">
 						<div class="row">
 							<div class="col-lg-1">
-								<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-								<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
+								
 							</div>
 							<div class="col-lg-8">
-								<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+								
 							</div>
 							<div class="col-lg-3">
-								<input type="text" id="inputMarca' . $cont . '" name="inputMarca' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['MarcaNome'] . '" value="' . $item['MarcaNome'] . '" readOnly>
+								
 							</div>
 						</div>
 					</div>								
 					<div class="col-lg-1">
-						<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
+						
 					</div>
 					<div class="col-lg-1">
-						<input type="text" id="inputQuantidade'.$cont.'" name="inputQuantidade'.$cont.'" class="form-control-border Quantidade" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$quantidade.'">
+						
 					</div>	
-					<div class="col-lg-1">
-						<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$valorUnitario.'">
+					<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+						<h3><b>Total:</b></h3>
 					</div>	
-					<div class="col-lg-1">
-						<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off" value="'.$valorTotal.'" readOnly>
-					</div>
-				</div>';	
+					<div class="col-lg-2">
+						<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
+					</div>											
+				</div>';
+
+	$output .= '<input type="hidden" id="totalRegistros" name="totalRegistros" value="'.$cont.'" >';
+
+	echo $output;
+} else {
+	echo null;
 }
-
-$output .= ' <div class="row" style="margin-top: 8px;">
-				<div class="col-lg-7">
-					<div class="row">
-						<div class="col-lg-1">
-							
-						</div>
-						<div class="col-lg-8">
-							
-						</div>
-						<div class="col-lg-3">
-							
-						</div>
-					</div>
-				</div>								
-				<div class="col-lg-1">
-					
-				</div>
-				<div class="col-lg-1">
-					
-				</div>	
-				<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
-					<h3><b>Total:</b></h3>
-				</div>	
-				<div class="col-lg-2">
-					<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
-				</div>											
-			</div>';
-
-$output .= '<input type="hidden" id="totalRegistros" name="totalRegistros" value="'.$cont.'" >';
-
-echo $output;
 
 ?>

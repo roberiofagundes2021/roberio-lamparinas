@@ -435,23 +435,24 @@ try {
 			$('#txtareaConteudoInicio').summernote();
 			$('#txtareaConteudoFim').summernote();
 
-		/*	$('#cmbSubCategoria').on('change', function(e){				
-				
-				var inputSubCategoria = $('#inputIdSubCategoria').val(); //alert(inputSubCategoria);
+			$('#cmbSubCategoria').on('change', function(e){
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
+				var inputIdCategoria = $('#inputIdCategoria').val();
 				
 				$.ajax({
 					type: "POST",
 					url: "fluxoAditivoNovofiltraProduto.php",
-					data: {idSubCategoria: inputSubCategoria, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
+					data: {cmbSubCategoria: cmbSubCategoria, inputIdCategoria: inputIdCategoria},
 					success: function(resposta){
-						//alert(resposta);
-
-						$("#tabelaProdutos").html(resposta).show();					
-						return false;						
-					}	
+						if (resposta !== null){
+							$("#tabelaProdutos").html(resposta).show();
+							return false;
+						} else {
+							ResetProduto()
+						}
+					}
 				});
 			});
-		*/
 			//Mostra o "Filtrando..." na combo Produto
 			function FiltraProduto(){
 				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
@@ -747,7 +748,7 @@ try {
 													$count = count($rowSubCategoria);														
 															
 													foreach ( $rowSubCategoria as $item){	
-														print('<option value="'.$item['SbCatId,'].'" selected>'.$item['SbCatNome'].'</option>');	
+														print('<option value="'.$item['SbCatId'].'" selected>'.$item['SbCatNome'].'</option>');	
 													}                  
 												?>
 											</select>
