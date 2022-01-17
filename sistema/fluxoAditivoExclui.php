@@ -7,6 +7,7 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputAditivoId'])){
 	
 	$iAditivo = $_POST['inputAditivoId'];
+	$iFluxoOperacional = $_SESSION['FluxoId'];
         	
 	try{
 		$conn->beginTransaction();	
@@ -31,6 +32,45 @@ if(isset($_POST['inputAditivoId'])){
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iAditivo); 
 		$result->execute();
+
+		//// Mudando status do fluxo, após excluir o aditivo.
+		$sql = "SELECT SituaId
+				FROM Situacao
+				WHERE SituaChave = 'LIBERADO' ";
+		$result = $conn->query($sql);
+		$rowStatus = $result->fetch(PDO::FETCH_ASSOC);
+		$bStatus = $rowStatus['SituaId'];
+
+		$sql = "UPDATE FluxoOperacional SET FlOpeStatus = :bStatus
+	            WHERE FlOpeId = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':bStatus', $bStatus);
+		$result->bindParam(':id', $iFluxoOperacional);
+		$result->execute();
+
+		
+		// Selecionando o id da Bandeja 
+		$sql = "SELECT BandeId
+		FROM Bandeja
+		WHERE BandeTabelaId =  ". $iAditivo ." ";
+		$result = $conn->query($sql);
+		$Bandeja= $result->fetch(PDO::FETCH_ASSOC);
+
+		/*----- DELETA BANDEJA X PERFIL -----*/
+		$sql = "DELETE FROM BandejaXPerfil
+				WHERE BnXPeBandeja = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $Bandeja['BandeId']); 
+		$result->execute();
+
+		/*----- DELETA BANDEJA -----*/
+		$sql = "DELETE FROM Bandeja
+				WHERE BandeId = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $Bandeja['BandeId']); 
+		$result->execute();
+
+
 		
 		$conn->commit();
 		

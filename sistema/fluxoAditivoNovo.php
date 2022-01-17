@@ -718,7 +718,7 @@ try {
 							<!-- /card-body -->
 							<!---------------------------------------------------------------------------------------------Produtos---------------------------------------------------------------------------------------------------------->
 							<?php
-								$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+								$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
 										FROM Produto
 										JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 										LEFT JOIN Marca on MarcaId = ProduMarca

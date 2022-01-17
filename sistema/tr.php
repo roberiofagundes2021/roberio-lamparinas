@@ -15,7 +15,7 @@ $url = basename($_SERVER['PHP_SELF']);
 
 $sqlPerfil = "SELECT PerfiId 
 			  FROM Perfil
-			  WHERE PerfiChave = ". $perfil . " and PerfiUnidade = " . $_SESSION['UnidadeId'];
+			  WHERE PerfiChave = '". $perfil . "' and PerfiUnidade = " . $_SESSION['UnidadeId'];
 $resultPerfilId = $conn->query($sqlPerfil);
 $perfilId = $resultPerfilId->fetchAll(PDO::FETCH_ASSOC);
 $perfilId = $perfilId[0]['PerfiId'];

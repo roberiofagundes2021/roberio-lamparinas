@@ -14,8 +14,10 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 	
 	$_SESSION['OrigemFluxoRealizado'] = $_POST['inputOrigem'];
 
-	$sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, FlOpeDataInicio, FlOpeDataFim, 
-				   FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, ForneRazaoSocial, CategNome 
+	$sql = "SELECT FlOpeId, FlOpeFornecedor, FlOpeCategoria, FlOpeSubCategoria, 
+				   FlOpeDataInicio, dbo.fnFimContrato(FlOpeId) as FimContrato,
+				   FlOpeNumContrato, FlOpeNumProcesso, dbo.fnValorTotalContrato(FlOpeId) as TotalContrato, 
+				   FlOpeStatus, ForneRazaoSocial, CategNome 
 			FROM FluxoOperacional
 			JOIN Fornecedor ON ForneId = FlOpeFornecedor
 			JOIN Categoria ON CategId = FlOpeCategoria	 
@@ -62,7 +64,7 @@ if (isset($_POST['inputSelecionados'])){
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>		
 	
 	<!-- /theme JS files -->
-
+<!--
 	<script type="text/javascript">
 		
 		$(document).ready(function() {
@@ -109,7 +111,7 @@ if (isset($_POST['inputSelecionados'])){
 		});
 
 	</script>	
-
+	-->
 </head>
 
 <body class="navbar-top  sidebar-xs">
@@ -269,7 +271,7 @@ if (isset($_POST['inputSelecionados'])){
 													<span class="input-group-prepend">
 														<span class="input-group-text"><i class="icon-calendar22"></i></span>
 													</span>
-													<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['FlOpeDataFim']; ?>" readOnly >
+													<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['FimContrato']; ?>" readOnly >
 												</div>
 											</div>
 										</div>								
@@ -291,7 +293,7 @@ if (isset($_POST['inputSelecionados'])){
 										<div class="col-lg-2" style="max-width: 210px;">
 											<div class="form-group">
 												<label for="inputValor">Valor Total</label>
-												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
+												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['TotalContrato']); ?>" readOnly>
 											</div>
 										</div>	
 
@@ -329,7 +331,8 @@ if (isset($_POST['inputSelecionados'])){
 								<?php
 									
 									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-											UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
+											UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, ProduValorCusto as ValorUnitario, 
+											MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Produto
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 											JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -436,7 +439,8 @@ if (isset($_POST['inputSelecionados'])){
 												$sql = "SELECT ISNULL(SUM(MvXPrQuantidade), 0) as Controle, MvXPrValorUnitario
 														FROM Movimentacao														
 														JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['Id']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$row['FlOpeDataFim']."' and MovimTipo = 'E' 
+														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['Id']." and 
+														MovimData between '".$row['FlOpeDataInicio']."' and '".$row['FimContrato']."' and MovimTipo = 'E' 
 														GROUP By MvXPrQuantidade, MvXPrValorUnitario";
 												$result = $conn->query($sql);
 												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -493,7 +497,8 @@ if (isset($_POST['inputSelecionados'])){
 								<?php
 									
 									$sql = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-											UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
+											UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, 
+											MarcaNome as Marca, SbCatNome as SubCategoria
 											FROM Produto
 											JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 											JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -599,7 +604,7 @@ if (isset($_POST['inputSelecionados'])){
 												$sql = "SELECT ISNULL(SUM(MvXPrQuantidade), 0) as Controle, MvXPrValorUnitario
 														FROM Movimentacao														
 														JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['Id']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$row['FlOpeDataFim']."' and MovimTipo = 'E' 
+														WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MvXPrProduto = ".$item['Id']." and MovimData between '".$row['FlOpeDataInicio']."' and '".$row['FimContrato']."' and MovimTipo = 'E' 
 														GROUP By MvXPrQuantidade, MvXPrValorUnitario";
 												$result = $conn->query($sql);
 												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
