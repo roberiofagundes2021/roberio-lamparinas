@@ -10,7 +10,11 @@ if(isset($_POST['inputPerfilId'])){
 	$iUnidade = $_SESSION['UnidadeId'];
         	
 	try{
-		
+		/*
+		$sql = "DELETE FROM PerfilXModulo
+				WHERE PrXMoPerfil = $iPerfil ";
+		$conn->query($sql);
+		*/
 		$sql = "DELETE FROM PerfilXPermissao
 				WHERE PrXPePerfil = $iPerfil and PrXPeUnidade = $iUnidade";
 		$conn->query($sql);
