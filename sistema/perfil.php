@@ -265,7 +265,28 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					document.getElementById('inputEstadoAtual').value = "EDITA";
 					document.formPerfil.action = "perfil.php";				
 				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formPerfil, "Tem certeza que deseja excluir esse perfil?", "perfilExclui.php");
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+					type: "POST",
+					url: "perfilValidaExcluir.php",
+					data: ('IdPerfil='+PerfilId),
+					success: function(resposta){
+
+						if(resposta == 1){
+							alerta('Atenção','Esse perfil está sendo usado por usuário da Unidade!','error');
+							return false;
+						} else{
+							confirmaExclusao(document.formPerfil, "Tem certeza que deseja excluir esse perfil?", "perfilExclui.php");
+						}	
+						document.getElementById('inputPerfilId').value = resposta;
+				
+						}
+					})
+
+					if (document.getElementById('inputPerfilId').value){
+							return false;
+						}
+
 				} else if (Tipo == 'mudaStatus'){
 					document.formPerfil.action = "perfilMudaSituacao.php";
 				}
