@@ -56,8 +56,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 
-			$sql = "INSERT INTO Perfil (PerfiNome, PerfiChave, PerfiStatus, PerfiUsuarioAtualizador, PerfiUnidade)
-					VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO Perfil (PerfiNome, PerfiChave, PerfiStatus, PerfiUsuarioAtualizador, PerfiUnidade, PerfiPadrao)
+					VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade, :iPerfiPadrao)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -65,7 +65,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':sChave' => formatarChave($_POST['inputNome']),
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId']
+							':iUnidade' => $_SESSION['UnidadeId'],
+							':iPerfiPadrao' => 0
 							));
 
 			$iPerfil = $conn->lastInsertId();
@@ -371,10 +372,10 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaPerfil('.$atualizar.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaPerfil('.$excluir.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
-														<a href="#" onclick="atualizaPerfil(1,'.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'permicao\');" class="list-icons-item"><i class="icon-lock2"></i></a>
-														<a href="#" onclick="atualizaPerfil(1,'.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'padraoPermicao\');" class="list-icons-item"><i class="icon-gear"></i></a>
+														<a title="Editar" href="#" onclick="atualizaPerfil('.$atualizar.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a title="Excluir" href="#" onclick="atualizaPerfil('.$excluir.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a title="Permissões" href="#" onclick="atualizaPerfil(1,'.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'permicao\');" class="list-icons-item"><i class="icon-lock2"></i></a>
+														<a title="Padrão de Permissões" href="#" onclick="atualizaPerfil(1,'.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'padraoPermicao\');" class="list-icons-item"><i class="icon-gear"></i></a>
 													</div>
 												</div>
 											</td>

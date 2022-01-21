@@ -75,10 +75,11 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			$sqlMenu = $conn->query($sqlMenu);
 			$sqlMenu = $sqlMenu->fetchAll(PDO::FETCH_ASSOC);
 
-			$arraySuperAdimin = [
+			$arraySuperAdmin = [
 				'Bancos',
 				'Tipo Fiscal',
-				'Setor'
+				'Padrões',
+				'Empresas'
 			];
 
 			// adicionando em PadraoPermissao
@@ -87,7 +88,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			PaPerInserir, PaPerSuperAdmin) VALUES";
 
 			foreach($sqlMenu as $menu){
-				$superAdmin = in_array($menu['MenuNome'], $arraySuperAdimin)?1:0;
+				$superAdmin = in_array($menu['MenuNome'], $arraySuperAdmin)?1:0;
 				$sql .= " ($iPerfil,$menu[MenuId], 1, 0, 0, 0, $superAdmin),";
 			}
 			$sql = substr_replace($sql ,"", -1);
@@ -351,9 +352,9 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaPerfil('.$atualizar.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaPerfil('.$excluir.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
-														<a href="#" onclick="atualizaPerfil(1,'.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'permicao\');" class="list-icons-item"><i class="icon-lock2"></i></a>
+														<a title="Editar" href="#" onclick="atualizaPerfil('.$atualizar.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7"></i></a>
+														<a title="Excluir" href="#" onclick="atualizaPerfil('.$excluir.','.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin"></i></a>
+														<a title="Padrão de Permissões Geral" href="#" onclick="atualizaPerfil(1,'.$item['PerfiId'].', \''.$item['PerfiNome'].'\','.$item['PerfiStatus'].', \'permicao\');" class="list-icons-item"><i class="icon-lock2"></i></a>
 													</div>
 												</div>
 											</td>

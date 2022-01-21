@@ -12,11 +12,13 @@ if(isset($_POST['inputPerfilId'])){
         	
 	try{
 
-		$sql = "DELETE FROM PadraoPermissao WHERE PaPerPerfil = $iPerfil";
-		$conn->query($sql);
+		// $sql = "DELETE FROM PadraoPermissao WHERE PaPerPerfil = $iPerfil";
+		// $conn->query($sql);
 
 		$sql = "DELETE FROM Perfil
 				WHERE PerfiId = $iPerfil and PerfiUnidade is null and PerfiPadrao = 1";
+		var_dump($sql);
+		exit;
 		$conn->query($sql);
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -24,6 +26,7 @@ if(isset($_POST['inputPerfilId'])){
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
+		$conn->rollBack();
 
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao deletar padrão de perfil!!!";

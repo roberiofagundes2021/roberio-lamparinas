@@ -20,22 +20,21 @@
 				if($usuaXPerm['UsuarPermissaoPerfil'] == 0){
 				$sqlConfig = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
 							MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, MenuSetorPrivado,
-							UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeUnidade
+							UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeUnidade, UsXPeSuperAdmin
 							FROM menu
 							join situacao on MenuStatus = SituaId
 							join UsuarioXPermissao on UsXPeUsuario = '$userId' and UsXPeUnidade = '$unidade' and UsXPeMenu = MenuId
-							where UPPER(MenuPosicao) = 'CONFIGURADOR'
-							order by MenuOrdem asc";
+							where UPPER(MenuPosicao) = 'CONFIGURADOR'".($_SESSION['PerfiChave'] != "SUPER"?' and UsXPeSuperAdmin = 0':'');
 				} else {
 				$sqlConfig = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
 						MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, PrXPeId, PrXPePerfil, MenuSetorPrivado
-						PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeUnidade
+						PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeUnidade, PrXPeSuperAdmin
 						FROM menu
 						join situacao on MenuStatus = SituaId
 						join PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$perfilId' and PrXPeUnidade  = '$unidade'
-						where UPPER(MenuPosicao) = 'CONFIGURADOR'
-						order by MenuOrdem asc";
+						where UPPER(MenuPosicao) = 'CONFIGURADOR'".($_SESSION['PerfiChave'] != "SUPER"?' and PrXPeSuperAdmin = 0':'');
 				}
+				$sqlConfig .= ' order by MenuOrdem asc';
 				$resultConfig = $conn->query($sqlConfig);
 				$config = $resultConfig->fetchAll(PDO::FETCH_ASSOC);			
 			?>
@@ -105,7 +104,6 @@
 											</a>
 										<div class="dropdown-menu dropdown-menu-right">');
 								foreach($config as $conf){
-									// echo('<a href="#" onclick="goPage('.'\''.$conf['MenuUrl'].'#'.$empresa['EmpreId'].'#'.$empresa['EmpreNomeFantasia'].'\''.');" class="dropdown-item"><i class="'.$conf['MenuIco'].'"></i>'.$conf['MenuNome'].'</a>');
 									echo('<a href="'.$conf['MenuUrl'].'" class="dropdown-item"><i class="'.$conf['MenuIco'].'"></i>'.$conf['MenuNome'].'</a>');
 								}
 								print('</div>

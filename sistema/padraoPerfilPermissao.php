@@ -145,6 +145,17 @@ $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 			document.getElementById('form_id').action = "PadraoPerfilPermissaoPersist.php";
 			document.getElementById("form_id").submit();
 		}
+		function resetPermissao(unidade, PerfilId, modulo) {
+			$('#unidade').val(unidade)
+			$('#PerfilId').val(PerfilId)
+			$('#modulo').val(modulo)
+
+			confirmaExclusao(document.getElementById('form_reset'),
+			modulo === 'all'?"Tem certeza que deseja resetar todos os módulos?":"Tem certeza que deseja resetar esse módulo?", "padraoPerfilPermissaoReset.php");
+
+			// $('#form_reset').attr('action', 'perfilPermissaoReset.php')
+			// $('#form_reset').submit()
+		}
 	</script>
 	
 </head>
@@ -198,14 +209,21 @@ td{
 									<div class="header-elements-inline">
 										<h3 class="card-title">Relação de Padrão de Permissões (<?php echo $_POST['inputPerfilNome']; ?>)</h3>
 										<div class="header-elements">
-											<div><a href="perfil.php" role="button"><< Relação de Perfis</a></div>
+											<div>
+												<a href="perfil.php" role="button"><< Relação de Perfis</a> 
+												| 
+												<?php echo '<a href="#" role="button" title="Resetar Todos" onClick="resetPermissao('.$unidade.','.$PerfilId.', `all`)">Resetar todos</a>'; ?>
+											</div>
 										</div>
 									</div>								
 								</div>
 							</div>
+							<form id="form_reset" method="POST">
+								<input type="hidden" value="" name="unidade" id="unidade" />
+								<input type="hidden" value="" name="PerfilId" id="PerfilId" />
+								<input type="hidden" value="" name="modulo" id="modulo" />
+							</form>
 						<form id="form_id" method="POST">
-						
-
 							<?php
 								echo '<input name="unidade" type="hidden" value="'.$unidade.'" />';
 								echo '<input name="PerfilId" type="hidden" value="'.$PerfilId.'" />';
@@ -216,12 +234,14 @@ td{
 									if($mod['SituaChave'] == strtoupper("ativo")){
 
 										$minimizar = $mod['ModulNome'] != 'Controle de Estoque' ? 'card-collapsed' : '';
+										$modulo = $mod['ModulId'];
 
 										print('<div class="card '.$minimizar.'">
 												<div class="card-header header-elements-inline">
 													<h3 class="card-title">'.$mod['ModulNome'].'</h3>
 													<div class="header-elements">
 														<div class="list-icons">
+															<i style="cursor: pointer;" onClick="resetPermissao('.$unidade.','.$PerfilId.','.$modulo.')" class="icon-reset" title="Resetar"></i>
 															<a class="list-icons-item" data-action="collapse"></a>
 														</div>
 													</div>
