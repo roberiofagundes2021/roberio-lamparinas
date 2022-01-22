@@ -260,44 +260,37 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				document.getElementById('inputPerfilId').value = PerfilId;
 				document.getElementById('inputPerfilNome').value = PerfilNome;
 				document.getElementById('inputPerfilStatus').value = PerfilStatus;
-						
-				if (Tipo == 'edita'){
-					document.getElementById('inputEstadoAtual').value = "EDITA";
-					document.formPerfil.action = "perfil.php";				
-				} else if (Tipo == 'exclui'){
+
+				if (Tipo == 'exclui'){
 					//Esse ajax está sendo usado para verificar no banco se o registro já existe
 					$.ajax({
-					type: "POST",
-					url: "perfilValidaExcluir.php",
-					data: ('IdPerfil='+PerfilId),
-					success: function(resposta){
-
-						if(resposta == 1){
-							alerta('Atenção','Esse perfil está sendo usado por usuário da Unidade!','error');
-							return false;
-						} else{
-							confirmaExclusao(document.formPerfil, "Tem certeza que deseja excluir esse perfil?", "perfilExclui.php");
-						}	
-						document.getElementById('inputPerfilId').value = resposta;
-				
+						type: "POST",
+						url: "perfilValidaExcluir.php",
+						data: ('IdPerfil='+PerfilId),
+						success: function(resposta){
+							
+							if(resposta > 0){
+								alerta('Atenção','Esse perfil está sendo usado por usuário da Unidade!','error');
+								return false;
+							} else{
+								confirmaExclusao(document.formPerfil, "Tem certeza que deseja excluir esse perfil?", "perfilExclui.php");
+							}
 						}
 					})
+				} else {
+					if (Tipo == 'edita'){
+						document.getElementById('inputEstadoAtual').value = "EDITA";
+						document.formPerfil.action = "perfil.php";				
+					} else if (Tipo == 'mudaStatus'){
+						document.formPerfil.action = "perfilMudaSituacao.php";
+					} else if (Tipo == 'permicao'){
+						document.formPerfil.action = "perfilPermissao.php";
+					} else if (Tipo == 'padraoPermicao'){
+						document.formPerfil.action = "padraoPerfilPermissao.php";
+					}
 
-					if (document.getElementById('inputPerfilId').value){
-							return false;
-						}
-
-				} else if (Tipo == 'mudaStatus'){
-					document.formPerfil.action = "perfilMudaSituacao.php";
+					document.formPerfil.submit();
 				}
-				else if (Tipo == 'permicao'){
-					document.formPerfil.action = "perfilPermissao.php";
-				}
-				else if (Tipo == 'padraoPermicao'){
-					document.formPerfil.action = "padraoPerfilPermissao.php";
-				}
-
-				document.formPerfil.submit();
 			} else{
 				alerta('Permissão Negada!','');
 			}

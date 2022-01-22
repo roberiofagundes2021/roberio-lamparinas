@@ -29,6 +29,8 @@ if(isset($_POST['inputClienteId'])){
 if(isset($_POST['inputTipo'])){	
 		
 	try{
+
+		$conn->beginTransaction();
 		
 		$sql = "UPDATE Cliente SET ClienTipo = :sTipo, ClienNome = :sNome, ClienRazaoSocial = :sRazaoSocial, ClienCnpj = :sCnpj, 
 									  ClienInscricaoMunicipal = :sInscricaoMunicipal, ClienInscricaoEstadual = :sInscricaoEstadual, 
@@ -40,9 +42,7 @@ if(isset($_POST['inputTipo'])){
 									  ClienCelular = :sCelular, ClienEmail = :sEmail, ClienSite = :sSite, ClienObservacao = :sObservacao,
 									  ClienUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE ClienId = :iCliente";
-		$result = $conn->prepare($sql);
-				
-		$conn->beginTransaction();				
+		$result = $conn->prepare($sql);						
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
@@ -83,7 +83,9 @@ if(isset($_POST['inputTipo'])){
 		$_SESSION['msg']['mensagem'] = "Cliente alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
-	} catch(PDOException $e) {		
+	} catch(PDOException $e) {
+		
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao alterar cliente!!!";

@@ -10,11 +10,9 @@ if(isset($_POST['inputPerfilId'])){
 	$iUnidade = $_SESSION['UnidadeId'];
         	
 	try{
-		/*
-		$sql = "DELETE FROM PerfilXModulo
-				WHERE PrXMoPerfil = $iPerfil ";
-		$conn->query($sql);
-		*/
+
+		$conn->beginTransaction();
+
 		$sql = "DELETE FROM PerfilXPermissao
 				WHERE PrXPePerfil = $iPerfil and PrXPeUnidade = $iUnidade";
 		$conn->query($sql);
@@ -26,12 +24,16 @@ if(isset($_POST['inputPerfilId'])){
 		$sql = "DELETE FROM Perfil
 				WHERE PerfiId = $iPerfil and PerfiUnidade = $iUnidade";
 		$conn->query($sql);
+
+		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Perfil excluído!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
+
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao excluir Perfil!!!";
