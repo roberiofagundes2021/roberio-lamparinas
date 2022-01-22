@@ -202,6 +202,13 @@ if(isset($_POST['inputData'])){
 						$('#cmbCategoria').val(flux.CategId);
 						$('#inputNumAta').val(flux.FlOpeNumAta);
 						$('#inputLote').val(flux.FlOpeNumAta);
+						
+						/*
+						if (flux.Saldo > 0){
+							getElementById("Mensagem").style.display = "block";
+						} else{
+							getElementById("Mensagem").style.display = "none";
+						}*/
 
 						$.getJSON('filtraSubCategoria.php?idContrato='+id, function (dados){
 					
@@ -437,31 +444,30 @@ if(isset($_POST['inputData'])){
 
 									<div class="row">
 										<?php 
-											if($_SESSION['UsuarId'] != 0){
-												print('
-													<div class="row col-lg-9">
-														<div class="row justify-content-center col-lg-12">
-															<div class="row justify-content-end align-content-center col-12 col-lg-8">
-																<p style="color: red; margin-right: 60px"><i class="icon-info3"></i> Há saldo remanescente do contrato a ser usado. Deseja utilizá-lo?</p>
-															</div>
-															<div class="form-group col-12 col-lg-4" style="margin-top: 10px ; margin-right: 20px">
-																<div class="form-check  form-check-inline">
-																	<label class="form-check-label">
-																		<input type="radio" id="inputSaldo" name="inputSaldo" value="S" class="form-input-styled" checked data-fouc>
-																		SIM
-																	</label>
-																</div>	
-																<div class="form-check form-check-inline">
-																	<label class="form-check-label">
-																		<input type="radio" id="inputSaldo" name="inputSaldo" value="N" class="form-input-styled" data-fouc>
-																		NÃO
-																	</label>
-																</div>	
-															</div>
+											
+											print('
+												<div id="Mensagem" class="row col-lg-12" style="background-color: #fcf8e3; display:none;">
+													<div class="row justify-content-left col-lg-12">
+														<div class="row justify-content-end align-center-center col-12 col-lg-8">
+															<p style="color: red; margin-right: 60px"><i class="icon-info3"></i> Há saldo remanescente do contrato a ser usado. Deseja utilizá-lo?</p>
 														</div>
-													</div> 
-												');
-											} 
+														<div class="form-group col-12 col-lg-4" style="margin-top: 10px ; margin-right: 20px">
+															<div class="form-check  form-check-inline">
+																<label class="form-check-label">
+																	<input type="radio" id="inputSaldo" name="inputSaldo" value="1" class="form-input-styled" checked data-fouc>
+																	SIM
+																</label>
+															</div>	
+															<div class="form-check form-check-inline">
+																<label class="form-check-label">
+																	<input type="radio" id="inputSaldo" name="inputSaldo" value="0" class="form-input-styled" data-fouc>
+																	NÃO
+																</label>
+															</div>	
+														</div>
+													</div>
+												</div> 
+											');							
 											
 										?>
 									</div>
