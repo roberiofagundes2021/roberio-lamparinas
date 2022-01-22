@@ -10,6 +10,21 @@ if(!isset($_POST['inputPerfilId'])){
 }
 $PerfilId = $_POST['inputPerfilId'];
 
+// busca o perfiChave
+$PerfiChave = "SELECT PerfiChave FROM Perfil
+				WHERE PerfiId = $PerfilId";
+$PerfiChave = $conn->query($PerfiChave);
+$PerfiChave = $PerfiChave->fetch(PDO::FETCH_ASSOC);
+$PerfiChave = $PerfiChave['PerfiChave'];
+// busca o perfil padrao, se existir
+$perfPadrao = "SELECT PerfiChave FROM Perfil
+				WHERE PerfiChave = '$PerfiChave' and PerfiPadrao = 1";
+$perfPadrao = $conn->query($perfPadrao);
+$perfPadrao = $perfPadrao->fetch(PDO::FETCH_ASSOC);
+
+// essa parte é para verificar se o perfil se trata de um perfil padrão
+$perfPadrao = isset($perfPadrao['PerfiChave'])?true:false;
+
 // ao recarregar fica sumindo o valor atribuido à $perfilId;
 
 $sqlModuloPxP = "SELECT ModulId, ModulOrdem, ModulNome, ModulStatus, SituaChave, SituaCor
@@ -33,8 +48,7 @@ $sqlMenuPxP = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModul
 				PaPrXPeUnidade
 				FROM Menu
 				JOIN Situacao on MenuStatus = SituaId
-				JOIN PadraoPerfilXPermissao on MenuId = PaPrXPeMenu and PaPrXPePerfil = ".$PerfilId." and PaPrXPeUnidade = ".$unidade;
-
+				JOIN PadraoPerfilXPermissao on MenuId = PaPrXPeMenu and PaPrXPePerfil = $PerfilId and PaPrXPeUnidade = $unidade";
 if($empresa == 'Publica'){
 	$sqlMenuPxP .=	" WHERE MenuSetorPublico = 1 ";
 } else {
@@ -211,11 +225,13 @@ td{
 										<div class="header-elements">
 											<div>
 												<a href="perfil.php" role="button"><< Relação de Perfis</a> 
-												| 
-												<?php echo '<a href="#" role="button" title="Resetar Todos" onClick="resetPermissao('.$unidade.','.$PerfilId.', `all`)">Resetar todos</a>'; ?>
+												<?php if($perfPadrao){echo '| <a href="#" role="button" title="Resetar Todos" onClick="resetPermissao('.$unidade.','.$PerfilId.', `all`)">Resetar todos</a>';} ?>
 											</div>
 										</div>
 									</div>								
+									<div class="">		
+										<p class="font-size-lg">OBS.: A opção de resetar estará presente APENAS para os perfis padrões do sistema!!</b></p>
+									</div>
 								</div>
 							</div>
 							<form id="form_reset" method="POST">
@@ -240,9 +256,9 @@ td{
 												<div class="card-header header-elements-inline">
 													<h3 class="card-title">'.$mod['ModulNome'].'</h3>
 													<div class="header-elements">
-														<div class="list-icons">
-															<i style="cursor: pointer;" onClick="resetPermissao('.$unidade.','.$PerfilId.','.$modulo.')" class="icon-reset" title="Resetar"></i>
-															<a class="list-icons-item" data-action="collapse"></a>
+														<div class="list-icons">'.
+															($perfPadrao?'<i style="cursor: pointer;" onClick="resetPermissao('.$unidade.','.$PerfilId.','.$modulo.')" class="icon-reset" title="Resetar"></i>':'')
+															.'<a class="list-icons-item" data-action="collapse"></a>
 														</div>
 													</div>
 												</div>
