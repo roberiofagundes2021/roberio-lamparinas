@@ -463,7 +463,7 @@ if(isset($_POST['inputData'])){
 										<?php 
 											
 											print('
-												<div id="Mensagem" class="row" style="margin-top: 10px;" display:block;">
+												<div id="Mensagem" class="row" style=" margin-top: 10px; display:none">
 													<div class="row justify-content-center col-lg-12 ">
 														<div class="form-group col-12 col-lg-10" style="margin-top: 15px;">
 															<p style="color: red"><i class="icon-info3"></i> Há saldo remanescente do contrato a ser usado. Deseja utilizá-lo?</p>
