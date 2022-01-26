@@ -84,9 +84,9 @@ if(isset($_POST['inputData'])){
 		
 		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComFluxoOperacional, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, 
 							OrComConteudoInicio, OrComConteudoFim, OrComFornecedor, OrComValorFrete, OrComSolicitante, OrComUnidadeEntrega, OrComLocalEntrega, 
-							OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, OrComSituacao, OrComUsuarioAtualizador, OrComUnidade)
+							OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, OrComSaldoRemanescente, OrComSituacao, OrComUsuarioAtualizador, OrComUnidade)
 				VALUES (:sTipo, :dFluxo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudoInicio, :sConteudoFim, :iFornecedor, :fValorFrete, 
-						:iSolicitante, :iUnidadeEntrega, :iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :bStatus, 
+						:iSolicitante, :iUnidadeEntrega, :iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :iSaldoRemanescente, :bStatus, 
 						:iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 		
@@ -113,6 +113,7 @@ if(isset($_POST['inputData'])){
 						':sEnderecoEntrega' => $_POST['inputEnderecoEntrega'],
 						':dDataEntrega' => $_POST['inputDataEntrega'] == '' ? null : $_POST['inputDataEntrega'],
 						':sObservacao' => $_POST['txtareaObservacao'],
+						':iSaldoRemanescente' => $_POST['inputSaldoRemanescente'],
 						':bStatus' => $rowSituacao['SituaId'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
@@ -234,8 +235,24 @@ if(isset($_POST['inputData'])){
 							$('#inputTelefoneFornecedor').val(Forne[3]);
 						} else {
 							$('#inputTelefoneFornecedor').val(Forne[4]);
-						}
+						}	
+
+						$.ajax({
+							type: "POST",
+							url: "ordemCompraSaldoRemanescente.php",
+							data: ('IdFlOpe='+flux.FlOpeId),
+							success: function(resposta){
+								
+								if(resposta == 1){
+									document.getElementById('Mensagem').style.display = "block";
+								} else{
+									document.getElementById('Mensagem').style.display = "none";
+								}
+							}
+
+						});
 					}
+
 					
 				});
 		
@@ -454,13 +471,13 @@ if(isset($_POST['inputData'])){
 														<div class="form-group col-12 col-lg-4" style="margin-top: 10px ; margin-right: 20px">
 															<div class="form-check  form-check-inline">
 																<label class="form-check-label">
-																	<input type="radio" id="inputSaldo" name="inputSaldo" value="1" class="form-input-styled" checked data-fouc>
+																	<input type="radio" id="inputSaldoRemanescente" name="inputSaldoRemanescente" value="1" class="form-input-styled" checked data-fouc>
 																	SIM
 																</label>
 															</div>	
 															<div class="form-check form-check-inline">
 																<label class="form-check-label">
-																	<input type="radio" id="inputSaldo" name="inputSaldo" value="0" class="form-input-styled" data-fouc>
+																	<input type="radio" id="inputSaldoRemanescente" name="inputSaldoRemanescente" value="0" class="form-input-styled" data-fouc>
 																	NÃO
 																</label>
 															</div>	
