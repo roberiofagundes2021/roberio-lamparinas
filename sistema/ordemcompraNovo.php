@@ -463,12 +463,12 @@ if(isset($_POST['inputData'])){
 										<?php 
 											
 											print('
-												<div id="Mensagem" class="row col-lg-12" style="background-color: #fcf8e3; display:none;">
-													<div class="row justify-content-left col-lg-12">
-														<div class="row justify-content-end align-center-center col-12 col-lg-8">
-															<p style="color: red; margin-right: 60px"><i class="icon-info3"></i> Há saldo remanescente do contrato a ser usado. Deseja utilizá-lo?</p>
+												<div id="Mensagem" class="row" style="margin-top: 10px;" display:block;">
+													<div class="row justify-content-center col-lg-12 ">
+														<div class="form-group col-12 col-lg-10" style="margin-top: 15px;">
+															<p style="color: red"><i class="icon-info3"></i> Há saldo remanescente do contrato a ser usado. Deseja utilizá-lo?</p>
 														</div>
-														<div class="form-group col-12 col-lg-4" style="margin-top: 10px ; margin-right: 20px">
+														<div  class="form-group col-12 col-lg-2">
 															<div class="form-check  form-check-inline">
 																<label class="form-check-label">
 																	<input type="radio" id="inputSaldoRemanescente" name="inputSaldoRemanescente" value="1" class="form-input-styled" checked data-fouc>
