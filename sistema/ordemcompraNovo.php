@@ -113,7 +113,7 @@ if(isset($_POST['inputData'])){
 						':sEnderecoEntrega' => $_POST['inputEnderecoEntrega'],
 						':dDataEntrega' => $_POST['inputDataEntrega'] == '' ? null : $_POST['inputDataEntrega'],
 						':sObservacao' => $_POST['txtareaObservacao'],
-						':iSaldoRemanescente' => $_POST['inputSaldoRemanescente'],
+						':iSaldoRemanescente' => isset($_POST['inputSaldoRemanescente']) ? $_POST['inputSaldoRemanescente'] : null,
 						':bStatus' => $rowSituacao['SituaId'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
@@ -245,8 +245,10 @@ if(isset($_POST['inputData'])){
 								
 								if(resposta == 1){
 									document.getElementById('Mensagem').style.display = "block";
+									document.getElementById('inputSaldoRemanescente').setAttribute('required', 'required')
 								} else{
 									document.getElementById('Mensagem').style.display = "none";
+									document.getElementById('inputSaldoRemanescente').removeAttribute('required', 'required');	
 								}
 							}
 
@@ -465,20 +467,16 @@ if(isset($_POST['inputData'])){
 											print('
 												<div id="Mensagem" class="row" style=" margin-top: 10px; display:none">
 													<div class="row justify-content-center col-lg-12 ">
-														<div class="form-group col-12 col-lg-10" style="margin-top: 15px;">
+														<div class="form-group col-12 col-lg-9">
 															<p style="color: red"><i class="icon-info3"></i> Há saldo remanescente do contrato a ser usado. Deseja utilizá-lo?</p>
 														</div>
-														<div  class="form-group col-12 col-lg-2">
+														<div class="form-group col-12 col-lg-3">
 															<div class="form-check  form-check-inline">
-																<label class="form-check-label">
-																	<input type="radio" id="inputSaldoRemanescente" name="inputSaldoRemanescente" value="1" class="form-input-styled" checked data-fouc>
-																	SIM
+																<label class="form-check-label" style="margin-right:40px">
+																	<input type="radio" id="inputSaldoRemanescente" name="inputSaldoRemanescente" value="1" class="form-input-styled" data-fouc required>SIM
 																</label>
-															</div>	
-															<div class="form-check form-check-inline">
 																<label class="form-check-label">
-																	<input type="radio" id="inputSaldoRemanescente" name="inputSaldoRemanescente" value="0" class="form-input-styled" data-fouc>
-																	NÃO
+																	<input type="radio" id="inputSaldoRemanescente" name="inputSaldoRemanescente" value="0" class="form-input-styled" data-fouc required>NÃO
 																</label>
 															</div>	
 														</div>
