@@ -16,7 +16,7 @@ if (isset($_POST['inputSolicitacaoId'])) {
 			JOIN Produto on ProduId = SlXPrProduto
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 			WHERE SlXPrUnidade = " . $_SESSION['UnidadeId'] . " and SolicId = " . $_POST['inputSolicitacaoId'] . "
-			";		
+			";
 	$result = $conn->query($sql);
 	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
 	$numProdutos = count($produtosSolicitacao);
@@ -31,7 +31,7 @@ if (isset($_POST['inputSolicitacaoId'])) {
 	$result = $conn->query($sql);
 	$servicoSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
 	$numServicos = count($servicoSolicitacao);
-	
+
 	$solicitacoes = array_merge($servicoSolicitacao, $produtosSolicitacao);
 	$idsProdutos = '';
 
@@ -45,7 +45,6 @@ if (isset($_POST['inputSolicitacaoId'])) {
 			}
 		}
 	}
-
 }
 
 /* VALIDA SE OS DADOS VIERAM DA MESMA PÁGINA */
@@ -58,7 +57,7 @@ if (isset($_POST['inputData'])) {
 		// SELECT MAX(SUBSTRING(MovimNumRecibo, 3, 6))
 		// 	FROM [Movimentacao] WHERE [MovimTipo] = 'T'
 
-		$newMovi = '1/'.(date("Y"));
+		$newMovi = '1/' . (date("Y"));
 
 		// vai retornar um valor contendo somente a segunda parte da string ex: "1/2021" => "2021"
 		$sqlMovi = "SELECT MAX(SUBSTRING(MovimNumRecibo, 3, 6)) as MovimNumRecibo
@@ -73,12 +72,12 @@ if (isset($_POST['inputData'])) {
 			// vai buscar o ultimo valor completo no banco
 			$sqlMovi = "SELECT MAX(MovimNumRecibo) as MovimNumRecibo
 					FROM Movimentacao
-					WHERE MovimUnidade = '$_SESSION[UnidadeId]' and MovimNumRecibo LIKE '%".date("Y")."%'";
+					WHERE MovimUnidade = '$_SESSION[UnidadeId]' and MovimNumRecibo LIKE '%" . date("Y") . "%'";
 			$resultMovi = $conn->query($sqlMovi);
 			$rowMovi = $resultMovi->fetch(PDO::FETCH_ASSOC);
-	
+
 			$newMovi = explode('/', $rowMovi['MovimNumRecibo']);
-			$newMovi = (intval($newMovi[0])+1).'/'.(date("Y"));
+			$newMovi = (intval($newMovi[0]) + 1) . '/' . (date("Y"));
 		}
 
 		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimNumRecibo, MovimData, MovimOrigemLocal, MovimDestinoSetor, MovimObservacao, 
@@ -121,7 +120,7 @@ if (isset($_POST['inputData'])) {
 
 					//Se classificação
 					if (isset($classificacao)) {
-							
+
 						// Se produto é um bem permanente (Insere na tabela Patrimonio).
 						if ($classificacao == 2) {
 
@@ -155,7 +154,6 @@ if (isset($_POST['inputData'])) {
 								if ($numeroPatri < 100000 && $numeroPatri > 9999) $numeroPatriFinal = "00" . $numeroPatri . "";
 								if ($numeroPatri < 1000000 && $numeroPatri > 99999) $numeroPatriFinal = "0" . $numeroPatri . "";
 								if ($numeroPatri < 10000000 && $numeroPatri > 999999) $numeroPatriFinal = $numeroPatri;
-
 							} else {
 
 								//Caso seja o primeiro registro na tabela para esta empresa
@@ -198,7 +196,6 @@ if (isset($_POST['inputData'])) {
 								':iUnidade' => $_SESSION['UnidadeId'],
 								':iPatrimonio' => $insertIdPatrimonio
 							));
-							
 						} else {
 
 							$sql = "INSERT INTO MovimentacaoXProduto
@@ -253,7 +250,7 @@ if (isset($_POST['inputData'])) {
 						':iMovimentacao' => $insertId,
 						':iServico' => $registro[1],
 						':iQuantidade' => (int) $registro[3],
-						':fValorUnitario' =>isset( $registro[2]) != '' ? (float)$registro[2] : null,
+						':fValorUnitario' => isset($registro[2]) != '' ? (float)$registro[2] : null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iUnidade' => $_SESSION['UnidadeId']
 					));
@@ -266,11 +263,11 @@ if (isset($_POST['inputData'])) {
 				FROM Situacao
 				WHERE SituaChave = 'LIBERADO' ";
 		$result = $conn->query($sql);
-		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC); 
-   
+		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
 		/*Capturando dados para Update*/
-	  	$iStatus = $rowSituacao['SituaId'];
-    
+		$iStatus = $rowSituacao['SituaId'];
+
 		/*Atualiza status bandeja*/
 		$sql = "UPDATE Bandeja SET BandeStatus = :iStatus
 				WHERE BandeUnidade = :iUnidade AND BandeId = :iBandeja";
@@ -279,8 +276,8 @@ if (isset($_POST['inputData'])) {
 		$result->bindParam(':iUnidade', $_SESSION['UnidadeId']);
 		$result->bindParam(':iBandeja', $_POST['inputBandejaId']);
 		$result->execute();
-   
-         /* Atualiza status das Ações */
+
+		/* Atualiza status das Ações */
 
 		$sql = "UPDATE Solicitacao SET SolicSituacao = :iStatus, SolicUsuarioAtualizador = :iUsuario
 				WHERE SolicId = :iSolicitacao";
@@ -289,7 +286,7 @@ if (isset($_POST['inputData'])) {
 		$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
 		$result->bindParam(':iSolicitacao', $_POST['SolicitacaoId']);
 		$result->execute();
-    
+
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -914,8 +911,8 @@ if (isset($_POST['inputData'])) {
 							// console.log(dados)
 
 							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal + 
-								'#' + obj.Validade + '#' + obj.Lote + '">' + obj.ProduNome + '</option>';
+								option += '<option value="' + obj.ProduId + '#' + obj.ProduCustoFinal +
+									'#' + obj.Validade + '#' + obj.Lote + '">' + obj.ProduNome + '</option>';
 							});
 
 							$('#cmbProduto').html(option).show();
@@ -940,15 +937,15 @@ if (isset($_POST['inputData'])) {
 
 				var Produto = cmbProduto.split("#");
 				var valor = Produto[1].replace(".", ",");
-				var validade = Produto[2]?Produto[2]:'';
-				var lote = Produto[3]==='null'?'':Produto[3];
+				var validade = Produto[2] ? Produto[2] : '';
+				var lote = Produto[3] === 'null' ? '' : Produto[3];
 
 				if (valor != 'null' && valor) {
 					$('#inputValorUnitario').val(valor);
 				} else {
 					$('#inputValorUnitario').val('0,00');
 				}
-				  
+
 				$('#inputLote').val(lote);
 
 				$('#inputValidade').val(validade);
@@ -974,6 +971,12 @@ if (isset($_POST['inputData'])) {
 			});
 
 			$('#btnAdicionar').click(function() {
+				var val = $('#tabelaProdutoServicoSaida tbody').children()
+				var leng = val.length-1
+				var id = (val[leng] && val[leng].id)?parseInt(val[leng].id.split('w')[1]):0
+
+				$('#inputNumItens').val(id);
+
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputProdutoServico = $('input[name="inputProdutoServico"]:checked').val();
 				var inputNumItens = $('#inputNumItens').val();
@@ -987,10 +990,6 @@ if (isset($_POST['inputData'])) {
 				var cmbClassificacao = $('#cmbClassificacao').val();
 				var inputIdProdutos = $('#inputIdProdutos').val(); //esse aqui guarda todos os IDs de produtos que estão na grid para serem movimentados
 				var inputIdServicos = $('#inputIdServicos').val(); //esse aqui guarda todos os IDs de serviços que estão na grid para serem movimentados
-				// console.log('Id_Produtos: '+inputIdProdutos);
-				// console.log('Id_Servicos: '+inputIdServicos);
-				// console.log('Item: '+Item[0]);
-				// console.log('Lote: '+inputLote);
 
 				//remove os espaços desnecessários antes e depois
 				inputQuantidade = inputQuantidade.trim();
@@ -1023,28 +1022,50 @@ if (isset($_POST['inputData'])) {
 				//if(Item[0].length == 1) Item[0] = "0"+Item[0];
 
 				//Verifica se o campo já está no array
-				if (inputProdutoServico == 'P'){
 
-					if (cmbProduto == '#' || cmbProduto == ''){
-						alerta('Atenção', 'Informe o produto!', 'error');						
+				
+				var itemId = []
+				var arr = []
+				if (inputProdutoServico == 'P') {
+					itemId = inputIdProdutos.split(",");
+				} else {
+					itemId = inputIdServicos.split(",");
+				}
+
+				for(var x=0;x<itemId.length;x++){
+					if(itemId[x]){
+						arr.push(itemId[x].trim())
+					}
+				}
+				
+				console.log(arr)
+				console.log(Item[0])
+				console.log(itemId)
+				console.log(arr.indexOf(Item[0]))
+				console.log('--------------------------')
+
+				if (inputProdutoServico == 'P') {
+
+					if (cmbProduto == '#' || cmbProduto == '') {
+						alerta('Atenção', 'Informe o produto!', 'error');
 						$('#cmbProduto').focus();
 						return false;
 					}
 
-					if (inputIdProdutos.includes(Item[0])) {
-						alerta('Atenção', 'Esse produto já foi adicionado!', 'error');						
+					if (arr.indexOf(Item[0]) != -1) {
+						alerta('Atenção', 'Esse produto já foi adicionado!', 'error');
 						$('#cmbProduto').focus();
 						return false;
 					}
-				} else{
+				} else {
 
-					if (cmbProduto == '#' || cmbProduto == ''){
-						alerta('Atenção', 'Informe o serviço!', 'error');						
+					if (cmbProduto == '#' || cmbProduto == '') {
+						alerta('Atenção', 'Informe o serviço!', 'error');
 						$('#cmbProduto').focus();
 						return false;
 					}
 
-					if (inputIdServicos.includes(Item[0])) {
+					if (arr.indexOf(Item[0]) != -1) {
 						alerta('Atenção', 'Esse serviço já foi adicionado!', 'error');
 						$('#cmbProduto').focus();
 						return false;
@@ -1063,6 +1084,7 @@ if (isset($_POST['inputData'])) {
 					$.ajax({
 						type: "POST",
 						url: "movimentacaoAddProduto.php",
+						dataType: "json",
 						data: {
 							tipo: inputTipo,
 							numItens: resNumItens,
@@ -1073,7 +1095,6 @@ if (isset($_POST['inputData'])) {
 							Lote: inputLote
 						},
 						success: function(resposta) {
-
 							//var newRow = $("<tr>");
 
 							//newRow.append(resposta);
@@ -1081,7 +1102,26 @@ if (isset($_POST['inputData'])) {
 
 								var inputTipo = $('input[name="inputTipo"]:checked').val();
 
-								$("#tabelaProdutoServicoSaida").append(resposta);
+								// $("#tabelaProdutoServicoSaida").append(resposta);
+								var table = $('#tabelaProdutoServicoSaida').DataTable()
+								var rowNode = table.row.add(resposta.data).draw().node()
+								
+								// adiciona os atributos na tag <tr>
+								$(rowNode).attr('id', resposta.identify[0]);
+								$(rowNode).attr('idProduSolicitacao', resposta.identify[1]);
+								$(rowNode).attr('tipo', resposta.identify[2]);
+								$(rowNode).attr('lote', resposta.identify[3]);
+								$(rowNode).attr('validade', resposta.identify[4]);
+								$(rowNode).attr('class', 'produtoSolicitacao trGrid');
+
+								// adiciona os atributos nas tags <td>
+								$(rowNode).find('td').eq(2).attr('style', 'text-align:center');
+								$(rowNode).find('td').eq(3).attr('style', 'text-align:center');
+								$(rowNode).find('td').eq(3).attr('id', 'quantEditaEntradaSaida');
+								$(rowNode).find('td').eq(4).attr('style', 'text-align:right');
+								$(rowNode).find('td').eq(5).attr('style', 'text-align:right');
+								$(rowNode).find('td').eq(6).attr('id', 'classificacaoSaida');
+								$(rowNode).find('td').eq(7).attr('class', 'text-center');
 
 								//Adiciona mais um item nessa contagem
 								$('#inputNumItens').val(resNumItens);
@@ -1098,7 +1138,7 @@ if (isset($_POST['inputData'])) {
 								if (inputProdutoServico == 'P') {
 									inputIdProdutos = inputIdProdutos + ', ' + Item[0];
 									$('#inputIdProdutos').val(inputIdProdutos);
-								} else{
+								} else {
 									inputIdServicos = inputIdServicos + ', ' + Item[0];
 									$('#inputIdServicos').val(inputIdServicos);
 								}
@@ -1164,6 +1204,7 @@ if (isset($_POST['inputData'])) {
 					$.ajax({
 						type: "POST",
 						url: "movimentacaoAddServico.php",
+						dataType: "json",
 						data: {
 							tipo: inputTipo,
 							numItens: resNumItens,
@@ -1174,8 +1215,28 @@ if (isset($_POST['inputData'])) {
 
 							//var newRow = $("<tr>");
 							if (resposta != 'SEMESTOQUE') {
-								//newRow.append(resposta);	    
-								$("#tabelaProdutoServicoSaida").append(resposta);
+								//newRow.append(resposta);
+
+								// $("#tabelaProdutoServicoSaida").append(resposta);
+								var table = $('#tabelaProdutoServicoSaida').DataTable()
+								var rowNode = table.row.add(resposta.data).draw().node()
+								
+								// adiciona os atributos na tag <tr>
+								$(rowNode).attr('id', resposta.identify[0]);
+								$(rowNode).attr('idProduSolicitacao', resposta.identify[1]);
+								$(rowNode).attr('tipo', resposta.identify[2]);
+								$(rowNode).attr('lote', resposta.identify[3]);
+								$(rowNode).attr('validade', resposta.identify[4]);
+								$(rowNode).attr('class', 'produtoSolicitacao trGrid');
+
+								// adiciona os atributos nas tags <td>
+								$(rowNode).find('td').eq(2).attr('style', 'text-align:center');
+								$(rowNode).find('td').eq(3).attr('style', 'text-align:center');
+								$(rowNode).find('td').eq(3).attr('id', 'quantEditaEntradaSaida');
+								$(rowNode).find('td').eq(4).attr('style', 'text-align:right');
+								$(rowNode).find('td').eq(5).attr('style', 'text-align:right');
+								$(rowNode).find('td').eq(6).attr('id', 'classificacaoSaida');
+								$(rowNode).find('td').eq(7).attr('class', 'text-center');
 
 								//Adiciona mais um item nessa contagem
 								$('#inputNumItens').val(resNumItens);
@@ -1221,44 +1282,43 @@ if (isset($_POST['inputData'])) {
 			}
 			produtosSolicitacaoSaida()
 
-
 			$(document).on('click', '.btn_remove', function() {
-
-				var inputProdutoServico = $('input[name="inputProdutoServico"]:checked').val();
 				var inputTotal = $('#inputTotal').val();
 				var button_id = $(this).attr("id");
 				var Produto = button_id.split("#");
+				var inputProdutoServico = button_id.split("#")[2];
 				var inputIdProdutos = $('#inputIdProdutos').val(); //array com o Id dos produtos adicionados
 				var inputIdServicos = $('#inputIdServicos').val(); //array com o Id dos servicos adicionados
 				var inputNumItens = $('#inputNumItens').val();
 
 				var item = '';
+				console.log(inputProdutoServico)
+				console.log($(this).attr("id"))
 
-				if(inputProdutoServico == 'P'){
+				if (inputProdutoServico == 'P') {
 					item = inputIdProdutos.split(",");
-				} else{
+				} else {
 					item = inputIdServicos.split(",");
-				}				
+				}
 
 				var i;
 				var arr = [];
 
 				for (i = 0; i < item.length; i++) {
-					arr.push(item[i]);
+					arr.push(item[i].trim());
 				}
 
 				var index = arr.indexOf(Produto[0]);
-
 				arr.splice(index, 1);
 
-				if (inputProdutoServico == 'P'){
+				if (inputProdutoServico == 'P') {
 					$('#inputIdProdutos').val(arr);
-				} else{
+				} else {
 					$('#inputIdServicos').val(arr);
-				}				
+				}
 
-				$("#row" + Produto[0] + "").remove(); //remove a linha da tabela
-				$("#campo" + Produto[0] + "").remove(); //remove o campo hidden
+				var table = $('#tabelaProdutoServicoSaida').DataTable() //busca a tabela
+				table.row($('#row'+Produto[0])).remove().draw();        //deleta a linha da tabela
 
 				//Agora falta calcular o valor total novamente
 				inputTotal = parseFloat(inputTotal) - parseFloat(Produto[1]);
@@ -1338,9 +1398,9 @@ if (isset($_POST['inputData'])) {
 					})
 
 					if (contSelectClass == contSelectClassVal) {
-						
+
 						$('#cmbDestinoSetor').prop("disabled", false);
-						
+
 						$.ajax({
 							type: "POST",
 							url: "movimentacaoNovoSaida.php",
@@ -1559,8 +1619,12 @@ if (isset($_POST['inputData'])) {
 
 					<form name="formMovimentacao" id="formMovimentacao" method="POST" class="form-validate-jquery" action="movimentacaoNovoSaida.php">
 
-						<input type="hidden" id="inputBandejaId" name="inputBandejaId" value="<?php if (isset($_POST['inputBandejaId'])){ echo $_POST['inputBandejaId']; } ?>">
-						<input type="hidden" id="SolicitacaoId" name="SolicitacaoId" value="<?php if (isset($_POST['inputSolicitacaoId'])) { echo $_POST['inputSolicitacaoId']; } ?>">
+						<input type="hidden" id="inputBandejaId" name="inputBandejaId" value="<?php if (isset($_POST['inputBandejaId'])) {
+																									echo $_POST['inputBandejaId'];
+																								} ?>">
+						<input type="hidden" id="SolicitacaoId" name="SolicitacaoId" value="<?php if (isset($_POST['inputSolicitacaoId'])) {
+																								echo $_POST['inputSolicitacaoId'];
+																							} ?>">
 
 						<div class="card-body">
 
@@ -1635,7 +1699,6 @@ if (isset($_POST['inputData'])) {
 																$usuarioPerfil = $result->fetch(PDO::FETCH_ASSOC);
 
 																print('<option value="' . $usuarioPerfil['SetorId'] . '" selected>' . $usuarioPerfil['SetorNome'] . '</option>');
-
 															} else {
 																$sql = "SELECT SetorId, SetorNome
 																		FROM Setor
@@ -1791,45 +1854,45 @@ if (isset($_POST['inputData'])) {
 									</div>
 
 									<div id="inputProdutos">
-										
+
 									</div>
 
 									<?php
-										if (isset($_POST['inputSolicitacaoId'])) {
-											print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="' . $numProdutos . '">');
-										} else {
-											print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">');
-										}
-										?>
-										<input type="hidden" id="itemEditadoquantidade" name="itemEditadoquantidade" value="0">
-										<?php
-										if (isset($_POST['inputSolicitacaoId'])) {
-											print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="' . $idsProdutos . '">');
-											print('<input type="hidden" id="inputIdServicos" name="inputIdServicos" value="' . $idsProdutos . '">');
-										} else {
-											print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">');
-											print('<input type="hidden" id="inputIdServicos" name="inputIdServicos" value="0">');
-										}
-										?>
-										<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
-										<?php
-										if (isset($_POST['inputSolicitacaoId'])) {
-											$totalGeral = 0;
+									if (isset($_POST['inputSolicitacaoId'])) {
+										print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="' . $numProdutos . '">');
+									} else {
+										print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">');
+									}
+									?>
+									<input type="hidden" id="itemEditadoquantidade" name="itemEditadoquantidade" value="0">
+									<?php
+									if (isset($_POST['inputSolicitacaoId'])) {
+										print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="' . $idsProdutos . '">');
+										print('<input type="hidden" id="inputIdServicos" name="inputIdServicos" value="' . $idsProdutos . '">');
+									} else {
+										print('<input type="hidden" id="inputIdProdutos" name="inputIdProdutos" value="0">');
+										print('<input type="hidden" id="inputIdServicos" name="inputIdServicos" value="0">');
+									}
+									?>
+									<input type="hidden" id="inputProdutosRemovidos" name="inputProdutosRemovidos" value="0">
+									<?php
+									if (isset($_POST['inputSolicitacaoId'])) {
+										$totalGeral = 0;
 
-											foreach ($solicitacoes  as $produto) {
-												$totalGeral += $produto['Quantidade'] * $produto['Valor'];
-											}
-
-											print('<input type="hidden" id="inputTotal" name="inputTotal" value="' . $totalGeral . '">');
-										} else {
-											print('<input type="hidden" id="inputTotal" name="inputTotal" value="0">');
+										foreach ($solicitacoes  as $produto) {
+											$totalGeral += $produto['Quantidade'] * $produto['Valor'];
 										}
-										?>
+
+										print('<input type="hidden" id="inputTotal" name="inputTotal" value="' . $totalGeral . '">');
+									} else {
+										print('<input type="hidden" id="inputTotal" name="inputTotal" value="0">');
+									}
+									?>
 
 									<div class="row">
 										<div class="col-lg-12">
 											<?php
-											print('<table class="table" id="tabelaProdutoServicoSaida">');
+												print('<table class="table" id="tabelaProdutoServicoSaida">');
 											?>
 											<thead>
 												<?php
@@ -1863,7 +1926,7 @@ if (isset($_POST['inputData'])) {
 												?>
 											</thead>
 											<tbody>
-												<?php
+												<?php /*
 												if (isset($_POST['inputSolicitacaoId'])) {
 													$idProdutoSolicitacao = 0;
 													$totalGeral = 0;
@@ -1893,7 +1956,7 @@ if (isset($_POST['inputData'])) {
 																</tr>
 															');
 												}
-												?>
+												*/?>
 
 												<?php
 												if (isset($_POST['inputSolicitacaoId'])) {
@@ -1913,16 +1976,16 @@ if (isset($_POST['inputData'])) {
 														$valorTotal = formataMoeda($produto['Quantidade'] * $produto['Valor']);
 														$valorTotalSemFormatacao = $produto['Quantidade'] * $produto['Valor'];
 
-														$UnMedNome = isset($produto['UnMedNome'])? $produto['UnMedNome']:'';
-														$SlXPrQuantidade = isset($produto['Quantidade'])? $produto['Quantidade']:'';
-														$ProduValor = isset($produto['Valor'])? $produto['Valor']:'';
+														$UnMedNome = isset($produto['UnMedNome']) ? $produto['UnMedNome'] : '';
+														$SlXPrQuantidade = isset($produto['Quantidade']) ? $produto['Quantidade'] : '';
+														$ProduValor = isset($produto['Valor']) ? $produto['Valor'] : '';
 
 														$totalGeral += $produto['Quantidade'] * $produto['Valor'];
 
 														$linha = '';
 
 														$linha .= "
-																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['Id'] . "' tipo='".$tipo."' lote='".$lote."' validade='".$validade."'>
+																<tr class='produtoSolicitacao trGrid' id='row" . $idProdutoSolicitacao . "' idProduSolicitacao='" . $produto['Id'] . "' tipo='" . $tipo . "' lote='" . $lote . "' validade='" . $validade . "'>
 																	<td>" . $idProdutoSolicitacao . "</td>
 																	<td>" . $produto['Nome'] . "</td>
 																	<td style='text-align:center'>" . $UnMedNome . "</td>
@@ -1931,33 +1994,31 @@ if (isset($_POST['inputData'])) {
 																	<td style='text-align:right'>" . $valorTotal . "</td>
 																
 															";
+														$linha .= '<td style="text-align:center">
+																		<div class="d-flex flex-row ">';
 
-														$linha .= '
-																	<td style="text-align:center">
-																		<div class="d-flex flex-row ">
-																			<select id="' . $idProdutoSolicitacao . '" name="cmbClassificacao' . $idProdutoSolicitacao . '" class="form-control form-control-select2 selectClassific">
-																				<option value="#">Selecione</option>
-															';
+														if ($produto['Tipo'] == 'P') {
+															$linha .= '<select id="' . $idProdutoSolicitacao . '" name="cmbClassificacao' . $idProdutoSolicitacao . '" class="form-control form-control-select2 selectClassific">
+																			<option value="#">Selecione</option>';
 
-														$sql = "SELECT ClassId, ClassNome
-																	FROM Classificacao
-																	JOIN Situacao on SituaId = ClassStatus
-																	WHERE SituaChave = 'ATIVO'
-																	ORDER BY ClassNome ASC";
-														$result = $conn->query($sql);
-														$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
+															$sql = "SELECT ClassId, ClassNome
+																		FROM Classificacao
+																		JOIN Situacao on SituaId = ClassStatus
+																		WHERE SituaChave = 'ATIVO'
+																		ORDER BY ClassNome ASC";
+															$result = $conn->query($sql);
+															$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
-														foreach ($rowClassificacao as $item) {
-															$linha .= '<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>';
+															foreach ($rowClassificacao as $item) {
+																$linha .= '<option value="' . $item['ClassId'] . '">' . $item['ClassNome'] . '</option>';
+															}
+															$linha .= "</select>";
 														}
 
-														$linha .= "
-																			</select>
-																		</div>
-																	</td>
-																	<td style='text-align:center;'><span name='remove' id='" . $idProdutoSolicitacao . "#" . $valorTotalSemFormatacao . "' class='btn btn_remove'>X</span></td>
-																</tr>
-															";
+														$linha .= "</div>
+																</td>
+																<td style='text-align:center;'><span name='remove' id='$idProdutoSolicitacao#$valorTotalSemFormatacao#".$produto['Tipo']."' class='btn btn_remove'>X</span></td>
+															</tr>";
 
 														print($linha);
 													}

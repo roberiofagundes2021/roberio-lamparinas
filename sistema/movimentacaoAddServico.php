@@ -26,18 +26,39 @@ $count = count($row);
 				$total = $_POST['quantidade'] * $row['ServiCustoFinal'];
 			}
 	
-			$output = 	'<tr id="row'.$_POST['numItens'].'">
-							 <td>'.$_POST['numItens'].'</td>
-							 <td data-popup="tooltip" title="'.$row['ServiDetalhamento'].'">'.$row['ServiNome'].'</td>
-							 <td></td>
-							 <td style="text-align: center">'.$_POST['quantidade'].'</td>
-							 <td style="text-align: right">'.$valorCusto.'</td>
-							 <td style="text-align: right">'.$valorTotal.'</td>
-							 <td></td>
-							 <td><span name="remove" id="'.$_POST['numItens'].'#'.$total.'" class="btn btn_remove">X</span></td>
-						 <tr>
-						 ';
-			echo $output;
+			// $output = 	'<tr id="row'.$_POST['numItens'].'">
+			// 				 <td>'.$_POST['numItens'].'</td>
+			// 				 <td data-popup="tooltip" title="'.$row['ServiDetalhamento'].'">'.$row['ServiNome'].'</td>
+			// 				 <td></td>
+			// 				 <td style="text-align: center">'.$_POST['quantidade'].'</td>
+			// 				 <td style="text-align: right">'.$valorCusto.'</td>
+			// 				 <td style="text-align: right">'.$valorTotal.'</td>
+			// 				 <td></td>
+			// 				 <td><span name="remove" id="'.$_POST['numItens'].'#'.$total.'" class="btn btn_remove">X</span></td>
+			// 			 <tr>
+			// 			 ';
+			// echo $output;
+
+			$teste = [
+				'data' => [
+					$_POST['numItens'],
+					$row['ServiDetalhamento'],
+					'',
+					$_POST['quantidade'],
+					$valorCusto,
+					$valorTotal,
+					'',
+					"<span name='remove' id='".$_POST['numItens']."#$total#S' class='btn btn_remove'>X</span>"
+				],
+				'identify' => [
+					'row'.$_POST['numItens'],   //ID
+					$row['ServiId'],            //ProdId
+					'S',                        //Tipo
+					'',                         //lote
+					''                          //validade
+				]
+			];
+			echo json_encode($teste);
 		} else {
 	
 			if ($_POST['tipo'] == 'E') {
@@ -52,7 +73,7 @@ $count = count($row);
 				$total = $_POST['quantidade'] * $row['ServiCustoFinal'];
 			}
 	
-			$output = 	'SEMESTOQUE';
+			$output = 'SEMESTOQUE';
 			echo $output;
 		}
 	} else{

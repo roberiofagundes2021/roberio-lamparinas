@@ -21,7 +21,9 @@ if (isset($_POST['inputMovimentacaoId'])) {
     $result = $conn->query($sql);
     $row = $result->fetch(PDO::FETCH_ASSOC);
 
-    //Após concluido a tela de Movimentação tem que avaliar se precisa desse Distinct, porque não deve ser criado vários registros na tabela MovimentacaoXProduto pra esse caso de produtos não patrimoniados.
+    // Após concluido a tela de Movimentação tem que avaliar se precisa desse Distinct,
+    // porque não deve ser criado vários registros na tabela MovimentacaoXProduto pra esse caso
+    // de produtos não patrimoniados.
     $sql = "SELECT Distinct MvXPrProduto, MvXPrQuantidade, MvXPrLote, isnull(cast(cast(MvXPrValidade as date)as varchar),'') as Validade, ClassNome, ClassChave, ProduNome, ProduMarca, 
             ProduModelo, ProduCodigo, ProduUnidadeMedida, ProduModelo, CategNome, UnMedSigla, ModelNome, MarcaNome
 	        FROM Movimentacao

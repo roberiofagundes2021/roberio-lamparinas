@@ -228,10 +228,14 @@ td{
 												<?php if($perfPadrao){echo '| <a href="#" role="button" title="Resetar Todos" onClick="resetPermissao('.$unidade.','.$PerfilId.', `all`)">Resetar todos</a>';} ?>
 											</div>
 										</div>
-									</div>								
-									<div class="">		
-										<p class="font-size-lg">OBS.: A opção de resetar estará presente APENAS para os perfis padrões do sistema!!</b></p>
 									</div>
+									<?php 
+										if(!$perfPadrao){
+											echo "<div class='row align-content-center col-lg-12 mt-3'>
+												<p style='color: red; margin: 0px'><i class='icon-info3'></i>A opção de resetar estará presente APENAS para os perfis padrões do sistema.</p>
+											</div>";
+										}
+									?>
 								</div>
 							</div>
 							<form id="form_reset" method="POST">

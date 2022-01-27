@@ -350,7 +350,6 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 						$(elem).on('click', () => {
 							let id = $(elem).attr('produId')
 							var produtoServico = $('input[name="inputProdutoServico"]:checked').val();
-							console.log('teste')
 
 							$.post(
 								'solicitacaoNovoCarrinho.php', {
