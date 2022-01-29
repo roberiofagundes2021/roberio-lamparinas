@@ -5,10 +5,12 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 // Formata Data para aparecer DD/MM/YYYY
-$sql = " SELECT OrComId, OrComNumero
+$sql = " SELECT OrComId, OrComNumero, FlOpeNumContrato
 		 FROM OrdemCompra
          JOIN Situacao on SituaId = OrComSituacao
-		 WHERE OrComUnidade = ". $_SESSION['UnidadeId'] . " and OrComFornecedor = " . $_GET['idFornecedor'] . " and SituaChave = 'LIBERADOCONTABILIDADE' ";
+         JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
+		 WHERE OrComUnidade = ". $_SESSION['UnidadeId'] . " and 
+         OrComFornecedor = " . $_GET['idFornecedor'] . " and SituaChave = 'LIBERADOCONTABILIDADE' ";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
@@ -75,10 +77,10 @@ if ($count) {
             }
 
             if ($saldosPositivos >= 1) {
-                print('<option idOrdemCompra="' . $value['OrComId'] . '" value="' . $value['OrComId'] . '">' . $value['OrComNumero'] . '</option>');
+                print('<option idOrdemCompra="' . $value['OrComId'] . '" value="'.$value['OrComId'].'">'.$value['OrComNumero'].' (Contrato: '.$value['FlOpeNumContrato'].')</option>');
             }
         } else {
-            print('<option idOrdemCompra="' . $value['OrComId'] . '" value="' . $value['OrComId'] . '">' . $value['OrComNumero'] . '</option>');
+            print('<option idOrdemCompra="' . $value['OrComId'] . '" value="' . $value['OrComId'] . '">' . $value['OrComNumero'].' (Contrato: '.$value['FlOpeNumContrato'].')</option>');
         }
     }
 }

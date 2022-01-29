@@ -24,8 +24,8 @@ if (isset($_POST['inputMovimentacaoId'])) {
     // Após concluido a tela de Movimentação tem que avaliar se precisa desse Distinct,
     // porque não deve ser criado vários registros na tabela MovimentacaoXProduto pra esse caso
     // de produtos não patrimoniados.
-    $sql = "SELECT Distinct MvXPrProduto, MvXPrQuantidade, MvXPrLote, isnull(cast(cast(MvXPrValidade as date)as varchar),'') as Validade, ClassNome, ClassChave, ProduNome, ProduMarca, 
-            ProduModelo, ProduCodigo, ProduUnidadeMedida, ProduModelo, CategNome, UnMedSigla, ModelNome, MarcaNome
+    $sql = "SELECT Distinct MvXPrProduto as ProduServi, MvXPrQuantidade as Quantidade, MvXPrLote, isnull(cast(cast(MvXPrValidade as date)as varchar),'') as Validade, ClassNome, ClassChave, ProduNome as Nome, ProduMarca as Marca, 
+            ProduModelo as Modelo, ProduCodigo as Codigo, ProduUnidadeMedida, ProduModelo as Modelo, CategNome as Categoria, UnMedSigla, ModelNome as NomeModelo, MarcaNome as Marca
 	        FROM Movimentacao
 	        JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
 	        JOIN Produto on ProduId = MvXPrProduto
@@ -34,9 +34,20 @@ if (isset($_POST['inputMovimentacaoId'])) {
 	        JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 	        LEFT JOIN Modelo on ModelId = ProduModelo
             LEFT JOIN Marca on MarcaId = ProduMarca
-	        WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao. " and ClassChave <> 'PERMANENTE' ";
-    $result = $conn->query($sql);
-    $rowMvPrNaoPatrimoniado = $result->fetchAll(PDO::FETCH_ASSOC);
+	        WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao. " and ClassChave <> 'PERMANENTE' 
+            UNION
+            SELECT Distinct MvXSrServico as ProduServi, MvXSrQuantidade as Quantidade, '' , '' , '', '' , ServiNome as Nome, ServiMarca as Marca, 
+            ServiModelo as Modelo, ServiCodigo as Codigo, '' , ServiModelo as Modelo, CategNome as Categoria, '', ModelNome as NomeModelo, MarcaNome as Marca
+            FROM Movimentacao
+            JOIN MovimentacaoXServico on MvXSrMovimentacao = MovimId
+            JOIN Servico on ServiId = MvXSrServico
+            JOIN Categoria on CategId = ServiCategoria
+            LEFT JOIN Modelo on ModelId = ServiModelo
+            LEFT JOIN Marca on MarcaId = ServiMarca
+            WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao. "
+            ";
+            $result = $conn->query($sql);
+            $rowMvPrNaoPatrimoniado = $result->fetchAll(PDO::FETCH_ASSOC);
 
     $sql = "SELECT MvXPrProduto, MvXPrQuantidade, MvXPrLote, isnull(cast(cast(MvXPrValidade as date)as varchar),'') as Validade, ClassNome, ClassChave, ProduNome, ProduMarca, 
             ProduModelo, ProduCodigo, ProduUnidadeMedida, ProduModelo, CategNome, UnMedSigla, ModelNome, MarcaNome, PatriNumero

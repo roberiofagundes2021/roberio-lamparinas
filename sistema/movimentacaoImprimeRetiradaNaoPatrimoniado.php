@@ -29,19 +29,19 @@
                 $html .= '  
                     <table style="width:100%; border: none;"> 
                         <tr>
-                            <td style="text-align: center; background-color: #eee;">Código: '.$value['ProduCodigo'].'</td>
+                            <td style="text-align: center; background-color: #eee;">Código: '.$value['Codigo'].'</td>
                          </tr>
                     </table>
                     <table style="width:100%; border: none;"> 
                         <tr>
-                            <td style="text-align: left; width:60%">Produto:<br>'.$value['ProduNome'].'</td>
-                            <td style="text-align: left; width:40%">Categoria:<br>'.$value['CategNome'].'</td>
+                            <td style="text-align: left; width:60%">Produto:<br>'.$value['Nome'].'</td>
+                            <td style="text-align: left; width:40%">Categoria:<br>'.$value['Categoria'].'</td>
                         </tr>
                     </table>
 	                <table style="width:100%; border: none;">
                         <tr>
-                            <td style="text-align: left; width:50%">Marca:<br>'. $value['MarcaNome'] .'</td>
-                            <td style="text-align: left; width:30%">Modelo:<br>'.$value['ModelNome'].'</td>
+                            <td style="text-align: left; width:50%">Marca:<br>'. $value['Marca'] .'</td>
+                            <td style="text-align: left; width:30%">Modelo:<br>'.$value['NomeModel'].'</td>
                             <td style="text-align: left; width:20%">Unidade:<br>'.$value['UnMedSigla'].'</td>                                    
                         </tr>
                     </table>
@@ -67,7 +67,7 @@
                 }
 
                 $html .= '
-                <td style="text-align: left; width:20%">Quantidade:<br>'.$value['MvXPrQuantidade'].'</td>                                
+                <td style="text-align: left; width:20%">Quantidade:<br>'.$value['Quantidade'].'</td>                                
                             </tr>          
                 </table>  <br> ';
 
@@ -106,19 +106,19 @@
                 $html .= '  
                     <table style="width:100%; border: none;"> 
                         <tr>
-                            <td style="text-align: center; background-color: #eee;">Código: '.$value['ProduCodigo'].'</td>
+                            <td style="text-align: center; background-color: #eee;">Código: '.$value['Codigo'].'</td>
                          </tr>
                     </table>
                     <table style="width:100%; border: none;"> 
                         <tr>
-                            <td style="text-align: left; width:60%">Produto:<br>'.$value['ProduNome'].'</td>
-                            <td style="text-align: left; width:40%">Categoria:<br>'.$value['CategNome'].'</td>
+                            <td style="text-align: left; width:60%">Produto:<br>'.$value['Nome'].'</td>
+                            <td style="text-align: left; width:40%">Categoria:<br>'.$value['Categoria'].'</td>
                         </tr>
                     </table>
 	                <table style="width:100%; border: none;">
                         <tr>
-                            <td style="text-align: left; width:50%">Marca:<br>'. $value['MarcaNome'] .'</td>
-                            <td style="text-align: left; width:30%">Modelo:<br>'.$value['ModelNome'].'</td>
+                            <td style="text-align: left; width:50%">Marca:<br>'. $value['Marca'] .'</td>
+                            <td style="text-align: left; width:30%">Modelo:<br>'.$value['NomeModel'].'</td>
                             <td style="text-align: left; width:20%">Unidade:<br>'.$value['UnMedSigla'].'</td>                                    
                         </tr>
                     </table>
@@ -144,7 +144,7 @@
                 }
 
                 $html .= '
-                <td style="text-align: left; width:20%">Quantidade:<br>'.$value['MvXPrQuantidade'].'</td>                                
+                <td style="text-align: left; width:20%">Quantidade:<br>'.$value['Quantidade'].'</td>                                
                             </tr>          
                 </table>  <br> ';
             }
