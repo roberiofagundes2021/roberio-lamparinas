@@ -11,7 +11,7 @@
 
 				$sqlEmpresa = "SELECT EmpreId, EmpreNomeFantasia
 				FROM Empresa
-				Where EmpreId = ".$_SESSION['EmpreId'];
+				WHERE EmpreId = ".$_SESSION['EmpreId'];
 			
 				$resultEmpresa = $conn->query($sqlEmpresa);
 				$empresa = $resultEmpresa->fetch(PDO::FETCH_ASSOC);
