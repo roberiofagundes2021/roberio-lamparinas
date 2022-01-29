@@ -156,7 +156,7 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
         
                                         <div class="col-lg-2">
-                                            <input type="text" class="form-control-border Valor text-right pula" id="inputCentroValor-`+x+`" name="inputCentroValor-`+x+`" onChange="calculaValorTotal(`+x+`)" onkeypress="pula(event)" value="" required>
+                                            <input type="" class="form-control-border Valor text-right pula" id="inputCentroValor-`+x+`" name="inputCentroValor-`+x+`" onChange="calculaValorTotal(`+x+`)" onkeypress="pula(event)" value="" required>
                                         </div>
         
                                         <div class="col-sm-1 btn" style="text-align:center;" onClick="reset('inputCentroValor-`+x+`', 0)">
@@ -271,7 +271,7 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 					document.getElementById(e.path[0].id).blur()
                 }
 			} else {
-				return onlynumber(e);
+				return e;
 			}
 
 			/* impede o sumbit caso esteja dentro de um form */
@@ -295,11 +295,11 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
             var totalNotaFiscal = parseFloat(valorTotal)
             var ValTotal = 0
             var total = parseFloat($('#totalRegistros').val())
-            var valor = parseFloat($('#inputCentroValor-'+id).val())
+            var valor = id?parseFloat($('#inputCentroValor-'+id).val().replace(',', '.')):0
             var cont = 0
 
             for(var x=0; x<total; x++){
-                ValTotal += parseFloat($('#inputCentroValor-'+x).val())?parseFloat($('#inputCentroValor-'+x).val()):0
+                ValTotal += parseFloat($('#inputCentroValor-'+x).val().replace(',', '.'))?parseFloat($('#inputCentroValor-'+x).val().replace(',', '.')):0
             }
 
             if (id !== undefined){
