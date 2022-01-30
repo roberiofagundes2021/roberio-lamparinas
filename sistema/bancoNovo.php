@@ -11,7 +11,7 @@ if(isset($_POST['inputNome']) && isset($_POST['inputCodigo'])){
 	try{
 		
 		$sql = "INSERT INTO Banco (BancoCodigo, BancoNome, BancoStatus, BancoUsuarioAtualizador)
-				VALUES (:sCodigo, :sNome, :bStatus, :iUsuarioAtualizador)";
+				    VALUES (:sCodigo, :sNome, :bStatus, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
