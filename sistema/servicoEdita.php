@@ -252,9 +252,9 @@ if(isset($_POST['inputNome'])){
 			//Ao mudar o Custo, atualiza o CustoFinal
 			$('#inputValorCusto').on('blur', function(e){
 								
-				var inputValorCusto = $('#inputValorCusto').val().replace('.', '').replace(',', '.');
-				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replace('.', '').replace(',', '.');
-				var inputMargemLucro = $('#inputMargemLucro').val().replace('.', '').replace(',', '.');
+				var inputValorCusto = $('#inputValorCusto').val().replaceAll('.', '').replace(',', '.');
+				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replaceAll('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replaceAll('.', '').replace(',', '.');
 				
 				if (inputValorCusto == null || inputValorCusto.trim() == '') {
 					inputValorCusto = 0.00;
@@ -278,9 +278,9 @@ if(isset($_POST['inputNome'])){
 			//Ao mudar o Custo, atualiza o CustoFinal
 			$('#inputOutrasDespesas').on('blur', function(e){
 								
-				var inputValorCusto = $('#inputValorCusto').val().replace('.', '').replace(',', '.');
-				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replace('.', '').replace(',', '.');
-				var inputMargemLucro = $('#inputMargemLucro').val().replace('.', '').replace(',', '.');
+				var inputValorCusto = $('#inputValorCusto').val().replaceAll('.', '').replace(',', '.');
+				var inputOutrasDespesas = $('#inputOutrasDespesas').val().replaceAll('.', '').replace(',', '.');
+				var inputMargemLucro = $('#inputMargemLucro').val().replaceAll('.', '').replace(',', '.');
 				
 				if (inputValorCusto == null || inputValorCusto.trim() == '') {
 					inputValorCusto = 0.00;
@@ -310,8 +310,8 @@ if(isset($_POST['inputNome'])){
 			//Ao mudar o Valor de Venda, atualiza a Margem de Lucro
 			$('#inputValorVenda').on('blur', function(e){
 								
-				var inputCustoFinal = $('#inputCustoFinal').val().replace('.', '').replace(',', '.');
-				var inputValorVenda = $('#inputValorVenda').val().replace('.', '').replace(',', '.');
+				var inputCustoFinal = $('#inputCustoFinal').val().replaceAll('.', '').replace(',', '.');
+				var inputValorVenda = $('#inputValorVenda').val().replaceAll('.', '').replace(',', '.');
 				
 				if (inputCustoFinal == null || inputCustoFinal.trim() == '') {
 					inputCustoFinal = 0.00;
@@ -337,7 +337,7 @@ if(isset($_POST['inputNome'])){
 			});	
 			
 			function atualizaValorVenda(){
-				var inputCustoFinal = $('#inputCustoFinal').val().replace('.', '').replace(',', '.');
+				var inputCustoFinal = $('#inputCustoFinal').val().replaceAll('.', '').replace(',', '.');
 				var inputMargemLucro = $('#inputMargemLucro').val().replace(',', '.');				
 				
 				if (inputCustoFinal == null || inputCustoFinal.trim() == '') {

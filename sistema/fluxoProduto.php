@@ -257,8 +257,8 @@ try{
 				
 				e.preventDefault();
 				
-				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
-				var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+				var inputValor = $('#inputValor').val().replaceAll('.', '').replace(',', '.');
+				var inputTotalGeral = $('#inputTotalGeral').val().replaceAll('.', '').replace(',', '.');
 				var totalProdutos = $('#totalRegistros').val();
 				var inputOrigem = $('#inputOrigem').val();
 
@@ -336,8 +336,8 @@ try{
 
 			while (n <= totalRegistros) {
 				
-				Quantidade = $('#inputQuantidade' + n + '').val().trim() == '' ? 0 : $('#inputQuantidade' + n + '').val();
-				ValorUnitario = $('#inputValorUnitario' + n + '').val() == '' ? 0 : $('#inputValorUnitario' + n + '').val().replace('.', '').replace(',', '.');
+				Quantidade = $('#inputQuantidade' + n + '').val().trim() == '' ? 0 : $('#inputQuantidade' + n + '').val().trim();
+				ValorUnitario = $('#inputValorUnitario' + n + '').val() == '' ? 0 : $('#inputValorUnitario' + n + '').val().replaceAll('.', '').replace(',', '.');
 
 				ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
 				TotalGeral += ValorTotal;

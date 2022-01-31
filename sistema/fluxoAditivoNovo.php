@@ -504,7 +504,7 @@ try {
 
 				var inputDataInicio = $('#inputDataInicio').val();
 				var inputDataFim = $('#inputDataFim').val();
-				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
+				var inputValor = $('#inputValor').val().replaceAll('.', '').replace(',', '.');
 
 				if (inputDataInicio == '' && inputDataFim == '' && (inputValor == 0 || inputValor == '')) {
 					alerta('Atenção', 'Informe as datas ou o valor do aditivo!', 'error');
@@ -526,9 +526,9 @@ try {
 
 				e.preventDefault();
 
-				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
-				var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
-				var inputTotalGeralServico = $('#inputTotalGeralServico').val().replace('.', '').replace(',', '.');
+				var inputValor = $('#inputValor').val().replaceAll('.', '').replace(',', '.');
+				var inputTotalGeral = $('#inputTotalGeral').val().replaceAll('.', '').replace(',', '.');
+				var inputTotalGeralServico = $('#inputTotalGeralServico').val().replaceAll('.', '').replace(',', '.');
 				var somaTotais = parseFloat(inputTotalGeral) + parseFloat(inputTotalGeralServico);
 
 				//Verifica se o valor ultrapassou o total do fluxo
@@ -560,11 +560,11 @@ try {
 
 		function calculaValorTotal(id) {
 
-			var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : $('#inputValorTotal' + id + '').val().replace('.', '').replace(',', '.');
-			var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+			var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : $('#inputValorTotal' + id + '').val().replaceAll('.', '').replace(',', '.');
+			var TotalGeralAnterior = $('#inputTotalGeral').val().replaceAll('.', '').replace(',', '.');
 
 			var Quantidade = $('#inputQuantidade' + id + '').val().trim() == '' ? 0 : $('#inputQuantidade' + id + '').val();
-			var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : $('#inputValorUnitario' + id + '').val().replace('.', '').replace(',', '.');
+			var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : $('#inputValorUnitario' + id + '').val().replaceAll('.', '').replace(',', '.');
 			var ValorTotal = 0;
 
 			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);
@@ -578,11 +578,11 @@ try {
 
 		function calculaValorTotalServico(id) {
 
-			var ValorTotalAnterior = $('#inputValorTotalServico' + id + '').val() == '' ? 0 : $('#inputValorTotalServico' + id + '').val().replace('.', '').replace(',', '.');
-			var TotalGeralAnterior = $('#inputTotalGeralServico').val().replace('.', '').replace(',', '.');
+			var ValorTotalAnterior = $('#inputValorTotalServico' + id + '').val() == '' ? 0 : $('#inputValorTotalServico' + id + '').val().replaceAll('.', '').replace(',', '.');
+			var TotalGeralAnterior = $('#inputTotalGeralServico').val().replaceAll('.', '').replace(',', '.');
 
 			var Quantidade = $('#inputQuantidadeServico' + id + '').val().trim() == '' ? 0 : $('#inputQuantidadeServico' + id + '').val();
-			var ValorUnitario = $('#inputValorUnitarioServico' + id + '').val() == '' ? 0 : $('#inputValorUnitarioServico' + id + '').val().replace('.', '').replace(',', '.');
+			var ValorUnitario = $('#inputValorUnitarioServico' + id + '').val() == '' ? 0 : $('#inputValorUnitarioServico' + id + '').val().replaceAll('.', '').replace(',', '.');
 			var ValorTotal = 0;
 
 			var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);

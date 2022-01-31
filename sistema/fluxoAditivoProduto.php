@@ -223,8 +223,8 @@ try {
 
                 e.preventDefault();
 
-                var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
-                var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+                var inputValor = $('#inputValor').val().replaceAll('.', '').replace(',', '.');
+                var inputTotalGeral = $('#inputTotalGeral').val().replaceAll('.', '').replace(',', '.');
 
                 //Verifica se o valor ultrapassou o total
                 if (parseFloat(inputTotalGeral) > parseFloat(inputValor)) {
@@ -257,11 +257,11 @@ try {
 
         function calculaValorTotal(id) {
 
-            var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : $('#inputValorTotal' + id + '').val().replace('.', '').replace(',', '.');
-            var TotalGeralAnterior = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+            var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : $('#inputValorTotal' + id + '').val().replaceAll('.', '').replace(',', '.');
+            var TotalGeralAnterior = $('#inputTotalGeral').val().replaceAll('.', '').replace(',', '.');
 
             var Quantidade = $('#inputQuantidade' + id + '').val().trim() == '' ? 0 : $('#inputQuantidade' + id + '').val();
-            var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : $('#inputValorUnitario' + id + '').val().replace('.', '').replace(',', '.');
+            var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : $('#inputValorUnitario' + id + '').val().replaceAll('.', '').replace(',', '.');
             var ValorTotal = 0;
 
             var ValorTotal = parseFloat(Quantidade) * parseFloat(ValorUnitario);

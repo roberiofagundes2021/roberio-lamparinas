@@ -744,7 +744,7 @@ if (isset($_POST['inputData'])) {
 		}
 
 		function verificaTotalNotaFiscal() {
-			let valorTotalNotaFiscal = $('#inputValorTotal').val().replace('.', '').replace(',', '.')
+			let valorTotalNotaFiscal = $('#inputValorTotal').val().replaceAll('.', '').replace(',', '.')
 			let valorTotalNotaFiscalGrid = $('#total').attr('valor')
 
 			if (parseFloat(valorTotalNotaFiscalGrid) != parseFloat(valorTotalNotaFiscal)) {

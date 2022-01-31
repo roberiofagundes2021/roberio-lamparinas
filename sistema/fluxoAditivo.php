@@ -74,7 +74,7 @@ $countAditivos = count($rowAditivo);
 				e.preventDefault();
 
 				var inputValor = parseFloat($('#inputValor').val());
-				var inputTotalGeral = $('#inputTotalGeral').val().replace('.', '').replace(',', '.');
+				var inputTotalGeral = $('#inputTotalGeral').val().replaceAll('.', '').replace(',', '.');
 
 				//Verifica se o valor ultrapassou o total
 				if (parseFloat(inputTotalGeral) > parseFloat(inputValor)) {

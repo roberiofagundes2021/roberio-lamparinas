@@ -209,12 +209,8 @@ if (isset($_POST['inputDataInicio'])) {
 
 				e.preventDefault();
 
-				var cmbFornecedor = $('#cmbFornecedor').val();
-				var cmbCategoria = $('#cmbCategoria').val();
-				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				var inputDataInicio = $('#inputDataInicio').val();
 				var inputDataFim = $('#inputDataFim').val();
-				var inputValor = $('#inputValor').val().replace('.', '').replace(',', '.');
 
 				if (inputDataFim < inputDataInicio) {
 					alerta('Atenção', 'A Data Fim deve ser maior que a Data Início!', 'error');
