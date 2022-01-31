@@ -156,10 +156,10 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
         
                                         <div class="col-lg-2">
-                                            <input type="" class="form-control-border Valor text-right pula" id="inputCentroValor-`+x+`" name="inputCentroValor-`+x+`" onChange="calculaValorTotal(`+x+`)" onkeypress="pula(event)" value="" required>
+                                            <input type="" class="form-control-border Valor text-right pula" id="inputCentroValor-${x}" name="inputCentroValor-${x}" onChange="calculaValorTotal(${x})" onkeypress="pula(event)" value="" required>
                                         </div>
         
-                                        <div class="col-sm-1 btn" style="text-align:center;" onClick="reset('inputCentroValor-`+x+`', 0)">
+                                        <div class="col-sm-1 btn" style="text-align:center;" onClick="reset('inputCentroValor-${x}', 0)">
                                             <i class="icon-reset" title="Resetar"></i>
                                         </div>
                                     </div>`;
@@ -280,7 +280,6 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 		}
 
         function reset(id, val){
-            console.log(valorTotal)
             if (id === 'all'){
                 var total = parseFloat($('#totalRegistros').val())
                 for(var x=0; x<total; x++){
@@ -295,21 +294,26 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
             var totalNotaFiscal = parseFloat(valorTotal)
             var ValTotal = 0
             var total = parseFloat($('#totalRegistros').val())
-            var valor = id?parseFloat($('#inputCentroValor-'+id).val().replace(',', '.')):0
+            var valor = id !== undefined?parseFloat($('#inputCentroValor-'+id).val().replace(',', '.')):0
             var cont = 0
 
+            $('#inputCentroValor-'+id).val(float2moeda(valor))
+
             for(var x=0; x<total; x++){
-                ValTotal += parseFloat($('#inputCentroValor-'+x).val().replace(',', '.'))?parseFloat($('#inputCentroValor-'+x).val().replace(',', '.')):0
+                ValTotal += parseFloat($(`#inputCentroValor-${x}`).val())?parseFloat($(`#inputCentroValor-${x}`).val().replace(',', '.')):0
             }
 
             if (id !== undefined){
                 if(ValTotal > totalNotaFiscal){
                     cont = ValTotal - totalNotaFiscal
                     ValTotal = ValTotal - cont
-                    $('#inputCentroValor-'+id).val(valor - cont)
+                    $('#inputCentroValor-'+id).val(float2moeda(valor - cont))
                 }
             }
-            $('#inputTotalGeral').val('R$' + parseFloat(ValTotal).toFixed(2).replace('.', ','))
+            var newValue = float2moeda(ValTotal) //parseFloat(ValTotal).toFixed(2).replace('.', ',')
+            $('#inputTotalGeral').val(`R$ ${newValue}`)
+            // retorna o status para quando for submeter o sistema verificar
+            // se o valor está batendo com o total
             if (ValTotal !== totalNotaFiscal && total > 0){
                 var obj = {
                     status: false,
