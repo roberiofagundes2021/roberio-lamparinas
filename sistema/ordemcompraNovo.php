@@ -242,7 +242,7 @@ if(isset($_POST['inputData'])){
 							url: "ordemCompraSaldoRemanescente.php",
 							data: ('IdFlOpe='+flux.FlOpeId),
 							success: function(resposta){
-								
+
 								if(resposta == 1){
 									document.getElementById('Mensagem').style.display = "block";
 									document.getElementById('inputSaldoRemanescente').setAttribute('required', 'required')
