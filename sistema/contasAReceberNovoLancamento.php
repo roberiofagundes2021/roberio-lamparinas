@@ -1107,11 +1107,10 @@ $dataInicio = date("Y-m-d");
                                                     <?php
                                                     try {
                                                         $sql = "SELECT PlConId, PlConCodigo, PlConNome
-                                                                  FROM PlanoContas
-                                                                  JOIN Situacao  ON SituaId = PlConStatus
-                                                                  JOIN CentroCusto on CnCusId = PlConCentroCusto
-                                                                 WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and SituaChave = 'ATIVO'
-                                                              ORDER BY PlConCodigo ASC";
+                                                                FROM PlanoContas
+                                                                JOIN Situacao  ON SituaId = PlConStatus
+                                                                WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and SituaChave = 'ATIVO'
+                                                                ORDER BY PlConCodigo ASC";
                                                         $result = $conn->query($sql);
                                                         $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
