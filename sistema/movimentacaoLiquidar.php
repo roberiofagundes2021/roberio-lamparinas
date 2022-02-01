@@ -294,13 +294,13 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
             var totalNotaFiscal = parseFloat(valorTotal)
             var ValTotal = 0
             var total = parseFloat($('#totalRegistros').val())
-            var valor = id !== undefined?parseFloat($('#inputCentroValor-'+id).val().replace(',', '.')):0
+            var valor = id !== undefined ? parseFloat($('#inputCentroValor-'+id).val().replaceAll('.', '').replace(',', '.')) : 0
             var cont = 0
 
             $('#inputCentroValor-'+id).val(float2moeda(valor))
 
             for(var x=0; x<total; x++){
-                ValTotal += parseFloat($(`#inputCentroValor-${x}`).val())?parseFloat($(`#inputCentroValor-${x}`).val().replace(',', '.')):0
+                ValTotal += parseFloat($(`#inputCentroValor-${x}`).val()) ? parseFloat($(`#inputCentroValor-${x}`).val().replaceAll('.', '').replace(',', '.')) : 0
             }
 
             if (id !== undefined){
