@@ -283,10 +283,10 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
             if (id === 'all'){
                 var total = parseFloat($('#totalRegistros').val())
                 for(var x=0; x<total; x++){
-                    $('#inputCentroValor-'+x).val(0)
+                    $('#inputCentroValor-'+x).val(float2moeda(0))
                 }
             } else {
-                $('#'+id).val(val)
+                $('#'+id).val(float2moeda(val))
             }
             calculaValorTotal()
         }
