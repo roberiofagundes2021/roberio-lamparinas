@@ -25,7 +25,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
     // porque não deve ser criado vários registros na tabela MovimentacaoXProduto pra esse caso
     // de produtos não patrimoniados.
     $sql = "SELECT Distinct MvXPrProduto as ProduServi, MvXPrQuantidade as Quantidade, MvXPrLote, isnull(cast(cast(MvXPrValidade as date)as varchar),'') as Validade, ClassNome, ClassChave, ProduNome as Nome, ProduMarca as Marca, 
-            ProduModelo as Modelo, ProduCodigo as Codigo, ProduUnidadeMedida, ProduModelo as Modelo, CategNome as Categoria, UnMedSigla, ModelNome as NomeModelo, MarcaNome as Marca
+            ProduModelo as Modelo, ProduCodigo as Codigo, ProduUnidadeMedida, ProduModelo as Modelo, CategNome as Categoria, UnMedSigla, ModelNome as NomeModelo, MarcaNome as Marca, Tipo = 'P'
 	        FROM Movimentacao
 	        JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
 	        JOIN Produto on ProduId = MvXPrProduto
@@ -37,7 +37,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
 	        WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao. " and ClassChave <> 'PERMANENTE' 
             UNION
             SELECT Distinct MvXSrServico as ProduServi, MvXSrQuantidade as Quantidade, '' , '' , '', '' , ServiNome as Nome, ServiMarca as Marca, 
-            ServiModelo as Modelo, ServiCodigo as Codigo, '' , ServiModelo as Modelo, CategNome as Categoria, '', ModelNome as NomeModelo, MarcaNome as Marca
+            ServiModelo as Modelo, ServiCodigo as Codigo, '' , ServiModelo as Modelo, CategNome as Categoria, '', ModelNome as NomeModelo, MarcaNome as Marca, Tipo = 'S'
             FROM Movimentacao
             JOIN MovimentacaoXServico on MvXSrMovimentacao = MovimId
             JOIN Servico on ServiId = MvXSrServico
