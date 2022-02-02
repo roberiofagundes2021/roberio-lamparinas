@@ -208,11 +208,6 @@ td{
 										</div>
 									</div>
 								</div>
-								<div class="">		
-									<p class="font-size-lg">OBS.: A listagem abaixo faz relação aos perfis padrões do sistema,
-										alterá-los afetará APENAS as novas unidades
-									</p>
-								</div>
 							</div>
 						</div>
 						<form id="form_id" method="POST">

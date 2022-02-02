@@ -16,21 +16,21 @@
 				$resultEmpresa = $conn->query($sqlEmpresa);
 				$empresa = $resultEmpresa->fetch(PDO::FETCH_ASSOC);
 
-				$SuperAdmin = $_SESSION['PerfiChave'] != "SUPER" ? ' and PrXPeSuperAdmin = 0' : '';
-
 				// Verifica se o usuário esta utilizando permissao personalizada ou do perfil
 				if($usuaXPerm['UsuarPermissaoPerfil'] == 0){
-				$sqlConfig = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
+					$SuperAdmin = $_SESSION['PerfiChave'] != "SUPER" ? ' and UsXPeSuperAdmin = 0' : '';
+					$sqlConfig = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
 							MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, MenuSetorPrivado,
-							UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeUnidade, UsXPeSuperAdmin
+							UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeUnidade, UsXPeSuperAdmin as SuperAdmin
 							FROM Menu
 							JOIN Situacao on MenuStatus = SituaId
 							JOIN UsuarioXPermissao on UsXPeUsuario = '$userId' and UsXPeUnidade = '$unidade' and UsXPeMenu = MenuId
 							WHERE UPPER(MenuPosicao) = 'CONFIGURADOR' ".$SuperAdmin;
 				} else {
-				$sqlConfig = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
+					$SuperAdmin = $_SESSION['PerfiChave'] != "SUPER" ? ' and PrXPeSuperAdmin = 0' : '';
+					$sqlConfig = "SELECT MenuId, MenuNome, MenuUrl, MenuIco, MenuSubMenu, MenuModulo, MenuSetorPublico, MenuPosicao,
 						MenuPai, MenuLevel, MenuOrdem, MenuStatus, SituaChave, PrXPeId, PrXPePerfil, MenuSetorPrivado
-						PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeUnidade, PrXPeSuperAdmin
+						PrXPeMenu, PrXPeVisualizar, PrXPeAtualizar,  PrXPeExcluir, PrXPeUnidade, PrXPeSuperAdmin as SuperAdmin
 						FROM Menu
 						JOIN Situacao on MenuStatus = SituaId
 						JOIN PerfilXPermissao on MenuId = PrXPeMenu and PrXPePerfil = '$perfilId' and PrXPeUnidade  = '$unidade'

@@ -94,7 +94,6 @@ if(isset($_POST['inputNome'])){
 				
 				var inputNomeNovo  = $('#inputNome').val();
 				//var inputNomeVelho = $('#inputPlanoContasNome').val();
-				var cmbCentroCusto   = $('#cmbCentroCusto').val();
 				var inputPlanoContasId = $('#inputPlanoContasId').val();
 				
 				//remove os espaços desnecessários antes e depois
@@ -104,7 +103,7 @@ if(isset($_POST['inputNome'])){
 				$.ajax({
 					type: "POST",
 					url: "planoContasValida.php",
-					data: {nome : inputNomeNovo, centroCusto : cmbCentroCusto, planoContasId : inputPlanoContasId},
+					data: {nome : inputNomeNovo, planoContasId : inputPlanoContasId},
 					success: function(resposta){
 						console.log(resposta)
 						if(resposta == 1){

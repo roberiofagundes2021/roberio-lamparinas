@@ -195,11 +195,18 @@
     <div class="card card-sidebar-mobile">
       <ul class="nav nav-sidebar" data-nav-type="accordion">
       <?php
+          if($_SESSION['PerfiChave'] == "CONTABILIDADE"){
+            echo '<li class="nav-item-header">
+              <div class="text-uppercase font-size-xs line-height-xs">Contábil e Fiscal</div>
+            </li>';
+          }
           foreach($modulo as $mod){
             if($mod['SituaChave'] == strtoupper("ativo")  && $mod['conteudo'] == 1){
-              echo '<li class="nav-item-header">
-                      <div class="text-uppercase font-size-xs line-height-xs">'.$mod['ModulNome'].'</div>
-                    </li>';
+              if($_SESSION['PerfiChave'] != "CONTABILIDADE"){
+                echo '<li class="nav-item-header">
+                  <div class="text-uppercase font-size-xs line-height-xs">'.$mod['ModulNome'].'</div>
+                </li>';
+              }
               foreach($menu as $men){
                 $visualizar = (isset($men['UsXPeVisualizar'])?$men['UsXPeVisualizar']:$men['PrXPeVisualizar']);
                 if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo") && $men['MenuPosicao']=='PRINCIPAL'){  
@@ -242,7 +249,8 @@
                 }
               }
             }
-          }?>
+          }
+          ?>
       </ul>
     </div>
     <!-- /Main navigation -->
