@@ -723,8 +723,10 @@ try {
 										JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 										LEFT JOIN Marca on MarcaId = ProduMarca
 										JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-										WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = $iCategoria and 
-										ProduSubCategoria in ($sSubCategorias)";
+										WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = $iCategoria";
+										if($sSubCategorias){
+											$sql .= ' and ProduSubCategoria in ($sSubCategorias)';
+										}
 								$result = $conn->query($sql);
 								$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 								$countProduto = count($rowProdutos);
@@ -732,6 +734,7 @@ try {
 
 							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && $countProduto >= 1 ? print('block') : print('none')  ?>">
 								
+							<?php if($sSubCategorias){ ?>	
 								<div class="row">
 									<div class="col-lg-12">
 										<div class="form-group">
@@ -755,6 +758,7 @@ try {
 										</div>
 									</div>
 								</div>
+							<?php } ?>
 							
 								<div class="card-header header-elements-inline">
 									<h5 class="card-title">Relação de Produtos</h5>
@@ -841,10 +845,10 @@ try {
 													<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
 												</div>	
 												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
+													<input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula text-right" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
 												</div>	
 												<div class="col-lg-2">
-													<input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off text-right" value="' . $fValorTotal . '" readOnly>
+													<input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off text-right text-right" value="' . $fValorTotal . '" readOnly>
 												</div>											
 											</div>');
 										}
@@ -894,7 +898,10 @@ try {
 									FROM Servico
 									JOIN Situacao on SituaId = ServiStatus
 									WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-									ServiSubCategoria in (" . $sSubCategorias . ") and SituaChave = 'ATIVO' ";
+									SituaChave = 'ATIVO'";
+							if($sSubCategorias){
+								$sql .= " and ServiSubCategoria in (" . $sSubCategorias . ")";
+							}
 							$result = $conn->query($sql);
 							$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 							$countServico = count($rowServicos);
@@ -936,7 +943,7 @@ try {
 
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-9">
+											<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
@@ -959,7 +966,7 @@ try {
 													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-1">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -983,7 +990,7 @@ try {
 
 											print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-9">
+												<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
@@ -1001,10 +1008,10 @@ try {
 													<input type="text" id="inputQuantidadeServico' . $cont . '" name="inputQuantidadeServico' . $cont . '" class="form-control-border Quantidade pula" onChange="calculaValorTotalServico(' . $cont . ')" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
 												</div>	
 												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitarioServico' . $cont . '" name="inputValorUnitarioServico' . $cont . '" class="form-control-border ValorUnitario pula" onChange="calculaValorTotalServico(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
+													<input type="text" id="inputValorUnitarioServico' . $cont . '" name="inputValorUnitarioServico' . $cont . '" class="form-control-border ValorUnitario pula text-right" onChange="calculaValorTotalServico(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
 												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorTotalServico' . $cont . '" name="inputValorTotalServico' . $cont . '" class="form-control-border-off" value="' . $fValorTotal . '" readOnly>
+												<div class="col-lg-2">
+													<input type="text" id="inputValorTotalServico' . $cont . '" name="inputValorTotalServico' . $cont . '" class="form-control-border-off text-right" value="' . $fValorTotal . '" readOnly>
 												</div>											
 											</div>');
 										}
@@ -1013,7 +1020,7 @@ try {
 									if (isset($_POST['inputDataInicio'])) {
 										print('
 										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-9">
+												<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															
@@ -1032,8 +1039,8 @@ try {
 												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
 													<h5><b>Total:</b></h5>
 												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputTotalGeralServico" name="inputTotalGeralServico" class="form-control-border-off" value="' . mostraValor($fTotalGeral) . '" readOnly>
+												<div class="col-lg-2">
+													<input type="text" id="inputTotalGeralServico" name="inputTotalGeralServico" class="form-control-border-off text-right" value="' . mostraValor($fTotalGeral) . '" readOnly>
 												</div>											
 											</div>');
 
