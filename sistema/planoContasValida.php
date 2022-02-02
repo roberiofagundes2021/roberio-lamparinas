@@ -18,6 +18,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 
 //Verifica se já existe esse registro (se existir, retorna true )
+
 if($count){
 	echo 1;
 } else {
