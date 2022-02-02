@@ -833,7 +833,6 @@ if (isset($_POST['inputData'])) {
 					},
 					success: function(resposta) {
 						var option = '<option value="#" "selected">Selecione o Patrimônio</option>';
-						console.log(resposta);
 						if (resposta) {
 							$('#cmbPatrimonio').html('');
 							$('#cmbPatrimonio').append(option)
@@ -1037,12 +1036,6 @@ if (isset($_POST['inputData'])) {
 						arr.push(itemId[x].trim())
 					}
 				}
-				
-				console.log(arr)
-				console.log(Item[0])
-				console.log(itemId)
-				console.log(arr.indexOf(Item[0]))
-				console.log('--------------------------')
 
 				if (inputProdutoServico == 'P') {
 
@@ -1096,9 +1089,11 @@ if (isset($_POST['inputData'])) {
 						},
 						success: function(resposta) {
 							//var newRow = $("<tr>");
+							console.log('#2')
+							console.log(resposta)
 
 							//newRow.append(resposta);
-							if (resposta != 'SEMESTOQUE') {
+							if (resposta.status != 'SEMESTOQUE') {
 
 								var inputTipo = $('input[name="inputTipo"]:checked').val();
 
@@ -1214,7 +1209,7 @@ if (isset($_POST['inputData'])) {
 						success: function(resposta) {
 
 							//var newRow = $("<tr>");
-							if (resposta != 'SEMESTOQUE') {
+							if (resposta.status != 'SEMESTOQUE') {
 								//newRow.append(resposta);
 
 								// $("#tabelaProdutoServicoSaida").append(resposta);
@@ -1292,8 +1287,6 @@ if (isset($_POST['inputData'])) {
 				var inputNumItens = $('#inputNumItens').val();
 
 				var item = '';
-				console.log(inputProdutoServico)
-				console.log($(this).attr("id"))
 
 				if (inputProdutoServico == 'P') {
 					item = inputIdProdutos.split(",");

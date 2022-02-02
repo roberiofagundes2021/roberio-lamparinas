@@ -73,8 +73,10 @@ $count = count($row);
 				$total = $_POST['quantidade'] * $row['ServiCustoFinal'];
 			}
 	
-			$output = 'SEMESTOQUE';
-			echo $output;
+			$teste = [
+				'status' => 'SEMESTOQUE'
+			];
+			echo json_encode($teste);
 		}
 	} else{
 		echo 0;

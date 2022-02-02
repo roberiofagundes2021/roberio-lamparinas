@@ -15,6 +15,7 @@ $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 $count = count($row);
 
+
 //Verifica se já existe esse registro (se existir, retorna true )
 if ($count) {
 
@@ -28,23 +29,6 @@ if ($count) {
 		$marca = $row['MarcaNome'] != "" ?  " MARCA: ". $row['MarcaNome'] : "";
 		$validade = $row['Validade'] != "" ? " - Validade: ".mostraData($row['Validade']) : "";
 		$lote = $_POST['Lote'] != "" ? " - Lote: ".$_POST['Lote'] : "";
-		
-		// $output = 	'<tr id="row' . $row['ProduId'] . '" class="trGrid">
-		// 				 <td>' . $_POST['numItens'] . '</td>
-		// 				 <td data-popup="tooltip" title="' . $row['ProduDetalhamento'] . $marca . $validade."".$lote.'">' . $row['ProduNome'] . '</td>
-		// 				 <td style="text-align: center">' . $row['UnMedSigla'] . '</td>
-		// 				 <td style="text-align: center">' . $_POST['quantidade'] . '</td>
-		// 				 <td style="text-align: right">' . $valorCusto . '</td>
-		// 				 <td style="text-align: right">' . $valorTotal . '</td>
-						 
-		// 			 ';
-
-		// $output .= '
-		// 			<td style="text-align:center">
-		// 			    <div class="d-flex flex-row ">
-		// 			        <select id="' . $_POST['numItens'] . '" name="cmbClassificacao' . $_POST['numItens'] . '" class="form-control form-control-select2 selectClassific2">
-		// 			            <option value="#">Selecione</option>
-		// 		';
 
 		$sql = "SELECT ClassId, ClassNome
 				FROM Classificacao
@@ -65,17 +49,8 @@ if ($count) {
 		}
 		$classificacao .= '</select>';
 
-		// $output .= "
-		// 					    </select>
-		// 					</div>
-		// 				</td>
-		// 				<td><span name='remove' id='" . $_POST['numItens'] . "#" . $total . "' class='btn btn_remove'>X</span></td>
-		// 			</tr>
-		// 	";
-
-		// echo $output;
-
 		$teste = [
+			'status' => '',
 			'data' => [
 				$_POST['numItens'],
 				$row['ProduDetalhamento'],
@@ -97,8 +72,10 @@ if ($count) {
 		echo json_encode($teste);
 
 	} else {
-		$output = 	'SEMESTOQUE';
-		echo $output;
+		$teste = [
+			'status' => 'SEMESTOQUE'
+		];
+		echo json_encode($teste);
 	}
 } else {
 	echo 0;
