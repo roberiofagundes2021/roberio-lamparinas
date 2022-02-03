@@ -450,19 +450,19 @@ try{
 												
 											</div>
 										</div>
-										<div class="col-lg-1 fluxoContrato">
+										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputContrato">Contrato</label>
 												<input type="text" id="inputContrato" name="inputContrato" class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly>
 											</div>
 										</div>
-										<div class="col-lg-2 fluxoProcesso">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputProcesso">Processo</label>
 												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
 											</div>
 										</div>	
-										<div class="col-lg-2 fluxoProcesso">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValor">Valor Total</label>
 												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
@@ -544,19 +544,20 @@ try{
 									
 									<?php
 
+										$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+												FROM Produto
+												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+												LEFT JOIN Marca on MarcaId = ProduMarca
+												LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
+												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
+												and SbCatId in (".$sSubCategorias.")
+												ORDER BY SbCatNome, ProduNome ASC";
+										$result = $conn->query($sql);
+										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+										$countProduto = count($rowProdutos);
+
 										if ($_POST['inputOrigem'] == 'fluxo.php'){
-											
-											$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
-													FROM Produto
-													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-													LEFT JOIN Marca on MarcaId = ProduMarca
-													LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
-													ORDER BY SbCatNome, ProduNome ASC";
-											$result = $conn->query($sql);
-											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-											$countProduto = count($rowProdutos);
 
 											if (!$countProduto){
 												$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, MarcaNome
@@ -575,26 +576,10 @@ try{
 
 										} else{
 
-											$sql = "SELECT Distinct ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, UnMedSigla, 
-													FOXPrQuantidade, FOXPrValorUnitario, SbCatNome, MarcaNome
-													FROM Produto
-													JOIN ProdutoOrcamento on PrOrcProduto = ProduId
-													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId 
-													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-													LEFT JOIN Marca on MarcaId = ProduMarca
-													LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-													WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
-													and FOXPrFluxoOperacional = " . $iFluxoOperacional."
-													and SbCatId in (".$sSubCategorias.")
-													ORDER BY SbCatNome, ProduNome ASC";
-											$result = $conn->query($sql);
-											$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
-											$countProduto = count($rowProdutos);
-
 											if (!$countProduto) {
 
 												if ($row['TrRefTabelaProduto'] == 'Produto'){
-													$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
+													$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
 															FROM Produto															
 															JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -604,7 +589,7 @@ try{
 															and SbCatId in (".$sSubCategorias.")
 															ORDER BY SbCatNome, ProduNome ASC";													
 												} else { //Se $row['TrRefTabelaProduto'] == ProdutoOrcamento
-													$sql = "SELECT Distinct ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
+													$sql = "SELECT ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
 															FROM Produto
 															JOIN ProdutoOrcamento on PrOrcProduto = ProduId
 															JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
