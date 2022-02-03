@@ -34,18 +34,19 @@ if (isset($_POST['inputIdFluxoOperacional'])) {
 
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
-			$sql = "INSERT INTO FluxoOperacionalXServico (FOXSrFluxoOperacional, FOXSrServico, FOXSrQuantidade, FOXSrValorUnitario, 
+			$sql = "INSERT INTO FluxoOperacionalXServico (FOXSrFluxoOperacional, FOXSrServico, FOXSrDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, 
 					FOXSrUsuarioAtualizador, FOXSrUnidade)
-					VALUES (:iFluxoOperacional, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+					VALUES (:iFluxoOperacional, :iServico, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
-				':iFluxoOperacional' => $iFluxoOperacional,
-				':iServico' => $_POST['inputIdServico' . $i],
-				':iQuantidade' => $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
-				':fValorUnitario' => $_POST['inputValorUnitario' . $i] == '' ? null : gravaValor($_POST['inputValorUnitario' . $i]),
-				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-				':iUnidade' => $_SESSION['UnidadeId']
+				':iFluxoOperacional' 	=> $iFluxoOperacional,
+				':iServico' 			=> $_POST['inputIdServico' . $i],
+				':sDetalhamento' 	   	=> $_POST['inputDetalhamento' . $i],
+				':iQuantidade' 			=> $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
+				':fValorUnitario' 		=> $_POST['inputValorUnitario' . $i] == '' ? null : gravaValor($_POST['inputValorUnitario' . $i]),
+				':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+				':iUnidade' 			=> $_SESSION['UnidadeId']
 			));
 		}
 
@@ -455,19 +456,19 @@ try {
 											</div>
 										</div>
 
-										<div class="col-lg-1 fluxoContrato">
+										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputContrato">Contrato</label>
 												<input type="text" id="inputContrato" name="inputContrato" class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly>
 											</div>
 										</div>
-										<div class="col-lg-2 fluxoProcesso">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputProcesso">Processo</label>
 												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
 											</div>
 										</div>
-										<div class="col-lg-2 fluxoProcesso">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValor">Valor Total</label>
 												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
@@ -545,17 +546,18 @@ try {
 
 									<?php       
 
-										if ($_POST['inputOrigem'] == 'fluxo.php'){
+										$sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
+												FROM Servico
+												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+												LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
+												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
+												and SbCatId in (".$sSubCategorias.")
+												ORDER BY SbCatNome, ServiNome ASC";
+										$result = $conn->query($sql);
+										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+										$countServico = count($rowServicos);
 
-											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
-													FROM Servico
-													JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-													LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
-													ORDER BY SbCatNome, ServiNome ASC";
-											$result = $conn->query($sql);
-											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-											$countServico = count($rowServicos);
+										if ($_POST['inputOrigem'] == 'fluxo.php'){
 
 											if (!$countServico) {
 												$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento
@@ -572,23 +574,10 @@ try {
 
 										} else{
 
-											$sql = "SELECT Distinct ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario, SbCatNome
-													FROM Servico
-													JOIN ServicoOrcamento on SrOrcServico = ServiId
-													JOIN FluxoOperacionalXServico on FOXSrServico = ServiId 
-													LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
-													and FOXSrFluxoOperacional = " . $iFluxoOperacional."
-													and SbCatId in (".$sSubCategorias.")
-													ORDER BY SbCatNome, ServiNome ASC";
-											$result = $conn->query($sql);
-											$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-											$countServico = count($rowServicos);
-
 											if (!$countServico) {
 
 												if ($row['TrRefTabelaServico'] == 'Servico'){
-													$sql = "SELECT Distinct ServiId, ServiNome, ServiDetalhamento as Detalhamento, SbCatNome
+													$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, SbCatNome
 															FROM Servico
 															LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = ServiId
@@ -596,7 +585,7 @@ try {
 															and SbCatId in (".$sSubCategorias.")
 															ORDER BY SbCatNome, ServiNome ASC";
 												} else { //Se $row['TrRefTabelaServico'] == ServicoOrcamento
-													$sql = "SELECT Distinct ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, SbCatNome
+													$sql = "SELECT ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, SbCatNome
 															FROM Servico
 															JOIN ServicoOrcamento on SrOrcServico = ServiId
 															LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
@@ -666,6 +655,7 @@ try {
 															</div>
 															<div class="col-lg-11">
 																<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['Detalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+																<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
 															</div>
 														</div>
 													</div>
