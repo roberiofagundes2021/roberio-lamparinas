@@ -1088,11 +1088,6 @@ if (isset($_POST['inputData'])) {
 							Lote: inputLote
 						},
 						success: function(resposta) {
-							//var newRow = $("<tr>");
-							console.log('#2')
-							console.log(resposta)
-
-							//newRow.append(resposta);
 							if (resposta.status != 'SEMESTOQUE') {
 
 								var inputTipo = $('input[name="inputTipo"]:checked').val();
@@ -1207,12 +1202,7 @@ if (isset($_POST['inputData'])) {
 							quantidade: inputQuantidade
 						},
 						success: function(resposta) {
-
-							//var newRow = $("<tr>");
 							if (resposta.status != 'SEMESTOQUE') {
-								//newRow.append(resposta);
-
-								// $("#tabelaProdutoServicoSaida").append(resposta);
 								var table = $('#tabelaProdutoServicoSaida').DataTable()
 								var rowNode = table.row.add(resposta.data).draw().node()
 								
