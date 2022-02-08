@@ -22,7 +22,7 @@ $CentroCustos = $resultCentroCusto->fetchAll(PDO::FETCH_ASSOC);
 
 // pesquisa o Planos de Contas da unidade
 $sqlPlanoConta = "SELECT PlConId, PlConCodigo, PlConNome, SituaChave
-                  FROM  PlanoContas JOIN Situacao on SituaId = PlConStatus
+                  FROM  PlanoConta JOIN Situacao on SituaId = PlConStatus
                   WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
 $resultPlanoConta = $conn->query($sqlPlanoConta);
 $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
