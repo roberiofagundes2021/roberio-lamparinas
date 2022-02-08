@@ -8,7 +8,7 @@ if(isset($_POST['nome'])){
 	$UnidadeId = $_SESSION['UnidadeId'];
 	$nome = $_POST['nome'];
 	$sql = "SELECT PlConId
-		    FROM PlanoContas
+		    FROM PlanoConta
 		    WHERE PlConUnidade = $UnidadeId and PlConNome = '$nome'".
 			(isset($_POST['planoContasId'])?' and PlConId <> '.$_POST['planoContasId']:'');
 }

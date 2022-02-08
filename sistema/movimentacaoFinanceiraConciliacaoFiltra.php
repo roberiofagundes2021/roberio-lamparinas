@@ -60,12 +60,12 @@ function queryPesquisa(){
         }
 
         if (!empty($_POST['cmbCentroDeCustos'])) {
-            $argsCenCustCp = " join PlanoContas
+            $argsCenCustCp = " join PlanoConta
                                 on PlConId = CnAPaPlanoContas
                                 join CentroCusto
                                 on CnCusId = PlConCentroCusto ";
 
-            $argsCenCustCr = " join PlanoContas
+            $argsCenCustCr = " join PlanoConta
                                 on PlConId = CnARePlanoContas
                                 join CentroCusto
                                 on CnCusId = PlConCentroCusto ";
@@ -214,12 +214,12 @@ function queryPesquisa(){
         }
 
         if (!empty($_SESSION['MovimentacaoFinanceiraConciliacaoCentroDeCustos'])) {
-            $argsCenCustCp = " join PlanoContas
+            $argsCenCustCp = " join PlanoConta
                                 on PlConId = CnAPaPlanoContas
                                 join CentroCusto
                                 on CnCusId = PlConCentroCusto ";
 
-            $argsCenCustCr = " join PlanoContas
+            $argsCenCustCr = " join PlanoConta
                                 on PlConId = CnARePlanoContas
                                 join CentroCusto
                                 on CnCusId = PlConCentroCusto ";

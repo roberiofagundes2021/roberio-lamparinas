@@ -12,11 +12,10 @@ try{
 		$conn->beginTransaction();
 		
 		$iMovimentacao = $_POST['inputMovimentacaoId'];
-        $movimentacao = $_POST['inputMovimentacaoId'];
         $data = $_POST['inputPeriodoDe'];
         $UsuarId = $_SESSION['UsuarId'];
         $UnidadeId = $_SESSION['UnidadeId'];
-        $planoCusto = $_POST['cmbPlanoContaId'];
+        $planoConta = $_POST['cmbPlanoContaId'];
 
         $registros = intval($_POST['totalRegistros']);
 
@@ -24,7 +23,7 @@ try{
         
         $sqlMovimentacao = "INSERT INTO MovimentacaoLiquidacao(MvLiqMovimentacao, MvLiqData, MvLiqUsuario,
         MvLiqUnidade, MvLiqPlanoContas)
-        VALUES('$movimentacao', '$data', '$UsuarId', '$UnidadeId', '$planoCusto')";
+        VALUES('$iMovimentacao', '$data', '$UsuarId', '$UnidadeId', '$planoConta')";
 
         $conn->query($sqlMovimentacao);
         $newMovimentacaoId = $conn->lastInsertId();

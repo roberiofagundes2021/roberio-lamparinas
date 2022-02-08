@@ -11,7 +11,7 @@ if(isset($_POST['inputPlanoContasId'])){
 	$iPlanoContas = $_POST['inputPlanoContasId'];
 		
 	$sql = "SELECT *
-			FROM PlanoContas
+			FROM PlanoConta
 			WHERE PlConId = $iPlanoContas ";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -26,7 +26,7 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 
-		$sql = "UPDATE PlanoContas SET PlConCodigo = :iCodigo, PlConNome = :sNome, PlConTipo = :sTipo, PlConNatureza = :sNatureza, PlConGrupo = :sGrupo, PlConDetalhamento = :sDetalhamento, PlConPlanoContaPai = :sPlanoContaPai, PlConStatus = :bStatus, PlConUsuarioAtualizador = :iUsuarioAtualizador
+		$sql = "UPDATE PlanoConta SET PlConCodigo = :iCodigo, PlConNome = :sNome, PlConTipo = :sTipo, PlConNatureza = :sNatureza, PlConGrupo = :sGrupo, PlConDetalhamento = :sDetalhamento, PlConPlanoContaPai = :sPlanoContaPai, PlConStatus = :bStatus, PlConUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE PlConId = :iPlanoContas";
 		$result = $conn->prepare($sql);
 				
@@ -211,7 +211,7 @@ if(isset($_POST['inputNome'])){
 										<option value="">Selecione</option>
 										<?php 
 											$sql = "SELECT PlConId, PlConCodigo, PlConNome
-													FROM PlanoContas
+													FROM PlanoConta
 													JOIN Situacao on SituaId = PlConStatus
 													WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
 													ORDER BY PlConCodigo ASC";

@@ -10,7 +10,7 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO PlanoContas (PlConCodigo, PlConNome, PlConTipo, PlConNatureza, PlConGrupo, PlConDetalhamento, PlConPlanoContaPai, PlConStatus, PlConUsuarioAtualizador, PlConUnidade)
+		$sql = "INSERT INTO PlanoConta (PlConCodigo, PlConNome, PlConTipo, PlConNatureza, PlConGrupo, PlConDetalhamento, PlConPlanoContaPai, PlConStatus, PlConUsuarioAtualizador, PlConUnidade)
 				VALUES (:iCodigo, :sNome, :sTipo, :sNatureza, :sGrupo, :sDetalhamento, :sPlanoContaPai, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 				
@@ -191,7 +191,7 @@ if(isset($_POST['inputNome'])){
 										<option value="">Selecione </option>
 										<?php 
 											$sql = "SELECT PlConId, PlConCodigo, PlConNome
-													FROM PlanoContas
+													FROM PlanoConta
 													JOIN Situacao on SituaId = PlConStatus
 													WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
 													ORDER BY PlConCodigo ASC";

@@ -359,7 +359,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 												<select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control multiselect-select-all" multiple="multiple" data-fouc>
 													<?php
 														$sql = "SELECT PlConId, PlConNome
-																FROM PlanoContas
+																FROM PlanoConta
 																JOIN Situacao 
 																ON SituaId = PlConStatus
 																WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " 

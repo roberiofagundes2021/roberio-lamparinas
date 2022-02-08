@@ -10,7 +10,7 @@ if(isset($_POST['inputPlanoContasId'])){
         	
 	try{
 		
-		$sql = "DELETE FROM PlanoContas
+		$sql = "DELETE FROM PlanoConta
 				WHERE PlConId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iPlanoContas); 

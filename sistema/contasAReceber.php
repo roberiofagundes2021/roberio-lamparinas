@@ -583,7 +583,7 @@ $dataFim = date("Y-m-d");
                                                     <option value="">Todos</option>
                                                     <?php
                                                     $sql = "SELECT PlConId, PlConCodigo, PlConNome
-                                                            FROM PlanoContas
+                                                            FROM PlanoConta
                                                             JOIN Situacao on SituaId = PlConStatus
                                                             WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
                                                             ORDER BY PlConCodigo ASC";

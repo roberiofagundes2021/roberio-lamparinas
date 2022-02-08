@@ -2,33 +2,37 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Relação de Contas à Pagar';
+$_SESSION['PaginaAtual'] = 'Movimentação Liquidação';
 
 include('global_assets/php/conexao.php');
 
 // pesquisa a movimentação
 $sqlMovimentacao = "SELECT MovimId, MovimNumRecibo, MovimData, MovimValorTotal, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie
-                FROM  Movimentacao
-                WHERE MovimUnidade = ".$_SESSION['UnidadeId'].
-                " and MovimId = ".$_POST['inputMovimentacaoId'];
+                    FROM  Movimentacao
+                    WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MovimId = ".$_POST['inputMovimentacaoId'];
 $resultMovimentacao = $conn->query($sqlMovimentacao);
 $Movimentacao = $resultMovimentacao->fetch(PDO::FETCH_ASSOC);
 
 // pesquisa os centros de custos da unidade
 $sqlCentroCusto = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusDetalhamento, CnCusStatus, SituaChave
-                FROM  CentroCusto JOIN Situacao on SituaId = CnCusStatus
-                WHERE CnCusUnidade = ".$_SESSION['UnidadeId'].
-                " and SituaChave = 'ATIVO'";
+                   FROM  CentroCusto JOIN Situacao on SituaId = CnCusStatus
+                   WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
 $resultCentroCusto = $conn->query($sqlCentroCusto);
 $CentroCustos = $resultCentroCusto->fetchAll(PDO::FETCH_ASSOC);
 
 // pesquisa o Planos de Contas da unidade
 $sqlPlanoConta = "SELECT PlConId, PlConCodigo, PlConNome, SituaChave
-                FROM  PlanoContas JOIN Situacao on SituaId = PlConStatus
-                WHERE PlConUnidade = ".$_SESSION['UnidadeId'].
-                " and SituaChave = 'ATIVO'";
+                  FROM  PlanoContas JOIN Situacao on SituaId = PlConStatus
+                  WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
 $resultPlanoConta = $conn->query($sqlPlanoConta);
 $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT MvAneArquivo
+        FROM MovimentacaoAnexo
+        WHERE MvAneUnidade = ". $_SESSION['UnidadeId'] ." AND MvAneMovimentacao = ".$_POST['inputMovimentacaoId'];
+$result = $conn->query($sql);
+$rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -38,7 +42,7 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Lamparinas | Relatório de Movimentação</title>
+    <title>Lamparinas | Movimentação Liquidar</title>
 
     <?php include_once("head.php"); ?>
 
@@ -56,13 +60,6 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	<!-- /theme JS files -->
-
-    <!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
-    <script type="text/javascript" language="javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-    <script type="text/javascript" language="javascript"
-        src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
-
 
     <?php
         echo '<script>
@@ -104,6 +101,7 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
                     }
                 }
             })
+            
             $('#submitForm').on('click', function(e){
                 e.preventDefault();
                 var response = calculaValorTotal()
@@ -119,6 +117,7 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
             })
 
             $('#relacaoCentroCusto').hide()
+            
             $('#cmbCentroCusto').on('change', function(){
                 var centros = $('#cmbCentroCusto').val();
                 var HTML = ''
@@ -193,56 +192,6 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
                     $('#relacaoCentroCusto').hide()
                 }
             })
-
-            $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data			
-
-            /* Início: Tabela Personalizada */
-            $('#tblMovimentacao').DataTable({
-                "order": [
-                    [1, "desc"],
-                    [2, "asc"]
-                ],
-                autoWidth: false,
-                responsive: true,
-                columnDefs: [{
-                        orderable: false, //item
-                        width: "5%",
-                        targets: [0]
-                    },
-                    {
-                        orderable: true, //codigo
-                        width: "15%",
-                        targets: [1]
-                    },
-                    {
-                        orderable: true, //centro
-                        width: "50%",
-                        targets: [2]
-                    },
-                    {
-                        orderable: true, //valor
-                        width: "25%",
-                        targets: [3]
-                    },
-                    {
-                        orderable: true, //Ações
-                        width: "5%",
-                        targets: [7]
-                    }
-                ],
-                dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
-                language: {
-                    search: '<span>Filtro:</span> _INPUT_',
-                    searchPlaceholder: 'filtra qualquer coluna...',
-                    lengthMenu: '<span>Mostrar:</span> _MENU_',
-                    paginate: {
-                        'first': 'Primeira',
-                        'last': 'Última',
-                        'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-                        'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
-                    }
-                }
-            });
         });
 
         function pula(e){
@@ -290,6 +239,7 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
             }
             calculaValorTotal()
         }
+
         function calculaValorTotal(id){
             var totalNotaFiscal = parseFloat(valorTotal)
             var ValTotal = 0
@@ -327,11 +277,6 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
                 }
                 return obj
             }
-        }
-
-        function print() {
-            $('#formImprime').attr('action', 'movimentacaoImprimeEntrada.php')
-            $('#formImprime').submit()
         }
     </script>
 
@@ -372,8 +317,10 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
                                                         <label for="inputNumeroNota">Nº Nota Fiscal</label>
                                                         <div class="input-group">
                                                             <input readOnly type="text" id="inputNumeroNota" name="inputNumeroNota" class="form-control" value="'.$Movimentacao['MovimNotaFiscal'].'">
-                                                            <span class="input-group-prepend" onClick="print()" style="cursor: pointer;">
-                                                                <span class="input-group-text" style="color: red;"><i class="icon-file-pdf"></i></span>
+                                                            <span class="input-group-prepend" style="cursor: pointer;">
+                                                                <a href="global_assets/anexos/movimentacao/'.$rowNotaFiscal['MvAneArquivo'].'" target="_blank">
+                                                                    <span class="input-group-text" style="color: red;"><i class="icon-file-pdf"></i></span>
+                                                                </a>
                                                             </span>
                                                         </div>
                                                     </div>
@@ -437,7 +384,7 @@ $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <!-- /basic responsive configuration -->
 
-                            <div id="relacaoCentroCusto" class="card">
+                            <div id="relacaoCentroCusto" class="card" style="display:none;">
                                 <div class="card-header header-elements-inline">
                                     <h5 class="card-title">Relação de Centro de Custo</h5>
                                     <div class="header-elements">

@@ -553,22 +553,21 @@ $dataFim = date("Y-m-d");
                         <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2">
                           <option value="">Todos</option>
                           <?php
-                                                    $sql = "SELECT CnBanId,
-                                                                   CnBanNome
-                                                              FROM ContaBanco
-                                                              JOIN Situacao 
-                                                                ON SituaId = CnBanStatus
-                                                             WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " 
-                                                               and SituaChave = 'ATIVO'
-                                                          ORDER BY CnBanNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
+                            $sql = "SELECT CnBanId,
+                                            CnBanNome
+                                      FROM ContaBanco
+                                      JOIN Situacao 
+                                        ON SituaId = CnBanStatus
+                                      WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " 
+                                        and SituaChave = 'ATIVO'
+                                  ORDER BY CnBanNome ASC";
+                            $result = $conn->query($sql);
+                            $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    foreach ($rowContaBanco as $item) {
-                                                      print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                                    }
-
-                                                    ?>
+                            foreach ($rowContaBanco as $item) {
+                              print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                            }
+                          ?>
                         </select>
                       </div>
                     </div>
@@ -579,21 +578,20 @@ $dataFim = date("Y-m-d");
                         <select id="cmbCentroDeCustos" name="cmbCentroDeCustos" class="form-control form-control-select2">
                           <option value="">Todos</option>
                           <?php
-                                                    $sql = "SELECT CnCusId, CnCusNome, CnCusCodigo
-                                                              FROM CentroCusto
-                                                              JOIN Situacao 
-                                                                ON SituaId = CnCusStatus
-                                                             WHERE CnCusUnidade = " . $_SESSION['UnidadeId'] . " 
-                                                               and SituaChave = 'ATIVO'
-                                                          ORDER BY CnCusCodigo ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
+                            $sql = "SELECT CnCusId, CnCusNome, CnCusCodigo
+                                      FROM CentroCusto
+                                      JOIN Situacao 
+                                        ON SituaId = CnCusStatus
+                                      WHERE CnCusUnidade = " . $_SESSION['UnidadeId'] . " 
+                                        and SituaChave = 'ATIVO'
+                                  ORDER BY CnCusCodigo ASC";
+                            $result = $conn->query($sql);
+                            $rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    foreach ($rowCentroDeCustos as $item) {
-                                                      print('<option value="' . $item['CnCusId'] . '">'. $item['CnCusCodigo'] .' - '. $item['CnCusNome'] . '</option>');
-                                                    }
-
-                                                    ?>
+                            foreach ($rowCentroDeCustos as $item) {
+                              print('<option value="' . $item['CnCusId'] . '">'. $item['CnCusCodigo'] .' - '. $item['CnCusNome'] . '</option>');
+                            }
+                          ?>
                         </select>
                       </div>
                     </div>
@@ -605,21 +603,21 @@ $dataFim = date("Y-m-d");
                         <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2">
                           <option value="">Todos</option>
                           <?php
-                                                    $sql = "SELECT PlConId, PlConNome, PlConCodigo
-                                                              FROM PlanoContas
-                                                              JOIN Situacao 
-                                                                ON SituaId = PlConStatus
-                                                             WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " 
-                                                               AND SituaChave = 'ATIVO'
-                                                          ORDER BY PlConCodigo ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+                              $sql = "SELECT PlConId, PlConNome, PlConCodigo
+                                        FROM PlanoConta
+                                        JOIN Situacao 
+                                          ON SituaId = PlConStatus
+                                        WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " 
+                                          AND SituaChave = 'ATIVO'
+                                    ORDER BY PlConCodigo ASC";
+                              $result = $conn->query($sql);
+                              $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    foreach ($rowPlanoContas as $item) {
-                                                      print('<option value="' . $item['PlConId'] . '">'. $item['PlConCodigo'] .' - '. $item['PlConNome'] . '</option>');
-                                                    }
+                              foreach ($rowPlanoContas as $item) {
+                                print('<option value="' . $item['PlConId'] . '">'. $item['PlConCodigo'] .' - '. $item['PlConNome'] . '</option>');
+                              }
 
-                                                    ?>
+                            ?>
                         </select>
                       </div>
                     </div>

@@ -74,13 +74,14 @@ if (isset($_POST['inputIdOrdemCompra'])){
 		
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 			
-			$sql = "INSERT INTO OrdemCompraXServico (OCXSrOrdemCompra, OCXSrServico, OCXSrQuantidade, OCXSrValorUnitario, OCXSrUsuarioAtualizador, OCXSrUnidade)
-					VALUES (:iOrdemCompra, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO OrdemCompraXServico (OCXSrOrdemCompra, OCXSrServico, OCXSrDetalhamento, OCXSrQuantidade, OCXSrValorUnitario, OCXSrUsuarioAtualizador, OCXSrUnidade)
+					VALUES (:iOrdemCompra, :iServico, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 			
 			$result->execute(array(
 				':iOrdemCompra' => $iOrdemCompra,
 				':iServico' => $_POST['inputIdServico'.$i],
+				':sDetalhamento' => $_POST['inputDetalhamento'.$i],
 				':iQuantidade' => $_POST['inputQuantidade'.$i] == ''? null : $_POST['inputQuantidade'.$i],
 				':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -441,13 +442,13 @@ if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado !
 									
 									<?php
 
-										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario, OCXSrQuantidade,
+										$sql = "SELECT ServiId, ServiNome, OCXSrDetalhamento as Detalhamento, FOXSrValorUnitario, OCXSrQuantidade,
 												dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ServiId, 'S') as SaldoOrdemCompra
 												FROM Servico
 												JOIN Situacao on SituaId = ServiStatus
 												JOIN OrdemCompraXServico on OCXSrServico = ServiId and OCXSrOrdemCompra = '$iOrdemCompra'
 												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
-												WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
+												WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria." and SituaChave='ATIVO'";
 										if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 											$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
 										}
@@ -457,12 +458,12 @@ if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado !
 										$count = count($rowServicos);
 
 										if(!$count>0){
-											$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario,
+											$sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento, FOXSrValorUnitario,
 													dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ServiId, 'S') as SaldoOrdemCompra
 													FROM Servico
 													JOIN Situacao on SituaId = ServiStatus
 													JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
-													WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria."and SituaChave='ATIVO'";
+													WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria." and SituaChave='ATIVO'";
 											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 												$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
 											}
@@ -537,7 +538,8 @@ if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado !
 															<input type="hidden" id="inputIdServico'.$cont.'" name="inputIdServico'.$cont.'" value="'.$item['ServiId'].'" class="idServico">
 														</div>
 														<div class="col-lg-10" style="width:100%">
-															<input type="text" id="inputServico'.$cont.'" name="inputServico'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ServiDetalhamento'].'" value="'.$item['ServiNome'].'" readOnly>
+															<input type="text" id="inputServico'.$cont.'" name="inputServico'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['Detalhamento'].'" value="'.$item['ServiNome'].'" readOnly>
+															<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
 														</div>
 													</div>
 												</div>

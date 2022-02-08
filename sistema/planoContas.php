@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Plano de Contas';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT PlConId, PlConCodigo, PlConNome, PlConTipo, PlConNatureza, PlConGrupo, PlConDetalhamento, PlConPlanoContaPai, PlConStatus, SituaNome, SituaCor, SituaChave, GrConNome
-		FROM PlanoContas
+		FROM PlanoConta
 		LEFT JOIN GrupoConta on GrConId = PlConGrupo
 		JOIN Situacao on SituaId = PlConStatus
 	    WHERE PlConUnidade = ". $_SESSION['UnidadeId'] ."

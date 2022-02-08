@@ -536,10 +536,10 @@ $dataFim = date("Y-m-d");
                                 <option value="#">Selecionar</option>
                                 <?php
                                     $sql = "SELECT PlConId, PlConNome
-                                                FROM PlanoContas
-                                                JOIN Situacao on SituaId = PlConStatus
-                                                WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                ORDER BY PlConNome ASC";
+                                            FROM PlanoConta
+                                            JOIN Situacao on SituaId = PlConStatus
+                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                            ORDER BY PlConNome ASC";
                                     $result = $conn->query($sql);
                                     $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
                                     
@@ -807,7 +807,7 @@ $dataFim = date("Y-m-d");
                                                     <option value="">Todos</option>
                                                     <?php
                                                     $sql = "SELECT PlConId, PlConCodigo, PlConNome
-                                                            FROM PlanoContas
+                                                            FROM PlanoConta
                                                             JOIN Situacao on SituaId = PlConStatus
                                                             WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
                                                             ORDER BY PlConCodigo ASC";

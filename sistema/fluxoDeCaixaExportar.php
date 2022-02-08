@@ -488,7 +488,7 @@ function retornaBuscaComoArray($dataFiltroDiaInicio, $dataFiltroDiaFim,$ccFiltro
               dbo.fnPlanoContasPrevisto(CnCusUnidade, PlConId, '".$dataFiltroDiaInicio."', '".$dataFiltroDiaFim."', 'S') as PL_PrevistoSaida,
               dbo.fnPlanoContasRealizado(CnCusUnidade, PlConId, '".$dataFiltroDiaInicio."', '".$dataFiltroDiaFim."', 'S') as PL_RealizadoSaida
           FROM CentroCusto CC 
-          JOIN PlanoContas PL ON PlConCentroCusto = CnCusId
+          JOIN PlanoConta PL ON PlConCentroCusto = CnCusId
           JOIN Situacao S1 ON S1.SituaId = CC.CnCusStatus
           JOIN Situacao S2 ON S2.SituaId = PL.PlConStatus
           WHERE CnCusUnidade = 1 

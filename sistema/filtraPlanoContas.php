@@ -7,12 +7,12 @@ include('global_assets/php/conexao.php');
 
 if (isset($_GET['idCentroCusto']) && $_GET['idCentroCusto'] != ''){
 	$sql = "SELECT PlConId, PlConCodigo, PlConNome
-			FROM PlanoContas
+			FROM PlanoConta
 			JOIN Situacao on SituaId = PlConStatus
 			WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and PlConCentroCusto = ". $_GET['idCentroCusto']." and SituaChave = 'ATIVO'";
 } else {
 	$sql = "SELECT PlConId, PlConCodigo, PlConNome
-			FROM PlanoContas
+			FROM PlanoConta
 			JOIN Situacao on SituaId = PlConStatus
 			WHERE PlConUnidade = ".$_SESSION['UnidadeId']."  and SituaChave = 'ATIVO'";	
 }

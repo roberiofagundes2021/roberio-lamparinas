@@ -31,12 +31,12 @@ require_once 'global_assets/php/vendor/autoload.php';
         }
 
         if (!empty($_POST['cmbCentroDeCustos_imp'])) {
-            $argsCenCustCp = " join PlanoContas
+            $argsCenCustCp = " join PlanoConta
                                 on PlConId = CnAPaPlanoContas
                                 join CentroCusto
                                 on CnCusId = PlConCentroCusto ";
 
-            $argsCenCustCr = " join PlanoContas
+            $argsCenCustCr = " join PlanoConta
                                 on PlConId = CnARePlanoContas
                                 join CentroCusto
                                 on CnCusId = PlConCentroCusto ";

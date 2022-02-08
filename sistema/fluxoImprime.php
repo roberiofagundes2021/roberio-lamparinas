@@ -184,7 +184,7 @@ try {
 			$totalGeralServicos += $valorTotal;
 		}	
 	}
-
+/*
 	$totalGeralAditivos = 0;
 
 	//Dados dos Aditivos
@@ -647,7 +647,7 @@ try {
 	";
 		/////////////////////////////////
 	}
-
+*/
 	$rodape = "<hr/>
     <div style='width:100%'>
 		<div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>

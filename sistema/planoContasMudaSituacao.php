@@ -21,7 +21,7 @@ if(isset($_POST['inputPlanoContasId'])){
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iStatus = $row['SituaId'];
 		
-		$sql = "UPDATE PlanoContas SET PlConStatus = :bStatus
+		$sql = "UPDATE PlanoConta SET PlConStatus = :bStatus
 				WHERE PlConId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $iStatus); 

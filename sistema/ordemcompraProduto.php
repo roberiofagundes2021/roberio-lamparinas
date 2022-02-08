@@ -80,13 +80,14 @@ if (isset($_POST['inputIdOrdemCompra'])){
 			$saldo = $saldo['Saldo'];
 			$quantidade = $_POST['inputQuantidade'.$i];
 			
-			$sql = "INSERT INTO OrdemCompraXProduto (OCXPrOrdemCompra, OCXPrProduto, OCXPrQuantidade, OCXPrValorUnitario, OCXPrUsuarioAtualizador, OCXPrUnidade)
-					VALUES (:iOrdemCompra, :iProduto, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO OrdemCompraXProduto (OCXPrOrdemCompra, OCXPrProduto, OCXPrDetalhamento, OCXPrQuantidade, OCXPrValorUnitario, OCXPrUsuarioAtualizador, OCXPrUnidade)
+					VALUES (:iOrdemCompra, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 			
 			$result->execute(array(
 							':iOrdemCompra' => $iOrdemCompra,
 							':iProduto' => $_POST['inputIdProduto'.$i],
+							':sDetalhamento' => $_POST['inputDetalhamento'.$i],
 							':iQuantidade' => $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
 							':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -445,7 +446,7 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 									</div>-->
 									
 									<?php
-										$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, FOXPrValorUnitario,
+										$sql = "SELECT ProduId, ProduNome, OCXPrDetalhamento as Detalhamento, UnMedSigla, OCXPrQuantidade, FOXPrValorUnitario,
 													dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ProduId, 'P') as SaldoOrdemCompra
 													FROM Produto
 													JOIN Situacao on SituaId = ProduStatus
@@ -461,13 +462,13 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
 										if(!$count>0){
-											$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrValorUnitario,
-															dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ProduId, 'P') as SaldoOrdemCompra
-															FROM Produto
-															JOIN Situacao on SituaId = ProduStatus
-															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-															JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxo'
-															WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
+											$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, FOXPrValorUnitario,
+													dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxo', ProduId, 'P') as SaldoOrdemCompra
+													FROM Produto
+													JOIN Situacao on SituaId = ProduStatus
+													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxo'
+													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
 											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 												$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
 											}
@@ -543,7 +544,8 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
 														</div>
 														<div class="col-lg-10" style="width:100%">
-															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['Detalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+															<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
 														</div>
 													</div>
 												</div>								

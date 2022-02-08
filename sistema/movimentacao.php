@@ -342,11 +342,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                   print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'anexo\', \'\');" class="dropdown-item"><i class="icon-attachment"></i> Anexar Nota Fiscal</a>');
                                 }
 
-                                if ($item['SituaChave'] == 'LIBERADOCENTRO' && $item['MovimTipo'] == 'E'){
+                                if ($item['MovimTipo'] == 'E' && $item['SituaChave'] == 'LIBERADOCENTRO'){
                                   print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'aprovacaoContabilidade\', \'\');" class="dropdown-item"><i class="icon-list2"></i> Enviar para Contabilidade</a>');
                                 }
 
-                                if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCONTABILIDADE' && $item['MovimTipo'] == 'E' && $_SESSION['PerfiChave'] == 'CONTABILIDADE' ){
+                                if ($item['MovimTipo'] == 'E' && $item['SituaChave'] != 'AGUARDANDOLIBERACAO'){
                                   print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'liquidar\', \'\');" class="dropdown-item"><i class="icon-coin-dollar"></i>Liquidar</a>');
                                 }
 

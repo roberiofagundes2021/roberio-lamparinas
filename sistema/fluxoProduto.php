@@ -589,7 +589,7 @@ try{
 															and SbCatId in (".$sSubCategorias.")
 															ORDER BY SbCatNome, ProduNome ASC";													
 												} else { //Se $row['TrRefTabelaProduto'] == ProdutoOrcamento
-													$sql = "SELECT ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
+													$sql = "SELECT ProduId, ProduNome, TRXPrDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
 															FROM Produto
 															JOIN ProdutoOrcamento on PrOrcProduto = ProduId
 															JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId

@@ -1107,7 +1107,7 @@ $dataInicio = date("Y-m-d");
                                                     <?php
                                                     try {
                                                         $sql = "SELECT PlConId, PlConCodigo, PlConNome
-                                                                FROM PlanoContas
+                                                                FROM PlanoConta
                                                                 JOIN Situacao  ON SituaId = PlConStatus
                                                                 WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and SituaChave = 'ATIVO'
                                                                 ORDER BY PlConCodigo ASC";
