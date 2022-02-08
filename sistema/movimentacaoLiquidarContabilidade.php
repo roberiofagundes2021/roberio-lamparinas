@@ -15,7 +15,7 @@ try{
         $data = $_POST['inputPeriodoDe'];
         $UsuarId = $_SESSION['UsuarId'];
         $UnidadeId = $_SESSION['UnidadeId'];
-        $planoConta = $_POST['cmbPlanoContaId'];
+        $planoCusto = $_POST['cmbPlanoContaId'];
 
         $registros = intval($_POST['totalRegistros']);
 
@@ -23,7 +23,7 @@ try{
         
         $sqlMovimentacao = "INSERT INTO MovimentacaoLiquidacao(MvLiqMovimentacao, MvLiqData, MvLiqUsuario,
         MvLiqUnidade, MvLiqPlanoContas)
-        VALUES('$iMovimentacao', '$data', '$UsuarId', '$UnidadeId', '$planoConta')";
+        VALUES('$iMovimentacao', '$data', '$UsuarId', '$UnidadeId', '$planoCusto')";
 
         $conn->query($sqlMovimentacao);
         $newMovimentacaoId = $conn->lastInsertId();
