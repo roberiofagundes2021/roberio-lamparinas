@@ -718,47 +718,61 @@ try {
 							<!-- /card-body -->
 							<!---------------------------------------------------------------------------------------------Produtos---------------------------------------------------------------------------------------------------------->
 							<?php
-								$sql = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+								$sqlProduto = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
 										FROM Produto
 										JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 										LEFT JOIN Marca on MarcaId = ProduMarca
 										JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-										WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = $iCategoria";
-										if($sSubCategorias){
-											$sql .= ' and ProduSubCategoria in ($sSubCategorias)';
-										}
-								$result = $conn->query($sql);
-								$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+										WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = $iCategoria
+										AND FOXPrFluxoOperacional = $iFluxoOperacional";
+								if($sSubCategorias){
+									$sqlProduto .= " and ProduSubCategoria in ($sSubCategorias)";
+								}
+								$resultProduto = $conn->query($sqlProduto);
+								$rowProdutos = $resultProduto->fetchAll(PDO::FETCH_ASSOC);
+
 								$countProduto = count($rowProdutos);
+
+								$sqlServico = "SELECT ServiId, ServiNome, ServiDetalhamento
+										FROM Servico
+										JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+										WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
+										and ServiCategoria = $iCategoria AND FOXSrFluxoOperacional = $iFluxoOperacional";
+								if($sSubCategorias){
+									$sqlServico .= " and ServiSubCategoria in (" . $sSubCategorias . ")";
+								}
+								$resultServico = $conn->query($sqlServico);
+								$rowServicos = $resultServico->fetchAll(PDO::FETCH_ASSOC);
+								$countServico = count($rowServicos);
 							?>
 
-							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && $countProduto >= 1 ? print('block') : print('none')  ?>">
+							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && !$countProduto >= 1 ? print('block') : print('none')  ?>">
 								
-							<?php if($sSubCategorias){ ?>	
-								<div class="row">
-									<div class="col-lg-12">
-										<div class="form-group">
-											<label for="cmbSubCategoria">SubCategoria(s)</label>
-											<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
-												<?php 
-													$sql = "SELECT SbCatId, SbCatNome
-															FROM SubCategoria
-															JOIN Situacao on SituaId = SbCatStatus	
-															WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
-															ORDER BY SbCatNome ASC";
-													$result = $conn->query($sql);
-													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-													$count = count($rowSubCategoria);														
-															
-													foreach ( $rowSubCategoria as $item){	
-														print('<option value="'.$item['SbCatId'].'" selected>'.$item['SbCatNome'].'</option>');	
-													}                  
-												?>
-											</select>
+								<?php if($sSubCategorias){ ?>	
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label for="cmbSubCategoria">SubCategoria(s)</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+													<?php 
+														$sql = "SELECT SbCatId, SbCatNome
+																FROM SubCategoria
+																JOIN Situacao on SituaId = SbCatStatus	
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+																ORDER BY SbCatNome ASC";
+														$result = $conn->query($sql);
+														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+														$count = count($rowSubCategoria);														
+																
+														foreach ( $rowSubCategoria as $item){	
+															print('<option value="'.$item['SbCatId'].'" selected>'.$item['SbCatNome'].'</option>');	
+														}                  
+													?>
+												</select>
+											</div>
 										</div>
 									</div>
-								</div>
-							<?php } ?>
+								<?php } ?>
 							
 								<div class="card-header header-elements-inline">
 									<h5 class="card-title">Relação de Produtos</h5>
@@ -892,20 +906,6 @@ try {
 
 								</div>
 							</div>
-							<!---------------------------------------------------------------------------------------------Serviços---------------------------------------------------------------------------------------------------------->
-							<?php
-							$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
-									FROM Servico
-									JOIN Situacao on SituaId = ServiStatus
-									WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-									SituaChave = 'ATIVO'";
-							if($sSubCategorias){
-								$sql .= " and ServiSubCategoria in (" . $sSubCategorias . ")";
-							}
-							$result = $conn->query($sql);
-							$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-							$countServico = count($rowServicos);
-							?>
 							<!------------------------------Se não existirem serviços ou se a requisição não estiver vindo do lugar certo-------------------------------------->
 							<div class="lista-servicos" style="display: <?php isset($_POST['inputDataInicio']) && $countServico >= 1 ? print('block') : print('none')  ?>">
 								<!-- Custom header text -->
