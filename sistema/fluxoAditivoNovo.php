@@ -746,7 +746,7 @@ try {
 								$countServico = count($rowServicos);
 							?>
 
-							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && !$countProduto >= 1 ? print('block') : print('none')  ?>">
+							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && $countProduto >= 1 ? print('block') : print('none')  ?>">
 								
 								<?php if($sSubCategorias){ ?>	
 									<div class="row">
