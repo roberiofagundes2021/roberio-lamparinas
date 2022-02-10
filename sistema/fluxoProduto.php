@@ -14,7 +14,7 @@ if(isset($_POST['inputFluxoOperacionalId'])){
 	$iFluxoOperacional = $_POST['inputIdFluxoOperacional'];
 	$iCategoria = $_POST['inputIdCategoria'];
 } else {
-	irpara("fluxo.php");
+	irpara($_POST['inputOrigem']);
 }
 
 //Se está alterando
