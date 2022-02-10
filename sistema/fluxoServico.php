@@ -14,7 +14,21 @@ if (isset($_POST['inputFluxoOperacionalId'])) {
 	$iFluxoOperacional = $_POST['inputIdFluxoOperacional'];
 	$iCategoria = $_POST['inputIdCategoria'];
 } else {
-	irpara("fluxo.php");
+	if (isset($_POST['inputOrigem'])){
+		irpara($_POST['inputOrigem']);
+	} else{
+		$sql = "SELECT ParamEmpresaPublica
+				FROM Parametro
+				WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
+		$result = $conn->query($sql);
+		$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
+
+		if ($rowParametro['ParamEmpresaPublica']){
+			irpara("contrato.php");
+		} else{
+			irpara("fluxo.php");
+		}
+	}
 }
 
 //Se está alterando
