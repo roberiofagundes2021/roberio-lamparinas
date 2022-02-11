@@ -13,12 +13,12 @@ if(isset($_POST['cmbSubCategorias']) && isset($_POST['inputIdCategoria']) && iss
 	$iSubCategoria = $_POST['inputIdCategoria'];
     $iFluxoOperacional = $_POST['iFluxoOperacional'];
 
-	$subCategoriaList = "(";
+	$subCategoriaList = "";
 
 	foreach($iCategorias as $subCat){
 		$subCategoriaList .= "$subCat,";
 	}
-	$subCategoriaList  = substr($subCategoriaList, 0, -1).")";
+	$subCategoriaList  = substr($subCategoriaList, 0, -1);
 
 	$sql = "SELECT DISTINCT ServiId, ServiNome, ServiDetalhamento
 			FROM Servico

@@ -95,6 +95,8 @@ $countAditivos = count($rowAditivo);
 			document.getElementById('inputAditivoId').value = AditiId;
 			document.getElementById('inputCategoria').value = Categoria;
 			document.getElementById('inputSubCategorias').value = SubCategorias;
+
+			document.formAditivo.setAttribute("target", "_self");
 			//alert(FluxoId + " - " + AditiId);
 			//return false;
 

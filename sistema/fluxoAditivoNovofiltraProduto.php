@@ -13,12 +13,12 @@ if(isset($_POST['cmbSubCategoria']) && isset($_POST['inputIdCategoria']) && isse
 	$iSubCategoria = $_POST['inputIdCategoria'];
 	$iFluxoOperacional = $_POST['iFluxoOperacional'];
 
-	$subCategoriaList = "(";
+	$subCategoriaList = "";
 
 	foreach($iCategorias as $subCat){
 		$subCategoriaList .= "$subCat,";
 	}
-	$subCategoriaList  = substr($subCategoriaList, 0, -1).")";
+	$subCategoriaList  = substr($subCategoriaList, 0, -1);
 
 	$sql = "SELECT DISTINCT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
 			FROM Produto
@@ -100,7 +100,7 @@ if(isset($_POST['cmbSubCategoria']) && isset($_POST['inputIdCategoria']) && isse
 						<h3><b>Total:</b></h3>
 					</div>	
 					<div class="col-lg-2">
-						<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
+						<input type="text" id="inputTotalGeralProduto" name="inputTotalGeralProduto" class="form-control-border-off" value="'.mostraValor($fTotalGeral).'" readOnly>
 					</div>											
 				</div>';
 

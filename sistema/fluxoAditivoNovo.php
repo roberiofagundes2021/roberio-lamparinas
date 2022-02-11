@@ -557,9 +557,9 @@ try {
 				e.preventDefault();
 
 				var inputValor = $('#inputValor').val().replaceAll('.', '').replace(',', '.');
-				var inputTotalGeral = $('#inputTotalGeral').val().replaceAll('.', '').replace(',', '.');
-				var inputTotalGeralServico = $('#inputTotalGeralServico').val().replaceAll('.', '').replace(',', '.');
-				var somaTotais = parseFloat(inputTotalGeral) + parseFloat(inputTotalGeralServico);
+				var inputTotalGeralProduto = $('#inputTotalGeralProduto').val()?$('#inputTotalGeralProduto').val().replaceAll('.', '').replace(',', '.'):0;
+				var inputTotalGeralServico = $('#inputTotalGeralServico').val()?$('#inputTotalGeralServico').val().replaceAll('.', '').replace(',', '.'):0;
+				var somaTotais = parseFloat(inputTotalGeralProduto) + parseFloat(inputTotalGeralServico);
 
 				//Verifica se o valor ultrapassou o total do fluxo
 				if (somaTotais > parseFloat(inputValor)) {
@@ -591,7 +591,7 @@ try {
 		function calculaValorTotal(id) {
 
 			var ValorTotalAnterior = $('#inputValorTotal' + id + '').val() == '' ? 0 : $('#inputValorTotal' + id + '').val().replaceAll('.', '').replace(',', '.');
-			var TotalGeralAnterior = $('#inputTotalGeral').val().replaceAll('.', '').replace(',', '.');
+			var TotalGeralAnterior = $('#inputTotalGeralProduto').val().replaceAll('.', '').replace(',', '.');
 
 			var Quantidade = $('#inputQuantidade' + id + '').val().trim() == '' ? 0 : $('#inputQuantidade' + id + '').val();
 			var ValorUnitario = $('#inputValorUnitario' + id + '').val() == '' ? 0 : $('#inputValorUnitario' + id + '').val().replaceAll('.', '').replace(',', '.');
@@ -603,7 +603,7 @@ try {
 
 			$('#inputValorTotal' + id + '').val(ValorTotal);
 
-			$('#inputTotalGeral').val(TotalGeral);
+			$('#inputTotalGeralProduto').val(TotalGeral);
 		}
 
 		function calculaValorTotalServico(id) {
@@ -896,6 +896,7 @@ try {
 												</div>											
 											</div>');
 										}
+										print('</div>');
 									}
 
 									if (isset($_POST['inputDataInicio'])) {
@@ -924,7 +925,7 @@ try {
 												<h5><b>Total:</b></h5>
 											</div>	
 											<div class="col-lg-2">
-												<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="' . mostraValor($fTotalGeral) . '" readOnly>
+												<input type="text" id="inputTotalGeralProduto" name="inputTotalGeralProduto" class="form-control-border-off text-right" value="' . mostraValor($fTotalGeral) . '" readOnly>
 											</div>											
 										</div>');
 
@@ -975,25 +976,25 @@ try {
 
 									<?php
 
-									$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
-											FROM Servico
-											JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-											LEFT JOIN Marca on MarcaId = ServiMarca
-											WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
-									$result = $conn->query($sql);
-									$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-									$countServico = count($rowServicos);
+									// $sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
+									// 		FROM Servico
+									// 		JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+									// 		LEFT JOIN Marca on MarcaId = ServiMarca
+									// 		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
+									// $result = $conn->query($sql);
+									// $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+									// $countServico = count($rowServicos);
 
-									if (!$countServico) {
-										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
-												FROM Servico
-												JOIN Situacao on SituaId = ServiStatus
-												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-												ServiSubCategoria in (" . $sSubCategorias . ") and SituaChave = 'ATIVO' ";
-										$result = $conn->query($sql);
-										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-										$countServico = count($rowServicos);
-									}
+									// if (!$countServico) {
+									// 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
+									// 			FROM Servico
+									// 			JOIN Situacao on SituaId = ServiStatus
+									// 			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
+									// 			ServiSubCategoria in (" . $sSubCategorias . ") and SituaChave = 'ATIVO' ";
+									// 	$result = $conn->query($sql);
+									// 	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
+									// 	$countServico = count($rowServicos);
+									// }
 
 									$cont = 0;
 									if (isset($_POST['inputDataInicio'])) {
@@ -1001,18 +1002,18 @@ try {
 										print('
 										<div class="row" style="margin-bottom: -20px;">
 											<div class="col-lg-8">
-													<div class="row">
-														<div class="col-lg-1">
-															<label for="inputCodigo"><strong>Item</strong></label>
-														</div>
-														<div class="col-lg-8">
-															<label for="inputServico"><strong>Servico</strong></label>
-														</div>
-														<div class="col-lg-3">
-															<label for="inputMarca"><strong>Marca</strong></label>
-														</div>
+												<div class="row">
+													<div class="col-lg-1">
+														<label for="inputCodigo"><strong>Item</strong></label>
 													</div>
-												</div>												
+													<div class="col-lg-8">
+														<label for="inputServico"><strong>Servico</strong></label>
+													</div>
+													<div class="col-lg-3">
+														<label for="inputMarca"><strong>Marca</strong></label>
+													</div>
+												</div>
+											</div>												
 											<div class="col-lg-1">
 												<div class="form-group">
 													<label for="inputQuantidade"><strong>Quantidade</strong></label>
@@ -1072,38 +1073,36 @@ try {
 												</div>											
 											</div>');
 										}
+										print('</div>');
 									}
 
 									if (isset($_POST['inputDataInicio'])) {
 										print('
 										<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
-													<div class="row">
-														<div class="col-lg-1">
-															
-														</div>
-														<div class="col-lg-8">
-															
-														</div>
-														<div class="col-lg-3">
-															
-														</div>
+											<div class="col-lg-8">
+												<div class="row">
+													<div class="col-lg-1">
+														
+													</div>
+													<div class="col-lg-8">
+														
+													</div>
+													<div class="col-lg-3">
+														
 													</div>
 												</div>
-												<div class="col-lg-1">
-													
-												</div>	
-												<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
-													<h5><b>Total:</b></h5>
-												</div>	
-												<div class="col-lg-2">
-													<input type="text" id="inputTotalGeralServico" name="inputTotalGeralServico" class="form-control-border-off text-right" value="' . mostraValor($fTotalGeral) . '" readOnly>
-												</div>											
-											</div>');
+											</div>
+											<div class="col-lg-1">
+											</div>	
+											<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
+												<h5><b>Total:</b></h5>
+											</div>	
+											<div class="col-lg-2">
+												<input type="text" id="inputTotalGeralServico" name="inputTotalGeralServico" class="form-control-border-off text-right" value="' . mostraValor($fTotalGeral) . '" readOnly>
+											</div>											
+										</div>');
 
 										print('<input type="hidden" id="totalRegistrosServicos" name="totalRegistrosServicos" value="' . $cont . '" >');
-
-										print('</div>');
 									}
 
 									?>
@@ -1133,7 +1132,7 @@ try {
 
 	</div>
 	<!-- /main content -->
-
+									
 	<!-- /page content -->
 
 </body>
