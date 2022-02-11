@@ -153,6 +153,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 										url,
 										dataPost,
 										function(data) {
+											console.log(dataPost)
 											if (!data) {
 												$(elemInp).val(0)
 											} else {
