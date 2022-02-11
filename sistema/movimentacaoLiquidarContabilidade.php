@@ -136,8 +136,8 @@ try{
         // insere todos os Centro de custos Selecionados em contas a pagar
 
         $sqlContasAPagar = "INSERT INTO ContasAPagarXCentroCusto
-        (CnAPaXCnCusContasAPagar, CnAPaXCnCusCentroCusto, CnAPaXCnCusUsuarioAtualizador, CnAPaXCnCusValor,
-        CnAPaXCnCusUnidade)
+        (CAPXCContasAPagar, CAPXCCentroCusto, CAPXCUsuarioAtualizador, CAPXCValor,
+        CAPXCUnidade)
         VALUES ";   
         for($x=0; $x < $registros; $x++){
             $keyNome = 'inputCentroNome-'.$x;
