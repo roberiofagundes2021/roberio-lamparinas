@@ -558,6 +558,53 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 									<input type="hidden" id="inputFluxoAditivo" name="inputFluxoAditivo" value="" />
 
 									<div class="row">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputNumContrato">Nº Contrato</label>
+												<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control text-danger" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly >
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputNumProcesso">Nº Processo</label>
+												<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
+											</div>
+										</div>
+										
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputDataInicio">Data Início <span class="text-danger">*</span></label>
+												<div class="input-group">
+													<span class="input-group-prepend">
+														<span class="input-group-text"><i class="icon-calendar22"></i></span>
+													</span>
+													<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['FlOpeDataInicio']; ?>" readOnly >
+												</div>
+											</div>
+										</div>
+										
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputDataFim">Data Fim <span class="text-danger">*</span></label>
+												<div class="input-group">
+													<span class="input-group-prepend">
+														<span class="input-group-text"><i class="icon-calendar22"></i></span>
+													</span>
+													<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['FimContrato']; ?>" readOnly >
+												</div>
+											</div>
+										</div>											
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputValor">Valor Total</label>
+												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['TotalContrato']); ?>" readOnly>
+											</div>
+										</div>										
+									</div>
+
+									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbFornecedor">Fornecedor</label>
@@ -607,53 +654,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 											</select>
 										</div>	
 									</div>
-
-									
-									<div class="row">
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="cmbProduto">Produto/Serviço</label>
-												<select id="cmbProduto" name="cmbProduto[]" class="form-control multiselect-filtering" multiple="multiple" data-fouc >
-													<?php 
-														echo $optionsFilter;
-													?>
-												</select>
-
-												<!--<input type="hidden" name="inputSelecionados" value="<?php //isset($aSelecionados) ? var_dump($aSelecionados) : ""; ?>">-->
-											</div>
-										</div>
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputDataInicio">Data Início <span class="text-danger">*</span></label>
-												<div class="input-group">
-													<span class="input-group-prepend">
-														<span class="input-group-text"><i class="icon-calendar22"></i></span>
-													</span>
-													<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="<?php echo $row['FlOpeDataInicio']; ?>" readOnly >
-												</div>
-											</div>
-										</div>
-										
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputDataFim">Data Fim <span class="text-danger">*</span></label>
-												<div class="input-group">
-													<span class="input-group-prepend">
-														<span class="input-group-text"><i class="icon-calendar22"></i></span>
-													</span>
-													<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="<?php echo $row['FimContrato']; ?>" readOnly >
-												</div>
-											</div>
-										</div>								
-										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputNumContrato">Nº Contrato</label>
-												<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly >
-											</div>
-										</div>
-									</div>
+			
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
@@ -665,20 +666,21 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 												</select>
 											</div>	
 										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputNumProcesso">Nº Processo</label>
-												<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
-											</div>
-										</div>
 
-										<div class="col-lg-3">
+										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputValor">Valor Total</label>
-												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['TotalContrato']); ?>" readOnly>
+												<label for="cmbProduto">Produto/Serviço</label>
+												<select id="cmbProduto" name="cmbProduto[]" class="form-control multiselect-filtering" multiple="multiple" data-fouc >
+													<?php 
+														echo $optionsFilter;
+													?>
+												</select>
+
+												<!--<input type="hidden" name="inputSelecionados" value="<?php //isset($aSelecionados) ? var_dump($aSelecionados) : ""; ?>">-->
 											</div>
 										</div>
 									</div>
+									
 									<div class="col-lg-12">	
 											<div class="text-right">
 												<a href="contrato.php" class="btn btn-basic" role="button"><< Fluxo Operacional/Contrato</a>
