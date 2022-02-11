@@ -57,6 +57,44 @@ if (isset($_POST['inputData'])) {
 
 		$numItems = intval($_POST['inputNumItens']);
 
+		// essa etapa vai buscar o Saldo Remanescente da ordem de compra
+		$sqlMovimentacao = "SELECT OrComId, OrComSaldoRemanescente, OrComFluxoOperacional
+		FROM Movimentacao
+		JOIN OrdemCompra on OrComId = MovimOrdemCompra
+		WHERE MovimId = $insertId";
+		$resultMovimentacao = $conn->query($sqlMovimentacao);
+		$rowMovimentacao = $resultMovimentacao->fetch(PDO::FETCH_ASSOC);
+
+		$sReferencia = 'P';
+
+		/* Caso exista Saldo Remanescente deve ser verificado a existencia de um aditivo caso exista
+		deve ser utilisado o "AditiNumero" do PENULTIMO aditivo*/
+		if($rowMovimentacao['OrComSaldoRemanescente'] == 1){
+			$sqlAdt = "SELECT (MAX(AditiNumero)-1) as AditiNumero FROM Aditivo
+			WHERE AditiValor is not null and AditiUnidade = ".$_SESSION['UnidadeId']." and AditiFluxoOperacional = ".$rowMovimentacao['OrComFluxoOperacional'];
+			$resultAdt = $conn->query($sqlAdt);
+			$rowAdt = $resultAdt->fetch(PDO::FETCH_ASSOC);
+
+			/* Caso encontre o aditivo sera setado na variavel $sReferencia o numero do aditivo ex.: "A1", "A2"
+			caso contrario sera setado em $sReferencia o valor "P" de principal*/
+			if($rowAdt['AditiNumero'] != null){
+				$sReferencia = 'A'.$rowAdt['AditiNumero'];
+			}
+		} else {
+			/* Caso NÃO exista Saldo Remanescente deve ser verificado a existencia de um aditivo caso exista
+			deve ser utilisado o "AditiNumero" do ULTIMO aditivo*/
+			$sqlAdt = "SELECT MAX(AditiNumero) as AditiNumero FROM Aditivo
+			WHERE AditiValor is not null and AditiUnidade = ".$_SESSION['UnidadeId']." and AditiFluxoOperacional = ".$rowMovimentacao['OrComFluxoOperacional'];
+			$resultAdt = $conn->query($sqlAdt);
+			$rowAdt = $resultAdt->fetch(PDO::FETCH_ASSOC);
+
+			/* Caso encontre o aditivo sera setado na variavel $sReferencia o numero do aditivo ex.: "A1", "A2"
+			caso contrario sera setado em $sReferencia o valor "P" de principal*/
+			if($rowAdt['AditiNumero'] != null){
+				$sReferencia = 'A'.$rowAdt['AditiNumero'];
+			}
+		}
+
 		for ($i = 1; $i <=  $numItems; $i++) {
 
 			$campoSoma = $i;
@@ -79,10 +117,10 @@ if (isset($_POST['inputData'])) {
 						$sql = "INSERT INTO MovimentacaoXProduto
 								(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote,
 								MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio,
-								MvXPrAnoFabricacao, MvXPrNumSerie)
-								VALUES 
+								MvXPrAnoFabricacao, MvXPrNumSerie, MvXPrReferencia)
+								VALUES
 								(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao,
-								:iUsuarioAtualizador, :iUnidade, :iPatrimonio, :iFabricacao, :iNumSerie)";
+								:iUsuarioAtualizador, :iUnidade, :iPatrimonio, :iFabricacao, :iNumSerie, :sReferencia)";
 						$result = $conn->prepare($sql);
 
 						$result->execute(array(
@@ -97,14 +135,15 @@ if (isset($_POST['inputData'])) {
 							':iClassificacao' => isset($registro[9]) ? (int) $registro[9] : null,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId'],
-							':iPatrimonio' => null
+							':iPatrimonio' => null,
+							':sReferencia' => $sReferencia
 						));
 					}
 				} else {
 					$sql = "INSERT INTO MovimentacaoXServico
-							(MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrUsuarioAtualizador, MvXSrUnidade)
-							VALUES 
-							(:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+							(MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrUsuarioAtualizador, MvXSrUnidade, MvXSrReferencia)
+							VALUES
+							(:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade, :sReferencia)";
 					$result = $conn->prepare($sql);
 
 					$result->execute(array(
@@ -113,7 +152,8 @@ if (isset($_POST['inputData'])) {
 						':iQuantidade' => (int) $registro[3],
 						':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iUnidade' => $_SESSION['UnidadeId']
+						':iUnidade' => $_SESSION['UnidadeId'],
+						':sReferencia' => $sReferencia
 					));
 				}
 			}

@@ -85,7 +85,7 @@ if(isset($_POST['inputData'])){
 		$sql = "INSERT INTO OrdemCompra (OrComTipo, OrComFluxoOperacional, OrComDtEmissao, OrComNumero, OrComLote, OrComNumAta, OrComNumProcesso, OrComCategoria, OrComSubCategoria, 
 							OrComConteudoInicio, OrComConteudoFim, OrComFornecedor, OrComValorFrete, OrComSolicitante, OrComUnidadeEntrega, OrComLocalEntrega, 
 							OrComEnderecoEntrega, OrComDtEntrega, OrComObservacao, OrComSaldoRemanescente, OrComSituacao, OrComUsuarioAtualizador, OrComUnidade)
-				VALUES (:sTipo, :dFluxo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudoInicio, :sConteudoFim, :iFornecedor, :fValorFrete, 
+				VALUES (:sTipo, :iFluxo, :dData, :sNumero, :sLote, :sNumAta, :sProcesso, :iCategoria, :iSubCategoria, :sConteudoInicio, :sConteudoFim, :iFornecedor, :fValorFrete, 
 						:iSolicitante, :iUnidadeEntrega, :iLocalEntrega, :sEnderecoEntrega, :dDataEntrega, :sObservacao, :iSaldoRemanescente, :bStatus, 
 						:iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
@@ -95,7 +95,7 @@ if(isset($_POST['inputData'])){
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
-						':dFluxo' => $_POST['inputFluxoOperacional'],
+						':iFluxo' => $_POST['inputFluxoOperacional'],
 						':dData' => gravaData($_POST['inputData']),
 						':sNumero' => $newNumero,
 						':sLote' => $_POST['inputLote'],

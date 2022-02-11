@@ -71,11 +71,47 @@ if (isset($_POST['inputIdOrdemCompra'])){
 			':iOrdemCompra' => $iOrdemCompra,
 			':iUnidade' => $_SESSION['UnidadeId']
 		));
+
+		// essa etapa vai buscar o Saldo Remanescente da ordem de compra
+		$sqlOrCom = "SELECT OrComId, OrComSaldoRemanescente, OrComFluxoOperacional FROM OrdemCompra
+		WHERE OrComId = $iOrdemCompra";
+		$resultOrCom = $conn->query($sqlOrCom);
+		$rowOrCom = $resultOrCom->fetch(PDO::FETCH_ASSOC);
+
+		$sReferencia = 'P';
+
+		/* Caso exista Saldo Remanescente deve ser verificado a existencia de um aditivo caso exista
+		deve ser utilisado o "AditiNumero" do PENULTIMO aditivo*/
+		if($rowOrCom['OrComSaldoRemanescente'] == 1){
+			$sqlAdt = "SELECT (MAX(AditiNumero)-1) as AditiNumero FROM Aditivo
+			WHERE AditiValor is not null and AditiUnidade = ".$_SESSION['UnidadeId']." and AditiFluxoOperacional = ".$rowOrCom['OrComFluxoOperacional'];
+			$resultAdt = $conn->query($sqlAdt);
+			$rowAdt = $resultAdt->fetch(PDO::FETCH_ASSOC);
+
+			/* Caso encontre o aditivo sera setado na variavel $sReferencia o numero do aditivo ex.: "A1", "A2"
+			caso contrario sera setado em $sReferencia o valor "P" de principal*/
+			if($rowAdt['AditiNumero'] != null){
+				$sReferencia = 'A'.$rowAdt['AditiNumero'];
+			}
+		} else {
+			/* Caso NÃO exista Saldo Remanescente deve ser verificado a existencia de um aditivo caso exista
+			deve ser utilisado o "AditiNumero" do ULTIMO aditivo*/
+			$sqlAdt = "SELECT MAX(AditiNumero) as AditiNumero FROM Aditivo
+			WHERE AditiValor is not null and AditiUnidade = ".$_SESSION['UnidadeId']." and AditiFluxoOperacional = ".$rowOrCom['OrComFluxoOperacional'];
+			$resultAdt = $conn->query($sqlAdt);
+			$rowAdt = $resultAdt->fetch(PDO::FETCH_ASSOC);
+
+			/* Caso encontre o aditivo sera setado na variavel $sReferencia o numero do aditivo ex.: "A1", "A2"
+			caso contrario sera setado em $sReferencia o valor "P" de principal*/
+			if($rowAdt['AditiNumero'] != null){
+				$sReferencia = 'A'.$rowAdt['AditiNumero'];
+			}
+		}
 		
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 			
-			$sql = "INSERT INTO OrdemCompraXServico (OCXSrOrdemCompra, OCXSrServico, OCXSrDetalhamento, OCXSrQuantidade, OCXSrValorUnitario, OCXSrUsuarioAtualizador, OCXSrUnidade)
-					VALUES (:iOrdemCompra, :iServico, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO OrdemCompraXServico (OCXSrOrdemCompra, OCXSrServico, OCXSrDetalhamento, OCXSrQuantidade, OCXSrValorUnitario, OCXSrUsuarioAtualizador, OCXSrUnidade, OCXSrReferencia)
+					VALUES (:iOrdemCompra, :iServico, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade, :sReferencia)";
 			$result = $conn->prepare($sql);
 			
 			$result->execute(array(
@@ -85,8 +121,9 @@ if (isset($_POST['inputIdOrdemCompra'])){
 				':iQuantidade' => $_POST['inputQuantidade'.$i] == ''? null : $_POST['inputQuantidade'.$i],
 				':fValorUnitario' => $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
 				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-				':iUnidade' => $_SESSION['UnidadeId']
-			));			
+				':iUnidade' => $_SESSION['UnidadeId'],
+				':sReferencia' => $sReferencia
+			));
 		}
 
 		$tipo = $row['OrComTipo'] == 'C' ? 'Carta Contrato' : 'Ordem de Compra';							
