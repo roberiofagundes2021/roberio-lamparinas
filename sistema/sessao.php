@@ -83,7 +83,7 @@ if ((array_key_exists('TRId', $_SESSION) || array_key_exists('TRNumero', $_SESSI
 }
 
 $arquivosAditivo = array('fluxoAditivo.php', 'fluxoAditivoNovo.php', 'fluxoAditivoExclui.php', 'fluxoAditivoImprime.php',
-						 'fluxoAditivoNovofiltraProduto.php');
+						 'fluxoAditivoNovofiltraProduto.php','fluxoAditivoNovofiltraServico.php');
 
 //Se existe a sessão $_SESSION['FluxoId'] e a página que está sendo acessada não é nenhuma das sitadas acima, limpa essa sessão.	  
 if (array_key_exists('FluxoId', $_SESSION) and !in_array(basename($_SERVER['PHP_SELF']), $arquivosAditivo)) {
@@ -91,7 +91,7 @@ if (array_key_exists('FluxoId', $_SESSION) and !in_array(basename($_SERVER['PHP_
 	unset($_SESSION['Origem']);
 }
 
-$arquivoAditivoNovo = array('fluxoAditivoNovo.php');
+$arquivoAditivoNovo = array('fluxoAditivoNovo.php','fluxoAditivoNovofiltraProduto.php','fluxoAditivoNovofiltraServico.php');
 
 if (array_key_exists('AditivoNovo', $_SESSION) and !in_array(basename($_SERVER['PHP_SELF']), $arquivoAditivoNovo)) {
 

@@ -7,10 +7,11 @@ include('global_assets/php/conexao.php');
 // cmbSubCategoria
 // inputIdCategoria
 
-if(isset($_POST['cmbSubCategoria']) && isset($_POST['inputIdCategoria'])){
+if(isset($_POST['cmbSubCategoria']) && isset($_POST['inputIdCategoria']) && isset($_POST['iFluxoOperacional'])){
 
 	$iCategorias = $_POST['cmbSubCategoria'];
 	$iSubCategoria = $_POST['inputIdCategoria'];
+	$iFluxoOperacional = $_POST['iFluxoOperacional'];
 
 	$subCategoriaList = "(";
 
@@ -19,13 +20,13 @@ if(isset($_POST['cmbSubCategoria']) && isset($_POST['inputIdCategoria'])){
 	}
 	$subCategoriaList  = substr($subCategoriaList, 0, -1).")";
 
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
-	FROM Produto
-	JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-	LEFT JOIN Marca on MarcaId = ProduMarca
-	JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = $iSubCategoria and 
-	ProduSubCategoria in ($subCategoriaList)";
+	$sql = "SELECT DISTINCT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+			FROM Produto
+			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			LEFT JOIN Marca on MarcaId = ProduMarca
+			JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = $iSubCategoria and 
+			ProduSubCategoria in ($subCategoriaList) AND FOXPrFluxoOperacional = $iFluxoOperacional";
 
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);

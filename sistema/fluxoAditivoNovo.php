@@ -438,11 +438,12 @@ try {
 			$('#cmbSubCategoria').on('change', function(e){
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 				var inputIdCategoria = $('#inputIdCategoria').val();
+				var iFluxoOperacional = $('#inputFluxoId').val();
 				
 				$.ajax({
 					type: "POST",
 					url: "fluxoAditivoNovofiltraProduto.php",
-					data: {cmbSubCategoria: cmbSubCategoria, inputIdCategoria: inputIdCategoria},
+					data: {cmbSubCategoria: cmbSubCategoria, inputIdCategoria: inputIdCategoria, iFluxoOperacional: iFluxoOperacional},
 					success: function(resposta){
 						if (resposta !== null){
 							$("#tabelaProdutos").html(resposta).show();
@@ -453,13 +454,42 @@ try {
 					}
 				});
 			});
+			
 			//Mostra o "Filtrando..." na combo Produto
 			function FiltraProduto(){
-				$('#cmbProduto').empty().append('<option>Filtrando...</option>');
+				$('#cmbSubCategoria').empty().append('<option>Filtrando...</option>');
 			}
 			
 			function ResetProduto(){
-				$('#cmbProduto').empty().append('<option>Sem produto</option>');
+				$('#cmbSubCategoria').empty().append('<option>Sem produto</option>');
+			}
+
+			$('#cmbSubCategorias').on('change', function(e){
+				var cmbSubCategorias = $('#cmbSubCategorias').val();
+				var inputIdCategoria = $('#inputIdCategoria').val();
+				var iFluxoOperacional = $('#inputFluxoId').val();
+				
+				$.ajax({
+					type: "POST",
+					url: "fluxoAditivoNovofiltraServico.php",
+					data: {cmbSubCategorias: cmbSubCategorias, inputIdCategoria: inputIdCategoria, iFluxoOperacional: iFluxoOperacional},
+					success: function(resposta){
+						if (resposta !== null){
+							$("#tabelaServicos").html(resposta).show();
+							return false;
+						} else {
+							ResetServico()
+						}
+					}
+				});
+			});
+			//Mostra o "Filtrando..." na combo Produto
+			function FiltraServico(){
+				$('#cmbSubCategorias').empty().append('<option>Filtrando...</option>');
+			}
+			
+			function ResetServico(){
+				$('#cmbSubCategorias').empty().append('<option>Sem produto</option>');
 			}
         
 			function pular() {
@@ -718,26 +748,25 @@ try {
 							<!-- /card-body -->
 							<!---------------------------------------------------------------------------------------------Produtos---------------------------------------------------------------------------------------------------------->
 							<?php
-								$sqlProduto = "SELECT Distinct ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
-										FROM Produto
-										JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-										LEFT JOIN Marca on MarcaId = ProduMarca
-										JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-										WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = $iCategoria
-										AND FOXPrFluxoOperacional = $iFluxoOperacional";
+								$sqlProduto = " SELECT Distinct ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+												FROM Produto
+												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+												LEFT JOIN Marca on MarcaId = ProduMarca
+												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+												WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " AND ProduCategoria = $iCategoria
+												AND FOXPrFluxoOperacional = $iFluxoOperacional";
 								if($sSubCategorias){
 									$sqlProduto .= " and ProduSubCategoria in ($sSubCategorias)";
 								}
 								$resultProduto = $conn->query($sqlProduto);
 								$rowProdutos = $resultProduto->fetchAll(PDO::FETCH_ASSOC);
-
 								$countProduto = count($rowProdutos);
 
-								$sqlServico = "SELECT ServiId, ServiNome, ServiDetalhamento
-										FROM Servico
-										JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-										WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " 
-										and ServiCategoria = $iCategoria AND FOXSrFluxoOperacional = $iFluxoOperacional";
+								$sqlServico = " SELECT Distinct ServiId, ServiNome, ServiDetalhamento
+												FROM Servico
+												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " AND ServiCategoria = $iCategoria 
+												AND FOXSrFluxoOperacional = $iFluxoOperacional";
 								if($sSubCategorias){
 									$sqlServico .= " and ServiSubCategoria in (" . $sSubCategorias . ")";
 								}
@@ -746,7 +775,7 @@ try {
 								$countServico = count($rowServicos);
 							?>
 
-							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && $countProduto >= 1 ? print('block') : print('none')  ?>">
+							<div class="lista-produtos" style="display: <?php isset($_POST['inputDataInicio']) && $countProduto >0 ? print('block') : print('none')  ?>">
 								
 								<?php if($sSubCategorias){ ?>	
 									<div class="row">
@@ -755,10 +784,11 @@ try {
 												<label for="cmbSubCategoria">SubCategoria(s)</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
 													<?php 
-														$sql = "SELECT SbCatId, SbCatNome
+														$sql = "SELECT DISTINCT SbCatId, SbCatNome
 																FROM SubCategoria
-																JOIN Situacao on SituaId = SbCatStatus	
-																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+																JOIN Situacao on SituaId = SbCatStatus
+																JOIN Produto on ProduSubCategoria = SbCatId	
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." AND SbCatId IN (".$sSubCategorias.")
 																ORDER BY SbCatNome ASC";
 														$result = $conn->query($sql);
 														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -907,8 +937,35 @@ try {
 								</div>
 							</div>
 							<!------------------------------Se não existirem serviços ou se a requisição não estiver vindo do lugar certo-------------------------------------->
-							<div class="lista-servicos" style="display: <?php isset($_POST['inputDataInicio']) && $countServico >= 1 ? print('block') : print('none')  ?>">
+							<div class="lista-servicos" style="display: <?php isset($_POST['inputDataInicio']) && $countServico >0 ? print('block') : print('none')  ?>">
 								<!-- Custom header text -->
+
+								<?php if($sSubCategorias){ ?>	
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label for="cmbSubCategorias">SubCategoria(s)</label>
+												<select id="cmbSubCategorias" name="cmbSubCategorias" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+													<?php 
+														$sql = "SELECT DISTINCT SbCatId, SbCatNome
+																FROM SubCategoria
+																JOIN Situacao on SituaId = SbCatStatus
+																JOIN Servico on ServiSubCategoria = SbCatId	
+																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+																ORDER BY SbCatNome ASC";
+														$result = $conn->query($sql);
+														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+														$count = count($rowSubCategoria);														
+																
+														foreach ( $rowSubCategoria as $item){	
+															print('<option value="'.$item['SbCatId'].'" selected>'.$item['SbCatNome'].'</option>');	
+														}                  
+													?>
+												</select>
+											</div>
+										</div>
+									</div>
+								<?php } ?>
 
 								<div class="card-header header-elements-inline">
 									<h5 class="card-title">Relação de Servicos</h5>
@@ -919,20 +976,20 @@ try {
 									<?php
 
 									$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
-												FROM Servico
-												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-												LEFT JOIN Marca on MarcaId = ServiMarca
-												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
+											FROM Servico
+											JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+											LEFT JOIN Marca on MarcaId = ServiMarca
+											WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
 									$result = $conn->query($sql);
 									$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 									$countServico = count($rowServicos);
 
 									if (!$countServico) {
 										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
-													FROM Servico
-													JOIN Situacao on SituaId = ServiStatus
-													WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-													ServiSubCategoria in (" . $sSubCategorias . ") and SituaChave = 'ATIVO' ";
+												FROM Servico
+												JOIN Situacao on SituaId = ServiStatus
+												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
+												ServiSubCategoria in (" . $sSubCategorias . ") and SituaChave = 'ATIVO' ";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countServico = count($rowServicos);
@@ -1053,7 +1110,7 @@ try {
 								</div>
 								<!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 							</div>
-							<div class="row" style="margin-top: 10px; display:<?php ($countProduto >= 1 || $countServico >= 1) &&  isset($_POST['inputDataInicio']) ? print('block') : print('none')  ?>">
+							<div class="row" style="margin-top: 10px; display:<?php ($countProduto >0 || $countServico >0) &&  isset($_POST['inputDataInicio']) ? print('block') : print('none')  ?>">
 								<div class="col-lg-6">
 									<div class="form-group">
 										<button class="btn btn-lg btn-principal" id="enviar2" style="margin-right:5px;">Alterar</button>
