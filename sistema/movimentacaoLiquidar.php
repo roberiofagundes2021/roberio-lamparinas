@@ -6,12 +6,38 @@ $_SESSION['PaginaAtual'] = 'Movimentação Liquidação';
 
 include('global_assets/php/conexao.php');
 
+$inputMovimentacaoId = $_POST['inputMovimentacaoId'];
+$UnidadeId = $_SESSION['UnidadeId'];
+
 // pesquisa a movimentação
-$sqlMovimentacao = "SELECT MovimId, MovimNumRecibo, MovimData, MovimValorTotal, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie
+$sqlMovimentacao = "SELECT MovimId, MovimNumRecibo, MovimData, MovimValorTotal, MovimNotaFiscal,
+                    MovimDataEmissao, MovimNumSerie, SituaChave
                     FROM  Movimentacao
-                    WHERE MovimUnidade = ".$_SESSION['UnidadeId']." and MovimId = ".$_POST['inputMovimentacaoId'];
+                    JOIN Situacao on SituaId = MovimSituacao
+                    WHERE MovimUnidade = $UnidadeId and MovimId = $inputMovimentacaoId";
 $resultMovimentacao = $conn->query($sqlMovimentacao);
 $Movimentacao = $resultMovimentacao->fetch(PDO::FETCH_ASSOC);
+
+if($Movimentacao['SituaChave'] == 'LIBERADOCONTABILIDADE'){
+    // Se ja estiver liqidado ira buscar os dados da liquidação
+    $sqlLiquidacao = "SELECT MvLiqId, MvLiqMovimentacao, MvLiqData, MvLiqUsuario,
+                    MvLiqUnidade, MvLiqPlanoConta, UsuarNome
+                    FROM MovimentacaoLiquidacao
+                    JOIN Usuario ON UsuarId = MvLiqUsuario
+                    WHERE MvLiqMovimentacao = $inputMovimentacaoId AND MvLiqUnidade = $UnidadeId";
+    $resultLiquidacao = $conn->query($sqlLiquidacao);
+    $MoviLiqui = $resultLiquidacao->fetch(PDO::FETCH_ASSOC);
+
+    // Buacando centros de custos da movimentação
+    $sqlMvLiqXCnCus = "SELECT MvLiqXCnCusMovimentacaoLiquidacao, MvLiqXCnCusCentroCusto, CnCusCodigo,
+                    MvLiqXCnCusUsuarioAtualizador, MvLiqXCnCusValor,MvLiqXCnCusUnidade, CnCusNome, CnCusId
+                    FROM MovimentacaoLiquidacaoXCentroCusto
+                    JOIN CentroCusto ON CnCusId = MvLiqXCnCusCentroCusto
+                    WHERE MvLiqXCnCusMovimentacaoLiquidacao = $MoviLiqui[MvLiqId]
+                    AND MvLiqXCnCusUnidade = $UnidadeId";
+    $resultMvLiqXCnCus = $conn->query($sqlMvLiqXCnCus);
+    $MvLiqXCnCus = $resultMvLiqXCnCus->fetchAll(PDO::FETCH_ASSOC);
+}
 
 // pesquisa os centros de custos da unidade
 $sqlCentroCusto = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusDetalhamento, CnCusStatus, SituaChave
@@ -24,6 +50,7 @@ $CentroCustos = $resultCentroCusto->fetchAll(PDO::FETCH_ASSOC);
 $sqlPlanoConta = "SELECT PlConId, PlConCodigo, PlConNome, SituaChave
                   FROM  PlanoConta JOIN Situacao on SituaId = PlConStatus
                   WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
+$sqlPlanoConta .= isset($MoviLiqui)?" and PlConId = $MoviLiqui[MvLiqPlanoConta]":'';
 $resultPlanoConta = $conn->query($sqlPlanoConta);
 $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 
@@ -116,7 +143,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                 }
             })
 
-            $('#relacaoCentroCusto').hide()
+            // $('#relacaoCentroCusto').hide()
             
             $('#cmbCentroCusto').on('change', function(){
                 var centros = $('#cmbCentroCusto').val();
@@ -339,21 +366,27 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                 <div class="form-group">
                                                     <label for="inputPeriodoDe">Data de vencimento <span class='text-danger'>*</span></label>
                                                     <div class="input-group">
-                                                        <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" required autofocus value="">
+                                                        <?php
+                                                            $disabled = isset($MoviLiqui['MvLiqPlanoConta'])? 'disabled':'';
+                                                            echo "<input type='date' id='PeriodoDe' name='PeriodoDe' $disabled class='form-control'  value='$MoviLiqui[MvLiqData]'>";
+                                                        ?>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <label for="cmbPlanoContaId">Plano de contas <span class='text-danger'>*</span></label>
-                                                    <select id="cmbPlanoContaId" name="cmbPlanoContaId" class="form-control form-control-select2" required autofocus>
-                                                        <option value="">Selecione</option>
-                                                        <?php
-                                                            foreach($PlanoConta as $Plano){
-                                                                echo "<option value='".$Plano['PlConId']."'>".$Plano['PlConNome']."</option>";
-                                                            }
-                                                        ?>
-                                                    </select>
+                                                    <?php
+                                                        $disabled = isset($MoviLiqui['MvLiqPlanoConta'])? 'disabled':'';
+                                                        $selected = isset($MoviLiqui['MvLiqPlanoConta'])? 'selected':'';
+                                                        $selectPlanCont = "<select id='cmbPlanoContaId' $disabled name='cmbPlanoContaId' class='form-control form-control-select2' required autofocus>
+                                                                        <option value=''>Selecione</option>";
+                                                        foreach($PlanoConta as $Plano){
+                                                            $selectPlanCont .= "<option $selected value='".$Plano['PlConId']."'>".$Plano['PlConNome']."</option>";
+                                                        }
+                                                        $selectPlanCont .= "</select>";
+                                                        echo $selectPlanCont;
+                                                    ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -361,30 +394,42 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                             <div class="col-lg-12">
                                                 <div class="form-group" style="border-bottom:1px solid #ddd;">
                                                     <label for="cmbCentroCusto">Centro de custos <span class='text-danger'>*</span></label>
-                                                    <select id="cmbCentroCusto" name="cmbCentroCusto[]" class="form-control select" multiple="multiple" required autofocus data-fouc>
-                                                        <?php
-                                                            foreach($CentroCustos as $CentroCusto){
-                                                                echo "<option value='".$CentroCusto['CnCusId']."'>".$CentroCusto['CnCusNome']."</option>";
-                                                            }
-                                                        ?>
-                                                    </select>
+                                                    <?php
+                                                        $CenCust = isset($MoviLiqui['MvLiqPlanoConta'])? $MvLiqXCnCus:$CentroCustos;
+                                                        $disabled = isset($MoviLiqui['MvLiqPlanoConta'])? 'disabled':'';
+
+                                                        $selectCencust = "<select id='cmbCentroCusto' $disabled name='cmbCentroCusto[]' class='form-control select' multiple='multiple' required autofocus data-fouc>";
+                                                        foreach($CenCust as $CentroCusto){
+                                                            $selectCencust .= "<option ".(isset($MoviLiqui['MvLiqPlanoConta'])?' selected ':'')."value='".$CentroCusto['CnCusId']."'>".$CentroCusto['CnCusNome']."</option>";
+                                                        }
+                                                        $selectCencust .= "</select>";
+                                                        echo $selectCencust;
+                                                    ?>
                                                 </div>
                                             </div>
                                         </div>
-                                    <div class="row">
-                                        <div>
-                                            <button id="submitForm" class="btn btn-principal">Liquidar</button>
-                                        </div>
+                                    <div class="row" style="width:100%;">
+                                        
+                                        <?php
+                                            echo !isset($MoviLiqui['MvLiqId'])? "<div>
+                                            <button id='submitForm' class='btn btn-principal'>Liquidar</button></div>":''
+                                        ?>
 
                                         <div>
                                             <a href="movimentacao.php" class="btn btn-basic" role="button">Cancelar</a>
+                                        </div>
+
+                                        <div style="text-align: right; position:absolute; right:10px; margin-top:10px">
+                                            <p style="color: red; margin-right: 20px"><i class="icon-info3"></i>
+                                                <?php echo "Liquidado pelo usuário $MoviLiqui[UsuarNome] na data ".mostraData($Movimentacao['MovimDataEmissao']); ?>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <!-- /basic responsive configuration -->
 
-                            <div id="relacaoCentroCusto" class="card" style="display:none;">
+                            <div id="relacaoCentroCusto" class="card" <?php echo isset($MoviLiqui['MvLiqId'])?'style="display:block;"':'style="display:none;"' ?> >
                                 <div class="card-header header-elements-inline">
                                     <h5 class="card-title">Relação de Centro de Custo</h5>
                                     <div class="header-elements">
@@ -400,34 +445,88 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                     <p class="mb-3">Abaixo estão listados todos os centros de custos selecionados. Para atualizar os valores, basta preencher a coluna <code>Valor</code> e depois clicar em <b>LIQUIDAR</b>.</p>
 
                                     <div class="row" style="margin-bottom: -20px;">
-                                        <div class="col-lg-9">
-                                            <div class="row">
-                                                <div class="col-lg-1">
-                                                    <label for="inputCodigo"><strong>Item</strong></label>
-                                                </div>
-                                                <div class="col-lg-2">
-                                                    <div class="col-sm-2" style="text-align:center;">
-                                                        <label for=""><strong>Código</strong></label>
+                                        <?php
+                                            echo !isset($MoviLiqui['MvLiqId'])?"<div class='col-lg-9'>
+                                                    <div class='row'>
+                                                        <div class='col-lg-1'>
+                                                            <label for='inputCodigo'><strong>Item</strong></label>
+                                                        </div>
+                                                        <div class='col-lg-2'>
+                                                            <div class='col-sm-2' style='text-align:center;'>
+                                                                <label for=''><strong>Código</strong></label>
+                                                            </div>
+                                                        </div>
+                                                        <div class='col-lg-9'>
+                                                            <label for='inputProduto'><strong>Centro de Custo</strong></label>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-lg-9">
-                                                    <label for="inputProduto"><strong>Centro de Custo</strong></label>
+                                                <div class='col-lg-2'>
+                                                    <div class='form-group'>
+                                                        <label for='inputValor'><strong>Valor</strong></label>
+                                                    </div>
+                                                </div>"
+                                                :
+                                                "<div class='col-lg-10'>
+                                                    <div class='row'>
+                                                        <div class='col-lg-1'>
+                                                            <label for='inputCodigo'><strong>Item</strong></label>
+                                                        </div>
+                                                        <div class='col-lg-2'>
+                                                            <div class='col-sm-2' style='text-align:center;'>
+                                                                <label for=''><strong>Código</strong></label>
+                                                            </div>
+                                                        </div>
+                                                        <div class='col-lg-9'>
+                                                            <label for='inputProduto'><strong>Centro de Custo</strong></label>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <div class="form-group">
-                                                <label for="inputValor"><strong>Valor</strong></label>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-1">
-                                            <div class="col-sm-12" style="text-align:center;">
-                                                <label for=""><strong>Resetar</strong></label>
-                                            </div>
-                                        </div>
+                                                <div class='col-lg-2'>
+                                                    <div class='form-group'>
+                                                        <label for='inputValor'><strong>Valor</strong></label>
+                                                    </div>
+                                                </div>"
+                                        ?>
+                                        <?php
+                                            if(!isset($MoviLiqui['MvLiqId'])){
+                                                echo "<div class='col-lg-1'>
+                                                        <div class='col-sm-12' style='text-align:center;'>
+                                                            <label for=''><strong>Resetar</strong></label>
+                                                        </div>
+                                                    </div>";
+                                            }
+                                        ?>
                                     </div>
-
                                     <div id="centroCustoContent">
+                                        <!-- caso ja esteja liquidado será mostrado os centros de custos -->
+                                        <?php
+                                            if(isset($MoviLiqui['MvLiqId'])){
+                                                $HTMLCenCust = '';
+                                                foreach($MvLiqXCnCus as $key => $CnCus){
+                                                    $HTMLCenCust .= "<div class='row' style='margin-top: 8px;'>
+                                                        <div class='col-lg-10'>
+                                                            <div class='row'>
+                                                                <div class='col-lg-1' style='min-width: 50x'>
+                                                                    <input type='text' id='inputItem-$key' name='inputItem1' class='form-control-border-off' value='".($key+1)."' readOnly>
+                                                                </div>
+                                                                <div class='col-lg-2'>
+                                                                    <input type='text' id='inputCentroCodigo-$key' name='inputCentroCodigo-$key' class='form-control-border-off' data-popup='tooltip' value='$CnCus[CnCusCodigo]' readOnly>
+                                                                </div>
+                                                                <div class='col-lg-9'>
+                                                                    <input type='text' id='inputCentroNome-$key' name='inputCentroNome-$key' class='form-control-border-off' data-popup='tooltip' value='$CnCus[CnCusNome]' readOnly>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                        
+                                                        <div class='col-lg-2'>
+                                                            <input type='' class='form-control-border-off Valor text-right' id='inputCentroValor-$key' name='inputCentroValor-$key' value='$CnCus[MvLiqXCnCusValor]' readOnly>
+                                                        </div>
+                                                    </div>";
+                                                }
+                                                echo $HTMLCenCust;
+                                            }
+                                        ?>
                                         <!-- aqui será adicionado o HTML listando centros de custos selecionados -->
                                     </div>
 
