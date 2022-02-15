@@ -107,7 +107,7 @@ if (isset($_POST['inputData'])) {
 
 			$campo = 'campo' . $i;
 			$classificacao = 'cmbClassificacao' . $i;
-			$classificacao = $_POST[$classificacao];
+			$classificacao = isset($_POST[$classificacao])?$_POST[$classificacao]:$classificacao;
 
 			//Aqui tenho que fazer esse IF, por causa das exclusões da Grid
 			if (isset($_POST[$campo])) {
@@ -301,7 +301,6 @@ if (isset($_POST['inputData'])) {
 		$_SESSION['msg']['tipo'] = "error";
 
 		echo 'Error: ' . $e->getMessage();
-		exit;
 	}
 
 	irpara("movimentacao.php");
@@ -1103,6 +1102,7 @@ if (isset($_POST['inputData'])) {
 								$(rowNode).attr('lote', resposta.identify[3]);
 								$(rowNode).attr('validade', resposta.identify[4]);
 								$(rowNode).attr('class', 'produtoSolicitacao trGrid');
+								$(rowNode).attr('title', resposta.identify[5]);
 
 								// adiciona os atributos nas tags <td>
 								$(rowNode).find('td').eq(2).attr('style', 'text-align:center');
@@ -1212,6 +1212,7 @@ if (isset($_POST['inputData'])) {
 								$(rowNode).attr('tipo', resposta.identify[2]);
 								$(rowNode).attr('lote', resposta.identify[3]);
 								$(rowNode).attr('validade', resposta.identify[4]);
+								$(rowNode).attr('title', resposta.identify[5]);
 								$(rowNode).attr('class', 'produtoSolicitacao trGrid');
 
 								// adiciona os atributos nas tags <td>
