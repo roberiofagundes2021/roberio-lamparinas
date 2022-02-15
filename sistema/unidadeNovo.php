@@ -169,121 +169,286 @@ if(isset($_POST['inputNome'])){
   <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
   <script src="global_assets/js/demo_pages/form_validation.js"></script>
 
+  <!-- Passo a passo -->
+  <script src="global_assets/js/plugins/forms/wizards/steps.min.js"></script>
+  <script src="global_assets/js/demo_pages/form_wizard.js"></script>
+
   <script type="text/javascript">
-  $(document).ready(function() {
+ 
+    $(document).ready(function() {
 
-    function limpa_formulário_cep() {
-      // Limpa valores do formulário de cep.
-      $("#inputEndereco").val("");
-      $("#inputBairro").val("");
-      $("#inputCidade").val("");
-      $("#cmbEstado").val("");
-    }
+      function limpa_formulário_cep() {
+        // Limpa valores do formulário de cep.
+        $("#inputEndereco").val("");
+        $("#inputBairro").val("");
+        $("#inputCidade").val("");
+        $("#cmbEstado").val("");
+      }
 
-    //Quando o campo cep perde o foco.
-    $("#inputCep").blur(function() {
+      //Quando o campo cep perde o foco.
+      $("#inputCep").blur(function() {
 
-      $("#cmbEstado").removeClass("form-control-select2");
+        $("#cmbEstado").removeClass("form-control-select2");
 
-      //Nova variável "cep" somente com dígitos.
-      var cep = $(this).val().replace(/\D/g, '');
+        //Nova variável "cep" somente com dígitos.
+        var cep = $(this).val().replace(/\D/g, '');
 
-      //Verifica se campo cep possui valor informado.
-      if (cep != "") {
+        //Verifica se campo cep possui valor informado.
+        if (cep != "") {
 
-        //Expressão regular para validar o CEP.
-        var validacep = /^[0-9]{8}$/;
+          //Expressão regular para validar o CEP.
+          var validacep = /^[0-9]{8}$/;
 
-        //Valida o formato do CEP.
-        if (validacep.test(cep)) {
+          //Valida o formato do CEP.
+          if (validacep.test(cep)) {
 
-          //Preenche os campos com "..." enquanto consulta webservice.
-          $("#inputEndereco").val("...");
-          $("#inputBairro").val("...");
-          $("#inputCidade").val("...");
-          $("#cmbEstado").val("...");
+            //Preenche os campos com "..." enquanto consulta webservice.
+            $("#inputEndereco").val("...");
+            $("#inputBairro").val("...");
+            $("#inputCidade").val("...");
+            $("#cmbEstado").val("...");
 
-          //Consulta o webservice viacep.com.br/
-          $.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
+            //Consulta o webservice viacep.com.br/
+            $.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
 
-            if (!("erro" in dados)) {
+              if (!("erro" in dados)) {
 
-              //Atualiza os campos com os valores da consulta.
-              $("#inputEndereco").val(dados.logradouro);
-              $("#inputBairro").val(dados.bairro);
-              $("#inputCidade").val(dados.localidade);
-              $("#cmbEstado").val(dados.uf);
-              //$("#cmbEstado").find('option[value="MA"]').attr('selected','selected');
-              //$('#cmbEstado :selected').text();
-              //$("#cmbEstado").find('option:selected').text();
-              //document.getElementById("cmbEstado").options[5].selected = true;
-            } //end if.
-            else {
-              //CEP pesquisado não foi encontrado.
-              limpa_formulário_cep();
-              alerta("Erro", "CEP não encontrado.", "erro");
-            }
-          });
+                //Atualiza os campos com os valores da consulta.
+                $("#inputEndereco").val(dados.logradouro);
+                $("#inputBairro").val(dados.bairro);
+                $("#inputCidade").val(dados.localidade);
+                $("#cmbEstado").val(dados.uf);
+                //$("#cmbEstado").find('option[value="MA"]').attr('selected','selected');
+                //$('#cmbEstado :selected').text();
+                //$("#cmbEstado").find('option:selected').text();
+                //document.getElementById("cmbEstado").options[5].selected = true;
+              } //end if.
+              else {
+                //CEP pesquisado não foi encontrado.
+                limpa_formulário_cep();
+                alerta("Erro", "CEP não encontrado.", "erro");
+              }
+            });
+          } //end if.
+          else {
+            //cep é inválido.
+            limpa_formulário_cep();
+            alerta("Erro", "Formato de CEP inválido.", "erro");
+          }
         } //end if.
         else {
-          //cep é inválido.
+          //cep sem valor, limpa formulário.
           limpa_formulário_cep();
-          alerta("Erro", "Formato de CEP inválido.", "erro");
         }
-      } //end if.
-      else {
-        //cep sem valor, limpa formulário.
-        limpa_formulário_cep();
-      }
+      });    
 
-    });
+      //Valida Registro Duplicado
+      $('#enviar').on('click', function(e) {
 
-    //Valida Registro Duplicado
-    $('#enviar').on('click', function(e) {
+        e.preventDefault();
 
-      e.preventDefault();
+        // subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
+        var cep = $("#inputCep").val()
+        cep = cep.replace(' ','')
+        $("#inputCep").val(cep)
 
-      // subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
-				var cep = $("#inputCep").val()
-				cep = cep.replace(' ','')
-				$("#inputCep").val(cep)
+        let inputNome = $('#inputNome').val();
+        let inputCep = $('#inputCep').val();
+        let inputEndereco = $('#inputEndereco').val();
+        let inputNumero = $('#inputNumero').val();
+        let inputBairro = $('#inputBairro').val();
+        let inputCidade = $('#inputCidade').val();
+        let cmbEstado = $('#cmbEstado').val();
 
-      let inputNome = $('#inputNome').val();
-      let inputCep = $('#inputCep').val();
-      let inputEndereco = $('#inputEndereco').val();
-      let inputNumero = $('#inputNumero').val();
-      let inputBairro = $('#inputBairro').val();
-      let inputCidade = $('#inputCidade').val();
-      let cmbEstado = $('#cmbEstado').val();
+        //remove os espaços desnecessários antes e depois
+        inputNome = inputNome.trim();
 
-      //remove os espaços desnecessários antes e depois
-      inputNome = inputNome.trim();
-
-      //Verifica se o campo só possui espaços em branco
-      if (!inputNome || !inputCep || !inputEndereco || !inputNumero || !inputBairro || !inputCidade || !cmbEstado) {
-        $("#formUnidade").submit();
-        $('#inputNome').focus();
-				return false;
-      }
-
-      //Esse ajax está sendo usado para verificar no banco se o registro já existe
-      $.ajax({
-        type: "POST",
-        url: "unidadeValida.php",
-        data: ('nome=' + inputNome),
-        success: function(resposta) {
-
-          if (resposta == 1) {
-            alerta('Atenção', 'Esse registro já existe!', 'error');
-            return false;
-          }
-
+        //Verifica se o campo só possui espaços em branco
+        if (!inputNome || !inputCep || !inputEndereco || !inputNumero || !inputBairro || !inputCidade || !cmbEstado) {
           $("#formUnidade").submit();
+          $('#inputNome').focus();
+          return false;
         }
+
+        //Esse ajax está sendo usado para verificar no banco se o registro já existe
+        $.ajax({
+          type: "POST",
+          url: "unidadeValida.php",
+          data: ('nome=' + inputNome),
+          success: function(resposta) {
+
+            if (resposta == 1) {
+              alerta('Atenção', 'Esse registro já existe!', 'error');
+              return false;
+            }
+
+            $("#formUnidade").submit();
+          }
+        })
       })
+
+      // Basic wizard setup
+      $('.steps-basic-unidade').steps({
+          headerTag: 'h6',
+          bodyTag: 'fieldset',
+          transitionEffect: 'fade',
+          titleTemplate: '<span class="number">#index#</span> #title#',
+          labels: {
+              previous: '<i class="icon-arrow-left13 mr-2" /> Voltar',
+              next: 'Avançar <i class="icon-arrow-right14 ml-2" />',
+              finish: 'Enviar <i class="icon-arrow-right14 ml-2" />'
+          },
+          onStepChanging: function (event, currentIndex, newIndex) {
+              
+              if (currentIndex == 0){
+
+                // subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
+                var cep = $("#inputCep").val()
+                cep = cep.replace(' ','')
+                $("#inputCep").val(cep)
+
+                let inputNome = $('#inputNome').val();
+                let inputCep = $('#inputCep').val();
+                let inputEndereco = $('#inputEndereco').val();
+                let inputNumero = $('#inputNumero').val();
+                let inputComplemento = $('#inputComplemento').val();
+                let inputBairro = $('#inputBairro').val();
+                let inputCidade = $('#inputCidade').val();
+                let cmbEstado = $('#cmbEstado').val();
+                var unidadeId = 0;
+
+                //remove os espaços desnecessários antes e depois
+                inputNome = inputNome.trim();
+
+                //Verifica se o campo só possui espaços em branco
+                if (!inputNome || !inputCep || !inputEndereco || !inputNumero || !inputBairro || !inputCidade || !cmbEstado) {
+                  $("#formUnidade").submit();
+                  $('#inputNome').focus();
+                  console.log('Passou aqui')
+                  return false;
+                }
+                
+                //Esse ajax está sendo usado para gravar a unidade no banco
+                $.ajax({
+                  type: "POST",
+                  url: "unidadeGravaPasso1.php",
+                  data: {
+                    nome: inputNome,
+                    cep: inputCep,
+                    endereco: inputEndereco,
+                    numero: inputNumero,
+                    complemento: inputComplemento,
+                    bairro: inputBairro,
+                    cidade: inputCidade,
+                    estado: cmbEstado
+                  },
+                  success: async function(resposta) {
+                   
+                    unidadeId = resposta;
+                  }
+                })
+                console.log(unidadeId)
+                //return true;                
+              }
+
+              if (currentIndex == 1){
+                alert(newIndex);
+                console.log(currentIndex)
+              }
+
+              if (currentIndex == 2){
+                alert(newIndex);
+                console.log(currentIndex)
+              }
+
+              
+              
+          }/* ,
+          onFinishing: function (event, currentIndex) {
+            form.validate().settings.ignore = ':disabled';
+            return form.valid();
+          },
+          onFinished: function (event, currentIndex) {
+              alert('Formumlário submetido.');
+          } */
+      });    
     })
-  })
   </script>
+
+  <style>
+
+      .number1:after {
+        content: '\e913';
+        font-family: icomoon;
+        display: inline-block;
+        font-size: 1rem;
+        line-height: 2.125rem;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transition: all ease-in-out .15s;
+      }
+
+      .passos .number1 {
+        background-color: #fff;
+        color: #ccc;
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        margin-left: -1.1875rem;
+        border: 2px solid #eee;
+        font-size: .875rem;
+        z-index: 10;
+        line-height: 2.125rem;
+        text-align: center;
+        width: 2.375rem;
+        height: 2.375rem;
+        border-radius: 50%;
+      }
+
+      .passos>ul {
+          display: table;
+          width: 100%;
+          table-layout: fixed;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+      }
+
+      .passos>ul>li {
+          display: table-cell;
+          width: auto;
+          vertical-align: top;
+          text-align: center;
+          position: relative;
+      }
+
+      .passos>ul>li.current .number1{
+        font-size: 0;
+        border-color: #00bcd4;
+        background-color: #fff;
+        color: #00bcd4;
+      }
+
+      .passos>ul>li.current>a {
+          color: #333;
+          cursor: default;
+      }
+
+      .passos>ul>li a {
+          position: relative;
+          padding-top: 3rem;
+          margin-top: 1.25rem;
+          margin-bottom: 1.25rem;
+          display: block;
+          outline: 0;
+          color: #999;
+      }
+
+      .passos .current-info {
+          display: none;
+      }
+  </style>  
 
 </head>
 
@@ -309,121 +474,158 @@ if(isset($_POST['inputNome'])){
         <!-- Info blocks -->
         <div class="card">
 
-          <form name="formUnidade" id="formUnidade" method="post" class="form-validate-jquery">
-            <div class="card-header header-elements-inline">
-              <h5 class="text-uppercase font-weight-bold">Cadastrar Nova Unidade</h5>
-            </div>
+          <div class="card-header bg-white header-elements-inline">
+						<h6 class="card-title text-uppercase font-weight-bold">Cadastrar Nova Unidade</h6>
+					</div>
 
-            <div class="card-body">
-              <div class="row">
-                <div class="col-lg-12">
-                  <div class="form-group">
-                    <label for="inputNome">Nome da Unidade <span class='text-danger'>*</span></label>
-                    <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Unidade" required autofocus>
+          <form name="formUnidade" id="formUnidade" method="post" class="form-validate-jquery wizard-form steps-basic-unidade">
+
+          <div class="passos" style="display:none">
+            
+            <ul role="tablist">
+              <li role="tab" class="first current" aria-disabled="false" aria-selected="true">
+                <a id="formUnidade-t-0" href="#formUnidade-h-0" aria-controls="formUnidade-p-0" class="">
+                  <span class="current-info audible">current step: </span>
+                  <span class="number1">1</span> Passo 1
+                </a>
+              </li>
+
+              <li role="tab" class="disabled" aria-disabled="true">
+                <a id="formUnidade-t-1" href="#formUnidade-h-1" aria-controls="formUnidade-p-1" class="disabled">
+                  <span class="number1">2</span> Passo 2
+                </a>
+              </li>
+              <li role="tab" class="disabled last" aria-disabled="true">
+                <a id="formUnidade-t-2" href="#formUnidade-h-2" aria-controls="formUnidade-p-2" class="disabled">
+                  <span class="number1">3</span> Passo 3
+                </a>
+              </li>
+            </ul>
+          </div>
+
+            <h6>Passo 1</h6>
+						<fieldset>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class="form-group">
+                      <label for="inputNome">Nome da Unidade <span class='text-danger'>*</span></label>
+                      <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Unidade" required autofocus>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="row">
-                <div class="col-lg-12">
-                  <h5 class="mb-0 font-weight-semibold">Endereço</h5>
-                  <br>
-                  <div class="row">
-                    <div class="col-lg-1">
-                      <div class="form-group">
-                        <label for="inputCep">CEP <span class='text-danger'>*</span></label>
-                        <input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP" maxLength="8" required>
+                <div class="row">
+                  <div class="col-lg-12">
+                    <h5 class="mb-0 font-weight-semibold">Endereço</h5>
+                    <br>
+                    <div class="row">
+                      <div class="col-lg-1">
+                        <div class="form-group">
+                          <label for="inputCep">CEP <span class='text-danger'>*</span></label>
+                          <input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP" maxLength="8" required>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-5">
+                        <div class="form-group">
+                          <label for="inputEndereco">Endereço <span class='text-danger'>*</span></label>
+                          <input type="text" id="inputEndereco" name="inputEndereco" class="form-control" placeholder="Endereço" required>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-1">
+                        <div class="form-group">
+                          <label for="inputNumero">Nº <span class='text-danger'>*</span></label>
+                          <input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número" required>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-5">
+                        <div class="form-group">
+                          <label for="inputComplemento">Complemento</label>
+                          <input type="text" id="inputComplemento" name="inputComplemento" class="form-control" placeholder="complemento">
+                        </div>
                       </div>
                     </div>
 
-                    <div class="col-lg-5">
-                      <div class="form-group">
-                        <label for="inputEndereco">Endereço <span class='text-danger'>*</span></label>
-                        <input type="text" id="inputEndereco" name="inputEndereco" class="form-control" placeholder="Endereço" required>
+                    <div class="row">
+                      <div class="col-lg-4">
+                        <div class="form-group">
+                          <label for="inputBairro">Bairro <span class='text-danger'>*</span></label>
+                          <input type="text" id="inputBairro" name="inputBairro" class="form-control" placeholder="Bairro" required>
+                        </div>
                       </div>
-                    </div>
 
-                    <div class="col-lg-1">
-                      <div class="form-group">
-                        <label for="inputNumero">Nº <span class='text-danger'>*</span></label>
-                        <input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número" required>
+                      <div class="col-lg-5">
+                        <div class="form-group">
+                          <label for="inputCidade">Cidade <span class='text-danger'>*</span></label>
+                          <input type="text" id="inputCidade" name="inputCidade" class="form-control" placeholder="Cidade" required>
+                        </div>
                       </div>
-                    </div>
 
-                    <div class="col-lg-5">
-                      <div class="form-group">
-                        <label for="inputComplemento">Complemento</label>
-                        <input type="text" id="inputComplemento" name="inputComplemento" class="form-control" placeholder="complemento">
+                      <div class="col-lg-3">
+                        <div class="form-group">
+                          <label for="cmbEstado">Estado <span class='text-danger'>*</span></label>
+                          <select id="cmbEstado" name="cmbEstado" class="form-control" required>
+                            <!-- retirei isso da class: form-control-select2 para que funcionasse a seleção do texto do estado, além do valor -->
+                            <option value="">Selecione um estado</option>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                            <option value="ES">Estrangeiro</option>
+                          </select>
+                        </div>
                       </div>
+                    </div> <!-- row -->
+                  </div> <!-- col-lg-12 -->
+                </div> <!-- row -->
+
+                <!--<div class="row" style="margin-top: 10px;">
+                  <div class="col-lg-12">
+                    <div class="form-group">
+                      <button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+                      <a href="unidade.php" class="btn btn-basic" role="button">Cancelar</a>
                     </div>
                   </div>
-
-                  <div class="row">
-                    <div class="col-lg-4">
-                      <div class="form-group">
-                        <label for="inputBairro">Bairro <span class='text-danger'>*</span></label>
-                        <input type="text" id="inputBairro" name="inputBairro" class="form-control" placeholder="Bairro" required>
-                      </div>
-                    </div>
-
-                    <div class="col-lg-5">
-                      <div class="form-group">
-                        <label for="inputCidade">Cidade <span class='text-danger'>*</span></label>
-                        <input type="text" id="inputCidade" name="inputCidade" class="form-control" placeholder="Cidade" required>
-                      </div>
-                    </div>
-
-                    <div class="col-lg-3">
-                      <div class="form-group">
-                        <label for="cmbEstado">Estado <span class='text-danger'>*</span></label>
-                        <select id="cmbEstado" name="cmbEstado" class="form-control" required>
-                          <!-- retirei isso da class: form-control-select2 para que funcionasse a seleção do texto do estado, além do valor -->
-                          <option value="">Selecione um estado</option>
-                          <option value="AC">Acre</option>
-                          <option value="AL">Alagoas</option>
-                          <option value="AP">Amapá</option>
-                          <option value="AM">Amazonas</option>
-                          <option value="BA">Bahia</option>
-                          <option value="CE">Ceará</option>
-                          <option value="DF">Distrito Federal</option>
-                          <option value="ES">Espírito Santo</option>
-                          <option value="GO">Goiás</option>
-                          <option value="MA">Maranhão</option>
-                          <option value="MT">Mato Grosso</option>
-                          <option value="MS">Mato Grosso do Sul</option>
-                          <option value="MG">Minas Gerais</option>
-                          <option value="PA">Pará</option>
-                          <option value="PB">Paraíba</option>
-                          <option value="PR">Paraná</option>
-                          <option value="PE">Pernambuco</option>
-                          <option value="PI">Piauí</option>
-                          <option value="RJ">Rio de Janeiro</option>
-                          <option value="RN">Rio Grande do Norte</option>
-                          <option value="RS">Rio Grande do Sul</option>
-                          <option value="RO">Rondônia</option>
-                          <option value="RR">Roraima</option>
-                          <option value="SC">Santa Catarina</option>
-                          <option value="SP">São Paulo</option>
-                          <option value="SE">Sergipe</option>
-                          <option value="TO">Tocantins</option>
-                          <option value="ES">Estrangeiro</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div> <!-- row -->
-                </div> <!-- col-lg-12 -->
-              </div> <!-- row -->
-              <br>
-
-              <div class="row" style="margin-top: 10px;">
-                <div class="col-lg-12">
-                  <div class="form-group">
-                    <button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-                    <a href="unidade.php" class="btn btn-basic" role="button">Cancelar</a>
-                  </div>
-                </div>
+                </div>-->
               </div>
-            </div>
+            </fieldset>
+
+            <h6>Passo2</h6>
+						<fieldset>
+              Teste2
+            </fieldset>
+
+            <h6>Passo3</h6>
+						<fieldset>
+              Teste3
+            </fieldset>
+            
             <!-- /card-body -->
           </form>
         </div>
