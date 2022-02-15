@@ -13,6 +13,7 @@ $count = count($row);
 //Verifica se já existe esse registro (se existir, retorna true )
 if ($count) {
 	if ($row['Estoque'] >= 1) {
+		$title = $row['ServiDetalhamento'];
 		if ($_POST['tipo'] == 'E') {
 			$valorCusto = formataMoeda($row['ServiValorCusto']);
 			$valorTotal = formataMoeda($_POST['quantidade'] * $row['ServiValorCusto']);
@@ -38,11 +39,12 @@ if ($count) {
 				"<span name='remove' id='" . $_POST['numItens'] . "#$total#S' class='btn btn_remove'>X</span>"
 			],
 			'identify' => [
-				'row' . $_POST['numItens'],   //ID
+				'row' . $_POST['numItens'], //ID
 				$row['ServiId'],            //ProdId
 				'S',                        //Tipo
 				'',                         //lote
-				''                          //validade
+				'',                         //validade
+				$title                      //detalhamento
 			]
 		];
 		echo json_encode($teste);
