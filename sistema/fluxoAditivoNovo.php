@@ -126,7 +126,7 @@ if (isset($_POST['inputDataInicio']) && !isset($_SESSION['AditivoNovo'])) {
 
 		$_SESSION['AditivoNovo'] = $conn->lastInsertId();
 
-		
+		$conn->commit();
 
 		if ($_POST['inputValor'] == '') {
 
@@ -201,7 +201,7 @@ if (isset($_POST['inputDataInicio']) && !isset($_SESSION['AditivoNovo'])) {
 			irpara("fluxoAditivo.php");
 		}
 
-		$conn->commit();
+		
 
 	} catch (PDOException $e) {
 
