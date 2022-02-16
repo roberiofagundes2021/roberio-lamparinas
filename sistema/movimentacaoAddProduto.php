@@ -29,6 +29,7 @@ if ($count) {
 		$marca = $row['MarcaNome'] != "" ?  " MARCA: " . $row['MarcaNome'] : "";
 		$validade = $row['Validade'] != "" ? " - Validade: " . mostraData($row['Validade']) : "";
 		$lote = $_POST['Lote'] != "" ? " - Lote: " . $_POST['Lote'] : "";
+		$title = $row['ProduDetalhamento'];
 
 		$sql = "SELECT ClassId, ClassNome
 				FROM Classificacao
@@ -49,7 +50,7 @@ if ($count) {
 		}
 		$classificacao .= '</select>';
 
-		$teste = [
+		$ProdutoData = [
 			'status' => '',
 			'data' => [
 				$_POST['numItens'],
@@ -62,19 +63,20 @@ if ($count) {
 				"<span name='remove' id='" . $_POST['numItens'] . "#$total#P' class='btn btn_remove'>X</span>"
 			],
 			'identify' => [
-				'row' . $_POST['numItens'],   //ID
+				'row' . $_POST['numItens'],  //ID
 				$row['ProduId'],            //ProdId
 				'P',                        //Tipo
 				$lote,                      //lote
-				$validade                  	//validade
+				$validade,                 	//validade
+				$title						//Detalhamento
 			]
 		];
-		echo json_encode($teste);
+		echo json_encode($ProdutoData);
 	} else {
-		$teste = [
+		$ProdutoData = [
 			'status' => 'SEMESTOQUE'
 		];
-		echo json_encode($teste);
+		echo json_encode($ProdutoData);
 	}
 } else {
 	echo 0;

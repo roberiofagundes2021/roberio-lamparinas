@@ -126,6 +126,8 @@ if (isset($_POST['inputDataInicio']) && !isset($_SESSION['AditivoNovo'])) {
 
 		$_SESSION['AditivoNovo'] = $conn->lastInsertId();
 
+		$conn->commit();
+
 		if ($_POST['inputValor'] == '') {
 
 			$sql = "SELECT SituaId
@@ -199,7 +201,7 @@ if (isset($_POST['inputDataInicio']) && !isset($_SESSION['AditivoNovo'])) {
 			irpara("fluxoAditivo.php");
 		}
 
-		$conn->commit();
+		
 
 	} catch (PDOException $e) {
 
@@ -447,6 +449,9 @@ try {
 					success: function(resposta){
 						if (resposta !== null){
 							$("#tabelaProdutos").html(resposta).show();
+
+							pular();
+
 							return false;
 						} else {
 							ResetProduto()
@@ -476,6 +481,9 @@ try {
 					success: function(resposta){
 						if (resposta !== null){
 							$("#tabelaServicos").html(resposta).show();
+							
+							pular();
+							
 							return false;
 						} else {
 							ResetServico()
@@ -643,7 +651,7 @@ try {
 			<?php include_once("cabecalho.php"); ?>
 
 			<!-- Content area -->
-			<div class="content">
+			<div class="content"> 
 
 				<!-- Info blocks -->
 				<div class="card">
@@ -896,10 +904,9 @@ try {
 												</div>											
 											</div>');
 										}
-										print('</div>');
-									}
+										
 
-									if (isset($_POST['inputDataInicio'])) {
+									
 										print('
 										<div class="row" style="margin-top: 8px;">
 											<div class="col-lg-7">
@@ -930,7 +937,11 @@ try {
 										</div>');
 
 										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >');
+									
+										print('</div>');
+									
 									}
+
 
 
 									?>
@@ -975,27 +986,6 @@ try {
 								<div class="card-body">
 
 									<?php
-
-									// $sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrQuantidade, FOXSrValorUnitario, MarcaNome
-									// 		FROM Servico
-									// 		JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-									// 		LEFT JOIN Marca on MarcaId = ServiMarca
-									// 		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
-									// $result = $conn->query($sql);
-									// $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-									// $countServico = count($rowServicos);
-
-									// if (!$countServico) {
-									// 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
-									// 			FROM Servico
-									// 			JOIN Situacao on SituaId = ServiStatus
-									// 			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-									// 			ServiSubCategoria in (" . $sSubCategorias . ") and SituaChave = 'ATIVO' ";
-									// 	$result = $conn->query($sql);
-									// 	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
-									// 	$countServico = count($rowServicos);
-									// }
-
 									$cont = 0;
 									if (isset($_POST['inputDataInicio'])) {
 
@@ -1073,10 +1063,7 @@ try {
 												</div>											
 											</div>');
 										}
-										print('</div>');
-									}
-
-									if (isset($_POST['inputDataInicio'])) {
+											
 										print('
 										<div class="row" style="margin-top: 8px;">
 											<div class="col-lg-8">
@@ -1103,6 +1090,8 @@ try {
 										</div>');
 
 										print('<input type="hidden" id="totalRegistrosServicos" name="totalRegistrosServicos" value="' . $cont . '" >');
+										
+										print('</div>');
 									}
 
 									?>
@@ -1120,20 +1109,20 @@ try {
 						</div>
 					</form>
 				</div>
-				<!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+				<!-- /info blocks -->
+			
+			</div>	
+			<!-- /content area -->
 
-			</div>
-			<?php !isset($_POST['inputDataInicio']) ?  include_once("footer.php") : '' ?>
+			<?php include_once("footer.php"); ?>
+
 		</div>
-		<!-- /info blocks -->
-		<?php isset($_POST['inputDataInicio']) ?  include_once("footer.php") : '' ?>
-	</div>
-	<!-- /content area -->
+		<!-- /main content -->
 
 	</div>
-	<!-- /main content -->
-									
 	<!-- /page content -->
+	
+	<?php include_once("alerta.php"); ?>
 
 </body>
 
