@@ -622,6 +622,12 @@ $dataInicio = date("Y-m-d");
 
     <?php include_once("head.php"); ?>
 
+    <!-- Validação -->
+    <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+    <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+    <script src="global_assets/js/demo_pages/form_validation.js"></script>
+     <!-- /Validação -->
+
     <!-- Theme JS files -->
     <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
     <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
@@ -637,11 +643,6 @@ $dataInicio = date("Y-m-d");
     <!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
     <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
     <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
-
-    <!-- Validação -->
-    <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-    <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-    <script src="global_assets/js/demo_pages/form_validation.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function() {
@@ -661,8 +662,7 @@ $dataInicio = date("Y-m-d");
                 $("#parcelasContainer").html("")
                 let descricao = $("#inputDescricao").val()
 
-                let valorParcela = moedatofloat(valorTotal);
-                valorParcela = (valorParcela / parcelas)
+                let valorParcela = float2moeda(parseFloat(valorTotal) / parcelas)
 
                 let numeroParcelas = `<input type="hidden" value="${parcelas}" name="inputNumeroParcelas">`
                 // let dataVencimento = dataVencimento
@@ -1109,7 +1109,8 @@ $dataInicio = date("Y-m-d");
                                                         $sql = "SELECT PlConId, PlConCodigo, PlConNome
                                                                 FROM PlanoConta
                                                                 JOIN Situacao  ON SituaId = PlConStatus
-                                                                WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and SituaChave = 'ATIVO'
+                                                                WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and
+                                                                PlConNatureza = 'R'  and SituaChave = 'ATIVO'
                                                                 ORDER BY PlConCodigo ASC";
                                                         $result = $conn->query($sql);
                                                         $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);

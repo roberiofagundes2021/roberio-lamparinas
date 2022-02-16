@@ -544,8 +544,8 @@ $dataFim = date("Y-m-d");
                                                         try {
                                                             $sql = "SELECT *
                                                                     FROM  Cliente
-                                                                    JOIN  Empresa ON ClienUnidade = EmpreId
-                                                                    WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . " and EmpreStatus = 1
+                                                                    JOIN Situacao ON SituaId = ClienStatus
+                                                                    WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
                                                                     ORDER BY ClienNome ASC";
                                                             $result = $conn->query($sql);
                                                             $rowCliente = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -585,7 +585,8 @@ $dataFim = date("Y-m-d");
                                                     $sql = "SELECT PlConId, PlConCodigo, PlConNome
                                                             FROM PlanoConta
                                                             JOIN Situacao on SituaId = PlConStatus
-                                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and
+                                                            PlConNatureza = 'R' and SituaChave = 'ATIVO'
                                                             ORDER BY PlConCodigo ASC";
                                                     $result = $conn->query($sql);
                                                     $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
