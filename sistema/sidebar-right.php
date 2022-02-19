@@ -107,9 +107,9 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
         <div class="card">
 
             <div style="padding: 10px 10px 5px 10px;background: #aaa;text-align: center;border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;">
-                <button onclick="teste();" class="btn bg-slate" id="enviar">Acesso Rápido</button>
+                <button class="btn bg-slate" id="enviar">Acesso Rápido</button>
             </div>        
-            <div class="card-body" style="">
+            <div class="card-body">
                 <div class="row">
                     <div class="col-12">
                         <button type="button" class="btn btn-outline bg-slate-600 text-slate-600 border-slate legitRipple" style="width: 100%;">
