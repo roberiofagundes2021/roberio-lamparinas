@@ -13,9 +13,9 @@ if(isset($_POST['inputNome'])){
 		$conn->beginTransaction();
 
 		$sql = "INSERT INTO Unidade (UnidaNome, UnidaCep, UnidaEndereco, UnidaNumero, UnidaComplemento, UnidaBairro, 
-									 UnidaCidade, UnidaEstado, UnidaStatus, UnidaUsuarioAtualizador, UnidaEmpresa)
-				VALUES (:sNome, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
-						:sCidade, :sEstado, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+                      UnidaCidade, UnidaEstado, UnidaStatus, UnidaUsuarioAtualizador, UnidaEmpresa)
+            VALUES (:sNome, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
+                :sCidade, :sEstado, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -32,43 +32,70 @@ if(isset($_POST['inputNome'])){
       ':iEmpresa' => $_SESSION['EmpresaId'],
     ));
 
-    $insertId = $conn->lastInsertId();
+    $unidadeIdNovo = $conn->lastInsertId();
 
     // criar novos perfis para a nova unidade
-
-    $sqlPerfisPadrao = "SELECT PaPerPerfil, PaPerMenu, PaPerInserir, PaPerVisualizar, PaPerAtualizar,
-    PaPerExcluir, PaPerSuperAdmin, PerfiNome,PerfiChave,PerfiStatus,PerfiUsuarioAtualizador,PerfiUnidade,
-    PerfiPadrao 
-    FROM PadraoPermissao
-    JOIN Perfil ON PerfiId = PaPerPerfil and PerfiPadrao = 1
-    JOIN Situacao ON SituaId = PerfiStatus and SituaChave = 'ATIVO'";
-
+    $sqlPerfisPadrao = "SELECT PerfiId, PerfiNome, PerfiChave, PerfiStatus, SituaNome, SituaChave, SituaCor
+                        FROM Perfil
+                        JOIN Situacao on SituaId = PerfiStatus
+                        WHERE PerfiUnidade is null and PerfiPadrao = 1 and SituaChave = 'ATIVO'";
     $sqlPerfisPadrao = $conn->query($sqlPerfisPadrao);
     $sqlPerfisPadrao = $sqlPerfisPadrao->fetchAll(PDO::FETCH_ASSOC);
 
     $usuaId = $_SESSION['UsuarId'];
 
+    $sqlPerfil = "INSERT INTO Perfil(PerfiNome,PerfiChave,PerfiStatus,PerfiUsuarioAtualizador,PerfiUnidade,PerfiPadrao) VALUES ";
+
+    foreach($sqlPerfisPadrao as $perfPadrao){
+      $sqlPerfil .= " ('".$perfPadrao['PerfiNome']."','".$perfPadrao['PerfiChave']."',".$perfPadrao['PerfiStatus'].",".$usuaId.",".$unidadeIdNovo.",0),";
+    }
+    $sqlPerfil = substr_replace($sqlPerfil, "", -1);
+    $conn->query($sqlPerfil);
+
     // inserir em PerfilXPermissao -------------------------------------------------------------------
     $sqlPerfilXPermissao = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
-    PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin) VALUES";
+    PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin) VALUES ";
 
     // inserir em PadraoPerfilXPermissao -------------------------------------------------------------
     $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
-    PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES";
+    PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";
 
-    foreach($sqlPerfisPadrao as $perfPadrao){
-      $sql = "INSERT INTO Perfil(PerfiNome,PerfiChave,PerfiStatus,PerfiUsuarioAtualizador,PerfiUnidade,PerfiPadrao)
-      VALUES ($perfPadrao[PerfiNome],$perfPadrao[PerfiChave],$perfPadrao[PerfiStatus],$usuaId,$insertId,0)";
-      $conn->query($sql);
+    $sql = "SELECT B.PerfiId as PerfiId, PaPerMenu, PaPerInserir, PaPerVisualizar, PaPerAtualizar, PaPerExcluir, PaPerSuperAdmin
+            FROM Perfil A
+            JOIN PadraoPermissao on PaPerPerfil = A.PerfiId
+            JOIN Perfil B on B.PerfiChave = A.PerfiChave
+            WHERE A.PerfiUnidade = ".$unidadeIdNovo;
+    $result = $conn->query($sql);
+    $rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);    
 
-      $lastId = $conn->lastInsertId();
+    $cont = 0;
+    foreach ($rowPerfil as $itemPerfil){
+        $sqlPerfilXPermissao .= " (".$itemPerfil['PerfiId'].", ".$itemPerfil['PaPerMenu'].", ".$unidadeIdNovo.", ".$itemPerfil['PaPerInserir'].",".
+        $itemPerfil['PaPerVisualizar'].", ".$itemPerfil['PaPerAtualizar'].", ".$itemPerfil['PaPerExcluir'].", ".$itemPerfil['PaPerSuperAdmin']."),";
+  
+        $sqlPadraoPerfilXPermissao .= " (".$itemPerfil['PerfiId'].", ".$itemPerfil['PaPerMenu'].", ".$unidadeIdNovo.", ".$itemPerfil['PaPerInserir'].",".
+        $itemPerfil['PaPerVisualizar'].", ".$itemPerfil['PaPerAtualizar'].", ".$itemPerfil['PaPerExcluir'].", ".$itemPerfil['PaPerSuperAdmin']."),";  
 
-      $sqlPerfilXPermissao .= " ($lastId, $perfPadrao[PaPerMenu], $insertId, $perfPadrao[PaPerInserir],
-      $perfPadrao[PaPerVisualizar], $perfPadrao[PaPerAtualizar], $perfPadrao[PaPerExcluir], $perfPadrao[PaPerSuperAdmin]),";
+        $cont++;
 
-      $sqlPadraoPerfilXPermissao .= " ($lastId, $perfPadrao[PaPerMenu], $insertId, $perfPadrao[PaPerInserir],
-      $perfPadrao[PaPerVisualizar], $perfPadrao[PaPerAtualizar], $perfPadrao[PaPerExcluir], $perfPadrao[PaPerSuperAdmin]),";
+        if ($cont > 800){
+
+            // Insere na base para não atingir o limite de 1000 linhas por INSERT
+            $sqlPerfilXPermissao = substr_replace($sqlPerfilXPermissao, "", -1);
+            $sqlPadraoPerfilXPermissao = substr_replace($sqlPadraoPerfilXPermissao, "", -1);
+            $conn->query($sqlPerfilXPermissao);
+            $conn->query($sqlPadraoPerfilXPermissao);     
+                    
+            // recria o inserir em PerfilXPermissao -------------------------------------------------------------------
+            $sqlPerfilXPermissao = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
+            PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin) VALUES ";
+
+            // recria o inserir em PadraoPerfilXPermissao -------------------------------------------------------------
+            $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
+            PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";            
+        }
     }
+
     $sqlPerfilXPermissao = substr_replace($sqlPerfilXPermissao, "", -1);
     $sqlPadraoPerfilXPermissao = substr_replace($sqlPadraoPerfilXPermissao, "", -1);
     $conn->query($sqlPerfilXPermissao);
@@ -86,7 +113,7 @@ if(isset($_POST['inputNome'])){
       ':sChave' => 'GESTAOANTERIOR',
       ':bStatus' => 1,
       ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-      ':iUnidade' => $insertId
+      ':iUnidade' => $unidadeIdNovo
     ));
 
   
@@ -100,35 +127,35 @@ if(isset($_POST['inputNome'])){
       ':sChave' => 'BOLETO',
       ':bStatus' => 1,
       ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-      ':iUnidade' => $insertId
+      ':iUnidade' => $unidadeIdNovo
     ));
 		$result->execute(array(
       ':sNome' => 'Cartão de Crédito',
       ':sChave' => 'CARTAOCREDITO',
       ':bStatus' => 1,
       ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-      ':iUnidade' => $insertId
+      ':iUnidade' => $unidadeIdNovo
     ));				
 		$result->execute(array(
       ':sNome' => 'Cartão de Débito',
       ':sChave' => 'CARTAODEBITO',
       ':bStatus' => 1,
       ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-      ':iUnidade' => $insertId
+      ':iUnidade' => $unidadeIdNovo
     ));
 		$result->execute(array(
       ':sNome' => 'Cheque',
       ':sChave' => 'CHEQUE',
       ':bStatus' => 1,
       ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-      ':iUnidade' => $insertId
+      ':iUnidade' => $unidadeIdNovo
     ));	
 		$result->execute(array(
       ':sNome' => 'Dinheiro',
       ':sChave' => 'DINHEIRO',
       ':bStatus' => 1,
       ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-      ':iUnidade' => $insertId
+      ':iUnidade' => $unidadeIdNovo
     ));							
 					
 		$conn->commit();			
@@ -145,7 +172,18 @@ if(isset($_POST['inputNome'])){
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir unidade!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();die;
+		echo 'Error: ' . $e->getMessage();
+    echo "<br>";
+    echo "CONT: ".$cont;
+    echo "<br><br>";
+    echo $sqlPerfil;
+    echo "<br><br>";
+    echo $sql;
+    echo "<br>";
+    echo $sqlPerfilXPermissao;
+    echo "<br>";
+    echo $sqlPadraoPerfilXPermissao;
+    die;
 	}
 	
 	irpara("unidade.php");
@@ -331,7 +369,7 @@ if(isset($_POST['inputNome'])){
                 //Esse ajax está sendo usado para gravar a unidade no banco
                 $.ajax({
                   type: "POST",
-                  url: "unidadeGravaPasso1.php",
+                  url: "unidadeGrava.php",
                   data: {
                     nome: inputNome,
                     cep: inputCep,
@@ -340,7 +378,8 @@ if(isset($_POST['inputNome'])){
                     complemento: inputComplemento,
                     bairro: inputBairro,
                     cidade: inputCidade,
-                    estado: cmbEstado
+                    estado: cmbEstado,
+                    etapa: 1
                   },
                   success: async function(resposta) {
                    
@@ -377,33 +416,10 @@ if(isset($_POST['inputNome'])){
 
   <style>
 
-      .number1:after {
-        content: '\e913';
-        font-family: icomoon;
-        display: inline-block;
-        font-size: 1rem;
-        line-height: 2.125rem;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        transition: all ease-in-out .15s;
-      }
-
-      .passos .number1 {
-        background-color: #fff;
-        color: #ccc;
-        display: inline-block;
-        position: absolute;
-        top: 0;
-        left: 50%;
-        margin-left: -1.1875rem;
-        border: 2px solid #eee;
-        font-size: .875rem;
-        z-index: 10;
-        line-height: 2.125rem;
-        text-align: center;
-        width: 2.375rem;
-        height: 2.375rem;
-        border-radius: 50%;
+      .passos {
+          position: relative;
+          display: block;
+          width: 100%;
       }
 
       .passos>ul {
@@ -423,18 +439,6 @@ if(isset($_POST['inputNome'])){
           position: relative;
       }
 
-      .passos>ul>li.current .number1{
-        font-size: 0;
-        border-color: #00bcd4;
-        background-color: #fff;
-        color: #00bcd4;
-      }
-
-      .passos>ul>li.current>a {
-          color: #333;
-          cursor: default;
-      }
-
       .passos>ul>li a {
           position: relative;
           padding-top: 3rem;
@@ -444,10 +448,160 @@ if(isset($_POST['inputNome'])){
           outline: 0;
           color: #999;
       }
+      
+      .passos>ul>li:after, .passos>ul>li:before {
+          content: '';
+          display: block;
+          position: absolute;
+          top: 2.375rem;
+          width: 50%;
+          height: 2px;
+          background-color: #00bcd4;
+          z-index: 9;
+      }   
+      
+      .passos>ul>li:before {
+          left: 0;
+      }
+
+      .passos>ul>li:after {
+          right: 0;
+      }      
+
+      /* Remove os traços antes e depois dos números */
+      .passos>ul>li:first-child:before,.passos>ul>li:last-child:after{
+          content:none
+      }
+
+      .passos>ul>li.current:after, .passos>ul>li.current~li:after, .passos>ul>li.current~li:before {
+          background-color: #eee;
+      }
+
+      .passos>ul>li.current>a {
+          color: #333;
+          cursor: default;
+      }      
+
+      .passos>ul>li.current .number1{
+          font-size: 0;
+          border-color: #00bcd4;
+          background-color: #fff;
+          color: #00bcd4;
+      }
+
+      .passos>ul>li.current .number:after {
+          content: '\e913';
+          font-family: icomoon;
+          display: inline-block;
+          font-size: 1rem;
+          line-height: 2.125rem;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          transition: all ease-in-out .15s;
+      }  
+      
+      @media screen and (prefers-reduced-motion:reduce){
+          .passos>ul>li.current .number1:after{
+              transition:none
+          }
+      }  
+      
+      .passos>ul>li.disabled a{
+          cursor:default
+      }
+      .passos>ul>li.done a,.passos>ul>li.done a:focus,.passos>ul>li.done a:hover{
+          color:#999
+      }
+      .passos>ul>li.done .number1{
+          font-size:0;
+          background-color:#00bcd4;
+          border-color:#00bcd4;
+          color:#fff
+      } 
+      
+      .passos>ul>li.done .number1:after{
+          content:'\ed6f';
+          font-family:icomoon;
+          display:inline-block;
+          font-size:1rem;
+          line-height:2.125rem;
+          -webkit-font-smoothing:antialiased;
+          -moz-osx-font-smoothing:grayscale;
+          transition:all ease-in-out .15s
+      }
+      @media screen and (prefers-reduced-motion:reduce){
+          .passos>ul>li.done .number1:after{
+              transition:none
+          }
+      }
+      .passos>ul>li.error .number1{
+          border-color:#f44336;
+          color:#f44336
+      }
+      .card>.card-header:not([class*=bg-])>.passos>ul{
+          border-top:1px solid rgba(0,0,0,.125)
+      }
+      @media (max-width:991.98px){
+          .passos>ul{
+              margin-bottom:1.25rem
+          }
+          .passos>ul>li{
+              display:block;
+              float:left;
+              width:50%
+          }
+          .passos>ul>li>a{
+              margin-bottom:0
+          }
+          .passos>ul>li:first-child:before,.passos>ul>li:last-child:after{
+              content:''
+          }
+          .passos>ul>li:last-child:after{
+              background-color:#00bcd4
+          }
+      }
+      @media (max-width:767.98px){
+          .passos>ul>li{
+              width:100%
+          }
+          .passos>ul>li.current:after{
+              background-color:#00bcd4
+          }
+      }      
+
+      .passos .number1 {
+          background-color: #fff;
+          color: #ccc;
+          display: inline-block;
+          position: absolute;
+          top: 0;
+          left: 50%;
+          margin-left: -1.1875rem;
+          border: 2px solid #eee;
+          font-size: .875rem;
+          z-index: 10;
+          line-height: 2.125rem;
+          text-align: center;
+          width: 2.375rem;
+          height: 2.375rem;
+          border-radius: 50%;
+      }
+
+      .number1:after {
+          content: '\e913';
+          font-family: icomoon;
+          display: inline-block;
+          font-size: 1rem;
+          line-height: 2.125rem;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          transition: all ease-in-out .15s;
+      }
 
       .passos .current-info {
           display: none;
       }
+
   </style>  
 
 </head>
@@ -478,9 +632,9 @@ if(isset($_POST['inputNome'])){
 						<h6 class="card-title text-uppercase font-weight-bold">Cadastrar Nova Unidade</h6>
 					</div>
 
-          <form name="formUnidade" id="formUnidade" method="post" class="form-validate-jquery wizard-form steps-basic-unidade">
+          <form name="formUnidade" id="formUnidade" method="post" class="form-validate-jquery wizard-form ">
 
-          <div class="passos" style="display:none">
+          <div class="passos">
             
             <ul role="tablist">
               <li role="tab" class="first current" aria-disabled="false" aria-selected="true">
@@ -492,7 +646,7 @@ if(isset($_POST['inputNome'])){
 
               <li role="tab" class="disabled" aria-disabled="true">
                 <a id="formUnidade-t-1" href="#formUnidade-h-1" aria-controls="formUnidade-p-1" class="disabled">
-                  <span class="number1">2</span> Passo 2
+                  <span class="number1">2</span> Passo2
                 </a>
               </li>
               <li role="tab" class="disabled last" aria-disabled="true">
@@ -503,7 +657,7 @@ if(isset($_POST['inputNome'])){
             </ul>
           </div>
 
-            <h6>Passo 1</h6>
+            <!--<h6>Passo 1</h6>-->
 						<fieldset>
               <div class="card-body">
                 <div class="row">
@@ -605,17 +759,17 @@ if(isset($_POST['inputNome'])){
                   </div> <!-- col-lg-12 -->
                 </div> <!-- row -->
 
-                <!--<div class="row" style="margin-top: 10px;">
+                <div class="row" style="margin-top: 10px;">
                   <div class="col-lg-12">
                     <div class="form-group">
                       <button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
                       <a href="unidade.php" class="btn btn-basic" role="button">Cancelar</a>
                     </div>
                   </div>
-                </div>-->
+                </div>
               </div>
             </fieldset>
-
+<!--
             <h6>Passo2</h6>
 						<fieldset>
               Teste2
@@ -625,7 +779,7 @@ if(isset($_POST['inputNome'])){
 						<fieldset>
               Teste3
             </fieldset>
-            
+    -->           
             <!-- /card-body -->
           </form>
         </div>

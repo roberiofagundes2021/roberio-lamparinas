@@ -138,7 +138,7 @@ try {
 			FROM Produto
 			JOIN AditivoXProduto on AdXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and AdXPrAditivo = ".$_POST['inputAditivoId'];
+			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and AdXPrAditivo = ".$_POST['inputAditivoId']." and AdXPrQuantidade > ' 0 ' ";
 
 	$result = $conn->query($sql);
 	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -147,7 +147,7 @@ try {
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, AdXSrQuantidade, AdXSrValorUnitario
 			FROM Servico
 			JOIN AditivoXServico on AdXSrServico = ServiId
-			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$_POST['inputAditivoId'];
+			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$_POST['inputAditivoId']." and AdXSrQuantidade > ' 0 ' ";
 
 	$result = $conn->query($sql);
 	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -187,7 +187,7 @@ try {
 				$valorTotal = 0;
 			}
 
-			if($totalProdutos == ($cont)){
+			
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
@@ -198,18 +198,9 @@ try {
 					<td style='text-align: right;'>".mostraValor($valorTotal)."</td>
 				</tr>
 			";
-			} else if($rowProduto['AdXPrQuantidade'] > 0) {
-				$html .= "
-				<tr>
-					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$rowProduto['ProduNome'].": ".$rowProduto['ProduDetalhamento']."</td>
-					<td style='text-align: center;'>".$rowProduto['UnMedSigla']."</td>					
-					<td style='text-align: center;'>".$rowProduto['AdXPrQuantidade']."</td>
-					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
-					<td style='text-align: right'>".mostraValor($valorTotal)."</td>
-				</tr>
-			";
-			}
+			
+				
+			
 			
 			$cont++;
 			$totalGeralProdutos += $valorTotal;
@@ -257,7 +248,7 @@ try {
 				$valorTotal = "";
 			}
 
-			if($totalServicos == ($cont)){
+			
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
@@ -267,17 +258,6 @@ try {
 					<td style='text-align: right;'>".mostraValor($valorTotal)."</td>
 				</tr>
 			";
-			} else if($rowProduto['AdXPrQuantidade'] > 0){
-				$html .= "
-				<tr>
-					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$rowServico['ServiNome'].": ".$rowServico['ServiDetalhamento']."</td>
-					<td style='text-align: center;'>".$rowServico['AdXSrQuantidade']."</td>
-					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
-					<td style='text-align: right'>".mostraValor($valorTotal)."</td>
-				</tr>
-			";
-			}
 			
 			$cont++;
 			$totalGeralServicos += $valorTotal;
