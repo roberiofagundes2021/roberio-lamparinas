@@ -84,7 +84,7 @@ $dataFim = date("Y-m-d");
         },
         {
           orderable: true, //Nª doc
-          width: "10%",
+          width: "8%",
           targets: [2]
         },
         {
@@ -104,14 +104,20 @@ $dataFim = date("Y-m-d");
         },
         {
           orderable: true, //Saldo Conciliado
-          width: "15%",
+          width: "19%",
           targets: [6]
         },
         {
-          orderable: false, //Ações
-          width: "10%",
+          orderable: true, //Situação
+          width: "5%",
           targets: [7]
         }
+        ,
+        {
+          orderable: false, //Ações
+          width: "3%",
+          targets: [8]
+        } 
       ],
       dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
       language: {
@@ -451,7 +457,20 @@ $dataFim = date("Y-m-d");
       );
     }
 
-    Filtrar(false);
+    Filtrar(true);
+  }
+
+  function atualizaConciliacao(idConciliacao, tipoConta) {
+    document.getElementById('inputConciliacaoId').value = idConciliacao;
+    document.getElementById('inputPermissionAtualiza').value = 1;
+    
+    if(tipoConta == 'ContaAReceber') {
+      document.formEditaConciliacao.action = "contasAReceberNovoLancamento.php";
+    }else if(tipoConta == 'ContaAPagar') {
+      document.formEditaConciliacao.action = "contasAPagarNovoLancamento.php";
+    }
+    
+    document.formEditaConciliacao.submit();
   }
   </script>
 
@@ -715,6 +734,7 @@ $dataFim = date("Y-m-d");
                       <th style='text-align: right;'>Saída</th>
                       <th style='text-align: right;'>Saldo</th>
                       <th style='text-align: right;'>Saldo Conciliado</th>
+                      <th>Situação</th>
                       <th>Conciliado</th>
                     </tr>
                   </thead>
@@ -737,6 +757,10 @@ $dataFim = date("Y-m-d");
         </div>
 
         <!-- /info blocks -->
+				<form name="formEditaConciliacao" method="post">
+					<input type="hidden" id="inputConciliacaoId" name="inputConciliacaoId" >
+          <input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza" >
+				</form>
       </div>
 
       <!-- /content area -->

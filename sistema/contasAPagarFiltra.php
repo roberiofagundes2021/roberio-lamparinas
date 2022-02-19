@@ -150,14 +150,13 @@ include('global_assets/php/conexao.php');
                 <div class="list-icons">
                     <div class="list-icons list-icons-extended">
                         <a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>
-                        <a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>
+                        <a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>
 				        <div class="dropdown">													
 				        	<a href="#" class="list-icons-item" data-toggle="dropdown">
 				        		<i class="icon-menu9"></i>
 				    
 				        	<div class="dropdown-menu dropdown-menu-right">
                                 <a href="#" class="dropdown-item btnParcelar"  data-popup="tooltip" data-placement="bottom" title="Parcelar"><i class="icon-file-text2"></i> Parcelar</a>
-                                <a href="#" class="dropdown-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Produto"><i class="icon-file-empty"></i></a>
 				        	</div>
 				        </div>
 				    </div>

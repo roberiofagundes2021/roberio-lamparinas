@@ -12,6 +12,38 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
 
 ?>
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        function buscar(date, conta) {
+           $.ajax ({
+                type: 'POST',
+                dataType: 'html',
+                url: 'resumoFinanceiroFiltra.php',
+                beforeSend: function () {
+                    //$("#dados").html('<img src="global_assets/images/lamparinas/loader.gif" style="width: 120px">');
+                },
+                data: {
+                    date: date,
+                    conta: conta
+                },
+                success: function(msg) {
+                    $("#dados").html(msg);
+                }
+           });
+        }
+
+        $('#enviar').click(function() {    
+            buscar($("#inputDataVencimento").val(), $("#contaBancoId").val())
+        });
+    });
+    
+    //Foi necessário usar essa função para pegar o value do select, já que no modo comum não funciona devido a essa página ser importada em outras páginas
+    function selecionaContaBanco(elemento) {
+        var contaBancoId = $(elemento).val();
+        document.getElementById('contaBancoId').value = contaBancoId;
+    }
+</script>
+
 <!-- Main sidebar -->
 <div class="sidebar sidebar-light sidebar-right sidebar-expand-md">
 
@@ -26,12 +58,12 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
             </div>
 
             <div style="padding: 10px 10px 0px 10px;background: #EEEDED;text-align: center;border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;">
-                <?php echo "<h3>".date("d/m/Y")."</h3>"; ?>
+                <input type="date" id="inputDataVencimento" name="inputDataVencimento" class="form-control" value="<?php echo date('Y-m-d'); ?>" style="font-size: 21px; text-align: center;">
             </div>
 
             <div style="padding: 10px 10px 0 10px; background: #ccc;">
                 <div class="form-group" style="font-size:16px;">
-                    <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2">
+                    <select id="cmbContaBanco" onchange="javascript:selecionaContaBanco(this);" name="cmbContaBanco" class="form-control form-control-select2">
                         <option value="">Todos</option>
                         <?php
                             $sql = "SELECT CnBanId, CnBanNome, dbo.fnDebitosDia(".$_SESSION['UnidadeId'].", CnBanId, convert(date, getdate())) as Debito
@@ -48,20 +80,23 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
                     </select>
                     <h3 class="form-text text-right" style="color: #666;">Conta</h3>
                 </div>
-
-                <div class="form-group">
-                    <input id="inputCredito" name="inputCredito" class="form-control" value="<?php echo $fCredito; ?>" style="font-size: 30px; text-align: right;">
-                    <h3 class="form-text text-right" style="color: #666;">Crédito</h3>
-                </div> 
-
-                <div class="form-group">
-                    <input id="inputDebito" name="inputDebito" class="form-control" value="<?php echo $fDebito; ?>" style="font-size: 30px; text-align: right;">
-                    <h3 class="form-text text-right" style="color: #666;">Débito</h3>
-                </div>                
-
-                <div class="form-group">
-                    <input id="inputSaldo" name="inputSaldo" class="form-control" value="<?php echo $fSaldo; ?>" style="font-size: 30px; text-align: right;">
-                    <h3 class="form-text text-right" style="color: #666;"><b>Saldo</b> (Crédito - Débito)</h3>
+                <input type="hidden" id="contaBancoId">
+                
+                <div id="dados">
+                    <div class="form-group">
+                        <input id="inputCredito" name="inputCredito" class="form-control" value="<?php echo $fCredito; ?>" style="font-size: 30px; text-align: right;" readonly>
+                        <h3 class="form-text text-right" style="color: #666;">Crédito</h3>
+                    </div> 
+    
+                    <div class="form-group">
+                        <input id="inputDebito" name="inputDebito" class="form-control" value="<?php echo $fDebito; ?>" style="font-size: 30px; text-align: right;" readonly>
+                        <h3 class="form-text text-right" style="color: #666;">Débito</h3>
+                    </div>                
+    
+                    <div class="form-group">
+                        <input id="inputSaldo" name="inputSaldo" class="form-control" value="<?php echo $fSaldo; ?>" style="font-size: 30px; text-align: right;" readonly>
+                        <h3 class="form-text text-right" style="color: #666;"><b>Saldo</b> (Crédito - Débito)</h3>
+                    </div>
                 </div>
             </div>
         </div>
@@ -72,7 +107,7 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
         <div class="card">
 
             <div style="padding: 10px 10px 5px 10px;background: #aaa;text-align: center;border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;">
-                <?php echo "<h2>Acesso Rápido</h2>"; ?>
+                <button onclick="teste();" class="btn bg-slate" id="enviar">Acesso Rápido</button>
             </div>        
             <div class="card-body" style="">
                 <div class="row">
