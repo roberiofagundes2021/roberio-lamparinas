@@ -60,48 +60,63 @@ if(isset($_POST['inputNome'])){
     $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
     PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";
 
-    $sql = "SELECT B.PerfiId as PerfiId, PaPerMenu, PaPerInserir, PaPerVisualizar, PaPerAtualizar, PaPerExcluir, PaPerSuperAdmin
-            FROM Perfil A
-            JOIN PadraoPermissao on PaPerPerfil = A.PerfiId
-            JOIN Perfil B on B.PerfiChave = A.PerfiChave
-            WHERE A.PerfiUnidade = ".$unidadeIdNovo;
+    // esse select traz todos os perfis
+    $sql = "SELECT PerfiId,PerfiNome,PerfiChave,PerfiStatus,PerfiUsuarioAtualizador,PerfiUnidade,PerfiPadrao
+    FROM Perfil WHERE PerfiUnidade = $unidadeIdNovo";
     $result = $conn->query($sql);
-    $rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);    
+    $rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
+
+    // esse select traz todos os perfis padrões com as respectivas PerfiChave
+    $sql = "SELECT PaPerPerfil,PaPerMenu,PaPerVisualizar,PaPerAtualizar,PaPerExcluir,PaPerInserir,PaPerSuperAdmin,
+    PerfiChave
+    FROM PadraoPermissao
+    JOIN Perfil ON PerfiId = PaPerPerfil
+    JOIN Menu ON MenuId = PaPerMenu";
+    $result = $conn->query($sql);
+    $rowPerfilPadrao = $result->fetchAll(PDO::FETCH_ASSOC);
+
 
     $cont = 0;
+    // nesse laço para cada perfil ele procura um perfil padrão que contenha a mesma PerfiChave para
+    // utilizar os campos: PaPerVisualizar, PaPerAtualizar, PaPerExcluir, PaPerSuperAdmin
     foreach ($rowPerfil as $itemPerfil){
-        $sqlPerfilXPermissao .= " (".$itemPerfil['PerfiId'].", ".$itemPerfil['PaPerMenu'].", ".$unidadeIdNovo.", ".$itemPerfil['PaPerInserir'].",".
-        $itemPerfil['PaPerVisualizar'].", ".$itemPerfil['PaPerAtualizar'].", ".$itemPerfil['PaPerExcluir'].", ".$itemPerfil['PaPerSuperAdmin']."),";
-  
-        $sqlPadraoPerfilXPermissao .= " (".$itemPerfil['PerfiId'].", ".$itemPerfil['PaPerMenu'].", ".$unidadeIdNovo.", ".$itemPerfil['PaPerInserir'].",".
-        $itemPerfil['PaPerVisualizar'].", ".$itemPerfil['PaPerAtualizar'].", ".$itemPerfil['PaPerExcluir'].", ".$itemPerfil['PaPerSuperAdmin']."),";  
+      foreach($rowPerfilPadrao as $rowPerPad){
+        if($itemPerfil['PerfiChave'] == $rowPerPad['PerfiChave']){
+          $sqlPerfilXPermissao .= " (".$itemPerfil['PerfiId'].", ".$rowPerPad['PaPerMenu'].", ".$unidadeIdNovo.", ".$rowPerPad['PaPerInserir'].",".
+          $rowPerPad['PaPerVisualizar'].", ".$rowPerPad['PaPerAtualizar'].", ".$rowPerPad['PaPerExcluir'].", ".$rowPerPad['PaPerSuperAdmin']."),";
+    
+          $sqlPadraoPerfilXPermissao .= " (".$itemPerfil['PerfiId'].", ".$rowPerPad['PaPerMenu'].", ".$unidadeIdNovo.", ".$rowPerPad['PaPerInserir'].",".
+          $rowPerPad['PaPerVisualizar'].", ".$rowPerPad['PaPerAtualizar'].", ".$rowPerPad['PaPerExcluir'].", ".$rowPerPad['PaPerSuperAdmin']."),";  
 
-        $cont++;
+          $cont++;
 
-        if ($cont > 800){
+          if ($cont > 800){
 
             // Insere na base para não atingir o limite de 1000 linhas por INSERT
             $sqlPerfilXPermissao = substr_replace($sqlPerfilXPermissao, "", -1);
             $sqlPadraoPerfilXPermissao = substr_replace($sqlPadraoPerfilXPermissao, "", -1);
             $conn->query($sqlPerfilXPermissao);
-            $conn->query($sqlPadraoPerfilXPermissao);     
-                    
+            $conn->query($sqlPadraoPerfilXPermissao);
+
             // recria o inserir em PerfilXPermissao -------------------------------------------------------------------
             $sqlPerfilXPermissao = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
             PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin) VALUES ";
 
             // recria o inserir em PadraoPerfilXPermissao -------------------------------------------------------------
             $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
-            PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";            
+            PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";
 
             $cont = 0;
+          }
         }
+      }
     }
-
-    $sqlPerfilXPermissao = substr_replace($sqlPerfilXPermissao, "", -1);
-    $sqlPadraoPerfilXPermissao = substr_replace($sqlPadraoPerfilXPermissao, "", -1);
-    $conn->query($sqlPerfilXPermissao);
-    $conn->query($sqlPadraoPerfilXPermissao);
+    if($cont > 0){
+      $sqlPerfilXPermissao = substr_replace($sqlPerfilXPermissao, "", -1);
+      $sqlPadraoPerfilXPermissao = substr_replace($sqlPadraoPerfilXPermissao, "", -1);
+      $conn->query($sqlPerfilXPermissao);
+      $conn->query($sqlPadraoPerfilXPermissao);
+    }
 
     // FIM---------------------------------------------------------------------------------------------
     
@@ -175,15 +190,15 @@ if(isset($_POST['inputNome'])){
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
-    echo "<br>";
+    echo "<br><br>";
     echo "CONT: ".$cont;
     echo "<br><br>";
     echo $sqlPerfil;
     echo "<br><br>";
     echo $sql;
-    echo "<br>";
+    echo "<br><br>";
     echo $sqlPerfilXPermissao;
-    echo "<br>";
+    echo "<br><br>";
     echo $sqlPadraoPerfilXPermissao;
     die;
 	}
