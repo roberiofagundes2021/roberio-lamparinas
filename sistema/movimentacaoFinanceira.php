@@ -168,7 +168,6 @@ $dataFim = date("Y-m-d");
         $('.datatable-footer').append(divTotal);
       }
 
-
       function Filtrar(carregamentoPagina) {
         let cont = false;
 
@@ -202,8 +201,30 @@ $dataFim = date("Y-m-d");
           tipoFiltro: tipoFiltro,
           permissionAtualiza: inputPermissionAtualiza,
           permissionExclui: inputPermissionExclui
-        };
+        }; 
 
+        //Esse ajax está sendo usado para verificar no banco se o registro já existe
+        $.ajax({
+          type: "POST",
+          url: url,
+          dataType: "json",
+          data: inputsValues,
+          destroy: true,
+          success: function(resposta) {
+            console.log(resposta)
+
+            let table 
+            table = $('#tblMovimentacaoFinanceira').DataTable()
+
+            let rowNode
+
+            resposta.forEach(item => {
+              rowNode = table.row.add(item.data).draw().node()
+            })
+          }
+        })
+
+          /*
         $.post(
           url,
           inputsValues,
@@ -226,14 +247,22 @@ $dataFim = date("Y-m-d");
             }
           }
         );
+        */
       }
 
       $('#submitPesquisar').on('click', (e) => {
         e.preventDefault()
+        
         Filtrar(false);
       })
 
       Filtrar(true);
+
+      //Para a tabela não fica em carregamento infinito quando a tela é carregada
+      let tabelaVazia = $(
+        '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+      )
+      $('tbody').html(tabelaVazia)
 
      /* $('#novoLacamento').on('click', (e) => {
         location.href = "movimentacaoFinanceiraPagamento.php";

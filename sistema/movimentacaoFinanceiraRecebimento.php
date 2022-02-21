@@ -293,6 +293,12 @@ $dataInicio = date("Y-m-d");
 
   <?php include_once("head.php"); ?>
 
+  <!-- Validação -->
+  <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+  <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+  <script src="global_assets/js/demo_pages/form_validation.js"></script>
+  <!--/ Validação -->
+
   <!-- Theme JS files -->
   <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
   <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
@@ -304,11 +310,6 @@ $dataInicio = date("Y-m-d");
   <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
   <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
   <!-- /theme JS files -->
-
-  <!-- Validação -->
-  <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-  <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-  <script src="global_assets/js/demo_pages/form_validation.js"></script>
 
   <script type="text/javascript">
   $(document).ready(function() {

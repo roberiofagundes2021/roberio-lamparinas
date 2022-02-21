@@ -82,7 +82,7 @@ $dataFim = date("Y-m-d");
                         targets: [2]
                     },
                     {
-                        orderable: true, //Fornecedor
+                        orderable: true, //Favorecido
                         width: "25%",
                         targets: [3]
                     },
@@ -770,7 +770,7 @@ $dataFim = date("Y-m-d");
 
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label for="cmbFornecedor">Fornecedor</label>
+                                                <label for="cmbFornecedor">Favorecido</label>
                                                 <select id="cmbFornecedor" name="cmbFornecedor"
                                                     class="form-control form-control-select2">
                                                     <option value="">Todos</option>
@@ -809,7 +809,8 @@ $dataFim = date("Y-m-d");
                                                     $sql = "SELECT PlConId, PlConCodigo, PlConNome
                                                             FROM PlanoConta
                                                             JOIN Situacao on SituaId = PlConStatus
-                                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and 
+                                                            PlConNatureza = 'D'  and SituaChave = 'ATIVO'
                                                             ORDER BY PlConCodigo ASC";
                                                     $result = $conn->query($sql);
                                                     $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -890,7 +891,7 @@ $dataFim = date("Y-m-d");
                                             <th></th>
                                             <th id='dataGrid'>Vencimento</th>
                                             <th>Descrição</th>
-                                            <th>Fornecedor</th>
+                                            <th>Favorecido</th>
                                             <th>Número Doc.</th>
                                             <th>Valor Total</th>
                                             <th>Status</th>

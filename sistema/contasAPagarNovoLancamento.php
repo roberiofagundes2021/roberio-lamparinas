@@ -275,7 +275,11 @@ if (isset($_POST['cmbPlanoContas'])) {
         }
     }
 
-    irpara("contasAPagar.php");
+    if(isset($_POST['inputControlador'])) {
+        irpara("movimentacaoFinanceiraConciliacao.php");
+    }else {
+        irpara("contasAPagar.php");
+    }
 }
 //$count = count($row);
 
@@ -286,6 +290,14 @@ if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) 
     		FROM ContasAPagar
             LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
     		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_POST['inputContasAPagarId'] . "";
+    $result = $conn->query($sql);
+    $lancamento = $result->fetch(PDO::FETCH_ASSOC);
+}else if(isset($_POST['inputConciliacaoId']) && $_POST['inputConciliacaoId']) {
+    $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
+            CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero
+    		FROM ContasAPagar
+            LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
+    		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_POST['inputConciliacaoId'] . "";
     $result = $conn->query($sql);
     $lancamento = $result->fetch(PDO::FETCH_ASSOC);
 }
@@ -304,6 +316,12 @@ $dataInicio = date("Y-m-d");
 
     <?php include_once("head.php"); ?>
 
+    <!-- Validação -->
+    <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+    <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+    <script src="global_assets/js/demo_pages/form_validation.js"></script>
+    <!--/ Validação -->
+
     <!-- Theme JS files -->
     <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
     <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
@@ -319,11 +337,6 @@ $dataInicio = date("Y-m-d");
     <!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
     <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
     <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
-
-    <!-- Validação -->
-    <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-    <script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-    <script src="global_assets/js/demo_pages/form_validation.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function() {
@@ -676,6 +689,13 @@ $dataInicio = date("Y-m-d");
                 <form id="lancamento" name="lancamento" class="form-validate-jquery" method="post" class="p-3">
                     <!-- Info blocks -->
                     <input type="hidden" id="inputPagamentoParcial" name="inputPagamentoParcial">
+
+                    <?php 
+                        if(isset($_POST['inputConciliacaoId'])) {
+                            echo '<input type="hidden" id="inputControlador" name="inputControlador" value="1">';
+                        }
+                    ?>
+
                     <div class="row">
                         <div class="col-lg-12">
                             <!-- Basic responsive configuration -->
@@ -708,7 +728,8 @@ $dataInicio = date("Y-m-d");
                                                     $sql = "SELECT PlConId, PlConCodigo, PlConNome
                                                             FROM PlanoConta
                                                             JOIN Situacao on SituaId = PlConStatus
-                                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and 
+                                                            PlConNatureza = 'D' and SituaChave = 'ATIVO'
                                                             ORDER BY PlConCodigo ASC";
                                                     $result = $conn->query($sql);
                                                     $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -769,7 +790,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputOrdemCarta">Ordem Compra/C. Contrato</label>
-                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra" value="<?php if (isset($lancamento)) echo $lancamento['OrComNumero'] ?>" class="form-control" >
+                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra" value="<?php if (isset($lancamento)) echo $lancamento['OrComNumero'] ?>" class="form-control" readonly>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
@@ -923,7 +944,7 @@ $dataInicio = date("Y-m-d");
                                                 echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
                                              }
                                         ?>
-                                        <a href="contasAPagar.php" class="btn">Cancelar</a>
+                                        <a href="javascript:history.go(-1)" class="btn">Cancelar</a>
                                 </div>
 
                             </div>
