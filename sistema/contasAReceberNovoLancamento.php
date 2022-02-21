@@ -559,7 +559,11 @@ if (isset($_POST['cmbPlanoContas'])) {
         }
     }
 
-    irpara("contasAReceber.php");
+    if(isset($_POST['inputControlador'])) {
+        irpara("movimentacaoFinanceiraConciliacao.php");
+    }else {
+        irpara("contasAReceber.php");
+    }
 }
 //$count = count($row);
 
@@ -600,6 +604,48 @@ if (isset($_POST['inputContasAReceberId']) && $_POST['inputContasAReceberId'] !=
     		       FROM ContasAReceber
                    LEFT JOIN FormaPagamento on FrPagId = CnAReFormaPagamento
     		       WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " .$_POST['inputContasAReceberId'] . "";
+
+        $result = $conn->query($sql);
+        $lancamento = $result->fetch(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        echo 'Error: ',  $e->getMessage(), "\n";
+    }
+}else if(isset($_POST['inputConciliacaoId']) && $_POST['inputConciliacaoId']) {
+    try {
+        $sql = "SELECT  CnAReId,
+                        CnAReDtEmissao,  
+                        CnARePlanoContas, 
+                        CnAReCliente, 
+                        CnAReDescricao, 
+                        CnAReNumDocumento,
+                        CnAReContaBanco, 
+                        CnAReFormaPagamento,
+                        CnAReVenda,
+                        CnAReDtVencimento, 
+                        CnAReValorAReceber, 
+                        CnAReDtRecebimento, 
+                        CnAReValorRecebido, 
+                        CnAReTipoJuros, 
+                        CnAReJuros, 
+                        CnAReTipoDesconto, 
+                        CnAReDesconto, 
+                        CnAReObservacao,
+                        CnAReNumCheque,                    
+                        CnAReValorCheque,                  
+                        CnAReDtEmissaoCheque,             
+                        CnAReDtVencimentoCheque,           
+                        CnAReBancoCheque,                 
+                        CnAReAgenciaCheque,                
+                        CnAReContaCheque,                  
+                        CnAReNomeCheque,                  
+                        CnAReCpfCheque, 
+                        CnAReStatus, 
+                        CnAReUsuarioAtualizador, 
+                        CnAReUnidade,
+                        FrPagChave            
+    		       FROM ContasAReceber
+                   LEFT JOIN FormaPagamento on FrPagId = CnAReFormaPagamento
+    		       WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " .$_POST['inputConciliacaoId'] . "";
 
         $result = $conn->query($sql);
         $lancamento = $result->fetch(PDO::FETCH_ASSOC);
@@ -1070,6 +1116,13 @@ $dataInicio = date("Y-m-d");
                 <form id="lancamento" name="lancamento" class="form-validate-jquery" method="post" class="p-3">
                     <!-- Info blocks -->
                     <input type="hidden" id="inputRecebimentoParcial" name="inputRecebimentoParcial">
+
+                    <?php 
+                        if(isset($_POST['inputConciliacaoId'])) {
+                            echo '<input type="hidden" id="inputControlador" name="inputControlador" value="1">';
+                        }
+                    ?>
+
                     <div class="row">
                         <div class="col-lg-12">
                             <!-- Basic responsive configuration -->
@@ -1377,7 +1430,7 @@ $dataInicio = date("Y-m-d");
                                                 echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
                                             }
                                         ?>
-                                     <a href="contasAReceber.php" class="btn">Cancelar</a>
+                                     <a href="javascript:history.go(-1)" class="btn">Cancelar</a>
                                 </div>
 
                             </div>

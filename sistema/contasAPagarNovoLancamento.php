@@ -275,7 +275,11 @@ if (isset($_POST['cmbPlanoContas'])) {
         }
     }
 
-    irpara("contasAPagar.php");
+    if(isset($_POST['inputControlador'])) {
+        irpara("movimentacaoFinanceiraConciliacao.php");
+    }else {
+        irpara("contasAPagar.php");
+    }
 }
 //$count = count($row);
 
@@ -286,6 +290,14 @@ if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) 
     		FROM ContasAPagar
             LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
     		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_POST['inputContasAPagarId'] . "";
+    $result = $conn->query($sql);
+    $lancamento = $result->fetch(PDO::FETCH_ASSOC);
+}else if(isset($_POST['inputConciliacaoId']) && $_POST['inputConciliacaoId']) {
+    $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
+            CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero
+    		FROM ContasAPagar
+            LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
+    		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_POST['inputConciliacaoId'] . "";
     $result = $conn->query($sql);
     $lancamento = $result->fetch(PDO::FETCH_ASSOC);
 }
@@ -677,6 +689,13 @@ $dataInicio = date("Y-m-d");
                 <form id="lancamento" name="lancamento" class="form-validate-jquery" method="post" class="p-3">
                     <!-- Info blocks -->
                     <input type="hidden" id="inputPagamentoParcial" name="inputPagamentoParcial">
+
+                    <?php 
+                        if(isset($_POST['inputConciliacaoId'])) {
+                            echo '<input type="hidden" id="inputControlador" name="inputControlador" value="1">';
+                        }
+                    ?>
+
                     <div class="row">
                         <div class="col-lg-12">
                             <!-- Basic responsive configuration -->
@@ -925,7 +944,7 @@ $dataInicio = date("Y-m-d");
                                                 echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
                                              }
                                         ?>
-                                        <a href="contasAPagar.php" class="btn">Cancelar</a>
+                                        <a href="javascript:history.go(-1)" class="btn">Cancelar</a>
                                 </div>
 
                             </div>

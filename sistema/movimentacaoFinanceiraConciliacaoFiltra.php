@@ -128,8 +128,12 @@ function queryPesquisa(){
                                TIPO = 'P' ,
                                CODTRANSFREC = 0,
                                CnAPaTransferencia as CODTRANSFPAG,
+                               SituaNome as SITUACAO,
+                               SituaCor as COR,
+                               SituaChave as CHAVE,s
                                CNAPACONCILIADO AS CONCILIADO
-                        FROM ContasAPagar ";
+                        FROM ContasAPagar 
+                        JOIN Situacao on SituaId = CnAPaStatus";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
                         }
@@ -145,8 +149,12 @@ function queryPesquisa(){
                                TIPO = 'R' , 
                                CnAReTransferencia as CODTRANSFREC, 
                                CODTRANSFPAG = 0,
+                               SituaNome as SITUACAO,
+                               SituaCor as COR,
+                               SituaChave as CHAVE,
                                CNARECONCILIADO AS CONCILIADO
-                        FROM ContasAReceber ";
+                        FROM ContasAReceber 
+                        JOIN Situacao on SituaId = CnAReStatus";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
                         }
@@ -162,8 +170,12 @@ function queryPesquisa(){
                                TIPO = 'R' , 
                                CnAReTransferencia as CODTRANSFREC, 
                                CODTRANSFPAG = 0,
+                               SituaNome as SITUACAO,
+                               SituaCor as COR,
+                               SituaChave as CHAVE,
                                CNARECONCILIADO AS CONCILIADO
-                        FROM ContasAReceber ";
+                        FROM ContasAReceber
+                        JOIN Situacao on SituaId = CnAReStatus";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
                         }
@@ -177,8 +189,12 @@ function queryPesquisa(){
                                TIPO = 'P' ,
                                CODTRANSFREC = 0 ,
                                CnAPaTransferencia as CODTRANSFPAG,
+                               SituaNome as SITUACAO,
+                               SituaCor as COR,
+                               SituaChave as CHAVE,
                                CNAPACONCILIADO AS CONCILIADO
-                        FROM ContasAPagar ";
+                        FROM ContasAPagar
+                        JOIN Situacao on SituaId = CnAPaStatus";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
                         }
@@ -280,8 +296,12 @@ function queryPesquisa(){
                                TIPO = 'P',
                                CODTRANSFREC = 0 ,
                                CnAPaTransferencia as CODTRANSFPAG,
+                               SituaNome as SITUACAO,
+                               SituaCor as COR,
+                               SituaChave as CHAVE,
                                CNAPACONCILIADO AS CONCILIADO
-                          FROM ContasAPagar ";
+                          FROM ContasAPagar 
+                          JOIN Situacao on SituaId = CnAPaStatus";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
                         }
@@ -297,8 +317,12 @@ function queryPesquisa(){
                                TIPO = 'R', 
                                CnAReTransferencia as CODTRANSFREC, 
                                CODTRANSFPAG = 0,
+                               SituaNome as SITUACAO,
+                               SituaCor as COR,
+                               SituaChave as CHAVE,
                                CNARECONCILIADO AS CONCILIADO
-                        FROM ContasAReceber ";
+                        FROM ContasAReceber 
+                        JOIN Situacao on SituaId = CnAReStatus";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
                         }
@@ -314,8 +338,12 @@ function queryPesquisa(){
                                TIPO = 'R',
                                CnAReTransferencia as CODTRANSFREC, 
                                CODTRANSFPAG = 0,
+                               SituaNome as SITUACAO,
+                               SituaCor as COR,
+                               SituaChave as CHAVE,
                                CNARECONCILIADO AS CONCILIADO
-                          FROM ContasAReceber ";
+                          FROM ContasAReceber 
+                          JOIN Situacao on SituaId = CnAReStatus";
                         if (isset($argsCenCustCr)) {
                             $sql .= " $argsCenCustCr ";
                         }
@@ -329,8 +357,12 @@ function queryPesquisa(){
                                TIPO = 'P' , 
                                CODTRANSFREC = 0 ,
                                CnAPaTransferencia as CODTRANSFPAG,
+                               SituaNome as SITUACAO,
+                               SituaCor as COR,
+                               SituaChave as CHAVE,
                                CNAPACONCILIADO AS CONCILIADO
-                          FROM ContasAPagar ";
+                          FROM ContasAPagar 
+                          JOIN Situacao on SituaId = CnAPaStatus";
                         if (isset($argsCenCustCp)) {
                             $sql .= " $argsCenCustCp ";
                         }
@@ -357,8 +389,12 @@ function queryPesquisa(){
                        TIPO = 'R', 
                        CNAReTransferencia AS CODTRANSFREC, 
                        CODTRANSFPAG = 0,
+                       SituaNome as SITUACAO,
+                       SituaCor as COR,
+                       SituaChave as CHAVE,
                        CNARECONCILIADO AS CONCILIADO
                   FROM ContasAReceber
+                  JOIN Situacao on SituaId = CnAReStatus
                  WHERE CNARESTATUS = 14
                    AND CnAReUnidade = " . $_SESSION['UnidadeId'] . " 
                    AND CnAReDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' 
@@ -371,8 +407,12 @@ function queryPesquisa(){
                        TIPO = 'P',
                        CODTRANSFREC = 0,
                        CnAPaTransferencia as CODTRANSFPAG,
+                       SituaNome as SITUACAO,
+                       SituaCor as COR,
+                       SituaChave as CHAVE,
                        CNAPACONCILIADO AS CONCILIADO
                   FROM ContasAPagar
+                  JOIN Situacao on SituaId = CnAPaStatus
                  WHERE CNAPASTATUS = 12
                    AND CnAPaUnidade = " . $_SESSION['UnidadeId'] . " 
                    AND CnAPaDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' 
@@ -448,8 +488,28 @@ function queryPesquisa(){
                     } else if ($item['CONCILIADO'] !== 0) {
                         $print .= "<td class='even' style='color: red;text-align: right;padding-right:40px;'>0,00</td>";
                     }
+
+                    //SITUAÇÃO
+                    $situacao = $item['SITUACAO']; //$item['SituaNome'];
+                    $situacaoClasse = 'badge badge-flat border-'.$item['COR'].' text-'.$item['COR'];
+                    $chave = $item['CHAVE'];
+
+                    if($chave == 'ARECEBER' || $chave == 'RECEBIDA') {
+                        $print .= '<td class="even" style="text-align: center;padding-right:40px;">
+                                    <a href="#" onclick="atualizaConciliacao('.$item['ID'].', \'ContaAReceber\');"><span class="badge  '.$situacaoClasse.'">'.$situacao.'</span></a>
+                               </td>';    
+                    }else if($chave == 'APAGAR' || $chave == 'PAGA') {
+                        $print .= '<td class="even" style="text-align: center;padding-right:40px;">
+                                        <a href="#" onclick="atualizaConciliacao('.$item['ID'].', \'ContaAPagar\');"><span class="badge  '.$situacaoClasse.'">'.$situacao.'</span></a>
+                                   </td>';
+                    }else {
+                        $print .= '<td class="even" style="text-align: center;padding-right:40px;">
+                                        <a href="#" onclick="atualizaConciliacao('.$item['ID'].', \'Teste\');"><span class="badge  '.$situacaoClasse.'">'.$situacao.'</span></a>
+                                   </td>';
+                    }
                     
-                    //MENU EDITAR E EXCLUIR
+                    
+                    //CHECKBOX - CONCILIADO
                     $print .= "
                         <td class='even d-flex flex-row justify-content-around align-content-center' style='text-align: center'>";
 
