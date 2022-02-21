@@ -13,9 +13,8 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
 ?>
 
 <script type="text/javascript">
-    $(document).ready(function () {
-        function buscar(date, conta) {
-           $.ajax ({
+    function buscar(date, conta) {
+        $.ajax ({
                 type: 'POST',
                 dataType: 'html',
                 url: 'resumoFinanceiroFiltra.php',
@@ -29,19 +28,21 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
                 success: function(msg) {
                     $("#dados").html(msg);
                 }
-           });
-        }
-
-        $('#enviar').click(function() {    
-            buscar($("#inputDataVencimento").val(), $("#contaBancoId").val())
         });
-    });
+    }
+
+    function selecionaData() {
+        buscar($("#inputDataVencimento").val(), $("#contaBancoId").val())
+    }
     
     //Foi necessário usar essa função para pegar o value do select, já que no modo comum não funciona devido a essa página ser importada em outras páginas
     function selecionaContaBanco(elemento) {
         var contaBancoId = $(elemento).val();
-        document.getElementById('contaBancoId').value = contaBancoId;
+        document.getElementById('contaBancoId').value = contaBancoId;  
+
+        buscar($("#inputDataVencimento").val(), $("#contaBancoId").val())
     }
+    
 </script>
 
 <!-- Main sidebar -->
@@ -58,12 +59,12 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
             </div>
 
             <div style="padding: 10px 10px 0px 10px;background: #EEEDED;text-align: center;border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;">
-                <input type="date" id="inputDataVencimento" name="inputDataVencimento" class="form-control" value="<?php echo date('Y-m-d'); ?>" style="font-size: 21px; text-align: center;">
+                <input type="date" id="inputDataVencimento" onchange="selecionaData();" name="inputDataVencimento" class="form-control" value="<?php echo date('Y-m-d'); ?>" style="font-size: 21px; text-align: center;">
             </div>
 
             <div style="padding: 10px 10px 0 10px; background: #ccc;">
                 <div class="form-group" style="font-size:16px;">
-                    <select id="cmbContaBanco" onchange="javascript:selecionaContaBanco(this);" name="cmbContaBanco" class="form-control form-control-select2">
+                    <select id="cmbContaBanco" onchange="selecionaContaBanco(this);" name="cmbContaBanco" class="form-control form-control-select2">
                         <option value="">Todos</option>
                         <?php
                             $sql = "SELECT CnBanId, CnBanNome, dbo.fnDebitosDia(".$_SESSION['UnidadeId'].", CnBanId, convert(date, getdate())) as Debito
@@ -107,7 +108,7 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
         <div class="card">
 
             <div style="padding: 10px 10px 5px 10px;background: #aaa;text-align: center;border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;">
-                <button class="btn bg-slate" id="enviar">Acesso Rápido</button>
+                <?php echo "<h2>Acesso Rápido</h2>"; ?>
             </div>        
             <div class="card-body">
                 <div class="row">
