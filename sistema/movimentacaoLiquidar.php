@@ -368,7 +368,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                     <div class="input-group">
                                                         <?php
                                                             $disabled = isset($MoviLiqui['MvLiqPlanoConta'])? 'disabled':'';
-                                                            echo "<input type='date' id='PeriodoDe' name='PeriodoDe' $disabled class='form-control'  value='$MoviLiqui[MvLiqData]'>";
+                                                            echo "<input type='date' id='PeriodoDe' name='PeriodoDe' $disabled class='form-control'  value='".(isset($MoviLiqui['MvLiqData'])?$MoviLiqui['MvLiqData']:'')."'>";
                                                         ?>
                                                     </div>
                                                 </div>
