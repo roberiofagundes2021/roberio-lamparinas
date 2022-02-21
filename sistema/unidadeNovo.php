@@ -93,6 +93,8 @@ if(isset($_POST['inputNome'])){
             // recria o inserir em PadraoPerfilXPermissao -------------------------------------------------------------
             $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
             PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";            
+
+            $cont = 0;
         }
     }
 
