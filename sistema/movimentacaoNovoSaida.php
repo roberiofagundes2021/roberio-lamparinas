@@ -8,6 +8,7 @@ include('global_assets/php/conexao.php');
 
 //Caso a chamada à página venha da liberação de uma solicitação na bandeja.
 if (isset($_POST['inputSolicitacaoId'])) {
+	$numProdutosServicos = 0;
 
 	$sql = "SELECT SlXPrQuantidade as Quantidade, ProduId as Id, ProduNome as Nome, ProduValorCusto as Valor, UnMedNome, Tipo = 'P',
 			dbo.fnLoteProduto(ProduUnidade, ProduId) as Lote, dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade
@@ -19,7 +20,7 @@ if (isset($_POST['inputSolicitacaoId'])) {
 			";
 	$result = $conn->query($sql);
 	$produtosSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
-	$numProdutos = count($produtosSolicitacao);
+	$numProdutosServicos += count($produtosSolicitacao);
 
 	$sql = "SELECT SlXSrQuantidade as Quantidade, ServiId as Id, ServiNome as Nome, ServiValorCusto as Valor, Tipo = 'S',
 			NULL as Lote, NULL as Validade
@@ -30,12 +31,12 @@ if (isset($_POST['inputSolicitacaoId'])) {
 			";
 	$result = $conn->query($sql);
 	$servicoSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
-	$numServicos = count($servicoSolicitacao);
+	$numProdutosServicos += count($servicoSolicitacao);
 
 	$solicitacoes = array_merge($servicoSolicitacao, $produtosSolicitacao);
 	$idsProdutos = '';
 
-	if ($numProdutos) {
+	if ($numProdutosServicos) {
 
 		foreach ($solicitacoes as $chave => $produto) {
 			if ($chave == 0) {
@@ -155,7 +156,6 @@ if (isset($_POST['inputData'])) {
 								if ($numeroPatri < 1000000 && $numeroPatri > 99999) $numeroPatriFinal = "0" . $numeroPatri . "";
 								if ($numeroPatri < 10000000 && $numeroPatri > 999999) $numeroPatriFinal = $numeroPatri;
 							} else {
-
 								//Caso seja o primeiro registro na tabela para esta empresa
 								$numeroPatriFinal = '0000001';
 							}
@@ -1318,6 +1318,7 @@ if (isset($_POST['inputData'])) {
 
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e) {
+				e.preventDefault();
 
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputTotal = $('#inputTotal').val();
@@ -1384,21 +1385,21 @@ if (isset($_POST['inputData'])) {
 					if (contSelectClass == contSelectClassVal) {
 
 						$('#cmbDestinoSetor').prop("disabled", false);
+						// console.log(submitProduto);
 
-						$.ajax({
-							type: "POST",
-							url: "movimentacaoNovoSaida.php",
-							data: submitProduto,
-							success: function(resposta) {
-								//window.location.href = "index.php";
-								console.log(resposta);
-							}
-						})
+						// $.ajax({
+						// 	type: "POST",
+						// 	url: "movimentacaoNovoSaida.php",
+						// 	data: submitProduto,
+						// 	success: function(resposta) {
+						// 		window.location.href = "index.php";
+						// 	}
+						// })
+						$("#formMovimentacao").submit();
 					} else {
 						alerta('Atenção', 'Informe a classificação dos produtos incluidos!', 'error');
 						return false;
 					}
-
 				} else {
 					$('#cmbDestinoSetor').prop("disabled", false);
 					document.querySelector("#formMovimentacao").submit();
@@ -1843,7 +1844,7 @@ if (isset($_POST['inputData'])) {
 
 									<?php
 									if (isset($_POST['inputSolicitacaoId'])) {
-										print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="' . $numProdutos . '">');
+										print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="' . $numProdutosServicos . '">');
 									} else {
 										print('<input type="hidden" id="inputNumItens" name="inputNumItens" value="0">');
 									}
