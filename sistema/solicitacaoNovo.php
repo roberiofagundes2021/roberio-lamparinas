@@ -139,7 +139,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 										}
 									}
 									if ($(elem).hasClass('bootstrap-touchspin-down')) {
-										if (quantidade > 0) {
+										if (quantidade > 1) {
 											quantidade--
 										}
 									}
@@ -154,8 +154,9 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 										dataPost,
 										function(data) {
 											console.log(dataPost)
+											console.log(data)
 											if (!data) {
-												$(elemInp).val(0)
+												$(elemInp).val(1)
 											} else {
 												$(elemInp).val(data)
 											}

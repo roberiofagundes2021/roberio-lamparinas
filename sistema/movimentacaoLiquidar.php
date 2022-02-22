@@ -49,7 +49,8 @@ $CentroCustos = $resultCentroCusto->fetchAll(PDO::FETCH_ASSOC);
 // pesquisa o Planos de Contas da unidade
 $sqlPlanoConta = "SELECT PlConId, PlConCodigo, PlConNome, SituaChave
                   FROM  PlanoConta JOIN Situacao on SituaId = PlConStatus
-                  WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
+                  WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+                  AND PlConNatureza = 'D'";
 $sqlPlanoConta .= isset($MoviLiqui)?" and PlConId = $MoviLiqui[MvLiqPlanoConta]":'';
 $resultPlanoConta = $conn->query($sqlPlanoConta);
 $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
@@ -73,6 +74,11 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
 
     <?php include_once("head.php"); ?>
 
+    <!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
     <!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
@@ -82,10 +88,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
 	
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+    <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<!-- /theme JS files -->
 
     <?php
@@ -418,12 +421,15 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                         <div>
                                             <a href="movimentacao.php" class="btn btn-basic" role="button">Cancelar</a>
                                         </div>
-
-                                        <div style="text-align: right; position:absolute; right:10px; margin-top:10px">
-                                            <p style="color: red; margin-right: 20px"><i class="icon-info3"></i>
-                                                <?php echo "Liquidado pelo usuário $MoviLiqui[UsuarNome] na data ".mostraData($Movimentacao['MovimDataEmissao']); ?>
-                                            </p>
-                                        </div>
+                                        <?php
+                                            if(isset($MoviLiqui['MvLiqId'])){
+                                                echo "<div style='text-align: right; position:absolute; right:10px; margin-top:10px'>
+                                                        <p style='color: red; margin-right: 20px'><i class='icon-info3'></i>
+                                                        Liquidado pelo usuário $MoviLiqui[UsuarNome] na data ".mostraData($Movimentacao['MovimDataEmissao']).
+                                                        "</p>
+                                                    </div>";
+                                            }
+                                        ?>  
                                     </div>
                                 </div>
                             </div>

@@ -9,6 +9,14 @@ if(isset($_POST['inputUnidadeId'])){
 	$iUnidade = $_POST['inputUnidadeId'];
         	
 	try{
+		$sql = "DELETE FROM PadraoPerfilXPermissao WHERE PaPrXPeUnidade = $iUnidade";
+		$conn->query($sql);
+
+		$sql = "DELETE FROM PerfilXPermissao WHERE PaPrXPeUnidade = $iUnidade";
+		$conn->query($sql);
+
+		$sql = "DELETE FROM Perfil WHERE PerfiUnidade = $iUnidade";
+		$conn->query($sql);
 		
 		$sql = "DELETE FROM Unidade
 				WHERE UnidaId = :id";
