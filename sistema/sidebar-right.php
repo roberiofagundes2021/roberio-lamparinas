@@ -13,35 +13,34 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
 ?>
 
 <script type="text/javascript">
-    function buscar(date, conta) {
-        $.ajax ({
-                type: 'POST',
-                dataType: 'html',
-                url: 'resumoFinanceiroFiltra.php',
-                beforeSend: function () {
-                    //$("#dados").html('<img src="global_assets/images/lamparinas/loader.gif" style="width: 120px">');
-                },
-                data: {
-                    date: date,
-                    conta: conta
-                },
-                success: function(msg) {
-                    $("#dados").html(msg);
-                }
+    $(document).ready(function () {
+        function buscar(date, conta) {
+            $.ajax ({
+                    type: 'POST',
+                    dataType: 'html',
+                    url: 'resumoFinanceiroFiltra.php',
+                    beforeSend: function () {
+                        //$("#dados").html('<img src="global_assets/images/lamparinas/loader.gif" style="width: 120px">');
+                    },
+                    data: {
+                        date: date,
+                        conta: conta
+                    },
+                    success: function(msg) {
+                        $("#dados").html(msg);
+                    }
+            });
+        }
+
+        $("#inputDtVencResumoFinanceiro").change(function() {
+            buscar($("#inputDtVencResumoFinanceiro").val(), $("#cmbCnBnResumoFinanceiro").val())
         });
-    }
 
-    function selecionaData() {
-        buscar($("#inputDataVencimento").val(), $("#contaBancoId").val())
-    }
-    
-    //Foi necessário usar essa função para pegar o value do select, já que no modo comum não funciona devido a essa página ser importada em outras páginas
-    function selecionaContaBanco(elemento) {
-        var contaBancoId = $(elemento).val();
-        document.getElementById('contaBancoId').value = contaBancoId;  
-
-        buscar($("#inputDataVencimento").val(), $("#contaBancoId").val())
-    }
+        $("#cmbCnBnResumoFinanceiro").change(function() {
+            buscar($("#inputDtVencResumoFinanceiro").val(), $("#cmbCnBnResumoFinanceiro").val())
+        });
+        
+    });
     
 </script>
 
@@ -59,12 +58,12 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
             </div>
 
             <div style="padding: 10px 10px 0px 10px;background: #EEEDED;text-align: center;border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;">
-                <input type="date" id="inputDataVencimento" onchange="selecionaData();" name="inputDataVencimento" class="form-control" value="<?php echo date('Y-m-d'); ?>" style="font-size: 21px; text-align: center;">
+                <input type="date" id="inputDtVencResumoFinanceiro" onchange="selecionaData();" name="inputDtVencResumoFinanceiro" class="form-control" value="<?php echo date('Y-m-d'); ?>" style="font-size: 21px; text-align: center;">
             </div>
 
             <div style="padding: 10px 10px 0 10px; background: #ccc;">
                 <div class="form-group" style="font-size:16px;">
-                    <select id="cmbContaBanco" onchange="selecionaContaBanco(this);" name="cmbContaBanco" class="form-control form-control-select2">
+                    <select id="cmbCnBnResumoFinanceiro" name="cmbCnBnResumoFinanceiro" class="form-control form-control-select2">
                         <option value="">Todos</option>
                         <?php
                             $sql = "SELECT CnBanId, CnBanNome, dbo.fnDebitosDia(".$_SESSION['UnidadeId'].", CnBanId, convert(date, getdate())) as Debito
@@ -81,7 +80,6 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
                     </select>
                     <h3 class="form-text text-right" style="color: #666;">Conta</h3>
                 </div>
-                <input type="hidden" id="contaBancoId">
                 
                 <div id="dados">
                     <div class="form-group">
