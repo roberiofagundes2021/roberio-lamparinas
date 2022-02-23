@@ -151,7 +151,8 @@ try {
 	<br>';
 
 	$totalGeralFluxo = $row['FlOpeValor'];
-	$totalGeralProdutos = 0;
+
+/*	$totalGeralProdutos = 0;
 
 	if ($rowProdutos){
 		foreach ($rowProdutos as $rowProduto) {
@@ -184,7 +185,7 @@ try {
 			$totalGeralServicos += $valorTotal;
 		}	
 	}
-
+*/
 	$totalGeralAditivos = 0;
 
 	//Dados dos Aditivos
@@ -659,7 +660,7 @@ try {
 	$mpdf->WriteHTML($html);
 
 	// Other code
-	$mpdf->Output();
+	$mpdf->Output(); // Para debugar o mpdf basta colocar ['debug' => true] dentro desse Output().
 } catch (\Mpdf\MpdfException $e) { // Note: safer fully qualified exception name used for catch
 
 	// Process the exception, log, print etc.
@@ -668,5 +669,5 @@ try {
 	$mpdf->WriteHTML($html);
 
 	// Other code
-	$mpdf->Output();
+	$mpdf->Output(['debug' => true]);
 }

@@ -22,7 +22,7 @@ try{
         /* Insere na Tabela Movimentacao Liquidacao */
         
         $sqlMovimentacao = "INSERT INTO MovimentacaoLiquidacao(MvLiqMovimentacao, MvLiqData, MvLiqUsuario,
-        MvLiqUnidade, MvLiqPlanoContas)
+        MvLiqUnidade, MvLiqPlanoConta)
         VALUES('$iMovimentacao', '$data', '$UsuarId', '$UnidadeId', '$planoCusto')";
 
         $conn->query($sqlMovimentacao);
@@ -171,7 +171,7 @@ try{
     $_SESSION['msg']['mensagem'] 	= "Erro ao Liquidar a Movimentação!!!";
     $_SESSION['msg']['tipo'] 		= "error";	
 
-    echo 'Error1: ' . $e->getMessage();
+    echo 'Error1: ' . $e->getMessage();die;
 }
 
 irpara("movimentacao.php");
