@@ -32,6 +32,12 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
             });
         }
 
+        //--|Aqui é para os dados n se perderem caso o usuário continue no mesmo caso de uso
+        $("#cmbCnBnResumoFinanceiro").val($("#cmbCnBnResumoFinanceiro").val()).change()
+
+        buscar($("#inputDtVencResumoFinanceiro").val(), $("#cmbCnBnResumoFinanceiro").val())
+        //--|
+
         $("#inputDtVencResumoFinanceiro").change(function() {
             buscar($("#inputDtVencResumoFinanceiro").val(), $("#cmbCnBnResumoFinanceiro").val())
         });
@@ -64,9 +70,10 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
             <div style="padding: 10px 10px 0 10px; background: #ccc;">
                 <div class="form-group" style="font-size:16px;">
                     <select id="cmbCnBnResumoFinanceiro" name="cmbCnBnResumoFinanceiro" class="form-control form-control-select2">
-                        <option value="">Todos</option>
+                        <option value="0">Todos</option>
                         <?php
-                            $sql = "SELECT CnBanId, CnBanNome, dbo.fnDebitosDia(".$_SESSION['UnidadeId'].", CnBanId, convert(date, getdate())) as Debito
+
+                            $sql = "SELECT CnBanId, CnBanNome
                                     FROM ContaBanco
                                     JOIN Situacao on SituaId = CnBanStatus
                                     WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
@@ -74,7 +81,7 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
                             $result = $conn->query($sql);
                             $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
                             foreach ($rowContaBanco as $item) {
-                                print('<option value="'.$item['CnBanId'].'#'.$item['Debito'].'">' . $item['CnBanNome'] . '</option>');
+                                print('<option value="'.$item['CnBanId'].'">' . $item['CnBanNome'] . '</option>');
                             }
                         ?>
                     </select>
