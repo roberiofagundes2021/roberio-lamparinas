@@ -12,10 +12,16 @@ if(isset($_POST['inputUnidadeId'])){
 		$sql = "DELETE FROM PadraoPerfilXPermissao WHERE PaPrXPeUnidade = $iUnidade";
 		$conn->query($sql);
 
-		$sql = "DELETE FROM PerfilXPermissao WHERE PaPrXPeUnidade = $iUnidade";
+		$sql = "DELETE FROM PerfilXPermissao WHERE PrXPeUnidade = $iUnidade";
 		$conn->query($sql);
 
 		$sql = "DELETE FROM Perfil WHERE PerfiUnidade = $iUnidade";
+		$conn->query($sql);
+
+		$sql = "DELETE FROM LocalEstoque WHERE LcEstUnidade = $iUnidade";
+		$conn->query($sql);
+
+		$sql = "DELETE FROM FormaPagamento WHERE FrPagUnidade = $iUnidade";
 		$conn->query($sql);
 		
 		$sql = "DELETE FROM Unidade

@@ -60,7 +60,7 @@ if(isset($_POST['inputNome'])){
     $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
     PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";
 
-    // esse select traz todos os perfis
+    // esse select traz todos os perfis da unidade nova
     $sql = "SELECT PerfiId,PerfiNome,PerfiChave,PerfiStatus,PerfiUsuarioAtualizador,PerfiUnidade,PerfiPadrao
     FROM Perfil WHERE PerfiUnidade = $unidadeIdNovo";
     $result = $conn->query($sql);
@@ -336,6 +336,9 @@ if(isset($_POST['inputNome'])){
               alerta('Atenção', 'Esse registro já existe!', 'error');
               return false;
             }
+
+            $('#gif').attr('style', 'display: block');
+            $('#enviar').attr('style', 'display: none');
 
             $("#formUnidade").submit();
           }
@@ -651,7 +654,7 @@ if(isset($_POST['inputNome'])){
 
           <form name="formUnidade" id="formUnidade" method="post" class="form-validate-jquery wizard-form ">
 
-          <div class="passos">
+          <!-- <div class="passos">
             
             <ul role="tablist">
               <li role="tab" class="first current" aria-disabled="false" aria-selected="true">
@@ -672,7 +675,7 @@ if(isset($_POST['inputNome'])){
                 </a>
               </li>
             </ul>
-          </div>
+          </div> -->
 
             <!--<h6>Passo 1</h6>-->
 						<fieldset>
@@ -778,8 +781,13 @@ if(isset($_POST['inputNome'])){
 
                 <div class="row" style="margin-top: 10px;">
                   <div class="col-lg-12">
-                    <div class="form-group">
-                      <button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+                    <div class="form-group row">
+                      <button class="btn btn-lg btn-principal" id="enviar">
+                        Incluir
+                      </button>
+                      <div id="gif" style="display: none" valign="top" colspan="7" class="dataTables_empty">
+                        <img src="global_assets/images/lamparinas/loader.gif" style="width: 80px; height: 40px;">
+                      </div>
                       <a href="unidade.php" class="btn btn-basic" role="button">Cancelar</a>
                     </div>
                   </div>
