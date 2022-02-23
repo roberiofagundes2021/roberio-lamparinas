@@ -425,8 +425,10 @@ function queryPesquisa(){
 
     if ($cont == 1) {
         $cont = 0;
-        print('<input type="hidden" id="elementosGrid" value="' . count($rowData) . '">');
+        //print('<input type="hidden" id="elementosGrid" value="' . count($rowData) . '">');
         $saldo = 0;
+
+        $arrayData = [];
         
         foreach ($rowData as $item) {
             $cont++;
@@ -439,6 +441,7 @@ function queryPesquisa(){
         
             $data = mostraData($item['DATA']);
 
+            /*
             $print = "
                 <tr>
                     <td class='even'><p class='m-0'>" . $data . "</p><input type='hidden' value='" . $item['DATA'] . "'></td>";
@@ -530,7 +533,97 @@ function queryPesquisa(){
                     </tr>
                 ";
             print($print);
+            */
+
+            //HISTÓRICO
+            if (intval($item['CODTRANSFREC']) > 0){
+                $historico = "<a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFREC'] . "'>" . $item['HISTORICO'] . "</a>";
+
+            } else if (intval($item['CODTRANSFPAG']) > 0) {
+                $historico = "<a href='movimentacaoFinanceiraTransferencia.php?lancamentoId=" . $item['CODTRANSFPAG'] . "'>" . $item['HISTORICO'] . "</a>";
+
+            } else if ($item['TIPO'] === 'R'){
+                $historico = "<a href='movimentacaoFinanceiraRecebimento.php?lancamentoId=" . $item['ID'] . "'>" . $item['HISTORICO'] . "</a>";
+
+            } else if ($item['TIPO'] === 'P') {
+                $historico = "<a href='movimentacaoFinanceiraPagamento.php?lancamentoId=" . $item['ID'] . "'>" . $item['HISTORICO'] . "</a>";
+            }
+
+            //NUMERO DO DOCUMENTO
+            $numeroDocucmento = $item['NUMDOC'];
+
+                    
+            if ($item['TIPO'] === 'R'){
+                //ENTRADA
+                $entrada = mostraValor($item['TOTAL']);
+            } else {
+                //SAIDA
+                $saida = mostraValor($item['TOTAL']);
+            }
+
+            //APLICANDO ESTILO NA COLUNA SALDO
+            if ($saldo < 0) {
+                $colunaSaldo = mostraValor($saldo);
+            }
+            else {
+                $colunaSaldo = mostraValor($saldo);
+            }
+
+            //Saldo conciliado
+            if ($item['CONCILIADO'] >= 1) {
+                $saldoConciliaco = mostraValor($saldo);
+
+            } else if ($item['CONCILIADO'] !== 0) {
+                $saldoConciliaco = "0,00";
+            }
+
+            //SITUAÇÃO
+            $situacao = $item['SITUACAO']; //$item['SituaNome'];
+            $situacaoClasse = 'badge badge-flat border-'.$item['COR'].' text-'.$item['COR'];
+            $chave = $item['CHAVE'];
+
+            if($chave == 'ARECEBER' || $chave == 'RECEBIDA') {
+                $colunaSituacao = '<a href="#" onclick="atualizaConciliacao('.$item['ID'].', \'ContaAReceber\');"><span class="badge  '.$situacaoClasse.'">'.$situacao.'</span></a>';    
+            }else if($chave == 'APAGAR' || $chave == 'PAGA') {
+                $colunaSituacao = '<a href="#" onclick="atualizaConciliacao('.$item['ID'].', \'ContaAPagar\');"><span class="badge  '.$situacaoClasse.'">'.$situacao.'</span></a>';
+            }else {
+                $colunaSituacao = '<a href="#" onclick="atualizaConciliacao('.$item['ID'].', \'Teste\');"><span class="badge  '.$situacaoClasse.'">'.$situacao.'</span></a>';
+            }
+
+            //CHECKBOX - CONCILIADO
+            $prod = $item['ID'].'#'.$item['TIPO'];
+            //BOTAO CONCILIADO
+            if ($item['CONCILIADO'] >= 1) {
+                $checkbox = "
+                    <input type='checkbox' id='".$prod."' <!--onchange='atualizarConciliado()-->' value='1' checked/>
+                ";
+            } else {
+                $checkbox = "
+                    <input type='checkbox' id='".$prod."' <!--onchange='atualizarConciliado()-->'  value='0' />
+                ";
+            }
+
+            $array = [
+                'data'=>[
+                    isset($data) ? $data : null, 
+                    isset($historico) ? $historico : null, 
+                    isset($numeroDocucmento) ? $numeroDocucmento : null, 
+                    isset($entrada) ? $entrada : null, 
+                    isset($saida) ? $saida : null, 
+                    isset($colunaSaldo) ? $colunaSaldo : null,
+                    isset($saldoConciliaco) ? $saldoConciliaco : null,
+                    isset($colunaSituacao) ? $colunaSituacao : null, 
+                    isset($checkbox) ? $checkbox : null
+                ],
+                'identify'=>[
+                    
+                ]
+            ];
+
+            array_push($arrayData,$array);
         }
+
+        print(json_encode($arrayData));
     }
 }
 

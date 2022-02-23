@@ -127,12 +127,16 @@ include('global_assets/php/conexao.php');
 
     if ($cont == 1) {
         $cont = 0;
-        print('<input type="hidden" id="elementosGrid" value="'.count($rowData).'">');
+        //print('<input type="hidden" id="elementosGrid" value="'.count($rowData).'">');
+
+        $arrayData = [];
         foreach ($rowData as $item) {
             $cont++;     
-
             $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Paga';
             $data = $_POST['statusTipo'] == 'APAGAR' ? mostraData($item['CnAPaDtVencimento']) : mostraData($item['CnAPaDtPagamento']);
+            
+            /*
+
             print('
             
             <tr>
@@ -165,7 +169,58 @@ include('global_assets/php/conexao.php');
                 </td>
             </tr>
             ');
+            */
+
+            $checkbox = '<input type="checkbox" id="check'.$cont.'"> <input type="hidden" value="'.$item["CnAPaId"].'">';
+            
+            $vencimento = '<p class="m-0">' . $data . '</p><input type="hidden" value="'.$item["CnAPaDtVencimento"].'">';
+
+            $descricao = '<a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\')">' . $item["CnAPaDescricao"] . '</a>';
+            
+            $favorecido = $item["ForneNome"];
+
+            $numDoc = $item["CnAPaNumDocumento"];
+
+            $valorTotal = mostraValor($item["CnAPaValorAPagar"]);
+
+            $status = $status;
+
+            $acoes = '
+                <div class="list-icons">
+                    <div class="list-icons list-icons-extended">
+                        <a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>
+                        <a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>
+                        <div class="dropdown">													
+                            <a href="#" class="list-icons-item" data-toggle="dropdown">
+                                <i class="icon-menu9"></i>
+                    
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a href="#" class="dropdown-item btnParcelar"  data-popup="tooltip" data-placement="bottom" title="Parcelar"><i class="icon-file-text2"></i> Parcelar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>';
+
+            $array = [
+                'data'=>[
+                    isset($checkbox) ? $checkbox : null, 
+                    isset($vencimento) ? $vencimento : null,
+                    isset($descricao) ? $descricao : null, 
+                    isset($favorecido) ? $favorecido : null, 
+                    isset($numDoc) ? $numDoc : null, 
+                    isset($valorTotal) ? $valorTotal : null, 
+                    isset($status) ? $status : null, 
+                    isset($acoes) ? $acoes : null
+                ],
+                'identify'=>[
+                    
+                ]
+            ];
+
+            array_push($arrayData,$array);
         }
+
+        print(json_encode($arrayData));
     }
 //}
 

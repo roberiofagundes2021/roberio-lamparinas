@@ -230,6 +230,7 @@ $dataFim = date("Y-m-d");
         tipoFiltro: tipoFiltro,
       };
 
+      /*
       $.post(
         url,
         inputsValues,
@@ -254,6 +255,61 @@ $dataFim = date("Y-m-d");
           }
         }
       );
+      */
+
+      $.ajax({
+          type: "POST",
+          url: url,
+          dataType: "json",
+          data: inputsValues,
+          success: function(resposta) {
+            //|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
+            let table 
+            table = $('#tblMovimentacaoFinanceira').DataTable()
+            table = $('#tblMovimentacaoFinanceira').DataTable().clear().draw()
+            //--|
+
+            table = $('#tblMovimentacaoFinanceira').DataTable()
+
+            let rowNode
+
+            resposta.forEach(item => {
+              rowNode = table.row.add(item.data).draw().node()
+
+              saldo = parseFloat(item.data[5].replace(",", "."));
+              saldoConciliado = parseFloat(item.data[6].replace(",", "."));
+
+              // adiciona os atributos nas tags <td>
+              $(rowNode).find('td').eq(3).attr('style', 'text-align: right; color: green;');
+              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: red;');
+              
+              if(saldo >= 0) {
+                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;');
+              }else {
+                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;');
+              }
+
+              if(saldoConciliado >= 0) {
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;');
+              }else {
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;');
+              }
+
+              $(rowNode).find('td').eq(8).attr('style', 'text-align: center;');
+            })
+          },
+          error: function(e) { 
+            table = $('#tblMovimentacaoFinanceira').DataTable()
+            table = $('#tblMovimentacaoFinanceira').DataTable().clear().draw()
+
+
+            let tabelaVazia = $(
+              '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+            )
+
+            $('tbody').html(tabelaVazia)
+          }
+        })
     }
 
     $('#submitPesquisar').on('click', (e) => {
@@ -499,12 +555,6 @@ $dataFim = date("Y-m-d");
               <div class="card-header">
                 <div class="header-elements-inline">
                   <h3 class="card-title">Conciliação das Movimentações Financeiras</h3>
-                  <div class="header-elements">
-                    <div class="list-icons">
-                      <a class="list-icons-item" data-action="collapse"></a>
-                      <a href="relatorioMovimentacao.php" class="list-icons-item" data-action="reload"></a>
-                    </div>
-                  </div>
                 </div>
                 <br>
                 <p>A relação abaixo faz referência às movimentações financeiras da empresa <?php echo($_SESSION['EmpreNomeFantasia']) ?></p>
@@ -539,7 +589,7 @@ $dataFim = date("Y-m-d");
                           <span class="input-group-prepend">
                             <span class="input-group-text"><i class="icon-calendar22"></i></span>
                           </span>
-                          <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" value="<?php 
+                          <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" min="1800-01-01" max="2100-12-12" value="<?php 
                                           if (isset($_SESSION['MovimentacaoFinanceiraConciliacaoPeriodoDe'])) {
                                             echo $_SESSION['MovimentacaoFinanceiraConciliacaoPeriodoDe'];
                                           }else 
@@ -556,7 +606,7 @@ $dataFim = date("Y-m-d");
                           <span class="input-group-prepend">
                             <span class="input-group-text"><i class="icon-calendar22"></i></span>
                           </span>
-                          <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php 
+                          <input type="date" id="inputAte" name="inputAte" class="form-control" min="1800-01-01" max="2100-12-12" value="<?php 
                                           if (isset($_SESSION['MovimentacaoFinanceiraConciliacaoAte'])) 
                                             echo $_SESSION['MovimentacaoFinanceiraConciliacaoAte'];
                                           else 
