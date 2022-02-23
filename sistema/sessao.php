@@ -106,7 +106,7 @@ if (array_key_exists('AditivoNovo', $_SESSION) and !in_array(basename($_SERVER['
 }
 
 $arquivosMovimentacaoFinanceira = array(
-	'movimentacaoFinanceira.php', 'movimentacaoFinanceiraFiltra.php', 'movimentacaoFinanceiraExclui.php', 'movimentacaoFinanceiraImprime.php', 'movimentacaoFinanceiraPagamento.php', 'movimentacaoFinanceiraRecebimento.php', 'movimentacaoFinanceiraTransferencia.php');
+	'movimentacaoFinanceira.php', 'movimentacaoFinanceiraFiltra.php', 'movimentacaoFinanceiraExclui.php', 'movimentacaoFinanceiraImprime.php', 'movimentacaoFinanceiraPagamento.php', 'movimentacaoFinanceiraRecebimento.php', 'movimentacaoFinanceiraTransferencia.php', 'resumoFinanceiroFiltra.php');
 
 if ((array_key_exists('MovFinancPeriodoDe', $_SESSION) || array_key_exists('MovFinancAte', $_SESSION) || array_key_exists('MovFinancContaBanco', $_SESSION) || array_key_exists('MovFinancPlanoContas', $_SESSION)|| array_key_exists('MovFinancCentroDeCustos', $_SESSION) || array_key_exists('MovFinancStatus', $_SESSION) || array_key_exists('MovFinancFormaPagamento', $_SESSION) || array_key_exists('MovFinancPermissionAtualiza', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoFinanceira)) {
 	
@@ -121,7 +121,7 @@ if ((array_key_exists('MovFinancPeriodoDe', $_SESSION) || array_key_exists('MovF
 }
 
 $arquivosMovimentacaoFinanceiraConciliacao = array(
-	'movimentacaoFinanceiraConciliacao.php', 'movimentacaoFinanceiraConciliacaoFiltra.php', 'movimentacaoFinanceiraExclui.php', 'movimentacaoFinanceiraImprime.php', 'movimentacaoFinanceiraPagamento.php', 'movimentacaoFinanceiraRecebimento.php', 'movimentacaoFinanceiraTransferencia.php');
+	'movimentacaoFinanceiraConciliacao.php', 'movimentacaoFinanceiraConciliacaoFiltra.php', 'movimentacaoFinanceiraExclui.php', 'movimentacaoFinanceiraImprime.php', 'movimentacaoFinanceiraPagamento.php', 'movimentacaoFinanceiraRecebimento.php', 'movimentacaoFinanceiraTransferencia.php', 'contasAPagarNovoLancamento.php', 'contasAReceberNovoLancamento.php', 'resumoFinanceiroFiltra.php');
 
 if ((array_key_exists('MovimentacaoFinanceiraConciliacaoPeriodoDe', $_SESSION) || array_key_exists('MovimentacaoFinanceiraConciliacaoAte', $_SESSION) || array_key_exists('MovimentacaoFinanceiraConciliacaoContaBanco', $_SESSION) || array_key_exists('MovimentacaoFinanceiraConciliacaoPlanoContas', $_SESSION)|| array_key_exists('MovimentacaoFinanceiraConciliacaoCentroDeCustos', $_SESSION) || array_key_exists('MovimentacaoFinanceiraConciliacaoStatus', $_SESSION) || array_key_exists('MovimentacaoFinanceiraConciliacaoFormaPagamento', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoFinanceiraConciliacao)) {
 	
@@ -139,7 +139,8 @@ $arquivosContasAPagar = array(
 	'contasAPagar.php', 'contasAPagarNovoLancamento.php',
 	'contasAPagarFiltra.php', 'contasAPagarExclui.php',
 	'contasAPagarPagamentoAgrupado.php',
-	'contasAPagarParcelamento.php'
+	'contasAPagarParcelamento.php',
+	'resumoFinanceiroFiltra.php'
 );
 
 if ((array_key_exists('ContPagPeriodoDe', $_SESSION) || array_key_exists('ContPagAte', $_SESSION) || array_key_exists('ContPagFornecedor', $_SESSION) || array_key_exists('ContPagPlanoContas', $_SESSION) || array_key_exists('ContPagStatus', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosContasAPagar)) {
@@ -155,7 +156,8 @@ $arquivosContasAReceber = array(
 	'contasAReceber.php', 'contasAReceberNovoLancamento.php',
 	'contasAReceberFiltra.php', 'contasAReceberExclui.php',
 	'contasAReceberPagamentoAgrupado.php',
-	'contasAReceberParcelamento.php'
+	'contasAReceberParcelamento.php',
+	'resumoFinanceiroFiltra.php'
 );
 
 if ((array_key_exists('ContRecPeriodoDe', $_SESSION)

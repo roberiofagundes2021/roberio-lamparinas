@@ -6,6 +6,11 @@ $_SESSION['PaginaAtual'] = 'Movimentação Liquidação';
 
 include('global_assets/php/conexao.php');
 
+// Caso o usuário dê um ENTER na URL, o sistema deve verificar e o POST existe, senão redireciona.
+if (!isset($_POST['inputMovimentacaoId'])){
+    irpara("movimentacao.php");
+}
+
 $inputMovimentacaoId = $_POST['inputMovimentacaoId'];
 $UnidadeId = $_SESSION['UnidadeId'];
 
@@ -347,11 +352,17 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                         <label for="inputNumeroNota">Nº Nota Fiscal</label>
                                                         <div class="input-group">
                                                             <input readOnly type="text" id="inputNumeroNota" name="inputNumeroNota" class="form-control" value="'.$Movimentacao['MovimNotaFiscal'].'">
-                                                            <span class="input-group-prepend" style="cursor: pointer;">
-                                                                <a href="global_assets/anexos/movimentacao/'.$rowNotaFiscal['MvAneArquivo'].'" target="_blank">
-                                                                    <span class="input-group-text" style="color: red;"><i class="icon-file-pdf"></i></span>
-                                                                </a>
-                                                            </span>
+                                                            <span class="input-group-prepend" style="cursor: pointer;">';
+                                                                
+                                                                if ($rowNotaFiscal['MvAneArquivo']){
+                                                                    echo '<a href="global_assets/anexos/movimentacao/'.$rowNotaFiscal['MvAneArquivo'].'" target="_blank" title="Abrir Nota Fiscal">
+                                                                            <span class="input-group-text" style="color: red;"><i class="icon-file-pdf"></i></span>
+                                                                          </a>';
+                                                                } else{
+                                                                    echo '<span class="input-group-text" style="color: red;"><i class="icon-file-pdf"></i></span>';
+                                                                }                                                               
+
+                                            echo            '</span>
                                                         </div>
                                                     </div>
                                                 </div>';
@@ -371,7 +382,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                     <div class="input-group">
                                                         <?php
                                                             $disabled = isset($MoviLiqui['MvLiqPlanoConta'])? 'disabled':'';
-                                                            echo "<input type='date' id='PeriodoDe' name='PeriodoDe' $disabled class='form-control'  value='".(isset($MoviLiqui['MvLiqData'])?$MoviLiqui['MvLiqData']:'')."'>";
+                                                            echo "<input type='date' id='inputPeriodoDe' name='inputPeriodoDe' $disabled class='form-control'  value='".(isset($MoviLiqui['MvLiqData'])?$MoviLiqui['MvLiqData']:'')."' required>";
                                                         ?>
                                                     </div>
                                                 </div>
@@ -385,7 +396,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                         $selectPlanCont = "<select id='cmbPlanoContaId' $disabled name='cmbPlanoContaId' class='form-control form-control-select2' required autofocus>
                                                                         <option value=''>Selecione</option>";
                                                         foreach($PlanoConta as $Plano){
-                                                            $selectPlanCont .= "<option $selected value='".$Plano['PlConId']."'>".$Plano['PlConNome']."</option>";
+                                                            $selectPlanCont .= "<option $selected value='".$Plano['PlConId']."'>".$Plano['PlConCodigo'] . ' - '.$Plano['PlConNome']."</option>";
                                                         }
                                                         $selectPlanCont .= "</select>";
                                                         echo $selectPlanCont;
@@ -414,7 +425,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                     <div class="row" style="width:100%;">
                                         
                                         <?php
-                                            echo !isset($MoviLiqui['MvLiqId'])? "<div>
+                                            echo !isset($MoviLiqui['MvLiqId']) && $_SESSION['PerfiChave'] == 'CONTABILIDADE' ? "<div>
                                             <button id='submitForm' class='btn btn-principal'>Liquidar</button></div>":''
                                         ?>
 
