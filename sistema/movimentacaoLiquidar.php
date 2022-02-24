@@ -16,8 +16,9 @@ $UnidadeId = $_SESSION['UnidadeId'];
 
 // pesquisa a movimentação
 $sqlMovimentacao = "SELECT MovimId, MovimNumRecibo, MovimData, MovimValorTotal, MovimNotaFiscal,
-                    MovimDataEmissao, MovimNumSerie, SituaChave
+                    MovimDataEmissao, MovimNumSerie, SituaChave, MvLiqData
                     FROM  Movimentacao
+                    JOIN MovimentacaoLiquidacao ON MvLiqMovimentacao = MovimId
                     JOIN Situacao on SituaId = MovimSituacao
                     WHERE MovimUnidade = $UnidadeId and MovimId = $inputMovimentacaoId";
 $resultMovimentacao = $conn->query($sqlMovimentacao);
@@ -425,8 +426,8 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                     <div class="row" style="width:100%;">
                                         
                                         <?php
-                                            echo !isset($MoviLiqui['MvLiqId']) && $_SESSION['PerfiChave'] == 'CONTABILIDADE' ? "<div>
-                                            <button id='submitForm' class='btn btn-principal'>Liquidar</button></div>":''
+                                            echo !isset($MoviLiqui['MvLiqId']) && ($_SESSION['PerfiChave'] == 'CONTABILIDADE' || $_SESSION['PerfiChave'] == 'SUPER') ?
+                                            "<div><button id='submitForm' class='btn btn-principal'>Liquidar</button></div>":''
                                         ?>
 
                                         <div>
@@ -436,7 +437,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                             if(isset($MoviLiqui['MvLiqId'])){
                                                 echo "<div style='text-align: right; position:absolute; right:10px; margin-top:10px'>
                                                         <p style='color: red; margin-right: 20px'><i class='icon-info3'></i>
-                                                        Liquidado pelo usuário $MoviLiqui[UsuarNome] na data ".mostraData($Movimentacao['MovimDataEmissao']).
+                                                        Liquidado pelo usuário $MoviLiqui[UsuarNome] na data ".mostraData($Movimentacao['MvLiqData']).
                                                         "</p>
                                                     </div>";
                                             }

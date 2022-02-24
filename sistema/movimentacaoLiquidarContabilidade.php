@@ -38,13 +38,16 @@ try{
         for($x=0; $x < $registros; $x++){
             $keyNome = 'inputCentroNome-'.$x;
             $keyId = 'inputIdCentro-'.$x;
-            $valor = str_replace(',', '.', $_POST['inputCentroValor-'.$x]);
+            $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+            $valor = str_replace(',', '.', $valor);
 
             if(isset($_POST[$keyNome])){
-                $sqlMovimentacaoXCentro .= "('$newMovimentacaoId', ".$_POST[$keyId].", '$UsuarId', ".$valor.", '$UnidadeId'),";
+                $sqlMovimentacaoXCentro .= "($newMovimentacaoId, $_POST[$keyId], $UsuarId, $valor, $UnidadeId),";
             }
         }
         $sqlMovimentacaoXCentro = substr($sqlMovimentacaoXCentro,0,-1);
+        // var_dump($sqlMovimentacaoXCentro);
+        // exit;
         $conn->query($sqlMovimentacaoXCentro);
         $sqlMovimentacaoXCentro = $conn->lastInsertId();
         
@@ -142,7 +145,9 @@ try{
         for($x=0; $x < $registros; $x++){
             $keyNome = 'inputCentroNome-'.$x;
             $keyId = 'inputIdCentro-'.$x;
-            $valor = str_replace(',', '.', $_POST['inputCentroValor-'.$x]);
+
+            $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+            $valor = str_replace(',', '.', $valor);
 
             if(isset($_POST[$keyNome])){
                 $sqlContasAPagar .= "('$newContasAPagarId', ".$_POST[$keyId].", '$UsuarId', ".$valor.", '$UnidadeId')";
