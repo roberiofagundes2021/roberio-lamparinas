@@ -72,6 +72,7 @@ $dataFim = date("Y-m-d");
       ],
       autoWidth: false,
       responsive: true,
+      paginate: false,
       columnDefs: [{
           orderable: true, //Data
           width: "10%",
@@ -272,6 +273,14 @@ $dataFim = date("Y-m-d");
             table = $('#tblMovimentacaoFinanceira').DataTable()
 
             let rowNode
+            let entrada = 0
+            let entradaTotal = 0
+            let saida = 0
+            let saidaTotal = 0
+            let saldo = 0
+            let saldoTotal = 0
+            let saldoConciliacao = 0
+            let saldoConciliacaoTotal = 0
 
             resposta.forEach(item => {
               rowNode = table.row.add(item.data).draw().node()
@@ -296,7 +305,49 @@ $dataFim = date("Y-m-d");
               }
 
               $(rowNode).find('td').eq(8).attr('style', 'text-align: center;');
+
+              entrada = item.data[3].replace(",", ".")
+              entradaTotal += parseFloat(entrada)
+
+              saida = (item.data[4] != null) ? item.data[4] : '0,00'
+              saida = saida.replace(",", ".")
+              saidaTotal += parseFloat(saida)
+
+              saldo = item.data[5].replace(",", ".")
+              saldoTotal += parseFloat(saldo)
+
+              saldoConciliacao = item.data[6].replace(",", ".")
+              saldoConciliacaoTotal += parseFloat(saldoConciliacao)
             })
+
+            saidaTotal = (saidaTotal > 0) ? -Math.abs(saidaTotal) : saidaTotal
+            corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
+            corConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? 'green' : 'red'
+
+            divTotal = `
+              <div id='footer-total' style='position:absolute; right: 20%; font-weight: bold; width: 38%; margin-top: 0.5%; font-size: 12px;'>
+                <div class='row'>
+                  <div class="col-md-3" style="color: green;">
+                    Total: ${float2moeda(entradaTotal)}
+                  </div>
+
+                  <div class="col-md-3" style="color: red;">
+                    Total: ${float2moeda(saidaTotal)}
+                  </div>
+
+                  <div class="col-md-3" style="color: ${corSaldoTotal};">
+                    Total: ${float2moeda(saldoTotal)}
+                  </div>
+
+                  <div class="col-md-3" style="color: ${corConciliacaoTotal};">
+                    Total: ${float2moeda(saldoConciliacaoTotal)}
+                  </div>
+                </div>
+              </div>`                    
+
+            $('#footer-total').remove(); //Para evitar que os valores se sobrescrevam
+            
+            $('.datatable-footer').append(divTotal)
           },
           error: function(e) { 
             table = $('#tblMovimentacaoFinanceira').DataTable()
@@ -308,6 +359,8 @@ $dataFim = date("Y-m-d");
             )
 
             $('tbody').html(tabelaVazia)
+
+            $('#footer-total').remove()
           }
         })
     }
@@ -391,6 +444,7 @@ $dataFim = date("Y-m-d");
     const custom = event.target.id.split('#');
     custom.push(event.target.value == 1 ? 0 : 1);
 
+    /*
     function atualizaTotal() {
       let childres = $('tbody').children();
       let totalEntrada = 0;
@@ -454,6 +508,7 @@ $dataFim = date("Y-m-d");
       $('.datatable-footer').append(divTotalSaldo);
       $('.datatable-footer').append(divTotalSaldoConciliado);
     }
+    */
 
 
     function Filtrar(carregamentoPagina) {

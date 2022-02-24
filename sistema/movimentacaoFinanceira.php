@@ -74,6 +74,7 @@ $dataFim = date("Y-m-d");
         ],
         autoWidth: false,
         responsive: true,
+        paginate: false,
         columnDefs: [{
             orderable: true, //Data
             width: "10%",
@@ -219,6 +220,12 @@ $dataFim = date("Y-m-d");
             table = $('#tblMovimentacaoFinanceira').DataTable()
 
             let rowNode
+            let entrada = 0
+            let entradaTotal = 0
+            let saida = 0
+            let saidaTotal = 0
+            let saldo = 0
+            let saldoTotal = 0
 
             resposta.forEach(item => {
               rowNode = table.row.add(item.data).draw().node()
@@ -234,17 +241,49 @@ $dataFim = date("Y-m-d");
               }else {
                 $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;');
               }
+
+              entrada = item.data[4].replace(",", ".")
+              entradaTotal += parseFloat(entrada)
+
+              saida = (item.data[5] != null) ? item.data[5] : '0,00'
+              saida = saida.replace(",", ".")
+              saidaTotal += parseFloat(saida)
+
+              saldo = item.data[6].replace(",", ".")
+              saldoTotal += parseFloat(saldo)
             })
+
+            saldoTotal = (saldoTotal < 0) ? 0.00 : saldoTotal
+
+            divTotal = `
+              <div id='footer-total' style='position:absolute; right: 6%; font-weight: bold; width: 29%; margin-top: 0.5%; font-size: 12px;'>
+                <div class='row'>
+                  <div class="col-md-4" style="color: green;">
+                    Total: ${float2moeda(entradaTotal)}
+                  </div>
+
+                  <div class="col-md-4" style="color: red;">
+                    Total: -${float2moeda(saidaTotal)}
+                  </div>
+
+                  <div class="col-md-4" style="color: green;">
+                    Total: ${float2moeda(saldoTotal)}
+                  </div>
+                </div>
+              </div>`                    
+
+            $('#footer-total').remove(); //Para evitar que os valores se sobrescrevam
+            
+            $('.datatable-footer').append(divTotal)
           },
           error: function(e) { 
-            table = $('#tblMovimentacaoFinanceira').DataTable()
-            table = $('#tblMovimentacaoFinanceira').DataTable().clear().draw()
-
             let tabelaVazia = $(
               '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
             )
 
             $('tbody').html(tabelaVazia)
+
+            $('#footer-total').remove()
           }
         })
 
