@@ -74,6 +74,7 @@ $dataFim = date("Y-m-d");
         ],
         autoWidth: false,
         responsive: true,
+        paginate: false,
         columnDefs: [{
             orderable: true, //Data
             width: "10%",
@@ -145,7 +146,7 @@ $dataFim = date("Y-m-d");
         })
 
       }
-      excluirConta(); */
+      excluirConta(); 
       function atualizaTotal() {
         let childres = $('tbody').children()
         let total = 0
@@ -167,6 +168,7 @@ $dataFim = date("Y-m-d");
 
         $('.datatable-footer').append(divTotal);
       }
+      */
 
       function Filtrar(carregamentoPagina) {
         let cont = false;
@@ -203,24 +205,85 @@ $dataFim = date("Y-m-d");
           permissionExclui: inputPermissionExclui
         }; 
 
-        //Esse ajax está sendo usado para verificar no banco se o registro já existe
         $.ajax({
           type: "POST",
           url: url,
           dataType: "json",
           data: inputsValues,
-          destroy: true,
           success: function(resposta) {
-            console.log(resposta)
-
+            //|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
             let table 
+            table = $('#tblMovimentacaoFinanceira').DataTable()
+            table = $('#tblMovimentacaoFinanceira').DataTable().clear().draw()
+            //--|
+            
             table = $('#tblMovimentacaoFinanceira').DataTable()
 
             let rowNode
+            let entrada = 0
+            let entradaTotal = 0
+            let saida = 0
+            let saidaTotal = 0
+            let saldo = 0
+            let saldoTotal = 0
 
             resposta.forEach(item => {
               rowNode = table.row.add(item.data).draw().node()
+
+              saldo = parseFloat(item.data[6].replace(",", "."));
+              
+              // adiciona os atributos nas tags <td>
+              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: green;');
+              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;');
+
+              if(saldo >= 0) {
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;');
+              }else {
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;');
+              }
+
+              entrada = item.data[4].replace(",", ".")
+              entradaTotal += parseFloat(entrada)
+
+              saida = (item.data[5] != null) ? item.data[5] : '0,00'
+              saida = saida.replace(",", ".")
+              saidaTotal += parseFloat(saida)
+
+              saldo = item.data[6].replace(",", ".")
+              saldoTotal += parseFloat(saldo)
             })
+
+            corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
+
+            divTotal = `
+              <div id='footer-total' style='position:absolute; right: 6%; font-weight: bold; width: 29%; margin-top: 0.5%; font-size: 12px;'>
+                <div class='row'>
+                  <div class="col-md-4" style="color: green;">
+                    Total: ${float2moeda(entradaTotal)}
+                  </div>
+
+                  <div class="col-md-4" style="color: red;">
+                    Total: -${float2moeda(saidaTotal)}
+                  </div>
+
+                  <div class="col-md-4" style="color: ${corSaldoTotal};">
+                    Total: ${float2moeda(saldoTotal)}
+                  </div>
+                </div>
+              </div>`                    
+
+            $('#footer-total').remove(); //Para evitar que os valores se sobrescrevam
+            
+            $('.datatable-footer').append(divTotal)
+          },
+          error: function(e) { 
+            let tabelaVazia = $(
+              '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+            )
+
+            $('tbody').html(tabelaVazia)
+
+            $('#footer-total').remove()
           }
         })
 
@@ -257,12 +320,6 @@ $dataFim = date("Y-m-d");
       })
 
       Filtrar(true);
-
-      //Para a tabela não fica em carregamento infinito quando a tela é carregada
-      let tabelaVazia = $(
-        '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-      )
-      $('tbody').html(tabelaVazia)
 
      /* $('#novoLacamento').on('click', (e) => {
         location.href = "movimentacaoFinanceiraPagamento.php";
@@ -414,7 +471,7 @@ $dataFim = date("Y-m-d");
                           <span class="input-group-prepend">
                             <span class="input-group-text"><i class="icon-calendar22"></i></span>
                           </span>
-                          <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control" value="<?php 
+                          <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" class="form-control"  min="1800-01-01" max="2100-12-12" value="<?php 
                           if (isset($_SESSION['MovFinancPeriodoDe'])) {
                             echo $_SESSION['MovFinancPeriodoDe'];
                           }else 
@@ -431,7 +488,7 @@ $dataFim = date("Y-m-d");
                           <span class="input-group-prepend">
                             <span class="input-group-text"><i class="icon-calendar22"></i></span>
                           </span>
-                          <input type="date" id="inputAte" name="inputAte" class="form-control" value="<?php 
+                          <input type="date" id="inputAte" name="inputAte" class="form-control" min="1800-01-01" max="2100-12-12" value="<?php 
                             if (isset($_SESSION['MovFinancAte'])) 
                               echo $_SESSION['MovFinancAte'];
                             else 

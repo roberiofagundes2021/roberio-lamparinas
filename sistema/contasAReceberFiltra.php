@@ -136,12 +136,15 @@ include('global_assets/php/conexao.php');
 
     if ($cont == 1) {
         $cont = 0;
-        print('<input type="hidden" id="elementosGrid" value="' . count($rowData) . '">');
+        //print('<input type="hidden" id="elementosGrid" value="' . count($rowData) . '">');
+
+        $arrayData = [];
         foreach ($rowData as $item) {
             $cont++;
 
             $status = $item['CnAReStatus'] == 13 ? 'À Receber' : 'Recebida';
             $data = $_POST['statusTipo'] == 'ARECEBER' ? mostraData($item['CnAReDtVencimento']) : mostraData($item['CnAReDtRecebimento']);
+            /*
             print('
             
             <tr>
@@ -175,7 +178,59 @@ include('global_assets/php/conexao.php');
                 </td>
             </tr>
             ');
+            */
+
+            $checkbox = '<input type="checkbox" id="check'.$cont.'"> <input type="hidden" value="'.$item["CnAReId"].'">';
+            
+            $vencimento = '<p class="m-0">' . $data . '</p><input type="hidden" value="'.$item["CnAReDtVencimento"].'">';
+
+            $descricao = '<a href=#" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'edita\')">' . $item["CnAReDescricao"] . '</a>';
+            
+            $cliente = $item["ClienNome"];
+
+            $numDoc = $item["CnAReNumDocumento"];
+
+            $valorTotal = mostraValor($item["CnAReValorAReceber"]);
+
+            $status = $status;
+
+            $acoes = '
+                    <div class="list-icons list-icons-extended">
+                        <a href="#" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>
+                        <a href="#" onclick="atualizaContasAReceber('.$_POST['permissionExclui'].','.$item["CnAReId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>
+                            <div class="dropdown">													
+                                <a href="#" class="list-icons-item" data-toggle="dropdown">
+                                    <i class="icon-menu9"></i>
+                        
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a href="#" class="dropdown-item btnParcelar"  data-popup="tooltip" data-placement="bottom" title="Parcelar"><i class="icon-file-text2"></i> Parcelar</a>
+                                    <a href="#" class="dropdown-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Produto"><i class="icon-file-empty"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                
+                    </div>';
+
+            $array = [
+                'data'=>[
+                    isset($checkbox) ? $checkbox : null, 
+                    isset($vencimento) ? $vencimento : null,
+                    isset($descricao) ? $descricao : null, 
+                    isset($cliente) ? $cliente : null, 
+                    isset($numDoc) ? $numDoc : null, 
+                    isset($valorTotal) ? $valorTotal : null, 
+                    isset($status) ? $status : null, 
+                    isset($acoes) ? $acoes : null
+                ],
+                'identify'=>[
+                    
+                ]
+            ];
+
+            array_push($arrayData,$array);
         }
+
+        print(json_encode($arrayData));
     }
 //}
 

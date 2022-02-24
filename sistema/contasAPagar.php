@@ -66,6 +66,7 @@ $dataFim = date("Y-m-d");
                 ],
                 autoWidth: false,
                 responsive: true,
+                paginate: false,
                 columnDefs: [{
                         orderable: false, //selecionar
                         width: "5%",
@@ -73,12 +74,12 @@ $dataFim = date("Y-m-d");
                     },
                     {
                         orderable: true, //Vencimento
-                        width: "10%",
+                        width: "7%",
                         targets: [1]
                     },
                     {
                         orderable: true, //Descrição
-                        width: "25%",
+                        width: "22%",
                         targets: [2]
                     },
                     {
@@ -88,7 +89,7 @@ $dataFim = date("Y-m-d");
                     },
                     {
                         orderable: true, //Número Doc.
-                        width: "12%",
+                        width: "15%",
                         targets: [4]
                     },
                     {
@@ -98,12 +99,12 @@ $dataFim = date("Y-m-d");
                     },
                     {
                         orderable: true, //Status
-                        width: "5%",
+                        width: "9%",
                         targets: [6]
                     },
                     {
-                        orderable: true, //Ações
-                        width: "5%",
+                        orderable: false, //Ações
+                        width: "4%",
                         targets: [7]
                     }
                 ],
@@ -345,11 +346,9 @@ $dataFim = date("Y-m-d");
                 })
             }
 
-            function pagamentoAgrupado() {
+            function pagamentoAgrupado(contadorLinha) {
 
-                let numLinhas = $("#elementosGrid").val()
-
-                for (let i = 1; i <= numLinhas; i++) {
+                for (let i = 1; i <= contadorLinha; i++) {
 
                     let id = $(`#check${i}`).parent().children().last().val();
                     let elementosLista = $(`#check${i}`).parent().parent().children()
@@ -634,6 +633,7 @@ $dataFim = date("Y-m-d");
                     permissionExclui: inputPermissionExclui
                 };
 
+                /*
                 $.post(
                     url,
                     inputsValues,
@@ -660,6 +660,60 @@ $dataFim = date("Y-m-d");
                         }
                     }
                 );
+                */
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+                    data: inputsValues,
+                    success: function(resposta) {
+                        //|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
+                        let table 
+                        table = $('#tblMovimentacao').DataTable()
+                        table = $('#tblMovimentacao').DataTable().clear().draw()
+                        //--|
+
+                        table = $('#tblMovimentacao').DataTable()
+
+                        let rowNode
+
+                        let contador = 0
+                        let valor = 0
+                        let valorTotal = 0
+
+                        resposta.forEach(item => {
+                            rowNode = table.row.add(item.data).draw().node()
+                                
+                            // adiciona os atributos nas tags <td>
+                            $(rowNode).find('td').eq(1).attr('style', 'text-align: center;');
+                            $(rowNode).find('td').eq(4).attr('style', 'text-align: center;');
+                            $(rowNode).find('td').eq(5).attr('style', 'text-align: right;');
+                            $(rowNode).find('td').eq(6).attr('style', 'text-align: center;');
+
+                            contador++
+                            valor = item.data[5].replace(",", ".");
+                            valorTotal += parseFloat(valor)
+                        })
+
+                        pagamentoAgrupado(contador)
+
+                        divTotal = `<div id='footer-total' style='position:absolute; right: 12.5%; font-weight: bold; width: 200px;'>Total: ${float2moeda(valorTotal)}</div>`                    
+            
+                        $('#footer-total').remove(); //Para evitar que os valores se sobrescrevam
+                        
+                        $('.datatable-footer').append(divTotal)
+                    },
+                    error: function(e) {
+                        let tabelaVazia = $(
+                            '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+                        )
+
+                        $('tbody').html(tabelaVazia)
+                        
+                        $('#footer-total').remove()
+                    }
+                })
             }
 
             $('#submitFiltro').on('click', (e) => {
@@ -748,7 +802,7 @@ $dataFim = date("Y-m-d");
                                                         <span class="input-group-text"><i
                                                                 class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputPeriodoDe" name="inputPeriodoDe"
+                                                    <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" min="1800-01-01" max="2100-12-12"
                                                         class="form-control" value="<?php if(isset($_SESSION['ContPagPeriodoDe'])) echo $_SESSION['ContPagPeriodoDe'];  else echo $dataInicio; ?>">
                                                 </div>
                                             </div>
@@ -762,7 +816,7 @@ $dataFim = date("Y-m-d");
                                                         <span class="input-group-text"><i
                                                                 class="icon-calendar22"></i></span>
                                                     </span>
-                                                    <input type="date" id="inputAte" name="inputAte"
+                                                    <input type="date" id="inputAte" name="inputAte" min="1800-01-01" max="2100-12-12"
                                                         class="form-control" value="<?php if(isset($_SESSION['ContPagAte'])) echo $_SESSION['ContPagAte'];  else echo $dataFim; ?>">
                                                 </div>
                                             </div>
@@ -895,7 +949,7 @@ $dataFim = date("Y-m-d");
                                             <th>Número Doc.</th>
                                             <th>Valor Total</th>
                                             <th>Status</th>
-                                            <th>Ações</th>
+                                            <th style="text-align: center;">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
