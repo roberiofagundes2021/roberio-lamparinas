@@ -253,7 +253,7 @@ $dataFim = date("Y-m-d");
               saldoTotal += parseFloat(saldo)
             })
 
-            saldoTotal = (saldoTotal < 0) ? 0.00 : saldoTotal
+            corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
 
             divTotal = `
               <div id='footer-total' style='position:absolute; right: 6%; font-weight: bold; width: 29%; margin-top: 0.5%; font-size: 12px;'>
@@ -266,7 +266,7 @@ $dataFim = date("Y-m-d");
                     Total: -${float2moeda(saidaTotal)}
                   </div>
 
-                  <div class="col-md-4" style="color: green;">
+                  <div class="col-md-4" style="color: ${corSaldoTotal};">
                     Total: ${float2moeda(saldoTotal)}
                   </div>
                 </div>
