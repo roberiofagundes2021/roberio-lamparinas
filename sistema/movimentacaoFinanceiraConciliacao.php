@@ -285,38 +285,42 @@ $dataFim = date("Y-m-d");
             resposta.forEach(item => {
               rowNode = table.row.add(item.data).draw().node()
 
-              saldo = parseFloat(item.data[5].replace(",", "."));
-              saldoConciliado = parseFloat(item.data[6].replace(",", "."));
+              saldo = parseFloat(item.data[5].replace(",", "."))
+              saldoConciliado = parseFloat(item.data[6].replace(",", "."))
 
               // adiciona os atributos nas tags <td>
-              $(rowNode).find('td').eq(3).attr('style', 'text-align: right; color: green;');
-              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: red;');
+              $(rowNode).find('td').eq(3).attr('style', 'text-align: right; color: green;')
+              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: red;')
               
               if(saldo >= 0) {
-                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;');
+                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;')
               }else {
-                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;');
+                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;')
               }
 
               if(saldoConciliado >= 0) {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;');
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;')
               }else {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;');
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;')
               }
 
-              $(rowNode).find('td').eq(8).attr('style', 'text-align: center;');
+              $(rowNode).find('td').eq(8).attr('style', 'text-align: center;')
 
-              entrada = item.data[3].replace(",", ".")
+              entrada = item.data[3].replace(".", "")
+              entrada = entrada.replace(",", ".")
               entradaTotal += parseFloat(entrada)
 
               saida = (item.data[4] != null) ? item.data[4] : '0,00'
+              saida = saida.replace(".", "")
               saida = saida.replace(",", ".")
               saidaTotal += parseFloat(saida)
 
-              saldo = item.data[5].replace(",", ".")
+              saldo = item.data[5].replace(".", "")
+              saldo = saldo.replace(",", ".")
               saldoTotal += parseFloat(saldo)
 
-              saldoConciliacao = item.data[6].replace(",", ".")
+              saldoConciliacao = item.data[6].replace(".", "")
+              saldoConciliacao = saldoConciliacao.replace(",", ".")
               saldoConciliacaoTotal += parseFloat(saldoConciliacao)
             })
 
@@ -345,7 +349,7 @@ $dataFim = date("Y-m-d");
                 </div>
               </div>`                    
 
-            $('#footer-total').remove(); //Para evitar que os valores se sobrescrevam
+            $('#footer-total').remove() //Para evitar que os valores se sobrescrevam
             
             $('.datatable-footer').append(divTotal)
           },

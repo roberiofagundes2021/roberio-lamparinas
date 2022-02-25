@@ -233,23 +233,26 @@ $dataFim = date("Y-m-d");
               saldo = parseFloat(item.data[6].replace(",", "."));
               
               // adiciona os atributos nas tags <td>
-              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: green;');
-              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;');
+              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: green;')
+              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;')
 
               if(saldo >= 0) {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;');
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;')
               }else {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;');
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;')
               }
 
-              entrada = item.data[4].replace(",", ".")
+              entrada = item.data[4].replace(".", "")
+              entrada = entrada.replace(",", ".")
               entradaTotal += parseFloat(entrada)
 
               saida = (item.data[5] != null) ? item.data[5] : '0,00'
+              saida = saida.replace(".", "")
               saida = saida.replace(",", ".")
               saidaTotal += parseFloat(saida)
 
-              saldo = item.data[6].replace(",", ".")
+              saldo = item.data[6].replace(".", "")
+              saldo = saldo.replace(",", ".")
               saldoTotal += parseFloat(saldo)
             })
 
@@ -272,7 +275,7 @@ $dataFim = date("Y-m-d");
                 </div>
               </div>`                    
 
-            $('#footer-total').remove(); //Para evitar que os valores se sobrescrevam
+            $('#footer-total').remove() //Para evitar que os valores se sobrescrevam
             
             $('.datatable-footer').append(divTotal)
           },

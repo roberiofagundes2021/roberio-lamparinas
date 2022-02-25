@@ -450,21 +450,22 @@ $dataFim = date("Y-m-d");
                             rowNode = table.row.add(item.data).draw().node()
 
                             // adiciona os atributos nas tags <td>
-                            $(rowNode).find('td').eq(1).attr('style', 'text-align: center;');
-                            $(rowNode).find('td').eq(4).attr('style', 'text-align: center;');
-                            $(rowNode).find('td').eq(5).attr('style', 'text-align: right;');
-                            $(rowNode).find('td').eq(6).attr('style', 'text-align: center;');
+                            $(rowNode).find('td').eq(1).attr('style', 'text-align: center;')
+                            $(rowNode).find('td').eq(4).attr('style', 'text-align: center;')
+                            $(rowNode).find('td').eq(5).attr('style', 'text-align: right;')
+                            $(rowNode).find('td').eq(6).attr('style', 'text-align: center;')
 
                             contador++
-                            valor = item.data[5].replace(",", ".");
+                            valor = item.data[5].replace(".", "")
+                            valor = valor.replace(",", ".")
                             valorTotal += parseFloat(valor)
                         })
 
                         //pagamentoAgrupado(contador)
 
-                        divTotal = `<div id='footer-total' style='position:absolute; right: 12.5%; font-weight: bold; width: 200px;'>Total: ${float2moeda(valorTotal)}</div>`                    
+                        divTotal = `<div id='footer-total' style='position:absolute; right: 9.5%; font-weight: bold; width: 200px;'>Total: ${float2moeda(valorTotal)}</div>`                    
             
-                        $('#footer-total').remove(); //Para evitar que os valores se sobrescrevam
+                        $('#footer-total').remove() //Para evitar que os valores se sobrescrevam
                         
                         $('.datatable-footer').append(divTotal)
                     },
