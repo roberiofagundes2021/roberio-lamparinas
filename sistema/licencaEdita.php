@@ -23,7 +23,13 @@ if(isset($_POST['inputLicencaId'])){
 				WHERE LicenEmpresa = ".$_SESSION['EmpresaId']." and LicenDtFim < (select max(LicenDtFim) from Licenca where LicenEmpresa = ".$_SESSION['EmpresaId'].")
 				ORDER BY LicenDtFim DESC"; 
 		$result = $conn->query($sql);
-		$rowUltimaLicenca = $result->fetch(PDO::FETCH_ASSOC);		
+		$rowUltimaLicenca = $result->fetch(PDO::FETCH_ASSOC);	
+		
+		$dtUltimaLicenca = 0;
+
+		if (isset($rowUltimaLicenca['LicenDtFim'])){
+			$dtUltimaLicenca = $rowUltimaLicenca['LicenDtFim'];
+		}		
 		
 	} catch(PDOException $e) {
 		echo 'Error: ' . $e->getMessage();
@@ -110,7 +116,7 @@ if(isset($_POST['inputDataInicio'])){
 				}
 
 				//Aqui falta verificar se a licença com data maior e ativa é menor que a data início (TEM QUE SER)
-				if (inputUltimaData > inputDataInicio) {
+				if (inputUltimaData != 0 && inputUltimaData > inputDataInicio) {
 					alerta('Atenção', 'A Data Início deve ser maior que a data fim da última licença!', 'error');
 					$('#inputDataInicio').focus();
 					return false;
@@ -161,7 +167,7 @@ if(isset($_POST['inputDataInicio'])){
 						</div>
 						
 						<input type="hidden" id="inputLicencaId" name="inputLicencaId" value="<?php echo $row['LicenId']; ?>" >
-						<input type="hidden" id="inputUltimaData" name="inputUltimaData" class="form-control" value="<?php echo $rowUltimaLicenca['LicenDtFim']; ?>">
+						<input type="hidden" id="inputUltimaData" name="inputUltimaData" class="form-control" value="<?php echo $dtUltimaLicenca; ?>">
 						
 						<div class="card-body">			
 							<div class="row">
