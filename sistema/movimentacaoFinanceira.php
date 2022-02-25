@@ -259,19 +259,17 @@ $dataFim = date("Y-m-d");
             corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
 
             divTotal = `
-              <div id='footer-total' style='position:absolute; right: 6%; font-weight: bold; width: 29%; margin-top: 0.5%; font-size: 12px;'>
-                <div class='row'>
-                  <div class="col-md-4" style="color: green;">
-                    Total: ${float2moeda(entradaTotal)}
-                  </div>
+              <div id='footer-total' class='row' style='position:absolute; text-align: right; font-weight: bold; width: 100%; margin-top: 0.9%; font-size: 10px;'>
+                <div style="width: 71.5%; color: green;">
+                  Total: ${float2moeda(entradaTotal)}
+                </div>
 
-                  <div class="col-md-4" style="color: red;">
-                    Total: -${float2moeda(saidaTotal)}
-                  </div>
+                <div style="width: 9.5%; color: red;">
+                  Total: -${float2moeda(saidaTotal)}
+                </div>
 
-                  <div class="col-md-4" style="color: ${corSaldoTotal};">
-                    Total: ${float2moeda(saldoTotal)}
-                  </div>
+                <div style="width: 9.5%; color: ${corSaldoTotal};">
+                  Total: ${float2moeda(saldoTotal)}
                 </div>
               </div>`                    
 

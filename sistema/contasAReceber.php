@@ -463,7 +463,7 @@ $dataFim = date("Y-m-d");
 
                         //pagamentoAgrupado(contador)
 
-                        divTotal = `<div id='footer-total' style='position:absolute; right: 9.5%; font-weight: bold; width: 200px;'>Total: ${float2moeda(valorTotal)}</div>`                    
+                        divTotal = `<div id='footer-total' style='position:absolute; padding-right: 21.2%; text-align: right; font-weight: bold; width: 100%;'>Total: ${float2moeda(valorTotal)}</div>`                    
             
                         $('#footer-total').remove() //Para evitar que os valores se sobrescrevam
                         
