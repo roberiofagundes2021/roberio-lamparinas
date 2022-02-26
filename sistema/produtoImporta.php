@@ -161,13 +161,11 @@ else {
 				
 				$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduCategoria, ProduSubCategoria, ProduDetalhamento, ProduFoto, 
 											ProduValorCusto, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
-											ProduEstoqueMinimo, ProduMarca, ProduModelo, ProduFabricante, ProduUnidadeMedida, 
-											ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, ProduStatus, 
-											ProduUsuarioAtualizador, ProduUnidade) 
+											ProduEstoqueMinimo, ProduUnidadeMedida, ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, 
+											ProduStatus, ProduUsuarioAtualizador, ProduUnidade) 
 						VALUES (:sCodigo, :sCodigoBarras, :sNome, :iCategoria, :iSubCategoria, :sDetalhamento, :sFoto, :fValorCusto, 
-								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iMarca, :iModelo,
-								:iFabricante, :iUnidadeMedida, :iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, 
-								:iUsuarioAtualizador, :iUnidade);";
+								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iUnidadeMedida, :iTipoFiscal, 
+								:iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, :iUsuarioAtualizador, :iUnidade);";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
@@ -184,9 +182,6 @@ else {
 								':fMargemLucro' => null,
 								':fValorVenda' => null,
 								':iEstoqueMinimo' => null,
-								':iMarca' => null,
-								':iModelo' => null,
-								':iFabricante' => null,
 								':iUnidadeMedida' => $rowUnidadeMedida['UnMedId'],
 								':iTipoFiscal' => null,
 								':iNcmFiscal' => null,

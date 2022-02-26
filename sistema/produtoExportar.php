@@ -8,14 +8,10 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT ProduCodigo, ProduCodigoBarras, ProduNome, CategNome, SbCatNome, ProduDetalhamento,
 		ProduValorCusto, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda,
-		ProduEstoqueMinimo, MarcaNome, ModelNome, FabriNome, UnMedNome, TpFisNome,
-		NcmNome, OrFisNome, ProduCest, SituaNome
+		ProduEstoqueMinimo, UnMedNome, TpFisNome, NcmNome, OrFisNome, ProduCest, SituaNome
 		FROM Produto
 		LEFT JOIN Categoria on CategId = ProduCategoria
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-		LEFT JOIN Marca on MarcaId = ProduMarca
-		LEFT JOIN Modelo on ModelId = ProduModelo
-		LEFT JOIN Fabricante on FabriId = ProduFabricante
 		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 		LEFT JOIN TipoFiscal on TpFisId = ProduTipoFiscal
 		LEFT JOIN Ncm on NcmId = ProduNcmFiscal
@@ -44,9 +40,6 @@ $dadosXls .= "        <th bgcolor='#cccccc'>CustoFinal</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>MargemLucro</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>ValorVenda</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>EstoqueMinimo</th>";
-$dadosXls .= "        <th bgcolor='#cccccc'>Marca</th>";
-$dadosXls .= "        <th bgcolor='#cccccc'>Modelo</th>";
-$dadosXls .= "        <th bgcolor='#cccccc'>Fabricante</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>UnidadeMedida</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>TipoFiscal</th>";
 $dadosXls .= "        <th bgcolor='#cccccc'>NcmFiscal</th>";
@@ -70,9 +63,6 @@ foreach($row as $item){
 	$dadosXls .= "      <td>".mostraValor($item['ProduMargemLucro'])."</td>";
 	$dadosXls .= "      <td>".mostraValor($item['ProduValorVenda'])."</td>";
 	$dadosXls .= "      <td>".$item['ProduEstoqueMinimo']."</td>";
-	$dadosXls .= "      <td>".utf8_decode($item['MarcaNome'])."</td>";
-	$dadosXls .= "      <td>".utf8_decode($item['ModelNome'])."</td>";
-	$dadosXls .= "      <td>".utf8_decode($item['FabriNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['UnMedNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['TpFisNome'])."</td>";
 	$dadosXls .= "      <td>".utf8_decode($item['NcmNome'])."</td>";
@@ -84,9 +74,7 @@ foreach($row as $item){
 $dadosXls .= "  </table>";
  
     // Definimos o nome do arquivo que será exportado  
-    $arquivo = "LamparinasProdutos.xls"; 
-    
-    
+    $arquivo = "LamparinasProdutos.xls";
      
     // Configurações header para forçar o download  
 	header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
