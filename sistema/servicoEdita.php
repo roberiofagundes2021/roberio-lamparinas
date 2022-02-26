@@ -26,8 +26,7 @@ if(isset($_POST['inputServicoId'])){
 	try{
 		
 		$sql = "SELECT ServiId, ServiCodigo, ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, ServiValorCusto,
-					   ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda, ServiFabricante,
-					   ServiMarca, ServiModelo, ServiNumSerie, SituaChave
+					   ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda, SituaChave
 				FROM Servico
 				JOIN Situacao on SituaId = ServiStatus
 				WHERE ServiId = $iServico ";
@@ -102,9 +101,10 @@ if(isset($_POST['inputNome'])){
 		}
 		
 		$sql = "UPDATE Servico SET ServiCodigo = :sCodigo, ServiNome = :sNome, ServiDetalhamento = :sDetalhamento, 
-		               ServiCategoria = :iCategoria, ServiSubCategoria = :iSubCategoria, ServiValorCusto = :fValorCusto, ServiOutrasDespesas = :fOutrasDespesas,
-		               ServiCustoFinal = :fCustoFinal, ServiMargemLucro = :fMargemLucro, ServiValorVenda = :fValorVenda, ServiFabricante = :iFabricante, 
-		               ServiMarca = :iMarca, ServiModelo = :iModelo, ServiNumSerie = :sNumSerie, ServiUsuarioAtualizador = :iUsuarioAtualizador ";
+		               ServiCategoria = :iCategoria, ServiSubCategoria = :iSubCategoria, ServiValorCusto = :fValorCusto, 
+					   ServiOutrasDespesas = :fOutrasDespesas, ServiCustoFinal = :fCustoFinal, 
+					   ServiMargemLucro = :fMargemLucro, ServiValorVenda = :fValorVenda, 
+					   ServiUsuarioAtualizador = :iUsuarioAtualizador ";
 
 		if ($_POST['inputServicoStatus'] == 'ALTERAR'){
 			$sql .= ", ServiStatus = ".$Status." ";
@@ -124,10 +124,6 @@ if(isset($_POST['inputNome'])){
 						':fCustoFinal' => $_POST['inputCustoFinal'] == null ? null : gravaValor($_POST['inputCustoFinal']),
 						':fMargemLucro' => $_POST['inputMargemLucro'] == null ? null : gravaValor($_POST['inputMargemLucro']),
 						':fValorVenda' => $_POST['inputValorVenda'] == null ? null : gravaValor($_POST['inputValorVenda']),
-						':iFabricante' => $_POST['cmbFabricante'] == '#' ? null : $_POST['cmbFabricante'],
-						':iMarca' => $_POST['cmbMarca'] == '#' ? null : $_POST['cmbMarca'],
-						':iModelo' => $_POST['cmbModelo'] == '#' ? null : $_POST['cmbModelo'],
-						':sNumSerie' => $_POST['inputNumSerie'] == '' ? null : $_POST['inputNumSerie'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iServico' => $_POST['inputServicoId']
 						));
@@ -545,92 +541,6 @@ if(isset($_POST['inputNome'])){
 								</div>						
 							</div>
 
-							<div class="row">
-								<div class="col-lg-12">
-									<h5 class="mb-0 font-weight-semibold">Dados do Fabricante</h5>
-									<br>
-									<div class="row">
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="cmbMarca">Marca</label>
-												<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
-													<?php 
-														$sql = "SELECT MarcaId, MarcaNome
-																FROM Marca
-																JOIN Situacao on SituaId = MarcaStatus
-																WHERE MarcaUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																ORDER BY MarcaNome ASC";
-														$result = $conn->query($sql);
-														$rowMarca = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowMarca as $item){
-															$seleciona = $item['MarcaId'] == $row['ServiMarca'] ? "selected" : "";
-															print('<option value="'.$item['MarcaId'].'" '. $seleciona .'>'.$item['MarcaNome'].'</option>');
-														}
-													
-													?>
-												</select>
-											</div>
-										</div>
-							
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="cmbModelo">Modelo</label>
-												<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
-													<?php 
-														$sql = "SELECT ModelId, ModelNome
-																FROM Modelo
-																JOIN Situacao on SituaId = ModelStatus
-																WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																ORDER BY ModelNome ASC";
-														$result = $conn->query($sql);
-														$rowModelo = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowModelo as $item){
-															$seleciona = $item['ModelId'] == $row['ServiModelo'] ? "selected" : "";
-															print('<option value="'.$item['ModelId'].'" '. $seleciona .'>'.$item['ModelNome'].'</option>');
-														}
-													
-													?>
-												</select>
-											</div>
-										</div>
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="cmbFabricante">Fabricante</label>
-												<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
-													<?php 
-														$sql = "SELECT FabriId, FabriNome
-																FROM Fabricante
-																JOIN Situacao on SituaId = FabriStatus
-																WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																ORDER BY FabriNome ASC";
-														$result = $conn->query($sql);
-														$rowFabricante = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowFabricante as $item){
-															$seleciona = $item['FabriId'] == $row['ServiFabricante'] ? "selected" : "";
-															print('<option value="'.$item['FabriId'].'" '. $seleciona .'>'.$item['FabriNome'].'</option>');
-														}
-													
-													?>
-												</select>
-											</div>
-										</div>
-								
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputNumSerie">Número de Série</label>
-												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Número de Série" value="<?php echo $numSerie; ?>">
-											</div>
-										</div>								
-									</div>
-								</div>
-							</div>
 							<br>
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								
