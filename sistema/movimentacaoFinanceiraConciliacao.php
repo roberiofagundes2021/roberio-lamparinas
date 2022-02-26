@@ -306,21 +306,20 @@ $dataFim = date("Y-m-d");
 
               $(rowNode).find('td').eq(8).attr('style', 'text-align: center;')
 
-              entrada = item.data[3].replace(".", "")
-              entrada = entrada.replace(",", ".")
+              entrada = (item.data[3] != null) ? item.data[3] : '0,00'
+              entrada = entrada.replace(".", "").replace(",", ".")
               entradaTotal += parseFloat(entrada)
 
               saida = (item.data[4] != null) ? item.data[4] : '0,00'
-              saida = saida.replace(".", "")
-              saida = saida.replace(",", ".")
+              saida = saida.replace(".", "").replace(",", ".")
               saidaTotal += parseFloat(saida)
 
-              saldo = item.data[5].replace(".", "")
-              saldo = saldo.replace(",", ".")
+              saldo = (item.data[5] != null) ? item.data[5] : '0,00'
+              saldo = saldo.replace(".", "").replace(",", ".")
               saldoTotal += parseFloat(saldo)
 
-              saldoConciliacao = item.data[6].replace(".", "")
-              saldoConciliacao = saldoConciliacao.replace(",", ".")
+              saldoConciliacao = (item.data[6] != null) ? item.data[6] : '0,00'
+              saldoConciliacao = saldoConciliacao.replace(".", "").replace(",", ".")
               saldoConciliacaoTotal += parseFloat(saldoConciliacao)
             })
 
@@ -329,8 +328,8 @@ $dataFim = date("Y-m-d");
             corConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? 'green' : 'red'
 
             divTotal = `
-              <div id='footer-total' class='row' style='position:absolute; text-align: right; font-weight: bold; width: 100%; margin-top: 0.9%; font-size: 10px;'>
-                <div style="width: 47.2%; color: green;">
+              <div id='footer-total' class='row' style='position:absolute; text-align: right; font-weight: bold; width: 100%; margin-top: 0.9%; font-size: 11px;'>
+                <div style="width: 47.3%; color: green;">
                   Total: ${float2moeda(entradaTotal)}
                 </div>
 
@@ -342,7 +341,7 @@ $dataFim = date("Y-m-d");
                   Total: ${float2moeda(saldoTotal)}
                 </div>
 
-                <div style="width: 14.8%; color: ${corConciliacaoTotal};">
+                <div style="width: 14.7%; color: ${corConciliacaoTotal};">
                   Total: ${float2moeda(saldoConciliacaoTotal)}
                 </div>`                    
 

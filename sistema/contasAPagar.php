@@ -692,11 +692,11 @@ $dataFim = date("Y-m-d");
                             $(rowNode).find('td').eq(6).attr('style', 'text-align: center;')
 
                             contador++
-                            valor = item.data[5].replace(".", "")
-                            valor = valor.replace(",", ".")
+                            valor = item.data[5].replace(".", "").replace(",", ".")
                             valorTotal += parseFloat(valor)
                         })
 
+                        modalParcelas()
                         pagamentoAgrupado(contador)
 
                         divTotal = `<div id='footer-total' style='position:absolute; padding-right: 21%; text-align: right; font-weight: bold; width: 100%;'>Total: ${float2moeda(valorTotal)}</div>`                    
