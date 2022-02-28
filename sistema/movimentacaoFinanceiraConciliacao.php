@@ -115,7 +115,7 @@ $dataFim = date("Y-m-d");
         }
         ,
         {
-          orderable: false, //Ações
+          orderable: true, //Conciliado
           width: "3%",
           targets: [8]
         } 
@@ -134,6 +134,7 @@ $dataFim = date("Y-m-d");
       }
     });
 
+    /*
     function atualizaTotal() {
       let childres = $('tbody').children();
       let totalEntrada = 0;
@@ -197,6 +198,7 @@ $dataFim = date("Y-m-d");
       $('.datatable-footer').append(divTotalSaldo);
       $('.datatable-footer').append(divTotalSaldoConciliado);
     }
+    */
 
 
     function Filtrar(carregamentoPagina) {
@@ -511,6 +513,7 @@ $dataFim = date("Y-m-d");
     */
 
 
+    /*
     function Filtrar(carregamentoPagina) {
       let cont = false;
 
@@ -569,6 +572,7 @@ $dataFim = date("Y-m-d");
     }
 
     Filtrar(true);
+    */
   }
 
   function atualizaConciliacao(idConciliacao, tipoConta) {
