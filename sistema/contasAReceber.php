@@ -185,7 +185,7 @@ $dataFim = date("Y-m-d");
                         let id = $(idContainer[1]).val()
                         let status = $(tds[6]).html();
 
-                        if (status == 'Paga') {
+                        if (status == 'Recebida') {
                             alerta('Atenção', 'A conta selecionada já foi paga!', 'error');
                             return false
                         } else {
@@ -244,8 +244,8 @@ $dataFim = date("Y-m-d");
                         //$('tbody').append(data)
                         alerta('Atenção', 'Parcelas geradas com sucesso!')
                         location.href = "contasAReceber.php";
-                       // modalParcelas()
-                      //  $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
+                        modalParcelas()
+                        $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
                         //RecebimentoAgrupado()
                       //  atualizaTotal()                        
                     }
@@ -456,11 +456,11 @@ $dataFim = date("Y-m-d");
                             $(rowNode).find('td').eq(6).attr('style', 'text-align: center;')
 
                             contador++
-                            valor = item.data[5].replace(".", "")
-                            valor = valor.replace(",", ".")
+                            valor = item.data[5].replace(".", "").replace(",", ".")
                             valorTotal += parseFloat(valor)
                         })
 
+                        modalParcelas()
                         //pagamentoAgrupado(contador)
 
                         divTotal = `<div id='footer-total' style='position:absolute; padding-right: 21.2%; text-align: right; font-weight: bold; width: 100%;'>Total: ${float2moeda(valorTotal)}</div>`                    

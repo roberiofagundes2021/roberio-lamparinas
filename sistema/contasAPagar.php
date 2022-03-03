@@ -250,7 +250,7 @@ $dataFim = date("Y-m-d");
                         //excluirConta()
                         $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
                         pagamentoAgrupado()
-                        atualizaTotal()
+                        //atualizaTotal()
                     }
                 )
 
@@ -473,6 +473,12 @@ $dataFim = date("Y-m-d");
 
             $("#salvarPA").on('click', (e) => {
                 e.preventDefault()
+                if($('#inputDescricaoPA').val() == '') {
+                    alerta('Atenção', 'A descrição é obrigatória!', 'error');
+                    $('#inputDescricaoPA').focus();
+                    return false
+                }
+                
                 pagamentoAgrupadoEnvia()
 
                 if (countPlanoContas == 0) {
@@ -1139,7 +1145,7 @@ $dataFim = date("Y-m-d");
                                 <div class="d-flex flex-row">
                                     <div class='col-lg-7'>
                                         <div class="form-group">
-                                            <label for="inputDescricaoPA">Descrição do Agrupamento</label>
+                                            <label for="inputDescricaoPA">Descrição do Agrupamento <span class="text-danger">*</span></label>
                                             <div class="input-group">
                                                 <input type="text" id="inputDescricaoPA" name="inputDescricaoPA"
                                                     class="form-control">
