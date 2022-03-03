@@ -12,7 +12,7 @@ $sql = "WITH itens as (SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN Situacao on SituaId = ProduStatus
-		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
+		WHERE dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) > 0 and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
 		SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, Estoque, rownum
 		FROM itens WHERE rownum >= 0 and rownum <= 20 ORDER BY ProduNome ASC";
 $result = $conn->query($sql);
@@ -26,7 +26,7 @@ $sqlCount = "SELECT COUNT(ProduId) as quantidade
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN Situacao on SituaId = ProduStatus
-	    WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
+	    WHERE dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) > 0 and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
 $resultCount = $conn->query($sqlCount);
 $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 
