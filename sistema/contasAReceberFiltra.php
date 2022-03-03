@@ -47,16 +47,6 @@ include('global_assets/php/conexao.php');
             $_SESSION['ContRecStatus'] = $_POST['cmbStatus'];
         }
 
-        if (!empty($_POST['cmbNumDoc'])) {
-            $args[]  = "CnAReNumDocumento = " . $_POST['cmbNumDoc'] . " ";
-            $_SESSION['ContRecNumDoc'] = $_POST['cmbNumDoc'];
-        }
-
-        if (!empty($_POST['cmbFormaDeRecebimento'])) {
-            $args[]  = "CnAReFormaPagamento = " . $_POST['cmbFormaDeRecebimento'] . " ";
-            $_SESSION['ContRecFormaPagamento'] = $_POST['cmbFormaDeRecebimento'];
-        }
-
         if (count($args) >= 1) {
 
             $string = implode(" and ", $args);
@@ -141,9 +131,9 @@ include('global_assets/php/conexao.php');
         $arrayData = [];
         foreach ($rowData as $item) {
             $cont++;
-
             $status = $item['CnAReStatus'] == 13 ? 'À Receber' : 'Recebida';
             $data = $_POST['statusTipo'] == 'ARECEBER' ? mostraData($item['CnAReDtVencimento']) : mostraData($item['CnAReDtRecebimento']);
+            
             /*
             print('
             
@@ -194,21 +184,22 @@ include('global_assets/php/conexao.php');
 
             $status = $status;
 
+            $visibilidade = ($status == 'Recebida') ? 'none' : 'block';
+
             $acoes = '
-                    <div class="list-icons list-icons-extended">
-                        <a href="#" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>
-                        <a href="#" onclick="atualizaContasAReceber('.$_POST['permissionExclui'].','.$item["CnAReId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>
-                            <div class="dropdown">													
+                    <div class="list-icons">
+                        <div class="list-icons list-icons-extended">
+                            <a href="#" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>
+                            <a href="#" onclick="atualizaContasAReceber('.$_POST['permissionExclui'].','.$item["CnAReId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>
+                            <div class="dropdown" style="display: '.$visibilidade.';">													
                                 <a href="#" class="list-icons-item" data-toggle="dropdown">
                                     <i class="icon-menu9"></i>
                         
                                 <div class="dropdown-menu dropdown-menu-right">
                                     <a href="#" class="dropdown-item btnParcelar"  data-popup="tooltip" data-placement="bottom" title="Parcelar"><i class="icon-file-text2"></i> Parcelar</a>
-                                    <a href="#" class="dropdown-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Produto"><i class="icon-file-empty"></i></a>
                                 </div>
                             </div>
                         </div>
-                
                     </div>';
 
             $array = [

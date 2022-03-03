@@ -869,7 +869,7 @@ $dataInicio = date("Y-m-d");
                                     <div id="camposPagamento" class="row justify-content-between" <?php echo $mostrar; ?>>
                                         <div class="col-lg-4">
                                             <div class="form-group">
-                                                <label for="cmbContaBanco">Conta/Banco</label>
+                                                <label for="cmbContaBanco">Conta/Banco <span class="text-danger">*</span></label>
                                                 <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2">
                                                     <option value="">Selecionar</option>
                                                     <?php
@@ -897,7 +897,7 @@ $dataInicio = date("Y-m-d");
                                         </div>
                                         <div class="col-lg-4">
                                             <div class="form-group">
-                                                <label for="cmbFormaPagemento">Forma de Pagamento</label>
+                                                <label for="cmbFormaPagemento">Forma de Pagamento <span class="text-danger">*</span></label>
                                                 <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2">
                                                     <option value="">Selecionar</option>
                                                     <?php
