@@ -23,10 +23,10 @@ if(isset($_POST['inputSetorId'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir setor!!!";
+		$_SESSION['msg']['mensagem'] = "Esse setor está sendo usado, portanto, não pode ser excluído!!!";
 		$_SESSION['msg']['tipo'] = "error";			
 		
-		echo 'Error: ' . $e->getMessage();
+		//echo 'Error: ' . $e->getMessage();
 	}
 }
 
