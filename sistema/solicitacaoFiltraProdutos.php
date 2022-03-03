@@ -50,7 +50,7 @@ function queryPesquisa()
                 $sql = "WITH itens as (SELECT  ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
                 CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ServiId) as rownum
                 FROM Servico
-                JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaFluxoOperacional is not null
+                -- JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaFluxoOperacional is not null
                 JOIN Categoria on CategId = ServiCategoria
                 JOIN Situacao on SituaId = ServiStatus
                 WHERE dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) > 0 and $string ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
@@ -59,7 +59,7 @@ function queryPesquisa()
 
                 $sqlCount = "SELECT ServiId
                 FROM Servico
-                JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaFluxoOperacional is not null
+                -- JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaFluxoOperacional is not null
                 JOIN Categoria on CategId = ServiCategoria
                 JOIN Situacao on SituaId = ServiStatus
                 WHERE dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) > 0 and $string ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
@@ -67,7 +67,7 @@ function queryPesquisa()
                 $sql = "WITH itens as (SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
                 ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ProduId) as rownum
                 FROM Produto
-                JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaFluxoOperacional is not null
+                -- JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaFluxoOperacional is not null
                 JOIN Categoria on CategId = ProduCategoria
                 JOIN Situacao on SituaId = ProduStatus
                 WHERE dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) > 0 and $string ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
@@ -76,7 +76,7 @@ function queryPesquisa()
 
                 $sqlCount = "SELECT ProduId
                 FROM Produto
-                JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaFluxoOperacional is not null
+                -- JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaFluxoOperacional is not null
                 JOIN Categoria on CategId = ProduCategoria
                 JOIN Situacao on SituaId = ProduStatus
                 WHERE dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) > 0  and $string ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
@@ -97,7 +97,7 @@ function queryPesquisa()
                 $sql = "WITH itens as (SELECT  ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, ServiDetalhamento as Detalhamento, 
                 CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ServiNome) as rownum
                 FROM Servico
-                JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaFluxoOperacional is not null
+                -- JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaFluxoOperacional is not null
                 JOIN Categoria on CategId = ServiCategoria
                 JOIN Situacao on SituaId = ServiStatus
                 WHERE dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) > 0 and ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
@@ -106,14 +106,14 @@ function queryPesquisa()
 
                 $sqlCount = "SELECT ServiId
                 FROM Servico
-                JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaFluxoOperacional is not null
+                -- JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaFluxoOperacional is not null
                 JOIN Situacao on SituaId = ServiStatus
                 WHERE dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) > 0 and ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
             } else {
                 $sql = "WITH itens as (SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
                 ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ProduNome) as rownum
                 FROM Produto
-                JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaFluxoOperacional is not null
+                -- JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaFluxoOperacional is not null
                 JOIN Categoria on CategId = ProduCategoria
                 JOIN Situacao on SituaId = ProduStatus
                 WHERE dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) > 0 and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
@@ -122,7 +122,7 @@ function queryPesquisa()
                 
                 $sqlCount = "SELECT ProduId
                 FROM Produto
-                JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaFluxoOperacional is not null
+                -- JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaFluxoOperacional is not null
                 JOIN Situacao on SituaId = ProduStatus
                 WHERE dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) > 0 and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
             }
