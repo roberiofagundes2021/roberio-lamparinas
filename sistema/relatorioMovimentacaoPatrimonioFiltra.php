@@ -47,8 +47,8 @@ function queryPesquisa(){
                 $string .= ' and ';
             }
 
-            $sql = "SELECT PatriId ,PatriNumero, PatriNumSerie, PatriEstadoConservacao, MvXPrId, MovimId, MovimData,
-                    MovimNotaFiscal, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, MvXPrAnoFabricacao, ProduNome, MarcaNome, FabriNome,
+            $sql = "SELECT PatriId ,PatriNumero, PatriNumSerie, PatriEstadoConservacao, MvXPrId, MovimId, MovimData, PrXFaId, PrXFaMarca, PrXFaModelo, PrXFaFabricante,
+                    MovimNotaFiscal, MvXPrValidade, MvXPrValorUnitario, MvXPrValidade, MvXPrAnoFabricacao, ProduNome, ProduId,
                     dbo.fnEmpenhosOrdemCompra(MovimUnidade, MovimOrdemCompra) as EmpenhosOrdemCompra,                   
                     CASE 
                         WHEN MovimOrigemLocal IS NULL THEN SetorO.SetorNome
@@ -62,8 +62,7 @@ function queryPesquisa(){
                     JOIN MovimentacaoXProduto on MvXPrPatrimonio = PatriId
                     JOIN Movimentacao on MovimId = MvXPrMovimentacao
                     JOIN Produto on ProduId = MvXPrProduto
-                    LEFT JOIN Marca on MarcaId = ProduMarca
-                    LEFT JOIN Fabricante on FabriId = ProduFabricante 
+                    LEFT JOIN ProdutoXFabricante on PrXFaPatrimonio = PatriId
                     LEFT JOIN LocalEstoque LocalO on LocalO.LcEstId = MovimOrigemLocal 
                     LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
                     LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
@@ -86,7 +85,7 @@ function queryPesquisa(){
             $cont++;
             print("
                 
-                <tr idPatrimonio=".$item['PatriId']." editado='0'>
+                <tr idPatrimonio=".$item['PatriId'].'#'.$item['ProduId'].'#'.$item['PrXFaId']." editado='0'>
                    <td class='even'>" . $cont . "</td>
                    <td class='odd'>" . $item['ProduNome'] . "</td>
                    <td class='even'>".$item['PatriNumero']."</td>
@@ -96,8 +95,6 @@ function queryPesquisa(){
                    <td class='even'>".mostraData($item['MvXPrValidade'])."</td>
                    <td class='odd'>" . $item['Origem'] . "</td>
                    <td class='even'>" . $item['Destino'] . "</td>
-                   <td class='even' style='display: none'>" . $item['MarcaNome'] . "</td>
-                   <td class='even' style='display: none'>" . $item['FabriNome'] . "</td>
                    <td class='even' style='display: none'>" . mostraData($item['MovimData']) . "</td>
                    <td class='even' style='display: none'>" . mostraData($item['MvXPrAnoFabricacao']) . "</td>
                    <td class='even' style='display: none'>" . $item['EmpenhosOrdemCompra'] . "</td>
@@ -109,6 +106,9 @@ function queryPesquisa(){
                    </td>
                    <td style='display: none' id='inputEstadoConservacao'>
                         <input type='text' value='" . $item['PatriEstadoConservacao'] . "'>
+                   </td> 
+                   <td style='display: none' id='inputIdProdutoXFabricante'>
+                        <input type='text' value='" . $item['PrXFaMarca'] . '#' . $item['PrXFaModelo'] . '#' . $item['PrXFaFabricante'] ."'>
                    </td>                   
                 </tr>
              ");
