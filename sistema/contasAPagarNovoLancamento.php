@@ -412,7 +412,7 @@ $dataInicio = date("Y-m-d");
                 $('#gerarParcelas').on('click', (e) => {
                     e.preventDefault()
                     let parcelas = $("#cmbParcelas").val()
-                    let valorTotal = $("#valorTotal").val()
+                    let valorTotal = $("#valorTotal").val().replace(".", "").replace(",", ".")
                     let dataVencimento = $("#inputDataVencimento").val()
                     let periodicidade = $("#cmbPeriodicidade").val()
 

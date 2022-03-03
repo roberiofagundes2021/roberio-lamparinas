@@ -116,8 +116,7 @@ if(isset($_POST['inputNome'])){
 		$sql = "UPDATE Produto SET ProduCodigo = :sCodigo, ProduCodigoBarras = :sCodigoBarras, ProduNome = :sNome, ProduDetalhamento = :sDetalhamento, 
 								   ProduFoto = :sFoto, ProduCategoria = :iCategoria, ProduSubCategoria = :iSubCategoria, ProduValorCusto = :fValorCusto, 
 								   ProduOutrasDespesas = :fOutrasDespesas, ProduCustoFinal = :fCustoFinal, ProduMargemLucro = :fMargemLucro, 
-								   ProduValorVenda = :fValorVenda, ProduEstoqueMinimo = :iEstoqueMinimo, ProduMarca = :iMarca, ProduModelo = :iModelo, 
-								   ProduFabricante = :iFabricante, ProduUnidadeMedida = :iUnidadeMedida, 
+								   ProduValorVenda = :fValorVenda, ProduEstoqueMinimo = :iEstoqueMinimo, ProduUnidadeMedida = :iUnidadeMedida, 
 								   ProduTipoFiscal = :iTipoFiscal, ProduNcmFiscal = :iNcmFiscal, ProduOrigemFiscal = :iOrigemFiscal, 
 								   ProduCest = :iCest, ProduUsuarioAtualizador = :iUsuarioAtualizador ";
 
@@ -142,9 +141,6 @@ if(isset($_POST['inputNome'])){
 						':fMargemLucro' => $_POST['inputMargemLucro'] == null ? null : gravaValor($_POST['inputMargemLucro']),
 						':fValorVenda' => $_POST['inputValorVenda'] == null ? null : gravaValor($_POST['inputValorVenda']),
 						':iEstoqueMinimo' => $_POST['inputEstoqueMinimo'] == '' ? null : $_POST['inputEstoqueMinimo'],
-						':iMarca' => $_POST['cmbMarca'] == '#' ? null : $_POST['cmbMarca'],
-						':iModelo' => $_POST['cmbModelo'] == '#' ? null : $_POST['cmbModelo'],
-						':iFabricante' => $_POST['cmbFabricante'] == '#' ? null : $_POST['cmbFabricante'],
 						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
 						':iTipoFiscal' => $_POST['cmbTipoFiscal'] == '#' ? null : $_POST['cmbTipoFiscal'],
 						':iNcmFiscal' => $_POST['cmbNcmFiscal'] == '#' ? null : $_POST['cmbNcmFiscal'],
@@ -653,86 +649,6 @@ if(isset($_POST['inputNome'])){
 										</div>
 									</div>
 								</div>						
-							</div>
-
-							<div class="row">
-								<div class="col-lg-12">
-									<h5 class="mb-0 font-weight-semibold">Dados do Fabricante</h5>
-									<br>
-									<div class="row">
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="cmbMarca">Marca</label>
-												<select id="cmbMarca" name="cmbMarca" class="form-control select-search">
-													<option value="#">Selecione</option>
-													<?php 
-														$sql = "SELECT MarcaId, MarcaNome
-																FROM Marca
-																JOIN Situacao on SituaId = MarcaStatus
-																WHERE MarcaUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																ORDER BY MarcaNome ASC";
-														$result = $conn->query($sql);
-														$rowMarca = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowMarca as $item){
-															$seleciona = $item['MarcaId'] == $row['ProduMarca'] ? "selected" : "";
-															print('<option value="'.$item['MarcaId'].'" '. $seleciona .'>'.$item['MarcaNome'].'</option>');
-														}
-													
-													?>
-												</select>
-											</div>
-										</div>
-							
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="cmbModelo">Modelo</label>
-												<select id="cmbModelo" name="cmbModelo" class="form-control select-search">
-													<option value="#">Selecione</option>
-													<?php 
-														$sql = "SELECT ModelId, ModelNome
-																FROM Modelo
-																JOIN Situacao on SituaId = ModelStatus
-																WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																ORDER BY ModelNome ASC";
-														$result = $conn->query($sql);
-														$rowModelo = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowModelo as $item){
-															$seleciona = $item['ModelId'] == $row['ProduModelo'] ? "selected" : "";
-															print('<option value="'.$item['ModelId'].'" '. $seleciona .'>'.$item['ModelNome'].'</option>');
-														}
-													
-													?>
-												</select>
-											</div>
-										</div>
-
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="cmbFabricante">Fabricante</label>
-												<select id="cmbFabricante" name="cmbFabricante" class="form-control select-search">
-													<option value="#">Selecione</option>
-													<?php 
-														$sql = "SELECT FabriId, FabriNome
-																FROM Fabricante
-																JOIN Situacao on SituaId = FabriStatus
-																WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																ORDER BY FabriNome ASC";
-														$result = $conn->query($sql);
-														$rowFabricante = $result->fetchAll(PDO::FETCH_ASSOC);
-														
-														foreach ($rowFabricante as $item){
-															$seleciona = $item['FabriId'] == $row['ProduFabricante'] ? "selected" : "";
-															print('<option value="'.$item['FabriId'].'" '. $seleciona .'>'.$item['FabriNome'].'</option>');
-														}
-													
-													?>
-												</select>
-											</div>
-										</div>
-									</div>
-								</div>
 							</div>
 							<br>
 									

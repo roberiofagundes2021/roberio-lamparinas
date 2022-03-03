@@ -130,7 +130,7 @@ function queryPesquisa(){
                                CnAPaTransferencia as CODTRANSFPAG,
                                SituaNome as SITUACAO,
                                SituaCor as COR,
-                               SituaChave as CHAVE,s
+                               SituaChave as CHAVE,
                                CNAPACONCILIADO AS CONCILIADO
                         FROM ContasAPagar 
                         JOIN Situacao on SituaId = CnAPaStatus";

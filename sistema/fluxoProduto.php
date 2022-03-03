@@ -46,30 +46,74 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 						':iFluxoOperacional' => $iFluxoOperacional,
 						':iUnidade' => $_SESSION['UnidadeId']
 						));
-		
-		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
-		
-			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrDetalhamento, FOXPrQuantidade, FOXPrValorUnitario, 
-					FOXPrUsuarioAtualizador, FOXPrUnidade)
-					VALUES (:iFluxoOperacional, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
-			$result = $conn->prepare($sql);
-			
-			$result->execute(array(
-							':iFluxoOperacional' 	=> $iFluxoOperacional,
-							':iProduto' 			=> $_POST['inputIdProduto'.$i],
-							':sDetalhamento' 	   	=> $_POST['inputDetalhamento' . $i],
-							':iQuantidade' 			=> $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-							':fValorUnitario' 		=> $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-							':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
-							':iUnidade' 			=> $_SESSION['UnidadeId']
-							));
-		}
+
+		if($_POST['atualizarFluxoOperacional'] == 1) {
+			for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+				$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrDetalhamento, FOXPrQuantidade, FOXPrValorUnitario, 
+						FOXPrUsuarioAtualizador, FOXPrUnidade)
+						VALUES (:iFluxoOperacional, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+				$resultFluxoOperacional = $conn->prepare($sql);
+				
+				$resultFluxoOperacional->execute(array(
+								':iFluxoOperacional' 	=> $iFluxoOperacional,
+								':iProduto' 			=> $_POST['inputIdProduto'.$i],
+								':sDetalhamento' 	   	=> $_POST['inputDetalhamento' . $i],
+								':iQuantidade' 			=> $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+								':fValorUnitario' 		=> $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+								':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+								':iUnidade' 			=> $_SESSION['UnidadeId']
+								));
+
+				$sql = "UPDATE ProdutoXFabricante SET PrXFaProduto = :iProduto, PrXFaMarca = :iMarca, PrXFaModelo = :iModelo, PrXFaFabricante = :iFabricante
+						WHERE PrXFaId = :iId";
+				$resultProdutoXFabricante = $conn->prepare($sql);
+						
+				$resultProdutoXFabricante->execute(array(
+								':iProduto' 			=> $_POST['inputIdProduto'.$i],
+								':iMarca' 	   	        => $_POST['inputMarca' . $i],
+								':iModelo' 	   	        => $_POST['inputModelo' . $i],
+								':iFabricante' 			=> $_POST['inputFabricante'.$i],
+								':iId' 	                => $_POST['inputProdutoXFabicanteId'.$i]
+								));
+			}
+		}else {
+			for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+				$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrDetalhamento, FOXPrQuantidade, FOXPrValorUnitario, 
+						FOXPrUsuarioAtualizador, FOXPrUnidade)
+						VALUES (:iFluxoOperacional, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+				$result = $conn->prepare($sql);
+				
+				$result->execute(array(
+								':iFluxoOperacional' 	=> $iFluxoOperacional,
+								':iProduto' 			=> $_POST['inputIdProduto'.$i],
+								':sDetalhamento' 	   	=> $_POST['inputDetalhamento' . $i],
+								':iQuantidade' 			=> $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+								':fValorUnitario' 		=> $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+								':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+								':iUnidade' 			=> $_SESSION['UnidadeId']
+								));
+	
+				$sql = "INSERT INTO ProdutoXFabricante (PrXFaProduto, PrXFaFluxoOperacional, PrXFaMarca, PrXFaModelo, PrXFaFabricante, PrXFaUnidade)
+						VALUES (:iProduto, :iFluxoOperacional, :iMarca, :iModelo, :iFabricante, :iUnidade)";
+				$result = $conn->prepare($sql);
+				
+				$result->execute(array(
+								':iProduto' 			=> $_POST['inputIdProduto'.$i],
+								':iFluxoOperacional' 	=> $iFluxoOperacional,
+								':iMarca' 	   	        => $_POST['inputMarca' . $i],
+								':iModelo' 	   	        => $_POST['inputModelo' . $i],
+								':iFabricante' 			=> $_POST['inputFabricante'.$i],
+								':iUnidade' 			=> $_SESSION['UnidadeId']
+								));
+			}
+		}		
 
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Fluxo Operacional alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
+
 
     } catch(PDOException $e){
 
@@ -136,6 +180,23 @@ try{
 	}	
 
 	$TotalFluxo = $row['FlOpeValor'];
+	
+	$sql = "SELECT PrXFaId, PrXFaMarca, PrXFaModelo, PrXFaFabricante
+			FROM ProdutoXFabricante
+			WHERE PrXFaUnidade = ". $_SESSION['UnidadeId'] ." and PrXFaFluxoOperacional = ".$iFluxoOperacional;
+	$resultResultadoSelect = $conn->query($sql);
+	$rowResultadoSelect = $resultResultadoSelect->fetchAll(PDO::FETCH_ASSOC);
+
+	$atualizar = 0;
+
+	foreach ($rowResultadoSelect as $itemSelect){
+		$iProdutoXFabrincante[] = $itemSelect['PrXFaId'];
+		$consultaMarca[] = $itemSelect['PrXFaMarca'];
+		$consultaModelo[] = $itemSelect['PrXFaModelo'];
+		$consultaFabricante[] = $itemSelect['PrXFaFabricante'];
+
+		$atualizar = 1;
+	}
 
 	$sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
 			FROM FluxoOperacionalXProduto
@@ -178,6 +239,8 @@ try{
 	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>	
 
 	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
+
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 	<!-- /theme JS files -->
 	
 	<!-- Adicionando Javascript -->
@@ -281,11 +344,11 @@ try{
 				for(i = 0; i <= totalProdutos; i++){
                     var valorTotal = $(`#inputValorTotal${i}`).val()
                     cont = valorTotal == '' ? 0 : 1;
-					if ($(`#inputValorTotal${i}`).val() == '0,00') {
+					if ($(`#inputValorTotal${i}`).val() == '0,00' || $(`#inputMarca${i}`).val() == '' || $(`#inputModelo${i}`).val() == '' || $(`#inputFabricante${i}`).val() == '') {
 						if (inputOrigem == 'fluxo.php'){
-							alerta('Atenção', 'Preencha todas as quantidades e valores dos produtos selecionados ou retire da lista', 'error');
+							alerta('Atenção', 'Preencha todos os campos dos produtos selecionados ou retire os da lista', 'error');
 						} else {
-							alerta('Atenção', 'Preencha todas as quantidades e valores dos produtos', 'error');
+							alerta('Atenção', 'Preencha todos os campos dos produtos', 'error');
 						}
 						
 						return false;
@@ -294,9 +357,9 @@ try{
 
 				if(cont == 0){
 					if (inputOrigem == 'fluxo.php'){
-						alerta('Atenção','Preencha todas as quantidades e valores dos produtos selecionados, ou retire da lista','error');
+						alerta('Atenção','Preencha todos os campos dos produtos selecionados, ou retire os da lista','error');
 					} else {
-						alerta('Atenção','Preencha todas as quantidades e valores dos produtos','error');
+						alerta('Atenção','Preencha todos os campos dos produtos','error');
 					}
 					return false;
 				}
@@ -558,11 +621,10 @@ try{
 									
 									<?php
 
-										$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+										$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario
 												FROM Produto
 												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												LEFT JOIN Marca on MarcaId = ProduMarca
 												LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
 												and SbCatId in (".$sSubCategorias.")
@@ -574,11 +636,10 @@ try{
 										if ($_POST['inputOrigem'] == 'fluxo.php'){
 
 											if (!$countProduto){
-												$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, MarcaNome
+												$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla
 														FROM Produto
 														JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 														JOIN Situacao on SituaId = ProduStatus
-														LEFT JOIN Marca on MarcaId = ProduMarca
 														LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 														WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and 
 														ProduSubCategoria in (".$sSubCategorias.") and SituaChave = 'ATIVO' 
@@ -593,22 +654,20 @@ try{
 											if (!$countProduto) {
 
 												if ($row['TrRefTabelaProduto'] == 'Produto'){
-													$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
+													$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, SbCatNome
 															FROM Produto															
 															JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-															LEFT JOIN Marca on MarcaId = ProduMarca
 															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
 															and SbCatId in (".$sSubCategorias.")
 															ORDER BY SbCatNome, ProduNome ASC";													
 												} else { //Se $row['TrRefTabelaProduto'] == ProdutoOrcamento
-													$sql = "SELECT ProduId, ProduNome, TRXPrDetalhamento as Detalhamento, MarcaNome, UnMedSigla, SbCatNome
+													$sql = "SELECT ProduId, ProduNome, TRXPrDetalhamento as Detalhamento, UnMedSigla, SbCatNome
 															FROM Produto
 															JOIN ProdutoOrcamento on PrOrcProduto = ProduId
 															JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-															LEFT JOIN Marca on MarcaId = ProduMarca
 															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
 															and SbCatId in (".$sSubCategorias.")
@@ -622,17 +681,24 @@ try{
 										}
 										
 										print('
+										<input type="hidden" id="atualizarFluxoOperacional" name="atualizarFluxoOperacional" value="'.$atualizar.'">
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-7">
+											<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
 														</div>
-														<div class="col-lg-8">
+														<div class="col-lg-2">
 															<label for="inputProduto"><strong>Produto</strong></label>
 														</div>
 														<div class="col-lg-3">
 															<label for="inputMarca"><strong>Marca</strong></label>
+														</div>
+														<div class="col-lg-3">
+															<label for="inputModelo"><strong>Modelo</strong></label>
+														</div>
+														<div class="col-lg-3">
+															<label for="inputFabricante"><strong>Fabricante</strong></label>
 														</div>
 													</div>
 												</div>												
@@ -651,7 +717,7 @@ try{
 													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-2">
+											<div class="col-lg-1">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -663,6 +729,8 @@ try{
 										$cont = 0;
 										$fTotalGeral = 0;
 										
+										$indice = 0;
+
 										foreach ($rowProdutos as $item){
 											
 											$cont++;
@@ -675,18 +743,69 @@ try{
 											
 											print('
 											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-7">
+												<div class="col-lg-8">
 													<div class="row">
 														<div class="col-lg-1">
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
 															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
 														</div>
-														<div class="col-lg-8">
+														<div class="col-lg-2">
 															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['Detalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
 															<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
 														</div>
 														<div class="col-lg-3">
-															<input type="text" id="inputMarca'.$cont.'" name="inputMarca'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['MarcaNome'].'" value="'.$item['MarcaNome'].'" readOnly>
+															<select id="inputMarca'.$cont.'" name="inputMarca'.$cont.'" class="form-control select-search">
+																<option value="">Selecione</option>');
+																	$sql = "SELECT MarcaId, MarcaNome
+																			FROM Marca
+																			JOIN Situacao on SituaId = MarcaStatus
+																			WHERE MarcaUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+																			ORDER BY MarcaNome ASC";
+																	$resultMarca = $conn->query($sql);
+																	$rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
+																
+																foreach ($rowMarca as $itemMarca){
+																	$seleciona = ($itemMarca['MarcaId'] == $consultaMarca[$indice]) ? "selected" : "";
+																	
+																	print('<option value="'.$itemMarca['MarcaId'].'" '.$seleciona.'>'.$itemMarca['MarcaNome'].'</option>');
+																}
+											print('			</select>
+														</div>
+														<div class="col-lg-3">
+															<select id="inputModelo'.$cont.'" name="inputModelo'.$cont.'" class="form-control select-search">
+																<option value="">Selecione</option>');
+																	$sql = "SELECT ModelId, ModelNome
+																			FROM Modelo
+																			JOIN Situacao on SituaId = ModelStatus
+																			WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+																			ORDER BY ModelNome ASC";
+																	$resultMarca = $conn->query($sql);
+																	$rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
+																
+																foreach ($rowMarca as $itemMarca){	
+																	$seleciona = ($itemMarca['ModelId'] == $consultaModelo[$indice]) ? "selected" : "";
+																	
+																	print('<option value="'.$itemMarca['ModelId'].'" '.$seleciona.'>'.$itemMarca['ModelNome'].'</option>');
+																}
+											print('			</select>
+														</div>
+														<div class="col-lg-3">
+															<select id="inputFabricante'.$cont.'" name="inputFabricante'.$cont.'" class="form-control select-search">
+																<option value="">Selecione</option>');
+																	$sql = "SELECT FabriId, FabriNome
+																			FROM Fabricante
+																			JOIN Situacao on SituaId = FabriStatus
+																			WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+																			ORDER BY FabriNome ASC";
+																	$resultMarca = $conn->query($sql);
+																	$rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
+																
+																foreach ($rowMarca as $itemMarca){			
+																	$seleciona = ($itemMarca['FabriId'] == $consultaFabricante[$indice]) ? "selected" : "";
+																	
+																	print('<option value="'.$itemMarca['FabriId'].'" '.$seleciona.'>'.$itemMarca['FabriNome'].'</option>');
+																}
+											print('			</select>
 														</div>
 													</div>
 												</div>								
@@ -699,11 +818,18 @@ try{
 												<div class="col-lg-1">
 													<input type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border ValorUnitario text-right pula" onChange="calculaValorTotal()" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
 												</div>	
-												<div class="col-lg-2">
+												<div class="col-lg-1">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off text-right" value="'.$fValorTotal.'" readOnly>
 												</div>											
-											</div>');											
+											</div>');
 											
+											$indice++;
+										}
+
+										if($atualizar == 1) {
+											for($j = 1; $j <= $cont; $j++) {
+												print('<input type="hidden" id="inputProdutoXFabicanteId'.$j.'" name="inputProdutoXFabicanteId'.$j.'" value="'.$iProdutoXFabrincante[$j - 1].'">');
+											}
 										}
 										
 										print('

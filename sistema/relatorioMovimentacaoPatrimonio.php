@@ -52,6 +52,19 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
 		
 		$insertIdPatrimonio = $conn->lastInsertId();
 
+        $sql = "INSERT INTO ProdutoXFabricante (PrXFaProduto, PrXFaPatrimonio, PrXFaMarca, PrXFaModelo, PrXFaFabricante, PrXFaUnidade)
+                VALUES (:iProduto, :iPatrimonio, :iMarca, :iModelo, :iFabricante, :iUnidade)";
+        $result = $conn->prepare($sql);
+        
+        $result->execute(array(
+                        ':iProduto' 			=> $idProduto,
+                        ':iPatrimonio' 	        => $insertIdPatrimonio,
+                        ':iMarca' 	   	        => $_POST['cmbPatriMarca'],
+                        ':iModelo' 	   	        => $_POST['cmbPatriModelo'],
+                        ':iFabricante' 			=> $_POST['cmbPatriFabricante'],
+                        ':iUnidade' 			=> $_SESSION['UnidadeId']
+                        ));
+
         $sql = "SELECT MotivId
                 FROM Motivo
                 JOIN Situacao on SituaId = MotivStatus
@@ -174,6 +187,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
     <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
     <script src="global_assets/js/demo_pages/form_layouts.js"></script>
     <script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+    <script src="global_assets/js/demo_pages/form_select2.js"></script>
     
     <!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
@@ -193,6 +207,10 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                 var cmbPatriProduto = $('#cmbPatriProduto').val();
                 var cmbPatriDestino = $('#cmbPatriDestino').val();
 
+                var cmbPatriMarca = $('#cmbPatriMarca').val();
+                var cmbPatriModelo = $('#cmbPatriModelo').val();
+                var cmbPatriFabricante = $('#cmbPatriFabricante').val();
+
                 //remove os espaços desnecessários antes e depois
                 inputPatriNumero = inputPatriNumero.trim();
 
@@ -210,6 +228,24 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                 if (cmbPatriDestino== ""){
                     alerta('Atenção', 'O destino é obrigatório!', 'error');
                     $('#inputPatriNumero').focus();
+                    return false;
+                }
+
+                if(cmbPatriMarca == "") {
+                    alerta('Atenção', 'A marca é obrigatória!', 'error');
+                    $('#cmbPatriMarca').focus();
+                    return false;
+                }
+                
+                if(cmbPatriModelo == "" ) {
+                    alerta('Atenção', 'O modelo é obrigatório!', 'error');
+                    $('#cmbPatriModelo').focus();
+                    return false;
+                }
+                
+                if(cmbPatriFabricante == "") {
+                    alerta('Atenção', 'O fabricante é obrigatório!', 'error');
+                    $('#cmbPatriFabricante').focus();
                     return false;
                 }
 
@@ -289,13 +325,12 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         let depreciacao = $(tds[5]).html();
                         let origem = $(tds[7]).html();
                         let destino = $(tds[8]).html();
-                        let marca = $(tds[9]).html();
-                        let fabricante = $(tds[10]).html();
-                        let data = $(tds[11]).html();
-                        let anoFabr = $(tds[12]).html();
-                        let empenho = $(tds[13]).html();
-                        let numeroSerie = $(tds[14]).children().first().val();
-                        let estadoConservacao = $(tds[15]).children().first().val();
+                        let data = $(tds[9]).html();
+                        let anoFabr = $(tds[10]).html();
+                        let empenho = $(tds[11]).html();
+                        let numeroSerie = $(tds[13]).children().first().val();
+                        let estadoConservacao = $(tds[14]).children().first().val();
+                        let arrayProdutoXFabricante = $(tds[15]).children().first().val().split('#');
                         
                         //console.log(numeroSerie)
 
@@ -309,27 +344,21 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
 
                         var NumSerie = numeroSerie ? numeroSerie : ''
 
+                        let marca = arrayProdutoXFabricante[0]
+
+                        let modelo = arrayProdutoXFabricante[1]
+
+                        let fabricante = arrayProdutoXFabricante[2]
+
                         $('#numeroSerie').val(NumSerie)
 
-                        $('#cmbEstadoConservacao').val(estadoConservacao)
+                        $('#cmbEstadoConservacao').val((estadoConservacao > 0) ? estadoConservacao : '').change()
 
-                        if (estadoConservacao) {
-                            let url = 'filtraEstadoConservacao.php'
-                            let inputsValues = {
-                                inputEstadoConservacao: estadoConservacao
-                            }
+                        $('#cmbPatriMarcaEdita').val(marca).change()
 
-                            $.post(
-                                url,
-                                inputsValues,
-                                (data) => {
-                                    if (data) {
-                                        $('#cmbEstadoConservacao').html(data)
+                        $('#cmbPatriModeloEdita').val(modelo).change()
 
-                                    } else {}
-                                }
-                            );
-                        }
+                        $('#cmbPatriFabricanteEdita').val(fabricante).change()
 
                         formModal = `
                                         <div class='row'>
@@ -421,24 +450,6 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class='row'>
-                                            <div class='col-lg-6'>
-                                                <div class="form-group">
-                                                    <label for="produto">Marca</label>
-                                                    <div class="input-group">
-                                                        <input class='form-control' value='${marca}' readOnly />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class='col-lg-6'>
-                                                <div class="form-group">
-                                                    <label for="produto">Fabricante</label>
-                                                    <div class="input-group">
-                                                        <input class='form-control' value='${fabricante}' readOnly />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                         <input type="text" id="inputProdutoEdita" name="inputProdutoEdita" value="${id}" style="display: none">
                         `;
                         $('.dados-produto').html(formModal)
@@ -464,8 +475,8 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                 var Produto = $('#cmbPatriProduto').val();
                 var Patri = Produto.split('#');
                 
-                $('#inputPatriMarca').val(Patri[1]);
-                $('#inputPatriFabricante').val(Patri[2]);		
+                //$('#inputPatriMarca').val(Patri[1]);
+                //$('#inputPatriFabricante').val(Patri[2]);		
             });
 
             /* Início: Tabela Personalizada */
@@ -659,11 +670,41 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
             $('#salvar').on('click', function (e) {
                 let numeroSerie = $('#numeroSerie').val()
                 let estadoConservacao = $('#cmbEstadoConservacao').val()
-                let id = $('#inputProdutoEdita').val()
+                let marca = $('#cmbPatriMarcaEdita').val()
+                let modelo = $('#cmbPatriModeloEdita').val()
+                let fabricante = $('#cmbPatriFabricanteEdita').val()
+
+                if (marca == ""){
+                    alerta('Atenção', 'A marca do patrimônio é obrigatória!', 'error');
+                    $('#cmbPatriMarcaEdita').focus();
+                    return false;
+                }
+
+                if (modelo == ""){
+                    alerta('Atenção', 'O modelo do patrimônio é obrigatório!', 'error');
+                    $('#cmbPatriModeloEdita').focus();
+                    return false;
+                }
+
+                if (fabricante == ""){
+                    alerta('Atenção', 'O fabricante do patrimônio é obrigatório!', 'error');
+                    $('#cmbPatriFabricanteEdita').focus();
+                    return false;
+                }
+
+                let arrayId = $('#inputProdutoEdita').val().split('#')
+                let id = arrayId[0]
+                let produto = arrayId[1]
+                let produtoXfabricante = arrayId[2] ? arrayId[2] : '' 
                 let url = 'relatorioMovimentacaoPatrimonioEdita.php'
                 let data = {
                     inputNumeroSerie: numeroSerie,
                     cmbEstadoConservacao: estadoConservacao,
+                    cmbPatriMarca: marca,
+                    cmbPatriModelo: modelo,
+                    cmbPatriFabricante: fabricante,
+                    inputProduto: produto,
+                    inputProdutoXFabricante: produtoXfabricante,
                     inputId: id
                 }
 
@@ -688,6 +729,8 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         }
                     }
                 )
+
+                Filtrar(true)
 
                 $('#page-modal').fadeOut(200);
                 $('body').css('overflow', 'scroll');
@@ -1066,20 +1109,67 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
 
                                 <div class="px-3 pt-3">
                                     <div class="d-flex flex-row p-1">
-                                        <div class='col-lg-6'>
+                                        <div class='col-lg-4'>
                                             <div class="form-group">
-                                                    <label for="inputPatriMarca">Marca</label>
-                                                <div class="input-group">
-                                                    <input type="text" id="inputPatriMarca" name="inputPatriMarca" class="form-control" readOnly>
-                                                </div>
+                                                <label for="cmbPatriMarca">Marca</label>
+                                                <select id="cmbPatriMarca" name="cmbPatriMarca" class="form-control select-search">
+                                                    <option value="">Selecione</option>'
+                                                    <?php
+                                                        $sql = "SELECT MarcaId, MarcaNome
+                                                                FROM Marca
+                                                                JOIN Situacao on SituaId = MarcaStatus
+                                                                WHERE MarcaUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                                ORDER BY MarcaNome ASC";
+                                                        $resultMarca = $conn->query($sql);
+                                                        $rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
+                                                    
+                                                    foreach ($rowMarca as $itemMarca){
+                                                        print('<option value="'.$itemMarca['MarcaId'].'">'.$itemMarca['MarcaNome'].'</option>');
+                                                    }
+                                                    ?>
+                                                </select>
                                             </div>
                                         </div>
-                                        <div class='col-lg-6'>
+                                        <div class='col-lg-4'>
                                             <div class="form-group">
-                                                    <label for="inputPatriFabricante">Fabricante</label>
-                                                <div class="input-group">
-                                                    <input type="text" id="inputPatriFabricante" name="inputPatriFabricante" class="form-control" readOnly>
-                                                </div>
+                                                <label for="cmbPatriModelo">Modelo</label>
+                                                <select id="cmbPatriModelo" name="cmbPatriModelo" class="form-control select-search">
+                                                    <option value="">Selecione</option>
+                                                    <?php
+                                                        $sql = "SELECT ModelId, ModelNome
+                                                                FROM Modelo
+                                                                JOIN Situacao on SituaId = ModelStatus
+                                                                WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                                ORDER BY ModelNome ASC";
+                                                        $resultMarca = $conn->query($sql);
+                                                        $rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
+                                                    
+                                                    foreach ($rowMarca as $itemMarca){	
+                                                        print('<option value="'.$itemMarca['ModelId'].'">'.$itemMarca['ModelNome'].'</option>');
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-4'>
+                                            <div class="form-group">
+                                                <label for="cmbPatriFabricante">Fabricante</label>
+                                                <select id="cmbPatriFabricante" name="cmbPatriFabricante" class="form-control select-search">
+                                                    <option value="">Selecione</option>
+                                                    <?php
+                                                    	$sql = "SELECT FabriId, FabriNome
+                                                                FROM Fabricante
+                                                                JOIN Situacao on SituaId = FabriStatus
+                                                                WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                                ORDER BY FabriNome ASC";
+                                                        $resultMarca = $conn->query($sql);
+                                                        $rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
+                                                    
+                                                    foreach ($rowMarca as $itemMarca){			
+                                                        print('<option value="'.$itemMarca['FabriId'].'">'.$itemMarca['FabriNome'].'</option>');
+                                                    }
+                                                    ?>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -1096,8 +1186,8 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
-                                            <label for="cmbPatriEstadoConservacao">Estado de Conservação</label>
                                             <div class="form-group">
+                                                <label for="cmbPatriEstadoConservacao">Estado de Conservação</label>
                                                 <select id="cmbPatriEstadoConservacao" name="cmbPatriEstadoConservacao" class="form-control form-control-select2">
                                                     <option value="">Selecionar</option>
                                                         <?php
@@ -1146,7 +1236,76 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                 <div class="dados-produto p-3">
 
                                 </div>
-                                <div class="d-flex flex-row p-2">
+                                
+                                <div class="px-3">
+                                    <div class="d-flex flex-row">
+                                        <div class='col-lg-4'>
+                                            <div class="form-group">
+                                                <label for="cmbPatriMarcaEdita">Marca</label>
+                                                <select id="cmbPatriMarcaEdita" name="cmbPatriMarcaEdita" class="form-control select-search">
+                                                    <option value="">Selecione</option>
+                                                    <?php
+                                                        $sql = "SELECT MarcaId, MarcaNome
+                                                                FROM Marca
+                                                                JOIN Situacao on SituaId = MarcaStatus
+                                                                WHERE MarcaUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                                ORDER BY MarcaNome ASC";
+                                                        $resultMarca = $conn->query($sql);
+                                                        $rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
+                                                    
+                                                    foreach ($rowMarca as $itemMarca){
+                                                        print('<option value="'.$itemMarca['MarcaId'].'">'.$itemMarca['MarcaNome'].'</option>');
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-4'>
+                                            <div class="form-group">
+                                                <label for="cmbPatriModeloEdita">Modelo</label>
+                                                <select id="cmbPatriModeloEdita" name="cmbPatriModeloEdita" class="form-control select-search">
+                                                    <option value="">Selecione</option>
+                                                    <?php
+                                                        $sql = "SELECT ModelId, ModelNome
+                                                                FROM Modelo
+                                                                JOIN Situacao on SituaId = ModelStatus
+                                                                WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                                ORDER BY ModelNome ASC";
+                                                        $resultMarca = $conn->query($sql);
+                                                        $rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
+                                                    
+                                                    foreach ($rowMarca as $itemMarca){	
+                                                        print('<option value="'.$itemMarca['ModelId'].'">'.$itemMarca['ModelNome'].'</option>');
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class='col-lg-4'>
+                                            <div class="form-group">
+                                                <label for="cmbPatriFabricanteEdita">Fabricante</label>
+                                                <select id="cmbPatriFabricanteEdita" name="cmbPatriFabricanteEdita" class="form-control select-search">
+                                                    <option value="">Selecione</option>
+                                                    <?php
+                                                    	$sql = "SELECT FabriId, FabriNome
+                                                                FROM Fabricante
+                                                                JOIN Situacao on SituaId = FabriStatus
+                                                                WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                                ORDER BY FabriNome ASC";
+                                                        $resultMarca = $conn->query($sql);
+                                                        $rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
+                                                    
+                                                    foreach ($rowMarca as $itemMarca){			
+                                                        print('<option value="'.$itemMarca['FabriId'].'">'.$itemMarca['FabriNome'].'</option>');
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex flex-row p-3">
                                     <div class='col-lg-6'>
                                         <div class="form-group">
                                             <label for="numeroSerie">Nº Série/Chassi <span
@@ -1158,11 +1317,9 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <label for="numeroSerie">Estado de Conservação <span
-                                                class="text-danger">(Editável)</span></label>
                                         <div class="form-group">
-                                            <select id="cmbEstadoConservacao" name="cmbEstadoConservacao"
-                                                class="form-control form-control-select2">
+                                            <label for="cmbEstadoConservacao">Estado de Conservação <span class="text-danger">(Editável)</span></label>
+                                            <select id="cmbEstadoConservacao" name="cmbEstadoConservacao" class="form-control form-control-select2">
                                                 <option value="">Selecionar</option>
                                                 <?php
                                                 $sql = "SELECT EstCoId, EstCoNome

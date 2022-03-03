@@ -23,6 +23,7 @@ function queryPesquisa()
         $args[]  = $_POST['inputProdutoServico'] == 'P'? "ProduSubCategoria = " . $_POST['inputSubCategoria'] . " " : "ServiSubCategoria = " . $_POST['inputSubCategoria'] . " ";
     }
 
+    /*
     if (!empty($_POST['inputMarca'])) {
         $args[]  = $_POST['inputProdutoServico'] == 'P'? "PrXFaMarca = " . $_POST['inputMarca'] . " " : "SrXFaMarca = " . $_POST['inputMarca'] . " ";
     }
@@ -34,7 +35,7 @@ function queryPesquisa()
     if (!empty($_POST['inputModelo'])) {
         $args[]  = $_POST['inputProdutoServico'] == 'P'? "PrXFaModelo = " . $_POST['inputModelo'] . " " : "SrXFaModelo = " . $_POST['inputModelo'] . " ";
     }
-
+    */
 
     if (count($args) >= 1) {
         try {

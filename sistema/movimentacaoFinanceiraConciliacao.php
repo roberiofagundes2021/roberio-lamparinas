@@ -115,7 +115,7 @@ $dataFim = date("Y-m-d");
         }
         ,
         {
-          orderable: false, //Ações
+          orderable: true, //Conciliado
           width: "3%",
           targets: [8]
         } 
@@ -134,6 +134,7 @@ $dataFim = date("Y-m-d");
       }
     });
 
+    /*
     function atualizaTotal() {
       let childres = $('tbody').children();
       let totalEntrada = 0;
@@ -197,6 +198,7 @@ $dataFim = date("Y-m-d");
       $('.datatable-footer').append(divTotalSaldo);
       $('.datatable-footer').append(divTotalSaldoConciliado);
     }
+    */
 
 
     function Filtrar(carregamentoPagina) {
@@ -285,38 +287,41 @@ $dataFim = date("Y-m-d");
             resposta.forEach(item => {
               rowNode = table.row.add(item.data).draw().node()
 
-              saldo = parseFloat(item.data[5].replace(",", "."));
-              saldoConciliado = parseFloat(item.data[6].replace(",", "."));
+              saldo = parseFloat(item.data[5].replace(",", "."))
+              saldoConciliado = parseFloat(item.data[6].replace(",", "."))
 
               // adiciona os atributos nas tags <td>
-              $(rowNode).find('td').eq(3).attr('style', 'text-align: right; color: green;');
-              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: red;');
+              $(rowNode).find('td').eq(3).attr('style', 'text-align: right; color: green;')
+              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: red;')
               
               if(saldo >= 0) {
-                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;');
+                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;')
               }else {
-                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;');
+                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;')
               }
 
               if(saldoConciliado >= 0) {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;');
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;')
               }else {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;');
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;')
               }
 
-              $(rowNode).find('td').eq(8).attr('style', 'text-align: center;');
+              $(rowNode).find('td').eq(8).attr('style', 'text-align: center;')
 
-              entrada = item.data[3].replace(",", ".")
+              entrada = (item.data[3] != null) ? item.data[3] : '0,00'
+              entrada = entrada.replace(".", "").replace(",", ".")
               entradaTotal += parseFloat(entrada)
 
               saida = (item.data[4] != null) ? item.data[4] : '0,00'
-              saida = saida.replace(",", ".")
+              saida = saida.replace(".", "").replace(",", ".")
               saidaTotal += parseFloat(saida)
 
-              saldo = item.data[5].replace(",", ".")
+              saldo = (item.data[5] != null) ? item.data[5] : '0,00'
+              saldo = saldo.replace(".", "").replace(",", ".")
               saldoTotal += parseFloat(saldo)
 
-              saldoConciliacao = item.data[6].replace(",", ".")
+              saldoConciliacao = (item.data[6] != null) ? item.data[6] : '0,00'
+              saldoConciliacao = saldoConciliacao.replace(".", "").replace(",", ".")
               saldoConciliacaoTotal += parseFloat(saldoConciliacao)
             })
 
@@ -325,27 +330,24 @@ $dataFim = date("Y-m-d");
             corConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? 'green' : 'red'
 
             divTotal = `
-              <div id='footer-total' style='position:absolute; right: 20%; font-weight: bold; width: 38%; margin-top: 0.5%; font-size: 12px;'>
-                <div class='row'>
-                  <div class="col-md-3" style="color: green;">
-                    Total: ${float2moeda(entradaTotal)}
-                  </div>
-
-                  <div class="col-md-3" style="color: red;">
-                    Total: ${float2moeda(saidaTotal)}
-                  </div>
-
-                  <div class="col-md-3" style="color: ${corSaldoTotal};">
-                    Total: ${float2moeda(saldoTotal)}
-                  </div>
-
-                  <div class="col-md-3" style="color: ${corConciliacaoTotal};">
-                    Total: ${float2moeda(saldoConciliacaoTotal)}
-                  </div>
+              <div id='footer-total' class='row' style='position:absolute; text-align: right; font-weight: bold; width: 100%; margin-top: 0.9%; font-size: 11px;'>
+                <div style="width: 47.3%; color: green;">
+                  Total: ${float2moeda(entradaTotal)}
                 </div>
-              </div>`                    
 
-            $('#footer-total').remove(); //Para evitar que os valores se sobrescrevam
+                <div style="width: 9.1%; color: red;">
+                  Total: ${float2moeda(saidaTotal)}
+                </div>
+
+                <div style="width: 9.1%; color: ${corSaldoTotal};">
+                  Total: ${float2moeda(saldoTotal)}
+                </div>
+
+                <div style="width: 14.7%; color: ${corConciliacaoTotal};">
+                  Total: ${float2moeda(saldoConciliacaoTotal)}
+                </div>`                    
+
+            $('#footer-total').remove() //Para evitar que os valores se sobrescrevam
             
             $('.datatable-footer').append(divTotal)
           },
@@ -511,6 +513,7 @@ $dataFim = date("Y-m-d");
     */
 
 
+    /*
     function Filtrar(carregamentoPagina) {
       let cont = false;
 
@@ -569,6 +572,7 @@ $dataFim = date("Y-m-d");
     }
 
     Filtrar(true);
+    */
   }
 
   function atualizaConciliacao(idConciliacao, tipoConta) {

@@ -151,11 +151,9 @@ else {
 				
 				$sql = "INSERT INTO Servico (ServiCodigo, ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, 
 											 ServiValorCusto, ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda, 
-											 ServiFabricante, ServiMarca, ServiModelo, ServiNumSerie, ServiStatus, ServiUnidade,
-											 ServiUsuarioAtualizador) 
+											 ServiStatus, ServiUnidade, ServiUsuarioAtualizador) 
 						VALUES (:sCodigo, :sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :fValorCusto, 
-								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iFabricante, :iMarca, 
-								:iModelo, :sNumSerie, :bStatus, :iUnidade, :iUsuarioAtualizador);";
+								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :bStatus, :iUnidade, :iUsuarioAtualizador);";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
@@ -169,10 +167,6 @@ else {
 								':fCustoFinal' => null,
 								':fMargemLucro' => null,
 								':fValorVenda' => null,
-								':iFabricante' => null,								
-								':iMarca' => null,
-								':iModelo' => null,
-								':sNumSerie' => null,
 								':bStatus' => 1,
 								':iUnidade' => $_SESSION['UnidadeId'],								
 								':iUsuarioAtualizador' => $_SESSION['UsuarId']

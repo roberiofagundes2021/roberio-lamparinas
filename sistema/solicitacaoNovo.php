@@ -407,9 +407,9 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 					let pesquisaProduto = $('#inputPesquisaProduto').val()
 					let categoria = $('#cmbCategoria').val()
 					let subCategoria = $('#cmbSubCategoria').val()
-					let marca = $('#cmbMarca').val()
-					let fabricante = $('#cmbFabricante').val()
-					let modelo = $('#cmbModelo').val()
+					//let marca = $('#cmbMarca').val()
+					//let fabricante = $('#cmbFabricante').val()
+					//let modelo = $('#cmbModelo').val()
 
 					let url = "solicitacaoFiltraProdutos.php"
 
@@ -418,9 +418,9 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 						inputPesquisaProduto: pesquisaProduto,
 						inputCategoria: categoria,
 						inputSubCategoria: subCategoria,
-						inputMarca: marca,
-						inputFabricante: fabricante,
-						inputModelo: modelo,
+						//inputMarca: marca,
+						//inputFabricante: fabricante,
+						//inputModelo: modelo,
 						min: 0,
 						max: 20,
 					};
@@ -506,9 +506,9 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 					let pesquisaProduto = $('#inputPesquisaProduto').val()
 					let categoria = $('#cmbCategoria').val()
 					let subCategoria = $('#cmbSubCategoria').val()
-					let marca = $('#cmbMarca').val()
-					let fabricante = $('#cmbFabricante').val()
-					let modelo = $('#cmbModelo').val()
+					//let marca = $('#cmbMarca').val()
+					//let fabricante = $('#cmbFabricante').val()
+					//let modelo = $('#cmbModelo').val()
 
 					let url = "solicitacaoFiltraProdutos.php";
 
@@ -517,9 +517,9 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 						inputPesquisaProduto: pesquisaProduto,
 						inputCategoria: categoria,
 						inputSubCategoria: subCategoria,
-						inputMarca: marca,
-						inputFabricante: fabricante,
-						inputModelo: modelo,
+						//inputMarca: marca,
+						//inputFabricante: fabricante,
+						//inputModelo: modelo,
 						min: min,
 						max: max,
 					};
@@ -631,7 +631,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 														</div>
 													</div>
 												</div>
-												<div class="col-lg-4">
+												<div class="col-lg-3">
 													<div class="form-group">
 														<label for="inputPesquisaProduto">Pesquisa</label>
 														<div class="form-group form-group-feedback form-group-feedback-right">
@@ -663,7 +663,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 														</select>
 													</div>
 												</div>
-												<div class="col-lg-3">
+												<div class="col-lg-2">
 													<div class="form-group">
 														<label for="cmbSubCategoria">SubCategoria</label>
 														<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
@@ -671,7 +671,13 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 														</select>
 													</div>
 												</div>
+												<div class="col-lg-2">
+													<div class="form-group pt-4">
+														<button id="submitFiltro" class="btn btn-principal form-control">Consultar</button>
+													</div>
+												</div>
 											</div>
+											<!--
 											<div class="row">
 												<div class="col-lg-4">
 													<div class="form-group">
@@ -679,6 +685,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 														<select id="cmbMarca" name="cmbMarca" class="form-control form-control-select2">
 															<option value="">Selecionar</option>
 															<?php
+															/*
 															$sql = "SELECT MarcaId, MarcaNome
 																	FROM Marca
 																	JOIN Situacao on SituaId = MarcaStatus											     
@@ -690,6 +697,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 															foreach ($rowMarca as $item) {
 																print('<option value="' . $item['MarcaId'] . '">' . $item['MarcaNome'] . '</option>');
 															}
+															*/
 															?>
 														</select>
 													</div>
@@ -700,6 +708,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 														<select id="cmbModelo" name="cmbModelo" class="form-control form-control-select2">
 															<option value="">Selecionar</option>
 															<?php
+															/*
 															$sql = "SELECT ModelId, ModelNome
 																	FROM Modelo														     
 																	JOIN Situacao on SituaId = ModelStatus											     
@@ -711,6 +720,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 															foreach ($rowModel as $item) {
 																print('<option value="' . $item['ModelId'] . '">' . $item['ModelNome'] . '</option>');
 															}
+															*/
 															?>
 														</select>
 													</div>
@@ -721,6 +731,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 														<select id="cmbFabricante" name="cmbFabricante" class="form-control form-control-select2">
 															<option value="">Selecionar</option>
 															<?php
+															/*
 															$sql = "SELECT FabriId, FabriNome
 																	FROM Fabricante														     
 																	JOIN Situacao on SituaId = FabriStatus											     
@@ -733,16 +744,12 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 															foreach ($rowFabri as $item) {
 																print('<option value="' . $item['FabriId'] . '">' . $item['FabriNome'] . '</option>');
 															}
+															*/
 															?>
 														</select>
 													</div>
 												</div>
-												<div class="col-lg-2">
-													<div class="form-group pt-4">
-														<button id="submitFiltro" class="btn btn-principal form-control">Consultar</button>
-													</div>
-												</div>
-											</div>
+											</div>-->
 										</form>
 									</div>
 								</div>

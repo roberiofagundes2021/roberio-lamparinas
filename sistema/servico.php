@@ -252,13 +252,6 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação de Serviços</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="perfil.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
@@ -269,7 +262,7 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
                                     <div class="col-lg-3">
 										<div class="text-right">
 											<a href="servicoNovo.php" class="btn btn-principal" role="button">Novo Serviço</a>
-											<a href="#" style="float:right; margin-left: 5px;" onclick="atualizaServico(0, '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Serviços"><i class="icon-drawer-out"></i></a>
+											<a href="#" style="float:right; margin-left: 5px;" onclick="atualizaServico(0, '', '', '', 'exportar')" class="btn bg-slate-700 btn-icon" role="button" data-popup="tooltip" data-placement="bottom" data-container="body" title="Exportar Serviços"><i class="icon-drawer-out"></i></a>
 											<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
 												<a href="#collapse-imprimir-relacao" class="dropdown-toggle btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
 													<i class="icon-drawer-in"></i>																						

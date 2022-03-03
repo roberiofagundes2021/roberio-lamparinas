@@ -233,46 +233,46 @@ $dataFim = date("Y-m-d");
               saldo = parseFloat(item.data[6].replace(",", "."));
               
               // adiciona os atributos nas tags <td>
-              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: green;');
-              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;');
+              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: green;')
+              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;')
 
               if(saldo >= 0) {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;');
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;')
               }else {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;');
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;')
               }
 
-              entrada = item.data[4].replace(",", ".")
+              entrada = (item.data[4] != null) ? item.data[4] : '0,00'
+              entrada = entrada.replace(".", "").replace(",", ".")
               entradaTotal += parseFloat(entrada)
 
               saida = (item.data[5] != null) ? item.data[5] : '0,00'
-              saida = saida.replace(",", ".")
+              saida = saida.replace(".", "").replace(",", ".")
               saidaTotal += parseFloat(saida)
 
-              saldo = item.data[6].replace(",", ".")
+              saldo = (item.data[6] != null) ? item.data[6] : '0,00'
+              saldo = saldo.replace(".", "").replace(",", ".")
               saldoTotal += parseFloat(saldo)
             })
 
             corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
 
             divTotal = `
-              <div id='footer-total' style='position:absolute; right: 6%; font-weight: bold; width: 29%; margin-top: 0.5%; font-size: 12px;'>
-                <div class='row'>
-                  <div class="col-md-4" style="color: green;">
-                    Total: ${float2moeda(entradaTotal)}
-                  </div>
+              <div id='footer-total' class='row' style='position:absolute; text-align: right; font-weight: bold; width: 100%; margin-top: 0.9%; font-size: 11px;'>
+                <div style="width: 71.4%; color: green;">
+                  Total: ${float2moeda(entradaTotal)}
+                </div>
 
-                  <div class="col-md-4" style="color: red;">
-                    Total: -${float2moeda(saidaTotal)}
-                  </div>
+                <div style="width: 9.6%; color: red;">
+                  Total: -${float2moeda(saidaTotal)}
+                </div>
 
-                  <div class="col-md-4" style="color: ${corSaldoTotal};">
-                    Total: ${float2moeda(saldoTotal)}
-                  </div>
+                <div style="width: 9.6%; color: ${corSaldoTotal};">
+                  Total: ${float2moeda(saldoTotal)}
                 </div>
               </div>`                    
 
-            $('#footer-total').remove(); //Para evitar que os valores se sobrescrevam
+            $('#footer-total').remove() //Para evitar que os valores se sobrescrevam
             
             $('.datatable-footer').append(divTotal)
           },
