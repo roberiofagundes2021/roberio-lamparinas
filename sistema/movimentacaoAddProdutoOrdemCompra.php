@@ -4,19 +4,27 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, ProduDetalhamento as detalhamento, OCXPrValorUnitario as valorCusto, ProduCustoFinal as custoFinal, UnMedSigla, MarcaNome, tipo = 'P'
+$ordemCompra = $_POST['ordemCompra'];
+$iUnidade = $_SESSION['UnidadeId'];
+
+$sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, ProduDetalhamento as detalhamento,
+        OCXPrValorUnitario as valorCusto, ProduCustoFinal as custoFinal, UnMedSigla, MarcaNome, tipo = 'P'
 		FROM OrdemCompraXProduto
         JOIN Produto on ProduId = OCXPrProduto
+        JOIN OrdemCompra on OrComId = OCXPrOrdemCompra
+        LEFT JOIN ProdutoXFabricante on PrXFaFluxoOperacional = OrComFluxoOperacional and PrXFaProduto = ProduId
  		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-        LEFT JOIN Marca on MarcaId = ProduMarca
-        WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and OCXPrOrdemCompra = '" . $_POST['ordemCompra'] . "'
+        LEFT JOIN Marca on MarcaId = PrXFaMarca
+        WHERE ProduUnidade = $iUnidade and OCXPrOrdemCompra = $ordemCompra
         UNION
-        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, OCXSrValorUnitario as valorCusto, ServiCustoFinal as custoFinal, '', MarcaNome, tipo = 'S'
+        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento,
+        OCXSrValorUnitario as valorCusto, ServiCustoFinal as custoFinal, '', MarcaNome, tipo = 'S'
 		FROM OrdemCompraXServico
         JOIN Servico on ServiId = OCXSrServico
-        LEFT JOIN Marca on MarcaId = ServiMarca
-        WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and OCXSrOrdemCompra = '" . $_POST['ordemCompra'] . "'
-        ";
+        JOIN OrdemCompra on OrComId = OCXSrOrdemCompra
+        LEFT JOIN ServicoXFabricante on SrXFaFluxoOperacional = OrComFluxoOperacional and SrXFaServico = ServiId
+        LEFT JOIN Marca on MarcaId = SrXFaMarca
+        WHERE ServiUnidade = $iUnidade and OCXSrOrdemCompra = $ordemCompra";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
