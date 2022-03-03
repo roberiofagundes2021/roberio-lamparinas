@@ -16,7 +16,7 @@ if(isset($_POST['valores'])){
             // var_dump($dados[$i]);
             $sql1 = "SELECT SituaId
 	    	            FROM Situacao
-	    	            WHERE SituaChave = 'PAGA'";
+	    	            WHERE SituaChave = 'PAGO'";
             $result = $conn->query($sql1);
             $situacao = $result->fetch(PDO::FETCH_ASSOC);
     

@@ -185,8 +185,8 @@ $dataFim = date("Y-m-d");
                         let id = $(idContainer[1]).val()
                         let status = $(tds[6]).html();
 
-                        if (status == 'Recebida') {
-                            alerta('Atenção', 'A conta selecionada já foi paga!', 'error');
+                        if (status == 'Recebido') {
+                            alerta('Atenção', 'A conta selecionada já foi recebida!', 'error');
                             return false
                         } else {
                             $('#page-modal').fadeIn(200);
@@ -382,7 +382,7 @@ $dataFim = date("Y-m-d");
 
                 if (statusArray[1] == 'ARECEBER') {
                     $('#dataGrid').html('Vencimento')
-                } else if (statusArray[1] == 'RECEBIDA') {
+                } else if (statusArray[1] == 'RECEBIDO') {
                     $('#dataGrid').html('Recebimento')
                 }
 
@@ -681,7 +681,7 @@ $dataFim = date("Y-m-d");
 
                                                         try {
                                                             foreach ($rowSituacao as $item) {
-                                                                if ($item['SituaChave'] == 'ARECEBER' || $item['SituaChave'] == 'RECEBIDA') {
+                                                                if ($item['SituaChave'] == 'ARECEBER' || $item['SituaChave'] == 'RECEBIDO') {
                                                                     if (isset($_SESSION['ContRecStatus'])) {
                                                                         if ($item['SituaId'] == $_SESSION['ContRecStatus']) {
                                                                             print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');

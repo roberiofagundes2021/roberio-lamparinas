@@ -132,7 +132,7 @@ include('global_assets/php/conexao.php');
         $arrayData = [];
         foreach ($rowData as $item) {
             $cont++;     
-            $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Paga';
+            $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Pago';
             $data = $_POST['statusTipo'] == 'APAGAR' ? mostraData($item['CnAPaDtVencimento']) : mostraData($item['CnAPaDtPagamento']);
             
             /*
@@ -185,7 +185,7 @@ include('global_assets/php/conexao.php');
 
             $status = $status;
 
-            $visibilidade = ($status == 'Paga') ? 'none' : 'block';
+            $visibilidade = ($status == 'Pago') ? 'none' : 'block';
 
             $acoes = '
                 <div class="list-icons">

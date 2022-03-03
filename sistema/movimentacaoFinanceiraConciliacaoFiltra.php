@@ -497,11 +497,11 @@ function queryPesquisa(){
                     $situacaoClasse = 'badge badge-flat border-'.$item['COR'].' text-'.$item['COR'];
                     $chave = $item['CHAVE'];
 
-                    if($chave == 'ARECEBER' || $chave == 'RECEBIDA') {
+                    if($chave == 'ARECEBER' || $chave == 'RECEBIDO') {
                         $print .= '<td class="even" style="text-align: center;padding-right:40px;">
                                     <a href="#" onclick="atualizaConciliacao('.$item['ID'].', \'ContaAReceber\');"><span class="badge  '.$situacaoClasse.'">'.$situacao.'</span></a>
                                </td>';    
-                    }else if($chave == 'APAGAR' || $chave == 'PAGA') {
+                    }else if($chave == 'APAGAR' || $chave == 'PAGO') {
                         $print .= '<td class="even" style="text-align: center;padding-right:40px;">
                                         <a href="#" onclick="atualizaConciliacao('.$item['ID'].', \'ContaAPagar\');"><span class="badge  '.$situacaoClasse.'">'.$situacao.'</span></a>
                                    </td>';
@@ -582,9 +582,9 @@ function queryPesquisa(){
             $situacaoClasse = 'badge badge-flat border-'.$item['COR'].' text-'.$item['COR'];
             $chave = $item['CHAVE'];
 
-            if($chave == 'ARECEBER' || $chave == 'RECEBIDA') {
+            if($chave == 'ARECEBER' || $chave == 'RECEBIDO') {
                 $colunaSituacao = '<a href="#" onclick="atualizaConciliacao('.$item['ID'].', \'ContaAReceber\');"><span class="badge  '.$situacaoClasse.'">'.$situacao.'</span></a>';    
-            }else if($chave == 'APAGAR' || $chave == 'PAGA') {
+            }else if($chave == 'APAGAR' || $chave == 'PAGO') {
                 $colunaSituacao = '<a href="#" onclick="atualizaConciliacao('.$item['ID'].', \'ContaAPagar\');"><span class="badge  '.$situacaoClasse.'">'.$situacao.'</span></a>';
             }else {
                 $colunaSituacao = '<a href="#" onclick="atualizaConciliacao('.$item['ID'].', \'Teste\');"><span class="badge  '.$situacaoClasse.'">'.$situacao.'</span></a>';

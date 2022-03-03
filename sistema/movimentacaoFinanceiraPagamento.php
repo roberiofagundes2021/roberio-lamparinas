@@ -15,7 +15,7 @@ if (isset($_POST['inputDataEmissao'])) {
       try {
         $sql = "SELECT SituaId
                 FROM Situacao
-                WHERE SituaChave = 'PAGA'";
+                WHERE SituaChave = 'PAGO'";
                 
         $result = $conn->query($sql);
         $situacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -69,7 +69,7 @@ if (isset($_POST['inputDataEmissao'])) {
           if (isset($_POST['inputValorTotal'])) {
             $sql = "SELECT SituaId
                       FROM Situacao
-                     WHERE SituaChave = 'PAGA'
+                     WHERE SituaChave = 'PAGO'
                     ";
             $result = $conn->query($sql);
             $situacao = $result->fetch(PDO::FETCH_ASSOC);

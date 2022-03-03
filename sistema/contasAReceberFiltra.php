@@ -131,7 +131,7 @@ include('global_assets/php/conexao.php');
         $arrayData = [];
         foreach ($rowData as $item) {
             $cont++;
-            $status = $item['CnAReStatus'] == 13 ? 'À Receber' : 'Recebida';
+            $status = $item['CnAReStatus'] == 13 ? 'À Receber' : 'Recebido';
             $data = $_POST['statusTipo'] == 'ARECEBER' ? mostraData($item['CnAReDtVencimento']) : mostraData($item['CnAReDtRecebimento']);
             
             /*
@@ -184,7 +184,7 @@ include('global_assets/php/conexao.php');
 
             $status = $status;
 
-            $visibilidade = ($status == 'Recebida') ? 'none' : 'block';
+            $visibilidade = ($status == 'Recebido') ? 'none' : 'block';
 
             $acoes = '
                     <div class="list-icons">

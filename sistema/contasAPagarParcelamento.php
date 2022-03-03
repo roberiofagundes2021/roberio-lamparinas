@@ -103,7 +103,7 @@ if(isset($_POST['numParcelas'])){
         // print('<input type="hidden" id="elementosGrid" value="'.count($rowData).'">');
 
         // $cont++;     
-        // $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Paga';
+        // $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Pago';
         // print("
         
         // <tr>

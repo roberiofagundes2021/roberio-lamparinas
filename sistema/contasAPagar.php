@@ -186,7 +186,7 @@ $dataFim = date("Y-m-d");
                         let id = $(idContainer[1]).val()
                         let status =  $(tds[6]).html();
 
-                        if(status == 'Paga'){
+                        if(status == 'Pago'){
                             alerta('Atenção', 'A conta selecionada já foi paga!', 'error');
                             return false
                         } else {
@@ -359,7 +359,7 @@ $dataFim = date("Y-m-d");
 
                     $(`#check${i}`).on('click', () => {
 
-                        if (status == 'Paga') {
+                        if (status == 'Pago') {
                             alerta('Atenção', 'A conta selecionada já foi paga!', 'error');
                             $(`#check${i}`).prop('checked', false)
                             return false
@@ -455,7 +455,7 @@ $dataFim = date("Y-m-d");
 
                                         let linha = $(`#check${i}`)
                                         let status = $(linhas[i]).children()[6]
-                                        $(status).html('Paga')
+                                        $(status).html('Pago')
                                         alerta('Atenção', 'Pagamento agrupado efetuado com sucesso!',
                                             'success');
                                         pagamentoAgrupado()
@@ -623,7 +623,7 @@ $dataFim = date("Y-m-d");
 
                 if (statusArray[1] == 'APAGAR'){ 
                     $('#dataGrid').html('Vencimento')
-                } else if (statusArray[1] == 'PAGA'){
+                } else if (statusArray[1] == 'PAGO'){
                     $('#dataGrid').html('Pagamento')
                 }
 
@@ -907,7 +907,7 @@ $dataFim = date("Y-m-d");
                                                         $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
     
                                                         foreach ($rowSituacao as $item) {
-                                                            if($item['SituaChave'] == 'APAGAR' || $item['SituaChave'] == 'PAGA'){
+                                                            if($item['SituaChave'] == 'APAGAR' || $item['SituaChave'] == 'PAGO'){
                                                                 if(isset($_SESSION['ContPagStatus'])){
                                                                     if($item['SituaId'] == $_SESSION['ContPagStatus']){
                                                                         print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');

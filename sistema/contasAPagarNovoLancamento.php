@@ -19,7 +19,7 @@ if (isset($_POST['cmbPlanoContas'])) {
             if (isset($_POST['inputValorTotalPago'])) {
                 $sql = "SELECT SituaId
                         FROM Situacao
-                        WHERE SituaChave = 'PAGA'
+                        WHERE SituaChave = 'PAGO'
                     ";
                 $result = $conn->query($sql);
                 $situacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -169,7 +169,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                 if (isset($_POST['inputValorTotalPago'])) {
                     $sql = "SELECT SituaId
                             FROM Situacao
-                            WHERE SituaChave = 'PAGA'
+                            WHERE SituaChave = 'PAGO'
                         ";
                     $result = $conn->query($sql);
                     $situacao = $result->fetch(PDO::FETCH_ASSOC);

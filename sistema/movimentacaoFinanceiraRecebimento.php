@@ -18,7 +18,7 @@ if (isset($_POST['inputDataEmissao'])) {
 
         $sql = "SELECT SituaId
                 FROM Situacao
-                WHERE SituaChave = 'RECEBIDA'
+                WHERE SituaChave = 'RECEBIDO'
             ";
         $result = $conn->query($sql);
         $situacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -109,7 +109,7 @@ if (isset($_POST['inputDataEmissao'])) {
           try {
               $sql = "SELECT SituaId
                         FROM Situacao
-                        WHERE SituaChave = 'RECEBIDA'
+                        WHERE SituaChave = 'RECEBIDO'
               ";
 
               $result = $conn->query($sql);

@@ -799,7 +799,7 @@ $dataFim = date("Y-m-d");
 
                                                         try {
                                                             foreach ($rowSituacao as $item) {
-                                                                if ($item['SituaChave'] == 'RECEBIDA' || $item['SituaChave'] === 'PAGA' || $item['SituaChave'] === 'TRANSFERIDA') {
+                                                                if ($item['SituaChave'] == 'RECEBIDO' || $item['SituaChave'] === 'PAGO' || $item['SituaChave'] === 'TRANSFERIDA') {
                                                                     if (isset($_SESSION['ContPagStatus'])) {
                                                                         if ($item['SituaId'] == $_SESSION['ContPagStatus']) {
                                                                             print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
