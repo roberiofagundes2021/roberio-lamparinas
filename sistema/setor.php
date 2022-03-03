@@ -11,7 +11,7 @@ if (isset($_POST['inputEmpresaId'])){
 	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
 }
 
-if (isset($_POST['inputEmpresaId'])){
+if (isset($_SESSION['EmpresaId'])){
 	
 	//Essa consulta é para preencher a grid usando a coluna Unidade
 	$sql = "SELECT SetorId, SetorNome, SetorStatus, UnidaNome, SituaNome, SituaCor, SituaChave
@@ -55,7 +55,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 	try{
 
-		if (isset($_POST['inputEmpresaId'])){
+		if (isset($_SESSION['EmpresaId'])){
 			$iUnidade = $_POST['cmbUnidade'];
 		} else{
 			$iUnidade = $_SESSION['UnidadeId'];
@@ -303,7 +303,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 </head>
 
-<body class="navbar-top <?php if (isset($_POST['inputEmpresaId'])) echo "sidebar-xs"; ?>">
+<body class="navbar-top <?php if (isset($_SESSION['EmpresaId'])) echo "sidebar-xs"; ?>">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -313,7 +313,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		<?php include_once("menu-left.php"); ?>
 
 		<?php 
-			  if (isset($_POST['inputEmpresaId'])){ 
+			  if (isset($_SESSION['EmpresaId'])){ 
 				include_once("menuLeftSecundario.php");
 			  } 
 		?>		
@@ -345,7 +345,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 								<div class="row">
 									<?php 
-										if (isset($_POST['inputEmpresaId'])){ 
+										if (isset($_SESSION['EmpresaId'])){ 
 											print('<div class="col-lg-5">');
 										} else{
 											print('<div class="col-lg-6">');  
@@ -359,7 +359,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 									<?php 
 							
-										if (isset($_POST['inputEmpresaId'])){
+										if (isset($_SESSION['EmpresaId'])){
 											
 											print('
 											<div class="col-lg-4">
@@ -413,7 +413,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							
 							<?php 
 							
-								if (isset($_POST['inputEmpresaId'])){
+								if (isset($_SESSION['EmpresaId'])){
 									print('<table id="tblSetorEmpresa" class="table">');
 								} else {
 									print('<table id="tblSetor" class="table">');
@@ -425,7 +425,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										<th>Setor</th>
 
 										<?php 
-											if (isset($_POST['inputEmpresaId'])){
+											if (isset($_SESSION['EmpresaId'])){
 												print('<td>Unidade</td>');
 											}
 										?>
@@ -445,7 +445,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<td>'.$item['SetorNome'].'</td>
 											');
 										
-										if (isset($_POST['inputEmpresaId'])){
+										if (isset($_SESSION['EmpresaId'])){
 											print('<td>'.$item['UnidaNome'].'</td>');
 										}
 
