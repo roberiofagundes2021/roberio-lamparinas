@@ -14,13 +14,8 @@ if (isset($_POST['inputEmpresaNome'])){
 	$_SESSION['EmpresaNome'] = $_POST['inputEmpresaNome'];
 }
 
-// isset($_POST['inputEmpresaId'])
-// isset($_POST['inputEmpresaId'])
 
-// isset($_POST['inputEmpresaNome'])
-// isset($_POST['inputEmpresaNome'])
-
-if (isset($_POST['inputEmpresaId'])){
+if (isset($_SESSION['EmpresaId'])){
 	
 	//Essa consulta é para preencher a grid usando a coluna Unidade
 	$sql = "SELECT LcEstId, LcEstNome, LcEstStatus, LcEstChave, UnidaNome, SituaNome, SituaCor, SituaChave
@@ -193,7 +188,7 @@ if (isset($_POST['inputEmpresaId'])){
 
 </head>
 
-<body class="navbar-top <?php if (isset($_POST['inputEmpresaId'])) echo "sidebar-xs"; ?>">
+<body class="navbar-top <?php if (isset($_SESSION['EmpresaId'])) echo "sidebar-xs"; ?>">
 
 	<?php include_once("topo.php"); ?>	
 
@@ -203,7 +198,7 @@ if (isset($_POST['inputEmpresaId'])){
 		<?php include_once("menu-left.php"); ?>
 
 		<?php 
-			  if (isset($_POST['inputEmpresaId'])){ 
+			  if (isset($_SESSION['EmpresaId'] )){ 
 				include_once("menuLeftSecundario.php");
 			  } 
 		?>		
@@ -229,7 +224,7 @@ if (isset($_POST['inputEmpresaId'])){
 								<div class="row">
 									<div class="col-lg-9">
 										<?php 
-											echo (isset($_POST['inputEmpresaNome'])?'<p class="font-size-lg">A relação abaixo faz referência aos Locais de Estoque da empresa <b>'.$_POST['inputEmpresaNome'].'</b></p>':
+											echo (isset($_SESSION['EmpresaNome'])?'<p class="font-size-lg">A relação abaixo faz referência aos Locais de Estoque da empresa <b>'.$_SESSION['EmpresaNome'].'</b></p>':
 											'<p class="font-size-lg">A relação abaixo faz referência a unidade <b>'.$unidadeUser['UnidaNome'].'</b></p>');
 										?>
 									</div>	
@@ -242,7 +237,7 @@ if (isset($_POST['inputEmpresaId'])){
 							
 							<?php 
 							
-								if (isset($_POST['inputEmpresaId'])){
+								if (isset($_SESSION['EmpresaId'])){
 									print('<table id="tblLocalEstoqueEmpresa" class="table">');
 								} else {
 									print('<table id="tblLocalEstoque" class="table">');
@@ -254,7 +249,7 @@ if (isset($_POST['inputEmpresaId'])){
 										<th>Local do Estoque</th>
 
 										<?php 
-											if (isset($_POST['inputEmpresaId'])){
+											if (isset($_SESSION['EmpresaId'] )){
 												print('<td>Unidade</td>');
 											}
 										?>
@@ -274,7 +269,7 @@ if (isset($_POST['inputEmpresaId'])){
 											<td>'.$item['LcEstNome'].'</td>
 											');
 										
-										if (isset($_POST['inputEmpresaId'])){
+										if (isset($_SESSION['EmpresaId'])){
 											print('<td>'.$item['UnidaNome'].'</td>');
 										}
 
