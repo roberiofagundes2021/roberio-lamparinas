@@ -39,73 +39,41 @@ if(isset($_POST['inputIdFluxoOperacional'])){
 		$conn->beginTransaction();
 
 		$sql = "DELETE FROM FluxoOperacionalXProduto
-				WHERE FOXPrFluxoOperacional = :iFluxoOperacional AND FOXPrUnidade = :iUnidade";
-		$result = $conn->prepare($sql);
-		
-		$result->execute(array(
-						':iFluxoOperacional' => $iFluxoOperacional,
-						':iUnidade' => $_SESSION['UnidadeId']
-						));
+				WHERE FOXPrFluxoOperacional = $iFluxoOperacional AND FOXPrUnidade = ".$_SESSION['UnidadeId'];
+		$conn->query($sql);
 
-		if($_POST['atualizarFluxoOperacional'] == 1) {
-			for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
-				$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrDetalhamento, FOXPrQuantidade, FOXPrValorUnitario, 
-						FOXPrUsuarioAtualizador, FOXPrUnidade)
-						VALUES (:iFluxoOperacional, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
-				$resultFluxoOperacional = $conn->prepare($sql);
-				
-				$resultFluxoOperacional->execute(array(
-								':iFluxoOperacional' 	=> $iFluxoOperacional,
-								':iProduto' 			=> $_POST['inputIdProduto'.$i],
-								':sDetalhamento' 	   	=> $_POST['inputDetalhamento' . $i],
-								':iQuantidade' 			=> $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-								':fValorUnitario' 		=> $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-								':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
-								':iUnidade' 			=> $_SESSION['UnidadeId']
-								));
+		$sql = "DELETE FROM ProdutoXFabricante
+				WHERE PrXFaFluxoOperacional = $iFluxoOperacional AND PrXFaUnidade = ".$_SESSION['UnidadeId'];
+		$conn->query($sql);
 
-				$sql = "UPDATE ProdutoXFabricante SET PrXFaProduto = :iProduto, PrXFaMarca = :iMarca, PrXFaModelo = :iModelo, PrXFaFabricante = :iFabricante
-						WHERE PrXFaId = :iId";
-				$resultProdutoXFabricante = $conn->prepare($sql);
-						
-				$resultProdutoXFabricante->execute(array(
-								':iProduto' 			=> $_POST['inputIdProduto'.$i],
-								':iMarca' 	   	        => $_POST['inputMarca' . $i],
-								':iModelo' 	   	        => $_POST['inputModelo' . $i],
-								':iFabricante' 			=> $_POST['inputFabricante'.$i],
-								':iId' 	                => $_POST['inputProdutoXFabicanteId'.$i]
-								));
-			}
-		}else {
-			for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
-				$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrDetalhamento, FOXPrQuantidade, FOXPrValorUnitario, 
-						FOXPrUsuarioAtualizador, FOXPrUnidade)
-						VALUES (:iFluxoOperacional, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
-				$result = $conn->prepare($sql);
-				
-				$result->execute(array(
-								':iFluxoOperacional' 	=> $iFluxoOperacional,
-								':iProduto' 			=> $_POST['inputIdProduto'.$i],
-								':sDetalhamento' 	   	=> $_POST['inputDetalhamento' . $i],
-								':iQuantidade' 			=> $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
-								':fValorUnitario' 		=> $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
-								':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
-								':iUnidade' 			=> $_SESSION['UnidadeId']
-								));
-	
-				$sql = "INSERT INTO ProdutoXFabricante (PrXFaProduto, PrXFaFluxoOperacional, PrXFaMarca, PrXFaModelo, PrXFaFabricante, PrXFaUnidade)
-						VALUES (:iProduto, :iFluxoOperacional, :iMarca, :iModelo, :iFabricante, :iUnidade)";
-				$result = $conn->prepare($sql);
-				
-				$result->execute(array(
-								':iProduto' 			=> $_POST['inputIdProduto'.$i],
-								':iFluxoOperacional' 	=> $iFluxoOperacional,
-								':iMarca' 	   	        => $_POST['inputMarca' . $i],
-								':iModelo' 	   	        => $_POST['inputModelo' . $i],
-								':iFabricante' 			=> $_POST['inputFabricante'.$i],
-								':iUnidade' 			=> $_SESSION['UnidadeId']
-								));
-			}
+		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
+			$sql = "INSERT INTO FluxoOperacionalXProduto (FOXPrFluxoOperacional, FOXPrProduto, FOXPrDetalhamento, FOXPrQuantidade, FOXPrValorUnitario, 
+					FOXPrUsuarioAtualizador, FOXPrUnidade)
+					VALUES (:iFluxoOperacional, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade)";
+			$resultFluxoOperacional = $conn->prepare($sql);
+			
+			$resultFluxoOperacional->execute(array(
+				':iFluxoOperacional' 	=> $iFluxoOperacional,
+				':iProduto' 			=> $_POST['inputIdProduto'.$i],
+				':sDetalhamento' 	   	=> $_POST['inputDetalhamento' . $i],
+				':iQuantidade' 			=> $_POST['inputQuantidade'.$i] == '' ? null : $_POST['inputQuantidade'.$i],
+				':fValorUnitario' 		=> $_POST['inputValorUnitario'.$i] == '' ? null : gravaValor($_POST['inputValorUnitario'.$i]),
+				':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+				':iUnidade' 			=> $_SESSION['UnidadeId']
+			));
+
+			$sql = "INSERT INTO ProdutoXFabricante (PrXFaProduto, PrXFaFluxoOperacional, PrXFaMarca, PrXFaModelo, PrXFaFabricante, PrXFaUnidade)
+					VALUES (:iProduto, :iFluxoOperacional, :iMarca, :iModelo, :iFabricante, :iUnidade)";
+			$result = $conn->prepare($sql);
+			
+			$result->execute(array(
+				':iProduto' 			=> $_POST['inputIdProduto'.$i],
+				':iFluxoOperacional' 	=> $iFluxoOperacional,
+				':iMarca' 	   	        => $_POST['inputMarca' . $i],
+				':iModelo' 	   	        => $_POST['inputModelo' . $i],
+				':iFabricante' 			=> $_POST['inputFabricante'.$i],
+				':iUnidade' 			=> $_SESSION['UnidadeId']
+			));
 		}		
 
 		$conn->commit();
