@@ -144,6 +144,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
       document.getElementById('inputMovimentacaoData').value = MovimData;
       document.getElementById('inputMovimentacaoTipo').value = MovimTipo;
       document.getElementById('inputMovimentacaoNotaFiscal').value = MovimNotaFiscal;
+      document.formMovimentacao.setAttribute("target", "_self");
 
       if (Tipo == 'motivo') {
         bootbox.alert({
