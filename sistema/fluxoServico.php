@@ -38,13 +38,19 @@ if (isset($_POST['inputIdFluxoOperacional'])) {
 	try {
 
 		$sql = "DELETE FROM FluxoOperacionalXServico
-				WHERE FOXSrFluxoOperacional = :iFluxoOperacional AND FOXSrUnidade = :iUnidade";
-		$result = $conn->prepare($sql);
+				WHERE FOXSrFluxoOperacional = $iFluxoOperacional AND FOXSrUnidade = ".$_SESSION['UnidadeId'];
+		$conn->query($sql);
 
-		$result->execute(array(
-			':iFluxoOperacional' => $iFluxoOperacional,
-			':iUnidade' => $_SESSION['UnidadeId']
-		));
+		$sql = "DELETE FROM ServicoXFabricante
+				WHERE SrXFaFluxoOperacional = $iFluxoOperacional and  SrXFaUnidade = ".$_SESSION['UnidadeId'];
+		$conn->query($sql);
+
+		// verificar se vai inserir novo ou atualizar existente...
+		$sqlSrXFa = "SELECT SrXFaId, SrXFaMarca, SrXFaModelo, SrXFaFabricante
+				FROM ServicoXFabricante
+				WHERE SrXFaFluxoOperacional = $iFluxoOperacional and  SrXFaUnidade = ".$_SESSION['UnidadeId'];
+		$resultUpdate = $conn->query($sqlSrXFa);
+		$InsertORUpdate = $resultUpdate->fetchAll(PDO::FETCH_ASSOC);
 
 		for ($i = 1; $i <= $_POST['totalRegistros']; $i++) {
 
@@ -60,6 +66,19 @@ if (isset($_POST['inputIdFluxoOperacional'])) {
 				':iQuantidade' 			=> $_POST['inputQuantidade' . $i] == '' ? null : $_POST['inputQuantidade' . $i],
 				':fValorUnitario' 		=> $_POST['inputValorUnitario' . $i] == '' ? null : gravaValor($_POST['inputValorUnitario' . $i]),
 				':iUsuarioAtualizador' 	=> $_SESSION['UsuarId'],
+				':iUnidade' 			=> $_SESSION['UnidadeId']
+			));
+
+			$sql = "INSERT INTO ServicoXFabricante(SrXFaServico,SrXFaFluxoOperacional,SrXFaMarca,SrXFaModelo,SrXFaFabricante,SrXFaUnidade)
+			VALUES(:iServico, :iFluxoOperacional, :iMarca, :iModelo, :iFabricante, :iUnidade)";
+			$resultProdutoXFabricante = $conn->prepare($sql);
+
+			$resultProdutoXFabricante->execute(array(
+				':iServico' 			=> $_POST['inputIdServico'.$i],
+				':iFluxoOperacional' 	=> $iFluxoOperacional,
+				':iMarca' 	   	        => $_POST['inputMarca' . $i],
+				':iModelo' 	   	        => $_POST['inputModelo' . $i],
+				':iFabricante' 			=> $_POST['inputFabricante'.$i],
 				':iUnidade' 			=> $_SESSION['UnidadeId']
 			));
 		}
@@ -177,6 +196,8 @@ try {
 	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
+
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 	<!-- /theme JS files -->
 
 	<!-- Adicionando Javascript -->
@@ -285,7 +306,7 @@ try {
 				for (i = 0; i <= totalServicos; i++) {
 					var valorTotal = $(`#inputValorTotal${i}`).val()
 					cont = valorTotal == '' ? 0 : 1;
-					if ($(`#inputValorTotal${i}`).val() == '0,00') {
+					if ($(`#inputValorTotal${i}`).val() == '0,00' || $(`#inputMarca${i}`).val() == '' || $(`#inputModelo${i}`).val() == '' || $(`#inputFabricante${i}`).val() == '') {
 						if (inputOrigem == 'fluxo.php'){
 							alerta('Atenção', 'Preencha todas as quantidades e valores dos serviços selecionados ou retire da lista', 'error');
 						} else {
@@ -617,13 +638,22 @@ try {
 										
 										print('
 										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-8">
+											<div class="col-lg-9">
 													<div class="row">
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
 														</div>
-														<div class="col-lg-11">
+														<div class="col-lg-5">
 															<label for="inputServico"><strong>Servico</strong></label>
+														</div>
+														<div class="col-lg-2">
+															<label for="inputServico"><strong>Marca</strong></label>
+														</div>
+														<div class="col-lg-2">
+															<label for="inputServico"><strong>Modelo</strong></label>
+														</div>
+														<div class="col-lg-2">
+															<label for="inputServico"><strong>Fabricante</strong></label>
 														</div>
 													</div>
 												</div>												
@@ -637,7 +667,7 @@ try {
 													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-2">
+											<div class="col-lg-1">
 												<div class="form-group">
 													<label for="inputValorTotal"><strong>Valor Total</strong></label>
 												</div>
@@ -652,6 +682,7 @@ try {
 										foreach ($rowServicos as $item) {
 
 											$cont++;
+											$iUnidade = $_SESSION['UnidadeId'];
 
 											$iQuantidade = isset($item['FOXSrQuantidade']) ? $item['FOXSrQuantidade'] : '';
 											$fValorUnitario = isset($item['FOXSrValorUnitario']) ? mostraValor($item['FOXSrValorUnitario']) : '';
@@ -659,27 +690,106 @@ try {
 
 											$fTotalGeral += (isset($item['FOXSrQuantidade']) and isset($item['FOXSrValorUnitario'])) ? $item['FOXSrQuantidade'] * $item['FOXSrValorUnitario'] : 0;
 
+											$sql = "SELECT MarcaId, MarcaNome
+													FROM Marca
+													JOIN Situacao on SituaId = MarcaStatus
+													WHERE MarcaUnidade = $iUnidade and SituaChave = 'ATIVO'
+													ORDER BY MarcaNome ASC";
+											$resultMarca = $conn->query($sql);
+											$rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
+
+											$sql = "SELECT ModelId, ModelNome
+													FROM Modelo
+													JOIN Situacao on SituaId = ModelStatus
+													WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+													ORDER BY ModelNome ASC";
+											$resultModelo = $conn->query($sql);
+											$rowModelo = $resultModelo->fetchAll(PDO::FETCH_ASSOC);
+
+											$sql = "SELECT FabriId, FabriNome
+													FROM Fabricante
+													JOIN Situacao on SituaId = FabriStatus
+													WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+													ORDER BY FabriNome ASC";
+											$resultFabricante = $conn->query($sql);
+											$rowFabricante = $resultFabricante->fetchAll(PDO::FETCH_ASSOC);
+
+											$HTML_MARCA = '';
+											$HTML_MODELO = '';
+											$HTML_FABRICANTE = '';
+
+											// vai buscar na tabela ServicoXFabricante os dados caso esse fluxo ja tenha sido liberado
+
+											$sqlSrXFa = "SELECT SrXFaId, SrXFaMarca, SrXFaModelo, SrXFaFabricante
+													FROM ServicoXFabricante
+													WHERE SrXFaServico = $item[ServiId] and SrXFaFluxoOperacional = $iFluxoOperacional and  SrXFaUnidade = $iUnidade";
+											$resultSrXFa = $conn->query($sqlSrXFa);
+											$resultSrXFa = $resultSrXFa->fetch(PDO::FETCH_ASSOC);
+
+											foreach($rowMarca as $marca){
+												$seleciona = "";
+												if(isset($resultSrXFa['SrXFaMarca'])){
+													$seleciona = ($resultSrXFa['SrXFaMarca'] == $marca['MarcaId']) ? "selected " : "";
+												}
+												$HTML_MARCA .= '<option value="'.$marca['MarcaId'].'" '.$seleciona.'>'.$marca['MarcaNome'].'</option>';
+											}
+
+											foreach($rowModelo as $modelo){
+												$seleciona = "";
+												if(isset($resultSrXFa['SrXFaModelo'])){
+													$seleciona = ($resultSrXFa['SrXFaModelo'] == $modelo['ModelId']) ? "selected " : "";
+												}
+												$HTML_MODELO .= '<option value="'.$modelo['ModelId'].'" '.$seleciona.'>'.$modelo['ModelNome'].'</option>';
+											}
+
+											foreach($rowFabricante as $fabricante){
+												$seleciona = "";
+												if(isset($resultSrXFa['SrXFaFabricante'])){
+													$seleciona = ($resultSrXFa['SrXFaFabricante'] == $fabricante['FabriId']) ? "selected " : "";
+												}
+												$HTML_FABRICANTE .= '<option value="'.$fabricante['FabriId'].'" '.$seleciona.'>'.$fabricante['FabriNome'].'</option>';
+											}
+
 											print('
 												<div class="row" style="margin-top: 8px;">
-													<div class="col-lg-8">
+													<div class="col-lg-9">
 														<div class="row">
 															<div class="col-lg-1">
 																<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
 																<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
 															</div>
-															<div class="col-lg-11">
+															<div class="col-lg-5">
 																<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['Detalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
 																<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
 															</div>
+															<div class="col-lg-2">
+																<select required id="inputMarca'.$cont.'" name="inputMarca'.$cont.'"'.($row['SituaChave'] == 'LIBERADO'?' disabled ':'').'class="form-control select-search">
+																	<option value="">Selecione</option>
+																	'.$HTML_MARCA.'
+																</select>
+															</div>
+															<div class="col-lg-2">
+																<select required id="inputModelo'.$cont.'" name="inputModelo'.$cont.'"'.($row['SituaChave'] == 'LIBERADO'?' disabled ':'').'class="form-control select-search">
+																	<option value="">Selecione</option>
+																	'.$HTML_MODELO.'
+																</select>
+															</div>
+															<div class="col-lg-2">
+																<select required id="inputFabricante'.$cont.'" name="inputFabricante'.$cont.'"'.($row['SituaChave'] == 'LIBERADO'?' disabled ':'').'class="form-control select-search">
+																	<option value="">Selecione</option>
+																	'.$HTML_FABRICANTE.'
+																</select>
+															</div>
 														</div>
-													</div>
-													<div class="col-lg-1">
+													</div>');
+
+											print('<div class="col-lg-1">
 														<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade text-right pula" onChange="calculaValorTotal()" value="' . $iQuantidade . '">
 													</div>	
 													<div class="col-lg-1">
 														<input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario text-right pula" onChange="calculaValorTotal()" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
 													</div>	
-													<div class="col-lg-2">
+													<div class="col-lg-1">
 														<input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off text-right" value="' . $fValorTotal . '" readOnly>
 													</div>											
 												</div>');
@@ -692,10 +802,16 @@ try {
 															<div class="col-lg-1">
 																
 															</div>
-															<div class="col-lg-8">
+															<div class="col-lg-5">
 																
 															</div>
-															<div class="col-lg-3">
+															<div class="col-lg-2">
+																
+															</div>
+															<div class="col-lg-2">
+																
+															</div>
+															<div class="col-lg-2">
 																
 															</div>
 														</div>
