@@ -478,7 +478,7 @@ $dataFim = date("Y-m-d");
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td style="text-align: right; font-size: 12px; font-weight: bold; color: green;"> ${total} </td>
+                            <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: green;"> ${total} </td>
                             <td></td>
                             <td></td>
                         </tr>`

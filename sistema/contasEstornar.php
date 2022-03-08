@@ -3,19 +3,20 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-//sJustificativa = $_POST['inputContasAPagarJustificativa']
+$justificativa = $_POST['inputContasAPagarJustificativa'];
 
 if(isset($_POST['inputContasAPagarId'])) {
     $contaApagarId = $_POST['inputContasAPagarId'];
     $situacao = 11; //Status a pagar 
 
     try {
-        $sql = "UPDATE ContasAPagar SET CnAPaStatus = :iStatus
+        $sql = "UPDATE ContasAPagar SET CnAPaStatus = :iStatus, CnAPaJustificativaEstorno = :sJustificativa
                 WHERE CnAPaId = $contaApagarId";
         $result = $conn->prepare($sql);
 
         $result->execute(array(
-            ':iStatus' => $situacao
+            ':iStatus' => $situacao,
+            ':sJustificativa' => $justificativa
         ));
 
 
@@ -37,12 +38,13 @@ if(isset($_POST['inputContasAPagarId'])) {
     $situacao = 13; //Status a receber 
 
     try {
-        $sql = "UPDATE ContasAReceber SET CnAReStatus = :iStatus
+        $sql = "UPDATE ContasAReceber SET CnAReStatus = :iStatus, CnAReJustificativaEstorno = :sJustificativa
                 WHERE CnAReId = $contaReceberId";
         $result = $conn->prepare($sql);
 
         $result->execute(array(
-            ':iStatus' => $situacao
+            ':iStatus' => $situacao,
+            ':sJustificativa' => $justificativa
         ));
 
 

@@ -342,11 +342,11 @@ $dataFim = date("Y-m-d");
             <tr id="total" role="row" class="even" position='relative'>
               <td></td>
               <td></td>
-              <td></td>
-              <td style="text-align: right; font-weight: bold; font-size: 12px; white-space: nowrap; color: green;">Total: ${float2moeda(entradaTotal)}</td>
-              <td style="text-align: right; font-weight: bold; font-size: 12px; white-space: nowrap; color: red;">Total: - ${float2moeda(saidaTotal)}</td>
-              <td style="text-align: right; font-weight: bold; font-size: 12px; white-space: nowrap; color: ${corSaldoTotal};">Total:${epsSaldoTotal}${float2moeda(saldoTotal)}
-              <td style="text-align: right; font-weight: bold; font-size: 12px; white-space: nowrap; color: ${corConciliacaoTotal};">Total:${epsConciliacaoTotal}${float2moeda(saldoConciliacaoTotal)}</td>
+              <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
+              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: green;">${float2moeda(entradaTotal)}</td>
+              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: red;">- ${float2moeda(saidaTotal)}</td>
+              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corSaldoTotal};">${epsSaldoTotal}${float2moeda(saldoTotal)}
+              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corConciliacaoTotal};">${epsConciliacaoTotal}${float2moeda(saldoConciliacaoTotal)}</td>
               <td></td>
               <td></td>
             </tr>`
@@ -579,6 +579,33 @@ $dataFim = date("Y-m-d");
     Filtrar(true);
     */
   }
+
+  function atualizaMovimentacaoFinanceira(Permission, MovimentacaoFinanceiraId, TipoMov, Tipo) {
+
+    document.getElementById('inputMovimentacaoFinanceiraId').value = MovimentacaoFinanceiraId;
+    document.getElementById('tipoMovId').value = TipoMov;
+    document.getElementById('inputPermissionAtualiza').value = Permission; 
+
+    if (Tipo == 'novo' || Tipo == 'edita') {
+        
+        if (TipoMov == 'T'){
+          document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraTransferencia.php";
+        } else if (TipoMov == 'R'){
+          document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraRecebimento.php";
+        } else {
+          document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraPagamento.php";
+        }          
+    } else if (Tipo == 'exclui') {
+        if(Permission){
+            confirmaExclusao(document.formMovimentacaoFinanceira, "Tem certeza que deseja excluir essa Movimentação ?", "movimentacaoFinanceiraExclui.php");
+        } else{
+            alerta('Permissão Negada!','');
+            return false;
+        }
+    }            
+
+    document.formMovimentacaoFinanceira.submit();
+  }  
 
   function atualizaConciliacao(idConciliacao, tipoConta) {
     document.getElementById('inputConciliacaoId').value = idConciliacao;
@@ -869,6 +896,12 @@ $dataFim = date("Y-m-d");
         </div>
 
         <!-- /info blocks -->
+        <form name="formMovimentacaoFinanceira" method="post">
+					<input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza">
+          <input type="hidden" id="tipoMovId" name="tipoMovId">
+					<input type="hidden" id="inputMovimentacaoFinanceiraId" name="inputMovimentacaoFinanceiraId" >
+        </form>
+
 				<form name="formEditaConciliacao" method="post">
 					<input type="hidden" id="inputConciliacaoId" name="inputConciliacaoId" >
           <input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza" >

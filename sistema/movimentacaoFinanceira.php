@@ -271,10 +271,10 @@ $dataFim = date("Y-m-d");
               <td></td>
               <td></td>
               <td></td>
-              <td></td>
-              <td style="text-align: right; font-size: 12px; font-weight: bold; color: green;">Total: ${float2moeda(entradaTotal)}</td>
-              <td style="text-align: right; font-size: 12px; font-weight: bold; color: red;">Total: - ${float2moeda(saidaTotal)}</td>
-              <td style="text-align: right; font-size: 12px; font-weight: bold; color: ${corSaldoTotal};">Total: ${float2moeda(saldoTotal)}</td>
+              <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
+              <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: green;">${float2moeda(entradaTotal)}</td>
+              <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: red;">- ${float2moeda(saidaTotal)}</td>
+              <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: ${corSaldoTotal};">${float2moeda(saldoTotal)}</td>
               <td></td>
             </tr>`
             

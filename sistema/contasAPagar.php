@@ -525,7 +525,7 @@ $dataFim = date("Y-m-d");
                         let indice = i + 1
 
 
-                        valorTotal += parseFloat(valor);
+                        valorTotal += parseFloat(valor.replace(".", "").replace(",", "."));
                         let elemNode = `<div class="d-flex flex-row justify-content-center">
                     <p class="col-1 mt-3">
                         ${indice}
@@ -720,7 +720,7 @@ $dataFim = date("Y-m-d");
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td style="text-align: right; font-size: 12px; font-weight: bold; color: red;"> ${total} </td>
+                            <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: red;"> ${total} </td>
                             <td></td>
                             <td></td>
                         </tr>`
